@@ -40,6 +40,7 @@ export class StepTracker {
   public aliasesById: {
     [stepId: number]: Set<number>;
   } = [];
+  public stepsWithNoDependencies = new Set<ExecutableStep>();
 
   /** @internal */
   public outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
@@ -73,6 +74,7 @@ export class StepTracker {
     this.assertPhaseNot("finalize");
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
+    this.stepsWithNoDependencies.add($step);
     this.stepById[stepId] = $step;
     this.aliasesById[stepId] = new Set([stepId]);
     this.outputPlansByRootStep.set($step, new Set());
@@ -202,6 +204,7 @@ export class StepTracker {
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the former is deleted!`,
       );
     }
+    this.stepsWithNoDependencies.delete($dependent);
     const dependencyIndex =
       writeableArray($dependent.dependencies).push($dependency) - 1;
     writeableSet($dependency.dependents).add({
@@ -419,6 +422,7 @@ export class StepTracker {
       }
     }
 
+    this.stepsWithNoDependencies.delete($original);
     this.outputPlansByRootStep.delete($original);
     this.layerPlansByRootStep.delete($original);
     this.layerPlansByParentStep.delete($original);

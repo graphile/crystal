@@ -1873,12 +1873,6 @@ export class OperationPlan {
       }
     } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
 
-    const isMaybeAPeer = (potentialPeer: ExecutableStep) =>
-      potentialPeer.id !== step.id &&
-      !potentialPeer.hasSideEffects &&
-      compatibleLayerPlans.has(potentialPeer.layerPlan) &&
-      potentialPeer.constructor === step.constructor;
-
     // Peers have the same dependencies, so an intersection of the dependencies
     // dependents is a quick way to avoid having to scan every single step.
     const l = step.dependencies.length;
@@ -1887,13 +1881,16 @@ export class OperationPlan {
       const deps = step.dependencies;
       for (let i = 0, l = deps.length; i < l; i++) {
         const dep = deps[i];
-        const dependents = [...dep.dependents].filter(
-          (d) =>
+        const potentialPeers = new Set<ExecutableStep>();
+        for (const d of dep.dependents) {
+          if (
             d.dependencyIndex === i &&
             d.step.dependencies.length === l &&
-            isMaybeAPeer(d.step),
-        );
-        const potentialPeers = new Set(dependents.map((d) => d.step));
+            isMaybeAPeer(step, compatibleLayerPlans, d.step)
+          ) {
+            potentialPeers.add(d.step);
+          }
+        }
         if (i === 0) {
           allPotentialPeers = potentialPeers;
         } else {
@@ -1910,12 +1907,13 @@ export class OperationPlan {
       }
       return [step, ...allPotentialPeers];
     } else {
-      return [
-        step,
-        ...[...this.stepTracker.activeSteps].filter(
-          (s) => s.dependencies.length === 0 && isMaybeAPeer(s),
-        ),
-      ];
+      const result = [step];
+      for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
+        if (isMaybeAPeer(step, compatibleLayerPlans, possiblyPeer)) {
+          result.push(possiblyPeer);
+        }
+      }
+      return result;
     }
   }
 
@@ -2846,4 +2844,16 @@ export class OperationPlan {
 
 function makeDefaultPlan(fieldName: string) {
   return ($step: ExecutableStep<any>) => access($step, [fieldName]);
+}
+function isMaybeAPeer(
+  step: ExecutableStep,
+  compatibleLayerPlans: Set<LayerPlan>,
+  potentialPeer: ExecutableStep,
+) {
+  return (
+    potentialPeer.id !== step.id &&
+    !potentialPeer.hasSideEffects &&
+    compatibleLayerPlans.has(potentialPeer.layerPlan) &&
+    potentialPeer.constructor === step.constructor
+  );
 }
