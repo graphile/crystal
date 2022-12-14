@@ -873,6 +873,9 @@ export function isEquivalent(
     symbolSubstitutes?: Map<symbol, symbol>;
   } = {},
 ): boolean {
+  if (sql1 === sql2) {
+    return true;
+  }
   const { symbolSubstitutes } = options;
   if (typeof sql1 === "symbol") {
     if (symbolSubstitutes?.has(sql1)) {
