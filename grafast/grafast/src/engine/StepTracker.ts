@@ -37,9 +37,11 @@ export class StepTracker {
   public stepById: {
     [stepId: number]: ExecutableStep;
   } = [];
-  public aliasesById: {
-    [stepId: number]: Set<number>;
+  /** @internal */
+  private aliasesById: {
+    [stepId: number]: Set<number> | undefined;
   } = [];
+  /** @internal */
   public stepsWithNoDependencies = new Set<ExecutableStep>();
 
   /** @internal */
@@ -76,7 +78,7 @@ export class StepTracker {
     this.activeSteps.add($step);
     this.stepsWithNoDependencies.add($step);
     this.stepById[stepId] = $step;
-    this.aliasesById[stepId] = new Set([stepId]);
+    this.aliasesById[stepId] = undefined;
     return stepId;
   }
 
@@ -289,11 +291,20 @@ export class StepTracker {
     }
 
     // Replace all references to $original with $replacement
-    for (const id of this.aliasesById[$original.id]) {
-      this.stepById[id] = $replacement;
-      this.aliasesById[$replacement.id].add(id);
+    const oldAliases = this.aliasesById[$original.id];
+    const newAliases =
+      this.aliasesById[$replacement.id] ?? new Set([$replacement.id]);
+    this.aliasesById[$replacement.id] = newAliases;
+    if (oldAliases) {
+      for (const id of oldAliases) {
+        this.stepById[id] = $replacement;
+        newAliases.add(id);
+      }
+      this.aliasesById[$original.id] = undefined;
+    } else {
+      this.stepById[$original.id] = $replacement;
+      newAliases.add($original.id);
     }
-    this.aliasesById[$original.id].clear();
 
     {
       // Transfer step dependents of $original to $replacement
@@ -417,11 +428,16 @@ export class StepTracker {
     // layer plans, output plans. (NOTE: if this call has come from replaceStep
     // then there shouldn't be any dependents).
 
-    for (const id of this.aliasesById[$original.id]) {
-      // Nothing needs us, so set ourself null (DELIBERATELY BYPASSES TYPESCRIPT!)
-      this.stepById[id] = null as any;
+    const oldAliases = this.aliasesById[$original.id];
+    if (oldAliases) {
+      for (const id of oldAliases) {
+        // Nothing needs us, so set ourself null (DELIBERATELY BYPASSES TYPESCRIPT!)
+        this.stepById[id] = null as any;
+      }
+      this.aliasesById[$original.id] = undefined;
+    } else if (this.stepById[$original.id] === $original) {
+      this.stepById[$original.id] = null as any;
     }
-    this.aliasesById[$original.id] = null as any;
 
     // Since this step is being removed, it doesn't need its dependencies any more
     const oldDependencies = $original.dependencies;
