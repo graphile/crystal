@@ -8,6 +8,7 @@ import type {
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan";
+import type { OperationPlanPhase } from "./OperationPlan.js";
 import type { OutputPlan } from "./OutputPlan";
 
 /**
@@ -67,7 +68,14 @@ export class StepTracker {
 
   constructor(private readonly operationPlan: OperationPlan) {}
 
+  private assertPhaseNot(phase: OperationPlanPhase) {
+    if (this.operationPlan.phase === phase) {
+      throw new Error(`Forbidden in '${phase}' phase`);
+    }
+  }
+
   public addStep($step: ExecutableStep): number {
+    this.assertPhaseNot("finalize");
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
     this.stepById[stepId] = $step;
@@ -81,6 +89,7 @@ export class StepTracker {
    * @internal
    */
   public addLayerPlan(layerPlan: LayerPlan) {
+    this.assertPhaseNot("finalize");
     const id = this.layerPlans.push(layerPlan) - 1;
     switch (layerPlan.reason.type) {
       case "root":
@@ -117,6 +126,7 @@ export class StepTracker {
    * @internal
    */
   public addOutputPlan(outputPlan: OutputPlan): void {
+    this.assertPhaseNot("finalize");
     this.allOutputPlans.push(outputPlan);
     this.outputPlansByRootStep.get(outputPlan.rootStep)!.add(outputPlan);
   }
@@ -127,6 +137,7 @@ export class StepTracker {
    * @internal
    */
   public deleteLayerPlan(layerPlan: LayerPlan) {
+    this.assertPhaseNot("finalize");
     if (isDev) {
       // TODO: validate assertions
       if (layerPlan.children.length > 0) {
@@ -173,6 +184,7 @@ export class StepTracker {
     $dependent: ExecutableStep,
     $dependency: ExecutableStep,
   ): number {
+    this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
@@ -196,6 +208,7 @@ export class StepTracker {
     outputPlan: OutputPlan,
     $dependency: ExecutableStep,
   ) {
+    this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($dependency)) {
       throw new Error(
         `Cannot add ${$dependency} to ${outputPlan} because it's deleted`,
@@ -214,6 +227,7 @@ export class StepTracker {
     layerPlan: LayerPlan,
     $dependency: ExecutableStep,
   ) {
+    this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($dependency)) {
       throw new Error(
         `Cannot add ${$dependency} to ${layerPlan} because it's deleted`,
@@ -233,6 +247,7 @@ export class StepTracker {
     $original: ExecutableStep,
     $replacement: ExecutableStep,
   ): void {
+    this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($original)) {
       // TODO: should this be an error?
       // console.warn(`${$original} should be replaced with ${$replacement} but it's no longer alive`);
@@ -348,7 +363,12 @@ export class StepTracker {
           dependents.delete(dependent);
         }
       }
-      if (this.isNotNeeded($dependency)) {
+
+      // If we've done our first tree-shake, let's keep it tidy in here.
+      if (
+        this.operationPlan.phase !== "plan" &&
+        this.isNotNeeded($dependency)
+      ) {
         // Nothing depends on $dependency and it has no side effects - we can get rid of it!
         this.eradicate($dependency);
       }

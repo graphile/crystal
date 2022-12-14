@@ -96,7 +96,8 @@ const isDev =
 /** How many times will we try re-optimizing before giving up */
 const MAX_OPTIMIZATION_LOOPS = 10;
 
-type OperationPlanPhase =
+/** @internal */
+export type OperationPlanPhase =
   | "init"
   | "plan"
   | "validate"
@@ -287,13 +288,14 @@ export class OperationPlan {
     // Replace access plans with direct access, etc
     this.optimizeOutputPlans();
 
-    // Get rid of steps that are no longer needed after optimising
+    this.phase = "finalize";
+
+    // Get rid of steps that are no longer needed after optimising (we
+    // shouldn't see any new steps or dependencies after here)
     this.stepTracker.treeShakeSteps();
 
     // Now shove steps as deep down as they can go (opposite of hoist)
     this.pushDownSteps();
-
-    this.phase = "finalize";
 
     // Plans are expected to execute later; they may take steps here to prepare
     // themselves (e.g. compiling SQL queries ahead of time).
