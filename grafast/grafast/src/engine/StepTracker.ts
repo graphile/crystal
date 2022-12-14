@@ -1,14 +1,7 @@
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import type { ExecutableStep } from "../step";
-import type {
-  LayerPlan,
-  LayerPlanReasonListItem,
-  LayerPlanReasonNullableField,
-  LayerPlanReasonPolymorphic,
-  LayerPlanReasonSubroutine,
-  LayerPlanReasonsWithParentStep,
-} from "./LayerPlan";
+import type { LayerPlan, LayerPlanReasonsWithParentStep } from "./LayerPlan";
 import type { OperationPlanPhase } from "./OperationPlan.js";
 import type { OutputPlan } from "./OutputPlan";
 
@@ -147,6 +140,18 @@ export class StepTracker {
       if (idx >= 0) {
         layerPlan.parentLayerPlan.children.splice(idx, 1);
       }
+    }
+    // Remove references
+    const $root = layerPlan.rootStep;
+    if ($root) {
+      this.layerPlansByRootStep.get($root)!.delete(layerPlan);
+    }
+    const $parent =
+      "parentStep" in layerPlan.reason ? layerPlan.reason.parentStep : null;
+    if ($parent) {
+      this.layerPlansByParentStep
+        .get($parent)!
+        .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
     }
     // Remove all plans in this layer
     for (const step of this.activeSteps) {
@@ -371,22 +376,28 @@ export class StepTracker {
     }
 
     if (isDev) {
-      const outputPlansByRoot = this.outputPlansByRootStep.get($original);
-      if (outputPlansByRoot!.size !== 0) {
+      const outputPlansByRoot = this.outputPlansByRootStep.get($original)!;
+      if (outputPlansByRoot.size !== 0) {
         throw new Error(
-          `${$original} eradicated, but it is needed by ${outputPlansByRoot}`,
+          `${$original} eradicated, but it is needed by ${[
+            ...outputPlansByRoot,
+          ]}`,
         );
       }
-      const layerPlansByRoot = this.layerPlansByRootStep.get($original);
-      if (layerPlansByRoot!.size !== 0) {
+      const layerPlansByRoot = this.layerPlansByRootStep.get($original)!;
+      if (layerPlansByRoot.size !== 0) {
         throw new Error(
-          `${$original} eradicated, but it is needed by ${layerPlansByRoot}`,
+          `${$original} eradicated, but it is needed by ${[
+            ...layerPlansByRoot,
+          ]}`,
         );
       }
-      const layerPlansByParent = this.layerPlansByParentStep.get($original);
-      if (layerPlansByParent!.size !== 0) {
+      const layerPlansByParent = this.layerPlansByParentStep.get($original)!;
+      if (layerPlansByParent.size !== 0) {
         throw new Error(
-          `${$original} eradicated, but it is needed by ${layerPlansByParent}`,
+          `${$original} eradicated, but it is needed by ${[
+            ...layerPlansByParent,
+          ]}`,
         );
       }
     }
