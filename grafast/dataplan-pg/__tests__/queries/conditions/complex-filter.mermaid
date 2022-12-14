@@ -50,9 +50,7 @@ graph TD
     class Bucket1,__Item20,PgSelectSingle21 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 20<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
-    PgClassExpression30{{"PgClassExpression[30∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
-    PgClassExpression35{{"PgClassExpression[35∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
-    class Bucket2,PgClassExpression22,PgClassExpression30,PgClassExpression35,Access40 bucket2
+    class Bucket2,PgClassExpression22,Access40 bucket2
     Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ40ᐳ[36]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item36,PgSelectSingle37 bucket3

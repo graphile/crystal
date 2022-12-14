@@ -98,8 +98,7 @@ graph TD
     class Bucket1,__Item11,PgSelectSingle12 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 11, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]<br />1: <br />ᐳ: PgClassExpression[13], Access[101]<br />2: __ListTransform[19]"):::bucket
     classDef bucket2 stroke:#7f007f
-    PgClassExpression14{{"PgClassExpression[14∈2]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    class Bucket2,PgClassExpression13,PgClassExpression14,__ListTransform19,Access101 bucket2
+    class Bucket2,PgClassExpression13,__ListTransform19,Access101 bucket2
     Bucket3("Bucket 3 (subroutine)<br />ROOT PgSelectSingle{3}ᐸrelational_itemsᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item20,PgSelectSingle21 bucket3

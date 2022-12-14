@@ -118,21 +118,13 @@ graph TD
     class Bucket2,__Item21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 11<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person_b...person_id”ᐳ"}}:::plan
-    List93{{"List[93∈3]<br />ᐸ92ᐳ"}}:::plan
-    class Bucket3,PgClassExpression23,PgClassExpression24,PgSelectSingle30,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,List36,PgPolymorphic37,Map92,List93 bucket3
+    class Bucket3,PgClassExpression23,PgSelectSingle30,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,List36,PgPolymorphic37,Map92 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[30]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression31 bucket4
     Bucket5("Bucket 5 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 33, 34, 35, 37<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
     classDef bucket5 stroke:#7fff00
-    PgClassExpression53{{"PgClassExpression[53∈5]<br />ᐸ__posts__.”author_id”ᐳ"}}:::plan
-    PgClassExpression69{{"PgClassExpression[69∈5]<br />ᐸ__comments...author_id”ᐳ"}}:::plan
-    PgClassExpression77{{"PgClassExpression[77∈5]<br />ᐸ__comments__.”post_id”ᐳ"}}:::plan
-    List87{{"List[87∈5]<br />ᐸ86ᐳ"}}:::plan
-    List89{{"List[89∈5]<br />ᐸ88ᐳ"}}:::plan
-    List91{{"List[91∈5]<br />ᐸ90ᐳ"}}:::plan
-    class Bucket5,PgSelect38,First42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgClassExpression53,PgSelectSingle59,PgClassExpression61,PgSelect62,First66,PgSelectSingle67,PgClassExpression68,PgClassExpression69,PgSelectSingle75,PgClassExpression77,PgSelectSingle83,PgClassExpression85,Map86,List87,Map88,List89,Map90,List91 bucket5
+    class Bucket5,PgSelect38,First42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgClassExpression61,PgSelect62,First66,PgSelectSingle67,PgClassExpression68,PgSelectSingle75,PgSelectSingle83,PgClassExpression85,Map86,Map88,Map90 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 59<br />ᐳPost<br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[59]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression60 bucket6

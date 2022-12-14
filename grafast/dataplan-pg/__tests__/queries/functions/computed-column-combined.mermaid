@@ -61,19 +61,13 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant30 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__forums__ᐳ"}}:::plan
-    List53{{"List[53∈1]<br />ᐸ52ᐳ"}}:::plan
-    class Bucket1,PgClassExpression14,PgSelectSingle20,Map52,List53 bucket1
+    class Bucket1,PgSelectSingle20,Map52 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
-    PgClassExpression23{{"PgClassExpression[23∈2]<br />ᐸ__forums_random_user__ᐳ"}}:::plan
-    List51{{"List[51∈2]<br />ᐸ50ᐳ"}}:::plan
-    class Bucket2,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgSelectSingle29,Map50,List51 bucket2
+    class Bucket2,PgClassExpression21,PgClassExpression22,PgSelectSingle29,Map50 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 50, 29<br /><br />ROOT PgSelectSingle{2}ᐸusers_most_recent_forumᐳ[29]"):::bucket
     classDef bucket3 stroke:#ffa500
-    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__users_mo...nt_forum__ᐳ"}}:::plan
-    List49{{"List[49∈3]<br />ᐸ48ᐳ"}}:::plan
-    class Bucket3,PgClassExpression31,PgSelectSingle37,PgClassExpression38,Access47,Map48,List49 bucket3
+    class Bucket3,PgSelectSingle37,PgClassExpression38,Access47,Map48 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ47ᐳ[44]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item44,PgSelectSingle45 bucket4

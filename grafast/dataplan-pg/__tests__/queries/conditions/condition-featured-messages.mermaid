@@ -109,9 +109,7 @@ graph TD
     class Bucket1,__Item15,PgSelectSingle16,Constant62 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 29, 15, 62<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
-    PgClassExpression24{{"PgClassExpression[24∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
-    PgClassExpression30{{"PgClassExpression[30∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
-    class Bucket2,PgClassExpression17,PgClassExpression24,PgClassExpression30 bucket2
+    class Bucket2,PgClassExpression17 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29, 15, 62<br /><br />ROOT Connectionᐸ25ᐳ[29]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgPageInfo59,Lambda61,First64,PgSelectSingle65,PgCursor66,PgClassExpression67,List68,Last70,PgSelectSingle71,PgCursor72,PgClassExpression73,List74,First76,PgSelectSingle77,PgClassExpression78,Access79,Access84,Lambda85 bucket3
@@ -120,17 +118,13 @@ graph TD
     class Bucket4,__Item32,PgSelectSingle33 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 33<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[33]"):::bucket
     classDef bucket5 stroke:#7fff00
-    PgClassExpression35{{"PgClassExpression[35∈5]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    List83{{"List[83∈5]<br />ᐸ82ᐳ"}}:::plan
-    class Bucket5,PgClassExpression34,PgClassExpression35,PgSelectSingle41,Map82,List83 bucket5
+    class Bucket5,PgClassExpression34,PgSelectSingle41,Map82 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 41<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[41]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression42,PgClassExpression43 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 33<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[33]"):::bucket
     classDef bucket7 stroke:#808000
-    PgClassExpression50{{"PgClassExpression[50∈7]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    List81{{"List[81∈7]<br />ᐸ80ᐳ"}}:::plan
-    class Bucket7,PgCursor46,PgClassExpression47,List48,PgClassExpression49,PgClassExpression50,PgSelectSingle56,Map80,List81 bucket7
+    class Bucket7,PgCursor46,PgClassExpression47,List48,PgClassExpression49,PgSelectSingle56,Map80 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 56<br /><br />ROOT PgSelectSingle{7}ᐸusersᐳ[56]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression57,PgClassExpression58 bucket8
