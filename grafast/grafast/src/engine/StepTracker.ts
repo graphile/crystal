@@ -25,6 +25,8 @@ function writeableSet<T>(a: ReadonlySet<T>): Set<T> {
  *
  * When a step is replaced by another step, all the dependencies are updated
  * such that the replaced step simply evaporates.
+ *
+ * @internal
  */
 export class StepTracker {
   /** @internal */
@@ -39,9 +41,12 @@ export class StepTracker {
     [stepId: number]: Set<number>;
   } = [];
 
-  private outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
-  private layerPlansByRootStep = new Map<ExecutableStep, Set<LayerPlan>>();
-  private layerPlansByParentStep = new Map<
+  /** @internal */
+  public outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
+  /** @internal */
+  public layerPlansByRootStep = new Map<ExecutableStep, Set<LayerPlan>>();
+  /** @internal */
+  public layerPlansByParentStep = new Map<
     ExecutableStep,
     Set<LayerPlan<LayerPlanReasonsWithParentStep>>
   >();

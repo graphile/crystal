@@ -2152,56 +2152,50 @@ export class OperationPlan {
     // Now find the lowest bucket that still satisfies all of it's dependents.
     const dependentLayerPlans = new Set<LayerPlan>();
 
-    for (const outputPlan of this.stepTracker.allOutputPlans) {
-      const outputPlanRootStep = outputPlan.rootStep;
-      if (outputPlanRootStep) {
-        if (outputPlanRootStep === step) {
-          if (outputPlan.layerPlan === step.layerPlan) {
-            return;
-          } else {
-            dependentLayerPlans.add(outputPlan.layerPlan);
-          }
-        }
+    for (const outputPlan of this.stepTracker.outputPlansByRootStep.get(
+      step,
+    )!) {
+      if (outputPlan.layerPlan === step.layerPlan) {
+        return;
+      } else {
+        dependentLayerPlans.add(outputPlan.layerPlan);
       }
     }
 
-    // TODO: make this calculation faster
-    for (const s of this.stepTracker.activeSteps) {
-      if (s.dependencies.includes(step)) {
-        if (s.layerPlan === step.layerPlan) {
-          return;
-        } else {
-          dependentLayerPlans.add(s.layerPlan);
-        }
+    for (const { step: s } of step.dependents) {
+      if (s.layerPlan === step.layerPlan) {
+        return;
+      } else {
+        dependentLayerPlans.add(s.layerPlan);
       }
     }
 
-    for (const layerPlan of this.stepTracker.layerPlans) {
-      if (!layerPlan) continue;
-      if (
-        layerPlan.reason.type === "nullableBoundary" &&
-        layerPlan.reason.parentStep === step
-      ) {
+    for (const layerPlan of this.stepTracker.layerPlansByParentStep.get(
+      step,
+    )!) {
+      if (layerPlan.parentLayerPlan === step.layerPlan) {
+        return;
+      } else {
         dependentLayerPlans.add(layerPlan.parentLayerPlan!);
       }
+    }
 
-      // Very much a copy from treeShakeSteps
-      if ("parentStep" in layerPlan.reason) {
-        if (layerPlan.reason.parentStep === step) {
-          dependentLayerPlans.add(layerPlan.parentLayerPlan!);
-        }
-      }
-      const layerPlanRootStep = layerPlan.rootStep;
-      if (layerPlanRootStep === step) {
+    for (const layerPlan of this.stepTracker.layerPlansByRootStep.get(step)!) {
+      if (layerPlan === step.layerPlan) {
+        return;
+      } else {
         dependentLayerPlans.add(layerPlan);
       }
     }
+
     if (dependentLayerPlans.size === 0) {
       throw new Error(`Nothing depends on ${step}?!`);
     }
+
     if (dependentLayerPlans.has(step.layerPlan)) {
-      // Already as deep as it can go...
-      return;
+      throw new Error(
+        `GraphileInternalError<c5cefdbc-9aa4-4895-8966-71171d8c0b36>: This should already have been caught`,
+      );
     }
 
     const paths: LayerPlan[][] = [];
