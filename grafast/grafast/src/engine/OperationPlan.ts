@@ -269,11 +269,6 @@ export class OperationPlan {
     // Now perform hoisting (and repeat deduplication)
     this.hoistSteps();
 
-    // Get rid of temporary steps before `optimize` triggers side-effects.
-    // (Critical due to steps that may have been discarded due to field errors
-    // or similar.)
-    this.stepTracker.treeShakeSteps();
-
     if (isDev) {
       this.phase = "validate";
       // Helpfully check steps don't do forbidden things.
@@ -281,6 +276,11 @@ export class OperationPlan {
     }
 
     this.phase = "optimize";
+
+    // Get rid of temporary steps before `optimize` triggers side-effects.
+    // (Critical due to steps that may have been discarded due to field errors
+    // or similar.)
+    this.stepTracker.treeShakeSteps();
 
     // Replace/inline/optimise steps
     this.optimizeSteps();

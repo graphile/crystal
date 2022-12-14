@@ -164,7 +164,6 @@ export class StepTracker {
     // Remove all plans in this layer
     for (const step of this.activeSteps) {
       if (step.layerPlan === layerPlan) {
-        this.stepById[step.id] = null as any;
         this.eradicate(step);
       }
     }
@@ -254,7 +253,13 @@ export class StepTracker {
       // Already handled
       return;
     }
-    this.stepById[$original.id] = $replacement;
+
+    // Replace all references to $original with $replacement
+    for (const id in this.stepById) {
+      if (this.stepById[id] === $original) {
+        this.stepById[id] = $replacement;
+      }
+    }
 
     {
       // Transfer step dependents of $original to $replacement
@@ -319,7 +324,6 @@ export class StepTracker {
   public treeShakeSteps() {
     for (const $step of this.activeSteps) {
       if (this.isNotNeeded($step)) {
-        this.stepById[$step.id] = null as any;
         this.eradicate($step);
       }
     }
@@ -352,6 +356,11 @@ export class StepTracker {
     // layer plans, output plans. (NOTE: if this call has come from replaceStep
     // then there shouldn't be any dependents).
 
+    if (this.stepById[$original.id] === $original) {
+      // Nothing needs us, so set ourself null (DELIBERATELY BYPASSES TYPESCRIPT!)
+      this.stepById[$original.id] = null as any;
+    }
+
     // Since this step is being removed, it doesn't need its dependencies any more
     const oldDependencies = $original.dependencies;
     for (const $dependency of oldDependencies) {
@@ -371,6 +380,27 @@ export class StepTracker {
       ) {
         // Nothing depends on $dependency and it has no side effects - we can get rid of it!
         this.eradicate($dependency);
+      }
+    }
+
+    if (isDev) {
+      const outputPlansByRoot = this.outputPlansByRootStep.get($original);
+      if (outputPlansByRoot!.size !== 0) {
+        throw new Error(
+          `${$original} eradicated, but it is needed by ${outputPlansByRoot}`,
+        );
+      }
+      const layerPlansByRoot = this.layerPlansByRootStep.get($original);
+      if (layerPlansByRoot!.size !== 0) {
+        throw new Error(
+          `${$original} eradicated, but it is needed by ${layerPlansByRoot}`,
+        );
+      }
+      const layerPlansByParent = this.layerPlansByParentStep.get($original);
+      if (layerPlansByParent!.size !== 0) {
+        throw new Error(
+          `${$original} eradicated, but it is needed by ${layerPlansByParent}`,
+        );
       }
     }
 
