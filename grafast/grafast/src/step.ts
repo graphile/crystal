@@ -35,6 +35,16 @@ export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
  */
 export const $$noExec = Symbol("noExec");
 
+function throwDestroyed(this: ExecutableStep) {
+  let message: string;
+  try {
+    message = `${this} has been destroyed; calling methods on it is no longer possible`;
+  } catch (e) {
+    message = `Step ${this?.id} has been destroyed; calling methods on it is no longer possible`;
+  }
+  throw new Error(message);
+}
+
 type DeepDepSkippable<T> = ExecutableStep<T> & {
   [$$deepDepSkip](): ExecutableStep;
 };
@@ -433,6 +443,20 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     values;
     extra;
     throw new Error(`${this} has not implemented an 'execute' method`);
+  }
+
+  public destroy(): void {
+    // Break ourself enough that if lifecycle methods are attempted an error
+    // will be thrown. This should help weed out bugs where steps are processed
+    // even after they have been removed/deduped.
+    this.addDependency = throwDestroyed;
+    this.deduplicate = throwDestroyed;
+    this.deduplicatedWith = throwDestroyed;
+    this.optimize = throwDestroyed;
+    this.finalize = throwDestroyed;
+    this.execute = throwDestroyed;
+
+    super.destroy();
   }
 }
 

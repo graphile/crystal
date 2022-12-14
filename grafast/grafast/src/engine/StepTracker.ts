@@ -493,6 +493,8 @@ export class StepTracker {
     this.layerPlansByRootStep.delete($original);
     this.layerPlansByParentStep.delete($original);
     this.activeSteps.delete($original);
+
+    // Referencing $original after this will likely cause errors.
     $original.destroy();
   }
 }

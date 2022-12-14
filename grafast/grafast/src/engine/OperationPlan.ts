@@ -1758,7 +1758,7 @@ export class OperationPlan {
     const processed = new Set<ExecutableStep>();
 
     const processStep = (step: ExecutableStep) => {
-      if (processed.has(step)) {
+      if (processed.has(step) || !this.stepTracker.activeSteps.has(step)) {
         return step;
       }
       processed.add(step);
@@ -1774,6 +1774,11 @@ export class OperationPlan {
             processStep($processFirst);
           }
         }
+      }
+
+      // Check again, processing another step may have invalidated this one.
+      if (!this.stepTracker.activeSteps.has(step)) {
+        return step;
       }
 
       let replacementStep: ExecutableStep = step;
