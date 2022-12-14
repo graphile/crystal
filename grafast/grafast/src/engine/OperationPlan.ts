@@ -2536,6 +2536,11 @@ export class OperationPlan {
         if (currentLayerPlan.copyPlanIds.includes(dep.id)) {
           break;
         }
+        if (isDev && this.stepTracker.getStepById(dep.id) !== dep) {
+          throw new Error(
+            `Plan mismatch - ${dep} != ${this.stepTracker.getStepById(dep.id)}`,
+          );
+        }
         currentLayerPlan.copyPlanIds.push(dep.id);
         currentLayerPlan = currentLayerPlan.parentLayerPlan;
         if (!currentLayerPlan) {
