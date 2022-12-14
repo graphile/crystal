@@ -2306,12 +2306,8 @@ export class OperationPlan {
         stepsAtMinDepth.push(step);
       }
     }
-    const layersAtMinDepth = [
-      ...new Set(stepsAtMinDepth.map((s) => s.layerPlan)),
-    ];
-    layersAtMinDepth.sort((a, z) => a.id - z.id);
     stepsAtMinDepth.sort((a, z) => a.id - z.id);
-    return { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps };
+    return { stepsAtMinDepth, allEquivalentSteps };
   }
 
   private deduplicateStep(step: ExecutableStep): ExecutableStep {
@@ -2320,24 +2316,24 @@ export class OperationPlan {
       return step;
     }
 
-    const { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps } = result;
+    const { stepsAtMinDepth, allEquivalentSteps } = result;
     if (allEquivalentSteps.size === 1) {
       const [first] = allEquivalentSteps;
       if (first === step) {
         return step;
       }
     }
-    assert.strictEqual(
-      layersAtMinDepth.length,
-      1,
-      "GraphileInternalError<dbed5ad8-284d-4b7f-833d-ec7203469fd0>: How did we find more than one layer at the min depth?!",
-    );
 
     // Hooray, one winning layer! Find the first one by id.
     const winner = stepsAtMinDepth[0];
-    winner.polymorphicPaths = new Set(
-      stepsAtMinDepth.flatMap((s) => [...s.polymorphicPaths]),
-    );
+
+    const polymorphicPaths = new Set<string>();
+    for (const s of stepsAtMinDepth) {
+      for (const p of s.polymorphicPaths) {
+        polymorphicPaths.add(p);
+      }
+    }
+    winner.polymorphicPaths = polymorphicPaths;
 
     // Give the steps a chance to pass their responsibilities to the winner.
     for (const target of allEquivalentSteps) {
