@@ -1925,13 +1925,12 @@ export class OperationPlan {
       return true;
     }
     // TODO:perf: we should calculate this _once only_ rather than for every step!
-    const subroutineParentSteps = this.stepTracker.layerPlans
-      .filter(
-        (p): p is LayerPlan<LayerPlanReasonSubroutine> =>
-          !!(p && p.reason.type === "subroutine"),
-      )
-      .map((p) => p.reason.parentStep);
-    if (subroutineParentSteps.includes(step)) {
+    const layerPlansWithParentStep =
+      this.stepTracker.layerPlansByParentStep.get(step)!;
+    const hasSubroutinesWithParentStep =
+      layerPlansWithParentStep?.size > 0 &&
+      [...layerPlansWithParentStep].some((l) => l.reason.type === "subroutine");
+    if (hasSubroutinesWithParentStep) {
       // Don't hoist steps that are the root of a subroutine
       // TODO: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
       return true;
