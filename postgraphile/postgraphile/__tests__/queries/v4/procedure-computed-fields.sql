@@ -3,36 +3,29 @@ select
   __frmcdc_compound_type_1__."foo_bar"::text as "1",
   ("c"."compound_type_computed_field"(__frmcdc_compound_type_1__))::text as "2",
   (not (__frmcdc_compound_type_1__ is null))::text as "3",
-  __types__."compound_type"::text as "4",
-  __frmcdc_compound_type_1_2."a"::text as "5",
-  __frmcdc_compound_type_1_2."foo_bar"::text as "6",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_2))::text as "7",
-  (not (__frmcdc_compound_type_1_2 is null))::text as "8",
-  __frmcdc_nested_compound_type_1__."a"::text as "9",
-  __frmcdc_compound_type_1_3."a"::text as "10",
-  __frmcdc_compound_type_1_3."foo_bar"::text as "11",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_3))::text as "12",
-  (not (__frmcdc_compound_type_1_3 is null))::text as "13",
-  __frmcdc_nested_compound_type_1__."b"::text as "14",
-  (not (__frmcdc_nested_compound_type_1__ is null))::text as "15",
-  __types__."nested_compound_type"::text as "16",
-  __frmcdc_compound_type_1_4."a"::text as "17",
-  __frmcdc_compound_type_1_4."foo_bar"::text as "18",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_4))::text as "19",
-  (not (__frmcdc_compound_type_1_4 is null))::text as "20",
-  __types__."nullable_compound_type"::text as "21",
-  __frmcdc_compound_type_1_5."a"::text as "22",
-  __frmcdc_compound_type_1_5."foo_bar"::text as "23",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_5))::text as "24",
-  (not (__frmcdc_compound_type_1_5 is null))::text as "25",
-  __frmcdc_nested_compound_type_1_2."a"::text as "26",
-  __frmcdc_compound_type_1_6."a"::text as "27",
-  __frmcdc_compound_type_1_6."foo_bar"::text as "28",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_6))::text as "29",
-  (not (__frmcdc_compound_type_1_6 is null))::text as "30",
-  __frmcdc_nested_compound_type_1_2."b"::text as "31",
-  (not (__frmcdc_nested_compound_type_1_2 is null))::text as "32",
-  __types__."nullable_nested_compound_type"::text as "33"
+  __frmcdc_compound_type_1_2."a"::text as "4",
+  __frmcdc_compound_type_1_2."foo_bar"::text as "5",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_2))::text as "6",
+  (not (__frmcdc_compound_type_1_2 is null))::text as "7",
+  __frmcdc_compound_type_1_3."a"::text as "8",
+  __frmcdc_compound_type_1_3."foo_bar"::text as "9",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_3))::text as "10",
+  (not (__frmcdc_compound_type_1_3 is null))::text as "11",
+  (not (__frmcdc_nested_compound_type_1__ is null))::text as "12",
+  __frmcdc_compound_type_1_4."a"::text as "13",
+  __frmcdc_compound_type_1_4."foo_bar"::text as "14",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_4))::text as "15",
+  (not (__frmcdc_compound_type_1_4 is null))::text as "16",
+  __frmcdc_compound_type_1_5."a"::text as "17",
+  __frmcdc_compound_type_1_5."foo_bar"::text as "18",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_5))::text as "19",
+  (not (__frmcdc_compound_type_1_5 is null))::text as "20",
+  __frmcdc_compound_type_1_6."a"::text as "21",
+  __frmcdc_compound_type_1_6."foo_bar"::text as "22",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_6))::text as "23",
+  (not (__frmcdc_compound_type_1_6 is null))::text as "24",
+  (not (__frmcdc_nested_compound_type_1_2 is null))::text as "25",
+  __types__."compound_type"::text as "26"
 from "b"."types" as __types__
 left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type_1__
 on TRUE
@@ -85,38 +78,37 @@ lateral (
         (row_number() over (partition by 1))::text as "1"
       from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
     ) _) as "5",
-    __post__::text as "6",
-    "a"."post_headline_trimmed"(__post__) as "7",
+    "a"."post_headline_trimmed"(__post__) as "6",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id0"
-    ) as "8",
+    ) as "7",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id1",
       __post_identifiers__."id2"
-    ) as "9",
-    "a"."post_headline_trimmed_strict"(__post__) as "10",
+    ) as "8",
+    "a"."post_headline_trimmed_strict"(__post__) as "9",
     "a"."post_headline_trimmed_strict"(
       __post__,
       __post_identifiers__."id3"
-    ) as "11",
+    ) as "10",
     "a"."post_headline_trimmed_strict"(
       __post__,
       __post_identifiers__."id4",
       __post_identifiers__."id5"
-    ) as "12",
+    ) as "11",
     "a"."post_headline_trimmed_no_defaults"(
       __post__,
       __post_identifiers__."id6",
       __post_identifiers__."id7"
-    ) as "13",
-    ("a"."post_computed_text_array"(__post__))::text as "14",
+    ) as "12",
+    ("a"."post_computed_text_array"(__post__))::text as "13",
     (
       select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
       from unnest("a"."post_computed_interval_array"(__post__)) t
-    )::text as "15",
-    __post_identifiers__.idx as "16"
+    )::text as "14",
+    __post_identifiers__.idx as "15"
   from "a"."post" as __post__
   left outer join lateral (select (__post__).*) as __post_2
   on TRUE
@@ -138,15 +130,13 @@ select
         from "c"."person_friends"(__person_friends__) as __person_friends_2
         limit 1
       ) _) as "1",
-      __person_friends__::text as "2",
-      "c"."person_first_name"(__person_friends__) as "3",
-      __person_friends__."id"::text as "4"
+      "c"."person_first_name"(__person_friends__) as "2",
+      __person_friends__."id"::text as "3"
     from "c"."person_friends"(__person__) as __person_friends__
   ) _) as "1",
   __person_first_post__."id"::text as "2",
   __person_first_post__."headline" as "3",
-  __person__::text as "4",
-  "c"."person_first_name"(__person__) as "5"
+  "c"."person_first_name"(__person__) as "4"
 from "c"."person" as __person__
 left outer join "c"."person_first_post"(__person__) as __person_first_post__
 on TRUE

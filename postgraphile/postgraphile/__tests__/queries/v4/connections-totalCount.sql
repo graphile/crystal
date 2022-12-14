@@ -8,8 +8,7 @@ select
       (count(*))::text as "0"
     from "c"."person_friends"(__person__) as __person_friends__
   ) _) as "0",
-  __person__::text as "1",
-  __person__."id"::text as "2"
+  __person__."id"::text as "1"
 from "c"."person" as __person__
 order by __person__."id" asc;
 

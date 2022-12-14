@@ -28,8 +28,7 @@ select
       ) and (
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
-  ) _) as "2",
-  __forums__."id" as "3"
+  ) _) as "2"
 from app_public.forums as __forums__
 where
   (

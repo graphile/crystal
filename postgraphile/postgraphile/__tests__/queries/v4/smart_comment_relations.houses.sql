@@ -118,8 +118,7 @@ select
   __streets_6."name" as "36",
   __properties_3."street_id"::text as "37",
   __properties_3."name_or_number" as "38",
-  __buildings_5."property_id"::text as "39",
-  __houses__."building_id"::text as "40"
+  __houses__."building_id"::text as "39"
 from "smart_comment_relations"."houses" as __houses__
 left outer join "smart_comment_relations"."streets" as __streets__
 on (__houses__."street_id"::"int4" = __streets__."id")

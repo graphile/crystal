@@ -5,10 +5,9 @@ select
       __messages__."body" as "0",
       __users__."username" as "1",
       __users__."gravatar_url" as "2",
-      __messages__."author_id" as "3",
-      __users_2."username" as "4",
-      __users_2."gravatar_url" as "5",
-      __messages__."id" as "6"
+      __users_2."username" as "3",
+      __users_2."gravatar_url" as "4",
+      __messages__."id" as "5"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -32,8 +31,7 @@ select
       ) and (
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
-  ) _) as "2",
-  __forums__."id" as "3"
+  ) _) as "2"
 from app_public.forums as __forums__
 where
   (

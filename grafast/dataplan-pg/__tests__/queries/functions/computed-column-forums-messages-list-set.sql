@@ -10,8 +10,7 @@ select
       true /* authorization checks */
     )
   ) _) as "0",
-  __forums__::text as "1",
-  __forums__."id" as "2"
+  __forums__."id" as "1"
 from app_public.forums as __forums__
 where
   (

@@ -49,7 +49,6 @@ lateral (
     __frmcdc_compound_type_1__."b" as "2",
     __frmcdc_compound_type_1__."c"::text as "3",
     (not (__frmcdc_compound_type_1__ is null))::text as "4",
-    __func_out_complex__."y"::text as "5",
     (select json_agg(_) from (
       select
         __post__."id"::text as "0"
@@ -58,12 +57,11 @@ lateral (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "6",
-    __person__."id"::text as "7",
-    __person__."person_full_name" as "8",
-    __func_out_complex__."z"::text as "9",
-    (not (__func_out_complex__ is null))::text as "10",
-    __func_out_complex_identifiers__.idx as "11"
+    ) _) as "5",
+    __person__."id"::text as "6",
+    __person__."person_full_name" as "7",
+    (not (__func_out_complex__ is null))::text as "8",
+    __func_out_complex_identifiers__.idx as "9"
   from "c"."func_out_complex"(
     __func_out_complex_identifiers__."id0",
     __func_out_complex_identifiers__."id1"
@@ -94,9 +92,8 @@ lateral (
     __frmcdc_compound_type_1__."b" as "2",
     __frmcdc_compound_type_1__."c"::text as "3",
     (not (__frmcdc_compound_type_1__ is null))::text as "4",
-    __func_out_out_compound_type__."o2"::text as "5",
-    (not (__func_out_out_compound_type__ is null))::text as "6",
-    __func_out_out_compound_type_identifiers__.idx as "7"
+    (not (__func_out_out_compound_type__ is null))::text as "5",
+    __func_out_out_compound_type_identifiers__.idx as "6"
   from "c"."func_out_out_compound_type"(__func_out_out_compound_type_identifiers__."id0") as __func_out_out_compound_type__
   left outer join lateral (select (__func_out_out_compound_type__."o2").*) as __frmcdc_compound_type_1__
   on TRUE
@@ -143,7 +140,6 @@ lateral (
     __frmcdc_compound_type_1__."b" as "4",
     __frmcdc_compound_type_1__."c"::text as "5",
     (not (__frmcdc_compound_type_1__ is null))::text as "6",
-    __person_computed_complex__."y"::text as "7",
     (select json_agg(_) from (
       select
         __post__."id"::text as "0"
@@ -152,31 +148,28 @@ lateral (
         __person_2."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "8",
-    __person_2."id"::text as "9",
-    __person_2."person_full_name" as "10",
-    __person_computed_complex__."z"::text as "11",
-    (not (__person_computed_complex__ is null))::text as "12",
-    __person_computed_first_arg_inout__."id"::text as "13",
-    __person_computed_first_arg_inout__."person_full_name" as "14",
-    __person_3."id"::text as "15",
-    __person_3."person_full_name" as "16",
-    __person_computed_first_arg_inout_out__."person"::text as "17",
-    __person_computed_first_arg_inout_out__."o"::text as "18",
-    (not (__person_computed_first_arg_inout_out__ is null))::text as "19",
-    __person_computed_inout_out__."ino" as "20",
-    __person_computed_inout_out__."o" as "21",
-    (not (__person_computed_inout_out__ is null))::text as "22",
-    __person_computed_out_out__."o1" as "23",
-    __person_computed_out_out__."o2" as "24",
-    (not (__person_computed_out_out__ is null))::text as "25",
-    __person__::text as "26",
+    ) _) as "7",
+    __person_2."id"::text as "8",
+    __person_2."person_full_name" as "9",
+    (not (__person_computed_complex__ is null))::text as "10",
+    __person_computed_first_arg_inout__."id"::text as "11",
+    __person_computed_first_arg_inout__."person_full_name" as "12",
+    __person_3."id"::text as "13",
+    __person_3."person_full_name" as "14",
+    __person_computed_first_arg_inout_out__."o"::text as "15",
+    (not (__person_computed_first_arg_inout_out__ is null))::text as "16",
+    __person_computed_inout_out__."ino" as "17",
+    __person_computed_inout_out__."o" as "18",
+    (not (__person_computed_inout_out__ is null))::text as "19",
+    __person_computed_out_out__."o1" as "20",
+    __person_computed_out_out__."o2" as "21",
+    (not (__person_computed_out_out__ is null))::text as "22",
     "c"."person_computed_inout"(
       __person__,
       __person_identifiers__."id1"
-    ) as "27",
-    "c"."person_computed_out"(__person__) as "28",
-    __person_identifiers__.idx as "29"
+    ) as "23",
+    "c"."person_computed_out"(__person__) as "24",
+    __person_identifiers__.idx as "25"
   from "c"."person" as __person__
   left outer join "c"."person_computed_complex"(
     __person__,
@@ -224,20 +217,16 @@ lateral (
     __person__."person_full_name" as "3",
     __person_secret__."sekrit" as "4",
     __person_secret__."person_id"::text as "5",
-    __person__."id"::text as "6",
-    __left_arm__."person_id"::text as "7",
-    __query_output_two_rows__."left_arm"::text as "8",
-    __post__."id"::text as "9",
-    __post__."headline" as "10",
-    __person_2."person_full_name" as "11",
-    __person_secret_2."sekrit" as "12",
-    __person_secret_2."person_id"::text as "13",
-    __person_2."id"::text as "14",
-    __post__."author_id"::text as "15",
-    __query_output_two_rows__."post"::text as "16",
-    __query_output_two_rows__."txt" as "17",
-    (not (__query_output_two_rows__ is null))::text as "18",
-    __query_output_two_rows_identifiers__.idx as "19"
+    __left_arm__."person_id"::text as "6",
+    __post__."id"::text as "7",
+    __post__."headline" as "8",
+    __person_2."person_full_name" as "9",
+    __person_secret_2."sekrit" as "10",
+    __person_secret_2."person_id"::text as "11",
+    __post__."author_id"::text as "12",
+    __query_output_two_rows__."txt" as "13",
+    (not (__query_output_two_rows__ is null))::text as "14",
+    __query_output_two_rows_identifiers__.idx as "15"
   from "c"."query_output_two_rows"(
     __query_output_two_rows_identifiers__."id0",
     __query_output_two_rows_identifiers__."id1",
@@ -274,20 +263,16 @@ lateral (
     __person__."person_full_name" as "3",
     __person_secret__."sekrit" as "4",
     __person_secret__."person_id"::text as "5",
-    __person__."id"::text as "6",
-    __left_arm__."person_id"::text as "7",
-    __query_output_two_rows__."left_arm"::text as "8",
-    __post__."id"::text as "9",
-    __post__."headline" as "10",
-    __person_2."person_full_name" as "11",
-    __person_secret_2."sekrit" as "12",
-    __person_secret_2."person_id"::text as "13",
-    __person_2."id"::text as "14",
-    __post__."author_id"::text as "15",
-    __query_output_two_rows__."post"::text as "16",
-    __query_output_two_rows__."txt" as "17",
-    (not (__query_output_two_rows__ is null))::text as "18",
-    __query_output_two_rows_identifiers__.idx as "19"
+    __left_arm__."person_id"::text as "6",
+    __post__."id"::text as "7",
+    __post__."headline" as "8",
+    __person_2."person_full_name" as "9",
+    __person_secret_2."sekrit" as "10",
+    __person_secret_2."person_id"::text as "11",
+    __post__."author_id"::text as "12",
+    __query_output_two_rows__."txt" as "13",
+    (not (__query_output_two_rows__ is null))::text as "14",
+    __query_output_two_rows_identifiers__.idx as "15"
   from "c"."query_output_two_rows"(
     __query_output_two_rows_identifiers__."id0",
     __query_output_two_rows_identifiers__."id1",
@@ -328,7 +313,6 @@ lateral (
     __frmcdc_compound_type_1__."b" as "2",
     __frmcdc_compound_type_1__."c"::text as "3",
     (not (__frmcdc_compound_type_1__ is null))::text as "4",
-    __func_out_complex_setof__."y"::text as "5",
     (select json_agg(_) from (
       select
         __post__."id"::text as "0"
@@ -337,12 +321,11 @@ lateral (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "6",
-    __person__."id"::text as "7",
-    __person__."person_full_name" as "8",
-    __func_out_complex_setof__."z"::text as "9",
-    (not (__func_out_complex_setof__ is null))::text as "10",
-    __func_out_complex_setof_identifiers__.idx as "11"
+    ) _) as "5",
+    __person__."id"::text as "6",
+    __person__."person_full_name" as "7",
+    (not (__func_out_complex_setof__ is null))::text as "8",
+    __func_out_complex_setof_identifiers__.idx as "9"
   from "c"."func_out_complex_setof"(
     __func_out_complex_setof_identifiers__."id0",
     __func_out_complex_setof_identifiers__."id1"

@@ -19,8 +19,7 @@ lateral (
     __relational_posts__."description" as "5",
     __relational_posts__."note" as "6",
     __relational_posts_title_lower__.v as "7",
-    __relational_posts__::text as "8",
-    __relational_posts_identifiers__.idx as "9"
+    __relational_posts_identifiers__.idx as "8"
   from (select (__relational_posts_identifiers__."id0").*) as __relational_posts__
   left outer join interfaces_and_unions.relational_items as __relational_items__
   on (__relational_posts__."id"::"int4" = __relational_items__."id")
