@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -23,22 +24,22 @@ graph TD
     PgCursor23{{"PgCursor[23∈3]"}}:::plan
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ”a”.”post_...(__post__)ᐳ"}}:::plan
-    Map106{{"Map[106∈3]<br />ᐸ22:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6,”7”:7,”8”:8,”9”:9,”10”:10}ᐳ"}}:::plan
+    Map106{{"Map[106∈3]<br />ᐸPgSelectSingle{2}ᐸpostᐳ[22]:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6,”7”:7,”8”:8,”9”:9,”10”:10}ᐳ"}}:::plan
     PgSelectSingle38{{"PgSelectSingle[38∈3]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression40{{"PgClassExpression[40∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    Map104{{"Map[104∈4]<br />ᐸ38:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7}ᐳ"}}:::plan
+    Map104{{"Map[104∈4]<br />ᐸPgSelectSingle{3}ᐸpersonᐳ[38]:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7}ᐳ"}}:::plan
     PgSelectSingle49{{"PgSelectSingle[49∈4]<br />ᐸperson_first_postᐳ"}}:::plan
     PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__person_f...ost__.”id”ᐳ"}}:::plan
     PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__person_f...”headline”ᐳ"}}:::plan
     PgClassExpression55{{"PgClassExpression[55∈5]<br />ᐸ”a”.”post_...st_post__)ᐳ"}}:::plan
-    Map102{{"Map[102∈5]<br />ᐸ49:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map102{{"Map[102∈5]<br />ᐸPgSelectSingle{4}ᐸperson_first_postᐳ[49]:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle62{{"PgSelectSingle[62∈5]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression63{{"PgClassExpression[63∈6]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression64{{"PgClassExpression[64∈6]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression66{{"PgClassExpression[66∈6]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    Connection78{{"Connection[78∈1]<br />ᐸ74ᐳ"}}:::plan
+    Connection78{{"Connection[78∈0]<br />ᐸ74ᐳ"}}:::plan
     Access101{{"Access[101∈4]<br />ᐸ106.1ᐳ"}}:::plan
     __ListTransform80[["__ListTransform[80∈4]<br />ᐸeach:79ᐳ"]]:::plan
     __Item81[/"__Item[81∈7]<br />ᐸ101ᐳ"\]:::itemplan
@@ -99,6 +100,7 @@ graph TD
     Access100 --> First90
     First90 --> PgSelectSingle91
     PgSelectSingle91 --> PgClassExpression92
+    Connection78 --> PgPageInfo93
     Access101 --> First95
     First95 --> PgSelectSingle96
     PgSelectSingle96 --> PgClassExpression98
@@ -108,22 +110,28 @@ graph TD
     subgraph "Buckets for queries/v4/posts"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Connection19 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 16, 17, 78, 93, 18<br />2: PgSelect[20]"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Connection19,Connection78 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19, 78<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 16, 17, 93, 18<br />2: PgSelect[20]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access16,Access17,Object18,PgSelect20,Connection78,PgPageInfo93 bucket1
+    class Bucket1,Access16,Access17,Object18,PgSelect20,PgPageInfo93 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 78, 93<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 78, 93<br /><br />ROOT PgSelectSingle{2}ᐸpostᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgCursor23,PgClassExpression24,List25,PgClassExpression27,PgClassExpression31,PgSelectSingle38,Map106 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 38, 106, 78, 93<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[38]<br />1: <br />ᐳ: 39, 40, 42, 104, 101, 100, 49, 90, 91, 92, 95, 96, 98, 99, 97<br />2: __ListTransform[80]"):::bucket
+    PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
+    List107{{"List[107∈3]<br />ᐸ106ᐳ"}}:::plan
+    class Bucket3,PgCursor23,PgClassExpression24,List25,PgClassExpression27,PgClassExpression31,PgClassExpression32,PgSelectSingle38,Map106,List107 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 38, 106, 78, 93<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[38]<br />1: <br />ᐳ: 39, 40, 42, 100, 101, 104, 49, 90, 91, 92, 95, 96, 98, 99, 97<br />2: __ListTransform[80]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression39,PgClassExpression40,PgClassExpression42,PgSelectSingle49,__ListTransform80,First90,PgSelectSingle91,PgClassExpression92,First95,PgSelectSingle96,PgCursor97,PgClassExpression98,List99,Access100,Access101,Map104 bucket4
+    PgClassExpression41{{"PgClassExpression[41∈4]<br />ᐸ__person__ᐳ"}}:::plan
+    List105{{"List[105∈4]<br />ᐸ104ᐳ"}}:::plan
+    class Bucket4,PgClassExpression39,PgClassExpression40,PgClassExpression41,PgClassExpression42,PgSelectSingle49,__ListTransform80,First90,PgSelectSingle91,PgClassExpression92,First95,PgSelectSingle96,PgCursor97,PgClassExpression98,List99,Access100,Access101,Map104,List105 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 49<br /><br />ROOT PgSelectSingle{4}ᐸperson_first_postᐳ[49]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression50,PgClassExpression51,PgClassExpression55,PgSelectSingle62,Map102 bucket5
+    PgClassExpression56{{"PgClassExpression[56∈5]<br />ᐸ__person_f...author_id”ᐳ"}}:::plan
+    List103{{"List[103∈5]<br />ᐸ102ᐳ"}}:::plan
+    class Bucket5,PgClassExpression50,PgClassExpression51,PgClassExpression55,PgClassExpression56,PgSelectSingle62,Map102,List103 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 62<br /><br />ROOT PgSelectSingle{5}ᐸpersonᐳ[62]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression63,PgClassExpression64,PgClassExpression66 bucket6

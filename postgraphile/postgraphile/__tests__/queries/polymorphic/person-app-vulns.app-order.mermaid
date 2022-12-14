@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
@@ -31,7 +32,7 @@ graph TD
     Access48{{"Access[48∈5]<br />ᐸ43.Symbol(data).3ᐳ"}}:::plan
     List49{{"List[49∈5]<br />ᐸ45,46,47,48ᐳ"}}:::plan
     PgCursor44{{"PgCursor[44∈5]"}}:::plan
-    JSONParse51[["JSONParse[51∈6]<br />ᐸ48ᐳ<br />ᐳAwsApplication"]]:::plan
+    JSONParse51[["JSONParse[51∈6]<br />ᐸAccess{5}ᐸ43.Symbol(data).3ᐳ[48]ᐳ<br />ᐳAwsApplication"]]:::plan
     Access52{{"Access[52∈6]<br />ᐸ51.0ᐳ"}}:::plan
     PgSelect53[["PgSelect[53∈6]<br />ᐸawsApplicationsᐳ<br />ᐳAwsApplication"]]:::plan
     First57{{"First[57∈6]"}}:::plan
@@ -39,7 +40,7 @@ graph TD
     PgClassExpression59{{"PgClassExpression[59∈6]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     PgClassExpression60{{"PgClassExpression[60∈6]<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
     PgClassExpression61{{"PgClassExpression[61∈6]<br />ᐸ__aws_appl..._deployed”ᐳ"}}:::plan
-    JSONParse63[["JSONParse[63∈6]<br />ᐸ48ᐳ<br />ᐳGcpApplication"]]:::plan
+    JSONParse63[["JSONParse[63∈6]<br />ᐸAccess{5}ᐸ43.Symbol(data).3ᐳ[48]ᐳ<br />ᐳGcpApplication"]]:::plan
     Access64{{"Access[64∈6]<br />ᐸ63.0ᐳ"}}:::plan
     PgSelect65[["PgSelect[65∈6]<br />ᐸgcpApplicationsᐳ<br />ᐳGcpApplication"]]:::plan
     First69{{"First[69∈6]"}}:::plan
@@ -87,7 +88,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-order"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,Access16,Access17,Object18,Connection19 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,Access16,Access17,Object18,Connection19 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,Connection40 bucket1

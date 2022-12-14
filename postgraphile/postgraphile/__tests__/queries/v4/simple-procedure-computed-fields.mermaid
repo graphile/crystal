@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -494,10 +495,11 @@ graph TD
     subgraph "Buckets for queries/v4/simple-procedure-computed-fields"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 174, 231, 357, 14<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,__InputStaticLeaf174,__InputStaticLeaf231,Connection357 bucket0
-    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ11ᐳ[15]<br />1: <br />ᐳ: 16, 31, 680, 41, 64, 86, 674, 134, 185, 671, 195, 668, 250, 665, 294, 664, 663, 313, 662, 677, 17, 19, 52, 62, 76, 678, 96, 144, 205, 260<br />2: __ListTransform[33]"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,__InputStaticLeaf174,__InputStaticLeaf231,Connection357 bucket0
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ11ᐳ[15]<br />1: <br />ᐳ: 16, 31, 41, 64, 86, 134, 185, 195, 250, 294, 313, 662, 663, 664, 665, 668, 671, 674, 677, 680, 17, 19, 52, 62, 76, 96, 144, 205, 260, 678<br />2: __ListTransform[33]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression19,Connection31,__ListTransform33,__InputStaticLeaf41,Connection52,PgClassExpression62,__InputStaticLeaf64,Connection76,__InputStaticLeaf86,Connection96,__InputStaticLeaf134,Connection144,Connection185,__InputStaticLeaf195,Connection205,__InputStaticLeaf250,Connection260,Connection294,Connection313,Access662,Access663,Access664,Access665,Access668,Access671,Access674,Access677,Reverse678,Access680 bucket1
+    PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__person__ᐳ"}}:::plan
+    class Bucket1,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,Connection31,__ListTransform33,__InputStaticLeaf41,Connection52,PgClassExpression62,__InputStaticLeaf64,Connection76,__InputStaticLeaf86,Connection96,__InputStaticLeaf134,Connection144,Connection185,__InputStaticLeaf195,Connection205,__InputStaticLeaf250,Connection260,Connection294,Connection313,Access662,Access663,Access664,Access665,Access668,Access671,Access674,Access677,Reverse678,Access680 bucket1
     Bucket2("Bucket 2 (subroutine)<br />ROOT PgSelectSingle{2}ᐸperson_friendsᐳ[35]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item34,PgSelectSingle35 bucket2
@@ -506,7 +508,8 @@ graph TD
     class Bucket3,__Item36,PgSelectSingle37 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 37, 36, 52<br /><br />ROOT PgSelectSingle{3}ᐸperson_friendsᐳ[37]<br />1: <br />ᐳ: 38, 40, 679<br />2: __ListTransform[54]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression38,PgClassExpression40,__ListTransform54,Access679 bucket4
+    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__person_friends__ᐳ"}}:::plan
+    class Bucket4,PgClassExpression38,PgClassExpression39,PgClassExpression40,__ListTransform54,Access679 bucket4
     Bucket5("Bucket 5 (subroutine)<br />ROOT PgSelectSingle{5}ᐸperson_friendsᐳ[56]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item55,PgSelectSingle56 bucket5
@@ -519,9 +522,10 @@ graph TD
     Bucket8("Bucket 8 (listItem)<br />Deps: 96<br /><br />ROOT __Item{8}ᐸ678ᐳ[78]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,__Item78,PgSelectSingle79 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 79, 78, 96<br /><br />ROOT PgSelectSingle{8}ᐸpostᐳ[79]<br />1: <br />ᐳ: 80, 84, 85, 676, 675<br />2: __ListTransform[98]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 79, 78, 96<br /><br />ROOT PgSelectSingle{8}ᐸpostᐳ[79]<br />1: <br />ᐳ: 80, 84, 85, 675, 676<br />2: __ListTransform[98]"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,PgClassExpression80,PgClassExpression84,PgClassExpression85,__ListTransform98,Access675,Access676 bucket9
+    PgClassExpression83{{"PgClassExpression[83∈9]<br />ᐸ__post__ᐳ"}}:::plan
+    class Bucket9,PgClassExpression80,PgClassExpression83,PgClassExpression84,PgClassExpression85,__ListTransform98,Access675,Access676 bucket9
     Bucket10("Bucket 10 (subroutine)<br />ROOT PgClassExpression{10}ᐸ__post_com...al_set__.vᐳ[101]"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,__Item99,PgSelectSingle100,PgClassExpression101 bucket10
@@ -537,9 +541,10 @@ graph TD
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 115<br /><br />ROOT PgClassExpression{13}ᐸ__post_com...al_set__.vᐳ[115]"):::bucket
     classDef bucket14 stroke:#a52a2a
     class Bucket14 bucket14
-    Bucket15("Bucket 15 (listItem)<br />Deps: 144<br /><br />ROOT __Item{15}ᐸ674ᐳ[126]<br />1: <br />ᐳ: 127, 673, 672, 128, 132, 133<br />2: __ListTransform[146]"):::bucket
+    Bucket15("Bucket 15 (listItem)<br />Deps: 144<br /><br />ROOT __Item{15}ᐸ674ᐳ[126]<br />1: <br />ᐳ: 127, 672, 673, 128, 132, 133<br />2: __ListTransform[146]"):::bucket
     classDef bucket15 stroke:#ff00ff
-    class Bucket15,__Item126,PgSelectSingle127,PgClassExpression128,PgClassExpression132,PgClassExpression133,__ListTransform146,Access672,Access673 bucket15
+    PgClassExpression131{{"PgClassExpression[131∈15]<br />ᐸ__post__ᐳ"}}:::plan
+    class Bucket15,__Item126,PgSelectSingle127,PgClassExpression128,PgClassExpression131,PgClassExpression132,PgClassExpression133,__ListTransform146,Access672,Access673 bucket15
     Bucket16("Bucket 16 (subroutine)<br />ROOT PgClassExpression{16}ᐸ__post_com...al_set__.vᐳ[149]"):::bucket
     classDef bucket16 stroke:#f5deb3
     class Bucket16,__Item147,PgSelectSingle148,PgClassExpression149 bucket16
@@ -558,9 +563,10 @@ graph TD
     Bucket21("Bucket 21 (listItem)<br />Deps: 205<br /><br />ROOT __Item{21}ᐸ671ᐳ[187]"):::bucket
     classDef bucket21 stroke:#0000ff
     class Bucket21,__Item187,PgSelectSingle188 bucket21
-    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 188, 187, 205<br /><br />ROOT PgSelectSingle{21}ᐸpostᐳ[188]<br />1: <br />ᐳ: 189, 193, 194, 670, 669<br />2: __ListTransform[207]"):::bucket
+    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 188, 187, 205<br /><br />ROOT PgSelectSingle{21}ᐸpostᐳ[188]<br />1: <br />ᐳ: 189, 193, 194, 669, 670<br />2: __ListTransform[207]"):::bucket
     classDef bucket22 stroke:#7fff00
-    class Bucket22,PgClassExpression189,PgClassExpression193,PgClassExpression194,__ListTransform207,Access669,Access670 bucket22
+    PgClassExpression192{{"PgClassExpression[192∈22]<br />ᐸ__post__ᐳ"}}:::plan
+    class Bucket22,PgClassExpression189,PgClassExpression192,PgClassExpression193,PgClassExpression194,__ListTransform207,Access669,Access670 bucket22
     Bucket23("Bucket 23 (subroutine)<br />ROOT PgClassExpression{23}ᐸ__post_com...al_set__.vᐳ[210]"):::bucket
     classDef bucket23 stroke:#ff1493
     class Bucket23,__Item208,PgSelectSingle209,PgClassExpression210 bucket23
@@ -576,9 +582,10 @@ graph TD
     Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 224<br /><br />ROOT PgClassExpression{26}ᐸ__post_com...al_set__.vᐳ[224]"):::bucket
     classDef bucket27 stroke:#ffff00
     class Bucket27 bucket27
-    Bucket28("Bucket 28 (listItem)<br />Deps: 260<br /><br />ROOT __Item{28}ᐸ668ᐳ[242]<br />1: <br />ᐳ: 243, 667, 666, 244, 248, 249<br />2: __ListTransform[262]"):::bucket
+    Bucket28("Bucket 28 (listItem)<br />Deps: 260<br /><br />ROOT __Item{28}ᐸ668ᐳ[242]<br />1: <br />ᐳ: 243, 666, 667, 244, 248, 249<br />2: __ListTransform[262]"):::bucket
     classDef bucket28 stroke:#00ffff
-    class Bucket28,__Item242,PgSelectSingle243,PgClassExpression244,PgClassExpression248,PgClassExpression249,__ListTransform262,Access666,Access667 bucket28
+    PgClassExpression247{{"PgClassExpression[247∈28]<br />ᐸ__post__ᐳ"}}:::plan
+    class Bucket28,__Item242,PgSelectSingle243,PgClassExpression244,PgClassExpression247,PgClassExpression248,PgClassExpression249,__ListTransform262,Access666,Access667 bucket28
     Bucket29("Bucket 29 (subroutine)<br />ROOT PgClassExpression{29}ᐸ__post_com...al_set__.vᐳ[265]"):::bucket
     classDef bucket29 stroke:#4169e1
     class Bucket29,__Item263,PgSelectSingle264,PgClassExpression265 bucket29
@@ -624,9 +631,10 @@ graph TD
     Bucket43("Bucket 43 (listItem)<br />Deps: 396<br /><br />ROOT __Item{43}ᐸ661ᐳ[378]"):::bucket
     classDef bucket43 stroke:#ff0000
     class Bucket43,__Item378,PgSelectSingle379 bucket43
-    Bucket44("Bucket 44 (nullableBoundary)<br />Deps: 379, 378, 396<br /><br />ROOT PgSelectSingle{43}ᐸpostᐳ[379]<br />1: <br />ᐳ: 380, 384, 385, 659, 658<br />2: __ListTransform[398]"):::bucket
+    Bucket44("Bucket 44 (nullableBoundary)<br />Deps: 379, 378, 396<br /><br />ROOT PgSelectSingle{43}ᐸpostᐳ[379]<br />1: <br />ᐳ: 380, 384, 385, 658, 659<br />2: __ListTransform[398]"):::bucket
     classDef bucket44 stroke:#ffff00
-    class Bucket44,PgClassExpression380,PgClassExpression384,PgClassExpression385,__ListTransform398,Access658,Access659 bucket44
+    PgClassExpression383{{"PgClassExpression[383∈44]<br />ᐸ__post__ᐳ"}}:::plan
+    class Bucket44,PgClassExpression380,PgClassExpression383,PgClassExpression384,PgClassExpression385,__ListTransform398,Access658,Access659 bucket44
     Bucket45("Bucket 45 (subroutine)<br />ROOT PgClassExpression{45}ᐸ__post_com...al_set__.vᐳ[401]"):::bucket
     classDef bucket45 stroke:#00ffff
     class Bucket45,__Item399,PgSelectSingle400,PgClassExpression401 bucket45
@@ -642,9 +650,10 @@ graph TD
     Bucket49("Bucket 49 (nullableBoundary)<br />Deps: 415<br /><br />ROOT PgClassExpression{48}ᐸ__post_com...al_set__.vᐳ[415]"):::bucket
     classDef bucket49 stroke:#ff00ff
     class Bucket49 bucket49
-    Bucket50("Bucket 50 (listItem)<br />Deps: 444<br /><br />ROOT __Item{50}ᐸ657ᐳ[426]<br />1: <br />ᐳ: 427, 656, 655, 428, 432, 433<br />2: __ListTransform[446]"):::bucket
+    Bucket50("Bucket 50 (listItem)<br />Deps: 444<br /><br />ROOT __Item{50}ᐸ657ᐳ[426]<br />1: <br />ᐳ: 427, 655, 656, 428, 432, 433<br />2: __ListTransform[446]"):::bucket
     classDef bucket50 stroke:#f5deb3
-    class Bucket50,__Item426,PgSelectSingle427,PgClassExpression428,PgClassExpression432,PgClassExpression433,__ListTransform446,Access655,Access656 bucket50
+    PgClassExpression431{{"PgClassExpression[431∈50]<br />ᐸ__post__ᐳ"}}:::plan
+    class Bucket50,__Item426,PgSelectSingle427,PgClassExpression428,PgClassExpression431,PgClassExpression432,PgClassExpression433,__ListTransform446,Access655,Access656 bucket50
     Bucket51("Bucket 51 (subroutine)<br />ROOT PgClassExpression{51}ᐸ__post_com...al_set__.vᐳ[449]"):::bucket
     classDef bucket51 stroke:#696969
     class Bucket51,__Item447,PgSelectSingle448,PgClassExpression449 bucket51
@@ -663,9 +672,10 @@ graph TD
     Bucket56("Bucket 56 (listItem)<br />Deps: 505<br /><br />ROOT __Item{56}ᐸ654ᐳ[487]"):::bucket
     classDef bucket56 stroke:#7fff00
     class Bucket56,__Item487,PgSelectSingle488 bucket56
-    Bucket57("Bucket 57 (nullableBoundary)<br />Deps: 488, 487, 505<br /><br />ROOT PgSelectSingle{56}ᐸpostᐳ[488]<br />1: <br />ᐳ: 489, 493, 494, 653, 652<br />2: __ListTransform[507]"):::bucket
+    Bucket57("Bucket 57 (nullableBoundary)<br />Deps: 488, 487, 505<br /><br />ROOT PgSelectSingle{56}ᐸpostᐳ[488]<br />1: <br />ᐳ: 489, 493, 494, 652, 653<br />2: __ListTransform[507]"):::bucket
     classDef bucket57 stroke:#ff1493
-    class Bucket57,PgClassExpression489,PgClassExpression493,PgClassExpression494,__ListTransform507,Access652,Access653 bucket57
+    PgClassExpression492{{"PgClassExpression[492∈57]<br />ᐸ__post__ᐳ"}}:::plan
+    class Bucket57,PgClassExpression489,PgClassExpression492,PgClassExpression493,PgClassExpression494,__ListTransform507,Access652,Access653 bucket57
     Bucket58("Bucket 58 (subroutine)<br />ROOT PgClassExpression{58}ᐸ__post_com...al_set__.vᐳ[510]"):::bucket
     classDef bucket58 stroke:#808000
     class Bucket58,__Item508,PgSelectSingle509,PgClassExpression510 bucket58
@@ -681,9 +691,10 @@ graph TD
     Bucket62("Bucket 62 (nullableBoundary)<br />Deps: 524<br /><br />ROOT PgClassExpression{61}ᐸ__post_com...al_set__.vᐳ[524]"):::bucket
     classDef bucket62 stroke:#00ffff
     class Bucket62 bucket62
-    Bucket63("Bucket 63 (listItem)<br />Deps: 560<br /><br />ROOT __Item{63}ᐸ651ᐳ[542]<br />1: <br />ᐳ: 543, 650, 649, 544, 548, 549<br />2: __ListTransform[562]"):::bucket
+    Bucket63("Bucket 63 (listItem)<br />Deps: 560<br /><br />ROOT __Item{63}ᐸ651ᐳ[542]<br />1: <br />ᐳ: 543, 649, 650, 544, 548, 549<br />2: __ListTransform[562]"):::bucket
     classDef bucket63 stroke:#4169e1
-    class Bucket63,__Item542,PgSelectSingle543,PgClassExpression544,PgClassExpression548,PgClassExpression549,__ListTransform562,Access649,Access650 bucket63
+    PgClassExpression547{{"PgClassExpression[547∈63]<br />ᐸ__post__ᐳ"}}:::plan
+    class Bucket63,__Item542,PgSelectSingle543,PgClassExpression544,PgClassExpression547,PgClassExpression548,PgClassExpression549,__ListTransform562,Access649,Access650 bucket63
     Bucket64("Bucket 64 (subroutine)<br />ROOT PgClassExpression{64}ᐸ__post_com...al_set__.vᐳ[565]"):::bucket
     classDef bucket64 stroke:#3cb371
     class Bucket64,__Item563,PgSelectSingle564,PgClassExpression565 bucket64

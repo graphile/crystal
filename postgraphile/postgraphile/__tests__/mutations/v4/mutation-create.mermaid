@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
@@ -183,7 +184,7 @@ graph TD
     PgSelect244[["PgSelect[244∈3]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"]]:::plan
     First248{{"First[248∈3]"}}:::plan
     PgSelectSingle249{{"PgSelectSingle[249∈3]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"}}:::plan
-    Map1165{{"Map[1165∈3]<br />ᐸ249:{”0”:9,”1”:10,”2”:11,”3”:12,”4”:13,”5”:14,”6”:15,”7”:16}ᐳ"}}:::plan
+    Map1165{{"Map[1165∈3]<br />ᐸPgSelectSingle{3}ᐸfrmcdc_nestedCompoundType_1ᐳ[249]:{”0”:9,”1”:10,”2”:11,”3”:12,”4”:13,”5”:14,”6”:15,”7”:16}ᐳ"}}:::plan
     PgSelectSingle256{{"PgSelectSingle[256∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
     PgClassExpression257{{"PgClassExpression[257∈14]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
     PgClassExpression258{{"PgClassExpression[258∈14]<br />ᐸ__frmcdc_c...pe_1__.”b”ᐳ"}}:::plan
@@ -192,7 +193,7 @@ graph TD
     PgClassExpression261{{"PgClassExpression[261∈14]<br />ᐸ__frmcdc_c...pe_1__.”e”ᐳ"}}:::plan
     PgClassExpression262{{"PgClassExpression[262∈14]<br />ᐸ__frmcdc_c...pe_1__.”f”ᐳ"}}:::plan
     PgClassExpression263{{"PgClassExpression[263∈14]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
-    Map1163{{"Map[1163∈3]<br />ᐸ249:{”0”:1,”1”:2,”2”:3,”3”:4,”4”:5,”5”:6,”6”:7,”7”:8}ᐳ"}}:::plan
+    Map1163{{"Map[1163∈3]<br />ᐸPgSelectSingle{3}ᐸfrmcdc_nestedCompoundType_1ᐳ[249]:{”0”:1,”1”:2,”2”:3,”3”:4,”4”:5,”5”:6,”6”:7,”7”:8}ᐳ"}}:::plan
     PgSelectSingle270{{"PgSelectSingle[270∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
     PgClassExpression271{{"PgClassExpression[271∈15]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
     PgClassExpression272{{"PgClassExpression[272∈15]<br />ᐸ__frmcdc_c...pe_1__.”b”ᐳ"}}:::plan
@@ -714,7 +715,7 @@ graph TD
     PgSelectSingle1140{{"PgSelectSingle[1140∈115]<br />ᐸfrmcdc_comptype_1ᐳ"}}:::plan
     PgClassExpression1141{{"PgClassExpression[1141∈116]<br />ᐸ__frmcdc_c...”schedule”ᐳ"}}:::plan
     PgClassExpression1142{{"PgClassExpression[1142∈116]<br />ᐸ__frmcdc_c...optimised”ᐳ"}}:::plan
-    Map1159{{"Map[1159∈114]<br />ᐸ1127:{”0”:0}ᐳ"}}:::plan
+    Map1159{{"Map[1159∈114]<br />ᐸPgSelectSingle{107}ᐸpostᐳ[1127]:{”0”:0}ᐳ"}}:::plan
     PgSelectSingle1149{{"PgSelectSingle[1149∈114]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression1150{{"PgClassExpression[1150∈117]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression1158{{"PgClassExpression[1158∈118]<br />ᐸ__person__.”created_at”ᐳ"}}:::plan
@@ -1219,16 +1220,20 @@ graph TD
     subgraph "Buckets for mutations/v4/mutation-create"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value1,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf11,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,__InputStaticLeaf20,__InputStaticLeaf21,__InputStaticLeaf22,__InputStaticLeaf24,__InputStaticLeaf25,__InputStaticLeaf26,__InputStaticLeaf27,__InputStaticLeaf28,__InputStaticLeaf29,__InputStaticLeaf30,__InputStaticLeaf31,__InputStaticLeaf32,__InputStaticLeaf33,__InputStaticLeaf34,__InputStaticLeaf38,__InputStaticLeaf39,__InputStaticLeaf43,__InputStaticLeaf44,__InputStaticLeaf46,__InputStaticLeaf47,__InputStaticLeaf51,__InputStaticLeaf52,__InputStaticLeaf53,__InputStaticLeaf54,__InputStaticLeaf55,__InputStaticLeaf56,__InputStaticLeaf57,__InputStaticLeaf59,__InputStaticLeaf60,__InputStaticLeaf61,__InputStaticLeaf62,__InputStaticLeaf63,__InputStaticLeaf64,__InputStaticLeaf67,__InputStaticLeaf68,__InputStaticLeaf69,__InputStaticLeaf70,__InputStaticLeaf71,__InputStaticLeaf72,__InputStaticLeaf74,__InputStaticLeaf75,__InputStaticLeaf76,__InputStaticLeaf77,__InputStaticLeaf78,__InputStaticLeaf79,__InputStaticLeaf80,__InputStaticLeaf82,__InputStaticLeaf83,__InputStaticLeaf84,__InputStaticLeaf85,__InputStaticLeaf86,__InputStaticLeaf87,__InputStaticLeaf89,__InputStaticLeaf92,__InputStaticLeaf93,__InputStaticLeaf94,__InputStaticLeaf95,__InputStaticLeaf96,__InputStaticLeaf97,__InputStaticLeaf99,__InputStaticLeaf101,__InputStaticLeaf102,__InputStaticLeaf103,__InputStaticLeaf104,__InputStaticLeaf105,__InputStaticLeaf106,__InputStaticLeaf108,__InputStaticLeaf109,__InputStaticLeaf113,__InputStaticLeaf114,__InputStaticLeaf117,__InputStaticLeaf118,__InputStaticLeaf128,__InputStaticLeaf129,__InputStaticLeaf130,__InputStaticLeaf132,__InputStaticLeaf133,__InputStaticLeaf134,Access136,Access137,Object138,List140,List141,Object142,Constant143,Constant144,Object145,Object146,Object147,Object148,Object149,Constant150,Constant151,Object152,Object153,Object154,Object155,Object156,Object157,List158,Object159,Object160,Object161,Object162,Object163,List164,List165,__InputStaticLeaf297,__InputStaticLeaf298,__InputStaticLeaf300,__InputStaticLeaf301,Access303,__InputStaticLeaf305,__InputStaticLeaf306,__InputStaticLeaf307,Connection344,Connection363,Connection382,Connection401,Connection420,Connection439,Connection458,Connection478,__InputStaticLeaf494,__InputStaticLeaf496,__InputStaticLeaf497,__InputStaticLeaf499,__InputStaticLeaf500,__InputStaticLeaf502,__InputStaticLeaf503,__InputStaticLeaf504,__InputStaticLeaf505,Connection541,Connection560,Connection579,Connection598,Connection617,Connection636,Connection655,Connection675,__InputStaticLeaf691,__InputStaticLeaf693,__InputStaticLeaf694,__InputStaticLeaf695,__InputStaticLeaf762,__InputStaticLeaf790,__InputStaticLeaf791,__InputStaticLeaf793,__InputStaticLeaf794,__InputDynamicScalar796,__InputStaticLeaf797,__InputStaticLeaf798,__InputStaticLeaf799,Connection836,Connection855,Connection874,Connection893,Connection912,Connection931,Connection950,Connection970,__InputStaticLeaf988,__InputStaticLeaf989,__InputStaticLeaf991,__InputStaticLeaf992,__InputStaticLeaf1017,__InputStaticLeaf1018,__InputStaticLeaf1030,__InputStaticLeaf1036,__InputStaticLeaf1037,__InputStaticLeaf1039,__InputStaticLeaf1040,__InputStaticLeaf1042,__InputStaticLeaf1043,Object1049,Object1050,Object1051,List1052,__InputStaticLeaf1068,__InputStaticLeaf1070,__InputStaticLeaf1074,__InputStaticLeaf1075,__InputStaticLeaf1077,__InputStaticLeaf1078,__InputStaticLeaf1080,__InputStaticLeaf1081,Object1087,Object1088,Object1089,List1090,Connection1125 bucket0
+    class Bucket0,__Value0,__Value1,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf11,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,__InputStaticLeaf20,__InputStaticLeaf21,__InputStaticLeaf22,__InputStaticLeaf24,__InputStaticLeaf25,__InputStaticLeaf26,__InputStaticLeaf27,__InputStaticLeaf28,__InputStaticLeaf29,__InputStaticLeaf30,__InputStaticLeaf31,__InputStaticLeaf32,__InputStaticLeaf33,__InputStaticLeaf34,__InputStaticLeaf38,__InputStaticLeaf39,__InputStaticLeaf43,__InputStaticLeaf44,__InputStaticLeaf46,__InputStaticLeaf47,__InputStaticLeaf51,__InputStaticLeaf52,__InputStaticLeaf53,__InputStaticLeaf54,__InputStaticLeaf55,__InputStaticLeaf56,__InputStaticLeaf57,__InputStaticLeaf59,__InputStaticLeaf60,__InputStaticLeaf61,__InputStaticLeaf62,__InputStaticLeaf63,__InputStaticLeaf64,__InputStaticLeaf67,__InputStaticLeaf68,__InputStaticLeaf69,__InputStaticLeaf70,__InputStaticLeaf71,__InputStaticLeaf72,__InputStaticLeaf74,__InputStaticLeaf75,__InputStaticLeaf76,__InputStaticLeaf77,__InputStaticLeaf78,__InputStaticLeaf79,__InputStaticLeaf80,__InputStaticLeaf82,__InputStaticLeaf83,__InputStaticLeaf84,__InputStaticLeaf85,__InputStaticLeaf86,__InputStaticLeaf87,__InputStaticLeaf89,__InputStaticLeaf92,__InputStaticLeaf93,__InputStaticLeaf94,__InputStaticLeaf95,__InputStaticLeaf96,__InputStaticLeaf97,__InputStaticLeaf99,__InputStaticLeaf101,__InputStaticLeaf102,__InputStaticLeaf103,__InputStaticLeaf104,__InputStaticLeaf105,__InputStaticLeaf106,__InputStaticLeaf108,__InputStaticLeaf109,__InputStaticLeaf113,__InputStaticLeaf114,__InputStaticLeaf117,__InputStaticLeaf118,__InputStaticLeaf128,__InputStaticLeaf129,__InputStaticLeaf130,__InputStaticLeaf132,__InputStaticLeaf133,__InputStaticLeaf134,Access136,Access137,Object138,List140,List141,Object142,Constant143,Constant144,Object145,Object146,Object147,Object148,Object149,Constant150,Constant151,Object152,Object153,Object154,Object155,Object156,Object157,List158,Object159,Object160,Object161,Object162,Object163,List164,List165,__InputStaticLeaf297,__InputStaticLeaf298,__InputStaticLeaf300,__InputStaticLeaf301,Access303,__InputStaticLeaf305,__InputStaticLeaf306,__InputStaticLeaf307,Connection344,Connection363,Connection382,Connection401,Connection420,Connection439,Connection458,Connection478,__InputStaticLeaf494,__InputStaticLeaf496,__InputStaticLeaf497,__InputStaticLeaf499,__InputStaticLeaf500,__InputStaticLeaf502,__InputStaticLeaf503,__InputStaticLeaf504,__InputStaticLeaf505,Connection541,Connection560,Connection579,Connection598,Connection617,Connection636,Connection655,Connection675,__InputStaticLeaf691,__InputStaticLeaf693,__InputStaticLeaf694,__InputStaticLeaf695,__InputStaticLeaf762,__InputStaticLeaf790,__InputStaticLeaf791,__InputStaticLeaf793,__InputStaticLeaf794,__InputDynamicScalar796,__InputStaticLeaf797,__InputStaticLeaf798,__InputStaticLeaf799,Connection836,Connection855,Connection874,Connection893,Connection912,Connection931,Connection950,Connection970,__InputStaticLeaf988,__InputStaticLeaf989,__InputStaticLeaf991,__InputStaticLeaf992,__InputStaticLeaf1017,__InputStaticLeaf1018,__InputStaticLeaf1030,__InputStaticLeaf1036,__InputStaticLeaf1037,__InputStaticLeaf1039,__InputStaticLeaf1040,__InputStaticLeaf1042,__InputStaticLeaf1043,Object1049,Object1050,Object1051,List1052,__InputStaticLeaf1068,__InputStaticLeaf1070,__InputStaticLeaf1074,__InputStaticLeaf1075,__InputStaticLeaf1077,__InputStaticLeaf1078,__InputStaticLeaf1080,__InputStaticLeaf1081,Object1087,Object1088,Object1089,List1090,Connection1125 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 138, 10, 11, 12, 13, 14, 15, 16, 17, 140, 21, 22, 141, 33, 34, 146, 149, 154, 53, 54, 55, 56, 57, 155, 158, 80, 159, 160, 163, 117, 118, 164, 165, 5<br /><br />1: PgInsert[135]<br />2: <br />ᐳ: Object[139]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert135,Object139 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 139, 135, 138, 5<br /><br />ROOT Object{1}ᐸ{result}ᐳ[139]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,Constant166,Constant167,Constant292,Lambda293 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 135, 167, 138<br /><br />ROOT PgInsert{1}[135]<br />1: <br />ᐳ: 168, 172, 173, 174, 175, 176, 177, 178, 179, 181, 182, 183, 185, 186, 187, 194, 201, 208, 209, 210, 211, 212, 213, 220, 228, 229, 243, 279, 282, 285, 286, 287, 288, 290, 169, 170, 188, 191, 195, 198, 202, 205<br />2: PgSelect[230], PgSelect[244]<br />ᐳ: 234, 235, 236, 237, 238, 239, 240, 241, 242, 248, 249, 1165, 256, 1163, 270, 278"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 135, 167, 138<br /><br />ROOT PgInsert{1}[135]<br />1: <br />ᐳ: 168, 172, 173, 174, 175, 176, 177, 178, 179, 181, 182, 183, 185, 186, 187, 194, 201, 208, 209, 210, 211, 212, 213, 220, 228, 229, 243, 279, 282, 285, 286, 287, 288, 290, 169, 170, 188, 191, 195, 198, 202, 205<br />2: PgSelect[230], PgSelect[244]<br />ᐳ: 234, 235, 236, 237, 238, 239, 240, 241, 242, 248, 249, 278, 1163, 1165, 256, 270"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression168,List169,Lambda170,PgClassExpression172,PgClassExpression173,PgClassExpression174,PgClassExpression175,PgClassExpression176,PgClassExpression177,PgClassExpression178,PgClassExpression179,PgClassExpression181,PgClassExpression182,PgClassExpression183,PgClassExpression185,PgClassExpression186,PgClassExpression187,Access188,Access191,PgClassExpression194,Access195,Access198,PgClassExpression201,Access202,Access205,PgClassExpression208,PgClassExpression209,PgClassExpression210,PgClassExpression211,PgClassExpression212,PgClassExpression213,PgClassExpression220,PgClassExpression228,PgClassExpression229,PgSelect230,First234,PgSelectSingle235,PgClassExpression236,PgClassExpression237,PgClassExpression238,PgClassExpression239,PgClassExpression240,PgClassExpression241,PgClassExpression242,PgClassExpression243,PgSelect244,First248,PgSelectSingle249,PgSelectSingle256,PgSelectSingle270,PgClassExpression278,PgClassExpression279,PgClassExpression282,PgClassExpression285,PgClassExpression286,PgClassExpression287,PgClassExpression288,PgClassExpression290,Map1163,Map1165 bucket3
+    PgClassExpression250{{"PgClassExpression[250∈3]<br />ᐸ__frmcdc_n...pe_1__.”a”ᐳ"}}:::plan
+    PgClassExpression264{{"PgClassExpression[264∈3]<br />ᐸ__frmcdc_n...pe_1__.”b”ᐳ"}}:::plan
+    List1164{{"List[1164∈3]<br />ᐸ1163ᐳ"}}:::plan
+    List1166{{"List[1166∈3]<br />ᐸ1165ᐳ"}}:::plan
+    class Bucket3,PgClassExpression168,List169,Lambda170,PgClassExpression172,PgClassExpression173,PgClassExpression174,PgClassExpression175,PgClassExpression176,PgClassExpression177,PgClassExpression178,PgClassExpression179,PgClassExpression181,PgClassExpression182,PgClassExpression183,PgClassExpression185,PgClassExpression186,PgClassExpression187,Access188,Access191,PgClassExpression194,Access195,Access198,PgClassExpression201,Access202,Access205,PgClassExpression208,PgClassExpression209,PgClassExpression210,PgClassExpression211,PgClassExpression212,PgClassExpression213,PgClassExpression220,PgClassExpression228,PgClassExpression229,PgSelect230,First234,PgSelectSingle235,PgClassExpression236,PgClassExpression237,PgClassExpression238,PgClassExpression239,PgClassExpression240,PgClassExpression241,PgClassExpression242,PgClassExpression243,PgSelect244,First248,PgSelectSingle249,PgClassExpression250,PgSelectSingle256,PgClassExpression264,PgSelectSingle270,PgClassExpression278,PgClassExpression279,PgClassExpression282,PgClassExpression285,PgClassExpression286,PgClassExpression287,PgClassExpression288,PgClassExpression290,Map1163,List1164,Map1165,List1166 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ179ᐳ[180]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item180 bucket4
@@ -1540,8 +1545,10 @@ graph TD
     class Bucket106,PgClassExpression1062,PgClassExpression1063 bucket106
     Bucket107("Bucket 107 (mutationField)<br />Deps: 138, 1068, 1070, 1090, 1125<br /><br />1: PgInsert[1082]<br />2: <br />ᐳ: Object[1086], PgClassExpression[1120]<br />3: PgSelect[1121]<br />ᐳ: 1126, 1127, 1162"):::bucket
     classDef bucket107 stroke:#7fff00
-    class Bucket107,PgInsert1082,Object1086,PgClassExpression1120,PgSelect1121,First1126,PgSelectSingle1127,Edge1162 bucket107
-    Bucket108("Bucket 108 (nullableBoundary)<br />Deps: 1082, 138, 1127, 1086, 1162, 1126, 1120<br /><br />ROOT Object{107}ᐸ{result}ᐳ[1086]<br />1: <br />ᐳ: 1151, 1130<br />2: PgSelect[1103]<br />ᐳ: First[1107], PgSelectSingle[1108]"):::bucket
+    PgCursor1129{{"PgCursor[1129∈107]"}}:::plan
+    List1131{{"List[1131∈107]<br />ᐸ1130ᐳ"}}:::plan
+    class Bucket107,PgInsert1082,Object1086,PgClassExpression1120,PgSelect1121,First1126,PgSelectSingle1127,PgCursor1129,List1131,Edge1162 bucket107
+    Bucket108("Bucket 108 (nullableBoundary)<br />Deps: 138, 1127, 1082, 1086, 1162, 1126, 1120<br /><br />ROOT Object{107}ᐸ{result}ᐳ[1086]<br />1: <br />ᐳ: 1130, 1151<br />2: PgSelect[1103]<br />ᐳ: First[1107], PgSelectSingle[1108]"):::bucket
     classDef bucket108 stroke:#ff1493
     class Bucket108,PgSelect1103,First1107,PgSelectSingle1108,PgClassExpression1130,PgClassExpression1151 bucket108
     Bucket109("Bucket 109 (nullableBoundary)<br />Deps: 1082, 138, 1108, 1120<br /><br />ROOT PgInsert{107}[1082]<br />1: <br />ᐳ: 1092, 1093<br />2: PgSelect[1094]"):::bucket
@@ -1561,7 +1568,10 @@ graph TD
     class Bucket113 bucket113
     Bucket114("Bucket 114 (nullableBoundary)<br />Deps: 1127, 1126, 1130<br /><br />ROOT PgSelectSingle{107}ᐸpostᐳ[1127]"):::bucket
     classDef bucket114 stroke:#4169e1
-    class Bucket114,PgClassExpression1133,PgSelectSingle1149,Map1159,Access1161 bucket114
+    PgClassExpression1134{{"PgClassExpression[1134∈114]<br />ᐸ__post__.”comptypes”ᐳ"}}:::plan
+    PgClassExpression1143{{"PgClassExpression[1143∈114]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
+    List1160{{"List[1160∈114]<br />ᐸ1159ᐳ"}}:::plan
+    class Bucket114,PgClassExpression1133,PgClassExpression1134,PgClassExpression1143,PgSelectSingle1149,Map1159,List1160,Access1161 bucket114
     Bucket115("Bucket 115 (listItem)<br />ROOT __Item{115}ᐸ1161ᐳ[1139]"):::bucket
     classDef bucket115 stroke:#3cb371
     class Bucket115,__Item1139,PgSelectSingle1140 bucket115

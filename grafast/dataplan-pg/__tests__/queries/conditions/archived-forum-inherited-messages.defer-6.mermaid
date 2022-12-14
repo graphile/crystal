@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -72,13 +73,15 @@ graph TD
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-6"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 28, 14<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection28 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection28 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 28, 14<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 15, 28, 14<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression17 bucket2
+    PgClassExpression23{{"PgClassExpression[23∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
+    class Bucket2,PgClassExpression17,PgClassExpression23,PgClassExpression29 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 28, 14<br /><br />ROOT Connectionᐸ24ᐳ[28]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,Access58 bucket3

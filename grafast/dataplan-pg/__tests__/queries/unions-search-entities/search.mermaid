@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
@@ -35,7 +36,7 @@ graph TD
     First34{{"First[34∈3]"}}:::plan
     PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸpostsᐳ"}}:::plan
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
-    Map75{{"Map[75∈3]<br />ᐸ35:{”0”:1}ᐳ"}}:::plan
+    Map75{{"Map[75∈3]<br />ᐸPgSelectSingle{3}ᐸpostsᐳ[35]:{”0”:1}ᐳ"}}:::plan
     PgSelectSingle43{{"PgSelectSingle[43∈3]<br />ᐸpeopleᐳ"}}:::plan
     PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgClassExpression45{{"PgClassExpression[45∈3]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
@@ -43,10 +44,10 @@ graph TD
     First50{{"First[50∈3]"}}:::plan
     PgSelectSingle51{{"PgSelectSingle[51∈3]<br />ᐸcommentsᐳ"}}:::plan
     PgClassExpression52{{"PgClassExpression[52∈3]<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
-    Map73{{"Map[73∈3]<br />ᐸ51:{”0”:3}ᐳ"}}:::plan
+    Map73{{"Map[73∈3]<br />ᐸPgSelectSingle{3}ᐸcommentsᐳ[51]:{”0”:3}ᐳ"}}:::plan
     PgSelectSingle59{{"PgSelectSingle[59∈3]<br />ᐸpeopleᐳ"}}:::plan
     PgClassExpression60{{"PgClassExpression[60∈5]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    Map71{{"Map[71∈3]<br />ᐸ51:{”0”:1,”1”:2}ᐳ"}}:::plan
+    Map71{{"Map[71∈3]<br />ᐸPgSelectSingle{3}ᐸcommentsᐳ[51]:{”0”:1,”1”:2}ᐳ"}}:::plan
     PgSelectSingle67{{"PgSelectSingle[67∈3]<br />ᐸpostsᐳ"}}:::plan
     PgClassExpression68{{"PgClassExpression[68∈6]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
     PgClassExpression69{{"PgClassExpression[69∈6]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
@@ -96,7 +97,7 @@ graph TD
     subgraph "Buckets for queries/unions-search-entities/search"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 11<br />2: PgSelect[8]<br />3: __ListTransform[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,__ListTransform12 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,__ListTransform12 bucket0
     Bucket1("Bucket 1 (subroutine)<br />ROOT PgSelectSingle{1}ᐸentity_searchᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
@@ -105,7 +106,13 @@ graph TD
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,List20,PgPolymorphic21 bucket2
     Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 17, 18, 19, 21<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgSelectSingle67,PgClassExpression70,Map71,Map73,Map75 bucket3
+    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__posts__.”author_id”ᐳ"}}:::plan
+    PgClassExpression53{{"PgClassExpression[53∈3]<br />ᐸ__comments...author_id”ᐳ"}}:::plan
+    PgClassExpression61{{"PgClassExpression[61∈3]<br />ᐸ__comments__.”post_id”ᐳ"}}:::plan
+    List72{{"List[72∈3]<br />ᐸ71ᐳ"}}:::plan
+    List74{{"List[74∈3]<br />ᐸ73ᐳ"}}:::plan
+    List76{{"List[76∈3]<br />ᐸ75ᐳ"}}:::plan
+    class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,PgClassExpression37,PgSelectSingle43,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgClassExpression53,PgSelectSingle59,PgClassExpression61,PgSelectSingle67,PgClassExpression70,Map71,List72,Map73,List74,Map75,List76 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 43<br />ᐳPost<br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[43]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression44 bucket4

@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -27,7 +28,7 @@ graph TD
     PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__houses__...or_number”ᐳ"}}:::plan
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__houses__...reet_name”ᐳ"}}:::plan
     PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__houses__...ilding_id”ᐳ"}}:::plan
-    Map378{{"Map[378∈3]<br />ᐸ22:{”0”:31,”1”:32,”2”:33}ᐳ"}}:::plan
+    Map378{{"Map[378∈3]<br />ᐸPgSelectSingle{2}ᐸhousesᐳ[22]:{”0”:31,”1”:32,”2”:33}ᐳ"}}:::plan
     PgSelectSingle40{{"PgSelectSingle[40∈3]<br />ᐸstreetsᐳ"}}:::plan
     Constant41{{"Constant[41∈1]"}}:::plan
     PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
@@ -43,7 +44,7 @@ graph TD
     List66{{"List[66∈6]<br />ᐸ64,65ᐳ"}}:::plan
     Lambda67{{"Lambda[67∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression69{{"PgClassExpression[69∈6]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    Map375{{"Map[375∈3]<br />ᐸ22:{”0”:18,”1”:19,”2”:20,”3”:21,”4”:22,”5”:23,”6”:24,”7”:25,”8”:26,”9”:27,”10”:28,”11”:29,”12”:30}ᐳ"}}:::plan
+    Map375{{"Map[375∈3]<br />ᐸPgSelectSingle{2}ᐸhousesᐳ[22]:{”0”:18,”1”:19,”2”:20,”3”:21,”4”:22,”5”:23,”6”:24,”7”:25,”8”:26,”9”:27,”10”:28,”11”:29,”12”:30}ᐳ"}}:::plan
     PgSelectSingle76{{"PgSelectSingle[76∈3]<br />ᐸbuildingsᐳ"}}:::plan
     Constant77{{"Constant[77∈1]"}}:::plan
     PgClassExpression78{{"PgClassExpression[78∈7]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
@@ -52,7 +53,7 @@ graph TD
     PgClassExpression82{{"PgClassExpression[82∈7]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
     PgClassExpression83{{"PgClassExpression[83∈7]<br />ᐸ__buildings__.”floors”ᐳ"}}:::plan
     PgClassExpression84{{"PgClassExpression[84∈7]<br />ᐸ__building...s_primary”ᐳ"}}:::plan
-    Map373{{"Map[373∈7]<br />ᐸ76:{”0”:6,”1”:7,”2”:8}ᐳ"}}:::plan
+    Map373{{"Map[373∈7]<br />ᐸPgSelectSingle{3}ᐸbuildingsᐳ[76]:{”0”:6,”1”:7,”2”:8}ᐳ"}}:::plan
     PgSelectSingle91{{"PgSelectSingle[91∈7]<br />ᐸstreetsᐳ"}}:::plan
     Constant92{{"Constant[92∈1]"}}:::plan
     PgClassExpression93{{"PgClassExpression[93∈8]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
@@ -68,7 +69,7 @@ graph TD
     List117{{"List[117∈10]<br />ᐸ115,116ᐳ"}}:::plan
     Lambda118{{"Lambda[118∈10]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression120{{"PgClassExpression[120∈10]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    Map370{{"Map[370∈7]<br />ᐸ76:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5}ᐳ"}}:::plan
+    Map370{{"Map[370∈7]<br />ᐸPgSelectSingle{3}ᐸbuildingsᐳ[76]:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5}ᐳ"}}:::plan
     PgSelectSingle127{{"PgSelectSingle[127∈7]<br />ᐸpropertiesᐳ"}}:::plan
     Constant128{{"Constant[128∈1]"}}:::plan
     PgClassExpression129{{"PgClassExpression[129∈11]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
@@ -76,7 +77,7 @@ graph TD
     Lambda131{{"Lambda[131∈11]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression133{{"PgClassExpression[133∈11]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
     PgClassExpression134{{"PgClassExpression[134∈11]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
-    Map368{{"Map[368∈11]<br />ᐸ127:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map368{{"Map[368∈11]<br />ᐸPgSelectSingle{7}ᐸpropertiesᐳ[127]:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle141{{"PgSelectSingle[141∈11]<br />ᐸstreetsᐳ"}}:::plan
     Constant142{{"Constant[142∈1]"}}:::plan
     PgClassExpression143{{"PgClassExpression[143∈12]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
@@ -92,7 +93,7 @@ graph TD
     List167{{"List[167∈14]<br />ᐸ165,166ᐳ"}}:::plan
     Lambda168{{"Lambda[168∈14]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression170{{"PgClassExpression[170∈14]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    Map365{{"Map[365∈3]<br />ᐸ22:{”0”:12,”1”:13,”2”:14,”3”:15,”4”:16,”5”:17}ᐳ"}}:::plan
+    Map365{{"Map[365∈3]<br />ᐸPgSelectSingle{2}ᐸhousesᐳ[22]:{”0”:12,”1”:13,”2”:14,”3”:15,”4”:16,”5”:17}ᐳ"}}:::plan
     PgSelectSingle177{{"PgSelectSingle[177∈3]<br />ᐸpropertiesᐳ"}}:::plan
     Constant178{{"Constant[178∈1]"}}:::plan
     PgClassExpression179{{"PgClassExpression[179∈15]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
@@ -100,7 +101,7 @@ graph TD
     Lambda181{{"Lambda[181∈15]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression183{{"PgClassExpression[183∈15]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
     PgClassExpression184{{"PgClassExpression[184∈15]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
-    Map363{{"Map[363∈15]<br />ᐸ177:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map363{{"Map[363∈15]<br />ᐸPgSelectSingle{3}ᐸpropertiesᐳ[177]:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle191{{"PgSelectSingle[191∈15]<br />ᐸstreetsᐳ"}}:::plan
     Constant192{{"Constant[192∈1]"}}:::plan
     PgClassExpression193{{"PgClassExpression[193∈16]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
@@ -116,12 +117,12 @@ graph TD
     List217{{"List[217∈18]<br />ᐸ215,216ᐳ"}}:::plan
     Lambda218{{"Lambda[218∈18]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression220{{"PgClassExpression[220∈18]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    Map360{{"Map[360∈3]<br />ᐸ22:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6,”7”:7,”8”:8,”9”:9,”10”:10,”11”:11}ᐳ"}}:::plan
+    Map360{{"Map[360∈3]<br />ᐸPgSelectSingle{2}ᐸhousesᐳ[22]:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6,”7”:7,”8”:8,”9”:9,”10”:10,”11”:11}ᐳ"}}:::plan
     PgSelectSingle228{{"PgSelectSingle[228∈3]<br />ᐸstreetPropertyᐳ"}}:::plan
     PgClassExpression229{{"PgClassExpression[229∈19]<br />ᐸ__street_p..._.”str_id”ᐳ"}}:::plan
     PgClassExpression230{{"PgClassExpression[230∈19]<br />ᐸ__street_p....”prop_id”ᐳ"}}:::plan
     PgClassExpression231{{"PgClassExpression[231∈19]<br />ᐸ__street_p...ent_owner”ᐳ"}}:::plan
-    Map358{{"Map[358∈19]<br />ᐸ228:{”0”:6,”1”:7,”2”:8}ᐳ"}}:::plan
+    Map358{{"Map[358∈19]<br />ᐸPgSelectSingle{3}ᐸstreetPropertyᐳ[228]:{”0”:6,”1”:7,”2”:8}ᐳ"}}:::plan
     PgSelectSingle238{{"PgSelectSingle[238∈19]<br />ᐸstreetsᐳ"}}:::plan
     Constant239{{"Constant[239∈1]"}}:::plan
     PgClassExpression240{{"PgClassExpression[240∈20]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
@@ -137,7 +138,7 @@ graph TD
     List264{{"List[264∈22]<br />ᐸ262,263ᐳ"}}:::plan
     Lambda265{{"Lambda[265∈22]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression267{{"PgClassExpression[267∈22]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    Map355{{"Map[355∈19]<br />ᐸ228:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5}ᐳ"}}:::plan
+    Map355{{"Map[355∈19]<br />ᐸPgSelectSingle{3}ᐸstreetPropertyᐳ[228]:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5}ᐳ"}}:::plan
     PgSelectSingle274{{"PgSelectSingle[274∈19]<br />ᐸpropertiesᐳ"}}:::plan
     Constant275{{"Constant[275∈1]"}}:::plan
     PgClassExpression276{{"PgClassExpression[276∈23]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
@@ -145,7 +146,7 @@ graph TD
     Lambda278{{"Lambda[278∈23]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression280{{"PgClassExpression[280∈23]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
     PgClassExpression281{{"PgClassExpression[281∈23]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
-    Map353{{"Map[353∈23]<br />ᐸ274:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map353{{"Map[353∈23]<br />ᐸPgSelectSingle{19}ᐸpropertiesᐳ[274]:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle288{{"PgSelectSingle[288∈23]<br />ᐸstreetsᐳ"}}:::plan
     Constant289{{"Constant[289∈1]"}}:::plan
     PgClassExpression290{{"PgClassExpression[290∈24]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
@@ -344,7 +345,7 @@ graph TD
     subgraph "Buckets for queries/v4/smart_comment_relations.houses"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 318, 319, 334, 18, 335, 336, 337<br />2: PgSelect[320], PgSelect[338]<br />ᐳ: 324, 325, 342, 343"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,__InputStaticLeaf318,__InputStaticLeaf319,PgSelect320,First324,PgSelectSingle325,__InputStaticLeaf334,Lambda335,Access336,Access337,PgSelect338,First342,PgSelectSingle343 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,__InputStaticLeaf318,__InputStaticLeaf319,PgSelect320,First324,PgSelectSingle325,__InputStaticLeaf334,Lambda335,Access336,Access337,PgSelect338,First342,PgSelectSingle343 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,Constant23,Constant41,Connection60,Constant64,Constant77,Constant92,Connection111,Constant115,Constant128,Constant142,Connection161,Constant165,Constant178,Constant192,Connection211,Constant215,Constant239,Connection258,Constant262,Constant275,Constant289,Connection308,Constant312 bucket1
@@ -353,7 +354,11 @@ graph TD
     class Bucket2,__Item21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 23, 41, 64, 77, 92, 115, 128, 142, 165, 178, 192, 215, 239, 262, 275, 289, 312, 60, 111, 161, 211, 258, 308<br /><br />ROOT PgSelectSingle{2}ᐸhousesᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression24,PgClassExpression25,List26,Lambda27,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgClassExpression32,PgSelectSingle40,PgSelectSingle76,PgSelectSingle177,PgSelectSingle228,Map360,Map365,Map375,Map378 bucket3
+    List361{{"List[361∈3]<br />ᐸ360ᐳ"}}:::plan
+    List366{{"List[366∈3]<br />ᐸ365ᐳ"}}:::plan
+    List376{{"List[376∈3]<br />ᐸ375ᐳ"}}:::plan
+    List379{{"List[379∈3]<br />ᐸ378ᐳ"}}:::plan
+    class Bucket3,PgClassExpression24,PgClassExpression25,List26,Lambda27,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgClassExpression32,PgSelectSingle40,PgSelectSingle76,PgSelectSingle177,PgSelectSingle228,Map360,List361,Map365,List366,Map375,List376,Map378,List379 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 40, 41, 378, 64, 60<br /><br />ROOT PgSelectSingle{3}ᐸstreetsᐳ[40]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression42,List43,Lambda44,PgClassExpression46,Access377 bucket4
@@ -365,7 +370,10 @@ graph TD
     class Bucket6,PgClassExpression65,List66,Lambda67,PgClassExpression69 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 76, 77, 92, 115, 128, 142, 165, 111, 161<br /><br />ROOT PgSelectSingle{3}ᐸbuildingsᐳ[76]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression78,List79,Lambda80,PgClassExpression82,PgClassExpression83,PgClassExpression84,PgSelectSingle91,PgSelectSingle127,Map370,Map373 bucket7
+    PgClassExpression121{{"PgClassExpression[121∈7]<br />ᐸ__building...operty_id”ᐳ"}}:::plan
+    List371{{"List[371∈7]<br />ᐸ370ᐳ"}}:::plan
+    List374{{"List[374∈7]<br />ᐸ373ᐳ"}}:::plan
+    class Bucket7,PgClassExpression78,List79,Lambda80,PgClassExpression82,PgClassExpression83,PgClassExpression84,PgSelectSingle91,PgClassExpression121,PgSelectSingle127,Map370,List371,Map373,List374 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 91, 92, 373, 115, 111<br /><br />ROOT PgSelectSingle{7}ᐸstreetsᐳ[91]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression93,List94,Lambda95,PgClassExpression97,Access372 bucket8
@@ -377,7 +385,8 @@ graph TD
     class Bucket10,PgClassExpression116,List117,Lambda118,PgClassExpression120 bucket10
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 127, 128, 142, 165, 161<br /><br />ROOT PgSelectSingle{7}ᐸpropertiesᐳ[127]"):::bucket
     classDef bucket11 stroke:#00ffff
-    class Bucket11,PgClassExpression129,List130,Lambda131,PgClassExpression133,PgClassExpression134,PgSelectSingle141,Map368 bucket11
+    List369{{"List[369∈11]<br />ᐸ368ᐳ"}}:::plan
+    class Bucket11,PgClassExpression129,List130,Lambda131,PgClassExpression133,PgClassExpression134,PgSelectSingle141,Map368,List369 bucket11
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 141, 142, 368, 165, 161<br /><br />ROOT PgSelectSingle{11}ᐸstreetsᐳ[141]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgClassExpression143,List144,Lambda145,PgClassExpression147,Access367 bucket12
@@ -389,7 +398,8 @@ graph TD
     class Bucket14,PgClassExpression166,List167,Lambda168,PgClassExpression170 bucket14
     Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 177, 178, 192, 215, 211<br /><br />ROOT PgSelectSingle{3}ᐸpropertiesᐳ[177]"):::bucket
     classDef bucket15 stroke:#ff00ff
-    class Bucket15,PgClassExpression179,List180,Lambda181,PgClassExpression183,PgClassExpression184,PgSelectSingle191,Map363 bucket15
+    List364{{"List[364∈15]<br />ᐸ363ᐳ"}}:::plan
+    class Bucket15,PgClassExpression179,List180,Lambda181,PgClassExpression183,PgClassExpression184,PgSelectSingle191,Map363,List364 bucket15
     Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 191, 192, 363, 215, 211<br /><br />ROOT PgSelectSingle{15}ᐸstreetsᐳ[191]"):::bucket
     classDef bucket16 stroke:#f5deb3
     class Bucket16,PgClassExpression193,List194,Lambda195,PgClassExpression197,Access362 bucket16
@@ -401,7 +411,9 @@ graph TD
     class Bucket18,PgClassExpression216,List217,Lambda218,PgClassExpression220 bucket18
     Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 228, 239, 262, 275, 289, 312, 258, 308<br /><br />ROOT PgSelectSingle{3}ᐸstreetPropertyᐳ[228]"):::bucket
     classDef bucket19 stroke:#7f007f
-    class Bucket19,PgClassExpression229,PgClassExpression230,PgClassExpression231,PgSelectSingle238,PgSelectSingle274,Map355,Map358 bucket19
+    List356{{"List[356∈19]<br />ᐸ355ᐳ"}}:::plan
+    List359{{"List[359∈19]<br />ᐸ358ᐳ"}}:::plan
+    class Bucket19,PgClassExpression229,PgClassExpression230,PgClassExpression231,PgSelectSingle238,PgSelectSingle274,Map355,List356,Map358,List359 bucket19
     Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 238, 239, 358, 262, 258<br /><br />ROOT PgSelectSingle{19}ᐸstreetsᐳ[238]"):::bucket
     classDef bucket20 stroke:#ffa500
     class Bucket20,PgClassExpression240,List241,Lambda242,PgClassExpression244,Access357 bucket20
@@ -413,7 +425,8 @@ graph TD
     class Bucket22,PgClassExpression263,List264,Lambda265,PgClassExpression267 bucket22
     Bucket23("Bucket 23 (nullableBoundary)<br />Deps: 274, 275, 289, 312, 308<br /><br />ROOT PgSelectSingle{19}ᐸpropertiesᐳ[274]"):::bucket
     classDef bucket23 stroke:#ff1493
-    class Bucket23,PgClassExpression276,List277,Lambda278,PgClassExpression280,PgClassExpression281,PgSelectSingle288,Map353 bucket23
+    List354{{"List[354∈23]<br />ᐸ353ᐳ"}}:::plan
+    class Bucket23,PgClassExpression276,List277,Lambda278,PgClassExpression280,PgClassExpression281,PgSelectSingle288,Map353,List354 bucket23
     Bucket24("Bucket 24 (nullableBoundary)<br />Deps: 288, 289, 353, 312, 308<br /><br />ROOT PgSelectSingle{23}ᐸstreetsᐳ[288]"):::bucket
     classDef bucket24 stroke:#808000
     class Bucket24,PgClassExpression290,List291,Lambda292,PgClassExpression294,Access352 bucket24

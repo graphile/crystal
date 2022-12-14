@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -20,11 +21,11 @@ graph TD
     PgClassExpression17{{"PgClassExpression[17∈1]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     PgClassExpression19{{"PgClassExpression[19∈1]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
-    Map80{{"Map[80∈1]<br />ᐸ16:{”0”:2,”1”:3}ᐳ"}}:::plan
+    Map80{{"Map[80∈1]<br />ᐸPgSelectSingle{1}ᐸcompoundKeyᐳ[16]:{”0”:2,”1”:3}ᐳ"}}:::plan
     PgSelectSingle26{{"PgSelectSingle[26∈1]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression27{{"PgClassExpression[27∈2]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression28{{"PgClassExpression[28∈2]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    Map78{{"Map[78∈1]<br />ᐸ16:{”0”:0,”1”:1}ᐳ"}}:::plan
+    Map78{{"Map[78∈1]<br />ᐸPgSelectSingle{1}ᐸcompoundKeyᐳ[16]:{”0”:0,”1”:1}ᐳ"}}:::plan
     PgSelectSingle35{{"PgSelectSingle[35∈1]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__person__.”email”ᐳ"}}:::plan
@@ -34,11 +35,11 @@ graph TD
     PgClassExpression51{{"PgClassExpression[51∈4]<br />ᐸ__foreign_...person_id”ᐳ"}}:::plan
     PgClassExpression52{{"PgClassExpression[52∈4]<br />ᐸ__foreign_...und_key_1”ᐳ"}}:::plan
     PgClassExpression53{{"PgClassExpression[53∈4]<br />ᐸ__foreign_...und_key_2”ᐳ"}}:::plan
-    Map76{{"Map[76∈4]<br />ᐸ50:{”0”:3,”1”:4}ᐳ"}}:::plan
+    Map76{{"Map[76∈4]<br />ᐸPgSelectSingle{4}ᐸforeignKeyᐳ[50]:{”0”:3,”1”:4}ᐳ"}}:::plan
     PgSelectSingle60{{"PgSelectSingle[60∈4]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression61{{"PgClassExpression[61∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression62{{"PgClassExpression[62∈5]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    Map74{{"Map[74∈4]<br />ᐸ50:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map74{{"Map[74∈4]<br />ᐸPgSelectSingle{4}ᐸforeignKeyᐳ[50]:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle70{{"PgSelectSingle[70∈4]<br />ᐸcompoundKeyᐳ"}}:::plan
     PgClassExpression71{{"PgClassExpression[71∈6]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression72{{"PgClassExpression[72∈6]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
@@ -81,10 +82,12 @@ graph TD
     subgraph "Buckets for queries/v4/simple-relations-tail-head"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[12], Access[13], Object[14]<br />2: PgSelect[11], PgSelect[45]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,PgSelect45 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,PgSelect45 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgSelectSingle26,PgSelectSingle35,Map78,Map80 bucket1
+    List79{{"List[79∈1]<br />ᐸ78ᐳ"}}:::plan
+    List81{{"List[81∈1]<br />ᐸ80ᐳ"}}:::plan
+    class Bucket1,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgSelectSingle26,PgSelectSingle35,Map78,List79,Map80,List81 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingle{1}ᐸpersonᐳ[26]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression27,PgClassExpression28 bucket2
@@ -93,7 +96,9 @@ graph TD
     class Bucket3,PgClassExpression36,PgClassExpression37 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ45ᐳ[49]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item49,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression53,PgSelectSingle60,PgSelectSingle70,Map74,Map76 bucket4
+    List75{{"List[75∈4]<br />ᐸ74ᐳ"}}:::plan
+    List77{{"List[77∈4]<br />ᐸ76ᐳ"}}:::plan
+    class Bucket4,__Item49,PgSelectSingle50,PgClassExpression51,PgClassExpression52,PgClassExpression53,PgSelectSingle60,PgSelectSingle70,Map74,List75,Map76,List77 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 60<br /><br />ROOT PgSelectSingle{4}ᐸpersonᐳ[60]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression61,PgClassExpression62 bucket5

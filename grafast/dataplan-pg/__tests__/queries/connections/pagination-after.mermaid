@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf10{{"__InputStaticLeaf[10∈0]"}}:::plan
@@ -28,7 +29,7 @@ graph TD
     List29{{"List[29∈3]<br />ᐸ28ᐳ"}}:::plan
     PgCursor27{{"PgCursor[27∈3]"}}:::plan
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    Map69{{"Map[69∈3]<br />ᐸ26:{”0”:1,”1”:2}ᐳ"}}:::plan
+    Map69{{"Map[69∈3]<br />ᐸPgSelectSingle{2}ᐸmessagesᐳ[26]:{”0”:1,”1”:2}ᐳ"}}:::plan
     PgSelectSingle37{{"PgSelectSingle[37∈3]<br />ᐸusersᐳ"}}:::plan
     PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
@@ -70,6 +71,7 @@ graph TD
     Map69 --> PgSelectSingle37
     PgSelectSingle37 --> PgClassExpression38
     PgSelectSingle37 --> PgClassExpression39
+    Connection19 --> PgPageInfo40
     PgSelect21 --> Lambda42
     PgSelect21 --> First48
     First48 --> PgSelectSingle49
@@ -89,7 +91,7 @@ graph TD
     subgraph "Buckets for queries/connections/pagination-after"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf12,Connection19,Lambda20 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf12,Connection19,Lambda20 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19, 20<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: PgValidateParsedCursor[22]<br />ᐳ: 16, 17, 23, 40, 46, 18<br />2: ToPg[24], PgSelect[65]<br />ᐳ: 66, 67, 68<br />3: PgSelect[21]<br />ᐳ: 42, 48, 49, 54, 55, 57, 58, 63, 64, 50, 59"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access16,Access17,Object18,PgSelect21,PgValidateParsedCursor22,Access23,ToPg24,PgPageInfo40,Lambda42,Constant46,First48,PgSelectSingle49,PgCursor50,PgClassExpression54,List55,Last57,PgSelectSingle58,PgCursor59,PgClassExpression63,List64,PgSelect65,First66,PgSelectSingle67,PgClassExpression68 bucket1
@@ -98,7 +100,9 @@ graph TD
     class Bucket2,__Item25,PgSelectSingle26 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[26]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgCursor27,PgClassExpression28,List29,PgClassExpression30,PgSelectSingle37,Map69 bucket3
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
+    List70{{"List[70∈3]<br />ᐸ69ᐳ"}}:::plan
+    class Bucket3,PgCursor27,PgClassExpression28,List29,PgClassExpression30,PgClassExpression31,PgSelectSingle37,Map69,List70 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 37<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[37]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression38,PgClassExpression39 bucket4

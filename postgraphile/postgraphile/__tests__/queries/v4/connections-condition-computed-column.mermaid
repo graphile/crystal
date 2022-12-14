@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf26{{"__InputStaticLeaf[26∈1]"}}:::plan
@@ -35,7 +36,7 @@ graph TD
     subgraph "Buckets for queries/v4/connections-condition-computed-column"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Connection31 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Connection31 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 31<br /><br />ROOT Connectionᐸ27ᐳ[31]<br />1: <br />ᐳ: 26, 28, 29, 30<br />2: PgSelect[32]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__InputStaticLeaf26,Access28,Access29,Object30,PgSelect32 bucket1

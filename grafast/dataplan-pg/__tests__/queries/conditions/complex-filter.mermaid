@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf14{{"__InputStaticLeaf[14∈0]"}}:::plan
@@ -43,13 +44,15 @@ graph TD
     subgraph "Buckets for queries/conditions/complex-filter"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 14, 17, 18, 28, 19<br />2: PgSelect[16]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf14,PgSelect16,Access17,Access18,Object19,__InputStaticLeaf28 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf14,PgSelect16,Access17,Access18,Object19,__InputStaticLeaf28 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ16ᐳ[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item20,PgSelectSingle21 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 20<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression22,Access40 bucket2
+    PgClassExpression30{{"PgClassExpression[30∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
+    PgClassExpression35{{"PgClassExpression[35∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
+    class Bucket2,PgClassExpression22,PgClassExpression30,PgClassExpression35,Access40 bucket2
     Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ40ᐳ[36]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item36,PgSelectSingle37 bucket3

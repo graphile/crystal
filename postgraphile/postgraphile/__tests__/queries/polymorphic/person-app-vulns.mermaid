@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
@@ -33,13 +34,13 @@ graph TD
     Access48{{"Access[48∈5]<br />ᐸ45.Symbol(data).1ᐳ"}}:::plan
     List49{{"List[49∈5]<br />ᐸ47,48ᐳ"}}:::plan
     PgCursor46{{"PgCursor[46∈5]"}}:::plan
-    JSONParse51[["JSONParse[51∈6]<br />ᐸ48ᐳ<br />ᐳAwsApplication"]]:::plan
+    JSONParse51[["JSONParse[51∈6]<br />ᐸAccess{5}ᐸ45.Symbol(data).1ᐳ[48]ᐳ<br />ᐳAwsApplication"]]:::plan
     Access52{{"Access[52∈6]<br />ᐸ51.0ᐳ"}}:::plan
     PgSelect53[["PgSelect[53∈6]<br />ᐸawsApplicationsᐳ<br />ᐳAwsApplication"]]:::plan
     First57{{"First[57∈6]"}}:::plan
     PgSelectSingle58{{"PgSelectSingle[58∈6]<br />ᐸawsApplicationsᐳ"}}:::plan
     PgClassExpression59{{"PgClassExpression[59∈6]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
-    JSONParse61[["JSONParse[61∈6]<br />ᐸ48ᐳ<br />ᐳGcpApplication"]]:::plan
+    JSONParse61[["JSONParse[61∈6]<br />ᐸAccess{5}ᐸ45.Symbol(data).1ᐳ[48]ᐳ<br />ᐳGcpApplication"]]:::plan
     Access62{{"Access[62∈6]<br />ᐸ61.0ᐳ"}}:::plan
     PgSelect63[["PgSelect[63∈6]<br />ᐸgcpApplicationsᐳ<br />ᐳGcpApplication"]]:::plan
     First67{{"First[67∈6]"}}:::plan
@@ -49,7 +50,7 @@ graph TD
     __Item71[/"__Item[71∈7]<br />ᐸ70ᐳ"\]:::itemplan
     PgUnionAllSingle72["PgUnionAllSingle[72∈7]"]:::plan
     Access73{{"Access[73∈7]<br />ᐸ72.Symbol(data).1ᐳ"}}:::plan
-    JSONParse74[["JSONParse[74∈8]<br />ᐸ73ᐳ<br />ᐳAwsApplication"]]:::plan
+    JSONParse74[["JSONParse[74∈8]<br />ᐸAccess{7}ᐸ72.Symbol(data).1ᐳ[73]ᐳ<br />ᐳAwsApplication"]]:::plan
     Access75{{"Access[75∈8]<br />ᐸ74.0ᐳ"}}:::plan
     PgSelect76[["PgSelect[76∈8]<br />ᐸawsApplicationsᐳ<br />ᐳAwsApplication"]]:::plan
     First80{{"First[80∈8]"}}:::plan
@@ -63,14 +64,14 @@ graph TD
     First91{{"First[91∈8]"}}:::plan
     PgUnionAllSingle92["PgUnionAllSingle[92∈8]"]:::plan
     Access93{{"Access[93∈8]<br />ᐸ92.Symbol(data).1ᐳ"}}:::plan
-    JSONParse94[["JSONParse[94∈9]<br />ᐸ93ᐳ<br />ᐳAwsApplicationᐳOrganization"]]:::plan
+    JSONParse94[["JSONParse[94∈9]<br />ᐸAccess{8}ᐸ92.Symbol(data).1ᐳ[93]ᐳ<br />ᐳAwsApplicationᐳOrganization"]]:::plan
     Access95{{"Access[95∈9]<br />ᐸ94.0ᐳ"}}:::plan
     PgSelect96[["PgSelect[96∈9]<br />ᐸorganizationsᐳ<br />ᐳAwsApplicationᐳOrganization"]]:::plan
     First100{{"First[100∈9]"}}:::plan
     PgSelectSingle101{{"PgSelectSingle[101∈9]<br />ᐸorganizationsᐳ"}}:::plan
     PgClassExpression102{{"PgClassExpression[102∈9]<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
     PgClassExpression103{{"PgClassExpression[103∈9]<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
-    JSONParse105[["JSONParse[105∈9]<br />ᐸ93ᐳ<br />ᐳAwsApplicationᐳPerson"]]:::plan
+    JSONParse105[["JSONParse[105∈9]<br />ᐸAccess{8}ᐸ92.Symbol(data).1ᐳ[93]ᐳ<br />ᐳAwsApplicationᐳPerson"]]:::plan
     Access106{{"Access[106∈9]<br />ᐸ105.0ᐳ"}}:::plan
     PgSelect107[["PgSelect[107∈9]<br />ᐸpeopleᐳ<br />ᐳAwsApplicationᐳPerson"]]:::plan
     First111{{"First[111∈9]"}}:::plan
@@ -81,7 +82,7 @@ graph TD
     __Item125[/"__Item[125∈10]<br />ᐸ121ᐳ"\]:::itemplan
     PgUnionAllSingle126["PgUnionAllSingle[126∈10]"]:::plan
     Access127{{"Access[127∈10]<br />ᐸ126.Symbol(data).1ᐳ"}}:::plan
-    JSONParse128[["JSONParse[128∈11]<br />ᐸ127ᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
+    JSONParse128[["JSONParse[128∈11]<br />ᐸAccess{10}ᐸ126.Symbol(data).1ᐳ[127]ᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
     Access129{{"Access[129∈11]<br />ᐸ128.0ᐳ"}}:::plan
     PgSelect130[["PgSelect[130∈11]<br />ᐸfirstPartyVulnerabilitiesᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
     First134{{"First[134∈11]"}}:::plan
@@ -90,7 +91,7 @@ graph TD
     PgClassExpression137{{"PgClassExpression[137∈11]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgClassExpression138{{"PgClassExpression[138∈11]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
     PgClassExpression139{{"PgClassExpression[139∈11]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    JSONParse141[["JSONParse[141∈11]<br />ᐸ127ᐳ<br />ᐳAwsApplicationᐳThirdPartyVulnerability"]]:::plan
+    JSONParse141[["JSONParse[141∈11]<br />ᐸAccess{10}ᐸ126.Symbol(data).1ᐳ[127]ᐳ<br />ᐳAwsApplicationᐳThirdPartyVulnerability"]]:::plan
     Access142{{"Access[142∈11]<br />ᐸ141.0ᐳ"}}:::plan
     PgSelect143[["PgSelect[143∈11]<br />ᐸthirdPartyVulnerabilitiesᐳ<br />ᐳAwsApplicationᐳThirdPartyVulnerability"]]:::plan
     First147{{"First[147∈11]"}}:::plan
@@ -111,7 +112,7 @@ graph TD
     Access176{{"Access[176∈13]<br />ᐸ173.Symbol(data).1ᐳ"}}:::plan
     List177{{"List[177∈13]<br />ᐸ175,176ᐳ<br />ᐳAwsApplication"}}:::plan
     PgCursor174{{"PgCursor[174∈13]"}}:::plan
-    JSONParse179[["JSONParse[179∈14]<br />ᐸ176ᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
+    JSONParse179[["JSONParse[179∈14]<br />ᐸAccess{13}ᐸ173.Symbol(data).1ᐳ[176]ᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
     Access180{{"Access[180∈14]<br />ᐸ179.0ᐳ"}}:::plan
     PgSelect181[["PgSelect[181∈14]<br />ᐸfirstPartyVulnerabilitiesᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
     First185{{"First[185∈14]"}}:::plan
@@ -119,7 +120,7 @@ graph TD
     PgClassExpression187{{"PgClassExpression[187∈14]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
     PgClassExpression188{{"PgClassExpression[188∈14]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgClassExpression189{{"PgClassExpression[189∈14]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    JSONParse191[["JSONParse[191∈14]<br />ᐸ176ᐳ<br />ᐳAwsApplicationᐳThirdPartyVulnerability"]]:::plan
+    JSONParse191[["JSONParse[191∈14]<br />ᐸAccess{13}ᐸ173.Symbol(data).1ᐳ[176]ᐳ<br />ᐳAwsApplicationᐳThirdPartyVulnerability"]]:::plan
     Access192{{"Access[192∈14]<br />ᐸ191.0ᐳ"}}:::plan
     PgSelect193[["PgSelect[193∈14]<br />ᐸthirdPartyVulnerabilitiesᐳ<br />ᐳAwsApplicationᐳThirdPartyVulnerability"]]:::plan
     First197{{"First[197∈14]"}}:::plan
@@ -127,7 +128,7 @@ graph TD
     PgClassExpression199{{"PgClassExpression[199∈14]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
     PgClassExpression200{{"PgClassExpression[200∈14]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgClassExpression201{{"PgClassExpression[201∈14]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    JSONParse203[["JSONParse[203∈8]<br />ᐸ73ᐳ<br />ᐳGcpApplication"]]:::plan
+    JSONParse203[["JSONParse[203∈8]<br />ᐸAccess{7}ᐸ72.Symbol(data).1ᐳ[73]ᐳ<br />ᐳGcpApplication"]]:::plan
     Access204{{"Access[204∈8]<br />ᐸ203.0ᐳ"}}:::plan
     PgSelect205[["PgSelect[205∈8]<br />ᐸgcpApplicationsᐳ<br />ᐳGcpApplication"]]:::plan
     First209{{"First[209∈8]"}}:::plan
@@ -141,14 +142,14 @@ graph TD
     First220{{"First[220∈8]"}}:::plan
     PgUnionAllSingle221["PgUnionAllSingle[221∈8]"]:::plan
     Access222{{"Access[222∈8]<br />ᐸ221.Symbol(data).1ᐳ"}}:::plan
-    JSONParse223[["JSONParse[223∈15]<br />ᐸ222ᐳ<br />ᐳGcpApplicationᐳOrganization"]]:::plan
+    JSONParse223[["JSONParse[223∈15]<br />ᐸAccess{8}ᐸ221.Symbol(data).1ᐳ[222]ᐳ<br />ᐳGcpApplicationᐳOrganization"]]:::plan
     Access224{{"Access[224∈15]<br />ᐸ223.0ᐳ"}}:::plan
     PgSelect225[["PgSelect[225∈15]<br />ᐸorganizationsᐳ<br />ᐳGcpApplicationᐳOrganization"]]:::plan
     First229{{"First[229∈15]"}}:::plan
     PgSelectSingle230{{"PgSelectSingle[230∈15]<br />ᐸorganizationsᐳ"}}:::plan
     PgClassExpression231{{"PgClassExpression[231∈15]<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
     PgClassExpression232{{"PgClassExpression[232∈15]<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
-    JSONParse234[["JSONParse[234∈15]<br />ᐸ222ᐳ<br />ᐳGcpApplicationᐳPerson"]]:::plan
+    JSONParse234[["JSONParse[234∈15]<br />ᐸAccess{8}ᐸ221.Symbol(data).1ᐳ[222]ᐳ<br />ᐳGcpApplicationᐳPerson"]]:::plan
     Access235{{"Access[235∈15]<br />ᐸ234.0ᐳ"}}:::plan
     PgSelect236[["PgSelect[236∈15]<br />ᐸpeopleᐳ<br />ᐳGcpApplicationᐳPerson"]]:::plan
     First240{{"First[240∈15]"}}:::plan
@@ -159,7 +160,7 @@ graph TD
     __Item254[/"__Item[254∈16]<br />ᐸ250ᐳ"\]:::itemplan
     PgUnionAllSingle255["PgUnionAllSingle[255∈16]"]:::plan
     Access256{{"Access[256∈16]<br />ᐸ255.Symbol(data).1ᐳ"}}:::plan
-    JSONParse257[["JSONParse[257∈17]<br />ᐸ256ᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
+    JSONParse257[["JSONParse[257∈17]<br />ᐸAccess{16}ᐸ255.Symbol(data).1ᐳ[256]ᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
     Access258{{"Access[258∈17]<br />ᐸ257.0ᐳ"}}:::plan
     PgSelect259[["PgSelect[259∈17]<br />ᐸfirstPartyVulnerabilitiesᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
     First263{{"First[263∈17]"}}:::plan
@@ -168,7 +169,7 @@ graph TD
     PgClassExpression266{{"PgClassExpression[266∈17]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgClassExpression267{{"PgClassExpression[267∈17]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
     PgClassExpression268{{"PgClassExpression[268∈17]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    JSONParse270[["JSONParse[270∈17]<br />ᐸ256ᐳ<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
+    JSONParse270[["JSONParse[270∈17]<br />ᐸAccess{16}ᐸ255.Symbol(data).1ᐳ[256]ᐳ<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
     Access271{{"Access[271∈17]<br />ᐸ270.0ᐳ"}}:::plan
     PgSelect272[["PgSelect[272∈17]<br />ᐸthirdPartyVulnerabilitiesᐳ<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
     First276{{"First[276∈17]"}}:::plan
@@ -189,7 +190,7 @@ graph TD
     Access305{{"Access[305∈19]<br />ᐸ302.Symbol(data).1ᐳ"}}:::plan
     List306{{"List[306∈19]<br />ᐸ304,305ᐳ<br />ᐳGcpApplication"}}:::plan
     PgCursor303{{"PgCursor[303∈19]"}}:::plan
-    JSONParse308[["JSONParse[308∈20]<br />ᐸ305ᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
+    JSONParse308[["JSONParse[308∈20]<br />ᐸAccess{19}ᐸ302.Symbol(data).1ᐳ[305]ᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
     Access309{{"Access[309∈20]<br />ᐸ308.0ᐳ"}}:::plan
     PgSelect310[["PgSelect[310∈20]<br />ᐸfirstPartyVulnerabilitiesᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
     First314{{"First[314∈20]"}}:::plan
@@ -197,7 +198,7 @@ graph TD
     PgClassExpression316{{"PgClassExpression[316∈20]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
     PgClassExpression317{{"PgClassExpression[317∈20]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgClassExpression318{{"PgClassExpression[318∈20]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    JSONParse320[["JSONParse[320∈20]<br />ᐸ305ᐳ<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
+    JSONParse320[["JSONParse[320∈20]<br />ᐸAccess{19}ᐸ302.Symbol(data).1ᐳ[305]ᐳ<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
     Access321{{"Access[321∈20]<br />ᐸ320.0ᐳ"}}:::plan
     PgSelect322[["PgSelect[322∈20]<br />ᐸthirdPartyVulnerabilitiesᐳ<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
     First326{{"First[326∈20]"}}:::plan
@@ -401,7 +402,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-app-vulns"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,Access16,Access17,Object18,Connection19 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,Access16,Access17,Object18,Connection19 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,Connection38 bucket1

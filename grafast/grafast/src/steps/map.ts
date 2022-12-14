@@ -76,7 +76,7 @@ export class MapStep extends UnbatchedExecutableStep {
 
   toStringMeta(): string {
     return (
-      chalk.bold.yellow(String(this.dependencies[0])) +
+      chalk.bold.yellow(String(this.dependencies[0].id)) +
       ":" +
       JSON.stringify(this.actualKeyByDesiredKey)
     );

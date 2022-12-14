@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf9{{"__InputStaticLeaf[9∈0]"}}:::plan
@@ -116,7 +117,7 @@ graph TD
     subgraph "Buckets for mutations/v4/pg11.types"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,Access28,Access29,Object30,List32,Object33,__InputStaticLeaf57,__InputStaticLeaf58,__InputStaticLeaf60,__InputStaticLeaf61,__InputStaticLeaf62,__InputStaticLeaf64,List77,Object78 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,Access28,Access29,Object30,List32,Object33,__InputStaticLeaf57,__InputStaticLeaf58,__InputStaticLeaf60,__InputStaticLeaf61,__InputStaticLeaf62,__InputStaticLeaf64,List77,Object78 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 30, 9, 12, 13, 32, 33<br /><br />1: PgUpdate[27]<br />2: <br />ᐳ: Object[31]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdate27,Object31 bucket1

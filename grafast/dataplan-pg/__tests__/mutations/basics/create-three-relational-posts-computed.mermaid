@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant7{{"Constant[7∈0]"}}:::plan
@@ -188,7 +189,7 @@ graph TD
     subgraph "Buckets for mutations/basics/create-three-relational-posts-computed"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Constant7,Constant8,Access10,Access11,Object12,Constant13,Constant14,Constant19,Constant20,__InputStaticLeaf28,__InputStaticLeaf80,__InputStaticLeaf132 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Constant7,Constant8,Access10,Access11,Object12,Constant13,Constant14,Constant19,Constant20,__InputStaticLeaf28,__InputStaticLeaf80,__InputStaticLeaf132 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 7, 8, 13, 14, 19, 20, 28, 80, 132, 5<br /><br />1: PgSelect[9]<br />2: PgSelect[15]<br />3: PgSelect[21]<br />4: 29, 81, 133<br />ᐳ: 25, 26, 27, 33, 34, 37, 85, 86, 89, 137, 138, 141"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect9,PgSelect15,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,PgSelect29,First33,PgSelectSingle34,PgClassExpression37,PgSelect81,First85,PgSelectSingle86,PgClassExpression89,PgSelect133,First137,PgSelectSingle138,PgClassExpression141 bucket1
