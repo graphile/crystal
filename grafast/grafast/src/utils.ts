@@ -308,6 +308,7 @@ export function arraysMatch<T>(
   array2: ReadonlyArray<T>,
   comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
 ): boolean {
+  if (array1 === array2) return true;
   const l = array1.length;
   if (l !== array2.length) {
     return false;
