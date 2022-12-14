@@ -35,7 +35,7 @@ export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
  */
 export const $$noExec = Symbol("noExec");
 
-function throwDestroyed(this: ExecutableStep) {
+function throwDestroyed(this: ExecutableStep): any {
   let message: string;
   try {
     message = `${this} has been destroyed; calling methods on it is no longer possible`;
