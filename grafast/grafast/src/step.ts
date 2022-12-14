@@ -108,9 +108,9 @@ export abstract class BaseStep {
   public layerPlan: LayerPlan;
   /** @deprecated please use layerPlan.operationPlan instead */
   public opPlan: OperationPlan;
-  public isArgumentsFinalized = false;
-  public isFinalized = false;
-  public debug = getDebug();
+  public isArgumentsFinalized: boolean;
+  public isFinalized: boolean;
+  public debug: boolean;
 
   // TODO: change hasSideEffects to getter/setter, forbid setting after a
   // particular phase.
@@ -118,9 +118,13 @@ export abstract class BaseStep {
    * Set this true for plans that implement mutations; this will prevent them
    * from being tree-shaken.
    */
-  public hasSideEffects = false;
+  public hasSideEffects: boolean;
 
   constructor() {
+    this.isArgumentsFinalized = false;
+    this.isFinalized = false;
+    this.debug = getDebug();
+    this.hasSideEffects = false;
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
     this.opPlan = layerPlan.operationPlan;
@@ -168,19 +172,6 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   static $$export: any;
 
   /**
-   * @internal
-   */
-  public _pathByDescendent: Map<ExecutableStep, ExecutableStep[] | null> =
-    new Map();
-
-  /**
-   * Only assigned once operationPlan is 'ready'.
-   *
-   * @internal
-   */
-  public _recursiveDependencyIds = new Set<string>();
-
-  /**
    * Setting this true is a performance optimisation, but it comes with strong
    * rules; we do not test you comply with these rules (as that would undo the
    * performance gains) but should you break them the behaviour is undefined
@@ -208,24 +199,8 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * The plan this plan will need data from in order to execute.
    * @internal
    */
-  public readonly dependencies: ReadonlyArray<ExecutableStep> = [];
+  public readonly dependencies: ReadonlyArray<ExecutableStep>;
 
-  /**
-   * The ids of the dependencies of this step that are in the same layer as it
-   * (optimization for executeBucket). Populated when finilizing the
-   * OperationPlan.
-   *
-   * @internal
-   */
-  public _sameLayerDependencies: Array<number> = [];
-
-  /**
-   * The plans that depend on this plan. Not populated until the 'finalize'
-   * phase; so don't rely on it until the OperationPlan is 'ready'.
-   *
-   * @internal
-   */
-  public sameLayerDependentPlans: Array<ExecutableStep> = [];
   /**
    * Just for mermaid
    * @internal
@@ -233,14 +208,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public dependents: ReadonlySet<{
     step: ExecutableStep;
     dependencyIndex: number;
-  }> = new Set();
-
-  /**
-   * Every layer plan has exactly one parent step. This is the reverse relationship.
-   *
-   * @internal
-   */
-  public childLayerPlans: Array<LayerPlan<any>> = [];
+  }>;
 
   /**
    * We reserve the right to change our mind as to whether this is a string or
@@ -254,17 +222,17 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   /**
    * True when `optimize` has been called at least once.
    */
-  public isOptimized = false;
+  public isOptimized: boolean;
   /**
    * Set this true if your plan's optimize method can be called a second time;
    * note that in this situation it's likely that your dependencies will not be
    * what you expect them to be (e.g. a PgSelectSingleStep might become an
    * AccessStep).
    */
-  public allowMultipleOptimizations = false;
+  public allowMultipleOptimizations: boolean;
 
   /** @internal */
-  public _stepOptions: StepOptions = { stream: null };
+  public _stepOptions: StepOptions;
 
   /** @internal */
   public polymorphicPaths: ReadonlySet<string>;
@@ -277,7 +245,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    */
-  public store = true;
+  public store: boolean;
 
   /**
    * Override the metaKey to be able to share execution meta between multiple
@@ -287,6 +255,12 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
 
   constructor() {
     super();
+    this.dependencies = [];
+    this.dependents = new Set();
+    this.isOptimized = false;
+    this.allowMultipleOptimizations = false;
+    this._stepOptions = { stream: null };
+    this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
     this.id = this.layerPlan._addStep(this);
     // @ts-ignore

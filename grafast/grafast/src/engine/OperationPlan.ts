@@ -2514,13 +2514,6 @@ export class OperationPlan {
           `When calling ${step}.finalize() a new plan was created; this is forbidden!`,
         );
       }
-      step._sameLayerDependencies = [];
-      for (const dep of step.dependencies) {
-        if (dep.layerPlan === step.layerPlan) {
-          dep.sameLayerDependentPlans.push(step);
-          step._sameLayerDependencies.push(dep.id);
-        }
-      }
     }
   }
 
