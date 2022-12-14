@@ -1888,6 +1888,7 @@ export class OperationPlan {
           for (const d of dep.dependents) {
             if (
               d.dependencyIndex === dependencyIndex &&
+              d.step !== step &&
               !allPeers.has(d.step) &&
               d.step.dependencies.length === dependencyCount &&
               isMaybeAPeer(step, compatibleLayerPlans, d.step)
@@ -1898,7 +1899,11 @@ export class OperationPlan {
         } else {
           const stillPeers = new Set<ExecutableStep>();
           for (const d of dep.dependents) {
-            if (d.dependencyIndex === dependencyIndex && allPeers.has(d.step)) {
+            if (
+              d.dependencyIndex === dependencyIndex &&
+              d.step !== step &&
+              allPeers.has(d.step)
+            ) {
               stillPeers.add(d.step);
             }
           }
