@@ -177,6 +177,13 @@ export class StepTracker {
     if (!step && !allowUnset) {
       throw new Error(`Illegal step access? Step with id ${id} doesn't exist`);
     }
+    if (isDev) {
+      if (step && !this.activeSteps.has(step)) {
+        throw new Error(
+          `${step} is not active, but we retrieved it from stepTracker.getStepById(${id}, ${allowUnset})`,
+        );
+      }
+    }
     return step;
   }
 
@@ -357,9 +364,9 @@ export class StepTracker {
     // layer plans, output plans. (NOTE: if this call has come from replaceStep
     // then there shouldn't be any dependents).
 
-    if (this.stepById[$original.id] === $original) {
+    for (const id of this.aliasesById[$original.id]) {
       // Nothing needs us, so set ourself null (DELIBERATELY BYPASSES TYPESCRIPT!)
-      this.stepById[$original.id] = null as any;
+      this.stepById[id] = null as any;
     }
     this.aliasesById[$original.id] = null as any;
 

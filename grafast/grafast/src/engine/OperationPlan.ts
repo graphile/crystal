@@ -1757,58 +1757,29 @@ export class OperationPlan {
       return;
     }
 
-    let previousStepCount = this.stepTracker.stepCount;
-    let steps: ExecutableStep[] = [];
+    const previousStepCount = this.stepTracker.stepCount;
 
-    /** Sort steps into the order to be processed. */
-    const sortSteps = () => {
-      // Sets are ordered in insertion order
-      const ordered = new Set<ExecutableStep>();
-      /** Adds 'step' to ordered, ensuring that all step's dependencies are there first */
-      const process = (step: ExecutableStep) => {
-        if (isDev && ordered.has(step)) {
-          throw new Error(
-            "Please ensure this step hasn't already been processed",
-          );
-        }
-        for (const dep of step.dependencies) {
-          if (!ordered.has(dep) && steps.includes(dep)) {
-            process(dep);
-          }
-        }
-        ordered.add(step);
-      };
-
-      for (let i = 0, l = steps.length; i < l; i++) {
-        const step = steps[i];
-        if (!ordered.has(step)) {
-          process(step);
-        }
-      }
-
-      // We want to `.pop()` steps from our list because that's more performant
-      // than `.shift()`, so we actually sort into reverse order
-      if (order === "dependencies-first") {
-        steps = [...ordered].reverse();
-      } else {
-        steps = [...ordered];
-      }
-    };
-
-    // DELIBERATELY shadows `fromStepId`
-    const processStepsFrom = (fromStepId: number) => {
-      // TODO: improve!
-      for (let stepId = fromStepId; stepId < previousStepCount; stepId++) {
-        const step = this.stepTracker.getStepById(stepId, true);
-        if (step && step.id === stepId) {
-          steps.push(step);
-        }
-      }
-      sortSteps();
-    };
-    processStepsFrom(fromStepId);
+    const processed = new Set<ExecutableStep>();
 
     const processStep = (step: ExecutableStep) => {
+      if (processed.has(step)) {
+        return step;
+      }
+      processed.add(step);
+      if (order === "dependents-first") {
+        for (const { step: $processFirst } of step.dependents) {
+          if ($processFirst.id >= fromStepId && !processed.has($processFirst)) {
+            processStep($processFirst);
+          }
+        }
+      } else {
+        for (const $processFirst of step.dependencies) {
+          if ($processFirst.id >= fromStepId && !processed.has($processFirst)) {
+            processStep($processFirst);
+          }
+        }
+      }
+
       let replacementStep: ExecutableStep = step;
       try {
         replacementStep = withGlobalLayerPlan(
@@ -1833,41 +1804,37 @@ export class OperationPlan {
         this.replaceStep(step, replacementStep);
       }
 
-      if (this.stepTracker.stepCount > previousStepCount) {
-        // We've generated new steps; they must be processed too!
-        const firstNewStepId = previousStepCount;
-        previousStepCount = this.stepTracker.stepCount;
-        processStepsFrom(firstNewStepId);
-      }
 
       return replacementStep;
     };
 
-    const oldPlanCount = this.stepTracker.stepCount;
-    let step;
-    while ((step = steps.pop())) {
-      if (!this.stepTracker.activeSteps.has(step)) {
-        // Must have been tree-shaken away!
-        continue;
-      }
+    for (let i = fromStepId; i < this.stepTracker.stepCount; i++) {
+      const step = this.stepTracker.getStepById(i, true);
+      // Must have been tree-shaken away!
+      if (!step || step.id !== i) continue;
       const resultStep = processStep(step);
-      const plansAdded = this.stepTracker.stepCount - oldPlanCount;
+      if (isDev) {
+        const plansAdded = this.stepTracker.stepCount - previousStepCount;
 
-      // NOTE: whilst processing steps new steps may be added, thus we must loop
-      // ascending and we must re-evaluate this.stepTracker.stepCount on each loop
-      // iteration.
-      if (isDev && plansAdded > 100000) {
-        throw new Error(
-          `Whilst processing steps as part of ${actionDescription}Plans, ${plansAdded} new steps have been created... That seems like it's likely a bug in the relevant method of one of your steps. The last plan processed was ${resultStep}`,
-        );
+        // NOTE: whilst processing steps new steps may be added, thus we must loop
+        // ascending and we must re-evaluate this.stepTracker.stepCount on each loop
+        // iteration.
+        if (plansAdded > 100000) {
+          throw new Error(
+            `Whilst processing steps as part of ${actionDescription}Plans, ${plansAdded} new steps have been created... That seems like it's likely a bug in the relevant method of one of your steps. The last plan processed was ${resultStep}`,
+          );
+        }
       }
     }
 
-    if (this.phase !== "plan" && this.stepTracker.stepCount > oldPlanCount) {
+    if (
+      this.phase !== "plan" &&
+      this.stepTracker.stepCount > previousStepCount
+    ) {
       // Any time new steps are added we should validate them. All plans are
       // validated once "plan" is finished, so no need to do it here for that
       // phase.
-      this.validateSteps(oldPlanCount);
+      this.validateSteps(previousStepCount);
     }
   }
 
