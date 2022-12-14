@@ -1870,7 +1870,7 @@ export class OperationPlan {
     // dependents is a quick way to avoid having to scan every single step.
     const l = step.dependencies.length;
     if (l > 0) {
-      const allPotentialPeers = new Set<ExecutableStep>();
+      let allPeers = new Set<ExecutableStep>();
       const deps = step.dependencies;
       for (
         let dependencyIndex = 0, dependencyCount = deps.length;
@@ -1878,6 +1878,10 @@ export class OperationPlan {
         dependencyIndex++
       ) {
         const dep = deps[dependencyIndex];
+        if (dep.dependents.size === 1) {
+          // I must be the only step!
+          return [step];
+        }
         if (dependencyIndex === 0) {
           for (const d of dep.dependents) {
             if (
@@ -1885,31 +1889,24 @@ export class OperationPlan {
               d.step.dependencies.length === dependencyCount &&
               isMaybeAPeer(step, compatibleLayerPlans, d.step)
             ) {
-              allPotentialPeers.add(d.step);
+              allPeers.add(d.step);
             }
           }
         } else {
           const stillPeers = new Set<ExecutableStep>();
           for (const d of dep.dependents) {
-            if (
-              d.dependencyIndex === dependencyIndex &&
-              allPotentialPeers.has(d.step)
-            ) {
+            if (d.dependencyIndex === dependencyIndex && allPeers.has(d.step)) {
               stillPeers.add(d.step);
             }
           }
-          for (const p of allPotentialPeers) {
-            if (!stillPeers.has(p)) {
-              allPotentialPeers.delete(p);
-              if (allPotentialPeers.size === 0) {
-                // Shortcut
-                return [step];
-              }
-            }
+          allPeers = stillPeers;
+          if (allPeers.size === 0) {
+            // Shortcut
+            return [step];
           }
         }
       }
-      return [step, ...allPotentialPeers];
+      return [step, ...allPeers];
     } else {
       const result = [step];
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
