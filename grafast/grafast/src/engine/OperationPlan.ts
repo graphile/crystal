@@ -1728,17 +1728,6 @@ export class OperationPlan {
     this.stepTracker.replaceStep($original, $replacement);
   }
 
-  private replaceSteps(
-    originalSteps: ExecutableStep[],
-    $replacement: ExecutableStep,
-  ): void {
-    for (const $original of originalSteps) {
-      if ($original !== $replacement) {
-        this.replaceStep($original, $replacement);
-      }
-    }
-  }
-
   // TODO: optimize
   /**
    * Process the given steps, either dependencies first (root to leaf) or
@@ -2280,17 +2269,20 @@ export class OperationPlan {
       }
     }
 
-    const allEquivalentSteps = [...new Set([step, ...equivalentSteps])];
+    const allEquivalentSteps = new Set([step, ...equivalentSteps]);
 
     // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
     let minDepth = Infinity;
     let stepsAtMinDepth: ExecutableStep[] = [];
-    for (let i = 0, l = allEquivalentSteps.length; i < l; i++) {
-      const step = allEquivalentSteps[i];
+    for (const step of allEquivalentSteps) {
       let depth = 0;
       let layer: LayerPlan | null = step.layerPlan;
       while ((layer = layer.parentLayerPlan)) {
         depth++;
+        if (depth > minDepth) {
+          // No point digging deeper
+          break;
+        }
       }
       if (depth < minDepth) {
         minDepth = depth;
@@ -2314,8 +2306,11 @@ export class OperationPlan {
     }
 
     const { layersAtMinDepth, stepsAtMinDepth, allEquivalentSteps } = result;
-    if (allEquivalentSteps.length === 1 && allEquivalentSteps[0] === step) {
-      return step;
+    if (allEquivalentSteps.size === 1) {
+      const [first] = allEquivalentSteps;
+      if (first === step) {
+        return step;
+      }
     }
     assert.strictEqual(
       layersAtMinDepth.length,
@@ -2333,11 +2328,9 @@ export class OperationPlan {
     for (const target of allEquivalentSteps) {
       if (winner !== target) {
         target.deduplicatedWith(winner);
+        this.replaceStep(target, winner);
       }
     }
-
-    // Everything else is equivalent to winner!
-    this.replaceSteps(allEquivalentSteps, winner);
 
     return winner;
   }
