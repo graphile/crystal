@@ -2557,9 +2557,16 @@ export class OperationPlan {
       if (!layerPlan) {
         continue;
       }
-      layerPlan.steps = [...this.stepTracker.activeSteps].filter(
-        (s) => s.layerPlan === layerPlan,
-      );
+      layerPlan.steps = [];
+    }
+    for (const step of this.stepTracker.activeSteps) {
+      step.layerPlan.steps.push(step);
+    }
+
+    for (const layerPlan of this.stepTracker.layerPlans) {
+      if (!layerPlan) {
+        continue;
+      }
       layerPlan.pendingSteps = layerPlan.steps.filter((s) => !($$noExec in s));
       const sideEffectSteps = layerPlan.pendingSteps.filter(
         (s) => s.hasSideEffects,
