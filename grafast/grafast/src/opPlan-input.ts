@@ -13,7 +13,6 @@ import {
   isScalarType,
 } from "graphql";
 
-import { isDev } from "./dev.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { __InputObjectStep, __TrackedObjectStep } from "./index.js";
 import type { InputStep } from "./input.js";

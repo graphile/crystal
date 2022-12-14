@@ -1870,25 +1870,36 @@ export class OperationPlan {
     // dependents is a quick way to avoid having to scan every single step.
     const l = step.dependencies.length;
     if (l > 0) {
-      let allPotentialPeers!: Set<ExecutableStep>;
+      const allPotentialPeers = new Set<ExecutableStep>();
       const deps = step.dependencies;
-      for (let i = 0, l = deps.length; i < l; i++) {
-        const dep = deps[i];
-        const potentialPeers = new Set<ExecutableStep>();
-        for (const d of dep.dependents) {
-          if (
-            d.dependencyIndex === i &&
-            d.step.dependencies.length === l &&
-            isMaybeAPeer(step, compatibleLayerPlans, d.step)
-          ) {
-            potentialPeers.add(d.step);
+      for (
+        let dependencyIndex = 0, dependencyCount = deps.length;
+        dependencyIndex < dependencyCount;
+        dependencyIndex++
+      ) {
+        const dep = deps[dependencyIndex];
+        if (dependencyIndex === 0) {
+          for (const d of dep.dependents) {
+            if (
+              d.dependencyIndex === dependencyIndex &&
+              d.step.dependencies.length === dependencyCount &&
+              isMaybeAPeer(step, compatibleLayerPlans, d.step)
+            ) {
+              allPotentialPeers.add(d.step);
+            }
           }
-        }
-        if (i === 0) {
-          allPotentialPeers = potentialPeers;
         } else {
+          const stillPeers = new Set<ExecutableStep>();
+          for (const d of dep.dependents) {
+            if (
+              d.dependencyIndex === dependencyIndex &&
+              allPotentialPeers.has(d.step)
+            ) {
+              stillPeers.add(d.step);
+            }
+          }
           for (const p of allPotentialPeers) {
-            if (!potentialPeers.has(p)) {
+            if (!stillPeers.has(p)) {
               allPotentialPeers.delete(p);
               if (allPotentialPeers.size === 0) {
                 // Shortcut

@@ -11,7 +11,6 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
-import { stripAnsi } from "../stripAnsi.js";
 import { newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
