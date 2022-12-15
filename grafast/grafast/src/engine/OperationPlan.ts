@@ -2072,7 +2072,7 @@ export class OperationPlan {
         : null;
 
     // 2: move it up a layer
-    step.layerPlan = step.layerPlan.parentLayerPlan;
+    (step.layerPlan as any) = step.layerPlan.parentLayerPlan;
 
     // 3: if it's was in a subroutine, the subroutine parent plan needs to list it as a dependency
     if ($subroutine) {
@@ -2248,7 +2248,7 @@ export class OperationPlan {
     }
 
     // 2: move it to target layer
-    step.layerPlan = deepest;
+    (step.layerPlan as any) = deepest;
   }
 
   private _deduplicateInnerLogic(step: ExecutableStep) {

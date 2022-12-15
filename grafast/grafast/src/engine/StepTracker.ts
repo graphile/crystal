@@ -421,13 +421,9 @@ export class StepTracker {
    * This method removes $original from the various maps/sets/lists, and also
    * removes the fact that it was dependent on other steps. If these other
    * steps no longer have any dependents (steps, layer plans or output plans)
-   * then they can also be eradicated.
+   * then they can also be eradicated _except_ during the 'plan' phase.
    */
   private eradicate($original: ExecutableStep) {
-    // TODO: first eradicate everything that depends on this step - steps,
-    // layer plans, output plans. (NOTE: if this call has come from replaceStep
-    // then there shouldn't be any dependents).
-
     const oldAliases = this.aliasesById[$original.id];
     if (oldAliases) {
       for (const id of oldAliases) {
@@ -461,7 +457,17 @@ export class StepTracker {
       }
     }
 
+    // Ensure nothing depends on this step - steps, layer plans, output plans.
+    // This should already be the case, so we just do it in dev as a
+    // consistency check.
     if (isDev) {
+      if ($original.dependents.size > 0) {
+        throw new Error(
+          `${$original} eradicated, but it is needed by ${[
+            ...$original.dependents,
+          ].map((d) => d.step)}`,
+        );
+      }
       const outputPlansByRoot = this.outputPlansByRootStep.get($original);
       if (outputPlansByRoot && outputPlansByRoot.size !== 0) {
         throw new Error(

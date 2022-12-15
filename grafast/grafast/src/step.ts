@@ -115,9 +115,9 @@ export abstract class BaseStep {
    *
    * @internal
    */
-  public layerPlan: LayerPlan;
+  public readonly layerPlan: LayerPlan;
   /** @deprecated please use layerPlan.operationPlan instead */
-  public opPlan: OperationPlan;
+  public readonly opPlan: OperationPlan;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   public debug: boolean;
@@ -215,7 +215,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * Just for mermaid
    * @internal
    */
-  public dependents: ReadonlySet<{
+  public readonly dependents: ReadonlySet<{
     step: ExecutableStep;
     dependencyIndex: number;
   }>;
