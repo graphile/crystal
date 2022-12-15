@@ -26,9 +26,7 @@ export class ListStep<
   }
 
   toStringMeta() {
-    return this.dependencies
-      .map((id) => this.opPlan.dangerouslyGetStep(id).id)
-      .join(",");
+    return this.dependencies.map(($dep) => $dep.id).join(",");
   }
 
   // Could be used to reduce the number of unique values returned
@@ -89,9 +87,7 @@ export class ListStep<
   public at<TIndex extends keyof TPlanTuple>(
     index: TIndex,
   ): TPlanTuple[TIndex] {
-    return this.getStep(
-      this.dependencies[index as number],
-    ) as TPlanTuple[TIndex];
+    return this.getDep(index as number) as TPlanTuple[TIndex];
   }
 }
 

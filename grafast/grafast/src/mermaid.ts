@@ -88,7 +88,7 @@ export function printPlanGraph(
   {
     steps,
   }: {
-    steps: OperationPlan["steps"];
+    steps: { [stepId: number]: ExecutableStep };
   },
 ): string {
   const color = (i: number) => {
@@ -133,7 +133,7 @@ export function printPlanGraph(
       const polyPaths = pp(plan.polymorphicPaths);
       const polyPathsIfDifferent =
         plan.dependencies.length === 1 &&
-        pp(steps[plan.dependencies[0]].polymorphicPaths) === polyPaths
+        pp(plan.dependencies[0].polymorphicPaths) === polyPaths
           ? ""
           : `\n${polyPaths}`;
 
@@ -185,8 +185,8 @@ export function printPlanGraph(
     "dependencies-first",
     (plan) => {
       const planNode = planId(plan);
-      const depNodes = plan.dependencies.map((depId) => {
-        return planId(steps[depId]);
+      const depNodes = plan.dependencies.map(($dep) => {
+        return planId($dep);
       });
       const transformItemPlanNode = null;
       // TODO: bucket steps need to be factored in here.
@@ -206,11 +206,7 @@ export function printPlanGraph(
             graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
           }
         } else {
-          if (
-            concise &&
-            plan.dependentPlans.length === 0 &&
-            depNodes.length === 1
-          ) {
+          if (concise && plan.dependents.size === 0 && depNodes.length === 1) {
             // Try alternating the nodes so they render closer together
             const depNode = depNodes[0];
             if (chainByDep[depNode] === undefined) {
@@ -233,8 +229,8 @@ export function printPlanGraph(
 
   graph.push("");
   if (!concise) graph.push("    subgraph Buckets");
-  for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
-    const layerPlan = operationPlan.layerPlans[i];
+  for (let i = 0, l = operationPlan.stepTracker.layerPlans.length; i < l; i++) {
+    const layerPlan = operationPlan.stepTracker.layerPlans[i];
     if (!layerPlan || layerPlan.id !== i) {
       continue;
     }
@@ -257,8 +253,10 @@ export function printPlanGraph(
                 .join(", ")}\n`
             : ""
         }${pp(layerPlan.polymorphicPaths)}${
-          layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
-            ? `\nROOT ${operationPlan.dangerouslyGetStep(layerPlan.rootStepId)}`
+          layerPlan.rootStep != null && layerPlan.reason.type !== "root"
+            ? `\nROOT ${operationPlan.dangerouslyGetStep(
+                layerPlan.rootStep.id,
+              )}`
             : ""
         }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
       )}):::bucket`,
@@ -273,8 +271,8 @@ export function printPlanGraph(
       ].join(",")} bucket${layerPlan.id}`,
     );
   }
-  for (let i = 0, l = operationPlan.layerPlans.length; i < l; i++) {
-    const layerPlan = operationPlan.layerPlans[i];
+  for (let i = 0, l = operationPlan.stepTracker.layerPlans.length; i < l; i++) {
+    const layerPlan = operationPlan.stepTracker.layerPlans[i];
     if (!layerPlan || layerPlan.id !== i) {
       continue;
     }

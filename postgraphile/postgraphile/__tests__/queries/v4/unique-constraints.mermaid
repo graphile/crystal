@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
@@ -81,7 +82,7 @@ graph TD
     subgraph "Buckets for queries/v4/unique-constraints"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 16, 25, 26, 35, 36, 45, 46, 11<br />2: 8, 17, 27, 37, 47<br />ᐳ: 12, 13, 21, 22, 31, 32, 41, 42, 51, 52"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,__InputStaticLeaf16,PgSelect17,First21,PgSelectSingle22,__InputStaticLeaf25,__InputStaticLeaf26,PgSelect27,First31,PgSelectSingle32,__InputStaticLeaf35,__InputStaticLeaf36,PgSelect37,First41,PgSelectSingle42,__InputStaticLeaf45,__InputStaticLeaf46,PgSelect47,First51,PgSelectSingle52 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,__InputStaticLeaf16,PgSelect17,First21,PgSelectSingle22,__InputStaticLeaf25,__InputStaticLeaf26,PgSelect27,First31,PgSelectSingle32,__InputStaticLeaf35,__InputStaticLeaf36,PgSelect37,First41,PgSelectSingle42,__InputStaticLeaf45,__InputStaticLeaf46,PgSelect47,First51,PgSelectSingle52 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,PgClassExpression15 bucket1

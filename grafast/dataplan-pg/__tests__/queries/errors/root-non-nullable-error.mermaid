@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Error7[["Error[7∈0]"]]:::unbatchedplan
 
@@ -17,5 +18,5 @@ graph TD
     subgraph "Buckets for queries/errors/root-non-nullable-error"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value5,Error7 bucket0
+    class Bucket0,__Value0,__Value5,Error7 bucket0
     end

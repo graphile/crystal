@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
@@ -77,7 +78,7 @@ graph TD
     PgClassExpression113{{"PgClassExpression[113∈11]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     List114{{"List[114∈11]<br />ᐸ112,113ᐳ"}}:::plan
     Lambda115{{"Lambda[115∈11]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    Map217{{"Map[217∈11]<br />ᐸ111:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
+    Map216{{"Map[216∈11]<br />ᐸ111:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
     PgSelectSingle122{{"PgSelectSingle[122∈11]<br />ᐸleftArmᐳ"}}:::plan
     Constant123{{"Constant[123∈11]"}}:::plan
     PgClassExpression124{{"PgClassExpression[124∈12]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
@@ -117,8 +118,8 @@ graph TD
     List179{{"List[179∈17]<br />ᐸ177,178ᐳ"}}:::plan
     Lambda180{{"Lambda[180∈17]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     Connection194{{"Connection[194∈17]<br />ᐸ190ᐳ"}}:::plan
-    Access216{{"Access[216∈17]<br />ᐸ175.0ᐳ"}}:::plan
-    __Item196[/"__Item[196∈18]<br />ᐸ216ᐳ"\]:::itemplan
+    Access218{{"Access[218∈17]<br />ᐸ175.0ᐳ"}}:::plan
+    __Item196[/"__Item[196∈18]<br />ᐸ218ᐳ"\]:::itemplan
     PgSelectSingle197{{"PgSelectSingle[197∈18]<br />ᐸpostᐳ"}}:::plan
     Constant198{{"Constant[198∈17]"}}:::plan
     PgClassExpression199{{"PgClassExpression[199∈19]<br />ᐸ__post__.”id”ᐳ"}}:::plan
@@ -187,8 +188,8 @@ graph TD
     PgSelectSingle111 --> PgClassExpression113
     Constant112 & PgClassExpression113 --> List114
     List114 --> Lambda115
-    PgSelectSingle111 --> Map217
-    Map217 --> PgSelectSingle122
+    PgSelectSingle111 --> Map216
+    Map216 --> PgSelectSingle122
     PgSelectSingle122 --> PgClassExpression124
     Constant123 & PgClassExpression124 --> List125
     List125 --> Lambda126
@@ -219,8 +220,8 @@ graph TD
     PgSelectSingle176 --> PgClassExpression178
     Constant177 & PgClassExpression178 --> List179
     List179 --> Lambda180
-    First175 --> Access216
-    Access216 ==> __Item196
+    First175 --> Access218
+    Access218 ==> __Item196
     __Item196 --> PgSelectSingle197
     PgSelectSingle197 --> PgClassExpression199
     Constant198 & PgClassExpression199 --> List200
@@ -237,7 +238,7 @@ graph TD
     subgraph "Buckets for queries/v4/rbac.basic"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 32, 42, 66, 93, 105, 131, 158, 170, 11<br />2: 8, 43, 67, 106, 132, 171, 206<br />ᐳ: 12, 13, 47, 48, 71, 72, 110, 111, 136, 137, 175, 176, 210, 211"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Connection32,__InputStaticLeaf42,PgSelect43,First47,PgSelectSingle48,__InputStaticLeaf66,PgSelect67,First71,PgSelectSingle72,Connection93,__InputStaticLeaf105,PgSelect106,First110,PgSelectSingle111,__InputStaticLeaf131,PgSelect132,First136,PgSelectSingle137,Connection158,__InputStaticLeaf170,PgSelect171,First175,PgSelectSingle176,PgSelect206,First210,PgSelectSingle211 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Connection32,__InputStaticLeaf42,PgSelect43,First47,PgSelectSingle48,__InputStaticLeaf66,PgSelect67,First71,PgSelectSingle72,Connection93,__InputStaticLeaf105,PgSelect106,First110,PgSelectSingle111,__InputStaticLeaf131,PgSelect132,First136,PgSelectSingle137,Connection158,__InputStaticLeaf170,PgSelect171,First175,PgSelectSingle176,PgSelect206,First210,PgSelectSingle211 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸpersonSecretᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression19 bucket1
@@ -270,7 +271,7 @@ graph TD
     class Bucket10,PgClassExpression98,List99,Lambda100,PgClassExpression102,PgClassExpression103,PgClassExpression104 bucket10
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 111<br /><br />ROOT PgSelectSingleᐸpersonᐳ[111]"):::bucket
     classDef bucket11 stroke:#00ffff
-    class Bucket11,Constant112,PgClassExpression113,List114,Lambda115,PgSelectSingle122,Constant123,Map217 bucket11
+    class Bucket11,Constant112,PgClassExpression113,List114,Lambda115,PgSelectSingle122,Constant123,Map216 bucket11
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 122, 123<br /><br />ROOT PgSelectSingle{11}ᐸleftArmᐳ[122]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgClassExpression124,List125,Lambda126,PgClassExpression128,PgClassExpression129,PgClassExpression130 bucket12
@@ -288,8 +289,8 @@ graph TD
     class Bucket16,PgClassExpression163,List164,Lambda165,PgClassExpression167,PgClassExpression168,PgClassExpression169 bucket16
     Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 176, 175<br /><br />ROOT PgSelectSingleᐸpersonᐳ[176]"):::bucket
     classDef bucket17 stroke:#696969
-    class Bucket17,Constant177,PgClassExpression178,List179,Lambda180,Connection194,Constant198,Access216 bucket17
-    Bucket18("Bucket 18 (listItem)<br />Deps: 198<br /><br />ROOT __Item{18}ᐸ216ᐳ[196]"):::bucket
+    class Bucket17,Constant177,PgClassExpression178,List179,Lambda180,Connection194,Constant198,Access218 bucket17
+    Bucket18("Bucket 18 (listItem)<br />Deps: 198<br /><br />ROOT __Item{18}ᐸ218ᐳ[196]"):::bucket
     classDef bucket18 stroke:#00bfff
     class Bucket18,__Item196,PgSelectSingle197 bucket18
     Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 197, 198<br /><br />ROOT PgSelectSingle{18}ᐸpostᐳ[197]"):::bucket

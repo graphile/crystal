@@ -11,8 +11,8 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
   ) _) as "1",
-  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "2",
-  __forums__."id" as "3"
+  __forums__."id" as "2",
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "3"
 from app_public.forums as __forums__
 where
   (

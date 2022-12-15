@@ -2,17 +2,6 @@ select
   __forums__."name" as "0",
   (select json_agg(_) from (
     select
-      (count(*))::text as "0"
-    from app_public.messages as __messages__
-    where
-      (
-        __messages__.archived_at is null
-      ) and (
-        __forums__."id"::"uuid" = __messages__."forum_id"
-      )
-  ) _) as "1",
-  (select json_agg(_) from (
-    select
       __messages__."body" as "0",
       __users__."username" as "1",
       __users__."gravatar_url" as "2",
@@ -32,6 +21,17 @@ select
       )
     order by __messages__."id" desc
     limit 3
+  ) _) as "1",
+  (select json_agg(_) from (
+    select
+      (count(*))::text as "0"
+    from app_public.messages as __messages__
+    where
+      (
+        __messages__.archived_at is null
+      ) and (
+        __forums__."id"::"uuid" = __messages__."forum_id"
+      )
   ) _) as "2"
 from app_public.forums as __forums__
 where (

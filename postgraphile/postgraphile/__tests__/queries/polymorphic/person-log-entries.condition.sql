@@ -17,8 +17,8 @@ lateral (
       )
       order by __log_entries__."text" desc, __log_entries__."id" asc
     ) _) as "0",
-    __people__."username" as "1",
-    __people__."person_id"::text as "2",
+    __people__."person_id"::text as "1",
+    __people__."username" as "2",
     __people_identifiers__.idx as "3"
   from "polymorphic"."people" as __people__
   where (

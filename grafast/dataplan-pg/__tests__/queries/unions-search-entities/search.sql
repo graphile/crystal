@@ -7,10 +7,10 @@ from (
 ) as __entity_search_identifiers__,
 lateral (
   select
-    (not (__entity_search__ is null))::text as "0",
-    __entity_search__."person_id"::text as "1",
-    __entity_search__."post_id"::text as "2",
-    __entity_search__."comment_id"::text as "3",
+    __entity_search__."person_id"::text as "0",
+    __entity_search__."post_id"::text as "1",
+    __entity_search__."comment_id"::text as "2",
+    (not (__entity_search__ is null))::text as "3",
     __entity_search_identifiers__.idx as "4"
   from interfaces_and_unions.search("query" := __entity_search_identifiers__."id0") as __entity_search__
   where (
@@ -74,17 +74,17 @@ from (
 ) as __comments_identifiers__,
 lateral (
   select
-    __comments__."body" as "0",
-    __posts__."body" as "1",
+    __comments__."comment_id"::text as "0",
+    __people__."username" as "1",
     __posts__."post_id"::text as "2",
-    __comments__."comment_id"::text as "3",
-    __people__."username" as "4",
+    __posts__."body" as "3",
+    __comments__."body" as "4",
     __comments_identifiers__.idx as "5"
   from interfaces_and_unions.comments as __comments__
-  left outer join interfaces_and_unions.posts as __posts__
-  on (__comments__."post_id"::"int4" = __posts__."post_id")
   left outer join interfaces_and_unions.people as __people__
   on (__comments__."author_id"::"int4" = __people__."person_id")
+  left outer join interfaces_and_unions.posts as __posts__
+  on (__comments__."post_id"::"int4" = __posts__."post_id")
   where
     (
       true /* authorization checks */

@@ -179,7 +179,6 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   };
   isSyncAndSafe = true;
 
-  private parentStepId: number;
   allowMultipleOptimizations = true;
   public readonly path: (string | number | symbol)[];
 
@@ -191,12 +190,11 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     super();
     this.path = path;
     this.addDependency(parentPlan);
-    this.parentStepId = parentPlan.id;
     this.unbatchedExecute = constructDestructureFunction(this.path, fallback);
   }
 
   toStringMeta(): string {
-    return `${chalk.bold.yellow(String(this.dependencies[0]))}.${this.path
+    return `${chalk.bold.yellow(String(this.getDep(0).id))}.${this.path
       .map((p) => String(p))
       .join(".")}`;
   }
@@ -208,10 +206,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     if (typeof attrName !== "string") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getStep(this.parentStepId), [
-      ...this.path,
-      attrName,
-    ]);
+    return new AccessStep(this.getDep(0), [...this.path, attrName]);
   }
 
   /**
@@ -221,10 +216,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     if (typeof index !== "number") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getStep(this.parentStepId), [
-      ...this.path,
-      index,
-    ]);
+    return new AccessStep(this.getDep(0), [...this.path, index]);
   }
 
   // An access of an access can become a single access

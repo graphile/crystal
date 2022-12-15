@@ -1,6 +1,6 @@
 select
-  __people__."username" as "0",
-  __people__."person_id"::text as "1"
+  __people__."person_id"::text as "0",
+  __people__."username" as "1"
 from "polymorphic"."people" as __people__
 order by __people__."person_id" asc
 limit 4;
@@ -159,10 +159,10 @@ from (
 lateral (
   select
     __aws_applications__."aws_id" as "0",
-    __aws_applications__."name" as "1",
-    __aws_applications__."organization_id"::text as "2",
+    __aws_applications__."id"::text as "1",
+    __aws_applications__."name" as "2",
     __aws_applications__."person_id"::text as "3",
-    __aws_applications__."id"::text as "4",
+    __aws_applications__."organization_id"::text as "4",
     __aws_applications_identifiers__.idx as "5"
   from "polymorphic"."aws_applications" as __aws_applications__
   where (
@@ -181,10 +181,10 @@ from (
 lateral (
   select
     __gcp_applications__."gcp_id" as "0",
-    __gcp_applications__."name" as "1",
-    __gcp_applications__."organization_id"::text as "2",
+    __gcp_applications__."id"::text as "1",
+    __gcp_applications__."name" as "2",
     __gcp_applications__."person_id"::text as "3",
-    __gcp_applications__."id"::text as "4",
+    __gcp_applications__."organization_id"::text as "4",
     __gcp_applications_identifiers__.idx as "5"
   from "polymorphic"."gcp_applications" as __gcp_applications__
   where (

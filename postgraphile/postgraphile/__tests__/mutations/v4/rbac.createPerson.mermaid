@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf10{{"__InputStaticLeaf[10∈0]"}}:::plan
@@ -59,7 +60,7 @@ graph TD
     subgraph "Buckets for mutations/v4/rbac.createPerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,__InputStaticLeaf17,Access19,Access20,Object21,List23,Object24 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,__InputStaticLeaf17,Access19,Access20,Object21,List23,Object24 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 21, 10, 23, 14, 15, 24<br /><br />1: PgInsert[18]<br />2: <br />ᐳ: Object[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsert18,Object22 bucket1

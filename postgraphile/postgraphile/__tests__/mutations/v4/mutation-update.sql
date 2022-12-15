@@ -269,9 +269,9 @@ lateral (
 ) as __person_result__;
 
 update "c"."compound_key" as __compound_key__ set "person_id_1" = $1::"int4", "extra" = $2::"bool" where ((__compound_key__."person_id_1" = $3::"int4") and (__compound_key__."person_id_2" = $4::"int4")) returning
-  __compound_key__."extra"::text as "0",
-  __compound_key__."person_id_1"::text as "1",
-  __compound_key__."person_id_2"::text as "2";
+  __compound_key__."person_id_1"::text as "0",
+  __compound_key__."person_id_2"::text as "1",
+  __compound_key__."extra"::text as "2";
 
 select __person_result__.*
 from (
@@ -293,9 +293,9 @@ lateral (
 ) as __person_result__;
 
 update "c"."compound_key" as __compound_key__ set "person_id_1" = $1::"int4", "extra" = $2::"bool" where ((__compound_key__."person_id_1" = $3::"int4") and (__compound_key__."person_id_2" = $4::"int4")) returning
-  __compound_key__."extra"::text as "0",
-  __compound_key__."person_id_1"::text as "1",
-  __compound_key__."person_id_2"::text as "2";
+  __compound_key__."person_id_1"::text as "0",
+  __compound_key__."person_id_2"::text as "1",
+  __compound_key__."extra"::text as "2";
 
 select __person_result__.*
 from (
@@ -336,9 +336,9 @@ lateral (
 ) as __person_result__;
 
 update "c"."compound_key" as __compound_key__ set "extra" = $1::"bool" where ((__compound_key__."person_id_1" = $2::"int4") and (__compound_key__."person_id_2" = $3::"int4")) returning
-  __compound_key__."extra"::text as "0",
-  __compound_key__."person_id_1"::text as "1",
-  __compound_key__."person_id_2"::text as "2";
+  __compound_key__."person_id_1"::text as "0",
+  __compound_key__."person_id_2"::text as "1",
+  __compound_key__."extra"::text as "2";
 
 select __person_result__.*
 from (

@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -60,7 +61,7 @@ graph TD
     subgraph "Buckets for queries/v4/geometry.queries"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,Connection19 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Connection19 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: Access[16], Access[17], Object[18]<br />2: PgSelect[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access16,Access17,Object18,PgSelect20 bucket1

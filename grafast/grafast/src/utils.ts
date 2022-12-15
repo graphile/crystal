@@ -308,6 +308,7 @@ export function arraysMatch<T>(
   array2: ReadonlyArray<T>,
   comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
 ): boolean {
+  if (array1 === array2) return true;
   const l = array1.length;
   if (l !== array2.length) {
     return false;
@@ -858,8 +859,7 @@ export function stepADependsOnStepB(
     throw new Error("Invalid call to stepADependsOnStepB");
   }
   // Depth-first search for match
-  for (const depId of stepA.dependencies) {
-    const dep = stepA.layerPlan.operationPlan.dangerouslyGetStep(depId);
+  for (const dep of stepA.dependencies) {
     if (dep === stepB) {
       return true;
     }

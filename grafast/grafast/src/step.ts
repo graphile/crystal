@@ -35,6 +35,16 @@ export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
  */
 export const $$noExec = Symbol("noExec");
 
+function throwDestroyed(this: ExecutableStep): any {
+  let message: string;
+  try {
+    message = `${this} has been destroyed; calling methods on it is no longer possible`;
+  } catch (e) {
+    message = `Step ${this?.id} has been destroyed; calling methods on it is no longer possible`;
+  }
+  throw new Error(message);
+}
+
 type DeepDepSkippable<T> = ExecutableStep<T> & {
   [$$deepDepSkip](): ExecutableStep;
 };
@@ -105,12 +115,12 @@ export abstract class BaseStep {
    *
    * @internal
    */
-  public layerPlan: LayerPlan;
+  public readonly layerPlan: LayerPlan;
   /** @deprecated please use layerPlan.operationPlan instead */
-  public opPlan: OperationPlan;
-  public isArgumentsFinalized = false;
-  public isFinalized = false;
-  public debug = getDebug();
+  public readonly opPlan: OperationPlan;
+  public isArgumentsFinalized: boolean;
+  public isFinalized: boolean;
+  public debug: boolean;
 
   // TODO: change hasSideEffects to getter/setter, forbid setting after a
   // particular phase.
@@ -118,9 +128,13 @@ export abstract class BaseStep {
    * Set this true for plans that implement mutations; this will prevent them
    * from being tree-shaken.
    */
-  public hasSideEffects = false;
+  public hasSideEffects: boolean;
 
   constructor() {
+    this.isArgumentsFinalized = false;
+    this.isFinalized = false;
+    this.debug = getDebug();
+    this.hasSideEffects = false;
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
     this.opPlan = layerPlan.operationPlan;
@@ -151,6 +165,12 @@ export abstract class BaseStep {
       );
     }
   }
+
+  public destroy(): void {
+    // TODO: should we do something to deliberately break this class, such as
+    // deleting all its properties? That would ensure anything that tried to
+    // use it after it was destroyed would end up in error.
+  }
 }
 
 /**
@@ -160,19 +180,6 @@ export abstract class BaseStep {
 export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
-
-  /**
-   * @internal
-   */
-  public _pathByDescendent: Map<ExecutableStep, ExecutableStep[] | null> =
-    new Map();
-
-  /**
-   * Only assigned once operationPlan is 'ready'.
-   *
-   * @internal
-   */
-  public _recursiveDependencyIds = new Set<string>();
 
   /**
    * Setting this true is a performance optimisation, but it comes with strong
@@ -199,47 +206,19 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public isSyncAndSafe!: boolean;
 
   /**
-   * The ids for plans this plan will need data from in order to execute. NOTE:
-   * it's important we use the id and not the plan here otherwise when we swap
-   * out plans during optimisation things will go awry.
-   *
+   * The plan this plan will need data from in order to execute.
    * @internal
    */
-  private readonly _dependencies: number[] = [];
+  public readonly dependencies: ReadonlyArray<ExecutableStep>;
 
-  /**
-   * The ids for plans this plan will need data from in order to execute.
-   */
-  public readonly dependencies: ReadonlyArray<number> = this._dependencies;
-
-  /**
-   * The ids of the dependencies of this step that are in the same layer as it
-   * (optimization for executeBucket). Populated when finilizing the
-   * OperationPlan.
-   *
-   * @internal
-   */
-  public _sameLayerDependencies: Array<number> = [];
-
-  /**
-   * The plans that depend on this plan. Not populated until the 'finalize'
-   * phase; so don't rely on it until the OperationPlan is 'ready'.
-   *
-   * @internal
-   */
-  public sameLayerDependentPlans: Array<ExecutableStep> = [];
   /**
    * Just for mermaid
    * @internal
    */
-  public dependentPlans: Array<ExecutableStep> = [];
-
-  /**
-   * Every layer plan has exactly one parent step. This is the reverse relationship.
-   *
-   * @internal
-   */
-  public childLayerPlans: Array<LayerPlan<any>> = [];
+  public readonly dependents: ReadonlySet<{
+    step: ExecutableStep;
+    dependencyIndex: number;
+  }>;
 
   /**
    * We reserve the right to change our mind as to whether this is a string or
@@ -253,17 +232,17 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   /**
    * True when `optimize` has been called at least once.
    */
-  public isOptimized = false;
+  public isOptimized: boolean;
   /**
    * Set this true if your plan's optimize method can be called a second time;
    * note that in this situation it's likely that your dependencies will not be
    * what you expect them to be (e.g. a PgSelectSingleStep might become an
    * AccessStep).
    */
-  public allowMultipleOptimizations = false;
+  public allowMultipleOptimizations: boolean;
 
   /** @internal */
-  public _stepOptions: StepOptions = { stream: null };
+  public _stepOptions: StepOptions;
 
   /** @internal */
   public polymorphicPaths: ReadonlySet<string>;
@@ -276,7 +255,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    */
-  public store = true;
+  public store: boolean;
 
   /**
    * Override the metaKey to be able to share execution meta between multiple
@@ -286,6 +265,12 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
 
   constructor() {
     super();
+    this.dependencies = [];
+    this.dependents = new Set();
+    this.isOptimized = false;
+    this.allowMultipleOptimizations = false;
+    this._stepOptions = { stream: null };
+    this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
     this.id = this.layerPlan._addStep(this);
     // @ts-ignore
@@ -302,8 +287,8 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return this.layerPlan.getStep(id, this);
   }
 
-  protected getDep(depId: number): ExecutableStep {
-    return this.getStep(this.dependencies[depId]);
+  public getDep(depId: number): ExecutableStep {
+    return this.dependencies[depId];
   }
 
   /**
@@ -368,13 +353,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     // deduplicate because we might refer to the dependency by its index. As
     // such, we should only dedupe by default but allow opting out.
     if (!skipDeduplication) {
-      const existingIndex = this._dependencies.indexOf(step.id);
+      const existingIndex = this.dependencies.indexOf(step);
       if (existingIndex >= 0) {
         return existingIndex;
       }
     }
 
-    return this._dependencies.push(step.id) - 1;
+    return this.opPlan.stepTracker.addStepDependency(this, step);
   }
 
   /**
@@ -387,7 +372,9 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * If you need to transform the peer to be equivalent you should do so via
    * the `deduplicatedWith` callback later.
    */
-  public deduplicate(_peers: ExecutableStep[]): ExecutableStep[] {
+  public deduplicate(
+    _peers: readonly ExecutableStep[],
+  ): readonly ExecutableStep[] {
     return [];
   }
 
@@ -456,6 +443,20 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     values;
     extra;
     throw new Error(`${this} has not implemented an 'execute' method`);
+  }
+
+  public destroy(): void {
+    // Break ourself enough that if lifecycle methods are attempted an error
+    // will be thrown. This should help weed out bugs where steps are processed
+    // even after they have been removed/deduped.
+    this.addDependency = throwDestroyed;
+    this.deduplicate = throwDestroyed;
+    this.deduplicatedWith = throwDestroyed;
+    this.optimize = throwDestroyed;
+    this.finalize = throwDestroyed;
+    this.execute = throwDestroyed;
+
+    super.destroy();
   }
 }
 

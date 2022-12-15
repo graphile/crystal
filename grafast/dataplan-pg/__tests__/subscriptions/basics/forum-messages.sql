@@ -13,9 +13,9 @@ lateral (
     (__messages__.archived_at is not null)::text as "3",
     __forums__."name" as "4",
     (__forums__.archived_at is not null)::text as "5",
-    __users__."gravatar_url" as "6",
+    __messages__."forum_id" as "6",
     __users__."username" as "7",
-    __messages__."forum_id" as "8",
+    __users__."gravatar_url" as "8",
     __messages_identifiers__.idx as "9"
   from app_public.messages as __messages__
   left outer join app_public.forums as __forums__
@@ -46,9 +46,9 @@ lateral (
     (__messages__.archived_at is not null)::text as "3",
     __forums__."name" as "4",
     (__forums__.archived_at is not null)::text as "5",
-    __users__."gravatar_url" as "6",
+    __messages__."forum_id" as "6",
     __users__."username" as "7",
-    __messages__."forum_id" as "8",
+    __users__."gravatar_url" as "8",
     __messages_identifiers__.idx as "9"
   from app_public.messages as __messages__
   left outer join app_public.forums as __forums__

@@ -1,5 +1,6 @@
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
+import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
@@ -41,7 +42,7 @@ export interface LayerPlanReasonNullableField {
    *
    * Also needed for execution (see `executeBucket`).
    */
-  parentStepId: number;
+  parentStep: ExecutableStep;
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonListItem {
@@ -54,7 +55,7 @@ export interface LayerPlanReasonListItem {
    * Also needed for execution (see `executeBucket`).
    */
   // TODO: rename to parentStepId
-  parentPlanId: number;
+  parentStep: ExecutableStep;
 
   /** If this listItem is to be streamed, the configuration for that streaming */
   stream?: {
@@ -82,14 +83,14 @@ export interface LayerPlanReasonPolymorphic {
   /**
    * Needed for execution (see `executeBucket`).
    */
-  parentPlanId: number;
+  parentStep: ExecutableStep;
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonSubroutine {
   // NOTE: the plan that has a subroutine should call executeBucket from within
   // `execute`.
   type: "subroutine";
-  parentPlanId: number;
+  parentStep: ExecutableStep;
 }
 
 export function isBranchingLayerPlan(layerPlan: LayerPlan<any>): boolean {
@@ -118,6 +119,16 @@ export type LayerPlanReason =
   | LayerPlanReasonDefer
   | LayerPlanReasonPolymorphic
   | LayerPlanReasonSubroutine;
+
+// The `A extends any ? ... : never` tells TypeScript to make this
+// distributive. TypeScript can be a bit arcane.
+export type HasParent<A extends LayerPlanReason> = A extends any
+  ? A extends { parentStep: ExecutableStep }
+    ? A
+    : never
+  : never;
+
+export type LayerPlanReasonsWithParentStep = HasParent<LayerPlanReason>;
 
 /** @internal */
 export interface LayerPlanPhase {
@@ -199,11 +210,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * @internal
    */
-  public rootStepId: number | null = null;
-
-  public rootStepIdByTypeName: {
-    [typeName: string]: number;
-  } = Object.create(null);
+  public readonly rootStep: ExecutableStep | null = null;
 
   /**
    * Which plans the results for which are available in a parent bucket need to
@@ -279,7 +286,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         : "";
     const deps = this.copyPlanIds.length > 0 ? `%${this.copyPlanIds}` : "";
     return `LayerPlan<${this.id}${chain}?${this.reason.type}${reasonExtra}!${
-      this.rootStepId ?? "x"
+      this.rootStep?.id ?? "x"
     }${deps}>`;
   }
 
@@ -289,6 +296,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       output.push(child.print(depth + 1));
     }
     return output.join("\n");
+  }
+
+  setRootStep($root: ExecutableStep): void {
+    this.operationPlan.stepTracker.setLayerPlanRootStep(this, $root);
   }
 
   /** @internal Use plan.getStep(id) instead. */
@@ -353,7 +364,18 @@ ${inner}
       // new arrays and looping.
 
       this.newBucket = this.makeNewBucketCallback(`\
-  const itemStepId = ${this.rootStepId};
+${
+  isDev
+    ? `/*
+makeNewBucketCallback called for LayerPlan with id: ${this.id}.
+Reason type: ${this.reason.type}
+Root step: ${this.rootStep?.id}
+Copy step ids: ${copyStepIds}
+*/
+`
+    : ``
+}\
+  const itemStepId = ${this.rootStep!.id};
   const nullableStepStore = parentBucket.store.get(itemStepId);
 
   const itemStepIdList = [];
@@ -397,10 +419,10 @@ ${copyStepIds
 `);
     } else if (this.reason.type === "listItem") {
       this.newBucket = this.makeNewBucketCallback(`\
-  const listStepStore = parentBucket.store.get(${this.reason.parentPlanId});
+  const listStepStore = parentBucket.store.get(${this.reason.parentStep.id});
 
   const itemStepIdList = [];
-  store.set(${this.rootStepId}, itemStepIdList);
+  store.set(${this.rootStep!.id}, itemStepIdList);
 
   // Prepare store with an empty list for each copyPlanId
   ${copyStepIds
@@ -456,7 +478,7 @@ ${copyStepIds
     let size = 0;
     switch (this.reason.type) {
       case "nullableBoundary": {
-        const itemStepId = this.rootStepId;
+        const itemStepId = this.rootStep?.id;
         assert.ok(
           itemStepId != null,
           "GraphileInternalError<f8136364-46c7-4886-b2ae-51319826f97d>: nullableStepStore layer plan has no rootStepId",
@@ -527,7 +549,7 @@ ${copyStepIds
         break;
       }
       case "listItem": {
-        const listStepId = this.reason.parentPlanId;
+        const listStepId = this.reason.parentStep.id;
         const listStepStore = parentBucket.store.get(listStepId);
         if (!listStepStore) {
           throw new Error(
@@ -537,7 +559,7 @@ ${copyStepIds
           );
         }
 
-        const itemStepId = this.rootStepId;
+        const itemStepId = this.rootStep?.id;
         if (itemStepId == null) {
           throw new Error(
             "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
@@ -592,7 +614,7 @@ ${copyStepIds
         break;
       }
       case "polymorphic": {
-        const polymorphicPlanId = this.reason.parentPlanId;
+        const polymorphicPlanId = this.reason.parentStep.id;
         const polymorphicPlanStore = parentBucket.store.get(polymorphicPlanId);
         if (!polymorphicPlanStore) {
           throw new Error(

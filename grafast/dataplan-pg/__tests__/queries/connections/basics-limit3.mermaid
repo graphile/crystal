@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf10{{"__InputStaticLeaf[10∈0]"}}:::plan
@@ -61,6 +62,7 @@ graph TD
     Map56 --> PgSelectSingle33
     PgSelectSingle33 --> PgClassExpression34
     PgSelectSingle33 --> PgClassExpression35
+    Connection19 --> PgPageInfo36
     PgSelect20 --> Lambda38
     PgSelect20 --> First41
     First41 --> PgSelectSingle42
@@ -80,7 +82,7 @@ graph TD
     subgraph "Buckets for queries/connections/basics-limit3"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf10,Connection19 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf10,Connection19 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 16, 17, 36, 39, 18<br />2: PgSelect[20], PgSelect[52]<br />ᐳ: 38, 41, 42, 44, 45, 47, 48, 50, 51, 53, 54, 55, 43, 49"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access16,Access17,Object18,PgSelect20,PgPageInfo36,Lambda38,Constant39,First41,PgSelectSingle42,PgCursor43,PgClassExpression44,List45,Last47,PgSelectSingle48,PgCursor49,PgClassExpression50,List51,PgSelect52,First53,PgSelectSingle54,PgClassExpression55 bucket1

@@ -18,6 +18,8 @@ import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
 
+const DEBUG_POLYMORPHISM = false;
+
 // An error that indicates this entry was skipped because it didn't match
 // polymorphicPath.
 const POLY_SKIPPED = newGrafastError(
@@ -340,8 +342,8 @@ export function executeBucket(
             const storeEntry = bucket.store.get(step.id)!;
             try {
               const deps: any = [];
-              for (const depId of step.dependencies) {
-                const depVal = bucket.store.get(depId)![dataIndex];
+              for (const $dep of step.dependencies) {
+                const depVal = bucket.store.get($dep.id)![dataIndex];
                 if (bucket.hasErrors && isGrafastError(depVal)) {
                   storeEntry[dataIndex] = depVal;
                   continue stepLoop;
@@ -512,16 +514,19 @@ export function executeBucket(
       const polymorphicPath = polymorphicPathList[index];
       if (!step.polymorphicPaths.has(polymorphicPath)) {
         foundErrors = true;
-        const e = isDev
-          ? newGrafastError(
-              new Error(
-                `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: ${step} (polymorphicPaths ${[
-                  ...step.polymorphicPaths,
-                ]}) has no match for '${polymorphicPath}'`,
-              ),
-              step.id,
-            )
-          : POLY_SKIPPED;
+        const e =
+          isDev && DEBUG_POLYMORPHISM
+            ? newGrafastError(
+                new Error(
+                  `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: step ${
+                    step.id
+                  } (polymorphicPaths ${[
+                    ...step.polymorphicPaths,
+                  ]}) has no match for '${polymorphicPath}'`,
+                ),
+                step.id,
+              )
+            : POLY_SKIPPED;
 
         errors[index] = e;
       } else if (extra._bucket.hasErrors) {
@@ -617,8 +622,8 @@ export function executeBucket(
       const depCount = step.dependencies.length;
       if (depCount > 0 || sideEffectPlanIdsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
-          const depId = step.dependencies[i];
-          dependencies[i] = store.get(depId)!;
+          const $dep = step.dependencies[i];
+          dependencies[i] = store.get($dep.id)!;
         }
         if (sideEffectPlanIdsWithErrors !== null) {
           for (const sideEffectPlanId of sideEffectPlanIdsWithErrors) {

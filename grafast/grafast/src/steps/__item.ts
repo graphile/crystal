@@ -30,9 +30,7 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   toStringMeta(): string {
-    return chalk.bold.yellow(
-      String(this.opPlan.dangerouslyGetStep(this.dependencies[0]).id),
-    );
+    return chalk.bold.yellow(String(this.dependencies[0].id));
   }
 
   [$$deepDepSkip](): ExecutableStep {

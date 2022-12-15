@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access8{{"Access[8∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -69,7 +70,7 @@ graph TD
     subgraph "Buckets for queries/interfaces-single-table/nested"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[8], Access[9], Object[10]<br />2: PgSelect[7]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect7,Access8,Access9,Object10 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 10<br /><br />ROOT __Item{1}ᐸ7ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12 bucket1
@@ -82,10 +83,10 @@ graph TD
     Bucket4("Bucket 4 (listItem)<br />Deps: 10<br /><br />ROOT __Item{4}ᐸ19ᐳ[22]<br />1: <br />ᐳ: 23, 24, 25, 27, 52, 54<br />2: PgSingleTablePolymorphic[26]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item22,PgSelectSingle23,PgClassExpression24,Lambda25,PgSingleTablePolymorphic26,PgClassExpression27,PgClassExpression52,PgClassExpression54 bucket4
-    Bucket5("Bucket 5 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 10, 27, 23, 26, 52, 24, 54<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br />1: PgSelect[28]<br />ᐳ: 32, 33, 34, 35, 39<br />2: PgSingleTablePolymorphic[36]"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 10, 27, 26, 23, 52, 24, 54<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br />1: PgSelect[28]<br />ᐳ: 32, 33, 34, 35, 39<br />2: PgSingleTablePolymorphic[36]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect28,First32,PgSelectSingle33,PgClassExpression34,Lambda35,PgSingleTablePolymorphic36,PgClassExpression39 bucket5
-    Bucket6("Bucket 6 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 33, 36, 27, 34, 39<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 36, 33, 27, 34, 39<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
     Bucket0 --> Bucket1

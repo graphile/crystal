@@ -551,7 +551,7 @@ export class PgSelectStep<
         throw new Error("Should not have any dependencies yet");
       }
       cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency(this.getStep(planId), true);
+        const myIdx = this.addDependency(cloneFrom.getDep(idx), true);
         if (myIdx !== idx) {
           throw new Error(
             `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
@@ -935,10 +935,12 @@ export class PgSelectStep<
     // about the rows.
 
     // Optimisation: if we're already selecting this fragment, return the existing one.
+    const options = {
+      symbolSubstitutes: this._symbolSubstitutes,
+    };
+    // TODO: performance of this sucks at planning time
     const index = this.selects.findIndex((frag) =>
-      sql.isEquivalent(frag, fragment, {
-        symbolSubstitutes: this._symbolSubstitutes,
-      }),
+      sql.isEquivalent(frag, fragment, options),
     );
     if (index >= 0) {
       return index;
@@ -2189,6 +2191,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       // check the symbol or alias matches. We do need to factor the different
       // symbols into SQL equivalency checks though.
       const symbolSubstitutes = new Map<symbol, symbol>();
+      const options = { symbolSubstitutes };
       if (typeof this.symbol === "symbol" && typeof p.symbol === "symbol") {
         if (this.symbol !== p.symbol) {
           symbolSubstitutes.set(this.symbol, p.symbol);
@@ -2222,7 +2225,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       }
 
       const sqlIsEquivalent = (a: SQL | symbol, b: SQL | symbol) =>
-        sql.isEquivalent(a, b, { symbolSubstitutes });
+        sql.isEquivalent(a, b, options);
 
       // Check trusted matches
       if (p.trusted !== this.trusted) {
@@ -2375,7 +2378,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
   >(otherPlan: TOtherStep): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, symbol, codec } = placeholder;
-      const dep = this.getStep(this.dependencies[dependencyIndex]);
+      const dep = this.getDep(dependencyIndex);
       /*
        * We have dependency `dep`. We're attempting to merge ourself into
        * `otherPlan`. We have two situations we need to handle:
@@ -2460,8 +2463,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           // for now.
           continue;
         }
-        const planId = this.dependencies[dependencyIndex];
-        const dep = this.getStep(planId);
+        const dep = this.getDep(dependencyIndex);
         if (dep instanceof __TrackedObjectStep) {
           // This has come from a variable, context or rootValue, therefore
           // it's shared and thus safe.
@@ -2471,7 +2473,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
         } else if (dep instanceof ConnectionStep) {
           // We only have this to detect errors, it's an empty object. Safe.
         } else if (dep instanceof PgClassExpressionStep) {
-          const p2 = this.getStep(dep.dependencies[dep.tableId]);
+          const p2 = dep.getDep(dep.tableId);
           const t2Parent = dep.getParentStep();
           if (!(t2Parent instanceof PgSelectSingleStep)) {
             continue;
@@ -2535,8 +2537,8 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
         }
       }
       if (t != null && p != null) {
-        const myContext = this.getStep(this.dependencies[this.contextId]);
-        const tsContext = this.getStep(t.dependencies[t.contextId]);
+        const myContext = this.getDep(this.contextId);
+        const tsContext = t.getDep(t.contextId);
         if (myContext != tsContext) {
           debugPlanVerbose(
             "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c (%c, %c)",
@@ -2587,7 +2589,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
                 const { dependencyIndex, codec } = this.queryValues[i];
-                const step = this.getStep(this.dependencies[dependencyIndex]);
+                const step = this.getDep(dependencyIndex);
                 if (step instanceof PgClassExpressionStep) {
                   return sql`${step.toSQL()}::${
                     codec.sqlType
@@ -2653,10 +2655,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           parent instanceof PgSelectSingleStep &&
           parent.getClassStep().mode !== "aggregate"
         ) {
-          const parent2 = this.getStep(parent.dependencies[parent.itemStepId]);
+          const parent2 = parent.getDep(parent.itemStepId);
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, codec } = this.queryValues[i];
-            const step = this.getStep(this.dependencies[dependencyIndex]);
+            const step = this.getDep(dependencyIndex);
             if (step instanceof PgClassExpressionStep) {
               return this.where(
                 sql`${step.toSQL()}::${codec.sqlType} = ${identifierMatch}`,

@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
@@ -57,7 +58,7 @@ graph TD
     subgraph "Buckets for queries/v4/longAliases"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 12<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression18,Connection30,First32,PgSelectSingle33,PgClassExpression34,Connection46,First48,PgSelectSingle49,PgClassExpression50,Access51,Access52 bucket1

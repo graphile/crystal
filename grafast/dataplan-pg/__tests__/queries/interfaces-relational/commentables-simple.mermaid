@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -34,7 +35,7 @@ graph TD
     PgSelect51[["PgSelect[51∈3]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
     First55{{"First[55∈3]"}}:::plan
     PgSelectSingle56{{"PgSelectSingle[56∈3]<br />ᐸrelational_checklistsᐳ"}}:::plan
-    Map116{{"Map[116∈3]<br />ᐸ56:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map114{{"Map[114∈3]<br />ᐸ56:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle63{{"PgSelectSingle[63∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
     PgClassExpression64{{"PgClassExpression[64∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgClassExpression72{{"PgClassExpression[72∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
@@ -42,7 +43,7 @@ graph TD
     PgSelect82[["PgSelect[82∈3]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
     First86{{"First[86∈3]"}}:::plan
     PgSelectSingle87{{"PgSelectSingle[87∈3]<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
-    Map114{{"Map[114∈3]<br />ᐸ87:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    Map116{{"Map[116∈3]<br />ᐸ87:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle94{{"PgSelectSingle[94∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
     PgClassExpression95{{"PgClassExpression[95∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgClassExpression103{{"PgClassExpression[103∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
@@ -72,16 +73,16 @@ graph TD
     Object11 & PgClassExpression19 --> PgSelect51
     PgSelect51 --> First55
     First55 --> PgSelectSingle56
-    PgSelectSingle56 --> Map116
-    Map116 --> PgSelectSingle63
+    PgSelectSingle56 --> Map114
+    Map114 --> PgSelectSingle63
     PgSelectSingle63 --> PgClassExpression64
     PgSelectSingle63 --> PgClassExpression72
     PgSelectSingle63 --> PgClassExpression80
     Object11 & PgClassExpression19 --> PgSelect82
     PgSelect82 --> First86
     First86 --> PgSelectSingle87
-    PgSelectSingle87 --> Map114
-    Map114 --> PgSelectSingle94
+    PgSelectSingle87 --> Map116
+    Map116 --> PgSelectSingle94
     PgSelectSingle94 --> PgClassExpression95
     PgSelectSingle94 --> PgClassExpression103
     PgSelectSingle94 --> PgClassExpression111
@@ -89,7 +90,7 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/commentables-simple"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[9], Access[10], Object[11]<br />2: PgSelect[8]<br />3: __ListTransform[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,__ListTransform12 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,__ListTransform12 bucket0
     Bucket1("Bucket 1 (subroutine)<br />ROOT PgSelectSingle{1}ᐸrelational_commentablesᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1

@@ -9,6 +9,7 @@ graph TD
 
 
     %% define steps
+    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
@@ -172,7 +173,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-page-2"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,Access16,Access17,Object18,Connection19,__InputStaticLeaf29,Lambda39,__InputStaticLeaf62,__InputStaticLeaf113 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,Access16,Access17,Object18,Connection19,__InputStaticLeaf29,Lambda39,__InputStaticLeaf62,__InputStaticLeaf113 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 39, 62, 113<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: 20, 44<br />ᐳ: 25, 45, 47, 38<br />2: ToPg[46], ToPg[48]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,__InputStaticLeaf25,Connection38,PgValidateParsedCursor44,Access45,ToPg46,Access47,ToPg48 bucket1

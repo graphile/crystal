@@ -59,11 +59,10 @@ export function each<
     }`,
     optimize(this) {
       const layerPlan = this.subroutineLayer;
-      const rootStep = this.opPlan.dangerouslyGetStep(layerPlan.rootStepId!);
+      const rootStep = layerPlan.rootStep;
       if (
         rootStep instanceof __ItemStep &&
-        this.opPlan.dangerouslyGetStep(rootStep.dependencies[0]).layerPlan !==
-          layerPlan
+        rootStep.dependencies[0].layerPlan !== layerPlan
       ) {
         // We don't do anything; replace ourself with our parent
         this.opPlan.deleteLayerPlan(layerPlan);

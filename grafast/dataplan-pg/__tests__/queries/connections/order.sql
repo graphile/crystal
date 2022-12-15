@@ -1,7 +1,7 @@
 select
-  __messages__."id" as "0",
+  __author__.username as "0",
   __messages__.body as "1",
-  __author__.username as "2",
+  __messages__."id" as "2",
   __messages__."body" as "3",
   __users__."username" as "4",
   __users__."gravatar_url" as "5"

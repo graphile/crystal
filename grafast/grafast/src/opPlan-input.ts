@@ -38,7 +38,8 @@ export function withFieldArgsForArguments<
   field: GraphQLField<any, any, any>,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null | void> | TParentStep {
-  operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
+  if (operationPlan.loc)
+    operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
   const fields: {
     [key: string]: GraphQLArgument;
   } = {};
@@ -54,7 +55,7 @@ export function withFieldArgsForArguments<
     fields,
     callback,
   );
-  operationPlan.loc.pop();
+  if (operationPlan.loc) operationPlan.loc.pop();
 
   return result;
 }
@@ -76,7 +77,8 @@ function withFieldArgsForArgumentsOrInputObject<
   const analyzedCoordinates: string[] = [];
 
   const getArgOnceOnly = (inPath: string | string[]) => {
-    operationPlan.loc.push(`getArgOnceOnly('${inPath}')`);
+    if (operationPlan.loc)
+      operationPlan.loc.push(`getArgOnceOnly('${inPath}')`);
     const path = Array.isArray(inPath) ? [...inPath] : [inPath];
     if (path.length < 1) {
       throw new Error("Invalid");
@@ -112,11 +114,19 @@ function withFieldArgsForArgumentsOrInputObject<
     let parentType = typeContainingFields;
     let argOrField: GraphQLArgument | GraphQLInputField = fields[argName];
     if (!argOrField) {
-      throw new Error(
-        `Attempted to access non-existant arg '${argName}' (known args: ${Object.keys(
-          fields,
-        ).join(", ")}) at ${operationPlan.loc.join(" > ")}`,
-      );
+      if (operationPlan.loc) {
+        throw new Error(
+          `Attempted to access non-existant arg '${argName}' (known args: ${Object.keys(
+            fields,
+          ).join(", ")}) at ${operationPlan.loc.join(" > ")}`,
+        );
+      } else {
+        throw new Error(
+          `Attempted to access non-existant arg '${argName}' (known args: ${Object.keys(
+            fields,
+          ).join(", ")})`,
+        );
+      }
     }
     let type = getNullableType(argOrField.type);
 
@@ -142,7 +152,7 @@ function withFieldArgsForArgumentsOrInputObject<
       type = getNullableType(argOrField.type);
     }
 
-    operationPlan.loc.pop();
+    if (operationPlan.loc) operationPlan.loc.pop();
     return { $value, argOrField, type, parentType };
   };
 
@@ -157,9 +167,10 @@ function withFieldArgsForArgumentsOrInputObject<
     details: ReturnType<typeof getArgOnceOnly>,
     $toPlan: ExecutableStep | ModifierStep | null,
   ) {
-    operationPlan.loc.push(
-      `planArgumentOrInputField(${details.argOrField.name})`,
-    );
+    if (operationPlan.loc)
+      operationPlan.loc.push(
+        `planArgumentOrInputField(${details.argOrField.name})`,
+      );
     const plan = operationPlan.withModifiers(() => {
       const { argOrField, $value, parentType } = details;
 
@@ -219,7 +230,7 @@ function withFieldArgsForArgumentsOrInputObject<
         },
       );
     });
-    operationPlan.loc.pop();
+    if (operationPlan.loc) operationPlan.loc.pop();
     return plan;
   }
 
@@ -227,9 +238,14 @@ function withFieldArgsForArgumentsOrInputObject<
     $value: InputStep,
     currentType: GraphQLInputType,
   ): ExecutableStep {
-    operationPlan.loc.push(`getPlannedValue(${$value},${currentType})`);
+    if (operationPlan.loc)
+      operationPlan.loc.push(
+        `getPlannedValue(${$value.id},${
+          "name" in currentType ? currentType.name : "?"
+        })`,
+      );
     const result = getPlannedValue_($value, currentType);
-    operationPlan.loc.pop();
+    if (operationPlan.loc) operationPlan.loc.pop();
     return result;
   }
 
@@ -448,7 +464,7 @@ function withFieldArgsForArgumentsOrInputObject<
     | ModifierStep;
 
   // Now handled all the remaining coordinates
-  operationPlan.loc.push("handle_remaining");
+  if (operationPlan.loc) operationPlan.loc.push("handle_remaining");
   if (
     !analyzedCoordinates.includes("") &&
     step != null &&
@@ -485,7 +501,7 @@ function withFieldArgsForArgumentsOrInputObject<
       process(fields);
     }
   }
-  operationPlan.loc.pop();
+  if (operationPlan.loc) operationPlan.loc.pop();
 
   return step as any;
 }
