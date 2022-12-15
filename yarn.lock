@@ -3117,6 +3117,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@changesets/changelog-github@npm:^0.4.7":
+  version: 0.4.7
+  resolution: "@changesets/changelog-github@npm:0.4.7"
+  dependencies:
+    "@changesets/get-github-info": "npm:^0.5.1"
+    "@changesets/types": "npm:^5.2.0"
+    dotenv: "npm:^8.1.0"
+  checksum: 11ecf1d1305e625a0e747ae8031c5be096f61d607c451560a135bc761552dacdfd306e0f38f28c1ff2ebdbdc96694c0a1e33340f5b5ec3271a2f71bb0307a6fd
+  languageName: node
+  linkType: hard
+
 "@changesets/cli@npm:^2.25.2":
   version: 2.25.2
   resolution: "@changesets/cli@npm:2.25.2"
@@ -3194,6 +3205,16 @@ __metadata:
     fs-extra: "npm:^7.0.1"
     semver: "npm:^5.4.1"
   checksum: 08a7c03c28c91815d35a014e65b8c504f946ce86ff40911644d768ff4a547116da56b0959c1366a216fd68f2079e780e375bf0b39910377e889e531e2cad7d9d
+  languageName: node
+  linkType: hard
+
+"@changesets/get-github-info@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "@changesets/get-github-info@npm:0.5.1"
+  dependencies:
+    dataloader: "npm:^1.4.0"
+    node-fetch: "npm:^2.5.0"
+  checksum: f9b29152721b66b0f6c1f072068b345bb821d1c727c950bd2a770787600dde0c0e6fe3cf0b86f5938ecbb4b8dc8a60400dbb46c168129ad697fb79e4bd281a97
   languageName: node
   linkType: hard
 
@@ -10050,6 +10071,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dataloader@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "dataloader@npm:1.4.0"
+  checksum: 62265b059812d532535e507b1a186c55848075d4876f09930b137c749237746ff0daccb33e85cdd05478bb08505aef72f822811f71d4200574a0273755542781
+  languageName: node
+  linkType: hard
+
 "dataloader@npm:^2.1.0":
   version: 2.1.0
   resolution: "dataloader@npm:2.1.0"
@@ -10557,6 +10585,13 @@ __metadata:
   dependencies:
     is-obj: "npm:^2.0.0"
   checksum: 640302936faf887e4772e97f33efdc1d12adc33183503497687f0400ef832f1596e81f19a9d0f641a8e3312e9cbaa1a5d6620783dda0113871064dc9dec4a30d
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^8.1.0":
+  version: 8.6.0
+  resolution: "dotenv@npm:8.6.0"
+  checksum: a58180cbaa6b7edec539461e4fd72fc9f2b7a181187a2e10942f047da15316f90f04eeeb18b7137049c6e5035a3451af103ddd7a8c691eac339d4e48e1bb1a08
   languageName: node
   linkType: hard
 
@@ -16246,7 +16281,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:2.6.7, node-fetch@npm:^2.6.7":
+"node-fetch@npm:2.6.7, node-fetch@npm:^2.5.0, node-fetch@npm:^2.6.7":
   version: 2.6.7
   resolution: "node-fetch@npm:2.6.7"
   dependencies:
@@ -19148,6 +19183,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.16.5"
     "@babel/preset-react": "npm:^7.18.6"
     "@babel/preset-typescript": "npm:^7.16.5"
+    "@changesets/changelog-github": "npm:^0.4.7"
     "@changesets/cli": "npm:^2.25.2"
     "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.22.5"
     "@knodes/typedoc-plugin-pages": "npm:^0.22.5"

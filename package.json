@@ -78,6 +78,7 @@
   },
   "packageManager": "yarn@3.2.1",
   "dependencies": {
+    "@changesets/changelog-github": "^0.4.7",
     "@changesets/cli": "^2.25.2"
   }
 }

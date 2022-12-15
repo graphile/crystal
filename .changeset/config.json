@@ -1,11 +1,15 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@2.2.0/schema.json",
-  "changelog": "@changesets/cli/changelog",
-  "commit": false,
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "benjie/postgraphile-private" }
+  ],
+  "//": { "snapshot": { "useCalculatedVersion": true } },
+  "commit": true,
   "fixed": [],
   "linked": [],
-  "access": "restricted",
-  "baseBranch": "main",
+  "access": "public",
+  "baseBranch": "planning",
   "updateInternalDependencies": "patch",
   "ignore": []
 }
