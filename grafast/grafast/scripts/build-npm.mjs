@@ -15,6 +15,7 @@ const packageJson = require("../package.json");
 const newJson = { ...packageJson };
 delete newJson.scripts;
 delete newJson.devDependencies;
+delete newJson.publishConfig.directory;
 
 await fsp.writeFile(
   __dirname + "/../release/package.json",
