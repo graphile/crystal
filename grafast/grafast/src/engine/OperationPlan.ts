@@ -1706,19 +1706,14 @@ export class OperationPlan {
     const errors: Error[] = [];
     for (const step of this.stepTracker.activeSteps) {
       if (step.id < offset) continue;
-      const referencingPlanIsAllowed =
-        // Required so that we can access the underlying value plan.
-        step instanceof __TrackedObjectStep;
-      if (!referencingPlanIsAllowed) {
-        for (const key in step) {
-          const val = step[key];
-          if (val instanceof ExecutableStep) {
-            errors.push(
-              new Error(
-                `ERROR: ExecutableStep ${step} has illegal reference via property '${key}' to plan ${val}. You must not reference steps directly, instead use the plan id to reference the plan, and look the plan up in \`this.opPlan.steps[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
-              ),
-            );
-          }
+      for (const key in step) {
+        const val = step[key];
+        if (val instanceof ExecutableStep) {
+          errors.push(
+            new Error(
+              `ERROR: ExecutableStep ${step} has illegal reference via property '${key}' to plan ${val}. You must not reference steps directly, instead use the plan id to reference the plan, and look the plan up in \`this.opPlan.steps[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
+            ),
+          );
         }
       }
     }
