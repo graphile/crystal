@@ -16,21 +16,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-engine.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "server",
     "grafast",
     "graphql",
     "graphile",
-    "fast"
+    "fast",
+    "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/crystal/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-pg",
+  "homepage": "https://github.com/graphile/heart/tree/main/grafast/grafserv",
   "dependencies": {
     "@graphile/lru": "workspace:^",
     "debug": "^4.1.1",

@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-build.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "graphile",
@@ -29,12 +29,13 @@
     "graphqljs",
     "plugin",
     "build",
-    "extension"
+    "extension",
+    "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/graphile-build/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {

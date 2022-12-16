@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-engine.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "graphile",
@@ -46,12 +46,13 @@
     "graphqljs",
     "plugin",
     "engine",
-    "extension"
+    "extension",
+    "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/graphile-engine/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
   "homepage": "https://graphile.org/graphile-engine/",
   "dependencies": {

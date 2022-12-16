@@ -10,19 +10,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-engine.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "jest",
     "graphql",
-    "schema"
+    "schema",
+    "graphile",
+    "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/graphile-engine/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/jest-serializer-simple#readme",
+  "homepage": "https://github.com/graphile/heart/tree/main/utils/jest-serializer-simple",
   "dependencies": {
     "@types/json5": "^2.2.0",
     "json5": "^2.2.0",

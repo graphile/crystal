@@ -34,13 +34,14 @@
   "keywords": [
     "graphile",
     "graphql",
-    "crystal",
+    "grafast",
     "postgresql",
     "postgres",
     "pg",
     "dataplan",
     "build",
-    "extension"
+    "extension",
+    "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",

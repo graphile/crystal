@@ -10,17 +10,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-build.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
-    "lru"
+    "lru",
+    "graphile",
+    "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/graphile-build/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/lru",
+  "homepage": "https://github.com/graphile/heart/tree/main/utils/lru",
   "engines": {
     "node": ">=14.17"
   },
