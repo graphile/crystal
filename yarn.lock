@@ -12873,7 +12873,6 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:^16.11.15"
     "@types/prettier": "npm:^2"
-    grafast: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
     prettier: "npm:^2.5.1"
@@ -12881,8 +12880,9 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
+    grafast: "workspace:*"
     graphql: "*"
-    pg-sql2: "*"
+    pg-sql2: "workspace:*"
   languageName: unknown
   linkType: soft
 
