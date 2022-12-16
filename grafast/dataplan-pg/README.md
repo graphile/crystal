@@ -5,14 +5,10 @@
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Follow](https://img.shields.io/badge/twitter-@GrafastHQ-blueviolet.svg)](https://twitter.com/GrafastHQ)
 
-_**A cutting-edge planning and execution engine for GraphQL**_
+**A collection of extremely highly optimized Gra*fast* step classes for
+interacting with PostgreSQL**
 
-[Grafast][grafast] understands GraphQL and (with your help) it understands your
-business logic; this allows it to orchestrate a GraphQL request's data
-requirements in an extremely efficient manner, leading to excellent performance,
-reduced server load, and happier customers.
-
-_@dataplan/pg is plan classes for interacting with PostgreSQL_
+Documentation: https://grafast.org/grafast/step-library/dataplan-pg/
 
 <!-- SPONSORS_BEGIN -->
 

@@ -6,7 +6,10 @@
 ![MIT license](https://img.shields.io/npm/l/grafserv.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-A highly performant GraphQL server for Node.js, powered by Grafast.
+_**A highly performant GraphQL server for Node.js, powered by
+[Gra*fast*](https://grafast.org).**_
+
+**Documentation**: https://grafast.org/grafserv/
 
 <!-- SPONSORS_BEGIN -->
 

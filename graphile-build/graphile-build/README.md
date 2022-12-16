@@ -7,20 +7,20 @@
 
 `graphile-build` provides a framework to build extensible GraphQL APIs by
 combining plugins. Each plugin typically has its own small purpose (such as
-implementing the Node interface, adding `query: Query` to mutation payloads, or
-watching an external source for schema changes) and by combining these plugins
-together you get a large, powerful, and manageable GraphQL schema. Plugins
-enable you to make broad changes to your GraphQL schema with minimal code, and
-because you're changing your schema in broad ways it helps to guarantee
-consistency.
+implementing the [`Node` interface][global-object-identification], adding
+`query: Query` to mutation payloads, or watching an external source for schema
+changes) and by combining these plugins together you get a large, powerful, and
+manageable GraphQL schema. Plugins enable you to make broad changes to your
+GraphQL schema with minimal code, and because you're changing your schema in
+broad ways it helps to guarantee consistency.
 
-Graphile Build has strong built-in support for [Grafast](../grafast/README.md)
+Graphile Build has strong built-in support for [Gra*fast*](https://grafast.org)
 so you can make an exceptionally performant auto-generated (or
 generator-assisted) GraphQL API.
 
 [PostGraphile](https://github.com/graphile/postgraphile) uses Graphile Build and
-Grafast to produce an extremely high performance standards-compliant GraphQL API
-with minimal fuss. The separate
+Gra*fast* to produce an extremely high performance standards-compliant GraphQL
+API with minimal fuss. The separate
 [`graphile-build-pg` module](../graphile-build-pg/README.md) contains the
 plugins that are specific to PostgreSQL support (`graphile-build` itself does
 not know nor care about databases).
@@ -58,3 +58,6 @@ And please give some love to our featured sponsors 🤩:
 ## Documentation
 
 TODO!
+
+[global-object-identification]:
+  https://relay.dev/graphql/objectidentification.htm
