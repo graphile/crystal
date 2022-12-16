@@ -1,10 +1,11 @@
 # ruru
 
-A [Grafast][grafast]-enhanced distribution of [Graph*i*QL][graphiql].
+A [Gra*fast*][grafast]-enhanced distribution of [Graph*i*QL][graphiql].
 
 **PRERELEASE**: this is pre-release software; use at your own risk and do not
 embed into public-facing projects. This will likely change a lot before it's
-ultimately released. This also explains the shocking lack of documentation.
+ultimately released. The pre-release nature also explains the shocking lack of
+documentation.
 
 ## Usage - CLI
 
@@ -88,14 +89,14 @@ app.get("/", (req, res, next) => {
 ## Why "ruru"?
 
 Jem and I are big fans of the late Terry Pratchett's Discworld universe. The
-city at the centre of many a Discworld tale is the twin city city-state of
+city at the centre of many a Discworld tale is the twin-city city-state of
 Ankh-Morpork. A "morepork" is a type of New Zealand owl, known in Māori as
 "ruru." Owls have excellent sight, and Ruru helps you to get an insight into not
 just the inputs and outputs of your API, but also what it does internally.
 
-RURU is also an abbreviation for checks to use when gathering information - is
-it: Reliable, Up-to-date, Relevant, Useful. We hope that you'll find Ruru to be
-all those things!
+RURU is also an abbreviation for checks to use when gathering information: "is
+it Reliable, Up-to-date, Relevant, and Useful?" We hope that you'll find Ruru to
+be all those things!
 
 <details>
 <summary>And this last reason is a little ru-rude...</summary>

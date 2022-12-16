@@ -21,7 +21,7 @@ over what goes into your GraphQL API whilst still saving you significant effort
 versus writing the schema without auto-generation.
 
 `graphile-build-pg` is a core component of [PostGraphile][], a library that
-helps you craft your ideal incredibly performant, best practices GraphQL API
+helps you craft your ideal, incredibly performant, best practices GraphQL API
 backed primarily by a PostgreSQL database with minimal developer effort.
 
 <!-- SPONSORS_BEGIN -->

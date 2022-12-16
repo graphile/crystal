@@ -39,4 +39,4 @@ And please give some love to our featured sponsors 🤩:
 
 <!-- SPONSORS_END -->
 
-[grafast]: packages/grafast/
+[grafast]: https://grafast.org
