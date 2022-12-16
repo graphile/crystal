@@ -3380,6 +3380,7 @@ __metadata:
     json5: "npm:^2.2.0"
     nodemon: "npm:^2.0.15"
     pg-sql2: "workspace:^"
+    postgres-array: "npm:~2.0.0"
     postgres-range: "npm:^1.1.1"
     ts-loader: "npm:^9.4.1"
     ts-node: "npm:^10.9.1"
