@@ -5953,6 +5953,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/license-checker-webpack-plugin@npm:^0":
+  version: 0.2.1
+  resolution: "@types/license-checker-webpack-plugin@npm:0.2.1"
+  dependencies:
+    "@types/webpack": "npm:^4"
+  checksum: 49f2db3d9f51a94122a49058d3e629005ee485668fd78b73c54e4397e69881c2d4e2bae8865c116c7d89dbf5056ef9ea23d00befe562dcb31996abeccc7045e9
+  languageName: node
+  linkType: hard
+
 "@types/lodash@npm:^4.14.178":
   version: 4.14.178
   resolution: "@types/lodash@npm:4.14.178"
@@ -6281,10 +6290,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/source-list-map@npm:*":
+  version: 0.1.2
+  resolution: "@types/source-list-map@npm:0.1.2"
+  checksum: e966d2fc8b845ac0f2d9898087e5313801ef6cdf7be6e7c906b78652c1b75f4b5b83a7ab1c30587c18327ebec50fad04700d81e763ac0e3dd674173d40e429d7
+  languageName: node
+  linkType: hard
+
 "@types/stack-utils@npm:^2.0.0":
   version: 2.0.1
   resolution: "@types/stack-utils@npm:2.0.1"
   checksum: a961a1d043517a2b6f7fc326fbce12cd3ba4a8dfc87b63ef2aa7cd991f6a8c7bc87942a51a792c3f922e34e3898d9de3139f2f6636a326a7ec4635389b822bd9
+  languageName: node
+  linkType: hard
+
+"@types/tapable@npm:^1":
+  version: 1.0.8
+  resolution: "@types/tapable@npm:1.0.8"
+  checksum: fee4703164b230e22bedb876ed77b4208bf3fe7878fe01d2aecd9d5bc51ca2c0887cb264af734b736de4b4d1e848f1f5d1eaa56b5722d8ee7625a5f9a78e3b1f
   languageName: node
   linkType: hard
 
@@ -6297,10 +6320,44 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/uglify-js@npm:*":
+  version: 3.17.1
+  resolution: "@types/uglify-js@npm:3.17.1"
+  dependencies:
+    source-map: "npm:^0.6.1"
+  checksum: 780fcc9a155ed73b95bc53b58d28afdf55b2cbf7ff1300c4293f36989a7ededa15b0edad426f26c2328fd97cf13af8d7ecc345d002dd76354b60d93c9f9539de
+  languageName: node
+  linkType: hard
+
 "@types/unist@npm:*, @types/unist@npm:^2.0.0, @types/unist@npm:^2.0.2, @types/unist@npm:^2.0.3":
   version: 2.0.6
   resolution: "@types/unist@npm:2.0.6"
   checksum: 4731b678e9d9ab41386b48bf67a5da9000705c6ae84cd4fc866f774004f5e8190a33117dbff95efc54b44404deaa08a421b646823b01c57db3eeb0652cdc71a9
+  languageName: node
+  linkType: hard
+
+"@types/webpack-sources@npm:*":
+  version: 3.2.0
+  resolution: "@types/webpack-sources@npm:3.2.0"
+  dependencies:
+    "@types/node": "npm:*"
+    "@types/source-list-map": "npm:*"
+    source-map: "npm:^0.7.3"
+  checksum: 7ab51f331c35901b9fec579e6065a4d989ba5a4b16b667f0642900a338070479e59e9664c31886a46b22712200d5ecbb494b6a8ffbdf8508b35e71da3ce51b3f
+  languageName: node
+  linkType: hard
+
+"@types/webpack@npm:^4":
+  version: 4.41.33
+  resolution: "@types/webpack@npm:4.41.33"
+  dependencies:
+    "@types/node": "npm:*"
+    "@types/tapable": "npm:^1"
+    "@types/uglify-js": "npm:*"
+    "@types/webpack-sources": "npm:*"
+    anymatch: "npm:^3.0.0"
+    source-map: "npm:^0.6.0"
+  checksum: bcc5c69a67da5ab414df81b71130da184e81e8d42856dc0113baa4c1825f5df93949c372b238d437cb72e9a2a33fcd551d6c7f07c25470a05a746ac0dee4a5d6
   languageName: node
   linkType: hard
 
@@ -7173,6 +7230,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"anymatch@npm:^3.0.0":
+  version: 3.1.3
+  resolution: "anymatch@npm:3.1.3"
+  dependencies:
+    normalize-path: "npm:^3.0.0"
+    picomatch: "npm:^2.0.4"
+  checksum: 0d50ce459783767bb68ce635c0a8f3e7de9843ebd6e6733accd59e13a49421a84944b8be5d68b5acecf74eca767a06229e07cae48151757744618e1a32dda0ed
+  languageName: node
+  linkType: hard
+
 "anymatch@npm:^3.0.3, anymatch@npm:~3.1.2":
   version: 3.1.2
   resolution: "anymatch@npm:3.1.2"
@@ -7244,6 +7311,13 @@ __metadata:
     "@babel/runtime": "npm:^7.10.2"
     "@babel/runtime-corejs3": "npm:^7.10.2"
   checksum: ac25b39935ebf70a61e8d821a7f87832a458fff7d769a705ec5f9a26018667bc48b6c0e1fa9536c198abfc3e6fac73de8631c4690d930a84938598dc7596497a
+  languageName: node
+  linkType: hard
+
+"array-find-index@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "array-find-index@npm:1.0.2"
+  checksum: 8b39efbf2ccac370a402ebfce086a9a541e749903379940b4ee01f9c8d1f41e1a144b8ca6b9a645b8c1ab61259df96acc14eab15c5959006381fdd862cb7c33b
   languageName: node
   linkType: hard
 
@@ -12647,6 +12721,7 @@ __metadata:
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@types/chai": "npm:^4"
     "@types/jest": "npm:^27.5.1"
+    "@types/license-checker-webpack-plugin": "npm:^0"
     "@types/lodash": "npm:^4.14.178"
     "@types/mermaid": "npm:^8"
     "@types/mocha": "npm:^9.1.1"
@@ -12658,6 +12733,7 @@ __metadata:
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     iterall: "npm:^1.3.0"
     jest: "npm:^28.1.0"
+    license-checker-webpack-plugin: "npm:^0.2.1"
     lodash: "npm:^4.17.21"
     mermaid: "npm:^8.14.0"
     mocha: "npm:^10.0.0"
@@ -15109,6 +15185,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"license-checker-webpack-plugin@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "license-checker-webpack-plugin@npm:0.2.1"
+  dependencies:
+    glob: "npm:^7.1.6"
+    lodash.template: "npm:^4.5.0"
+    minimatch: "npm:^3.0.4"
+    semver: "npm:^6.3.0"
+    spdx-expression-validate: "npm:^2.0.0"
+    spdx-satisfies: "npm:^5.0.0"
+    superstruct: "npm:^0.10.12"
+    webpack-sources: "npm:^1.4.3"
+    wrap-ansi: "npm:^6.1.0"
+  peerDependencies:
+    webpack: ^4.4.0 || ^5.4.0
+  checksum: ed4e1230550e879d37d663d326dbda34ce6144977e39e18336972cb83ecde815dc35257572f876b53a1add650e5e15ec5f2ad1d2089b161a470e9f6d2c5fe330
+  languageName: node
+  linkType: hard
+
 "light-my-request@npm:^4.2.0":
   version: 4.8.0
   resolution: "light-my-request@npm:4.8.0"
@@ -15242,6 +15337,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash._reinterpolate@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "lodash._reinterpolate@npm:3.0.0"
+  checksum: 9facfc8cc4a2c6c5cb30904a5d1423a01a734dffb0326d40061f78599891c1f3c47e8dc9e6058ea6b13fd46f7a1e56ca78e1a1463fadbc8e40724ef9fc0a97d4
+  languageName: node
+  linkType: hard
+
 "lodash.curry@npm:^4.0.1":
   version: 4.1.1
   resolution: "lodash.curry@npm:4.1.1"
@@ -15351,6 +15453,25 @@ __metadata:
   version: 4.4.0
   resolution: "lodash.startcase@npm:4.4.0"
   checksum: 69016d357418df331d77517ce537d02eb74e149770dcc2036c146e4e21dc203cc4c43ddefa7f43961edbc9c8676a30c8d3de21275d6c0ecc79afd699adb96bee
+  languageName: node
+  linkType: hard
+
+"lodash.template@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.template@npm:4.5.0"
+  dependencies:
+    lodash._reinterpolate: "npm:^3.0.0"
+    lodash.templatesettings: "npm:^4.0.0"
+  checksum: 1ae7707368e362daebd16cd1f330b62e9d060c278316851740d8517173faf2f3f8769e6da2d88ccec63ee9068e6d949595bdc9907ed9015f9b58a32fd94fdbd7
+  languageName: node
+  linkType: hard
+
+"lodash.templatesettings@npm:^4.0.0":
+  version: 4.2.0
+  resolution: "lodash.templatesettings@npm:4.2.0"
+  dependencies:
+    lodash._reinterpolate: "npm:^3.0.0"
+  checksum: 2dfd0463e1a8e8709345eeab76007deab3688b549dbc2fde1dd5de0d53fbf1d2bcd4c5f003756f5baaf6540386511c7c7babbe80894f43f5b95de653e50510cb
   languageName: node
   linkType: hard
 
@@ -19882,6 +20003,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"source-list-map@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "source-list-map@npm:2.0.1"
+  checksum: 0c847a4c46ede845d6ff12636322973e1f56035e722d035122d37007cf64c5ad67c462973b2ed756db161aaaf30b6be8b4df9a6d6163c92c52c4a7946f99c7ae
+  languageName: node
+  linkType: hard
+
 "source-map-js@npm:^1.0.2":
   version: 1.0.2
   resolution: "source-map-js@npm:1.0.2"
@@ -19916,10 +20044,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map@npm:^0.6.0, source-map@npm:^0.6.1, source-map@npm:~0.6.0":
+"source-map@npm:^0.6.0, source-map@npm:^0.6.1, source-map@npm:~0.6.0, source-map@npm:~0.6.1":
   version: 0.6.1
   resolution: "source-map@npm:0.6.1"
   checksum: cba9f44c3a4a0485f44a7760ebe427eecdd3b58011ae0459c05506b54f898835b2302073d6afa563a19b60ee9e54c82e33bc4a032e28bebacdfc635f1d0bf7e0
+  languageName: node
+  linkType: hard
+
+"source-map@npm:^0.7.3":
+  version: 0.7.4
+  resolution: "source-map@npm:0.7.4"
+  checksum: 97353dd6ffe747221f810400254a2c0110d745758aa094d3efe697d15c7697bb9bf49fea7028e88e97f973af53ac98cf69522ced606a4b46428fdd3e0d759280
   languageName: node
   linkType: hard
 
@@ -19954,6 +20089,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"spdx-compare@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "spdx-compare@npm:1.0.0"
+  dependencies:
+    array-find-index: "npm:^1.0.2"
+    spdx-expression-parse: "npm:^3.0.0"
+    spdx-ranges: "npm:^2.0.0"
+  checksum: fe8d4bb4e5bd9c67756f5d117e8a3287c45716b6f9996a443ccbd3dd879d43b5138d56ae22dd528b23308ccdd9ac9b0ff5ecbdfb6e849a60d56492520f25a6d1
+  languageName: node
+  linkType: hard
+
 "spdx-correct@npm:^3.0.0":
   version: 3.1.1
   resolution: "spdx-correct@npm:3.1.1"
@@ -19981,10 +20127,37 @@ __metadata:
   languageName: node
   linkType: hard
 
+"spdx-expression-validate@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "spdx-expression-validate@npm:2.0.0"
+  dependencies:
+    spdx-expression-parse: "npm:^3.0.0"
+  checksum: 3c30dfa8b760a0360b4fe68ad0a2a27bee960c469216f600acd6a4f10875ba3af97d8d54eeff29b206f0a6886d78b6f9b6fc069262f8dfbe8f80f0b83ad24705
+  languageName: node
+  linkType: hard
+
 "spdx-license-ids@npm:^3.0.0":
   version: 3.0.11
   resolution: "spdx-license-ids@npm:3.0.11"
   checksum: c315e8eee809cc5b1dd9cb586255d32d1cca37dd21dc71d554eeb93b285dc14ee47df0dbd629f5dd1efd2513201f3ed0175df59f917a67d11652ee1b25a854c3
+  languageName: node
+  linkType: hard
+
+"spdx-ranges@npm:^2.0.0":
+  version: 2.1.1
+  resolution: "spdx-ranges@npm:2.1.1"
+  checksum: dd052571ff41341a7e7cb32f6e3df4588242864145b54a7d3f27bc2a02a0b2857cad5596574125fcab461d6bf5deed720c490dc2c4fe178c6f2828da6fbed599
+  languageName: node
+  linkType: hard
+
+"spdx-satisfies@npm:^5.0.0":
+  version: 5.0.1
+  resolution: "spdx-satisfies@npm:5.0.1"
+  dependencies:
+    spdx-compare: "npm:^1.0.0"
+    spdx-expression-parse: "npm:^3.0.0"
+    spdx-ranges: "npm:^2.0.0"
+  checksum: afb97a40fb8296d7a52325841cfefe1f14c18c3350eecdc12f9453f39f7580b9b38e20cdba28af7ef6301e4a1d1c1783e4f36d30293371c119b39ee4f1a20fd9
   languageName: node
   linkType: hard
 
@@ -20409,6 +20582,13 @@ __metadata:
   peerDependencies:
     graphql: ">=0.10.0"
   checksum: 9137453182d1924bad7f8b6ae817217a4f2d8d77200271be8bfe04c7758d545f68b55d1c830cba0b466d170b64469abe8b6a744746bc1ae5f4a00ae982c6ea89
+  languageName: node
+  linkType: hard
+
+"superstruct@npm:^0.10.12":
+  version: 0.10.13
+  resolution: "superstruct@npm:0.10.13"
+  checksum: f1faa3018d306266ee90b0f8b1e33ceea93dce7ce05681c3afccc9fd76f76910c7b2d883ed5db14b677ebd13996636cd79cb6885dd319896e3ad1a0ada7c0451
   languageName: node
   linkType: hard
 
@@ -22020,6 +22200,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"webpack-sources@npm:^1.4.3":
+  version: 1.4.3
+  resolution: "webpack-sources@npm:1.4.3"
+  dependencies:
+    source-list-map: "npm:^2.0.0"
+    source-map: "npm:~0.6.1"
+  checksum: 1119600f0fa6e0e7b3e12804d93401dd87011fa38ee10ae05988fb200a82166687116f13415934424f4372f6431955a1725ecb48fc06f2e77d0c380542c5e72a
+  languageName: node
+  linkType: hard
+
 "webpack-sources@npm:^3.2.2":
   version: 3.2.2
   resolution: "webpack-sources@npm:3.2.2"
@@ -22294,7 +22484,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrap-ansi@npm:^6.2.0":
+"wrap-ansi@npm:^6.1.0, wrap-ansi@npm:^6.2.0":
   version: 6.2.0
   resolution: "wrap-ansi@npm:6.2.0"
   dependencies:

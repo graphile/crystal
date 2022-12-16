@@ -47,6 +47,8 @@ SOFTWARE.
 The contents of the \`node_modules\` directory are produced from external
 libraries; their license terms will likely differ from the terms above - you
 should review them also.
+
+Licenses of bundled dependencies are detailed in dist/LICENSES.txt
 `,
 );
 
