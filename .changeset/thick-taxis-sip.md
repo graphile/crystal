@@ -12,7 +12,6 @@
 "@dataplan/json": patch
 "@dataplan/pg": patch
 "grafserv": patch
-"@grafast/ruru": patch
 "eslint-plugin-graphile-export": patch
 "graphile-config": patch
 "graphile-export": patch
