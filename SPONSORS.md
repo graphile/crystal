@@ -8,9 +8,9 @@ Graphile ecosystem. Find out
 
 - Surge
 - Netflix
+- Qwick
 - The Guild
 - Chad Furman
-- Qwick
 - Fanatics
 - Dovetail
 - Enzuzo
@@ -36,6 +36,7 @@ Graphile ecosystem. Find out
 - latch.bio
 - IaSQL
 - nullachtvierzehn
+- Ayog Healthcare
 
 ## Supporters
 
@@ -61,7 +62,6 @@ Graphile ecosystem. Find out
 - Stéphane Klein
 - Alvin Ali Khaled
 - Splitgraph
-- OnThisSpot
 - Zymego
 - ARK
 - Sen Palanisami
