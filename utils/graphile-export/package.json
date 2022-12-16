@@ -44,7 +44,6 @@
     "@babel/parser": "^7.16.6",
     "@babel/template": "^7.16.0",
     "@types/node": "^16.11.15",
-    "grafast": "workspace:^",
     "prettier": "^2.5.1",
     "tslib": "^2.4.0"
   },
@@ -52,6 +51,7 @@
     "node": ">=16"
   },
   "peerDependencies": {
+    "grafast": "workspace:*",
     "graphql": "*",
     "pg-sql2": "workspace:*"
   },
