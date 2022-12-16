@@ -4044,49 +4044,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafast/ruru@workspace:^, @grafast/ruru@workspace:grafast/ruru":
-  version: 0.0.0-use.local
-  resolution: "@grafast/ruru@workspace:grafast/ruru"
-  dependencies:
-    "@graphiql/plugin-explorer": "npm:^0.1.5"
-    "@graphiql/react": "npm:^0.13.2"
-    "@graphiql/toolkit": "npm:^0.8.0"
-    "@types/codemirror": "npm:^5.60.5"
-    "@types/debug": "npm:^4.1.7"
-    "@types/http-proxy": "npm:^1"
-    "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:^16.11.15"
-    "@types/nodemon": "npm:1.19.1"
-    "@types/react": "npm:^18"
-    "@types/react-dom": "npm:^18.0.0"
-    "@types/yargs": "npm:^17.0.10"
-    css-loader: "npm:^6.7.1"
-    file-loader: "npm:^6.2.0"
-    graphile-config: "workspace:^"
-    graphiql: "npm:^2.0.8"
-    graphiql-explorer: "npm:^0.9.0"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
-    http-proxy: "npm:^1.18.1"
-    jest: "npm:^28.1.0"
-    nodemon: "npm:^2.0.15"
-    react: "npm:>=16 <19"
-    react-dom: "npm:>=16 <19"
-    style-loader: "npm:^3.3.1"
-    svg-inline-loader: "npm:^0.8.2"
-    ts-loader: "npm:^9.3.1"
-    ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^4.8.1-rc"
-    webpack: "npm:^5.72.0"
-    webpack-cli: "npm:^4.9.2"
-    yargs: "npm:^17.4.1"
-  peerDependencies:
-    graphql: "*"
-  bin:
-    ruru: ./dist/cli-run.js
-  languageName: unknown
-  linkType: soft
-
 "@graphile/lds@workspace:utils/lds":
   version: 0.0.0-use.local
   resolution: "@graphile/lds@workspace:utils/lds"
@@ -12720,7 +12677,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "grafserv@workspace:grafast/grafserv"
   dependencies:
-    "@grafast/ruru": "workspace:^"
     "@graphile/lru": "workspace:^"
     debug: "npm:^4.1.1"
     eventemitter3: "npm:^4.0.7"
@@ -12729,6 +12685,7 @@ __metadata:
     jest: "npm:^28.1.0"
     jest-serializer-graphql-schema: "workspace:^"
     nodemon: "npm:^2.0.15"
+    ruru: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
@@ -12752,7 +12709,6 @@ __metadata:
     "@envelop/core": "npm:^2.0.0"
     "@envelop/parser-cache": "npm:^4.0.0"
     "@envelop/validation-cache": "npm:^4.0.0"
-    "@grafast/ruru": "workspace:^"
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@types/debug": "npm:^4.1.7"
     "@types/express": "npm:^4"
@@ -12773,6 +12729,7 @@ __metadata:
     jest: "npm:^28.1.0"
     jsonwebtoken: "npm:^8.5.1"
     pg-introspection: "workspace:^"
+    ruru: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
@@ -17735,7 +17692,6 @@ __metadata:
   resolution: "postgraphile@workspace:postgraphile/postgraphile"
   dependencies:
     "@dataplan/pg": "workspace:*"
-    "@grafast/ruru": "workspace:^"
     "@graphile/lru": "npm:4.6.0-alpha.0"
     "@types/debug": "npm:^4.1.7"
     "@types/express": "npm:^4"
@@ -17756,6 +17712,7 @@ __metadata:
     jsonwebtoken: "npm:^8.5.1"
     nodemon: "npm:^2.0.15"
     pg: "npm:^8.7.1"
+    ruru: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
@@ -19250,6 +19207,49 @@ __metadata:
   checksum: 45bff4f6664ae79b8653ebd32c6e9e9e37139683f7bd1d54d5a05c409c9d167ece16c9b7e36a99ac4bb7a08b5f72b4084a1e08eba443bc6e2ca9044ef972752c
   languageName: node
   linkType: hard
+
+"ruru@workspace:^, ruru@workspace:grafast/ruru":
+  version: 0.0.0-use.local
+  resolution: "ruru@workspace:grafast/ruru"
+  dependencies:
+    "@graphiql/plugin-explorer": "npm:^0.1.5"
+    "@graphiql/react": "npm:^0.13.2"
+    "@graphiql/toolkit": "npm:^0.8.0"
+    "@types/codemirror": "npm:^5.60.5"
+    "@types/debug": "npm:^4.1.7"
+    "@types/http-proxy": "npm:^1"
+    "@types/jest": "npm:^27.5.1"
+    "@types/node": "npm:^16.11.15"
+    "@types/nodemon": "npm:1.19.1"
+    "@types/react": "npm:^18"
+    "@types/react-dom": "npm:^18.0.0"
+    "@types/yargs": "npm:^17.0.10"
+    css-loader: "npm:^6.7.1"
+    file-loader: "npm:^6.2.0"
+    graphile-config: "workspace:^"
+    graphiql: "npm:^2.0.8"
+    graphiql-explorer: "npm:^0.9.0"
+    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    http-proxy: "npm:^1.18.1"
+    jest: "npm:^28.1.0"
+    nodemon: "npm:^2.0.15"
+    react: "npm:>=16 <19"
+    react-dom: "npm:>=16 <19"
+    style-loader: "npm:^3.3.1"
+    svg-inline-loader: "npm:^0.8.2"
+    ts-loader: "npm:^9.3.1"
+    ts-node: "npm:^10.9.1"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^4.8.1-rc"
+    webpack: "npm:^5.72.0"
+    webpack-cli: "npm:^4.9.2"
+    yargs: "npm:^17.4.1"
+  peerDependencies:
+    graphql: "*"
+  bin:
+    ruru: ./dist/cli-run.js
+  languageName: unknown
+  linkType: soft
 
 "rw@npm:1":
   version: 1.3.3

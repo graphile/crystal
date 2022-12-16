@@ -6,7 +6,7 @@ import "codemirror-graphql/hint";
 import "codemirror-graphql/lint";
 import "codemirror-graphql/mode";
 
-import { Ruru } from "@grafast/ruru";
+import { Ruru } from "ruru";
 // eslint-disable-next-line @typescript-eslint/no-duplicate-imports
 import CodeMirror from "@uiw/react-codemirror";
 import * as Grafast from "grafast";

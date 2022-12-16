@@ -56,7 +56,6 @@
   "homepage": "https://graphile.org/graphile-engine/",
   "dependencies": {
     "@dataplan/pg": "workspace:*",
-    "@grafast/ruru": "workspace:^",
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.15",
     "@types/pg": "^8.6.2",
@@ -70,6 +69,7 @@
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.1",
+    "ruru": "workspace:^",
     "tslib": "^2.4.0"
   },
   "engines": {

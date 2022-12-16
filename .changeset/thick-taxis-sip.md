@@ -7,6 +7,7 @@
 "jest-serializer-simple": major
 "@graphile/lru": major
 "pg-sql2": major
+"ruru": major
 "grafast": patch
 "@dataplan/json": patch
 "@dataplan/pg": patch
