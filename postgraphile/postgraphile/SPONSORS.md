@@ -7,11 +7,11 @@ Graphile ecosystem. Find out
 ## Featured
 
 - Surge
-- Story.ai
-- Chad Furman
-- Fanatics
+- Netflix
 - Qwick
 - The Guild
+- Chad Furman
+- Fanatics
 - Dovetail
 - Enzuzo
 - Stellate
@@ -20,8 +20,8 @@ Graphile ecosystem. Find out
 
 ## Leaders
 
-- Robert Claypool
 - Joe Dennis
+- Robert Claypool
 - domonda
 - nigelrmtaylor
 - DocIQ
@@ -34,38 +34,38 @@ Graphile ecosystem. Find out
 - Taiste
 - Notably
 - Nathanael Beisiegel
-- William Baxter
 - latch.bio
+- nullachtvierzehn
+- Ayog Healthcare
 
 ## Supporters
 
 - Postlight
 - nick
 - Sam Levin
-- Philipp Litzenberger
 - Matt Bretl
 - Chris Watland
 - svarmony
 - James Rascoe
 - Daniel Einspanjer
-- stlbucket
 - Simon Elliott
-- Mark
+- stlbucket
 - CJ Lazell
+- Mark
+- Philipp Litzenberger
 - Mansoor Razzaq
 - Keith Layne
 - Olli Selamaa
 - Paul Melnikow
 - Jimmy Liu
-- Stéphane Klein
 - Kadi Kraman
+- Stéphane Klein
 - Alvin Ali Khaled
 - Splitgraph
-- OnThisSpot
 - Zymego
-- Benjamin Berman
 - ARK
 - Sen Palanisami
+- Benjamin Berman
 - CartoLab
 - IFCHOR GROUP
 - Zentered
