@@ -8,10 +8,12 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "node": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./adaptors/node-postgres": {
       "types": "./dist/adaptors/node-postgres.d.ts",
+      "node": "./dist/adaptors/node-postgres.js",
       "default": "./dist/adaptors/node-postgres.js"
     }
   },
@@ -25,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-build.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "graphile",
@@ -41,11 +43,11 @@
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/crystal/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-pg",
+  "homepage": "https://grafast.org/grafast/step-library/dataplan-pg/",
   "dependencies": {
-    "@graphile/lru": "4.6.0-alpha.0",
+    "@graphile/lru": "workspace:^",
     "@types/node": "^16.11.15",
     "grafast": "workspace:^",
     "pg-sql2": "workspace:^",
