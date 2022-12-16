@@ -53,7 +53,7 @@
   },
   "peerDependencies": {
     "graphql": "*",
-    "pg-sql2": "*"
+    "pg-sql2": "workspace:*"
   },
   "files": [
     "dist"

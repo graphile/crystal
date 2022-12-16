@@ -12882,7 +12882,7 @@ __metadata:
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
     graphql: "*"
-    pg-sql2: "*"
+    pg-sql2: "workspace:*"
   languageName: unknown
   linkType: soft
 
