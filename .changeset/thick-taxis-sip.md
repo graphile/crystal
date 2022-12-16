@@ -1,20 +1,20 @@
 ---
-"graphile-build": major
-"graphile-build-pg": major
-"graphile-utils": major
-"postgraphile": major
-"jest-serializer-graphql-schema": major
-"jest-serializer-simple": major
-"@graphile/lru": major
-"pg-sql2": major
 "ruru": major
-"grafast": patch
 "@dataplan/json": patch
 "@dataplan/pg": patch
-"grafserv": patch
+"@graphile/lru": patch
 "eslint-plugin-graphile-export": patch
+"grafast": patch
+"grafserv": patch
+"graphile-build": patch
+"graphile-build-pg": patch
 "graphile-config": patch
 "graphile-export": patch
+"graphile-utils": patch
+"jest-serializer-graphql-schema": patch
+"jest-serializer-simple": patch
+"pg-sql2": patch
+"postgraphile": patch
 "pg-introspection": patch
 ---
 
