@@ -878,27 +878,27 @@ mutation {
  	createPost (
 ```
 
-Press Ctrl + Space and it will give you an intellisense suggestion of ```input:```:
+Press Ctrl + Space and it will give you an autocomplete suggestion of ```input:```:
 
-![Alt text](images/1_input.jpg?raw=true "Intellisense suggesting input")
+![Alt text](images/1_input.jpg?raw=true "Autocomplete suggestion of input")
 
 ```
 mutation {
  	createPost (input: {}
 ```
 
-Next intellisense will suggest you need a ```post```:
+Next autocomplete will suggest you need a ```post```:
 
-![Alt text](images/2_post.jpg?raw=true "Intellisense suggesting post")
+![Alt text](images/2_post.jpg?raw=true "Autocomplete suggesting post")
 
 ```
 mutation {
  	createPost (input: {post : {}}
 ```
 
-Then intellisense will suggest the parameters:
+Then autocomplete will suggest the parameters:
 
-![Alt text](images/3_args.jpg?raw=true "Intellisense suggesting the arguments for the parameter")
+![Alt text](images/3_args.jpg?raw=true "Autocomplete suggesting the arguments for the parameter")
 
 ```
 mutation {
