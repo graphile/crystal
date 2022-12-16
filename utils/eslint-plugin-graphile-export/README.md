@@ -59,8 +59,8 @@ Add to your eslintrc:
 ```
 
 NOTE: this plugin will automatically add `EXPORTABLE` callbacks in places where
-it things it's suitable, but it currently does not add the EXPORTABLE import to
-the file. You'll need to add that yourself:
+it thinks it's suitable, but it currently does not add the `EXPORTABLE` import
+to the file. You'll need to add that yourself:
 
 ```ts
 import { EXPORTABLE } from "graphile-export";

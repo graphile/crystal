@@ -1,4 +1,4 @@
-# NOT YET FULLY IMPLEMENTED
+# V5: NOT YET FULLY IMPLEMENTED
 
 # graphile-utils
 
@@ -9,11 +9,11 @@
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
 This package contains helpers for building plugins for GraphQL schemas utilising
-Graphile Engine, such as the one produced by
-[PostGraphile](https://graphile.org/postgraphile).
+Graphile Build, such as the one produced by
+[PostGraphile](https://postgraphile.org).
 
 Documentation is currently available
-[here](https://graphile.org/postgraphile/extending/).
+[here](https://postgraphile.org/postgraphile/next/extending/).
 
 PRs to improve documentation are always welcome!
 
@@ -62,7 +62,7 @@ directives.
 
 ### `makeExtendSchemaPlugin`
 
-Docs: https://www.graphile.org/postgraphile/make-extend-schema-plugin/
+Docs: https://postgraphile.org/postgraphile/next/make-extend-schema-plugin
 
 Enables you to add additonal types or extend existing types within your Graphile
 Engine GraphQL schema.
@@ -117,7 +117,7 @@ makeExtendSchemaPlugin((build) => ({
 
 ### `makeAddInflectorsPlugin`
 
-Docs: https://www.graphile.org/postgraphile/make-add-inflectors-plugin/
+Docs: https://postgraphile.org/postgraphile/next/make-add-inflectors-plugin
 
 If you don't like the default naming conventions that come with a Graphile
 Engine GraphQL schema then it's easy for you to override them using the
@@ -125,13 +125,13 @@ inflector.
 
 ### `makeChangeNullabilityPlugin`
 
-Docs: https://www.graphile.org/postgraphile/make-change-nullability-plugin/
+Docs: https://postgraphile.org/postgraphile/next/make-change-nullability-plugin
 
 Use this plugin to override the nullability of fields in your GraphQL schema.
 
 ### `makeProcessSchemaPlugin`
 
-Docs: https://www.graphile.org/postgraphile/make-process-schema-plugin/
+Docs: https://postgraphile.org/postgraphile/next/make-process-schema-plugin
 
 Enables you to process the schema after it's built, e.g. print it to a file,
 augment it with a third party library (e.g. graphql-shield), etc.

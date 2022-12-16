@@ -60,7 +60,6 @@
     "@envelop/core": "^2.0.0",
     "@envelop/parser-cache": "^4.0.0",
     "@envelop/validation-cache": "^4.0.0",
-    "@grafast/ruru": "workspace:^",
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/debug": "^4.1.7",
     "@types/express": "^4",
@@ -73,6 +72,7 @@
     "graphql": "16.1.0-experimental-stream-defer.6",
     "graphql-helix": "^1.11.0",
     "jest": "^28.1.0",
+    "ruru": "workspace:^",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.1-rc"
   }

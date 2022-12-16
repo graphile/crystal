@@ -9,13 +9,14 @@ _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL
 database. Highly customisable and extensible thanks to incredibly powerful
 plugin system.**_
 
+**Documentation**: https://postgraphile.org/postgraphile/next/
+
 An incredibly low-effort way to build a well structured and high-performance
 GraphQL API backed primarily by a PostgreSQL database. Our main focusses are
 performance, automatic best-practices and customisability/extensibility. Use
-this if you have a PostgreSQL database and you want to use it as the "source of
-truth" for an auto-generated GraphQL API (which you can still make significant
-changes to). **NOTE**: thanks to [graphile-export][] you can also use this as a
-starting point for an API that you then manage yourself.
+this if you have a PostgreSQL database and you want to use it as the primary
+"source of truth" for an auto-generated GraphQL API (which you can still make
+significant changes to).
 
 <!-- SPONSORS_BEGIN -->
 

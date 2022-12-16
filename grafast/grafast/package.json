@@ -20,7 +20,7 @@
     "test": "yarn test:mocha",
     "test:mocha": "mocha '**/__tests__/**/*-test.ts'",
     "build": "zx scripts/build-npm.mjs",
-    "pack": "echo 'FORBIDDEN' && exit 1",
+    "postpack": "echo 'FORBIDDEN' && exit 1",
     "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
   },
   "repository": {
@@ -90,5 +90,9 @@
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",
     "zx": "^7.0.8"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "release"
   }
 }

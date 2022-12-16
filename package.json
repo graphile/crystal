@@ -7,7 +7,7 @@
     "test": "yarn workspaces foreach --topological run test",
     "posttest": "yarn workspaces foreach --topological run posttest",
     "prepack:all": "scripts/prepack-all",
-    "build": "tsc -b && yarn && yarn workspace @grafast/ruru prepack",
+    "build": "tsc -b && yarn && yarn workspace ruru prepack",
     "watch": "yarn build && tsc -b --watch",
     "clean": "jest --clearCache && rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo}",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
@@ -76,5 +76,9 @@
     "node": ">=14.17",
     "yarn": ">=1.3.2"
   },
-  "packageManager": "yarn@3.2.1"
+  "packageManager": "yarn@3.2.1",
+  "dependencies": {
+    "@changesets/changelog-github": "^0.4.7",
+    "@changesets/cli": "^2.25.2"
+  }
 }
