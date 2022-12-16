@@ -4071,13 +4071,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphile/lru@npm:4.6.0-alpha.0":
-  version: 4.6.0-alpha.0
-  resolution: "@graphile/lru@npm:4.6.0-alpha.0"
-  checksum: e328b8726fd8f3afd28e95719c6f1af16fd34b32f946e96fbf1cbb2b8f93719037059669a7069912e2071bc8e39762589bcd6c2771f389e802985fdb4b598c17
-  languageName: node
-  linkType: hard
-
 "@graphile/lru@workspace:^, @graphile/lru@workspace:utils/lru":
   version: 0.0.0-use.local
   resolution: "@graphile/lru@workspace:utils/lru"
@@ -12720,7 +12713,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "grafast@workspace:grafast/grafast"
   dependencies:
-    "@graphile/lru": "npm:4.6.0-alpha.0"
+    "@graphile/lru": "workspace:^"
     "@types/chai": "npm:^4"
     "@types/jest": "npm:^27.5.1"
     "@types/license-checker-webpack-plugin": "npm:^0"
@@ -12794,7 +12787,7 @@ __metadata:
     "@envelop/core": "npm:^2.0.0"
     "@envelop/parser-cache": "npm:^4.0.0"
     "@envelop/validation-cache": "npm:^4.0.0"
-    "@graphile/lru": "npm:4.6.0-alpha.0"
+    "@graphile/lru": "workspace:^"
     "@types/debug": "npm:^4.1.7"
     "@types/express": "npm:^4"
     "@types/jest": "npm:^27.5.1"
@@ -12825,7 +12818,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "graphile-build@workspace:graphile-build/graphile-build"
   dependencies:
-    "@graphile/lru": "npm:4.6.0-alpha.0"
+    "@graphile/lru": "workspace:^"
     "@types/debug": "npm:^4.1.7"
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:^16.11.15"
@@ -17211,7 +17204,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "pg-sql2@workspace:utils/pg-sql2"
   dependencies:
-    "@graphile/lru": "npm:4.6.0-alpha.0"
+    "@graphile/lru": "workspace:^"
     "@types/debug": "npm:4.1.7"
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:16.11.15"
@@ -17822,7 +17815,7 @@ __metadata:
   resolution: "postgraphile@workspace:postgraphile/postgraphile"
   dependencies:
     "@dataplan/pg": "workspace:*"
-    "@graphile/lru": "npm:4.6.0-alpha.0"
+    "@graphile/lru": "workspace:^"
     "@types/debug": "npm:^4.1.7"
     "@types/express": "npm:^4"
     "@types/jest": "npm:^27.5.1"

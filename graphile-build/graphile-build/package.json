@@ -36,7 +36,7 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@graphile/lru": "4.6.0-alpha.0",
+    "@graphile/lru": "workspace:^",
     "@types/node": "^16.11.15",
     "@types/pluralize": "^0.0.29",
     "@types/semver": "^7.3.9",

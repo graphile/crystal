@@ -57,7 +57,7 @@
   "homepage": "https://graphile.org/graphile-engine/",
   "dependencies": {
     "@dataplan/pg": "workspace:*",
-    "@graphile/lru": "4.6.0-alpha.0",
+    "@graphile/lru": "workspace:^",
     "@types/node": "^16.11.15",
     "@types/pg": "^8.6.2",
     "debug": "^4.3.3",
