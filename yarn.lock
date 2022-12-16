@@ -3388,6 +3388,7 @@ __metadata:
     typescript: "npm:^4.8.1-rc"
     webpack: "npm:^5.74.0"
     webpack-cli: "npm:^4.10.0"
+    webpack-node-externals: "npm:^3.0.0"
     zx: "npm:^7.0.8"
   peerDependencies:
     graphql: "*"
@@ -22009,6 +22010,13 @@ __metadata:
     clone-deep: "npm:^4.0.1"
     wildcard: "npm:^2.0.0"
   checksum: 8f5c833d09868b73f2f09453927ba85df4f750c57536f4fdbafa4aaa875b56a17534e4ce3f8f48db1498857416711eba28e88238af581357478d623cad81a2e7
+  languageName: node
+  linkType: hard
+
+"webpack-node-externals@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "webpack-node-externals@npm:3.0.0"
+  checksum: bb47f8d3223a32756fbcf25d97704a7903cd1e7724c2c84d98af65e2e806de75740b57ce18ee5f6159937b7c5e823446d3a4ba0c3c8ea2bab97770c62a70e071
   languageName: node
   linkType: hard
 
