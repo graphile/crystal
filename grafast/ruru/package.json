@@ -28,17 +28,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/postgraphile.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "graphile",
     "graphql",
-    "graphiql"
+    "graphiql",
+    "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/postgraphile/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
   "homepage": "https://grafast.org/ruru/",
   "dependencies": {

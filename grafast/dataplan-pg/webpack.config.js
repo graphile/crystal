@@ -1,3 +1,4 @@
+const nodeExternals = require("webpack-node-externals");
 const webpack = require("webpack");
 const path = require("path");
 const LicenseCheckerWebpackPlugin = require("license-checker-webpack-plugin");
@@ -5,16 +6,16 @@ const LicenseCheckerWebpackPlugin = require("license-checker-webpack-plugin");
 module.exports = {
   entry: {
     index: "./dist/index.js",
-    envelop: {
+    "adaptors/node-postgres": {
       dependOn: "index",
-      import: "./dist/envelop.js",
+      import: "./dist/adaptors/node-postgres.js",
     },
   },
   output: {
     path: path.resolve(__dirname, "release/dist"),
     filename: "[name].js",
     library: {
-      name: "grafast",
+      name: "dataplan_pg",
       type: "umd",
     },
     globalObject: "this",
@@ -40,43 +41,17 @@ module.exports = {
         /(^.*[/\\]node_modules[/\\]((?:@[^/\\]+[/\\])?(?:[^@/\\][^/\\]*)))/,
     }),
   ],
-  externals: {
-    // graphql -> external
-    graphql: {
-      commonjs: "graphql",
-      commonjs2: "graphql",
-      amd: "graphql",
-      root: "graphql",
-    },
-    // TODO: we really need to remove the dependency on buildExecutionContext
-    "graphql/execution/execute": {
-      commonjs: "graphql/execution/execute",
-      commonjs2: "graphql/execution/execute",
-      amd: "graphql/execution/execute",
-      root: "graphql/execution/execute",
-    },
-    // crypto.createHash -> external, optional
-    crypto: {
-      commonjs: "crypto",
-      commonjs2: "crypto",
-      amd: "crypto",
-      root: "crypto",
-    },
-    // util.inspect -> external, optional
-    util: {
-      commonjs: "util",
-      commonjs2: "util",
-      amd: "util",
-      root: "util",
-    },
-    // @graphile/lru -> bundle
-    // chalk -> bundle
-    // debug -> bundle
-    // events.EventEmitter -> replaced with eventemitter3 -> bundle
-    // iterall -> bundle
-    // lodash -> bundle
-    // tslib -> bundle
+  target: "node", // use require() & use NodeJs CommonJS style
+  externalsPresets: {
+    node: true, // in order to ignore built-in modules like path, fs, etc.
   },
+  externals: [
+    // in order to ignore all modules in node_modules folder
+    nodeExternals(),
+    nodeExternals({
+      modulesDir: path.resolve(__dirname, "../../node_modules"),
+    }),
+  ],
   performance: {
     maxEntrypointSize: 215000,
   },

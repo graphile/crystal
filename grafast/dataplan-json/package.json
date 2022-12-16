@@ -9,21 +9,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-build.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "graphile",
     "graphql",
-    "crystal",
+    "grafast",
     "json",
-    "dataplan"
+    "dataplan",
+    "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/crystal/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-json",
+  "homepage": "https://github.com/graphile/heart/tree/main/grafast/dataplan-json",
   "dependencies": {
     "chalk": "^4.1.2",
     "tslib": "^2.4.0"

@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-engine.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "sql",
@@ -24,14 +24,16 @@
     "tagged",
     "template",
     "literal",
-    "es6"
+    "es6",
+    "graphile",
+    "graphite"
   ],
   "author": "Benjie Gillam <benjie@jemjie.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/graphile-engine/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/pg-sql2",
+  "homepage": "https://github.com/graphile/heart/tree/main/utils/pg-sql2",
   "devDependencies": {
     "@types/debug": "4.1.7",
     "@types/jest": "^27.5.1",
@@ -42,7 +44,7 @@
     "typescript": "^4.8.1-rc"
   },
   "dependencies": {
-    "@graphile/lru": "4.6.0-alpha.0",
+    "@graphile/lru": "workspace:^",
     "tslib": "^2.4.0"
   },
   "files": [

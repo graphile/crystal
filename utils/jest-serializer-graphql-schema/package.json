@@ -11,19 +11,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-engine.git"
+    "url": "git+https://github.com/graphile/heart.git"
   },
   "keywords": [
     "jest",
     "graphql",
-    "schema"
+    "schema",
+    "graphile",
+    "graphite"
   ],
   "author": "David Baumgold <david@davidbaumgold.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/graphile-engine/issues"
+    "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/jest-serializer-graphql-schema#readme",
+  "homepage": "https://github.com/graphile/heart/tree/main/utils/jest-serializer-graphql-schema",
   "peerDependencies": {
     "graphql": "*"
   },

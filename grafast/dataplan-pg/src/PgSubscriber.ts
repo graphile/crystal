@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import EventEmitter from "eventemitter3";
 import type { Deferred, GrafastSubscriber } from "grafast";
 import { defer } from "grafast";
 import type { Notification, Pool, PoolClient } from "pg";
