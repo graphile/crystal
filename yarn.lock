@@ -3366,12 +3366,13 @@ __metadata:
   resolution: "@dataplan/pg@workspace:grafast/dataplan-pg"
   dependencies:
     "@dataplan/json": "workspace:^"
-    "@graphile/lru": "npm:4.6.0-alpha.0"
+    "@graphile/lru": "workspace:^"
     "@mermaid-js/mermaid-cli": "npm:^8.14.0"
     "@types/jest": "npm:^27.5.1"
     "@types/json5": "npm:^2.2.0"
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
+    eventemitter3: "npm:^4.0.7"
     grafast: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
@@ -3380,9 +3381,13 @@ __metadata:
     nodemon: "npm:^2.0.15"
     pg-sql2: "workspace:^"
     postgres-range: "npm:^1.1.1"
+    ts-loader: "npm:^9.4.1"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
+    webpack: "npm:^5.74.0"
+    webpack-cli: "npm:^4.10.0"
+    zx: "npm:^7.0.8"
   peerDependencies:
     graphql: "*"
   languageName: unknown
