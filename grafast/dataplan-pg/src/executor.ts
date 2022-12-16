@@ -1,5 +1,4 @@
 import LRU from "@graphile/lru";
-import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
@@ -14,9 +13,9 @@ import type {
 } from "grafast";
 import { defer, isAsyncIterable, isDev } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
-import { inspect } from "util";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.js";
+import { inspect } from "./inspect.js";
 
 const LOOK_DOWN = "👇".repeat(30);
 const LOOK_UP = "👆".repeat(30);
@@ -411,9 +410,8 @@ ${duration}
                     scopedCache,
                   );
                 }
-                if (isDev) {
-                  assert.ok(
-                    remaining.includes(identifiersJSON) === false,
+                if (isDev && remaining.includes(identifiersJSON)) {
+                  throw new Error(
                     "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
                   );
                 }

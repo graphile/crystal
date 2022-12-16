@@ -1,5 +1,4 @@
-import { inspect } from "util";
-
+import { inspect } from "../inspect.js";
 import type { PgPoint } from "./point.js";
 import { stringifyPoint } from "./point.js";
 

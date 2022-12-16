@@ -1,4 +1,3 @@
-import assert from "assert";
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
@@ -2354,11 +2353,11 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
   ): {
     [desiredIndex: string]: string;
   } {
-    assert.equal(
-      otherPlan.mode,
-      this.mode,
-      "GraphileInternalError<d12a3d95-4f7b-41d9-8cb4-a97bd169d128>: attempted to merge selects with a PgSelectStep in a different mode",
-    );
+    if (otherPlan.mode !== this.mode) {
+      throw new Error(
+        "GraphileInternalError<d12a3d95-4f7b-41d9-8cb4-a97bd169d128>: attempted to merge selects with a PgSelectStep in a different mode",
+      );
+    }
     const actualKeyByDesiredKey = Object.create(null);
     //console.log(`Other ${otherPlan} selects:`);
     //console.dir(otherPlan.selects, { depth: 8 });

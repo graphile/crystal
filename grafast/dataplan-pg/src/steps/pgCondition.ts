@@ -1,4 +1,3 @@
-import assert from "assert";
 import type { BaseStep, ExecutableStep } from "grafast";
 import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
@@ -121,20 +120,16 @@ export class PgConditionStep<
   }
 
   where(condition: PgWhereConditionSpec<any>): void {
-    assert.equal(
-      this.isHaving,
-      false,
-      `cannot call .where() on a 'having' condition`,
-    );
+    if (this.isHaving) {
+      throw new Error(`Cannot call .where() on a 'having' condition`);
+    }
     this.conditions.push(condition);
   }
 
   having(condition: PgHavingConditionSpec<any>): void {
-    assert.equal(
-      this.isHaving,
-      true,
-      `cannot call .having() on a 'where' condition`,
-    );
+    if (!this.isHaving) {
+      throw new Error(`cannot call .having() on a 'where' condition`);
+    }
     this.havingConditions.push(condition);
   }
 

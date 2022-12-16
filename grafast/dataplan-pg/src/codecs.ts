@@ -2,7 +2,6 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";
-import { inspect } from "util";
 
 import type {
   PgBox,
@@ -35,6 +34,7 @@ import {
   stringifyPolygon,
 } from "./codecUtils/index.js";
 import { exportAs } from "./exportAs.js";
+import { inspect } from "./inspect.js";
 import type {
   PgDecode,
   PgEncode,

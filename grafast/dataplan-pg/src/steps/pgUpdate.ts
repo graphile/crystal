@@ -6,7 +6,6 @@ import type {
 import { ExecutableStep, isDev, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
-import { inspect } from "util";
 
 import type { PgTypeColumn, PgTypeColumns } from "../codecs.js";
 import type {
@@ -15,6 +14,7 @@ import type {
   PgSourceRow,
   PgSourceUnique,
 } from "../datasource.js";
+import { inspect } from "../inspect.js";
 import type { PgTypeCodec, PlanByUniques } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";

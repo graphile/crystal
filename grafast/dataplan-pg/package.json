@@ -23,6 +23,8 @@
     "test": "yarn test:install-schema && jest -i",
     "posttest": "ts-node ./scripts/exportExampleSchema.ts && node ./scripts/runExampleSchema.mjs",
     "prepack": "tsc -b",
+    "build": "zx scripts/build-npm.mjs",
+    "postpack": "echo 'FORBIDDEN' && exit 1",
     "serve:example": "GRAPHILE_ENV=development NODE_ENV=development yarn nodemon --watch serve-example-schema.js --watch dist --watch ../grafast/dist/ -x 'node --inspect --enable-source-maps serve-example-schema.js'"
   },
   "repository": {
@@ -61,8 +63,7 @@
     "graphql": "*"
   },
   "files": [
-    "dist",
-    "index.js"
+    "dist"
   ],
   "devDependencies": {
     "@dataplan/json": "workspace:^",
@@ -70,12 +71,21 @@
     "@types/jest": "^27.5.1",
     "@types/json5": "^2.2.0",
     "@types/nodemon": "1.19.1",
+    "eventemitter3": "^4.0.7",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^28.1.0",
     "jest-serializer-simple": "workspace:^",
     "json5": "^2.2.0",
     "nodemon": "^2.0.15",
+    "ts-loader": "^9.4.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.8.1-rc"
+    "typescript": "^4.8.1-rc",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "zx": "^7.0.8"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "release"
   }
 }

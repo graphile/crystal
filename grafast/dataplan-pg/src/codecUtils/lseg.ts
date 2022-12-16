@@ -1,4 +1,4 @@
-import { inspect } from "util";
+import { inspect } from "../inspect.js";
 
 export interface PgLseg {
   a: { x: number; y: number };

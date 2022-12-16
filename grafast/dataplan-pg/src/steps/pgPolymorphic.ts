@@ -6,8 +6,8 @@ import type {
 } from "grafast";
 import { isDev, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
 import type { GraphQLObjectType } from "graphql";
-import { inspect } from "util";
 
+import { inspect } from "../inspect.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
