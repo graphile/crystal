@@ -972,7 +972,7 @@ In SQL we can see the JWT contains the role and the person_id:
 
 ![Alt text](images/6_role.jpg?raw=true "Role is contained in the JWT")
 
-Remember when Graphophile accepts an Authorization Request Header with a valid JWT containing a role field...
+Remember when PostGraphile accepts an Authorization Request Header with a valid JWT containing a role field...
 
 ![Alt text](images/4_header.jpg?raw=true "Set Request Header Authorization")
 
