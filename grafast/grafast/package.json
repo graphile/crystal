@@ -20,7 +20,7 @@
     "test": "yarn test:mocha",
     "test:mocha": "mocha '**/__tests__/**/*-test.ts'",
     "build": "zx scripts/build-npm.mjs",
-    "prepack": "echo 'FORBIDDEN' && exit 1",
+    "postpack": "echo 'FORBIDDEN' && exit 1",
     "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
   },
   "repository": {

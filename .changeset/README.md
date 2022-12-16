@@ -14,7 +14,7 @@ To leverage this, we need the following in the relevant package.json:
   "scripts": {
     // ...
     // Optional:
-    "prepack": "echo 'FORBIDDEN' && exit 1"
+    "postpack": "echo 'FORBIDDEN' && exit 1"
   },
   "publishConfig": {
     "access": "public",
