@@ -21,44 +21,6 @@ function exportAs<T>(thing: T, exportName: string) {
 const isDev = process.env.GRAPHILE_ENV === "development";
 
 /**
- * Returns true if the given expression does not need parenthesis to be
- * inserted into another expression, false if not wrapping in parenthesis could
- * cause ambiguity. We're relying on the user to be sensible here, this is not
- * fool-proof.
- *
- * @remarks The following are all parens safe:
- *
- * - A placeholder `$1`
- * - A number `0.123456`
- * - A string `'Foo bar'` / `E'Foo bar'`
- * - An identifier `schema.table.column` / `"MyScHeMa"."MyTaBlE"."MyCoLuMn"`
- *
- * The following might seem but are not parens safe:
- *
- * - A function call `schema.func(param)` - reason: `schema.func(param).*`
- *   should be `(schema.func(param)).*`
- * - A simple expression `1 = 2` - reason: `1 = 2 = false` is invalid; whereas
- *   `(1 = 2) = false` is fine. Similarly `1 = 2::text` differs from `(1 = 2)::text`.
- */
-function isParensSafe(expr: string): boolean {
-  if (expr.match(/^\$[0-9]+$/)) {
-    return true;
-  } else if (expr.match(/^[0-9]+(?:\.[0-9]+)?$/) || expr.match(/^\.[0-9]+$/)) {
-    return true;
-  } else if (expr.match(/^'[^']+'$/)) {
-    return true;
-  } else {
-    // Identifiers
-    const parts = expr.split(".");
-    if (
-      parts.every((p) => p.match(/^"[^"]+"$/) || p.match(/^[a-zA-Z0-9_]+$/))
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
-/**
  * This is the secret to our safety; since this is a symbol it cannot be faked
  * in a JSON payload and it cannot be constructed with a new Symbol (even with
  * the same argument), so external data cannot make itself trusted.
@@ -69,9 +31,9 @@ const $$trusted = Symbol("pg-sql2-trusted");
  * Represents raw SQL, the text will be output verbatim into the compiled query.
  */
 export interface SQLRawNode {
-  text: string;
-  type: "RAW";
-  [$$trusted]: true;
+  readonly text: string;
+  readonly type: "RAW";
+  readonly [$$trusted]: true;
 }
 
 /**
@@ -80,54 +42,50 @@ export interface SQLRawNode {
  * reserved words.
  */
 export interface SQLIdentifierNode {
-  names: Array<string | SymbolAndName>;
-  type: "IDENTIFIER";
-  [$$trusted]: true;
+  readonly names: ReadonlyArray<string | SymbolAndName>;
+  readonly type: "IDENTIFIER";
+  readonly [$$trusted]: true;
 }
 
 /**
  * A value that can be used in `sql.value(...)`; note that objects are **NOT**
  * valid values; you must `JSON.stringify(obj)` or similar.
  */
-export type SQLRawValue = string | number | boolean | null | Array<SQLRawValue>;
+export type SQLRawValue =
+  | string
+  | number
+  | boolean
+  | null
+  | ReadonlyArray<SQLRawValue>;
 
 /**
  * Represents an SQL value that will be replaced with a placeholder in the
  * compiled SQL statement.
  */
 export interface SQLValueNode {
-  value: SQLRawValue;
-  type: "VALUE";
-  [$$trusted]: true;
+  readonly value: SQLRawValue;
+  readonly type: "VALUE";
+  readonly [$$trusted]: true;
 }
 
 /**
  * Represents that the SQL inside this should be indented when pretty printed.
  */
 export interface SQLIndentNode {
-  content: SQL;
-  type: "INDENT";
-  [$$trusted]: true;
-}
-
-/**
- * Represents that the SQL inside this should be wrapped in parenthesis if necessary.
- */
-export interface SQLParensNode {
-  content: SQL;
-  type: "PARENS";
-  force: boolean;
-  [$$trusted]: true;
+  readonly content: SQLQuery;
+  readonly type: "INDENT";
+  readonly flags: number;
+  readonly [$$trusted]: true;
 }
 
 /**
  * Informs pg-sql2 to treat symbol2 as if it were the same as symbol1
  */
 export interface SQLSymbolAliasNode {
-  a: SymbolAndName;
-  b: SymbolAndName;
-  type: "SYMBOL_ALIAS";
-  [$$trusted]: true;
+  readonly a: SymbolAndName;
+  readonly b: SymbolAndName;
+  readonly type: "SYMBOL_ALIAS";
+  readonly [$$trusted]: true;
 }
 
 /**
@@ -135,10 +93,10 @@ export interface SQLSymbolAliasNode {
  * replacements provided.
  */
 export interface SQLPlaceholderNode {
-  type: "PLACEHOLDER";
-  symbol: symbol;
-  fallback?: SQL;
-  [$$trusted]: true;
+  readonly type: "PLACEHOLDER";
+  readonly symbol: symbol;
+  readonly fallback?: SQL;
+  readonly [$$trusted]: true;
 }
 
 /** @internal */
@@ -147,16 +105,15 @@ export type SQLNode =
   | SQLValueNode
   | SQLIdentifierNode
   | SQLIndentNode
-  | SQLParensNode
   | SQLSymbolAliasNode
   | SQLPlaceholderNode;
 
 /** @internal */
 export interface SQLQuery {
-  type: "QUERY";
-  nodes: Array<SQLNode>;
-  flags: number;
-  [$$trusted]: true;
+  readonly type: "QUERY";
+  readonly nodes: ReadonlyArray<SQLNode>;
+  readonly flags: number;
+  readonly [$$trusted]: true;
 }
 const FLAG_HAS_PARENS = 1 << 0;
 
@@ -280,14 +237,11 @@ function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
 }
 
 function makeIndentNode(content: SQL): SQLIndentNode {
-  return Object.freeze({ type: "INDENT", content, [$$trusted]: true as const });
-}
-
-function makeParensNode(content: SQL, force?: boolean): SQLParensNode {
+  const flags = content.type === "QUERY" ? content.flags : 0;
   return Object.freeze({
-    type: "PARENS",
-    content,
-    force: force ?? false,
+    type: "INDENT",
+    flags,
+    content: content.type === "QUERY" ? content : makeQueryNode([content]),
     [$$trusted]: true as const,
   });
 }
@@ -405,7 +359,7 @@ export function compile(
     const sqlFragments: string[] = [];
 
     const trustedInput = enforceValidNode(untrustedInput, ``);
-    const items: Array<SQLNode> =
+    const items: ReadonlyArray<SQLNode> =
       trustedInput.type === "QUERY" ? trustedInput.nodes : [trustedInput];
     const itemCount = items.length;
 
@@ -486,15 +440,6 @@ export function compile(
               "\n" +
               "  ".repeat(indent),
           );
-          break;
-        }
-        case "PARENS": {
-          const inner = print(item.content, indent);
-          if (item.force || !isParensSafe(inner)) {
-            sqlFragments.push(`(${inner})`);
-          } else {
-            sqlFragments.push(inner);
-          }
           break;
         }
         case "SYMBOL_ALIAS": {
@@ -696,6 +641,8 @@ const trueNode = makeRawNode(`TRUE`, "true");
 const falseNode = makeRawNode(`FALSE`, "false");
 const nullNode = makeRawNode(`NULL`, "null");
 export const blank = makeRawNode(``, "blank");
+const OPEN_PARENS = makeRawNode(`(`);
+const CLOSE_PARENS = makeRawNode(`)`);
 
 /**
  * If the value is simple will inline it into the query, otherwise will defer
@@ -791,56 +738,126 @@ export function indent(
     "raw" in fragmentOrStrings
       ? sql(fragmentOrStrings, ...values)
       : fragmentOrStrings;
-  return isDev ? makeIndentNode(fragment) : fragment;
+  if (!isDev) {
+    return fragment;
+  }
+  return makeIndentNode(fragment);
 }
 
 export function indentIf(condition: boolean, fragment: SQL): SQL {
   return isDev && condition ? makeIndentNode(fragment) : fragment;
 }
 
+function parenthesize(fragment: SQL, inFlags = 0): SQLQuery {
+  const flags = inFlags | FLAG_HAS_PARENS;
+  if (fragment.type === "QUERY") {
+    return makeQueryNode([OPEN_PARENS, ...fragment.nodes, CLOSE_PARENS], flags);
+  } else {
+    return makeQueryNode([OPEN_PARENS, fragment, CLOSE_PARENS], flags);
+  }
+}
 /**
  * Wraps the given fragment in parens if necessary (or if forced, e.g. for a
  * subquery or maybe stylistically a join condition).
+ *
+ * Returns the input SQL fragment if it does not need parenthesis to be
+ * inserted into another expression, otherwise a parenthesised fragment if not
+ * doing so could cause ambiguity. We're relying on the user to be sensible
+ * here, this is not fool-proof.
+ *
+ * @remarks The following are all parens safe:
+ *
+ * - A placeholder `$1`
+ * - A number `0.123456`
+ * - A string `'Foo bar'` / `E'Foo bar'`
+ * - An identifier `table.column` / `"MyTaBlE"."MyCoLuMn"`
+ *
+ * The following might seem but are not parens safe:
+ *
+ * - A function call `schema.func(param)` - reason: `schema.func(param).*`
+ *   should be `(schema.func(param)).*`
+ * - A simple expression `1 = 2` - reason: `1 = 2 = false` is invalid; whereas
+ *   `(1 = 2) = false` is fine. Similarly `1 = 2::text` differs from `(1 = 2)::text`.
+ * - An identifier `table.column.attribute` / `"MyTaBlE"."MyCoLuMn"."MyAtTrIbUtE"` (this needs to be `(table.column).attribute`)
  */
-export function parens(fragment: SQL, force?: boolean): SQL {
-  // No need to recursively wrap with parens
-  if (fragment.type === "QUERY") {
-    if (fragment.nodes.length === 0) {
+export function parens(frag: SQL, force?: boolean): SQL {
+  if (frag.type === "QUERY") {
+    if ((frag.flags & FLAG_HAS_PARENS) === FLAG_HAS_PARENS) {
+      return frag;
+    }
+    const { nodes } = frag;
+    const nodeCount = nodes.length;
+    if (nodeCount === 0) {
       throw new Error(
         `You're wrapping an empty fragment in parens; this is likely an error. If this is deliberate, please explicitly use parenthesis.`,
       );
-    } else if (fragment.nodes.length === 1) {
-      // Pretend that the child was just a single node
-      return parens(fragment.nodes[0]!, force);
-    } else {
-      // Normal behavior (fall through)
-    }
-  } else if (fragment.type === "PARENS") {
-    if (fragment.force || !force) {
-      // No change; use existing fragment
-      return fragment;
-    } else {
-      // Need to force parens on previous fragment content
-      return parens(fragment.content, true);
-    }
-  } else if (fragment.type === "INDENT") {
-    if (fragment.content.type === "QUERY") {
-      if (fragment.content.nodes.length === 1) {
-        const inner = fragment.content.nodes[0]!;
-        if (inner.type === "PARENS" && !inner.force) {
-          return makeParensNode(inner.content, force);
+    } else if (nodeCount === 1) {
+      return parens(nodes[0], force);
+    } else if (force) {
+      return parenthesize(frag);
+    } else if (nodeCount === 3) {
+      // Check for `IDENTIFIER.IDENTIFIER`
+      for (let i = 0; i < nodeCount; i++) {
+        const node = nodes[i];
+        if (i % 2 === 0) {
+          if (node.type !== "IDENTIFIER" || node.names.length !== 1) {
+            return parenthesize(frag);
+          }
         } else {
-          // Normal behavior (fall through)
+          if (node.type !== "RAW" || node.text !== ".") {
+            return parenthesize(frag);
+          }
         }
-      } else {
-        // Normal behavior (fall through)
       }
-    } else if (fragment.content.type === "PARENS" && !fragment.content.force) {
-      return makeParensNode(fragment.content.content, force);
+      return frag;
+    } else {
+      return parenthesize(frag);
+    }
+  } else if (frag.type === "INDENT") {
+    const inner = parens(frag.content, force);
+    if (
+      inner.type === "QUERY" &&
+      (inner.flags & FLAG_HAS_PARENS) === FLAG_HAS_PARENS
+    ) {
+      // Move the parens to outside
+      const innerNodesCount = inner.nodes.length;
+      const lp = inner.nodes[0];
+      const rp = inner.nodes[innerNodesCount - 1];
+      const rest = inner.nodes.slice(1, innerNodesCount - 1);
+      if (lp !== OPEN_PARENS || rp !== CLOSE_PARENS) {
+        throw new Error(
+          `pg-sql2 BUG: unexpected inconsistency in parens - please file an issue!`,
+        );
+      }
+      return parenthesize(indent(makeQueryNode(rest)), inner.flags);
+    } else if (inner === frag.content) {
+      return frag;
+    } else {
+      return makeIndentNode(inner);
+    }
+  } else if (force) {
+    return parenthesize(frag);
+  } else if (frag.type === "VALUE") {
+    return frag;
+  } else if (frag.type === "IDENTIFIER") {
+    return frag;
+  } else if (frag.type === "RAW") {
+    const expr = frag.text;
+    if (expr.match(/^[0-9]+(?:\.[0-9]+)?$/) || expr.match(/^\.[0-9]+$/)) {
+      return frag;
+    } else if (expr.match(/^'[^']+'$/)) {
+      return frag;
+    } else {
+      // Identifiers
+      const parts = expr.split(".");
+      if (
+        parts.every((p) => p.match(/^"[^"]+"$/) || p.match(/^[a-zA-Z0-9_]+$/))
+      ) {
+        return frag;
+      }
     }
   }
-
-  return makeParensNode(fragment, force);
+  return parenthesize(frag);
 }
 
 export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
@@ -923,15 +940,6 @@ export function isEquivalent(
         }
         return isEquivalent(sql1.content, sql2.content, options);
       }
-      case "PARENS": {
-        if (sql2.type !== sql1.type) {
-          return false;
-        }
-        if (sql2.force !== sql1.force) {
-          return false;
-        }
-        return isEquivalent(sql1.content, sql2.content, options);
-      }
       case "IDENTIFIER": {
         if (sql2.type !== sql1.type) {
           return false;
@@ -989,12 +997,6 @@ function replaceSymbolInNode(
     }
     case "INDENT": {
       return makeIndentNode(replaceSymbol(frag.content, needle, replacement));
-    }
-    case "PARENS": {
-      return makeParensNode(
-        replaceSymbol(frag.content, needle, replacement),
-        frag.force,
-      );
     }
     case "SYMBOL_ALIAS": {
       const newA = frag.a.s === needle ? replacement : frag.a.s;
