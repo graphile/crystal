@@ -48,7 +48,7 @@ describe("sql.query", () => {
     const node = sql`select 1`;
     expect(sansSymbols(node)).toEqual({ type: "RAW", text: "select 1" });
     const node2 = sql`select ${sql`1`}` as SQLQuery;
-    expect(node2.map(sansSymbols)).toEqual([
+    expect(node2.nodes.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "RAW", text: "1" },
     ]);
@@ -56,7 +56,7 @@ describe("sql.query", () => {
 
   it("with values", () => {
     const node = sql`select ${sql.value(1)}::integer` as SQLQuery;
-    expect(node.map(sansSymbols)).toEqual([
+    expect(node.nodes.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "VALUE", value: 1 },
       { type: "RAW", text: "::integer" },
@@ -65,7 +65,7 @@ describe("sql.query", () => {
 
   it("with sub-sub-sub query", () => {
     const node = sql`select ${sql`1 ${sql`from ${sql`foo`}`}`}` as SQLQuery;
-    expect(node.map(sansSymbols)).toEqual([
+    expect(node.nodes.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "RAW", text: "1 " },
       { type: "RAW", text: "from " },
@@ -76,7 +76,7 @@ describe("sql.query", () => {
   it("with symbols", () => {
     const sym1 = Symbol("---flibble-de£dee---");
     const node = sql`select 1 as ${sql.identifier(sym1)}` as SQLQuery;
-    expect(node.map(sansSymbols)).toEqual([
+    expect(node.nodes.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select 1 as " },
       { type: "IDENTIFIER", names: [{ s: sym1, n: "flibble_de_dee" }] },
     ]);
@@ -94,7 +94,7 @@ describe("sql.join", () => {
       ],
       ", ",
     )}` as SQLQuery;
-    expect(node.map(sansSymbols)).toEqual([
+    expect(node.nodes.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "VALUE", value: 1 },
       { type: "RAW", text: ", " },

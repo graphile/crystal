@@ -1497,9 +1497,9 @@ and ${condition(i + 1)}`}
 
   private buildJoin() {
     const joins: SQL[] = this.joins.map((j) => {
-      const conditions =
+      const conditions: SQL =
         j.type === "cross"
-          ? []
+          ? sql.blank
           : j.conditions.length === 0
           ? sql.true
           : j.conditions.length === 1

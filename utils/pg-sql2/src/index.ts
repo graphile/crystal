@@ -150,8 +150,15 @@ export type SQLNode =
   | SQLParensNode
   | SQLSymbolAliasNode
   | SQLPlaceholderNode;
+
 /** @internal */
-export type SQLQuery = Array<SQLNode>;
+export interface SQLQuery {
+  type: "QUERY";
+  nodes: Array<SQLNode>;
+  flags: number;
+  [$$trusted]: true;
+}
+const FLAG_HAS_PARENS = 1 << 0;
 
 /**
  * Representation of SQL, identifiers, values, etc; to generate a query that
@@ -306,18 +313,24 @@ function makePlaceholderNode(
   });
 }
 
-function isSQLNode(node: unknown): node is SQLNode {
+function makeQueryNode(nodes: Array<SQLNode>, flags = 0): SQLQuery {
+  return Object.freeze({
+    type: "QUERY",
+    nodes,
+    flags,
+    [$$trusted]: true as const,
+  });
+}
+
+function isSQL(node: unknown): node is SQL {
   return typeof node === "object" && node !== null && node[$$trusted] === true;
 }
 
-function isSQL(fragment: unknown): fragment is SQL {
-  return Array.isArray(fragment)
-    ? fragment.length === 0 || fragment.every((el) => isSQLNode(el))
-    : isSQLNode(fragment);
-}
-
-function enforceValidNode(node: unknown, where?: string): SQLNode {
-  if (isSQLNode(node)) {
+function enforceValidNode(node: SQLQuery, where?: string): SQLQuery;
+function enforceValidNode(node: SQLNode, where?: string): SQLNode;
+function enforceValidNode(node: SQL, where?: string): SQL;
+function enforceValidNode(node: unknown, where?: string): SQL {
+  if (isSQL(node)) {
     return node;
   }
   throw new Error(
@@ -385,13 +398,15 @@ export function compile(
     return identifierForSymbol;
   }
 
-  function print(inItems: SQL, indent = 0) {
+  function print(untrustedInput: SQL, indent = 0) {
     /**
      * Join this to generate the SQL query
      */
     const sqlFragments: string[] = [];
 
-    const items: Array<SQLNode> = Array.isArray(inItems) ? inItems : [inItems];
+    const trustedInput = enforceValidNode(untrustedInput, ``);
+    const items: Array<SQLNode> =
+      trustedInput.type === "QUERY" ? trustedInput.nodes : [trustedInput];
     const itemCount = items.length;
 
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
@@ -577,23 +592,31 @@ const sqlBase = function sql(
       items.push(makeRawNode(text));
     }
     if (i < l - 1) {
-      const val = values[i];
-      if (Array.isArray(val)) {
-        // Avoid allocating a new array by using forEach rather than map.
-        val.forEach((v, j) =>
-          enforceValidNode(v, `template literal placeholder ${i} child ${j}`),
-        );
-        items.push(...val);
+      const rawVal = values[i];
+      const valid: SQL = enforceValidNode(
+        rawVal,
+        `template literal placeholder ${i}`,
+      );
+      if (valid.type === "QUERY") {
+        // NOTE: this clears the flags
+
+        const itemsCount = items.length;
+        const { nodes } = valid;
+        const nodeCount = nodes.length;
+
+        // Pre-allocate space
+        // TODO: check this actually improves performance
+        items.length = itemsCount + nodeCount;
+
+        for (let nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++) {
+          items[itemsCount + nodeIndex] = nodes[nodeIndex];
+        }
       } else {
-        const node: SQLNode = enforceValidNode(
-          val,
-          `template literal placeholder ${i}`,
-        );
-        items.push(node);
+        items.push(valid);
       }
     }
   }
-  return items;
+  return makeQueryNode(items);
 };
 
 let sqlRawWarningOutput = false;
@@ -707,10 +730,7 @@ export function literal(val: string | number | boolean | null): SQL {
  * dealing with lists of SQL items, for example a dynamic list of columns or
  * variadic SQL function arguments.
  */
-export function join(
-  items: Array<Array<SQLNode> | SQLNode>,
-  separator = "",
-): SQL {
+export function join(items: Array<SQL>, separator = ""): SQL {
   if (!Array.isArray(items)) {
     throw new Error(
       `[pg-sql2] Invalid sql.join call - the first argument should be an array, but it was '${inspect(
@@ -728,20 +748,11 @@ export function join(
 
   // Short circuit joins of size <= 1
   if (items.length === 0) {
-    return [];
+    return blank;
   } else if (items.length === 1) {
-    const nodeOrNodes = items[0];
-    if (Array.isArray(nodeOrNodes)) {
-      // Performance: we don't map here because we don't want to allocate a new array.
-      nodeOrNodes.forEach((n, j) =>
-        enforceValidNode(n, `join item ${0} child ${j}`),
-      );
-      const nodes: Array<SQLNode> = nodeOrNodes;
-      return nodes;
-    } else {
-      const node: SQLNode = enforceValidNode(nodeOrNodes, `join item ${0}`);
-      return node;
-    }
+    const rawNode = items[0];
+    const node: SQL = enforceValidNode(rawNode, `join item ${0}`);
+    return node;
   }
 
   const hasSeparator = separator.length > 0;
@@ -749,29 +760,22 @@ export function join(
 
   const currentItems: Array<SQLNode> = [];
   for (let i = 0, l = items.length; i < l; i++) {
-    const nodeOrNodes = items[i];
+    const rawNode = items[i];
     const addSeparator = i > 0 && hasSeparator;
-    if (Array.isArray(nodeOrNodes)) {
-      // Performance: we don't map here because we don't want to allocate a new array.
-      nodeOrNodes.forEach((n, j) =>
-        enforceValidNode(n, `join item ${i} child ${j}`),
-      );
-      const nodes: Array<SQLNode> = nodeOrNodes;
-      if (addSeparator) {
-        currentItems.push(sepNode, ...nodes);
-      } else {
-        currentItems.push(...nodes);
+    const node: SQL = enforceValidNode(rawNode, `join item ${i}`);
+    if (addSeparator) {
+      currentItems.push(sepNode);
+    }
+    if (node.type === "QUERY") {
+      for (const innerNode of node.nodes) {
+        // TODO: optimize
+        currentItems.push(innerNode);
       }
     } else {
-      const node: SQLNode = enforceValidNode(nodeOrNodes, `join item ${i}`);
-      if (addSeparator) {
-        currentItems.push(sepNode, node);
-      } else {
-        currentItems.push(node);
-      }
+      currentItems.push(node);
     }
   }
-  return currentItems;
+  return makeQueryNode(currentItems);
 }
 
 export function indent(fragment: SQL): SQL;
@@ -800,14 +804,14 @@ export function indentIf(condition: boolean, fragment: SQL): SQL {
  */
 export function parens(fragment: SQL, force?: boolean): SQL {
   // No need to recursively wrap with parens
-  if (Array.isArray(fragment)) {
-    if (fragment.length === 0) {
+  if (fragment.type === "QUERY") {
+    if (fragment.nodes.length === 0) {
       throw new Error(
         `You're wrapping an empty fragment in parens; this is likely an error. If this is deliberate, please explicitly use parenthesis.`,
       );
-    } else if (fragment.length === 1) {
+    } else if (fragment.nodes.length === 1) {
       // Pretend that the child was just a single node
-      return parens(fragment[0]!, force);
+      return parens(fragment.nodes[0]!, force);
     } else {
       // Normal behavior (fall through)
     }
@@ -820,9 +824,9 @@ export function parens(fragment: SQL, force?: boolean): SQL {
       return parens(fragment.content, true);
     }
   } else if (fragment.type === "INDENT") {
-    if (Array.isArray(fragment.content)) {
-      if (fragment.content.length === 1) {
-        const inner = fragment.content[0]!;
+    if (fragment.content.type === "QUERY") {
+      if (fragment.content.nodes.length === 1) {
+        const inner = fragment.content.nodes[0]!;
         if (inner.type === "PARENS" && !inner.force) {
           return makeParensNode(inner.content, force);
         } else {
@@ -890,12 +894,14 @@ export function isEquivalent(
   } else if (typeof sql2 === "symbol") {
     return false;
   }
-  if (Array.isArray(sql1)) {
-    if (!Array.isArray(sql2)) {
+  if (sql1.type === "QUERY") {
+    if (sql2.type !== "QUERY") {
       return false;
     }
-    return arraysMatch(sql1, sql2, (a, b) => isEquivalent(a, b, options));
-  } else if (Array.isArray(sql2)) {
+    return arraysMatch(sql1.nodes, sql2.nodes, (a, b) =>
+      isEquivalent(a, b, options),
+    );
+  } else if (sql2.type === "QUERY") {
     return false;
   } else {
     switch (sql1.type) {
@@ -1021,16 +1027,16 @@ export function replaceSymbol(
   needle: symbol,
   replacement: symbol,
 ): SQL {
-  if (Array.isArray(frag)) {
+  if (frag.type === "QUERY") {
     let changed = false;
-    const newFrag = frag.map((node) => {
+    const newNodes = frag.nodes.map((node) => {
       const newNode = replaceSymbolInNode(node, needle, replacement);
       if (newNode !== node) {
         changed = true;
       }
       return newNode;
     });
-    return changed ? newFrag : frag;
+    return changed ? makeQueryNode(newNodes) : frag;
   } else {
     return replaceSymbolInNode(frag, needle, replacement);
   }
