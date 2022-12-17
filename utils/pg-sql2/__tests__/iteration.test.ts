@@ -102,3 +102,20 @@ it("join(conditions, ' and ') 3", () => {
     values: [],
   });
 });
+
+it("join(conditions, ' and ') 4", () => {
+  const conditions = [
+    sql.parens(sql.indent(sql`__person__."id" < __person_identifiers__."id0"`)),
+  ];
+  const node = sql.join(
+    conditions.map((c) => sql.parens(sql.indent(c))),
+    " and ",
+  );
+  expect(sql.compile(node)).toEqual({
+    text: `\
+(
+    __person__."id" < __person_identifiers__."id0"
+)`,
+    values: [],
+  });
+});
