@@ -42,7 +42,7 @@ export interface SQLRawNode {
  * reserved words.
  */
 export interface SQLIdentifierNode {
-  readonly names: ReadonlyArray<string | SymbolAndName>;
+  readonly s: SymbolAndName;
   readonly type: "IDENTIFIER";
   readonly [$$trusted]: true;
 }
@@ -217,12 +217,10 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
 }
 
 // Simple function to help V8 optimize it.
-function makeIdentifierNode(
-  names: Array<string | SymbolAndName>,
-): SQLIdentifierNode {
+function makeIdentifierNode(s: SymbolAndName): SQLIdentifierNode {
   return Object.freeze({
     type: "IDENTIFIER",
-    names,
+    s,
     [$$trusted]: true as const,
   });
 }
@@ -387,37 +385,19 @@ export function compile(
           break;
         }
         case "IDENTIFIER": {
-          const nameCount = item.names.length;
-          const mappedNames = [];
-          for (const name of item.names) {
-            if (typeof name === "string") {
-              // This was escaped inside of `sql.identifier`
-              mappedNames.push(name);
-            } else if (name.s) {
-              // Get the correct identifier string for this symbol.
-              // NOTE: we cannot use `SymbolAndName` as the key as a symbol may may
-              // generate multiple SymbolAndName objects.
-              let identifierForSymbol = symbolToIdentifier.get(name.s);
+          // Get the correct identifier string for this symbol.
+          // NOTE: we cannot use `SymbolAndName` as the key as a symbol may may
+          // generate multiple SymbolAndName objects.
+          let identifierForSymbol = symbolToIdentifier.get(item.s.s);
 
-              // If there is no identifier, create one and set it.
-              if (!identifierForSymbol) {
-                identifierForSymbol = makeIdentifierForSymbol(name);
-              }
-
-              // Return the identifier. Since we create it, we won’t have to
-              // escape it because we know all of the characters are safe.
-              mappedNames.push(identifierForSymbol);
-            } else {
-              throw new Error(
-                `[pg-sql2] Invalid IDENTIFIER node, expected string or SymbolAndName, received '${inspect(
-                  name,
-                )}' - this could be a bug in pg-sql2, please report it.`,
-              );
-            }
+          // If there is no identifier, create one and set it.
+          if (!identifierForSymbol) {
+            identifierForSymbol = makeIdentifierForSymbol(item.s);
           }
-          sqlFragments.push(
-            nameCount === 1 ? mappedNames[0]! : mappedNames.join("."),
-          );
+
+          // Return the identifier. Since we create it, we won’t have to
+          // escape it because we know all of the characters are safe.
+          sqlFragments.push(identifierForSymbol);
           break;
         }
         case "VALUE": {
@@ -615,15 +595,18 @@ export function identifier(...names: Array<string | symbol>): SQL {
     );
   }
 
-  const finalNames: Array<string | SymbolAndName> = [];
+  const items: SQLNode[] = [];
   for (let i = 0; i < nameCount; i++) {
+    if (i > 0) {
+      items[i * 2 - 1] = dot;
+    }
     const name = names[i];
     if (typeof name === "string") {
       // By escaping here rather than during compile we can reduce redundant computation.
-      finalNames[i] = escapeSqlIdentifier(name);
+      items[i * 2] = makeRawNode(escapeSqlIdentifier(name));
     } else if (typeof name === "symbol") {
       // The final name has to be evaluated at compile-time, but we can at least mangle it up front.
-      finalNames[i] = getSymbolAndName(name);
+      items[i * 2] = makeIdentifierNode(getSymbolAndName(name));
     } else {
       throw new Error(
         `[pg-sql2] Invalid argument to sql.identifier - argument ${i} (0-indexed) should be a string or a symbol, but was '${inspect(
@@ -633,7 +616,7 @@ export function identifier(...names: Array<string | symbol>): SQL {
     }
   }
 
-  return makeIdentifierNode(finalNames);
+  return makeQueryNode(items);
 }
 
 /**
@@ -648,6 +631,7 @@ const trueNode = makeRawNode(`TRUE`, "true");
 const falseNode = makeRawNode(`FALSE`, "false");
 const nullNode = makeRawNode(`NULL`, "null");
 export const blank = makeRawNode(``, "blank");
+export const dot = makeRawNode(`.`, "dot");
 const OPEN_PARENS = makeRawNode(`(`);
 const CLOSE_PARENS = makeRawNode(`)`);
 
@@ -815,6 +799,7 @@ export function parens(frag: SQL, force?: boolean): SQL {
       return parenthesize(frag);
     } else if (nodeCount === 2) {
       // Check for `IDENTIFIER.rawtext`
+      // TODO: check for 'rawtext.IDENTIFIER' too
       const [identifier, rawtext] = nodes;
       if (
         identifier.type !== "IDENTIFIER" ||
@@ -975,9 +960,7 @@ export function isEquivalent(
         if (sql2.type !== sql1.type) {
           return false;
         }
-        return arraysMatch(sql1.names, sql2.names, (a, b) =>
-          identifiersAreEquivalent(a, b, symbolSubstitutes),
-        );
+        return identifiersAreEquivalent(sql1.s, sql2.s, symbolSubstitutes);
       }
       case "PLACEHOLDER": {
         if (sql2.type !== sql1.type) {
@@ -1010,16 +993,11 @@ function replaceSymbolInNode(
       return frag;
     }
     case "IDENTIFIER": {
-      let changed = false;
-      const newNames = frag.names.map((v) => {
-        if (typeof v !== "string" && v.s === needle) {
-          changed = true;
-          return getSymbolAndName(replacement);
-        } else {
-          return v;
-        }
-      });
-      return changed ? makeIdentifierNode(newNames) : frag;
+      if (frag.s.s === needle) {
+        return makeIdentifierNode(getSymbolAndName(replacement));
+      } else {
+        return frag;
+      }
     }
     case "VALUE": {
       return frag.value === (needle as any)
@@ -1109,19 +1087,11 @@ function getSubstitute(
   throw new Error("symbolSubstitutes depth too deep");
 }
 
-type IdentifierName = SQLIdentifierNode["names"] extends ReadonlyArray<infer U>
-  ? U
-  : never;
 function identifiersAreEquivalent(
-  ids1: IdentifierName,
-  ids2: IdentifierName,
+  ids1: SymbolAndName,
+  ids2: SymbolAndName,
   symbolSubstitutes?: Map<symbol, symbol>,
 ): boolean {
-  if (typeof ids1 === "string") {
-    return ids2 === ids1;
-  } else if (typeof ids2 === "string") {
-    return false;
-  }
   const namesMatch = ids1.n === ids2.n;
   const symbol1 = getSubstitute(ids1.s, symbolSubstitutes);
   const symbol2 = getSubstitute(ids2.s, symbolSubstitutes);
