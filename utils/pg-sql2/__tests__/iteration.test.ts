@@ -1,6 +1,44 @@
 import type { SQLQuery } from "../src/index.js";
 import sql from "../src/index.js";
 
+it("table.column::text 1", () => {
+  const node = sql`${sql.parens(sql.identifier("table", "column"))}::text`;
+  expect(sql.compile(node)).toEqual({
+    text: '"table"."column"::text',
+    values: [],
+  });
+});
+
+it("table.column::text 2", () => {
+  const node = sql`${sql.parens(
+    sql`${sql.identifier("table")}.${sql.identifier("column")}`,
+  )}::text`;
+  expect(sql.compile(node)).toEqual({
+    text: '"table"."column"::text',
+    values: [],
+  });
+});
+
+it("table.column::text 3", () => {
+  const node = sql`${sql.parens(
+    sql`${sql.identifier("table")}."column"`,
+  )}::text`;
+  expect(sql.compile(node)).toEqual({
+    text: '"table"."column"::text',
+    values: [],
+  });
+});
+
+it("__table__.column::text", () => {
+  const node = sql`${sql.parens(
+    sql`${sql.identifier(Symbol("table"))}.column`,
+  )}::text`;
+  expect(sql.compile(node)).toEqual({
+    text: "__table__.column::text",
+    values: [],
+  });
+});
+
 it("((table.column).attr)::text 1", () => {
   const node = sql`${sql.parens(
     sql`${sql.parens(sql.identifier("table", "column"), true)}.${sql.identifier(

@@ -748,6 +748,17 @@ export function indentIf(condition: boolean, fragment: SQL): SQL {
   return isDev && condition ? makeIndentNode(fragment) : fragment;
 }
 
+const QUOTED_IDENTIFIER_REGEX = /^"[^"]+"$/;
+const UNQUOTED_IDENTIFIER_REGEX = /^[a-zA-Z0-9_]+$/;
+const NUMBER_REGEX_1 = /^[0-9]+(?:\.[0-9]+)?$/;
+const NUMBER_REGEX_2 = /^\.[0-9]+$/;
+const STRING_REGEX = /^'[^']+'$/;
+
+/** For determining if a raw SQL string looks like an identifier (for parens reasons) */
+function isIdentifierLike(p: string) {
+  return p.match(QUOTED_IDENTIFIER_REGEX) || p.match(UNQUOTED_IDENTIFIER_REGEX);
+}
+
 function parenthesize(fragment: SQL, inFlags = 0): SQLQuery {
   const flags = inFlags | FLAG_HAS_PARENS;
   if (fragment.type === "QUERY") {
@@ -795,6 +806,21 @@ export function parens(frag: SQL, force?: boolean): SQL {
       return parens(nodes[0], force);
     } else if (force) {
       return parenthesize(frag);
+    } else if (nodeCount === 2) {
+      // Check for `IDENTIFIER.rawtext`
+      const [identifier, rawtext] = nodes;
+      if (
+        identifier.type !== "IDENTIFIER" ||
+        rawtext.type !== "RAW" ||
+        !rawtext.text.startsWith(".")
+      ) {
+        return parenthesize(frag);
+      }
+      const parts = rawtext.text.slice(1).split(".");
+      if (!parts.every(isIdentifierLike)) {
+        return parenthesize(frag);
+      }
+      return frag;
     } else if (nodeCount === 3) {
       // Check for `IDENTIFIER.IDENTIFIER`
       for (let i = 0; i < nodeCount; i++) {
@@ -843,16 +869,14 @@ export function parens(frag: SQL, force?: boolean): SQL {
     return frag;
   } else if (frag.type === "RAW") {
     const expr = frag.text;
-    if (expr.match(/^[0-9]+(?:\.[0-9]+)?$/) || expr.match(/^\.[0-9]+$/)) {
+    if (expr.match(NUMBER_REGEX_1) || expr.match(NUMBER_REGEX_2)) {
       return frag;
-    } else if (expr.match(/^'[^']+'$/)) {
+    } else if (expr.match(STRING_REGEX)) {
       return frag;
     } else {
       // Identifiers
       const parts = expr.split(".");
-      if (
-        parts.every((p) => p.match(/^"[^"]+"$/) || p.match(/^[a-zA-Z0-9_]+$/))
-      ) {
+      if (parts.every(isIdentifierLike)) {
         return frag;
       }
     }
