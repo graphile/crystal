@@ -157,3 +157,27 @@ it("join(conditions, ' and ') 4", () => {
     values: [],
   });
 });
+
+it("expression column", () => {
+  const node = sql`${sql.parens(
+    sql.parens(
+      sql`${sql.identifier(Symbol("forums"))}.archived_at is not null`,
+    ),
+  )}::text`;
+  expect(sql.compile(node)).toEqual({
+    text: `(__forums__.archived_at is not null)::text`,
+    values: [],
+  });
+});
+
+it("expression column 2", () => {
+  const node = sql`${sql.parens(
+    sql`${sql.parens(
+      sql`${sql.identifier(Symbol("forums"))}.archived_at is not null`,
+    )}`,
+  )}::text`;
+  expect(sql.compile(node)).toEqual({
+    text: `(__forums__.archived_at is not null)::text`,
+    values: [],
+  });
+});

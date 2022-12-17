@@ -512,9 +512,10 @@ const sqlBase = function sql(
       "[pg-sql2] sql should be used as a template literal, not a function call.",
     );
   }
+  const stringsLength = strings.length;
   const first = strings[0];
   // Reduce memory churn with a cache
-  if (strings.length === 1) {
+  if (stringsLength === 1) {
     if (first === "") {
       return blank;
     }
@@ -525,8 +526,14 @@ const sqlBase = function sql(
     }
     return node;
   }
+
+  // Special case sql`${...}` - just return the node directly
+  if (stringsLength === 2 && strings[0] === "" && strings[1] === "") {
+    return values[0];
+  }
+
   const items: Array<SQLNode> = [];
-  for (let i = 0, l = strings.length; i < l; i++) {
+  for (let i = 0, l = stringsLength; i < l; i++) {
     const text = strings[i];
     if (typeof text !== "string") {
       throw new Error(
