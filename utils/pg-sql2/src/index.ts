@@ -265,10 +265,41 @@ function makePlaceholderNode(
   });
 }
 
-function makeQueryNode(nodes: Array<SQLNode>, flags = 0): SQLQuery {
+function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
+  // compress the nodes - squash all adjoining RAW nodes together
+  let replacementNodes: Array<SQLNode> = [];
+  let currentText = "";
+  const l = nodes.length;
+  const lastButOne = l - 1;
+  for (let i = 0; i < l; i++) {
+    const node = nodes[i];
+    if (
+      node.type === "RAW" &&
+      ((flags & FLAG_HAS_PARENS) === 0 ||
+        ((i !== 0 || node !== OPEN_PARENS) &&
+          (i !== lastButOne || node !== CLOSE_PARENS)))
+    ) {
+      currentText += node.text;
+      if (currentText !== "") {
+        if (!replacementNodes) {
+          replacementNodes = nodes.slice(0, i - 1);
+        }
+      }
+    } else if (replacementNodes) {
+      if (currentText !== "") {
+        replacementNodes.push(makeRawNode(currentText));
+        currentText = "";
+      }
+      replacementNodes.push(node);
+    }
+  }
+  if (currentText !== "") {
+    replacementNodes.push(makeRawNode(currentText));
+    currentText = "";
+  }
   return Object.freeze({
     type: "QUERY",
-    nodes,
+    nodes: replacementNodes ?? nodes,
     flags,
     [$$trusted]: true as const,
   });
@@ -596,17 +627,23 @@ export function identifier(...names: Array<string | symbol>): SQL {
   }
 
   const items: SQLNode[] = [];
+  let currentText = "";
   for (let i = 0; i < nameCount; i++) {
     if (i > 0) {
-      items[i * 2 - 1] = dot;
+      currentText += ".";
     }
     const name = names[i];
     if (typeof name === "string") {
       // By escaping here rather than during compile we can reduce redundant computation.
-      items[i * 2] = makeRawNode(escapeSqlIdentifier(name));
+      const escaped = escapeSqlIdentifier(name);
+      currentText += escaped;
     } else if (typeof name === "symbol") {
+      if (currentText !== "") {
+        items.push(makeRawNode(currentText));
+        currentText = "";
+      }
       // The final name has to be evaluated at compile-time, but we can at least mangle it up front.
-      items[i * 2] = makeIdentifierNode(getSymbolAndName(name));
+      items.push(makeIdentifierNode(getSymbolAndName(name)));
     } else {
       throw new Error(
         `[pg-sql2] Invalid argument to sql.identifier - argument ${i} (0-indexed) should be a string or a symbol, but was '${inspect(
@@ -615,8 +652,12 @@ export function identifier(...names: Array<string | symbol>): SQL {
       );
     }
   }
+  if (currentText !== "") {
+    items.push(makeRawNode(currentText));
+    currentText = "";
+  }
 
-  return makeQueryNode(items);
+  return items.length === 1 ? items[0] : makeQueryNode(items);
 }
 
 /**
@@ -818,7 +859,10 @@ export function parens(frag: SQL, force?: boolean): SQL {
       for (let i = 0; i < nodeCount; i++) {
         const node = nodes[i];
         if (i % 2 === 0) {
-          if (node.type !== "IDENTIFIER" || node.names.length !== 1) {
+          if (
+            node.type !== "IDENTIFIER" &&
+            (node.type !== "RAW" || !isIdentifierLike(node.text))
+          ) {
             return parenthesize(frag);
           }
         } else {
