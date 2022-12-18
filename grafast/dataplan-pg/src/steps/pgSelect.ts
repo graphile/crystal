@@ -1005,7 +1005,7 @@ export class PgSelectStep<
           break;
         }
         default: {
-          const never: never = condition;
+          const never: never = condition.type;
           console.error("Unsupported condition: ", never);
           throw new Error(`Unsupported condition`);
         }

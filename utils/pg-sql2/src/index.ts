@@ -25,15 +25,14 @@ const isDev = process.env.GRAPHILE_ENV === "development";
  * in a JSON payload and it cannot be constructed with a new Symbol (even with
  * the same argument), so external data cannot make itself trusted.
  */
-const $$trusted = Symbol("pg-sql2-trusted");
+const $$type = Symbol("pg-sql2-type");
 
 /**
  * Represents raw SQL, the text will be output verbatim into the compiled query.
  */
 export interface SQLRawNode {
+  readonly [$$type]: "RAW";
   readonly text: string;
-  readonly type: "RAW";
-  readonly [$$trusted]: true;
 }
 
 /**
@@ -42,10 +41,9 @@ export interface SQLRawNode {
  * reserved words.
  */
 export interface SQLIdentifierNode {
+  readonly [$$type]: "IDENTIFIER";
   readonly s: symbol;
   readonly n: string;
-  readonly type: "IDENTIFIER";
-  readonly [$$trusted]: true;
 }
 
 /**
@@ -64,29 +62,26 @@ export type SQLRawValue =
  * compiled SQL statement.
  */
 export interface SQLValueNode {
+  readonly [$$type]: "VALUE";
   readonly value: SQLRawValue;
-  readonly type: "VALUE";
-  readonly [$$trusted]: true;
 }
 
 /**
  * Represents that the SQL inside this should be indented when pretty printed.
  */
 export interface SQLIndentNode {
+  readonly [$$type]: "INDENT";
   readonly content: SQLQuery;
-  readonly type: "INDENT";
   readonly flags: number;
-  readonly [$$trusted]: true;
 }
 
 /**
  * Informs pg-sql2 to treat symbol2 as if it were the same as symbol1
  */
 export interface SQLSymbolAliasNode {
+  readonly [$$type]: "SYMBOL_ALIAS";
   readonly as: symbol;
   readonly bs: symbol;
-  readonly type: "SYMBOL_ALIAS";
-  readonly [$$trusted]: true;
 }
 
 /**
@@ -94,10 +89,9 @@ export interface SQLSymbolAliasNode {
  * replacements provided.
  */
 export interface SQLPlaceholderNode {
-  readonly type: "PLACEHOLDER";
+  readonly [$$type]: "PLACEHOLDER";
   readonly symbol: symbol;
   readonly fallback?: SQL;
-  readonly [$$trusted]: true;
 }
 
 /** @internal */
@@ -111,10 +105,9 @@ export type SQLNode =
 
 /** @internal */
 export interface SQLQuery {
-  readonly type: "QUERY";
+  readonly [$$type]: "QUERY";
   readonly nodes: ReadonlyArray<SQLNode>;
   readonly flags: number;
-  readonly [$$trusted]: true;
 }
 const FLAG_HAS_PARENS = 1 << 0;
 
@@ -191,9 +184,8 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
     );
   }
   const newNode: SQLRawNode = {
-    type: "RAW",
+    [$$type]: "RAW" as const,
     text,
-    [$$trusted]: true,
   };
   if (exportName) {
     exportAs(newNode, exportName);
@@ -209,38 +201,34 @@ function makeIdentifierNode(
   n = getSymbolName(s),
 ): SQLIdentifierNode {
   return Object.freeze({
-    type: "IDENTIFIER",
+    [$$type]: "IDENTIFIER" as const,
     s,
     n,
-    [$$trusted]: true as const,
   });
 }
 
 // Simple function to help V8 optimize it.
 function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({
-    type: "VALUE",
+    [$$type]: "VALUE" as const,
     value: rawValue,
-    [$$trusted]: true as const,
   });
 }
 
 function makeIndentNode(content: SQL): SQLIndentNode {
-  const flags = content.type === "QUERY" ? content.flags : 0;
+  const flags = content[$$type] === "QUERY" ? content.flags : 0;
   return Object.freeze({
-    type: "INDENT",
+    [$$type]: "INDENT" as const,
     flags,
-    content: content.type === "QUERY" ? content : makeQueryNode([content]),
-    [$$trusted]: true as const,
+    content: content[$$type] === "QUERY" ? content : makeQueryNode([content]),
   });
 }
 
 function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
   return Object.freeze({
-    type: "SYMBOL_ALIAS",
+    [$$type]: "SYMBOL_ALIAS" as const,
     as: a,
     bs: b,
-    [$$trusted]: true as const,
   });
 }
 
@@ -249,10 +237,9 @@ function makePlaceholderNode(
   fallback?: SQL,
 ): SQLPlaceholderNode {
   return Object.freeze({
-    type: "PLACEHOLDER",
+    [$$type]: "PLACEHOLDER" as const,
     symbol,
     fallback,
-    [$$trusted]: true as const,
   });
 }
 
@@ -263,7 +250,7 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
   const l = nodes.length;
   for (let i = 0; i < l; i++) {
     const node = nodes[i];
-    if (node.type === "RAW") {
+    if (node[$$type] === "RAW") {
       currentText += node.text;
       if (currentText !== "") {
         if (!replacementNodes) {
@@ -283,15 +270,18 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
     currentText = "";
   }
   return Object.freeze({
-    type: "QUERY",
+    [$$type]: "QUERY" as const,
     nodes: replacementNodes ?? nodes,
     flags,
-    [$$trusted]: true as const,
   });
 }
 
 function isSQL(node: unknown): node is SQL {
-  return typeof node === "object" && node !== null && node[$$trusted] === true;
+  return (
+    typeof node === "object" &&
+    node !== null &&
+    typeof node[$$type] === "string"
+  );
 }
 
 function enforceValidNode(node: SQLQuery, where?: string): SQLQuery;
@@ -373,14 +363,14 @@ export function compile(
 
     const trustedInput = enforceValidNode(untrustedInput, ``);
     const items: ReadonlyArray<SQLNode> =
-      trustedInput.type === "QUERY"
+      trustedInput[$$type] === "QUERY"
         ? expandQueryNodes(trustedInput)
         : [trustedInput];
     const itemCount = items.length;
 
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
       const item = enforceValidNode(items[itemIndex], `item ${itemIndex}`);
-      switch (item.type) {
+      switch (item[$$type]) {
         case "RAW": {
           if (item.text === "") {
             // No need to add blank raw text!
@@ -547,7 +537,7 @@ const sqlBase = function sql(
         rawVal,
         `template literal placeholder ${i}`,
       );
-      if (valid.type === "QUERY") {
+      if (valid[$$type] === "QUERY") {
         // NOTE: this clears the flags
 
         const itemsCount = items.length;
@@ -732,7 +722,7 @@ export function join(items: Array<SQL>, separator = ""): SQL {
     if (addSeparator) {
       currentItems.push(sepNode);
     }
-    if (node.type === "QUERY") {
+    if (node[$$type] === "QUERY") {
       for (const innerNode of expandQueryNodes(node)) {
         // TODO: optimize
         currentItems.push(innerNode);
@@ -789,7 +779,7 @@ function isIdentifierLike(p: string) {
 
 function parenthesize(fragment: SQL, inFlags = 0): SQLQuery {
   const flags = inFlags | FLAG_HAS_PARENS;
-  if (fragment.type === "QUERY") {
+  if (fragment[$$type] === "QUERY") {
     return makeQueryNode(fragment.nodes, flags);
   } else {
     return makeQueryNode([fragment], flags);
@@ -820,7 +810,7 @@ function parenthesize(fragment: SQL, inFlags = 0): SQLQuery {
  * - An identifier `table.column.attribute` / `"MyTaBlE"."MyCoLuMn"."MyAtTrIbUtE"` (this needs to be `(table.column).attribute`)
  */
 export function parens(frag: SQL, force?: boolean): SQL {
-  if (frag.type === "QUERY") {
+  if (frag[$$type] === "QUERY") {
     if ((frag.flags & FLAG_HAS_PARENS) === FLAG_HAS_PARENS) {
       return frag;
     }
@@ -839,8 +829,8 @@ export function parens(frag: SQL, force?: boolean): SQL {
       // TODO: check for 'rawtext.IDENTIFIER' too
       const [identifier, rawtext] = nodes;
       if (
-        identifier.type !== "IDENTIFIER" ||
-        rawtext.type !== "RAW" ||
+        identifier[$$type] !== "IDENTIFIER" ||
+        rawtext[$$type] !== "RAW" ||
         !rawtext.text.startsWith(".")
       ) {
         return parenthesize(frag);
@@ -856,13 +846,13 @@ export function parens(frag: SQL, force?: boolean): SQL {
         const node = nodes[i];
         if (i % 2 === 0) {
           if (
-            node.type !== "IDENTIFIER" &&
-            (node.type !== "RAW" || !isIdentifierLike(node.text))
+            node[$$type] !== "IDENTIFIER" &&
+            (node[$$type] !== "RAW" || !isIdentifierLike(node.text))
           ) {
             return parenthesize(frag);
           }
         } else {
-          if (node.type !== "RAW" || node.text !== ".") {
+          if (node[$$type] !== "RAW" || node.text !== ".") {
             return parenthesize(frag);
           }
         }
@@ -871,10 +861,10 @@ export function parens(frag: SQL, force?: boolean): SQL {
     } else {
       return parenthesize(frag);
     }
-  } else if (frag.type === "INDENT") {
+  } else if (frag[$$type] === "INDENT") {
     const inner = parens(frag.content, force);
     if (
-      inner.type === "QUERY" &&
+      inner[$$type] === "QUERY" &&
       (inner.flags & FLAG_HAS_PARENS) === FLAG_HAS_PARENS
     ) {
       // Move the parens to outside
@@ -886,11 +876,11 @@ export function parens(frag: SQL, force?: boolean): SQL {
     }
   } else if (force) {
     return parenthesize(frag);
-  } else if (frag.type === "VALUE") {
+  } else if (frag[$$type] === "VALUE") {
     return frag;
-  } else if (frag.type === "IDENTIFIER") {
+  } else if (frag[$$type] === "IDENTIFIER") {
     return frag;
-  } else if (frag.type === "RAW") {
+  } else if (frag[$$type] === "RAW") {
     const expr = frag.text;
     if (expr.match(NUMBER_REGEX_1) || expr.match(NUMBER_REGEX_2)) {
       return frag;
@@ -954,37 +944,37 @@ export function isEquivalent(
   } else if (typeof sql2 === "symbol") {
     return false;
   }
-  if (sql1.type === "QUERY") {
-    if (sql2.type !== "QUERY" || sql2.flags !== sql1.flags) {
+  if (sql1[$$type] === "QUERY") {
+    if (sql2[$$type] !== "QUERY" || sql2.flags !== sql1.flags) {
       return false;
     }
     return arraysMatch(sql1.nodes, sql2.nodes, (a, b) =>
       isEquivalent(a, b, options),
     );
-  } else if (sql2.type === "QUERY") {
+  } else if (sql2[$$type] === "QUERY") {
     return false;
   } else {
-    switch (sql1.type) {
+    switch (sql1[$$type]) {
       case "RAW": {
-        if (sql2.type !== sql1.type) {
+        if (sql2[$$type] !== sql1[$$type]) {
           return false;
         }
         return sql1.text === sql2.text;
       }
       case "VALUE": {
-        if (sql2.type !== sql1.type) {
+        if (sql2[$$type] !== sql1[$$type]) {
           return false;
         }
         return sql1.value === sql2.value;
       }
       case "INDENT": {
-        if (sql2.type !== sql1.type) {
+        if (sql2[$$type] !== sql1[$$type]) {
           return false;
         }
         return isEquivalent(sql1.content, sql2.content, options);
       }
       case "IDENTIFIER": {
-        if (sql2.type !== sql1.type) {
+        if (sql2[$$type] !== sql1[$$type]) {
           return false;
         }
         const { n: ids1n, s: ids1s } = sql1;
@@ -996,7 +986,7 @@ export function isEquivalent(
         return namesMatch && symbolsMatch;
       }
       case "PLACEHOLDER": {
-        if (sql2.type !== sql1.type) {
+        if (sql2[$$type] !== sql1[$$type]) {
           return false;
         }
         const symbol1 = getSubstitute(sql1.symbol, symbolSubstitutes);
@@ -1021,7 +1011,7 @@ function replaceSymbolInNode(
   needle: symbol,
   replacement: symbol,
 ): SQLNode {
-  switch (frag.type) {
+  switch (frag[$$type]) {
     case "RAW": {
       return frag;
     }
@@ -1058,7 +1048,7 @@ function replaceSymbolInNode(
     }
     default: {
       const never: never = frag;
-      throw new Error(`Unhandled SQL type ${(never as any).type}`);
+      throw new Error(`Unhandled SQL type ${(never as any)[$$type]}`);
     }
   }
 }
@@ -1071,7 +1061,7 @@ export function replaceSymbol(
   needle: symbol,
   replacement: symbol,
 ): SQL {
-  if (frag.type === "QUERY") {
+  if (frag[$$type] === "QUERY") {
     let changed = false;
     const newNodes = frag.nodes.map((node) => {
       const newNode = replaceSymbolInNode(node, needle, replacement);
