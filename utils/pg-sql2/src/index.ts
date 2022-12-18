@@ -997,7 +997,13 @@ export function isEquivalent(
         if (sql2.type !== sql1.type) {
           return false;
         }
-        return identifiersAreEquivalent(sql1.s, sql2.s, symbolSubstitutes);
+        const { n: ids1n, s: ids1s } = sql1.s;
+        const { n: ids2n, s: ids2s } = sql2.s;
+        const namesMatch = ids1n === ids2n;
+        const symbol1 = getSubstitute(ids1s, symbolSubstitutes);
+        const symbol2 = getSubstitute(ids2s, symbolSubstitutes);
+        const symbolsMatch = symbol1 === symbol2;
+        return namesMatch && symbolsMatch;
       }
       case "PLACEHOLDER": {
         if (sql2.type !== sql1.type) {
@@ -1122,18 +1128,6 @@ function getSubstitute(
     }
   }
   throw new Error("symbolSubstitutes depth too deep");
-}
-
-function identifiersAreEquivalent(
-  ids1: SymbolAndName,
-  ids2: SymbolAndName,
-  symbolSubstitutes?: Map<symbol, symbol>,
-): boolean {
-  const namesMatch = ids1.n === ids2.n;
-  const symbol1 = getSubstitute(ids1.s, symbolSubstitutes);
-  const symbol2 = getSubstitute(ids2.s, symbolSubstitutes);
-  const symbolsMatch = symbol1 === symbol2;
-  return namesMatch && symbolsMatch;
 }
 
 export const sql = sqlBase as PgSQL;
