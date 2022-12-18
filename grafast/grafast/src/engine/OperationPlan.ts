@@ -1872,7 +1872,7 @@ export class OperationPlan {
     // dependents is a quick way to avoid having to scan every single step.
     const l = step.dependencies.length;
     if (l > 0) {
-      let allPeers = new Set<ExecutableStep>();
+      let allPeers: Array<ExecutableStep> = [step];
       const deps = step.dependencies;
       for (
         let dependencyIndex = 0, dependencyCount = deps.length;
@@ -1889,32 +1889,33 @@ export class OperationPlan {
             if (
               d.dependencyIndex === dependencyIndex &&
               d.step !== step &&
-              !allPeers.has(d.step) &&
+              !allPeers.includes(d.step) &&
               d.step.dependencies.length === dependencyCount &&
               isMaybeAPeer(step, compatibleLayerPlans, d.step)
             ) {
-              allPeers.add(d.step);
+              allPeers.push(d.step);
             }
           }
         } else {
-          const stillPeers = new Set<ExecutableStep>();
+          const stillPeers: Array<ExecutableStep> = [];
           for (const d of dep.dependents) {
             if (
               d.dependencyIndex === dependencyIndex &&
               d.step !== step &&
-              allPeers.has(d.step)
+              allPeers.includes(d.step) &&
+              !stillPeers.includes(d.step)
             ) {
-              stillPeers.add(d.step);
+              stillPeers.push(d.step);
             }
           }
           allPeers = stillPeers;
-          if (allPeers.size === 0) {
+          if (allPeers.length === 0) {
             // Shortcut
             return [step];
           }
         }
       }
-      return [step, ...allPeers];
+      return allPeers;
     } else {
       const result = [step];
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
