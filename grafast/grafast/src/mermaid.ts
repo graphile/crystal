@@ -206,7 +206,11 @@ export function printPlanGraph(
             graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
           }
         } else {
-          if (concise && plan.dependents.size === 0 && depNodes.length === 1) {
+          if (
+            concise &&
+            plan.dependents.length === 0 &&
+            depNodes.length === 1
+          ) {
             // Try alternating the nodes so they render closer together
             const depNode = depNodes[0];
             if (chainByDep[depNode] === undefined) {

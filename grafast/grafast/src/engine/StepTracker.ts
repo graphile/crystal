@@ -5,6 +5,8 @@ import type { LayerPlan, LayerPlanReasonsWithParentStep } from "./LayerPlan";
 import type { OperationPlanPhase } from "./OperationPlan.js";
 import type { OutputPlan } from "./OutputPlan";
 
+const EMPTY_ARRAY = Object.freeze([]);
+
 /**
  * We want everything else to treat things like `dependencies` as read only,
  * however we ourselves want to be able to write to them, so we can use
@@ -222,7 +224,7 @@ export class StepTracker {
     this.stepsWithNoDependencies.delete($dependent);
     const dependencyIndex =
       writeableArray($dependent.dependencies).push($dependency) - 1;
-    writeableSet($dependency.dependents).add({
+    writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,
     });
@@ -309,12 +311,12 @@ export class StepTracker {
     {
       // Transfer step dependents of $original to $replacement
       const dependents = $original.dependents;
-      const replacementDependents = writeableSet($replacement.dependents);
+      const replacementDependents = writeableArray($replacement.dependents);
       for (const { step: $dependent, dependencyIndex } of dependents) {
         writeableArray($dependent.dependencies)[dependencyIndex] = $replacement;
-        replacementDependents.add({ step: $dependent, dependencyIndex });
+        replacementDependents.push({ step: $dependent, dependencyIndex });
       }
-      writeableSet($original.dependents).clear();
+      ($original.dependents as any).splice(0, $original.dependents.length);
     }
 
     {
@@ -406,7 +408,7 @@ export class StepTracker {
     const s2 = this.layerPlansByRootStep.get($step);
     const s3 = this.layerPlansByParentStep.get($step);
     return (
-      $step.dependents.size === 0 &&
+      $step.dependents.length === 0 &&
       !$step.hasSideEffects &&
       (!s1 || s1.size === 0) &&
       (!s2 || s2.size === 0) &&
@@ -440,10 +442,13 @@ export class StepTracker {
     for (const $dependency of oldDependencies) {
       // $dependency is no longer a dependent of $original, since we're getting
       // rid of $original
-      const dependents = writeableSet($dependency.dependents);
-      for (const dependent of dependents) {
+      const dependents = writeableArray($dependency.dependents);
+      for (let i = 0, l = dependents.length; i < l; i++) {
+        const dependent = dependents[i];
         if (dependent.step === $original) {
-          dependents.delete(dependent);
+          dependents.splice(i, 1);
+          i--;
+          l--;
         }
       }
 
@@ -461,11 +466,11 @@ export class StepTracker {
     // This should already be the case, so we just do it in dev as a
     // consistency check.
     if (isDev) {
-      if ($original.dependents.size > 0) {
+      if ($original.dependents.length > 0) {
         throw new Error(
-          `${$original} eradicated, but it is needed by ${[
-            ...$original.dependents,
-          ].map((d) => d.step)}`,
+          `${$original} eradicated, but it is needed by ${$original.dependents.map(
+            (d) => d.step,
+          )}`,
         );
       }
       const outputPlansByRoot = this.outputPlansByRootStep.get($original);

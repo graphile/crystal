@@ -215,7 +215,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * Just for mermaid
    * @internal
    */
-  public readonly dependents: ReadonlySet<{
+  public readonly dependents: ReadonlyArray<{
     step: ExecutableStep;
     dependencyIndex: number;
   }>;
@@ -266,7 +266,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   constructor() {
     super();
     this.dependencies = [];
-    this.dependents = new Set();
+    this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
     this._stepOptions = { stream: null };

@@ -1764,9 +1764,15 @@ export class OperationPlan {
       }
 
       if (order === "dependents-first") {
-        for (const { step: $processFirst } of step.dependents) {
+        for (let i = 0; i < step.dependents.length; i++) {
+          const entry = step.dependents[i];
+          const { step: $processFirst } = entry;
           if ($processFirst.id >= fromStepId && !processed.has($processFirst)) {
             processStep($processFirst);
+            if (step.dependents[i] !== entry) {
+              // The world has change; go back to the start
+              i = -1;
+            }
           }
         }
       } else {
@@ -1886,7 +1892,7 @@ export class OperationPlan {
         dependencyIndex++
       ) {
         const dep = deps[dependencyIndex];
-        if (dep.dependents.size === 1) {
+        if (dep.dependents.length === 1) {
           // I must be the only step!
           return [step];
         }
