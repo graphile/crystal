@@ -1753,9 +1753,6 @@ export class OperationPlan {
     const processed = new Set<ExecutableStep>();
 
     const processStep = (step: ExecutableStep) => {
-      if (processed.has(step)) {
-        return step;
-      }
       // MUST come before anything else, otherwise infinite loops may occur
       processed.add(step);
 
@@ -1817,8 +1814,8 @@ export class OperationPlan {
 
     for (let i = fromStepId; i < this.stepTracker.stepCount; i++) {
       const step = this.stepTracker.getStepById(i, true);
-      // Must have been tree-shaken away!
-      if (!step || step.id !== i) continue;
+      // Check it hasn't been tree-shaken away, or already processed
+      if (!step || step.id !== i || processed.has(step)) continue;
       const resultStep = processStep(step);
       if (isDev) {
         const plansAdded = this.stepTracker.stepCount - previousStepCount;
