@@ -39,7 +39,7 @@ describe("sql.query", () => {
     const node = sql`select 1`;
     expect(node).toEqual({ [$$type]: "RAW", t: "select 1" });
     const node2 = sql`select ${sql`1`}` as SQLQuery;
-    expect(node2.n).toEqual([{ [$$type]: "RAW", t: "select 1" }]);
+    expect(node2).toEqual({ [$$type]: "RAW", t: "select 1" });
   });
 
   it("with values", () => {
@@ -53,7 +53,7 @@ describe("sql.query", () => {
 
   it("with sub-sub-sub query", () => {
     const node = sql`select ${sql`1 ${sql`from ${sql`foo`}`}`}` as SQLQuery;
-    expect(node.n).toEqual([{ [$$type]: "RAW", t: "select 1 from foo" }]);
+    expect(node).toEqual({ [$$type]: "RAW", t: "select 1 from foo" });
   });
 
   it("with symbols", () => {

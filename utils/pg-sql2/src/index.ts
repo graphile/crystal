@@ -254,34 +254,9 @@ function makePlaceholderNode(
 }
 
 function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
-  // compress the nodes - squash all adjoining RAW nodes together
-  let replacementNodes: Array<SQLNode> = [];
-  let currentText = "";
-  const l = nodes.length;
-  for (let i = 0; i < l; i++) {
-    const node = nodes[i];
-    if (node[$$type] === "RAW") {
-      currentText += node.t;
-      if (currentText !== "") {
-        if (!replacementNodes) {
-          replacementNodes = nodes.slice(0, i - 1);
-        }
-      }
-    } else if (replacementNodes) {
-      if (currentText !== "") {
-        replacementNodes.push(makeRawNode(currentText));
-        currentText = "";
-      }
-      replacementNodes.push(node);
-    }
-  }
-  if (currentText !== "") {
-    replacementNodes.push(makeRawNode(currentText));
-    currentText = "";
-  }
   return Object.freeze({
     [$$type]: "QUERY" as const,
-    n: replacementNodes ?? nodes,
+    n: nodes,
     f: flags,
   });
 }
@@ -528,6 +503,7 @@ const sqlBase = function sql(
   }
 
   const items: Array<SQLNode> = [];
+  let currentText = "";
   for (let i = 0, l = stringsLength; i < l; i++) {
     const text = strings[i];
     if (typeof text !== "string") {
@@ -535,35 +511,47 @@ const sqlBase = function sql(
         "[pg-sql2] sql.query must be invoked as a template literal, not a function call.",
       );
     }
-    if (text.length > 0) {
-      items.push(makeRawNode(text));
-    }
+    currentText += text;
     if (i < l - 1) {
       const rawVal = values[i];
       const valid: SQL = enforceValidNode(
         rawVal,
         `template literal placeholder ${i}`,
       );
-      if (valid[$$type] === "QUERY") {
+      if (valid[$$type] === "RAW") {
+        currentText += valid.t;
+      } else if (valid[$$type] === "QUERY") {
         // NOTE: this clears the flags
 
-        const itemsCount = items.length;
         const nodes = expandQueryNodes(valid);
         const nodeCount = nodes.length;
 
-        // Pre-allocate space
-        // TODO: check this actually improves performance
-        items.length = itemsCount + nodeCount;
-
         for (let nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++) {
-          items[itemsCount + nodeIndex] = nodes[nodeIndex];
+          const node = nodes[nodeIndex];
+          if (node[$$type] === "RAW") {
+            currentText += node.t;
+          } else {
+            if (currentText !== "") {
+              items.push(makeRawNode(currentText));
+              currentText = "";
+            }
+            items.push(node);
+          }
         }
       } else {
+        if (currentText !== "") {
+          items.push(makeRawNode(currentText));
+          currentText = "";
+        }
         items.push(valid);
       }
     }
   }
-  return makeQueryNode(items);
+  if (currentText !== "") {
+    items.push(makeRawNode(currentText));
+    currentText = "";
+  }
+  return items.length === 1 ? items[0] : makeQueryNode(items);
 };
 
 let sqlRawWarningOutput = false;
@@ -719,26 +707,44 @@ export function join(items: Array<SQL>, separator = ""): SQL {
   }
 
   const hasSeparator = separator.length > 0;
-  const sepNode = hasSeparator ? makeRawNode(separator) : blank;
-
+  let currentText = "";
   const currentItems: Array<SQLNode> = [];
   for (let i = 0, l = items.length; i < l; i++) {
     const rawNode = items[i];
     const addSeparator = i > 0 && hasSeparator;
     const node: SQL = enforceValidNode(rawNode, `join item ${i}`);
     if (addSeparator) {
-      currentItems.push(sepNode);
+      currentText += separator;
     }
     if (node[$$type] === "QUERY") {
       for (const innerNode of expandQueryNodes(node)) {
-        // TODO: optimize
-        currentItems.push(innerNode);
+        if (innerNode[$$type] === "RAW") {
+          currentText += innerNode.t;
+        } else {
+          if (currentText !== "") {
+            currentItems.push(makeRawNode(currentText));
+            currentText = "";
+          }
+          currentItems.push(innerNode);
+        }
       }
+    } else if (node[$$type] === "RAW") {
+      currentText += node.t;
     } else {
+      if (currentText !== "") {
+        currentItems.push(makeRawNode(currentText));
+        currentText = "";
+      }
       currentItems.push(node);
     }
   }
-  return makeQueryNode(currentItems);
+  if (currentText !== "") {
+    currentItems.push(makeRawNode(currentText));
+    currentText = "";
+  }
+  return currentItems.length === 1
+    ? currentItems[0]
+    : makeQueryNode(currentItems);
 }
 
 function expandQueryNodes(node: SQLQuery): ReadonlyArray<SQLNode> {
