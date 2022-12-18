@@ -428,10 +428,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           this,
           $parent,
         );
-        this.processRoot = new Function(
+        this.processRoot = newFunction([
           "value",
           `return value${expression};`,
-        ) as (value: any) => any;
+        ]) as (value: any) => any;
       }
     }
   }
@@ -761,8 +761,13 @@ ${preamble}\
 ${inner}
 }`;
   // console.log(functionBody);
-  const f = new Function(...[...Object.keys(realArgs), functionBody]);
+  const f = newFunction([...Object.keys(realArgs), functionBody]);
   return f(...Object.values(realArgs)) as any;
+}
+
+/** Because `new Function` retains the scope, we do it at top level to avoid capturing extra values */
+function newFunction(args: string[]) {
+  return new Function(...args);
 }
 
 function makeExecuteChildPlanCode(
