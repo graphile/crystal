@@ -316,7 +316,7 @@ export class StepTracker {
         writeableArray($dependent.dependencies)[dependencyIndex] = $replacement;
         replacementDependents.push({ step: $dependent, dependencyIndex });
       }
-      ($original.dependents as any).splice(0, $original.dependents.length);
+      ($original.dependents as any) = [];
     }
 
     {
@@ -442,15 +442,9 @@ export class StepTracker {
     for (const $dependency of oldDependencies) {
       // $dependency is no longer a dependent of $original, since we're getting
       // rid of $original
-      const dependents = writeableArray($dependency.dependents);
-      for (let i = 0, l = dependents.length; i < l; i++) {
-        const dependent = dependents[i];
-        if (dependent.step === $original) {
-          dependents.splice(i, 1);
-          i--;
-          l--;
-        }
-      }
+      ($dependency.dependents as any) = $dependency.dependents.filter(
+        (dependent) => dependent.step !== $original,
+      );
 
       // If we've done our first tree-shake, let's keep it tidy in here.
       if (
