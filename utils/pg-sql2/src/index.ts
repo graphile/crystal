@@ -273,12 +273,7 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
   const lastButOne = l - 1;
   for (let i = 0; i < l; i++) {
     const node = nodes[i];
-    if (
-      node.type === "RAW" &&
-      ((flags & FLAG_HAS_PARENS) === 0 ||
-        ((i !== 0 || node !== OPEN_PARENS) &&
-          (i !== lastButOne || node !== CLOSE_PARENS)))
-    ) {
+    if (node.type === "RAW") {
       currentText += node.text;
       if (currentText !== "") {
         if (!replacementNodes) {
@@ -389,7 +384,9 @@ export function compile(
 
     const trustedInput = enforceValidNode(untrustedInput, ``);
     const items: ReadonlyArray<SQLNode> =
-      trustedInput.type === "QUERY" ? trustedInput.nodes : [trustedInput];
+      trustedInput.type === "QUERY"
+        ? expandQueryNodes(trustedInput)
+        : [trustedInput];
     const itemCount = items.length;
 
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
@@ -564,7 +561,7 @@ const sqlBase = function sql(
         // NOTE: this clears the flags
 
         const itemsCount = items.length;
-        const { nodes } = valid;
+        const nodes = expandQueryNodes(valid);
         const nodeCount = nodes.length;
 
         // Pre-allocate space
@@ -746,7 +743,7 @@ export function join(items: Array<SQL>, separator = ""): SQL {
       currentItems.push(sepNode);
     }
     if (node.type === "QUERY") {
-      for (const innerNode of node.nodes) {
+      for (const innerNode of expandQueryNodes(node)) {
         // TODO: optimize
         currentItems.push(innerNode);
       }
@@ -755,6 +752,15 @@ export function join(items: Array<SQL>, separator = ""): SQL {
     }
   }
   return makeQueryNode(currentItems);
+}
+
+function expandQueryNodes(node: SQLQuery): ReadonlyArray<SQLNode> {
+  const parens = (node.flags & FLAG_HAS_PARENS) === FLAG_HAS_PARENS;
+  if (parens) {
+    return [OPEN_PARENS, ...node.nodes, CLOSE_PARENS];
+  } else {
+    return node.nodes;
+  }
 }
 
 export function indent(fragment: SQL): SQL;
@@ -794,9 +800,9 @@ function isIdentifierLike(p: string) {
 function parenthesize(fragment: SQL, inFlags = 0): SQLQuery {
   const flags = inFlags | FLAG_HAS_PARENS;
   if (fragment.type === "QUERY") {
-    return makeQueryNode([OPEN_PARENS, ...fragment.nodes, CLOSE_PARENS], flags);
+    return makeQueryNode(fragment.nodes, flags);
   } else {
-    return makeQueryNode([OPEN_PARENS, fragment, CLOSE_PARENS], flags);
+    return makeQueryNode([fragment], flags);
   }
 }
 /**
@@ -882,16 +888,7 @@ export function parens(frag: SQL, force?: boolean): SQL {
       (inner.flags & FLAG_HAS_PARENS) === FLAG_HAS_PARENS
     ) {
       // Move the parens to outside
-      const innerNodesCount = inner.nodes.length;
-      const lp = inner.nodes[0];
-      const rp = inner.nodes[innerNodesCount - 1];
-      const rest = inner.nodes.slice(1, innerNodesCount - 1);
-      if (lp !== OPEN_PARENS || rp !== CLOSE_PARENS) {
-        throw new Error(
-          `pg-sql2 BUG: unexpected inconsistency in parens - please file an issue!`,
-        );
-      }
-      return parenthesize(indent(makeQueryNode(rest)), inner.flags);
+      return parenthesize(indent(makeQueryNode(inner.nodes)), inner.flags);
     } else if (inner === frag.content) {
       return frag;
     } else {
@@ -963,16 +960,12 @@ export function isEquivalent(
   }
   const symbolSubstitutes = options?.symbolSubstitutes;
   if (typeof sql1 === "symbol") {
-    if (symbolSubstitutes?.has(sql1)) {
-      return symbolSubstitutes.get(sql1) === sql2;
-    } else {
-      return sql2 === sql1;
-    }
+    return symbolSubstitutes?.get(sql1) === sql2;
   } else if (typeof sql2 === "symbol") {
     return false;
   }
   if (sql1.type === "QUERY") {
-    if (sql2.type !== "QUERY") {
+    if (sql2.type !== "QUERY" || sql2.flags !== sql1.flags) {
       return false;
     }
     return arraysMatch(sql1.nodes, sql2.nodes, (a, b) =>
@@ -1091,7 +1084,7 @@ export function replaceSymbol(
       }
       return newNode;
     });
-    return changed ? makeQueryNode(newNodes) : frag;
+    return changed ? makeQueryNode(newNodes, frag.flags) : frag;
   } else {
     return replaceSymbolInNode(frag, needle, replacement);
   }
