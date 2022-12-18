@@ -74,7 +74,7 @@ describe("sql.query", () => {
     const node = sql`select 1 as ${sql.identifier(sym1)}` as SQLQuery;
     expect(node.nodes.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select 1 as " },
-      { type: "IDENTIFIER", s: { s: sym1, n: "flibble_de_dee" } },
+      { type: "IDENTIFIER", s: sym1, n: "flibble_de_dee" },
     ]);
   });
 });

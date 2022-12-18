@@ -42,7 +42,8 @@ export interface SQLRawNode {
  * reserved words.
  */
 export interface SQLIdentifierNode {
-  readonly s: SymbolAndName;
+  readonly s: symbol;
+  readonly n: string;
   readonly type: "IDENTIFIER";
   readonly [$$trusted]: true;
 }
@@ -82,8 +83,10 @@ export interface SQLIndentNode {
  * Informs pg-sql2 to treat symbol2 as if it were the same as symbol1
  */
 export interface SQLSymbolAliasNode {
-  readonly a: SymbolAndName;
-  readonly b: SymbolAndName;
+  readonly as: symbol;
+  readonly an: string;
+  readonly bs: symbol;
+  readonly bn: string;
   readonly type: "SYMBOL_ALIAS";
   readonly [$$trusted]: true;
 }
@@ -162,25 +165,11 @@ function mangleName(str: string): string {
   );
 }
 
-/**
- * A symbol and it's name
- *
- * @see {@link getSymbolAndName}.
- *
- * @privateRemarks
- *
- * Objects with short fixed properties are more efficient than
- * tuples in V8.
- *
- * @internal
- */
-export type SymbolAndName = { s: symbol; n: string };
-
 // Alas we cannot use WeakMap to cache this because symbols cannot be WeakMap
 // keys (and we wouldn't want to open the user to memory exhaustion via a map).
 // Symbol.prototype.description is available since Node 11.15.0, 12.4.0.
-function getSymbolAndName(symbol: symbol): SymbolAndName {
-  return { s: symbol, n: mangleName(symbol.description || "local") };
+function getSymbolName(symbol: symbol): string {
+  return mangleName(symbol.description || "local");
 }
 
 // Copied from https://github.com/brianc/node-postgres/blob/860cccd53105f7bc32fed8b1de69805f0ecd12eb/lib/client.js#L285-L302
@@ -217,10 +206,14 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
 }
 
 // Simple function to help V8 optimize it.
-function makeIdentifierNode(s: SymbolAndName): SQLIdentifierNode {
+function makeIdentifierNode(
+  s: symbol,
+  n = getSymbolName(s),
+): SQLIdentifierNode {
   return Object.freeze({
     type: "IDENTIFIER",
     s,
+    n,
     [$$trusted]: true as const,
   });
 }
@@ -247,8 +240,10 @@ function makeIndentNode(content: SQL): SQLIndentNode {
 function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
   return Object.freeze({
     type: "SYMBOL_ALIAS",
-    a: getSymbolAndName(a),
-    b: getSymbolAndName(b),
+    as: a,
+    an: getSymbolName(a),
+    bs: b,
+    bn: getSymbolName(b),
     [$$trusted]: true as const,
   });
 }
@@ -270,7 +265,6 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
   let replacementNodes: Array<SQLNode> = [];
   let currentText = "";
   const l = nodes.length;
-  const lastButOne = l - 1;
   for (let i = 0; i < l; i++) {
     const node = nodes[i];
     if (node.type === "RAW") {
@@ -359,8 +353,7 @@ export function compile(
   /**
    * Makes a friendly name to use in the query for the given SymbolAndName.
    */
-  function makeIdentifierForSymbol(name: SymbolAndName) {
-    const { s: symbol, n: safeDesc } = name;
+  function makeIdentifierForSymbol(symbol: symbol, safeDesc: string) {
     if (!descCounter[safeDesc]) {
       descCounter[safeDesc] = 0;
     }
@@ -414,13 +407,11 @@ export function compile(
         }
         case "IDENTIFIER": {
           // Get the correct identifier string for this symbol.
-          // NOTE: we cannot use `SymbolAndName` as the key as a symbol may may
-          // generate multiple SymbolAndName objects.
-          let identifierForSymbol = symbolToIdentifier.get(item.s.s);
+          let identifierForSymbol = symbolToIdentifier.get(item.s);
 
           // If there is no identifier, create one and set it.
           if (!identifierForSymbol) {
-            identifierForSymbol = makeIdentifierForSymbol(item.s);
+            identifierForSymbol = makeIdentifierForSymbol(item.s, item.n);
           }
 
           // Return the identifier. Since we create it, we won’t have to
@@ -451,8 +442,8 @@ export function compile(
           break;
         }
         case "SYMBOL_ALIAS": {
-          const symbol1 = item.a.s;
-          const symbol2 = item.b.s;
+          const symbol1 = item.as;
+          const symbol2 = item.bs;
           const name1 = symbolToIdentifier.get(symbol1);
           const name2 = symbolToIdentifier.get(symbol2);
           if (name1 && name2 && name1 !== name2) {
@@ -465,7 +456,10 @@ export function compile(
           } else if (name2) {
             symbolToIdentifier.set(symbol1, name2);
           } else {
-            const identifierForSymbol = makeIdentifierForSymbol(item.a);
+            const identifierForSymbol = makeIdentifierForSymbol(
+              item.as,
+              item.an,
+            );
             symbolToIdentifier.set(symbol1, identifierForSymbol);
             symbolToIdentifier.set(symbol2, identifierForSymbol);
           }
@@ -640,7 +634,7 @@ export function identifier(...names: Array<string | symbol>): SQL {
         currentText = "";
       }
       // The final name has to be evaluated at compile-time, but we can at least mangle it up front.
-      items.push(makeIdentifierNode(getSymbolAndName(name)));
+      items.push(makeIdentifierNode(name));
     } else {
       throw new Error(
         `[pg-sql2] Invalid argument to sql.identifier - argument ${i} (0-indexed) should be a string or a symbol, but was '${inspect(
@@ -997,8 +991,8 @@ export function isEquivalent(
         if (sql2.type !== sql1.type) {
           return false;
         }
-        const { n: ids1n, s: ids1s } = sql1.s;
-        const { n: ids2n, s: ids2s } = sql2.s;
+        const { n: ids1n, s: ids1s } = sql1;
+        const { n: ids2n, s: ids2s } = sql2;
         const namesMatch = ids1n === ids2n;
         const symbol1 = getSubstitute(ids1s, symbolSubstitutes);
         const symbol2 = getSubstitute(ids2s, symbolSubstitutes);
@@ -1036,8 +1030,8 @@ function replaceSymbolInNode(
       return frag;
     }
     case "IDENTIFIER": {
-      if (frag.s.s === needle) {
-        return makeIdentifierNode(getSymbolAndName(replacement));
+      if (frag.s === needle) {
+        return makeIdentifierNode(replacement);
       } else {
         return frag;
       }
@@ -1051,9 +1045,9 @@ function replaceSymbolInNode(
       return makeIndentNode(replaceSymbol(frag.content, needle, replacement));
     }
     case "SYMBOL_ALIAS": {
-      const newA = frag.a.s === needle ? replacement : frag.a.s;
-      const newB = frag.b.s === needle ? replacement : frag.b.s;
-      if (newA !== frag.a.s || newB !== frag.b.s) {
+      const newA = frag.as === needle ? replacement : frag.as;
+      const newB = frag.bs === needle ? replacement : frag.bs;
+      if (newA !== frag.as || newB !== frag.bs) {
         return makeSymbolAliasNode(newA, newB);
       } else {
         return frag;
