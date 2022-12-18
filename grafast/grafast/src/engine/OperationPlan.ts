@@ -1903,7 +1903,7 @@ export class OperationPlan {
             }
           }
         } else {
-          const stillPeers: Array<ExecutableStep> = [];
+          const stillPeers: Array<ExecutableStep> = [step];
           for (const d of dep.dependents) {
             if (
               d.dependencyIndex === dependencyIndex &&
