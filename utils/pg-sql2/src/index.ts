@@ -983,9 +983,10 @@ export function arraysMatch<T>(
   return true;
 }
 
-export function isEquivalent(
-  sql1: SQL | symbol,
-  sql2: SQL | symbol,
+/*
+export function isEquivalentSymbol(
+  sql1: symbol,
+  sql2: symbol,
   options?: {
     symbolSubstitutes?: Map<symbol, symbol>;
   },
@@ -994,12 +995,20 @@ export function isEquivalent(
     return true;
   }
   const symbolSubstitutes = options?.symbolSubstitutes;
-  if (typeof sql1 === "symbol") {
-    return symbolSubstitutes?.get(sql1) === sql2;
-  } else if (typeof sql2 === "symbol") {
-    return false;
-  }
-  if (sql1[$$type] === "QUERY") {
+  return symbolSubstitutes?.get(sql1) === sql2;
+}
+*/
+
+export function isEquivalent(
+  sql1: SQL,
+  sql2: SQL,
+  options?: {
+    symbolSubstitutes?: Map<symbol, symbol>;
+  },
+): boolean {
+  if (sql1 === sql2) {
+    return true;
+  } else if (sql1[$$type] === "QUERY") {
     if (sql2[$$type] !== "QUERY" || sql2.f !== sql1.f || sql2.c !== sql1.c) {
       return false;
     }
@@ -1033,6 +1042,7 @@ export function isEquivalent(
         const { n: ids1n, s: ids1s } = sql1;
         const { n: ids2n, s: ids2s } = sql2;
         const namesMatch = ids1n === ids2n;
+        const symbolSubstitutes = options?.symbolSubstitutes;
         const symbol1 = getSubstitute(ids1s, symbolSubstitutes);
         const symbol2 = getSubstitute(ids2s, symbolSubstitutes);
         const symbolsMatch = symbol1 === symbol2;
@@ -1042,6 +1052,7 @@ export function isEquivalent(
         if (sql2[$$type] !== sql1[$$type]) {
           return false;
         }
+        const symbolSubstitutes = options?.symbolSubstitutes;
         const symbol1 = getSubstitute(sql1.s, symbolSubstitutes);
         const symbol2 = getSubstitute(sql2.s, symbolSubstitutes);
         return symbol1 === symbol2;

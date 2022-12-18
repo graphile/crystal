@@ -2222,7 +2222,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
         return false;
       }
 
-      const sqlIsEquivalent = (a: SQL | symbol, b: SQL | symbol) =>
+      const sqlIsEquivalent = (a: SQL, b: SQL) =>
         sql.isEquivalent(a, b, options);
 
       // Check trusted matches
