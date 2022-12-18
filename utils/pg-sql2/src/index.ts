@@ -1,5 +1,6 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
+import { check } from "prettier";
 import { inspect } from "util";
 
 function exportAs<T>(thing: T, exportName: string) {
@@ -118,6 +119,8 @@ export interface SQLQuery {
   readonly n: ReadonlyArray<SQLNode>;
   /** flags */
   readonly f: number;
+  /** checksum - for faster isEquivalent checks */
+  readonly c: number;
 }
 const FLAG_HAS_PARENS = 1 << 0;
 
@@ -253,11 +256,50 @@ function makePlaceholderNode(
   });
 }
 
+const CHARCODE_A = "A".charCodeAt(0);
+
 function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
+  let checksum = 0;
+  for (const node of nodes) {
+    switch (node[$$type]) {
+      case "RAW": {
+        const { t } = node;
+        for (let i = 0, l = t.length; i < l; i++) {
+          checksum += t.charCodeAt(i) - CHARCODE_A;
+        }
+        break;
+      }
+      case "VALUE": {
+        checksum += 211;
+        break;
+      }
+      case "IDENTIFIER": {
+        checksum -= 53;
+        break;
+      }
+      case "INDENT": {
+        checksum += node.c.c;
+        break;
+      }
+      case "SYMBOL_ALIAS": {
+        checksum += 93;
+        break;
+      }
+      case "PLACEHOLDER": {
+        checksum += 87;
+        break;
+      }
+      default: {
+        const never: never = node[$$type];
+        throw new Error(`Unrecognized node type ${never}`);
+      }
+    }
+  }
   return Object.freeze({
     [$$type]: "QUERY" as const,
     n: nodes,
     f: flags,
+    c: checksum,
   });
 }
 
@@ -958,7 +1000,7 @@ export function isEquivalent(
     return false;
   }
   if (sql1[$$type] === "QUERY") {
-    if (sql2[$$type] !== "QUERY" || sql2.f !== sql1.f) {
+    if (sql2[$$type] !== "QUERY" || sql2.f !== sql1.f || sql2.c !== sql1.c) {
       return false;
     }
     return arraysMatch(sql1.n, sql2.n, (a, b) => isEquivalent(a, b, options));
