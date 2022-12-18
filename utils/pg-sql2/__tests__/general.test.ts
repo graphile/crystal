@@ -7,7 +7,7 @@ it("sql.value(nonsense)", () => {
   const node = sql.value({ foo: { bar: 1 } } as any);
   expect(node).toEqual({
     [$$type]: "VALUE",
-    value: { foo: { bar: 1 } },
+    v: { foo: { bar: 1 } },
   });
 });
 
@@ -15,21 +15,21 @@ it("sql.value(nr)", () => {
   const node = sql.value(3);
   expect(node).toEqual({
     [$$type]: "VALUE",
-    value: 3,
+    v: 3,
   });
 });
 
 describe("sql.identifier", () => {
   it("one", () => {
     const node = sql.identifier("foo");
-    expect(node).toEqual({ [$$type]: "RAW", text: '"foo"' });
+    expect(node).toEqual({ [$$type]: "RAW", t: '"foo"' });
   });
 
   it("many", () => {
     const node = sql.identifier("foo", "bar", 'b"z');
     expect(node).toEqual({
       [$$type]: "RAW",
-      text: '"foo"."bar"."b""z"',
+      t: '"foo"."bar"."b""z"',
     });
   });
 });
@@ -37,32 +37,30 @@ describe("sql.identifier", () => {
 describe("sql.query", () => {
   it("simple", () => {
     const node = sql`select 1`;
-    expect(node).toEqual({ [$$type]: "RAW", text: "select 1" });
+    expect(node).toEqual({ [$$type]: "RAW", t: "select 1" });
     const node2 = sql`select ${sql`1`}` as SQLQuery;
-    expect(node2.nodes).toEqual([{ [$$type]: "RAW", text: "select 1" }]);
+    expect(node2.n).toEqual([{ [$$type]: "RAW", t: "select 1" }]);
   });
 
   it("with values", () => {
     const node = sql`select ${sql.value(1)}::integer` as SQLQuery;
-    expect(node.nodes).toEqual([
-      { [$$type]: "RAW", text: "select " },
-      { [$$type]: "VALUE", value: 1 },
-      { [$$type]: "RAW", text: "::integer" },
+    expect(node.n).toEqual([
+      { [$$type]: "RAW", t: "select " },
+      { [$$type]: "VALUE", v: 1 },
+      { [$$type]: "RAW", t: "::integer" },
     ]);
   });
 
   it("with sub-sub-sub query", () => {
     const node = sql`select ${sql`1 ${sql`from ${sql`foo`}`}`}` as SQLQuery;
-    expect(node.nodes).toEqual([
-      { [$$type]: "RAW", text: "select 1 from foo" },
-    ]);
+    expect(node.n).toEqual([{ [$$type]: "RAW", t: "select 1 from foo" }]);
   });
 
   it("with symbols", () => {
     const sym1 = Symbol("---flibble-de£dee---");
     const node = sql`select 1 as ${sql.identifier(sym1)}` as SQLQuery;
-    expect(node.nodes).toEqual([
-      { [$$type]: "RAW", text: "select 1 as " },
+    expect(node.n).toEqual([
+      { [$$type]: "RAW", t: "select 1 as " },
       { [$$type]: "IDENTIFIER", s: sym1, n: "flibble_de_dee" },
     ]);
   });
@@ -79,12 +77,12 @@ describe("sql.join", () => {
       ],
       ", ",
     )}` as SQLQuery;
-    expect(node.nodes).toEqual([
-      { [$$type]: "RAW", text: "select " },
-      { [$$type]: "VALUE", value: 1 },
-      { [$$type]: "RAW", text: ', "foo"."bar", baz.qux(1, 2, 3), baz.qux(' },
-      { [$$type]: "VALUE", value: 1 },
-      { [$$type]: "RAW", text: ", 2, 3)" },
+    expect(node.n).toEqual([
+      { [$$type]: "RAW", t: "select " },
+      { [$$type]: "VALUE", v: 1 },
+      { [$$type]: "RAW", t: ', "foo"."bar", baz.qux(1, 2, 3), baz.qux(' },
+      { [$$type]: "VALUE", v: 1 },
+      { [$$type]: "RAW", t: ", 2, 3)" },
     ]);
   });
 });
@@ -184,7 +182,7 @@ describe("sqli", () => {
     expect(() => {
       sql`select ${sql.join(
         [
-          { [Symbol("pg-sql2-type")]: "VALUE", value: 1 } as any,
+          { [Symbol("pg-sql2-type")]: "VALUE", v: 1 } as any,
           sql.identifier("foo", "bar"),
           sql`baz.qux(1, 2, 3)`,
           sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
