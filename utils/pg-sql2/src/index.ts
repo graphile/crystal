@@ -264,8 +264,8 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
     switch (node[$$type]) {
       case "RAW": {
         const { t } = node;
-        for (let i = 0, l = t.length; i < l; i++) {
-          checksum += t.charCodeAt(i) - CHARCODE_A;
+        for (let i = 0, l = Math.min(t.length, 10000); i < l; i++) {
+          checksum += Math.min(t.charCodeAt(i) - CHARCODE_A, 100);
         }
         break;
       }
