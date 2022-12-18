@@ -84,9 +84,7 @@ export interface SQLIndentNode {
  */
 export interface SQLSymbolAliasNode {
   readonly as: symbol;
-  readonly an: string;
   readonly bs: symbol;
-  readonly bn: string;
   readonly type: "SYMBOL_ALIAS";
   readonly [$$trusted]: true;
 }
@@ -241,9 +239,7 @@ function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
   return Object.freeze({
     type: "SYMBOL_ALIAS",
     as: a,
-    an: getSymbolName(a),
     bs: b,
-    bn: getSymbolName(b),
     [$$trusted]: true as const,
   });
 }
@@ -458,7 +454,7 @@ export function compile(
           } else {
             const identifierForSymbol = makeIdentifierForSymbol(
               item.as,
-              item.an,
+              getSymbolName(item.as),
             );
             symbolToIdentifier.set(symbol1, identifierForSymbol);
             symbolToIdentifier.set(symbol2, identifierForSymbol);
