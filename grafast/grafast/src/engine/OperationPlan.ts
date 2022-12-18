@@ -1753,10 +1753,16 @@ export class OperationPlan {
     const processed = new Set<ExecutableStep>();
 
     const processStep = (step: ExecutableStep) => {
-      if (processed.has(step) || !this.stepTracker.activeSteps.has(step)) {
+      if (processed.has(step)) {
         return step;
       }
+      // MUST come before anything else, otherwise infinite loops may occur
       processed.add(step);
+
+      if (!this.stepTracker.activeSteps.has(step)) {
+        return step;
+      }
+
       if (order === "dependents-first") {
         for (const { step: $processFirst } of step.dependents) {
           if ($processFirst.id >= fromStepId && !processed.has($processFirst)) {
