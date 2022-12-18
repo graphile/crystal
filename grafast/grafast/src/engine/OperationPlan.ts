@@ -1899,15 +1899,18 @@ export class OperationPlan {
           return [step];
         }
         if (dependencyIndex === 0) {
-          for (const d of dep.dependents) {
+          for (const {
+            dependencyIndex: dDependencyIndex,
+            step: dStep,
+          } of dep.dependents) {
             if (
-              d.dependencyIndex === dependencyIndex &&
-              d.step !== step &&
-              !allPeers.includes(d.step) &&
-              d.step.dependencies.length === dependencyCount &&
-              isMaybeAPeer(step, compatibleLayerPlans, d.step)
+              dDependencyIndex === dependencyIndex &&
+              dStep !== step &&
+              !allPeers.includes(dStep) &&
+              dStep.dependencies.length === dependencyCount &&
+              isMaybeAPeer(step, compatibleLayerPlans, dStep)
             ) {
-              allPeers.push(d.step);
+              allPeers.push(dStep);
             }
           }
         } else {
