@@ -1862,17 +1862,19 @@ export class OperationPlan {
      * - do not pass the LayerPlan of one of the dependencies
      * - do not pass a "deferred" layer plan
      */
-    const compatibleLayerPlans = new Set<LayerPlan>();
+    const compatibleLayerPlans: Array<LayerPlan> = [];
     let currentLayerPlan: LayerPlan | null = step.layerPlan;
-    const doNotPass = new Set<LayerPlan>();
+    const doNotPass: Array<LayerPlan> = [];
     for (const dep of step.dependencies) {
-      doNotPass.add(dep.layerPlan);
+      if (!doNotPass.includes(dep.layerPlan)) {
+        doNotPass.push(dep.layerPlan);
+      }
     }
 
     do {
-      compatibleLayerPlans.add(currentLayerPlan);
+      compatibleLayerPlans.push(currentLayerPlan);
 
-      if (doNotPass.has(currentLayerPlan)) {
+      if (doNotPass.includes(currentLayerPlan)) {
         break;
       }
       if (isDeferredLayerPlan(currentLayerPlan)) {
@@ -2303,7 +2305,9 @@ export class OperationPlan {
       }
     }
 
-    const allEquivalentSteps = new Set([step, ...equivalentSteps]);
+    const allEquivalentSteps = equivalentSteps.includes(step)
+      ? equivalentSteps
+      : [step, ...equivalentSteps];
 
     // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
     let minDepth = Infinity;
@@ -2336,7 +2340,7 @@ export class OperationPlan {
     }
 
     const { stepsAtMinDepth, allEquivalentSteps } = result;
-    if (allEquivalentSteps.size === 1) {
+    if (allEquivalentSteps.length === 1) {
       const [first] = allEquivalentSteps;
       if (first === step) {
         return step;
@@ -2872,13 +2876,13 @@ function makeDefaultPlan(fieldName: string) {
 }
 function isMaybeAPeer(
   step: ExecutableStep,
-  compatibleLayerPlans: Set<LayerPlan>,
+  compatibleLayerPlans: ReadonlyArray<LayerPlan>,
   potentialPeer: ExecutableStep,
 ) {
   return (
     potentialPeer.id !== step.id &&
     !potentialPeer.hasSideEffects &&
-    compatibleLayerPlans.has(potentialPeer.layerPlan) &&
+    compatibleLayerPlans.includes(potentialPeer.layerPlan) &&
     potentialPeer.constructor === step.constructor
   );
 }
