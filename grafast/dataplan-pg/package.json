@@ -1,6 +1,6 @@
 {
   "name": "@dataplan/pg",
-  "version": "0.0.0",
+  "version": "0.0.1-0.0",
   "description": "PostgreSQL data plans for Graphile Crystal",
   "type": "commonjs",
   "main": "dist/index.js",

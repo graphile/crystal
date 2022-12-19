@@ -1,6 +1,6 @@
 {
   "name": "@dataplan/json",
-  "version": "0.0.0",
+  "version": "0.0.1-0.0",
   "description": "JSON data plans for Graphile Crystal",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
