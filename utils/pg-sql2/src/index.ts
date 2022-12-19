@@ -1,6 +1,5 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
-import { check } from "prettier";
 import { inspect } from "util";
 
 function exportAs<T>(thing: T, exportName: string) {

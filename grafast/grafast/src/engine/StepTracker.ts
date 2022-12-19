@@ -5,8 +5,6 @@ import type { LayerPlan, LayerPlanReasonsWithParentStep } from "./LayerPlan";
 import type { OperationPlanPhase } from "./OperationPlan.js";
 import type { OutputPlan } from "./OutputPlan";
 
-const EMPTY_ARRAY = Object.freeze([]);
-
 /**
  * We want everything else to treat things like `dependencies` as read only,
  * however we ourselves want to be able to write to them, so we can use
@@ -15,9 +13,6 @@ const EMPTY_ARRAY = Object.freeze([]);
  * @internal
  */
 function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
-  return a as any;
-}
-function writeableSet<T>(a: ReadonlySet<T>): Set<T> {
   return a as any;
 }
 

@@ -1896,6 +1896,7 @@ export class OperationPlan {
           return [step];
         }
         if (dependencyIndex === 0) {
+          // SLOW!
           for (const {
             dependencyIndex: dDependencyIndex,
             step: dStep,
