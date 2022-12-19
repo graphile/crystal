@@ -811,14 +811,12 @@ postgraphile \
 
 ---
 
-
 ## How to use the system
 
 Congralations your PostGraphile system is up and running, lets go ahead and use it!
 
 First thing is to make sure you have populated the database with the demo data provided, the script is here:
 https://github.com/graphile/postgraphile/blob/main/examples/forum/data.sql
-
 
 ### Query All Table Records
 
@@ -837,7 +835,6 @@ query {
 	}
 }
 ```
-
 
 ## Query a Table Record By Id
 
@@ -868,7 +865,6 @@ PostGraphile smarts allow you to query Functions that can return single/scalar o
 }
 ```
 
-
 ## Mutating a Post
 
 Use your favorite GraphQL IDE (eg https://insomnia.rest/) to work out the syntax of the API. Start by typing:
@@ -878,18 +874,18 @@ mutation {
  	createPost (
 ```
 
-Press Ctrl + Space and it will give you an autocomplete suggestion of ```input:```:
+Press Ctrl + Space and it will give you an autocomplete suggestion of `input:`:
 
-![Alt text](images/1_input.jpg?raw=true "Autocomplete suggestion of input")
+![Alt text](images/1_input.jpg?raw=true 'Autocomplete suggestion of input')
 
 ```
 mutation {
  	createPost (input: {}
 ```
 
-Next autocomplete will suggest you need a ```post```:
+Next autocomplete will suggest you need a `post`:
 
-![Alt text](images/2_post.jpg?raw=true "Autocomplete suggesting post")
+![Alt text](images/2_post.jpg?raw=true 'Autocomplete suggesting post')
 
 ```
 mutation {
@@ -898,7 +894,7 @@ mutation {
 
 Then autocomplete will suggest the parameters:
 
-![Alt text](images/3_args.jpg?raw=true "Autocomplete suggesting the arguments for the parameter")
+![Alt text](images/3_args.jpg?raw=true 'Autocomplete suggesting the arguments for the parameter')
 
 ```
 mutation {
@@ -906,18 +902,16 @@ mutation {
 }
 ```
 
-
 And dont forget the return type of post id, otherwise you'll get the error message:
 
 > "Field "createPost" of type "CreatePostPayload" must have a selection of subfields.
 
-
 ```
-mutation 
+mutation
 {
   createPost (input: {post : {authorId: 1, headline: "Clickbait", body:"Unbelievable GraphQL combines multiple backends!", topic: DISCUSSION}})
   {
-    post 
+    post
     {
       id
     }
@@ -929,21 +923,19 @@ Now execute that command and it fails with:
 
 > "message": "permission denied for table post",
 
-
 ## Overcoming Security
 
 After getting a feel for writing mutations we realise we need to understand how security works before altering the database.
 
 **Getting a Json Web Token (JWT)**
- 
-Since we specified **"--default-role forum_example_anonymous"** when starting PostGraphile we're using the **forum_example_anonymous** role. In order to create and save posts we need to assume the **forum_example_person** role that's been granted access to INSERT in the ```forum_example.post``` table:
+
+Since we specified **"--default-role forum_example_anonymous"** when starting PostGraphile we're using the **forum_example_anonymous** role. In order to create and save posts we need to assume the **forum_example_person** role that's been granted access to INSERT in the `forum_example.post` table:
 
 ```
 grant INSERT, update, delete on table forum_example.post to forum_example_person;
 ```
 
- First we need to get the JWT for a user/person, here I've used *spowell0@noaa.gov*. You can refer to the forum/data.sql demo data file for other people and unencrypted passwords.
-
+First we need to get the JWT for a user/person, here I've used *spowell0@noaa.gov*. You can refer to the forum/data.sql demo data file for other people and unencrypted passwords.
 
 ```
 mutation {
@@ -963,25 +955,21 @@ Returns:
 			"jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI....."
 ```
 
-*If you get a  **function crypt(text, text) does not exist** error after trying to authenticate, set the Schema for the crypt call: forum-example.crypt in the authenticate function.*
-  
+_If you get a **function crypt(text, text) does not exist** error after trying to authenticate, set the Schema for the crypt call: forum-example.crypt in the authenticate function._
 
 **Using a Json Web Token (JWT)**
 
 In SQL we can see the JWT contains the role and the person_id:
 
-![Alt text](images/6_role.jpg?raw=true "Role is contained in the JWT")
+![Alt text](images/6_role.jpg?raw=true 'Role is contained in the JWT')
 
 Remember when PostGraphile accepts an Authorization Request Header with a valid JWT containing a role field...
 
-![Alt text](images/4_header.jpg?raw=true "Set Request Header Authorization")
+![Alt text](images/4_header.jpg?raw=true 'Set Request Header Authorization')
 
+...then the Request Bodys' GraphQL is executed as a transaction using that Postgres Roles' privilages:
 
-...then the Request Bodys' GraphQL is executed as a transaction using that Postgres Roles' privilages: 
-
-![Alt text](images/5_post.jpg?raw=true "Posting with Authorization works")
-
-
+![Alt text](images/5_post.jpg?raw=true 'Posting with Authorization works')
 
 ## Conclusion
 
