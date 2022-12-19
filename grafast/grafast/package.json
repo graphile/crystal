@@ -51,6 +51,9 @@
   "engines": {
     "node": ">=14.17"
   },
+  "dependencies": {
+    "@graphile/lru": "workspace:^"
+  },
   "peerDependencies": {
     "graphile-config": "workspace:^",
     "graphql": "*"
@@ -64,7 +67,6 @@
     "dist"
   ],
   "devDependencies": {
-    "@graphile/lru": "workspace:^",
     "@types/chai": "^4",
     "@types/jest": "^27.5.1",
     "@types/license-checker-webpack-plugin": "^0",
