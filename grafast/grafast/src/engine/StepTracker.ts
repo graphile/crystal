@@ -15,9 +15,6 @@ import type { OutputPlan } from "./OutputPlan";
 function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
   return a as any;
 }
-function writeableSet<T>(a: ReadonlySet<T>): Set<T> {
-  return a as any;
-}
 
 /**
  * This class keeps track of all of our steps, and the dependencies between
@@ -222,7 +219,7 @@ export class StepTracker {
     this.stepsWithNoDependencies.delete($dependent);
     const dependencyIndex =
       writeableArray($dependent.dependencies).push($dependency) - 1;
-    writeableSet($dependency.dependents).add({
+    writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,
     });
@@ -309,12 +306,12 @@ export class StepTracker {
     {
       // Transfer step dependents of $original to $replacement
       const dependents = $original.dependents;
-      const replacementDependents = writeableSet($replacement.dependents);
+      const replacementDependents = writeableArray($replacement.dependents);
       for (const { step: $dependent, dependencyIndex } of dependents) {
         writeableArray($dependent.dependencies)[dependencyIndex] = $replacement;
-        replacementDependents.add({ step: $dependent, dependencyIndex });
+        replacementDependents.push({ step: $dependent, dependencyIndex });
       }
-      writeableSet($original.dependents).clear();
+      ($original.dependents as any) = [];
     }
 
     {
@@ -406,7 +403,7 @@ export class StepTracker {
     const s2 = this.layerPlansByRootStep.get($step);
     const s3 = this.layerPlansByParentStep.get($step);
     return (
-      $step.dependents.size === 0 &&
+      $step.dependents.length === 0 &&
       !$step.hasSideEffects &&
       (!s1 || s1.size === 0) &&
       (!s2 || s2.size === 0) &&
@@ -440,12 +437,9 @@ export class StepTracker {
     for (const $dependency of oldDependencies) {
       // $dependency is no longer a dependent of $original, since we're getting
       // rid of $original
-      const dependents = writeableSet($dependency.dependents);
-      for (const dependent of dependents) {
-        if (dependent.step === $original) {
-          dependents.delete(dependent);
-        }
-      }
+      ($dependency.dependents as any) = $dependency.dependents.filter(
+        (dependent) => dependent.step !== $original,
+      );
 
       // If we've done our first tree-shake, let's keep it tidy in here.
       if (
@@ -461,11 +455,11 @@ export class StepTracker {
     // This should already be the case, so we just do it in dev as a
     // consistency check.
     if (isDev) {
-      if ($original.dependents.size > 0) {
+      if ($original.dependents.length > 0) {
         throw new Error(
-          `${$original} eradicated, but it is needed by ${[
-            ...$original.dependents,
-          ].map((d) => d.step)}`,
+          `${$original} eradicated, but it is needed by ${$original.dependents.map(
+            (d) => d.step,
+          )}`,
         );
       }
       const outputPlansByRoot = this.outputPlansByRootStep.get($original);

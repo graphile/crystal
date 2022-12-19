@@ -178,7 +178,10 @@ function toRecordString(val: SQLRawValue): string {
     return val ? "t" : "f";
   } else if (typeof val === "number") {
     return "" + val;
-  } else if (Array.isArray(val)) {
+  } else if (
+    // essentially Array.isArray in this context
+    typeof val === "object"
+  ) {
     const parts = val.map((v) => toListString(v));
     return `{${parts.join(",")}}`;
   } else if (/[(),"\\]/.test(val) || val.length === 0) {
@@ -214,7 +217,10 @@ function toListString(val: SQLRawValue): string {
     return val ? "t" : "f";
   } else if (typeof val === "number") {
     return "" + val;
-  } else if (Array.isArray(val)) {
+  } else if (
+    // essentially Array.isArray in this context
+    typeof val === "object"
+  ) {
     const parts = val.map((v) => toListString(v));
     return `{${parts.join(",")}}`;
   } else {

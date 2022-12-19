@@ -168,8 +168,8 @@ export class PgConditionStep<
             continue;
           }
           default: {
-            const never: never = c;
-            throw new Error(`Unsupported condition: ` + (never as any).type);
+            const never: never = c.type;
+            throw new Error(`Unsupported condition: ` + (never as any));
           }
         }
       }

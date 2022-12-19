@@ -1753,14 +1753,23 @@ export class OperationPlan {
     const processed = new Set<ExecutableStep>();
 
     const processStep = (step: ExecutableStep) => {
-      if (processed.has(step) || !this.stepTracker.activeSteps.has(step)) {
+      // MUST come before anything else, otherwise infinite loops may occur
+      processed.add(step);
+
+      if (!this.stepTracker.activeSteps.has(step)) {
         return step;
       }
-      processed.add(step);
+
       if (order === "dependents-first") {
-        for (const { step: $processFirst } of step.dependents) {
+        for (let i = 0; i < step.dependents.length; i++) {
+          const entry = step.dependents[i];
+          const { step: $processFirst } = entry;
           if ($processFirst.id >= fromStepId && !processed.has($processFirst)) {
             processStep($processFirst);
+            if (step.dependents[i] !== entry) {
+              // The world has change; go back to the start
+              i = -1;
+            }
           }
         }
       } else {
@@ -1805,8 +1814,8 @@ export class OperationPlan {
 
     for (let i = fromStepId; i < this.stepTracker.stepCount; i++) {
       const step = this.stepTracker.getStepById(i, true);
-      // Must have been tree-shaken away!
-      if (!step || step.id !== i) continue;
+      // Check it hasn't been tree-shaken away, or already processed
+      if (!step || step.id !== i || processed.has(step)) continue;
       const resultStep = processStep(step);
       if (isDev) {
         const plansAdded = this.stepTracker.stepCount - previousStepCount;
@@ -1850,17 +1859,19 @@ export class OperationPlan {
      * - do not pass the LayerPlan of one of the dependencies
      * - do not pass a "deferred" layer plan
      */
-    const compatibleLayerPlans = new Set<LayerPlan>();
+    const compatibleLayerPlans: Array<LayerPlan> = [];
     let currentLayerPlan: LayerPlan | null = step.layerPlan;
-    const doNotPass = new Set<LayerPlan>();
+    const doNotPass: Array<LayerPlan> = [];
     for (const dep of step.dependencies) {
-      doNotPass.add(dep.layerPlan);
+      if (!doNotPass.includes(dep.layerPlan)) {
+        doNotPass.push(dep.layerPlan);
+      }
     }
 
     do {
-      compatibleLayerPlans.add(currentLayerPlan);
+      compatibleLayerPlans.push(currentLayerPlan);
 
-      if (doNotPass.has(currentLayerPlan)) {
+      if (doNotPass.includes(currentLayerPlan)) {
         break;
       }
       if (isDeferredLayerPlan(currentLayerPlan)) {
@@ -1872,7 +1883,7 @@ export class OperationPlan {
     // dependents is a quick way to avoid having to scan every single step.
     const l = step.dependencies.length;
     if (l > 0) {
-      let allPeers = new Set<ExecutableStep>();
+      let allPeers: Array<ExecutableStep> = [step];
       const deps = step.dependencies;
       for (
         let dependencyIndex = 0, dependencyCount = deps.length;
@@ -1880,41 +1891,46 @@ export class OperationPlan {
         dependencyIndex++
       ) {
         const dep = deps[dependencyIndex];
-        if (dep.dependents.size === 1) {
+        if (dep.dependents.length === 1) {
           // I must be the only step!
           return [step];
         }
         if (dependencyIndex === 0) {
-          for (const d of dep.dependents) {
+          // SLOW!
+          for (const {
+            dependencyIndex: dDependencyIndex,
+            step: dStep,
+          } of dep.dependents) {
             if (
-              d.dependencyIndex === dependencyIndex &&
-              d.step !== step &&
-              !allPeers.has(d.step) &&
-              d.step.dependencies.length === dependencyCount &&
-              isMaybeAPeer(step, compatibleLayerPlans, d.step)
+              dDependencyIndex === dependencyIndex &&
+              dStep !== step &&
+              !allPeers.includes(dStep) &&
+              dStep.dependencies.length === dependencyCount &&
+              isMaybeAPeer(step, compatibleLayerPlans, dStep)
             ) {
-              allPeers.add(d.step);
+              allPeers.push(dStep);
             }
           }
         } else {
-          const stillPeers = new Set<ExecutableStep>();
+          const stillPeers: Array<ExecutableStep> = [step];
           for (const d of dep.dependents) {
             if (
               d.dependencyIndex === dependencyIndex &&
               d.step !== step &&
-              allPeers.has(d.step)
+              allPeers.includes(d.step) &&
+              !stillPeers.includes(d.step)
             ) {
-              stillPeers.add(d.step);
+              stillPeers.push(d.step);
             }
           }
           allPeers = stillPeers;
-          if (allPeers.size === 0) {
+          if (allPeers.length === 0) {
             // Shortcut
             return [step];
           }
         }
       }
-      return [step, ...allPeers];
+      return allPeers;
     } else {
       const result = [step];
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
@@ -2290,7 +2306,9 @@ export class OperationPlan {
       }
     }
 
-    const allEquivalentSteps = new Set([step, ...equivalentSteps]);
+    const allEquivalentSteps = equivalentSteps.includes(step)
+      ? equivalentSteps
+      : [step, ...equivalentSteps];
 
     // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
     let minDepth = Infinity;
@@ -2323,7 +2341,7 @@ export class OperationPlan {
     }
 
     const { stepsAtMinDepth, allEquivalentSteps } = result;
-    if (allEquivalentSteps.size === 1) {
+    if (allEquivalentSteps.length === 1) {
       const [first] = allEquivalentSteps;
       if (first === step) {
         return step;
@@ -2859,13 +2877,13 @@ function makeDefaultPlan(fieldName: string) {
 }
 function isMaybeAPeer(
   step: ExecutableStep,
-  compatibleLayerPlans: Set<LayerPlan>,
+  compatibleLayerPlans: ReadonlyArray<LayerPlan>,
   potentialPeer: ExecutableStep,
 ) {
   return (
     potentialPeer.id !== step.id &&
     !potentialPeer.hasSideEffects &&
-    compatibleLayerPlans.has(potentialPeer.layerPlan) &&
+    compatibleLayerPlans.includes(potentialPeer.layerPlan) &&
     potentialPeer.constructor === step.constructor
   );
 }

@@ -1005,7 +1005,7 @@ export class PgSelectStep<
           break;
         }
         default: {
-          const never: never = condition;
+          const never: never = condition.type;
           console.error("Unsupported condition: ", never);
           throw new Error(`Unsupported condition`);
         }
@@ -1154,14 +1154,13 @@ export class PgSelectStep<
       let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
 
       if (i < orderCount - 1) {
-        fragment = sql`(${fragment})
-or (
+        fragment = sql`(${fragment}) or (
 ${sql.indent`${orderFragment} = ${sqlValue}
-and ${condition(i + 1)}`}
+and ${sql.indent(sql.parens(condition(i + 1)))}`}
 )`;
       }
 
-      return sql.parens(sql.indent(fragment));
+      return fragment;
     };
 
     /*
@@ -1497,9 +1496,9 @@ and ${condition(i + 1)}`}
 
   private buildJoin() {
     const joins: SQL[] = this.joins.map((j) => {
-      const conditions =
+      const conditions: SQL =
         j.type === "cross"
-          ? []
+          ? sql.blank
           : j.conditions.length === 0
           ? sql.true
           : j.conditions.length === 1
@@ -2223,7 +2222,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
         return false;
       }
 
-      const sqlIsEquivalent = (a: SQL | symbol, b: SQL | symbol) =>
+      const sqlIsEquivalent = (a: SQL, b: SQL) =>
         sql.isEquivalent(a, b, options);
 
       // Check trusted matches
