@@ -8,9 +8,9 @@ sponsor](https://graphile.org/sponsor/).
 
 - Surge
 - Netflix
+- Qwick
 - The Guild
 - Chad Furman
-- Qwick
 - Fanatics
 - Dovetail
 - Enzuzo
@@ -36,6 +36,7 @@ sponsor](https://graphile.org/sponsor/).
 - Nathanael Beisiegel
 - latch.bio
 - nullachtvierzehn
+- Ayog Healthcare
 
 ## Supporters
 
@@ -61,7 +62,6 @@ sponsor](https://graphile.org/sponsor/).
 - Stéphane Klein
 - Alvin Ali Khaled
 - Splitgraph
-- OnThisSpot
 - Zymego
 - ARK
 - Sen Palanisami
