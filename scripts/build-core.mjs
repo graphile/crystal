@@ -83,6 +83,7 @@ export async function transformPackageJson(sourceFilePath, targetFilePath) {
 }
 
 export async function encryptSourceFile(codePath) {
+  const pkg = require(codePath);
   const code = await fsp.readFile(codePath, "utf8");
   // I_SPONSOR_GRAPHILE=and_acknowledge_prerelease_caveats
   const password = "and_acknowledge_prerelease_caveats";
@@ -145,6 +146,20 @@ try {
   );
   process.exit(42);
 }
+
+// Convince Node to allow ESM named imports
+${Object.keys(pkg)
+  .map(
+    (varName) =>
+      `${
+        varName.match(/^[_a-zA-Z$][_a-zA-Z$0-9]*$/)
+          ? `exports.${varName}`
+          : `exports[${JSON.stringify(varName)}]`
+      } = null /* placeholder */;`,
+  )
+  .join("\n")}
+
+// Load our decrypted module
 eval(decrypted);
 `,
   );
