@@ -17,7 +17,7 @@ await $`cp README.npm.md release/README.md`;
 
 await writePrereleaseLicense(__dirname + "/../release/LICENSE.md");
 await transformPackageJson(
-  __dirname + "../package.json",
+  __dirname + "/../package.json",
   __dirname + "/../release/package.json",
 );
 await encryptSourceFile(__dirname + "/../release/dist/index.js");
