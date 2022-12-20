@@ -25,6 +25,7 @@
     "pg-sql2": "5.0.0-0.0"
   },
   "changesets": [
+    "shiny-teachers-double",
     "thick-taxis-sip"
   ]
 }
