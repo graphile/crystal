@@ -1,5 +1,14 @@
 # @dataplan/pg
 
+## 0.0.1-0.1
+
+### Patch Changes
+
+- [`55f15cf35`](undefined) - Tweaked build script
+
+- Updated dependencies [[`55f15cf35`](undefined)]:
+  - grafast@0.0.1-0.1
+
 ## 0.0.1-0.0
 
 ### Patch Changes

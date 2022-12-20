@@ -1,5 +1,11 @@
 # grafast
 
+## 0.0.1-0.1
+
+### Patch Changes
+
+- [`55f15cf35`](undefined) - Tweaked build script
+
 ## 0.0.1-0.0
 
 ### Patch Changes

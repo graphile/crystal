@@ -1,5 +1,12 @@
 # graphile-export
 
+## 0.0.2-0.1
+
+### Patch Changes
+
+- Updated dependencies [[`55f15cf35`](undefined)]:
+  - grafast@0.0.1-0.1
+
 ## 0.0.2-0.0
 
 ### Patch Changes
