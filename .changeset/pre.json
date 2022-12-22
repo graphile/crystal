@@ -25,6 +25,8 @@
     "pg-sql2": "5.0.0-0.0"
   },
   "changesets": [
+    "fast-zoos-float",
+    "fuzzy-mangos-compete",
     "shiny-teachers-double",
     "thick-taxis-sip"
   ]
