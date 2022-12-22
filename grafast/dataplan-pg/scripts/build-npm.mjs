@@ -12,7 +12,8 @@ cd(__dirname + "/..");
 await $`rm -Rf tsconfig.tsbuildinfo dist release`;
 await $`tsc -b`;
 await $`webpack --mode=production`;
-await $`cp dist/*.d.ts release/dist/`;
+await $`find dist -type d -exec mkdir -p release/{} \\;`;
+await $`find dist -type f -name '*.d.ts' -exec cp {} release/{} \\;`;
 await $`cp README.npm.md release/README.md`;
 
 await writePrereleaseLicense(__dirname + "/../release/LICENSE.md");
