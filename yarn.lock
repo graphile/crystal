@@ -4084,23 +4084,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphiql/plugin-explorer@npm:^0.1.5":
-  version: 0.1.5
-  resolution: "@graphiql/plugin-explorer@npm:0.1.5"
+"@graphiql/plugin-explorer@npm:^0.1.12":
+  version: 0.1.12
+  resolution: "@graphiql/plugin-explorer@npm:0.1.12"
   dependencies:
-    "@graphiql/react": "npm:^0.13.2"
+    "@graphiql/react": "npm:^0.15.0"
     graphiql-explorer: "npm:^0.9.0"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: b60f2ff1b0f7029d1f2389fa1302f159c80ef2f88361557489b461b8bdcda463e667ef869c547ed55b1ac6584dea7bf23fb45492b3b1d7fd7a4a1a7a16e40fdc
+  checksum: 0d22ad45de4aeec65d49caa70421b84ee7fc413b2d115cedaa6314ae025b77821a5c42b587cd271d91b6f6476ae4bf69b1651e67aa1efb9463dd7e718aa078a0
   languageName: node
   linkType: hard
 
-"@graphiql/react@npm:^0.13.2":
-  version: 0.13.2
-  resolution: "@graphiql/react@npm:0.13.2"
+"@graphiql/react@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "@graphiql/react@npm:0.15.0"
   dependencies:
     "@graphiql/toolkit": "npm:^0.8.0"
     "@reach/combobox": "npm:^0.17.0"
@@ -4110,7 +4110,7 @@ __metadata:
     "@reach/tooltip": "npm:^0.17.0"
     "@reach/visually-hidden": "npm:^0.17.0"
     codemirror: "npm:^5.65.3"
-    codemirror-graphql: "npm:^2.0.0"
+    codemirror-graphql: "npm:^2.0.2"
     copy-to-clipboard: "npm:^3.2.0"
     graphql-language-service: "npm:^5.1.0"
     markdown-it: "npm:^12.2.0"
@@ -4119,7 +4119,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 9a7588b36be58db8ea189092cc5ec29eede6ecdda2523f07c03d5fb0685bdbd784f3d19e1f20b422304a42efdf51dca209d7396167cf4f21c1407c17be5e69cc
+  checksum: e5e2030bf603f7f85f048f03776d139e4f79bee61f2226f9d6a5885865c53501042afa65350e0483dedbb65c8321e18d672b94ca2088a80517f3886f125c6ef9
   languageName: node
   linkType: hard
 
@@ -8477,20 +8477,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codemirror-graphql@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "codemirror-graphql@npm:2.0.0"
+"codemirror-graphql@npm:^2.0.0, codemirror-graphql@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "codemirror-graphql@npm:2.0.2"
   dependencies:
-    graphql-language-service: "npm:^5.1.0"
+    graphql-language-service: "npm:5.0.6"
   peerDependencies:
-    "@codemirror/language": ^0.20.0
+    "@codemirror/language": 6.0.0
     codemirror: ^5.65.3
     graphql: ^15.5.0 || ^16.0.0
-  checksum: 73ea04d622a29a8f2258290003fd92f431f7727147d926871524d6dbca3506380144c190aa90a0c453a713e5ecdad391d98c9f13dbaaf7600263e23d240d480f
+  checksum: 96e6e5771cb2119ccda04724cb5c7933c39c462cdc1fb3b6692a8d277b198c2705af070d4d2a191dd1800d55fa132a5b63158991be049be8b32f94b993cf4c53
   languageName: node
   linkType: hard
 
-"codemirror@npm:^5.0.0, codemirror@npm:^5.65.3, codemirror@npm:^5.65.8":
+"codemirror@npm:^5.0.0":
+  version: 5.65.11
+  resolution: "codemirror@npm:5.65.11"
+  checksum: 9817d26f5308622cf17ab1038e209720586432aa09d1c1a3c7649f34c1b2c2a4a2a9dc371d993ba19771dfa32ff894e730139292f82eaf223a29f9ae1298253c
+  languageName: node
+  linkType: hard
+
+"codemirror@npm:^5.65.3, codemirror@npm:^5.65.8":
   version: 5.65.9
   resolution: "codemirror@npm:5.65.9"
   checksum: 3c6f7b54eacb2574e997e802e8a7dc65cdd29fdc02442be0b779fc1c73bea2afd64da49b586660b17e4d7c5f13461b814d9136230b027e1a226bf03c818d4f9f
@@ -12920,11 +12927,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphiql@npm:^2.0.8":
-  version: 2.0.8
-  resolution: "graphiql@npm:2.0.8"
+"graphiql@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "graphiql@npm:2.2.0"
   dependencies:
-    "@graphiql/react": "npm:^0.13.2"
+    "@graphiql/react": "npm:^0.15.0"
     "@graphiql/toolkit": "npm:^0.8.0"
     entities: "npm:^2.0.0"
     graphql-language-service: "npm:^5.1.0"
@@ -12933,7 +12940,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 27843b1afbdadc961c992ca083936054c3c2dc5b7b8b9e24fdf31fc13e22d56f04f89efe41bd5e051e8dae74c7c9cdd985368bfb6f5d0530df28d423f240523e
+  checksum: f792ac1ccb0dd78344cf14186c9b14235833d4e3abe7c5f69f77ebdcb1bb76e1cdd18cb6c73cc13d5f3c48155452cd6ffbe913988fb0b9e1b087d4d15e819300
   languageName: node
   linkType: hard
 
@@ -12973,6 +12980,20 @@ __metadata:
   peerDependencies:
     graphql: ^15.3.0 || ^16.0.0
   checksum: 1157fb2b2d1b9b29740930d87dfbbd09859152b306dd5c2cf76f7094be2f6a50418f280ca5a59d9f70be339fd59de7c5866ab0f533a673484a49fac6f4bb214c
+  languageName: node
+  linkType: hard
+
+"graphql-language-service@npm:5.0.6":
+  version: 5.0.6
+  resolution: "graphql-language-service@npm:5.0.6"
+  dependencies:
+    nullthrows: "npm:^1.0.0"
+    vscode-languageserver-types: "npm:^3.15.1"
+  peerDependencies:
+    graphql: ^15.5.0 || ^16.0.0
+  bin:
+    graphql: dist/temp-bin.js
+  checksum: 48701709a876e053412cc7cb463545b82c549579244bbd07e51d0780fa0f93e03429d0c47941c4bfa4e8069fc3d87340af6e680f10911c07c0542edc0b5d4ab6
   languageName: node
   linkType: hard
 
@@ -19335,8 +19356,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ruru@workspace:grafast/ruru"
   dependencies:
-    "@graphiql/plugin-explorer": "npm:^0.1.5"
-    "@graphiql/react": "npm:^0.13.2"
+    "@graphiql/plugin-explorer": "npm:^0.1.12"
+    "@graphiql/react": "npm:^0.15.0"
     "@graphiql/toolkit": "npm:^0.8.0"
     "@types/codemirror": "npm:^5.60.5"
     "@types/debug": "npm:^4.1.7"
@@ -19350,7 +19371,7 @@ __metadata:
     css-loader: "npm:^6.7.1"
     file-loader: "npm:^6.2.0"
     graphile-config: "workspace:^"
-    graphiql: "npm:^2.0.8"
+    graphiql: "npm:^2.2.0"
     graphiql-explorer: "npm:^0.9.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     http-proxy: "npm:^1.18.1"
@@ -21930,7 +21951,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vscode-languageserver-types@npm:^3.17.1":
+"vscode-languageserver-types@npm:^3.15.1, vscode-languageserver-types@npm:^3.17.1":
   version: 3.17.2
   resolution: "vscode-languageserver-types@npm:3.17.2"
   checksum: 55a56752ebed5e40444633718436d26a5b603bd0f8af58e61d3698c69e56f2016001edc3d8ed9999a64ba5cf901db7ebfe678bf667d487e82e12d6c7551901c4
