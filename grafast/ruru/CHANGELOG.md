@@ -1,5 +1,11 @@
 # ruru
 
+## 2.0.0-0.1
+
+### Patch Changes
+
+- [`6576bd37b`](undefined) - Fix text colours in dark mode
+
 ## 2.0.0-0.0
 
 ### Major Changes

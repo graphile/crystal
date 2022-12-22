@@ -1,5 +1,13 @@
 # grafserv
 
+## 0.0.1-0.2
+
+### Patch Changes
+
+- Updated dependencies [[`6576bd37b`](undefined), [`25037fc15`](undefined)]:
+  - ruru@2.0.0-0.1
+  - grafast@0.0.1-0.2
+
 ## 0.0.1-0.1
 
 ### Patch Changes

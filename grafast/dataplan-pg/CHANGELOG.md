@@ -1,5 +1,14 @@
 # @dataplan/pg
 
+## 0.0.1-0.2
+
+### Patch Changes
+
+- [`25037fc15`](undefined) - Fix distribution of TypeScript types
+
+- Updated dependencies [[`25037fc15`](undefined)]:
+  - grafast@0.0.1-0.2
+
 ## 0.0.1-0.1
 
 ### Patch Changes
