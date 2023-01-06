@@ -15,6 +15,8 @@ type TimestampTZ = string;
  * DATABASE command. Consult [managing-databases] for details about the meaning of some of the parameters.
  */
 export interface PgDatabase {
+  /* COMMON FIELDS */
+
   /** Row identifier */
   _id: PgOid;
 
@@ -26,12 +28,6 @@ export interface PgDatabase {
 
   /** Character encoding for this database (pg_encoding_to_char() can translate this number to the encoding name) */
   encoding: number | null;
-
-  /** LC_COLLATE for this database */
-  datcollate: PgName | null;
-
-  /** LC_CTYPE for this database */
-  datctype: PgName | null;
 
   /**
    * If true, then this database can be cloned by any user with CREATEDB privileges; if false, then only superusers or
@@ -47,9 +43,6 @@ export interface PgDatabase {
 
   /** Sets maximum number of concurrent connections that can be made to this database. -1 means no limit. */
   datconnlimit: number | null;
-
-  /** Last system OID in the database; useful particularly to pg_dump */
-  datlastsysoid: PgOid | null;
 
   /**
    * All transaction IDs before this one have been replaced with a permanent (frozen) transaction ID in this database.
@@ -73,6 +66,51 @@ export interface PgDatabase {
 
   /** Access privileges; see [ddl-priv] for details */
   datacl: ReadonlyArray<PgAclItem> | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * Locale provider for this database: c = libc, i = icu
+   *
+   * @remarks Only in 15.x
+   */
+  datlocprovider?: string | null | undefined;
+
+  /**
+   * LC_COLLATE for this database
+   *
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x, 10.x
+   */
+  datcollate?: string | null | undefined;
+
+  /**
+   * LC_CTYPE for this database
+   *
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x, 10.x
+   */
+  datctype?: string | null | undefined;
+
+  /**
+   * ICU locale ID for this database
+   *
+   * @remarks Only in 15.x
+   */
+  daticulocale?: string | null | undefined;
+
+  /**
+   * Provider-specific version of the collation. This is recorded when the database is created and then checked when it
+   * is used, to detect changes in the collation definition that could lead to data corruption.
+   *
+   * @remarks Only in 15.x
+   */
+  datcollversion?: string | null | undefined;
+
+  /**
+   * Last system OID in the database; useful particularly to pg_dump
+   *
+   * @remarks Only in 14.x, 13.x, 12.x, 11.x, 10.x
+   */
+  datlastsysoid?: PgOid | null | undefined;
 }
 
 /**
@@ -175,11 +213,7 @@ export interface PgClass {
    */
   relisshared: boolean | null;
 
-  /**
-   * - p = permanent table,
-   * - u = unlogged table,
-   * - t = temporary table
-   */
+  /** p = permanent table/sequence, u = unlogged table/sequence, t = temporary table/sequence */
   relpersistence: string | null;
 
   /**
@@ -211,7 +245,7 @@ export interface PgClass {
   /** True if table has (or once had) triggers; see pg_trigger catalog */
   relhastriggers: boolean | null;
 
-  /** True if table or index has (or once had) any inheritance children */
+  /** True if table or index has (or once had) any inheritance children or partitions */
   relhassubclass: boolean | null;
 
   /** True if table has row-level security enabled; see pg_policy catalog */
@@ -266,7 +300,7 @@ export interface PgClass {
    * original relation; otherwise zero. That state is only visible internally; this field should never contain anything
    * other than zero for a user-visible relation.
    *
-   * @remarks Only in 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x
    */
   relrewrite?: PgOid | null | undefined;
 
@@ -404,7 +438,7 @@ export interface PgAttribute {
    * (see [guc-default-toast-compression]). Otherwise, 'p' selects pglz compression, while 'l' selects LZ4 compression.
    * However, this field is ignored whenever attstorage does not allow compression.
    *
-   * @remarks Only in 14.x
+   * @remarks Only in 15.x, 14.x
    */
   attcompression?: string | null | undefined;
 
@@ -413,7 +447,7 @@ export interface PgAttribute {
    * added with a non-volatile DEFAULT value after the row is created. The actual value used is stored in the
    * attmissingval column.
    *
-   * @remarks Only in 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x
    */
   atthasmissing?: boolean | null | undefined;
 
@@ -421,7 +455,7 @@ export interface PgAttribute {
    * If a zero byte (''), then not a generated column. Otherwise, s = stored. (Other values might be added in the
    * future.)
    *
-   * @remarks Only in 14.x, 13.x, 12.x
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x
    */
   attgenerated?: string | null | undefined;
 }
@@ -549,9 +583,17 @@ export interface PgConstraint {
   /**
    * The corresponding constraint of the parent partitioned table, if this is a constraint on a partition; else zero
    *
-   * @remarks Only in 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x
    */
   conparentid?: PgOid | null | undefined;
+
+  /**
+   * If a foreign key with a SET NULL or SET DEFAULT delete action, the columns that will be updated. If null, all of the
+   * referencing columns will be updated.
+   *
+   * @remarks Only in 15.x
+   */
+  confdelsetcols?: ReadonlyArray<number> | null | undefined;
 
   /**
    * If a check constraint, a human-readable representation of the expression
@@ -698,14 +740,14 @@ export interface PgProc {
   /**
    * Planner support function for this function (see [xfunc-optimization]), or zero if none
    *
-   * @remarks Only in 14.x, 13.x, 12.x
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x
    */
   prosupport?: PgOid | null | undefined;
 
   /**
    * f for a normal function, p for a procedure, a for an aggregate function, or w for a window function
    *
-   * @remarks Only in 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x
    */
   prokind?: string | null | undefined;
 
@@ -713,7 +755,7 @@ export interface PgProc {
    * Pre-parsed SQL function body. This is used for SQL-language functions when the body is given in SQL-standard
    * notation rather than as a string literal. It's null in other cases.
    *
-   * @remarks Only in 14.x
+   * @remarks Only in 15.x, 14.x
    */
   prosqlbody?: string | null | undefined;
 
@@ -986,7 +1028,7 @@ export interface PgType {
    * types have typsubscript = array_subscript_handler, but other types may have other handler functions to implement
    * specialized subscripting behavior.
    *
-   * @remarks Only in 14.x
+   * @remarks Only in 15.x, 14.x
    */
   typsubscript?: PgOid | null | undefined;
 }
@@ -1099,8 +1141,8 @@ export interface PgIndex {
   indisreplident: boolean | null;
 
   /**
-   * This is an array of indnatts values that indicate which table columns this index indexes. For example a value of 1 3
-   * would mean that the first and the third table columns make up the index entries. Key columns come before non-key
+   * This is an array of indnatts values that indicate which table columns this index indexes. For example, a value of 1
+   * 3 would mean that the first and the third table columns make up the index entries. Key columns come before non-key
    * (included) columns. A zero in this array indicates that the corresponding index attribute is an expression over the
    * table columns, rather than a simple column reference.
    */
@@ -1139,9 +1181,18 @@ export interface PgIndex {
    * The number of key columns in the index, not counting any included columns, which are merely stored and do not
    * participate in the index semantics
    *
-   * @remarks Only in 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x
    */
   indnkeyatts?: number | null | undefined;
+
+  /**
+   * This value is only used for unique indexes. If false, this unique index will consider null values distinct (so the
+   * index can contain multiple null values in a column, the default PostgreSQL behavior). If it is true, it will
+   * consider null values to be equal (so the index can only contain one null value in a column).
+   *
+   * @remarks Only in 15.x
+   */
+  indnullsnotdistinct?: boolean | null | undefined;
 }
 
 /**
@@ -1169,7 +1220,7 @@ export interface PgInherits {
   /**
    * true for a partition that is in the process of being detached; false otherwise.
    *
-   * @remarks Only in 14.x
+   * @remarks Only in 15.x, 14.x
    */
   inhdetachpending?: boolean | null | undefined;
 }
@@ -1250,7 +1301,7 @@ export interface PgRange {
   /**
    * OID of the multirange type for this range type
    *
-   * @remarks Only in 14.x
+   * @remarks Only in 15.x, 14.x
    */
   rngmultitypid?: PgOid | null | undefined;
 }
@@ -1260,10 +1311,10 @@ export interface PgRange {
  * commands to find which other objects must be dropped by DROP CASCADE or prevent dropping in the DROP RESTRICT case.
  */
 export interface PgDepend {
-  /** The OID of the system catalog the dependent object is in, or zero for a DEPENDENCY_PIN entry */
+  /** The OID of the system catalog the dependent object is in */
   classid: PgOid;
 
-  /** The OID of the specific dependent object, or zero for a DEPENDENCY_PIN entry */
+  /** The OID of the specific dependent object */
   objid: PgOid;
 
   /**
