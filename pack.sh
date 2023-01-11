@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -e -x
 
 rm -rf builds/
@@ -140,4 +141,5 @@ yarn pack -o package.tgz
 mv package.tgz ../../builds/postgraphile.tgz
 cd -
 
-echo 'All packages packed into `builds/`'
+echo "All packages packed into 'builds/'"
+echo "Now publish them with './publish.sh'"
