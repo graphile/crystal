@@ -1,5 +1,12 @@
 # graphile-build-pg
 
+## 5.0.0-0.6
+
+### Patch Changes
+
+- Updated dependencies [[`9ebe3d860`](undefined)]:
+  - @dataplan/pg@0.0.1-0.5
+
 ## 5.0.0-0.5
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @dataplan/pg
 
+## 0.0.1-0.5
+
+### Patch Changes
+
+- [`9ebe3d860`](undefined) - Fix issue with webpack bundling adaptor
+
 ## 0.0.1-0.4
 
 ### Patch Changes
