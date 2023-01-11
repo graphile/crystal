@@ -121,7 +121,7 @@ export const RuruInner: FC<{
         }}
       >
         <GraphiQLInterface
-          editorTheme={editorTheme ?? "dracula"}
+          editorTheme={editorTheme ?? "graphiql"}
           onEditQuery={onEditQuery}
         >
           <GraphiQL.Logo>

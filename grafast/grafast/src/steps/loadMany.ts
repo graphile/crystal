@@ -5,6 +5,7 @@ import type {
   GrafastValuesList,
   PromiseOrDirect,
 } from "../interfaces.js";
+import type { ListCapableStep } from "../step.js";
 import { ExecutableStep } from "../step.js";
 import { canonicalJSONStringify } from "../utils.js";
 import { access } from "./access.js";
@@ -96,11 +97,10 @@ interface LoadManyMeta {
   cache?: Map<any, readonly any[]>;
 }
 
-export class LoadManyStep<
-  TSpec,
-  TData,
-  TParams extends Record<string, any>,
-> extends ExecutableStep {
+export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
+  extends ExecutableStep
+  implements ListCapableStep<TData, LoadManySingleRecordStep<TData>>
+{
   static $$export = { moduleName: "grafast", exportName: "LoadManyStep" };
 
   loadOptions: LoadManyOptions<TData, TParams> | null = null;
@@ -118,8 +118,8 @@ export class LoadManyStep<
   toStringMeta() {
     return this.load.displayName || this.load.name;
   }
-  listItem($item: __ItemStep<TData>) {
-    return new LoadManySingleRecordStep($item, this.toStringMeta());
+  listItem($item: __ItemStep<this>) {
+    return new LoadManySingleRecordStep<TData>($item, this.toStringMeta());
   }
   setParam<TParamKey extends keyof TParams>(
     paramKey: TParamKey,
