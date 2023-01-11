@@ -53,7 +53,7 @@
     "node": ">=16"
   },
   "peerDependencies": {
-    "grafast": "0.0.1-0.3",
+    "grafast": "*",
     "graphql": "*",
     "pg-sql2": "workspace:^5.0.0-0.0"
   },
