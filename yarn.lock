@@ -12887,9 +12887,9 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
-    grafast: "workspace:*"
+    grafast: "workspace:^|0.x"
     graphql: "*"
-    pg-sql2: "workspace:*"
+    pg-sql2: "workspace:^|5.x"
   languageName: unknown
   linkType: soft
 
