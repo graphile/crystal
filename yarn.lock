@@ -3366,7 +3366,6 @@ __metadata:
   resolution: "@dataplan/pg@workspace:grafast/dataplan-pg"
   dependencies:
     "@dataplan/json": "workspace:^"
-    "@dataplan/pg": "workspace:^"
     "@graphile/lru": "workspace:^"
     "@mermaid-js/mermaid-cli": "npm:^8.14.0"
     "@types/jest": "npm:^27.5.1"

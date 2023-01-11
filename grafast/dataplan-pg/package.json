@@ -50,6 +50,7 @@
   },
   "homepage": "https://grafast.org/grafast/step-library/dataplan-pg/",
   "dependencies": {
+    "@dataplan/json": "workspace:^",
     "@graphile/lru": "workspace:^",
     "@types/node": "^16.11.15",
     "chalk": "^4.1.2",
@@ -76,8 +77,6 @@
     "dist"
   ],
   "devDependencies": {
-    "@dataplan/json": "workspace:^",
-    "@dataplan/pg": "workspace:^",
     "@mermaid-js/mermaid-cli": "^8.14.0",
     "@types/jest": "^27.5.1",
     "@types/json5": "^2.2.0",
