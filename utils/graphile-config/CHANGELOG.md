@@ -1,5 +1,11 @@
 # graphile-config
 
+## 0.0.1-0.1
+
+### Patch Changes
+
+- [`d11c1911c`](undefined) - Fix dependencies
+
 ## 0.0.1-0.0
 
 ### Patch Changes

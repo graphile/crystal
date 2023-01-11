@@ -1,6 +1,6 @@
 {
   "name": "graphile-export",
-  "version": "0.0.2-0.2",
+  "version": "0.0.2-0.3",
   "description": "Export in-memory generated GraphQL schemas to JS files when built with our helpers.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -53,7 +53,7 @@
     "node": ">=16"
   },
   "peerDependencies": {
-    "grafast": "*",
+    "grafast": "0.0.1-0.3",
     "graphql": "*",
     "pg-sql2": "workspace:^5.0.0-0.0"
   },
