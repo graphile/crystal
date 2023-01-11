@@ -106,4 +106,4 @@ create event trigger postgraphile_watch_ddl
 create event trigger postgraphile_watch_drop
   on sql_drop
   execute procedure postgraphile_watch.notify_watchers_drop();
-`;
+` as string; /* otherwise the .d.ts includes this full string! */
