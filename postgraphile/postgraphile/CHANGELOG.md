@@ -1,5 +1,11 @@
 # postgraphile
 
+## 5.0.0-0.7
+
+### Patch Changes
+
+- [`d7b87b325`](undefined) - Fix importing presets
+
 ## 5.0.0-0.6
 
 ### Patch Changes
