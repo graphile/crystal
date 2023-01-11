@@ -3,3 +3,4 @@ examples
 yarn.lock
 .npmignore
 dist/examples
+CHANGELOG.md

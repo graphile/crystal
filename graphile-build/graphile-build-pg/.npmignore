@@ -2,3 +2,5 @@ __tests__
 examples
 yarn.lock
 .npmignore
+dist/examples
+CHANGELOG.md
