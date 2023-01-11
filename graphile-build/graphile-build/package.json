@@ -36,7 +36,6 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@graphile/lru": "workspace:^",
     "@types/node": "^16.11.15",
     "@types/pluralize": "^0.0.29",
     "@types/semver": "^7.3.9",
@@ -45,6 +44,7 @@
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
     "graphile-export": "workspace:^",
+    "lodash": "^4.17.21",
     "pluralize": "^7.0.0",
     "semver": "^7.3.5",
     "tslib": "^2.4.0"

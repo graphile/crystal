@@ -2,6 +2,7 @@ import { $$idempotent } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLObjectType, Kind } from "graphql";
+// TODO: remove 'lodash' dependency
 import camelCaseAll from "lodash/camelCase.js";
 import upperFirstAll from "lodash/upperFirst.js";
 import plz from "pluralize";

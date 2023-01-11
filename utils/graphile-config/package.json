@@ -45,7 +45,8 @@
     "debug": "^4.3.3",
     "interpret": "^2.2.0",
     "semver": "^7.3.5",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.0",
+    "yargs": "^17.4.1"
   },
   "engines": {
     "node": ">=16"

@@ -11,7 +11,6 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../../utils/lru" },
     { "path": "../../grafast/grafast" },
     { "path": "../../utils/graphile-export" },
     { "path": "../../utils/graphile-config" }

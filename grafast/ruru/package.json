@@ -50,7 +50,7 @@
     "@types/yargs": "^17.0.10",
     "graphile-config": "workspace:^",
     "graphiql": "^2.2.0",
-    "graphiql-explorer": "^0.9.0",
+    "mermaid": "^8.14.0",
     "react": ">=16 <19",
     "react-dom": ">=16 <19",
     "tslib": "^2.4.0",
