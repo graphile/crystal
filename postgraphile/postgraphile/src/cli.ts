@@ -68,14 +68,23 @@ export function options(yargs: Argv) {
     });
 }
 
-function isGraphileConfigPreset(foo: unknown): foo is GraphileConfig.Preset {
+function isGraphileConfigPreset(
+  foo: unknown,
+  d = 0,
+): foo is GraphileConfig.Preset {
   if (typeof foo !== "object") return false;
   if (foo === null) return false;
   const prototype = Object.getPrototypeOf(foo);
-  if (prototype === null || prototype === Object.prototype) {
-    return true;
+  if (prototype !== null && prototype !== Object.prototype) {
+    return false;
   }
-  return false;
+  if (
+    (foo as any).default &&
+    (d > 0 || isGraphileConfigPreset((foo as any).default, d + 1))
+  ) {
+    return false;
+  }
+  return true;
 }
 
 async function loadPresets(
@@ -84,16 +93,32 @@ async function loadPresets(
   const specs = presetSpecs.split(",");
   const presets: GraphileConfig.Preset[] = [];
   for (const spec of specs) {
-    const [moduleName, exportName = "default"] = spec.split(":");
-    const mod = await import(moduleName);
-    const possiblePreset = mod[exportName];
+    const [moduleName, exportName = null] = spec.split(":");
+    let mod;
+    try {
+      mod = require(moduleName);
+    } catch (e) {
+      if (e.code === "ERR_REQUIRE_ESM") {
+        mod = await import(moduleName);
+      } else {
+        throw e;
+      }
+    }
+    const possiblePreset =
+      exportName !== null
+        ? mod[exportName]
+        : isGraphileConfigPreset(mod)
+        ? mod
+        : mod.default;
     if (isGraphileConfigPreset(possiblePreset)) {
       presets.push(possiblePreset);
     } else {
       throw new Error(
-        `Imported '${spec}' but the '${exportName}' export doesn't look like a preset: ${inspect(
-          spec,
-        )}`,
+        `Imported '${spec}' but ${
+          exportName ? `the '${exportName}' export` : `it`
+        } doesn't look like a preset: ${inspect(
+          possiblePreset,
+        )} - other exports: ${Object.keys(mod).join(", ")}`,
       );
     }
   }
