@@ -1,7 +1,7 @@
 {
   "name": "@dataplan/json",
   "version": "0.0.1-0.2",
-  "description": "JSON data plans for Graphile Crystal",
+  "description": "JSON step classes for Grafast",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

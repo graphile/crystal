@@ -1,7 +1,7 @@
 {
   "name": "@dataplan/pg",
   "version": "0.0.1-0.2",
-  "description": "PostgreSQL data plans for Graphile Crystal",
+  "description": "PostgreSQL step classes for Grafast",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
