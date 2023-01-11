@@ -1,5 +1,11 @@
 # @dataplan/pg
 
+## 0.0.1-0.4
+
+### Patch Changes
+
+- [`bf83f591d`](undefined) - Fix deps
+
 ## 0.0.1-0.3
 
 ### Patch Changes
