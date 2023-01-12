@@ -52,7 +52,7 @@
   "dependencies": {
     "@graphile/lru": "4.11.0",
     "@types/json5": "^0.0.30",
-    "@types/jsonwebtoken": "^8.3.2",
+    "@types/jsonwebtoken": "^9.0.1",
     "@types/pg": ">=6 <9",
     "@types/ws": "^7.4.0",
     "body-parser": "^1.15.2",
