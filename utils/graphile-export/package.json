@@ -53,8 +53,8 @@
     "node": ">=16"
   },
   "peerDependencies": {
-    "grafast": "*",
-    "graphql": "*",
+    "grafast": "workspace:^0.0.1-0.3",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg-sql2": "workspace:^5.0.0-0.0"
   },
   "files": [

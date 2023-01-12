@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/graphile/heart/tree/main/utils/jest-serializer-graphql-schema",
   "peerDependencies": {
-    "graphql": "*"
+    "graphql": ">=15 <17"
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",

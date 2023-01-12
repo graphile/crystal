@@ -53,7 +53,7 @@
     "node": ">=16"
   },
   "peerDependencies": {
-    "graphql": "*"
+    "graphql": "^16.1.0-experimental-stream-defer.6"
   },
   "files": [
     "dist",

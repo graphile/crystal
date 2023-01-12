@@ -34,7 +34,7 @@
   },
   "peerDependencies": {
     "grafast": "workspace:^",
-    "graphql": "*"
+    "graphql": "^16.1.0-experimental-stream-defer.6"
   },
   "files": [
     "dist"

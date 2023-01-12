@@ -3357,7 +3357,7 @@ __metadata:
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
     grafast: "workspace:^"
-    graphql: "*"
+    graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
   linkType: soft
 
@@ -3398,7 +3398,7 @@ __metadata:
     webpack-node-externals: "npm:^3.0.0"
     zx: "npm:^7.0.8"
   peerDependencies:
-    graphql: "*"
+    graphql: ^16.1.0-experimental-stream-defer.6
     pg: ^8.7.1
   peerDependenciesMeta:
     pg:
@@ -12762,7 +12762,7 @@ __metadata:
   peerDependencies:
     "@envelop/core": ^3.0.4
     graphile-config: "workspace:^"
-    graphql: "*"
+    graphql: ^16.1.0-experimental-stream-defer.6
   peerDependenciesMeta:
     "@envelop/core":
       optional: true
@@ -12789,7 +12789,7 @@ __metadata:
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
     grafast: "workspace:^"
-    graphql: "*"
+    graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
   linkType: soft
 
@@ -12862,7 +12862,7 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
-    graphql: "*"
+    graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
   linkType: soft
 
@@ -12908,8 +12908,8 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
-    grafast: "*"
-    graphql: "*"
+    grafast: "workspace:^0.0.1-0.3"
+    graphql: ^16.1.0-experimental-stream-defer.6
     pg-sql2: "workspace:^5.0.0-0.0"
   languageName: unknown
   linkType: soft
@@ -12932,7 +12932,7 @@ __metadata:
     grafast: "workspace:^"
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
-    graphql: "*"
+    graphql: ^16.1.0-experimental-stream-defer.6
     pg-introspection: "workspace:^"
   languageName: unknown
   linkType: soft
@@ -14747,7 +14747,7 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
-    graphql: "*"
+    graphql: ">=15 <17"
   languageName: unknown
   linkType: soft
 
@@ -19414,7 +19414,7 @@ __metadata:
     webpack-cli: "npm:^4.9.2"
     yargs: "npm:^17.4.1"
   peerDependencies:
-    graphql: "*"
+    graphql: ^16.1.0-experimental-stream-defer.6
   bin:
     ruru: ./dist/cli-run.js
   languageName: unknown
