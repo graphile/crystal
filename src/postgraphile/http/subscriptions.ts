@@ -408,15 +408,13 @@ export async function enhanceHttpServerWithWebSockets<
 
           // for supplying custom execution arguments. if not already
           // complete, the pluginHook should fill in the gaps
-          const hookedArgs = (
-            pluginHook
-              ? pluginHook('postgraphile:ws:onSubscribe', args, {
-                  context: ctx,
-                  message: msg,
-                  options,
-                })
-              : args
-          ) as ExecutionArgs;
+          const hookedArgs = (pluginHook
+            ? pluginHook('postgraphile:ws:onSubscribe', args, {
+                context: ctx,
+                message: msg,
+                options,
+              })
+            : args) as ExecutionArgs;
           if (!args.document) {
             return [
               // same error that graphql.validate would throw if the document is missing
