@@ -1,5 +1,12 @@
 # ruru
 
+## 2.0.0-0.3
+
+### Patch Changes
+
+- [`0983df3f6`](undefined) - Downgrade to React 16 to work around npm infinite
+  loop bug (npm/cli#5322).
+
 ## 2.0.0-0.2
 
 ### Patch Changes

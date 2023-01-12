@@ -1,5 +1,15 @@
 # postgraphile
 
+## 5.0.0-0.8
+
+### Patch Changes
+
+- Updated dependencies [[`0983df3f6`](undefined)]:
+  - ruru@2.0.0-0.3
+  - grafserv@0.0.1-0.4
+  - graphile-build-pg@5.0.0-0.6
+  - @dataplan/pg@0.0.1-0.5
+
 ## 5.0.0-0.7
 
 ### Patch Changes
