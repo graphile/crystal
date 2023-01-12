@@ -51,8 +51,8 @@
     "graphile-config": "workspace:^",
     "graphiql": "^2.2.0",
     "mermaid": "^8.14.0",
-    "react": ">=16 <19",
-    "react-dom": ">=16 <19",
+    "react": ">=16 <17",
+    "react-dom": ">=16 <17",
     "tslib": "^2.4.0",
     "yargs": "^17.4.1"
   },
