@@ -154,7 +154,7 @@ export async function enhanceHttpServerWithWebSockets<
         statusCode: number,
         _statusMessage?: OutgoingHttpHeaders | string | undefined,
         headers?: OutgoingHttpHeaders | undefined,
-      ): void => {
+      ): Response => {
         if (statusCode && statusCode > 200) {
           // tslint:disable-next-line no-console
           console.error(
@@ -168,6 +168,7 @@ export async function enhanceHttpServerWithWebSockets<
           );
           socket.close();
         }
+        return dummyRes!;
       };
       await applyMiddleware(options.websocketMiddlewares, req, dummyRes);
 
@@ -526,7 +527,7 @@ export async function enhanceHttpServerWithWebSockets<
             // both v0 and v1, v1 will prevail
             v1Wss;
       if (wss) {
-        wss.handleUpgrade(req, socket, head, ws => {
+        wss.handleUpgrade(req, socket as any, head, ws => {
           wss.emit('connection', ws, req);
         });
       }
