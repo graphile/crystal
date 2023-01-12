@@ -415,8 +415,11 @@ export default function createPostGraphileHttpRequestHandler(
     firstRequestHandler = null;
     let graphqlRouteForWs = graphqlRoute;
 
-    const { pathname = '' } = parseUrl(req) || {};
-    const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
+    const parsed = parseUrl(req) || { pathname: '' };
+    const pathname = parsed && typeof parsed.pathname === 'string' ? parsed.pathname : '';
+    const parsed2 = parseUrl.original(req) || { pathname: '' };
+    const originalPathname =
+      parsed2 && typeof parsed2.pathname === 'string' ? parsed2.pathname : '';
     if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
       const base = originalPathname.slice(0, originalPathname.length - pathname.length);
       // Our websocket GraphQL route must be at a different place
