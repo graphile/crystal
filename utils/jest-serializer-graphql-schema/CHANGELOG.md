@@ -1,5 +1,11 @@
 # jest-serializer-graphql-schema
 
+## 5.0.0-0.2
+
+### Patch Changes
+
+- [`768f32681`](undefined) - Fix peerDependencies ranges
+
 ## 5.0.0-0.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # graphile-utils
 
+## 5.0.0-0.7
+
+### Patch Changes
+
+- [`768f32681`](undefined) - Fix peerDependencies ranges
+
+- Updated dependencies [[`768f32681`](undefined)]:
+  - grafast@0.0.1-0.4
+  - graphile-build@5.0.0-0.5
+  - graphile-build-pg@5.0.0-0.7
+
 ## 5.0.0-0.6
 
 ### Patch Changes

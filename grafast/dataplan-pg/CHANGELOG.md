@@ -1,5 +1,15 @@
 # @dataplan/pg
 
+## 0.0.1-0.6
+
+### Patch Changes
+
+- [`768f32681`](undefined) - Fix peerDependencies ranges
+
+- Updated dependencies [[`768f32681`](undefined)]:
+  - @dataplan/json@0.0.1-0.4
+  - grafast@0.0.1-0.4
+
 ## 0.0.1-0.5
 
 ### Patch Changes

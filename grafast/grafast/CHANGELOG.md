@@ -1,5 +1,11 @@
 # grafast
 
+## 0.0.1-0.4
+
+### Patch Changes
+
+- [`768f32681`](undefined) - Fix peerDependencies ranges
+
 ## 0.0.1-0.3
 
 ### Patch Changes
