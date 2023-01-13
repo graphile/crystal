@@ -562,6 +562,7 @@ export {
   join,
   key,
   run,
+  run as eval,
   compile,
   undefinedNode as undefined,
   isDYK,
@@ -576,6 +577,7 @@ export interface DevilYouKnow {
   literal: typeof lit;
   key: typeof key;
   run: typeof run;
+  eval: typeof run;
   compile: typeof compile;
   indent: typeof indent;
   indentIf: typeof indentIf;
@@ -593,6 +595,7 @@ const attributes = {
   join,
   key,
   run,
+  eval: run,
   compile,
   indent,
   indentIf,

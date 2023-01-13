@@ -207,7 +207,7 @@ this is intended to be used with relatively straightforward strings
 `{/*...*/}` you instead use `Object.create(null)` and set the properties on the
 resulting object - this prevents attacks such as **prototype polution**.
 
-### `dyk.run(fragment)`
+### `dyk.run(fragment)` (alias: eval)
 
 Evaluates the DYK fragment and returns the result.
 
