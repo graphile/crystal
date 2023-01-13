@@ -39,6 +39,7 @@
     { "path": "utils/lds" },
     { "path": "utils/lru" },
     { "path": "utils/pg-sql2" },
+    { "path": "utils/devil-you-know" },
     { "path": "graphile-build/graphile-build" },
     { "path": "graphile-build/graphile-build-pg" },
     { "path": "grafast/grafast" },

@@ -81,12 +81,12 @@ const source = new Source(/* ... */);
 const toEval = dyk`\
   const source = ${dyk.ref(source)};
   return function plan($record) {
-    const $records = source.find(${dyk.str(spec)});
+    const $records = source.find(${dyk.lit(spec)});
     return connection($records);
   }
 `;
 
-const plan = dyk.eval(toEval);
+const plan = dyk.run(toEval);
 
 console.log(plan.toString());
 /* Outputs:
@@ -131,11 +131,36 @@ dyk`return 2 + ${1}`;
 then an error will be thrown. This prevents code injection, as all values must
 go through an allowed API.
 
-### `dyk.str(string)` (alias: dyk.string)
+### `dyk.ref(val)` (alias: dyk.reference)
 
-Escapes `string` for embedding into JavaScript. Besides being useful for general
-purposes, this is the preferred way of safely settings keys on a dynamic object,
-for example:
+Tells `dyk` to pass the given value by reference into the scope of the function
+via a closure, and returns an identifier that can be used to reference it. Note:
+the identifier used will be randomized to avoid the risk of conflicts, so if you
+are building code that will ultimately return a function, we recommend giving
+the ref an alias outside of the function to make the function text easier to
+debug, e.g.:
+
+```js
+const source = new Source(/* ... */);
+const spec = "some string here";
+
+const toEval = dyk`\
+  const source = ${dyk.ref(source)};
+  return function plan($record) {
+    const $records = source.find(${dyk.lit(spec)});
+    return connection($records);
+  }
+`;
+```
+
+### `dyk.lit(val)` (alias: dyk.literal)
+
+As `dyk.ref`, but in the case of simple primitive values (strings, numbers,
+booleans, null, undefined) may write them directly to the code rather than
+passing them by reference, which may make the resulting code easier to read.
+
+Besides being useful for general purposes, this is the preferred way of safely
+settings keys on a dynamic object, for example:
 
 ```js
 // This is a perfectly reasonable key
@@ -147,47 +172,21 @@ const key2 = "__proto__";
 
 const fragment = dyk`\
   const obj = Object.create(null);
-  obj[${dyk.str(key1)}] = 1;
-  obj[${dyk.str(key2)}] = {str: true};
+  obj[${dyk.lit(key1)}] = 1;
+  obj[${dyk.lit(key2)}] = {str: true};
   return obj;
 `;
 ```
 
-### `dyk.ref(val)` (alias: dyk.reference)
-
-Tells `dyk` to pass the given value by reference into the scope of the function
-via a closure, and returns an identifier that can be used to reference it. Note:
-the identifier used will be randomized to avoid the risk of conflicts, so if you
-are building code that will ultimately return a function, we recommend giving
-the ref an alias outside of the function to make the function text easier to
-debug, e.g.:
-
-```js
-const toEval = dyk`\
-  const source = ${dyk.ref(source)};
-  return function plan($record) {
-    const $records = source.find(${dyk.str(specString)});
-    return connection($records);
-  }
-`;
-```
-
-### `dyk.lit(val)` (alias: dyk.literal)
-
-As `dyk.ref`, but in the case of very simple values (strings, numbers, booleans)
-may write them directly to the code rather than passing them by reference, which
-may make the resulting code easier to read. Should only be used with data that
-is not sensitive and is trusted (not user-provided data).
-
 ### `dyk.join(arrayOfFragments, delimiter)`
 
-Joins an array of `dyk` values using the delimiter (a `dyk` string); e.g.
+Joins an array of `dyk` values using the delimiter (a plain string); e.g.
 
 ```js
 const keysAndValues = ["a", "b", "c", "d"].map(
   (n, i) => dyk`${dyk.key(n)}: ${dyk.literal(i)}`,
 );
-const obj = dyk`{ ${dyk.join(keysAndValues, dyk`, `)} }`;
+const obj = dyk`{ ${dyk.join(keysAndValues, ", ")} }`;
 // obj = { a: 0, b: 1, c: 2, d: 3 }
 ```
 
@@ -226,6 +225,6 @@ for debugging, or tests.
 
 ```js
 const fragment = dyk`return ${dyk.ref(1)} + ${dyk.ref(2)}`;
-const result = dyk.print(fragment);
+const result = dyk.out(fragment);
 // result = { string: `return _$_ref1 + _$_ref2`, refs: { _$_ref1: 1, _$_ref2: 2 } }
 ```

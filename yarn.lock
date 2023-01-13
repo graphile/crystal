@@ -10448,6 +10448,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"devil-you-know@workspace:utils/devil-you-know":
+  version: 0.0.0-use.local
+  resolution: "devil-you-know@workspace:utils/devil-you-know"
+  dependencies:
+    "@graphile/lru": "workspace:^"
+    "@types/debug": "npm:4.1.7"
+    "@types/jest": "npm:^27.5.1"
+    "@types/node": "npm:16.11.15"
+    jest: "npm:^28.1.0"
+    markdown-doctest: "npm:^1.1.0"
+    ts-node: "npm:^10.9.1"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^4.8.1-rc"
+  languageName: unknown
+  linkType: soft
+
 "devtools-protocol@npm:0.0.960912":
   version: 0.0.960912
   resolution: "devtools-protocol@npm:0.0.960912"
@@ -12908,7 +12924,7 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
   peerDependencies:
-    grafast: "workspace:^0.0.1-0.3"
+    grafast: "workspace:^0.0.1-0.4"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg-sql2: "workspace:^5.0.0-0.0"
   languageName: unknown
