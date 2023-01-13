@@ -447,11 +447,11 @@ function key(key: string): DYK {
   }
 }
 
-function run(fragment: DYK): any {
+function run<TResult>(fragment: DYK): TResult {
   const compiled = compile(fragment);
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
-  return new Function(...argNames, compiled.string)(...argValues);
+  return new Function(...argNames, compiled.string)(...argValues) as any;
 }
 
 /**
