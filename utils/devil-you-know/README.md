@@ -217,7 +217,7 @@ const result = dyk.run(fragment);
 // result = 3;
 ```
 
-### `dyk.out(fragment)` (alias: output)
+### `dyk.compile(fragment)`
 
 Builds the DYK fragment into a string ready to be evaluated, but does not
 evaluate it. Returns an object containing the `string` and any `refs`. Useful
@@ -225,6 +225,6 @@ for debugging, or tests.
 
 ```js
 const fragment = dyk`return ${dyk.ref(1)} + ${dyk.ref(2)}`;
-const result = dyk.out(fragment);
+const result = dyk.compile(fragment);
 // result = { string: `return _$_ref1 + _$_ref2`, refs: { _$_ref1: 1, _$_ref2: 2 } }
 ```

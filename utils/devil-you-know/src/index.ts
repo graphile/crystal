@@ -156,7 +156,7 @@ function enforceValidNode(node: unknown, where?: string): DYK {
  * Accepts an dyk`...` expression and compiles it out to DYK text with
  * placeholders, and the values to substitute for these values.
  */
-function out(fragment: DYK): {
+function compile(fragment: DYK): {
   string: string;
   refs: {
     [key: string]: any;
@@ -448,7 +448,7 @@ function key(key: string): DYK {
 }
 
 function run(fragment: DYK): any {
-  const compiled = out(fragment);
+  const compiled = compile(fragment);
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
   return new Function(...argNames, compiled.string)(...argValues);
@@ -562,7 +562,7 @@ export {
   join,
   key,
   run,
-  out,
+  compile,
   undefinedNode as undefined,
   isDYK,
 };
@@ -576,8 +576,7 @@ export interface DevilYouKnow {
   literal: typeof lit;
   key: typeof key;
   run: typeof run;
-  out: typeof out;
-  output: typeof out;
+  compile: typeof compile;
   indent: typeof indent;
   indentIf: typeof indentIf;
   undefined: DYK;
@@ -594,8 +593,7 @@ const attributes = {
   join,
   key,
   run,
-  out,
-  output: out,
+  compile,
   indent,
   indentIf,
   undefined: undefinedNode,
