@@ -1,57 +1,12 @@
 import chalk from "chalk";
 import debugFactory from "debug";
+import dyk, { DYK } from "devil-you-know";
 
 import { inspect } from "../inspect.js";
 import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 
-// NOTE: this runs at startup so it will NOT notice values that pollute the
-// Object prototype after startup. It is assumed that you are running Node in
-// an environment where the prototype will NOT be polluted.
-// RECOMMENDATION: `Object.seal(Object.prototype)`
-const forbiddenPropertyNames = Object.getOwnPropertyNames(Object.prototype);
-
-/**
- * Returns true for values of 'blah' that you can do `foo.blah` with.
- * Extremely conservative.
- */
-function canAccessViaDot(str: string): boolean {
-  return /^[_a-zA-Z][_a-zA-Z0-9]{0,200}$/.test(str);
-}
-
-/**
- * Throws an error if the path value is unsafe, for example `__proto__`,
- * or a value which cannot safely be serialized via JSON.stringify.
- *
- * NOTE: it's HEAVILY ENCOURAGED that all properties to be used like this have
- * a `$` or `@` prefix to make sure no builtins are accessed by accident.
- *
- * **IMPORTANT**: Any properties that can be influenced by untrusted user input
- * _MUST_ adhere to the above naming prefixes.
- *
- * @see https://github.com/brianc/node-postgres/issues/1408#issuecomment-322444305
- * @see https://github.com/joliss/js-string-escape
- */
-function assertSafeToAccessViaBraces(str: string): void {
-  if (!/^[-@$_a-zA-Z0-9]*$/.test(str)) {
-    // Note this is a _lot_ stricter than it needs to be, but I'd rather be
-    // over-strict than have to add a dependency that _might_ change as
-    // JS/Unicode evolve.
-    throw new Error(`Forbidden property access to unsafe property '${str}'`);
-  }
-}
-
-/**
- * This function adds a modicum of safety to property access. Really you should
- * conform to the naming conventions mentioned in assertSafeToAccessViaBraces,
- * so you should never hit this.
- */
-function needsHasOwnPropertyCheck(str: string): boolean {
-  return forbiddenPropertyNames.includes(str);
-}
-
-const warnedAboutItems = new Set<string>();
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /** @internal */
@@ -69,51 +24,21 @@ function constructDestructureFunction(
   path: (string | number | symbol)[],
   fallback: any,
 ): (_extra: ExecutionExtra, value: any) => any {
-  const jitParts: string[] = [];
-  const symbols: symbol[] = [];
+  // value?.blah?.bog?.["!!!"]?.[0]
+  const varName = dyk`value`;
+  let expression = varName;
 
   let slowMode = false;
 
-  for (let i = 0, l = path.length; i < l; i++) {
-    const pathItem = path[i];
-    if (typeof pathItem === "symbol") {
-      const symbolIndex = symbols.push(pathItem) - 1;
-      jitParts.push(`?.[symbols[${symbolIndex}]]`);
-    } else if (typeof pathItem === "string") {
-      // Don't use JIT mode if we need to add hasOwnProperty checks.
-      if (!slowMode && needsHasOwnPropertyCheck(pathItem)) {
-        slowMode = true;
-        if (!warnedAboutItems.has(pathItem)) {
-          warnedAboutItems.add(pathItem);
-          // TODO: link to documentation.
-          console.warn(
-            `WARNING: access to '${pathItem}' opts out of performant destructurer. Please ensure that properties being accessed are prefixed with '$' or '@'.`,
-          );
-        }
-      }
-
-      // ESSENTIAL security check to enable our JIT-ing below.
-      assertSafeToAccessViaBraces(pathItem);
-
-      if (canAccessViaDot(pathItem)) {
-        // ?._mySimpleProperty
-        jitParts.push(`?.${pathItem}`);
-      } else {
-        // ?.["@@meaning"]
-        jitParts.push(`?.[${JSON.stringify(pathItem)}]`);
-      }
-    } else if (Number.isFinite(pathItem)) {
-      // ?.[42]
-      jitParts.push(`?.[${JSON.stringify(pathItem)}]`);
-    } else if (pathItem == null) {
-      slowMode = true;
-    } else {
-      throw new Error(
-        `Invalid path item: ${inspect(pathItem)} in path '${JSON.stringify(
-          path,
-        )}'`,
-      );
+  try {
+    for (let i = 0, l = path.length; i < l; i++) {
+      const pathItem = path[i];
+      expression = dyk.optionalAccess(expression, pathItem);
     }
+  } catch (e) {
+    // TODO: better handle this deopt
+    console.warn(`AccessStep: expression deoptimized: ${e}`);
+    slowMode = true;
   }
 
   // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
@@ -139,24 +64,21 @@ function constructDestructureFunction(
       return current ?? fallback;
     };
   } else {
-    // ?.blah?.bog?.["!!!"]?.[0]
-    const expression = jitParts.join("");
-
+    const expressionWithFallback =
+      fallback !== undefined
+        ? dyk`${expression} ?? ${dyk.lit(fallback)}`
+        : expression;
     // return value?.blah?.bog?.["!!!"]?.[0]
-    const functionBody = `return value${expression}`; /* THERE MUST BE NO SEMICOLON IN STRING */
+    const functionExpression: DYK = dyk`return function quicklyExtractValueAtPath(extra, value) {${dyk.indent`
+return ${expressionWithFallback};
+`}}`;
 
     // JIT this via `new Function` for great performance.
-    const quicklyExtractValueAtPath = (
-      fallback !== undefined || symbols.length > 0
-        ? new Function(
-            "fallback",
-            "symbols",
-            `return (extra, value) => {${functionBody} ?? fallback}`,
-          )(fallback, symbols)
-        : new Function("extra", "value", functionBody)
-    ) as any;
-    quicklyExtractValueAtPath.displayName = "quicklyExtractValueAtPath";
-    quicklyExtractValueAtPath[expressionSymbol] = expression;
+    const quicklyExtractValueAtPath = dyk.eval(functionExpression) as any;
+    quicklyExtractValueAtPath[expressionSymbol] = [
+      varName,
+      expressionWithFallback,
+    ];
     return quicklyExtractValueAtPath;
   }
 }

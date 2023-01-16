@@ -53,7 +53,8 @@
   },
   "dependencies": {
     "@graphile/lru": "workspace:^",
-    "debug": "^4.3.3"
+    "debug": "^4.3.3",
+    "devil-you-know": "workspace:^"
   },
   "peerDependencies": {
     "@envelop/core": "^3.0.4",

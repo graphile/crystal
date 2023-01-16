@@ -10448,7 +10448,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"devil-you-know@workspace:utils/devil-you-know":
+"devil-you-know@workspace:^, devil-you-know@workspace:utils/devil-you-know":
   version: 0.0.0-use.local
   resolution: "devil-you-know@workspace:utils/devil-you-know"
   dependencies:
@@ -12757,6 +12757,7 @@ __metadata:
     chai: "npm:^4.3.6"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.3"
+    devil-you-know: "workspace:^"
     eventemitter3: "npm:^4.0.7"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     iterall: "npm:^1.3.0"

@@ -32,6 +32,7 @@ import type { ExecutableStep } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
+import dyk, { DYK } from "devil-you-know";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
@@ -420,18 +421,21 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       this.rootStep.id,
     );
     if ($root instanceof AccessStep && $root.fallback === undefined) {
-      const expression = $root.unbatchedExecute![expressionSymbol];
-      if (expression && expression.length > 0) {
+      const expressionDetails: [DYK, DYK] | undefined =
+        $root.unbatchedExecute![expressionSymbol];
+      if (expressionDetails) {
         // @ts-ignore
         const $parent: ExecutableStep<any> = $root.getDep(0);
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
           this,
           $parent,
         );
-        this.processRoot = newFunction([
-          "value",
-          `return value${expression};`,
-        ]) as (value: any) => any;
+        const [varName, expression] = expressionDetails;
+        this.processRoot = dyk.eval(
+          dyk`return function shortcutExtractValueAtPath(${varName}) {${dyk.indent`
+return ${expression};
+`}}`,
+        ) as (value: any) => any;
       }
     }
   }
