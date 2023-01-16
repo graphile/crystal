@@ -225,27 +225,21 @@ this is intended to be used with relatively straightforward strings
 `Object.getOwnPropertyNames(Object.prototype)`.)
 
 **IMPORTANT**: It's strongly recommended that instead of defining an object via
-`{/*...*/}` you instead use `const obj = Object.create(null);` and set the
-properties on the resulting object via `obj${dyk.access(key)} = ...` - this
-prevents attacks such as **prototype polution**.
+`const obj = { ${dyk.dangerousKey(untrustedKey)}: value }` you instead use
+`const obj = Object.create(null);` and then set the properties on the resulting
+object via `${obj}[${dyk.lit(untrustedKey)}] = value;` - this prevents attacks
+such as **prototype polution** since properties like `__proto__` are not special
+on null-prototype objects, whereas they can cause havok in regular `{}` objects.
 
-### `dyk.access(obj, key, hasNullPrototype = false)`
+### `dyk.get(obj, key)`
 
 Returns an expression that relatively safely accesses key `key` of object `obj`.
-`key` may be a string, symbol or number and `dyk` will turn the access into
+`key` may be a string, symbol or number and `dyk` will turn the get into
 `obj.foo` or `obj["foo"]` as appropriate.
 
-Note that if key is one of the Object prototype builtins (`__proto__`,
-`constructor`, etc) then DYK will add an `Object.hasOwnProperty` check _unless_
-you inform DYK that this object `hasNullPrototype` (in which case these checks
-are not necessary).
+### `dyk.optionalGet(obj, key)`
 
-Note that this is only intended to be used with plain objects, using it with
-other object types (e.g. classes) may lead to unexpected results.
-
-### `dyk.optionalAccess(obj, key, hasNullPrototype = false)`
-
-As with `dyk.access` except the access will be `obj?.foo` or `obj?.["foo"]` as
+As with `dyk.get` except the get will be `obj?.foo` or `obj?.["foo"]` as
 appropriate - i.e. the `?.` optional chaining operator is used.
 
 ### `dyk.tempVar(symbol = Symbol())`

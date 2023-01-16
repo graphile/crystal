@@ -470,10 +470,11 @@ export const canRepresentAsIdentifier = (key: string) =>
 
 /**
  * IMPORTANT: It's strongly recommended that instead of defining an object via
- * `const obj = {${dyk.dangerousKey(untrustedString)}: value}` you instead use
+ * `const obj = { ${dyk.dangerousKey(untrustedKey)}: value }` you instead use
  * `const obj = Object.create(null);` and then set the properties on the resulting
- * object via `obj${dyk.access(key)} = ...;` - this prevents attacks such as
- * **prototype polution**.
+ * object via `${obj}[${dyk.lit(untrustedKey)}] = value;` - this prevents attacks such as
+ * **prototype polution** since properties like `__proto__` are not special on
+ * null-prototype objects, whereas they can cause havok in regular `{}` objects.
  */
 function dangerousKey(key: string): DYK {
   if (typeof key !== "string") {
@@ -494,97 +495,31 @@ function dangerousKey(key: string): DYK {
   }
 }
 
-// NOTE: this runs at startup so it will NOT notice values that pollute the
-// Object prototype after startup. It is assumed that you are running Node in
-// an environment where the prototype will NOT be polluted.
-// RECOMMENDATION: `Object.seal(Object.prototype)`
-const forbiddenPropertyNames = Object.getOwnPropertyNames(Object.prototype);
-
-/**
- * This function adds a modicum of safety to property access. Really you should
- * conform to the naming conventions mentioned in assertSafeToAccessViaBraces,
- * so you should never hit this.
- */
-function needsHasOwnPropertyCheck(str: string): boolean {
-  return forbiddenPropertyNames.includes(str);
-}
-
 function canAccessViaDot(str: string): boolean {
   return str.length < 200 && /^[_a-zA-Z][_a-zA-Z0-9]*$/.test(str);
 }
 
-function hasOwnProperty(obj: DYK, key: string | symbol | number): DYK {
-  return dyk`Object.prototype.hasOwnProperty.call(${obj}, ${dyk.lit(key)})`;
-}
-
-const warnedAboutItems = new Set<string>();
-
-function accessShared(
-  obj: DYK,
-  accessFrag: DYK,
-  key: string | symbol | number,
-  hasNullPrototype: boolean,
-): DYK {
-  if (
-    !hasNullPrototype &&
-    typeof key === "string" &&
-    needsHasOwnPropertyCheck(key)
-  ) {
-    if (!warnedAboutItems.has(key)) {
-      warnedAboutItems.add(key);
-      // TODO: link to documentation.
-      console.warn(
-        `WARNING: access to '${key}' opts out of performant destructurer. Please ensure that properties being accessed are prefixed with '$' or '@'.`,
-      );
-    }
-    return dyk.tmp(
-      obj,
-      (tmp) =>
-        dyk`${dyk.hasOwnProperty(tmp, key)} ? ${tmp}${accessFrag} : undefined`,
-    );
-  } else {
-    return dyk`${obj}${accessFrag}`;
-  }
-}
-
 /**
  * Accesses the key of an object either via `.` or `[]` as appropriate;
- * `obj${dyk.access(key)}` would become `obj.foo` or `obj["1foo"]` as
+ * `obj${dyk.get(key)}` would become `obj.foo` or `obj["1foo"]` as
  * appropriate.
- *
- * Note: if the key is dangerous (such as `__proto__` or `constructor`) we'll
- * automatically add an `Object.hasOwnProperty` check unless `hasNullPrototype`
- * is true.
  */
-function access(
-  obj: DYK,
-  key: string | symbol | number,
-  hasNullPrototype = false,
-): DYK {
+function get(obj: DYK, key: string | symbol | number): DYK {
   const accessFrag =
     typeof key === "string" && canAccessViaDot(key)
       ? // ?._mySimpleProperty
         dyk`.${makeRawNode(key)}`
       : // ?.["@@meaning"]
         dyk`[${dyk.lit(key)}]`;
-
-  return accessShared(obj, accessFrag, key, hasNullPrototype);
+  return dyk`${obj}${accessFrag}`;
 }
 
 /**
  * Accesses the key of an object via optional-chaining:
- * `obj${dyk.optionalAccess(key)}` would become `obj?.foo` or `obj?.["1foo"]` as
+ * `obj${dyk.optionalGet(key)}` would become `obj?.foo` or `obj?.["1foo"]` as
  * appropriate.
- *
- * Note: if the key is dangerous (such as `__proto__` or `constructor`) we'll
- * automatically add an `Object.hasOwnProperty` check unless `hasNullPrototype`
- * is true.
  */
-function optionalAccess(
-  obj: DYK,
-  key: string | symbol | number,
-  hasNullPrototype = false,
-): DYK {
+function optionalGet(obj: DYK, key: string | symbol | number): DYK {
   const accessFrag =
     typeof key === "string" && canAccessViaDot(key)
       ? // ?._mySimpleProperty
@@ -592,7 +527,7 @@ function optionalAccess(
       : // ?.["@@meaning"]
         dyk`?.[${dyk.lit(key)}]`;
 
-  return accessShared(obj, accessFrag, key, hasNullPrototype);
+  return dyk`${obj}${accessFrag}`;
 }
 
 /**
@@ -699,7 +634,9 @@ function expandQueryNodes(node: DYKQuery): ReadonlyArray<DYKNode> {
 }
 
 /**
- * WARNING: all lines will be indented, without any parsing, so if there are template literals that contain newlines, spaces will be added inside these too.
+ * WARNING: all lines will be indented, without any parsing, so if there are
+ * template literals that contain newlines, spaces will be added inside these
+ * too.
  */
 function indent(fragment: DYK): DYK;
 function indent(strings: TemplateStringsArray, ...values: Array<DYK>): DYK;
@@ -730,11 +667,10 @@ export {
   lit,
   join,
   dangerousKey,
-  access,
-  optionalAccess,
+  get,
+  optionalGet,
   tmp,
   tempVar,
-  hasOwnProperty,
   run,
   run as eval,
   compile,
@@ -751,11 +687,10 @@ export interface DevilYouKnow {
   literal: typeof lit;
   join: typeof join;
   dangerousKey: typeof dangerousKey;
-  access: typeof access;
-  optionalAccess: typeof optionalAccess;
+  get: typeof get;
+  optionalGet: typeof optionalGet;
   tmp: typeof tmp;
   tempVar: typeof tempVar;
-  hasOwnProperty: typeof hasOwnProperty;
   run: typeof run;
   eval: typeof run;
   compile: typeof compile;
@@ -774,11 +709,10 @@ const attributes = {
   literal: lit,
   join,
   dangerousKey,
-  access,
-  optionalAccess,
+  get,
+  optionalGet,
   tmp,
   tempVar,
-  hasOwnProperty,
   run,
   eval: run,
   compile,
