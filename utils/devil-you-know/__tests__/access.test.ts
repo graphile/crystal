@@ -3,7 +3,7 @@ import dyk from "../dist";
 it("gives simple access to simple string prop", () => {
   const untrustedInput = "frogs";
   const result = dyk.compile(
-    dyk`return (obj) => ${dyk.get(dyk`obj`, untrustedInput)}`,
+    dyk`return (obj) => obj${dyk.get(untrustedInput)}`,
   );
   expect(result.refs).toEqual({});
   expect(result.string).toMatchInlineSnapshot(`"return (obj) => obj.frogs"`);
@@ -16,7 +16,7 @@ it("gives simple access to dangerous string prop", () => {
   // access more caution.
   const untrustedInput = "__proto__";
   const result = dyk.compile(
-    dyk`return (obj) => ${dyk.get(dyk`obj`, untrustedInput)}`,
+    dyk`return (obj) => obj${dyk.get(untrustedInput)}`,
   );
   expect(result.refs).toEqual({});
   expect(result.string).toMatchInlineSnapshot(
@@ -27,7 +27,7 @@ it("gives simple access to dangerous string prop", () => {
 it("gives bracketed access to simple number prop", () => {
   const untrustedInput = 27;
   const result = dyk.compile(
-    dyk`return (obj) => ${dyk.get(dyk`obj`, untrustedInput)}`,
+    dyk`return (obj) => obj${dyk.get(untrustedInput)}`,
   );
   expect(result.refs).toEqual({});
   expect(result.string).toMatchInlineSnapshot(`"return (obj) => obj[27]"`);
@@ -36,7 +36,7 @@ it("gives bracketed access to simple number prop", () => {
 it("gives bracketed access to simple symbol prop", () => {
   const untrustedInput = Symbol("some_symbol");
   const result = dyk.compile(
-    dyk`return (obj) => ${dyk.get(dyk`obj`, untrustedInput)}`,
+    dyk`return (obj) => obj${dyk.get(untrustedInput)}`,
   );
   expect(result.refs).toMatchInlineSnapshot(`
     Object {
