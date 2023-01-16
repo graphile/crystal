@@ -231,16 +231,16 @@ object via `${obj}[${dyk.lit(untrustedKey)}] = value;` - this prevents attacks
 such as **prototype polution** since properties like `__proto__` are not special
 on null-prototype objects, whereas they can cause havok in regular `{}` objects.
 
-### `dyk.get(obj, key)`
+### `dyk.get(key)`
 
-Returns an expression that relatively safely accesses key `key` of object `obj`.
-`key` may be a string, symbol or number and `dyk` will turn the get into
-`obj.foo` or `obj["foo"]` as appropriate.
+Returns an expression for accessing the property `key` (which could be a string,
+symbol or number) of the preceding expression; will return code like `.foo` or
+`["foo"]` as appropriate.
 
-### `dyk.optionalGet(obj, key)`
+### `dyk.optionalGet(key)`
 
-As with `dyk.get` except the get will be `obj?.foo` or `obj?.["foo"]` as
-appropriate - i.e. the `?.` optional chaining operator is used.
+As with `dyk.get` except using optional chaining - the expression will be
+`?.foo` or `?.["foo"]` as appropriate.
 
 ### `dyk.tempVar(symbol = Symbol())`
 

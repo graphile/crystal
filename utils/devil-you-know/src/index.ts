@@ -504,14 +504,12 @@ function canAccessViaDot(str: string): boolean {
  * `obj${dyk.get(key)}` would become `obj.foo` or `obj["1foo"]` as
  * appropriate.
  */
-function get(obj: DYK, key: string | symbol | number): DYK {
-  const accessFrag =
-    typeof key === "string" && canAccessViaDot(key)
-      ? // ?._mySimpleProperty
-        dyk`.${makeRawNode(key)}`
-      : // ?.["@@meaning"]
-        dyk`[${dyk.lit(key)}]`;
-  return dyk`${obj}${accessFrag}`;
+function get(key: string | symbol | number): DYK {
+  return typeof key === "string" && canAccessViaDot(key)
+    ? // ?._mySimpleProperty
+      dyk`.${makeRawNode(key)}`
+    : // ?.["@@meaning"]
+      dyk`[${dyk.lit(key)}]`;
 }
 
 /**
@@ -519,15 +517,12 @@ function get(obj: DYK, key: string | symbol | number): DYK {
  * `obj${dyk.optionalGet(key)}` would become `obj?.foo` or `obj?.["1foo"]` as
  * appropriate.
  */
-function optionalGet(obj: DYK, key: string | symbol | number): DYK {
-  const accessFrag =
-    typeof key === "string" && canAccessViaDot(key)
-      ? // ?._mySimpleProperty
-        dyk`?.${makeRawNode(key)}`
-      : // ?.["@@meaning"]
-        dyk`?.[${dyk.lit(key)}]`;
-
-  return dyk`${obj}${accessFrag}`;
+function optionalGet(key: string | symbol | number): DYK {
+  return typeof key === "string" && canAccessViaDot(key)
+    ? // ?._mySimpleProperty
+      dyk`?.${makeRawNode(key)}`
+    : // ?.["@@meaning"]
+      dyk`?.[${dyk.lit(key)}]`;
 }
 
 /**

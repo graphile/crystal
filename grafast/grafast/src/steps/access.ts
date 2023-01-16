@@ -7,8 +7,6 @@ import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 
-const hasOwnProperty = Object.prototype.hasOwnProperty;
-
 /** @internal */
 export const expressionSymbol = Symbol("expression");
 
@@ -24,21 +22,28 @@ function constructDestructureFunction(
   path: (string | number | symbol)[],
   fallback: any,
 ): (_extra: ExecutionExtra, value: any) => any {
-  // value?.blah?.bog?.["!!!"]?.[0]
-  const varName = dyk`value`;
-  let expression = varName;
+  const jitParts: DYK[] = [];
 
   let slowMode = false;
 
-  try {
-    for (let i = 0, l = path.length; i < l; i++) {
-      const pathItem = path[i];
-      expression = dyk.optionalAccess(expression, pathItem);
+  for (let i = 0, l = path.length; i < l; i++) {
+    const pathItem = path[i];
+    const t = typeof pathItem;
+    if (
+      t === "symbol" ||
+      t === "string" ||
+      (t === "number" && Number.isFinite(pathItem))
+    ) {
+      jitParts.push(dyk.get(pathItem));
+    } else if (pathItem == null) {
+      slowMode = true;
+    } else {
+      throw new Error(
+        `Invalid path item: ${inspect(pathItem)} in path '${JSON.stringify(
+          path,
+        )}'`,
+      );
     }
-  } catch (e) {
-    // TODO: better handle this deopt
-    console.warn(`AccessStep: expression deoptimized: ${e}`);
-    slowMode = true;
   }
 
   // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
@@ -46,39 +51,26 @@ function constructDestructureFunction(
   if (slowMode) {
     return function slowlyExtractValueAtPath(_meta: any, value: any): any {
       let current = value;
-      for (let i = 0, l = path.length; i < l; i++) {
+      for (let i = 0, l = path.length; i < l && current != null; i++) {
         const pathItem = path[i];
-        if (current == null) {
-          current = undefined;
-        } else if (typeof pathItem === "number") {
-          current = Array.isArray(current) ? current[pathItem] : undefined;
-        } else {
-          current =
-            typeof current === "object" &&
-            current &&
-            hasOwnProperty.call(current, pathItem)
-              ? current[pathItem]
-              : undefined;
-        }
+        current = current[pathItem];
       }
-      return current ?? fallback;
+      return fallback !== undefined ? current ?? fallback : current;
     };
   } else {
-    const expressionWithFallback =
-      fallback !== undefined
-        ? dyk`${expression} ?? ${dyk.lit(fallback)}`
-        : expression;
-    // return value?.blah?.bog?.["!!!"]?.[0]
-    const functionExpression: DYK = dyk`return function quicklyExtractValueAtPath(extra, value) {${dyk.indent`
-return ${expressionWithFallback};
-`}}`;
+    // ?.blah?.bog?.["!!!"]?.[0]
+    const expression = dyk.join(jitParts, "");
 
-    // JIT this via `new Function` for great performance.
-    const quicklyExtractValueAtPath = dyk.eval(functionExpression) as any;
-    quicklyExtractValueAtPath[expressionSymbol] = [
-      varName,
-      expressionWithFallback,
-    ];
+    // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
+    const quicklyExtractValueAtPath =
+      dyk.run<any>(dyk`return function quicklyExtractValueAtPath(extra, value) {
+  return (value${expression})${
+        fallback !== undefined ? dyk` ?? ${dyk.lit(fallback)}` : dyk.blank
+      };
+};`);
+
+    // JIT this for great performance.
+    quicklyExtractValueAtPath[expressionSymbol] = [expression, fallback];
     return quicklyExtractValueAtPath;
   }
 }

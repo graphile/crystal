@@ -421,7 +421,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       this.rootStep.id,
     );
     if ($root instanceof AccessStep && $root.fallback === undefined) {
-      const expressionDetails: [DYK, DYK] | undefined =
+      const expressionDetails: [DYK, any] | undefined =
         $root.unbatchedExecute![expressionSymbol];
       if (expressionDetails) {
         // @ts-ignore
@@ -430,12 +430,12 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           this,
           $parent,
         );
-        const [varName, expression] = expressionDetails;
-        this.processRoot = dyk.eval(
-          dyk`return function shortcutExtractValueAtPath(${varName}) {${dyk.indent`
-return ${expression};
-`}}`,
-        ) as (value: any) => any;
+        const [expression, fallback] = expressionDetails;
+        this.processRoot = dyk.run<(value: any) => any>(
+          dyk`return value => (value${expression})${
+            fallback !== undefined ? dyk` ?? ${dyk.lit(fallback)}` : dyk.blank
+          };`,
+        );
       }
     }
   }
