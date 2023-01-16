@@ -35,9 +35,9 @@ symbols.
 We also attempt to address the **garbage collection** concern by ensuring that
 there is no ephemeral data in the closure in which the code is evaluated, so
 nothing to be garbage collected. Note that we **do not** capture the closure in
-which you define the string - all parameters must be passed explicitly (e.g. via
-`dyk.ref`), which is one reason we use `new Function` rather than `eval` under
-the hood.
+which you define the string - all parameters must be passed explicitly (via the
+helpers), which is one reason we use `new Function` rather than `eval` under the
+hood.
 
 <!-- SPONSORS_BEGIN -->
 
@@ -68,6 +68,43 @@ And please give some love to our featured sponsors 🤩:
 <em>\* Sponsors the entire Graphile suite</em>
 
 <!-- SPONSORS_END -->
+
+## Installation
+
+```
+yarn add devil-you-know
+```
+
+or
+
+```
+npm install --save devil-you-know
+```
+
+## Importing
+
+We use the abbreviation `dyk` (pronounced
+[_deek_](https://www.collinsdictionary.com/dictionary/english/deek) - **not**
+like the abbreviation for Richard, nor the name for a sea defence embankment) to
+refer to the tagged template literal function, and all the helpers are available
+as properties on this function, so it's typically the only thing you need to
+import.
+
+For ESM, import `dyk`:
+
+<!-- skip-example -->
+
+```js
+import { dyk } from "devil-you-know";
+```
+
+Or for CommonJS, `require` it:
+
+<!-- skip-example -->
+
+```js
+const { dyk } = require("devil-you-know");
+```
 
 ## Example
 
@@ -100,22 +137,6 @@ function plan($record) {
 ```
 
 ## API
-
-For ESM, import `dyk`:
-
-<!-- skip-example -->
-
-```js
-import { dyk } from "devil-you-know";
-```
-
-Or for CommonJS, `require` it:
-
-<!-- skip-example -->
-
-```js
-const { dyk } = require("devil-you-know");
-```
 
 ### `` dyk`...` ``
 
