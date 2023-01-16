@@ -205,18 +205,18 @@ Joins an array of `dyk` values using the delimiter (a plain string); e.g.
 
 ```js
 const keysAndValues = ["a", "b", "c", "d"].map(
-  (n, i) => dyk`${dyk.key(n)}: ${dyk.literal(i)}`,
+  (n, i) => dyk`${dyk.dangerousKey(n)}: ${dyk.literal(i)}`,
 );
 const obj = dyk`{ ${dyk.join(keysAndValues, ", ")} }`;
 // obj = { a: 0, b: 1, c: 2, d: 3 }
 ```
 
-### `dyk.key(ident, forceQuotes = false)`
+### `dyk.dangerousKey(ident, forceQuotes = false)`
 
 Takes `ident` and turns it into the representation of a safely escaped
-JavaScript object key. We do our best to not put quote marks around the key
-unless necessary (or `forceQuotes` is set), so that the output code is more
-pleasant to read.
+JavaScript object key (to be used in an object definition). We do our best to
+not put quote marks around the key unless necessary (or `forceQuotes` is set),
+so that the output code is more pleasant to read.
 
 We'll throw an error if you pass an `ident` that contains unexpected characters,
 this is intended to be used with relatively straightforward strings
@@ -225,8 +225,47 @@ this is intended to be used with relatively straightforward strings
 `Object.getOwnPropertyNames(Object.prototype)`.)
 
 **IMPORTANT**: It's strongly recommended that instead of defining an object via
-`{/*...*/}` you instead use `Object.create(null)` and set the properties on the
-resulting object - this prevents attacks such as **prototype polution**.
+`{/*...*/}` you instead use `const obj = Object.create(null);` and set the
+properties on the resulting object via `obj${dyk.access(key)} = ...` - this
+prevents attacks such as **prototype polution**.
+
+### `dyk.access(obj, key, hasNullPrototype = false)`
+
+Returns an expression that relatively safely accesses key `key` of object `obj`.
+`key` may be a string, symbol or number and `dyk` will turn the access into
+`obj.foo` or `obj["foo"]` as appropriate.
+
+Note that if key is one of the Object prototype builtins (`__proto__`,
+`constructor`, etc) then DYK will add an `Object.hasOwnProperty` check _unless_
+you inform DYK that this object `hasNullPrototype` (in which case these checks
+are not necessary).
+
+Note that this is only intended to be used with plain objects, using it with
+other object types (e.g. classes) may lead to unexpected results.
+
+### `dyk.optionalAccess(obj, key, hasNullPrototype = false)`
+
+As with `dyk.access` except the access will be `obj?.foo` or `obj?.["foo"]` as
+appropriate - i.e. the `?.` optional chaining operator is used.
+
+### `dyk.tempVar(symbol = Symbol())`
+
+**EXPERIMENTAL**
+
+Creates a temporary variable (or returns the existing temp var if the same
+symbol is passed again) that can be used in expressions and statements.
+
+### `dyk.tmp(obj, callback)`
+
+(**ADVANCED**)
+
+If `obj` is potentially expensive code and you need to reference it multiple
+times (e.g. `` dyk`(${obj}.foo === 3 ? ${obj}.bar : ${obj}.baz)`  ``) then you
+can use `tmp` to create a temporary variable that stores reference to it and
+return the result of calling `callback` passing this temporary reference. E.g.
+`` dyk.tmp(obj, tmp => dyk`(${tmp}.foo === 3 ? ${tmp}.bar : ${tmp}.baz)`) ``
+means that the potentially expensive expression in the original `obj` variable
+only need to be evaluated once, not 3 times.
 
 ### `dyk.run(fragment)` (alias: eval)
 

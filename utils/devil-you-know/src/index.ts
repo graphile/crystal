@@ -48,6 +48,12 @@ export interface DYKRefNode {
   readonly v: any;
 }
 
+export interface DYKTemporaryVariableNode {
+  readonly [$$type]: "VARIABLE";
+  /** symbol */
+  readonly s: symbol;
+}
+
 /**
  * Represents that the DYK inside this should be indented when pretty printed.
  */
@@ -58,7 +64,11 @@ export interface DYKIndentNode {
 }
 
 /** @internal */
-export type DYKNode = DYKRawNode | DYKRefNode | DYKIndentNode;
+export type DYKNode =
+  | DYKRawNode
+  | DYKRefNode
+  | DYKTemporaryVariableNode
+  | DYKIndentNode;
 
 /** @internal */
 export interface DYKQuery {
@@ -111,6 +121,13 @@ function makeRefNode(rawValue: any): DYKRefNode {
   return Object.freeze({
     [$$type]: "REF" as const,
     v: rawValue,
+  });
+}
+
+function makeTemporaryVariableNode(symbol: symbol): DYKTemporaryVariableNode {
+  return Object.freeze({
+    [$$type]: "VARIABLE" as const,
+    s: symbol,
   });
 }
 
@@ -188,6 +205,18 @@ function compile(fragment: DYK): {
     return identifier;
   };
 
+  const varMap = new Map<symbol, string>();
+  let tmpCounter = 0;
+  const getVar = (sym: symbol) => {
+    let existing = varMap.get(sym);
+    if (existing) {
+      return existing;
+    }
+    const varName = `_$_tmp${tmpCounter++}`;
+    varMap.set(sym, varName);
+    return varName;
+  };
+
   function print(untrustedInput: DYK, indent = 0) {
     /**
      * Join this to generate the DYK query
@@ -220,6 +249,11 @@ function compile(fragment: DYK): {
           dykFragments.push(identifier);
           break;
         }
+        case "VARIABLE": {
+          const identifier = getVar(item.s);
+          dykFragments.push(identifier);
+          break;
+        }
         case "INDENT": {
           assert.ok(isDev, "INDENT nodes only allowed in development mode");
           dykFragments.push(
@@ -240,9 +274,15 @@ function compile(fragment: DYK): {
     }
     return dykFragments.join("");
   }
-  const string = isDev
-    ? print(fragment).replace(/\n\s*\n/g, "\n")
-    : print(fragment);
+  let str = print(fragment);
+  const variables = [];
+  for (const varName of varMap.values()) {
+    variables.push(`let ${varName};`);
+  }
+  if (variables.length > 0) {
+    str = variables.join("\n") + "\n" + str;
+  }
+  const string = isDev ? str.replace(/\n\s*\n/g, "\n") : str;
 
   return {
     string,
@@ -428,9 +468,16 @@ export const isSafeObjectPropertyName = (key: string) =>
 export const canRepresentAsIdentifier = (key: string) =>
   key === "_" || /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
 
-function key(key: string): DYK {
+/**
+ * IMPORTANT: It's strongly recommended that instead of defining an object via
+ * `const obj = {${dyk.dangerousKey(untrustedString)}: value}` you instead use
+ * `const obj = Object.create(null);` and then set the properties on the resulting
+ * object via `obj${dyk.access(key)} = ...;` - this prevents attacks such as
+ * **prototype polution**.
+ */
+function dangerousKey(key: string): DYK {
   if (typeof key !== "string") {
-    throw new Error("Invalid call to dyk.key - expected a string");
+    throw new Error("Invalid call to dyk.dangerousKey - expected a string");
   }
   if (isSafeObjectPropertyName(key)) {
     if (canRepresentAsIdentifier(key)) {
@@ -447,11 +494,133 @@ function key(key: string): DYK {
   }
 }
 
+// NOTE: this runs at startup so it will NOT notice values that pollute the
+// Object prototype after startup. It is assumed that you are running Node in
+// an environment where the prototype will NOT be polluted.
+// RECOMMENDATION: `Object.seal(Object.prototype)`
+const forbiddenPropertyNames = Object.getOwnPropertyNames(Object.prototype);
+
+/**
+ * This function adds a modicum of safety to property access. Really you should
+ * conform to the naming conventions mentioned in assertSafeToAccessViaBraces,
+ * so you should never hit this.
+ */
+function needsHasOwnPropertyCheck(str: string): boolean {
+  return forbiddenPropertyNames.includes(str);
+}
+
+function canAccessViaDot(str: string): boolean {
+  return str.length < 200 && /^[_a-zA-Z][_a-zA-Z0-9]*$/.test(str);
+}
+
+function hasOwnProperty(obj: DYK, key: string | symbol | number): DYK {
+  return dyk`Object.prototype.hasOwnProperty.call(${obj}, ${dyk.lit(key)})`;
+}
+
+const warnedAboutItems = new Set<string>();
+
+function accessShared(
+  obj: DYK,
+  accessFrag: DYK,
+  key: string | symbol | number,
+  hasNullPrototype: boolean,
+): DYK {
+  if (
+    !hasNullPrototype &&
+    typeof key === "string" &&
+    needsHasOwnPropertyCheck(key)
+  ) {
+    if (!warnedAboutItems.has(key)) {
+      warnedAboutItems.add(key);
+      // TODO: link to documentation.
+      console.warn(
+        `WARNING: access to '${key}' opts out of performant destructurer. Please ensure that properties being accessed are prefixed with '$' or '@'.`,
+      );
+    }
+    return dyk.tmp(
+      obj,
+      (tmp) =>
+        dyk`${dyk.hasOwnProperty(tmp, key)} ? ${tmp}${accessFrag} : undefined`,
+    );
+  } else {
+    return dyk`${obj}${accessFrag}`;
+  }
+}
+
+/**
+ * Accesses the key of an object either via `.` or `[]` as appropriate;
+ * `obj${dyk.access(key)}` would become `obj.foo` or `obj["1foo"]` as
+ * appropriate.
+ *
+ * Note: if the key is dangerous (such as `__proto__` or `constructor`) we'll
+ * automatically add an `Object.hasOwnProperty` check unless `hasNullPrototype`
+ * is true.
+ */
+function access(
+  obj: DYK,
+  key: string | symbol | number,
+  hasNullPrototype = false,
+): DYK {
+  const accessFrag =
+    typeof key === "string" && canAccessViaDot(key)
+      ? // ?._mySimpleProperty
+        dyk`.${makeRawNode(key)}`
+      : // ?.["@@meaning"]
+        dyk`[${dyk.lit(key)}]`;
+
+  return accessShared(obj, accessFrag, key, hasNullPrototype);
+}
+
+/**
+ * Accesses the key of an object via optional-chaining:
+ * `obj${dyk.optionalAccess(key)}` would become `obj?.foo` or `obj?.["1foo"]` as
+ * appropriate.
+ *
+ * Note: if the key is dangerous (such as `__proto__` or `constructor`) we'll
+ * automatically add an `Object.hasOwnProperty` check unless `hasNullPrototype`
+ * is true.
+ */
+function optionalAccess(
+  obj: DYK,
+  key: string | symbol | number,
+  hasNullPrototype = false,
+): DYK {
+  const accessFrag =
+    typeof key === "string" && canAccessViaDot(key)
+      ? // ?._mySimpleProperty
+        dyk`?.${makeRawNode(key)}`
+      : // ?.["@@meaning"]
+        dyk`?.[${dyk.lit(key)}]`;
+
+  return accessShared(obj, accessFrag, key, hasNullPrototype);
+}
+
+/**
+ * @experimental
+ */
+function tempVar(symbol = Symbol()): DYK {
+  return makeTemporaryVariableNode(symbol);
+}
+
+function tmp(obj: DYK, callback: (tmp: DYK) => DYK): DYK {
+  const varName = dyk.tempVar();
+  return dyk`(${varName} = ${obj}, ${callback(varName)})`;
+}
+
 function run<TResult>(fragment: DYK): TResult {
   const compiled = compile(fragment);
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
-  return new Function(...argNames, compiled.string)(...argValues) as any;
+  try {
+    return new Function(...argNames, compiled.string)(...argValues) as any;
+  } catch (e) {
+    // TODO: improve this!
+    console.error(`Error occurred during code generation:`);
+    console.error(e);
+    console.error("Function definition:");
+    console.error(compiled.string);
+    throw new Error(`Error occurred during code generation.`);
+  }
 }
 
 /**
@@ -560,7 +729,12 @@ export {
   ref,
   lit,
   join,
-  key,
+  dangerousKey,
+  access,
+  optionalAccess,
+  tmp,
+  tempVar,
+  hasOwnProperty,
   run,
   run as eval,
   compile,
@@ -575,7 +749,13 @@ export interface DevilYouKnow {
   reference: typeof ref;
   lit: typeof lit;
   literal: typeof lit;
-  key: typeof key;
+  join: typeof join;
+  dangerousKey: typeof dangerousKey;
+  access: typeof access;
+  optionalAccess: typeof optionalAccess;
+  tmp: typeof tmp;
+  tempVar: typeof tempVar;
+  hasOwnProperty: typeof hasOwnProperty;
   run: typeof run;
   eval: typeof run;
   compile: typeof compile;
@@ -593,7 +773,12 @@ const attributes = {
   lit,
   literal: lit,
   join,
-  key,
+  dangerousKey,
+  access,
+  optionalAccess,
+  tmp,
+  tempVar,
+  hasOwnProperty,
   run,
   eval: run,
   compile,
