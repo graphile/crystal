@@ -1,5 +1,13 @@
 # @dataplan/pg
 
+## 0.0.1-0.7
+
+### Patch Changes
+
+- Updated dependencies [[`cd37fd02a`](undefined)]:
+  - grafast@0.0.1-0.5
+  - @dataplan/json@0.0.1-0.5
+
 ## 0.0.1-0.6
 
 ### Patch Changes
