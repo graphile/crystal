@@ -4,6 +4,13 @@ set -e -x
 rm -rf builds/
 mkdir builds/
 
+# @graphile/lru
+cd utils/lru
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/graphile__lru.tgz
+cd -
+
 # tamedevil
 cd utils/tamedevil
 rm -f *.tgz
@@ -23,13 +30,6 @@ cd grafast/ruru
 rm -f *.tgz
 yarn pack -o package.tgz
 mv package.tgz ../../builds/ruru.tgz
-cd -
-
-# @graphile/lru
-cd utils/lru
-rm -f *.tgz
-yarn pack -o package.tgz
-mv package.tgz ../../builds/graphile__lru.tgz
 cd -
 
 #grafast
