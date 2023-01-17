@@ -558,6 +558,13 @@ function substring(text: string, stringType: "'" | '"' | "`"): DYK {
   return makeRawNode(escaped);
 }
 
+/**
+ * Escapes `content` so that it can be safely embedded in a multiline comment.
+ */
+function subcomment(content: string | number | null | undefined) {
+  return makeRawNode(String(content).replace(/\*\//g, "* /"));
+}
+
 const disallowedKeys: Array<string | symbol | number> = [
   ...Object.getOwnPropertyNames(Object.prototype),
   ...Object.getOwnPropertySymbols(Object.prototype),
@@ -841,6 +848,7 @@ export {
   lit,
   lit as literal,
   substring,
+  subcomment,
   join,
   identifier,
   dangerousKey,
@@ -865,6 +873,7 @@ export interface DevilYouKnow {
   lit: typeof lit;
   literal: typeof lit;
   substring: typeof substring;
+  subcomment: typeof subcomment;
   join: typeof join;
   identifier: typeof identifier;
   dangerousKey: typeof dangerousKey;
@@ -897,6 +906,7 @@ const attributes = {
   lit,
   literal: lit,
   substring,
+  subcomment,
   join,
   identifier,
   dangerousKey,

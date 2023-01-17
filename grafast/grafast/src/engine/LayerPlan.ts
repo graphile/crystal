@@ -1,3 +1,4 @@
+import dyk, { DYK } from "devil-you-know";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
@@ -317,14 +318,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return this.operationPlan._addModifierStep(step);
   }
 
-  public makeNewBucketCallback(inner: string): typeof this.newBucket {
-    const body = `\
-return function newBucket${this.id}(parentBucket) {
+  public makeNewBucketCallback(inner: DYK): typeof this.newBucket {
+    return dyk.run`\
+const that = ${dyk.ref(this)};
+const newBucket = ${dyk.ref(newBucket)};
+return function ${dyk.identifier(`newBucket${this.id}`)}(parentBucket) {
   const store = new Map();
   const polymorphicPathList = ${
     this.reason.type === "mutationField"
-      ? "parentBucket.polymorphicPathList"
-      : "[]"
+      ? dyk`parentBucket.polymorphicPathList`
+      : dyk`[]`
   };
   const map = new Map();
   let size = 0;
@@ -341,7 +344,7 @@ ${inner}
       hasErrors: parentBucket.hasErrors,
       polymorphicPathList,
     });
-    parentBucket.children[${this.id}] = {
+    parentBucket.children[${dyk.lit(this.id)}] = {
       bucket: childBucket,
       map,
     };
@@ -352,8 +355,6 @@ ${inner}
   }
 }
 `;
-    //console.log(body);
-    return new Function("that", "newBucket", body)(this, newBucket);
   }
 
   public finalize(): void {
@@ -363,34 +364,37 @@ ${inner}
       // then we can just copy everything wholesale rather than building
       // new arrays and looping.
 
-      this.newBucket = this.makeNewBucketCallback(`\
+      this.newBucket = this.makeNewBucketCallback(dyk`\
 ${
   isDev
-    ? `/*
-makeNewBucketCallback called for LayerPlan with id: ${this.id}.
-Reason type: ${this.reason.type}
-Root step: ${this.rootStep?.id}
-Copy step ids: ${copyStepIds}
+    ? dyk`/*
+makeNewBucketCallback called for LayerPlan with id: ${dyk.subcomment(this.id)}.
+Reason type: ${dyk.subcomment(this.reason.type)}
+Root step: ${dyk.subcomment(this.rootStep?.id)}
+Copy step ids: ${dyk.subcomment(copyStepIds.join(","))}
 */
 `
-    : ``
+    : dyk.blank
 }\
-  const itemStepId = ${this.rootStep!.id};
+  const itemStepId = ${dyk.lit(this.rootStep!.id)};
   const nullableStepStore = parentBucket.store.get(itemStepId);
 
   const itemStepIdList = [];
   store.set(itemStepId, itemStepIdList);
 
   // Prepare store with an empty list for each copyPlanId
-${copyStepIds
-  .map(
-    (planId) => `\
-  const source${planId} = parentBucket.store.get(${planId});
-  const target${planId} = [];
-  store.set(${planId}, target${planId});
+${dyk.join(
+  copyStepIds.map(
+    (planId) => dyk`\
+  const ${dyk.identifier(`source${planId}`)} = parentBucket.store.get(${dyk.lit(
+      planId,
+    )});
+  const ${dyk.identifier(`target${planId}`)} = [];
+  store.set(${dyk.lit(planId)}, ${dyk.identifier(`target${planId}`)});
 `,
-  )
-  .join("")}
+  ),
+  "",
+)}
 
   // We'll typically be creating fewer nullableBoundary bucket entries
   // than we have parent bucket entries (because we exclude nulls), so
@@ -407,33 +411,41 @@ ${copyStepIds
       itemStepIdList[newIndex] = fieldValue;
 
       polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
-${copyStepIds
-  .map(
-    (planId) => `\
-      target${planId}[newIndex] = source${planId}[originalIndex];
+${dyk.join(
+  copyStepIds.map(
+    (planId) => dyk`\
+      ${dyk.identifier(`target${planId}`)}[newIndex] = ${dyk.identifier(
+      `source${planId}`,
+    )}[originalIndex];
 `,
-  )
-  .join("")}
+  ),
+  "",
+)}
     }
   }
 `);
     } else if (this.reason.type === "listItem") {
-      this.newBucket = this.makeNewBucketCallback(`\
-  const listStepStore = parentBucket.store.get(${this.reason.parentStep.id});
+      this.newBucket = this.makeNewBucketCallback(dyk`\
+  const listStepStore = parentBucket.store.get(${dyk.lit(
+    this.reason.parentStep.id,
+  )});
 
   const itemStepIdList = [];
-  store.set(${this.rootStep!.id}, itemStepIdList);
+  store.set(${dyk.lit(this.rootStep!.id)}, itemStepIdList);
 
   // Prepare store with an empty list for each copyPlanId
-  ${copyStepIds
-    .map(
-      (planId) => `\
-  const source${planId} = parentBucket.store.get(${planId});
-  const target${planId} = [];
-  store.set(${planId}, target${planId});
+  ${dyk.join(
+    copyStepIds.map(
+      (planId) => dyk`\
+  const ${dyk.identifier(`source${planId}`)} = parentBucket.store.get(${dyk.lit(
+        planId,
+      )});
+  const ${dyk.identifier(`target${planId}`)} = [];
+  store.set(${dyk.lit(planId)}, ${dyk.identifier(`target${planId}`)});
   `,
-    )
-    .join("")}
+    ),
+    "",
+  )}
 
   // We'll typically be creating more listItem bucket entries than we
   // have parent buckets, so we must "multiply up" the store entries.
@@ -452,13 +464,16 @@ ${copyStepIds
         itemStepIdList[newIndex] = list[j];
 
         polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
-        ${copyStepIds
-          .map(
-            (planId) => `\
-        target${planId}[newIndex] = source${planId}[originalIndex];
+        ${dyk.join(
+          copyStepIds.map(
+            (planId) => dyk`\
+        ${dyk.identifier(`target${planId}`)}[newIndex] = ${dyk.identifier(
+              `source${planId}`,
+            )}[originalIndex];
         `,
-          )
-          .join("")}
+          ),
+          "",
+        )}
       }
     }
   }

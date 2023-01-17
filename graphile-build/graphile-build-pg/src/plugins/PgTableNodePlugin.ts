@@ -104,18 +104,14 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             plan: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
-                  new Function(
-                    "list",
-                    "constant",
-                    `return $record => list([constant(${JSON.stringify(
-                      identifier,
-                    )}), ${pk
-                      .map(
-                        (columnName) =>
-                          `$record.get(${JSON.stringify(columnName)})`,
-                      )
-                      .join(", ")}])`,
-                  ) as any,
+                  dyk.run`return function (list, constant) {
+  return $record => list([constant(${dyk.lit(identifier)}), ${dyk.join(
+                    pk.map(
+                      (columnName) => dyk`$record.get(${dyk.lit(columnName)})`,
+                    ),
+                    ", ",
+                  )}]);
+}` as any,
                   [list, constant],
                 )
               : EXPORTABLE(

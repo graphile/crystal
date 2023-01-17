@@ -1,3 +1,4 @@
+import dyk from "devil-you-know";
 import type {
   GraphQLInputObjectType,
   GraphQLInputType,
@@ -65,23 +66,27 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   }
 
   finalize() {
-    this.unbatchedExecute = new Function(
-      "extra",
-      ...this.dependencies.map((_, i) => `val${i}`),
-      `\
-    const resultValues = Object.create(null);
-    ${Object.entries(this.inputFields)
-      .map(([inputFieldName, { dependencyIndex }]) => {
+    this.unbatchedExecute = dyk.run`return function (extra, ${dyk.join(
+      this.dependencies.map((_, i) => dyk.identifier(`val${i}`)),
+      ", ",
+    )}) {
+  const resultValues = Object.create(null);
+  ${dyk.join(
+    Object.entries(this.inputFields).map(
+      ([inputFieldName, { dependencyIndex }]) => {
         if (dependencyIndex == null) {
           throw new Error("inputFieldPlan has gone missing.");
         }
-        return `\
-    resultValues[${JSON.stringify(inputFieldName)}] = val${dependencyIndex};`;
-      })
-      .join("\n")}
-    return resultValues;
-`,
-    ) as any;
+        return dyk`\
+  resultValues${dyk.set(inputFieldName, true)} = ${dyk.identifier(
+          `val${dependencyIndex}`,
+        )};`;
+      },
+    ),
+    "\n",
+  )}
+  return resultValues;
+}` as any;
     super.finalize();
   }
 
