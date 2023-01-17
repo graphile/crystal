@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import dyk, { DYK } from "devil-you-know";
 import type { GraphQLObjectType } from "graphql";
 
 import { isDev, noop } from "./dev.js";
@@ -473,36 +474,42 @@ export abstract class UnbatchedExecutableStep<
     if (this.execute === UnbatchedExecutableStep.prototype.execute) {
       const depIndexes =
         this.dependencies.length > 0 ? this.dependencies.map((_, i) => i) : [0];
-      const tryOrNot = (inStr: string): string => {
+      const tryOrNot = (inFrag: DYK): DYK => {
         if (this.isSyncAndSafe) {
-          return inStr;
+          return inFrag;
         } else {
-          return `\
+          return dyk`\
       try {
-${inStr.replace(/^/gm, "  ")}
+${dyk.indent(inFrag)}
       } catch (e) {
         results[i] = e instanceof Error ? e : Promise.reject(e);
       }
 `;
         }
       };
-      this.execute = new Function(
-        "values",
-        "extra",
-        `\
-    const [ ${depIndexes.map((i) => `list${i}`).join(", ")} ] = values;
-    const count = list0.length;
-    const results = [];
-    for (let i = 0; i < count; i++) {
-${tryOrNot(`\
-      results[i] = this.unbatchedExecute(extra, ${depIndexes
-        .map((depIndex) => `list${depIndex}[i]`)
-        .join(", ")});
+      this.execute = dyk.run`
+return function execute(values, extra) {
+  const [
+${dyk.join(
+  depIndexes.map((i) => dyk`    ${dyk.identifier(`list${i}`)},\n`),
+  "",
+)}\
+  ] = values;
+  const count = list0.length;
+  const results = [];
+  for (let i = 0; i < count; i++) {
+${tryOrNot(dyk`\
+    results[i] = this.unbatchedExecute(extra, ${dyk.join(
+      depIndexes.map(
+        (depIndex) => dyk`${dyk.identifier(`list${depIndex}`)}[i]`,
+      ),
+      ", ",
+    )});
 `)}\
-    }
-    return results;
-`,
-      ) as any;
+  }
+  return results;
+}
+` as any;
     }
     super.finalize();
   }

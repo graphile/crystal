@@ -1,6 +1,6 @@
 // TODO: optimise constraint matching, e.g. by collapsing redundant constraints
 // and then compiling (JIT-style) remaining constraints into a function using
-// `new Function`.
+// devil-you-know
 
 /**
  * Asserts that a value strictly matches.
