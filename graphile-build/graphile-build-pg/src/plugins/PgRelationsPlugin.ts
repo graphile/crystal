@@ -15,19 +15,13 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder, pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
-import {
-  arraysMatch,
-  connection,
-  evalSafeProperty,
-  list,
-  object,
-} from "grafast";
+import { arraysMatch, connection, list, object } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
-import { isSafeObjectPropertyName } from "devil-you-know";
+import dyk, { DYK, isSafeObjectPropertyName } from "devil-you-know";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -430,18 +424,19 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 };
 
 function makeSpecString(
-  identifier: string,
+  identifier: DYK,
   localColumns: readonly string[],
   remoteColumns: readonly string[],
 ) {
-  return `{ ${remoteColumns
-    .map(
+  return dyk`{ ${dyk.join(
+    remoteColumns.map(
       (remoteColumnName, i) =>
-        `${evalSafeProperty(
-          remoteColumnName as string,
-        )}: ${identifier}.get(${JSON.stringify(localColumns[i])})`,
-    )
-    .join(", ")} }`;
+        dyk`${dyk.dangerousKey(remoteColumnName)}: ${identifier}.get(${dyk.lit(
+          localColumns[i],
+        )})`,
+    ),
+    ", ",
+  )} }`;
 }
 
 function makeRelationPlans(
@@ -451,8 +446,8 @@ function makeRelationPlans(
   isMutationPayload: boolean,
 ) {
   const recordOrResult = isMutationPayload
-    ? `$record.get("result")`
-    : `$record`;
+    ? dyk`$record.get("result")`
+    : dyk`$record`;
   const clean =
     remoteColumns.every(
       (remoteColumnName) =>
@@ -489,10 +484,9 @@ function makeRelationPlans(
     ? // Optimise function for both execution and export.
       // eslint-disable-next-line graphile-export/exhaustive-deps
       (EXPORTABLE(
-        new Function(
-          "otherSource",
-          `return $record => otherSource.get(${specString})`,
-        ) as any,
+        dyk.run`return function (otherSource) {
+  return $record => otherSource.get(${specString});
+}` as any,
         [otherSource],
       ) as any)
     : isMutationPayload
@@ -515,10 +509,9 @@ function makeRelationPlans(
   const listPlan = clean
     ? // eslint-disable-next-line graphile-export/exhaustive-deps
       (EXPORTABLE(
-        new Function(
-          "otherSource",
-          `return $record => otherSource.find(${specString})`,
-        ) as any,
+        dyk.run`return function (otherSource) {
+  return $record => otherSource.find(${specString});
+}` as any,
         [otherSource],
       ) as any)
     : isMutationPayload
@@ -541,14 +534,12 @@ function makeRelationPlans(
   const connectionPlan = clean
     ? // eslint-disable-next-line graphile-export/exhaustive-deps
       (EXPORTABLE(
-        new Function(
-          "otherSource",
-          "connection",
-          `return $record => {
-  const $records = otherSource.find(${specString});
-  return connection($records);
-}`,
-        ) as any,
+        dyk.run`return function (otherSource, connection) {
+  return $record => {
+    const $records = otherSource.find(${specString});
+    return connection($records);
+  }
+}` as any,
         [otherSource, connection],
       ) as any)
     : isMutationPayload
@@ -912,22 +903,20 @@ function addRelations(
                 "sql",
               ]);
 
-              const functionLines: string[] = [];
+              const functionLines: DYK[] = [];
+              const prefixLines: DYK[] = [];
               if (isMutationPayload) {
-                functionLines.push(`return ($in) => {`);
-                functionLines.push(`  const $record = $in.get("result");`);
+                functionLines.push(dyk`return ($in) => {`);
+                functionLines.push(dyk`  const $record = $in.get("result");`);
               } else {
-                functionLines.push(`return ($record) => {`);
+                functionLines.push(dyk`return ($record) => {`);
               }
 
               let previousIdentifier = "$record";
-              const argNames: string[] = [
-                "list",
-                "object",
-                "connection",
-                "sql",
-              ];
-              const argValues: any[] = [list, object, connection, sql];
+              prefixLines.push(dyk`const list = ${dyk.ref(list)};`);
+              prefixLines.push(dyk`const object = ${dyk.ref(object)};`);
+              prefixLines.push(dyk`const connection = ${dyk.ref(connection)};`);
+              prefixLines.push(dyk`const sql = ${dyk.ref(sql)};`);
               let isStillSingular = true;
               for (let i = 0, l = path.layers.length; i < l; i++) {
                 const layer = path.layers[i];
@@ -945,8 +934,11 @@ function addRelations(
                 const sourceName = idents.makeSafeIdentifier(
                   `${source.name}Source`,
                 );
-                argNames.push(sourceName);
-                argValues.push(source);
+                prefixLines.push(
+                  dyk`const ${dyk.identifier(sourceName)} = ${dyk.ref(
+                    source,
+                  )};`,
+                );
                 if (isStillSingular) {
                   if (!isUnique) {
                     isStillSingular = false;
@@ -959,13 +951,15 @@ function addRelations(
                     }`,
                   );
                   const specString = makeSpecString(
-                    previousIdentifier,
+                    dyk.identifier(previousIdentifier),
                     localColumns,
                     remoteColumns,
                   );
                   functionLines.push(
-                    `  const ${newIdentifier} = ${sourceName}.${
-                      isUnique ? "get" : "find"
+                    dyk`  const ${dyk.identifier(
+                      newIdentifier,
+                    )} = ${dyk.identifier(sourceName)}.${
+                      isUnique ? dyk`get` : dyk`find`
                     }(${specString});`,
                   );
                   previousIdentifier = newIdentifier;
@@ -988,12 +982,18 @@ function addRelations(
             functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
             */
                   const specString = makeSpecString(
-                    "$entry",
+                    dyk`$entry`,
                     localColumns,
                     remoteColumns,
                   );
                   functionLines.push(
-                    `  const ${newIdentifier} = each(${previousIdentifier}, ($entry) => ${sourceName}.get(${specString}));`,
+                    dyk`  const ${dyk.identifier(
+                      newIdentifier,
+                    )} = each(${dyk.identifier(
+                      previousIdentifier,
+                    )}, ($entry) => ${dyk.identifier(
+                      sourceName,
+                    )}.get(${specString}));`,
                   );
                   previousIdentifier = newIdentifier;
                 }
@@ -1001,21 +1001,29 @@ function addRelations(
 
               if (isStillSingular && !single) {
                 functionLines.push(
-                  `  const $list = list([${previousIdentifier}]);`,
+                  dyk`  const $list = list([${dyk.identifier(
+                    previousIdentifier,
+                  )}]);`,
                 );
                 previousIdentifier = "$list";
               }
 
               if (isConnection) {
                 functionLines.push(
-                  `  return connection(${previousIdentifier});`,
+                  dyk`  return connection(${dyk.identifier(
+                    previousIdentifier,
+                  )});`,
                 );
               } else {
-                functionLines.push(`  return ${previousIdentifier};`);
+                functionLines.push(
+                  dyk`  return ${dyk.identifier(previousIdentifier)};`,
+                );
               }
-              functionLines.push(`}`);
-              const functionBody = functionLines.join("\n");
-              return new Function(...argNames, functionBody)(...argValues);
+              functionLines.push(dyk`}`);
+              return dyk.run`${dyk.join(prefixLines, "\n")}${dyk.join(
+                functionLines,
+                "\n",
+              )}`;
             } catch (e) {
               console.error(e);
               // TODO: fallback if unsafe

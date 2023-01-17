@@ -13,7 +13,6 @@ import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
   __TrackedObjectStep,
-  evalSafeProperty,
   lambda,
   object,
   ObjectStep,
@@ -760,6 +759,7 @@ return (_$root, args) => {
   const plan = object({ result: pgUpdate(source, ${specFromArgsString}) });
   args.apply(plan);
   return plan;
+}
 }` as any,
                                   [object, pgUpdate, source],
                                 )
@@ -787,7 +787,8 @@ return (_$root, args) => {
 return (_$root, args) => {
   const plan = object({ result: pgDelete(source, ${specFromArgsString}) });
   args.apply(plan);
-  return plan
+  return plan;
+}
 }` as any,
                                 [object, pgDelete, source],
                               )

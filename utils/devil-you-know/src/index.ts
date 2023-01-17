@@ -603,6 +603,7 @@ function identifier(name: string) {
   return makeRawNode(name);
 }
 
+// TODO: rename to `ensureSafeKey` or `safeKeyOrThrow` or something?
 /**
  * IMPORTANT: It's strongly recommended that instead of defining an object via
  * `const obj = { ${dyk.dangerousKey(untrustedKey)}: value }` you instead use

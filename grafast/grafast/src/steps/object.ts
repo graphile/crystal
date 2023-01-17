@@ -1,9 +1,9 @@
 // import debugFactory from "debug";
 
+import dyk, { isSafeObjectPropertyName } from "devil-you-know";
 import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import { evalSafeProperty, isSafeObjectPropertyName } from "../utils.js";
 import type { SetterCapableStep } from "./setter.js";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -133,25 +133,40 @@ export class ObjectStep<
     }
     const keysAreSafe = this.keys.every(isSafeObjectPropertyName);
     const inner = keysAreSafe
-      ? `\
+      ? dyk`\
   const newObj = {
-${this.keys
-  .map((key, i) => `    ${evalSafeProperty(key)}: val${i}`)
-  .join(",\n")}
+${dyk.join(
+  this.keys.map(
+    (key, i) => dyk`    ${dyk.dangerousKey(key)}: ${dyk.identifier(`val${i}`)}`,
+  ),
+  ",\n",
+)}
   };
 `
-      : `\
+      : dyk`\
   const newObj = Object.create(null);
-${this.keys.map((key, i) => `  newObj[keys[${i}]] = val${i};\n`).join("")}\
+${dyk.join(
+  this.keys.map(
+    (key, i) => dyk`  newObj${dyk.set(key)} = ${dyk.identifier(`val${i}`)};\n`,
+  ),
+  "",
+)}\
 `;
-    const functionBody = `\
-return function ({ meta }, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
+    return dyk.run`\
+return function ({ meta }, ${dyk.join(
+      this.keys.map((_k, i) => dyk.identifier(`val${i}`)),
+      ", ",
+    )}) {
   if (meta.nextIndex) {
     for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
-      if (${this.keys
-        .map((key, i) => `values[${i}] === val${i}`)
-        .join(" && ")}) {
+      if (${dyk.join(
+        this.keys.map(
+          (_key, i) =>
+            dyk`values[${dyk.lit(i)}] === ${dyk.identifier(`val${i}`)}`,
+        ),
+        " && ",
+      )}) {
         return obj;
       }
     }
@@ -162,19 +177,15 @@ return function ({ meta }, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
     }
   }
 ${inner}
-  meta.results[meta.nextIndex] = [[${this.keys
-    .map((key, i) => `val${i}`)
-    .join(",")}], newObj];
+  meta.results[meta.nextIndex] = [[${dyk.join(
+    this.keys.map((_key, i) => dyk.identifier(`val${i}`)),
+    ",",
+  )}], newObj];
   // Only cache 10 results, use a round-robin
   meta.nextIndex = meta.nextIndex === 9 ? 0 : meta.nextIndex + 1;
   return newObj;
 }
 `;
-    if (keysAreSafe) {
-      return new Function(functionBody)() as any;
-    } else {
-      return new Function("keys", functionBody)(this.keys) as any;
-    }
   }
 
   finalize() {

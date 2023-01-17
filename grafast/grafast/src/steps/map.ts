@@ -9,8 +9,7 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import { canRepresentAsIdentifier, evalSafeProperty } from "../utils.js";
-import { isSafeObjectPropertyName } from "devil-you-know";
+import dyk, { isSafeObjectPropertyName } from "devil-you-know";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -23,19 +22,14 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     )
   ) {
     // We can do a fast custom conversion
-    return new Function(
-      "obj",
-      `return (obj == null ? obj : { ${entries
-        .map(
-          ([key, val]) =>
-            `${evalSafeProperty(key)}: obj${
-              canRepresentAsIdentifier(val)
-                ? `.${val}`
-                : `[${JSON.stringify(val)}]`
-            }`,
-        )
-        .join(", ")} })`,
-    ) as any;
+    return dyk.run`return function(obj) {
+  return (obj == null ? obj : { ${dyk.join(
+    entries.map(
+      ([key, val]) => dyk`${dyk.dangerousKey(key)}: obj${dyk.get(val)}`,
+    ),
+    ", ",
+  )} });
+}` as any;
   }
   // Fallback to slow conversion
   return (obj: object | null | GrafastError): object | null | GrafastError => {

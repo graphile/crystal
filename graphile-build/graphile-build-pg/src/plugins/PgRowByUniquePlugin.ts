@@ -2,9 +2,8 @@ import "graphile-config";
 
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
-import { evalSafeProperty } from "grafast";
 import { EXPORTABLE } from "graphile-export";
-import { isSafeObjectPropertyName } from "devil-you-know";
+import dyk, { isSafeObjectPropertyName } from "devil-you-know";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -125,19 +124,17 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                      */
                     // eslint-disable-next-line graphile-export/exhaustive-deps
                     EXPORTABLE(
-                      new Function(
-                        "source",
-                        `return (_$root, args) => source.get({ ${columnNames
-                          .map(
-                            (columnName) =>
-                              `${evalSafeProperty(
-                                columnName,
-                              )}: args.get(${JSON.stringify(
-                                detailsByColumnName[columnName].graphqlName,
-                              )})`,
-                          )
-                          .join(", ")} })`,
-                      ) as any,
+                      dyk.run`return function (source) {
+  return (_$root, args) => source.get({ ${dyk.join(
+    columnNames.map(
+      (columnName) =>
+        dyk`${dyk.dangerousKey(columnName)}: args.get(${dyk.lit(
+          detailsByColumnName[columnName].graphqlName,
+        )})`,
+    ),
+    ", ",
+  )} });
+}` as any,
                       [source],
                     )
                   : EXPORTABLE(

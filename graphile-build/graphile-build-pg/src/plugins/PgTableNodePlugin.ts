@@ -8,9 +8,9 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
-import { access, constant, evalSafeProperty, list } from "grafast";
+import { access, constant, list } from "grafast";
 import { EXPORTABLE } from "graphile-export";
-import { isSafeObjectPropertyName } from "devil-you-know";
+import dyk, { isSafeObjectPropertyName } from "devil-you-know";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
@@ -131,15 +131,17 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             getSpec: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
-                  new Function(
-                    "access",
-                    `return $list => ({ ${pk.map(
-                      (columnName, index) =>
-                        `${evalSafeProperty(columnName)}: access($list, [${
-                          index + 1
-                        }])`,
-                    )} })`,
-                  ) as any,
+                  dyk.run`return function (access) {
+  return $list => ({ ${dyk.join(
+    pk.map(
+      (columnName, index) =>
+        dyk`${dyk.dangerousKey(columnName)}: access($list, [${dyk.lit(
+          index + 1,
+        )}])`,
+    ),
+    ", ",
+  )} })
+}` as any,
                   [access],
                 )
               : EXPORTABLE(
