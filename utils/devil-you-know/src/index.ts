@@ -562,13 +562,15 @@ const disallowedKeys: Array<string | symbol | number> = [
   ...Object.getOwnPropertyNames(Object.prototype),
   ...Object.getOwnPropertySymbols(Object.prototype),
 ];
+
 /**
- * Is safe to set as the key of a POJO (without a null prototype) and doesn't
- * include any characters that would make it unsafe in eval'd code (before or
- * after JSON.stringify).
+ * Is safe to set as the key of a POJO (without a null prototype).
  */
-export const isSafeObjectPropertyName = (key: string) =>
-  /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key) &&
+export const isSafeObjectPropertyName = (key: string | symbol | number) =>
+  (typeof key === "number" ||
+    typeof key === "symbol" ||
+    (typeof key === "string" &&
+      /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key))) &&
   !disallowedKeys.includes(key);
 
 /**
@@ -577,8 +579,12 @@ export const isSafeObjectPropertyName = (key: string) =>
  * @remarks
  * Doesn't allow it to start with two underscores.
  */
-export const canRepresentAsIdentifier = (key: string) =>
-  key === "_" || /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
+export const canRepresentAsIdentifier = (
+  key: string | symbol | number,
+): key is string | number =>
+  Number.isFinite(key) ||
+  (typeof key === "string" &&
+    (key === "_" || /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key)));
 
 function isValidVariableName(name: string): boolean {
   if (reservedWords.has(name)) {
@@ -605,13 +611,10 @@ function identifier(name: string) {
  * **prototype polution** since properties like `__proto__` are not special on
  * null-prototype objects, whereas they can cause havok in regular `{}` objects.
  */
-function dangerousKey(key: string): DYK {
-  if (typeof key !== "string") {
-    throw new Error("Invalid call to dyk.dangerousKey - expected a string");
-  }
+function dangerousKey(key: string | symbol | number): DYK {
   if (isSafeObjectPropertyName(key)) {
     if (canRepresentAsIdentifier(key)) {
-      return makeRawNode(key);
+      return makeRawNode(String(key));
     } else {
       return makeRawNode(JSON.stringify(key));
     }

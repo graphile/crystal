@@ -323,16 +323,13 @@ export class OperationPlan {
 
     // A JIT'd object constructor
     this.makeMetaByMetaKey = dyk.run`
-return () => {
-  const meta = Object.create(null);
+return () => ({
 ${dyk.join(
   allMetaKeysList.map(
-    (key) => dyk`  meta${dyk.set(key, true)} = Object.create(null);`,
+    (key) => dyk`\n  ${dyk.dangerousKey(key)}: Object.create(null),`,
   ),
-  "\n",
-)}
-  return meta;
-};`;
+  "",
+)}\n});`;
   }
 
   /**
