@@ -26,6 +26,7 @@ import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
+import dyk from "devil-you-know";
 
 declare global {
   namespace GraphileBuild {
@@ -661,16 +662,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                  * exported schema.
                  */
                 const specFromArgsString = clean
-                  ? `{ ${uniqueColumns
-                      .map(
+                  ? dyk`{ ${dyk.join(
+                      uniqueColumns.map(
                         ([columnName, fieldName]) =>
-                          `${evalSafeProperty(
+                          dyk`${dyk.dangerousKey(
                             columnName,
-                          )}: args.get(['input', ${JSON.stringify(
-                            fieldName,
-                          )}])`,
-                      )
-                      .join(", ")} }`
+                          )}: args.get(['input', ${dyk.lit(fieldName)}])`,
+                      ),
+                      ", ",
+                    )} }`
                   : null;
 
                 const tableTypeName = inflection.tableType(source.codec);
@@ -756,17 +756,12 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             ? specFromArgsString
                               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                                 EXPORTABLE(
-                                  new Function(
-                                    "object",
-                                    "pgUpdate",
-                                    "source",
-                                    `\
+                                  dyk.run`return function(object, pgUpdate, source) {
 return (_$root, args) => {
-  const plan = object({result: pgUpdate(source, ${specFromArgsString})});
+  const plan = object({ result: pgUpdate(source, ${specFromArgsString}) });
   args.apply(plan);
   return plan;
-}`,
-                                  ) as any,
+}` as any,
                                   [object, pgUpdate, source],
                                 )
                               : (EXPORTABLE(
@@ -789,17 +784,12 @@ return (_$root, args) => {
                             : specFromArgsString
                             ? // eslint-disable-next-line graphile-export/exhaustive-deps
                               EXPORTABLE(
-                                new Function(
-                                  "object",
-                                  "pgDelete",
-                                  "source",
-                                  `\
+                                dyk.run`return function (object, pgDelete, source) {
 return (_$root, args) => {
-  const plan = object({result: pgDelete(source, ${specFromArgsString})});
+  const plan = object({ result: pgDelete(source, ${specFromArgsString}) });
   args.apply(plan);
   return plan
-}`,
-                                ) as any,
+}` as any,
                                 [object, pgDelete, source],
                               )
                             : (EXPORTABLE(
