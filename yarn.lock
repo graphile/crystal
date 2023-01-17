@@ -10448,22 +10448,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tamedevil@workspace:^, tamedevil@workspace:utils/tamedevil":
-  version: 0.0.0-use.local
-  resolution: "tamedevil@workspace:utils/tamedevil"
-  dependencies:
-    "@graphile/lru": "workspace:^"
-    "@types/debug": "npm:4.1.7"
-    "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:16.11.15"
-    jest: "npm:^28.1.0"
-    markdown-doctest: "npm:^1.1.0"
-    ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^4.8.1-rc"
-  languageName: unknown
-  linkType: soft
-
 "devtools-protocol@npm:0.0.960912":
   version: 0.0.960912
   resolution: "devtools-protocol@npm:0.0.960912"
@@ -12757,7 +12741,6 @@ __metadata:
     chai: "npm:^4.3.6"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.3"
-    tamedevil: "workspace:^"
     eventemitter3: "npm:^4.0.7"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     iterall: "npm:^1.3.0"
@@ -12769,6 +12752,7 @@ __metadata:
     nodemon: "npm:^2.0.15"
     pg-sql2: "workspace:^"
     spec-md: "npm:^3.0.2"
+    tamedevil: "workspace:^"
     ts-loader: "npm:^9.4.1"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
@@ -12832,7 +12816,6 @@ __metadata:
     "@types/node": "npm:^16.11.15"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.3"
-    tamedevil: "workspace:^"
     express: "npm:^4.17.2"
     express-graphql: "npm:^0.12.0"
     fastify: "npm:^3.27.2"
@@ -12850,6 +12833,7 @@ __metadata:
     pg-introspection: "workspace:^"
     pg-sql2: "workspace:^"
     ruru: "workspace:^"
+    tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
@@ -20766,6 +20750,22 @@ __metadata:
   checksum: 3836f54c477c83cc717e2589f8ea36bc34c7b97f2ccacc58546abfb67518d78dfd247cbaa9c33ecdfa1fa529f0496e15a12e8c81b6503b49851b952c3eae75b7
   languageName: node
   linkType: hard
+
+"tamedevil@workspace:^, tamedevil@workspace:utils/tamedevil":
+  version: 0.0.0-use.local
+  resolution: "tamedevil@workspace:utils/tamedevil"
+  dependencies:
+    "@graphile/lru": "workspace:^"
+    "@types/debug": "npm:4.1.7"
+    "@types/jest": "npm:^27.5.1"
+    "@types/node": "npm:16.11.15"
+    jest: "npm:^28.1.0"
+    markdown-doctest: "npm:^1.1.0"
+    ts-node: "npm:^10.9.1"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^4.8.1-rc"
+  languageName: unknown
+  linkType: soft
 
 "tapable@npm:^1.0.0":
   version: 1.1.3

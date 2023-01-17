@@ -18,6 +18,8 @@ import {
   Kind,
   OperationTypeNode,
 } from "graphql";
+import type {TE} from "tamedevil";
+import te, { stringifyString, toJSON } from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
@@ -32,7 +34,6 @@ import type { ExecutableStep } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
-import te, { TE, toJSON, stringifyString } from "tamedevil";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 

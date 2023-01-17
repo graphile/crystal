@@ -1,6 +1,7 @@
 import chalk from "chalk";
-import te, { TE } from "tamedevil";
 import type { GraphQLObjectType } from "graphql";
+import type { TE } from "tamedevil";
+import te from "tamedevil";
 
 import { isDev, noop } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";

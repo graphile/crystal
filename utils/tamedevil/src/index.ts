@@ -1,7 +1,8 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
 import { inspect } from "util";
-import { reservedWords } from "./reservedWords";
+
+import { reservedWords } from "./reservedWords.js";
 
 type Primitive = null | boolean | number | string;
 
@@ -209,7 +210,7 @@ function compile(fragment: TE): {
   const varMap = new Map<symbol, string>();
   let tmpCounter = 0;
   const getVar = (sym: symbol) => {
-    let existing = varMap.get(sym);
+    const existing = varMap.get(sym);
     if (existing) {
       return existing;
     }
@@ -431,7 +432,7 @@ const undefinedNode = makeRawNode(`undefined`, "undefined");
  * - surrogates
  */
 // eslint-disable-next-line no-control-regex
-const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
+// const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
 
 /**
  * A 'short string' has a length less than or equal to this, and can
@@ -843,26 +844,27 @@ const te = teBase as TamedEvil;
 export default te;
 
 export {
-  te,
-  ref,
+  compile,
+  dangerousKey,
+  run as eval,
+  get,
+  identifier,
+  isTE,
+  join,
   lit,
   lit as literal,
-  substring,
-  subcomment,
-  join,
-  identifier,
-  dangerousKey,
-  get,
   optionalGet,
-  set,
-  tmp,
-  tempVar,
-  run,
-  run as eval,
-  compile,
-  undefinedNode as undefined,
-  isTE,
+  ref,
   reservedWords,
+  run,
+  set,
+  subcomment,
+  substring,
+  te,
+  tempVar,
+  tmp,
+  undefinedNode as undefined,
+  raw,
 };
 
 export interface TamedEvil {
@@ -897,6 +899,7 @@ export interface TamedEvil {
   blank: TE;
   isTE: typeof isTE;
   reservedWords: typeof reservedWords;
+  raw: typeof raw;
 }
 
 const attributes = {
@@ -924,6 +927,7 @@ const attributes = {
   blank: blankNode,
   isTE,
   reservedWords,
+  raw,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {

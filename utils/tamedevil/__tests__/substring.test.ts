@@ -1,4 +1,5 @@
-import te, { TE } from "../dist";
+import type { TE } from "../dist/index.js";
+import te from "../dist/index.js";
 
 const evilString = "'\"` \\'\\\"\\` ${foo}\\${foo}\\\\${foo}";
 

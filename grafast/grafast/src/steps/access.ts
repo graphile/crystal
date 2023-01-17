@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import debugFactory from "debug";
-import te, { TE } from "tamedevil";
+import type { TE } from "tamedevil";
+import te from "tamedevil";
 
 import { inspect } from "../inspect.js";
 import type { ExecutionExtra } from "../interfaces.js";

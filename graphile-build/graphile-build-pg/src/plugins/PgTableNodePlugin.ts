@@ -11,6 +11,7 @@ import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import te, { isSafeObjectPropertyName } from "tamedevil";
+
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";

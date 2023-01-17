@@ -20,11 +20,11 @@ import {
 } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
-import te, { isSafeObjectPropertyName } from "tamedevil";
 
 declare global {
   namespace GraphileBuild {

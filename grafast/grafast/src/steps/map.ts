@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import type { GrafastError } from "../error.js";
 import type {
@@ -9,7 +10,6 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import te, { isSafeObjectPropertyName } from "tamedevil";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 

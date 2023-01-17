@@ -1,4 +1,4 @@
-import te from "../dist";
+import te from "../dist/index.js";
 
 it("basic", () => {
   expect(te.compile(te`return 1`)).toMatchInlineSnapshot(`

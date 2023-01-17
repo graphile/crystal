@@ -21,7 +21,8 @@ import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
-import te, { TE, isSafeObjectPropertyName } from "tamedevil";
+import type {TE } from "tamedevil";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";

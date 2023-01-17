@@ -1,4 +1,6 @@
-import te, { TE } from "tamedevil";
+import type { TE } from "tamedevil";
+import te from "tamedevil";
+
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";

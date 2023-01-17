@@ -1,5 +1,4 @@
 import LRU from "@graphile/lru";
-import te from "tamedevil";
 import type {
   FieldNode,
   FragmentDefinitionNode,
@@ -24,6 +23,7 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
+import te from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Constraint } from "../constraints.js";

@@ -1,9 +1,9 @@
-import te from "tamedevil";
 import type {
   GraphQLInputObjectType,
   GraphQLInputType,
   ValueNode,
 } from "graphql";
+import te from "tamedevil";
 
 import type { InputStep } from "../input.js";
 import { inputPlan } from "../input.js";
