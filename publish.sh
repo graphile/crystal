@@ -23,6 +23,7 @@ tar tzf postgraphile-private/builds/postgraphile.tgz
 read -n1 -p "Publish? [y,n]" doit
 case $doit in
   y|Y)
+    npm publish --access=public --tag=prealpha postgraphile-private/builds/tamedevil.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/graphile-config.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/ruru.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/graphile__lru.tgz

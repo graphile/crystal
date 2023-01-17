@@ -4,6 +4,13 @@ set -e -x
 rm -rf builds/
 mkdir builds/
 
+# tamedevil
+cd utils/tamedevil
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/tamedevil.tgz
+cd -
+
 # graphile-config
 cd utils/graphile-config
 rm -f *.tgz
