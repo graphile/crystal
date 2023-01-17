@@ -58,7 +58,7 @@ it("a few refs", () => {
     ]",
     }
   `);
-  const val = dyk.run(frag);
+  const val = dyk.run<any[]>(frag);
   expect(val[4]).toStrictEqual(AWKWARD_STRING);
   expect(val[9]).toStrictEqual(COMPLEX_OBJECT);
   expect(val).toMatchInlineSnapshot(`
@@ -119,7 +119,7 @@ it("a few lits", () => {
     ]",
     }
   `);
-  const val = dyk.run(frag);
+  const val = dyk.run<any[]>(frag);
   expect(val[4]).toStrictEqual(AWKWARD_STRING);
   expect(val[9]).toStrictEqual(COMPLEX_OBJECT);
   expect(val).toMatchInlineSnapshot(`
@@ -185,4 +185,8 @@ it("mixture", () => {
   `);
   const val = dyk.run(frag);
   expect(val).toStrictEqual(COMPLEX_OBJECT);
+});
+
+it("dyk.run`return ${dyk.lit(1)}+${dyk.ref(2)}`", () => {
+  expect(dyk.run`return ${dyk.lit(1)}+${dyk.ref(2)}`).toEqual(3);
 });

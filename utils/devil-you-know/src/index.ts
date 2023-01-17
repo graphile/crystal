@@ -555,7 +555,19 @@ function tmp(obj: DYK, callback: (tmp: DYK) => DYK): DYK {
   return dyk`(${varName} = ${obj}, ${callback(varName)})`;
 }
 
-function run<TResult>(fragment: DYK): TResult {
+function run<TResult>(fragment: DYK): TResult;
+function run<TResult>(strings: TemplateStringsArray, ...values: DYK[]): TResult;
+function run<TResult>(
+  fragmentOrStrings: DYK | TemplateStringsArray,
+  ...values: DYK[]
+): TResult {
+  if ("raw" in fragmentOrStrings) {
+    return run(dyk(fragmentOrStrings, ...values));
+  }
+  if (values.length > 0) {
+    throw new Error("Invalid call to `dyk.run`");
+  }
+  const fragment = fragmentOrStrings;
   const compiled = compile(fragment);
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
@@ -707,8 +719,14 @@ export interface DevilYouKnow {
   optionalGet: typeof optionalGet;
   tmp: typeof tmp;
   tempVar: typeof tempVar;
-  run: typeof run;
-  eval: typeof run;
+  run: {
+    <TResult>(fragment: DYK): TResult;
+    <TResult>(strings: TemplateStringsArray, ...values: DYK[]): TResult;
+  };
+  eval: {
+    <TResult>(fragment: DYK): TResult;
+    <TResult>(strings: TemplateStringsArray, ...values: DYK[]): TResult;
+  };
   compile: typeof compile;
   indent: typeof indent;
   indentIf: typeof indentIf;
