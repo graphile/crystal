@@ -14,7 +14,6 @@ import {
   __InputObjectStep,
   __TrackedObjectStep,
   evalSafeProperty,
-  isSafeObjectPropertyName,
   lambda,
   object,
   ObjectStep,
@@ -26,7 +25,7 @@ import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
-import dyk from "devil-you-know";
+import dyk, { isSafeObjectPropertyName } from "devil-you-know";
 
 declare global {
   namespace GraphileBuild {

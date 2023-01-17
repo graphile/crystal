@@ -8,15 +8,9 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
-import {
-  access,
-  constant,
-  evalSafeProperty,
-  isSafeObjectPropertyName,
-  list,
-} from "grafast";
+import { access, constant, evalSafeProperty, list } from "grafast";
 import { EXPORTABLE } from "graphile-export";
-
+import { isSafeObjectPropertyName } from "devil-you-know";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";

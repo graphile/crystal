@@ -9,11 +9,8 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import {
-  canRepresentAsIdentifier,
-  evalSafeProperty,
-  isSafeObjectPropertyName,
-} from "../utils.js";
+import { canRepresentAsIdentifier, evalSafeProperty } from "../utils.js";
+import { isSafeObjectPropertyName } from "devil-you-know";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 

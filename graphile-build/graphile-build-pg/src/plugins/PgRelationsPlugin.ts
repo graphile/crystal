@@ -19,7 +19,6 @@ import {
   arraysMatch,
   connection,
   evalSafeProperty,
-  isSafeObjectPropertyName,
   list,
   object,
 } from "grafast";
@@ -28,6 +27,7 @@ import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
+import { isSafeObjectPropertyName } from "devil-you-know";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
