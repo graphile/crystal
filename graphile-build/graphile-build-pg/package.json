@@ -42,7 +42,7 @@
     "@dataplan/pg": "workspace:^",
     "@types/node": "^16.11.15",
     "debug": "^4.3.3",
-    "devil-you-know": "workspace:^",
+    "tamedevil": "workspace:^",
     "grafast": "workspace:^",
     "graphile-build": "workspace:*",
     "graphile-config": "workspace:^",

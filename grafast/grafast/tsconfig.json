@@ -12,6 +12,6 @@
     { "path": "../../utils/lru" },
     { "path": "../../utils/pg-sql2" },
     { "path": "../../utils/graphile-config" },
-    { "path": "../../utils/devil-you-know" }
+    { "path": "../../utils/tamedevil" }
   ]
 }

@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import dyk, { DYK } from "devil-you-know";
+import te, { TE } from "tamedevil";
 import type { GraphQLObjectType } from "graphql";
 
 import { isDev, noop } from "./dev.js";
@@ -474,34 +474,34 @@ export abstract class UnbatchedExecutableStep<
     if (this.execute === UnbatchedExecutableStep.prototype.execute) {
       const depIndexes =
         this.dependencies.length > 0 ? this.dependencies.map((_, i) => i) : [0];
-      const tryOrNot = (inFrag: DYK): DYK => {
+      const tryOrNot = (inFrag: TE): TE => {
         if (this.isSyncAndSafe) {
           return inFrag;
         } else {
-          return dyk`\
+          return te`\
       try {
-${dyk.indent(inFrag)}
+${te.indent(inFrag)}
       } catch (e) {
         results[i] = e instanceof Error ? e : Promise.reject(e);
       }
 `;
         }
       };
-      this.execute = dyk.run`
+      this.execute = te.run`
 return function execute(values, extra) {
   const [
-${dyk.join(
-  depIndexes.map((i) => dyk`    ${dyk.identifier(`list${i}`)},\n`),
+${te.join(
+  depIndexes.map((i) => te`    ${te.identifier(`list${i}`)},\n`),
   "",
 )}\
   ] = values;
   const count = list0.length;
   const results = [];
   for (let i = 0; i < count; i++) {
-${tryOrNot(dyk`\
-    results[i] = this.unbatchedExecute(extra, ${dyk.join(
+${tryOrNot(te`\
+    results[i] = this.unbatchedExecute(extra, ${te.join(
       depIndexes.map(
-        (depIndex) => dyk`${dyk.identifier(`list${depIndex}`)}[i]`,
+        (depIndex) => te`${te.identifier(`list${depIndex}`)}[i]`,
       ),
       ", ",
     )});

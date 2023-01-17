@@ -15,7 +15,7 @@ function exportAs<T>(thing: T, exportName: string) {
     }
   } else {
     Object.defineProperty(thing, "$$export", {
-      value: { moduleName: "devil-you-know", exportName },
+      value: { moduleName: "tamedevil", exportName },
     });
   }
   return thing;
@@ -28,61 +28,61 @@ const isDev = process.env.GRAPHILE_ENV === "development";
  * in a JSON payload and it cannot be constructed with a new Symbol (even with
  * the same argument), so external data cannot make itself trusted.
  */
-const $$type = Symbol("devil-you-know-type");
+const $$type = Symbol("tamedevil-type");
 
 /**
- * Represents raw DYK, the text will be output verbatim into the compiled code.
+ * Represents raw TE, the text will be output verbatim into the compiled code.
  */
-export interface DYKRawNode {
+export interface TERawNode {
   readonly [$$type]: "RAW";
   /** text */
   readonly t: string;
 }
 
 /**
- * Represents an DYK value that will be replaced with a closure variable in the
- * compiled DYK statement.
+ * Represents an TE value that will be replaced with a closure variable in the
+ * compiled TE statement.
  */
-export interface DYKRefNode {
+export interface TERefNode {
   readonly [$$type]: "REF";
   /** value */
   readonly v: any;
 }
 
-export interface DYKTemporaryVariableNode {
+export interface TETemporaryVariableNode {
   readonly [$$type]: "VARIABLE";
   /** symbol */
   readonly s: symbol;
 }
 
 /**
- * Represents that the DYK inside this should be indented when pretty printed.
+ * Represents that the TE inside this should be indented when pretty printed.
  */
-export interface DYKIndentNode {
+export interface TEIndentNode {
   readonly [$$type]: "INDENT";
   /** content */
-  readonly c: DYKQuery;
+  readonly c: TEQuery;
 }
 
 /** @internal */
-export type DYKNode =
-  | DYKRawNode
-  | DYKRefNode
-  | DYKTemporaryVariableNode
-  | DYKIndentNode;
+export type TENode =
+  | TERawNode
+  | TERefNode
+  | TETemporaryVariableNode
+  | TEIndentNode;
 
 /** @internal */
-export interface DYKQuery {
+export interface TEQuery {
   readonly [$$type]: "QUERY";
   /** nodes */
-  readonly n: ReadonlyArray<DYKNode>;
+  readonly n: ReadonlyArray<TENode>;
 }
 
 /**
- * Representation of DYK, identifiers, values, etc; to generate a query that
- * can be issued to the database it needs to be fed to `dyk.compile`.
+ * Representation of TE, identifiers, values, etc; to generate a query that
+ * can be issued to the database it needs to be fed to `te.compile`.
  */
-export type DYK = DYKNode | DYKQuery;
+export type TE = TENode | TEQuery;
 
 /**
  * This helps us to avoid GC overhead of allocating new raw nodes all the time
@@ -91,21 +91,21 @@ export type DYK = DYKNode | DYKQuery;
  * been turned into an object, 10000 would mean 500kB which seems an acceptable
  * amount of memory to consume for this.
  */
-const CACHE_RAW_NODES = new LRU<string, DYKRawNode>({ maxLength: 10000 });
+const CACHE_RAW_NODES = new LRU<string, TERawNode>({ maxLength: 10000 });
 
-function makeRawNode(text: string, exportName?: string): DYKRawNode {
+function makeRawNode(text: string, exportName?: string): TERawNode {
   const n = CACHE_RAW_NODES.get(text);
   if (n) {
     return n;
   }
   if (typeof text !== "string") {
     throw new Error(
-      `[devil-you-know] Invalid argument to makeRawNode - expected string, but received '${inspect(
+      `[tamedevil] Invalid argument to makeRawNode - expected string, but received '${inspect(
         text,
       )}'`,
     );
   }
-  const newNode: DYKRawNode = {
+  const newNode: TERawNode = {
     [$$type]: "RAW" as const,
     t: text,
   };
@@ -118,35 +118,35 @@ function makeRawNode(text: string, exportName?: string): DYKRawNode {
 }
 
 // Simple function to help V8 optimize it.
-function makeRefNode(rawValue: any): DYKRefNode {
+function makeRefNode(rawValue: any): TERefNode {
   return Object.freeze({
     [$$type]: "REF" as const,
     v: rawValue,
   });
 }
 
-function makeTemporaryVariableNode(symbol: symbol): DYKTemporaryVariableNode {
+function makeTemporaryVariableNode(symbol: symbol): TETemporaryVariableNode {
   return Object.freeze({
     [$$type]: "VARIABLE" as const,
     s: symbol,
   });
 }
 
-function makeIndentNode(content: DYK): DYKIndentNode {
+function makeIndentNode(content: TE): TEIndentNode {
   return Object.freeze({
     [$$type]: "INDENT" as const,
     c: content[$$type] === "QUERY" ? content : makeQueryNode([content]),
   });
 }
 
-function makeQueryNode(nodes: ReadonlyArray<DYKNode>): DYKQuery {
+function makeQueryNode(nodes: ReadonlyArray<TENode>): TEQuery {
   return Object.freeze({
     [$$type]: "QUERY" as const,
     n: nodes,
   });
 }
 
-function isDYK(node: unknown): node is DYK {
+function isTE(node: unknown): node is TE {
   return (
     typeof node === "object" &&
     node !== null &&
@@ -154,27 +154,27 @@ function isDYK(node: unknown): node is DYK {
   );
 }
 
-function enforceValidNode(node: DYKQuery, where?: string): DYKQuery;
-function enforceValidNode(node: DYKNode, where?: string): DYKNode;
-function enforceValidNode(node: DYK, where?: string): DYK;
-function enforceValidNode(node: unknown, where?: string): DYK {
-  if (isDYK(node)) {
+function enforceValidNode(node: TEQuery, where?: string): TEQuery;
+function enforceValidNode(node: TENode, where?: string): TENode;
+function enforceValidNode(node: TE, where?: string): TE;
+function enforceValidNode(node: unknown, where?: string): TE {
+  if (isTE(node)) {
     return node;
   }
   throw new Error(
-    `[devil-you-know] Invalid expression. Expected an DYK item${
+    `[tamedevil] Invalid expression. Expected an TE item${
       where ? ` at ${where}` : ""
     } but received '${inspect(
       node,
-    )}'. This may mean that there is an issue in the DYK expression where a dynamic value was not escaped via 'dyk.ref(...)', an embedded string wasn't wrapped with 'dyk.string(...)', or a DYK expression was added without using the \`dyk\` tagged template literal.`,
+    )}'. This may mean that there is an issue in the TE expression where a dynamic value was not escaped via 'te.ref(...)', an embedded string wasn't wrapped with 'te.string(...)', or a TE expression was added without using the \`te\` tagged template literal.`,
   );
 }
 
 /**
- * Accepts an dyk`...` expression and compiles it out to DYK text with
+ * Accepts an te`...` expression and compiles it out to TE text with
  * placeholders, and the values to substitute for these values.
  */
-function compile(fragment: DYK): {
+function compile(fragment: TE): {
   string: string;
   refs: {
     [key: string]: any;
@@ -197,7 +197,7 @@ function compile(fragment: DYK): {
     // Arbitrary
     if (refCount > 65535) {
       throw new Error(
-        "[devil-you-know] This DYK statement would contain too many placeholders; devil-you-know supports at most 65535 placeholders. To solve this, consider passing multiple values in using a single array or object.",
+        "[tamedevil] This TE statement would contain too many placeholders; tamedevil supports at most 65535 placeholders. To solve this, consider passing multiple values in using a single array or object.",
       );
     }
     const identifier = `_$$_ref_${refCount}`;
@@ -218,14 +218,14 @@ function compile(fragment: DYK): {
     return varName;
   };
 
-  function print(untrustedInput: DYK, indent = 0) {
+  function print(untrustedInput: TE, indent = 0) {
     /**
-     * Join this to generate the DYK query
+     * Join this to generate the TE query
      */
-    const dykFragments: string[] = [];
+    const teFragments: string[] = [];
 
     const trustedInput = enforceValidNode(untrustedInput, ``);
-    const items: ReadonlyArray<DYKNode> =
+    const items: ReadonlyArray<TENode> =
       trustedInput[$$type] === "QUERY"
         ? expandQueryNodes(trustedInput)
         : [trustedInput];
@@ -240,24 +240,24 @@ function compile(fragment: DYK): {
             break;
           }
           // IMPORTANT: this **must not** mangle primitives. Fortunately they're single line so it should be fine.
-          dykFragments.push(
+          teFragments.push(
             isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
           );
           break;
         }
         case "REF": {
           const identifier = makeRef(item.v);
-          dykFragments.push(identifier);
+          teFragments.push(identifier);
           break;
         }
         case "VARIABLE": {
           const identifier = getVar(item.s);
-          dykFragments.push(identifier);
+          teFragments.push(identifier);
           break;
         }
         case "INDENT": {
           assert.ok(isDev, "INDENT nodes only allowed in development mode");
-          dykFragments.push(
+          teFragments.push(
             "\n" +
               "  ".repeat(indent + 1) +
               print(item.c, indent + 1) +
@@ -269,11 +269,11 @@ function compile(fragment: DYK): {
         default: {
           const never: never = item;
           // This cannot happen
-          throw new Error(`Unsupported node found in DYK: ${inspect(never)}`);
+          throw new Error(`Unsupported node found in TE: ${inspect(never)}`);
         }
       }
     }
-    return dykFragments.join("");
+    return teFragments.join("");
   }
   let str = print(fragment);
   const variables = [];
@@ -292,23 +292,23 @@ function compile(fragment: DYK): {
 }
 
 // LRU not necessary
-const CACHE_SIMPLE_FRAGMENTS = new Map<string, DYKRawNode>();
+const CACHE_SIMPLE_FRAGMENTS = new Map<string, TERawNode>();
 
 /**
- * A template string tag that creates a `DYK` query out of some strings and
- * some values. Use this to construct all PostgreDYK queries to avoid DYK
+ * A template string tag that creates a `TE` query out of some strings and
+ * some values. Use this to construct all PostgreTE queries to avoid TE
  * injection.
  *
  * Note that using this function, the user *must* specify if they are injecting
- * raw text. This makes a DYK injection vulnerability harder to create.
+ * raw text. This makes a TE injection vulnerability harder to create.
  */
-const dykBase = function dyk(
+const teBase = function te(
   strings: TemplateStringsArray,
-  ...values: Array<DYK>
-): DYK {
+  ...values: Array<TE>
+): TE {
   if (!Array.isArray(strings) || !strings.raw) {
     throw new Error(
-      "[devil-you-know] dyk should be used as a template literal, not a function call.",
+      "[tamedevil] te should be used as a template literal, not a function call.",
     );
   }
   const stringsLength = strings.length;
@@ -326,24 +326,24 @@ const dykBase = function dyk(
     return node;
   }
 
-  // Special case dyk`${...}` - just return the node directly
+  // Special case te`${...}` - just return the node directly
   if (stringsLength === 2 && strings[0] === "" && strings[1] === "") {
     return values[0];
   }
 
-  const items: Array<DYKNode> = [];
+  const items: Array<TENode> = [];
   let currentText = "";
   for (let i = 0, l = stringsLength; i < l; i++) {
     const text = strings[i];
     if (typeof text !== "string") {
       throw new Error(
-        "[devil-you-know] dyk must be invoked as a template literal, not a function call.",
+        "[tamedevil] te must be invoked as a template literal, not a function call.",
       );
     }
     currentText += text;
     if (i < l - 1) {
       const rawVal = values[i];
-      const valid: DYK = enforceValidNode(
+      const valid: TE = enforceValidNode(
         rawVal,
         `template literal placeholder ${i}`,
       );
@@ -383,25 +383,25 @@ const dykBase = function dyk(
 
 let rawWarningOutput = false;
 /**
- * Creates a DYK item for a raw code string. Just plain ol‘ raw code. This
+ * Creates a TE item for a raw code string. Just plain ol‘ raw code. This
  * method is dangerous though because it involves no escaping, so proceed with
  * caution! It's very very rarely warranted - there is likely a safer way of
  * achieving your goal. DO NOT USE THIS WITH UNTRUSTED INPUT!
  */
-function raw(text: string): DYK {
+function raw(text: string): TE {
   if (!rawWarningOutput) {
     rawWarningOutput = true;
     try {
-      throw new Error("dyk.raw first invoked here");
+      throw new Error("te.raw first invoked here");
     } catch (e: any) {
       console.warn(
-        `[devil-you-know] WARNING: you're using the dyk.raw escape hatch, usage of this API is rarely required and is highly discouraged. Please be sure this is what you intend. ${e.stack}`,
+        `[tamedevil] WARNING: you're using the te.raw escape hatch, usage of this API is rarely required and is highly discouraged. Please be sure this is what you intend. ${e.stack}`,
       );
     }
   }
   if (typeof text !== "string") {
     throw new Error(
-      `[devil-you-know] dyk.raw must be passed a string, but it was passed '${inspect(
+      `[tamedevil] te.raw must be passed a string, but it was passed '${inspect(
         text,
       )}'.`,
     );
@@ -410,10 +410,10 @@ function raw(text: string): DYK {
 }
 
 /**
- * Creates a DYK item for a value that will be included in our final query.
- * This value will be added in a way which avoids DYK injection.
+ * Creates a TE item for a value that will be included in our final query.
+ * This value will be added in a way which avoids TE injection.
  */
-function ref(val: any): DYK {
+function ref(val: any): TE {
   return makeRefNode(val);
 }
 
@@ -482,9 +482,9 @@ export const toJSON = (value: any): string => {
 
 /**
  * If the value is simple will inline it into the query, otherwise will defer
- * to `dyk.ref`.
+ * to `te.ref`.
  */
-function lit(val: any): DYK {
+function lit(val: any): TE {
   if (val === undefined) {
     return undefinedNode;
   } else if (
@@ -514,10 +514,10 @@ function lit(val: any): DYK {
  * you. Example:
  *
  * ```js
- * const code = dyk`const str = "abc${dyk.substring(untrusted, '"')}123";`
+ * const code = te`const str = "abc${te.substring(untrusted, '"')}123";`
  * ```
  */
-function substring(text: string, stringType: "'" | '"' | "`"): DYK {
+function substring(text: string, stringType: "'" | '"' | "`"): TE {
   // Quick scan to see if it's safe to use verbatim
   const l = text.length;
   if (l < MAX_SHORT_STRING_LENGTH) {
@@ -613,13 +613,13 @@ function identifier(name: string) {
 // TODO: rename to `ensureSafeKey` or `safeKeyOrThrow` or something?
 /**
  * IMPORTANT: It's strongly recommended that instead of defining an object via
- * `const obj = { ${dyk.dangerousKey(untrustedKey)}: value }` you instead use
+ * `const obj = { ${te.dangerousKey(untrustedKey)}: value }` you instead use
  * `const obj = Object.create(null);` and then set the properties on the resulting
- * object via `${obj}[${dyk.lit(untrustedKey)}] = value;` - this prevents attacks such as
+ * object via `${obj}[${te.lit(untrustedKey)}] = value;` - this prevents attacks such as
  * **prototype polution** since properties like `__proto__` are not special on
  * null-prototype objects, whereas they can cause havok in regular `{}` objects.
  */
-function dangerousKey(key: string | symbol | number): DYK {
+function dangerousKey(key: string | symbol | number): TE {
   if (isSafeObjectPropertyName(key)) {
     if (canRepresentAsIdentifier(key)) {
       return makeRawNode(String(key));
@@ -630,7 +630,7 @@ function dangerousKey(key: string | symbol | number): DYK {
     throw new Error(
       `Forbidden object key: ${JSON.stringify(
         key,
-      )}; consider using 'Object.create(null)' and assigning properties using dyk.lit.`,
+      )}; consider using 'Object.create(null)' and assigning properties using te.lit.`,
     );
   }
 }
@@ -644,34 +644,34 @@ function canAccessViaDot(str: string): boolean {
 
 /**
  * Accesses the key of an object either via `.` or `[]` as appropriate;
- * `obj${dyk.get(key)}` would become `obj.foo` or `obj["1foo"]` as
+ * `obj${te.get(key)}` would become `obj.foo` or `obj["1foo"]` as
  * appropriate.
  */
-function get(key: string | symbol | number): DYK {
+function get(key: string | symbol | number): TE {
   return typeof key === "string" && canAccessViaDot(key)
     ? // ._mySimpleProperty
-      dyk`.${makeRawNode(key)}`
+      te`.${makeRawNode(key)}`
     : // ["@@meaning"]
-      dyk`[${dyk.lit(key)}]`;
+      te`[${te.lit(key)}]`;
 }
 
 /**
  * Accesses the key of an object via optional-chaining:
- * `obj${dyk.optionalGet(key)}` would become `obj?.foo` or `obj?.["1foo"]` as
+ * `obj${te.optionalGet(key)}` would become `obj?.foo` or `obj?.["1foo"]` as
  * appropriate.
  */
-function optionalGet(key: string | symbol | number): DYK {
+function optionalGet(key: string | symbol | number): TE {
   return typeof key === "string" && canAccessViaDot(key)
     ? // ?._mySimpleProperty
-      dyk`?.${makeRawNode(key)}`
+      te`?.${makeRawNode(key)}`
     : // ?.["@@meaning"]
-      dyk`?.[${dyk.lit(key)}]`;
+      te`?.[${te.lit(key)}]`;
 }
 
 // TODO: rename this. 'leftSet'? 'leftAccess'? 'safeAccess'?
 /**
  * Sets the key of an object either via `.` or `[]` as appropriate;
- * `obj${dyk.set(key)}` would become `obj.foo` or `obj["1foo"]` as
+ * `obj${te.set(key)}` would become `obj.foo` or `obj["1foo"]` as
  * appropriate.
  *
  * If the object you're setting properties on has a `null` prototype
@@ -679,7 +679,7 @@ function optionalGet(key: string | symbol | number): DYK {
  * keys are allowed. If this is not the case, then an error will be thrown on
  * certain potentially dangerous keys such as `__proto__` or `constructor`.
  */
-function set(key: string | symbol | number, hasNullPrototype = false): DYK {
+function set(key: string | symbol | number, hasNullPrototype = false): TE {
   if (!hasNullPrototype && disallowedKeys.includes(key)) {
     throw new Error(
       `Attempted to set '${String(
@@ -689,34 +689,34 @@ function set(key: string | symbol | number, hasNullPrototype = false): DYK {
   }
   return typeof key === "string" && canAccessViaDot(key)
     ? // ._mySimpleProperty
-      dyk`.${makeRawNode(key)}`
+      te`.${makeRawNode(key)}`
     : // ["@@meaning"]
-      dyk`[${dyk.lit(key)}]`;
+      te`[${te.lit(key)}]`;
 }
 
 /**
  * @experimental
  */
-function tempVar(symbol = Symbol()): DYK {
+function tempVar(symbol = Symbol()): TE {
   return makeTemporaryVariableNode(symbol);
 }
 
-function tmp(obj: DYK, callback: (tmp: DYK) => DYK): DYK {
-  const varName = dyk.tempVar();
-  return dyk`(${varName} = ${obj}, ${callback(varName)})`;
+function tmp(obj: TE, callback: (tmp: TE) => TE): TE {
+  const varName = te.tempVar();
+  return te`(${varName} = ${obj}, ${callback(varName)})`;
 }
 
-function run<TResult>(fragment: DYK): TResult;
-function run<TResult>(strings: TemplateStringsArray, ...values: DYK[]): TResult;
+function run<TResult>(fragment: TE): TResult;
+function run<TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
 function run<TResult>(
-  fragmentOrStrings: DYK | TemplateStringsArray,
-  ...values: DYK[]
+  fragmentOrStrings: TE | TemplateStringsArray,
+  ...values: TE[]
 ): TResult {
   if ("raw" in fragmentOrStrings) {
-    return run(dyk(fragmentOrStrings, ...values));
+    return run(te(fragmentOrStrings, ...values));
   }
   if (values.length > 0) {
-    throw new Error("Invalid call to `dyk.run`");
+    throw new Error("Invalid call to `te.run`");
   }
   const fragment = fragmentOrStrings;
   const compiled = compile(fragment);
@@ -740,21 +740,21 @@ function newFunction(...args: string[]) {
 }
 
 /**
- * Join some DYK items together, optionally separated by a string. Useful when
- * dealing with lists of DYK items, for example a dynamic list of columns or
- * variadic DYK function arguments.
+ * Join some TE items together, optionally separated by a string. Useful when
+ * dealing with lists of TE items, for example a dynamic list of columns or
+ * variadic TE function arguments.
  */
-function join(items: Array<DYK>, separator = ""): DYK {
+function join(items: Array<TE>, separator = ""): TE {
   if (!Array.isArray(items)) {
     throw new Error(
-      `[devil-you-know] Invalid dyk.join call - the first argument should be an array, but it was '${inspect(
+      `[tamedevil] Invalid te.join call - the first argument should be an array, but it was '${inspect(
         items,
       )}'.`,
     );
   }
   if (typeof separator !== "string") {
     throw new Error(
-      `[devil-you-know] Invalid separator passed to dyk.join - must be a string, but we received '${inspect(
+      `[tamedevil] Invalid separator passed to te.join - must be a string, but we received '${inspect(
         separator,
       )}'`,
     );
@@ -765,17 +765,17 @@ function join(items: Array<DYK>, separator = ""): DYK {
     return blankNode;
   } else if (items.length === 1) {
     const rawNode = items[0];
-    const node: DYK = enforceValidNode(rawNode, `join item ${0}`);
+    const node: TE = enforceValidNode(rawNode, `join item ${0}`);
     return node;
   }
 
   const hasSeparator = separator.length > 0;
   let currentText = "";
-  const currentItems: Array<DYKNode> = [];
+  const currentItems: Array<TENode> = [];
   for (let i = 0, l = items.length; i < l; i++) {
     const rawNode = items[i];
     const addSeparator = i > 0 && hasSeparator;
-    const node: DYK = enforceValidNode(rawNode, `join item ${i}`);
+    const node: TE = enforceValidNode(rawNode, `join item ${i}`);
     if (addSeparator) {
       currentText += separator;
     }
@@ -810,7 +810,7 @@ function join(items: Array<DYK>, separator = ""): DYK {
     : makeQueryNode(currentItems);
 }
 
-function expandQueryNodes(node: DYKQuery): ReadonlyArray<DYKNode> {
+function expandQueryNodes(node: TEQuery): ReadonlyArray<TENode> {
   return node.n;
 }
 
@@ -819,15 +819,15 @@ function expandQueryNodes(node: DYKQuery): ReadonlyArray<DYKNode> {
  * template literals that contain newlines, spaces will be added inside these
  * too.
  */
-function indent(fragment: DYK): DYK;
-function indent(strings: TemplateStringsArray, ...values: Array<DYK>): DYK;
+function indent(fragment: TE): TE;
+function indent(strings: TemplateStringsArray, ...values: Array<TE>): TE;
 function indent(
-  fragmentOrStrings: DYK | TemplateStringsArray,
-  ...values: Array<DYK>
-): DYK {
+  fragmentOrStrings: TE | TemplateStringsArray,
+  ...values: Array<TE>
+): TE {
   const fragment =
     "raw" in fragmentOrStrings
-      ? dyk(fragmentOrStrings, ...values)
+      ? te(fragmentOrStrings, ...values)
       : fragmentOrStrings;
   if (!isDev) {
     return fragment;
@@ -835,15 +835,15 @@ function indent(
   return makeIndentNode(fragment);
 }
 
-function indentIf(condition: boolean, fragment: DYK): DYK {
+function indentIf(condition: boolean, fragment: TE): TE {
   return isDev && condition ? makeIndentNode(fragment) : fragment;
 }
 
-const dyk = dykBase as DevilYouKnow;
-export default dyk;
+const te = teBase as TamedEvil;
+export default te;
 
 export {
-  dyk,
+  te,
   ref,
   lit,
   lit as literal,
@@ -861,13 +861,13 @@ export {
   run as eval,
   compile,
   undefinedNode as undefined,
-  isDYK,
+  isTE,
   reservedWords,
 };
 
-export interface DevilYouKnow {
-  (strings: TemplateStringsArray, ...values: Array<DYK>): DYK;
-  dyk: DevilYouKnow;
+export interface TamedEvil {
+  (strings: TemplateStringsArray, ...values: Array<TE>): TE;
+  te: TamedEvil;
   ref: typeof ref;
   reference: typeof ref;
   lit: typeof lit;
@@ -883,24 +883,24 @@ export interface DevilYouKnow {
   tmp: typeof tmp;
   tempVar: typeof tempVar;
   run: {
-    <TResult>(fragment: DYK): TResult;
-    <TResult>(strings: TemplateStringsArray, ...values: DYK[]): TResult;
+    <TResult>(fragment: TE): TResult;
+    <TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
   };
   eval: {
-    <TResult>(fragment: DYK): TResult;
-    <TResult>(strings: TemplateStringsArray, ...values: DYK[]): TResult;
+    <TResult>(fragment: TE): TResult;
+    <TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
   };
   compile: typeof compile;
   indent: typeof indent;
   indentIf: typeof indentIf;
-  undefined: DYK;
-  blank: DYK;
-  isDYK: typeof isDYK;
+  undefined: TE;
+  blank: TE;
+  isTE: typeof isTE;
   reservedWords: typeof reservedWords;
 }
 
 const attributes = {
-  dyk,
+  te,
   ref,
   reference: ref,
   lit,
@@ -922,7 +922,7 @@ const attributes = {
   indentIf,
   undefined: undefinedNode,
   blank: blankNode,
-  isDYK,
+  isTE,
   reservedWords,
 };
 
@@ -932,4 +932,4 @@ Object.entries(attributes).forEach(([exportName, value]) => {
   }
 });
 
-Object.assign(dykBase, attributes);
+Object.assign(teBase, attributes);

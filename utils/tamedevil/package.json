@@ -1,5 +1,5 @@
 {
-  "name": "devil-you-know",
+  "name": "tamedevil",
   "version": "0.0.0-0.0",
   "description": "Build and evaluate JavaScript strings safely via tagged template literals",
   "main": "dist/index.js",
@@ -33,7 +33,7 @@
   "bugs": {
     "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/heart/tree/main/utils/devil-you-know",
+  "homepage": "https://github.com/graphile/heart/tree/main/utils/tamedevil",
   "devDependencies": {
     "@types/debug": "4.1.7",
     "@types/jest": "^27.5.1",

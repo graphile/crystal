@@ -1,7 +1,7 @@
-import dyk from "../dist";
+import te from "../dist";
 
 it("basic", () => {
-  expect(dyk.compile(dyk`return 1`)).toMatchInlineSnapshot(`
+  expect(te.compile(te`return 1`)).toMatchInlineSnapshot(`
     Object {
       "refs": Object {},
       "string": "return 1",
@@ -13,19 +13,19 @@ const COMPLEX_OBJECT = { a: 1, b: { c: 3 } };
 const AWKWARD_STRING = "string\"'`$\\";
 
 it("a few refs", () => {
-  const frag = dyk`return [
-  ${dyk.ref(-Number.MAX_SAFE_INTEGER)},
-  ${dyk.ref(-Number.MAX_VALUE)},
-  ${dyk.ref(Number.MIN_VALUE)},
-  ${dyk.ref("")},
-  ${dyk.ref(AWKWARD_STRING)},
-  ${dyk.ref(true)},
-  ${dyk.ref(false)},
-  ${dyk.ref(null)},
-  ${dyk.ref(undefined)},
-  ${dyk.ref(COMPLEX_OBJECT)}
+  const frag = te`return [
+  ${te.ref(-Number.MAX_SAFE_INTEGER)},
+  ${te.ref(-Number.MAX_VALUE)},
+  ${te.ref(Number.MIN_VALUE)},
+  ${te.ref("")},
+  ${te.ref(AWKWARD_STRING)},
+  ${te.ref(true)},
+  ${te.ref(false)},
+  ${te.ref(null)},
+  ${te.ref(undefined)},
+  ${te.ref(COMPLEX_OBJECT)}
 ]`;
-  expect(dyk.compile(frag)).toMatchInlineSnapshot(`
+  expect(te.compile(frag)).toMatchInlineSnapshot(`
     Object {
       "refs": Object {
         "_$$_ref_1": -9007199254740991,
@@ -58,7 +58,7 @@ it("a few refs", () => {
     ]",
     }
   `);
-  const val = dyk.run<any[]>(frag);
+  const val = te.run<any[]>(frag);
   expect(val[4]).toStrictEqual(AWKWARD_STRING);
   expect(val[9]).toStrictEqual(COMPLEX_OBJECT);
   expect(val).toMatchInlineSnapshot(`
@@ -83,19 +83,19 @@ it("a few refs", () => {
 });
 
 it("a few lits", () => {
-  const frag = dyk`return [
-  ${dyk.lit(-Number.MAX_SAFE_INTEGER)},
-  ${dyk.lit(-Number.MAX_VALUE)},
-  ${dyk.lit(Number.MIN_VALUE)},
-  ${dyk.lit("")},
-  ${dyk.lit(AWKWARD_STRING)},
-  ${dyk.lit(true)},
-  ${dyk.lit(false)},
-  ${dyk.lit(null)},
-  ${dyk.lit(undefined)},
-  ${dyk.lit(COMPLEX_OBJECT)}
+  const frag = te`return [
+  ${te.lit(-Number.MAX_SAFE_INTEGER)},
+  ${te.lit(-Number.MAX_VALUE)},
+  ${te.lit(Number.MIN_VALUE)},
+  ${te.lit("")},
+  ${te.lit(AWKWARD_STRING)},
+  ${te.lit(true)},
+  ${te.lit(false)},
+  ${te.lit(null)},
+  ${te.lit(undefined)},
+  ${te.lit(COMPLEX_OBJECT)}
 ]`;
-  expect(dyk.compile(frag)).toMatchInlineSnapshot(`
+  expect(te.compile(frag)).toMatchInlineSnapshot(`
     Object {
       "refs": Object {
         "_$$_ref_1": Object {
@@ -119,7 +119,7 @@ it("a few lits", () => {
     ]",
     }
   `);
-  const val = dyk.run<any[]>(frag);
+  const val = te.run<any[]>(frag);
   expect(val[4]).toStrictEqual(AWKWARD_STRING);
   expect(val[9]).toStrictEqual(COMPLEX_OBJECT);
   expect(val).toMatchInlineSnapshot(`
@@ -144,21 +144,21 @@ it("a few lits", () => {
 });
 
 it("mixture", () => {
-  const inner = dyk`[
-  ${dyk.lit(-Number.MAX_SAFE_INTEGER)},
-  ${dyk.lit(-Number.MAX_VALUE)},
-  ${dyk.lit(Number.MIN_VALUE)},
-  ${dyk.lit("")},
-  ${dyk.lit(AWKWARD_STRING)},
-  ${dyk.lit(true)},
-  ${dyk.lit(false)},
-  ${dyk.lit(null)},
-  ${dyk.ref(undefined)},
-  ${dyk.ref(COMPLEX_OBJECT)}
+  const inner = te`[
+  ${te.lit(-Number.MAX_SAFE_INTEGER)},
+  ${te.lit(-Number.MAX_VALUE)},
+  ${te.lit(Number.MIN_VALUE)},
+  ${te.lit("")},
+  ${te.lit(AWKWARD_STRING)},
+  ${te.lit(true)},
+  ${te.lit(false)},
+  ${te.lit(null)},
+  ${te.ref(undefined)},
+  ${te.ref(COMPLEX_OBJECT)}
 ]`;
-  const key = dyk.lit(9);
-  const frag = dyk`return ${inner}[${key}];`;
-  expect(dyk.compile(frag)).toMatchInlineSnapshot(`
+  const key = te.lit(9);
+  const frag = te`return ${inner}[${key}];`;
+  expect(te.compile(frag)).toMatchInlineSnapshot(`
     Object {
       "refs": Object {
         "_$$_ref_1": undefined,
@@ -183,10 +183,10 @@ it("mixture", () => {
     ][9];",
     }
   `);
-  const val = dyk.run(frag);
+  const val = te.run(frag);
   expect(val).toStrictEqual(COMPLEX_OBJECT);
 });
 
-it("dyk.run`return ${dyk.lit(1)}+${dyk.ref(2)}`", () => {
-  expect(dyk.run`return ${dyk.lit(1)}+${dyk.ref(2)}`).toEqual(3);
+it("te.run`return ${te.lit(1)}+${te.ref(2)}`", () => {
+  expect(te.run`return ${te.lit(1)}+${te.ref(2)}`).toEqual(3);
 });

@@ -10,7 +10,7 @@ import type {
 import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";
 import { EXPORTABLE } from "graphile-export";
-import dyk, { isSafeObjectPropertyName } from "devil-you-know";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
@@ -104,10 +104,10 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             plan: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
-                  dyk.run`return function (list, constant) {
-  return $record => list([constant(${dyk.lit(identifier)}), ${dyk.join(
+                  te.run`return function (list, constant) {
+  return $record => list([constant(${te.lit(identifier)}), ${te.join(
                     pk.map(
-                      (columnName) => dyk`$record.get(${dyk.lit(columnName)})`,
+                      (columnName) => te`$record.get(${te.lit(columnName)})`,
                     ),
                     ", ",
                   )}]);
@@ -127,11 +127,11 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             getSpec: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
-                  dyk.run`return function (access) {
-  return $list => ({ ${dyk.join(
+                  te.run`return function (access) {
+  return $list => ({ ${te.join(
     pk.map(
       (columnName, index) =>
-        dyk`${dyk.dangerousKey(columnName)}: access($list, [${dyk.lit(
+        te`${te.dangerousKey(columnName)}: access($list, [${te.lit(
           index + 1,
         )}])`,
     ),

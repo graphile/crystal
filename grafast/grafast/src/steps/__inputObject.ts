@@ -1,4 +1,4 @@
-import dyk from "devil-you-know";
+import te from "tamedevil";
 import type {
   GraphQLInputObjectType,
   GraphQLInputType,
@@ -66,19 +66,19 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   }
 
   finalize() {
-    this.unbatchedExecute = dyk.run`return function (extra, ${dyk.join(
-      this.dependencies.map((_, i) => dyk.identifier(`val${i}`)),
+    this.unbatchedExecute = te.run`return function (extra, ${te.join(
+      this.dependencies.map((_, i) => te.identifier(`val${i}`)),
       ", ",
     )}) {
   const resultValues = Object.create(null);
-  ${dyk.join(
+  ${te.join(
     Object.entries(this.inputFields).map(
       ([inputFieldName, { dependencyIndex }]) => {
         if (dependencyIndex == null) {
           throw new Error("inputFieldPlan has gone missing.");
         }
-        return dyk`\
-  resultValues${dyk.set(inputFieldName, true)} = ${dyk.identifier(
+        return te`\
+  resultValues${te.set(inputFieldName, true)} = ${te.identifier(
           `val${dependencyIndex}`,
         )};`;
       },

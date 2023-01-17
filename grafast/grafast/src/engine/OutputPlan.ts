@@ -32,7 +32,7 @@ import type { ExecutableStep } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
-import dyk, { DYK, toJSON, stringifyString } from "devil-you-know";
+import te, { TE, toJSON, stringifyString } from "tamedevil";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
@@ -422,7 +422,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       this.rootStep.id,
     );
     if ($root instanceof AccessStep && $root.fallback === undefined) {
-      const expressionDetails: [DYK, any] | undefined =
+      const expressionDetails: [TE, any] | undefined =
         $root.unbatchedExecute![expressionSymbol];
       if (expressionDetails) {
         // @ts-ignore
@@ -432,9 +432,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           $parent,
         );
         const [expression, fallback] = expressionDetails;
-        this.processRoot = dyk.run<(value: any) => any>(
-          dyk`return value => (value${expression})${
-            fallback !== undefined ? dyk` ?? ${dyk.lit(fallback)}` : dyk.blank
+        this.processRoot = te.run<(value: any) => any>(
+          te`return value => (value${expression})${
+            fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
           };`,
         );
       }
@@ -725,13 +725,13 @@ export function getChildBucketAndIndex(
 }
 
 function makeExecutor<TAsString extends boolean>(
-  inner: DYK,
-  nameExtra: DYK,
+  inner: TE,
+  nameExtra: TE,
   asString: TAsString,
   args: { [key: string]: any } = EMPTY_OBJECT,
   // this.type.mode === "introspection" || this.type.mode === "root"
   skipNullHandling = false,
-  preamble: DYK = dyk.blank,
+  preamble: TE = te.blank,
 ): TAsString extends true
   ? typeof OutputPlan.prototype.executeString
   : typeof OutputPlan.prototype.execute {
@@ -741,16 +741,16 @@ function makeExecutor<TAsString extends boolean>(
     nonNullError,
     $$error,
   };
-  return dyk.run`
-${dyk.join(
+  return te.run`
+${te.join(
   Object.entries(realArgs).map(
     ([argName, value]) =>
-      dyk`const ${dyk.identifier(argName)} = ${dyk.lit(value)};`,
+      te`const ${te.identifier(argName)} = ${te.lit(value)};`,
   ),
   "\n",
 )}
 return function compiledOutputPlan${
-    asString ? dyk`String` : dyk.blank
+    asString ? te`String` : te.blank
   }_${nameExtra}(
   root,
   mutablePath,
@@ -763,11 +763,11 @@ ${preamble}\
   if (bucketRootValue == null) {
     ${
       skipNullHandling
-        ? dyk`// root/introspection, null is fine`
-        : dyk`return ${asString ? dyk`"null"` : dyk`null`};`
+        ? te`// root/introspection, null is fine`
+        : te`return ${asString ? te`"null"` : te`null`};`
     }
   }${
-    skipNullHandling ? dyk` else ` : dyk`\n  `
+    skipNullHandling ? te` else ` : te`\n  `
   }if (typeof bucketRootValue === 'object' && $$error in bucketRootValue) {
     throw coerceError(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
@@ -776,36 +776,36 @@ ${inner}
 }
 
 function makeExecuteChildPlanCode(
-  setTargetOrReturn: DYK,
-  locationDetails: DYK,
-  childOutputPlan: DYK,
+  setTargetOrReturn: TE,
+  locationDetails: TE,
+  childOutputPlan: TE,
   isNonNull: boolean,
   asString: boolean,
-  childBucket: DYK = dyk`childBucket`,
-  childBucketIndex: DYK = dyk`childBucketIndex`,
+  childBucket: TE = te`childBucket`,
+  childBucketIndex: TE = te`childBucketIndex`,
 ) {
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
     // No need to catch error
-    return dyk`
+    return te`
       if (${childBucket} == null) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
       }
       const fieldResult = ${childOutputPlan}.${
-      asString ? dyk`executeString` : dyk`execute`
+      asString ? te`executeString` : te`execute`
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
-      if (fieldResult == ${asString ? dyk`"null"` : dyk`null`}) {
+      if (fieldResult == ${asString ? te`"null"` : te`null`}) {
         throw nonNullError(${locationDetails}, mutablePath.slice(1));
       }
       ${setTargetOrReturn} fieldResult;`;
   } else {
     // Need to catch error and set null
-    return dyk`
+    return te`
       try {
         const fieldResult = ${childBucket} == null ? ${
-      asString ? dyk`"null"` : dyk`null`
+      asString ? te`"null"` : te`null`
     } : ${childOutputPlan}.${
-      asString ? dyk`executeString` : dyk`execute`
+      asString ? te`executeString` : te`execute`
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
       } catch (e) {
@@ -816,7 +816,7 @@ function makeExecuteChildPlanCode(
           mutablePath.splice(pathLengthTarget, overSize);
         }
         root.errors.push(error);
-        ${setTargetOrReturn} ${asString ? dyk`"null"` : dyk`null`};
+        ${setTargetOrReturn} ${asString ? te`"null"` : te`null`};
       }`;
   }
 }
@@ -827,8 +827,8 @@ function makeExecuteChildPlanCode(
  * and increasing the probability of optimization).
  */
 
-const nullExecutor = makeExecutor(dyk`  return null;`, dyk`null`, false);
-const nullExecutorString = makeExecutor(dyk`  return "null";`, dyk`null`, true);
+const nullExecutor = makeExecutor(te`  return null;`, te`null`, false);
+const nullExecutorString = makeExecutor(te`  return "null";`, te`null`, true);
 
 /* This is what leafExecutor should use if insideGraphQL (which isn't currently
  * supported)
@@ -841,46 +841,46 @@ const nullExecutorString = makeExecutor(dyk`  return "null";`, dyk`null`, true);
   }
 ` */
 const leafExecutor = makeExecutor(
-  dyk`\
+  te`\
   return this.type.serialize(bucketRootValue);
 `,
-  dyk`leaf`,
+  te`leaf`,
   false,
 );
 
 const leafExecutorString = makeExecutor(
-  dyk`\
-  return ${dyk.ref(toJSON)}(this.type.serialize(bucketRootValue));
+  te`\
+  return ${te.ref(toJSON)}(this.type.serialize(bucketRootValue));
 `,
-  dyk`leaf`,
+  te`leaf`,
   true,
 );
 
 const booleanLeafExecutorString = makeExecutor(
-  dyk`\
+  te`\
   const val = this.type.serialize(bucketRootValue);
   return val === true ? 'true' : 'false';
 `,
-  dyk`booleanLeaf`,
+  te`booleanLeaf`,
   true,
   EMPTY_OBJECT,
   false,
-  dyk`\
+  te`\
   if (bucketRootValue === true) return 'true';
   if (bucketRootValue === false) return 'false';
 `,
 );
 
 const intLeafExecutorString = makeExecutor(
-  dyk`\
+  te`\
   return '' + this.type.serialize(bucketRootValue);
 `,
-  dyk`intLeaf`,
+  te`intLeaf`,
   true,
   EMPTY_OBJECT,
   false,
   // Fast check to see if number is 32 bit integer
-  dyk`\
+  te`\
   if ((bucketRootValue | 0) === bucketRootValue) {
     return '' + bucketRootValue;
   }
@@ -888,14 +888,14 @@ const intLeafExecutorString = makeExecutor(
 );
 
 const floatLeafExecutorString = makeExecutor(
-  dyk`\
+  te`\
   return String(this.type.serialize(bucketRootValue));
 `,
-  dyk`floatLeaf`,
+  te`floatLeaf`,
   true,
   EMPTY_OBJECT,
   false,
-  dyk`\
+  te`\
   if (Number.isFinite(bucketRootValue)) {
     return '' + bucketRootValue;
   }
@@ -903,14 +903,14 @@ const floatLeafExecutorString = makeExecutor(
 );
 
 const stringLeafExecutorString = makeExecutor(
-  dyk`\
+  te`\
   return stringifyString(this.type.serialize(bucketRootValue));
 `,
-  dyk`stringLeaf`,
+  te`stringLeaf`,
   true,
   { stringifyString },
   false,
-  dyk`\
+  te`\
   if (typeof bucketRootValue === 'string') {
     return stringifyString(bucketRootValue);
   }
@@ -921,10 +921,10 @@ function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
   return makeExecutor(
-    dyk`\
+    te`\
 ${
   isDev
-    ? dyk`\
+    ? te`\
   if (!isPolymorphicData(bucketRootValue)) {
     throw coerceError(
       new Error(
@@ -935,13 +935,13 @@ ${
     );
   }
 `
-    : dyk``
+    : te``
 }\
   const typeName = bucketRootValue[$$concreteType];
   const childOutputPlan = this.childByTypeName[typeName];
   ${
     isDev
-      ? dyk`{
+      ? te`{
     assert.ok(
       typeName,
       "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
@@ -951,13 +951,13 @@ ${
       \`GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
     );
   }`
-      : dyk``
+      : te``
   }
 
   const directChild = bucket.children[childOutputPlan.layerPlan.id];
   if (directChild) {
     return childOutputPlan.${
-      asString ? dyk`executeString` : dyk`execute`
+      asString ? te`executeString` : te`execute`
     }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
   } else {
     const c = getChildBucketAndIndex(
@@ -971,11 +971,11 @@ ${
     }
     const [childBucket, childBucketIndex] = c;
     return childOutputPlan.${
-      asString ? dyk`executeString` : dyk`execute`
+      asString ? te`executeString` : te`execute`
     }(root, mutablePath, childBucket, childBucketIndex);
   }
 `,
-    dyk`polymorphic`,
+    te`polymorphic`,
     asString,
     {
       isPolymorphicData,
@@ -996,19 +996,19 @@ function makeArrayExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
   return makeExecutor(
-    dyk`\
+    te`\
   if (!Array.isArray(bucketRootValue)) {
     console.warn(\`Hit fallback for value \${inspect(bucketRootValue)} coercion to mode 'array'\`);
-    return ${asString ? dyk`"null"` : dyk`null`};
+    return ${asString ? te`"null"` : te`null`};
   }
 
   const childOutputPlan = this.child;
   const l = bucketRootValue.length;
-  ${asString ? dyk`let string;` : dyk`const data = [];`}
+  ${asString ? te`let string;` : te`const data = [];`}
   if (l === 0) {
-${asString ? dyk`    string = "[]";` : dyk`    /* noop */`}
+${asString ? te`    string = "[]";` : te`    /* noop */`}
   } else {
-${asString ? dyk`    string = "[";\n` : dyk.blank}\
+${asString ? te`    string = "[";\n` : te.blank}\
     const mutablePathIndex = mutablePath.push(-1) - 1;
 
     // Now to populate the children...
@@ -1037,22 +1037,22 @@ ${asString ? dyk`    string = "[";\n` : dyk.blank}\
       }
 
       mutablePath[mutablePathIndex] = i;
-${asString ? dyk`\n      if (i > 0) { string += ","; }` : dyk.blank}
+${asString ? te`\n      if (i > 0) { string += ","; }` : te.blank}
 ${makeExecuteChildPlanCode(
-  asString ? dyk`string +=` : dyk`data[i] =`,
-  dyk`this.locationDetails`,
-  dyk`childOutputPlan`,
+  asString ? te`string +=` : te`data[i] =`,
+  te`this.locationDetails`,
+  te`childOutputPlan`,
   childIsNonNull,
   asString,
 )}
     }
 
     mutablePath.pop();
-${asString ? dyk`    string += "]";\n` : dyk.blank}
+${asString ? te`    string += "]";\n` : te.blank}
   }
 ${
   canStream
-    ? dyk`\
+    ? te`\
   const stream = bucketRootValue[$$streamMore] /* as | AsyncIterableIterator<any> | undefined*/;
   if (stream) {
     root.streams.push({
@@ -1066,13 +1066,13 @@ ${
       startIndex: bucketRootValue.length,
     });
   }`
-    : dyk``
+    : te``
 }
 
-  return ${asString ? dyk`string` : dyk`data`};
+  return ${asString ? te`string` : te`data`};
 `,
-    dyk`array${childIsNonNull ? dyk`_nonNull` : dyk.blank}${
-      canStream ? dyk`_stream` : dyk.blank
+    te`array${childIsNonNull ? te`_nonNull` : te.blank}${
+      canStream ? te`_stream` : te.blank
     }`,
     asString,
     {
@@ -1171,15 +1171,15 @@ const introspect = (
 };
 
 const introspectionExecutor = makeExecutor(
-  dyk`  return introspect(root, this, mutablePath, false)`,
-  dyk`introspection`,
+  te`  return introspect(root, this, mutablePath, false)`,
+  te`introspection`,
   false,
   { introspect },
   true,
 );
 const introspectionExecutorString = makeExecutor(
-  dyk`  return introspect(root, this, mutablePath, true)`,
-  dyk`introspection`,
+  te`  return introspect(root, this, mutablePath, true)`,
+  te`introspection`,
   true,
   { introspect },
   true,
@@ -1220,13 +1220,13 @@ function makeObjectExecutor<TAsString extends boolean>(
     );
   }
 
-  const inner = dyk`\
-  ${asString ? dyk`let string = "{";` : dyk`const obj = Object.create(null);`}
+  const inner = te`\
+  ${asString ? te`let string = "{";` : te`const obj = Object.create(null);`}
   const { keys } = this;
   const { children } = bucket;
   const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
 
-${dyk.join(
+${te.join(
   Object.entries(fieldTypes).map(
     ([fieldName, { fieldType, sameBucket }], i) => {
       switch (fieldType) {
@@ -1235,37 +1235,37 @@ ${dyk.join(
             // NOTE: this code relies on the fact that fieldName and typeName do
             // not require any quoting in JSON/JS - they must conform to GraphQL
             // `Name`.
-            return dyk`    string += \`${
-              i === 0 ? dyk.blank : dyk`,`
-            }"${dyk.substring(fieldName, "`")}":"\${typeName}"\`;`;
+            return te`    string += \`${
+              i === 0 ? te.blank : te`,`
+            }"${te.substring(fieldName, "`")}":"\${typeName}"\`;`;
           } else {
-            return dyk`    obj${dyk.set(fieldName, true)} = typeName;`;
+            return te`    obj${te.set(fieldName, true)} = typeName;`;
           }
         }
         case "outputPlan!":
         case "outputPlan?": {
-          return dyk`\
+          return te`\
     {
-      mutablePath[mutablePathIndex] = ${dyk.lit(fieldName)};
-      const spec = keys${dyk.get(fieldName)};
+      mutablePath[mutablePathIndex] = ${te.lit(fieldName)};
+      const spec = keys${te.get(fieldName)};
 ${
   sameBucket
-    ? dyk`\
+    ? te`\
 ${makeExecuteChildPlanCode(
   asString
-    ? dyk`string += \`${i === 0 ? dyk.blank : dyk`,`}"${dyk.substring(
+    ? te`string += \`${i === 0 ? te.blank : te`,`}"${te.substring(
         fieldName,
         "`",
       )}":\` +`
-    : dyk`obj${dyk.set(fieldName, true)} =`,
-  dyk`spec.locationDetails`,
-  dyk`spec.outputPlan`,
+    : te`obj${te.set(fieldName, true)} =`,
+  te`spec.locationDetails`,
+  te`spec.outputPlan`,
   fieldType === "outputPlan!",
   asString,
-  dyk`bucket`,
-  dyk`bucketIndex`,
+  te`bucket`,
+  te`bucketIndex`,
 )}`
-    : dyk`\
+    : te`\
       let childBucket, childBucketIndex;
       const directChild = children[spec.outputPlan.layerPlanId];
       if (directChild) {
@@ -1286,13 +1286,13 @@ ${makeExecuteChildPlanCode(
       }
 ${makeExecuteChildPlanCode(
   asString
-    ? dyk`string += \`${i === 0 ? dyk.blank : dyk`,`}"${dyk.substring(
+    ? te`string += \`${i === 0 ? te.blank : te`,`}"${te.substring(
         fieldName,
         "`",
       )}":\` +`
-    : dyk`obj${dyk.set(fieldName, true)} =`,
-  dyk`spec.locationDetails`,
-  dyk`spec.outputPlan`,
+    : te`obj${te.set(fieldName, true)} =`,
+  te`spec.locationDetails`,
+  te`spec.outputPlan`,
   fieldType === "outputPlan!",
   asString,
 )}`
@@ -1312,10 +1312,10 @@ ${makeExecuteChildPlanCode(
 )}
 
   mutablePath.pop();
-${asString ? dyk`  string += "}";\n` : dyk.blank}\
+${asString ? te`  string += "}";\n` : te.blank}\
 ${
   hasDeferredOutputPlans
-    ? dyk`
+    ? te`
   // Everything seems okay; queue any deferred payloads
   for (const defer of this.deferredOutputPlans) {
     root.queue.push({
@@ -1328,16 +1328,16 @@ ${
     });
   }
 `
-    : dyk``
+    : te``
 }
-  return ${asString ? dyk`string` : dyk`obj`};`;
+  return ${asString ? te`string` : te`obj`};`;
 
   // TODO: figure out how to memoize this. Should be able to key it on:
   // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
   // - existence of deferredOutputPlans
   return makeExecutor(
     inner,
-    dyk`object`,
+    te`object`,
     asString,
     {
       typeName: typeName,

@@ -9,7 +9,7 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import dyk, { isSafeObjectPropertyName } from "devil-you-know";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -22,10 +22,10 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     )
   ) {
     // We can do a fast custom conversion
-    return dyk.run`return function(obj) {
-  return (obj == null ? obj : { ${dyk.join(
+    return te.run`return function(obj) {
+  return (obj == null ? obj : { ${te.join(
     entries.map(
-      ([key, val]) => dyk`${dyk.dangerousKey(key)}: obj${dyk.get(val)}`,
+      ([key, val]) => te`${te.dangerousKey(key)}: obj${te.get(val)}`,
     ),
     ", ",
   )} });

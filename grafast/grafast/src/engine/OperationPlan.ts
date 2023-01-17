@@ -1,5 +1,5 @@
 import LRU from "@graphile/lru";
-import dyk from "devil-you-know";
+import te from "tamedevil";
 import type {
   FieldNode,
   FragmentDefinitionNode,
@@ -322,11 +322,11 @@ export class OperationPlan {
     const allMetaKeysList = [...allMetaKeys];
 
     // A JIT'd object constructor
-    this.makeMetaByMetaKey = dyk.run`
+    this.makeMetaByMetaKey = te.run`
 return () => ({
-${dyk.join(
+${te.join(
   allMetaKeysList.map(
-    (key) => dyk`\n  ${dyk.dangerousKey(key)}: Object.create(null),`,
+    (key) => te`\n  ${te.dangerousKey(key)}: Object.create(null),`,
   ),
   "",
 )}\n});`;

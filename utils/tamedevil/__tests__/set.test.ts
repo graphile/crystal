@@ -1,9 +1,9 @@
-import dyk from "../dist";
+import te from "../dist";
 
 const symbol = Symbol("symbol");
 
 const testCases: Array<
-  [string | symbol | number, ReturnType<typeof dyk.compile>]
+  [string | symbol | number, ReturnType<typeof te.compile>]
 > = [
   ["foo", { refs: {}, string: "obj.foo" }],
   ["1foo", { refs: {}, string: `obj["1foo"]` }],
@@ -17,25 +17,25 @@ const testCases: Array<
 ];
 
 it.each(testCases)("set on Object.create(null)", (val, expected) => {
-  expect(dyk.compile(dyk`obj${dyk.set(val, true)}`)).toEqual(expected);
+  expect(te.compile(te`obj${te.set(val, true)}`)).toEqual(expected);
 });
 
 it("works on 'frogs' if non-null prototype", () => {
-  expect(dyk.compile(dyk`obj${dyk.set("frogs")}`)).toEqual({
+  expect(te.compile(te`obj${te.set("frogs")}`)).toEqual({
     refs: {},
     string: "obj.frogs",
   });
 });
 it("throws on '__proto__' if non-null prototype", () => {
   expect(() =>
-    dyk.compile(dyk`obj${dyk.set("__proto__")}`),
+    te.compile(te`obj${te.set("__proto__")}`),
   ).toThrowErrorMatchingInlineSnapshot(
     `"Attempted to set '__proto__' on an object that isn't declared as having a null prototype. This could be unsafe."`,
   );
 });
 it("throws on 'constructor' if non-null prototype", () => {
   expect(() =>
-    dyk.compile(dyk`obj${dyk.set("constructor")}`),
+    te.compile(te`obj${te.set("constructor")}`),
   ).toThrowErrorMatchingInlineSnapshot(
     `"Attempted to set 'constructor' on an object that isn't declared as having a null prototype. This could be unsafe."`,
   );

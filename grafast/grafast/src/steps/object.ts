@@ -1,6 +1,6 @@
 // import debugFactory from "debug";
 
-import dyk, { isSafeObjectPropertyName } from "devil-you-know";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -133,37 +133,37 @@ export class ObjectStep<
     }
     const keysAreSafe = this.keys.every(isSafeObjectPropertyName);
     const inner = keysAreSafe
-      ? dyk`\
+      ? te`\
   const newObj = {
-${dyk.join(
+${te.join(
   this.keys.map(
-    (key, i) => dyk`    ${dyk.dangerousKey(key)}: ${dyk.identifier(`val${i}`)}`,
+    (key, i) => te`    ${te.dangerousKey(key)}: ${te.identifier(`val${i}`)}`,
   ),
   ",\n",
 )}
   };
 `
-      : dyk`\
+      : te`\
   const newObj = Object.create(null);
-${dyk.join(
+${te.join(
   this.keys.map(
-    (key, i) => dyk`  newObj${dyk.set(key)} = ${dyk.identifier(`val${i}`)};\n`,
+    (key, i) => te`  newObj${te.set(key)} = ${te.identifier(`val${i}`)};\n`,
   ),
   "",
 )}\
 `;
-    return dyk.run`\
-return function ({ meta }, ${dyk.join(
-      this.keys.map((_k, i) => dyk.identifier(`val${i}`)),
+    return te.run`\
+return function ({ meta }, ${te.join(
+      this.keys.map((_k, i) => te.identifier(`val${i}`)),
       ", ",
     )}) {
   if (meta.nextIndex) {
     for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
-      if (${dyk.join(
+      if (${te.join(
         this.keys.map(
           (_key, i) =>
-            dyk`values[${dyk.lit(i)}] === ${dyk.identifier(`val${i}`)}`,
+            te`values[${te.lit(i)}] === ${te.identifier(`val${i}`)}`,
         ),
         " && ",
       )}) {
@@ -177,8 +177,8 @@ return function ({ meta }, ${dyk.join(
     }
   }
 ${inner}
-  meta.results[meta.nextIndex] = [[${dyk.join(
-    this.keys.map((_key, i) => dyk.identifier(`val${i}`)),
+  meta.results[meta.nextIndex] = [[${te.join(
+    this.keys.map((_key, i) => te.identifier(`val${i}`)),
     ",",
   )}], newObj];
   // Only cache 10 results, use a round-robin

@@ -3,7 +3,7 @@ import "graphile-config";
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-export";
-import dyk, { isSafeObjectPropertyName } from "devil-you-know";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -124,11 +124,11 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                      */
                     // eslint-disable-next-line graphile-export/exhaustive-deps
                     EXPORTABLE(
-                      dyk.run`return function (source) {
-  return (_$root, args) => source.get({ ${dyk.join(
+                      te.run`return function (source) {
+  return (_$root, args) => source.get({ ${te.join(
     columnNames.map(
       (columnName) =>
-        dyk`${dyk.dangerousKey(columnName)}: args.get(${dyk.lit(
+        te`${te.dangerousKey(columnName)}: args.get(${te.lit(
           detailsByColumnName[columnName].graphqlName,
         )})`,
     ),

@@ -24,7 +24,7 @@ import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
 import { tagToString } from "../utils.js";
-import dyk, { isSafeObjectPropertyName } from "devil-you-know";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 declare global {
   namespace GraphileBuild {
@@ -660,12 +660,12 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                  * exported schema.
                  */
                 const specFromArgsString = clean
-                  ? dyk`{ ${dyk.join(
+                  ? te`{ ${te.join(
                       uniqueColumns.map(
                         ([columnName, fieldName]) =>
-                          dyk`${dyk.dangerousKey(
+                          te`${te.dangerousKey(
                             columnName,
-                          )}: args.get(['input', ${dyk.lit(fieldName)}])`,
+                          )}: args.get(['input', ${te.lit(fieldName)}])`,
                       ),
                       ", ",
                     )} }`
@@ -754,7 +754,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             ? specFromArgsString
                               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                                 EXPORTABLE(
-                                  dyk.run`return function(object, pgUpdate, source) {
+                                  te.run`return function(object, pgUpdate, source) {
 return (_$root, args) => {
   const plan = object({ result: pgUpdate(source, ${specFromArgsString}) });
   args.apply(plan);
@@ -783,7 +783,7 @@ return (_$root, args) => {
                             : specFromArgsString
                             ? // eslint-disable-next-line graphile-export/exhaustive-deps
                               EXPORTABLE(
-                                dyk.run`return function (object, pgDelete, source) {
+                                te.run`return function (object, pgDelete, source) {
 return (_$root, args) => {
   const plan = object({ result: pgDelete(source, ${specFromArgsString}) });
   args.apply(plan);

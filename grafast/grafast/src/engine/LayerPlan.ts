@@ -1,4 +1,4 @@
-import dyk, { DYK } from "devil-you-know";
+import te, { TE } from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
@@ -318,16 +318,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return this.operationPlan._addModifierStep(step);
   }
 
-  public makeNewBucketCallback(inner: DYK): typeof this.newBucket {
-    return dyk.run`\
-const that = ${dyk.ref(this)};
-const newBucket = ${dyk.ref(newBucket)};
-return function ${dyk.identifier(`newBucket${this.id}`)}(parentBucket) {
+  public makeNewBucketCallback(inner: TE): typeof this.newBucket {
+    return te.run`\
+const that = ${te.ref(this)};
+const newBucket = ${te.ref(newBucket)};
+return function ${te.identifier(`newBucket${this.id}`)}(parentBucket) {
   const store = new Map();
   const polymorphicPathList = ${
     this.reason.type === "mutationField"
-      ? dyk`parentBucket.polymorphicPathList`
-      : dyk`[]`
+      ? te`parentBucket.polymorphicPathList`
+      : te`[]`
   };
   const map = new Map();
   let size = 0;
@@ -344,7 +344,7 @@ ${inner}
       hasErrors: parentBucket.hasErrors,
       polymorphicPathList,
     });
-    parentBucket.children[${dyk.lit(this.id)}] = {
+    parentBucket.children[${te.lit(this.id)}] = {
       bucket: childBucket,
       map,
     };
@@ -364,33 +364,33 @@ ${inner}
       // then we can just copy everything wholesale rather than building
       // new arrays and looping.
 
-      this.newBucket = this.makeNewBucketCallback(dyk`\
+      this.newBucket = this.makeNewBucketCallback(te`\
 ${
   isDev
-    ? dyk`/*
-makeNewBucketCallback called for LayerPlan with id: ${dyk.subcomment(this.id)}.
-Reason type: ${dyk.subcomment(this.reason.type)}
-Root step: ${dyk.subcomment(this.rootStep?.id)}
-Copy step ids: ${dyk.subcomment(copyStepIds.join(","))}
+    ? te`/*
+makeNewBucketCallback called for LayerPlan with id: ${te.subcomment(this.id)}.
+Reason type: ${te.subcomment(this.reason.type)}
+Root step: ${te.subcomment(this.rootStep?.id)}
+Copy step ids: ${te.subcomment(copyStepIds.join(","))}
 */
 `
-    : dyk.blank
+    : te.blank
 }\
-  const itemStepId = ${dyk.lit(this.rootStep!.id)};
+  const itemStepId = ${te.lit(this.rootStep!.id)};
   const nullableStepStore = parentBucket.store.get(itemStepId);
 
   const itemStepIdList = [];
   store.set(itemStepId, itemStepIdList);
 
   // Prepare store with an empty list for each copyPlanId
-${dyk.join(
+${te.join(
   copyStepIds.map(
-    (planId) => dyk`\
-  const ${dyk.identifier(`source${planId}`)} = parentBucket.store.get(${dyk.lit(
+    (planId) => te`\
+  const ${te.identifier(`source${planId}`)} = parentBucket.store.get(${te.lit(
       planId,
     )});
-  const ${dyk.identifier(`target${planId}`)} = [];
-  store.set(${dyk.lit(planId)}, ${dyk.identifier(`target${planId}`)});
+  const ${te.identifier(`target${planId}`)} = [];
+  store.set(${te.lit(planId)}, ${te.identifier(`target${planId}`)});
 `,
   ),
   "",
@@ -411,10 +411,10 @@ ${dyk.join(
       itemStepIdList[newIndex] = fieldValue;
 
       polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
-${dyk.join(
+${te.join(
   copyStepIds.map(
-    (planId) => dyk`\
-      ${dyk.identifier(`target${planId}`)}[newIndex] = ${dyk.identifier(
+    (planId) => te`\
+      ${te.identifier(`target${planId}`)}[newIndex] = ${te.identifier(
       `source${planId}`,
     )}[originalIndex];
 `,
@@ -425,23 +425,23 @@ ${dyk.join(
   }
 `);
     } else if (this.reason.type === "listItem") {
-      this.newBucket = this.makeNewBucketCallback(dyk`\
-  const listStepStore = parentBucket.store.get(${dyk.lit(
+      this.newBucket = this.makeNewBucketCallback(te`\
+  const listStepStore = parentBucket.store.get(${te.lit(
     this.reason.parentStep.id,
   )});
 
   const itemStepIdList = [];
-  store.set(${dyk.lit(this.rootStep!.id)}, itemStepIdList);
+  store.set(${te.lit(this.rootStep!.id)}, itemStepIdList);
 
   // Prepare store with an empty list for each copyPlanId
-  ${dyk.join(
+  ${te.join(
     copyStepIds.map(
-      (planId) => dyk`\
-  const ${dyk.identifier(`source${planId}`)} = parentBucket.store.get(${dyk.lit(
+      (planId) => te`\
+  const ${te.identifier(`source${planId}`)} = parentBucket.store.get(${te.lit(
         planId,
       )});
-  const ${dyk.identifier(`target${planId}`)} = [];
-  store.set(${dyk.lit(planId)}, ${dyk.identifier(`target${planId}`)});
+  const ${te.identifier(`target${planId}`)} = [];
+  store.set(${te.lit(planId)}, ${te.identifier(`target${planId}`)});
   `,
     ),
     "",
@@ -464,10 +464,10 @@ ${dyk.join(
         itemStepIdList[newIndex] = list[j];
 
         polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
-        ${dyk.join(
+        ${te.join(
           copyStepIds.map(
-            (planId) => dyk`\
-        ${dyk.identifier(`target${planId}`)}[newIndex] = ${dyk.identifier(
+            (planId) => te`\
+        ${te.identifier(`target${planId}`)}[newIndex] = ${te.identifier(
               `source${planId}`,
             )}[originalIndex];
         `,

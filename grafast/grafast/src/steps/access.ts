@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import debugFactory from "debug";
-import dyk, { DYK } from "devil-you-know";
+import te, { TE } from "tamedevil";
 
 import { inspect } from "../inspect.js";
 import type { ExecutionExtra } from "../interfaces.js";
@@ -22,7 +22,7 @@ function constructDestructureFunction(
   path: (string | number | symbol)[],
   fallback: any,
 ): (_extra: ExecutionExtra, value: any) => any {
-  const jitParts: DYK[] = [];
+  const jitParts: TE[] = [];
 
   let slowMode = false;
 
@@ -34,7 +34,7 @@ function constructDestructureFunction(
       t === "string" ||
       (t === "number" && Number.isFinite(pathItem))
     ) {
-      jitParts.push(dyk.get(pathItem));
+      jitParts.push(te.get(pathItem));
     } else if (pathItem == null) {
       slowMode = true;
     } else {
@@ -59,13 +59,13 @@ function constructDestructureFunction(
     };
   } else {
     // ?.blah?.bog?.["!!!"]?.[0]
-    const expression = dyk.join(jitParts, "");
+    const expression = te.join(jitParts, "");
 
     // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
     const quicklyExtractValueAtPath =
-      dyk.run<any>(dyk`return function quicklyExtractValueAtPath(extra, value) {
+      te.run<any>(te`return function quicklyExtractValueAtPath(extra, value) {
   return (value${expression})${
-        fallback !== undefined ? dyk` ?? ${dyk.lit(fallback)}` : dyk.blank
+        fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
       };
 };`);
 
