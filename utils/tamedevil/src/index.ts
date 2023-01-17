@@ -1,6 +1,4 @@
 import LRU from "@graphile/lru";
-import * as assert from "assert";
-import { inspect } from "util";
 
 import { reservedWords } from "./reservedWords.js";
 
@@ -101,7 +99,7 @@ function makeRawNode(text: string, exportName?: string): TERawNode {
   }
   if (typeof text !== "string") {
     throw new Error(
-      `[tamedevil] Invalid argument to makeRawNode - expected string, but received '${inspect(
+      `[tamedevil] Invalid argument to makeRawNode - expected string, but received '${String(
         text,
       )}'`,
     );
@@ -165,7 +163,7 @@ function enforceValidNode(node: unknown, where?: string): TE {
   throw new Error(
     `[tamedevil] Invalid expression. Expected an TE item${
       where ? ` at ${where}` : ""
-    } but received '${inspect(
+    } but received '${String(
       node,
     )}'. This may mean that there is an issue in the TE expression where a dynamic value was not escaped via 'te.ref(...)', an embedded string wasn't wrapped with 'te.string(...)', or a TE expression was added without using the \`te\` tagged template literal.`,
   );
@@ -257,7 +255,9 @@ function compile(fragment: TE): {
           break;
         }
         case "INDENT": {
-          assert.ok(isDev, "INDENT nodes only allowed in development mode");
+          if (!isDev) {
+            throw new Error("INDENT nodes only allowed in development mode");
+          }
           teFragments.push(
             "\n" +
               "  ".repeat(indent + 1) +
@@ -270,7 +270,7 @@ function compile(fragment: TE): {
         default: {
           const never: never = item;
           // This cannot happen
-          throw new Error(`Unsupported node found in TE: ${inspect(never)}`);
+          throw new Error(`Unsupported node found in TE: ${String(never)}`);
         }
       }
     }
@@ -402,7 +402,7 @@ function raw(text: string): TE {
   }
   if (typeof text !== "string") {
     throw new Error(
-      `[tamedevil] te.raw must be passed a string, but it was passed '${inspect(
+      `[tamedevil] te.raw must be passed a string, but it was passed '${String(
         text,
       )}'.`,
     );
@@ -748,14 +748,14 @@ function newFunction(...args: string[]) {
 function join(items: Array<TE>, separator = ""): TE {
   if (!Array.isArray(items)) {
     throw new Error(
-      `[tamedevil] Invalid te.join call - the first argument should be an array, but it was '${inspect(
+      `[tamedevil] Invalid te.join call - the first argument should be an array, but it was '${String(
         items,
       )}'.`,
     );
   }
   if (typeof separator !== "string") {
     throw new Error(
-      `[tamedevil] Invalid separator passed to te.join - must be a string, but we received '${inspect(
+      `[tamedevil] Invalid separator passed to te.join - must be a string, but we received '${String(
         separator,
       )}'`,
     );
