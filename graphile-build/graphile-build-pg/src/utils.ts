@@ -1,4 +1,5 @@
 import type { PgSmartTagsDict } from "pg-introspection";
+import { reservedWords } from "devil-you-know";
 
 export function tagToString(
   str: undefined | null | boolean | string | (string | boolean)[],
@@ -252,107 +253,7 @@ export function parseDatabaseIdentifierFromSmartTag<
  */
 export class Idents {
   // Initialized with forbidden words
-  idents = new Set<string>([
-    // JS reserved words
-    "await",
-    "break",
-    "case",
-    "catch",
-    "class",
-    "const",
-    "continue",
-    "debugger",
-    "default",
-    "delete",
-    "do",
-    "else",
-    "export",
-    "extends",
-    "false",
-    "finally",
-    "for",
-    "function",
-    "if",
-    "import",
-    "in",
-    "instanceof",
-    "new",
-    "null",
-    "return",
-    "super",
-    "switch",
-    "this",
-    "throw",
-    "true",
-    "try",
-    "typeof",
-    "var",
-    "void",
-    "while",
-    "with",
-    "let",
-    "static",
-    "yield",
-
-    // Future reserved words
-    "enum",
-    "implements",
-    "interface",
-    "package",
-    "private",
-    "protected",
-    "public",
-
-    "abstract",
-    "boolean",
-    "byte",
-    "char",
-    "double",
-    "final",
-    "float",
-    "goto",
-    "int",
-    "long",
-    "native",
-    "short",
-    "synchronized",
-    "throws",
-    "transient",
-    "volatile",
-
-    // Special
-    "arguments",
-    "as",
-    "import",
-    "require",
-    "eval",
-    "Function",
-    "from",
-    "get",
-    "of",
-    "in",
-    "set",
-    "null",
-    "undefined",
-    "Math",
-    "Number",
-    "BigInt",
-    "true",
-    "false",
-
-    // Confusing
-    "async",
-
-    // Globals
-    "window",
-    "global",
-    "globalThis",
-    "process",
-    "require",
-    "import",
-    "constructor",
-    "class",
-  ]);
+  idents = new Set(reservedWords);
 
   /**
    * Don't allow using these identifiers (presumably because they're already in use.

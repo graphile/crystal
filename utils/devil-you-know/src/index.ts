@@ -1,6 +1,7 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
 import { inspect } from "util";
+import { reservedWords } from "./reservedWords";
 
 type Primitive = null | boolean | number | string;
 
@@ -468,6 +469,23 @@ export const isSafeObjectPropertyName = (key: string) =>
 export const canRepresentAsIdentifier = (key: string) =>
   key === "_" || /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
 
+function isValidVariableName(name: string): boolean {
+  if (reservedWords.has(name)) {
+    return false;
+  }
+  if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name)) {
+    return false;
+  }
+  return true;
+}
+
+function identifier(name: string) {
+  if (!isValidVariableName(name)) {
+    throw new Error(`Invalid identifier name '${name}'`);
+  }
+  return makeRawNode(name);
+}
+
 /**
  * IMPORTANT: It's strongly recommended that instead of defining an object via
  * `const obj = { ${dyk.dangerousKey(untrustedKey)}: value }` you instead use
@@ -661,6 +679,7 @@ export {
   ref,
   lit,
   join,
+  identifier,
   dangerousKey,
   get,
   optionalGet,
@@ -671,6 +690,7 @@ export {
   compile,
   undefinedNode as undefined,
   isDYK,
+  reservedWords,
 };
 
 export interface DevilYouKnow {
@@ -681,6 +701,7 @@ export interface DevilYouKnow {
   lit: typeof lit;
   literal: typeof lit;
   join: typeof join;
+  identifier: typeof identifier;
   dangerousKey: typeof dangerousKey;
   get: typeof get;
   optionalGet: typeof optionalGet;
@@ -694,6 +715,7 @@ export interface DevilYouKnow {
   undefined: DYK;
   blank: DYK;
   isDYK: typeof isDYK;
+  reservedWords: typeof reservedWords;
 }
 
 const attributes = {
@@ -703,6 +725,7 @@ const attributes = {
   lit,
   literal: lit,
   join,
+  identifier,
   dangerousKey,
   get,
   optionalGet,
@@ -716,6 +739,7 @@ const attributes = {
   undefined: undefinedNode,
   blank: blankNode,
   isDYK,
+  reservedWords,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {
