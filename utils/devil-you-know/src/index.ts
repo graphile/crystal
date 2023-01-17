@@ -421,6 +421,66 @@ const blankNode = makeRawNode(``, "blank");
 const undefinedNode = makeRawNode(`undefined`, "undefined");
 
 /**
+ * A regexp that matches the first character that might need escaping in a JSON
+ * string. ("Might" because we'd rather be safe.)
+ *
+ * Unsafe:
+ * - `\\`
+ * - `"`
+ * - control characters
+ * - surrogates
+ */
+// eslint-disable-next-line no-control-regex
+const forbiddenCharacters = /["\\\u0000-\u001f\ud800-\udfff]/;
+
+/**
+ * A 'short string' has a length less than or equal to this, and can
+ * potentially have JSON.stringify skipped on it if it doesn't contain any of
+ * the forbiddenCharacters. To prevent the forbiddenCharacters regexp running
+ * for a long time, we cap the length of string we test.
+ */
+const MAX_SHORT_STRING_LENGTH = 200; // TODO: what should this be?
+
+const BACKSLASH_CODE = "\\".charCodeAt(0);
+const QUOTE_CODE = '"'.charCodeAt(0);
+
+// Bizarrely this seems to be faster than the regexp approach
+export function stringifyString(value: string): string {
+  const l = value.length;
+  if (l > MAX_SHORT_STRING_LENGTH) {
+    return JSON.stringify(value);
+  }
+  // Scan through for disallowed charcodes
+  for (let i = 0; i < l; i++) {
+    const code = value.charCodeAt(i);
+    if (
+      code === BACKSLASH_CODE ||
+      code === QUOTE_CODE ||
+      (code & 0xffe0) === 0 || // equivalent to `code <= 0x001f`
+      (code & 0xc000) !== 0 // Not quite equivalent to `code >= 0xd800`, but good enough for our purposes
+    ) {
+      // Backslash, quote, control character or surrogate
+      return JSON.stringify(value);
+    }
+  }
+  return `"${value}"`;
+}
+
+// TODO: more optimal stringifier
+// TODO: rename to jsonStringify?
+export const toJSON = (value: any): string => {
+  if (value == null) return "null";
+  if (value === true) return "true";
+  if (value === false) return "false";
+  const t = typeof value;
+  if (t === "number") return "" + value;
+  if (t === "string") {
+    return stringifyString(value as string);
+  }
+  return JSON.stringify(value);
+};
+
+/**
  * If the value is simple will inline it into the query, otherwise will defer
  * to `dyk.ref`.
  */
@@ -442,15 +502,66 @@ function lit(val: any): DYK {
      * https://github.com/tc39/proposal-json-superset
      */
     const primitive: Primitive = val;
-    return makeRawNode(JSON.stringify(primitive));
+    return makeRawNode(toJSON(primitive));
   } else {
     return ref(val);
   }
 }
 
-const disallowedKeys = Object.keys(
-  Object.getOwnPropertyDescriptors(Object.prototype),
-);
+/**
+ * If you're building a string and you want to inject untrusted content into it
+ * without opening yourself to code injection attacks, this is the method for
+ * you. Example:
+ *
+ * ```js
+ * const code = dyk`const str = "abc${dyk.substring(untrusted, '"')}123";`
+ * ```
+ */
+function substring(text: string, stringType: "'" | '"' | "`"): DYK {
+  // Quick scan to see if it's safe to use verbatim
+  const l = text.length;
+  if (l < MAX_SHORT_STRING_LENGTH) {
+    const stringTypeCode = stringType.charCodeAt(0);
+    let verbatim = true;
+    for (let i = 0; i < l; i++) {
+      const code = text.charCodeAt(i);
+      if (
+        code === BACKSLASH_CODE ||
+        code === stringTypeCode ||
+        (code & 0xffe0) === 0 || // equivalent to `code <= 0x001f`
+        (code & 0xc000) !== 0 // Not quite equivalent to `code >= 0xd800`, but good enough for our purposes
+      ) {
+        // Backslash, quote, control character or surrogate
+        verbatim = false;
+        break;
+      }
+    }
+    if (verbatim) {
+      return makeRawNode(text);
+    }
+  }
+
+  // Not safe to use verbatim, so let's escape it
+
+  // This'll escape most things that need escaping - backslashes, fancy characters, double quotes, etc.
+  const jsonStringified = JSON.stringify(text);
+  // But we're already in a string so we don't want the quote marks
+  const inner = jsonStringified.substring(1, jsonStringified.length - 1);
+  // And if we're not inside a `"` we'll need to escape our string type.
+  const escaped =
+    stringType === '"'
+      ? inner // "" strings already escapes
+      : stringType === "'"
+      ? inner.replace(/'/g, "\\'") // '' strings need `'` escaped too (`\` has already been escaped)
+      : inner.replace(/[`$]/g, "\\$&"); // `` strings need both '`' and `$` to be escaped
+  // Finally return a raw node
+  return makeRawNode(escaped);
+}
+
+const disallowedKeys: Array<string | symbol | number> = [
+  ...Object.getOwnPropertyNames(Object.prototype),
+  ...Object.getOwnPropertySymbols(Object.prototype),
+];
 /**
  * Is safe to set as the key of a POJO (without a null prototype) and doesn't
  * include any characters that would make it unsafe in eval'd code (before or
@@ -514,7 +625,10 @@ function dangerousKey(key: string): DYK {
 }
 
 function canAccessViaDot(str: string): boolean {
-  return str.length < 200 && /^[_a-zA-Z][_a-zA-Z0-9]*$/.test(str);
+  return (
+    str.length < MAX_SHORT_STRING_LENGTH &&
+    /^[$_a-zA-Z][$_a-zA-Z0-9]*$/.test(str)
+  );
 }
 
 /**
@@ -524,9 +638,9 @@ function canAccessViaDot(str: string): boolean {
  */
 function get(key: string | symbol | number): DYK {
   return typeof key === "string" && canAccessViaDot(key)
-    ? // ?._mySimpleProperty
+    ? // ._mySimpleProperty
       dyk`.${makeRawNode(key)}`
-    : // ?.["@@meaning"]
+    : // ["@@meaning"]
       dyk`[${dyk.lit(key)}]`;
 }
 
@@ -541,6 +655,32 @@ function optionalGet(key: string | symbol | number): DYK {
       dyk`?.${makeRawNode(key)}`
     : // ?.["@@meaning"]
       dyk`?.[${dyk.lit(key)}]`;
+}
+
+// TODO: rename this. 'leftSet'? 'leftAccess'? 'safeAccess'?
+/**
+ * Sets the key of an object either via `.` or `[]` as appropriate;
+ * `obj${dyk.set(key)}` would become `obj.foo` or `obj["1foo"]` as
+ * appropriate.
+ *
+ * If the object you're setting properties on has a `null` prototype
+ * (`Object.create(null)`) then you can set `hasNullPrototype` to true and all
+ * keys are allowed. If this is not the case, then an error will be thrown on
+ * certain potentially dangerous keys such as `__proto__` or `constructor`.
+ */
+function set(key: string | symbol | number, hasNullPrototype = false): DYK {
+  if (!hasNullPrototype && disallowedKeys.includes(key)) {
+    throw new Error(
+      `Attempted to set '${String(
+        key,
+      )}' on an object that isn't declared as having a null prototype. This could be unsafe.`,
+    );
+  }
+  return typeof key === "string" && canAccessViaDot(key)
+    ? // ._mySimpleProperty
+      dyk`.${makeRawNode(key)}`
+    : // ["@@meaning"]
+      dyk`[${dyk.lit(key)}]`;
 }
 
 /**
@@ -572,7 +712,7 @@ function run<TResult>(
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
   try {
-    return new Function(...argNames, compiled.string)(...argValues) as any;
+    return newFunction(...argNames, compiled.string)(...argValues) as TResult;
   } catch (e) {
     // TODO: improve this!
     console.error(`Error occurred during code generation:`);
@@ -581,6 +721,11 @@ function run<TResult>(
     console.error(compiled.string);
     throw new Error(`Error occurred during code generation.`);
   }
+}
+
+/** Because `new Function` retains the scope, we do it at top level to avoid capturing extra values */
+function newFunction(...args: string[]) {
+  return new Function(...args);
 }
 
 /**
@@ -690,11 +835,14 @@ export {
   dyk,
   ref,
   lit,
+  lit as literal,
+  substring,
   join,
   identifier,
   dangerousKey,
   get,
   optionalGet,
+  set,
   tmp,
   tempVar,
   run,
@@ -712,11 +860,13 @@ export interface DevilYouKnow {
   reference: typeof ref;
   lit: typeof lit;
   literal: typeof lit;
+  substring: typeof substring;
   join: typeof join;
   identifier: typeof identifier;
   dangerousKey: typeof dangerousKey;
   get: typeof get;
   optionalGet: typeof optionalGet;
+  set: typeof set;
   tmp: typeof tmp;
   tempVar: typeof tempVar;
   run: {
@@ -742,11 +892,13 @@ const attributes = {
   reference: ref,
   lit,
   literal: lit,
+  substring,
   join,
   identifier,
   dangerousKey,
   get,
   optionalGet,
+  set,
   tmp,
   tempVar,
   run,

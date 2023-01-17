@@ -199,6 +199,18 @@ const fragment = dyk`\
 `;
 ```
 
+### `dyk.substring(str, stringType)`
+
+If you're building a string and you want to inject untrusted content into it
+without opening yourself to code injection attacks, this is the method for you.
+Pass the string you'd like escaped as the first argument, and the second
+argument should be `"`, `'` or `` ` `` depending on what type of string you're
+embedding into. Example:
+
+```js
+const code = dyk`const str = "abc${dyk.substring(untrusted, '"')}123";`;
+```
+
 ### `dyk.join(arrayOfFragments, delimiter)`
 
 Joins an array of `dyk` values using the delimiter (a plain string); e.g.
@@ -256,6 +268,13 @@ symbol or number) of the preceding expression; will return code like `.foo` or
 
 As with `dyk.get` except using optional chaining - the expression will be
 `?.foo` or `?.["foo"]` as appropriate.
+
+### `dyk.set(key, hasNullPrototype)`
+
+As with `dyk.get`, except since it's for setting a key we'll perform checks to
+ensure you're not writing to unsafe keys (such as `__proto__`) unless you
+specify that `hasNullPrototype` is true (because any key can bet written safely
+to `Object.create(null)`).
 
 ### `dyk.tempVar(symbol = Symbol())`
 
