@@ -1,4 +1,5 @@
 import LRU from "@graphile/lru";
+import dyk from "devil-you-know";
 import type {
   FieldNode,
   FragmentDefinitionNode,
@@ -321,12 +322,17 @@ export class OperationPlan {
     const allMetaKeysList = [...allMetaKeys];
 
     // A JIT'd object constructor
-    this.makeMetaByMetaKey = new Function(
-      "keys",
-      `return () => ({${allMetaKeysList
-        .map((key, idx) => `\n  [keys[${idx}]]: Object.create(null)`)
-        .join(",")}\n})`,
-    )(allMetaKeysList) as any;
+    this.makeMetaByMetaKey = dyk.run`
+return () => {
+  const meta = Object.create(null);
+${dyk.join(
+  allMetaKeysList.map(
+    (key) => dyk`  meta${dyk.set(key, true)} = Object.create(null);`,
+  ),
+  "\n",
+)}
+  return meta;
+};`;
   }
 
   /**
