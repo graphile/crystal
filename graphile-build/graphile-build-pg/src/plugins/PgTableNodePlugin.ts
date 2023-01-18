@@ -105,7 +105,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             plan: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
-                  te.run`return function (list, constant) {
+                  te.run`\
+return function (list, constant) {
   return $record => list([constant(${te.lit(identifier)}), ${te.join(
                     pk.map(
                       (columnName) => te`$record.get(${te.lit(columnName)})`,
@@ -128,7 +129,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             getSpec: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
-                  te.run`return function (access) {
+                  te.run`\
+return function (access) {
   return $list => ({ ${te.join(
     pk.map(
       (columnName, index) =>
@@ -137,7 +139,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         )}])`,
     ),
     ", ",
-  )} })
+  )} });
 }` as any,
                   [access],
                 )

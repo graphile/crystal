@@ -461,11 +461,9 @@ function makeRelationPlans(
         isSafeObjectPropertyName(localColumnName),
     );
 
-  const specString = makeSpecString(
-    recordOrResult,
-    localColumns,
-    remoteColumns,
-  );
+  const specString = clean
+    ? makeSpecString(recordOrResult, localColumns, remoteColumns)
+    : null;
 
   const specFromRecord = EXPORTABLE(
     (localColumns, remoteColumns) =>
@@ -481,87 +479,90 @@ function makeRelationPlans(
     result: PgSelectSingleStep<any, any, any, any>;
   }>;
 
-  const singleRecordPlan = clean
-    ? // Optimise function for both execution and export.
-      // eslint-disable-next-line graphile-export/exhaustive-deps
-      (EXPORTABLE(
-        te.run`\
+  const singleRecordPlan =
+    clean && specString
+      ? // Optimise function for both execution and export.
+        // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          te.run`\
 return function (otherSource) {
   return $record => otherSource.get(${specString});
 }` as any,
-        [otherSource],
-      ) as any)
-    : isMutationPayload
-    ? EXPORTABLE(
-        (otherSource, specFromRecord) =>
-          function plan($in: MutationPayload) {
-            const $record = $in.get("result");
-            return otherSource.get(specFromRecord($record));
-          },
-        [otherSource, specFromRecord],
-      )
-    : EXPORTABLE(
-        (otherSource, specFromRecord) =>
-          function plan($record: PgSelectSingleStep<any, any, any, any>) {
-            return otherSource.get(specFromRecord($record));
-          },
-        [otherSource, specFromRecord],
-      );
+          [otherSource],
+        ) as any)
+      : isMutationPayload
+      ? EXPORTABLE(
+          (otherSource, specFromRecord) =>
+            function plan($in: MutationPayload) {
+              const $record = $in.get("result");
+              return otherSource.get(specFromRecord($record));
+            },
+          [otherSource, specFromRecord],
+        )
+      : EXPORTABLE(
+          (otherSource, specFromRecord) =>
+            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+              return otherSource.get(specFromRecord($record));
+            },
+          [otherSource, specFromRecord],
+        );
 
-  const listPlan = clean
-    ? // eslint-disable-next-line graphile-export/exhaustive-deps
-      (EXPORTABLE(
-        te.run`\
+  const listPlan =
+    clean && specString
+      ? // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          te.run`\
 return function (otherSource) {
   return $record => otherSource.find(${specString});
 }` as any,
-        [otherSource],
-      ) as any)
-    : isMutationPayload
-    ? EXPORTABLE(
-        (otherSource, specFromRecord) =>
-          function plan($in: MutationPayload) {
-            const $record = $in.get("result");
-            return otherSource.find(specFromRecord($record));
-          },
-        [otherSource, specFromRecord],
-      )
-    : EXPORTABLE(
-        (otherSource, specFromRecord) =>
-          function plan($record: PgSelectSingleStep<any, any, any, any>) {
-            return otherSource.find(specFromRecord($record));
-          },
-        [otherSource, specFromRecord],
-      );
+          [otherSource],
+        ) as any)
+      : isMutationPayload
+      ? EXPORTABLE(
+          (otherSource, specFromRecord) =>
+            function plan($in: MutationPayload) {
+              const $record = $in.get("result");
+              return otherSource.find(specFromRecord($record));
+            },
+          [otherSource, specFromRecord],
+        )
+      : EXPORTABLE(
+          (otherSource, specFromRecord) =>
+            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+              return otherSource.find(specFromRecord($record));
+            },
+          [otherSource, specFromRecord],
+        );
 
-  const connectionPlan = clean
-    ? // eslint-disable-next-line graphile-export/exhaustive-deps
-      (EXPORTABLE(
-        te.run`\
+  const connectionPlan =
+    clean && specString
+      ? // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          te.run`\
 return function (otherSource, connection) {
   return $record => {
     const $records = otherSource.find(${specString});
     return connection($records);
   }
 }` as any,
-        [otherSource, connection],
-      ) as any)
-    : isMutationPayload
-    ? EXPORTABLE(
-        (connection, otherSource, specFromRecord) =>
-          function plan($in: MutationPayload) {
-            const $record = $in.get("result");
-            return connection(otherSource.find(specFromRecord($record)));
-          },
-        [connection, otherSource, specFromRecord],
-      )
-    : EXPORTABLE(
-        (connection, otherSource, specFromRecord) =>
-          function plan($record: PgSelectSingleStep<any, any, any, any>) {
-            return connection(otherSource.find(specFromRecord($record)));
-          },
-        [connection, otherSource, specFromRecord],
-      );
+          [otherSource, connection],
+        ) as any)
+      : isMutationPayload
+      ? EXPORTABLE(
+          (connection, otherSource, specFromRecord) =>
+            function plan($in: MutationPayload) {
+              const $record = $in.get("result");
+              return connection(otherSource.find(specFromRecord($record)));
+            },
+          [connection, otherSource, specFromRecord],
+        )
+      : EXPORTABLE(
+          (connection, otherSource, specFromRecord) =>
+            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+              return connection(otherSource.find(specFromRecord($record)));
+            },
+          [connection, otherSource, specFromRecord],
+        );
   return { singleRecordPlan, listPlan, connectionPlan };
 }
 
@@ -959,6 +960,7 @@ function addRelations(
                       }`,
                     ),
                   );
+                  // FIXME: is this always safe?
                   const specString = makeSpecString(
                     previousIdentifier,
                     localColumns,

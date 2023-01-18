@@ -754,7 +754,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             ? specFromArgsString
                               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                                 EXPORTABLE(
-                                  te.run`return function(object, pgUpdate, source) {
+                                  te.run`\
+return function(object, pgUpdate, source) {
 return (_$root, args) => {
   const plan = object({ result: pgUpdate(source, ${specFromArgsString}) });
   args.apply(plan);
@@ -783,7 +784,8 @@ return (_$root, args) => {
                             : specFromArgsString
                             ? // eslint-disable-next-line graphile-export/exhaustive-deps
                               EXPORTABLE(
-                                te.run`return function (object, pgDelete, source) {
+                                te.run`\
+return function (object, pgDelete, source) {
 return (_$root, args) => {
   const plan = object({ result: pgDelete(source, ${specFromArgsString}) });
   args.apply(plan);

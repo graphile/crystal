@@ -124,7 +124,8 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                      */
                     // eslint-disable-next-line graphile-export/exhaustive-deps
                     EXPORTABLE(
-                      te.run`return function (source) {
+                      te.run`\
+return function (source) {
   return (_$root, args) => source.get({ ${te.join(
     columnNames.map(
       (columnName) =>
