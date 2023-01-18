@@ -916,6 +916,7 @@ export {
   lit,
   lit as literal,
   optionalGet,
+  raw,
   ref,
   reservedWords,
   run,
@@ -926,7 +927,6 @@ export {
   tempVar,
   tmp,
   undefinedNode as undefined,
-  raw,
 };
 
 export interface TamedEvil {

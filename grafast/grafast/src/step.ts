@@ -501,9 +501,7 @@ ${te.join(
   for (let i = 0; i < count; i++) {
 ${tryOrNot(te`\
     results[i] = this.unbatchedExecute(extra, ${te.join(
-      depIndexes.map(
-        (depIndex) => te`${te.identifier(`list${depIndex}`)}[i]`,
-      ),
+      depIndexes.map((depIndex) => te`${te.identifier(`list${depIndex}`)}[i]`),
       ", ",
     )});
 `)}\

@@ -1,13 +1,14 @@
-import { parse } from "graphql";
 import { expect } from "chai";
-import { describe, it } from "mocha";
+import { parse } from "graphql";
+import { it } from "mocha";
+
 import {
-  grafastSync,
-  makeGrafastSchema,
   access,
   constant,
   execute,
-} from "../dist";
+  grafastSync,
+  makeGrafastSchema,
+} from "../dist/index.js";
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
