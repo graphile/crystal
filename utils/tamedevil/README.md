@@ -89,15 +89,11 @@ typically the only thing you need to import.
 
 For ESM, import `te`:
 
-<!-- skip-example -->
-
 ```js
 import { te } from "tamedevil";
 ```
 
 Or for CommonJS, `require` it:
-
-<!-- skip-example -->
 
 ```js
 const { te } = require("tamedevil");
@@ -122,15 +118,13 @@ const toEval = te`\
 
 const plan = te.run(toEval);
 
-console.log(plan.toString());
-/* Outputs:
-
-function plan($record) {
-  const $records = source.find("some string here");
-  return connection($records);
-}
-
-*/
+assert.strictEqual(
+  plan.toString(),
+  `function plan($record) {
+    const $records = source.find("some string here");
+    return connection($records);
+  }`,
+);
 ```
 
 ## API
@@ -143,7 +137,7 @@ embedded expressions. If a non `te` expression is passed in, e.g.:
 <!-- skip-example -->
 
 ```js
-te`return 2 + ${1}`;
+te`return 2 + ${1}`; // WILL THROW AN ERROR
 ```
 
 then an error will be thrown. This prevents code injection, as all values must
@@ -162,13 +156,21 @@ debug, e.g.:
 const source = new Source(/* ... */);
 const spec = "some string here";
 
-const toEval = te`\
+const plan = te.run`\
   const source = ${te.ref(source)};
   return function plan($record) {
     const $records = source.find(${te.lit(spec)});
     return connection($records);
   }
 `;
+
+assert.strictEqual(
+  plan.toString(),
+  `function plan($record) {
+    const $records = source.find("some string here");
+    return connection($records);
+  }`,
+);
 ```
 
 ### `te.lit(val)` (alias: te.literal)
@@ -188,12 +190,16 @@ const key1 = "one";
 // fine for `Object.create(null)`
 const key2 = "__proto__";
 
-const fragment = te`\
+const obj = te.run`\
   const obj = Object.create(null);
   obj[${te.lit(key1)}] = 1;
-  obj[${te.lit(key2)}] = {str: true};
+  obj[${te.lit(key2)}] = { str: true };
   return obj;
 `;
+
+assert.equal(typeof obj, "object");
+assert.equal(obj.one, 1);
+assert.deepEqual(obj.__proto__, { str: true });
 ```
 
 ### `te.substring(str, stringType)`
@@ -209,7 +215,9 @@ embedding into. Example:
 const untrusted = "'\"` \\'\\\"\\` ${process.exit(1)}";
 
 // Safely insert the untrusted input into a string
-const code = te`const str = "abc${te.substring(untrusted, '"')}123";`;
+const code = te.run`return "abc${te.substring(untrusted, '"')}123";`;
+
+assert.strictEqual(code, "abc'\"` \\'\\\"\\` ${process.exit(1)}123");
 ```
 
 ### `te.join(arrayOfFragments, delimiter)`
@@ -220,8 +228,9 @@ Joins an array of `te` values using the delimiter (a plain string); e.g.
 const keysAndValues = ["a", "b", "c", "d"].map(
   (n, i) => te`${te.dangerousKey(n)}: ${te.literal(i)}`,
 );
-const obj = te`{ ${te.join(keysAndValues, ", ")} }`;
-// obj = { a: 0, b: 1, c: 2, d: 3 }
+const obj = te.run`return { ${te.join(keysAndValues, ", ")} }`;
+
+assert.deepEqual(obj, { a: 0, b: 1, c: 2, d: 3 });
 ```
 
 ### `te.identifier(name)`
@@ -303,7 +312,8 @@ Evaluates the TE fragment and returns the result.
 ```js
 const fragment = te`return 1 + 2`;
 const result = te.run(fragment);
-// result = 3;
+
+assert.equal(result, 3);
 ```
 
 ### `te.compile(fragment)`
@@ -315,5 +325,9 @@ for debugging, or tests.
 ```js
 const fragment = te`return ${te.ref(1)} + ${te.ref(2)}`;
 const result = te.compile(fragment);
-// result = { string: `return _$_ref1 + _$_ref2`, refs: { _$_ref1: 1, _$_ref2: 2 } }
+
+assert.deepEqual(result, {
+  string: `return _$$_ref_1 + _$$_ref_2`,
+  refs: { _$$_ref_1: 1, _$$_ref_2: 2 },
+});
 ```

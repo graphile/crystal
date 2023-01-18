@@ -7,5 +7,6 @@ module.exports = {
   globals: {
     te: mod.te,
     Source,
+    assert: require("assert"),
   },
 };
