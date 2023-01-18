@@ -21,12 +21,12 @@ import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
-import type {TE } from "tamedevil";
-import te, { isSafeObjectPropertyName } from "tamedevil";
+import type { TE } from "tamedevil";
+import te, { isSafeObjectPropertyName, Idents } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { Idents, tagToString } from "../utils.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -936,9 +936,7 @@ function addRelations(
                   `${source.name}Source`,
                 );
                 prefixLines.push(
-                  te`const ${te.identifier(sourceName)} = ${te.ref(
-                    source,
-                  )};`,
+                  te`const ${te.identifier(sourceName)} = ${te.ref(source)};`,
                 );
                 if (isStillSingular) {
                   if (!isUnique) {

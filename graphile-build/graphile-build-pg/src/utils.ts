@@ -247,38 +247,3 @@ export function parseDatabaseIdentifierFromSmartTag<
     return bits as any;
   }
 }
-
-/**
- * Makes safe identifiers
- */
-export class Idents {
-  // Initialized with forbidden words
-  idents = new Set(reservedWords);
-
-  /**
-   * Don't allow using these identifiers (presumably because they're already in use.
-   */
-  forbid(identifiers: string[]) {
-    for (const identifier in identifiers) {
-      this.idents.add(identifier);
-    }
-  }
-
-  makeSafeIdentifier(str: string): string {
-    const { idents } = this;
-    const safe = str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
-    let ident: string | undefined = undefined;
-    for (let i = 1; i < 10000; i++) {
-      const val = safe + (i > 1 ? String(i) : "");
-      if (!idents.has(val)) {
-        ident = val;
-        break;
-      }
-    }
-    if (!ident) {
-      throw new Error("Too many identifiers!");
-    }
-    idents.add(ident);
-    return ident;
-  }
-}
