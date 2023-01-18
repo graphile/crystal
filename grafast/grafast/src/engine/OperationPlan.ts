@@ -326,10 +326,11 @@ export class OperationPlan {
 return () => ({
 ${te.join(
   allMetaKeysList.map(
-    (key) => te`\n  ${te.dangerousKey(key)}: Object.create(null),`,
+    (key) => te`  ${te.dangerousKey(key)}: Object.create(null),\n`,
   ),
   "",
-)}\n});`;
+)}\
+});`;
   }
 
   /**

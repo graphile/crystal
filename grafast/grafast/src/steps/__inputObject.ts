@@ -67,7 +67,9 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
 
   finalize() {
     this.unbatchedExecute = te.run`return function (extra, ${te.join(
-      this.dependencies.map((_, i) => te.identifier(`val${i}`)),
+      this.dependencies.map((_, dependencyIndex) =>
+        te.identifier(`val${dependencyIndex}`),
+      ),
       ", ",
     )}) {
   const resultValues = Object.create(null);

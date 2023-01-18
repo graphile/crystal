@@ -346,6 +346,7 @@ ${inner}
       hasErrors: parentBucket.hasErrors,
       polymorphicPathList,
     });
+    // TODO: set ourselves in more places so that we never have to call 'getChildBucketAndIndex'.
     parentBucket.children[${te.lit(this.id)}] = {
       bucket: childBucket,
       map,
