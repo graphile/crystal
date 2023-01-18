@@ -916,7 +916,7 @@ function addRelations(
                 functionLines.push(te`return ($record) => {`);
               }
 
-              let previousIdentifier = "$record";
+              let previousIdentifier = te.identifier(`$record`);
 
               // ENHANCEMENT: these ensure that the variables are defined in
               // the closure, but they also output noise
@@ -950,29 +950,31 @@ function addRelations(
                   if (!isUnique) {
                     isStillSingular = false;
                   }
-                  const newIdentifier = idents.makeSafeIdentifier(
-                    `$${
-                      isUnique
-                        ? build.inflection.singularize(source.name)
-                        : build.inflection.pluralize(source.name)
-                    }`,
+                  const newIdentifier = te.identifier(
+                    idents.makeSafeIdentifier(
+                      `$${
+                        isUnique
+                          ? build.inflection.singularize(source.name)
+                          : build.inflection.pluralize(source.name)
+                      }`,
+                    ),
                   );
                   const specString = makeSpecString(
-                    te.identifier(previousIdentifier),
+                    previousIdentifier,
                     localColumns,
                     remoteColumns,
                   );
                   functionLines.push(
-                    te`  const ${te.identifier(
-                      newIdentifier,
-                    )} = ${te.identifier(sourceName)}.${
-                      isUnique ? te`get` : te`find`
-                    }(${specString});`,
+                    te`  const ${newIdentifier} = ${te.identifier(
+                      sourceName,
+                    )}.${isUnique ? te`get` : te`find`}(${specString});`,
                   );
                   previousIdentifier = newIdentifier;
                 } else {
-                  const newIdentifier = idents.makeSafeIdentifier(
-                    `$${build.inflection.pluralize(source.name)}`,
+                  const newIdentifier = te.identifier(
+                    idents.makeSafeIdentifier(
+                      `$${build.inflection.pluralize(source.name)}`,
+                    ),
                   );
                   /*
             const tupleIdentifier = makeSafeIdentifier(
@@ -996,11 +998,7 @@ function addRelations(
                     remoteColumns,
                   );
                   functionLines.push(
-                    te`  const ${te.identifier(
-                      newIdentifier,
-                    )} = each(${te.identifier(
-                      previousIdentifier,
-                    )}, (${$entry}) => ${te.identifier(
+                    te`  const ${newIdentifier} = each(${previousIdentifier}, (${$entry}) => ${te.identifier(
                       sourceName,
                     )}.get(${specString}));`,
                   );
@@ -1009,24 +1007,19 @@ function addRelations(
               }
 
               if (isStillSingular && !single) {
+                const newIdentifier = te.identifier("$list");
                 functionLines.push(
-                  te`  const $list = list([${te.identifier(
-                    previousIdentifier,
-                  )}]);`,
+                  te`  const ${newIdentifier} = list([${previousIdentifier}]);`,
                 );
-                previousIdentifier = "$list";
+                previousIdentifier = newIdentifier;
               }
 
               if (isConnection) {
                 functionLines.push(
-                  te`  return connection(${te.identifier(
-                    previousIdentifier,
-                  )});`,
+                  te`  return connection(${previousIdentifier});`,
                 );
               } else {
-                functionLines.push(
-                  te`  return ${te.identifier(previousIdentifier)};`,
-                );
+                functionLines.push(te`  return ${previousIdentifier};`);
               }
               functionLines.push(te`}`);
               return te.run`${te.join(prefixLines, "\n")}${te.join(
