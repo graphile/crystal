@@ -2,10 +2,10 @@ const mod = require(".");
 class Source {}
 module.exports = {
   require: {
-    "devil-you-know": mod,
+    tamedevil: mod,
   },
   globals: {
-    dyk: mod.dyk,
+    te: mod.te,
     Source,
   },
 };

@@ -205,6 +205,10 @@ argument should be `"`, `'` or `` ` `` depending on what type of string you're
 embedding into. Example:
 
 ```js
+// Some untrusted user input, could have anything in it
+const untrusted = "'\"` \\'\\\"\\` ${process.exit(1)}";
+
+// Safely insert the untrusted input into a string
 const code = te`const str = "abc${te.substring(untrusted, '"')}123";`;
 ```
 
