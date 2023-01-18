@@ -1,6 +1,13 @@
+import { parse } from "graphql";
 import { expect } from "chai";
 import { describe, it } from "mocha";
-import { grafastSync, makeGrafastSchema, access, constant } from "../dist";
+import {
+  grafastSync,
+  makeGrafastSchema,
+  access,
+  constant,
+  execute,
+} from "../dist";
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
@@ -64,8 +71,7 @@ it("ok", () => {
   });
   console.dir(result);
   expect(result.errors).to.equal(undefined);
-  expect(JSON.stringify(result.data, null, 2)).to.equal(
-    `\
+  const expected = `\
 {
   "o": {
     "a": null,
@@ -79,6 +85,15 @@ it("ok", () => {
       "b": "The first prime"
     }
   }
-}`,
+}`;
+  expect(JSON.stringify(result.data, null, 2)).to.equal(expected);
+  const result2 = execute(
+    {
+      schema,
+      document: parse(source),
+    },
+    {},
+    true,
   );
+  expect(JSON.stringify(JSON.parse(result2.data), null, 2)).to.equal(expected);
 });
