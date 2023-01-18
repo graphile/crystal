@@ -896,89 +896,103 @@ function addRelations(
           ) => {
             const single = mode === "singleRecord";
             const isConnection = mode === "connection";
-            try {
-              const idents = new Idents();
-              idents.forbid([
-                "$list",
-                "$in",
-                "$record",
-                "$entry",
-                "$tuple",
-                "list",
-                "sql",
-              ]);
+            const idents = new Idents();
+            idents.forbid([
+              "$list",
+              "$in",
+              "$record",
+              "$entry",
+              "$tuple",
+              "list",
+              "sql",
+            ]);
 
-              const functionLines: TE[] = [];
-              const prefixLines: TE[] = [];
-              if (isMutationPayload) {
-                functionLines.push(te`return ($in) => {`);
-                functionLines.push(te`  const $record = $in.get("result");`);
-              } else {
-                functionLines.push(te`return ($record) => {`);
-              }
+            const functionLines: TE[] = [];
+            const prefixLines: TE[] = [];
+            if (isMutationPayload) {
+              functionLines.push(te`return ($in) => {`);
+              functionLines.push(te`  const $record = $in.get("result");`);
+            } else {
+              functionLines.push(te`return ($record) => {`);
+            }
 
-              let previousIdentifier = te.identifier(`$record`);
+            let previousIdentifier = te.identifier(`$record`);
 
-              // ENHANCEMENT: these ensure that the variables are defined in
-              // the closure, but they also output noise
-              // (`list;object;connection;sql;`) which could be eliminated.
-              prefixLines.push(te`${te.ref(list, "list")};`);
-              prefixLines.push(te`${te.ref(object, "object")};`);
-              prefixLines.push(te`${te.ref(connection, "connection")};`);
-              prefixLines.push(te`${te.ref(sql, "sql")};`);
+            // ENHANCEMENT: these ensure that the variables are defined in
+            // the closure, but they also output noise
+            // (`list;object;connection;sql;`) which could be eliminated.
+            prefixLines.push(te`${te.ref(list, "list")};`);
+            prefixLines.push(te`${te.ref(object, "object")};`);
+            prefixLines.push(te`${te.ref(connection, "connection")};`);
+            prefixLines.push(te`${te.ref(sql, "sql")};`);
 
-              let isStillSingular = true;
-              for (let i = 0, l = path.layers.length; i < l; i++) {
-                const layer = path.layers[i];
-                const { localColumns, remoteColumns, source, isUnique } = layer;
-                if (
-                  !(
-                    localColumns.every(isSafeObjectPropertyName) &&
-                    remoteColumns.every(isSafeObjectPropertyName)
-                  )
-                ) {
+            let isStillSingular = true;
+            for (let i = 0, l = path.layers.length; i < l; i++) {
+              const layer = path.layers[i];
+              const { localColumns, remoteColumns, source, isUnique } = layer;
+              const clean =
+                localColumns.every(isSafeObjectPropertyName) &&
+                remoteColumns.every(isSafeObjectPropertyName);
+              const sourceName = idents.makeSafeIdentifier(
+                `${source.name}Source`,
+              );
+              prefixLines.push(
+                te`const ${te.identifier(sourceName)} = ${te.ref(source)};`,
+              );
+              if (isStillSingular) {
+                if (!isUnique) {
+                  isStillSingular = false;
+                }
+                const newIdentifier = te.identifier(
+                  idents.makeSafeIdentifier(
+                    `$${
+                      isUnique
+                        ? build.inflection.singularize(source.name)
+                        : build.inflection.pluralize(source.name)
+                    }`,
+                  ),
+                );
+                const specFromRecord = EXPORTABLE(
+                  (localColumns, remoteColumns) =>
+                    ($record: PgSelectSingleStep<any, any, any, any>) => {
+                      return remoteColumns.reduce(
+                        (memo, remoteColumnName, i) => {
+                          memo[remoteColumnName] = $record.get(
+                            localColumns[i] as string,
+                          );
+                          return memo;
+                        },
+                        Object.create(null),
+                      );
+                    },
+                  [localColumns, remoteColumns],
+                );
+                if (!clean) {
                   throw new Error(
-                    "Unsafe identifier found, falling back to slow mode",
+                    "GraphileInternalError<94fe5fe8-74a4-418b-93ea-beac09b64b5d>: TODO: handle relations on columns that use unsafe keywords",
                   );
                 }
-                const sourceName = idents.makeSafeIdentifier(
-                  `${source.name}Source`,
+                // FIXME: the non-clean branch of this does not currently have any tests, it might not work. Hence the throw above, out of an abundance of caution.
+                const specString = clean
+                  ? makeSpecString(
+                      previousIdentifier,
+                      localColumns,
+                      remoteColumns,
+                    )
+                  : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
+                functionLines.push(
+                  te`  const ${newIdentifier} = ${te.identifier(sourceName)}.${
+                    isUnique ? te`get` : te`find`
+                  }(${specString});`,
                 );
-                prefixLines.push(
-                  te`const ${te.identifier(sourceName)} = ${te.ref(source)};`,
+                previousIdentifier = newIdentifier;
+              } else {
+                const newIdentifier = te.identifier(
+                  idents.makeSafeIdentifier(
+                    `$${build.inflection.pluralize(source.name)}`,
+                  ),
                 );
-                if (isStillSingular) {
-                  if (!isUnique) {
-                    isStillSingular = false;
-                  }
-                  const newIdentifier = te.identifier(
-                    idents.makeSafeIdentifier(
-                      `$${
-                        isUnique
-                          ? build.inflection.singularize(source.name)
-                          : build.inflection.pluralize(source.name)
-                      }`,
-                    ),
-                  );
-                  // FIXME: is this always safe?
-                  const specString = makeSpecString(
-                    previousIdentifier,
-                    localColumns,
-                    remoteColumns,
-                  );
-                  functionLines.push(
-                    te`  const ${newIdentifier} = ${te.identifier(
-                      sourceName,
-                    )}.${isUnique ? te`get` : te`find`}(${specString});`,
-                  );
-                  previousIdentifier = newIdentifier;
-                } else {
-                  const newIdentifier = te.identifier(
-                    idents.makeSafeIdentifier(
-                      `$${build.inflection.pluralize(source.name)}`,
-                    ),
-                  );
-                  /*
+                /*
             const tupleIdentifier = makeSafeIdentifier(
               `${previousIdentifier}Tuples`,
             );
@@ -992,49 +1006,42 @@ function addRelations(
             );
             functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
             */
-                  // ENHANCEMENT: we could rename this to be the singular of the source name or something
-                  const $entry = te`$entry`;
-                  const specString = makeSpecString(
-                    $entry,
-                    localColumns,
-                    remoteColumns,
-                  );
-                  functionLines.push(
-                    te`  const ${newIdentifier} = each(${previousIdentifier}, (${$entry}) => ${te.identifier(
-                      sourceName,
-                    )}.get(${specString}));`,
-                  );
-                  previousIdentifier = newIdentifier;
-                }
-              }
-
-              if (isStillSingular && !single) {
-                const newIdentifier = te.identifier("$list");
+                // ENHANCEMENT: we could rename this to be the singular of the source name or something
+                const $entry = te`$entry`;
+                const specString = makeSpecString(
+                  $entry,
+                  localColumns,
+                  remoteColumns,
+                );
                 functionLines.push(
-                  te`  const ${newIdentifier} = list([${previousIdentifier}]);`,
+                  te`  const ${newIdentifier} = each(${previousIdentifier}, (${$entry}) => ${te.identifier(
+                    sourceName,
+                  )}.get(${specString}));`,
                 );
                 previousIdentifier = newIdentifier;
               }
-
-              if (isConnection) {
-                functionLines.push(
-                  te`  return connection(${previousIdentifier});`,
-                );
-              } else {
-                functionLines.push(te`  return ${previousIdentifier};`);
-              }
-              functionLines.push(te`}`);
-              return te.run`${te.join(prefixLines, "\n")}${te.join(
-                functionLines,
-                "\n",
-              )}`;
-            } catch (e) {
-              console.error(e);
-              // TODO: fallback if unsafe
-              throw new Error(
-                "GraphileInternalError<94fe5fe8-74a4-418b-93ea-beac09b64b5d>: TODO: implement slow mode when identifiers are not JSON-to-JS-safe (or expand the definition of JSON-to-JS safe)",
-              );
             }
+
+            if (isStillSingular && !single) {
+              const newIdentifier = te.identifier("$list");
+              functionLines.push(
+                te`  const ${newIdentifier} = list([${previousIdentifier}]);`,
+              );
+              previousIdentifier = newIdentifier;
+            }
+
+            if (isConnection) {
+              functionLines.push(
+                te`  return connection(${previousIdentifier});`,
+              );
+            } else {
+              functionLines.push(te`  return ${previousIdentifier};`);
+            }
+            functionLines.push(te`}`);
+            return te.run`${te.join(prefixLines, "\n")}${te.join(
+              functionLines,
+              "\n",
+            )}`;
           };
           const singleRecordPlan = makePlanResolver("singleRecord");
           const listPlan = makePlanResolver("list");
