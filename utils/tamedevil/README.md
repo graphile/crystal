@@ -143,7 +143,7 @@ te`return 2 + ${1}`; // WILL THROW AN ERROR
 then an error will be thrown. This prevents code injection, as all values must
 go through an allowed API.
 
-### `te.ref(val)` (alias: te.reference)
+### `te.ref(val, name?)` (alias: te.reference)
 
 Tells `te` to pass the given value by reference into the scope of the function
 via a closure, and returns an identifier that can be used to reference it. Note:
@@ -160,6 +160,29 @@ const plan = te.run`\
   const source = ${te.ref(source)};
   return function plan($record) {
     const $records = source.find(${te.lit(spec)});
+    return connection($records);
+  }
+`;
+
+assert.strictEqual(
+  plan.toString(),
+  `function plan($record) {
+    const $records = source.find("some string here");
+    return connection($records);
+  }`,
+);
+```
+
+If you want to force a particular identifier to be used, you can pass the
+`name`, but then it's up to you to ensure that no conflicts take place:
+
+```js
+const source = new Source(/* ... */);
+const spec = "some string here";
+
+const plan = te.run`\
+  return function plan($record) {
+    const $records = ${te.ref(source, "source")}.find(${te.lit(spec)});
     return connection($records);
   }
 `;

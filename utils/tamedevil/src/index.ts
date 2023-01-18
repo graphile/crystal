@@ -46,6 +46,8 @@ export interface TERefNode {
   readonly [$$type]: "REF";
   /** value */
   readonly v: any;
+  /** name */
+  readonly n: string | undefined;
 }
 
 export interface TETemporaryVariableNode {
@@ -117,10 +119,11 @@ function makeRawNode(text: string, exportName?: string): TERawNode {
 }
 
 // Simple function to help V8 optimize it.
-function makeRefNode(rawValue: any): TERefNode {
+function makeRefNode(rawValue: any, name?: string): TERefNode {
   return Object.freeze({
     [$$type]: "REF" as const,
     v: rawValue,
+    n: name,
   });
 }
 
@@ -187,7 +190,7 @@ function compile(fragment: TE): {
   const refs: { [key: string]: any } = Object.create(null);
   let refCount = 0;
   const refMap = new Map<any, string>();
-  const makeRef = (value: any): string => {
+  const makeRef = (value: any, suggestedName?: string): string => {
     const existingIdentifier = refMap.get(value);
     if (existingIdentifier) {
       return existingIdentifier;
@@ -199,7 +202,7 @@ function compile(fragment: TE): {
         "[tamedevil] This TE statement would contain too many placeholders; tamedevil supports at most 65535 placeholders. To solve this, consider passing multiple values in using a single array or object.",
       );
     }
-    const identifier = `_$$_ref_${refCount}`;
+    const identifier = suggestedName ?? `_$$_ref_${refCount}`;
     refMap.set(value, identifier);
     refs[identifier] = value;
     return identifier;
@@ -216,6 +219,8 @@ function compile(fragment: TE): {
     varMap.set(sym, varName);
     return varName;
   };
+
+  const variables: string[] = [];
 
   function print(untrustedInput: TE, indent = 0) {
     /**
@@ -245,8 +250,11 @@ function compile(fragment: TE): {
           break;
         }
         case "REF": {
-          const identifier = makeRef(item.v);
+          const identifier = makeRef(item.v, item.n);
           teFragments.push(identifier);
+          if (item.n != null && identifier !== item.n) {
+            variables.push(`const ${item.n} = ${identifier};`);
+          }
           break;
         }
         case "VARIABLE": {
@@ -277,7 +285,6 @@ function compile(fragment: TE): {
     return teFragments.join("");
   }
   let str = print(fragment);
-  const variables = [];
   for (const varName of varMap.values()) {
     variables.push(`let ${varName};`);
   }
@@ -414,8 +421,15 @@ function raw(text: string): TE {
  * Creates a TE item for a value that will be included in our final query.
  * This value will be added in a way which avoids TE injection.
  */
-function ref(val: any): TE {
-  return makeRefNode(val);
+function ref(val: any, name?: string): TE {
+  if (name != null) {
+    if (!isValidVariableName(name)) {
+      throw new Error(`Invalid variable name '${name}'`);
+    }
+    return makeRefNode(val, name);
+  } else {
+    return makeRefNode(val);
+  }
 }
 
 const blankNode = makeRawNode(``, "blank");

@@ -190,3 +190,110 @@ it("mixture", () => {
 it("te.run`return ${te.lit(1)}+${te.ref(2)}`", () => {
   expect(te.run`return ${te.lit(1)}+${te.ref(2)}`).toEqual(3);
 });
+
+it("throws on forbidden identifiers", () => {
+  expect(() => te.identifier("null")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid identifier name 'null'"`,
+  );
+  expect(() => te.ref(null, "null")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid variable name 'null'"`,
+  );
+
+  expect(() => te.identifier("true")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid identifier name 'true'"`,
+  );
+  expect(() => te.ref(true, "true")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid variable name 'true'"`,
+  );
+
+  expect(() => te.identifier("false")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid identifier name 'false'"`,
+  );
+  expect(() => te.ref(false, "false")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid variable name 'false'"`,
+  );
+
+  expect(() => te.identifier("debugger")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid identifier name 'debugger'"`,
+  );
+  expect(() => te.ref(null, "debugger")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid variable name 'debugger'"`,
+  );
+
+  expect(() => te.identifier("undefined")).toThrowErrorMatchingInlineSnapshot(
+    `"Invalid identifier name 'undefined'"`,
+  );
+  expect(() =>
+    te.ref(undefined, "undefined"),
+  ).toThrowErrorMatchingInlineSnapshot(`"Invalid variable name 'undefined'"`);
+});
+
+it("named refs", () => {
+  const frag = te`return [
+  ${te.ref(-Number.MAX_SAFE_INTEGER, "maxSafeInt")},
+  ${te.ref(-Number.MAX_VALUE, "maxValue")},
+  ${te.ref(Number.MIN_VALUE, "minValue")},
+  ${te.ref("", "empty")},
+  ${te.ref(AWKWARD_STRING, "awkward")},
+  ${te.ref(true, "trueVal")},
+  ${te.ref(false, "falseVal")},
+  ${te.ref(null, "nullVal")},
+  ${te.ref(undefined, "undefinedVal")},
+  ${te.ref(COMPLEX_OBJECT, "complex")}
+]`;
+  expect(te.compile(frag)).toMatchInlineSnapshot(`
+    Object {
+      "refs": Object {
+        "awkward": "string\\"'\`$\\\\",
+        "complex": Object {
+          "a": 1,
+          "b": Object {
+            "c": 3,
+          },
+        },
+        "empty": "",
+        "falseVal": false,
+        "maxSafeInt": -9007199254740991,
+        "maxValue": -1.7976931348623157e+308,
+        "minValue": 5e-324,
+        "nullVal": null,
+        "trueVal": true,
+        "undefinedVal": undefined,
+      },
+      "string": "return [
+      maxSafeInt,
+      maxValue,
+      minValue,
+      empty,
+      awkward,
+      trueVal,
+      falseVal,
+      nullVal,
+      undefinedVal,
+      complex
+    ]",
+    }
+  `);
+  const val = te.run<any[]>(frag);
+  expect(val[4]).toStrictEqual(AWKWARD_STRING);
+  expect(val[9]).toStrictEqual(COMPLEX_OBJECT);
+  expect(val).toMatchInlineSnapshot(`
+    Array [
+      -9007199254740991,
+      -1.7976931348623157e+308,
+      5e-324,
+      "",
+      "string\\"'\`$\\\\",
+      true,
+      false,
+      null,
+      undefined,
+      Object {
+        "a": 1,
+        "b": Object {
+          "c": 3,
+        },
+      },
+    ]
+  `);
+});
