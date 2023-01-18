@@ -35,8 +35,6 @@ import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
 
-const EMPTY_OBJECT = Object.freeze(Object.create(null));
-
 export type OutputPlanTypeIntrospection = {
   mode: "introspection";
   /**
@@ -757,9 +755,11 @@ ${preamble}\
     skipNullHandling ? te` else ` : te`\n  `
   }if (typeof bucketRootValue === 'object' && ${te.ref(
     $$error,
+    "$$error",
   )} in bucketRootValue) {
     throw ${te.ref(
       coerceError,
+      "coerceError",
     )}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
@@ -780,13 +780,19 @@ function makeExecuteChildPlanCode(
     // No need to catch error
     return te`
       if (${childBucket} == null) {
-        throw ${te.ref(nonNullError)}(${locationDetails}, mutablePath.slice(1));
+        throw ${te.ref(
+          nonNullError,
+          "nonNullError",
+        )}(${locationDetails}, mutablePath.slice(1));
       }
       const fieldResult = ${childOutputPlan}.${
       asString ? te`executeString` : te`execute`
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
       if (fieldResult == ${asString ? te`"null"` : te`null`}) {
-        throw ${te.ref(nonNullError)}(${locationDetails}, mutablePath.slice(1));
+        throw ${te.ref(
+          nonNullError,
+          "nonNullError",
+        )}(${locationDetails}, mutablePath.slice(1));
       }
       ${setTargetOrReturn} fieldResult;`;
   } else {
@@ -802,6 +808,7 @@ function makeExecuteChildPlanCode(
       } catch (e) {
         const error = ${te.ref(
           coerceError,
+          "coerceError",
         )}(e, ${locationDetails}, mutablePath.slice(1));
         const pathLengthTarget = mutablePathIndex + 1;
         const overSize = mutablePath.length - pathLengthTarget;
@@ -843,7 +850,7 @@ const leafExecutor = makeExecutor(
 
 const leafExecutorString = makeExecutor(
   te`\
-  return ${te.ref(toJSON)}(this.type.serialize(bucketRootValue));
+  return ${te.ref(toJSON, "toJSON")}(this.type.serialize(bucketRootValue));
 `,
   te`leaf`,
   true,
@@ -894,14 +901,17 @@ const floatLeafExecutorString = makeExecutor(
 
 const stringLeafExecutorString = makeExecutor(
   te`\
-  return ${te.ref(stringifyString)}(this.type.serialize(bucketRootValue));
+  return ${te.ref(
+    stringifyString,
+    "stringifyString",
+  )}(this.type.serialize(bucketRootValue));
 `,
   te`stringLeaf`,
   true,
   false,
   te`\
   if (typeof bucketRootValue === 'string') {
-    return ${te.ref(stringifyString)}(bucketRootValue);
+    return ${te.ref(stringifyString, "stringifyString")}(bucketRootValue);
   }
 `,
 );
@@ -914,8 +924,8 @@ function makePolymorphicExecutor<TAsString extends boolean>(
 ${
   isDev
     ? te`\
-  if (!${te.ref(isPolymorphicData)}(bucketRootValue)) {
-    throw ${te.ref(coerceError)}(
+  if (!${te.ref(isPolymorphicData, "isPolymorphicData")}(bucketRootValue)) {
+    throw ${te.ref(coerceError, "coerceError")}(
       new Error(
         "GraphileInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
       ),
@@ -926,16 +936,16 @@ ${
 `
     : te``
 }\
-  const typeName = bucketRootValue[${te.ref($$concreteType)}];
+  const typeName = bucketRootValue[${te.ref($$concreteType, "$$concreteType")}];
   const childOutputPlan = this.childByTypeName[typeName];
   ${
     isDev
       ? te`{
-    ${te.ref(assert)}.ok(
+    ${te.ref(assert, "assert")}.ok(
       typeName,
       "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
     );
-    ${te.ref(assert)}.ok(
+    ${te.ref(assert, "assert")}.ok(
       childOutputPlan,
       \`GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
     );
@@ -949,7 +959,7 @@ ${
       asString ? te`executeString` : te`execute`
     }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
   } else {
-    const c = ${te.ref(getChildBucketAndIndex)}(
+    const c = ${te.ref(getChildBucketAndIndex, "getChildBucketAndIndex")}(
       childOutputPlan,
       this,
       bucket,
@@ -982,6 +992,7 @@ function makeArrayExecutor<TAsString extends boolean>(
   if (!Array.isArray(bucketRootValue)) {
     console.warn(\`Hit fallback for value \${${te.ref(
       inspect,
+      "inspect",
     )}(bucketRootValue)} coercion to mode 'array'\`);
     return ${asString ? te`"null"` : te`null`};
   }
@@ -1006,7 +1017,7 @@ ${asString ? te`    string = "[";\n` : te.blank}\
       if (directChild) {
         childBucketIndex = lookup[i];
       } else {
-        const c = ${te.ref(getChildBucketAndIndex)}(
+        const c = ${te.ref(getChildBucketAndIndex, "getChildBucketAndIndex")}(
           childOutputPlan,
           this,
           bucket,
@@ -1039,6 +1050,7 @@ ${
     ? te`\
   const stream = bucketRootValue[${te.ref(
     $$streamMore,
+    "$$streamMore",
   )}] /* as | AsyncIterableIterator<any> | undefined*/;
   if (stream) {
     root.streams.push({
@@ -1151,13 +1163,19 @@ const introspect = (
 };
 
 const introspectionExecutor = makeExecutor(
-  te`  return ${te.ref(introspect)}(root, this, mutablePath, false)`,
+  te`  return ${te.ref(
+    introspect,
+    "introspect",
+  )}(root, this, mutablePath, false)`,
   te`introspection`,
   false,
   true,
 );
 const introspectionExecutorString = makeExecutor(
-  te`  return ${te.ref(introspect)}(root, this, mutablePath, true)`,
+  te`  return ${te.ref(
+    introspect,
+    "introspect",
+  )}(root, this, mutablePath, true)`,
   te`introspection`,
   true,
   true,
@@ -1253,7 +1271,7 @@ ${makeExecuteChildPlanCode(
         childBucket = directChild.bucket;
         childBucketIndex = directChild.map.get(bucketIndex);
       } else {
-        const c = ${te.ref(getChildBucketAndIndex)}(
+        const c = ${te.ref(getChildBucketAndIndex, "getChildBucketAndIndex")}(
           spec.outputPlan,
           this,
           bucket,
