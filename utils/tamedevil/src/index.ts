@@ -334,7 +334,8 @@ const teBase = function te(
 
   const items: Array<TENode> = [];
   let currentText = "";
-  for (let i = 0, l = stringsLength; i < l; i++) {
+  const finalStringIndex = stringsLength - 1;
+  for (let i = 0; i < stringsLength; i++) {
     const text = strings[i];
     if (typeof text !== "string") {
       throw new Error(
@@ -342,10 +343,9 @@ const teBase = function te(
       );
     }
     currentText += text;
-    if (i < l - 1) {
-      const rawVal = values[i];
+    if (i < finalStringIndex) {
       const valid: TE = enforceValidNode(
-        rawVal,
+        values[i],
         `template literal placeholder ${i}`,
       );
       if (valid[$$type] === "RAW") {
@@ -519,6 +519,9 @@ function lit(val: any): TE {
  * ```
  */
 function substring(text: string, stringType: "'" | '"' | "`"): TE {
+  if (typeof text !== "string" || typeof stringType !== "string") {
+    throw new Error(`Invalid call to te.substring`);
+  }
   // Quick scan to see if it's safe to use verbatim
   const l = text.length;
   if (l < MAX_SHORT_STRING_LENGTH) {
@@ -587,7 +590,7 @@ export const isSafeObjectPropertyName = (key: string | symbol | number) =>
  * @remarks
  * Doesn't allow it to start with two underscores.
  */
-export const canRepresentAsIdentifier = (
+const canBeObjectKeyWithoutQuotes = (
   key: string | symbol | number,
 ): key is string | number =>
   Number.isFinite(key) ||
@@ -605,7 +608,7 @@ function isValidVariableName(name: string): boolean {
 }
 
 function identifier(name: string) {
-  if (!isValidVariableName(name)) {
+  if (typeof name !== "string" || !isValidVariableName(name)) {
     throw new Error(`Invalid identifier name '${name}'`);
   }
   return makeRawNode(name);
@@ -622,7 +625,7 @@ function identifier(name: string) {
  */
 function dangerousKey(key: string | symbol | number): TE {
   if (isSafeObjectPropertyName(key)) {
-    if (canRepresentAsIdentifier(key)) {
+    if (canBeObjectKeyWithoutQuotes(key)) {
       return makeRawNode(String(key));
     } else {
       return makeRawNode(JSON.stringify(key));
@@ -699,12 +702,18 @@ function set(key: string | symbol | number, hasNullPrototype = false): TE {
  * @experimental
  */
 function tempVar(symbol = Symbol()): TE {
+  if (typeof symbol !== "symbol") {
+    throw new Error(`Invalid call to te.tempVar`);
+  }
   return makeTemporaryVariableNode(symbol);
 }
 
 function tmp(obj: TE, callback: (tmp: TE) => TE): TE {
+  const trustedObj = enforceValidNode(obj);
+  // ENHANCEMENT: we should be able to reuse these tempvars between tmp calls
+  // that aren't nested (or are nested at the same level).
   const varName = te.tempVar();
-  return te`(${varName} = ${obj}, ${callback(varName)})`;
+  return te`(${varName} = ${trustedObj}, ${callback(varName)})`;
 }
 
 function run<TResult>(fragment: TE): TResult;
@@ -719,7 +728,7 @@ function run<TResult>(
   if (values.length > 0) {
     throw new Error("Invalid call to `te.run`");
   }
-  const fragment = fragmentOrStrings;
+  const fragment = enforceValidNode(fragmentOrStrings);
   const compiled = compile(fragment);
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
@@ -775,8 +784,8 @@ function join(items: Array<TE>, separator = ""): TE {
   const currentItems: Array<TENode> = [];
   for (let i = 0, l = items.length; i < l; i++) {
     const rawNode = items[i];
-    const addSeparator = i > 0 && hasSeparator;
     const node: TE = enforceValidNode(rawNode, `join item ${i}`);
+    const addSeparator = i > 0 && hasSeparator;
     if (addSeparator) {
       currentText += separator;
     }
@@ -829,7 +838,7 @@ function indent(
   const fragment =
     "raw" in fragmentOrStrings
       ? te(fragmentOrStrings, ...values)
-      : fragmentOrStrings;
+      : enforceValidNode(fragmentOrStrings);
   if (!isDev) {
     return fragment;
   }
@@ -837,7 +846,8 @@ function indent(
 }
 
 function indentIf(condition: boolean, fragment: TE): TE {
-  return isDev && condition ? makeIndentNode(fragment) : fragment;
+  const trusted = enforceValidNode(fragment);
+  return isDev && condition ? makeIndentNode(trusted) : trusted;
 }
 
 const te = teBase as TamedEvil;
