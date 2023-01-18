@@ -866,6 +866,9 @@ function indentIf(condition: boolean, fragment: TE): TE {
 
 /**
  * Makes safe identifiers
+ *
+ * @experimental
+ * @internal
  */
 export class Idents {
   // Initialized with forbidden words

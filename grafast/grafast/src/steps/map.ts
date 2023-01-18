@@ -24,9 +24,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     // We can do a fast custom conversion
     return te.run`return function(obj) {
   return (obj == null ? obj : { ${te.join(
-    entries.map(
-      ([key, val]) => te`${te.dangerousKey(key)}: obj${te.get(val)}`,
-    ),
+    entries.map(([key, val]) => te`${te.dangerousKey(key)}: obj${te.get(val)}`),
     ", ",
   )} });
 }` as any;
@@ -39,7 +37,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
       memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
       return memo;
-    }, {} as object);
+    }, Object.create(null) as object);
   };
 }
 

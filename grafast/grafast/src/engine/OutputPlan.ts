@@ -748,9 +748,9 @@ ${preamble}\
   if (bucketRootValue == null) {
     ${
       skipNullHandling
-        ? te`// root/introspection, null is fine`
-        : te`return ${asString ? te`"null"` : te`null`};`
-    }
+        ? te`// root/introspection, null is fine\n`
+        : te`return ${asString ? te`"null"` : te`null`};\n`
+    }\
   }${
     skipNullHandling ? te` else ` : te`\n  `
   }if (typeof bucketRootValue === 'object' && ${te.ref(

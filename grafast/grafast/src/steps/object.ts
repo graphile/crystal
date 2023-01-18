@@ -148,7 +148,8 @@ ${te.join(
   const newObj = Object.create(null);
 ${te.join(
   this.keys.map(
-    (key, i) => te`  newObj${te.set(key)} = ${te.identifier(`val${i}`)};\n`,
+    (key, i) =>
+      te`  newObj${te.set(key, true)} = ${te.identifier(`val${i}`)};\n`,
   ),
   "",
 )}\
@@ -163,8 +164,7 @@ return function ({ meta }, ${te.join(
       const [values, obj] = meta.results[i];
       if (${te.join(
         this.keys.map(
-          (_key, i) =>
-            te`values[${te.lit(i)}] === ${te.identifier(`val${i}`)}`,
+          (_key, i) => te`values[${te.lit(i)}] === ${te.identifier(`val${i}`)}`,
         ),
         " && ",
       )}) {

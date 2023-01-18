@@ -63,12 +63,12 @@ function constructDestructureFunction(
     const expression = te.join(jitParts, "");
 
     // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
-    const quicklyExtractValueAtPath =
-      te.run<any>(te`return function quicklyExtractValueAtPath(extra, value) {
+    const quicklyExtractValueAtPath = te.run<any>`\
+return function quicklyExtractValueAtPath(extra, value) {
   return (value${expression})${
-        fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
-      };
-};`);
+      fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
+    };
+};`;
 
     // JIT this for great performance.
     quicklyExtractValueAtPath[expressionSymbol] = [expression, fallback];

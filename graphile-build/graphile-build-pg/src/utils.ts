@@ -1,5 +1,4 @@
 import type { PgSmartTagsDict } from "pg-introspection";
-import { reservedWords } from "tamedevil";
 
 export function tagToString(
   str: undefined | null | boolean | string | (string | boolean)[],

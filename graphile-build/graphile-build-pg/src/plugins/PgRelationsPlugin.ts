@@ -485,7 +485,8 @@ function makeRelationPlans(
     ? // Optimise function for both execution and export.
       // eslint-disable-next-line graphile-export/exhaustive-deps
       (EXPORTABLE(
-        te.run`return function (otherSource) {
+        te.run`\
+return function (otherSource) {
   return $record => otherSource.get(${specString});
 }` as any,
         [otherSource],
@@ -510,7 +511,8 @@ function makeRelationPlans(
   const listPlan = clean
     ? // eslint-disable-next-line graphile-export/exhaustive-deps
       (EXPORTABLE(
-        te.run`return function (otherSource) {
+        te.run`\
+return function (otherSource) {
   return $record => otherSource.find(${specString});
 }` as any,
         [otherSource],
@@ -535,7 +537,8 @@ function makeRelationPlans(
   const connectionPlan = clean
     ? // eslint-disable-next-line graphile-export/exhaustive-deps
       (EXPORTABLE(
-        te.run`return function (otherSource, connection) {
+        te.run`\
+return function (otherSource, connection) {
   return $record => {
     const $records = otherSource.find(${specString});
     return connection($records);
@@ -914,10 +917,15 @@ function addRelations(
               }
 
               let previousIdentifier = "$record";
-              prefixLines.push(te`const list = ${te.ref(list)};`);
-              prefixLines.push(te`const object = ${te.ref(object)};`);
-              prefixLines.push(te`const connection = ${te.ref(connection)};`);
-              prefixLines.push(te`const sql = ${te.ref(sql)};`);
+
+              // ENHANCEMENT: these ensure that the variables are defined in
+              // the closure, but they also output noise
+              // (`list;object;connection;sql;`) which could be eliminated.
+              prefixLines.push(te`${te.ref(list, "list")};`);
+              prefixLines.push(te`${te.ref(object, "object")};`);
+              prefixLines.push(te`${te.ref(connection, "connection")};`);
+              prefixLines.push(te`${te.ref(sql, "sql")};`);
+
               let isStillSingular = true;
               for (let i = 0, l = path.layers.length; i < l; i++) {
                 const layer = path.layers[i];
@@ -980,8 +988,10 @@ function addRelations(
             );
             functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
             */
+                  // ENHANCEMENT: we could rename this to be the singular of the source name or something
+                  const $entry = te`$entry`;
                   const specString = makeSpecString(
-                    te`$entry`,
+                    $entry,
                     localColumns,
                     remoteColumns,
                   );
@@ -990,7 +1000,7 @@ function addRelations(
                       newIdentifier,
                     )} = each(${te.identifier(
                       previousIdentifier,
-                    )}, ($entry) => ${te.identifier(
+                    )}, (${$entry}) => ${te.identifier(
                       sourceName,
                     )}.get(${specString}));`,
                   );
