@@ -15,23 +15,18 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder, pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
-import {
-  arraysMatch,
-  connection,
-  evalSafeProperty,
-  isSafeObjectPropertyName,
-  list,
-  object,
-} from "grafast";
+import { arraysMatch, connection, list, object } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
+import type { TE } from "tamedevil";
+import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { Idents, tagToString } from "../utils.js";
+import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -430,18 +425,19 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 };
 
 function makeSpecString(
-  identifier: string,
+  identifier: TE,
   localColumns: readonly string[],
   remoteColumns: readonly string[],
 ) {
-  return `{ ${remoteColumns
-    .map(
+  return te`{ ${te.join(
+    remoteColumns.map(
       (remoteColumnName, i) =>
-        `${evalSafeProperty(
-          remoteColumnName as string,
-        )}: ${identifier}.get(${JSON.stringify(localColumns[i])})`,
-    )
-    .join(", ")} }`;
+        te`${te.dangerousKey(remoteColumnName)}: ${identifier}.get(${te.lit(
+          localColumns[i],
+        )})`,
+    ),
+    ", ",
+  )} }`;
 }
 
 function makeRelationPlans(
@@ -451,8 +447,8 @@ function makeRelationPlans(
   isMutationPayload: boolean,
 ) {
   const recordOrResult = isMutationPayload
-    ? `$record.get("result")`
-    : `$record`;
+    ? te`$record.get("result")`
+    : te`$record`;
   const clean =
     remoteColumns.every(
       (remoteColumnName) =>
@@ -465,11 +461,9 @@ function makeRelationPlans(
         isSafeObjectPropertyName(localColumnName),
     );
 
-  const specString = makeSpecString(
-    recordOrResult,
-    localColumns,
-    remoteColumns,
-  );
+  const specString = clean
+    ? makeSpecString(recordOrResult, localColumns, remoteColumns)
+    : null;
 
   const specFromRecord = EXPORTABLE(
     (localColumns, remoteColumns) =>
@@ -485,88 +479,90 @@ function makeRelationPlans(
     result: PgSelectSingleStep<any, any, any, any>;
   }>;
 
-  const singleRecordPlan = clean
-    ? // Optimise function for both execution and export.
-      // eslint-disable-next-line graphile-export/exhaustive-deps
-      (EXPORTABLE(
-        new Function(
-          "otherSource",
-          `return $record => otherSource.get(${specString})`,
-        ) as any,
-        [otherSource],
-      ) as any)
-    : isMutationPayload
-    ? EXPORTABLE(
-        (otherSource, specFromRecord) =>
-          function plan($in: MutationPayload) {
-            const $record = $in.get("result");
-            return otherSource.get(specFromRecord($record));
-          },
-        [otherSource, specFromRecord],
-      )
-    : EXPORTABLE(
-        (otherSource, specFromRecord) =>
-          function plan($record: PgSelectSingleStep<any, any, any, any>) {
-            return otherSource.get(specFromRecord($record));
-          },
-        [otherSource, specFromRecord],
-      );
+  const singleRecordPlan =
+    clean && specString
+      ? // Optimise function for both execution and export.
+        // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          te.run`\
+return function (otherSource) {
+  return $record => otherSource.get(${specString});
+}` as any,
+          [otherSource],
+        ) as any)
+      : isMutationPayload
+      ? EXPORTABLE(
+          (otherSource, specFromRecord) =>
+            function plan($in: MutationPayload) {
+              const $record = $in.get("result");
+              return otherSource.get(specFromRecord($record));
+            },
+          [otherSource, specFromRecord],
+        )
+      : EXPORTABLE(
+          (otherSource, specFromRecord) =>
+            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+              return otherSource.get(specFromRecord($record));
+            },
+          [otherSource, specFromRecord],
+        );
 
-  const listPlan = clean
-    ? // eslint-disable-next-line graphile-export/exhaustive-deps
-      (EXPORTABLE(
-        new Function(
-          "otherSource",
-          `return $record => otherSource.find(${specString})`,
-        ) as any,
-        [otherSource],
-      ) as any)
-    : isMutationPayload
-    ? EXPORTABLE(
-        (otherSource, specFromRecord) =>
-          function plan($in: MutationPayload) {
-            const $record = $in.get("result");
-            return otherSource.find(specFromRecord($record));
-          },
-        [otherSource, specFromRecord],
-      )
-    : EXPORTABLE(
-        (otherSource, specFromRecord) =>
-          function plan($record: PgSelectSingleStep<any, any, any, any>) {
-            return otherSource.find(specFromRecord($record));
-          },
-        [otherSource, specFromRecord],
-      );
+  const listPlan =
+    clean && specString
+      ? // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          te.run`\
+return function (otherSource) {
+  return $record => otherSource.find(${specString});
+}` as any,
+          [otherSource],
+        ) as any)
+      : isMutationPayload
+      ? EXPORTABLE(
+          (otherSource, specFromRecord) =>
+            function plan($in: MutationPayload) {
+              const $record = $in.get("result");
+              return otherSource.find(specFromRecord($record));
+            },
+          [otherSource, specFromRecord],
+        )
+      : EXPORTABLE(
+          (otherSource, specFromRecord) =>
+            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+              return otherSource.find(specFromRecord($record));
+            },
+          [otherSource, specFromRecord],
+        );
 
-  const connectionPlan = clean
-    ? // eslint-disable-next-line graphile-export/exhaustive-deps
-      (EXPORTABLE(
-        new Function(
-          "otherSource",
-          "connection",
-          `return $record => {
-  const $records = otherSource.find(${specString});
-  return connection($records);
-}`,
-        ) as any,
-        [otherSource, connection],
-      ) as any)
-    : isMutationPayload
-    ? EXPORTABLE(
-        (connection, otherSource, specFromRecord) =>
-          function plan($in: MutationPayload) {
-            const $record = $in.get("result");
-            return connection(otherSource.find(specFromRecord($record)));
-          },
-        [connection, otherSource, specFromRecord],
-      )
-    : EXPORTABLE(
-        (connection, otherSource, specFromRecord) =>
-          function plan($record: PgSelectSingleStep<any, any, any, any>) {
-            return connection(otherSource.find(specFromRecord($record)));
-          },
-        [connection, otherSource, specFromRecord],
-      );
+  const connectionPlan =
+    clean && specString
+      ? // eslint-disable-next-line graphile-export/exhaustive-deps
+        (EXPORTABLE(
+          te.run`\
+return function (otherSource, connection) {
+  return $record => {
+    const $records = otherSource.find(${specString});
+    return connection($records);
+  }
+}` as any,
+          [otherSource, connection],
+        ) as any)
+      : isMutationPayload
+      ? EXPORTABLE(
+          (connection, otherSource, specFromRecord) =>
+            function plan($in: MutationPayload) {
+              const $record = $in.get("result");
+              return connection(otherSource.find(specFromRecord($record)));
+            },
+          [connection, otherSource, specFromRecord],
+        )
+      : EXPORTABLE(
+          (connection, otherSource, specFromRecord) =>
+            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+              return connection(otherSource.find(specFromRecord($record)));
+            },
+          [connection, otherSource, specFromRecord],
+        );
   return { singleRecordPlan, listPlan, connectionPlan };
 }
 
@@ -900,80 +896,103 @@ function addRelations(
           ) => {
             const single = mode === "singleRecord";
             const isConnection = mode === "connection";
-            try {
-              const idents = new Idents();
-              idents.forbid([
-                "$list",
-                "$in",
-                "$record",
-                "$entry",
-                "$tuple",
-                "list",
-                "sql",
-              ]);
+            const idents = new Idents();
+            idents.forbid([
+              "$list",
+              "$in",
+              "$record",
+              "$entry",
+              "$tuple",
+              "list",
+              "sql",
+            ]);
 
-              const functionLines: string[] = [];
-              if (isMutationPayload) {
-                functionLines.push(`return ($in) => {`);
-                functionLines.push(`  const $record = $in.get("result");`);
-              } else {
-                functionLines.push(`return ($record) => {`);
-              }
+            const functionLines: TE[] = [];
+            const prefixLines: TE[] = [];
+            if (isMutationPayload) {
+              functionLines.push(te`return ($in) => {`);
+              functionLines.push(te`  const $record = $in.get("result");`);
+            } else {
+              functionLines.push(te`return ($record) => {`);
+            }
 
-              let previousIdentifier = "$record";
-              const argNames: string[] = [
-                "list",
-                "object",
-                "connection",
-                "sql",
-              ];
-              const argValues: any[] = [list, object, connection, sql];
-              let isStillSingular = true;
-              for (let i = 0, l = path.layers.length; i < l; i++) {
-                const layer = path.layers[i];
-                const { localColumns, remoteColumns, source, isUnique } = layer;
-                if (
-                  !(
-                    localColumns.every(isSafeObjectPropertyName) &&
-                    remoteColumns.every(isSafeObjectPropertyName)
-                  )
-                ) {
-                  throw new Error(
-                    "Unsafe identifier found, falling back to slow mode",
-                  );
+            let previousIdentifier = te.identifier(`$record`);
+
+            // ENHANCEMENT: these ensure that the variables are defined in
+            // the closure, but they also output noise
+            // (`list;object;connection;sql;`) which could be eliminated.
+            prefixLines.push(te`${te.ref(list, "list")};`);
+            prefixLines.push(te`${te.ref(object, "object")};`);
+            prefixLines.push(te`${te.ref(connection, "connection")};`);
+            prefixLines.push(te`${te.ref(sql, "sql")};`);
+
+            let isStillSingular = true;
+            for (let i = 0, l = path.layers.length; i < l; i++) {
+              const layer = path.layers[i];
+              const { localColumns, remoteColumns, source, isUnique } = layer;
+              const clean =
+                localColumns.every(isSafeObjectPropertyName) &&
+                remoteColumns.every(isSafeObjectPropertyName);
+              const sourceName = idents.makeSafeIdentifier(
+                `${source.name}Source`,
+              );
+              prefixLines.push(
+                te`const ${te.identifier(sourceName)} = ${te.ref(source)};`,
+              );
+              if (isStillSingular) {
+                if (!isUnique) {
+                  isStillSingular = false;
                 }
-                const sourceName = idents.makeSafeIdentifier(
-                  `${source.name}Source`,
-                );
-                argNames.push(sourceName);
-                argValues.push(source);
-                if (isStillSingular) {
-                  if (!isUnique) {
-                    isStillSingular = false;
-                  }
-                  const newIdentifier = idents.makeSafeIdentifier(
+                const newIdentifier = te.identifier(
+                  idents.makeSafeIdentifier(
                     `$${
                       isUnique
                         ? build.inflection.singularize(source.name)
                         : build.inflection.pluralize(source.name)
                     }`,
+                  ),
+                );
+                const specFromRecord = EXPORTABLE(
+                  (localColumns, remoteColumns) =>
+                    ($record: PgSelectSingleStep<any, any, any, any>) => {
+                      return remoteColumns.reduce(
+                        (memo, remoteColumnName, i) => {
+                          memo[remoteColumnName] = $record.get(
+                            localColumns[i] as string,
+                          );
+                          return memo;
+                        },
+                        Object.create(null),
+                      );
+                    },
+                  [localColumns, remoteColumns],
+                );
+                if (!clean) {
+                  throw new Error(
+                    "GraphileInternalError<94fe5fe8-74a4-418b-93ea-beac09b64b5d>: TODO: handle relations on columns that use unsafe keywords",
                   );
-                  const specString = makeSpecString(
-                    previousIdentifier,
-                    localColumns,
-                    remoteColumns,
-                  );
-                  functionLines.push(
-                    `  const ${newIdentifier} = ${sourceName}.${
-                      isUnique ? "get" : "find"
-                    }(${specString});`,
-                  );
-                  previousIdentifier = newIdentifier;
-                } else {
-                  const newIdentifier = idents.makeSafeIdentifier(
+                }
+                // FIXME: the non-clean branch of this does not currently have any tests, it might not work. Hence the throw above, out of an abundance of caution.
+                const specString = clean
+                  ? makeSpecString(
+                      previousIdentifier,
+                      localColumns,
+                      remoteColumns,
+                    )
+                  : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
+                functionLines.push(
+                  te`  const ${newIdentifier} = ${te.identifier(sourceName)}.${
+                    isUnique ? te`get` : te`find`
+                  }(${specString});`,
+                );
+                previousIdentifier = newIdentifier;
+              } else {
+                const newIdentifier = te.identifier(
+                  idents.makeSafeIdentifier(
                     `$${build.inflection.pluralize(source.name)}`,
-                  );
-                  /*
+                  ),
+                );
+                /*
             const tupleIdentifier = makeSafeIdentifier(
               `${previousIdentifier}Tuples`,
             );
@@ -987,42 +1006,42 @@ function addRelations(
             );
             functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
             */
-                  const specString = makeSpecString(
-                    "$entry",
-                    localColumns,
-                    remoteColumns,
-                  );
-                  functionLines.push(
-                    `  const ${newIdentifier} = each(${previousIdentifier}, ($entry) => ${sourceName}.get(${specString}));`,
-                  );
-                  previousIdentifier = newIdentifier;
-                }
-              }
-
-              if (isStillSingular && !single) {
-                functionLines.push(
-                  `  const $list = list([${previousIdentifier}]);`,
+                // ENHANCEMENT: we could rename this to be the singular of the source name or something
+                const $entry = te`$entry`;
+                const specString = makeSpecString(
+                  $entry,
+                  localColumns,
+                  remoteColumns,
                 );
-                previousIdentifier = "$list";
-              }
-
-              if (isConnection) {
                 functionLines.push(
-                  `  return connection(${previousIdentifier});`,
+                  te`  const ${newIdentifier} = each(${previousIdentifier}, (${$entry}) => ${te.identifier(
+                    sourceName,
+                  )}.get(${specString}));`,
                 );
-              } else {
-                functionLines.push(`  return ${previousIdentifier};`);
+                previousIdentifier = newIdentifier;
               }
-              functionLines.push(`}`);
-              const functionBody = functionLines.join("\n");
-              return new Function(...argNames, functionBody)(...argValues);
-            } catch (e) {
-              console.error(e);
-              // TODO: fallback if unsafe
-              throw new Error(
-                "GraphileInternalError<94fe5fe8-74a4-418b-93ea-beac09b64b5d>: TODO: implement slow mode when identifiers are not JSON-to-JS-safe (or expand the definition of JSON-to-JS safe)",
-              );
             }
+
+            if (isStillSingular && !single) {
+              const newIdentifier = te.identifier("$list");
+              functionLines.push(
+                te`  const ${newIdentifier} = list([${previousIdentifier}]);`,
+              );
+              previousIdentifier = newIdentifier;
+            }
+
+            if (isConnection) {
+              functionLines.push(
+                te`  return connection(${previousIdentifier});`,
+              );
+            } else {
+              functionLines.push(te`  return ${previousIdentifier};`);
+            }
+            functionLines.push(te`}`);
+            return te.run`${te.join(prefixLines, "\n")}${te.join(
+              functionLines,
+              "\n",
+            )}`;
           };
           const singleRecordPlan = makePlanResolver("singleRecord");
           const listPlan = makePlanResolver("list");

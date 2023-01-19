@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import type { GrafastError } from "../error.js";
 import type {
@@ -9,11 +10,6 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import {
-  canRepresentAsIdentifier,
-  evalSafeProperty,
-  isSafeObjectPropertyName,
-} from "../utils.js";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -26,19 +22,12 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     )
   ) {
     // We can do a fast custom conversion
-    return new Function(
-      "obj",
-      `return (obj == null ? obj : { ${entries
-        .map(
-          ([key, val]) =>
-            `${evalSafeProperty(key)}: obj${
-              canRepresentAsIdentifier(val)
-                ? `.${val}`
-                : `[${JSON.stringify(val)}]`
-            }`,
-        )
-        .join(", ")} })`,
-    ) as any;
+    return te.run`return function(obj) {
+  return (obj == null ? obj : { ${te.join(
+    entries.map(([key, val]) => te`${te.dangerousKey(key)}: obj${te.get(val)}`),
+    ", ",
+  )} });
+}` as any;
   }
   // Fallback to slow conversion
   return (obj: object | null | GrafastError): object | null | GrafastError => {
@@ -48,7 +37,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
       memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
       return memo;
-    }, {} as object);
+    }, Object.create(null) as object);
   };
 }
 

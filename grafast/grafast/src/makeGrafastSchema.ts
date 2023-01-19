@@ -120,7 +120,7 @@ export interface GrafastPlans {
 export function makeGrafastSchema(details: {
   typeDefs: string;
   plans: GrafastPlans;
-  enableDeferStream: boolean;
+  enableDeferStream?: boolean;
 }): GraphQLSchema {
   const { typeDefs, plans, enableDeferStream = true } = details;
 

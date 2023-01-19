@@ -2,8 +2,8 @@ import "graphile-config";
 
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
-import { evalSafeProperty, isSafeObjectPropertyName } from "grafast";
 import { EXPORTABLE } from "graphile-export";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -124,19 +124,18 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                      */
                     // eslint-disable-next-line graphile-export/exhaustive-deps
                     EXPORTABLE(
-                      new Function(
-                        "source",
-                        `return (_$root, args) => source.get({ ${columnNames
-                          .map(
-                            (columnName) =>
-                              `${evalSafeProperty(
-                                columnName,
-                              )}: args.get(${JSON.stringify(
-                                detailsByColumnName[columnName].graphqlName,
-                              )})`,
-                          )
-                          .join(", ")} })`,
-                      ) as any,
+                      te.run`\
+return function (source) {
+  return (_$root, args) => source.get({ ${te.join(
+    columnNames.map(
+      (columnName) =>
+        te`${te.dangerousKey(columnName)}: args.get(${te.lit(
+          detailsByColumnName[columnName].graphqlName,
+        )})`,
+    ),
+    ", ",
+  )} });
+}` as any,
                       [source],
                     )
                   : EXPORTABLE(

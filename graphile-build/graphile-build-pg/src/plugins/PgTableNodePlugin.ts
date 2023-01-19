@@ -8,14 +8,9 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
-import {
-  access,
-  constant,
-  evalSafeProperty,
-  isSafeObjectPropertyName,
-  list,
-} from "grafast";
+import { access, constant, list } from "grafast";
 import { EXPORTABLE } from "graphile-export";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -110,18 +105,15 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             plan: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
-                  new Function(
-                    "list",
-                    "constant",
-                    `return $record => list([constant(${JSON.stringify(
-                      identifier,
-                    )}), ${pk
-                      .map(
-                        (columnName) =>
-                          `$record.get(${JSON.stringify(columnName)})`,
-                      )
-                      .join(", ")}])`,
-                  ) as any,
+                  te.run`\
+return function (list, constant) {
+  return $record => list([constant(${te.lit(identifier)}), ${te.join(
+                    pk.map(
+                      (columnName) => te`$record.get(${te.lit(columnName)})`,
+                    ),
+                    ", ",
+                  )}]);
+}` as any,
                   [list, constant],
                 )
               : EXPORTABLE(
@@ -137,15 +129,18 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             getSpec: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
-                  new Function(
-                    "access",
-                    `return $list => ({ ${pk.map(
-                      (columnName, index) =>
-                        `${evalSafeProperty(columnName)}: access($list, [${
-                          index + 1
-                        }])`,
-                    )} })`,
-                  ) as any,
+                  te.run`\
+return function (access) {
+  return $list => ({ ${te.join(
+    pk.map(
+      (columnName, index) =>
+        te`${te.dangerousKey(columnName)}: access($list, [${te.lit(
+          index + 1,
+        )}])`,
+    ),
+    ", ",
+  )} });
+}` as any,
                   [access],
                 )
               : EXPORTABLE(

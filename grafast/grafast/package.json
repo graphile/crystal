@@ -1,6 +1,6 @@
 {
   "name": "grafast",
-  "version": "0.0.1-0.4",
+  "version": "0.0.1-0.5",
   "description": "Cutting edge GraphQL planning and execution engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -53,7 +53,8 @@
   },
   "dependencies": {
     "@graphile/lru": "workspace:^",
-    "debug": "^4.3.3"
+    "debug": "^4.3.3",
+    "tamedevil": "workspace:^"
   },
   "peerDependencies": {
     "@envelop/core": "^3.0.4",

@@ -1,5 +1,15 @@
 # grafast
 
+## 0.0.1-0.5
+
+### Patch Changes
+
+- [`cd37fd02a`](undefined) - Introduce new tamedevil package for managing JIT
+  code
+
+- Updated dependencies [[`cd37fd02a`](undefined)]:
+  - tamedevil@0.0.0-0.1
+
 ## 0.0.1-0.4
 
 ### Patch Changes

@@ -1,9 +1,10 @@
 // import debugFactory from "debug";
 
+import te, { isSafeObjectPropertyName } from "tamedevil";
+
 import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import { evalSafeProperty, isSafeObjectPropertyName } from "../utils.js";
 import type { SetterCapableStep } from "./setter.js";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -133,25 +134,40 @@ export class ObjectStep<
     }
     const keysAreSafe = this.keys.every(isSafeObjectPropertyName);
     const inner = keysAreSafe
-      ? `\
+      ? te`\
   const newObj = {
-${this.keys
-  .map((key, i) => `    ${evalSafeProperty(key)}: val${i}`)
-  .join(",\n")}
+${te.join(
+  this.keys.map(
+    (key, i) => te`    ${te.dangerousKey(key)}: ${te.identifier(`val${i}`)}`,
+  ),
+  ",\n",
+)}
   };
 `
-      : `\
+      : te`\
   const newObj = Object.create(null);
-${this.keys.map((key, i) => `  newObj[keys[${i}]] = val${i};\n`).join("")}\
+${te.join(
+  this.keys.map(
+    (key, i) =>
+      te`  newObj${te.set(key, true)} = ${te.identifier(`val${i}`)};\n`,
+  ),
+  "",
+)}\
 `;
-    const functionBody = `\
-return function ({ meta }, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
+    return te.run`\
+return function ({ meta }, ${te.join(
+      this.keys.map((_k, i) => te.identifier(`val${i}`)),
+      ", ",
+    )}) {
   if (meta.nextIndex) {
     for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
-      if (${this.keys
-        .map((key, i) => `values[${i}] === val${i}`)
-        .join(" && ")}) {
+      if (${te.join(
+        this.keys.map(
+          (_key, i) => te`values[${te.lit(i)}] === ${te.identifier(`val${i}`)}`,
+        ),
+        " && ",
+      )}) {
         return obj;
       }
     }
@@ -162,19 +178,15 @@ return function ({ meta }, ${this.keys.map((k, i) => `val${i}`).join(", ")}) {
     }
   }
 ${inner}
-  meta.results[meta.nextIndex] = [[${this.keys
-    .map((key, i) => `val${i}`)
-    .join(",")}], newObj];
+  meta.results[meta.nextIndex] = [[${te.join(
+    this.keys.map((_key, i) => te.identifier(`val${i}`)),
+    ",",
+  )}], newObj];
   // Only cache 10 results, use a round-robin
   meta.nextIndex = meta.nextIndex === 9 ? 0 : meta.nextIndex + 1;
   return newObj;
 }
 `;
-    if (keysAreSafe) {
-      return new Function(functionBody)() as any;
-    } else {
-      return new Function("keys", functionBody)(this.keys) as any;
-    }
   }
 
   finalize() {

@@ -23,6 +23,7 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
+import te from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Constraint } from "../constraints.js";
@@ -321,12 +322,15 @@ export class OperationPlan {
     const allMetaKeysList = [...allMetaKeys];
 
     // A JIT'd object constructor
-    this.makeMetaByMetaKey = new Function(
-      "keys",
-      `return () => ({${allMetaKeysList
-        .map((key, idx) => `\n  [keys[${idx}]]: Object.create(null)`)
-        .join(",")}\n})`,
-    )(allMetaKeysList) as any;
+    this.makeMetaByMetaKey = te.run`
+return () => ({
+${te.join(
+  allMetaKeysList.map(
+    (key) => te`  ${te.dangerousKey(key)}: Object.create(null),\n`,
+  ),
+  "",
+)}\
+});`;
   }
 
   /**

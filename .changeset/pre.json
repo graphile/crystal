@@ -22,13 +22,15 @@
     "@graphile/lds": "5.0.0-0.0",
     "@graphile/lru": "5.0.0-0.0",
     "pg-introspection": "0.0.0",
-    "pg-sql2": "5.0.0-0.0"
+    "pg-sql2": "5.0.0-0.0",
+    "tamedevil": "0.0.0-0.0"
   },
   "changesets": [
     "fast-zoos-float",
     "forty-chefs-deliver",
     "fresh-gorillas-burn",
     "fuzzy-mangos-compete",
+    "itchy-waves-fetch",
     "lovely-zebras-visit",
     "rare-crabs-compare",
     "shiny-teachers-double",

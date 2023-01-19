@@ -17,6 +17,7 @@
     { "path": "../../utils/graphile-export" },
     { "path": "../../grafast/ruru" },
     { "path": "../../utils/graphile-config" },
-    { "path": "../../utils/pg-introspection" }
+    { "path": "../../utils/pg-introspection" },
+    { "path": "../../utils/tamedevil" }
   ]
 }

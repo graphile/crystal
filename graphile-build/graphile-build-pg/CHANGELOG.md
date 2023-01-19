@@ -1,5 +1,18 @@
 # graphile-build-pg
 
+## 5.0.0-0.8
+
+### Patch Changes
+
+- [`cd37fd02a`](undefined) - Introduce new tamedevil package for managing JIT
+  code
+
+- Updated dependencies [[`cd37fd02a`](undefined)]:
+  - grafast@0.0.1-0.5
+  - tamedevil@0.0.0-0.1
+  - @dataplan/pg@0.0.1-0.7
+  - graphile-build@5.0.0-0.6
+
 ## 5.0.0-0.7
 
 ### Patch Changes

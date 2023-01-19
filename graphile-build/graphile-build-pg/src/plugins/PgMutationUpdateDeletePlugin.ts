@@ -13,8 +13,6 @@ import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
   __TrackedObjectStep,
-  evalSafeProperty,
-  isSafeObjectPropertyName,
   lambda,
   object,
   ObjectStep,
@@ -22,6 +20,7 @@ import {
 } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -661,16 +660,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                  * exported schema.
                  */
                 const specFromArgsString = clean
-                  ? `{ ${uniqueColumns
-                      .map(
+                  ? te`{ ${te.join(
+                      uniqueColumns.map(
                         ([columnName, fieldName]) =>
-                          `${evalSafeProperty(
+                          te`${te.dangerousKey(
                             columnName,
-                          )}: args.get(['input', ${JSON.stringify(
-                            fieldName,
-                          )}])`,
-                      )
-                      .join(", ")} }`
+                          )}: args.get(['input', ${te.lit(fieldName)}])`,
+                      ),
+                      ", ",
+                    )} }`
                   : null;
 
                 const tableTypeName = inflection.tableType(source.codec);
@@ -756,17 +754,14 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             ? specFromArgsString
                               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                                 EXPORTABLE(
-                                  new Function(
-                                    "object",
-                                    "pgUpdate",
-                                    "source",
-                                    `\
+                                  te.run`\
+return function(object, pgUpdate, source) {
 return (_$root, args) => {
-  const plan = object({result: pgUpdate(source, ${specFromArgsString})});
+  const plan = object({ result: pgUpdate(source, ${specFromArgsString}) });
   args.apply(plan);
   return plan;
-}`,
-                                  ) as any,
+}
+}` as any,
                                   [object, pgUpdate, source],
                                 )
                               : (EXPORTABLE(
@@ -789,17 +784,14 @@ return (_$root, args) => {
                             : specFromArgsString
                             ? // eslint-disable-next-line graphile-export/exhaustive-deps
                               EXPORTABLE(
-                                new Function(
-                                  "object",
-                                  "pgDelete",
-                                  "source",
-                                  `\
+                                te.run`\
+return function (object, pgDelete, source) {
 return (_$root, args) => {
-  const plan = object({result: pgDelete(source, ${specFromArgsString})});
+  const plan = object({ result: pgDelete(source, ${specFromArgsString}) });
   args.apply(plan);
-  return plan
-}`,
-                                ) as any,
+  return plan;
+}
+}` as any,
                                 [object, pgDelete, source],
                               )
                             : (EXPORTABLE(

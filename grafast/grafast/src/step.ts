@@ -1,5 +1,7 @@
 import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
+import type { TE } from "tamedevil";
+import te from "tamedevil";
 
 import { isDev, noop } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
@@ -473,36 +475,40 @@ export abstract class UnbatchedExecutableStep<
     if (this.execute === UnbatchedExecutableStep.prototype.execute) {
       const depIndexes =
         this.dependencies.length > 0 ? this.dependencies.map((_, i) => i) : [0];
-      const tryOrNot = (inStr: string): string => {
+      const tryOrNot = (inFrag: TE): TE => {
         if (this.isSyncAndSafe) {
-          return inStr;
+          return inFrag;
         } else {
-          return `\
+          return te`\
       try {
-${inStr.replace(/^/gm, "  ")}
+${te.indent(inFrag)}
       } catch (e) {
         results[i] = e instanceof Error ? e : Promise.reject(e);
       }
 `;
         }
       };
-      this.execute = new Function(
-        "values",
-        "extra",
-        `\
-    const [ ${depIndexes.map((i) => `list${i}`).join(", ")} ] = values;
-    const count = list0.length;
-    const results = [];
-    for (let i = 0; i < count; i++) {
-${tryOrNot(`\
-      results[i] = this.unbatchedExecute(extra, ${depIndexes
-        .map((depIndex) => `list${depIndex}[i]`)
-        .join(", ")});
+      this.execute = te.run`
+return function execute(values, extra) {
+  const [
+${te.join(
+  depIndexes.map((i) => te`    ${te.identifier(`list${i}`)},\n`),
+  "",
+)}\
+  ] = values;
+  const count = list0.length;
+  const results = [];
+  for (let i = 0; i < count; i++) {
+${tryOrNot(te`\
+    results[i] = this.unbatchedExecute(extra, ${te.join(
+      depIndexes.map((depIndex) => te`${te.identifier(`list${depIndex}`)}[i]`),
+      ", ",
+    )});
 `)}\
-    }
-    return results;
-`,
-      ) as any;
+  }
+  return results;
+}
+` as any;
     }
     super.finalize();
   }

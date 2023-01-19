@@ -3,6 +3,7 @@ import type {
   GraphQLInputType,
   ValueNode,
 } from "graphql";
+import te from "tamedevil";
 
 import type { InputStep } from "../input.js";
 import { inputPlan } from "../input.js";
@@ -65,23 +66,29 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   }
 
   finalize() {
-    this.unbatchedExecute = new Function(
-      "extra",
-      ...this.dependencies.map((_, i) => `val${i}`),
-      `\
-    const resultValues = Object.create(null);
-    ${Object.entries(this.inputFields)
-      .map(([inputFieldName, { dependencyIndex }]) => {
+    this.unbatchedExecute = te.run`return function (extra, ${te.join(
+      this.dependencies.map((_, dependencyIndex) =>
+        te.identifier(`val${dependencyIndex}`),
+      ),
+      ", ",
+    )}) {
+  const resultValues = Object.create(null);
+  ${te.join(
+    Object.entries(this.inputFields).map(
+      ([inputFieldName, { dependencyIndex }]) => {
         if (dependencyIndex == null) {
           throw new Error("inputFieldPlan has gone missing.");
         }
-        return `\
-    resultValues[${JSON.stringify(inputFieldName)}] = val${dependencyIndex};`;
-      })
-      .join("\n")}
-    return resultValues;
-`,
-    ) as any;
+        return te`\
+  resultValues${te.set(inputFieldName, true)} = ${te.identifier(
+          `val${dependencyIndex}`,
+        )};`;
+      },
+    ),
+    "\n",
+  )}
+  return resultValues;
+}` as any;
     super.finalize();
   }
 
