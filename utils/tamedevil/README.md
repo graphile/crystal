@@ -302,7 +302,7 @@ symbol or number) of the preceding expression; will return code like `.foo` or
 As with `te.get` except using optional chaining - the expression will be `?.foo`
 or `?.["foo"]` as appropriate.
 
-### `te.set(key, hasNullPrototype)`
+### `te.set(key, hasNullPrototype?)`
 
 As with `te.get`, except since it's for setting a key we'll perform checks to
 ensure you're not writing to unsafe keys (such as `__proto__`) unless you
