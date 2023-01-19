@@ -141,7 +141,7 @@ return function (source) {
                   : EXPORTABLE(
                       (detailsByColumnName, source) =>
                         function plan(_$root: any, args: FieldArgs) {
-                          const spec = {};
+                          const spec = Object.create(null);
                           for (const columnName in detailsByColumnName) {
                             spec[columnName] = args.get(
                               detailsByColumnName[columnName].graphqlName,

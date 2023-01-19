@@ -11,7 +11,7 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
     [key in keyof THooks]?: Array<
       THooks[keyof THooks] extends PluginHook<infer U> ? U : never
     >;
-  } = {};
+  } = Object.create(null);
 
   hook<THookName extends keyof THooks>(
     event: THookName,

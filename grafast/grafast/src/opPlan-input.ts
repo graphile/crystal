@@ -42,7 +42,7 @@ export function withFieldArgsForArguments<
     operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
   const fields: {
     [key: string]: GraphQLArgument;
-  } = {};
+  } = Object.create(null);
   const args = field.args;
   for (const arg of args) {
     fields[arg.name] = arg;
@@ -534,7 +534,7 @@ function withFieldArgsForArgOrField<
 const defaultInputObjectTypeInputPlanResolver: InputObjectTypeInputPlanResolver =
   (input, info) => {
     const fields = info.type.getFields();
-    const obj: { [key: string]: ExecutableStep } = {};
+    const obj: { [key: string]: ExecutableStep } = Object.create(null);
     for (const fieldName in fields) {
       obj[fieldName] = input.get(fieldName);
     }

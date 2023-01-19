@@ -360,7 +360,7 @@ export function compile(
    */
   const descCounter: {
     [description: string]: number;
-  } = {};
+  } = Object.create(null);
 
   /**
    * Makes a friendly name to use in the query for the given SymbolAndName.

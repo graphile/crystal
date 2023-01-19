@@ -67,12 +67,12 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
           });
         if (!isIndexed) {
           if (!column.extensions) {
-            column.extensions = {};
+            column.extensions = Object.create(null);
           }
-          if (!column.extensions.tags) {
-            column.extensions.tags = Object.create(null);
+          if (!column.extensions!.tags) {
+            column.extensions!.tags = Object.create(null);
           }
-          addBehaviorToTags(column.extensions.tags!, "-filterBy -orderBy");
+          addBehaviorToTags(column.extensions!.tags!, "-filterBy -orderBy");
         }
       },
     },

@@ -533,7 +533,7 @@ async function main() {
   const contextValue = {
     withPgClient,
   };
-  const variableValues = {};
+  const variableValues = Object.create(null);
 
   // Run our query
   const result = await graphql({

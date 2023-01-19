@@ -169,7 +169,7 @@ export function makeGrafastSchema(details: {
           const graphileExtensions: GraphQLFieldExtensions<
             any,
             any
-          >["graphile"] = {};
+          >["graphile"] = Object.create(null);
           (field.extensions as any).graphile = graphileExtensions;
           if (fieldSpec.resolve) {
             field.resolve = fieldSpec.resolve;
@@ -178,10 +178,10 @@ export function makeGrafastSchema(details: {
             field.subscribe = fieldSpec.subscribe;
           }
           if (fieldSpec.plan) {
-            graphileExtensions.plan = fieldSpec.plan;
+            graphileExtensions!.plan = fieldSpec.plan;
           }
           if (fieldSpec.subscribePlan) {
-            graphileExtensions.subscribePlan = fieldSpec.subscribePlan;
+            graphileExtensions!.subscribePlan = fieldSpec.subscribePlan;
           }
 
           if (typeof fieldSpec.args === "object" && fieldSpec.args != null) {

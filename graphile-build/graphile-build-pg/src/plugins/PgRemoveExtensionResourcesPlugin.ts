@@ -26,7 +26,7 @@ export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
     hooks: {
       pgIntrospection_introspection(info, event) {
         const { introspection } = event;
-        const oidByCatalog = {};
+        const oidByCatalog = Object.create(null);
         for (const oid in introspection.catalog_by_oid) {
           oidByCatalog[introspection.catalog_by_oid[oid]] = oid;
         }

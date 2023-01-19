@@ -1127,7 +1127,7 @@ const introspect = (
 
     kind: Kind.DOCUMENT,
   };
-  const variableValues: Record<string, any> = {};
+  const variableValues: Record<string, any> = Object.create(null);
   for (const variableName of variableNames) {
     variableValues[variableName] = root.variables[variableName];
   }
