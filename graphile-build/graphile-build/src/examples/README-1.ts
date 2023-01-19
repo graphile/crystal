@@ -96,7 +96,7 @@ const MyRandomFieldPlugin: GraphileConfig.Plugin = {
   ]);
 
   // This'd normally be the "gather" phase, but we don't need one
-  const input: GraphileBuild.BuildInput = {};
+  const input: GraphileBuild.BuildInput = Object.create(null);
 
   // Build the schema:
   const schema = buildSchema(config, input);

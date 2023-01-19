@@ -249,7 +249,7 @@ export class PgUnionAllSingleStep
         `No PK found for ${objectType.name}; this should have been caught earlier?!`,
       );
     }
-    const spec = {};
+    const spec = Object.create(null);
     const $parsed = jsonParse(access(this, [$$data, this.pkKey]));
     for (let i = 0, l = pk.columns.length; i < l; i++) {
       const col = pk.columns[i];

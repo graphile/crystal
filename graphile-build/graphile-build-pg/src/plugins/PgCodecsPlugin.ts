@@ -334,7 +334,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             );
           }
 
-          const columns: PgTypeColumns = {};
+          const columns: PgTypeColumns = Object.create(null);
           const allAttributes =
             await info.helpers.pgIntrospection.getAttributesForClass(
               databaseName,

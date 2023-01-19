@@ -123,9 +123,9 @@ const gatherBase = (
   const resolvedPreset = resolvePresets([preset]);
   const options = resolvedPreset.gather || {};
   const plugins = resolvedPreset.plugins;
-  const globalState: { [key: string]: any } = {};
-  const gatherState: { [key: string]: any } = {};
-  const helpers: { [key: string]: any } = {}; // GatherHelpers
+  const globalState: { [key: string]: any } = Object.create(null);
+  const gatherState: { [key: string]: any } = Object.create(null);
+  const helpers: { [key: string]: any } = Object.create(null); // GatherHelpers
 
   const hooks = new AsyncHooks<GraphileConfig.GatherHooks>();
 
@@ -167,7 +167,7 @@ const gatherBase = (
       };
       pluginContext.set(plugin, context);
       if (spec.namespace != null) {
-        helpers[spec.namespace] = {};
+        helpers[spec.namespace] = Object.create(null);
         if (spec.helpers != null) {
           const specHelpers = spec.helpers;
           for (const helperName of Object.keys(specHelpers)) {
@@ -196,7 +196,7 @@ const gatherBase = (
   }
 
   async function run() {
-    const output: Partial<GraphileBuild.BuildInput> = {};
+    const output: Partial<GraphileBuild.BuildInput> = Object.create(null);
     if (gatherPlugins) {
       // Reset state
       for (const plugin of gatherPlugins) {

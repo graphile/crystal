@@ -74,7 +74,7 @@ export default function makeNewBuild(
       origin: string | null | undefined;
       Step?: { new (...args: any[]): ExecutableStep<any> } | null;
     };
-  } = {};
+  } = Object.create(null);
 
   const scopeByType = new Map<GraphQLNamedType, GraphileBuild.SomeScope>();
 
