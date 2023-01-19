@@ -14,7 +14,7 @@ import {
 } from "./makeGrafastSchema.js";
 import { PrintPlanGraphOptions } from "./mermaid.js";
 
-// TODO: doing this here feels "naughty".
+// HACK: doing this here feels "naughty".
 debugFactory.formatters.c = grafastPrint;
 
 import { defer, Deferred } from "./deferred.js";
@@ -208,7 +208,7 @@ export {
   __TrackedObjectStep,
   __ValueStep,
   $$bypassGraphQL,
-  $$concreteType, // TODO: we really oughtn't export this
+  $$concreteType, // FIXME: we really oughtn't export this
   $$data,
   $$eventEmitter,
   $$extensions,

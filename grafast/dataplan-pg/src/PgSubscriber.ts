@@ -45,7 +45,7 @@ export class PgSubscriber<
       if (waiting) {
         const p = waiting;
         waiting = null;
-        // TODO: Is this right?!
+        // FIXME: Is this right?!
         p.reject(new Error("Terminated"));
       }
       eventEmitter.removeListener(topic as string, recv);

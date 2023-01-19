@@ -219,7 +219,7 @@ export class PgClassExpressionStep<
   }
 
   public unbatchedExecute(extra: ExecutionExtra, rawV: any): any {
-    // TODO: this feels like a hack; should we really have to manually unwrap
+    // HACK: this feels like a hack; should we really have to manually unwrap
     // PgUnionAllStep polymorphism here?
     const v = this.needsPolymorphicUnwrap ? rawV?.[$$data] : rawV;
     if (v == null) {

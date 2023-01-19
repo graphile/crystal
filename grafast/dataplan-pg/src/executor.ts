@@ -177,7 +177,6 @@ export class PgExecutor<TSettings = any> {
     }
     if (debugVerbose.enabled) {
       const end = process.hrtime.bigint();
-      // TODO: why use bigint if you're just going to round it? :D
       const duration = (Number((end - start) / 10000n) / 100).toFixed(2) + "ms";
       const rows = queryResult?.rows;
       const rowResults =
@@ -248,7 +247,7 @@ ${duration}
     values: ReadonlyArray<SQLRawValue>,
     name?: string,
   ) {
-    // TODO: we could probably make this more efficient by grouping the
+    // PERF: we could probably make this more efficient by grouping the
     // deferreds further, DataLoader-style, and running one SQL query for
     // everything.
     return await context.withPgClient(context.pgSettings, (client) =>
@@ -363,7 +362,7 @@ ${duration}
     for (const [context, batch] of batches) {
       promises.push(
         (async () => {
-          // TODO: cache must factor in placeholders.
+          // FIXME: cache must factor in placeholders.
           let cacheForContext = useCache ? context[this.$$cache] : null;
           if (!cacheForContext) {
             cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
@@ -389,7 +388,7 @@ ${duration}
             const batchSize = batch.length;
             for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
               const { queryValues, resultIndex } = batch[batchIndex];
-              const identifiersJSON = JSON.stringify(queryValues); // TODO: Canonical? Manual for perf?
+              const identifiersJSON = JSON.stringify(queryValues); // PERF: Canonical? Manual for perf?
               const existingResult = scopedCache.get(identifiersJSON);
               if (existingResult) {
                 if (debugVerbose.enabled) {
@@ -450,7 +449,7 @@ ${duration}
                   "Query with identifiers was executed, but no identifier reference was found in the values passed",
                 );
               }
-              // TODO: we could probably make this more efficient by grouping the
+              // PERF: we could probably make this more efficient by grouping the
               // deferreds further, DataLoader-style, and running one SQL query for
               // everything.
               const queryResult = common.useTransaction
@@ -558,7 +557,7 @@ ${duration}
         const batchSize = batch.length;
         for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
           const { queryValues } = batch[batchIndex];
-          const identifiersJSON = JSON.stringify(queryValues); // TODO: Canonical? Manual for perf?
+          const identifiersJSON = JSON.stringify(queryValues); // Perf: Canonical? Manual for perf?
           const existing = batchIndexesByIdentifiersJSON.get(identifiersJSON);
           if (existing) {
             existing.push(batchIndex);
@@ -595,7 +594,7 @@ ${duration}
           ...batchIndexesByIdentifiersJSON.values(),
         ];
 
-        // TODO: batchIndexesByIdentifiersJSON = null;
+        // PERF: batchIndexesByIdentifiersJSON = null;
 
         const sqlValues = rawSqlValues.map((v) => {
           // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
@@ -743,7 +742,7 @@ ${duration}
 
         // Registers the cursor
         await execute<TOutput>(declareCursorSQL, sqlValues);
-        // TODO: if the above statement(s) throw an error, is the resulting stream being null okay?
+        // FIXME: if the above statement(s) throw an error, is the resulting stream being null okay?
 
         // Ensure we release the cursor now we've registered it.
         try {
@@ -799,7 +798,7 @@ ${duration}
       this._executeWithClient<TData>(client, text, values),
     );
 
-    // TODO: we could probably make this more efficient rather than blowing away the entire cache!
+    // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
     context[this.$$cache]?.reset();
 

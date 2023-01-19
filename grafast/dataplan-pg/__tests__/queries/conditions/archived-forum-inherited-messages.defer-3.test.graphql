@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-# TODO: should be able to reduce to just 2 queries because the two defers
+# PERF: should be able to reduce to just 2 queries because the two defers
 # _could_ share the same LayerPlan.
 ## expect(queries).toHaveLength(3);
 {

@@ -179,13 +179,11 @@ export type PgSelectIdentifierSpec =
 
 export type PgSelectArgumentSpec =
   | {
-      // TODO: Rename to step
       step: ExecutableStep<any>;
       pgCodec: PgTypeCodec<any, any, any, any>;
       name?: string;
     }
   | {
-      // TODO: Rename to step
       step: PgTypedExecutableStep<any>;
       name?: string;
     };
@@ -758,7 +756,7 @@ export class PgSelectStep<
 
   public setFirst(first: InputStep): this {
     this.locker.assertParameterUnlocked("first");
-    // TODO: don't eval
+    // PERF: don't eval
     this.first = first.eval() ?? null;
     this.locker.lockParameter("first");
     return this;
@@ -806,7 +804,7 @@ export class PgSelectStep<
    */
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
-    // TODO: This is a truly hideous hack. We should solve this by having this
+    // HACK: This is a truly hideous hack. We should solve this by having this
     // plan resolve to an object with rows and metadata.
     return lambda(this, listHasMore);
   }
@@ -937,7 +935,7 @@ export class PgSelectStep<
     const options = {
       symbolSubstitutes: this._symbolSubstitutes,
     };
-    // TODO: performance of this sucks at planning time
+    // PERF: performance of this sucks at planning time
     const index = this.selects.findIndex((frag) =>
       sql.isEquivalent(frag, fragment, options),
     );
@@ -950,7 +948,7 @@ export class PgSelectStep<
 
   private nullCheckIndex: number | null | undefined = undefined;
   public getNullCheckIndex(): number | null {
-    // TODO: if this isn't coming from a function _and_ it's not being inlined
+    // PERF: if this isn't coming from a function _and_ it's not being inlined
     // via a left-join or similar then we shouldn't need this and should be
     // able to drop it.
     if (this.nullCheckIndex !== undefined) {
@@ -1129,7 +1127,7 @@ export class PgSelectStep<
       const order = orders[i];
       // Codec is responsible for performing validation/coercion and throwing
       // error if value is invalid.
-      // TODO: make sure this ^ is clear in the relevant places.
+      // FIXME: make sure this ^ is clear in the relevant places.
       /*
           const sqlValue = sql`${sql.value(
             (void 0 /* forbid relying on `this` * /, order.codec.toPg)(
@@ -1146,7 +1144,7 @@ export class PgSelectStep<
         toPg(access($parsedCursorPlan, [i + 1]), orderCodec),
         orderCodec,
       );
-      // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
+      // FIXME: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
       const gt =
         (order.direction === "ASC" && beforeOrAfter === "after") ||
         (order.direction === "DESC" && beforeOrAfter === "before");
@@ -1293,7 +1291,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         ? reverseArray(slicedRows)
         : slicedRows;
       if (this.fetchOneExtra) {
-        // TODO: this is an ugly hack; really we should consider resolving to an
+        // HACK: this is an ugly hack; really we should consider resolving to an
         // object that can contain metadata as well as the rows.
         Object.defineProperty(orderedRows, "hasMore", { value: hasMore });
       }
@@ -1385,7 +1383,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         if (!isAsyncIterable(stream)) {
           return stream;
         }
-        // TODO: Merge the initial results and the stream together manually to
+        // FIXME: Merge the initial results and the stream together manually to
         // avoid unstoppable async generator problem.
         return (async function* () {
           const l = initialFetchResult[idx].length;
@@ -1979,7 +1977,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
                 }`
               : baseQuery;
 
-          // TODO: if the query does not have a limit/offset; should we use an
+          // PERF: if the query does not have a limit/offset; should we use an
           // `inner join` in a flattened query instead of a wrapped query with
           // `lateral`?
 
@@ -2147,7 +2145,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           text,
           rawSqlValues,
           identifierIndex,
-          // TODO: when streaming we must not set this to true
+          // FIXME: when streaming we must not set this to true
           shouldReverseOrder: this.shouldReverseOrder(),
           name: hash(text),
         };
@@ -2388,7 +2386,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
        *    case we should turn it into an SQL expression and inline that.
        */
 
-      // TODO:perf: we know dep can't depend on otherPlan if
+      // PERF: we know dep can't depend on otherPlan if
       // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
       // `otherPlan`'s layerPlan.
       if (stepAMayDependOnStepB(otherPlan, dep)) {
@@ -2571,7 +2569,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           this.offset == null &&
           this.mode !== "aggregate" &&
           table.mode !== "aggregate"
-          // TODO: && !this.order && ... */
+          // FIXME: && !this.order && ... */
         ) {
           if (this.selects.length > 0) {
             debugPlanVerbose(
@@ -2708,7 +2706,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
                   ? reverseArray(slicedRows)
                   : slicedRows;
                 if (this.fetchOneExtra) {
-                  // TODO: this is an ugly hack; really we should consider resolving to an
+                  // HACK: this is an ugly hack; really we should consider resolving to an
                   // object that can contain metadata as well as the rows.
                   Object.defineProperty(orderedRows, "hasMore", {
                     value: hasMore,

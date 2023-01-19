@@ -166,7 +166,6 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    */
   private processRoot: ((value: any) => any) | null = null;
 
-  // TODO: since polymorphic handles branching, we can remove the `typeName` layer from this.
   /**
    * For root/object output plans, the keys to set on the resulting object
    * grouped by the concrete object type name.
@@ -466,7 +465,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           // Boolean type
           this.executeString = booleanLeafExecutorString;
         } else {
-          // TODO: we could probably optimize enums too
+          // PERF: we could probably optimize enums too
           this.executeString = leafExecutorString;
         }
         break;
@@ -689,7 +688,7 @@ export function getChildBucketAndIndex(
     }
 
     /*
-     * TODO: this '|| i > 0' feels really really really hacky... What happens if we have
+     * HACK: this '|| i > 0' feels really really really hacky... What happens if we have
      * nested arrays? I'm concerned there's a bug here.
      */
     if (arrayIndex == null || i !== l - 1) {
@@ -1131,7 +1130,7 @@ const introspect = (
   for (const variableName of variableNames) {
     variableValues[variableName] = root.variables[variableName];
   }
-  // TODO: make this canonical
+  // PERF: make this canonical
   const canonical = JSON.stringify(variableValues);
   const cached = introspectionCacheByVariableValues.get(canonical);
   if (cached) {
@@ -1143,7 +1142,7 @@ const introspect = (
     variableValues,
   });
   if (graphqlResult.errors) {
-    // TODO: we should map the introspection path
+    // FIXME: we should map the introspection path
     console.error("INTROSPECTION FAILED!");
     console.error(graphqlResult);
     const { node } = locationDetails;
@@ -1196,7 +1195,7 @@ function makeObjectExecutor<TAsString extends boolean>(
 ): TAsString extends true
   ? typeof OutputPlan.prototype.executeString
   : typeof OutputPlan.prototype.execute {
-  // TODO: figure out how to memoize this (without introducing memory leaks)
+  // PERF: figure out how to memoize this (without introducing memory leaks)
 
   const keys = Object.keys(fieldTypes);
   /*
@@ -1331,7 +1330,7 @@ ${
 }
   return ${asString ? te`string` : te`obj`};`;
 
-  // TODO: figure out how to memoize this. Should be able to key it on:
+  // PERF: figure out how to memoize this. Should be able to key it on:
   // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
   // - existence of deferredOutputPlans
   return makeExecutor(inner, te`object`, asString, isRoot);

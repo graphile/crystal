@@ -387,7 +387,7 @@ ${te.join(
           );
         }
 
-        // TODO: check that requestingStep is allowed to get steps
+        // Check that requestingStep is allowed to get steps
         if (
           requestingStep.isOptimized &&
           (this.phase !== "optimize" ||
@@ -580,7 +580,7 @@ ${te.join(
       node: this.operation.selectionSet.selections,
     };
     if (subscriptionPlanResolver) {
-      // TODO: optimize this
+      // PERF: optimize this
       const trackedArguments = withGlobalLayerPlan(
         this.rootLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
@@ -663,7 +663,7 @@ ${te.join(
         selectionSet.selections,
       );
     } else {
-      // TODO: take the regular GraphQL subscription resolver and convert it to a plan. (Lambda plan?)
+      // FIXME: take the regular GraphQL subscription resolver and convert it to a plan. (Lambda plan?)
       const subscribeStep = this.trackedRootValueStep;
       this.rootLayerPlan.setRootStep(subscribeStep);
 
@@ -681,7 +681,7 @@ ${te.join(
         withGlobalLayerPlan(
           subscriptionEventLayerPlan,
           POLYMORPHIC_ROOT_PATHS,
-          // TODO: is this right?
+          // FIXME: is this right?
           () => new __ItemStep(this.rootValueStep),
         ),
       );
@@ -884,7 +884,7 @@ ${te.join(
                   mode: "introspection",
                   field,
                   variableNames,
-                  // TODO: if variableNames.length === 0 we should be able to optimize this!
+                  // PERF: if variableNames.length === 0 we should be able to optimize this!
                   introspectionCacheByVariableValues: new LRU({
                     maxLength: 3,
                   }),
@@ -1048,7 +1048,7 @@ ${te.join(
             trackedArguments,
           ));
         } else {
-          // TODO: should this use the default plan resolver?
+          // FIXME: should this use the default plan resolver?
           // There's no step resolver; use the parent step
           step = parentStep;
         }
@@ -1434,7 +1434,7 @@ ${te.join(
     $step: ExecutableStep,
     allPossibleObjectTypes: readonly GraphQLObjectType[],
   ): LayerPlan<LayerPlanReasonPolymorphic> {
-    // TODO: I added the $step.id to pathString to fix a planning issue; but maybe we can do this without branching?
+    // OPTIMIZE: I added the $step.id to pathString to fix a planning issue; but maybe we can do this without branching?
     // https://github.com/benjie/postgraphile-private/issues/109
     const pathString = `${path.join("|")}!${$step.id}`;
     const polymorphicLayerPlanByPath =
@@ -1583,7 +1583,7 @@ ${te.join(
       );
       const haltTree = true;
       this.modifierSteps = [];
-      // TODO: consider deleting all steps that were allocated during this. For
+      // PERF: consider deleting all steps that were allocated during this. For
       // now we'll just rely on tree-shaking.
       return { step, haltTree };
     } finally {
@@ -1636,7 +1636,7 @@ ${te.join(
       }
     }
     return {
-      // TODO: should this be FieldArgs?
+      // FIXME: should this be FieldArgs?
       get(name) {
         return trackedArgumentValues[name];
       },
@@ -1734,7 +1734,7 @@ ${te.join(
     this.stepTracker.replaceStep($original, $replacement);
   }
 
-  // TODO: optimize
+  // PERF: optimize
   /**
    * Process the given steps, either dependencies first (root to leaf) or
    * dependents first (leaves to root).
@@ -1953,7 +1953,7 @@ ${te.join(
     if (step instanceof __ItemStep || step instanceof __ValueStep) {
       return true;
     }
-    // TODO:perf: we should calculate this _once only_ rather than for every step!
+    // PERF: we should calculate this _once only_ rather than for every step!
     const layerPlansWithParentStep =
       this.stepTracker.layerPlansByParentStep.get(step);
     const hasSubroutinesWithParentStep =
@@ -1962,7 +1962,7 @@ ${te.join(
       [...layerPlansWithParentStep].some((l) => l.reason.type === "subroutine");
     if (hasSubroutinesWithParentStep) {
       // Don't hoist steps that are the root of a subroutine
-      // TODO: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
+      // PERF: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
       return true;
     }
     return false;
@@ -1997,7 +1997,7 @@ ${te.join(
           // It's cheap, try and hoist it.
           // NOTE: this means this will run for non-matching types, which is
           // not ideal. We may need to revert this.
-          // TODO: ensure this is safe.
+          // FIXME: ensure this is safe.
           break;
         } else {
           return;
@@ -2027,7 +2027,7 @@ ${te.join(
         // NOTE: It's the user's responsibility to ensure that steps that have
         // side effects are marked as such via `step.hasSideEffects = true`.
         if (step.isSyncAndSafe) {
-          // TODO: warn user we're hoisting from a mutationField?
+          // FIXME: warn user we're hoisting from a mutationField?
           break;
         } else {
           // Plans that rely on external state shouldn't be hoisted because
@@ -2122,7 +2122,7 @@ ${te.join(
         // NOTE: It's the user's responsibility to ensure that steps that have
         // side effects are marked as such via `step.hasSideEffects = true`.
         if (step.isSyncAndSafe) {
-          // TODO: warn user we're hoisting from a mutationField?
+          // FIXME: warn user we're hoisting from a mutationField?
           break;
         } else {
           // Plans that rely on external state shouldn't be hoisted because
@@ -2141,7 +2141,7 @@ ${te.join(
       }
     }
 
-    // TODO: don't allow pushing down into mutationField?
+    // FIXME: don't allow pushing down into mutationField?
 
     // Now find the lowest bucket that still satisfies all of it's dependents.
     const dependentLayerPlans = new Set<LayerPlan>();
@@ -2224,12 +2224,12 @@ ${te.join(
     outerloop: for (let i = 0; i < minPathLength; i++) {
       const expected = paths[0][i];
       if (expected.reason.type === "polymorphic") {
-        // TODO: reconsider
+        // PERF: reconsider
         // Let's not pass polymorphic boundaries for now
         break;
       }
       if (expected.reason.type === "subroutine") {
-        // TODO: reconsider
+        // PERF: reconsider
         // Let's not pass subroutine boundaries for now
         break;
       }
@@ -2281,7 +2281,7 @@ ${te.join(
 
     const stepOptions = this.getStepOptionsForStep(step);
     const shouldStream = !!stepOptions?.stream;
-    // TODO: revisit this decision in the context of SAGE.
+    // FIXME: revisit this decision in the context of SAGE.
     if (shouldStream) {
       // Never deduplicate streaming plans, we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
@@ -2375,7 +2375,7 @@ ${te.join(
   }
 
   /*
-   * TODO: calculation if peers for deduplicate is too expensive, and shouldn't
+   * PERF: calculation if peers for deduplicate is too expensive, and shouldn't
    * be done in an expensive loop. Alternative:
    *
    * 1. build a `list` of the steps to deduplicate
@@ -2451,7 +2451,7 @@ ${te.join(
       (lp) => lp.reason.type === "stream",
     );
 
-    // TODO: if step isn't streamable, don't create a streamLayerPlan because
+    // PERF: if step isn't streamable, don't create a streamLayerPlan because
     // there's no point (and then we can leverage better optimisations).
 
     return {
@@ -2630,7 +2630,7 @@ ${te.join(
           processSideEffectPlan(sideEffectDep);
         }
 
-        // TODO: this is silly, we should be able to group them together and
+        // PERF: this is silly, we should be able to group them together and
         // run them in parallel, and they don't even have side effects!
         for (const dep of rest) {
           processSideEffectPlan(dep);
@@ -2732,7 +2732,7 @@ ${te.join(
         layerPlan.phases.push(Object.assign(phase, { _allSteps }));
       }
 
-      // TODO:perf: this could probably be faster.
+      // PERF: this could probably be faster.
       // Populate copyPlanIds for each step
       for (const step of layerPlan.steps) {
         // Items shouldn't have their "list" copied in.
