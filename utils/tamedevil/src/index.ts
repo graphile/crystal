@@ -918,7 +918,6 @@ export {
   optionalGet,
   raw,
   ref,
-  reservedWords,
   run,
   set,
   subcomment,
@@ -960,7 +959,6 @@ export interface TamedEvil {
   undefined: TE;
   blank: TE;
   isTE: typeof isTE;
-  reservedWords: typeof reservedWords;
   raw: typeof raw;
 }
 
@@ -988,7 +986,6 @@ const attributes = {
   undefined: undefinedNode,
   blank: blankNode,
   isTE,
-  reservedWords,
   raw,
 };
 
