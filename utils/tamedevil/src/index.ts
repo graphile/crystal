@@ -98,8 +98,17 @@ export type TE = TENode | TEQuery;
  * amount of memory to consume for this.
  */
 const CACHE_RAW_NODES = new LRU<string, TERawNode>({ maxLength: 10000 });
+const CACHE_MAX_ENTRY_LENGTH = 50;
 
 function makeRawNode(text: string, exportName?: string): TERawNode {
+  // Don't use the cache for longer texts
+  if (text.length > CACHE_MAX_ENTRY_LENGTH && exportName === undefined) {
+    return Object.freeze({
+      [$$type]: "RAW" as const,
+      t: text,
+    });
+  }
+
   const n = CACHE_RAW_NODES.get(text);
   if (n) {
     return n;
