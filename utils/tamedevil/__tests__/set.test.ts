@@ -12,6 +12,7 @@ const testCases: Array<
     { refs: {}, string: `obj["1foo\\"]; process.exit(1); //"]` },
   ],
   ["__proto__", { refs: {}, string: "obj.__proto__" }],
+  ["constructor", { refs: {}, string: "obj.constructor" }],
   [1, { refs: {}, string: `obj[1]` }],
   [symbol, { refs: { _$$_ref_1: symbol }, string: `obj[_$$_ref_1]` }],
 ];
