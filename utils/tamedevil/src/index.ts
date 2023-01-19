@@ -336,7 +336,7 @@ const teBase = function te(
 
   // Special case te`${...}` - just return the node directly
   if (stringsLength === 2 && strings[0] === "" && strings[1] === "") {
-    return values[0];
+    return enforceValidNode(values[0]);
   }
 
   const items: Array<TENode> = [];
