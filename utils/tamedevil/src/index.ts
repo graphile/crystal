@@ -55,6 +55,10 @@ export interface TERefNode {
   readonly n: string | undefined;
 }
 
+/**
+ * Represents a temporary variable that will be created, primarily useful for
+ * inline wrangling of data where statements are not available.
+ */
 export interface TETemporaryVariableNode {
   readonly [$$type]: "VARIABLE";
   /** symbol */
@@ -85,8 +89,8 @@ export interface TEQuery {
 }
 
 /**
- * Representation of TE, identifiers, values, etc; to generate a query that
- * can be issued to the database it needs to be fed to `te.compile`.
+ * A tamedevil node or fragment, ready to be combined into a larger fragment or
+ * evaluated directly. To evaluate, feed this node into `te.run()`.
  */
 export type TE = TENode | TEQuery;
 
@@ -141,6 +145,7 @@ function makeRefNode(rawValue: any, name?: string): TERefNode {
   });
 }
 
+// Simple function to help V8 optimize it.
 function makeTemporaryVariableNode(symbol: symbol): TETemporaryVariableNode {
   return Object.freeze({
     [$$type]: "VARIABLE" as const,
@@ -148,6 +153,7 @@ function makeTemporaryVariableNode(symbol: symbol): TETemporaryVariableNode {
   });
 }
 
+// Simple function to help V8 optimize it.
 function makeIndentNode(content: TE): TEIndentNode {
   return Object.freeze({
     [$$type]: "INDENT" as const,
@@ -155,6 +161,7 @@ function makeIndentNode(content: TE): TEIndentNode {
   });
 }
 
+// Simple function to help V8 optimize it.
 function makeQueryNode(nodes: ReadonlyArray<TENode>): TEQuery {
   return Object.freeze({
     [$$type]: "QUERY" as const,
@@ -162,6 +169,9 @@ function makeQueryNode(nodes: ReadonlyArray<TENode>): TEQuery {
   });
 }
 
+/**
+ * Returns true if the given node is a TE node, false otherwise.
+ */
 function isTE(node: unknown): node is TE {
   return (
     typeof node === "object" &&
@@ -170,6 +180,12 @@ function isTE(node: unknown): node is TE {
   );
 }
 
+/**
+ * If the given node is a valid TE node it will be returned, otherwise an error
+ * will be thrown.
+ *
+ * @internal
+ */
 function enforceValidNode(node: TEQuery, where?: string): TEQuery;
 function enforceValidNode(node: TENode, where?: string): TENode;
 function enforceValidNode(node: TE, where?: string): TE;
@@ -187,8 +203,8 @@ function enforceValidNode(node: unknown, where?: string): TE {
 }
 
 /**
- * Accepts an te`...` expression and compiles it out to TE text with
- * placeholders, and the values to substitute for these values.
+ * Accepts an te`...` expression and compiles it out to the function body
+ * `string` and the `refs` that need to be passed via the closure.
  */
 function compile(fragment: TE): {
   string: string;
@@ -238,7 +254,7 @@ function compile(fragment: TE): {
 
   function print(untrustedInput: TE, indent = 0) {
     /**
-     * Join this to generate the TE query
+     * Join this to generate the TE string
      */
     const teFragments: string[] = [];
 
@@ -257,7 +273,7 @@ function compile(fragment: TE): {
             // No need to add blank raw text!
             break;
           }
-          // IMPORTANT: this **must not** mangle primitives. Fortunately they're single line so it should be fine.
+          // IMPORTANT: this **must not** mangle primitives. Fortunately they're all single line so it should be fine.
           teFragments.push(
             isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
           );
@@ -317,12 +333,17 @@ function compile(fragment: TE): {
 const CACHE_SIMPLE_FRAGMENTS = new Map<string, TERawNode>();
 
 /**
- * A template string tag that creates a `TE` query out of some strings and
- * some values. Use this to construct all PostgreTE queries to avoid TE
- * injection.
+ * A template string tag function that creates a `TE` query out of some strings and
+ * some TE values. Use this to prepare all dynamically executed code code
+ * injection attacks.
  *
- * Note that using this function, the user *must* specify if they are injecting
- * raw text. This makes a TE injection vulnerability harder to create.
+ * Note that this function enforces that every passed placeholder is a TE node,
+ * preventing potentially untrusted raw text from being injected into the code
+ * to be evaluated, thereby seriously reducing the risk of code injection
+ * attacks. Care must still be taken in the building and management of these
+ * code strings, however, since no parsing takes place - so it is up to the
+ * coder to use the right TE helper in the right positions in the constructed
+ * code.
  */
 const teBase = function te(
   strings: TemplateStringsArray,
@@ -404,10 +425,15 @@ const teBase = function te(
 };
 
 let rawWarningOutput = false;
+// FIXME: should we just straight up remove this method?
 /**
- * Creates a TE item for a raw code string. Just plain ol‘ raw code. This
- * method is dangerous though because it involves no escaping, so proceed with
- * caution! It's very very rarely warranted - there is likely a safer way of
+ * Creates a TE node for a raw code string. Just plain ol‘ raw code - EXTREMELY
+ * DANGEROUS.
+ *
+ * This method is dangerous because it involves no escaping, so proceed with
+ * caution!
+ *
+ * It's very very rarely warranted to use this - there is likely a safer way of
  * achieving your goal. DO NOT USE THIS WITH UNTRUSTED INPUT!
  */
 function raw(text: string): TE {
@@ -417,7 +443,7 @@ function raw(text: string): TE {
       throw new Error("te.raw first invoked here");
     } catch (e: any) {
       console.warn(
-        `[tamedevil] WARNING: you're using the te.raw escape hatch, usage of this API is rarely required and is highly discouraged. Please be sure this is what you intend. ${e.stack}`,
+        `[tamedevil] WARNING: you're using the te.raw escape hatch, usage of this API is rarely required and is highly discouraged due to the potential security ramifications. Please be sure this is what you intend. ${e.stack}`,
       );
     }
   }
@@ -432,8 +458,9 @@ function raw(text: string): TE {
 }
 
 /**
- * Creates a TE item for a value that will be included in our final query.
- * This value will be added in a way which avoids TE injection.
+ * Creates a TE node for an arbitrary JS object that will be made available
+ * (via a closure) to the final code that will be executed. This value is not
+ * serialized or similar, it is passed by reference.
  */
 function ref(val: any, name?: string): TE {
   if (name != null) {
@@ -473,7 +500,10 @@ const MAX_SHORT_STRING_LENGTH = 200; // TODO: what should this be?
 const BACKSLASH_CODE = "\\".charCodeAt(0);
 const QUOTE_CODE = '"'.charCodeAt(0);
 
-// Bizarrely this seems to be faster than the regexp approach
+/**
+ * Similar to `JSON.stringify(string)`, but faster. Bizarrely this seems to be
+ * faster than the regexp approach
+ */
 export function stringifyString(value: string): string {
   const l = value.length;
   if (l > MAX_SHORT_STRING_LENGTH) {
@@ -497,6 +527,9 @@ export function stringifyString(value: string): string {
 
 // TODO: more optimal stringifier
 // TODO: rename to jsonStringify?
+/**
+ * Equivalent to JSON.stringify, but typically faster.
+ */
 export const toJSON = (value: any): string => {
   if (value == null) return "null";
   if (value === true) return "true";
@@ -510,8 +543,8 @@ export const toJSON = (value: any): string => {
 };
 
 /**
- * If the value is simple will inline it into the query, otherwise will defer
- * to `te.ref`.
+ * If the value is simple this will stringify it and inject it directly into
+ * the code to be evaluated, otherwise will defer to `te.ref`.
  */
 function lit(val: any): TE {
   if (val === undefined) {
@@ -539,8 +572,12 @@ function lit(val: any): TE {
 
 /**
  * If you're building a string and you want to inject untrusted content into it
- * without opening yourself to code injection attacks, this is the method for
- * you. Example:
+ * without opening yourself to code injection attacks nor doing awkward string
+ * concatenation, this is the method for you. It's essential that you pass the
+ * correct type of string that you're embedding into via the `stringType`
+ * parameter.
+ *
+ * Example:
  *
  * ```js
  * const code = te`const str = "abc${te.substring(untrusted, '"')}123";`
@@ -597,13 +634,18 @@ function subcomment(content: string | number | null | undefined) {
   return makeRawNode(String(content).replace(/\*\//g, "* /"));
 }
 
+/**
+ * Values that cannot safely be used as the keys on a POJO (`{}`) due to
+ * security or similar concerns. For example `__proto__` is disallowed.
+ */
 const disallowedKeys: Array<string | symbol | number> = [
   ...Object.getOwnPropertyNames(Object.prototype),
   ...Object.getOwnPropertySymbols(Object.prototype),
 ];
 
 /**
- * Is safe to set as the key of a POJO (without a null prototype).
+ * Returns true if the given key is safe to set as the key of a POJO (without a
+ * null prototype), false otherwise.
  */
 export const isSafeObjectPropertyName = (key: string | symbol | number) =>
   (typeof key === "number" ||
@@ -613,7 +655,8 @@ export const isSafeObjectPropertyName = (key: string | symbol | number) =>
   !disallowedKeys.includes(key);
 
 /**
- * Can represent as an identifier rather than a string key
+ * Returns true if you can use the given key as the key to a POJO without
+ * requiring quote marks or square braces.
  *
  * @remarks
  * Doesn't allow it to start with two underscores.
@@ -625,6 +668,11 @@ const canBeObjectKeyWithoutQuotes = (
   (typeof key === "string" &&
     (key === "_" || /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key)));
 
+/**
+ * If this returns true then the given `name` is allowed to be a variable name
+ * in JavaScript. If it returns false then it may or may not be safe to use it
+ * as a variable name.
+ */
 function isValidVariableName(name: string): boolean {
   if (reservedWords.has(name)) {
     return false;
@@ -635,6 +683,11 @@ function isValidVariableName(name: string): boolean {
   return true;
 }
 
+/**
+ * Asserts that the given `name` is allowed to be used as an identifier
+ * (variable name, function name, etc); and if so it returns a TE node
+ * representing this identifier. If disallowed, will throw an error.
+ */
 function identifier(name: string) {
   if (typeof name !== "string" || !isValidVariableName(name)) {
     throw new Error(`Invalid identifier name '${name}'`);
@@ -644,12 +697,19 @@ function identifier(name: string) {
 
 // TODO: rename to `ensureSafeKey` or `safeKeyOrThrow` or something?
 /**
+ * Checks that the given `key` is not explicitly disallowed as a key on a POJO and returns a TE node representing it. If disallowed, an error will be thrown. Useful for building easy to read objects:
+ *
+ * ```js
+ * const obj = te.run`return { ${te.identifier("frogs")}: "frogs" }`;
+ * ```
+ *
  * IMPORTANT: It's strongly recommended that instead of defining an object via
  * `const obj = { ${te.dangerousKey(untrustedKey)}: value }` you instead use
  * `const obj = Object.create(null);` and then set the properties on the resulting
- * object via `${obj}[${te.lit(untrustedKey)}] = value;` - this prevents attacks such as
- * **prototype polution** since properties like `__proto__` are not special on
- * null-prototype objects, whereas they can cause havok in regular `{}` objects.
+ * object via `${obj}${te.set(untrustedKey, true)} = value;` - this prevents
+ * attacks such as **prototype polution** since properties like `__proto__` are
+ * not special on null-prototype objects, whereas they can cause havok in
+ * regular `{}` objects (POJOs).
  */
 function dangerousKey(key: string | symbol | number): TE {
   if (isSafeObjectPropertyName(key)) {
@@ -678,6 +738,8 @@ function canAccessViaDot(str: string): boolean {
  * Accesses the key of an object either via `.` or `[]` as appropriate;
  * `obj${te.get(key)}` would become `obj.foo` or `obj["1foo"]` as
  * appropriate.
+ *
+ * DO NOT USE THIS FOR ASSIGNMENT!
  */
 function get(key: string | symbol | number): TE {
   return typeof key === "string" && canAccessViaDot(key)
@@ -691,6 +753,8 @@ function get(key: string | symbol | number): TE {
  * Accesses the key of an object via optional-chaining:
  * `obj${te.optionalGet(key)}` would become `obj?.foo` or `obj?.["1foo"]` as
  * appropriate.
+ *
+ * DO NOT USE THIS FOR ASSIGNMENT!
  */
 function optionalGet(key: string | symbol | number): TE {
   return typeof key === "string" && canAccessViaDot(key)
@@ -702,9 +766,10 @@ function optionalGet(key: string | symbol | number): TE {
 
 // TODO: rename this. 'leftSet'? 'leftAccess'? 'safeAccess'?
 /**
- * Sets the key of an object either via `.` or `[]` as appropriate;
- * `obj${te.set(key)}` would become `obj.foo` or `obj["1foo"]` as
- * appropriate.
+ * Access to the key of an object either via `.` or `[]` as appropriate ready
+ * for being assigned to; `obj${te.set(key)}` would become `obj.foo` or
+ * `obj["1foo"]` as appropriate. Note this is different to `get` because it
+ * performs additional checks.
  *
  * If the object you're setting properties on has a `null` prototype
  * (`Object.create(null)`) then you can set `hasNullPrototype` to true and all
@@ -736,6 +801,9 @@ function tempVar(symbol = Symbol()): TE {
   return makeTemporaryVariableNode(symbol);
 }
 
+/**
+ * @experimental
+ */
 function tmp(obj: TE, callback: (tmp: TE) => TE): TE {
   const trustedObj = enforceValidNode(obj);
   // ENHANCEMENT: we should be able to reuse these tempvars between tmp calls
@@ -744,6 +812,11 @@ function tmp(obj: TE, callback: (tmp: TE) => TE): TE {
   return te`(${varName} = ${trustedObj}, ${callback(varName)})`;
 }
 
+/**
+ * Evaluates the given TE fragment, and returns the result. Note that the
+ * fragment must contain a `return` statement for the result to not be
+ * undefined.
+ */
 function run<TResult>(fragment: TE): TResult;
 function run<TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
 function run<TResult>(
@@ -779,8 +852,8 @@ function newFunction(...args: string[]) {
 
 /**
  * Join some TE items together, optionally separated by a string. Useful when
- * dealing with lists of TE items, for example a dynamic list of columns or
- * variadic TE function arguments.
+ * dealing with lists of TE nodes, for example a dynamic list of object
+ * properties.
  */
 function join(items: Array<TE>, separator = ""): TE {
   if (!Array.isArray(items)) {
@@ -848,11 +921,15 @@ function join(items: Array<TE>, separator = ""): TE {
     : makeQueryNode(currentItems);
 }
 
+/** @internal */
 function expandQueryNodes(node: TEQuery): ReadonlyArray<TENode> {
   return node.n;
 }
 
 /**
+ * Indicates that the given fragment should be indented when output in debug
+ * mode. (Has no effect in production mode.)
+ *
  * WARNING: all lines will be indented, without any parsing, so if there are
  * template literals that contain newlines, spaces will be added inside these
  * too.
@@ -873,6 +950,10 @@ function indent(
   return makeIndentNode(fragment);
 }
 
+/**
+ * If the given condition is true, the fragment will be wrapped with an indent
+ * node, otherwise it will be returned verbatim.
+ */
 function indentIf(condition: boolean, fragment: TE): TE {
   const trusted = enforceValidNode(fragment);
   return isDev && condition ? makeIndentNode(trusted) : trusted;
