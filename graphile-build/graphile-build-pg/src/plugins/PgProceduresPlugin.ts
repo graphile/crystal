@@ -219,7 +219,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             // return type of this function.
 
             const numberOfArguments = allArgTypes.length ?? 0;
-            const columns: PgTypeColumns = {};
+            const columns: PgTypeColumns = Object.create(null);
             for (let i = 0, l = numberOfArguments; i < l; i++) {
               const argType = allArgTypes[i];
               const trueArgName = pgProc.proargnames?.[i];

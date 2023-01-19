@@ -178,7 +178,7 @@ export function printPlanGraph(
 
   graph.push("");
   graph.push("    %% plan dependencies");
-  const chainByDep: { [depNode: string]: string } = {};
+  const chainByDep: { [depNode: string]: string } = Object.create(null);
   operationPlan.processSteps(
     "printingPlanDeps",
     0,

@@ -133,7 +133,7 @@ pool.on("error", (e) => {
   };
 
   // Our operation requires no variables
-  const variableValues = {};
+  const variableValues = Object.create(null);
 
   // Run our query on our initial schema
   const result = await graphql({

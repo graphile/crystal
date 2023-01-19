@@ -45,7 +45,11 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
             registerCursorConnection(
               options: GraphileBuild.RegisterCursorConnectionOptions,
             ) {
-              const { typeName, scope = {}, nonNullNode = false } = options;
+              const {
+                typeName,
+                scope = Object.create(null),
+                nonNullNode = false,
+              } = options;
               if (
                 (options.connectionTypeName || options.edgeTypeName) &&
                 !(options.connectionTypeName && options.edgeTypeName)

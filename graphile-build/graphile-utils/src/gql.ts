@@ -16,7 +16,7 @@ export function gql(
   ...interpolatedValues: Array<string | DocumentNode>
 ): DocumentNode {
   const gqlStrings = [];
-  const placeholders = {};
+  const placeholders = Object.create(null);
   const additionalDefinitions: Array<DefinitionNode> = [];
   for (let idx = 0, length = strings.length; idx < length; idx++) {
     gqlStrings.push(strings[idx]);

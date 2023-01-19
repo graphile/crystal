@@ -60,7 +60,7 @@ export function augmentIntrospection(
   const introspectionResults = JSON.parse(introspectionResultsString);
   const introspection = introspectionResults as Introspection;
 
-  const oidByCatalog: { [catalog: string]: string } = {};
+  const oidByCatalog: { [catalog: string]: string } = Object.create(null);
   for (const [oid, catalog] of Object.entries(introspection.catalog_by_oid)) {
     oidByCatalog[catalog] = oid;
   }

@@ -338,7 +338,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           return source;
         }
         source = (async () => {
-          const relations: GraphileConfig.PgTablesPluginSourceRelations = {};
+          const relations: GraphileConfig.PgTablesPluginSourceRelations =
+            Object.create(null);
           const { pgClass, databaseName } =
             info.state.detailsBySourceBuilder.get(sourceBuilder)!;
           await info.process("pgTables_PgSourceBuilder_relations", {
