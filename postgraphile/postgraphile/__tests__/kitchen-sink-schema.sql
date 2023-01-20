@@ -1517,11 +1517,20 @@ create schema js_reserved;
 /*
 
 Object.getOwnPropertyNames(Object.prototype)
-["toString","toLocaleString","valueOf","hasOwnProperty","isPrototypeOf","propertyIsEnumerable","__defineGetter__","__defineSetter__","__lookupGetter__","__lookupSetter__","__proto__","constructor"]
+["toString","toLocaleString","valueOf","hasOwnProperty",
+"isPrototypeOf","propertyIsEnumerable","__defineGetter__",
+"__defineSetter__","__lookupGetter__","__lookupSetter__",
+"__proto__","constructor"]
 
 Also see utils/tamedevil/src/reservedWords.ts
 */
 
 create table js_reserved.table1(
-  id serial primary key
+  id serial primary key,
+  constructor text
+);
+
+create table js_reserved.table2(
+  id serial primary key,
+  constructor text
 );
