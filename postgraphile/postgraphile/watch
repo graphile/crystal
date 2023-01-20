@@ -8,4 +8,4 @@ yarn nodemon \
   --watch "../../graphile-build/*/dist/**/*" \
   --watch "../../postgraphile/*/dist/**/*" \
   --watch "../../utils/*/dist/**/*" \
-  -x "node --enable-source-maps dist/cli-run.js -c ${1:-'pggql_test'} -s ${2:-'public'} -e"
+  -x "node --enable-source-maps dist/cli-run.js -c ${1:-'pggql_test'} -s ${2:-'public'} -e --watch"
