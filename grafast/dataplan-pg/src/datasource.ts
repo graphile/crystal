@@ -719,7 +719,7 @@ export class PgSource<
   }
 
   private validateRelations(): void {
-    // TODO: skip this if not isDev?
+    // PERF: skip this if not isDev?
 
     if (!this._relations) {
       return;

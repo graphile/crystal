@@ -157,7 +157,7 @@ function withFieldArgsForArgumentsOrInputObject<
   };
 
   function notUndefined($value: InputStep) {
-    // TODO: having a lot of 'is undefined' checks is expensive; instead we
+    // OPTIMIZE: having a lot of 'is undefined' checks is expensive; instead we
     // should optimize this so that it tracks the set of keys that are set and
     // matches against those as a single operation.
     return !("evalIs" in $value && $value.evalIs(undefined));
@@ -365,7 +365,7 @@ function withFieldArgsForArgumentsOrInputObject<
     } else if (isScalarType(currentType)) {
       return;
     } else if (isEnumType(currentType)) {
-      // TODO: only do this if this enum type has values that have side effects
+      // PERF: only do this if this enum type has values that have side effects
       const value = $value.eval();
       const enumValue = currentType.getValues().find((v) => v.value === value);
       const enumResolver = enumValue?.extensions.graphile?.applyPlan;

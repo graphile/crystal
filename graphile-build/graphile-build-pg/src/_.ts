@@ -1,4 +1,4 @@
-// TODO: benchmark this; might be faster to use `Array.from()` or an explicit
+// PERF: benchmark this; might be faster to use `Array.from()` or an explicit
 // for loop with set existance check
 /**
  * Returns a new array containing only the unique elements of `list`.

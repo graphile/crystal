@@ -1495,7 +1495,7 @@ ${te.join(
     deduplicate = true,
   ): { haltTree: boolean; step: ExecutableStep<any> } {
     // The step may have been de-duped whilst sibling steps were planned
-    // TODO: this should be handled in the parent?
+    // PERF: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
 
     if (this.loc) this.loc.push(`planField(${path.join(".")})`);

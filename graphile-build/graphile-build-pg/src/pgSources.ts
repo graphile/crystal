@@ -97,7 +97,7 @@ export function getWithPgClientFromPgSource(
     }
   } else {
     const promise = (async () => {
-      // TODO: We should cache imports
+      // PERF: We should cache imports
       let adaptor: any;
       try {
         adaptor = require(source.adaptor);

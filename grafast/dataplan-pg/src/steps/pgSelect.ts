@@ -1449,7 +1449,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       if (fragmentsWithAliases.length > 100) {
         // The maximum number of arguments you can pass to a PostgreSQL
         // function is 100, so we need to concatenate multiple arrays
-        // TODO: jsonb_build_array || jsonb_build_array
+        // TODO: concatenate via `(jsonb_build_array(...) || jsonb_build_array(...))::json`
         throw new Error(
           "Please select fewer fields, support for this many fields has not yet been added.",
         );

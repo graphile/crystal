@@ -239,7 +239,7 @@ export function executePreemptive(
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  // TODO: batch this method so it can process multiple GraphQL requests in parallel
+  // PERF: batch this method so it can process multiple GraphQL requests in parallel
 
   // TODO: when we batch, we need to change `bucketIndex` and `size`!
   const bucketIndex = 0;
@@ -283,7 +283,7 @@ export function executePreemptive(
     index: number,
   ): PromiseOrDirect<ExecutionResult | AsyncGenerator<AsyncExecutionResult>> {
     const layerPlan = subscriptionLayerPlan!;
-    // TODO: we could consider batching this.
+    // PERF: we could consider batching this.
     const store: Bucket["store"] = new Map();
     const newBucketIndex = 0;
 
@@ -403,7 +403,7 @@ export function executePreemptive(
             break;
           }
           if (isAsyncIterable(payload)) {
-            // TODO: avoid 'for await'
+            // FIXME: avoid 'for await' because it can cause the stream to exit late if we're waiting on a promise and the stream exits in the interrim
             for await (const entry of payload) {
               iterator.push(entry);
             }
@@ -663,10 +663,10 @@ async function processStream(
             `GraphileInternalError<2db7b749-399f-486b-bd12-7ca337b937e4>: ${spec.bucket.layerPlan} doesn't seem to include ${copyPlanId} (required by ${directLayerPlanChild} via ${spec.outputPlan})`,
           );
         }
-        // TODO: optimize away these .get calls
+        // PERF: optimize away these .get calls
         store.get(copyPlanId)![bucketIndex] = list[spec.bucketIndex];
       }
-      // TODO: we should be able to optimize this
+      // PERF: we should be able to optimize this
       bucketIndex++;
     }
 
@@ -822,7 +822,7 @@ function processSingleDeferred(
       store.get(copyPlanId)![bucketIndex] =
         spec.bucket.store.get(copyPlanId)![spec.bucketIndex];
     }
-    // TODO: we should be able to optimize this
+    // PERF: we should be able to optimize this
     bucketIndex++;
   }
 

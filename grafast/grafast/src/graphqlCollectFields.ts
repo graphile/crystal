@@ -21,7 +21,7 @@ import type { __TrackedObjectStep } from "./steps/index.js";
  *
  * @internal
  *
- * TODO: inline.
+ * PERF: inline.
  */
 function getDirective(
   selection: SelectionNode,
@@ -39,7 +39,7 @@ function getDirective(
  *
  * @internal
  *
- * TODO: inline.
+ * PERF: inline.
  */
 export function evalDirectiveArg<T = unknown>(
   selection: SelectionNode,

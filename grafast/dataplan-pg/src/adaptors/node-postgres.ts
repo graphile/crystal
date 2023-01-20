@@ -248,7 +248,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
     }
   };
 
-  // TODO: under what situations is this actually required? We added it to
+  // PERF: under what situations is this actually required? We added it to
   // force test queries that were sharing the same client to run in series
   // rather than parallel (probably for the filter plugin test suite?) but it
   // adds a tiny bit of overhead and most likely is only needed for people
