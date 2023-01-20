@@ -622,7 +622,7 @@ function substring(text: string, stringType: "'" | '"' | "`"): TE {
       ? inner // "" strings already escapes
       : stringType === "'"
       ? inner.replace(/'/g, "\\'") // '' strings need `'` escaped too (`\` has already been escaped)
-      : inner.replace(/[`$]/g, "\\$&"); // `` strings need both '`' and `$` to be escaped
+      : inner.replace(/[`$]/g, "\\$&"); // `` strings need both '`' and `$` to be escaped (`\` has already been escaped)
   // Finally return a raw node
   return makeRawNode(escaped);
 }
