@@ -1513,8 +1513,12 @@ comment on table polymorphic.third_party_vulnerabilities is $$
 @refVia applications via:gcp_application_third_party_vulnerabilities;gcp_applications
 $$;
 
+--------------------------------------------------------------------------------
+
 create schema js_reserved;
 /*
+
+Reserved keywords should be safe to use in a non-polymorphic schema
 
 Object.getOwnPropertyNames(Object.prototype)
 ["toString","toLocaleString","valueOf","hasOwnProperty",
@@ -1527,10 +1531,45 @@ Also see utils/tamedevil/src/reservedWords.ts
 
 create table js_reserved.table1(
   id serial primary key,
-  constructor text
+  constructor text unique
 );
 
 create table js_reserved.table2(
   id serial primary key,
-  constructor text
+  constructor text references js_reserved.table1(constructor)
 );
+
+create type js_reserved.item_type as enum (
+  'TOPIC',
+  'POST'
+);
+
+create table js_reserved.relational_items (
+  id serial primary key,
+
+  -- This column is used to tell us which table we need to join to
+  type js_reserved.item_type not null default 'POST'::js_reserved.item_type,
+
+  -- Shared attributes
+  parent_id int references js_reserved.relational_items on delete cascade,
+  constructor text references js_reserved.table1(constructor)
+
+);
+
+create table js_reserved.relational_topics (
+  id int primary key references js_reserved.relational_items,
+  title text not null
+);
+
+create table js_reserved.relational_posts (
+  id int primary key references js_reserved.relational_items,
+  title text not null,
+  description text default '-- Enter description here --',
+  note text
+);
+
+comment on table js_reserved.relational_items is $$
+  @interface mode:relational type:type
+  @type TOPIC references:relational_topics
+  @type POST references:relational_posts
+  $$
