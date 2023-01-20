@@ -284,7 +284,7 @@ export class PgDeleteStep<
                 `No values were deleted in collection '${this.source.name}' because no values you can delete were found matching these criteria.`,
               ),
             )
-          : {})
+          : Object.create(null))
       );
     });
   }

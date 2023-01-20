@@ -667,7 +667,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   extensions: {
                     graphile: {
                       inputPlan() {
-                        return object({});
+                        return object(Object.create(null));
                       },
                     },
                   },
@@ -696,7 +696,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   extensions: {
                     graphile: {
                       inputPlan() {
-                        return object({});
+                        return object(Object.create(null));
                       },
                     },
                   },
@@ -721,7 +721,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   extensions: {
                     graphile: {
                       inputPlan() {
-                        return object({});
+                        return object(Object.create(null));
                       },
                     },
                   },

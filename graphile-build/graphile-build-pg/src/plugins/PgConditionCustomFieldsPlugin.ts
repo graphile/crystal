@@ -120,7 +120,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
               `Adding computed column condition argument for ${pgCodec.name}`,
             );
             return memo;
-          }, {}),
+          }, Object.create(null)),
           `Adding computed column filterable functions to condition for '${pgCodec.name}'`,
         );
 

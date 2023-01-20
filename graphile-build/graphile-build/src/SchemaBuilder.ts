@@ -197,7 +197,7 @@ class SchemaBuilder<
     ) as Partial<TBuild> & GraphileBuild.BuildBase;
 
     const build = this.applyHooks("build", initialBuild, initialBuild, {
-      scope: {},
+      scope: Object.create(null),
       type: "build",
     });
 
@@ -209,7 +209,10 @@ class SchemaBuilder<
 
     const finalBuild = Object.freeze(build) as TBuild;
     finalBuild.status.isBuildPhaseComplete = true;
-    const initContext: GraphileBuild.ContextInit = { scope: {}, type: "init" };
+    const initContext: GraphileBuild.ContextInit = {
+      scope: Object.create(null),
+      type: "init",
+    };
     this.applyHooks("init", INIT_OBJECT, finalBuild, initContext);
     finalBuild.status.isInitPhaseComplete = true;
     return finalBuild;
@@ -235,7 +238,7 @@ class SchemaBuilder<
     );
 
     const finalizeContext: GraphileBuild.ContextFinalize = {
-      scope: {},
+      scope: Object.create(null),
       type: "finalize",
     };
 

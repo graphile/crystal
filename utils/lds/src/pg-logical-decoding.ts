@@ -64,7 +64,7 @@ export const changeToRecord = (change: InsertChange | UpdateChange) => {
   return columnnames.reduce((memo, name, i) => {
     memo[name] = columnvalues[i];
     return memo;
-  }, {});
+  }, Object.create(null));
 };
 
 export const changeToPk = (change: UpdateChange | DeleteChange) => {

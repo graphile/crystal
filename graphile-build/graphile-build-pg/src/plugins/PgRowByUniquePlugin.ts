@@ -196,7 +196,7 @@ return function (source) {
                             type: new GraphQLNonNull(columnType),
                           };
                           return args;
-                        }, {}),
+                        }, Object.create(null)),
 
                         plan: plan as any,
                       }),
