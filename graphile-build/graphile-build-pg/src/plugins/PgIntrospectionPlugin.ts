@@ -364,7 +364,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     }),
     initialState: (): State => ({
       introspectionResultsPromise: null,
-      executors: {},
+      executors: Object.create(null),
     }),
     helpers: {
       getExecutorForDatabase(info, databaseName) {

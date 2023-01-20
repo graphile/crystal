@@ -100,7 +100,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
       switch (Type) {
         case GraphQLSchema: {
           const rawSpec = inSpec as GraphQLSchemaConfig;
-          const scope = (inScope || {}) as GraphileBuild.ScopeSchema;
+          const scope = (inScope ||
+            Object.create(null)) as GraphileBuild.ScopeSchema;
           const context: GraphileBuild.ContextSchema = {
             type: "GraphQLSchema",
             scope,
@@ -127,7 +128,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             any,
             any
           >;
-          const scope = (inScope || {}) as GraphileBuild.ScopeObject;
+          const scope = (inScope ||
+            Object.create(null)) as GraphileBuild.ScopeObject;
 
           const objectContext: GraphileBuild.ContextObject = {
             type: "GraphQLObjectType",
@@ -334,7 +336,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             any,
             any
           >;
-          const scope = (inScope || {}) as GraphileBuild.ScopeInterface;
+          const scope = (inScope ||
+            Object.create(null)) as GraphileBuild.ScopeInterface;
 
           const interfaceContext: GraphileBuild.ContextInterface = {
             type: "GraphQLInterfaceType",
@@ -421,7 +424,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               const fieldsSpec = builder.applyHooks(
                 "GraphQLInterfaceType_fields",
                 build.extend(
-                  {},
+                  Object.create(null),
                   rawFields,
                   `Default field included in newWithHooks call for '${
                     rawSpec.name
@@ -482,7 +485,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             any,
             any
           >;
-          const scope = (inScope || {}) as GraphileBuild.ScopeUnion;
+          const scope = (inScope ||
+            Object.create(null)) as GraphileBuild.ScopeUnion;
 
           const commonContext: GraphileBuild.ContextUnion = {
             type: "GraphQLUnionType",
@@ -524,7 +528,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLInputObjectType: {
           const rawSpec = inSpec as GraphileBuild.GraphileInputObjectTypeConfig;
-          const scope = (inScope || {}) as GraphileBuild.ScopeInputObject;
+          const scope = (inScope ||
+            Object.create(null)) as GraphileBuild.ScopeInputObject;
 
           const inputObjectContext: GraphileBuild.ContextInputObject = {
             type: "GraphQLInputObjectType",
@@ -588,7 +593,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   ? rawSpec.fields(fieldsContext)
                   : rawSpec.fields) || {};
               const fieldsList: typeof rawFields = build.extend(
-                {},
+                Object.create(null),
                 rawFields,
                 `Default field included in newWithHooks call for '${
                   rawSpec.name
@@ -632,7 +637,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLScalarType: {
           const rawSpec = inSpec as GraphQLScalarTypeConfig<any, any>;
-          const scope = (inScope || {}) as GraphileBuild.ScopeScalar;
+          const scope = (inScope ||
+            Object.create(null)) as GraphileBuild.ScopeScalar;
 
           const scalarContext: GraphileBuild.ContextScalar = {
             type: "GraphQLScalarType",
@@ -653,7 +659,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLEnumType: {
           const rawSpec = inSpec as GraphQLEnumTypeConfig;
-          const scope = (inScope || {}) as GraphileBuild.ScopeEnum;
+          const scope = (inScope ||
+            Object.create(null)) as GraphileBuild.ScopeEnum;
 
           const enumContext: GraphileBuild.ContextEnum = {
             type: "GraphQLEnumType",

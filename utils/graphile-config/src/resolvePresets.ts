@@ -181,7 +181,11 @@ function mergePreset(
     const targetScope = targetPreset[scope];
     const sourceScope = sourcePreset[scope];
     if (targetScope && sourceScope) {
-      targetPreset[scope] = Object.assign({}, targetScope, sourceScope);
+      targetPreset[scope] = Object.assign(
+        Object.create(null),
+        targetScope,
+        sourceScope,
+      );
     } else {
       targetPreset[scope] = targetScope || sourceScope;
     }

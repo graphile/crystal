@@ -1000,7 +1000,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   description: value.description,
                 };
                 return memo;
-              }, {});
+              }, Object.create(null));
               build.registerEnumType(
                 typeName,
                 {},

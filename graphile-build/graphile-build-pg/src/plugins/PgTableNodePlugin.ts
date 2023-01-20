@@ -148,7 +148,7 @@ return function (access) {
                     const spec = pk.reduce((memo, column, index) => {
                       memo[column] = access($list, [index + 1]);
                       return memo;
-                    }, {});
+                    }, Object.create(null));
                     return spec;
                   },
                   [access, pk],

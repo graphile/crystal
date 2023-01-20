@@ -26,7 +26,7 @@ const schema = makeGrafastSchema({
   plans: {
     Query: {
       o() {
-        return constant({});
+        return constant(Object.create(null));
       },
     },
     Obj: {

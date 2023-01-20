@@ -361,7 +361,7 @@ export class PgSourceBuilder<
                   memo[key] = spec;
                 }
                 return memo;
-              }, {});
+              }, Object.create(null));
             },
           }
         : null),

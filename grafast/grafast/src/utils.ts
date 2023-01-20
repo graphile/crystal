@@ -443,7 +443,7 @@ export function objectFieldSpec<
             : null),
         };
         return memo;
-      }, {})
+      }, Object.create(null))
     : {};
 
   return {
@@ -597,7 +597,7 @@ export function getEnumValueConfig(
         memo[value.value] = value;
         return memo;
       },
-      {},
+      Object.create(null),
     );
   }
   return enumType[$$valueConfigByValue][outputValue];

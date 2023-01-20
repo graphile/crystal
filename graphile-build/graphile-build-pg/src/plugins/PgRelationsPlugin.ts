@@ -254,7 +254,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
   gather: <GraphileConfig.PluginGatherConfig<"pgRelations", State, Cache>>{
     namespace: "pgRelations",
-    initialState: (): State => ({}),
+    initialState: (): State => Object.create(null),
     helpers: {
       async addRelation(info, event, pgConstraint, isReferencee = false) {
         const pgClass = isReferencee
@@ -633,13 +633,13 @@ function addRelations(
         refDefinition: spec.definition,
         ref: spec,
       }))
-    : Object.entries(codec.extensions?.refDefinitions ?? {}).map(
-        ([refName, refDefinition]) => ({
-          refName,
-          refDefinition,
-          codec,
-        }),
-      );
+    : Object.entries(
+        codec.extensions?.refDefinitions ?? Object.create(null),
+      ).map(([refName, refDefinition]) => ({
+        refName,
+        refDefinition,
+        codec,
+      }));
 
   type Layer = {
     relationName: string;

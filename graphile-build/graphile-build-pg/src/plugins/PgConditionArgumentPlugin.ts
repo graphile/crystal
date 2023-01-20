@@ -155,7 +155,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                       );
                       return memo;
                     },
-                    {},
+                    Object.create(null),
                   );
                 },
               }),

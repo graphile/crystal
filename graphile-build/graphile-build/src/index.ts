@@ -150,11 +150,13 @@ const gatherBase = (
       }
       const cache =
         spec.namespace != null
-          ? (globalState[spec.namespace] = spec.initialCache?.() ?? {})
+          ? (globalState[spec.namespace] =
+              spec.initialCache?.() ?? Object.create(null))
           : EMPTY_OBJECT;
       const state =
         spec.namespace != null
-          ? (gatherState[spec.namespace] = spec.initialState?.() ?? {})
+          ? (gatherState[spec.namespace] =
+              spec.initialState?.() ?? Object.create(null))
           : EMPTY_OBJECT;
       const context: GatherPluginContext<any, any> = {
         helpers: helpers as GraphileConfig.GatherHelpers,
