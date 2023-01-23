@@ -1526,33 +1526,34 @@ Object.getOwnPropertyNames(Object.prototype)
 "__defineSetter__","__lookupGetter__","__lookupSetter__",
 "__proto__","constructor"]
 
-Also see utils/tamedevil/src/reservedWords.ts
+Also see utils/tamedevil/src/reservedWords.ts - top section
 */
 
-create table js_reserved.table1(
+create table js_reserved.building(
   id serial primary key,
+  name text,
   constructor text unique
 );
 
-create table js_reserved.table2(
+create table js_reserved.machine(
   id serial primary key,
-  constructor text references js_reserved.table1(constructor)
+  input text,
+  constructor text references js_reserved.building(constructor)
 );
 
 create type js_reserved.item_type as enum (
   'TOPIC',
-  'POST'
+  'STATUS'
 );
 
 create table js_reserved.relational_items (
   id serial primary key,
 
   -- This column is used to tell us which table we need to join to
-  type js_reserved.item_type not null default 'POST'::js_reserved.item_type,
+  type js_reserved.item_type not null default 'STATUS'::js_reserved.item_type,
 
   -- Shared attributes
-  parent_id int references js_reserved.relational_items on delete cascade,
-  constructor text references js_reserved.table1(constructor)
+  constructor text references js_reserved.building(constructor)
 
 );
 
@@ -1561,9 +1562,9 @@ create table js_reserved.relational_topics (
   title text not null
 );
 
-create table js_reserved.relational_posts (
+create table js_reserved.relational_status (
   id int primary key references js_reserved.relational_items,
-  title text not null,
+  --title text not null,
   description text default '-- Enter description here --',
   note text
 );
@@ -1571,5 +1572,5 @@ create table js_reserved.relational_posts (
 comment on table js_reserved.relational_items is $$
   @interface mode:relational type:type
   @type TOPIC references:relational_topics
-  @type POST references:relational_posts
-  $$
+  @type STATUS references:relational_status
+  $$;

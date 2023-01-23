@@ -1,0 +1,56 @@
+{
+  machineById: {
+    buildingByConstructor: {
+      id: 1,
+      constructor: "Cable",
+    },
+    constructor: "Cable",
+    input: "Wire",
+  },
+  buildingById: {
+    machinesByConstructor: {
+      nodes: [
+        {
+          id: 2,
+          constructor: "Concrete",
+          input: "Limestone",
+        },
+      ],
+    },
+    name: "Limestone Quarry",
+  },
+  allRelationalItems: {
+    nodes: [
+      {
+        id: 1,
+        constructor: "Cable",
+        type: "TOPIC",
+        title: "Upgrade",
+      },
+      {
+        id: 2,
+        constructor: "Concrete",
+        type: "TOPIC",
+        title: "Maintenance",
+      },
+      {
+        id: 3,
+        constructor: "Iron Plate",
+        type: "STATUS",
+        note: "Stopped",
+      },
+      {
+        id: 4,
+        constructor: "Iron Plate",
+        type: "STATUS",
+        note: "Scheduled",
+      },
+      {
+        id: 5,
+        constructor: "Cable",
+        type: "TOPIC",
+        title: "Emergency",
+      },
+    ],
+  },
+}

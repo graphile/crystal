@@ -609,3 +609,36 @@ insert into polymorphic.gcp_application_third_party_vulnerabilities (gcp_applica
   (4, 2),
   (5, 5),
   (5, 4);
+
+----------------------------------------
+
+insert into js_reserved.building
+  (constructor,  name) values
+  ('Cable',      'Copper Plant'), 
+  ('Concrete',   'Limestone Quarry'),
+  ('Iron Plate', 'Iron Mine');
+
+insert into js_reserved.machine
+  (constructor,  input) values
+  ('Cable',      'Wire'), 
+  ('Concrete',   'Limestone'),
+  ('Iron Plate', 'Iron Ingot');
+
+insert into js_reserved.relational_items
+  (id, type,     constructor   ) values
+  (1,  'TOPIC',  'Cable'       ),
+  (2,  'TOPIC',  'Concrete'    ),
+  (3,  'STATUS', 'Iron Plate'  ),
+  (5,  'TOPIC',  'Cable'       ),
+  (4,  'STATUS', 'Iron Plate'  );
+
+insert into js_reserved.relational_topics
+  (id, title)  values
+  (1, 'Upgrade'),
+  (2, 'Maintenance'),
+  (5, 'Emergency');
+
+  insert into js_reserved.relational_status
+  (id, note,       description            )  values
+  (3, 'Stopped',    'Best look into that' ),
+  (4, 'Scheduled',  null                  );
