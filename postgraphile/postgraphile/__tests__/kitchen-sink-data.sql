@@ -52,6 +52,12 @@ delete from polymorphic.log_entries cascade;
 delete from polymorphic.people cascade;
 delete from polymorphic.organizations cascade;
 
+delete from js_reserved.building cascade;
+delete from js_reserved.machine cascade;
+delete from js_reserved.relational_items cascade; 
+delete from js_reserved.relational_topics cascade;
+delete from js_reserved.relational_status cascade;
+
 alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
