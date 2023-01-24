@@ -1,0 +1,18 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  cropById(id: 1) {
+    yield
+    amount
+  }
+  cropByYield(yield: "corn") {
+    amount
+    id
+  }
+  allCropsList {
+    id
+    yield
+  }
+}
