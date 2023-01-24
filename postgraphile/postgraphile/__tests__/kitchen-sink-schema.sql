@@ -1572,7 +1572,6 @@ comment on table js_reserved.relational_items is $$
   @type TOPIC references:relational_topics
   @type STATUS references:relational_status
   $$;
-----------------------------------------
 
 create table js_reserved.project (
   id serial primary key,
