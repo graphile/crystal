@@ -618,6 +618,9 @@ insert into polymorphic.gcp_application_third_party_vulnerabilities (gcp_applica
 
 ----------------------------------------
 
+alter sequence js_reserved.building_id_seq restart with 1;
+alter sequence js_reserved.machine_id_seq restart with 1;
+
 insert into js_reserved.building
   (constructor,  name) values
   ('Cable',      'Copper Plant'), 
@@ -648,3 +651,5 @@ insert into js_reserved.relational_topics
   (id, note,       description            )  values
   (3, 'Stopped',    'Best look into that' ),
   (4, 'Scheduled',  null                  );
+
+  alter sequence js_reserved.relational_items_id_seq restart with 6;
