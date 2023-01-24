@@ -634,7 +634,8 @@ function addRelations(
         ref: spec,
       }))
     : Object.entries(
-        codec.extensions?.refDefinitions ?? (Object.create(null) as object),
+        codec.extensions?.refDefinitions ??
+          (Object.create(null) as Record<string, never>),
       ).map(([refName, refDefinition]) => ({
         refName,
         refDefinition,
