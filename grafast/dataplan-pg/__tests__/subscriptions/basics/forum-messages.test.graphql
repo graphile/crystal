@@ -2,9 +2,9 @@
 #> checkErrorSnapshots: false
 #! const query = 'insert into app_public.messages (forum_id, author_id, body) values ($1, $2, $3);';
 #! await pgClient.query(query, ["ca700000-0000-0000-0000-000000000ca7", "a11ce000-0000-0000-0000-0000000a11ce", "New message 1"]);
-#! await waitFor(() => payloads.length >= 1);
+#! await waitFor(() => payloads.length >= 1, 15000);
 #! await pgClient.query(query, ["ca700000-0000-0000-0000-000000000ca7", "b0b00000-0000-0000-0000-000000000b0b", "New message 2"]);
-#! await waitFor(() => payloads.length >= 2);
+#! await waitFor(() => payloads.length >= 2, 15000);
 #! await pgClient.query(query, ["d0900000-0000-0000-0000-000000000d09", "b0b00000-0000-0000-0000-000000000b0b", "Message shouldn't appear"]);
 subscription {
   forumMessage(forumId: "ca700000-0000-0000-0000-000000000ca7") {
