@@ -282,7 +282,7 @@ export interface PgFunctionSourceOptions<
   selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
   description?: string;
 }
-// TODO: is there a better way?
+// FIXME: is there a better way? Maybe relations should be separate from sources, then PgSourceBuilder wouldn't be needed? See: https://github.com/benjie/postgraphile-private/issues/117
 /**
  * This class hacks around TypeScript inference issues by allowing us to define
  * the relations at a later step to avoid circular references.
@@ -719,7 +719,7 @@ export class PgSource<
   }
 
   private validateRelations(): void {
-    // TODO: skip this if not isDev?
+    // PERF: skip this if not isDev?
 
     if (!this._relations) {
       return;

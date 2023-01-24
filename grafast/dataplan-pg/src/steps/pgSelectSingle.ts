@@ -731,7 +731,7 @@ export function pgSelectSingleFromRecord<
     TParameters
   >,
 ): PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters> {
-  // TODO: we should be able to optimise this so that `plan.record()` returns the original record again.
+  // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
   return pgSelectFromRecord(source, record).single() as PgSelectSingleStep<
     TColumns,
     TUniques,

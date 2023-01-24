@@ -633,13 +633,14 @@ function addRelations(
         refDefinition: spec.definition,
         ref: spec,
       }))
-    : Object.entries(codec.extensions?.refDefinitions ?? {}).map(
-        ([refName, refDefinition]) => ({
-          refName,
-          refDefinition,
-          codec,
-        }),
-      );
+    : Object.entries(
+        codec.extensions?.refDefinitions ??
+          (Object.create(null) as Record<string, never>),
+      ).map(([refName, refDefinition]) => ({
+        refName,
+        refDefinition,
+        codec,
+      }));
 
   type Layer = {
     relationName: string;

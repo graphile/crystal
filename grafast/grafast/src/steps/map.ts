@@ -37,7 +37,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
       memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
       return memo;
-    }, Object.create(null) as object);
+    }, Object.create(null) as Record<string, any>);
   };
 }
 

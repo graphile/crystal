@@ -45,10 +45,10 @@ import type {
   PgTypeCodecPolymorphism,
 } from "./interfaces.js";
 
-// TODO: optimisation: `identity` can be shortcut
+// PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
 
-// TODO: the `toPg` method should currently never be called with
+// FIXME: the `toPg` method should currently never be called with
 // null/undefined; but this does happen quite often. Instead we should
 // auto-handle null/undefined in toPg.
 
@@ -506,14 +506,14 @@ export function listOfType<
   > = {
     name: innerCodec.name + "[]",
     sqlType: identifier,
-    // TODO: this does __NOT__ handle nulls safely!
+    // FIXME: this does __NOT__ handle nulls safely!
     fromPg: (value) =>
       value == null
         ? null
         : (arrayParse(value)
             .flat(100)
             .map((v) => innerCodec.fromPg(v)) as any),
-    // TODO: this does __NOT__ handle nulls safely!
+    // FIXME: this does __NOT__ handle nulls safely!
     toPg: (value) => {
       if (!value) {
         return null;
@@ -606,7 +606,7 @@ function escapeRangeValue(
     return "";
   }
   const encoded = "" + innerCodec.toPg(value);
-  // TODO: we don't always need to do this
+  // PERF: we don't always need to do this
   return `"${encoded.replace(/"/g, '""')}"`;
 }
 

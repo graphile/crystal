@@ -16,8 +16,6 @@ export const expressionSymbol = Symbol("expression");
  * incoming object. If possible it will return a dynamically constructed
  * function which will enable V8 to optimise the function over time via the
  * JIT.
- *
- * TODO: this is security critical! Be hyper vigilant when reviewing it.
  */
 function constructDestructureFunction(
   path: (string | number | symbol)[],

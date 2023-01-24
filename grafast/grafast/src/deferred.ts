@@ -22,7 +22,7 @@ export function defer<T = void>(): Deferred<T> {
   promise.resolve = resolve;
   promise.reject = reject;
 
-  // TODO: this is to avoid unhandledPromiseRejection errors; generally
+  // PERF: this is to avoid unhandledPromiseRejection errors; generally
   // deferred errors are handled at a later time (or can be safely ignored if
   // another error wins). Maybe there's a better way?
   promise.then(null, NOOP);

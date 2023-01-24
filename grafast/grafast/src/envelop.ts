@@ -35,7 +35,7 @@ function processExplain(
   }
 
   // Assumption: explainAllowed is relatively short (and unique).
-  // TODO: there's probably a faster way to do this...
+  // PERF: there's probably a faster way to do this...
   return explainAllowed.filter((p) => explainParts.includes(p));
 }
 

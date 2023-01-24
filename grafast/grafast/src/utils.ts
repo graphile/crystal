@@ -921,7 +921,7 @@ export function stepsAreInSamePhase(
     }
     const t = currentLayerPlan.reason.type;
     if (t === "polymorphic") {
-      // TODO: can optimize this so that if all polymorphicPaths match then it
+      // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
       // passes
       return false;
     } else if (t === "subscription" || t === "defer") {

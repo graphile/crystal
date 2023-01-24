@@ -491,7 +491,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               }
             }
 
-            // TODO: this is technically unsafe; we should check the namespace
+            // FIXME: this is technically unsafe; we should check the namespace
             // matches the citext extension namespace
             if (type.typname === "citext") {
               return TYPES.citext;
