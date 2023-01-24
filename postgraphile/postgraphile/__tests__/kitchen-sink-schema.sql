@@ -1584,5 +1584,3 @@ create table js_reserved.crop (
   yield text unique,
   amount int
 );
-
-----------------------------------------

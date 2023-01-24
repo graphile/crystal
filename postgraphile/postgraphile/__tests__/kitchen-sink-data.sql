@@ -61,7 +61,6 @@ delete from js_reserved.building cascade;
 delete from js_reserved.project cascade;
 delete from js_reserved.crop cascade;
 
-
 alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
@@ -672,4 +671,3 @@ insert into js_reserved.crop
   ('wheat', 100   ),
   ('corn',  200   ),
   ('oat',   555   );
-
