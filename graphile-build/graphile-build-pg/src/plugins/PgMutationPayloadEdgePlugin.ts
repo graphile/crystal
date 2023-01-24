@@ -210,7 +210,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                           const spec = pkColumns.reduce((memo, columnName) => {
                             memo[columnName] = $result.get(columnName);
                             return memo;
-                          }, {});
+                          }, Object.create(null));
                           return source.find(spec);
                         }
                       })();

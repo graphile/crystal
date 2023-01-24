@@ -4694,7 +4694,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (constant) =>
             function plan() {
-              return constant({});
+              return constant(Object.create(null));
             },
           [constant],
         ),

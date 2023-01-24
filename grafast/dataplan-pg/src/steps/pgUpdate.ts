@@ -329,7 +329,7 @@ export class PgUpdateStep<
         text,
         values: sqlValues,
       });
-      return rows[0] ?? (rowCount === 0 ? null : {});
+      return rows[0] ?? (rowCount === 0 ? null : Object.create(null));
     });
   }
 

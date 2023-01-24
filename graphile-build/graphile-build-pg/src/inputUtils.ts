@@ -38,7 +38,7 @@ export function makePgTypeCodecMeta(
   _codec: PgTypeCodec<any, any, any>,
 ): PgTypeCodecMeta {
   return {
-    typeNameBySituation: {},
+    typeNameBySituation: Object.create(null),
   };
 }
 

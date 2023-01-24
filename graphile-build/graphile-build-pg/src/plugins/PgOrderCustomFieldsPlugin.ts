@@ -112,7 +112,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
             }
 
             return memo;
-          }, {}),
+          }, Object.create(null)),
           `Adding computed column orderable functions to order by for '${pgCodec.name}'`,
         );
 

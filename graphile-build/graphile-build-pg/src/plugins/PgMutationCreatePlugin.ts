@@ -278,7 +278,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       (object, pgInsert, source) =>
                         function plan(_: any, args: FieldArgs) {
                           const plan = object({
-                            result: pgInsert(source, {}),
+                            result: pgInsert(source, Object.create(null)),
                           });
                           args.apply(plan);
                           return plan;

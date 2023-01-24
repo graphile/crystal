@@ -36,7 +36,7 @@ export const useStorage = (): RuruStorage => {
   const storage = typeof window !== "undefined" ? window.localStorage : null;
   // Trigger re-render every time we set
   const [revision, bump] = useState(0);
-  const [cache] = useState<Partial<StoredKeys>>({});
+  const [cache] = useState<Partial<StoredKeys>>(Object.create(null));
 
   return useMemo(() => {
     if (!storage) {

@@ -198,8 +198,8 @@ export function makeExtendSchemaPlugin(
           } = graphql;
           const {
             typeDefs,
-            resolvers = {},
-            plans = {},
+            resolvers = Object.create(null),
+            plans = Object.create(null),
           } = typeof generator === "function"
             ? generator(build, options)
             : generator;
@@ -375,7 +375,7 @@ export function makeExtendSchemaPlugin(
                     },
                   };
                 },
-                {},
+                Object.create(null),
               );
 
               const scope = scopeFromDirectives(directives);
@@ -505,8 +505,8 @@ export function makeExtendSchemaPlugin(
                     getFields(
                       fieldsContext.Self,
                       definition.fields,
-                      {}, // Interface doesn't need resolvers
-                      {}, // Interface doesn't need resolvers
+                      Object.create(null), // Interface doesn't need resolvers
+                      Object.create(null), // Interface doesn't need resolvers
                       fieldsContext,
                       build,
                     ),
@@ -629,7 +629,7 @@ export function makeExtendSchemaPlugin(
                   `Adding fields from ${uniquePluginName}`,
                 );
               },
-              {},
+              Object.create(null),
             );
             return extend(
               fields,
@@ -667,7 +667,7 @@ export function makeExtendSchemaPlugin(
                   `Adding interfaces from ${uniquePluginName}`,
                 );
               },
-              {},
+              Object.create(null),
             );
             return extend(
               interfaces,
@@ -706,7 +706,7 @@ export function makeExtendSchemaPlugin(
                   `Adding fields from ${uniquePluginName}`,
                 );
               },
-              {},
+              Object.create(null),
             );
             return extend(
               fields,
@@ -737,8 +737,8 @@ export function makeExtendSchemaPlugin(
                 const moreFields = getFields(
                   Self,
                   extension.fields,
-                  {}, // No resolvers for interfaces
-                  {}, // No resolvers for interfaces
+                  Object.create(null), // No resolvers for interfaces
+                  Object.create(null), // No resolvers for interfaces
                   context,
                   build,
                 );
@@ -748,7 +748,7 @@ export function makeExtendSchemaPlugin(
                   `Adding fields from ${uniquePluginName}`,
                 );
               },
-              {},
+              Object.create(null),
             );
             return extend(
               fields,
@@ -786,7 +786,7 @@ export function makeExtendSchemaPlugin(
                   `Adding interfaces from ${uniquePluginName}`,
                 );
               },
-              {},
+              Object.create(null),
             );
             return extend(
               interfaces,
@@ -963,7 +963,7 @@ export function makeExtendSchemaPlugin(
           );
         }
         return memo;
-      }, {});
+      }, Object.create(null));
     }
     return {};
   }
@@ -1072,7 +1072,7 @@ export function makeExtendSchemaPlugin(
             `AST issue: expected 'FieldDefinition', instead received '${field.kind}'`,
           );
         }
-      }, {});
+      }, Object.create(null));
     }
     return {};
   }
@@ -1106,7 +1106,7 @@ export function makeExtendSchemaPlugin(
           );
         }
         return memo;
-      }, {});
+      }, Object.create(null));
     }
     return {};
   }

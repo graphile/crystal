@@ -493,7 +493,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 };
                                 return memo;
                               },
-                              {},
+                              Object.create(null),
                             )),
                       },
                       mode === "update"
