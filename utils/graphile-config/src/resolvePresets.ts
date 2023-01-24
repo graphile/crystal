@@ -12,7 +12,7 @@ function inspect(a: any): string {
     : String(a);
 }
 
-function isResolvedPreset(
+export function isResolvedPreset(
   preset: GraphileConfig.Preset,
 ): preset is GraphileConfig.ResolvedPreset {
   return (preset.plugins && preset.extends?.length === 0) || false;

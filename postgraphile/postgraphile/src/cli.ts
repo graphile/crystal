@@ -3,6 +3,7 @@ import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 import { createServer } from "node:http";
 import { inspect } from "node:util";
+import grafserv from "grafserv/node";
 
 import { postgraphile } from "./index.js";
 import { makePgSources } from "./schema.js";
@@ -188,9 +189,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const instance = postgraphile(config);
 
-  const serv = await instance.getGrafserv();
+  const serv = instance.createServ(grafserv);
 
-  const server = createServer(serv.handler);
+  const server = createServer(serv.createHandler());
   server.once("listening", () => {
     server.on("error", (e) => {
       console.error("Server raised an error:", e);

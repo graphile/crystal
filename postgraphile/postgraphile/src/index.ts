@@ -2,21 +2,23 @@
 import "graphile-build";
 import "graphile-build-pg";
 
-import type { Deferred } from "grafast";
+import { Deferred, isPromiseLike } from "grafast";
 import { defer } from "grafast";
-// TODO: duplicate ServerParams locally to avoid the extra dependency?
-import type { Grafserv, ServerParams } from "grafserv";
+import type { GrafservBase, GrafservConfig } from "grafserv";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 
 import { makeSchema, watchSchema } from "./schema.js";
+import { ServerParams } from "./interfaces.js";
 
 export { makePgSources, makeSchema } from "./schema.js";
 
 export { GraphileBuild, GraphileConfig };
 
 export function postgraphile(preset: GraphileConfig.Preset): {
-  getGrafserv(): Promise<Grafserv>;
+  createServ<TGrafserv extends GrafservBase>(
+    grafserv: (config: GrafservConfig) => TGrafserv,
+  ): TGrafserv;
   getServerParams(): Promise<ServerParams>;
   getSchema(): Promise<GraphQLSchema>;
   release(): Promise<void>;
@@ -44,13 +46,14 @@ export function postgraphile(preset: GraphileConfig.Preset): {
         oldServerParams.resolve(serverParams);
       }
       if (server) {
-        server.setParams(serverParams);
+        server.setPreset(serverParams.resolvedPreset);
+        server.setSchema(serverParams.schema);
       }
     });
   } else {
     serverParams = makeSchema(preset);
   }
-  let server: Grafserv | undefined;
+  let server: GrafservBase | undefined;
 
   let released = false;
   function assertAlive() {
@@ -60,21 +63,29 @@ export function postgraphile(preset: GraphileConfig.Preset): {
   }
 
   return {
-    async getGrafserv() {
+    createServ(grafserv) {
       assertAlive();
-      if (!server) {
-        const { grafserv } = await import("grafserv");
-
-        server = grafserv(config, serverParams);
-        server.onRelease(() => {
-          if (!released) {
-            throw new Error(
-              `Grafserv instance released before PostGraphile instance; this is forbidden.`,
-            );
-          }
-        });
+      if (server) {
+        throw new Error(
+          `createGrafserv is currently only allowed to be called once; if you'd like to call it multiple times please file an issue with your use case and we can discuss implementing that.`,
+        );
       }
-      return server;
+      const schema = isPromiseLike(serverParams)
+        ? serverParams.then((p) => p.schema)
+        : serverParams.schema;
+      const newServer = grafserv({
+        preset,
+        schema,
+      });
+      newServer.onRelease(() => {
+        if (!released) {
+          throw new Error(
+            `Grafserv instance released before PostGraphile instance; this is forbidden.`,
+          );
+        }
+      });
+      server = newServer;
+      return newServer;
     },
     async getServerParams() {
       assertAlive();

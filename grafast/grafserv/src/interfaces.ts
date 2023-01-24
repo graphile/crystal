@@ -8,9 +8,15 @@ export type ContextCallback = (
   graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
 ) => object;
 
+// TODO: delete me
 export interface ServerParams {
   schema: GraphQLSchema;
   resolvedPreset: GraphileConfig.ResolvedPreset;
+}
+
+export interface GrafservConfig {
+  schema: GraphQLSchema | PromiseLike<GraphQLSchema>;
+  preset?: GraphileConfig.Preset;
 }
 
 export interface ServerOptions {
@@ -35,6 +41,9 @@ export interface ServerOptions {
 
   /** The length, in bytes, for the largest request body that the server will accept */
   maxRequestLength?: number;
+
+  /** How long should we wait for a schema promise to resolve before sending a failure to the client? */
+  schemaWaitTime?: number;
 }
 
 declare global {
