@@ -57,7 +57,10 @@ delete from js_reserved.relational_topics cascade;
 delete from js_reserved.relational_items cascade; 
 delete from js_reserved.machine cascade;
 delete from js_reserved.building cascade;
+
 delete from js_reserved.project cascade;
+delete from js_reserved.crop cascade;
+
 
 alter table b.types enable trigger user;
 
@@ -655,9 +658,16 @@ insert into js_reserved.relational_status
 
 alter sequence js_reserved.relational_items_id_seq restart with 6;
 alter sequence js_reserved.project_id_seq restart with 1;
+alter sequence js_reserved.crop_id_seq restart with 1;
+
 
 insert into js_reserved.project
   (__proto__,  brand     ) values
   ('DynaTAC',  'Motorola'),
   ('VCS',      'Atari'   ),
   ('Model T',  'Ford'    );
+
+insert into js_reserved.crop
+  (yield, amount ) values
+  ('wheat', 100);
+

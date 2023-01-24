@@ -1579,5 +1579,10 @@ create table js_reserved.project (
   __proto__ text unique
 );
 
+create table js_reserved.crop (
+  id serial primary key,
+  yield text unique,
+  amount int
+);
 
 ----------------------------------------
