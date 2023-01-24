@@ -12,37 +12,26 @@ if (process.env.DEBUG) {
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "grafast";
 import {
-  $$bypassGraphQL,
   execute as grafastExecute,
   stringifyPayload,
   subscribe as grafastSubscribe,
 } from "grafast";
 import type {
   AsyncExecutionResult,
-  ExecutionArgs,
   ExecutionPatchResult,
   GraphQLError,
   GraphQLSchema,
 } from "graphql";
-import {
-  execute as graphqlExecute,
-  getOperationAST,
-  parse,
-  subscribe as graphqlSubscribe,
-  validate,
-  validateSchema,
-} from "graphql";
+import { getOperationAST, parse, validate, validateSchema } from "graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import { relative } from "path";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
-import { createWithPgClient } from "../src/adaptors/node-postgres.js";
 import { makeExampleSchema } from "../src/examples/exampleSchema.js";
-import type { PgClientResult } from "../src/executor.js";
 //import prettier from "prettier";
-import type { PgClient, PgClientQuery, WithPgClient } from "../src/index.js";
+import type { PgClientQuery } from "../src/index.js";
 import { PgSubscriber } from "../src/index.js";
 import { withTestWithPgClient } from "./sharedHelpers.js";
 
@@ -90,7 +79,7 @@ let optimizedSchema!: GraphQLSchema;
 /** Schema with optimizations disabled */
 let deoptimizedSchema!: GraphQLSchema;
 /** Postgres pool */
-let testPool: Pool | null = null;
+let testPool!: Pool;
 
 beforeAll(() => {
   optimizedSchema = makeExampleSchema();
@@ -112,8 +101,8 @@ afterAll(async () => {
   if (p._clients.length > 0) {
     console.warn(`Warning: ${p._clients.length} clients are still in the pool`);
   }
-  testPool = null;
-  optimizedSchema = deoptimizedSchema = null;
+  testPool = null as any;
+  optimizedSchema = deoptimizedSchema = null as any;
 });
 
 async function resetSequences() {
@@ -158,7 +147,7 @@ export async function runTestQuery(
   return withTestWithPgClient(
     testPool,
     queries,
-    config.directPg,
+    Boolean(config.directPg),
     async (withPgClient) => {
       const pgSubscriber = new PgSubscriber(testPool);
       try {
@@ -352,7 +341,7 @@ export async function runTestQuery(
         await pgSubscriber.release();
       }
     },
-  );
+  ) as any;
 }
 
 /**
