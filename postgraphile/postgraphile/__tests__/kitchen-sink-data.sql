@@ -61,6 +61,7 @@ delete from js_reserved.building cascade;
 delete from js_reserved.project cascade;
 delete from js_reserved.crop cascade;
 delete from js_reserved.material cascade;
+delete from js_reserved.constructor cascade;
 
 alter table b.types enable trigger user;
 
@@ -680,3 +681,11 @@ insert into js_reserved.material
   ('concrete', 'rough' ),
   ('glass',    'smooth'),
   ('rubber',   'spongy');
+
+alter sequence js_reserved.constructor_id_seq restart with 1;
+
+insert into js_reserved.constructor
+  (name, export) values
+  ('Copper Plant', 'Copper Wire'),
+  ('Limestone Quarry','Concrete'),
+  ('Iron Mine', 'Iron Plates');

@@ -1590,3 +1590,9 @@ create table js_reserved.material (
   class text unique,
   valueOf text unique
 );
+
+create table js_reserved.constructor (
+  id serial primary key,
+  name text unique,
+  export text unique
+);

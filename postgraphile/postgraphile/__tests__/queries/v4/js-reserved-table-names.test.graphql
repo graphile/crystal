@@ -1,0 +1,18 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  allConstructorsList {
+    export
+    name
+    id
+  }
+  constructorByExport(export: "Copper Wire") {
+    name
+  }
+  constructorById(id: 2) {
+    name
+    export
+  }
+}

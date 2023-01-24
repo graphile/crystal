@@ -1,0 +1,26 @@
+{
+  allConstructorsList: [
+    {
+      export: "Copper Wire",
+      name: "Copper Plant",
+      id: 1,
+    },
+    {
+      export: "Concrete",
+      name: "Limestone Quarry",
+      id: 2,
+    },
+    {
+      export: "Iron Plates",
+      name: "Iron Mine",
+      id: 3,
+    },
+  ],
+  constructorByExport: {
+    name: "Copper Plant",
+  },
+  constructorById: {
+    name: "Limestone Quarry",
+    export: "Concrete",
+  },
+}
