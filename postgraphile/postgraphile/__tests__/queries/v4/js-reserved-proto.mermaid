@@ -1,0 +1,81 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+
+    %% define steps
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
+    Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgSelect8[["PgSelect[8∈0]<br />ᐸprojectᐳ"]]:::plan
+    First12{{"First[12∈0]"}}:::plan
+    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸprojectᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__project__.”id”ᐳ"}}:::plan
+    __InputStaticLeaf16{{"__InputStaticLeaf[16∈0]"}}:::plan
+    PgSelect17[["PgSelect[17∈0]<br />ᐸprojectᐳ"]]:::plan
+    First21{{"First[21∈0]"}}:::plan
+    PgSelectSingle22{{"PgSelectSingle[22∈0]<br />ᐸprojectᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈2]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈2]<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
+    Connection37{{"Connection[37∈0]<br />ᐸ33ᐳ"}}:::plan
+    PgSelect38[["PgSelect[38∈3]<br />ᐸprojectᐳ"]]:::plan
+    __Item39[/"__Item[39∈4]<br />ᐸ38ᐳ"\]:::itemplan
+    PgSelectSingle40{{"PgSelectSingle[40∈4]<br />ᐸprojectᐳ"}}:::plan
+    PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
+    PgClassExpression42{{"PgClassExpression[42∈5]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
+    PgClassExpression43{{"PgClassExpression[43∈5]<br />ᐸ__project__.”id”ᐳ"}}:::plan
+
+    %% plan dependencies
+    __Value3 --> Access9
+    __Value3 --> Access10
+    Access9 & Access10 --> Object11
+    Object11 & __InputStaticLeaf7 --> PgSelect8
+    PgSelect8 --> First12
+    First12 --> PgSelectSingle13
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 --> PgClassExpression15
+    Object11 & __InputStaticLeaf16 --> PgSelect17
+    PgSelect17 --> First21
+    First21 --> PgSelectSingle22
+    PgSelectSingle22 --> PgClassExpression23
+    PgSelectSingle22 --> PgClassExpression24
+    Object11 & Connection37 --> PgSelect38
+    PgSelect38 ==> __Item39
+    __Item39 --> PgSelectSingle40
+    PgSelectSingle40 --> PgClassExpression41
+    PgSelectSingle40 --> PgClassExpression42
+    PgSelectSingle40 --> PgClassExpression43
+
+    subgraph "Buckets for queries/v4/js-reserved-proto"
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 16, 37, 11<br />2: PgSelect[8], PgSelect[17]<br />ᐳ: 12, 13, 21, 22"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,__InputStaticLeaf16,PgSelect17,First21,PgSelectSingle22,Connection37 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸprojectᐳ[13]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgClassExpression14,PgClassExpression15 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingleᐸprojectᐳ[22]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgClassExpression23,PgClassExpression24 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 37<br /><br />ROOT Connectionᐸ33ᐳ[37]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgSelect38 bucket3
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ38ᐳ[39]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item39,PgSelectSingle40 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 40<br /><br />ROOT PgSelectSingle{4}ᐸprojectᐳ[40]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgClassExpression41,PgClassExpression42,PgClassExpression43 bucket5
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3
+    Bucket3 --> Bucket4
+    Bucket4 --> Bucket5
+    end

@@ -1,0 +1,29 @@
+{
+  projectByProto__: {
+    brand: "Motorola",
+    id: 1,
+  },
+  projectById: {
+    brand: "Atari",
+    _proto__: "VCS",
+  },
+  allProjects: {
+    nodes: [
+      {
+        _proto__: "DynaTAC",
+        brand: "Motorola",
+        id: 1,
+      },
+      {
+        _proto__: "VCS",
+        brand: "Atari",
+        id: 2,
+      },
+      {
+        _proto__: "Model T",
+        brand: "Ford",
+        id: 3,
+      },
+    ],
+  },
+}
