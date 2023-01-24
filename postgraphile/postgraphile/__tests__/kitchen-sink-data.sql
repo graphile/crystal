@@ -60,6 +60,7 @@ delete from js_reserved.building cascade;
 
 delete from js_reserved.project cascade;
 delete from js_reserved.crop cascade;
+delete from js_reserved.material cascade;
 
 alter table b.types enable trigger user;
 
@@ -636,6 +637,8 @@ insert into js_reserved.machine
   ('Concrete',   'Limestone'),
   ('Iron Plate', 'Iron Ingot');
 
+alter sequence js_reserved.relational_items_id_seq restart with 6;
+
 insert into js_reserved.relational_items
   (id, type,     constructor   ) values
   (1,  'TOPIC',  'Cable'       ),
@@ -655,10 +658,8 @@ insert into js_reserved.relational_status
   (3, 'Stopped',    'Best look into that' ),
   (4, 'Scheduled',  null                  );
 
-alter sequence js_reserved.relational_items_id_seq restart with 6;
-alter sequence js_reserved.crop_id_seq restart with 1;
-
 alter sequence js_reserved.project_id_seq restart with 1;
+alter sequence js_reserved.crop_id_seq restart with 1;
 
 insert into js_reserved.project
   (__proto__,  brand     ) values
@@ -671,3 +672,11 @@ insert into js_reserved.crop
   ('wheat', 100   ),
   ('corn',  200   ),
   ('oat',   555   );
+
+alter sequence js_reserved.material_id_seq restart with 1;
+
+insert into js_reserved.material
+  (class,      valueOf ) values
+  ('concrete', 'rough' ),
+  ('glass',    'smooth'),
+  ('rubber',   'spongy');

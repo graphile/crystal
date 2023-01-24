@@ -1584,3 +1584,9 @@ create table js_reserved.crop (
   yield text unique,
   amount int
 );
+
+create table js_reserved.material (
+  id serial primary key,
+  class text unique,
+  valueOf text unique
+);

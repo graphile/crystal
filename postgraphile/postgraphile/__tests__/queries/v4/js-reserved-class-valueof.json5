@@ -1,0 +1,31 @@
+{
+  allMaterials: {
+    nodes: [
+      {
+        valueof: "rough",
+        class: "concrete",
+        id: 1,
+      },
+      {
+        valueof: "smooth",
+        class: "glass",
+        id: 2,
+      },
+      {
+        valueof: "spongy",
+        class: "rubber",
+        id: 3,
+      },
+    ],
+  },
+  materialByClass: {
+    class: "concrete",
+    valueof: "rough",
+    id: 1,
+  },
+  materialByValueof: {
+    class: "rubber",
+    valueof: "spongy",
+    id: 3,
+  },
+}

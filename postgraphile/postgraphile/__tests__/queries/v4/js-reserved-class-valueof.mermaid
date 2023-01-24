@@ -1,0 +1,85 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+
+    %% define steps
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    PgSelect20[["PgSelect[20∈1]<br />ᐸmaterialᐳ"]]:::plan
+    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸmaterialᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__material__.”valueof”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__material__.”class”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__material__.”id”ᐳ"}}:::plan
+    __InputStaticLeaf26{{"__InputStaticLeaf[26∈0]"}}:::plan
+    PgSelect27[["PgSelect[27∈0]<br />ᐸmaterialᐳ"]]:::plan
+    First31{{"First[31∈0]"}}:::plan
+    PgSelectSingle32{{"PgSelectSingle[32∈0]<br />ᐸmaterialᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__material__.”class”ᐳ"}}:::plan
+    PgClassExpression34{{"PgClassExpression[34∈4]<br />ᐸ__material__.”valueof”ᐳ"}}:::plan
+    PgClassExpression35{{"PgClassExpression[35∈4]<br />ᐸ__material__.”id”ᐳ"}}:::plan
+    __InputStaticLeaf36{{"__InputStaticLeaf[36∈0]"}}:::plan
+    PgSelect37[["PgSelect[37∈0]<br />ᐸmaterialᐳ"]]:::plan
+    First41{{"First[41∈0]"}}:::plan
+    PgSelectSingle42{{"PgSelectSingle[42∈0]<br />ᐸmaterialᐳ"}}:::plan
+    PgClassExpression43{{"PgClassExpression[43∈5]<br />ᐸ__material__.”class”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈5]<br />ᐸ__material__.”valueof”ᐳ"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__material__.”id”ᐳ"}}:::plan
+
+    %% plan dependencies
+    __Value3 --> Access16
+    __Value3 --> Access17
+    Access16 & Access17 --> Object18
+    Object18 & Connection19 --> PgSelect20
+    PgSelect20 ==> __Item21
+    __Item21 --> PgSelectSingle22
+    PgSelectSingle22 --> PgClassExpression23
+    PgSelectSingle22 --> PgClassExpression24
+    PgSelectSingle22 --> PgClassExpression25
+    Object18 & __InputStaticLeaf26 --> PgSelect27
+    PgSelect27 --> First31
+    First31 --> PgSelectSingle32
+    PgSelectSingle32 --> PgClassExpression33
+    PgSelectSingle32 --> PgClassExpression34
+    PgSelectSingle32 --> PgClassExpression35
+    Object18 & __InputStaticLeaf36 --> PgSelect37
+    PgSelect37 --> First41
+    First41 --> PgSelectSingle42
+    PgSelectSingle42 --> PgClassExpression43
+    PgSelectSingle42 --> PgClassExpression44
+    PgSelectSingle42 --> PgClassExpression45
+
+    subgraph "Buckets for queries/v4/js-reserved-class-valueof"
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 26, 36, 18<br />2: PgSelect[27], PgSelect[37]<br />ᐳ: 31, 32, 41, 42"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,__InputStaticLeaf26,PgSelect27,First31,PgSelectSingle32,__InputStaticLeaf36,PgSelect37,First41,PgSelectSingle42 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgSelect20 bucket1
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item21,PgSelectSingle22 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸmaterialᐳ[22]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression23,PgClassExpression24,PgClassExpression25 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 32<br /><br />ROOT PgSelectSingleᐸmaterialᐳ[32]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgClassExpression33,PgClassExpression34,PgClassExpression35 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingleᐸmaterialᐳ[42]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgClassExpression43,PgClassExpression44,PgClassExpression45 bucket5
+    Bucket0 --> Bucket1 & Bucket4 & Bucket5
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    end

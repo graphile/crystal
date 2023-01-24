@@ -1,0 +1,23 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  allMaterials {
+    nodes {
+      valueof
+      class
+      id
+    }
+  }
+  materialByClass(class: "concrete") {
+    class
+    valueof
+    id
+  }
+  materialByValueof(valueof: "spongy") {
+    class
+    valueof
+    id
+  }
+}
