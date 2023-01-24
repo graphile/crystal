@@ -53,12 +53,16 @@ an instance:
 const instance = grafserv({ schema, preset });
 ```
 
-This instance will have a number of helpers on it, including helpers specific to
-integrating it with your framework of choice. For servers that operate on a
-middleware basis this is typically `instance.addTo(app)` (which allows
-registering multiple route handlers), though different servers may have
-different APIs, such as `instance.createHandler()` for Node and
-`instance.createGraphQLHandler()` for Lambda and Next.js.
+`grafserv` is passed the GraphQL schema to use (if it's available, otherwise
+passing either null or a promise is also acceptable) and a `graphql-config`
+preset - i.e. your configuration.
+
+Calling `grafserv` will return an instance; this instance will have a number of
+helpers on it, including helpers specific to integrating it with your framework
+of choice. For servers that operate on a middleware basis this is typically
+`instance.addTo(app)` (which allows registering multiple route handlers), though
+different servers may have different APIs, such as `instance.createHandler()`
+for Node and `instance.createGraphQLHandler()` for Lambda and Next.js.
 
 Note: There is little value in Grafserv reimplementing every non-GraphQL concern
 your server may have, so instead it leans on the ecosystem of your chosen server
@@ -68,6 +72,39 @@ example, to compress your responses you'd need to use a module like
 for Express, [`koa-compress`](https://www.npmjs.com/package/koa-compress) for
 Koa, or [`@fastify/compress`](https://www.npmjs.com/package/@fastify/compress)
 for Fastify.
+
+### instance.release()
+
+Releases any resources created by the instance; no further requests should be
+handled (though currently active requests will be allowed to complete).
+
+// TODO: consider terminating subscriptions or other long-lived things.
+
+### instance.onRelease(cb)
+
+Adds `cb` to the list of callbacks to be called when the server is released;
+useful for releasing resources you created only for the server. Callbacks will
+be called in reverse order that they were added.
+
+### instance.setSchema(newSchema)
+
+Replaces the schema to use for future requests (currently active requests are
+unaffected) - this is primarily used for "watch" mode.
+
+### instance.setPreset(newPreset)
+
+Replaces the config to use for future requests (currently active requests are
+unaffected) - this is primarily used for "watch" mode. Note that certain
+configuration changes might not be reflected by certain servers until a restart.
+
+### instance.getSchema()
+
+Returns either the GraphQL schema that is currently in use, or a promise to the
+same.
+
+### instance.getPreset()
+
+Returns the resolved `graphile-config` preset that is currently in use.
 
 ## Servers
 
