@@ -1,6 +1,9 @@
 // It's helpful to see the full error stack
 Error.stackTraceLimit = Infinity;
 
+// Normally tests complete well under 5 seconds, but sporadic issues in the
+// subscriptions test on CI mean we've bumped this up
+jest.setTimeout(15000);
 if (process.env.DEBUG) {
   // When debug is set, outputting the console logs makes the tests slow.
   jest.setTimeout(30000);
