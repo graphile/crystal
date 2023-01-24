@@ -968,11 +968,7 @@ function addRelations(
                     },
                   [localColumns, remoteColumns],
                 );
-                if (!clean) {
-                  throw new Error(
-                    "GraphileInternalError<94fe5fe8-74a4-418b-93ea-beac09b64b5d>: TODO: handle relations on columns that use unsafe keywords",
-                  );
-                }
+
                 // FIXME: the non-clean branch of this does not currently have any tests, it might not work. Hence the throw above, out of an abundance of caution.
                 const specString = clean
                   ? makeSpecString(

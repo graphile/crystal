@@ -52,6 +52,12 @@ delete from polymorphic.log_entries cascade;
 delete from polymorphic.people cascade;
 delete from polymorphic.organizations cascade;
 
+delete from js_reserved.relational_status cascade;
+delete from js_reserved.relational_topics cascade;
+delete from js_reserved.relational_items cascade; 
+delete from js_reserved.machine cascade;
+delete from js_reserved.building cascade;
+
 alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
@@ -609,3 +615,41 @@ insert into polymorphic.gcp_application_third_party_vulnerabilities (gcp_applica
   (4, 2),
   (5, 5),
   (5, 4);
+
+----------------------------------------
+
+alter sequence js_reserved.building_id_seq restart with 1;
+alter sequence js_reserved.machine_id_seq restart with 1;
+
+insert into js_reserved.building
+  (constructor,  name) values
+  ('Cable',      'Copper Plant'), 
+  ('Concrete',   'Limestone Quarry'),
+  ('Iron Plate', 'Iron Mine');
+
+insert into js_reserved.machine
+  (constructor,  input) values
+  ('Cable',      'Wire'), 
+  ('Concrete',   'Limestone'),
+  ('Iron Plate', 'Iron Ingot');
+
+insert into js_reserved.relational_items
+  (id, type,     constructor   ) values
+  (1,  'TOPIC',  'Cable'       ),
+  (2,  'TOPIC',  'Concrete'    ),
+  (3,  'STATUS', 'Iron Plate'  ),
+  (5,  'TOPIC',  'Cable'       ),
+  (4,  'STATUS', 'Iron Plate'  );
+
+insert into js_reserved.relational_topics
+  (id, title)  values
+  (1, 'Upgrade'),
+  (2, 'Maintenance'),
+  (5, 'Emergency');
+
+  insert into js_reserved.relational_status
+  (id, note,        description           )  values
+  (3, 'Stopped',    'Best look into that' ),
+  (4, 'Scheduled',  null                  );
+
+  alter sequence js_reserved.relational_items_id_seq restart with 6;

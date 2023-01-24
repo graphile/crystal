@@ -15,7 +15,8 @@ drop schema if exists
   named_query_builder,
   enum_tables,
   geometry,
-  polymorphic
+  polymorphic,
+  js_reserved
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -1511,3 +1512,63 @@ comment on table polymorphic.third_party_vulnerabilities is $$
 @refVia applications via:aws_application_third_party_vulnerabilities;aws_applications
 @refVia applications via:gcp_application_third_party_vulnerabilities;gcp_applications
 $$;
+
+--------------------------------------------------------------------------------
+
+create schema js_reserved;
+/*
+
+Reserved keywords should be safe to use in a non-polymorphic schema
+
+Object.getOwnPropertyNames(Object.prototype)
+["toString","toLocaleString","valueOf","hasOwnProperty",
+"isPrototypeOf","propertyIsEnumerable","__defineGetter__",
+"__defineSetter__","__lookupGetter__","__lookupSetter__",
+"__proto__","constructor"]
+
+Also see utils/tamedevil/src/reservedWords.ts - top section
+*/
+
+create table js_reserved.building (
+  id serial primary key,
+  name text,
+  constructor text unique
+);
+
+create table js_reserved.machine (
+  id serial primary key,
+  input text,
+  constructor text references js_reserved.building(constructor)
+);
+
+create type js_reserved.item_type as enum (
+  'TOPIC',
+  'STATUS'
+);
+
+create table js_reserved.relational_items (
+  id serial primary key,
+
+  -- This column is used to tell us which table we need to join to
+  type js_reserved.item_type not null default 'STATUS'::js_reserved.item_type,
+
+  -- Shared attributes
+  constructor text references js_reserved.building (constructor)
+);
+
+create table js_reserved.relational_topics (
+  id int primary key references js_reserved.relational_items,
+  title text not null
+);
+
+create table js_reserved.relational_status (
+  id int primary key references js_reserved.relational_items,
+  description text default '-- Enter description here --',
+  note text
+);
+
+comment on table js_reserved.relational_items is $$
+  @interface mode:relational type:type
+  @type TOPIC references:relational_topics
+  @type STATUS references:relational_status
+  $$;

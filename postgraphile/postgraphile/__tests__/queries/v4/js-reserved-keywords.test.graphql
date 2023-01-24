@@ -1,0 +1,39 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+query {
+  machineById(id: 1) {
+    buildingByConstructor {
+      id
+      constructor
+    }
+    constructor
+    input
+  }
+  buildingById(id: 2) {
+    machinesByConstructor {
+      nodes {
+        id
+        constructor
+        input
+      }
+    }
+    name
+  }
+  allRelationalItems {
+    nodes {
+      id
+      constructor
+      type
+      ... on RelationalTopic {
+        id
+        title
+      }
+      ... on RelationalStatus {
+        id
+        note
+      }
+    }
+  }
+}
