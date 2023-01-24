@@ -159,7 +159,7 @@ function mangleName(str: string): string {
       // (`__desc_number__`) and the number might be up to, say, 8 digits long.
       // (It'll never be anywhere near this, surely?) This leaves 50 characters
       // for description.
-      .substr(0, 50)
+      .substring(0, 50)
 
       // Don't end in an underscore, since we'll be adding one anyway (and we
       // don't want double-underscores). This must be done after length limiting
@@ -180,7 +180,7 @@ function getSymbolName(symbol: symbol): string {
 // Trivial performance optimizations by Benjie.
 // Replaced with regexp because it's 11x faster by Benjie.
 export function escapeSqlIdentifier(str: string): string {
-  return `"${str.replace(/"/g, '""')}"`;
+  return `"${str.replace(/["\0]/g, '""')}"`;
 }
 
 function makeRawNode(text: string, exportName?: string): SQLRawNode {

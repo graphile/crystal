@@ -142,7 +142,7 @@ export class StepTracker {
   public deleteLayerPlan(layerPlan: LayerPlan) {
     this.assertPhaseNot("finalize");
     if (isDev) {
-      // TODO: validate assertions
+      // FIXME: validate assertions
       if (layerPlan.children.length > 0) {
         throw new Error(
           "This layer plan has children... should we really be deleting it?!",
@@ -238,7 +238,7 @@ export class StepTracker {
     }
     const $existing = outputPlan.rootStep;
     if ($existing) {
-      // TODO: Cleanup, tree shake, etc
+      // FIXME: Cleanup, tree shake, etc
       this.outputPlansByRootStep.get($existing)?.delete(outputPlan);
     }
     (outputPlan.rootStep as any) = $dependency;
@@ -262,7 +262,7 @@ export class StepTracker {
     }
     const $existing = layerPlan.rootStep;
     if ($existing) {
-      // TODO: Cleanup, tree shake, etc
+      // FIXME: Cleanup, tree shake, etc
       this.layerPlansByRootStep.get($existing)!.delete(layerPlan);
     }
     (layerPlan.rootStep as any) = $dependency;
@@ -281,7 +281,7 @@ export class StepTracker {
   ): void {
     this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($original)) {
-      // TODO: should this be an error?
+      // FIXME: should this be an error?
       // console.warn(`${$original} should be replaced with ${$replacement} but it's no longer alive`);
       // Already handled
       return;
@@ -356,7 +356,7 @@ export class StepTracker {
       }
     }
 
-    // TODO: had to add the code ensuring all the layer plan parentPlanId's
+    // HACK: had to add the code ensuring all the layer plan parentPlanId's
     // existed to fix polymorphism, but it feels wrong. Should we be doing
     // something different?
     {
@@ -380,8 +380,8 @@ export class StepTracker {
       }
     }
 
-    // TODO: ensure side-effect plans are handled nicely
-    // TODO: ensure plans in 'subprocedure' layerPlans are marked active
+    // FIXME: ensure side-effect plans are handled nicely
+    // FIXME: ensure plans in 'subprocedure' layerPlans are marked active
 
     // Remove this step (and perform localized tree-shaking)
     this.eradicate($original);

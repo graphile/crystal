@@ -1096,7 +1096,7 @@ on (${sql.indent(
           TYPES.text,
         );
       } else {
-        // TODO: this is bad. We're getting the codec from just one of the
+        // HACK: this is bad. We're getting the codec from just one of the
         // members and assuming the type for the given column will match for
         // all of them. We should either validate that this is the same, change
         // the signature of `getFragmentAndCodecFromOrder` to pass all the
@@ -1133,7 +1133,7 @@ on (${sql.indent(
             const pkCol = pk.columns[pkIndex];
             return [
               sql`${digest.alias}.${sql.identifier(pkCol)}`,
-              // TODO: this is not the correct way of casting.
+              // FIXME: this is not the correct way of casting.
               sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
                 pkColumns[pkCol].codec.sqlType
               }`,
@@ -1155,7 +1155,7 @@ on (${sql.indent(
             return [frag, identifierPlaceholders[i], order.direction];
           }
         })();
-        // TODO: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
+        // FIXME: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
         const gt =
           (direction === "ASC" && beforeOrAfter === "after") ||
           (direction === "DESC" && beforeOrAfter === "before");
@@ -1425,7 +1425,7 @@ and ${condition(i + 1)}`}
     // not introduce a security issue).
     const hash = createHash("sha256");
 
-    // TODO: this is bad. We're getting the codec from just one of the
+    // HACK: this is bad. We're getting the codec from just one of the
     // members and assuming the type for the given column will match for
     // all of them. We should either validate that this is the same, change
     // the signature of `getFragmentAndCodecFromOrder` to pass all the
@@ -1471,7 +1471,7 @@ and ${condition(i + 1)}`}
     const typeIdx = normalMode ? this.selectType() : null;
     const reverse = normalMode ? this.shouldReverseOrder() : null;
 
-    //TODO: THIS IS UNSAFE. See "TODO: this is bad" comments.
+    // HACK: THIS IS UNSAFE. See "HACK: this is bad" comments.
     const mutualCodec = this.memberDigests[0].finalSource.codec;
 
     const makeQuery = () => {
@@ -1640,7 +1640,7 @@ from (${innerQuery}) as ${tableAlias}\
             codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
           } as ${sql.identifier(String(i))}`;
         } else {
-          // TODO: eradicate this (aggregate mode) without breaking arrayMode
+          // PERF: eradicate this (aggregate mode) without breaking arrayMode
           // tuple numbering
           return sql`null as ${sql.identifier(String(i))}`;
         }
@@ -1788,7 +1788,7 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
       text,
       rawSqlValues,
       identifierIndex,
-      // TODO: when streaming we must not set this to true
+      // FIXME: when streaming we must not set this to true
       shouldReverseOrder: this.shouldReverseOrder(),
       name: hash(text),
     };
@@ -1858,7 +1858,7 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
         ? reverseArray(slicedRows)
         : slicedRows;
       if (this.fetchOneExtra) {
-        // TODO: this is an ugly hack; really we should consider resolving to an
+        // HACK: this is an ugly hack; really we should consider resolving to an
         // object that can contain metadata as well as the rows.
         Object.defineProperty(orderedRows, "hasMore", { value: hasMore });
       }

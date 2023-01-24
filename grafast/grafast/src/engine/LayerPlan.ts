@@ -57,7 +57,6 @@ export interface LayerPlanReasonListItem {
    *
    * Also needed for execution (see `executeBucket`).
    */
-  // TODO: rename to parentStepId
   parentStep: ExecutableStep;
 
   /** If this listItem is to be streamed, the configuration for that streaming */
@@ -342,11 +341,11 @@ ${inner}
       layerPlan: that,
       size,
       store,
-      // TODO: not necessarily, if we don't copy the errors, we don't have the errors.
+      // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
       hasErrors: parentBucket.hasErrors,
       polymorphicPathList,
     });
-    // TODO: set ourselves in more places so that we never have to call 'getChildBucketAndIndex'.
+    // PERF: set ourselves in more places so that we never have to call 'getChildBucketAndIndex'.
     parentBucket.children[${te.lit(this.id)}] = {
       bucket: childBucket,
       map,
@@ -363,7 +362,7 @@ ${inner}
   public finalize(): void {
     const copyStepIds = [...this.copyPlanIds];
     if (this.reason.type === "nullableBoundary") {
-      // TODO:perf: if parent bucket has no nulls/errors in itemStepId
+      // PERF: if parent bucket has no nulls/errors in itemStepId
       // then we can just copy everything wholesale rather than building
       // new arrays and looping.
 
@@ -510,7 +509,7 @@ ${te.join(
           );
         }
 
-        // TODO:perf: if parent bucket has no nulls/errors in `itemStepId`
+        // PERF: if parent bucket has no nulls/errors in `itemStepId`
         // then we can just copy everything wholesale rather than building
         // new arrays and looping.
         const hasNoNullsOrErrors = false;
@@ -679,7 +678,7 @@ ${te.join(
           const newIndex = size++;
           map.set(originalIndex, newIndex);
 
-          // TODO:perf: might be faster if we look this up as a constant rather than using concatenation here
+          // PERF: might be faster if we look this up as a constant rather than using concatenation here
           const newPolymorphicPath =
             parentBucket.polymorphicPathList[originalIndex] + ">" + typeName;
 
@@ -722,7 +721,7 @@ ${te.join(
         layerPlan: this,
         size,
         store,
-        // TODO: not necessarily, if we don't copy the errors, we don't have the errors.
+        // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
         hasErrors: parentBucket.hasErrors,
         polymorphicPathList,
       });

@@ -28,7 +28,7 @@ function getBodyFromRequest(
         req.off("end", done);
         req.off("error", reject);
         req.off("data", handleData);
-        // TODO: validate this approach
+        // FIXME: validate this approach
         reject(new Error("Too much data"));
       }
     };
@@ -78,7 +78,7 @@ function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
 }
 
 export interface Grafserv {
-  // TODO: should build handler on demand depending on flavour needed
+  // FIXME: should build handler on demand depending on flavour needed
   handler: RequestListener;
   release(): Promise<void>;
   onRelease(cb: () => PromiseOrDirect<void>): void;
@@ -407,7 +407,7 @@ export function grafserv(
           req,
           dynamicOptions.maxRequestLength,
         );
-        // TODO: this parsing is unsafe (it doesn't even check the
+        // FIXME: this parsing is unsafe (it doesn't even check the
         // content-type!) - replace it with V4's behaviour
         const body = JSON.parse(bodyRaw);
         const sP = isPromiseLike(serverParams)
@@ -443,7 +443,7 @@ export function grafserv(
       return;
     }
 
-    // TODO: handle 'HEAD' requests
+    // FIXME: handle 'HEAD' requests
     if (
       dynamicOptions.graphiql &&
       (req.url === dynamicOptions.graphiqlPath ||

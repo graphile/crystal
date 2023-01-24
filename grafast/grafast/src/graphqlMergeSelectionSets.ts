@@ -9,21 +9,22 @@ import { Kind } from "graphql";
 import type { OperationPlan } from "./index.js";
 import { inspect } from "./inspect.js";
 
-// TODO:perf: this is incredibly inefficient
+// PERF: this is incredibly inefficient
 function typeMatchesCondition(
   operationPlan: OperationPlan,
   type: GraphQLObjectType,
   condition: NamedTypeNode,
 ) {
-  if (type.name === condition.name.value) {
+  const name = condition.name.value;
+  if (type.name === name) {
     return true;
   }
-  if (type.getInterfaces().some((i) => i.name === condition.name.value)) {
+  if (type.getInterfaces().some((i) => i.name === name)) {
     return true;
   }
   if (
     operationPlan.unionsContainingObjectType[type.name].some(
-      (u) => u.name === condition.name.value,
+      (u) => u.name === name,
     )
   ) {
     return true;

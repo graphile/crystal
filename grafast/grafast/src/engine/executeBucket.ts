@@ -234,7 +234,7 @@ export function executeBucket(
             ? streamOptions.initialCount
             : Infinity;
 
-          // TODO:critical: need to ensure that iterator is terminated
+          // FIXME: need to ensure that iterator is terminated
           // even if the stream is never consumed (e.g. if something else
           // errors). For query/mutation we can do this when operation
           // completes, for subscription we should do it after each
@@ -427,7 +427,7 @@ export function executeBucket(
             return promises ? awaitPromises() : runSyncSteps();
           },
         );
-        // TODO: rehandle this!
+        // FIXME: rehandle this!
         /*
           .then(null, (e) => {
             // THIS SHOULD NEVER HAPPEN!
@@ -588,7 +588,7 @@ export function executeBucket(
     }
   }
 
-  // TODO: if this is what we end up with, remove the indirection.
+  // FIXME: if this is what we end up with, remove the indirection.
   /**
    * Execute the step directly; since there's no errors we can pass the
    * dependencies through verbatim!
@@ -601,7 +601,7 @@ export function executeBucket(
     return executeOrStream(step, dependencies, extra);
   }
 
-  // TODO: this function used to state that it would never throw/reject... but,
+  // FIXME: this function used to state that it would never throw/reject... but,
   // no code is perfect... so that just seemed like it was asking for
   // trouble. Lets make sure if it throws/rejects that nothing bad will happen.
   /**
@@ -662,7 +662,7 @@ export function executeBucket(
   }
 
   function executeSamePhaseChildren(): PromiseOrDirect<void> {
-    // TODO: create a JIT factory for this at planning time
+    // PERF: create a JIT factory for this at planning time
     const childPromises: PromiseLike<any>[] = [];
 
     // This promise should never reject
