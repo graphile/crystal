@@ -40,3 +40,172 @@ And please give some love to our featured sponsors 🤩:
 <em>\* Sponsors the entire Graphile suite</em>
 
 <!-- SPONSORS_END -->
+
+## Usage
+
+Grafserv supports many different servers, and because each server is different
+each has their own entrypoint, e.g. `grafserv/node` for the Node.js HTTP server
+or `grafserv/express/v4` for Express v4. Generally you import the `grafserv`
+function from the relevant entrypoint for your server of choice and then create
+an instance:
+
+```js
+const instance = grafserv({ schema, preset });
+```
+
+This instance will have a number of helpers on it, including helpers specific to
+integrating it with your framework of choice. For servers that operate on a
+middleware basis this is typically `instance.addTo(app)` (which allows
+registering multiple route handlers), though different servers may have
+different APIs, such as `instance.createHandler()` for Node and
+`instance.createGraphQLHandler()` for Lambda and Next.js.
+
+Note: There is little value in Grafserv reimplementing every non-GraphQL concern
+your server may have, so instead it leans on the ecosystem of your chosen server
+to handle things like compression, rate limits, sessions, cookies, etc. For
+example, to compress your responses you'd need to use a module like
+[`compression`](https://expressjs.com/en/resources/middleware/compression.html)
+for Express, [`koa-compress`](https://www.npmjs.com/package/koa-compress) for
+Koa, or [`@fastify/compress`](https://www.npmjs.com/package/@fastify/compress)
+for Fastify.
+
+## Servers
+
+### Node HTTP server
+
+```js
+import { createServer } from "node:http";
+import grafserv from "grafserv/node";
+import preset from "./graphile.config.js";
+import schema from "./schema.js";
+
+// Create a Grafserv instance
+const instance = grafserv({ schema, preset });
+
+// Mount the request handler into a new HTTP server
+const server = createServer(instance.createHandler());
+
+// Start the Node server
+server.listen(5678);
+```
+
+### Express V4
+
+```js
+import { express } from "express";
+import grafserv from "grafserv/express/v4";
+import preset from "./graphile.config.js";
+import schema from "./schema.js";
+
+// Create an express app
+const app = express();
+// (Add any Express middleware you want here.)
+
+// Create a Grafserv instance
+const instance = grafserv({ schema, preset });
+
+// Add the Grafserv instance's route handlers to the Express app
+instance.addTo(app);
+
+// Start the Express server
+app.listen(5678);
+```
+
+### Koa V2
+
+```js
+import Koa from "koa";
+import grafserv from "grafserv/koa/v2";
+import preset from "./graphile.config.js";
+import schema from "./schema.js";
+
+// Create a Koa app
+const app = new Koa();
+// (Add any Koa middleware you want here.)
+
+// Create a Grafserv instance
+const instance = grafserv({ schema, preset });
+
+// Add the Grafserv instance's route handlers to the Koa app
+instance.addTo(app);
+
+// Start the Koa server
+app.listen(5678);
+```
+
+### Fastify V4
+
+```js
+import Fastify from "fastify";
+import grafserv from "grafserv/fastify/v4";
+import preset from "./graphile.config.js";
+import schema from "./schema.js";
+
+// Create a Koa app
+const app = Fastify({
+  logger: true,
+});
+// (Add any Fastify middleware you want here.)
+
+// Create a Grafserv instance
+const instance = grafserv({ schema, preset });
+
+// Add the Grafserv instance's route handlers to the Fastify app
+instance.addTo(app);
+
+// Start the Fastify server
+app.listen({ port: 5678 }, (err, address) => {
+  if (err) throw err;
+  console.log(`Server is now listening on ${address}`);
+});
+```
+
+### Next.js API route
+
+Grafserv handles a number of API routes, so you should define one for each of
+the things you care about. It's critical that you ensure that the paths line up
+with those used in the Graphile config, otherwise the assets will not correctly
+be served/referenced, this may cause issues when communicating between [Ruru][]
+and GraphQL.
+
+```js
+// utils/grafserv.js
+import grafserv from "grafserv/next/v13";
+import preset from "./graphile.config.js";
+import schema from "./schema.js";
+
+// Create a shared Grafserv instance
+export const instance = grafserv({ schema, preset });
+```
+
+```js
+// pages/api/graphql.js
+import { instance } from "../../utils/grafserv.js";
+
+// Create and export the `/graphql` route handler
+const handler = instance.createGraphQLHandler();
+export default handler;
+```
+
+```js
+// pages/api/ruru.js
+import { instance } from "../../utils/grafserv.js";
+
+// Create and export the `/ruru` route handler
+const handler = instance.createRuruHandler();
+export default handler;
+```
+
+### Lambda
+
+```js
+import grafserv from "grafserv/lambda";
+import preset from "./graphile.config.js";
+import schema from "./schema.js";
+
+// Create a Grafserv instance
+const instance = grafserv({ schema, preset });
+
+// Export a lambda handler for GraphQL
+export const handler = instance.createGraphQLHandler();
+```
