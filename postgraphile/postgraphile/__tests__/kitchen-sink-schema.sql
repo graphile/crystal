@@ -1529,13 +1529,13 @@ Object.getOwnPropertyNames(Object.prototype)
 Also see utils/tamedevil/src/reservedWords.ts - top section
 */
 
-create table js_reserved.building(
+create table js_reserved.building (
   id serial primary key,
   name text,
   constructor text unique
 );
 
-create table js_reserved.machine(
+create table js_reserved.machine (
   id serial primary key,
   input text,
   constructor text references js_reserved.building(constructor)
@@ -1553,8 +1553,7 @@ create table js_reserved.relational_items (
   type js_reserved.item_type not null default 'STATUS'::js_reserved.item_type,
 
   -- Shared attributes
-  constructor text references js_reserved.building(constructor)
-
+  constructor text references js_reserved.building (constructor)
 );
 
 create table js_reserved.relational_topics (
@@ -1564,7 +1563,6 @@ create table js_reserved.relational_topics (
 
 create table js_reserved.relational_status (
   id int primary key references js_reserved.relational_items,
-  --title text not null,
   description text default '-- Enter description here --',
   note text
 );

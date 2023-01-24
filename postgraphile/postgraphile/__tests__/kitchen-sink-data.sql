@@ -648,7 +648,7 @@ insert into js_reserved.relational_topics
   (5, 'Emergency');
 
   insert into js_reserved.relational_status
-  (id, note,       description            )  values
+  (id, note,        description           )  values
   (3, 'Stopped',    'Best look into that' ),
   (4, 'Scheduled',  null                  );
 
