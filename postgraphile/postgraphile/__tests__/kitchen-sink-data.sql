@@ -620,7 +620,7 @@ insert into polymorphic.gcp_application_third_party_vulnerabilities (gcp_applica
   (5, 5),
   (5, 4);
 
-----------------------------------------
+--------------------------------------------------------------------------------
 
 alter sequence js_reserved.building_id_seq restart with 1;
 alter sequence js_reserved.machine_id_seq restart with 1;
@@ -657,8 +657,9 @@ insert into js_reserved.relational_status
   (4, 'Scheduled',  null                  );
 
 alter sequence js_reserved.relational_items_id_seq restart with 6;
-alter sequence js_reserved.project_id_seq restart with 1;
 alter sequence js_reserved.crop_id_seq restart with 1;
+
+alter sequence js_reserved.project_id_seq restart with 1;
 
 insert into js_reserved.project
   (__proto__,  brand     ) values
