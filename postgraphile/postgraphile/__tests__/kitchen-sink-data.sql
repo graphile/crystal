@@ -64,6 +64,7 @@ delete from js_reserved.material cascade;
 delete from js_reserved.constructor cascade;
 delete from js_reserved.yield cascade;
 delete from js_reserved.__proto__ cascade;
+delete from js_reserved.null cascade;
 
 
 alter table b.types enable trigger user;
@@ -708,3 +709,11 @@ insert into js_reserved.__proto__
   ('DynaTAC',  'Motorola'),
   ('VCS',      'Atari'   ),
   ('Model T',  'Ford'    );
+
+alter sequence js_reserved.null_id_seq restart with 1;
+
+insert into js_reserved.null
+  (hasOwnProperty, break) values
+  ('apartment', '10 am'),
+  ('flat', 'noon'),
+  ('house', '3 pm');

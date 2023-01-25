@@ -1611,6 +1611,6 @@ create table js_reserved.__proto__ (
 
 create table js_reserved.null (
   id serial primary key,
-  name text unique,
-  brand text
+  hasOwnProperty text unique,
+  break text unique
 );
