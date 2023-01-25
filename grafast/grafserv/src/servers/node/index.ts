@@ -81,7 +81,10 @@ function getDigest(req: IncomingMessage, res: ServerResponse): RequestDigest {
 }
 
 const END = Buffer.from("\r\n-----\r\n", "utf8");
-
+const DIVIDE = Buffer.from(
+  `\r\n---\r\nContent-Type: application/json\r\n\r\n`,
+  "utf8",
+);
 class NodeGrafserv extends GrafservBase {
   constructor(config: GrafservConfig) {
     super(config);
@@ -185,12 +188,7 @@ class NodeGrafserv extends GrafservBase {
                   stringifyPayload(payload as any, asString),
                   "utf8",
                 );
-                res.write(
-                  Buffer.from(
-                    `\r\n---\r\nContent-Type: application/json\r\nContent-Length: ${payloadBuffer.length}\r\n\r\n`,
-                    "utf8",
-                  ),
-                );
+                res.write(DIVIDE);
                 res.write(payloadBuffer);
               }
             } finally {
