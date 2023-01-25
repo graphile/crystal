@@ -9,8 +9,7 @@ import {
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
-import type { ServerParams } from "../interfaces.js";
-import type { HandlerResult } from "./interfaces.js";
+import type { ServerParams, HandlerResult } from "../interfaces.js";
 
 let lastString: string;
 let lastHash: string;

@@ -1,5 +1,4 @@
-import type { ServerParams } from "../interfaces.js";
-import type { HandlerResult } from "./interfaces.js";
+import type { ServerParams, HandlerResult } from "../interfaces.js";
 
 const ruruServer = import("ruru/server");
 let ruruHTML: Awaited<typeof ruruServer>["ruruHTML"] | undefined = undefined;

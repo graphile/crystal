@@ -2,11 +2,19 @@ import EventEmitter from "eventemitter3";
 import { GraphQLSchema, isSchema, validateSchema } from "graphql";
 import { resolvePresets } from "graphile-config";
 import { isPromiseLike, PromiseOrDirect, TypedEventEmitter } from "grafast";
-import { GrafservConfig } from "../interfaces";
+import {
+  GrafservConfig,
+  RequestDigest,
+  SendResult,
+  SendError,
+  HandlerResult,
+} from "../interfaces";
+import { OptionsFromConfig, optionsFromConfig } from "../options";
 
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
   private releasing = false;
+  protected dynamicOptions!: OptionsFromConfig;
   protected resolvedPreset!: GraphileConfig.ResolvedPreset;
   protected schema: GraphQLSchema | PromiseLike<GraphQLSchema> | null;
   protected schemaError: PromiseLike<GraphQLSchema> | null;
@@ -34,6 +42,34 @@ export class GrafservBase {
       );
     } else {
       this.eventEmitter.emit("schema:ready", config.schema);
+    }
+  }
+
+  private _processRequest(
+    request: RequestDigest,
+  ): PromiseOrDirect<HandlerResult> {
+    try {
+      throw new Error("TODO");
+    } catch (e) {
+      return { type: "html", status: 500, payload: "ERROR" } as HandlerResult;
+    }
+  }
+
+  protected processRequest(details: {
+    request: RequestDigest;
+    sendResult: SendResult;
+    sendError: SendError;
+  }) {
+    const { request, sendResult, sendError } = details;
+    try {
+      const result = this._processRequest(request);
+      if (isPromiseLike(result)) {
+        result.then(sendResult, sendError);
+      } else {
+        sendResult(result);
+      }
+    } catch (e) {
+      sendError(e);
     }
   }
 
@@ -71,6 +107,7 @@ export class GrafservBase {
 
   public setPreset(newPreset: GraphileConfig.Preset) {
     this.resolvedPreset = resolvePresets([newPreset]);
+    this.dynamicOptions = optionsFromConfig(this.resolvedPreset);
   }
 
   public setSchema(newSchema: GraphQLSchema) {

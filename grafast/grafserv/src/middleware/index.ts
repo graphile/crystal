@@ -13,7 +13,7 @@ import type { IncomingMessage, RequestListener, ServerResponse } from "http";
 import type { ServerParams } from "../interfaces.js";
 import { makeGraphiQLHandler } from "./graphiql.js";
 import { makeGraphQLHandler } from "./graphql.js";
-import type { EventStreamEvent, HandlerResult } from "./interfaces.js";
+import type { EventStreamEvent, HandlerResult } from "../interfaces.js";
 
 function getBodyFromRequest(
   req: IncomingMessage,
