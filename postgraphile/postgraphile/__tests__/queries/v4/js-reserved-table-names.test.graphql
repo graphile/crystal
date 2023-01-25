@@ -3,6 +3,11 @@
 #> subscriptions: true
 #> simpleCollections: "both"
 {
+  allYieldsList {
+    crop
+    export
+    id
+  }
   allConstructorsList {
     export
     name
@@ -10,9 +15,22 @@
   }
   constructorByExport(export: "Copper Wire") {
     name
+    id
   }
   constructorById(id: 2) {
     name
+    export
+  }
+  constructorByName(name: "Iron Mine") {
+    export
+    id
+  }
+  yieldByExport(export: "UK") {
+    export
+    id
+  }
+  yieldById(id: 2) {
+    crop
     export
   }
 }

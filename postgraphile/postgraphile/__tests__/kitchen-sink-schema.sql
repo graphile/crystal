@@ -1596,3 +1596,9 @@ create table js_reserved.constructor (
   name text unique,
   export text unique
 );
+
+create table js_reserved.yield (
+  id serial primary key,
+  crop text,
+  export text unique
+)

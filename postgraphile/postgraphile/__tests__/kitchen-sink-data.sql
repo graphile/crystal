@@ -62,6 +62,8 @@ delete from js_reserved.project cascade;
 delete from js_reserved.crop cascade;
 delete from js_reserved.material cascade;
 delete from js_reserved.constructor cascade;
+delete from js_reserved.yield cascade;
+
 
 alter table b.types enable trigger user;
 
@@ -685,7 +687,15 @@ insert into js_reserved.material
 alter sequence js_reserved.constructor_id_seq restart with 1;
 
 insert into js_reserved.constructor
-  (name, export) values
-  ('Copper Plant', 'Copper Wire'),
-  ('Limestone Quarry','Concrete'),
-  ('Iron Mine', 'Iron Plates');
+  (name,               export) values
+  ('Copper Plant',     'Copper Wire'),
+  ('Limestone Quarry', 'Concrete'),
+  ('Iron Mine',        'Iron Plates');
+
+alter sequence js_reserved.yield_id_seq restart with 1;
+
+insert into js_reserved.yield
+  (crop,    export) values
+  ('wheat', 'UK'),
+  ('corn',  'IE'),
+  ('oat',   'FR');

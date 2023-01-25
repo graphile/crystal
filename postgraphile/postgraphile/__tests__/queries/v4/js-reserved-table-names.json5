@@ -1,4 +1,21 @@
 {
+  allYieldsList: [
+    {
+      crop: "wheat",
+      export: "UK",
+      id: 1,
+    },
+    {
+      crop: "corn",
+      export: "IE",
+      id: 2,
+    },
+    {
+      crop: "oat",
+      export: "FR",
+      id: 3,
+    },
+  ],
   allConstructorsList: [
     {
       export: "Copper Wire",
@@ -18,9 +35,22 @@
   ],
   constructorByExport: {
     name: "Copper Plant",
+    id: 1,
   },
   constructorById: {
     name: "Limestone Quarry",
     export: "Concrete",
+  },
+  constructorByName: {
+    export: "Iron Plates",
+    id: 3,
+  },
+  yieldByExport: {
+    export: "UK",
+    id: 1,
+  },
+  yieldById: {
+    crop: "corn",
+    export: "IE",
   },
 }
