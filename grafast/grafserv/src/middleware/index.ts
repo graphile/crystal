@@ -25,67 +25,6 @@ import type { EventStreamEvent, HandlerResult } from "../interfaces.js";
   const eventEmitter: TypedEventEmitter<{
     newSchema: GraphQLSchema;
   }> = new EventEmitter();
-  type SchemaChangeEvent = {
-    event: "change";
-    data: "schema";
-  };
-  function makeStream(): AsyncIterableIterator<SchemaChangeEvent> {
-    const queue: Array<{
-      resolve: (value: IteratorResult<SchemaChangeEvent>) => void;
-      reject: (e: Error) => void;
-    }> = [];
-    let finished = false;
-    const bump = () => {
-      const next = queue.shift();
-      if (next) {
-        next.resolve({
-          done: false,
-          value: { event: "change", data: "schema" },
-        });
-      }
-    };
-    const flushQueue = (e?: Error) => {
-      const entries = queue.splice(0, queue.length);
-      for (const entry of entries) {
-        if (e) {
-          entry.reject(e);
-        } else {
-          entry.resolve({ done: true } as IteratorResult<SchemaChangeEvent>);
-        }
-      }
-    };
-    eventEmitter.on("newSchema", bump);
-    return {
-      [Symbol.asyncIterator]() {
-        return this;
-      },
-      next() {
-        if (finished) {
-          return Promise.resolve({
-            done: true,
-          } as IteratorResult<SchemaChangeEvent>);
-        }
-        return new Promise((resolve, reject) => {
-          queue.push({ resolve, reject });
-        });
-      },
-      return() {
-        finished = true;
-        if (queue.length) {
-          flushQueue();
-        }
-        return Promise.resolve({
-          done: true,
-        } as IteratorResult<SchemaChangeEvent>);
-      },
-      throw(e) {
-        if (queue.length) {
-          flushQueue(e);
-        }
-        return Promise.reject(e);
-      },
-    };
-  }
   function addHandlers(r: ServerParams): ServerResultAndHandlers {
     eventEmitter.emit("newSchema", r.schema);
     return {

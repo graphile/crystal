@@ -132,3 +132,8 @@ export type HandlerResult =
   | GraphQLIncrementalHandlerResult
   | TextHandlerResult
   | EventStreamHeandlerResult;
+
+export type SchemaChangeEvent = {
+  event: "change";
+  data: "schema";
+};

@@ -8,6 +8,7 @@ import {
   SendResult,
   SendError,
   HandlerResult,
+  SchemaChangeEvent,
 } from "../interfaces";
 import { OptionsFromConfig, optionsFromConfig } from "../options";
 import { makeGraphQLHandler } from "../middleware/graphql";
@@ -25,6 +26,8 @@ export class GrafservBase {
     "schema:error": any;
   }>;
   private initialized = false;
+  private graphqlHandler!: ReturnType<typeof makeGraphQLHandler>;
+  private graphiqlHandler!: ReturnType<typeof makeGraphiQLHandler>;
 
   constructor(config: GrafservConfig) {
     this.eventEmitter = new EventEmitter();
@@ -85,23 +88,18 @@ export class GrafservBase {
         return this.graphiqlHandler(request);
       }
 
-      /*
       if (
         dynamicOptions.watch &&
-        request.path === dynamicOptions.eventStreamRoute &&
-        request.method === "GET"
+        request.method === "GET" &&
+        request.path === dynamicOptions.eventStreamRoute
       ) {
-        (async () => {
-          const stream = makeStream();
-          sendResult(res, {
-            type: "event-stream",
-            payload: stream,
-            statusCode: 200,
-          });
-        })().catch(handleError);
-        return;
+        const stream = this.makeStream();
+        return {
+          type: "event-stream",
+          payload: stream,
+          statusCode: 200,
+        };
       }
-      */
 
       // Unhandled
       return null;
@@ -197,8 +195,6 @@ export class GrafservBase {
     }
   }
 
-  private graphqlHandler!: ReturnType<typeof makeGraphQLHandler>;
-  private graphiqlHandler!: ReturnType<typeof makeGraphiQLHandler>;
   private refreshHandlers() {
     if (!this.initialized) {
       return;
@@ -210,5 +206,63 @@ export class GrafservBase {
       this.schema,
     );
     this.graphiqlHandler = makeGraphiQLHandler();
+  }
+
+  private makeStream(): AsyncIterableIterator<SchemaChangeEvent> {
+    const queue: Array<{
+      resolve: (value: IteratorResult<SchemaChangeEvent>) => void;
+      reject: (e: Error) => void;
+    }> = [];
+    let finished = false;
+    const bump = () => {
+      const next = queue.shift();
+      if (next) {
+        next.resolve({
+          done: false,
+          value: { event: "change", data: "schema" },
+        });
+      }
+    };
+    const flushQueue = (e?: Error) => {
+      const entries = queue.splice(0, queue.length);
+      for (const entry of entries) {
+        if (e) {
+          entry.reject(e);
+        } else {
+          entry.resolve({ done: true } as IteratorResult<SchemaChangeEvent>);
+        }
+      }
+    };
+    this.eventEmitter.on("schema:ready", bump);
+    return {
+      [Symbol.asyncIterator]() {
+        return this;
+      },
+      next() {
+        if (finished) {
+          return Promise.resolve({
+            done: true,
+          } as IteratorResult<SchemaChangeEvent>);
+        }
+        return new Promise((resolve, reject) => {
+          queue.push({ resolve, reject });
+        });
+      },
+      return() {
+        finished = true;
+        if (queue.length) {
+          flushQueue();
+        }
+        return Promise.resolve({
+          done: true,
+        } as IteratorResult<SchemaChangeEvent>);
+      },
+      throw(e) {
+        if (queue.length) {
+          flushQueue(e);
+        }
+        return Promise.reject(e);
+      },
+    };
   }
 }
