@@ -3,14 +3,9 @@
 #> subscriptions: true
 #> simpleCollections: "both"
 {
-  allYieldsList {
-    crop
-    export
-    id
-  }
   allConstructorsList {
-    export
     name
+    export
     id
   }
   constructorByExport(export: "Copper Wire") {
@@ -18,19 +13,54 @@
     id
   }
   constructorById(id: 2) {
-    name
     export
+    name
   }
   constructorByName(name: "Iron Mine") {
     export
     id
   }
-  yieldByExport(export: "UK") {
+  allYieldsList {
+    crop
     export
+    id
+  }
+  yieldByExport(export: "UK") {
+    crop
     id
   }
   yieldById(id: 2) {
     crop
     export
+  }
+  allProtoSList {
+    id
+    name
+    brand
+  }
+  _protoById(id: 1) {
+    brand
+    name
+  }
+  _protoByName(name: "VCS") {
+    brand
+    id
+  }
+  allNullsList {
+    break
+    hasownproperty
+    id
+  }
+  nullByBreak(break: "10 am") {
+    hasownproperty
+    id
+  }
+  nullByHasownproperty(hasownproperty: "flat") {
+    break
+    id
+  }
+  nullById(id: 3) {
+    break
+    hasownproperty
   }
 }
