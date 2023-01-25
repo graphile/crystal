@@ -29,21 +29,20 @@ export function mapIterator<T, U>(
       }
       const next = iterator.next();
       return next.then((v) => {
-        let done = false;
-        let value = cb(v.value);
         if (v.done) {
+          if (v.value !== undefined) {
+            throw new Error("Invalid assumption; tell Benjie he did bad.");
+          }
           if (end) {
             status = 1;
-            if (value !== undefined) {
-              throw new Error("Invalid assumption; tell Benjie he did bad.");
-            }
-            value = end();
+            return { value: end(), done: false };
           } else {
             status = 2;
-            done = true;
+            return { value: undefined, done: true };
           }
+        } else {
+          return { value: cb(v.value), done: false };
         }
-        return { done, value };
       });
     },
     return(value) {
