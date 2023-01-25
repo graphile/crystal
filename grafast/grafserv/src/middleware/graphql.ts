@@ -164,7 +164,13 @@ export const makeGraphQLHandler = (
     const { errors, document } = parseAndValidate(query);
 
     if (errors) {
-      return { type: "graphql", statusCode: 200, payload: { errors } };
+      return {
+        type: "graphql",
+        request,
+        dynamicOptions,
+        statusCode: 200,
+        payload: { errors },
+      };
     }
 
     const args: ExecutionArgs = {
@@ -189,16 +195,27 @@ export const makeGraphQLHandler = (
       if (isAsyncIterable(result)) {
         return {
           type: "graphqlIncremental",
+          request,
+          dynamicOptions,
           statusCode: 200,
           iterator: result,
           asString,
         };
       }
-      return { type: "graphql", statusCode: 200, payload: result, asString };
+      return {
+        type: "graphql",
+        request,
+        dynamicOptions,
+        statusCode: 200,
+        payload: result,
+        asString,
+      };
     } catch (e) {
       console.error(e);
       return {
         type: "graphql",
+        request,
+        dynamicOptions,
         statusCode: 500,
         payload: {
           errors: [new GraphQLError(e.message)],

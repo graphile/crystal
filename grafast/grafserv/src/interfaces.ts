@@ -84,14 +84,20 @@ declare global {
 
 export interface RequestDigest {
   method: "HEAD" | "GET" | "POST" | string;
+  httpVersionMajor: number;
+  httpVersionMinor: number;
   path: string;
   headers: Record<string, string>;
   getBody(dynamicOptions: OptionsFromConfig): PromiseOrDirect<string>;
   frameworkMeta: Grafserv.RequestDigestFrameworkMeta[keyof Grafserv.RequestDigestFrameworkMeta];
+  // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
+  preferJSON?: boolean;
 }
 
 interface IHandlerResult {
   type: string;
+  request: RequestDigest;
+  dynamicOptions: OptionsFromConfig;
   statusCode?: number;
 }
 export interface HTMLHandlerResult extends IHandlerResult {
@@ -137,3 +143,53 @@ export type SchemaChangeEvent = {
   event: "change";
   data: "schema";
 };
+
+type JSONValue = null | boolean | number | string | JSONValue[] | JSONObject;
+interface JSONObject {
+  [key: string]: JSONValue;
+}
+
+export interface ErrorResult {
+  type: "error";
+  error: Error;
+}
+
+export interface BufferResult {
+  type: "buffer";
+  statusCode: number;
+  headers: Record<string, string>;
+  buffer: Buffer;
+}
+
+export interface JSONResult {
+  type: "json";
+  statusCode: number;
+  headers: Record<string, string>;
+  json: JSONValue;
+}
+
+export interface BufferStreamResult {
+  type: "bufferStream";
+  statusCode: number;
+  headers: Record<string, string>;
+  /** If true, setNoDelay, etc */
+  lowLatency: boolean;
+  bufferIterator: AsyncGenerator<Buffer, void, undefined>;
+}
+
+/*
+export interface JSONStreamResult {
+  type: "jsonStream";
+  statusCode: number;
+  headers: Record<string, string>;
+  /** If true, setNoDelay, etc * /
+  lowLatency: boolean;
+  jsonIterator: AsyncGenerator<JSONValue, void, undefined>;
+}
+*/
+
+export type Result =
+  | ErrorResult
+  | BufferResult
+  | JSONResult
+  | BufferStreamResult;

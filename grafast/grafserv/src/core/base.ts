@@ -1,18 +1,27 @@
 import EventEmitter from "eventemitter3";
 import { GraphQLSchema, isSchema, validateSchema } from "graphql";
 import { resolvePresets } from "graphile-config";
-import { isPromiseLike, PromiseOrDirect, TypedEventEmitter } from "grafast";
+import {
+  isPromiseLike,
+  PromiseOrDirect,
+  stringifyPayload,
+  TypedEventEmitter,
+} from "grafast";
 import {
   GrafservConfig,
   RequestDigest,
-  SendResult,
-  SendError,
   HandlerResult,
   SchemaChangeEvent,
+  Result,
+  BufferResult,
+  EventStreamEvent,
+  ErrorResult,
 } from "../interfaces";
 import { OptionsFromConfig, optionsFromConfig } from "../options";
 import { makeGraphQLHandler } from "../middleware/graphql";
 import { makeGraphiQLHandler } from "../middleware/graphiql";
+import { handleErrors } from "../utils";
+import { mapIterator } from "../mapIterator";
 
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
@@ -70,6 +79,8 @@ export class GrafservBase {
           console.dir(e);
           return {
             type: "graphql",
+            request,
+            dynamicOptions,
             payload: { errors: [e] },
             statusCode: 500,
           } as HandlerResult;
@@ -96,6 +107,8 @@ export class GrafservBase {
         const stream = this.makeStream();
         return {
           type: "event-stream",
+          request,
+          dynamicOptions,
           payload: stream,
           statusCode: 200,
         };
@@ -107,27 +120,26 @@ export class GrafservBase {
       console.error("Unexpected error occurred in _processRequest", e);
       return {
         type: "html",
+        request,
+        dynamicOptions,
         status: 500,
         payload: Buffer.from("ERROR", "utf8"),
       } as HandlerResult;
     }
   }
 
-  protected processRequest(details: {
-    request: RequestDigest;
-    sendResult: SendResult;
-    sendError: SendError;
-  }) {
-    const { request, sendResult, sendError } = details;
+  protected processRequest(
+    request: RequestDigest,
+  ): PromiseOrDirect<Result | null> {
     try {
       const result = this._processRequest(request);
       if (isPromiseLike(result)) {
-        result.then(sendResult, sendError);
+        return result.then(sendResult, sendError);
       } else {
-        sendResult(result);
+        return sendResult(result);
       }
     } catch (e) {
-      sendError(e);
+      return sendError(e);
     }
   }
 
@@ -205,7 +217,10 @@ export class GrafservBase {
       this.dynamicOptions,
       this.schema,
     );
-    this.graphiqlHandler = makeGraphiQLHandler();
+    this.graphiqlHandler = makeGraphiQLHandler(
+      this.resolvedPreset,
+      this.dynamicOptions,
+    );
   }
 
   private makeStream(): AsyncIterableIterator<SchemaChangeEvent> {
@@ -266,3 +281,182 @@ export class GrafservBase {
     };
   }
 }
+
+const END = Buffer.from("\r\n-----\r\n", "utf8");
+const DIVIDE = Buffer.from(
+  `\r\n---\r\nContent-Type: application/json\r\n\r\n`,
+  "utf8",
+);
+
+function sendResult(
+  handlerResult: HandlerResult | null,
+): PromiseOrDirect<Result | null> {
+  if (handlerResult === null) {
+    return null;
+  }
+  switch (handlerResult.type) {
+    case "graphql": {
+      const {
+        payload,
+        statusCode = 200,
+        asString,
+        dynamicOptions,
+        request: { preferJSON },
+      } = handlerResult;
+
+      handleErrors(payload);
+      const buffer = Buffer.from(
+        stringifyPayload(payload as any, asString),
+        "utf8",
+      );
+      const headers = Object.create(null);
+      headers["Content-Type"] = "application/json";
+      headers["Content-Length"] = buffer.length;
+      if (dynamicOptions.watch) {
+        headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamRoute;
+      }
+      return {
+        type: "buffer",
+        statusCode,
+        headers,
+        buffer,
+      };
+    }
+    case "graphqlIncremental": {
+      const {
+        iterator,
+        statusCode = 200,
+        asString,
+        dynamicOptions,
+        request: { preferJSON },
+      } = handlerResult;
+      const headers = Object.create(null);
+      (headers["Content-Type"] = 'multipart/mixed; boundary="-"'),
+        (headers["Transfer-Encoding"] = "chunked");
+      if (dynamicOptions.watch) {
+        headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamRoute;
+      }
+
+      const bufferIterator = mapIterator(
+        iterator,
+        (payload) => {
+          handleErrors(payload);
+          const payloadBuffer = Buffer.from(
+            stringifyPayload(payload as any, asString),
+            "utf8",
+          );
+          return Buffer.concat([DIVIDE, payloadBuffer]);
+        },
+        () => {
+          return END;
+        },
+      );
+
+      return {
+        type: "bufferStream",
+        headers,
+        statusCode,
+        lowLatency: true,
+        bufferIterator,
+      };
+    }
+    case "text":
+    case "html": {
+      const {
+        payload,
+        statusCode = 200,
+        request: { preferJSON },
+      } = handlerResult;
+      const headers = Object.create(null);
+      if (handlerResult.type === "html") {
+        headers["Content-Type"] = "text/html; charset=utf-8";
+      } else {
+        headers["Content-Type"] = "text/plain; charset=utf-8";
+      }
+      headers["Content-Length"] = payload.length;
+      return {
+        type: "buffer",
+        statusCode,
+        headers,
+        buffer: payload,
+      } as BufferResult;
+    }
+    case "event-stream": {
+      const {
+        payload: stream,
+        statusCode = 200,
+        request: { httpVersionMajor },
+      } = handlerResult;
+
+      // Making sure these options are set.
+
+      // Set headers for Server-Sent Events.
+      const headers = Object.create(null);
+      // Don't buffer EventStream in nginx
+      headers["X-Accel-Buffering"] = "no";
+      headers["Content-Type"] = "text/event-stream";
+      headers["Cache-Control"] = "no-cache, no-transform";
+      if (httpVersionMajor >= 2) {
+        // NOOP
+      } else {
+        headers["Connection"] = "keep-alive";
+      }
+
+      // Creates a stream for the response
+
+      const send = (event: EventStreamEvent): Buffer => {
+        let payload = "";
+        if (event.event) {
+          payload += `event: ${event.event}\n`;
+        }
+        if (event.id) {
+          payload += `id: ${event.id}\n`;
+        }
+        if (event.retry) {
+          payload += `retry: ${event.retry}\n`;
+        }
+        if (event.data != null) {
+          payload += `data: ${event.data.replace(/\n/g, "\ndata: ")}\n`;
+        }
+        payload += "\n";
+        return Buffer.from(payload, "utf8");
+      };
+
+      const bufferIterator = mapIterator<EventStreamEvent, Buffer>(
+        stream,
+        send,
+        undefined,
+        () => send({ event: "open" }),
+      );
+
+      return {
+        type: "bufferStream",
+        statusCode,
+        headers,
+        lowLatency: true,
+        bufferIterator,
+      };
+    }
+    default: {
+      const never: never = handlerResult;
+      console.error(`Did not understand '${never}' passed to sendResult`);
+      const payload = Buffer.from("Unexpected input to sendResult", "utf8");
+      const headers = Object.create(null);
+      headers["Content-Type"] = "text/plain; charset=utf-8";
+      headers["Content-Length"] = payload.length;
+      return {
+        type: "buffer",
+        statusCode: 500,
+        headers,
+        buffer: payload,
+      } as BufferResult;
+    }
+  }
+}
+
+const sendError = (error: Error): ErrorResult => {
+  return {
+    type: "error",
+    error,
+  };
+};
