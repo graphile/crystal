@@ -20,12 +20,35 @@
   },
   materialByClass: {
     class: "concrete",
-    valueof: "rough",
     id: 1,
   },
   materialByValueof: {
     class: "rubber",
-    valueof: "spongy",
     id: 3,
+  },
+  allCropsList: [
+    {
+      id: 1,
+      amount: 100,
+      yield: "wheat",
+    },
+    {
+      id: 2,
+      amount: 200,
+      yield: "corn",
+    },
+    {
+      id: 3,
+      amount: 555,
+      yield: "oat",
+    },
+  ],
+  cropById: {
+    yield: "wheat",
+    amount: 100,
+  },
+  cropByYield: {
+    amount: 200,
+    id: 2,
   },
 }

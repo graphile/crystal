@@ -12,12 +12,23 @@
   }
   materialByClass(class: "concrete") {
     class
-    valueof
     id
   }
   materialByValueof(valueof: "spongy") {
     class
-    valueof
+    id
+  }
+  allCropsList {
+    id
+    amount
+    yield
+  }
+  cropById(id: 1) {
+    yield
+    amount
+  }
+  cropByYield(yield: "corn") {
+    amount
     id
   }
 }
