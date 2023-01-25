@@ -63,6 +63,7 @@ delete from js_reserved.crop cascade;
 delete from js_reserved.material cascade;
 delete from js_reserved.constructor cascade;
 delete from js_reserved.yield cascade;
+delete from js_reserved.__proto__ cascade;
 
 
 alter table b.types enable trigger user;
@@ -699,3 +700,11 @@ insert into js_reserved.yield
   ('wheat', 'UK'),
   ('corn',  'IE'),
   ('oat',   'FR');
+
+alter sequence js_reserved.__proto___id_seq restart with 1;
+
+insert into js_reserved.__proto__
+  (name,        brand     ) values
+  ('DynaTAC',  'Motorola'),
+  ('VCS',      'Atari'   ),
+  ('Model T',  'Ford'    );

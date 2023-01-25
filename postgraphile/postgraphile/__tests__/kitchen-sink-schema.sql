@@ -1601,4 +1601,16 @@ create table js_reserved.yield (
   id serial primary key,
   crop text,
   export text unique
-)
+);
+
+create table js_reserved.__proto__ (
+  id serial primary key,
+  name text unique,
+  brand text
+);
+
+create table js_reserved.null (
+  id serial primary key,
+  name text unique,
+  brand text
+);
