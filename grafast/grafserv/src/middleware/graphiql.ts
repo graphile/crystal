@@ -1,8 +1,4 @@
-import type {
-  ServerParams,
-  HandlerResult,
-  RequestDigest,
-} from "../interfaces.js";
+import type { HandlerResult, RequestDigest } from "../interfaces.js";
 import { OptionsFromConfig } from "../options.js";
 
 const ruruServer = import("ruru/server");

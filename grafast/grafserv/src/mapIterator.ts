@@ -47,10 +47,12 @@ export function mapIterator<T, U>(
       });
     },
     return(value) {
+      status = 2;
       iterator.return?.(value);
       return Promise.resolve({ value: undefined, done: true });
     },
     throw(error) {
+      status = 2;
       iterator.throw?.(error);
       return Promise.reject(error);
     },

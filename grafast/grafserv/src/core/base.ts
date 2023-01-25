@@ -403,8 +403,7 @@ function sendResult(
       }
 
       // Creates a stream for the response
-
-      const send = (event: EventStreamEvent): Buffer => {
+      const event2buffer = (event: EventStreamEvent): Buffer => {
         let payload = "";
         if (event.event) {
           payload += `event: ${event.event}\n`;
@@ -424,9 +423,9 @@ function sendResult(
 
       const bufferIterator = mapIterator<EventStreamEvent, Buffer>(
         stream,
-        send,
+        event2buffer,
         undefined,
-        () => send({ event: "open" }),
+        () => event2buffer({ event: "open" }),
       );
 
       return {
