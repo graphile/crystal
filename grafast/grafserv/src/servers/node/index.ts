@@ -7,7 +7,6 @@ import {
   SendError,
   RequestDigest,
   EventStreamEvent,
-  HandlerResult,
 } from "../../interfaces";
 import { handleErrors } from "../../utils";
 
@@ -22,7 +21,7 @@ declare global {
   }
 }
 
-export function getBodyFromRequest(
+function getBodyFromRequest(
   req: IncomingMessage,
   maxLength: number,
 ): Promise<string> {
@@ -81,7 +80,9 @@ function getDigest(req: IncomingMessage, res: ServerResponse): RequestDigest {
   };
 }
 
-export class NodeGrafserv extends GrafservBase {
+const END = Buffer.from("\r\n-----\r\n", "utf8");
+
+class NodeGrafserv extends GrafservBase {
   constructor(config: GrafservConfig) {
     super(config);
   }
@@ -147,6 +148,10 @@ export class NodeGrafserv extends GrafservBase {
           const { payload, statusCode = 200, asString } = handlerResult;
 
           handleErrors(payload);
+          const payloadBuffer = Buffer.from(
+            stringifyPayload(payload as any, asString),
+            "utf8",
+          );
           res.writeHead(statusCode, {
             "Content-Type": "application/json",
             ...(dynamicOptions.watch
@@ -154,9 +159,9 @@ export class NodeGrafserv extends GrafservBase {
                   "X-GraphQL-Event-Stream": dynamicOptions.eventStreamRoute,
                 }
               : null),
+            "Content-Length": payloadBuffer.length,
           });
-          const payloadString = stringifyPayload(payload as any, asString);
-          res.end(payloadString);
+          res.end(payloadBuffer);
           break;
         }
         case "graphqlIncremental": {
@@ -176,17 +181,20 @@ export class NodeGrafserv extends GrafservBase {
             try {
               for await (const payload of iterator) {
                 handleErrors(payload);
-                const payloadString = stringifyPayload(
-                  payload as any,
-                  asString,
+                const payloadBuffer = Buffer.from(
+                  stringifyPayload(payload as any, asString),
+                  "utf8",
                 );
                 res.write(
-                  "\r\n---\r\nContent-Type: application/json\r\n\r\n" +
-                    payloadString,
+                  Buffer.from(
+                    `\r\n---\r\nContent-Type: application/json\r\nContent-Length: ${payloadBuffer.length}\r\n\r\n`,
+                    "utf8",
+                  ),
                 );
+                res.write(payloadBuffer);
               }
             } finally {
-              res.write("\r\n-----\r\n");
+              res.write(END);
               res.end();
             }
           })().catch((e) => {
@@ -331,8 +339,12 @@ export class NodeGrafserv extends GrafservBase {
         default: {
           const never: never = handlerResult;
           console.error(`Did not understand '${never}' passed to sendResult`);
-          res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
-          res.end("Unexpected input to sendResult");
+          const payload = Buffer.from("Unexpected input to sendResult", "utf8");
+          res.writeHead(500, {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Content-Length": payload.length,
+          });
+          res.end(payload);
         }
       }
     };
@@ -349,7 +361,7 @@ export class NodeGrafserv extends GrafservBase {
 
     return (e: Error) => {
       console.error(e);
-      const payload = "Internal server error";
+      const payload = Buffer.from("Internal server error", "utf8");
       res.writeHead(500, {
         "Content-Type": "text/plain",
         "Content-Length": payload.length,
