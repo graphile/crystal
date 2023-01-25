@@ -65,7 +65,7 @@ delete from js_reserved.constructor cascade;
 delete from js_reserved.yield cascade;
 delete from js_reserved.__proto__ cascade;
 delete from js_reserved.null cascade;
-
+delete from js_reserved.reserved cascade;
 
 alter table b.types enable trigger user;
 
@@ -717,3 +717,12 @@ insert into js_reserved.null
   ('apartment', '10 am'),
   ('flat', 'noon'),
   ('house', '3 pm');
+
+alter sequence js_reserved.reserved_id_seq restart with 1;
+
+insert into js_reserved.reserved
+  ("null",                            "case",          "do") values
+  ('No Limit',                       '2 Unlimited',    '1993'),
+  ('No More Mr Nice Guy',            'Alice Cooper',   '1973'),
+  ('No Woman No Cry',                'Bob Marley',     '1974'),
+  ('(I Can''t Get No) Satisfaction', 'Rolling Stones', '1965')

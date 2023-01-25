@@ -1614,3 +1614,10 @@ create table js_reserved.null (
   hasOwnProperty text unique,
   break text unique
 );
+
+create table js_reserved.reserved (
+  id serial primary key,
+  "null" text unique,
+  "case" text unique,
+  "do" text unique
+)

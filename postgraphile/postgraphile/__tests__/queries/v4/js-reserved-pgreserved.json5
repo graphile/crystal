@@ -1,0 +1,47 @@
+{
+  allReservedsList: [
+    {
+      case: "2 Unlimited",
+      do: "1993",
+      id: 1,
+      null: "No Limit",
+    },
+    {
+      case: "Alice Cooper",
+      do: "1973",
+      id: 2,
+      null: "No More Mr Nice Guy",
+    },
+    {
+      case: "Bob Marley",
+      do: "1974",
+      id: 3,
+      null: "No Woman No Cry",
+    },
+    {
+      case: "Rolling Stones",
+      do: "1965",
+      id: 4,
+      null: "(I Can't Get No) Satisfaction",
+    },
+  ],
+  reservedByCase: {
+    do: "1993",
+    id: 1,
+    null: "No Limit",
+  },
+  reservedByDo: {
+    case: "Alice Cooper",
+    id: 2,
+    null: "No More Mr Nice Guy",
+  },
+  reservedById: {
+    case: "Rolling Stones",
+    do: "1965",
+    null: "(I Can't Get No) Satisfaction",
+  },
+  reservedByNull: {
+    case: "2 Unlimited",
+    do: "1993",
+  },
+}
