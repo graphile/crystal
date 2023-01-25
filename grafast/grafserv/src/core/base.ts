@@ -10,6 +10,8 @@ import {
   HandlerResult,
 } from "../interfaces";
 import { OptionsFromConfig, optionsFromConfig } from "../options";
+import { makeGraphQLHandler } from "../middleware/graphql";
+import { makeGraphiQLHandler } from "../middleware/graphiql";
 
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
@@ -22,6 +24,7 @@ export class GrafservBase {
     "schema:ready": GraphQLSchema;
     "schema:error": any;
   }>;
+  private initialized = false;
 
   constructor(config: GrafservConfig) {
     this.eventEmitter = new EventEmitter();
@@ -43,15 +46,72 @@ export class GrafservBase {
     } else {
       this.eventEmitter.emit("schema:ready", config.schema);
     }
+    this.initialized = true;
+    this.refreshHandlers();
   }
 
   private _processRequest(
     request: RequestDigest,
-  ): PromiseOrDirect<HandlerResult> {
+  ): PromiseOrDirect<HandlerResult | null> {
+    const dynamicOptions = this.dynamicOptions;
     try {
-      throw new Error("TODO");
+      if (
+        request.path === dynamicOptions.graphqlPath &&
+        request.method === "POST"
+      ) {
+        return this.graphqlHandler(request).catch((e) => {
+          // Special error handling for GraphQL route
+          console.error(
+            "An error occurred whilst attempting to handle the GraphQL request:",
+          );
+          console.dir(e);
+          return {
+            type: "graphql",
+            payload: { errors: [e] },
+            statusCode: 500,
+          } as HandlerResult;
+        });
+      }
+
+      // FIXME: handle 'HEAD' requests
+
+      if (
+        dynamicOptions.graphiql &&
+        request.method === "GET" &&
+        (request.path === dynamicOptions.graphiqlPath ||
+          (dynamicOptions.graphiqlOnGraphQLGET &&
+            request.path === dynamicOptions.graphqlPath))
+      ) {
+        return this.graphiqlHandler(request);
+      }
+
+      /*
+      if (
+        dynamicOptions.watch &&
+        request.path === dynamicOptions.eventStreamRoute &&
+        request.method === "GET"
+      ) {
+        (async () => {
+          const stream = makeStream();
+          sendResult(res, {
+            type: "event-stream",
+            payload: stream,
+            statusCode: 200,
+          });
+        })().catch(handleError);
+        return;
+      }
+      */
+
+      // Unhandled
+      return null;
     } catch (e) {
-      return { type: "html", status: 500, payload: "ERROR" } as HandlerResult;
+      console.error("Unexpected error occurred in _processRequest", e);
+      return {
+        type: "html",
+        status: 500,
+        payload: Buffer.from("ERROR", "utf8"),
+      } as HandlerResult;
     }
   }
 
@@ -107,7 +167,11 @@ export class GrafservBase {
 
   public setPreset(newPreset: GraphileConfig.Preset) {
     this.resolvedPreset = resolvePresets([newPreset]);
-    this.dynamicOptions = optionsFromConfig(this.resolvedPreset);
+    const newOptions = optionsFromConfig(this.resolvedPreset);
+    if (this.dynamicOptions !== newOptions) {
+      this.dynamicOptions = newOptions;
+      this.refreshHandlers();
+    }
   }
 
   public setSchema(newSchema: GraphQLSchema) {
@@ -125,8 +189,26 @@ export class GrafservBase {
         `setParams called with invalid schema; first error: ${errors[0]}`,
       );
     }
-    this.schemaError = null;
-    this.schema = newSchema;
-    this.eventEmitter.emit("schema:ready", newSchema);
+    if (this.schema !== newSchema) {
+      this.schemaError = null;
+      this.schema = newSchema;
+      this.eventEmitter.emit("schema:ready", newSchema);
+      this.refreshHandlers();
+    }
+  }
+
+  private graphqlHandler!: ReturnType<typeof makeGraphQLHandler>;
+  private graphiqlHandler!: ReturnType<typeof makeGraphiQLHandler>;
+  private refreshHandlers() {
+    if (!this.initialized) {
+      return;
+    }
+    // TODO: this.graphqlHandler?.release()?
+    this.graphqlHandler = makeGraphQLHandler(
+      this.resolvedPreset,
+      this.dynamicOptions,
+      this.schema,
+    );
+    this.graphiqlHandler = makeGraphiQLHandler();
   }
 }

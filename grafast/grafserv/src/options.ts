@@ -9,6 +9,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     maxRequestLength = 100_000,
   } = config.server ?? {};
   return {
+    asString: true,
     graphqlPath,
     graphiql,
     graphiqlOnGraphQLGET,

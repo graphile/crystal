@@ -5,11 +5,14 @@ import {
   execute as grafastExecute,
   hookArgs,
   isAsyncIterable,
+  isPromiseLike,
+  PromiseOrDirect,
 } from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
-import type { ServerParams, HandlerResult } from "../interfaces.js";
+import type { HandlerResult, RequestDigest } from "../interfaces.js";
+import { OptionsFromConfig } from "../options.js";
 
 let lastString: string;
 let lastHash: string;
@@ -78,16 +81,67 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
   return parseAndValidate;
 }
 
-export const makeGraphQLHandler = (params: ServerParams) => {
-  const { schema } = params;
-  const parseAndValidate = makeParseAndValidateFunction(schema);
-  const asString = true;
+export const makeGraphQLHandler = (
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+  dynamicOptions: OptionsFromConfig,
+  schemaOrPromise: PromiseOrDirect<GraphQLSchema> | null,
+) => {
+  if (schemaOrPromise == null) {
+    const err = Promise.reject(
+      new GraphQLError(
+        "The schema is currently unavailable",
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          statusCode: 503,
+        },
+      ),
+    );
+    return () => err;
+  }
 
-  return async (
-    resolvedPreset: GraphileConfig.ResolvedPreset,
-    ctx: GraphileConfig.GraphQLRequestContext,
-    body: unknown,
-  ): Promise<HandlerResult> => {
+  let schema: GraphQLSchema;
+  let parseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+  let wait: PromiseLike<void> | null;
+
+  if (isPromiseLike(schemaOrPromise)) {
+    wait = schemaOrPromise.then((_schema) => {
+      if (_schema == null) {
+        throw new GraphQLError(
+          "The schema is current unavailable.",
+          null,
+          null,
+          null,
+          null,
+          null,
+          {
+            statusCode: 503,
+          },
+        );
+      }
+      schema = _schema;
+      parseAndValidate = makeParseAndValidateFunction(schema);
+      wait = null;
+    });
+  } else {
+    schema = schemaOrPromise;
+    parseAndValidate = makeParseAndValidateFunction(schema);
+  }
+
+  const asString = dynamicOptions.asString;
+
+  return async (request: RequestDigest): Promise<HandlerResult> => {
+    if (wait) {
+      await wait;
+    }
+    // FIXME: if method === POST...
+    const bodyRaw = await request.getBody(dynamicOptions);
+    // FIXME: this parsing is unsafe (it doesn't even check the
+    // content-type!) - replace it with V4's behaviour
+    const body = JSON.parse(bodyRaw);
     // Parse the body
     if (typeof body !== "object" || body == null) {
       throw new Error("Invalid body in request");
@@ -122,7 +176,13 @@ export const makeGraphQLHandler = (params: ServerParams) => {
       operationName,
     };
 
-    await hookArgs(args, ctx, resolvedPreset);
+    await hookArgs(
+      args,
+      {
+        request,
+      },
+      resolvedPreset,
+    );
 
     try {
       const result = await grafastExecute(args, resolvedPreset);

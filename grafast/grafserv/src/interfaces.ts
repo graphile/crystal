@@ -2,9 +2,10 @@ import { PromiseOrDirect } from "grafast";
 import "graphile-config";
 
 import type { GraphQLSchema } from "graphql";
-import type { IncomingMessage } from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Socket } from "node:net";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import { OptionsFromConfig } from "./options";
 
 export type ContextCallback = (
   graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
@@ -59,8 +60,7 @@ declare global {
      */
     interface GraphQLRequestContext {
       // TODO: add things like operationName, operation, etc?
-      httpRequest?: IncomingMessage;
-      socket?: Socket;
+      request?: RequestDigest;
     }
     interface Preset {
       server?: ServerOptions;
@@ -68,14 +68,26 @@ declare global {
   }
 }
 
-export type SendResult = (result: HandlerResult) => void;
+/**
+ * If result is null then the response should pass through to the next handler
+ * in the server (or raise a 404 or similar error)
+ */
+export type SendResult = (result: HandlerResult | null) => void;
 export type SendError = (error: any) => void;
+
+declare global {
+  namespace Grafserv {
+    /** Extend this through declaration merging */
+    interface RequestDigestFrameworkMeta {}
+  }
+}
 
 export interface RequestDigest {
   method: "HEAD" | "GET" | "POST" | string;
   path: string;
   headers: Record<string, string>;
-  getBody(): PromiseOrDirect<string>;
+  getBody(dynamicOptions: OptionsFromConfig): PromiseOrDirect<string>;
+  frameworkMeta: Grafserv.RequestDigestFrameworkMeta[keyof Grafserv.RequestDigestFrameworkMeta];
 }
 
 interface IHandlerResult {
@@ -84,11 +96,11 @@ interface IHandlerResult {
 }
 export interface HTMLHandlerResult extends IHandlerResult {
   type: "html";
-  payload: string;
+  payload: Buffer;
 }
 export interface TextHandlerResult extends IHandlerResult {
   type: "text";
-  payload: string;
+  payload: Buffer;
 }
 export interface GraphQLHandlerResult extends IHandlerResult {
   type: "graphql";

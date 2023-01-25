@@ -1,3 +1,4 @@
+import { stringifyPayload } from "grafast";
 import { IncomingMessage, ServerResponse } from "http";
 import { GrafservBase } from "../../core/base";
 import {
@@ -5,8 +6,21 @@ import {
   SendResult,
   SendError,
   RequestDigest,
+  EventStreamEvent,
+  HandlerResult,
 } from "../../interfaces";
-import { OptionsFromConfig } from "../../options";
+import { handleErrors } from "../../utils";
+
+declare global {
+  namespace Grafserv {
+    interface RequestDigestFrameworkMeta {
+      node: {
+        req: IncomingMessage;
+        res: ServerResponse;
+      };
+    }
+  }
+}
 
 export function getBodyFromRequest(
   req: IncomingMessage,
@@ -52,16 +66,17 @@ function processHeaders(
   return headerDigest;
 }
 
-function getDigest(
-  dynamicOptions: OptionsFromConfig,
-  req: IncomingMessage,
-): RequestDigest {
+function getDigest(req: IncomingMessage, res: ServerResponse): RequestDigest {
   return {
     method: req.method!,
     path: req.url!,
     headers: processHeaders(req.headers),
-    getBody() {
+    getBody(dynamicOptions) {
       return getBodyFromRequest(req, dynamicOptions.maxRequestLength);
+    },
+    frameworkMeta: {
+      req,
+      res,
     },
   };
 }
@@ -78,7 +93,7 @@ export class NodeGrafserv extends GrafservBase {
   ) => void {
     return (req, res, next) => {
       try {
-        const request = getDigest(this.dynamicOptions, req);
+        const request = getDigest(req, res);
         const sendResult = this.makeSendResult(req, res, next);
         const sendError = this.makeSendError(req, res, next);
         this.processRequest({
@@ -104,13 +119,222 @@ export class NodeGrafserv extends GrafservBase {
   }
 
   private makeSendResult(
-    _req: IncomingMessage,
+    req: IncomingMessage,
     res: ServerResponse,
-    _next?: (err?: Error) => void,
+    next?: (err?: Error) => void,
   ): SendResult {
-    return (result) => {
-      res.writeHead(503);
-      res.end("TODO");
+    const dynamicOptions = this.dynamicOptions;
+    return function sendResult(handlerResult) {
+      if (handlerResult == null) {
+        // Not handled
+        if (typeof next === "function") {
+          return next();
+        } else {
+          console.log(`Unhandled ${req.method} to ${req.url}`);
+          sendResult({
+            type: "text",
+            payload: Buffer.from(
+              `Could not process ${req.method} request to ${req.url} ─ please POST requests to ${dynamicOptions.graphqlPath}`,
+              "utf8",
+            ),
+            statusCode: 404,
+          });
+          return;
+        }
+      }
+      switch (handlerResult.type) {
+        case "graphql": {
+          const { payload, statusCode = 200, asString } = handlerResult;
+
+          handleErrors(payload);
+          res.writeHead(statusCode, {
+            "Content-Type": "application/json",
+            ...(dynamicOptions.watch
+              ? {
+                  "X-GraphQL-Event-Stream": dynamicOptions.eventStreamRoute,
+                }
+              : null),
+          });
+          const payloadString = stringifyPayload(payload as any, asString);
+          res.end(payloadString);
+          break;
+        }
+        case "graphqlIncremental": {
+          const { iterator, statusCode = 200, asString } = handlerResult;
+          res.writeHead(statusCode, {
+            "Content-Type": 'multipart/mixed; boundary="-"',
+            "Transfer-Encoding": "chunked",
+            ...(dynamicOptions.watch
+              ? {
+                  "X-GraphQL-Event-Stream": dynamicOptions.eventStreamRoute,
+                }
+              : null),
+          });
+
+          (async () => {
+            // TODO: use manual looping so the iterable can be aborted without awaiting the promise
+            try {
+              for await (const payload of iterator) {
+                handleErrors(payload);
+                const payloadString = stringifyPayload(
+                  payload as any,
+                  asString,
+                );
+                res.write(
+                  "\r\n---\r\nContent-Type: application/json\r\n\r\n" +
+                    payloadString,
+                );
+              }
+            } finally {
+              res.write("\r\n-----\r\n");
+              res.end();
+            }
+          })().catch((e) => {
+            console.error(`Error occurred when streaming result: ${e}`);
+            try {
+              res.end();
+            } catch (e2) {
+              console.error(
+                `A further error occurred when terminating the request: ${e2}`,
+              );
+            }
+          });
+
+          break;
+        }
+        case "text":
+        case "html": {
+          const { payload, statusCode = 200 } = handlerResult;
+          res.writeHead(statusCode, {
+            "Content-Type":
+              handlerResult.type === "html"
+                ? "text/html; charset=utf-8"
+                : "text/plain; charset=utf-8",
+            "Content-Length": payload.length,
+          });
+          res.end(payload);
+          break;
+        }
+        case "event-stream": {
+          const { payload: stream, statusCode = 200 } = handlerResult;
+
+          // Making sure these options are set.
+          res.req.socket.setTimeout(0);
+          res.req.socket.setNoDelay(true);
+          res.req.socket.setKeepAlive(true);
+
+          // Set headers for Server-Sent Events.
+          // Don't buffer EventStream in nginx
+          res.setHeader("X-Accel-Buffering", "no");
+          res.setHeader("Content-Type", "text/event-stream");
+          res.setHeader("Cache-Control", "no-cache, no-transform");
+          if (res.req.httpVersionMajor >= 2) {
+            // NOOP
+          } else {
+            res.setHeader("Connection", "keep-alive");
+          }
+          res.writeHead(statusCode);
+
+          // Creates a stream for the response
+
+          let stopped = false;
+          const send = (event: EventStreamEvent) => {
+            if (stopped) {
+              return;
+            }
+            let payload = "";
+            if (event.event) {
+              payload += `event: ${event.event}\n`;
+            }
+            if (event.id) {
+              payload += `id: ${event.id}\n`;
+            }
+            if (event.retry) {
+              payload += `retry: ${event.retry}\n`;
+            }
+            if (event.data != null) {
+              payload += `data: ${event.data.replace(/\n/g, "\ndata: ")}\n`;
+            }
+            payload += "\n";
+            res.write(payload);
+            // Technically we should see if `.write()` returned false, and if so we
+            // should pause the stream. However, since our stream is coming from
+            // watch mode, we find it unlikely that a significant amount of data
+            // will be buffered (and we don't recommend watch mode in production),
+            // so it doesn't feel like we need this currently. If it turns out you
+            // need this, a PR would be welcome.
+
+            if (typeof (res as any).flush === "function") {
+              // https://github.com/expressjs/compression#server-sent-events
+              (res as any).flush();
+            } else if (typeof (res as any).flushHeaders === "function") {
+              (res as any).flushHeaders();
+            }
+          };
+
+          // Notify client that connection is open.
+          send({ event: "open" });
+
+          // Process stream
+          const iterator = stream[Symbol.asyncIterator]();
+          const waitNext = () => {
+            const n = iterator.next();
+            n.then(
+              (r) => {
+                if (!r.done || r.value) {
+                  send(r.value);
+                }
+                if (r.done) {
+                  res.end();
+                  cleanup();
+                  return;
+                } else {
+                  if (!stopped) {
+                    waitNext();
+                  }
+                }
+              },
+              (error) => {
+                console.error("Error occurred processing event stream:", error);
+                send({
+                  event: "error",
+                  data: JSON.stringify({
+                    errors: [
+                      { message: "Error occurred processing event stream" },
+                    ],
+                  }),
+                });
+                res.end();
+                cleanup();
+              },
+            );
+          };
+          waitNext();
+
+          // Clean up when connection closes.
+          const cleanup = () => {
+            stopped = true;
+            try {
+              iterator.return?.();
+            } catch {
+              /* nom nom nom */
+            }
+            res.req.removeListener("close", cleanup);
+            res.req.removeListener("finish", cleanup);
+            res.req.removeListener("error", cleanup);
+          };
+          res.req.on("close", cleanup);
+          res.req.on("finish", cleanup);
+          res.req.on("error", cleanup);
+          break;
+        }
+        default: {
+          const never: never = handlerResult;
+          console.error(`Did not understand '${never}' passed to sendResult`);
+          res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+          res.end("Unexpected input to sendResult");
+        }
+      }
     };
   }
 
@@ -122,9 +346,15 @@ export class NodeGrafserv extends GrafservBase {
     if (typeof next === "function") {
       return next;
     }
-    return (error) => {
-      res.writeHead(500);
-      res.end("TODO");
+
+    return (e: Error) => {
+      console.error(e);
+      const payload = "Internal server error";
+      res.writeHead(500, {
+        "Content-Type": "text/plain",
+        "Content-Length": payload.length,
+      });
+      res.end(payload);
     };
   }
 }
