@@ -1,0 +1,21 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  projectByProto__(_proto__: "DynaTAC") {
+    brand
+    id
+  }
+  projectById(id: 2) {
+    brand
+    _proto__
+  }
+  allProjects {
+    nodes {
+      _proto__
+      brand
+      id
+    }
+  }
+}

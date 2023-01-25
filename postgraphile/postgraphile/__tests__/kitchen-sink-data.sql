@@ -58,6 +58,9 @@ delete from js_reserved.relational_items cascade;
 delete from js_reserved.machine cascade;
 delete from js_reserved.building cascade;
 
+delete from js_reserved.project cascade;
+delete from js_reserved.crop cascade;
+
 alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
@@ -616,7 +619,7 @@ insert into polymorphic.gcp_application_third_party_vulnerabilities (gcp_applica
   (5, 5),
   (5, 4);
 
-----------------------------------------
+--------------------------------------------------------------------------------
 
 alter sequence js_reserved.building_id_seq restart with 1;
 alter sequence js_reserved.machine_id_seq restart with 1;
@@ -647,9 +650,24 @@ insert into js_reserved.relational_topics
   (2, 'Maintenance'),
   (5, 'Emergency');
 
-  insert into js_reserved.relational_status
+insert into js_reserved.relational_status
   (id, note,        description           )  values
   (3, 'Stopped',    'Best look into that' ),
   (4, 'Scheduled',  null                  );
 
-  alter sequence js_reserved.relational_items_id_seq restart with 6;
+alter sequence js_reserved.relational_items_id_seq restart with 6;
+alter sequence js_reserved.crop_id_seq restart with 1;
+
+alter sequence js_reserved.project_id_seq restart with 1;
+
+insert into js_reserved.project
+  (__proto__,  brand     ) values
+  ('DynaTAC',  'Motorola'),
+  ('VCS',      'Atari'   ),
+  ('Model T',  'Ford'    );
+
+insert into js_reserved.crop
+  (yield,   amount) values
+  ('wheat', 100   ),
+  ('corn',  200   ),
+  ('oat',   555   );
