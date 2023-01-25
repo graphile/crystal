@@ -1,11 +1,13 @@
-import { PromiseOrDirect } from "grafast";
 import "graphile-config";
 
-import type { GraphQLSchema } from "graphql";
-import type { IncomingMessage, ServerResponse } from "node:http";
-import type { Socket } from "node:net";
-import type { AsyncExecutionResult, ExecutionResult } from "graphql";
-import { OptionsFromConfig } from "./options";
+import type { PromiseOrDirect } from "grafast";
+import type {
+  AsyncExecutionResult,
+  ExecutionResult,
+  GraphQLSchema,
+} from "graphql";
+
+import type { OptionsFromConfig } from "./options";
 
 export type ContextCallback = (
   graphqlRequestContext: GraphileConfig.GraphQLRequestContext,

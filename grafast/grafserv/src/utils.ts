@@ -1,5 +1,6 @@
 import { stripAnsi } from "grafast";
-import { AsyncExecutionResult, ExecutionResult, GraphQLError } from "graphql";
+import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import { GraphQLError } from "graphql";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,

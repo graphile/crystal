@@ -1,27 +1,26 @@
 import EventEmitter from "eventemitter3";
-import { GraphQLSchema, isSchema, validateSchema } from "graphql";
+import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
+import { isPromiseLike, stringifyPayload } from "grafast";
 import { resolvePresets } from "graphile-config";
-import {
-  isPromiseLike,
-  PromiseOrDirect,
-  stringifyPayload,
-  TypedEventEmitter,
-} from "grafast";
-import {
-  GrafservConfig,
-  RequestDigest,
-  HandlerResult,
-  SchemaChangeEvent,
-  Result,
+import type { GraphQLSchema } from "graphql";
+import { isSchema, validateSchema } from "graphql";
+
+import type {
   BufferResult,
-  EventStreamEvent,
   ErrorResult,
-} from "../interfaces";
-import { OptionsFromConfig, optionsFromConfig } from "../options";
-import { makeGraphQLHandler } from "../middleware/graphql";
-import { makeGraphiQLHandler } from "../middleware/graphiql";
-import { handleErrors } from "../utils";
-import { mapIterator } from "../mapIterator";
+  EventStreamEvent,
+  GrafservConfig,
+  HandlerResult,
+  RequestDigest,
+  Result,
+  SchemaChangeEvent,
+} from "../interfaces.js";
+import { mapIterator } from "../mapIterator.js";
+import { makeGraphiQLHandler } from "../middleware/graphiql.js";
+import { makeGraphQLHandler } from "../middleware/graphql.js";
+import type { OptionsFromConfig } from "../options.js";
+import { optionsFromConfig } from "../options.js";
+import { handleErrors } from "../utils.js";
 
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
@@ -301,7 +300,6 @@ function sendResult(
         statusCode = 200,
         asString,
         dynamicOptions,
-        request: { preferJSON },
       } = handlerResult;
 
       handleErrors(payload);
@@ -328,7 +326,6 @@ function sendResult(
         statusCode = 200,
         asString,
         dynamicOptions,
-        request: { preferJSON },
       } = handlerResult;
       const headers = Object.create(null);
       (headers["Content-Type"] = 'multipart/mixed; boundary="-"'),
@@ -362,11 +359,7 @@ function sendResult(
     }
     case "text":
     case "html": {
-      const {
-        payload,
-        statusCode = 200,
-        request: { preferJSON },
-      } = handlerResult;
+      const { payload, statusCode = 200 } = handlerResult;
       const headers = Object.create(null);
       if (handlerResult.type === "html") {
         headers["Content-Type"] = "text/html; charset=utf-8";

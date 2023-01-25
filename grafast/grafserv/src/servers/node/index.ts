@@ -1,11 +1,7 @@
-import { IncomingMessage, ServerResponse } from "http";
-import { GrafservBase } from "../../core/base";
-import {
-  GrafservConfig,
-  SendResult,
-  SendError,
-  RequestDigest,
-} from "../../interfaces";
+import type { IncomingMessage, ServerResponse } from "http";
+
+import { GrafservBase } from "../../core/base.js";
+import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
 
 declare global {
   namespace Grafserv {
@@ -151,9 +147,7 @@ class NodeGrafserv extends GrafservBase {
             res.writeHead(statusCode, headers);
 
             // Clean up when connection closes.
-            let stopped = false;
             const cleanup = () => {
-              stopped = true;
               try {
                 bufferIterator.return?.();
               } catch {

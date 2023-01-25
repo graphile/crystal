@@ -2,14 +2,14 @@
 import "graphile-build";
 import "graphile-build-pg";
 
-import { Deferred, isPromiseLike } from "grafast";
-import { defer } from "grafast";
+import type { Deferred } from "grafast";
+import { defer, isPromiseLike } from "grafast";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 
+import type { ServerParams } from "./interfaces.js";
 import { makeSchema, watchSchema } from "./schema.js";
-import { ServerParams } from "./interfaces.js";
 
 export { makePgSources, makeSchema } from "./schema.js";
 

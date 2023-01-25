@@ -1,4 +1,4 @@
-import { GraphQLSchema } from "graphql";
+import type { GraphQLSchema } from "graphql";
 
 export interface ServerParams {
   schema: GraphQLSchema;

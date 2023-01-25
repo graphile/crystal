@@ -1,5 +1,5 @@
 import type { HandlerResult, RequestDigest } from "../interfaces.js";
-import { OptionsFromConfig } from "../options.js";
+import type { OptionsFromConfig } from "../options.js";
 
 const ruruServer = import("ruru/server");
 let ruruHTML: Awaited<typeof ruruServer>["ruruHTML"] | undefined = undefined;
