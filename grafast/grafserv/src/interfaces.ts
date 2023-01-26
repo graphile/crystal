@@ -79,13 +79,6 @@ declare global {
   }
 }
 
-/**
- * If result is null then the response should pass through to the next handler
- * in the server (or raise a 404 or similar error)
- */
-export type SendResult = (result: HandlerResult | null) => void;
-export type SendError = (error: any) => void;
-
 declare global {
   namespace Grafserv {
     /** Extend this through declaration merging */
@@ -194,6 +187,7 @@ export interface JSONResult {
   type: "json";
   statusCode: number;
   headers: Record<string, string>;
+  // TODO: should this be `ExecutionResult | AsyncExecutionResult` instead?
   json: JSONValue;
 }
 
