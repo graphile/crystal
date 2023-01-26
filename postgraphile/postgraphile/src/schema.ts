@@ -12,7 +12,7 @@ import * as pg from "pg";
 
 const Pool = pg.Pool || (pg as any).default?.Pool;
 
-import type { ServerParams } from "grafserv";
+import type { ServerParams } from "./interfaces.js";
 
 declare global {
   namespace GraphileBuild {

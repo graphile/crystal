@@ -125,7 +125,7 @@ export async function runTestQuery(
     ) => Promise<void>;
     path: string;
     deoptimize?: boolean;
-    asString?: boolean;
+    outputDataAsString?: boolean;
   } = Object.create(null),
 ): Promise<{
   payloads?: Array<{
@@ -139,7 +139,7 @@ export async function runTestQuery(
   extensions?: any;
 }> {
   const { variableValues, checkErrorSnapshots } = config;
-  const { path, asString, deoptimize } = options;
+  const { path, outputDataAsString, deoptimize } = options;
   await resetSequences();
 
   const queries: PgClientQuery[] = [];
@@ -197,7 +197,7 @@ export async function runTestQuery(
                   contextValue,
                 },
                 preset,
-                asString,
+                outputDataAsString,
               )
             : await execute(
                 {
@@ -207,7 +207,7 @@ export async function runTestQuery(
                   contextValue,
                 },
                 preset,
-                asString,
+                outputDataAsString,
               );
 
         if (isAsyncIterable(result)) {
@@ -218,8 +218,10 @@ export async function runTestQuery(
           // Start collecting the payloads
           const promise = (async () => {
             for await (const rawEntry of result) {
-              const entry = asString
-                ? JSON.parse(stringifyPayload(rawEntry as any, asString))
+              const entry = outputDataAsString
+                ? JSON.parse(
+                    stringifyPayload(rawEntry as any, outputDataAsString),
+                  )
                 : rawEntry;
               const { hasNext, ...rest } = entry;
               if (Object.keys(rest).length > 0 || hasNext) {
@@ -324,7 +326,7 @@ export async function runTestQuery(
         } else {
           // Throw away symbol keys/etc
           const { data, errors, extensions } = JSON.parse(
-            stringifyPayload(result as any, asString),
+            stringifyPayload(result as any, outputDataAsString),
           );
           if (!checkErrorSnapshots && errors) {
             console.error(errors[0].originalError || errors[0]);

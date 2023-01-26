@@ -51,7 +51,7 @@ export interface GrafastPrepareOptions {
    * this is an optimization for returning the data over a network socket or
    * similar.
    */
-  asString?: boolean;
+  outputDataAsString?: boolean;
 }
 
 const bypassGraphQLObj = Object.assign(Object.create(null), {
@@ -63,7 +63,7 @@ function noop() {}
 function processRoot(
   ctx: OutputPlanContext,
   iterator: ResultIterator,
-  asString: boolean,
+  outputDataAsString: boolean,
 ): PromiseOrDirect<void> {
   const { streams, queue } = ctx.root;
 
@@ -77,12 +77,17 @@ function processRoot(
   const promises: PromiseLike<void>[] = [];
   for (const stream of streams) {
     promises.push(
-      processStream(ctx.requestContext, iterator, stream, asString),
+      processStream(ctx.requestContext, iterator, stream, outputDataAsString),
     );
   }
   for (const deferred of queue) {
     promises.push(
-      processDeferred(ctx.requestContext, iterator, deferred, asString),
+      processDeferred(
+        ctx.requestContext,
+        iterator,
+        deferred,
+        outputDataAsString,
+      ),
     );
   }
 
@@ -96,7 +101,7 @@ const finalize = (
   data: JSONValue | null | undefined | AsyncIterable<any>,
   ctx: OutputPlanContext,
   extensions: any,
-  asString: boolean,
+  outputDataAsString: boolean,
 ): ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void> => {
   if (isAsyncIterable(data)) {
     // It's a subscription! Batch execute the child bucket for
@@ -130,7 +135,7 @@ const finalize = (
       // TODO: payload.label
       iterator.push(payload);
 
-      const promise = processRoot(ctx, iterator, asString);
+      const promise = processRoot(ctx, iterator, outputDataAsString);
       if (isPromiseLike(promise)) {
         promise.then(
           () => {
@@ -143,7 +148,9 @@ const finalize = (
         );
       } else {
         iterator.push(
-          asString ? ('{"hasNext":false}' as any) : { hasNext: false },
+          outputDataAsString
+            ? ('{"hasNext":false}' as any)
+            : { hasNext: false },
         );
         iterator.return(undefined);
       }
@@ -235,7 +242,7 @@ export function executePreemptive(
   variableValues: any,
   context: any,
   rootValue: any,
-  asString: boolean,
+  outputDataAsString: boolean,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -313,13 +320,13 @@ export function executePreemptive(
         requestContext,
         [],
         rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
-        asString,
+        outputDataAsString,
       );
       return finalize(
         result,
         ctx,
         index === 0 ? rootValue[$$extensions] ?? undefined : undefined,
-        asString,
+        outputDataAsString,
       );
     }
     if (isPromiseLike(bucketPromise)) {
@@ -425,13 +432,13 @@ export function executePreemptive(
       requestContext,
       [],
       rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
-      asString,
+      outputDataAsString,
     );
     return finalize(
       result,
       ctx,
       rootValue[$$extensions] ?? undefined,
-      asString,
+      outputDataAsString,
     );
   }
 
@@ -502,7 +509,7 @@ export function grafastPrepare(
     variableValues,
     context,
     rootValue,
-    options.asString ?? false,
+    options.outputDataAsString ?? false,
   );
 }
 
@@ -614,7 +621,7 @@ async function processStream(
   requestContext: RequestContext,
   iterator: ResultIterator,
   spec: SubsequentStreamSpec,
-  asString: boolean,
+  outputDataAsString: boolean,
 ): Promise<void> {
   /** Resolve this when finished */
   const whenDone = defer();
@@ -699,7 +706,7 @@ async function processStream(
           requestContext,
           [...spec.path, actualIndex],
           spec.root.variables,
-          asString,
+          outputDataAsString,
         );
         const iteratorPayload = Object.create(null);
         if (result !== undefined) {
@@ -716,7 +723,7 @@ async function processStream(
         // TODO: extensions?
 
         iterator.push(iteratorPayload);
-        const promise = processRoot(ctx, iterator, asString);
+        const promise = processRoot(ctx, iterator, outputDataAsString);
         if (isPromiseLike(promise)) {
           promises.push(promise);
         }
@@ -921,27 +928,42 @@ function processBatches(
   }
 }
 
-function processBatch(asString: boolean) {
-  const batchesByRequestContext = deferredBatchesByRequestContext;
-  deferredBatchesByRequestContext = new Map();
-  const whenDone = nextBatch!;
-  nextBatch = null;
+function processBatchAsString() {
+  const batchesByRequestContext = deferredBatchesByRequestContextAsString;
+  deferredBatchesByRequestContextAsString = new Map();
+  const whenDone = nextBatchAsString!;
+  nextBatchAsString = null;
 
-  processBatches(batchesByRequestContext, whenDone, asString);
+  processBatches(batchesByRequestContext, whenDone, true);
 }
 
-let deferredBatchesByRequestContext: Map<
+function processBatchNotAsString() {
+  const batchesByRequestContext = deferredBatchesByRequestContextNotAsString;
+  deferredBatchesByRequestContextNotAsString = new Map();
+  const whenDone = nextBatchNotAsString!;
+  nextBatchNotAsString = null;
+
+  processBatches(batchesByRequestContext, whenDone, false);
+}
+
+type DBBRC = Map<
   RequestContext,
   Map<OutputPlan, Array<[ResultIterator, SubsequentPayloadSpec]>>
-> = new Map();
-let nextBatch: Deferred<void> | null = null;
+>;
+let deferredBatchesByRequestContextAsString: DBBRC = new Map();
+let deferredBatchesByRequestContextNotAsString: DBBRC = new Map();
+let nextBatchAsString: Deferred<void> | null = null;
+let nextBatchNotAsString: Deferred<void> | null = null;
 
 function processDeferred(
   requestContext: RequestContext,
   iterator: ResultIterator,
   spec: SubsequentPayloadSpec,
-  asString: boolean,
+  outputDataAsString: boolean,
 ): PromiseLike<void> {
+  const deferredBatchesByRequestContext = outputDataAsString
+    ? deferredBatchesByRequestContextAsString
+    : deferredBatchesByRequestContextNotAsString;
   let deferredBatches = deferredBatchesByRequestContext.get(requestContext);
   if (!deferredBatches) {
     deferredBatches = new Map();
@@ -953,10 +975,17 @@ function processDeferred(
   } else {
     deferredBatches.set(spec.outputPlan, [[iterator, spec]]);
   }
-  if (!nextBatch) {
-    nextBatch = defer();
-    setTimeout(() => processBatch(asString), 1);
+  if (outputDataAsString) {
+    if (!nextBatchAsString) {
+      nextBatchAsString = defer();
+      setTimeout(processBatchAsString, 1);
+    }
+    return nextBatchAsString;
+  } else {
+    if (!nextBatchNotAsString) {
+      nextBatchNotAsString = defer();
+      setTimeout(processBatchNotAsString, 1);
+    }
+    return nextBatchNotAsString;
   }
-
-  return nextBatch;
 }

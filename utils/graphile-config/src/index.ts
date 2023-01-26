@@ -4,4 +4,4 @@ export { GraphileConfig };
 
 export { applyHooks, AsyncHooks, HookObject } from "./hooks.js";
 export type { PluginHook, PluginHookObject } from "./interfaces.js";
-export { resolvePresets } from "./resolvePresets.js";
+export { isResolvedPreset, resolvePresets } from "./resolvePresets.js";

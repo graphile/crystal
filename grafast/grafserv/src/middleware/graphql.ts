@@ -1,16 +1,23 @@
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
+import type { PromiseOrDirect } from "grafast";
 import {
   $$extensions,
   execute as grafastExecute,
   hookArgs,
   isAsyncIterable,
+  isPromiseLike,
 } from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
-import type { ServerParams } from "../interfaces.js";
-import type { HandlerResult } from "./interfaces.js";
+import type {
+  GrafservBody,
+  HandlerResult,
+  JSONValue,
+  RequestDigest,
+} from "../interfaces.js";
+import type { OptionsFromConfig } from "../options.js";
 
 let lastString: string;
 let lastHash: string;
@@ -79,16 +86,82 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
   return parseAndValidate;
 }
 
-export const makeGraphQLHandler = (params: ServerParams) => {
-  const { schema } = params;
-  const parseAndValidate = makeParseAndValidateFunction(schema);
-  const asString = true;
+function processBody(body: GrafservBody): JSONValue | null {
+  switch (body.type) {
+    case "buffer": {
+      return JSON.parse(body.buffer.toString("utf8"));
+    }
+    case "json": {
+      return body.json;
+    }
+    default: {
+      const never: never = body;
+      throw new Error(`Do not understand type ${(never as any).type}`);
+    }
+  }
+}
 
-  return async (
-    resolvedPreset: GraphileConfig.ResolvedPreset,
-    ctx: GraphileConfig.GraphQLRequestContext,
-    body: unknown,
-  ): Promise<HandlerResult> => {
+export const makeGraphQLHandler = (
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+  dynamicOptions: OptionsFromConfig,
+  schemaOrPromise: PromiseOrDirect<GraphQLSchema> | null,
+) => {
+  if (schemaOrPromise == null) {
+    const err = Promise.reject(
+      new GraphQLError(
+        "The schema is currently unavailable",
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          statusCode: 503,
+        },
+      ),
+    );
+    return () => err;
+  }
+
+  let schema: GraphQLSchema;
+  let parseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+  let wait: PromiseLike<void> | null;
+
+  if (isPromiseLike(schemaOrPromise)) {
+    wait = schemaOrPromise.then((_schema) => {
+      if (_schema == null) {
+        throw new GraphQLError(
+          "The schema is current unavailable.",
+          null,
+          null,
+          null,
+          null,
+          null,
+          {
+            statusCode: 503,
+          },
+        );
+      }
+      schema = _schema;
+      parseAndValidate = makeParseAndValidateFunction(schema);
+      wait = null;
+    });
+  } else {
+    schema = schemaOrPromise;
+    parseAndValidate = makeParseAndValidateFunction(schema);
+  }
+
+  const outputDataAsString = dynamicOptions.outputDataAsString;
+
+  return async (request: RequestDigest): Promise<HandlerResult> => {
+    if (wait) {
+      await wait;
+    }
+    // FIXME: if method === POST...
+    const bodyRaw = await request.getBody(dynamicOptions);
+    // FIXME: this parsing is unsafe (it doesn't even check the
+    // content-type!) - replace it with V4's behaviour
+    const body = processBody(bodyRaw);
     // Parse the body
     if (typeof body !== "object" || body == null) {
       throw new Error("Invalid body in request");
@@ -111,7 +184,13 @@ export const makeGraphQLHandler = (params: ServerParams) => {
     const { errors, document } = parseAndValidate(query);
 
     if (errors) {
-      return { type: "graphql", statusCode: 200, payload: { errors } };
+      return {
+        type: "graphql",
+        request,
+        dynamicOptions,
+        statusCode: 200,
+        payload: { errors },
+      };
     }
 
     const args: ExecutionArgs = {
@@ -123,23 +202,40 @@ export const makeGraphQLHandler = (params: ServerParams) => {
       operationName,
     };
 
-    await hookArgs(args, ctx, resolvedPreset);
+    await hookArgs(
+      args,
+      {
+        request,
+      },
+      resolvedPreset,
+    );
 
     try {
       const result = await grafastExecute(args, resolvedPreset);
       if (isAsyncIterable(result)) {
         return {
           type: "graphqlIncremental",
+          request,
+          dynamicOptions,
           statusCode: 200,
           iterator: result,
-          asString,
+          outputDataAsString,
         };
       }
-      return { type: "graphql", statusCode: 200, payload: result, asString };
+      return {
+        type: "graphql",
+        request,
+        dynamicOptions,
+        statusCode: 200,
+        payload: result,
+        outputDataAsString,
+      };
     } catch (e) {
       console.error(e);
       return {
         type: "graphql",
+        request,
+        dynamicOptions,
         statusCode: 500,
         payload: {
           errors: [new GraphQLError(e.message)],

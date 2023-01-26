@@ -15,10 +15,10 @@ import { withGrafastArgs } from "./execute.js";
 export function subscribe(
   args: ExecutionArgs,
   resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
-  asString = false,
+  outputDataAsString = false,
 ): PromiseOrValue<
   | AsyncGenerator<ExecutionResult | AsyncExecutionResult, void, void>
   | ExecutionResult
 > {
-  return withGrafastArgs(args, resolvedPreset, asString);
+  return withGrafastArgs(args, resolvedPreset, outputDataAsString);
 }

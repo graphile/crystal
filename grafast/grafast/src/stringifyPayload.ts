@@ -2,9 +2,9 @@ import type { JSONObject } from "./interfaces.js";
 
 export function stringifyPayload(
   payload: JSONObject,
-  asString: boolean | undefined,
+  outputDataAsString: boolean | undefined,
 ): string {
-  if (!asString || typeof payload.data !== "string") {
+  if (!outputDataAsString || typeof payload.data !== "string") {
     return JSON.stringify(payload);
   }
   let str = "{";

@@ -56,6 +56,7 @@ export const orderedPlugins: GraphileConfig.Preset = {
   ],
 };
 
+// TODO: should this be PostGraphilePresetAmber?
 export const postgraphilePresetAmber: GraphileConfig.Preset = {
   extends: [orderedPlugins, graphileBuildPreset, graphileBuildPgPreset],
   plugins: [SwallowErrorsPlugin],

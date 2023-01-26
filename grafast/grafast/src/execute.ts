@@ -23,7 +23,7 @@ const isDev =
 export function withGrafastArgs(
   args: ExecutionArgs,
   resolvedPreset: GraphileConfig.ResolvedPreset,
-  asString: boolean,
+  outputDataAsString: boolean,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -85,7 +85,7 @@ export function withGrafastArgs(
 
   const rootValue = grafastPrepare(args, {
     explain: options?.explain,
-    asString,
+    outputDataAsString,
   });
   if (unlisten) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
@@ -105,9 +105,9 @@ export function withGrafastArgs(
 export function execute(
   args: ExecutionArgs,
   resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
-  asString = false,
+  outputDataAsString = false,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  return withGrafastArgs(args, resolvedPreset, asString);
+  return withGrafastArgs(args, resolvedPreset, outputDataAsString);
 }

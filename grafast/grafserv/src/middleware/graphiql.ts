@@ -1,20 +1,25 @@
-import type { ServerParams } from "../interfaces.js";
-import type { HandlerResult } from "./interfaces.js";
+import type { HandlerResult, RequestDigest } from "../interfaces.js";
+import type { OptionsFromConfig } from "../options.js";
 
 const ruruServer = import("ruru/server");
 let ruruHTML: Awaited<typeof ruruServer>["ruruHTML"] | undefined = undefined;
 
 // TODO: use a specific version of mermaid
-export function makeGraphiQLHandler(_params: ServerParams) {
-  return async (): Promise<HandlerResult> => {
+export function makeGraphiQLHandler(
+  _resolvedPreset: GraphileConfig.ResolvedPreset,
+  dynamicOptions: OptionsFromConfig,
+) {
+  return async (request: RequestDigest): Promise<HandlerResult> => {
     if (!ruruHTML) {
       ruruHTML = (await ruruServer).ruruHTML;
     }
     const config = {};
     return {
       statusCode: 200,
+      request,
+      dynamicOptions,
       type: "html",
-      payload: ruruHTML(config),
+      payload: Buffer.from(ruruHTML(config), "utf8"),
     };
   };
 }
