@@ -11,7 +11,12 @@ import {
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
-import type { HandlerResult, RequestDigest } from "../interfaces.js";
+import type {
+  HandlerResult,
+  RequestDigest,
+  GrafservBody,
+  JSONValue,
+} from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 
 let lastString: string;
@@ -81,6 +86,21 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
   return parseAndValidate;
 }
 
+function processBody(body: GrafservBody): JSONValue | null {
+  switch (body.type) {
+    case "buffer": {
+      return JSON.parse(body.buffer.toString("utf8"));
+    }
+    case "json": {
+      return body.json;
+    }
+    default: {
+      const never: never = body;
+      throw new Error(`Do not understand type ${(never as any).type}`);
+    }
+  }
+}
+
 export const makeGraphQLHandler = (
   resolvedPreset: GraphileConfig.ResolvedPreset,
   dynamicOptions: OptionsFromConfig,
@@ -141,7 +161,7 @@ export const makeGraphQLHandler = (
     const bodyRaw = await request.getBody(dynamicOptions);
     // FIXME: this parsing is unsafe (it doesn't even check the
     // content-type!) - replace it with V4's behaviour
-    const body = JSON.parse(bodyRaw);
+    const body = processBody(bodyRaw);
     // Parse the body
     if (typeof body !== "object" || body == null) {
       throw new Error("Invalid body in request");

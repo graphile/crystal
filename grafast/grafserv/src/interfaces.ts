@@ -84,13 +84,25 @@ declare global {
   }
 }
 
+export interface GrafservBodyBuffer {
+  type: "buffer";
+  buffer: Buffer;
+}
+
+export interface GrafservBodyJSON {
+  type: "json";
+  json: JSONValue;
+}
+
+export type GrafservBody = GrafservBodyBuffer | GrafservBodyJSON;
+
 export interface RequestDigest {
   method: "HEAD" | "GET" | "POST" | string;
   httpVersionMajor: number;
   httpVersionMinor: number;
   path: string;
   headers: Record<string, string>;
-  getBody(dynamicOptions: OptionsFromConfig): PromiseOrDirect<string>;
+  getBody(dynamicOptions: OptionsFromConfig): PromiseOrDirect<GrafservBody>;
   frameworkMeta: Grafserv.RequestDigestFrameworkMeta[keyof Grafserv.RequestDigestFrameworkMeta];
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
@@ -146,8 +158,14 @@ export type SchemaChangeEvent = {
   data: "schema";
 };
 
-type JSONValue = null | boolean | number | string | JSONValue[] | JSONObject;
-interface JSONObject {
+export type JSONValue =
+  | null
+  | boolean
+  | number
+  | string
+  | JSONValue[]
+  | JSONObject;
+export interface JSONObject {
   [key: string]: JSONValue;
 }
 

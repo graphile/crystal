@@ -6040,6 +6040,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/koa-bodyparser@npm:^4":
+  version: 4.3.10
+  resolution: "@types/koa-bodyparser@npm:4.3.10"
+  dependencies:
+    "@types/koa": "npm:*"
+  checksum: 32fa65da94f1e2c6eb64552485d5975a56b35562ab219d6288ed82355a208881999448ac2a92c0bcae97287eefc572bf6484a0c5e5b6092eec7e43d76365a4cc
+  languageName: node
+  linkType: hard
+
 "@types/koa-compose@npm:*":
   version: 3.2.5
   resolution: "@types/koa-compose@npm:3.2.5"
@@ -8650,6 +8659,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"co-body@npm:^6.0.0":
+  version: 6.1.0
+  resolution: "co-body@npm:6.1.0"
+  dependencies:
+    inflation: "npm:^2.0.0"
+    qs: "npm:^6.5.2"
+    raw-body: "npm:^2.3.3"
+    type-is: "npm:^1.6.16"
+  checksum: 1100c846a080dde7e33b1fb5240912637a23f54c8123144a69a451512a9d802259d1cdc53ebe1e95c848e7b2051c50ddc832400e89d87af10225239a6f5f2444
+  languageName: node
+  linkType: hard
+
 "co@npm:^4.6.0":
   version: 4.6.0
   resolution: "co@npm:4.6.0"
@@ -9202,6 +9223,13 @@ __metadata:
   dependencies:
     toggle-selection: "npm:^1.0.6"
   checksum: b73dbd1099d182c0d75fdac09e56499aac1bdc41c5f849cb4dcdec8d237c9ff8b659e21dc3d5f98c1f18fa64f7b3c78aa0126f9ca252019600d1005e6acd302a
+  languageName: node
+  linkType: hard
+
+"copy-to@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "copy-to@npm:2.0.1"
+  checksum: 9dc1c01673e45710d32786cc742ad094accd2005dd8ea9bf81611097f6646a43033e213a08b1096106ad80ad53c0ed1b9de3e0927df072293face86d4b702e38
   languageName: node
   linkType: hard
 
@@ -13084,6 +13112,7 @@ __metadata:
     "@graphile/lru": "workspace:^"
     "@types/express": "npm:^4"
     "@types/koa": "npm:^2"
+    "@types/koa-bodyparser": "npm:^4"
     debug: "npm:^4.1.1"
     eventemitter3: "npm:^4.0.7"
     express: "npm:^4.18.2"
@@ -13093,6 +13122,7 @@ __metadata:
     jest: "npm:^28.1.0"
     jest-serializer-graphql-schema: "workspace:^"
     koa: "npm:^2.14.1"
+    koa-bodyparser: "npm:^4.3.0"
     nodemon: "npm:^2.0.15"
     ruru: "workspace:^"
     ts-node: "npm:^10.9.1"
@@ -14011,6 +14041,13 @@ __metadata:
   version: 0.2.0-alpha.42
   resolution: "infima@npm:0.2.0-alpha.42"
   checksum: 70358507243d7963dbc6ea7f18a8d0cc566e99aa4e3fa476ea56dba244f31ec31dec51bb17f2458bb0792c9628955a6009c59d3f4b5d5bd2657707ac9a2ba417
+  languageName: node
+  linkType: hard
+
+"inflation@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "inflation@npm:2.0.0"
+  checksum: 3a3ccd10638e1a47fddce8cf9eb0c2bf4a7727ec85e3f98882a6dad605d371573cf418899522285066bd0fa825ddd37df238f95b8fcc3757442bf5b75316141e
   languageName: node
   linkType: hard
 
@@ -15517,6 +15554,16 @@ __metadata:
   version: 2.0.5
   resolution: "klona@npm:2.0.5"
   checksum: a4dcd9c0ea136553a0343f57e8da6b9d4cc0275e54711061c46ef12b2b890e88e830ff67e853d738cb1b3e7049426cda203592abb39fcb2ef724526fb5fa139f
+  languageName: node
+  linkType: hard
+
+"koa-bodyparser@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "koa-bodyparser@npm:4.3.0"
+  dependencies:
+    co-body: "npm:^6.0.0"
+    copy-to: "npm:^2.0.1"
+  checksum: bb5e4b11e882268858b8a119d26584e4776444504d30a9260695320f4a733be35e3767afa169b9507afbd7c815ea966c89477d11acfcbc4170b949e77483cac4
   languageName: node
   linkType: hard
 
@@ -18715,7 +18762,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:6.11.0":
+"qs@npm:6.11.0, qs@npm:^6.5.2":
   version: 6.11.0
   resolution: "qs@npm:6.11.0"
   dependencies:
@@ -18796,7 +18843,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"raw-body@npm:2.5.1":
+"raw-body@npm:2.5.1, raw-body@npm:^2.3.3":
   version: 2.5.1
   resolution: "raw-body@npm:2.5.1"
   dependencies:

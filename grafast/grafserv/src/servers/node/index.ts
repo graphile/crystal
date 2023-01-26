@@ -1,7 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "http";
+import { Readable } from "stream";
 
 import { GrafservBase } from "../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
+import { processHeaders, getBodyFromRequest } from "../../utils.js";
 
 declare global {
   namespace Grafserv {
@@ -12,50 +14,6 @@ declare global {
       };
     }
   }
-}
-
-function getBodyFromRequest(
-  req: IncomingMessage,
-  maxLength: number,
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    req.setEncoding("utf8");
-    let data = "";
-    const handleData = (chunk: Buffer) => {
-      data += chunk;
-      if (data.length > maxLength) {
-        req.off("end", done);
-        req.off("error", reject);
-        req.off("data", handleData);
-        // FIXME: validate this approach
-        reject(new Error("Too much data"));
-      }
-    };
-    const done = () => {
-      resolve(data);
-    };
-    req.on("end", done);
-    req.on("error", reject);
-    req.on("data", handleData);
-  });
-}
-
-function processHeaders(
-  headers: IncomingMessage["headers"],
-): Record<string, string> {
-  const headerDigest: Record<string, string> = Object.create(null);
-  for (const key in headers) {
-    const val = headers[key];
-    if (val == null) {
-      continue;
-    }
-    if (typeof val === "string") {
-      headerDigest[key] = val;
-    } else {
-      headerDigest[key] = val.join("\n");
-    }
-  }
-  return headerDigest;
 }
 
 function getDigest(req: IncomingMessage, res: ServerResponse): RequestDigest {
