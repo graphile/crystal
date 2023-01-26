@@ -1622,10 +1622,18 @@ create table js_reserved.reserved (
   "do" text unique
 );
 
-create function js_reserved.await(yield int, __proto__ int, constructor int) returns int as $$
-  select yield + __proto__ + constructor;
+create function js_reserved.await(yield int, __proto__ int, constructor int, "hasOwnProperty" int) returns int as $$
+  select yield + __proto__ + constructor + "hasOwnProperty";
 $$ language sql stable;
 
-create function js_reserved.null_yield(n js_reserved.null, yield int, __proto__ int, constructor int) returns int as $$
-  select yield + __proto__ + constructor;
+create function js_reserved.case(yield int, __proto__ int, constructor int, "hasOwnProperty" int) returns int as $$
+  select yield + __proto__ + constructor + "hasOwnProperty";
+$$ language sql stable;
+
+create function js_reserved."valueOf"(yield int, __proto__ int, constructor int, "hasOwnProperty" int) returns int as $$
+  select yield + __proto__ + constructor + "hasOwnProperty";
+$$ language sql stable;
+
+create function js_reserved.null_yield(n js_reserved.null, yield int, __proto__ int, constructor int, "valueOf" int) returns int as $$
+  select yield + __proto__ + constructor + "valueOf";
 $$ language sql stable;
