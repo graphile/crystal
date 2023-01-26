@@ -197,4 +197,5 @@ export const makeV4Preset = (
   };
 };
 
-export default makeV4Preset();
+export const V4Preset = makeV4Preset();
+export default V4Preset;
