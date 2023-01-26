@@ -13,12 +13,6 @@ export type ContextCallback = (
   graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
 ) => object;
 
-// TODO: delete me
-export interface ServerParams {
-  schema: GraphQLSchema;
-  resolvedPreset: GraphileConfig.ResolvedPreset;
-}
-
 export interface GrafservConfig {
   schema: GraphQLSchema | PromiseLike<GraphQLSchema>;
   preset?: GraphileConfig.Preset;
