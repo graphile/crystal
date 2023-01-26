@@ -12,10 +12,10 @@ import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
 import type {
-  HandlerResult,
-  RequestDigest,
   GrafservBody,
+  HandlerResult,
   JSONValue,
+  RequestDigest,
 } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 

@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from "express";
-import { GrafservConfig } from "../../../interfaces.js";
+
+import type { GrafservConfig } from "../../../interfaces.js";
 import { NodeGrafserv } from "../../node/index.js";
 
 declare global {

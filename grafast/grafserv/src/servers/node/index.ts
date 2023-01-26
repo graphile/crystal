@@ -1,9 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { Readable } from "stream";
 
 import { GrafservBase } from "../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
-import { processHeaders, getBodyFromRequest } from "../../utils.js";
+import { getBodyFromRequest, processHeaders } from "../../utils.js";
 
 declare global {
   namespace Grafserv {

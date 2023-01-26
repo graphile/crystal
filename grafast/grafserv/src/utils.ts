@@ -2,6 +2,7 @@ import { stripAnsi } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { GraphQLError } from "graphql";
 import type { Readable } from "node:stream";
+
 import type { GrafservBody } from "./interfaces.js";
 
 export function handleErrors(
