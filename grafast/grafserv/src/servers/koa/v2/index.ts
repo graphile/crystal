@@ -23,13 +23,13 @@ function getDigest(ctx: Context): RequestDigest {
     method: ctx.request.method,
     path: ctx.request.url,
     headers: processHeaders(ctx.request.headers),
-    getBody(_dynamicOptions) {
+    getBody(dynamicOptions) {
       if ("body" in ctx.request) {
         // FIXME: not necessarily JSON, e.g. if parsing form?
         return { type: "json", json: (ctx.request as any).body };
       } else {
         // No koa-bodyparser, let's just read the body ourself
-        return getBodyFromRequest(ctx.req, _dynamicOptions.maxRequestLength);
+        return getBodyFromRequest(ctx.req, dynamicOptions.maxRequestLength);
       }
     },
     frameworkMeta: {
@@ -45,8 +45,6 @@ export class KoaGrafserv extends GrafservBase {
   }
 
   public createHandler(): (ctx: Context, next: (err?: Error) => void) => void {
-    const dynamicOptions = this.dynamicOptions;
-    // FIXME: 'async' here is risky
     return async (ctx, next) => {
       const request = getDigest(ctx);
       const result = await this.processRequest(request);
