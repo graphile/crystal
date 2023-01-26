@@ -55,7 +55,14 @@ export class KoaGrafserv extends GrafservBase {
 
       switch (result.type) {
         case "error": {
-          throw result.error;
+          const { statusCode, headers } = result;
+          ctx.response.set(headers);
+          ctx.response.status = statusCode;
+          // TODO: mutating the error is probably bad form...
+          const errorWithStatus = Object.assign(result.error, {
+            status: statusCode,
+          });
+          throw errorWithStatus;
         }
         case "buffer": {
           const { statusCode, headers, buffer } = result;

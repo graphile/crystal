@@ -173,6 +173,8 @@ export interface JSONObject {
 
 export interface ErrorResult {
   type: "error";
+  statusCode: number;
+  headers: Record<string, string>;
   error: Error;
 }
 

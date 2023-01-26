@@ -2,7 +2,7 @@ import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import { isPromiseLike, stringifyPayload } from "grafast";
 import { resolvePresets } from "graphile-config";
-import type { GraphQLSchema } from "graphql";
+import type { GraphQLError, GraphQLSchema } from "graphql";
 import { isSchema, validateSchema } from "graphql";
 
 import type {
@@ -457,8 +457,13 @@ function sendResult(
 }
 
 const sendError = (error: Error): ErrorResult => {
+  const statusCode =
+    ((error as GraphQLError).extensions?.statusCode as number | undefined) ??
+    500;
   return {
     type: "error",
+    statusCode,
+    headers: Object.create(null),
     error,
   };
 };
