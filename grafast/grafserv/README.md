@@ -129,7 +129,7 @@ server.listen(preset.server.port ?? 5678);
 ### Express V4
 
 ```js
-import { express } from "express";
+import express from "express";
 import { grafserv } from "grafserv/express/v4";
 import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";

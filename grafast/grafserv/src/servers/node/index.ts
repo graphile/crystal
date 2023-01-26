@@ -75,7 +75,7 @@ function getDigest(req: IncomingMessage, res: ServerResponse): RequestDigest {
   };
 }
 
-class NodeGrafserv extends GrafservBase {
+export class NodeGrafserv extends GrafservBase {
   constructor(config: GrafservConfig) {
     super(config);
   }
