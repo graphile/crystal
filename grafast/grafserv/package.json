@@ -21,6 +21,10 @@
     "./koa/v2": {
       "types": "./dist/servers/koa/v2/index.d.ts",
       "default": "./dist/servers/koa/v2/index.js"
+    },
+    "./fastify/v4": {
+      "types": "./dist/servers/fastify/v4/index.d.ts",
+      "default": "./dist/servers/fastify/v4/index.js"
     }
   },
   "scripts": {
