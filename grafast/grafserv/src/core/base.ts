@@ -300,25 +300,35 @@ function sendResult(
         statusCode = 200,
         asString,
         dynamicOptions,
+        request: { preferJSON },
       } = handlerResult;
 
       handleErrors(payload);
-      const buffer = Buffer.from(
-        stringifyPayload(payload as any, asString),
-        "utf8",
-      );
       const headers = Object.create(null);
       headers["Content-Type"] = "application/json";
-      headers["Content-Length"] = buffer.length;
       if (dynamicOptions.watch) {
         headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamRoute;
       }
-      return {
-        type: "buffer",
-        statusCode,
-        headers,
-        buffer,
-      };
+      if (preferJSON && !asString) {
+        return {
+          type: "json",
+          statusCode,
+          headers,
+          json: payload as any,
+        };
+      } else {
+        const buffer = Buffer.from(
+          stringifyPayload(payload as any, asString),
+          "utf8",
+        );
+        headers["Content-Length"] = buffer.length;
+        return {
+          type: "buffer",
+          statusCode,
+          headers,
+          buffer,
+        };
+      }
     }
     case "graphqlIncremental": {
       const {

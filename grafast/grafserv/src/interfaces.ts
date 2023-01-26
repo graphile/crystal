@@ -49,6 +49,20 @@ export interface ServerOptions {
 
   /** How long should we wait for a schema promise to resolve before sending a failure to the client? */
   schemaWaitTime?: number;
+
+  /**
+   * Use grafast 'string' optimization - response will be partially stringified
+   * already, use `stringifyPayload` before sending to the user
+   *
+   * @remarks
+   *
+   * This is a `server` option rather than a `grafast` option because the
+   * server is responsible for stringifying the body before sending it to the
+   * user, via `stringifyPayload`. If we were to make this a `grafast` option
+   * then everything using grafast would be affected by it, and code expecting
+   * objects would break.
+   */
+  outputDataAsString?: boolean;
 }
 
 declare global {

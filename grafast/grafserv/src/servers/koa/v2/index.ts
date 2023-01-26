@@ -35,6 +35,7 @@ function getDigest(ctx: Context): RequestDigest {
     frameworkMeta: {
       ctx,
     },
+    preferJSON: true,
   };
 }
 

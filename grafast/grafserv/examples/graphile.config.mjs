@@ -6,6 +6,7 @@ import "grafserv";
 const preset = {
   server: {
     port: 5678,
+    outputDataAsString: true,
   },
 };
 export default preset;

@@ -7,9 +7,10 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     watch = false,
     eventStreamRoute = "/graphql/stream",
     maxRequestLength = 100_000,
+    outputDataAsString = false,
   } = config.server ?? {};
   return {
-    asString: true,
+    asString: outputDataAsString,
     graphqlPath,
     graphiql,
     graphiqlOnGraphQLGET,
