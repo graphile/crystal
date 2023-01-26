@@ -681,7 +681,7 @@ insert into js_reserved.crop
 alter sequence js_reserved.material_id_seq restart with 1;
 
 insert into js_reserved.material
-  (class,      valueOf ) values
+  (class,      "valueOf" ) values
   ('concrete', 'rough' ),
   ('glass',    'smooth'),
   ('rubber',   'spongy');
@@ -713,7 +713,7 @@ insert into js_reserved.__proto__
 alter sequence js_reserved.null_id_seq restart with 1;
 
 insert into js_reserved.null
-  (hasOwnProperty, break) values
+  ("hasOwnProperty", break) values
   ('apartment', '10 am'),
   ('flat', 'noon'),
   ('house', '3 pm');

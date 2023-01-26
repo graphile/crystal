@@ -48,19 +48,19 @@
   }
   allNullsList {
     break
-    hasownproperty
+    hasOwnProperty
     id
   }
   nullByBreak(break: "10 am") {
-    hasownproperty
+    hasOwnProperty
     id
   }
-  nullByHasownproperty(hasownproperty: "flat") {
+  nullByHasOwnProperty(hasOwnProperty: "flat") {
     break
     id
   }
   nullById(id: 3) {
     break
-    hasownproperty
+    hasOwnProperty
   }
 }

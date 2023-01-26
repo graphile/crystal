@@ -1588,7 +1588,7 @@ create table js_reserved.crop (
 create table js_reserved.material (
   id serial primary key,
   class text unique,
-  valueOf text unique
+  "valueOf" text unique
 );
 
 create table js_reserved.constructor (
@@ -1611,7 +1611,7 @@ create table js_reserved.__proto__ (
 
 create table js_reserved.null (
   id serial primary key,
-  hasOwnProperty text unique,
+  "hasOwnProperty" text unique,
   break text unique
 );
 

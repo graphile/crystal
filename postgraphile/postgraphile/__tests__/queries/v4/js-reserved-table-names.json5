@@ -81,30 +81,30 @@
   allNullsList: [
     {
       break: "10 am",
-      hasownproperty: "apartment",
+      hasOwnProperty: "apartment",
       id: 1,
     },
     {
       break: "noon",
-      hasownproperty: "flat",
+      hasOwnProperty: "flat",
       id: 2,
     },
     {
       break: "3 pm",
-      hasownproperty: "house",
+      hasOwnProperty: "house",
       id: 3,
     },
   ],
   nullByBreak: {
-    hasownproperty: "apartment",
+    hasOwnProperty: "apartment",
     id: 1,
   },
-  nullByHasownproperty: {
+  nullByHasOwnProperty: {
     break: "noon",
     id: 2,
   },
   nullById: {
     break: "3 pm",
-    hasownproperty: "house",
+    hasOwnProperty: "house",
   },
 }

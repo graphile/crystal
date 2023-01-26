@@ -157,7 +157,7 @@ lateral (
 
 select
   __null__."break" as "0",
-  __null__."hasownproperty" as "1",
+  __null__."hasOwnProperty" as "1",
   __null__."id"::text as "2"
 from "js_reserved"."null" as __null__
 order by __null__."id" asc;
@@ -171,7 +171,7 @@ from (
 ) as __null_identifiers__,
 lateral (
   select
-    __null__."hasownproperty" as "0",
+    __null__."hasOwnProperty" as "0",
     __null__."id"::text as "1",
     __null_identifiers__.idx as "2"
   from "js_reserved"."null" as __null__
@@ -195,7 +195,7 @@ lateral (
     __null_identifiers__.idx as "2"
   from "js_reserved"."null" as __null__
   where (
-    __null__."hasownproperty" = __null_identifiers__."id0"
+    __null__."hasOwnProperty" = __null_identifiers__."id0"
   )
   order by __null__."id" asc
 ) as __null_result__;
@@ -210,7 +210,7 @@ from (
 lateral (
   select
     __null__."break" as "0",
-    __null__."hasownproperty" as "1",
+    __null__."hasOwnProperty" as "1",
     __null__."id"::text as "2",
     __null_identifiers__.idx as "3"
   from "js_reserved"."null" as __null__

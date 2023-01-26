@@ -5,7 +5,7 @@
 {
   allMaterials {
     nodes {
-      valueof
+      valueOf
       class
       id
     }
@@ -14,7 +14,7 @@
     class
     id
   }
-  materialByValueof(valueof: "spongy") {
+  materialByValueOf(valueOf: "spongy") {
     class
     id
   }

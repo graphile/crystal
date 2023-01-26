@@ -2,17 +2,17 @@
   allMaterials: {
     nodes: [
       {
-        valueof: "rough",
+        valueOf: "rough",
         class: "concrete",
         id: 1,
       },
       {
-        valueof: "smooth",
+        valueOf: "smooth",
         class: "glass",
         id: 2,
       },
       {
-        valueof: "spongy",
+        valueOf: "spongy",
         class: "rubber",
         id: 3,
       },
@@ -22,7 +22,7 @@
     class: "concrete",
     id: 1,
   },
-  materialByValueof: {
+  materialByValueOf: {
     class: "rubber",
     id: 3,
   },

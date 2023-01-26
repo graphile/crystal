@@ -31,7 +31,7 @@ lateral (
     __material_identifiers__.idx as "2"
   from "js_reserved"."material" as __material__
   where (
-    __material__."valueof" = __material_identifiers__."id0"
+    __material__."valueOf" = __material_identifiers__."id0"
   )
   order by __material__."id" asc
 ) as __material_result__;
@@ -83,7 +83,7 @@ lateral (
 ) as __crop_result__;
 
 select
-  __material__."valueof" as "0",
+  __material__."valueOf" as "0",
   __material__."class" as "1",
   __material__."id"::text as "2"
 from "js_reserved"."material" as __material__
