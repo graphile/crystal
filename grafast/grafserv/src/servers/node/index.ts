@@ -221,6 +221,6 @@ class NodeGrafserv extends GrafservBase {
   }
 }
 
-export default function grafserv(config: GrafservConfig) {
+export function grafserv(config: GrafservConfig) {
   return new NodeGrafserv(config);
 }

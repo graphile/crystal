@@ -112,9 +112,9 @@ Returns the resolved `graphile-config` preset that is currently in use.
 
 ```js
 import { createServer } from "node:http";
-import grafserv from "grafserv/node";
-import preset from "./graphile.config.js";
-import schema from "./schema.js";
+import { grafserv } from "grafserv/node";
+import preset from "./graphile.config.mjs";
+import schema from "./schema.mjs";
 
 // Create a Grafserv instance
 const instance = grafserv({ schema, preset });
@@ -123,16 +123,16 @@ const instance = grafserv({ schema, preset });
 const server = createServer(instance.createHandler());
 
 // Start the Node server
-server.listen(5678);
+server.listen(preset.server.port ?? 5678);
 ```
 
 ### Express V4
 
 ```js
 import { express } from "express";
-import grafserv from "grafserv/express/v4";
-import preset from "./graphile.config.js";
-import schema from "./schema.js";
+import { grafserv } from "grafserv/express/v4";
+import preset from "./graphile.config.mjs";
+import schema from "./schema.mjs";
 
 // Create an express app
 const app = express();
@@ -145,16 +145,16 @@ const instance = grafserv({ schema, preset });
 instance.addTo(app);
 
 // Start the Express server
-app.listen(5678);
+app.listen(preset.server.port ?? 5678);
 ```
 
 ### Koa V2
 
 ```js
 import Koa from "koa";
-import grafserv from "grafserv/koa/v2";
-import preset from "./graphile.config.js";
-import schema from "./schema.js";
+import { grafserv } from "grafserv/koa/v2";
+import preset from "./graphile.config.mjs";
+import schema from "./schema.mjs";
 
 // Create a Koa app
 const app = new Koa();
@@ -167,16 +167,16 @@ const instance = grafserv({ schema, preset });
 instance.addTo(app);
 
 // Start the Koa server
-app.listen(5678);
+app.listen(preset.server.port ?? 5678);
 ```
 
 ### Fastify V4
 
 ```js
 import Fastify from "fastify";
-import grafserv from "grafserv/fastify/v4";
-import preset from "./graphile.config.js";
-import schema from "./schema.js";
+import { grafserv } from "grafserv/fastify/v4";
+import preset from "./graphile.config.mjs";
+import schema from "./schema.mjs";
 
 // Create a Koa app
 const app = Fastify({
@@ -191,7 +191,7 @@ const instance = grafserv({ schema, preset });
 instance.addTo(app);
 
 // Start the Fastify server
-app.listen({ port: 5678 }, (err, address) => {
+app.listen({ port: preset.server.port ?? 5678 }, (err, address) => {
   if (err) throw err;
   console.log(`Server is now listening on ${address}`);
 });
@@ -206,18 +206,18 @@ be served/referenced, this may cause issues when communicating between [Ruru][]
 and GraphQL.
 
 ```js
-// utils/grafserv.js
-import grafserv from "grafserv/next/v13";
-import preset from "./graphile.config.js";
-import schema from "./schema.js";
+// utils/grafserv.mjs
+import { grafserv } from "grafserv/next/v13";
+import preset from "./graphile.config.mjs";
+import schema from "./schema.mjs";
 
 // Create a shared Grafserv instance
 export const instance = grafserv({ schema, preset });
 ```
 
 ```js
-// pages/api/graphql.js
-import { instance } from "../../utils/grafserv.js";
+// pages/api/graphql.mjs
+import { instance } from "../../utils/grafserv.mjs";
 
 // Create and export the `/graphql` route handler
 const handler = instance.createGraphQLHandler();
@@ -225,8 +225,8 @@ export default handler;
 ```
 
 ```js
-// pages/api/ruru.js
-import { instance } from "../../utils/grafserv.js";
+// pages/api/ruru.mjs
+import { instance } from "../../utils/grafserv.mjs";
 
 // Create and export the `/ruru` route handler
 const handler = instance.createRuruHandler();
@@ -236,9 +236,9 @@ export default handler;
 ### Lambda
 
 ```js
-import grafserv from "grafserv/lambda";
-import preset from "./graphile.config.js";
-import schema from "./schema.js";
+import { grafserv } from "grafserv/lambda";
+import preset from "./graphile.config.mjs";
+import schema from "./schema.mjs";
 
 // Create a Grafserv instance
 const instance = grafserv({ schema, preset });
