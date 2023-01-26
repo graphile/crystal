@@ -1,4 +1,4 @@
-import type { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { PassThrough } from "node:stream";
 
 import {
@@ -11,7 +11,7 @@ import type {
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
-import { getBodyFromRequest, processHeaders } from "../../../utils.js";
+import { processHeaders } from "../../../utils.js";
 
 declare global {
   namespace Grafserv {
@@ -105,7 +105,9 @@ export class FastifyGrafserv extends GrafservBase {
         } catch (e) {
           try {
             stream.end();
-          } catch (e2) {}
+          } catch (e2) {
+            /* nom nom nom */
+          }
           try {
             // TODO: what should we really do here?
             if (bufferIterator.return) {
@@ -113,7 +115,9 @@ export class FastifyGrafserv extends GrafservBase {
             } else if (bufferIterator.throw) {
               bufferIterator.throw(e);
             }
-          } catch (e2) {}
+          } catch (e2) {
+            /* nom nom nom */
+          }
         }
 
         return reply;
@@ -136,7 +140,6 @@ export class FastifyGrafserv extends GrafservBase {
       app.getDefaultJsonParser("ignore", "ignore"),
     );
 
-    const that = this;
     const dynamicOptions = this.dynamicOptions;
 
     app.route({
@@ -144,14 +147,14 @@ export class FastifyGrafserv extends GrafservBase {
       method: "POST",
       url: this.dynamicOptions.graphqlPath,
       bodyLimit: this.dynamicOptions.maxRequestLength,
-      async handler(request, reply) {
+      handler: async (request, reply) => {
         const digest = getDigest(request, reply);
         if (dynamicOptions.graphiqlOnGraphQLGET) {
           // Consider handling this
         }
-        const handlerResult = await that.graphqlHandler(digest);
+        const handlerResult = await this.graphqlHandler(digest);
         const result = await convertHandlerResultToResult(handlerResult);
-        return that.send(request, reply, result);
+        return this.send(request, reply, result);
       },
     });
 
@@ -160,11 +163,11 @@ export class FastifyGrafserv extends GrafservBase {
         method: "GET",
         url: this.dynamicOptions.graphiqlPath,
         bodyLimit: this.dynamicOptions.maxRequestLength,
-        async handler(request, reply) {
+        handler: async (request, reply) => {
           const digest = getDigest(request, reply);
-          const handlerResult = await that.graphiqlHandler(digest);
+          const handlerResult = await this.graphiqlHandler(digest);
           const result = await convertHandlerResultToResult(handlerResult);
-          return that.send(request, reply, result);
+          return this.send(request, reply, result);
         },
       });
     }
@@ -174,18 +177,18 @@ export class FastifyGrafserv extends GrafservBase {
         method: "GET",
         url: this.dynamicOptions.eventStreamRoute,
         bodyLimit: this.dynamicOptions.maxRequestLength,
-        async handler(request, reply) {
+        handler: async (request, reply) => {
           const digest = getDigest(request, reply);
           // TODO: refactor this to use the eventStreamHandler once we write that...
           const handlerResult: EventStreamHeandlerResult = {
             type: "event-stream",
             request: digest,
             dynamicOptions,
-            payload: that.makeStream(),
+            payload: this.makeStream(),
             statusCode: 200,
           };
           const result = await convertHandlerResultToResult(handlerResult);
-          return that.send(request, reply, result);
+          return this.send(request, reply, result);
         },
       });
     }
