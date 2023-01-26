@@ -21,7 +21,8 @@ const fsp = require("node:fs/promises");
 // Benchmark settings
 const NUMBER_OF_REQUESTS = 10000;
 const CONCURRENCY = 3;
-const asString = true; /* Should we use the grafast string optimization */
+/** Should we use the grafast string optimization */
+const asString = true;
 
 const typeDefs = /* GraphQL */ `
   type Query {

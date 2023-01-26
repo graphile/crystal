@@ -298,7 +298,7 @@ function sendResult(
       const {
         payload,
         statusCode = 200,
-        asString,
+        outputDataAsString,
         dynamicOptions,
         request: { preferJSON },
       } = handlerResult;
@@ -309,7 +309,7 @@ function sendResult(
       if (dynamicOptions.watch) {
         headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamRoute;
       }
-      if (preferJSON && !asString) {
+      if (preferJSON && !outputDataAsString) {
         return {
           type: "json",
           statusCode,
@@ -318,7 +318,7 @@ function sendResult(
         };
       } else {
         const buffer = Buffer.from(
-          stringifyPayload(payload as any, asString),
+          stringifyPayload(payload as any, outputDataAsString),
           "utf8",
         );
         headers["Content-Length"] = buffer.length;
@@ -334,7 +334,7 @@ function sendResult(
       const {
         iterator,
         statusCode = 200,
-        asString,
+        outputDataAsString,
         dynamicOptions,
       } = handlerResult;
       const headers = Object.create(null);
@@ -349,7 +349,7 @@ function sendResult(
         (payload) => {
           handleErrors(payload);
           const payloadBuffer = Buffer.from(
-            stringifyPayload(payload as any, asString),
+            stringifyPayload(payload as any, outputDataAsString),
             "utf8",
           );
           return Buffer.concat([DIVIDE, payloadBuffer]);

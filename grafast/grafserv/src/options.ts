@@ -10,7 +10,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     outputDataAsString = false,
   } = config.server ?? {};
   return {
-    asString: outputDataAsString,
+    outputDataAsString,
     graphqlPath,
     graphiql,
     graphiqlOnGraphQLGET,

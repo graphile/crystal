@@ -151,7 +151,7 @@ export const makeGraphQLHandler = (
     parseAndValidate = makeParseAndValidateFunction(schema);
   }
 
-  const asString = dynamicOptions.asString;
+  const outputDataAsString = dynamicOptions.outputDataAsString;
 
   return async (request: RequestDigest): Promise<HandlerResult> => {
     if (wait) {
@@ -219,7 +219,7 @@ export const makeGraphQLHandler = (
           dynamicOptions,
           statusCode: 200,
           iterator: result,
-          asString,
+          outputDataAsString,
         };
       }
       return {
@@ -228,7 +228,7 @@ export const makeGraphQLHandler = (
         dynamicOptions,
         statusCode: 200,
         payload: result,
-        asString,
+        outputDataAsString,
       };
     } catch (e) {
       console.error(e);

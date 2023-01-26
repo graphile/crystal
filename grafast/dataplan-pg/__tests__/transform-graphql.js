@@ -113,7 +113,7 @@ beforeAll(() => {
       ? `result2.then(() => {}, () => {}).then(() =>
     runTestQuery(document, config, { callback, path, ${
       options.includeDeoptimize ? `deoptimize: true, ` : ``
-    }asString: true })
+    }outputDataAsString: true })
   )`
       : `result2.then(() => {}, () => {})`
   };
