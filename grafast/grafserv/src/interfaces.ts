@@ -41,6 +41,7 @@ export interface ServerOptions {
   /** The length, in bytes, for the largest request body that the server will accept */
   maxRequestLength?: number;
 
+  // FIXME: IMPLEMENT THIS!
   /** How long should we wait for a schema promise to resolve before sending a failure to the client? */
   schemaWaitTime?: number;
 
