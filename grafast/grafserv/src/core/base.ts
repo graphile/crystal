@@ -34,8 +34,8 @@ export class GrafservBase {
     "schema:error": any;
   }>;
   private initialized = false;
-  private graphqlHandler!: ReturnType<typeof makeGraphQLHandler>;
-  private graphiqlHandler!: ReturnType<typeof makeGraphiQLHandler>;
+  public graphqlHandler!: ReturnType<typeof makeGraphQLHandler>;
+  public graphiqlHandler!: ReturnType<typeof makeGraphiQLHandler>;
 
   constructor(config: GrafservConfig) {
     this.eventEmitter = new EventEmitter();
@@ -133,12 +133,12 @@ export class GrafservBase {
     try {
       const result = this._processRequest(request);
       if (isPromiseLike(result)) {
-        return result.then(sendResult, sendError);
+        return result.then(convertHandlerResultToResult, handleError);
       } else {
-        return sendResult(result);
+        return convertHandlerResultToResult(result);
       }
     } catch (e) {
-      return sendError(e);
+      return handleError(e);
     }
   }
 
@@ -222,7 +222,8 @@ export class GrafservBase {
     );
   }
 
-  private makeStream(): AsyncIterableIterator<SchemaChangeEvent> {
+  // TODO: Rename this, or make it a middleware, or something
+  public makeStream(): AsyncIterableIterator<SchemaChangeEvent> {
     const queue: Array<{
       resolve: (value: IteratorResult<SchemaChangeEvent>) => void;
       reject: (e: Error) => void;
@@ -287,7 +288,7 @@ const DIVIDE = Buffer.from(
   "utf8",
 );
 
-function sendResult(
+export function convertHandlerResultToResult(
   handlerResult: HandlerResult | null,
 ): PromiseOrDirect<Result | null> {
   if (handlerResult === null) {
@@ -441,8 +442,13 @@ function sendResult(
     }
     default: {
       const never: never = handlerResult;
-      console.error(`Did not understand '${never}' passed to sendResult`);
-      const payload = Buffer.from("Unexpected input to sendResult", "utf8");
+      console.error(
+        `Did not understand '${never}' passed to convertHandlerResultToResult`,
+      );
+      const payload = Buffer.from(
+        "Unexpected input to convertHandlerResultToResult",
+        "utf8",
+      );
       const headers = Object.create(null);
       headers["Content-Type"] = "text/plain; charset=utf-8";
       headers["Content-Length"] = payload.length;
@@ -456,7 +462,7 @@ function sendResult(
   }
 }
 
-const sendError = (error: Error): ErrorResult => {
+export const handleError = (error: Error): ErrorResult => {
   const statusCode =
     ((error as GraphQLError).extensions?.statusCode as number | undefined) ??
     500;
