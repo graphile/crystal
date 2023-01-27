@@ -8,7 +8,12 @@ import {
   isAsyncIterable,
   isPromiseLike,
 } from "grafast";
-import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
+import {
+  DocumentNode,
+  ExecutionArgs,
+  getOperationAST,
+  GraphQLSchema,
+} from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 import { makeAcceptMatcher } from "../accept.js";
 
@@ -325,6 +330,27 @@ export const makeGraphQLHandler = (
         contentType: chosenContentType,
         payload: { errors },
       };
+    }
+
+    if (request.method !== "POST") {
+      // Forbid mutation
+      const operation = getOperationAST(document, operationName);
+      if (operation?.operation === "mutation") {
+        const error = new GraphQLError(
+          "Mutations may only take place over POST requests.",
+          operation,
+        );
+        return {
+          type: "graphql",
+          request,
+          dynamicOptions,
+          statusCode: isLegacy ? 200 : 500,
+          contentType: chosenContentType,
+          payload: {
+            errors: [error],
+          },
+        };
+      }
     }
 
     const args: ExecutionArgs = {
