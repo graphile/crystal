@@ -7,6 +7,8 @@ const preset = {
   server: {
     port: 5678,
     outputDataAsString: true,
+    graphqlOverGET: true,
+    graphiqlOnGraphQLGET: true,
   },
 };
 export default preset;
