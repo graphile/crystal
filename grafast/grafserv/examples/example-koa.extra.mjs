@@ -7,14 +7,7 @@ import schema from "./schema.mjs";
 // Create a Koa app
 const app = new Koa();
 // Parse the body
-app.use(
-  bodyParser({
-    detectJSON: (ctx) =>
-      ["application/json", "application/graphql-request+json"].includes(
-        ctx.type,
-      ),
-  }),
-);
+app.use(bodyParser());
 // (Add any Koa middleware you want here.)
 
 // Create a Grafserv instance

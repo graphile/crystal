@@ -134,11 +134,15 @@ export class FastifyGrafserv extends GrafservBase {
   }
 
   addTo(app: FastifyInstance) {
+    // application/graphql-request+json isn't currently an official serialization format:
+    // https://graphql.github.io/graphql-over-http/draft/#sec-Media-Types
+    /*
     app.addContentTypeParser(
       "application/graphql-request+json",
       { parseAs: "string" },
       app.getDefaultJsonParser("ignore", "ignore"),
     );
+    */
 
     const dynamicOptions = this.dynamicOptions;
 
