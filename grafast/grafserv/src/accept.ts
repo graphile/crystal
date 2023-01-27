@@ -138,7 +138,13 @@ function parseAccepts(acceptHeader: string) {
           if (nextCharCode !== SLASH) {
             throw new Error("Expected '/' after '*'");
           }
-          state = State.EXPECT_SUBTYPE;
+          if (acceptHeader.charCodeAt(i + 1) === ASTERISK) {
+            ++i;
+            currentAccept.subtype = "*";
+            state = State.EXPECT_COMMA_OR_SEMICOLON;
+          } else {
+            state = State.EXPECT_SUBTYPE;
+          }
         } else if (isToken(charCode)) {
           currentAccept = {
             type: acceptHeader[i],
@@ -162,10 +168,7 @@ function parseAccepts(acceptHeader: string) {
         break;
       }
       case State.EXPECT_SUBTYPE: {
-        if (charCode === ASTERISK) {
-          currentAccept!.subtype = "*";
-          state = State.EXPECT_COMMA_OR_SEMICOLON;
-        } else if (isToken(charCode)) {
+        if (isToken(charCode)) {
           currentAccept!.subtype = acceptHeader[i];
           state = State.CONTINUE_SUBTYPE;
         } else {
