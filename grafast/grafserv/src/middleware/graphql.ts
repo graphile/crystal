@@ -411,10 +411,31 @@ export const makeGraphQLHandler = (
     if (wait) {
       await wait;
     }
-    const body =
-      request.method === "POST"
-        ? processAndValidateBody(request, await request.getBody(dynamicOptions))
-        : processAndValidateQueryParams(await request.getQueryParams());
+    let body: ValidatedBody;
+    try {
+      body =
+        request.method === "POST"
+          ? processAndValidateBody(
+              request,
+              await request.getBody(dynamicOptions),
+            )
+          : processAndValidateQueryParams(await request.getQueryParams());
+    } catch (e) {
+      if (
+        typeof e.statusCode === "number" &&
+        e.statusCode >= 400 &&
+        e.statusCode < 600
+      ) {
+        throw e;
+      } else {
+        // TODO: should maybe handle more specific issues here. See examples:
+        // https://graphql.github.io/graphql-over-http/draft/#sec-Examples
+        throw httpError(
+          400,
+          `Parsing failed, please check that the data you're sending to the server is correct`,
+        );
+      }
+    }
 
     const { query, operationName, variableValues } = body;
 
@@ -425,7 +446,7 @@ export const makeGraphQLHandler = (
         type: "graphql",
         request,
         dynamicOptions,
-        statusCode: 200,
+        statusCode: isLegacy ? 200 : 400,
         contentType: chosenContentType,
         payload: { errors },
       };
@@ -487,7 +508,12 @@ export const makeGraphQLHandler = (
         type: "graphql",
         request,
         dynamicOptions,
-        statusCode: 200,
+        statusCode:
+          isLegacy || !result.errors
+            ? 200
+            : result.data === undefined
+            ? 400
+            : 200,
         contentType: chosenContentType,
         payload: result,
         outputDataAsString,
