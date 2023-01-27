@@ -23,10 +23,10 @@ import {
   HandlerResult,
   JSONValue,
   NormalizedRequestDigest,
-  RequestDigest,
 } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 import { parse as parseQueryString } from "node:querystring";
+import { httpError } from "../utils.js";
 
 let lastString: string;
 let lastHash: string;
@@ -107,11 +107,11 @@ function processAndValidateQueryParams(
 ): ValidatedBody {
   const query = params.query;
   if (typeof query !== "string") {
-    throw new Error("query must be a string");
+    throw httpError(400, "query must be a string");
   }
   const operationName = params.operationName ?? undefined;
   if (operationName != null && typeof operationName !== "string") {
-    throw new Error("operationName, if given, must be a string");
+    throw httpError(400, "operationName, if given, must be a string");
   }
   const variablesString = params.variables ?? undefined;
   const variableValues =
@@ -122,7 +122,7 @@ function processAndValidateQueryParams(
     variableValues != null &&
     (typeof variableValues !== "object" || Array.isArray(variableValues))
   ) {
-    throw new Error("Invalid variables; expected JSON-encoded object");
+    throw httpError(400, "Invalid variables; expected JSON-encoded object");
   }
   const extensionsString = params.extensions ?? undefined;
   const extensions =
@@ -133,7 +133,7 @@ function processAndValidateQueryParams(
     extensions != null &&
     (typeof extensions !== "object" || Array.isArray(extensions))
   ) {
-    throw new Error("Invalid extensions; expected JSON-encoded object");
+    throw httpError(400, "Invalid extensions; expected JSON-encoded object");
   }
   return {
     query,
@@ -145,32 +145,32 @@ function processAndValidateQueryParams(
 
 function processAndValidateJSON(params: JSONValue): ValidatedBody {
   if (!params) {
-    throw new Error("No body");
+    throw httpError(400, "No body");
   }
   if (typeof params !== "object" || Array.isArray(params)) {
-    throw new Error("Invalid body; expected object");
+    throw httpError(400, "Invalid body; expected object");
   }
   const query = params.query;
   if (typeof query !== "string") {
-    throw new Error("query must be a string");
+    throw httpError(400, "query must be a string");
   }
   const operationName = params.operationName ?? undefined;
   if (operationName != null && typeof operationName !== "string") {
-    throw new Error("operationName, if given, must be a string");
+    throw httpError(400, "operationName, if given, must be a string");
   }
   const variableValues = params.variables ?? undefined;
   if (
     variableValues != null &&
     (typeof variableValues !== "object" || Array.isArray(variableValues))
   ) {
-    throw new Error("Invalid variables; expected JSON-encoded object");
+    throw httpError(400, "Invalid variables; expected JSON-encoded object");
   }
   const extensions = params.extensions ?? undefined;
   if (
     extensions != null &&
     (typeof extensions !== "object" || Array.isArray(extensions))
   ) {
-    throw new Error("Invalid extensions; expected JSON-encoded object");
+    throw httpError(400, "Invalid extensions; expected JSON-encoded object");
   }
   return {
     query,
@@ -186,10 +186,7 @@ function processAndValidateBody(
 ): ValidatedBody {
   const contentType = request[$$normalizedHeaders]["content-type"];
   if (!contentType) {
-    throw Object.assign(
-      new Error("Could not determine the Content-Type of the request"),
-      { statusCode: 400 },
-    );
+    throw httpError(400, "Could not determine the Content-Type of the request");
   }
   const semi = contentType.indexOf(";");
   const ct = semi >= 0 ? contentType.slice(0, semi).trim() : contentType.trim();
@@ -210,7 +207,7 @@ function processAndValidateBody(
         }
         default: {
           const never: never = body;
-          throw new Error(`Do not understand type ${(never as any).type}`);
+          throw httpError(400, `Do not understand type ${(never as any).type}`);
         }
       }
     }
@@ -230,7 +227,7 @@ function processAndValidateBody(
             typeof body.json !== "object" ||
             Array.isArray(body.json)
           ) {
-            throw new Error(`Invalid body`);
+            throw httpError(400, `Invalid body`);
           }
           return processAndValidateQueryParams(
             body.json as Record<string, any>,
@@ -238,7 +235,7 @@ function processAndValidateBody(
         }
         default: {
           const never: never = body;
-          throw new Error(`Do not understand type ${(never as any).type}`);
+          throw httpError(400, `Do not understand type ${(never as any).type}`);
         }
       }
     }
@@ -266,12 +263,12 @@ function processAndValidateBody(
         }
         default: {
           const never: never = body;
-          throw new Error(`Do not understand type ${(never as any).type}`);
+          throw httpError(400, `Do not understand type ${(never as any).type}`);
         }
       }
     }
     default: {
-      throw new Error(`Do not understand content type`);
+      throw httpError(400, `Do not understand content type`);
     }
   }
 }
@@ -377,14 +374,35 @@ export const makeGraphQLHandler = (
       ) {
         /* continue */
       } else {
-        // TODO: should we raise 501? Forbidden for GET/HEAD.
-
-        // Unsupported method.
-        return null;
+        return {
+          type: "graphql",
+          request,
+          dynamicOptions,
+          statusCode: 405,
+          contentType: "application/json",
+          payload: {
+            errors: [new GraphQLError("Method not supported, please use POST")],
+          },
+        };
       }
     } else {
-      // Who knows what they want?
-      return null;
+      // > Respond with a 406 Not Acceptable status code and stop processing the request.
+      // https://graphql.github.io/graphql-over-http/draft/#sel-DANHELDAACNA4rR
+
+      return {
+        type: "graphql",
+        request,
+        dynamicOptions,
+        statusCode: 406,
+        contentType: "application/json",
+        payload: {
+          errors: [
+            new GraphQLError(
+              "Could not find a supported media type; consider adding 'application/json' or 'application/graphql-response+json' to your Accept header.",
+            ),
+          ],
+        },
+      };
     }
 
     // If we get here, we're handling a GraphQL request
@@ -480,7 +498,9 @@ export const makeGraphQLHandler = (
         type: "graphql",
         request,
         dynamicOptions,
-        statusCode: isLegacy ? 200 : 500,
+        // e.g. We should always return 400 on no Content-Type header:
+        // https://graphql.github.io/graphql-over-http/draft/#sel-DALLDJAADLCA8tb
+        statusCode: e.statusCode ?? (isLegacy ? 200 : 500),
         contentType: chosenContentType,
         payload: {
           errors: [new GraphQLError(e.message)],
