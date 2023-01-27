@@ -3,7 +3,11 @@ import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { GraphQLError } from "graphql";
 import type { Readable } from "node:stream";
 
-import type { GrafservBody } from "./interfaces.js";
+import {
+  $$normalizedHeaders,
+  GrafservBody,
+  RequestDigest,
+} from "./interfaces.js";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,
@@ -68,4 +72,15 @@ export function getBodyFromRequest(
     req.on("error", reject);
     req.on("data", handleData);
   });
+}
+
+export function normalizeRequest(request: RequestDigest) {
+  if (!request[$$normalizedHeaders]) {
+    const normalized = Object.create(null);
+    for (const key in request.headers) {
+      normalized[key.toLowerCase()] = request.headers[key];
+    }
+    request[$$normalizedHeaders] = normalized;
+  }
+  return request;
 }

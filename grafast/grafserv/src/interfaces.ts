@@ -98,6 +98,7 @@ export interface GrafservBodyJSON {
 
 export type GrafservBody = GrafservBodyBuffer | GrafservBodyJSON;
 
+export const $$normalizedHeaders = Symbol("normalizedHeaders");
 export interface RequestDigest {
   method: "HEAD" | "GET" | "POST" | string;
   httpVersionMajor: number;
@@ -108,6 +109,8 @@ export interface RequestDigest {
   frameworkMeta: Grafserv.RequestDigestFrameworkMeta[keyof Grafserv.RequestDigestFrameworkMeta];
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
+  /** As 'headers', but with the keys lowercased */
+  [$$normalizedHeaders]?: Record<string, string>;
 }
 
 interface IHandlerResult {
