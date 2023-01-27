@@ -3,12 +3,12 @@ import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { GraphQLError } from "graphql";
 import type { Readable } from "node:stream";
 
-import {
-  $$normalizedHeaders,
+import type {
   GrafservBody,
   NormalizedRequestDigest,
   RequestDigest,
 } from "./interfaces.js";
+import { $$normalizedHeaders } from "./interfaces.js";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,

@@ -8,24 +8,25 @@ import {
   isAsyncIterable,
   isPromiseLike,
 } from "grafast";
+import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import {
-  DocumentNode,
-  ExecutionArgs,
   getOperationAST,
-  GraphQLSchema,
+  GraphQLError,
+  parse,
+  Source,
+  validate,
 } from "graphql";
-import { GraphQLError, parse, Source, validate } from "graphql";
-import { makeAcceptMatcher } from "../accept.js";
+import { parse as parseQueryString } from "node:querystring";
 
-import {
-  $$normalizedHeaders,
+import { makeAcceptMatcher } from "../accept.js";
+import type {
   GrafservBody,
   HandlerResult,
   JSONValue,
   NormalizedRequestDigest,
 } from "../interfaces.js";
+import { $$normalizedHeaders } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
-import { parse as parseQueryString } from "node:querystring";
 import { httpError } from "../utils.js";
 
 let lastString: string;

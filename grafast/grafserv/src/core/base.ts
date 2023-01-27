@@ -2,12 +2,10 @@ import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import { isPromiseLike, stringifyPayload } from "grafast";
 import { resolvePresets } from "graphile-config";
-import { GraphQLError, GraphQLSchema } from "graphql";
-import { isSchema, validateSchema } from "graphql";
-import { makeAcceptMatcher } from "../accept.js";
+import type { GraphQLSchema } from "graphql";
+import { GraphQLError, isSchema, validateSchema } from "graphql";
 
-import {
-  $$normalizedHeaders,
+import type {
   BufferResult,
   ErrorResult,
   EventStreamEvent,

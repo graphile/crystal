@@ -41,7 +41,7 @@ export function makeAcceptMatcher(mediaTypes: string[]) {
       const specs = parseAccepts(acceptHeader);
       // Find the first spec that matches each, then pick the one with the
       // highest q.
-      let bestQ: number = 0;
+      let bestQ = 0;
       let bestMediaType: string | null = null;
       for (const digest of typeDigests) {
         const highestPrecedenceSpecMatch = specs.find((spec) => {
@@ -178,7 +178,7 @@ function parseAccepts(acceptHeader: string) {
   const accepts: Accept[] = [];
   let state = State.EXPECT_TYPE;
   let currentAccept: Accept | null = null;
-  let currentParameterName: string = "";
+  let currentParameterName = "";
   function next() {
     if (currentAccept!.parameters.q) {
       const q = parseFloat(currentAccept!.parameters.q);
