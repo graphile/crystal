@@ -10,11 +10,14 @@ import {
 } from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
+import { makeAcceptMatcher } from "../accept.js";
 
 import {
+  $$normalizedHeaders,
   GrafservBody,
   HandlerResult,
   JSONValue,
+  NormalizedRequestDigest,
   RequestDigest,
 } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
@@ -101,6 +104,26 @@ function processBody(body: GrafservBody): JSONValue | null {
   }
 }
 
+export const APPLICATION_JSON = "application/json;charset=utf-8";
+export const APPLICATION_GRAPHQL_RESPONSE_JSON =
+  "application/graphql-response+json;charset=utf-8";
+export const TEXT_HTML = "text/html;charset=utf-8";
+
+/** https://graphql.github.io/graphql-over-http/draft/#sec-Legacy-Watershed */
+const isAfterWatershed = Date.now() >= +new Date(2025, 0, 1);
+const GRAPHQL_TYPES = isAfterWatershed
+  ? [APPLICATION_GRAPHQL_RESPONSE_JSON, APPLICATION_JSON]
+  : [APPLICATION_JSON, APPLICATION_GRAPHQL_RESPONSE_JSON];
+
+const graphqlAcceptMatcher = makeAcceptMatcher([...GRAPHQL_TYPES]);
+
+const graphqlOrHTMLAcceptMatcher = makeAcceptMatcher([
+  ...GRAPHQL_TYPES,
+  // Must be lowest priority, otherwise GraphiQL may override GraphQL in some
+  // situations
+  TEXT_HTML,
+]);
+
 export const makeGraphQLHandler = (
   resolvedPreset: GraphileConfig.ResolvedPreset,
   dynamicOptions: OptionsFromConfig,
@@ -153,7 +176,47 @@ export const makeGraphQLHandler = (
 
   const outputDataAsString = dynamicOptions.outputDataAsString;
 
-  return async (request: RequestDigest): Promise<HandlerResult> => {
+  return async (
+    request: NormalizedRequestDigest,
+    graphiqlHandler?: (
+      request: NormalizedRequestDigest,
+    ) => Promise<HandlerResult | null>,
+  ): Promise<HandlerResult | null> => {
+    const accept = request[$$normalizedHeaders].accept;
+    // Do they want HTML, or do they want GraphQL?
+    const chosenContentType =
+      request.method === "GET" &&
+      dynamicOptions.graphiqlOnGraphQLGET &&
+      graphiqlHandler
+        ? graphqlOrHTMLAcceptMatcher(accept)
+        : graphqlAcceptMatcher(accept);
+
+    if (chosenContentType === TEXT_HTML) {
+      // They want HTML -> Ruru
+      return graphiqlHandler!(request);
+    } else if (
+      chosenContentType === APPLICATION_JSON ||
+      chosenContentType === APPLICATION_GRAPHQL_RESPONSE_JSON
+    ) {
+      // They want GraphQL
+      if (
+        request.method === "POST" ||
+        (dynamicOptions.graphqlOverGET && request.method === "GET")
+      ) {
+        /* continue */
+      } else {
+        // TODO: should we raise 501? Forbidden for GET/HEAD.
+
+        // Unsupported method.
+        return null;
+      }
+    } else {
+      // Who knows what they want?
+      return null;
+    }
+
+    // If we get here, we're handling a GraphQL request
+
     if (wait) {
       await wait;
     }
@@ -189,6 +252,7 @@ export const makeGraphQLHandler = (
         request,
         dynamicOptions,
         statusCode: 200,
+        contentType: chosenContentType,
         payload: { errors },
       };
     }
@@ -227,6 +291,7 @@ export const makeGraphQLHandler = (
         request,
         dynamicOptions,
         statusCode: 200,
+        contentType: chosenContentType,
         payload: result,
         outputDataAsString,
       };
@@ -237,6 +302,7 @@ export const makeGraphQLHandler = (
         request,
         dynamicOptions,
         statusCode: 500,
+        contentType: chosenContentType,
         payload: {
           errors: [new GraphQLError(e.message)],
           extensions: (args.rootValue as any)?.[$$extensions],

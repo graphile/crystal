@@ -122,7 +122,7 @@ export interface NormalizedRequestDigest extends RequestDigest {
 
 interface IHandlerResult {
   type: string;
-  request: RequestDigest;
+  request: NormalizedRequestDigest;
   dynamicOptions: OptionsFromConfig;
   statusCode?: number;
 }
@@ -136,6 +136,7 @@ export interface TextHandlerResult extends IHandlerResult {
 }
 export interface GraphQLHandlerResult extends IHandlerResult {
   type: "graphql";
+  contentType: string;
   payload: ExecutionResult;
   outputDataAsString?: boolean;
 }

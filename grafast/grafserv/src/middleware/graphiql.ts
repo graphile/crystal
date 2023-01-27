@@ -1,4 +1,4 @@
-import type { HandlerResult, RequestDigest } from "../interfaces.js";
+import type { HandlerResult, NormalizedRequestDigest } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 
 const ruruServer = import("ruru/server");
@@ -9,7 +9,7 @@ export function makeGraphiQLHandler(
   _resolvedPreset: GraphileConfig.ResolvedPreset,
   dynamicOptions: OptionsFromConfig,
 ) {
-  return async (request: RequestDigest): Promise<HandlerResult> => {
+  return async (request: NormalizedRequestDigest): Promise<HandlerResult> => {
     if (!ruruHTML) {
       ruruHTML = (await ruruServer).ruruHTML;
     }

@@ -11,7 +11,7 @@ import type {
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
-import { processHeaders } from "../../../utils.js";
+import { normalizeRequest, processHeaders } from "../../../utils.js";
 
 declare global {
   namespace Grafserv {
@@ -153,7 +153,9 @@ export class FastifyGrafserv extends GrafservBase {
       handler: async (request, reply) => {
         const digest = getDigest(request, reply);
         // TODO: if HTML is preferred, render GraphiQL
-        const handlerResult = await this.graphqlHandler(digest);
+        const handlerResult = await this.graphqlHandler(
+          normalizeRequest(digest),
+        );
         const result = await convertHandlerResultToResult(handlerResult);
         return this.send(request, reply, result);
       },
@@ -166,7 +168,9 @@ export class FastifyGrafserv extends GrafservBase {
         bodyLimit: this.dynamicOptions.maxRequestLength,
         handler: async (request, reply) => {
           const digest = getDigest(request, reply);
-          const handlerResult = await this.graphiqlHandler(digest);
+          const handlerResult = await this.graphiqlHandler(
+            normalizeRequest(digest),
+          );
           const result = await convertHandlerResultToResult(handlerResult);
           return this.send(request, reply, result);
         },
@@ -183,7 +187,7 @@ export class FastifyGrafserv extends GrafservBase {
           // TODO: refactor this to use the eventStreamHandler once we write that...
           const handlerResult: EventStreamHeandlerResult = {
             type: "event-stream",
-            request: digest,
+            request: normalizeRequest(digest),
             dynamicOptions,
             payload: this.makeStream(),
             statusCode: 200,

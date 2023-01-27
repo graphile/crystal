@@ -13,37 +13,20 @@ import {
   EventStreamEvent,
   GrafservConfig,
   HandlerResult,
+  NormalizedRequestDigest,
   RequestDigest,
   Result,
   SchemaChangeEvent,
 } from "../interfaces.js";
 import { mapIterator } from "../mapIterator.js";
 import { makeGraphiQLHandler } from "../middleware/graphiql.js";
-import { makeGraphQLHandler } from "../middleware/graphql.js";
+import { APPLICATION_JSON, makeGraphQLHandler } from "../middleware/graphql.js";
 import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest } from "../utils.js";
 
-const APPLICATION_JSON = "application/json;charset=utf-8";
-const APPLICATION_GRAPHQL_RESPONSE_JSON =
-  "application/graphql-response+json;charset=utf-8";
-const TEXT_HTML = "text/html;charset=utf-8";
-
-const graphqlAcceptMatcher = makeAcceptMatcher([
-  APPLICATION_JSON,
-  APPLICATION_GRAPHQL_RESPONSE_JSON,
-]);
-
-const graphqlOrHTMLAcceptMatcher = makeAcceptMatcher([
-  APPLICATION_JSON,
-  APPLICATION_GRAPHQL_RESPONSE_JSON,
-  // Must be lowest priority, otherwise GraphiQL may override GraphQL in some
-  // situations
-  TEXT_HTML,
-]);
-
 function handleGraphQLError(
-  request: RequestDigest,
+  request: NormalizedRequestDigest,
   dynamicOptions: OptionsFromConfig,
   e: Error,
 ) {
@@ -62,6 +45,9 @@ function handleGraphQLError(
     dynamicOptions,
     payload: { errors: [error] },
     statusCode: 500,
+    // Fall back to application/json; this is when an unexpected error happens
+    // so it shouldn't be hit.
+    contentType: APPLICATION_JSON,
   } as HandlerResult;
 }
 
@@ -108,41 +94,12 @@ export class GrafservBase {
     inRequest: RequestDigest,
   ): PromiseOrDirect<HandlerResult | null> {
     const request = normalizeRequest(inRequest);
-    const accept = request[$$normalizedHeaders].accept;
     const dynamicOptions = this.dynamicOptions;
     try {
       if (request.path === dynamicOptions.graphqlPath) {
-        // Do they want HTML, or do they want GraphQL?
-        const bestMatch =
-          request.method === "GET" && dynamicOptions.graphiqlOnGraphQLGET
-            ? graphqlOrHTMLAcceptMatcher(accept)
-            : graphqlAcceptMatcher(accept);
-
-        if (bestMatch === TEXT_HTML) {
-          // They want HTML -> Ruru
-          return this.graphiqlHandler(request);
-        } else if (
-          bestMatch === APPLICATION_JSON ||
-          bestMatch === APPLICATION_GRAPHQL_RESPONSE_JSON
-        ) {
-          // They want GraphQL
-          if (
-            request.method === "POST" ||
-            (dynamicOptions.graphqlOverGET && request.method === "GET")
-          ) {
-            return this.graphqlHandler(request).catch((e) =>
-              handleGraphQLError(request, dynamicOptions, e),
-            );
-          } else {
-            // TODO: should we raise 501? Forbidden for GET/HEAD.
-
-            // Unsupported method.
-            return null;
-          }
-        } else {
-          // Who knows what they want?
-          return null;
-        }
+        return this.graphqlHandler(request, this.graphiqlHandler).catch((e) =>
+          handleGraphQLError(request, dynamicOptions, e),
+        );
       }
 
       // FIXME: handle 'HEAD' requests
@@ -356,6 +313,7 @@ export function convertHandlerResultToResult(
       const {
         payload,
         statusCode = 200,
+        contentType,
         outputDataAsString,
         dynamicOptions,
         request: { preferJSON },
@@ -363,7 +321,7 @@ export function convertHandlerResultToResult(
 
       handleErrors(payload);
       const headers = Object.create(null);
-      headers["Content-Type"] = "application/json";
+      headers["Content-Type"] = contentType;
       if (dynamicOptions.watch) {
         headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamRoute;
       }
