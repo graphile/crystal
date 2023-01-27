@@ -22,6 +22,7 @@ interface Accept {
   type: string;
   subtype: string;
   parameters: Record<string, string>;
+  q: number | null;
 }
 
 const SPACE = " ".charCodeAt(0);
@@ -117,6 +118,13 @@ function parseAccepts(acceptHeader: string) {
   let currentAccept: Accept | null = null;
   let currentParameterName: string = "";
   function next() {
+    if (currentAccept!.parameters.q) {
+      const q = parseFloat(currentAccept!.parameters.q);
+      if (Number.isNaN(q) || q < 0 || q > 1) {
+        throw new Error("q out of range");
+      }
+      currentAccept!.q = q;
+    }
     accepts.push(currentAccept!);
     currentAccept = null;
     state = State.EXPECT_TYPE;
@@ -131,6 +139,7 @@ function parseAccepts(acceptHeader: string) {
           currentAccept = {
             type: "*",
             subtype: "",
+            q: null,
             parameters: Object.create(null),
           };
           const nextCharCode = acceptHeader.charCodeAt(++i);
@@ -148,6 +157,7 @@ function parseAccepts(acceptHeader: string) {
           currentAccept = {
             type: acceptHeader[i],
             subtype: "",
+            q: null,
             parameters: Object.create(null),
           };
           state = State.CONTINUE_TYPE;
