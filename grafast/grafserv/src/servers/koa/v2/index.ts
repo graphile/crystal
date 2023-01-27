@@ -23,6 +23,9 @@ function getDigest(ctx: Context): RequestDigest {
     method: ctx.request.method,
     path: ctx.request.url,
     headers: processHeaders(ctx.request.headers),
+    getQueryParams() {
+      return ctx.request.query as Record<string, string | string[]>;
+    },
     getBody(dynamicOptions) {
       if ("body" in ctx.request) {
         // FIXME: not necessarily JSON, e.g. if parsing form?

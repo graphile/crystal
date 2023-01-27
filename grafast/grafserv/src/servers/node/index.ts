@@ -1,4 +1,5 @@
-import type { IncomingMessage, ServerResponse } from "http";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import { parse as parseQueryString } from "node:querystring";
 
 import { GrafservBase } from "../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
@@ -22,6 +23,14 @@ function getDigest(req: IncomingMessage, res: ServerResponse): RequestDigest {
     method: req.method!,
     path: req.url!,
     headers: processHeaders(req.headers),
+    getQueryParams() {
+      const qi = req.url!.indexOf("?");
+      const search = qi >= 0 ? req.url!.substring(qi) : null;
+      const queryParams = search
+        ? parseQueryString(search)
+        : Object.create(null);
+      return queryParams;
+    },
     getBody(dynamicOptions) {
       return getBodyFromRequest(req, dynamicOptions.maxRequestLength);
     },

@@ -34,6 +34,9 @@ function getDigest(
     method: request.method,
     path: request.url,
     headers: processHeaders(request.headers),
+    getQueryParams() {
+      return request.query as Record<string, string>;
+    },
     getBody(_dynamicOptions) {
       return { type: "json", json: request.body as any };
     },

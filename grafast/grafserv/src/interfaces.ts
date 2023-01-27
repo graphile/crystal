@@ -108,6 +108,7 @@ export interface RequestDigest {
   httpVersionMinor: number;
   path: string;
   headers: Record<string, string>;
+  getQueryParams: () => PromiseOrDirect<Record<string, string | string[]>>;
   getBody(dynamicOptions: OptionsFromConfig): PromiseOrDirect<GrafservBody>;
   frameworkMeta: Grafserv.RequestDigestFrameworkMeta[keyof Grafserv.RequestDigestFrameworkMeta];
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification

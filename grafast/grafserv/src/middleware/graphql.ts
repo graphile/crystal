@@ -89,6 +89,54 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
   return parseAndValidate;
 }
 
+interface ValidatedBody {
+  query: string;
+  operationName: string | undefined;
+  variableValues: Record<string, any> | undefined;
+  extensions: Record<string, any> | undefined;
+}
+
+function processAndValidateQueryParams(
+  params: Record<string, string | string[]>,
+): ValidatedBody {
+  const query = params.query;
+  if (typeof query !== "string") {
+    throw new Error("query must be a string");
+  }
+  const operationName = params.operationName ?? undefined;
+  if (operationName != null && typeof operationName !== "string") {
+    throw new Error("operationName, if given, must be a string");
+  }
+  const variablesString = params.variables ?? undefined;
+  const variableValues =
+    typeof variablesString === "string"
+      ? JSON.parse(variablesString)
+      : undefined;
+  if (
+    variableValues != null &&
+    (typeof variableValues !== "object" || Array.isArray(variableValues))
+  ) {
+    throw new Error("Invalid variables; expected JSON-encoded object");
+  }
+  const extensionsString = params.extensions ?? undefined;
+  const extensions =
+    typeof extensionsString === "string"
+      ? JSON.parse(extensionsString)
+      : undefined;
+  if (
+    extensions != null &&
+    (typeof extensions !== "object" || Array.isArray(extensions))
+  ) {
+    throw new Error("Invalid extensions; expected JSON-encoded object");
+  }
+  return {
+    query,
+    operationName,
+    variableValues,
+    extensions,
+  };
+}
+
 function processBody(body: GrafservBody): JSONValue | null {
   switch (body.type) {
     case "buffer": {
@@ -102,6 +150,44 @@ function processBody(body: GrafservBody): JSONValue | null {
       throw new Error(`Do not understand type ${(never as any).type}`);
     }
   }
+}
+
+function processAndValidateBody(body: GrafservBody): ValidatedBody {
+  const params = processBody(body);
+  if (!params) {
+    throw new Error("No body");
+  }
+  if (typeof params !== "object" || Array.isArray(params)) {
+    throw new Error("Invalid body; expected object");
+  }
+  const query = params.query;
+  if (typeof query !== "string") {
+    throw new Error("query must be a string");
+  }
+  const operationName = params.operationName ?? undefined;
+  if (operationName != null && typeof operationName !== "string") {
+    throw new Error("operationName, if given, must be a string");
+  }
+  const variableValues = params.variables ?? undefined;
+  if (
+    variableValues != null &&
+    (typeof variableValues !== "object" || Array.isArray(variableValues))
+  ) {
+    throw new Error("Invalid variables; expected JSON-encoded object");
+  }
+  const extensions = params.extensions ?? undefined;
+  if (
+    extensions != null &&
+    (typeof extensions !== "object" || Array.isArray(extensions))
+  ) {
+    throw new Error("Invalid extensions; expected JSON-encoded object");
+  }
+  return {
+    query,
+    operationName,
+    variableValues,
+    extensions,
+  };
 }
 
 export const APPLICATION_JSON = "application/json;charset=utf-8";
@@ -221,29 +307,12 @@ export const makeGraphQLHandler = (
     if (wait) {
       await wait;
     }
-    // FIXME: if method === POST...
-    const bodyRaw = await request.getBody(dynamicOptions);
-    // FIXME: this parsing is unsafe (it doesn't even check the
-    // content-type!) - replace it with V4's behaviour
-    const body = processBody(bodyRaw);
-    // Parse the body
-    if (typeof body !== "object" || body == null) {
-      throw new Error("Invalid body in request");
-    }
-    const {
-      query,
-      variables: variableValues,
-      operationName,
-    } = body as Record<string, any>;
-    if (typeof query !== "string") {
-      throw new Error("Invalid query");
-    }
-    if (typeof operationName !== "string" && operationName != null) {
-      throw new Error("Invalid operationName");
-    }
-    if (variableValues != null && typeof variableValues !== "object") {
-      throw new Error("Invalid variables");
-    }
+    const body =
+      request.method === "POST"
+        ? processAndValidateBody(await request.getBody(dynamicOptions))
+        : processAndValidateQueryParams(await request.getQueryParams());
+
+    const { query, operationName, variableValues } = body;
 
     const { errors, document } = parseAndValidate(query);
 
