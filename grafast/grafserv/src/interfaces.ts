@@ -94,12 +94,20 @@ export interface GrafservBodyBuffer {
   buffer: Buffer;
 }
 
+export interface GrafservBodyText {
+  type: "text";
+  text: string;
+}
+
 export interface GrafservBodyJSON {
   type: "json";
   json: JSONValue;
 }
 
-export type GrafservBody = GrafservBodyBuffer | GrafservBodyJSON;
+export type GrafservBody =
+  | GrafservBodyBuffer
+  | GrafservBodyText
+  | GrafservBodyJSON;
 
 export const $$normalizedHeaders = Symbol("normalizedHeaders");
 export interface RequestDigest {

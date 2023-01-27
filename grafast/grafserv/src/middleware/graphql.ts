@@ -26,6 +26,7 @@ import {
   RequestDigest,
 } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
+import { parse as parseQueryString } from "node:querystring";
 
 let lastString: string;
 let lastHash: string;
@@ -102,7 +103,7 @@ interface ValidatedBody {
 }
 
 function processAndValidateQueryParams(
-  params: Record<string, string | string[]>,
+  params: Record<string, string | string[] | undefined>,
 ): ValidatedBody {
   const query = params.query;
   if (typeof query !== "string") {
@@ -142,23 +143,7 @@ function processAndValidateQueryParams(
   };
 }
 
-function processBody(body: GrafservBody): JSONValue | null {
-  switch (body.type) {
-    case "buffer": {
-      return JSON.parse(body.buffer.toString("utf8"));
-    }
-    case "json": {
-      return body.json;
-    }
-    default: {
-      const never: never = body;
-      throw new Error(`Do not understand type ${(never as any).type}`);
-    }
-  }
-}
-
-function processAndValidateBody(body: GrafservBody): ValidatedBody {
-  const params = processBody(body);
+function processAndValidateJSON(params: JSONValue): ValidatedBody {
   if (!params) {
     throw new Error("No body");
   }
@@ -193,6 +178,102 @@ function processAndValidateBody(body: GrafservBody): ValidatedBody {
     variableValues,
     extensions,
   };
+}
+
+function processAndValidateBody(
+  request: NormalizedRequestDigest,
+  body: GrafservBody,
+): ValidatedBody {
+  const contentType = request[$$normalizedHeaders]["content-type"];
+  if (!contentType) {
+    throw Object.assign(
+      new Error("Could not determine the Content-Type of the request"),
+      { statusCode: 400 },
+    );
+  }
+  const semi = contentType.indexOf(";");
+  const ct = semi >= 0 ? contentType.slice(0, semi).trim() : contentType.trim();
+  // TODO: we should probably at least look at the parameters... e.g. throw if encoding !== utf-8
+  switch (ct) {
+    case "application/json": {
+      switch (body.type) {
+        case "buffer": {
+          return processAndValidateJSON(
+            JSON.parse(body.buffer.toString("utf8")),
+          );
+        }
+        case "text": {
+          return processAndValidateJSON(JSON.parse(body.text));
+        }
+        case "json": {
+          return processAndValidateJSON(body.json);
+        }
+        default: {
+          const never: never = body;
+          throw new Error(`Do not understand type ${(never as any).type}`);
+        }
+      }
+    }
+    case "application/x-www-form-urlencoded": {
+      switch (body.type) {
+        case "buffer": {
+          return processAndValidateQueryParams(
+            parseQueryString(body.buffer.toString("utf8")),
+          );
+        }
+        case "text": {
+          return processAndValidateQueryParams(parseQueryString(body.text));
+        }
+        case "json": {
+          if (
+            body.json == null ||
+            typeof body.json !== "object" ||
+            Array.isArray(body.json)
+          ) {
+            throw new Error(`Invalid body`);
+          }
+          return processAndValidateQueryParams(
+            body.json as Record<string, any>,
+          );
+        }
+        default: {
+          const never: never = body;
+          throw new Error(`Do not understand type ${(never as any).type}`);
+        }
+      }
+    }
+    case "application/graphql": {
+      // TODO: I have a vague feeling that people that do this pass variables via the query string?
+      switch (body.type) {
+        case "text": {
+          return {
+            query: body.text,
+            operationName: undefined,
+            variableValues: undefined,
+            extensions: undefined,
+          };
+        }
+        case "buffer": {
+          return {
+            query: body.buffer.toString("utf8"),
+            operationName: undefined,
+            variableValues: undefined,
+            extensions: undefined,
+          };
+        }
+        case "json": {
+          return processAndValidateJSON(body.json);
+        }
+        default: {
+          const never: never = body;
+          throw new Error(`Do not understand type ${(never as any).type}`);
+        }
+      }
+    }
+    default: {
+      throw new Error(`Do not understand content type`);
+    }
+  }
 }
 
 export const APPLICATION_JSON = "application/json;charset=utf-8";
@@ -314,7 +395,7 @@ export const makeGraphQLHandler = (
     }
     const body =
       request.method === "POST"
-        ? processAndValidateBody(await request.getBody(dynamicOptions))
+        ? processAndValidateBody(request, await request.getBody(dynamicOptions))
         : processAndValidateQueryParams(await request.getQueryParams());
 
     const { query, operationName, variableValues } = body;
@@ -344,7 +425,9 @@ export const makeGraphQLHandler = (
           type: "graphql",
           request,
           dynamicOptions,
-          statusCode: isLegacy ? 200 : 500,
+          // Note: the GraphQL-over-HTTP spec currently mandates 405, even for legacy clients:
+          // https://graphql.github.io/graphql-over-http/draft/#sel-FALJRPCE2BCGoBitR
+          statusCode: 405,
           contentType: chosenContentType,
           payload: {
             errors: [error],
