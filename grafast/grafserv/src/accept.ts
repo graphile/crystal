@@ -7,22 +7,84 @@ import LRU from "@graphile/lru";
  * be returned. If no match is possible, `null` will be returned.
  */
 export function makeAcceptMatcher(mediaTypes: string[]) {
+  const typeDigests: TypeDigest[] = mediaTypes.map((t) => {
+    // TODO: this parsing is super lazy and isn't 100% reliable; e.g. it could
+    // be broken by `foo/bar;baz="\\";frog"`. We're only handling values passed
+    // by our own code though, and we ain't passing this kind of nonsense.
+    const [spec, ...params] = t.split(";");
+    const parameters = Object.create(null);
+    for (const param of params) {
+      const [key, val] = param.split("=");
+      parameters[key] = val;
+    }
+    const [type, subtype] = spec.split("/");
+
+    return {
+      type,
+      subtype,
+      parameters,
+      q: 1,
+      originalType: t,
+    };
+  });
   const lru = new LRU({ maxLength: 50 });
-  return function preferredAccept(acceptHeader: string): string | null {
+  return function preferredAccept(
+    acceptHeader: string | undefined,
+  ): string | null {
+    if (acceptHeader === undefined) {
+      return mediaTypes[0];
+    }
     const existing = lru.get(acceptHeader);
-    if (existing) {
+    if (existing !== undefined) {
       return existing;
     } else {
       const specs = parseAccepts(acceptHeader);
+      // Find the first spec that matches each, then pick the one with the
+      // highest q.
+      let bestQ: number = 0;
+      let bestMediaType: string | null = null;
+      for (const digest of typeDigests) {
+        const highestPrecedenceSpecMatch = specs.find((spec) => {
+          return (
+            spec.type === "*" ||
+            (spec.type === digest.type &&
+              (spec.subtype === "*" ||
+                (spec.subtype === digest.subtype &&
+                  matchesParameters(spec.parameters, digest.parameters))))
+          );
+        });
+        if (highestPrecedenceSpecMatch) {
+          if (!bestMediaType || highestPrecedenceSpecMatch.q > bestQ) {
+            bestQ = highestPrecedenceSpecMatch.q;
+            bestMediaType = digest.originalType;
+          }
+        }
+      }
+      lru.set(acceptHeader, bestMediaType);
+      return bestMediaType;
     }
   };
 }
+
+function matchesParameters(
+  required: Record<string, string>,
+  given: Record<string, string>,
+) {
+  for (const key in required) {
+    if (given[key] !== required[key]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+type TypeDigest = Accept & { originalType: string };
 
 interface Accept {
   type: string;
   subtype: string;
   parameters: Record<string, string>;
-  q: number | null;
+  q: number;
 }
 
 const SPACE = " ".charCodeAt(0);
@@ -123,6 +185,7 @@ function parseAccepts(acceptHeader: string) {
       if (Number.isNaN(q) || q < 0 || q > 1) {
         throw new Error("q out of range");
       }
+      delete currentAccept!.parameters.q;
       currentAccept!.q = q;
     }
     accepts.push(currentAccept!);
@@ -139,7 +202,7 @@ function parseAccepts(acceptHeader: string) {
           currentAccept = {
             type: "*",
             subtype: "",
-            q: null,
+            q: 1,
             parameters: Object.create(null),
           };
           const nextCharCode = acceptHeader.charCodeAt(++i);
@@ -157,7 +220,7 @@ function parseAccepts(acceptHeader: string) {
           currentAccept = {
             type: acceptHeader[i],
             subtype: "",
-            q: null,
+            q: 1,
             parameters: Object.create(null),
           };
           state = State.CONTINUE_TYPE;
@@ -288,5 +351,28 @@ function parseAccepts(acceptHeader: string) {
   if (state !== State.EXPECT_TYPE) {
     next();
   }
+
+  // Sort `accepts` by precedence. Precedence is how accurate the match is:
+  // a/b;c=d
+  // a/b
+  // a/*
+  // */*
+  const score = (accept: Accept) => {
+    let val = 0;
+    if (accept.type !== "*") {
+      val += 1_000;
+    }
+    if (accept.subtype !== "*") {
+      val += 1_000_000;
+    }
+    val += Object.keys(accept.parameters).length;
+    return val;
+  };
+  accepts.sort((a, z) => {
+    const scoreA = score(a);
+    const scoreZ = score(z);
+    return scoreZ - scoreA;
+  });
+
   return accepts;
 }
