@@ -11,14 +11,13 @@ import {
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import { GraphQLError, parse, Source, validate } from "graphql";
 
-import type {
+import {
   GrafservBody,
   HandlerResult,
   JSONValue,
   RequestDigest,
 } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
-import { normalizeRequest } from "../utils.js";
 
 let lastString: string;
 let lastHash: string;
@@ -155,7 +154,6 @@ export const makeGraphQLHandler = (
   const outputDataAsString = dynamicOptions.outputDataAsString;
 
   return async (request: RequestDigest): Promise<HandlerResult> => {
-    normalizeRequest(request);
     if (wait) {
       await wait;
     }

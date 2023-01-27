@@ -29,6 +29,9 @@ export interface ServerOptions {
   /** The path at which the GraphQL event stream would be made available; usually /graphql/stream */
   eventStreamRoute?: string;
 
+  /** If true, allow GraphQL over GET requests. This has security ramifications, exercise caution. */
+  graphqlOverGET?: boolean;
+
   graphiql?: boolean;
   /** If true, then we will render GraphiQL on GET requests to the /graphql endpoint */
   graphiqlOnGraphQLGET?: boolean;
@@ -109,8 +112,12 @@ export interface RequestDigest {
   frameworkMeta: Grafserv.RequestDigestFrameworkMeta[keyof Grafserv.RequestDigestFrameworkMeta];
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
+}
+
+export interface NormalizedRequestDigest extends RequestDigest {
+  preferJSON: boolean;
   /** As 'headers', but with the keys lowercased */
-  [$$normalizedHeaders]?: Record<string, string>;
+  [$$normalizedHeaders]: Record<string, string>;
 }
 
 interface IHandlerResult {

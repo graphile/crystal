@@ -2,10 +2,12 @@ import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import { isPromiseLike, stringifyPayload } from "grafast";
 import { resolvePresets } from "graphile-config";
-import type { GraphQLError, GraphQLSchema } from "graphql";
+import { GraphQLError, GraphQLSchema } from "graphql";
 import { isSchema, validateSchema } from "graphql";
+import { makeAcceptMatcher } from "../accept.js";
 
-import type {
+import {
+  $$normalizedHeaders,
   BufferResult,
   ErrorResult,
   EventStreamEvent,
@@ -20,7 +22,48 @@ import { makeGraphiQLHandler } from "../middleware/graphiql.js";
 import { makeGraphQLHandler } from "../middleware/graphql.js";
 import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
-import { handleErrors } from "../utils.js";
+import { handleErrors, normalizeRequest } from "../utils.js";
+
+const APPLICATION_JSON = "application/json;charset=utf-8";
+const APPLICATION_GRAPHQL_RESPONSE_JSON =
+  "application/graphql-response+json;charset=utf-8";
+const TEXT_HTML = "text/html;charset=utf-8";
+
+const graphqlAcceptMatcher = makeAcceptMatcher([
+  APPLICATION_JSON,
+  APPLICATION_GRAPHQL_RESPONSE_JSON,
+]);
+
+const graphqlOrHTMLAcceptMatcher = makeAcceptMatcher([
+  APPLICATION_JSON,
+  APPLICATION_GRAPHQL_RESPONSE_JSON,
+  // Must be lowest priority, otherwise GraphiQL may override GraphQL in some
+  // situations
+  TEXT_HTML,
+]);
+
+function handleGraphQLError(
+  request: RequestDigest,
+  dynamicOptions: OptionsFromConfig,
+  e: Error,
+) {
+  const error =
+    e instanceof GraphQLError
+      ? e
+      : new GraphQLError("Unknown error occurred", null, null, null, null, e);
+  // Special error handling for GraphQL route
+  console.error(
+    "An error occurred whilst attempting to handle the GraphQL request:",
+  );
+  console.dir(e);
+  return {
+    type: "graphql",
+    request,
+    dynamicOptions,
+    payload: { errors: [error] },
+    statusCode: 500,
+  } as HandlerResult;
+}
 
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
@@ -62,28 +105,44 @@ export class GrafservBase {
   }
 
   private _processRequest(
-    request: RequestDigest,
+    inRequest: RequestDigest,
   ): PromiseOrDirect<HandlerResult | null> {
+    const request = normalizeRequest(inRequest);
+    const accept = request[$$normalizedHeaders].accept;
     const dynamicOptions = this.dynamicOptions;
     try {
-      if (
-        request.path === dynamicOptions.graphqlPath &&
-        request.method === "POST"
-      ) {
-        return this.graphqlHandler(request).catch((e) => {
-          // Special error handling for GraphQL route
-          console.error(
-            "An error occurred whilst attempting to handle the GraphQL request:",
-          );
-          console.dir(e);
-          return {
-            type: "graphql",
-            request,
-            dynamicOptions,
-            payload: { errors: [e] },
-            statusCode: 500,
-          } as HandlerResult;
-        });
+      if (request.path === dynamicOptions.graphqlPath) {
+        // Do they want HTML, or do they want GraphQL?
+        const bestMatch =
+          request.method === "GET" && dynamicOptions.graphiqlOnGraphQLGET
+            ? graphqlOrHTMLAcceptMatcher(accept)
+            : graphqlAcceptMatcher(accept);
+
+        if (bestMatch === TEXT_HTML) {
+          // They want HTML -> Ruru
+          return this.graphiqlHandler(request);
+        } else if (
+          bestMatch === APPLICATION_JSON ||
+          bestMatch === APPLICATION_GRAPHQL_RESPONSE_JSON
+        ) {
+          // They want GraphQL
+          if (
+            request.method === "POST" ||
+            (dynamicOptions.graphqlOverGET && request.method === "GET")
+          ) {
+            return this.graphqlHandler(request).catch((e) =>
+              handleGraphQLError(request, dynamicOptions, e),
+            );
+          } else {
+            // TODO: should we raise 501? Forbidden for GET/HEAD.
+
+            // Unsupported method.
+            return null;
+          }
+        } else {
+          // Who knows what they want?
+          return null;
+        }
       }
 
       // FIXME: handle 'HEAD' requests
@@ -91,9 +150,7 @@ export class GrafservBase {
       if (
         dynamicOptions.graphiql &&
         request.method === "GET" &&
-        (request.path === dynamicOptions.graphiqlPath ||
-          (dynamicOptions.graphiqlOnGraphQLGET &&
-            request.path === dynamicOptions.graphqlPath))
+        request.path === dynamicOptions.graphiqlPath
       ) {
         return this.graphiqlHandler(request);
       }

@@ -6,6 +6,7 @@ import type { Readable } from "node:stream";
 import {
   $$normalizedHeaders,
   GrafservBody,
+  NormalizedRequestDigest,
   RequestDigest,
 } from "./interfaces.js";
 
@@ -74,13 +75,16 @@ export function getBodyFromRequest(
   });
 }
 
-export function normalizeRequest(request: RequestDigest) {
+export function normalizeRequest(
+  request: RequestDigest | NormalizedRequestDigest,
+): NormalizedRequestDigest {
   if (!request[$$normalizedHeaders]) {
     const normalized = Object.create(null);
     for (const key in request.headers) {
       normalized[key.toLowerCase()] = request.headers[key];
     }
     request[$$normalizedHeaders] = normalized;
+    request.preferJSON = Boolean(request.preferJSON);
   }
-  return request;
+  return request as NormalizedRequestDigest;
 }
