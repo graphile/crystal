@@ -255,7 +255,7 @@ function parseAccepts(acceptHeader: string) {
         } else if (charCode === COMMA) {
           next();
         } else if (isToken(charCode)) {
-          currentAccept!.type += acceptHeader[i];
+          currentAccept!.subtype += acceptHeader[i];
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
         }
@@ -305,7 +305,7 @@ function parseAccepts(acceptHeader: string) {
           state = State.CONTINUE_QUOTED_PARAMETER_VALUE;
         } else if (isToken(charCode)) {
           state = State.CONTINUE_PARAMETER_VALUE;
-          currentParameterName += acceptHeader[i];
+          currentAccept!.parameters[currentParameterName] += acceptHeader[i];
         } else if (charCode === EQUALS) {
           state = State.EXPECT_PARAMETER_VALUE;
         } else {
