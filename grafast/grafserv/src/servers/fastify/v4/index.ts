@@ -147,14 +147,18 @@ export class FastifyGrafserv extends GrafservBase {
     const dynamicOptions = this.dynamicOptions;
 
     app.route({
-      method: this.dynamicOptions.graphqlOverGET ? ["GET", "POST"] : ["POST"],
+      method:
+        this.dynamicOptions.graphqlOverGET ||
+        this.dynamicOptions.graphiqlOnGraphQLGET
+          ? ["GET", "POST"]
+          : ["POST"],
       url: this.dynamicOptions.graphqlPath,
       bodyLimit: this.dynamicOptions.maxRequestLength,
       handler: async (request, reply) => {
         const digest = getDigest(request, reply);
-        // TODO: if HTML is preferred, render GraphiQL
         const handlerResult = await this.graphqlHandler(
           normalizeRequest(digest),
+          this.graphiqlHandler,
         );
         const result = await convertHandlerResultToResult(handlerResult);
         return this.send(request, reply, result);

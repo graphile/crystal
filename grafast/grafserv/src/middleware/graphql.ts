@@ -216,6 +216,7 @@ export const makeGraphQLHandler = (
     }
 
     // If we get here, we're handling a GraphQL request
+    const isLegacy = chosenContentType === APPLICATION_JSON;
 
     if (wait) {
       await wait;
@@ -301,7 +302,7 @@ export const makeGraphQLHandler = (
         type: "graphql",
         request,
         dynamicOptions,
-        statusCode: 500,
+        statusCode: isLegacy ? 200 : 500,
         contentType: chosenContentType,
         payload: {
           errors: [new GraphQLError(e.message)],
