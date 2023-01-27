@@ -125,7 +125,6 @@ function parseAccepts(acceptHeader: string) {
     const charCode = acceptHeader.charCodeAt(i);
     switch (state) {
       case State.EXPECT_TYPE: {
-        // TODO: other types of whitespace?
         if (isWhitespace(charCode)) {
           continue;
         } else if (charCode === ASTERISK) {
