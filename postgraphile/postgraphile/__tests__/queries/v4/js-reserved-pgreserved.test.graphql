@@ -1,0 +1,31 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  allReservedsList {
+    case
+    do
+    id
+    null
+  }
+  reservedByCase(case: "2 Unlimited") {
+    do
+    id
+    null
+  }
+  reservedByDo(do: "1973") {
+    case
+    id
+    null
+  }
+  reservedById(id: 4) {
+    case
+    do
+    null
+  }
+  reservedByNull(null: "No Limit") {
+    case
+    do
+  }
+}

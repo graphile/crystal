@@ -1,0 +1,54 @@
+{
+  allMaterials: {
+    nodes: [
+      {
+        valueOf: "rough",
+        class: "concrete",
+        id: 1,
+      },
+      {
+        valueOf: "smooth",
+        class: "glass",
+        id: 2,
+      },
+      {
+        valueOf: "spongy",
+        class: "rubber",
+        id: 3,
+      },
+    ],
+  },
+  materialByClass: {
+    class: "concrete",
+    id: 1,
+  },
+  materialByValueOf: {
+    class: "rubber",
+    id: 3,
+  },
+  allCropsList: [
+    {
+      id: 1,
+      amount: 100,
+      yield: "wheat",
+    },
+    {
+      id: 2,
+      amount: 200,
+      yield: "corn",
+    },
+    {
+      id: 3,
+      amount: 555,
+      yield: "oat",
+    },
+  ],
+  cropById: {
+    yield: "wheat",
+    amount: 100,
+  },
+  cropByYield: {
+    amount: 200,
+    id: 2,
+  },
+}

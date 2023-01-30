@@ -1,0 +1,34 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  allMaterials {
+    nodes {
+      valueOf
+      class
+      id
+    }
+  }
+  materialByClass(class: "concrete") {
+    class
+    id
+  }
+  materialByValueOf(valueOf: "spongy") {
+    class
+    id
+  }
+  allCropsList {
+    id
+    amount
+    yield
+  }
+  cropById(id: 1) {
+    yield
+    amount
+  }
+  cropByYield(yield: "corn") {
+    amount
+    id
+  }
+}

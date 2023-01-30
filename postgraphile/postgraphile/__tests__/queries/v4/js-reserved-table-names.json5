@@ -1,0 +1,110 @@
+{
+  allConstructorsList: [
+    {
+      name: "Copper Plant",
+      export: "Copper Wire",
+      id: 1,
+    },
+    {
+      name: "Limestone Quarry",
+      export: "Concrete",
+      id: 2,
+    },
+    {
+      name: "Iron Mine",
+      export: "Iron Plates",
+      id: 3,
+    },
+  ],
+  constructorByExport: {
+    name: "Copper Plant",
+    id: 1,
+  },
+  constructorById: {
+    export: "Concrete",
+    name: "Limestone Quarry",
+  },
+  constructorByName: {
+    export: "Iron Plates",
+    id: 3,
+  },
+  allYieldsList: [
+    {
+      crop: "wheat",
+      export: "UK",
+      id: 1,
+    },
+    {
+      crop: "corn",
+      export: "IE",
+      id: 2,
+    },
+    {
+      crop: "oat",
+      export: "FR",
+      id: 3,
+    },
+  ],
+  yieldByExport: {
+    crop: "wheat",
+    id: 1,
+  },
+  yieldById: {
+    crop: "corn",
+    export: "IE",
+  },
+  allProtoSList: [
+    {
+      id: 1,
+      name: "DynaTAC",
+      brand: "Motorola",
+    },
+    {
+      id: 2,
+      name: "VCS",
+      brand: "Atari",
+    },
+    {
+      id: 3,
+      name: "Model T",
+      brand: "Ford",
+    },
+  ],
+  _protoById: {
+    brand: "Motorola",
+    name: "DynaTAC",
+  },
+  _protoByName: {
+    brand: "Atari",
+    id: 2,
+  },
+  allNullsList: [
+    {
+      break: "10 am",
+      hasOwnProperty: "apartment",
+      id: 1,
+    },
+    {
+      break: "noon",
+      hasOwnProperty: "flat",
+      id: 2,
+    },
+    {
+      break: "3 pm",
+      hasOwnProperty: "house",
+      id: 3,
+    },
+  ],
+  nullByBreak: {
+    hasOwnProperty: "apartment",
+    id: 1,
+  },
+  nullByHasOwnProperty: {
+    break: "noon",
+    id: 2,
+  },
+  nullById: {
+    break: "3 pm",
+    hasOwnProperty: "house",
+  },
+}

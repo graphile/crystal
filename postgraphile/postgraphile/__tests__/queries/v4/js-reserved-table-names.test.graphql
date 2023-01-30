@@ -1,0 +1,66 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  allConstructorsList {
+    name
+    export
+    id
+  }
+  constructorByExport(export: "Copper Wire") {
+    name
+    id
+  }
+  constructorById(id: 2) {
+    export
+    name
+  }
+  constructorByName(name: "Iron Mine") {
+    export
+    id
+  }
+  allYieldsList {
+    crop
+    export
+    id
+  }
+  yieldByExport(export: "UK") {
+    crop
+    id
+  }
+  yieldById(id: 2) {
+    crop
+    export
+  }
+  allProtoSList {
+    id
+    name
+    brand
+  }
+  _protoById(id: 1) {
+    brand
+    name
+  }
+  _protoByName(name: "VCS") {
+    brand
+    id
+  }
+  allNullsList {
+    break
+    hasOwnProperty
+    id
+  }
+  nullByBreak(break: "10 am") {
+    hasOwnProperty
+    id
+  }
+  nullByHasOwnProperty(hasOwnProperty: "flat") {
+    break
+    id
+  }
+  nullById(id: 3) {
+    break
+    hasOwnProperty
+  }
+}

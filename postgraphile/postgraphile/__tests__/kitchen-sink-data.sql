@@ -60,6 +60,12 @@ delete from js_reserved.building cascade;
 
 delete from js_reserved.project cascade;
 delete from js_reserved.crop cascade;
+delete from js_reserved.material cascade;
+delete from js_reserved.constructor cascade;
+delete from js_reserved.yield cascade;
+delete from js_reserved.__proto__ cascade;
+delete from js_reserved.null cascade;
+delete from js_reserved.reserved cascade;
 
 alter table b.types enable trigger user;
 
@@ -636,6 +642,8 @@ insert into js_reserved.machine
   ('Concrete',   'Limestone'),
   ('Iron Plate', 'Iron Ingot');
 
+alter sequence js_reserved.relational_items_id_seq restart with 6;
+
 insert into js_reserved.relational_items
   (id, type,     constructor   ) values
   (1,  'TOPIC',  'Cable'       ),
@@ -655,10 +663,8 @@ insert into js_reserved.relational_status
   (3, 'Stopped',    'Best look into that' ),
   (4, 'Scheduled',  null                  );
 
-alter sequence js_reserved.relational_items_id_seq restart with 6;
-alter sequence js_reserved.crop_id_seq restart with 1;
-
 alter sequence js_reserved.project_id_seq restart with 1;
+alter sequence js_reserved.crop_id_seq restart with 1;
 
 insert into js_reserved.project
   (__proto__,  brand     ) values
@@ -671,3 +677,52 @@ insert into js_reserved.crop
   ('wheat', 100   ),
   ('corn',  200   ),
   ('oat',   555   );
+
+alter sequence js_reserved.material_id_seq restart with 1;
+
+insert into js_reserved.material
+  (class,      "valueOf" ) values
+  ('concrete', 'rough' ),
+  ('glass',    'smooth'),
+  ('rubber',   'spongy');
+
+alter sequence js_reserved.constructor_id_seq restart with 1;
+
+insert into js_reserved.constructor
+  (name,               export) values
+  ('Copper Plant',     'Copper Wire'),
+  ('Limestone Quarry', 'Concrete'),
+  ('Iron Mine',        'Iron Plates');
+
+alter sequence js_reserved.yield_id_seq restart with 1;
+
+insert into js_reserved.yield
+  (crop,    export) values
+  ('wheat', 'UK'),
+  ('corn',  'IE'),
+  ('oat',   'FR');
+
+alter sequence js_reserved.__proto___id_seq restart with 1;
+
+insert into js_reserved.__proto__
+  (name,        brand     ) values
+  ('DynaTAC',  'Motorola'),
+  ('VCS',      'Atari'   ),
+  ('Model T',  'Ford'    );
+
+alter sequence js_reserved.null_id_seq restart with 1;
+
+insert into js_reserved.null
+  ("hasOwnProperty", break) values
+  ('apartment', '10 am'),
+  ('flat', 'noon'),
+  ('house', '3 pm');
+
+alter sequence js_reserved.reserved_id_seq restart with 1;
+
+insert into js_reserved.reserved
+  ("null",                            "case",          "do") values
+  ('No Limit',                       '2 Unlimited',    '1993'),
+  ('No More Mr Nice Guy',            'Alice Cooper',   '1973'),
+  ('No Woman No Cry',                'Bob Marley',     '1974'),
+  ('(I Can''t Get No) Satisfaction', 'Rolling Stones', '1965')
