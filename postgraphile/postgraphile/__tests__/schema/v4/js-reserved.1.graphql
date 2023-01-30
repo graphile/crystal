@@ -1,0 +1,4544 @@
+type Building implements Node {
+  constructor: String
+  id: Int!
+
+  """Reads and enables pagination through a set of `Machine`."""
+  machinesByConstructor(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MachineCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachinesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MachinesConnection!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByConstructor(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+}
+
+"""
+A condition to be used against `Building` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input BuildingCondition {
+  """Checks for equality with the object’s `constructor` field."""
+  constructor: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""An input for mutations affecting `Building`"""
+input BuildingInput {
+  constructor: String
+  id: Int
+  name: String
+}
+
+"""
+Represents an update to a `Building`. Fields that are set will be updated.
+"""
+input BuildingPatch {
+  constructor: String
+  id: Int
+  name: String
+}
+
+"""A connection to a list of `Building` values."""
+type BuildingsConnection {
+  """
+  A list of edges which contains the `Building` and cursor to aid in pagination.
+  """
+  edges: [BuildingsEdge]!
+
+  """A list of `Building` objects."""
+  nodes: [Building]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Building` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Building` edge in the connection."""
+type BuildingsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Building` at the end of the edge."""
+  node: Building
+}
+
+"""Methods to use when ordering `Building`."""
+enum BuildingsOrderBy {
+  CONSTRUCTOR_ASC
+  CONSTRUCTOR_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type Constructor implements Node {
+  export: String
+  id: Int!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Constructor` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ConstructorCondition {
+  """Checks for equality with the object’s `export` field."""
+  export: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""An input for mutations affecting `Constructor`"""
+input ConstructorInput {
+  export: String
+  id: Int
+  name: String
+}
+
+"""
+Represents an update to a `Constructor`. Fields that are set will be updated.
+"""
+input ConstructorPatch {
+  export: String
+  id: Int
+  name: String
+}
+
+"""A connection to a list of `Constructor` values."""
+type ConstructorsConnection {
+  """
+  A list of edges which contains the `Constructor` and cursor to aid in pagination.
+  """
+  edges: [ConstructorsEdge]!
+
+  """A list of `Constructor` objects."""
+  nodes: [Constructor]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Constructor` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Constructor` edge in the connection."""
+type ConstructorsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Constructor` at the end of the edge."""
+  node: Constructor
+}
+
+"""Methods to use when ordering `Constructor`."""
+enum ConstructorsOrderBy {
+  EXPORT_ASC
+  EXPORT_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""All input for the create `Building` mutation."""
+input CreateBuildingInput {
+  """The `Building` to be created by this mutation."""
+  building: BuildingInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `Building` mutation."""
+type CreateBuildingPayload {
+  """The `Building` that was created by this mutation."""
+  building: Building
+
+  """An edge for our `Building`. May be used by Relay 1."""
+  buildingEdge(
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BuildingsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Constructor` mutation."""
+input CreateConstructorInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Constructor` to be created by this mutation."""
+  constructor: ConstructorInput!
+}
+
+"""The output of our create `Constructor` mutation."""
+type CreateConstructorPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Constructor` that was created by this mutation."""
+  constructor: Constructor
+
+  """An edge for our `Constructor`. May be used by Relay 1."""
+  constructorEdge(
+    """The method to use when ordering `Constructor`."""
+    orderBy: [ConstructorsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConstructorsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Crop` mutation."""
+input CreateCropInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Crop` to be created by this mutation."""
+  crop: CropInput!
+}
+
+"""The output of our create `Crop` mutation."""
+type CreateCropPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Crop` that was created by this mutation."""
+  crop: Crop
+
+  """An edge for our `Crop`. May be used by Relay 1."""
+  cropEdge(
+    """The method to use when ordering `Crop`."""
+    orderBy: [CropsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CropsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Machine` mutation."""
+input CreateMachineInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Machine` to be created by this mutation."""
+  machine: MachineInput!
+}
+
+"""The output of our create `Machine` mutation."""
+type CreateMachinePayload {
+  """Reads a single `Building` that is related to this `Machine`."""
+  buildingByConstructor: Building
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Machine` that was created by this mutation."""
+  machine: Machine
+
+  """An edge for our `Machine`. May be used by Relay 1."""
+  machineEdge(
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachinesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachinesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Material` mutation."""
+input CreateMaterialInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Material` to be created by this mutation."""
+  material: MaterialInput!
+}
+
+"""The output of our create `Material` mutation."""
+type CreateMaterialPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Material` that was created by this mutation."""
+  material: Material
+
+  """An edge for our `Material`. May be used by Relay 1."""
+  materialEdge(
+    """The method to use when ordering `Material`."""
+    orderBy: [MaterialsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MaterialsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Null` mutation."""
+input CreateNullInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Null` to be created by this mutation."""
+  null: NullInput!
+}
+
+"""The output of our create `Null` mutation."""
+type CreateNullPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Null` that was created by this mutation."""
+  null: Null
+
+  """An edge for our `Null`. May be used by Relay 1."""
+  nullEdge(
+    """The method to use when ordering `Null`."""
+    orderBy: [NullsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NullsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Project` mutation."""
+input CreateProjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Project` to be created by this mutation."""
+  project: ProjectInput!
+}
+
+"""The output of our create `Project` mutation."""
+type CreateProjectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Project` that was created by this mutation."""
+  project: Project
+
+  """An edge for our `Project`. May be used by Relay 1."""
+  projectEdge(
+    """The method to use when ordering `Project`."""
+    orderBy: [ProjectsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProjectsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `_Proto__` mutation."""
+input CreateProtoInput {
+  """The `_Proto__` to be created by this mutation."""
+  _proto__: _Proto__Input!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `_Proto__` mutation."""
+type CreateProtoPayload {
+  """An edge for our `_Proto__`. May be used by Relay 1."""
+  _protoEdge(
+    """The method to use when ordering `_Proto__`."""
+    orderBy: [_ProtoSOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): _Proto__SEdge
+
+  """The `_Proto__` that was created by this mutation."""
+  _proto__: _Proto__
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `RelationalStatus` mutation."""
+input CreateRelationalStatusInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RelationalStatus` to be created by this mutation."""
+  relationalStatus: RelationalStatusInput!
+}
+
+"""The output of our create `RelationalStatus` mutation."""
+type CreateRelationalStatusPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalStatus`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalStatus` that was created by this mutation."""
+  relationalStatus: RelationalStatus
+
+  """An edge for our `RelationalStatus`. May be used by Relay 1."""
+  relationalStatusEdge(
+    """The method to use when ordering `RelationalStatus`."""
+    orderBy: [RelationalStatusesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalStatusesEdge
+}
+
+"""All input for the create `RelationalTopic` mutation."""
+input CreateRelationalTopicInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RelationalTopic` to be created by this mutation."""
+  relationalTopic: RelationalTopicInput!
+}
+
+"""The output of our create `RelationalTopic` mutation."""
+type CreateRelationalTopicPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalTopic` that was created by this mutation."""
+  relationalTopic: RelationalTopic
+
+  """An edge for our `RelationalTopic`. May be used by Relay 1."""
+  relationalTopicEdge(
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsEdge
+}
+
+"""All input for the create `Reserved` mutation."""
+input CreateReservedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Reserved` to be created by this mutation."""
+  reserved: ReservedInput!
+}
+
+"""The output of our create `Reserved` mutation."""
+type CreateReservedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Reserved` that was created by this mutation."""
+  reserved: Reserved
+
+  """An edge for our `Reserved`. May be used by Relay 1."""
+  reservedEdge(
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ReservedsEdge
+}
+
+"""All input for the create `Yield` mutation."""
+input CreateYieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Yield` to be created by this mutation."""
+  yield: YieldInput!
+}
+
+"""The output of our create `Yield` mutation."""
+type CreateYieldPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Yield` that was created by this mutation."""
+  yield: Yield
+
+  """An edge for our `Yield`. May be used by Relay 1."""
+  yieldEdge(
+    """The method to use when ordering `Yield`."""
+    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): YieldsEdge
+}
+
+type Crop implements Node {
+  amount: Int
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  yield: String
+}
+
+"""
+A condition to be used against `Crop` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input CropCondition {
+  """Checks for equality with the object’s `amount` field."""
+  amount: Int
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `yield` field."""
+  yield: String
+}
+
+"""An input for mutations affecting `Crop`"""
+input CropInput {
+  amount: Int
+  id: Int
+  yield: String
+}
+
+"""Represents an update to a `Crop`. Fields that are set will be updated."""
+input CropPatch {
+  amount: Int
+  id: Int
+  yield: String
+}
+
+"""A connection to a list of `Crop` values."""
+type CropsConnection {
+  """
+  A list of edges which contains the `Crop` and cursor to aid in pagination.
+  """
+  edges: [CropsEdge]!
+
+  """A list of `Crop` objects."""
+  nodes: [Crop]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Crop` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Crop` edge in the connection."""
+type CropsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Crop` at the end of the edge."""
+  node: Crop
+}
+
+"""Methods to use when ordering `Crop`."""
+enum CropsOrderBy {
+  AMOUNT_ASC
+  AMOUNT_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  YIELD_ASC
+  YIELD_DESC
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""All input for the `deleteBuildingByConstructor` mutation."""
+input DeleteBuildingByConstructorInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  constructor: String!
+}
+
+"""All input for the `deleteBuildingById` mutation."""
+input DeleteBuildingByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteBuilding` mutation."""
+input DeleteBuildingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Building` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Building` mutation."""
+type DeleteBuildingPayload {
+  """The `Building` that was deleted by this mutation."""
+  building: Building
+
+  """An edge for our `Building`. May be used by Relay 1."""
+  buildingEdge(
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BuildingsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedBuildingId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteConstructorByExport` mutation."""
+input DeleteConstructorByExportInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  export: String!
+}
+
+"""All input for the `deleteConstructorById` mutation."""
+input DeleteConstructorByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteConstructorByName` mutation."""
+input DeleteConstructorByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
+}
+
+"""All input for the `deleteConstructor` mutation."""
+input DeleteConstructorInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Constructor` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Constructor` mutation."""
+type DeleteConstructorPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Constructor` that was deleted by this mutation."""
+  constructor: Constructor
+
+  """An edge for our `Constructor`. May be used by Relay 1."""
+  constructorEdge(
+    """The method to use when ordering `Constructor`."""
+    orderBy: [ConstructorsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConstructorsEdge
+  deletedConstructorId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteCropById` mutation."""
+input DeleteCropByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteCropByYield` mutation."""
+input DeleteCropByYieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  yield: String!
+}
+
+"""All input for the `deleteCrop` mutation."""
+input DeleteCropInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Crop` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Crop` mutation."""
+type DeleteCropPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Crop` that was deleted by this mutation."""
+  crop: Crop
+
+  """An edge for our `Crop`. May be used by Relay 1."""
+  cropEdge(
+    """The method to use when ordering `Crop`."""
+    orderBy: [CropsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CropsEdge
+  deletedCropId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteMachineById` mutation."""
+input DeleteMachineByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteMachine` mutation."""
+input DeleteMachineInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Machine` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Machine` mutation."""
+type DeleteMachinePayload {
+  """Reads a single `Building` that is related to this `Machine`."""
+  buildingByConstructor: Building
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedMachineId: ID
+
+  """The `Machine` that was deleted by this mutation."""
+  machine: Machine
+
+  """An edge for our `Machine`. May be used by Relay 1."""
+  machineEdge(
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachinesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachinesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteMaterialByClass` mutation."""
+input DeleteMaterialByClassInput {
+  class: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""All input for the `deleteMaterialById` mutation."""
+input DeleteMaterialByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteMaterialByValueOf` mutation."""
+input DeleteMaterialByValueOfInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  valueOf: String!
+}
+
+"""All input for the `deleteMaterial` mutation."""
+input DeleteMaterialInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Material` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Material` mutation."""
+type DeleteMaterialPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedMaterialId: ID
+
+  """The `Material` that was deleted by this mutation."""
+  material: Material
+
+  """An edge for our `Material`. May be used by Relay 1."""
+  materialEdge(
+    """The method to use when ordering `Material`."""
+    orderBy: [MaterialsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MaterialsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteNullByBreak` mutation."""
+input DeleteNullByBreakInput {
+  break: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""All input for the `deleteNullByHasOwnProperty` mutation."""
+input DeleteNullByHasOwnPropertyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  hasOwnProperty: String!
+}
+
+"""All input for the `deleteNullById` mutation."""
+input DeleteNullByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteNull` mutation."""
+input DeleteNullInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Null` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Null` mutation."""
+type DeleteNullPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedNullId: ID
+
+  """The `Null` that was deleted by this mutation."""
+  null: Null
+
+  """An edge for our `Null`. May be used by Relay 1."""
+  nullEdge(
+    """The method to use when ordering `Null`."""
+    orderBy: [NullsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NullsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteProjectById` mutation."""
+input DeleteProjectByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteProjectByProto__` mutation."""
+input DeleteProjectByProtoInput {
+  _proto__: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""All input for the `deleteProject` mutation."""
+input DeleteProjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Project` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Project` mutation."""
+type DeleteProjectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedProjectId: ID
+
+  """The `Project` that was deleted by this mutation."""
+  project: Project
+
+  """An edge for our `Project`. May be used by Relay 1."""
+  projectEdge(
+    """The method to use when ordering `Project`."""
+    orderBy: [ProjectsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProjectsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteProtoById` mutation."""
+input DeleteProtoByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteProtoByName` mutation."""
+input DeleteProtoByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
+}
+
+"""All input for the `deleteProto__` mutation."""
+input DeleteProtoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `_Proto__` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `_Proto__` mutation."""
+type DeleteProtoPayload {
+  """An edge for our `_Proto__`. May be used by Relay 1."""
+  _protoEdge(
+    """The method to use when ordering `_Proto__`."""
+    orderBy: [_ProtoSOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): _Proto__SEdge
+
+  """The `_Proto__` that was deleted by this mutation."""
+  _proto__: _Proto__
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedProtoId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteRelationalStatusById` mutation."""
+input DeleteRelationalStatusByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteRelationalStatus` mutation."""
+input DeleteRelationalStatusInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `RelationalStatus` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `RelationalStatus` mutation."""
+type DeleteRelationalStatusPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedRelationalStatusId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalStatus`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalStatus` that was deleted by this mutation."""
+  relationalStatus: RelationalStatus
+
+  """An edge for our `RelationalStatus`. May be used by Relay 1."""
+  relationalStatusEdge(
+    """The method to use when ordering `RelationalStatus`."""
+    orderBy: [RelationalStatusesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalStatusesEdge
+}
+
+"""All input for the `deleteRelationalTopicById` mutation."""
+input DeleteRelationalTopicByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteRelationalTopic` mutation."""
+input DeleteRelationalTopicInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `RelationalTopic` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `RelationalTopic` mutation."""
+type DeleteRelationalTopicPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedRelationalTopicId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalTopic` that was deleted by this mutation."""
+  relationalTopic: RelationalTopic
+
+  """An edge for our `RelationalTopic`. May be used by Relay 1."""
+  relationalTopicEdge(
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsEdge
+}
+
+"""All input for the `deleteReservedByCase` mutation."""
+input DeleteReservedByCaseInput {
+  case: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""All input for the `deleteReservedByDo` mutation."""
+input DeleteReservedByDoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  do: String!
+}
+
+"""All input for the `deleteReservedById` mutation."""
+input DeleteReservedByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteReservedByNull` mutation."""
+input DeleteReservedByNullInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  null: String!
+}
+
+"""All input for the `deleteReserved` mutation."""
+input DeleteReservedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Reserved` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Reserved` mutation."""
+type DeleteReservedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedReservedId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Reserved` that was deleted by this mutation."""
+  reserved: Reserved
+
+  """An edge for our `Reserved`. May be used by Relay 1."""
+  reservedEdge(
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ReservedsEdge
+}
+
+"""All input for the `deleteYieldByExport` mutation."""
+input DeleteYieldByExportInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  export: String!
+}
+
+"""All input for the `deleteYieldById` mutation."""
+input DeleteYieldByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteYield` mutation."""
+input DeleteYieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Yield` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Yield` mutation."""
+type DeleteYieldPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedYieldId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Yield` that was deleted by this mutation."""
+  yield: Yield
+
+  """An edge for our `Yield`. May be used by Relay 1."""
+  yieldEdge(
+    """The method to use when ordering `Yield`."""
+    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): YieldsEdge
+}
+
+enum ItemType {
+  STATUS
+  TOPIC
+}
+
+type Machine implements Node {
+  """Reads a single `Building` that is related to this `Machine`."""
+  buildingByConstructor: Building
+  constructor: String
+  id: Int!
+  input: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Machine` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input MachineCondition {
+  """Checks for equality with the object’s `constructor` field."""
+  constructor: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `input` field."""
+  input: String
+}
+
+"""An input for mutations affecting `Machine`"""
+input MachineInput {
+  constructor: String
+  id: Int
+  input: String
+}
+
+"""
+Represents an update to a `Machine`. Fields that are set will be updated.
+"""
+input MachinePatch {
+  constructor: String
+  id: Int
+  input: String
+}
+
+"""A connection to a list of `Machine` values."""
+type MachinesConnection {
+  """
+  A list of edges which contains the `Machine` and cursor to aid in pagination.
+  """
+  edges: [MachinesEdge]!
+
+  """A list of `Machine` objects."""
+  nodes: [Machine]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Machine` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Machine` edge in the connection."""
+type MachinesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Machine` at the end of the edge."""
+  node: Machine
+}
+
+"""Methods to use when ordering `Machine`."""
+enum MachinesOrderBy {
+  CONSTRUCTOR_ASC
+  CONSTRUCTOR_DESC
+  ID_ASC
+  ID_DESC
+  INPUT_ASC
+  INPUT_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type Material implements Node {
+  class: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  valueOf: String
+}
+
+"""
+A condition to be used against `Material` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input MaterialCondition {
+  """Checks for equality with the object’s `class` field."""
+  class: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `valueOf` field."""
+  valueOf: String
+}
+
+"""An input for mutations affecting `Material`"""
+input MaterialInput {
+  class: String
+  id: Int
+  valueOf: String
+}
+
+"""
+Represents an update to a `Material`. Fields that are set will be updated.
+"""
+input MaterialPatch {
+  class: String
+  id: Int
+  valueOf: String
+}
+
+"""A connection to a list of `Material` values."""
+type MaterialsConnection {
+  """
+  A list of edges which contains the `Material` and cursor to aid in pagination.
+  """
+  edges: [MaterialsEdge]!
+
+  """A list of `Material` objects."""
+  nodes: [Material]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Material` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Material` edge in the connection."""
+type MaterialsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Material` at the end of the edge."""
+  node: Material
+}
+
+"""Methods to use when ordering `Material`."""
+enum MaterialsOrderBy {
+  CLASS_ASC
+  CLASS_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  VALUE_OF_ASC
+  VALUE_OF_DESC
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Building`."""
+  createBuilding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateBuildingInput!
+  ): CreateBuildingPayload
+
+  """Creates a single `Constructor`."""
+  createConstructor(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateConstructorInput!
+  ): CreateConstructorPayload
+
+  """Creates a single `Crop`."""
+  createCrop(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCropInput!
+  ): CreateCropPayload
+
+  """Creates a single `Machine`."""
+  createMachine(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMachineInput!
+  ): CreateMachinePayload
+
+  """Creates a single `Material`."""
+  createMaterial(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMaterialInput!
+  ): CreateMaterialPayload
+
+  """Creates a single `Null`."""
+  createNull(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNullInput!
+  ): CreateNullPayload
+
+  """Creates a single `Project`."""
+  createProject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateProjectInput!
+  ): CreateProjectPayload
+
+  """Creates a single `_Proto__`."""
+  createProto__(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateProtoInput!
+  ): CreateProtoPayload
+
+  """Creates a single `RelationalStatus`."""
+  createRelationalStatus(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalStatusInput!
+  ): CreateRelationalStatusPayload
+
+  """Creates a single `RelationalTopic`."""
+  createRelationalTopic(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalTopicInput!
+  ): CreateRelationalTopicPayload
+
+  """Creates a single `Reserved`."""
+  createReserved(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateReservedInput!
+  ): CreateReservedPayload
+
+  """Creates a single `Yield`."""
+  createYield(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateYieldInput!
+  ): CreateYieldPayload
+
+  """Deletes a single `Building` using its globally unique id."""
+  deleteBuilding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBuildingInput!
+  ): DeleteBuildingPayload
+
+  """Deletes a single `Building` using a unique key."""
+  deleteBuildingByConstructor(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBuildingByConstructorInput!
+  ): DeleteBuildingPayload
+
+  """Deletes a single `Building` using a unique key."""
+  deleteBuildingById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBuildingByIdInput!
+  ): DeleteBuildingPayload
+
+  """Deletes a single `Constructor` using its globally unique id."""
+  deleteConstructor(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteConstructorInput!
+  ): DeleteConstructorPayload
+
+  """Deletes a single `Constructor` using a unique key."""
+  deleteConstructorByExport(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteConstructorByExportInput!
+  ): DeleteConstructorPayload
+
+  """Deletes a single `Constructor` using a unique key."""
+  deleteConstructorById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteConstructorByIdInput!
+  ): DeleteConstructorPayload
+
+  """Deletes a single `Constructor` using a unique key."""
+  deleteConstructorByName(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteConstructorByNameInput!
+  ): DeleteConstructorPayload
+
+  """Deletes a single `Crop` using its globally unique id."""
+  deleteCrop(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCropInput!
+  ): DeleteCropPayload
+
+  """Deletes a single `Crop` using a unique key."""
+  deleteCropById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCropByIdInput!
+  ): DeleteCropPayload
+
+  """Deletes a single `Crop` using a unique key."""
+  deleteCropByYield(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCropByYieldInput!
+  ): DeleteCropPayload
+
+  """Deletes a single `Machine` using its globally unique id."""
+  deleteMachine(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMachineInput!
+  ): DeleteMachinePayload
+
+  """Deletes a single `Machine` using a unique key."""
+  deleteMachineById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMachineByIdInput!
+  ): DeleteMachinePayload
+
+  """Deletes a single `Material` using its globally unique id."""
+  deleteMaterial(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMaterialInput!
+  ): DeleteMaterialPayload
+
+  """Deletes a single `Material` using a unique key."""
+  deleteMaterialByClass(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMaterialByClassInput!
+  ): DeleteMaterialPayload
+
+  """Deletes a single `Material` using a unique key."""
+  deleteMaterialById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMaterialByIdInput!
+  ): DeleteMaterialPayload
+
+  """Deletes a single `Material` using a unique key."""
+  deleteMaterialByValueOf(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMaterialByValueOfInput!
+  ): DeleteMaterialPayload
+
+  """Deletes a single `Null` using its globally unique id."""
+  deleteNull(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNullInput!
+  ): DeleteNullPayload
+
+  """Deletes a single `Null` using a unique key."""
+  deleteNullByBreak(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNullByBreakInput!
+  ): DeleteNullPayload
+
+  """Deletes a single `Null` using a unique key."""
+  deleteNullByHasOwnProperty(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNullByHasOwnPropertyInput!
+  ): DeleteNullPayload
+
+  """Deletes a single `Null` using a unique key."""
+  deleteNullById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNullByIdInput!
+  ): DeleteNullPayload
+
+  """Deletes a single `Project` using its globally unique id."""
+  deleteProject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProjectInput!
+  ): DeleteProjectPayload
+
+  """Deletes a single `Project` using a unique key."""
+  deleteProjectById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProjectByIdInput!
+  ): DeleteProjectPayload
+
+  """Deletes a single `Project` using a unique key."""
+  deleteProjectByProto__(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProjectByProtoInput!
+  ): DeleteProjectPayload
+
+  """Deletes a single `_Proto__` using a unique key."""
+  deleteProtoById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProtoByIdInput!
+  ): DeleteProtoPayload
+
+  """Deletes a single `_Proto__` using a unique key."""
+  deleteProtoByName(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProtoByNameInput!
+  ): DeleteProtoPayload
+
+  """Deletes a single `_Proto__` using its globally unique id."""
+  deleteProto__(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProtoInput!
+  ): DeleteProtoPayload
+
+  """Deletes a single `RelationalStatus` using its globally unique id."""
+  deleteRelationalStatus(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalStatusInput!
+  ): DeleteRelationalStatusPayload
+
+  """Deletes a single `RelationalStatus` using a unique key."""
+  deleteRelationalStatusById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalStatusByIdInput!
+  ): DeleteRelationalStatusPayload
+
+  """Deletes a single `RelationalTopic` using its globally unique id."""
+  deleteRelationalTopic(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalTopicInput!
+  ): DeleteRelationalTopicPayload
+
+  """Deletes a single `RelationalTopic` using a unique key."""
+  deleteRelationalTopicById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalTopicByIdInput!
+  ): DeleteRelationalTopicPayload
+
+  """Deletes a single `Reserved` using its globally unique id."""
+  deleteReserved(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedInput!
+  ): DeleteReservedPayload
+
+  """Deletes a single `Reserved` using a unique key."""
+  deleteReservedByCase(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedByCaseInput!
+  ): DeleteReservedPayload
+
+  """Deletes a single `Reserved` using a unique key."""
+  deleteReservedByDo(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedByDoInput!
+  ): DeleteReservedPayload
+
+  """Deletes a single `Reserved` using a unique key."""
+  deleteReservedById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedByIdInput!
+  ): DeleteReservedPayload
+
+  """Deletes a single `Reserved` using a unique key."""
+  deleteReservedByNull(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteReservedByNullInput!
+  ): DeleteReservedPayload
+
+  """Deletes a single `Yield` using its globally unique id."""
+  deleteYield(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteYieldInput!
+  ): DeleteYieldPayload
+
+  """Deletes a single `Yield` using a unique key."""
+  deleteYieldByExport(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteYieldByExportInput!
+  ): DeleteYieldPayload
+
+  """Deletes a single `Yield` using a unique key."""
+  deleteYieldById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteYieldByIdInput!
+  ): DeleteYieldPayload
+
+  """Updates a single `Building` using its globally unique id and a patch."""
+  updateBuilding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBuildingInput!
+  ): UpdateBuildingPayload
+
+  """Updates a single `Building` using a unique key and a patch."""
+  updateBuildingByConstructor(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBuildingByConstructorInput!
+  ): UpdateBuildingPayload
+
+  """Updates a single `Building` using a unique key and a patch."""
+  updateBuildingById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBuildingByIdInput!
+  ): UpdateBuildingPayload
+
+  """
+  Updates a single `Constructor` using its globally unique id and a patch.
+  """
+  updateConstructor(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateConstructorInput!
+  ): UpdateConstructorPayload
+
+  """Updates a single `Constructor` using a unique key and a patch."""
+  updateConstructorByExport(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateConstructorByExportInput!
+  ): UpdateConstructorPayload
+
+  """Updates a single `Constructor` using a unique key and a patch."""
+  updateConstructorById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateConstructorByIdInput!
+  ): UpdateConstructorPayload
+
+  """Updates a single `Constructor` using a unique key and a patch."""
+  updateConstructorByName(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateConstructorByNameInput!
+  ): UpdateConstructorPayload
+
+  """Updates a single `Crop` using its globally unique id and a patch."""
+  updateCrop(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCropInput!
+  ): UpdateCropPayload
+
+  """Updates a single `Crop` using a unique key and a patch."""
+  updateCropById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCropByIdInput!
+  ): UpdateCropPayload
+
+  """Updates a single `Crop` using a unique key and a patch."""
+  updateCropByYield(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCropByYieldInput!
+  ): UpdateCropPayload
+
+  """Updates a single `Machine` using its globally unique id and a patch."""
+  updateMachine(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMachineInput!
+  ): UpdateMachinePayload
+
+  """Updates a single `Machine` using a unique key and a patch."""
+  updateMachineById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMachineByIdInput!
+  ): UpdateMachinePayload
+
+  """Updates a single `Material` using its globally unique id and a patch."""
+  updateMaterial(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMaterialInput!
+  ): UpdateMaterialPayload
+
+  """Updates a single `Material` using a unique key and a patch."""
+  updateMaterialByClass(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMaterialByClassInput!
+  ): UpdateMaterialPayload
+
+  """Updates a single `Material` using a unique key and a patch."""
+  updateMaterialById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMaterialByIdInput!
+  ): UpdateMaterialPayload
+
+  """Updates a single `Material` using a unique key and a patch."""
+  updateMaterialByValueOf(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMaterialByValueOfInput!
+  ): UpdateMaterialPayload
+
+  """Updates a single `Null` using its globally unique id and a patch."""
+  updateNull(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNullInput!
+  ): UpdateNullPayload
+
+  """Updates a single `Null` using a unique key and a patch."""
+  updateNullByBreak(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNullByBreakInput!
+  ): UpdateNullPayload
+
+  """Updates a single `Null` using a unique key and a patch."""
+  updateNullByHasOwnProperty(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNullByHasOwnPropertyInput!
+  ): UpdateNullPayload
+
+  """Updates a single `Null` using a unique key and a patch."""
+  updateNullById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNullByIdInput!
+  ): UpdateNullPayload
+
+  """Updates a single `Project` using its globally unique id and a patch."""
+  updateProject(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProjectInput!
+  ): UpdateProjectPayload
+
+  """Updates a single `Project` using a unique key and a patch."""
+  updateProjectById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProjectByIdInput!
+  ): UpdateProjectPayload
+
+  """Updates a single `Project` using a unique key and a patch."""
+  updateProjectByProto__(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProjectByProtoInput!
+  ): UpdateProjectPayload
+
+  """Updates a single `_Proto__` using a unique key and a patch."""
+  updateProtoById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProtoByIdInput!
+  ): UpdateProtoPayload
+
+  """Updates a single `_Proto__` using a unique key and a patch."""
+  updateProtoByName(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProtoByNameInput!
+  ): UpdateProtoPayload
+
+  """Updates a single `_Proto__` using its globally unique id and a patch."""
+  updateProto__(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProtoInput!
+  ): UpdateProtoPayload
+
+  """
+  Updates a single `RelationalStatus` using its globally unique id and a patch.
+  """
+  updateRelationalStatus(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalStatusInput!
+  ): UpdateRelationalStatusPayload
+
+  """Updates a single `RelationalStatus` using a unique key and a patch."""
+  updateRelationalStatusById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalStatusByIdInput!
+  ): UpdateRelationalStatusPayload
+
+  """
+  Updates a single `RelationalTopic` using its globally unique id and a patch.
+  """
+  updateRelationalTopic(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalTopicInput!
+  ): UpdateRelationalTopicPayload
+
+  """Updates a single `RelationalTopic` using a unique key and a patch."""
+  updateRelationalTopicById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalTopicByIdInput!
+  ): UpdateRelationalTopicPayload
+
+  """Updates a single `Reserved` using its globally unique id and a patch."""
+  updateReserved(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedInput!
+  ): UpdateReservedPayload
+
+  """Updates a single `Reserved` using a unique key and a patch."""
+  updateReservedByCase(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedByCaseInput!
+  ): UpdateReservedPayload
+
+  """Updates a single `Reserved` using a unique key and a patch."""
+  updateReservedByDo(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedByDoInput!
+  ): UpdateReservedPayload
+
+  """Updates a single `Reserved` using a unique key and a patch."""
+  updateReservedById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedByIdInput!
+  ): UpdateReservedPayload
+
+  """Updates a single `Reserved` using a unique key and a patch."""
+  updateReservedByNull(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateReservedByNullInput!
+  ): UpdateReservedPayload
+
+  """Updates a single `Yield` using its globally unique id and a patch."""
+  updateYield(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateYieldInput!
+  ): UpdateYieldPayload
+
+  """Updates a single `Yield` using a unique key and a patch."""
+  updateYieldByExport(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateYieldByExportInput!
+  ): UpdateYieldPayload
+
+  """Updates a single `Yield` using a unique key and a patch."""
+  updateYieldById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateYieldByIdInput!
+  ): UpdateYieldPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+type Null implements Node {
+  break: String
+  hasOwnProperty: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  yield(_proto__: Int, constructor: Int, valueOf: Int, yield: Int): Int
+}
+
+"""
+A condition to be used against `Null` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input NullCondition {
+  """Checks for equality with the object’s `break` field."""
+  break: String
+
+  """Checks for equality with the object’s `hasOwnProperty` field."""
+  hasOwnProperty: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Null`"""
+input NullInput {
+  break: String
+  hasOwnProperty: String
+  id: Int
+}
+
+"""Represents an update to a `Null`. Fields that are set will be updated."""
+input NullPatch {
+  break: String
+  hasOwnProperty: String
+  id: Int
+}
+
+"""A connection to a list of `Null` values."""
+type NullsConnection {
+  """
+  A list of edges which contains the `Null` and cursor to aid in pagination.
+  """
+  edges: [NullsEdge]!
+
+  """A list of `Null` objects."""
+  nodes: [Null]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Null` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Null` edge in the connection."""
+type NullsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Null` at the end of the edge."""
+  node: Null
+}
+
+"""Methods to use when ordering `Null`."""
+enum NullsOrderBy {
+  BREAK_ASC
+  BREAK_DESC
+  HAS_OWN_PROPERTY_ASC
+  HAS_OWN_PROPERTY_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+type Project implements Node {
+  _proto__: String
+  brand: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Project` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input ProjectCondition {
+  """Checks for equality with the object’s `_proto__` field."""
+  _proto__: String
+
+  """Checks for equality with the object’s `brand` field."""
+  brand: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Project`"""
+input ProjectInput {
+  _proto__: String
+  brand: String
+  id: Int
+}
+
+"""
+Represents an update to a `Project`. Fields that are set will be updated.
+"""
+input ProjectPatch {
+  _proto__: String
+  brand: String
+  id: Int
+}
+
+"""A connection to a list of `Project` values."""
+type ProjectsConnection {
+  """
+  A list of edges which contains the `Project` and cursor to aid in pagination.
+  """
+  edges: [ProjectsEdge]!
+
+  """A list of `Project` objects."""
+  nodes: [Project]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Project` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Project` edge in the connection."""
+type ProjectsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Project` at the end of the edge."""
+  node: Project
+}
+
+"""Methods to use when ordering `Project`."""
+enum ProjectsOrderBy {
+  BRAND_ASC
+  BRAND_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  _PROTO_ASC
+  _PROTO_DESC
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Get a single `_Proto__`."""
+  _protoById(id: Int!): _Proto__
+
+  """Get a single `_Proto__`."""
+  _protoByName(name: String!): _Proto__
+
+  """Reads a single `_Proto__` using its globally unique `ID`."""
+  _proto__(
+    """The globally unique `ID` to be used in selecting a single `_Proto__`."""
+    nodeId: ID!
+  ): _Proto__
+
+  """Reads and enables pagination through a set of `Building`."""
+  allBuildings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BuildingCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BuildingsConnection
+
+  """Reads and enables pagination through a set of `Constructor`."""
+  allConstructors(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ConstructorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Constructor`."""
+    orderBy: [ConstructorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ConstructorsConnection
+
+  """Reads and enables pagination through a set of `Crop`."""
+  allCrops(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CropCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Crop`."""
+    orderBy: [CropsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CropsConnection
+
+  """Reads and enables pagination through a set of `Machine`."""
+  allMachines(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MachineCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachinesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MachinesConnection
+
+  """Reads and enables pagination through a set of `Material`."""
+  allMaterials(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MaterialCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Material`."""
+    orderBy: [MaterialsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MaterialsConnection
+
+  """Reads and enables pagination through a set of `Null`."""
+  allNulls(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: NullCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Null`."""
+    orderBy: [NullsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NullsConnection
+
+  """Reads and enables pagination through a set of `Project`."""
+  allProjects(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProjectCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Project`."""
+    orderBy: [ProjectsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ProjectsConnection
+
+  """Reads and enables pagination through a set of `_Proto__`."""
+  allProtoS(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: _ProtoCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `_Proto__`."""
+    orderBy: [_ProtoSOrderBy!] = [PRIMARY_KEY_ASC]
+  ): _Proto__SConnection
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  allRelationalItems(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection
+
+  """Reads and enables pagination through a set of `RelationalStatus`."""
+  allRelationalStatuses(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalStatusCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalStatus`."""
+    orderBy: [RelationalStatusesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalStatusesConnection
+
+  """Reads and enables pagination through a set of `RelationalTopic`."""
+  allRelationalTopics(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalTopicCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsConnection
+
+  """Reads and enables pagination through a set of `Reserved`."""
+  allReserveds(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ReservedCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ReservedsConnection
+
+  """Reads and enables pagination through a set of `Yield`."""
+  allYields(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: YieldCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Yield`."""
+    orderBy: [YieldsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): YieldsConnection
+  await(_proto__: Int, constructor: Int, hasOwnProperty: Int, yield: Int): Int
+
+  """Reads a single `Building` using its globally unique `ID`."""
+  building(
+    """The globally unique `ID` to be used in selecting a single `Building`."""
+    nodeId: ID!
+  ): Building
+
+  """Get a single `Building`."""
+  buildingByConstructor(constructor: String!): Building
+
+  """Get a single `Building`."""
+  buildingById(id: Int!): Building
+  case(_proto__: Int, constructor: Int, hasOwnProperty: Int, yield: Int): Int
+
+  """Reads a single `Constructor` using its globally unique `ID`."""
+  constructor(
+    """
+    The globally unique `ID` to be used in selecting a single `Constructor`.
+    """
+    nodeId: ID!
+  ): Constructor
+
+  """Get a single `Constructor`."""
+  constructorByExport(export: String!): Constructor
+
+  """Get a single `Constructor`."""
+  constructorById(id: Int!): Constructor
+
+  """Get a single `Constructor`."""
+  constructorByName(name: String!): Constructor
+
+  """Reads a single `Crop` using its globally unique `ID`."""
+  crop(
+    """The globally unique `ID` to be used in selecting a single `Crop`."""
+    nodeId: ID!
+  ): Crop
+
+  """Get a single `Crop`."""
+  cropById(id: Int!): Crop
+
+  """Get a single `Crop`."""
+  cropByYield(yield: String!): Crop
+
+  """Reads a single `Machine` using its globally unique `ID`."""
+  machine(
+    """The globally unique `ID` to be used in selecting a single `Machine`."""
+    nodeId: ID!
+  ): Machine
+
+  """Get a single `Machine`."""
+  machineById(id: Int!): Machine
+
+  """Reads a single `Material` using its globally unique `ID`."""
+  material(
+    """The globally unique `ID` to be used in selecting a single `Material`."""
+    nodeId: ID!
+  ): Material
+
+  """Get a single `Material`."""
+  materialByClass(class: String!): Material
+
+  """Get a single `Material`."""
+  materialById(id: Int!): Material
+
+  """Get a single `Material`."""
+  materialByValueOf(valueOf: String!): Material
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """Reads a single `Null` using its globally unique `ID`."""
+  null(
+    """The globally unique `ID` to be used in selecting a single `Null`."""
+    nodeId: ID!
+  ): Null
+
+  """Get a single `Null`."""
+  nullByBreak(break: String!): Null
+
+  """Get a single `Null`."""
+  nullByHasOwnProperty(hasOwnProperty: String!): Null
+
+  """Get a single `Null`."""
+  nullById(id: Int!): Null
+
+  """Reads a single `Project` using its globally unique `ID`."""
+  project(
+    """The globally unique `ID` to be used in selecting a single `Project`."""
+    nodeId: ID!
+  ): Project
+
+  """Get a single `Project`."""
+  projectById(id: Int!): Project
+
+  """Get a single `Project`."""
+  projectByProto__(_proto__: String!): Project
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Reads a single `RelationalStatus` using its globally unique `ID`."""
+  relationalStatus(
+    """
+    The globally unique `ID` to be used in selecting a single `RelationalStatus`.
+    """
+    nodeId: ID!
+  ): RelationalStatus
+
+  """Get a single `RelationalStatus`."""
+  relationalStatusById(id: Int!): RelationalStatus
+
+  """Reads a single `RelationalTopic` using its globally unique `ID`."""
+  relationalTopic(
+    """
+    The globally unique `ID` to be used in selecting a single `RelationalTopic`.
+    """
+    nodeId: ID!
+  ): RelationalTopic
+
+  """Get a single `RelationalTopic`."""
+  relationalTopicById(id: Int!): RelationalTopic
+
+  """Reads a single `Reserved` using its globally unique `ID`."""
+  reserved(
+    """The globally unique `ID` to be used in selecting a single `Reserved`."""
+    nodeId: ID!
+  ): Reserved
+
+  """Get a single `Reserved`."""
+  reservedByCase(case: String!): Reserved
+
+  """Get a single `Reserved`."""
+  reservedByDo(do: String!): Reserved
+
+  """Get a single `Reserved`."""
+  reservedById(id: Int!): Reserved
+
+  """Get a single `Reserved`."""
+  reservedByNull(null: String!): Reserved
+  valueOf(_proto__: Int, constructor: Int, hasOwnProperty: Int, yield: Int): Int
+
+  """Reads a single `Yield` using its globally unique `ID`."""
+  yield(
+    """The globally unique `ID` to be used in selecting a single `Yield`."""
+    nodeId: ID!
+  ): Yield
+
+  """Get a single `Yield`."""
+  yieldByExport(export: String!): Yield
+
+  """Get a single `Yield`."""
+  yieldById(id: Int!): Yield
+}
+
+interface RelationalItem {
+  """Reads a single `Building` that is related to this `RelationalItem`."""
+  buildingByConstructor: Building
+  constructor: String
+  id: Int!
+
+  """
+  Reads a single `RelationalStatus` that is related to this `RelationalItem`.
+  """
+  relationalStatusById: RelationalStatus
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
+  """
+  relationalTopicById: RelationalTopic
+  type: ItemType!
+}
+
+"""
+A condition to be used against `RelationalItem` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemCondition {
+  """Checks for equality with the object’s `constructor` field."""
+  constructor: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+}
+
+"""A connection to a list of `RelationalItem` values."""
+type RelationalItemsConnection {
+  """
+  A list of edges which contains the `RelationalItem` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemsEdge]!
+
+  """A list of `RelationalItem` objects."""
+  nodes: [RelationalItem]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `RelationalItem` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `RelationalItem` edge in the connection."""
+type RelationalItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalItem` at the end of the edge."""
+  node: RelationalItem
+}
+
+"""Methods to use when ordering `RelationalItem`."""
+enum RelationalItemsOrderBy {
+  CONSTRUCTOR_ASC
+  CONSTRUCTOR_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TYPE_ASC
+  TYPE_DESC
+}
+
+type RelationalStatus implements Node & RelationalItem {
+  """Reads a single `Building` that is related to this `RelationalStatus`."""
+  buildingByConstructor: Building
+  constructor: String
+  description: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  note: String
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalStatus`.
+  """
+  relationalItemById: RelationalItem
+
+  """
+  Reads a single `RelationalStatus` that is related to this `RelationalStatus`.
+  """
+  relationalStatusById: RelationalStatus
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalStatus`.
+  """
+  relationalTopicById: RelationalTopic
+  type: ItemType!
+}
+
+"""
+A condition to be used against `RelationalStatus` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalStatusCondition {
+  """Checks for equality with the object’s `constructor` field."""
+  constructor: String
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `note` field."""
+  note: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+}
+
+"""An input for mutations affecting `RelationalStatus`"""
+input RelationalStatusInput {
+  constructor: String
+  description: String
+  id: Int!
+  note: String
+  type: ItemType
+}
+
+"""
+Represents an update to a `RelationalStatus`. Fields that are set will be updated.
+"""
+input RelationalStatusPatch {
+  constructor: String
+  description: String
+  id: Int
+  note: String
+  type: ItemType
+}
+
+"""A connection to a list of `RelationalStatus` values."""
+type RelationalStatusesConnection {
+  """
+  A list of edges which contains the `RelationalStatus` and cursor to aid in pagination.
+  """
+  edges: [RelationalStatusesEdge]!
+
+  """A list of `RelationalStatus` objects."""
+  nodes: [RelationalStatus]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalStatus` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalStatus` edge in the connection."""
+type RelationalStatusesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalStatus` at the end of the edge."""
+  node: RelationalStatus
+}
+
+"""Methods to use when ordering `RelationalStatus`."""
+enum RelationalStatusesOrderBy {
+  CONSTRUCTOR_ASC
+  CONSTRUCTOR_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  NOTE_ASC
+  NOTE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TYPE_ASC
+  TYPE_DESC
+}
+
+type RelationalTopic implements Node & RelationalItem {
+  """Reads a single `Building` that is related to this `RelationalTopic`."""
+  buildingByConstructor: Building
+  constructor: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemById: RelationalItem
+
+  """
+  Reads a single `RelationalStatus` that is related to this `RelationalTopic`.
+  """
+  relationalStatusById: RelationalStatus
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
+  """
+  relationalTopicById: RelationalTopic
+  title: String!
+  type: ItemType!
+}
+
+"""
+A condition to be used against `RelationalTopic` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalTopicCondition {
+  """Checks for equality with the object’s `constructor` field."""
+  constructor: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+}
+
+"""An input for mutations affecting `RelationalTopic`"""
+input RelationalTopicInput {
+  constructor: String
+  id: Int!
+  title: String!
+  type: ItemType
+}
+
+"""
+Represents an update to a `RelationalTopic`. Fields that are set will be updated.
+"""
+input RelationalTopicPatch {
+  constructor: String
+  id: Int
+  title: String
+  type: ItemType
+}
+
+"""A connection to a list of `RelationalTopic` values."""
+type RelationalTopicsConnection {
+  """
+  A list of edges which contains the `RelationalTopic` and cursor to aid in pagination.
+  """
+  edges: [RelationalTopicsEdge]!
+
+  """A list of `RelationalTopic` objects."""
+  nodes: [RelationalTopic]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalTopic` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalTopic` edge in the connection."""
+type RelationalTopicsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalTopic` at the end of the edge."""
+  node: RelationalTopic
+}
+
+"""Methods to use when ordering `RelationalTopic`."""
+enum RelationalTopicsOrderBy {
+  CONSTRUCTOR_ASC
+  CONSTRUCTOR_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+}
+
+type Reserved implements Node {
+  case: String
+  do: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  null: String
+}
+
+"""
+A condition to be used against `Reserved` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ReservedCondition {
+  """Checks for equality with the object’s `case` field."""
+  case: String
+
+  """Checks for equality with the object’s `do` field."""
+  do: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `null` field."""
+  null: String
+}
+
+"""An input for mutations affecting `Reserved`"""
+input ReservedInput {
+  case: String
+  do: String
+  id: Int
+  null: String
+}
+
+"""
+Represents an update to a `Reserved`. Fields that are set will be updated.
+"""
+input ReservedPatch {
+  case: String
+  do: String
+  id: Int
+  null: String
+}
+
+"""A connection to a list of `Reserved` values."""
+type ReservedsConnection {
+  """
+  A list of edges which contains the `Reserved` and cursor to aid in pagination.
+  """
+  edges: [ReservedsEdge]!
+
+  """A list of `Reserved` objects."""
+  nodes: [Reserved]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Reserved` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Reserved` edge in the connection."""
+type ReservedsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Reserved` at the end of the edge."""
+  node: Reserved
+}
+
+"""Methods to use when ordering `Reserved`."""
+enum ReservedsOrderBy {
+  CASE_ASC
+  CASE_DESC
+  DO_ASC
+  DO_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  NULL_ASC
+  NULL_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""All input for the `updateBuildingByConstructor` mutation."""
+input UpdateBuildingByConstructorInput {
+  """
+  An object where the defined keys will be set on the `Building` being updated.
+  """
+  buildingPatch: BuildingPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  constructor: String!
+}
+
+"""All input for the `updateBuildingById` mutation."""
+input UpdateBuildingByIdInput {
+  """
+  An object where the defined keys will be set on the `Building` being updated.
+  """
+  buildingPatch: BuildingPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `updateBuilding` mutation."""
+input UpdateBuildingInput {
+  """
+  An object where the defined keys will be set on the `Building` being updated.
+  """
+  buildingPatch: BuildingPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Building` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Building` mutation."""
+type UpdateBuildingPayload {
+  """The `Building` that was updated by this mutation."""
+  building: Building
+
+  """An edge for our `Building`. May be used by Relay 1."""
+  buildingEdge(
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BuildingsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateConstructorByExport` mutation."""
+input UpdateConstructorByExportInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Constructor` being updated.
+  """
+  constructorPatch: ConstructorPatch!
+  export: String!
+}
+
+"""All input for the `updateConstructorById` mutation."""
+input UpdateConstructorByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Constructor` being updated.
+  """
+  constructorPatch: ConstructorPatch!
+  id: Int!
+}
+
+"""All input for the `updateConstructorByName` mutation."""
+input UpdateConstructorByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Constructor` being updated.
+  """
+  constructorPatch: ConstructorPatch!
+  name: String!
+}
+
+"""All input for the `updateConstructor` mutation."""
+input UpdateConstructorInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Constructor` being updated.
+  """
+  constructorPatch: ConstructorPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Constructor` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Constructor` mutation."""
+type UpdateConstructorPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Constructor` that was updated by this mutation."""
+  constructor: Constructor
+
+  """An edge for our `Constructor`. May be used by Relay 1."""
+  constructorEdge(
+    """The method to use when ordering `Constructor`."""
+    orderBy: [ConstructorsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConstructorsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateCropById` mutation."""
+input UpdateCropByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Crop` being updated.
+  """
+  cropPatch: CropPatch!
+  id: Int!
+}
+
+"""All input for the `updateCropByYield` mutation."""
+input UpdateCropByYieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Crop` being updated.
+  """
+  cropPatch: CropPatch!
+  yield: String!
+}
+
+"""All input for the `updateCrop` mutation."""
+input UpdateCropInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Crop` being updated.
+  """
+  cropPatch: CropPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Crop` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Crop` mutation."""
+type UpdateCropPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Crop` that was updated by this mutation."""
+  crop: Crop
+
+  """An edge for our `Crop`. May be used by Relay 1."""
+  cropEdge(
+    """The method to use when ordering `Crop`."""
+    orderBy: [CropsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CropsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateMachineById` mutation."""
+input UpdateMachineByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Machine` being updated.
+  """
+  machinePatch: MachinePatch!
+}
+
+"""All input for the `updateMachine` mutation."""
+input UpdateMachineInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Machine` being updated.
+  """
+  machinePatch: MachinePatch!
+
+  """
+  The globally unique `ID` which will identify a single `Machine` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Machine` mutation."""
+type UpdateMachinePayload {
+  """Reads a single `Building` that is related to this `Machine`."""
+  buildingByConstructor: Building
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Machine` that was updated by this mutation."""
+  machine: Machine
+
+  """An edge for our `Machine`. May be used by Relay 1."""
+  machineEdge(
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachinesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachinesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateMaterialByClass` mutation."""
+input UpdateMaterialByClassInput {
+  class: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Material` being updated.
+  """
+  materialPatch: MaterialPatch!
+}
+
+"""All input for the `updateMaterialById` mutation."""
+input UpdateMaterialByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Material` being updated.
+  """
+  materialPatch: MaterialPatch!
+}
+
+"""All input for the `updateMaterialByValueOf` mutation."""
+input UpdateMaterialByValueOfInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Material` being updated.
+  """
+  materialPatch: MaterialPatch!
+  valueOf: String!
+}
+
+"""All input for the `updateMaterial` mutation."""
+input UpdateMaterialInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Material` being updated.
+  """
+  materialPatch: MaterialPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Material` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Material` mutation."""
+type UpdateMaterialPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Material` that was updated by this mutation."""
+  material: Material
+
+  """An edge for our `Material`. May be used by Relay 1."""
+  materialEdge(
+    """The method to use when ordering `Material`."""
+    orderBy: [MaterialsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MaterialsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateNullByBreak` mutation."""
+input UpdateNullByBreakInput {
+  break: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Null` being updated.
+  """
+  nullPatch: NullPatch!
+}
+
+"""All input for the `updateNullByHasOwnProperty` mutation."""
+input UpdateNullByHasOwnPropertyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  hasOwnProperty: String!
+
+  """
+  An object where the defined keys will be set on the `Null` being updated.
+  """
+  nullPatch: NullPatch!
+}
+
+"""All input for the `updateNullById` mutation."""
+input UpdateNullByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Null` being updated.
+  """
+  nullPatch: NullPatch!
+}
+
+"""All input for the `updateNull` mutation."""
+input UpdateNullInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Null` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Null` being updated.
+  """
+  nullPatch: NullPatch!
+}
+
+"""The output of our update `Null` mutation."""
+type UpdateNullPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Null` that was updated by this mutation."""
+  null: Null
+
+  """An edge for our `Null`. May be used by Relay 1."""
+  nullEdge(
+    """The method to use when ordering `Null`."""
+    orderBy: [NullsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NullsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateProjectById` mutation."""
+input UpdateProjectByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Project` being updated.
+  """
+  projectPatch: ProjectPatch!
+}
+
+"""All input for the `updateProjectByProto__` mutation."""
+input UpdateProjectByProtoInput {
+  _proto__: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Project` being updated.
+  """
+  projectPatch: ProjectPatch!
+}
+
+"""All input for the `updateProject` mutation."""
+input UpdateProjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Project` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Project` being updated.
+  """
+  projectPatch: ProjectPatch!
+}
+
+"""The output of our update `Project` mutation."""
+type UpdateProjectPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Project` that was updated by this mutation."""
+  project: Project
+
+  """An edge for our `Project`. May be used by Relay 1."""
+  projectEdge(
+    """The method to use when ordering `Project`."""
+    orderBy: [ProjectsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProjectsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateProtoById` mutation."""
+input UpdateProtoByIdInput {
+  """
+  An object where the defined keys will be set on the `_Proto__` being updated.
+  """
+  _protoPatch: _ProtoPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `updateProtoByName` mutation."""
+input UpdateProtoByNameInput {
+  """
+  An object where the defined keys will be set on the `_Proto__` being updated.
+  """
+  _protoPatch: _ProtoPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
+}
+
+"""All input for the `updateProto__` mutation."""
+input UpdateProtoInput {
+  """
+  An object where the defined keys will be set on the `_Proto__` being updated.
+  """
+  _protoPatch: _ProtoPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `_Proto__` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `_Proto__` mutation."""
+type UpdateProtoPayload {
+  """An edge for our `_Proto__`. May be used by Relay 1."""
+  _protoEdge(
+    """The method to use when ordering `_Proto__`."""
+    orderBy: [_ProtoSOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): _Proto__SEdge
+
+  """The `_Proto__` that was updated by this mutation."""
+  _proto__: _Proto__
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateRelationalStatusById` mutation."""
+input UpdateRelationalStatusByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalStatus` being updated.
+  """
+  relationalStatusPatch: RelationalStatusPatch!
+}
+
+"""All input for the `updateRelationalStatus` mutation."""
+input UpdateRelationalStatusInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `RelationalStatus` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `RelationalStatus` being updated.
+  """
+  relationalStatusPatch: RelationalStatusPatch!
+}
+
+"""The output of our update `RelationalStatus` mutation."""
+type UpdateRelationalStatusPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalStatus`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalStatus` that was updated by this mutation."""
+  relationalStatus: RelationalStatus
+
+  """An edge for our `RelationalStatus`. May be used by Relay 1."""
+  relationalStatusEdge(
+    """The method to use when ordering `RelationalStatus`."""
+    orderBy: [RelationalStatusesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalStatusesEdge
+}
+
+"""All input for the `updateRelationalTopicById` mutation."""
+input UpdateRelationalTopicByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalTopic` being updated.
+  """
+  relationalTopicPatch: RelationalTopicPatch!
+}
+
+"""All input for the `updateRelationalTopic` mutation."""
+input UpdateRelationalTopicInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `RelationalTopic` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `RelationalTopic` being updated.
+  """
+  relationalTopicPatch: RelationalTopicPatch!
+}
+
+"""The output of our update `RelationalTopic` mutation."""
+type UpdateRelationalTopicPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalTopic` that was updated by this mutation."""
+  relationalTopic: RelationalTopic
+
+  """An edge for our `RelationalTopic`. May be used by Relay 1."""
+  relationalTopicEdge(
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsEdge
+}
+
+"""All input for the `updateReservedByCase` mutation."""
+input UpdateReservedByCaseInput {
+  case: String!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""All input for the `updateReservedByDo` mutation."""
+input UpdateReservedByDoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  do: String!
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""All input for the `updateReservedById` mutation."""
+input UpdateReservedByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""All input for the `updateReservedByNull` mutation."""
+input UpdateReservedByNullInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  null: String!
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""All input for the `updateReserved` mutation."""
+input UpdateReservedInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Reserved` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Reserved` being updated.
+  """
+  reservedPatch: ReservedPatch!
+}
+
+"""The output of our update `Reserved` mutation."""
+type UpdateReservedPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Reserved` that was updated by this mutation."""
+  reserved: Reserved
+
+  """An edge for our `Reserved`. May be used by Relay 1."""
+  reservedEdge(
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ReservedsEdge
+}
+
+"""All input for the `updateYieldByExport` mutation."""
+input UpdateYieldByExportInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  export: String!
+
+  """
+  An object where the defined keys will be set on the `Yield` being updated.
+  """
+  yieldPatch: YieldPatch!
+}
+
+"""All input for the `updateYieldById` mutation."""
+input UpdateYieldByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Yield` being updated.
+  """
+  yieldPatch: YieldPatch!
+}
+
+"""All input for the `updateYield` mutation."""
+input UpdateYieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Yield` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Yield` being updated.
+  """
+  yieldPatch: YieldPatch!
+}
+
+"""The output of our update `Yield` mutation."""
+type UpdateYieldPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Yield` that was updated by this mutation."""
+  yield: Yield
+
+  """An edge for our `Yield`. May be used by Relay 1."""
+  yieldEdge(
+    """The method to use when ordering `Yield`."""
+    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): YieldsEdge
+}
+
+type Yield implements Node {
+  crop: String
+  export: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Yield` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input YieldCondition {
+  """Checks for equality with the object’s `crop` field."""
+  crop: String
+
+  """Checks for equality with the object’s `export` field."""
+  export: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Yield`"""
+input YieldInput {
+  crop: String
+  export: String
+  id: Int
+}
+
+"""
+Represents an update to a `Yield`. Fields that are set will be updated.
+"""
+input YieldPatch {
+  crop: String
+  export: String
+  id: Int
+}
+
+"""A connection to a list of `Yield` values."""
+type YieldsConnection {
+  """
+  A list of edges which contains the `Yield` and cursor to aid in pagination.
+  """
+  edges: [YieldsEdge]!
+
+  """A list of `Yield` objects."""
+  nodes: [Yield]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Yield` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Yield` edge in the connection."""
+type YieldsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Yield` at the end of the edge."""
+  node: Yield
+}
+
+"""Methods to use when ordering `Yield`."""
+enum YieldsOrderBy {
+  CROP_ASC
+  CROP_DESC
+  EXPORT_ASC
+  EXPORT_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `_Proto__` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input _ProtoCondition {
+  """Checks for equality with the object’s `brand` field."""
+  brand: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""
+Represents an update to a `_Proto__`. Fields that are set will be updated.
+"""
+input _ProtoPatch {
+  brand: String
+  id: Int
+  name: String
+}
+
+"""Methods to use when ordering `_Proto__`."""
+enum _ProtoSOrderBy {
+  BRAND_ASC
+  BRAND_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type _Proto__ implements Node {
+  brand: String
+  id: Int!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""An input for mutations affecting `_Proto__`"""
+input _Proto__Input {
+  brand: String
+  id: Int
+  name: String
+}
+
+"""A connection to a list of `_Proto__` values."""
+type _Proto__SConnection {
+  """
+  A list of edges which contains the `_Proto__` and cursor to aid in pagination.
+  """
+  edges: [_Proto__SEdge]!
+
+  """A list of `_Proto__` objects."""
+  nodes: [_Proto__]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `_Proto__` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `_Proto__` edge in the connection."""
+type _Proto__SEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `_Proto__` at the end of the edge."""
+  node: _Proto__
+}
