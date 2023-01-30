@@ -190,6 +190,7 @@ function parseAccepts(acceptHeader: string) {
   let state = State.EXPECT_TYPE;
   let currentAccept: Accept | null = null;
   let currentParameterName = "";
+  let currentParameterValue = "";
   function next() {
     if (currentAccept!.parameters.q) {
       const q = parseFloat(currentAccept!.parameters.q);
@@ -295,6 +296,7 @@ function parseAccepts(acceptHeader: string) {
           continue;
         } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentParameterName = acceptHeader[i];
+          currentParameterValue = "";
           state = State.CONTINUE_PARAMETER_NAME;
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
@@ -309,7 +311,6 @@ function parseAccepts(acceptHeader: string) {
             throw new Error("Overriding parameter!");
           }
           */
-          currentAccept!.parameters[currentParameterName] = "";
           // "q" is not a valid parameter name; it's just used for weighting.
           if (currentParameterName !== "q") {
             currentAccept!.noParams = false;
@@ -326,7 +327,7 @@ function parseAccepts(acceptHeader: string) {
           state = State.CONTINUE_QUOTED_PARAMETER_VALUE;
         } else if (/*@__INLINE__*/ isToken(charCode)) {
           state = State.CONTINUE_PARAMETER_VALUE;
-          currentAccept!.parameters[currentParameterName] += acceptHeader[i];
+          currentParameterValue += acceptHeader[i];
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
         }
@@ -334,6 +335,8 @@ function parseAccepts(acceptHeader: string) {
       }
       case State.CONTINUE_QUOTED_PARAMETER_VALUE: {
         if (charCode === DOUBLE_QUOTE) {
+          currentAccept!.parameters[currentParameterName] =
+            currentParameterValue;
           state = State.EXPECT_COMMA_OR_SEMICOLON;
         } else if (charCode === BACKSLASH) {
           const char = acceptHeader[++i];
@@ -353,21 +356,25 @@ function parseAccepts(acceptHeader: string) {
           // come out as "n" and "t" in the output. This is specifically for
           // escaping quote marks, parenthesis, backslashes.
           // TODO: Technically we should respect `quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )`
-          currentAccept!.parameters[currentParameterName] += char;
+          currentParameterValue += char;
         } else {
           // TODO: Technically we should respect `qdtext = HTAB / SP / %x21 / %x23-5B / %x5D-7E / obs-text`
-          currentAccept!.parameters[currentParameterName] += acceptHeader[i];
+          currentParameterValue += acceptHeader[i];
         }
         break;
       }
       case State.CONTINUE_PARAMETER_VALUE: {
         if (charCode === SEMICOLON) {
+          currentAccept!.parameters[currentParameterName] =
+            currentParameterValue;
           // Parameters
           state = State.EXPECT_PARAMETER_NAME;
         } else if (charCode === COMMA) {
+          currentAccept!.parameters[currentParameterName] =
+            currentParameterValue;
           /*@__INLINE__*/ next();
         } else if (/*@__INLINE__*/ isToken(charCode)) {
-          currentAccept!.parameters[currentParameterName] += acceptHeader[i];
+          currentParameterValue += acceptHeader[i];
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
         }
