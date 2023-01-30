@@ -173,6 +173,11 @@ enum State {
   CONTINUE_QUOTED_PARAMETER_VALUE = 9,
 }
 
+// PERF: we could increase the speed of this significantly by checking the
+// type/subtype against the supported types/subtypes, and if a match is not
+// found then skip `i` right up to the next `,` without adding the entry to
+// `accepts`
+
 /**
  * Parser based on https://httpwg.org/specs/rfc9110.html#rfc.section.12.5.1
  *
