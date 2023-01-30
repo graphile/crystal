@@ -207,7 +207,7 @@ function parseAccepts(acceptHeader: string) {
     const charCode = acceptHeader.charCodeAt(i);
     switch (state) {
       case State.EXPECT_TYPE: {
-        if (isWhitespace(charCode)) {
+        if (/*@__INLINE__*/ isWhitespace(charCode)) {
           continue;
         } else if (charCode === ASTERISK) {
           // `*/*`
@@ -227,7 +227,7 @@ function parseAccepts(acceptHeader: string) {
             throw new Error("Expected '*' after '*/'");
           }
           state = State.EXPECT_COMMA_OR_SEMICOLON;
-        } else if (isToken(charCode)) {
+        } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentAccept = {
             type: acceptHeader[i],
             subtype: "",
@@ -244,7 +244,7 @@ function parseAccepts(acceptHeader: string) {
       case State.CONTINUE_TYPE: {
         if (charCode === SLASH) {
           state = State.EXPECT_SUBTYPE;
-        } else if (isToken(charCode)) {
+        } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentAccept!.type += acceptHeader[i];
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
@@ -255,7 +255,7 @@ function parseAccepts(acceptHeader: string) {
         if (charCode === ASTERISK) {
           currentAccept!.subtype = "*";
           state = State.EXPECT_COMMA_OR_SEMICOLON;
-        } else if (isToken(charCode)) {
+        } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentAccept!.subtype = acceptHeader[i];
           state = State.CONTINUE_SUBTYPE;
         } else {
@@ -269,9 +269,9 @@ function parseAccepts(acceptHeader: string) {
           state = State.EXPECT_PARAMETER_NAME;
         } else if (charCode === COMMA) {
           next();
-        } else if (isToken(charCode)) {
+        } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentAccept!.subtype += acceptHeader[i];
-        } else if (isWhitespace(charCode)) {
+        } else if (/*@__INLINE__*/ isWhitespace(charCode)) {
           state = State.EXPECT_COMMA_OR_SEMICOLON;
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
@@ -279,7 +279,7 @@ function parseAccepts(acceptHeader: string) {
         break;
       }
       case State.EXPECT_COMMA_OR_SEMICOLON: {
-        if (isWhitespace(charCode)) {
+        if (/*@__INLINE__*/ isWhitespace(charCode)) {
           continue;
         } else if (charCode === SEMICOLON) {
           state = State.EXPECT_PARAMETER_NAME;
@@ -291,9 +291,9 @@ function parseAccepts(acceptHeader: string) {
         break;
       }
       case State.EXPECT_PARAMETER_NAME: {
-        if (isOWS(charCode)) {
+        if (/*@__INLINE__*/ isOWS(charCode)) {
           continue;
-        } else if (isToken(charCode)) {
+        } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentParameterName = acceptHeader[i];
           state = State.CONTINUE_PARAMETER_NAME;
         } else {
@@ -302,7 +302,7 @@ function parseAccepts(acceptHeader: string) {
         break;
       }
       case State.CONTINUE_PARAMETER_NAME: {
-        if (isToken(charCode)) {
+        if (/*@__INLINE__*/ isToken(charCode)) {
           currentParameterName += acceptHeader[i];
         } else if (charCode === EQUALS) {
           state = State.EXPECT_PARAMETER_VALUE;
@@ -324,7 +324,7 @@ function parseAccepts(acceptHeader: string) {
       case State.EXPECT_PARAMETER_VALUE: {
         if (charCode === DOUBLE_QUOTE) {
           state = State.CONTINUE_QUOTED_PARAMETER_VALUE;
-        } else if (isToken(charCode)) {
+        } else if (/*@__INLINE__*/ isToken(charCode)) {
           state = State.CONTINUE_PARAMETER_VALUE;
           currentAccept!.parameters[currentParameterName] += acceptHeader[i];
         } else if (charCode === EQUALS) {
@@ -356,7 +356,7 @@ function parseAccepts(acceptHeader: string) {
           state = State.EXPECT_PARAMETER_NAME;
         } else if (charCode === COMMA) {
           next();
-        } else if (isToken(charCode)) {
+        } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentAccept!.parameters[currentParameterName] += acceptHeader[i];
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
