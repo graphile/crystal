@@ -302,9 +302,7 @@ function parseAccepts(acceptHeader: string) {
         break;
       }
       case State.CONTINUE_PARAMETER_NAME: {
-        if (/*@__INLINE__*/ isToken(charCode)) {
-          currentParameterName += acceptHeader[i];
-        } else if (charCode === EQUALS) {
+        if (charCode === EQUALS) {
           state = State.EXPECT_PARAMETER_VALUE;
           /*
           if (currentAccept?.parameters[currentParameterName]) {
@@ -316,6 +314,8 @@ function parseAccepts(acceptHeader: string) {
           if (currentParameterName !== "q") {
             currentAccept!.noParams = false;
           }
+        } else if (/*@__INLINE__*/ isToken(charCode)) {
+          currentParameterName += acceptHeader[i];
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
         }
