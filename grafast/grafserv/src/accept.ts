@@ -292,7 +292,12 @@ function parseAccepts(acceptHeader: string) {
         break;
       }
       case State.EXPECT_PARAMETER_NAME: {
-        if (/*@__INLINE__*/ isOWS(charCode)) {
+        if (charCode === SEMICOLON) {
+          continue;
+        } else if (charCode === COMMA) {
+          /*@__INLINE__*/ next();
+          continue;
+        } else if (/*@__INLINE__*/ isOWS(charCode)) {
           continue;
         } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentParameterName = acceptHeader[i];
