@@ -340,6 +340,18 @@ function parseAccepts(acceptHeader: string) {
           if (char === undefined) {
             throw new Error(`Unexpected terminating backslash`);
           }
+          // From the spec:
+          //
+          // > A sender SHOULD NOT generate a quoted-pair in a quoted-string
+          // > except where necessary to quote DQUOTE and backslash octets
+          // > occurring within that string. A sender SHOULD NOT generate a
+          // > quoted-pair in a comment except where necessary to quote
+          // > parentheses ["(" and ")"] and backslash octets occurring within
+          // > that comment.
+          //
+          // i.e. this isn't for `\n` and `\t` and similar, those would just
+          // come out as "n" and "t" in the output. This is specifically for
+          // escaping quote marks, parenthesis, backslashes.
           // TODO: Technically we should respect `quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )`
           currentAccept!.parameters[currentParameterName] += char;
         } else {
