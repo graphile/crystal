@@ -6,6 +6,10 @@ import schema from "./schema.mjs";
 // Create an express app
 const app = express();
 // (Add any Express middleware you want here.)
+app.use((req, _res, next) => {
+  req.thing = "Hello from Express!";
+  next();
+});
 
 // Create a Grafserv instance
 const instance = grafserv({ schema, preset });

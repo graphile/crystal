@@ -132,6 +132,8 @@ export interface NormalizedRequestDigest extends RequestDigest {
    */
   [$$normalizedHeaders]: Record<string, string>;
   getHeader(name: string): string | undefined;
+  /** @deprecated use getHeader unless the original case is essential. */
+  headers: Record<string, string>;
 }
 
 interface IHandlerResult {
