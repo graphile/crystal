@@ -42,6 +42,8 @@ import { withTestWithPgClient } from "./sharedHelpers.js";
  */
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /** Sorts two GraphQLError paths. */
 const pathCompare = (
   path1: readonly (string | number)[],
@@ -242,6 +244,13 @@ export async function runTestQuery(
             if (!config.directPg) {
               throw new Error("Can only use callback in directPg mode");
             }
+
+            if (operationType === "subscription") {
+              // Wait a moment for Postgres to synchronize across threads,
+              // otherwise we might hit a race condition.
+              await sleep(200);
+            }
+
             const poolClient = await testPool.connect();
             try {
               await options.callback(poolClient, originalPayloads);
