@@ -14,8 +14,8 @@ import type {
 import { normalizeRequest, processHeaders } from "../../../utils.js";
 
 declare global {
-  namespace Grafserv {
-    interface RequestDigestFrameworkMeta {
+  namespace GraphileConfig {
+    interface GraphQLRequestContext {
       fastifyv4: {
         request: FastifyRequest;
         reply: FastifyReply;
@@ -42,7 +42,7 @@ function getDigest(
     getBody() {
       return { type: "json", json: request.body as any };
     },
-    meta: {
+    requestContext: {
       fastifyv4: {
         request,
         reply,

@@ -8,8 +8,8 @@ import type { OptionsFromConfig } from "../../../options.js";
 import { getBodyFromRequest, processHeaders } from "../../../utils.js";
 
 declare global {
-  namespace Grafserv {
-    interface RequestDigestFrameworkMeta {
+  namespace GraphileConfig {
+    interface GraphQLRequestContext {
       koav2: {
         ctx: Context;
       };
@@ -41,7 +41,7 @@ function getDigest(
         return getBodyFromRequest(ctx.req, dynamicOptions.maxRequestLength);
       }
     },
-    meta: {
+    requestContext: {
       koav2: {
         ctx,
       },

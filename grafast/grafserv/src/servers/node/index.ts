@@ -7,8 +7,8 @@ import type { OptionsFromConfig } from "../../options.js";
 import { getBodyFromRequest, processHeaders } from "../../utils.js";
 
 declare global {
-  namespace Grafserv {
-    interface RequestDigestFrameworkMeta {
+  namespace GraphileConfig {
+    interface GraphQLRequestContext {
       node: {
         req: IncomingMessage;
         res: ServerResponse;
@@ -48,7 +48,7 @@ export class NodeGrafserv extends GrafservBase {
       getBody() {
         return getBodyFromRequest(req, dynamicOptions.maxRequestLength);
       },
-      meta: {
+      requestContext: {
         node: {
           req,
           res,

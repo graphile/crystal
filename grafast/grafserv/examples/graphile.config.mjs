@@ -17,9 +17,9 @@ const preset = {
     context(requestContext) {
       return {
         user_id: requestContext.http?.getHeader("x-user-id"),
-        expressThing: requestContext.http?.meta.expressv4?.req.thing,
-        koaThing: requestContext.http?.meta.koav2?.ctx.thing,
-        fastifyThing: requestContext.http?.meta.fastifyv4?.request.thing,
+        expressThing: requestContext.expressv4?.req.thing,
+        koaThing: requestContext.koav2?.ctx.thing,
+        fastifyThing: requestContext.fastifyv4?.request.thing,
       };
     },
   },

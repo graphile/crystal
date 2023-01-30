@@ -489,6 +489,7 @@ export const makeGraphQLHandler = (
     await hookArgs(
       args,
       {
+        ...request.requestContext,
         http: request,
       },
       resolvedPreset,

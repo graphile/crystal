@@ -12,7 +12,7 @@ import { isPromiseLike } from "./utils.js";
  */
 export function hookArgs(
   args: ExecutionArgs,
-  ctx: GraphileConfig.GraphQLRequestContext,
+  ctx: Partial<GraphileConfig.GraphQLRequestContext>,
   resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
 ): ExecutionArgs | PromiseLike<ExecutionArgs> {
   // Make context mutable

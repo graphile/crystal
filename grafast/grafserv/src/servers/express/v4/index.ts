@@ -6,8 +6,8 @@ import { getBodyFromRequest, processHeaders } from "../../../utils.js";
 import { NodeGrafserv } from "../../node/index.js";
 
 declare global {
-  namespace Grafserv {
-    interface RequestDigestFrameworkMeta {
+  namespace GraphileConfig {
+    interface GraphQLRequestContext {
       expressv4: {
         req: Request;
         res: Response;
@@ -37,7 +37,7 @@ export class ExpressGrafserv extends NodeGrafserv {
           req.body ?? getBodyFromRequest(req, dynamicOptions.maxRequestLength)
         );
       },
-      meta: {
+      requestContext: {
         expressv4: {
           req,
           res,

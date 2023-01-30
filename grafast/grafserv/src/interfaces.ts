@@ -82,13 +82,6 @@ declare global {
   }
 }
 
-declare global {
-  namespace Grafserv {
-    /** Extend this through declaration merging */
-    interface RequestDigestFrameworkMeta {}
-  }
-}
-
 export interface GrafservBodyBuffer {
   type: "buffer";
   buffer: Buffer;
@@ -119,7 +112,7 @@ export interface RequestDigest {
   headers: Record<string, string>;
   getQueryParams: () => PromiseOrDirect<Record<string, string | string[]>>;
   getBody(): PromiseOrDirect<GrafservBody>;
-  meta: Partial<Grafserv.RequestDigestFrameworkMeta>;
+  requestContext: Partial<GraphileConfig.GraphQLRequestContext>;
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
 }
