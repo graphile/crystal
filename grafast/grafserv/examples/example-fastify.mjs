@@ -8,6 +8,9 @@ const app = Fastify({
   logger: true,
 });
 // (Add any Fastify middleware you want here.)
+app.addHook("onRequest", async (request, _reply) => {
+  request.thing = "Hello from Fastify!";
+});
 
 // Create a Grafserv instance
 const instance = grafserv({ schema, preset });

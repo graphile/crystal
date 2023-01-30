@@ -6,6 +6,10 @@ import schema from "./schema.mjs";
 // Create a Koa app
 const app = new Koa();
 // (Add any Koa middleware you want here.)
+app.use(async (ctx, next) => {
+  ctx.thing = "Hello from Koa!";
+  return next();
+});
 
 // Create a Grafserv instance
 const instance = grafserv({ schema, preset });

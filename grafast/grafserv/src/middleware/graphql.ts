@@ -420,10 +420,7 @@ export const makeGraphQLHandler = (
     try {
       body =
         request.method === "POST"
-          ? processAndValidateBody(
-              request,
-              await request.getBody(dynamicOptions),
-            )
+          ? processAndValidateBody(request, await request.getBody())
           : processAndValidateQueryParams(await request.getQueryParams());
     } catch (e) {
       if (
@@ -492,7 +489,7 @@ export const makeGraphQLHandler = (
     await hookArgs(
       args,
       {
-        request,
+        http: request,
       },
       resolvedPreset,
     );

@@ -4,29 +4,35 @@ import { PassThrough } from "node:stream";
 
 import { GrafservBase } from "../../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
+import type { OptionsFromConfig } from "../../../options.js";
 import { getBodyFromRequest, processHeaders } from "../../../utils.js";
 
 declare global {
   namespace Grafserv {
     interface RequestDigestFrameworkMeta {
-      koa: {
+      koav2: {
         ctx: Context;
       };
     }
   }
 }
 
-function getDigest(ctx: Context): RequestDigest {
+function getDigest(
+  dynamicOptions: OptionsFromConfig,
+  ctx: Context,
+): RequestDigest {
   return {
     httpVersionMajor: ctx.req.httpVersionMajor,
     httpVersionMinor: ctx.req.httpVersionMinor,
+    // TODO: check Koa respects X-Forwarded-Proto when configured to trust the proxy
+    isSecure: ctx.secure,
     method: ctx.request.method,
     path: ctx.request.url,
     headers: processHeaders(ctx.request.headers),
     getQueryParams() {
       return ctx.request.query as Record<string, string | string[]>;
     },
-    getBody(dynamicOptions) {
+    getBody() {
       if ("body" in ctx.request) {
         // FIXME: not necessarily JSON, e.g. if parsing form?
         return { type: "json", json: (ctx.request as any).body };
@@ -35,8 +41,10 @@ function getDigest(ctx: Context): RequestDigest {
         return getBodyFromRequest(ctx.req, dynamicOptions.maxRequestLength);
       }
     },
-    frameworkMeta: {
-      ctx,
+    meta: {
+      koav2: {
+        ctx,
+      },
     },
     preferJSON: true,
   };
@@ -48,8 +56,9 @@ export class KoaGrafserv extends GrafservBase {
   }
 
   public createHandler(): (ctx: Context, next: (err?: Error) => void) => void {
+    const dynamicOptions = this.dynamicOptions;
     return async (ctx, next) => {
-      const request = getDigest(ctx);
+      const request = getDigest(dynamicOptions, ctx);
       const result = await this.processRequest(request);
 
       if (result === null) {
