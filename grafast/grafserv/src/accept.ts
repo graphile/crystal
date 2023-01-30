@@ -25,6 +25,7 @@ export function makeAcceptMatcher(mediaTypes: string[]) {
       parameters,
       q: 1,
       originalType: t,
+      noParams: Object.keys(parameters).length === 0,
     };
   });
   const lru = new LRU({ maxLength: 50 });
@@ -46,11 +47,12 @@ export function makeAcceptMatcher(mediaTypes: string[]) {
       for (const digest of typeDigests) {
         const highestPrecedenceSpecMatch = specs.find((spec) => {
           return (
-            spec.type === "*" ||
-            (spec.type === digest.type &&
-              (spec.subtype === "*" ||
-                (spec.subtype === digest.subtype &&
-                  matchesParameters(spec.parameters, digest.parameters))))
+            (spec.type === "*" ||
+              (spec.type === digest.type &&
+                (spec.subtype === "*" || spec.subtype === digest.subtype))) &&
+            (spec.noParams ||
+              (!digest.noParams &&
+                matchesParameters(spec.parameters, digest.parameters)))
           );
         });
         if (highestPrecedenceSpecMatch) {
@@ -85,6 +87,8 @@ interface Accept {
   subtype: string;
   parameters: Record<string, string>;
   q: number;
+  /** Optimization: true if parameters has no keys */
+  noParams: boolean;
 }
 
 const SPACE = " ".charCodeAt(0);
@@ -204,6 +208,7 @@ function parseAccepts(acceptHeader: string) {
             subtype: "",
             q: 1,
             parameters: Object.create(null),
+            noParams: true,
           };
           const nextCharCode = acceptHeader.charCodeAt(++i);
           if (nextCharCode !== SLASH) {
@@ -222,6 +227,7 @@ function parseAccepts(acceptHeader: string) {
             subtype: "",
             q: 1,
             parameters: Object.create(null),
+            noParams: true,
           };
           state = State.CONTINUE_TYPE;
         } else {
@@ -295,6 +301,10 @@ function parseAccepts(acceptHeader: string) {
           }
           */
           currentAccept!.parameters[currentParameterName] = "";
+          // "q" is not a valid parameter name; it's just used for weighting.
+          if (currentParameterName !== "q") {
+            currentAccept!.noParams = false;
+          }
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
         }
