@@ -316,8 +316,8 @@ export const makeGraphQLHandler = (
     return () => err;
   }
 
-  let schema: GraphQLSchema;
-  let parseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+  let latestSchema: GraphQLSchema;
+  let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
   let wait: PromiseLike<void> | null;
 
   if (isPromiseLike(schemaOrPromise)) {
@@ -335,13 +335,13 @@ export const makeGraphQLHandler = (
           },
         );
       }
-      schema = _schema;
-      parseAndValidate = makeParseAndValidateFunction(schema);
+      latestSchema = _schema;
+      latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
       wait = null;
     });
   } else {
-    schema = schemaOrPromise;
-    parseAndValidate = makeParseAndValidateFunction(schema);
+    latestSchema = schemaOrPromise;
+    latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
   }
 
   const outputDataAsString = dynamicOptions.outputDataAsString;
@@ -412,6 +412,10 @@ export const makeGraphQLHandler = (
     if (wait) {
       await wait;
     }
+    // Get a reference to the latest versions to use for this entire operation
+    const schema = latestSchema;
+    const parseAndValidate = latestParseAndValidate;
+
     let body: ValidatedBody;
     try {
       body =
