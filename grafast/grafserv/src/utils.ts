@@ -3,7 +3,12 @@ import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { GraphQLError } from "graphql";
 import type { Readable } from "node:stream";
 
-import type { GrafservBody } from "./interfaces.js";
+import type {
+  GrafservBody,
+  NormalizedRequestDigest,
+  RequestDigest,
+} from "./interfaces.js";
+import { $$normalizedHeaders } from "./interfaces.js";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,
@@ -68,4 +73,25 @@ export function getBodyFromRequest(
     req.on("error", reject);
     req.on("data", handleData);
   });
+}
+
+export function normalizeRequest(
+  request: RequestDigest | NormalizedRequestDigest,
+): NormalizedRequestDigest {
+  if (!request[$$normalizedHeaders]) {
+    const normalized = Object.create(null);
+    for (const key in request.headers) {
+      normalized[key.toLowerCase()] = request.headers[key];
+    }
+    request[$$normalizedHeaders] = normalized;
+    request.preferJSON = Boolean(request.preferJSON);
+  }
+  return request as NormalizedRequestDigest;
+}
+
+export function httpError(
+  statusCode: number,
+  message: string,
+): Error & { statusCode: number } {
+  return Object.assign(new Error(message), { statusCode });
 }

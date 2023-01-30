@@ -11,7 +11,7 @@ import type {
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
-import { processHeaders } from "../../../utils.js";
+import { normalizeRequest, processHeaders } from "../../../utils.js";
 
 declare global {
   namespace Grafserv {
@@ -34,6 +34,9 @@ function getDigest(
     method: request.method,
     path: request.url,
     headers: processHeaders(request.headers),
+    getQueryParams() {
+      return request.query as Record<string, string>;
+    },
     getBody(_dynamicOptions) {
       return { type: "json", json: request.body as any };
     },
@@ -134,25 +137,32 @@ export class FastifyGrafserv extends GrafservBase {
   }
 
   addTo(app: FastifyInstance) {
+    // application/graphql-request+json isn't currently an official serialization format:
+    // https://graphql.github.io/graphql-over-http/draft/#sec-Media-Types
+    /*
     app.addContentTypeParser(
       "application/graphql-request+json",
       { parseAs: "string" },
       app.getDefaultJsonParser("ignore", "ignore"),
     );
+    */
 
     const dynamicOptions = this.dynamicOptions;
 
     app.route({
-      // TODO: support GraphQL over GET
-      method: "POST",
+      method:
+        this.dynamicOptions.graphqlOverGET ||
+        this.dynamicOptions.graphiqlOnGraphQLGET
+          ? ["GET", "POST"]
+          : ["POST"],
       url: this.dynamicOptions.graphqlPath,
       bodyLimit: this.dynamicOptions.maxRequestLength,
       handler: async (request, reply) => {
         const digest = getDigest(request, reply);
-        if (dynamicOptions.graphiqlOnGraphQLGET) {
-          // Consider handling this
-        }
-        const handlerResult = await this.graphqlHandler(digest);
+        const handlerResult = await this.graphqlHandler(
+          normalizeRequest(digest),
+          this.graphiqlHandler,
+        );
         const result = await convertHandlerResultToResult(handlerResult);
         return this.send(request, reply, result);
       },
@@ -165,7 +175,9 @@ export class FastifyGrafserv extends GrafservBase {
         bodyLimit: this.dynamicOptions.maxRequestLength,
         handler: async (request, reply) => {
           const digest = getDigest(request, reply);
-          const handlerResult = await this.graphiqlHandler(digest);
+          const handlerResult = await this.graphiqlHandler(
+            normalizeRequest(digest),
+          );
           const result = await convertHandlerResultToResult(handlerResult);
           return this.send(request, reply, result);
         },
@@ -182,7 +194,7 @@ export class FastifyGrafserv extends GrafservBase {
           // TODO: refactor this to use the eventStreamHandler once we write that...
           const handlerResult: EventStreamHeandlerResult = {
             type: "event-stream",
-            request: digest,
+            request: normalizeRequest(digest),
             dynamicOptions,
             payload: this.makeStream(),
             statusCode: 200,

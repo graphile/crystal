@@ -29,6 +29,9 @@ export interface ServerOptions {
   /** The path at which the GraphQL event stream would be made available; usually /graphql/stream */
   eventStreamRoute?: string;
 
+  /** If true, allow GraphQL over GET requests. This has security ramifications, exercise caution. */
+  graphqlOverGET?: boolean;
+
   graphiql?: boolean;
   /** If true, then we will render GraphiQL on GET requests to the /graphql endpoint */
   graphiqlOnGraphQLGET?: boolean;
@@ -91,28 +94,44 @@ export interface GrafservBodyBuffer {
   buffer: Buffer;
 }
 
+export interface GrafservBodyText {
+  type: "text";
+  text: string;
+}
+
 export interface GrafservBodyJSON {
   type: "json";
   json: JSONValue;
 }
 
-export type GrafservBody = GrafservBodyBuffer | GrafservBodyJSON;
+export type GrafservBody =
+  | GrafservBodyBuffer
+  | GrafservBodyText
+  | GrafservBodyJSON;
 
+export const $$normalizedHeaders = Symbol("normalizedHeaders");
 export interface RequestDigest {
   method: "HEAD" | "GET" | "POST" | string;
   httpVersionMajor: number;
   httpVersionMinor: number;
   path: string;
   headers: Record<string, string>;
+  getQueryParams: () => PromiseOrDirect<Record<string, string | string[]>>;
   getBody(dynamicOptions: OptionsFromConfig): PromiseOrDirect<GrafservBody>;
   frameworkMeta: Grafserv.RequestDigestFrameworkMeta[keyof Grafserv.RequestDigestFrameworkMeta];
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
 }
 
+export interface NormalizedRequestDigest extends RequestDigest {
+  preferJSON: boolean;
+  /** As 'headers', but with the keys lowercased */
+  [$$normalizedHeaders]: Record<string, string>;
+}
+
 interface IHandlerResult {
   type: string;
-  request: RequestDigest;
+  request: NormalizedRequestDigest;
   dynamicOptions: OptionsFromConfig;
   statusCode?: number;
 }
@@ -126,6 +145,7 @@ export interface TextHandlerResult extends IHandlerResult {
 }
 export interface GraphQLHandlerResult extends IHandlerResult {
   type: "graphql";
+  contentType: string;
   payload: ExecutionResult;
   outputDataAsString?: boolean;
 }

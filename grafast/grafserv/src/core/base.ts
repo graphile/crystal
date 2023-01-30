@@ -2,8 +2,8 @@ import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import { isPromiseLike, stringifyPayload } from "grafast";
 import { resolvePresets } from "graphile-config";
-import type { GraphQLError, GraphQLSchema } from "graphql";
-import { isSchema, validateSchema } from "graphql";
+import type { GraphQLSchema } from "graphql";
+import { GraphQLError, isSchema, validateSchema } from "graphql";
 
 import type {
   BufferResult,
@@ -11,16 +11,43 @@ import type {
   EventStreamEvent,
   GrafservConfig,
   HandlerResult,
+  NormalizedRequestDigest,
   RequestDigest,
   Result,
   SchemaChangeEvent,
 } from "../interfaces.js";
 import { mapIterator } from "../mapIterator.js";
 import { makeGraphiQLHandler } from "../middleware/graphiql.js";
-import { makeGraphQLHandler } from "../middleware/graphql.js";
+import { APPLICATION_JSON, makeGraphQLHandler } from "../middleware/graphql.js";
 import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
-import { handleErrors } from "../utils.js";
+import { handleErrors, normalizeRequest } from "../utils.js";
+
+function handleGraphQLError(
+  request: NormalizedRequestDigest,
+  dynamicOptions: OptionsFromConfig,
+  e: Error,
+) {
+  const error =
+    e instanceof GraphQLError
+      ? e
+      : new GraphQLError("Unknown error occurred", null, null, null, null, e);
+  // Special error handling for GraphQL route
+  console.error(
+    "An error occurred whilst attempting to handle the GraphQL request:",
+  );
+  console.dir(e);
+  return {
+    type: "graphql",
+    request,
+    dynamicOptions,
+    payload: { errors: [error] },
+    statusCode: 500,
+    // Fall back to application/json; this is when an unexpected error happens
+    // so it shouldn't be hit.
+    contentType: APPLICATION_JSON,
+  } as HandlerResult;
+}
 
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
@@ -62,28 +89,15 @@ export class GrafservBase {
   }
 
   private _processRequest(
-    request: RequestDigest,
+    inRequest: RequestDigest,
   ): PromiseOrDirect<HandlerResult | null> {
+    const request = normalizeRequest(inRequest);
     const dynamicOptions = this.dynamicOptions;
     try {
-      if (
-        request.path === dynamicOptions.graphqlPath &&
-        request.method === "POST"
-      ) {
-        return this.graphqlHandler(request).catch((e) => {
-          // Special error handling for GraphQL route
-          console.error(
-            "An error occurred whilst attempting to handle the GraphQL request:",
-          );
-          console.dir(e);
-          return {
-            type: "graphql",
-            request,
-            dynamicOptions,
-            payload: { errors: [e] },
-            statusCode: 500,
-          } as HandlerResult;
-        });
+      if (request.path === dynamicOptions.graphqlPath) {
+        return this.graphqlHandler(request, this.graphiqlHandler).catch((e) =>
+          handleGraphQLError(request, dynamicOptions, e),
+        );
       }
 
       // FIXME: handle 'HEAD' requests
@@ -91,9 +105,7 @@ export class GrafservBase {
       if (
         dynamicOptions.graphiql &&
         request.method === "GET" &&
-        (request.path === dynamicOptions.graphiqlPath ||
-          (dynamicOptions.graphiqlOnGraphQLGET &&
-            request.path === dynamicOptions.graphqlPath))
+        request.path === dynamicOptions.graphiqlPath
       ) {
         return this.graphiqlHandler(request);
       }
@@ -299,6 +311,7 @@ export function convertHandlerResultToResult(
       const {
         payload,
         statusCode = 200,
+        contentType,
         outputDataAsString,
         dynamicOptions,
         request: { preferJSON },
@@ -306,7 +319,7 @@ export function convertHandlerResultToResult(
 
       handleErrors(payload);
       const headers = Object.create(null);
-      headers["Content-Type"] = "application/json";
+      headers["Content-Type"] = contentType;
       if (dynamicOptions.watch) {
         headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamRoute;
       }

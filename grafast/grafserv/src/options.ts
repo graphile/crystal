@@ -1,6 +1,7 @@
 export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
   const {
     graphqlPath = "/graphql",
+    graphqlOverGET = false,
     graphiql = true,
     graphiqlOnGraphQLGET = true,
     graphiqlPath = "/",
@@ -13,6 +14,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
   return {
     outputDataAsString,
     graphqlPath,
+    graphqlOverGET,
     graphiql,
     graphiqlOnGraphQLGET,
     graphiqlPath,
