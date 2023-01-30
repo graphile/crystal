@@ -252,7 +252,10 @@ function parseAccepts(acceptHeader: string) {
         break;
       }
       case State.EXPECT_SUBTYPE: {
-        if (isToken(charCode)) {
+        if (charCode === ASTERISK) {
+          currentAccept!.subtype = "*";
+          state = State.EXPECT_COMMA_OR_SEMICOLON;
+        } else if (isToken(charCode)) {
           currentAccept!.subtype = acceptHeader[i];
           state = State.CONTINUE_SUBTYPE;
         } else {
@@ -268,6 +271,8 @@ function parseAccepts(acceptHeader: string) {
           next();
         } else if (isToken(charCode)) {
           currentAccept!.subtype += acceptHeader[i];
+        } else if (isWhitespace(charCode)) {
+          state = State.EXPECT_COMMA_OR_SEMICOLON;
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
         }
