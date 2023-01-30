@@ -489,7 +489,7 @@ export const makeGraphQLHandler = (
     await hookArgs(
       args,
       {
-        request,
+        http: request,
       },
       resolvedPreset,
     );

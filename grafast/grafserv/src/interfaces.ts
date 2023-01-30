@@ -74,7 +74,7 @@ declare global {
      */
     interface GraphQLRequestContext {
       // TODO: add things like operationName, operation, etc?
-      request?: NormalizedRequestDigest;
+      http?: NormalizedRequestDigest;
     }
     interface Preset {
       server?: ServerOptions;
