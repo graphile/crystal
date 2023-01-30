@@ -17,43 +17,49 @@ declare global {
   }
 }
 
-function getDigest(
-  dynamicOptions: OptionsFromConfig,
-  req: IncomingMessage,
-  res: ServerResponse,
-): RequestDigest {
-  return {
-    httpVersionMajor: req.httpVersionMajor,
-    httpVersionMinor: req.httpVersionMinor,
-    method: req.method!,
-    path: req.url!,
-    headers: processHeaders(req.headers),
-    getQueryParams() {
-      const qi = req.url!.indexOf("?");
-      const search = qi >= 0 ? req.url!.substring(qi) : null;
-      const queryParams = search
-        ? parseQueryString(search)
-        : Object.create(null);
-      return queryParams;
-    },
-    getBody() {
-      return getBodyFromRequest(req, dynamicOptions.maxRequestLength);
-    },
-    meta: {
-      node: {
-        req,
-        res,
-      },
-    },
-  };
-}
-
 export class NodeGrafserv extends GrafservBase {
   constructor(config: GrafservConfig) {
     super(config);
   }
 
-  public createHandler(): (
+  protected getDigest(
+    dynamicOptions: OptionsFromConfig,
+    req: IncomingMessage,
+    res: ServerResponse,
+    isHTTPS: boolean,
+  ): RequestDigest {
+    const reqUrl = req.url!;
+    const qi = reqUrl.indexOf("?");
+    const path = qi >= 0 ? reqUrl.substring(0, qi) : reqUrl;
+    const search = qi >= 0 ? reqUrl.substring(qi + 1) : null;
+    return {
+      httpVersionMajor: req.httpVersionMajor,
+      httpVersionMinor: req.httpVersionMinor,
+      isSecure: isHTTPS,
+      method: req.method!,
+      path,
+      headers: processHeaders(req.headers),
+      getQueryParams() {
+        const queryParams = search
+          ? parseQueryString(search)
+          : Object.create(null);
+        return queryParams;
+      },
+      getBody() {
+        return getBodyFromRequest(req, dynamicOptions.maxRequestLength);
+      },
+      meta: {
+        node: {
+          req,
+          res,
+        },
+      },
+    };
+  }
+
+  public createHandler(
+    isHTTPS = false,
+  ): (
     req: IncomingMessage,
     res: ServerResponse,
     next?: (err?: Error) => void,
@@ -62,7 +68,7 @@ export class NodeGrafserv extends GrafservBase {
     // FIXME: 'async' here is risky
     return async (req, res, next) => {
       try {
-        const request = getDigest(dynamicOptions, req, res);
+        const request = this.getDigest(dynamicOptions, req, res, isHTTPS);
         const result = await this.processRequest(request);
 
         if (result === null) {

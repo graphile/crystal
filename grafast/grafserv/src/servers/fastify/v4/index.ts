@@ -31,6 +31,8 @@ function getDigest(
   return {
     httpVersionMajor: request.raw.httpVersionMajor,
     httpVersionMinor: request.raw.httpVersionMinor,
+    // TODO: check Fastify respects X-Forwarded-Proto when configured to trust the proxy
+    isSecure: request.protocol === "https",
     method: request.method,
     path: request.url,
     headers: processHeaders(request.headers),

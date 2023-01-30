@@ -114,6 +114,7 @@ export interface RequestDigest {
   method: "HEAD" | "GET" | "POST" | string;
   httpVersionMajor: number;
   httpVersionMinor: number;
+  isSecure: boolean;
   path: string;
   headers: Record<string, string>;
   getQueryParams: () => PromiseOrDirect<Record<string, string | string[]>>;
