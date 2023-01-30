@@ -268,7 +268,7 @@ function parseAccepts(acceptHeader: string) {
           // Parameters
           state = State.EXPECT_PARAMETER_NAME;
         } else if (charCode === COMMA) {
-          next();
+          /*@__INLINE__*/ next();
         } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentAccept!.subtype += acceptHeader[i];
         } else if (/*@__INLINE__*/ isWhitespace(charCode)) {
@@ -284,7 +284,7 @@ function parseAccepts(acceptHeader: string) {
         } else if (charCode === SEMICOLON) {
           state = State.EXPECT_PARAMETER_NAME;
         } else if (charCode === COMMA) {
-          next();
+          /*@__INLINE__*/ next();
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
         }
@@ -355,7 +355,7 @@ function parseAccepts(acceptHeader: string) {
           // Parameters
           state = State.EXPECT_PARAMETER_NAME;
         } else if (charCode === COMMA) {
-          next();
+          /*@__INLINE__*/ next();
         } else if (/*@__INLINE__*/ isToken(charCode)) {
           currentAccept!.parameters[currentParameterName] += acceptHeader[i];
         } else {
@@ -370,7 +370,7 @@ function parseAccepts(acceptHeader: string) {
     }
   }
   if (state !== State.EXPECT_TYPE) {
-    next();
+    /*@__INLINE__*/ next();
   }
 
   // Sort `accepts` by precedence. Precedence is how accurate the match is:
