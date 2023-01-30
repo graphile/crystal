@@ -327,8 +327,6 @@ function parseAccepts(acceptHeader: string) {
         } else if (/*@__INLINE__*/ isToken(charCode)) {
           state = State.CONTINUE_PARAMETER_VALUE;
           currentAccept!.parameters[currentParameterName] += acceptHeader[i];
-        } else if (charCode === EQUALS) {
-          state = State.EXPECT_PARAMETER_VALUE;
         } else {
           throw new Error(`Unexpected character '${acceptHeader[i]}'`);
         }
