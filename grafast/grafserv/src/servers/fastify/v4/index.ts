@@ -16,7 +16,7 @@ import { normalizeRequest, processHeaders } from "../../../utils.js";
 declare global {
   namespace Grafserv {
     interface RequestDigestFrameworkMeta {
-      fastify: {
+      fastifyv4: {
         request: FastifyRequest;
         reply: FastifyReply;
       };
@@ -37,12 +37,14 @@ function getDigest(
     getQueryParams() {
       return request.query as Record<string, string>;
     },
-    getBody(_dynamicOptions) {
+    getBody() {
       return { type: "json", json: request.body as any };
     },
-    frameworkMeta: {
-      request,
-      reply,
+    meta: {
+      fastifyv4: {
+        request,
+        reply,
+      },
     },
     preferJSON: true,
   };

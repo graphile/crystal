@@ -4,6 +4,7 @@ import { parse as parseQueryString } from "node:querystring";
 import { GrafservBase } from "../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
 import { getBodyFromRequest, processHeaders } from "../../utils.js";
+import type { OptionsFromConfig } from "../../options.js";
 
 declare global {
   namespace Grafserv {
@@ -16,7 +17,11 @@ declare global {
   }
 }
 
-function getDigest(req: IncomingMessage, res: ServerResponse): RequestDigest {
+function getDigest(
+  dynamicOptions: OptionsFromConfig,
+  req: IncomingMessage,
+  res: ServerResponse,
+): RequestDigest {
   return {
     httpVersionMajor: req.httpVersionMajor,
     httpVersionMinor: req.httpVersionMinor,
@@ -31,12 +36,14 @@ function getDigest(req: IncomingMessage, res: ServerResponse): RequestDigest {
         : Object.create(null);
       return queryParams;
     },
-    getBody(dynamicOptions) {
+    getBody() {
       return getBodyFromRequest(req, dynamicOptions.maxRequestLength);
     },
-    frameworkMeta: {
-      req,
-      res,
+    meta: {
+      node: {
+        req,
+        res,
+      },
     },
   };
 }
@@ -55,7 +62,7 @@ export class NodeGrafserv extends GrafservBase {
     // FIXME: 'async' here is risky
     return async (req, res, next) => {
       try {
-        const request = getDigest(req, res);
+        const request = getDigest(dynamicOptions, req, res);
         const result = await this.processRequest(request);
 
         if (result === null) {

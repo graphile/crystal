@@ -75,16 +75,34 @@ export function getBodyFromRequest(
   });
 }
 
+export function memo<T>(fn: () => T): () => T {
+  let cache: T;
+  let called = false;
+  return function memoized(this: any) {
+    if (called) {
+      return cache;
+    } else {
+      called = true;
+      cache = fn.call(this);
+      return cache;
+    }
+  };
+}
+
 export function normalizeRequest(
   request: RequestDigest | NormalizedRequestDigest,
 ): NormalizedRequestDigest {
   if (!request[$$normalizedHeaders]) {
+    const r = request as NormalizedRequestDigest;
     const normalized = Object.create(null);
-    for (const key in request.headers) {
-      normalized[key.toLowerCase()] = request.headers[key];
+    for (const key in r.headers) {
+      normalized[key.toLowerCase()] = r.headers[key];
     }
-    request[$$normalizedHeaders] = normalized;
-    request.preferJSON = Boolean(request.preferJSON);
+    r[$$normalizedHeaders] = normalized;
+    r.preferJSON = Boolean(r.preferJSON);
+    r.getHeader = (key) => normalized[key.toLowerCase()];
+    r.getBody = memo(r.getBody);
+    r.getQueryParams = memo(r.getQueryParams);
   }
   return request as NormalizedRequestDigest;
 }

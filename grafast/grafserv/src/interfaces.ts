@@ -74,7 +74,7 @@ declare global {
      */
     interface GraphQLRequestContext {
       // TODO: add things like operationName, operation, etc?
-      request?: RequestDigest;
+      request?: NormalizedRequestDigest;
     }
     interface Preset {
       server?: ServerOptions;
@@ -117,16 +117,20 @@ export interface RequestDigest {
   path: string;
   headers: Record<string, string>;
   getQueryParams: () => PromiseOrDirect<Record<string, string | string[]>>;
-  getBody(dynamicOptions: OptionsFromConfig): PromiseOrDirect<GrafservBody>;
-  frameworkMeta: Grafserv.RequestDigestFrameworkMeta[keyof Grafserv.RequestDigestFrameworkMeta];
+  getBody(): PromiseOrDirect<GrafservBody>;
+  meta: Partial<Grafserv.RequestDigestFrameworkMeta>;
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
 }
 
 export interface NormalizedRequestDigest extends RequestDigest {
   preferJSON: boolean;
-  /** As 'headers', but with the keys lowercased */
+  /**
+   * As 'headers', but with the keys lowercased
+   * @internal
+   */
   [$$normalizedHeaders]: Record<string, string>;
+  getHeader(name: string): string | undefined;
 }
 
 interface IHandlerResult {
