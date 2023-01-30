@@ -56,7 +56,7 @@ export function makeAcceptMatcher(mediaTypes: string[]) {
           );
         });
         if (highestPrecedenceSpecMatch) {
-          if (!bestMediaType || highestPrecedenceSpecMatch.q > bestQ) {
+          if (bestMediaType === null || highestPrecedenceSpecMatch.q > bestQ) {
             bestQ = highestPrecedenceSpecMatch.q;
             bestMediaType = digest.originalType;
           }
@@ -80,8 +80,6 @@ function matchesParameters(
   return true;
 }
 
-type TypeDigest = Accept & { originalType: string };
-
 interface Accept {
   type: string;
   subtype: string;
@@ -89,6 +87,10 @@ interface Accept {
   q: number;
   /** Optimization: true if parameters has no keys */
   noParams: boolean;
+}
+
+interface TypeDigest extends Accept {
+  originalType: string;
 }
 
 const SPACE = " ".charCodeAt(0);
