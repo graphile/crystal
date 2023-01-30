@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy();
+#> schema: ["js_reserved"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  await(_proto__: 1, constructor: 2, hasOwnProperty: 3, yield: 4)
+  case(_proto__: 10, constructor: 10, hasOwnProperty: 10, yield: 10)
+  valueOf(_proto__: 2, constructor: 4, hasOwnProperty: 6, yield: 8)
+  nullById(id: 1) {
+    yield(_proto__: 1, constructor: 2, valueOf: 3, yield: 4)
+    break
+  }
+}

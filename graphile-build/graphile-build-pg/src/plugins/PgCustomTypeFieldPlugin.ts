@@ -299,7 +299,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         return this.listField(this.computedColumnField(details));
       },
       argument(options, details) {
-        return this.camelCase(details.param.name || `arg${details.index}`);
+        return this.coerceToGraphQLName(
+          this.camelCase(details.param.name || `arg${details.index}`),
+        );
       },
       recordFunctionConnectionType(options, details) {
         return this.connectionType(
