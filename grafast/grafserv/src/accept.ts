@@ -205,9 +205,10 @@ function parseAccepts(acceptHeader: string) {
         if (isWhitespace(charCode)) {
           continue;
         } else if (charCode === ASTERISK) {
+          // `*/*`
           currentAccept = {
             type: "*",
-            subtype: "",
+            subtype: "*",
             q: 1,
             parameters: Object.create(null),
             noParams: true,
@@ -216,13 +217,11 @@ function parseAccepts(acceptHeader: string) {
           if (nextCharCode !== SLASH) {
             throw new Error("Expected '/' after '*'");
           }
-          if (acceptHeader.charCodeAt(i + 1) === ASTERISK) {
-            ++i;
-            currentAccept.subtype = "*";
-            state = State.EXPECT_COMMA_OR_SEMICOLON;
-          } else {
-            state = State.EXPECT_SUBTYPE;
+          const nextNextCharCode = acceptHeader.charCodeAt(++i);
+          if (nextNextCharCode !== ASTERISK) {
+            throw new Error("Expected '*' after '*/'");
           }
+          state = State.EXPECT_COMMA_OR_SEMICOLON;
         } else if (isToken(charCode)) {
           currentAccept = {
             type: acceptHeader[i],
