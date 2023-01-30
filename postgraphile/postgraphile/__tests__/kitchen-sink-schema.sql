@@ -1639,6 +1639,6 @@ create function js_reserved.null_yield(n js_reserved.null, yield int, __proto__ 
 $$ language sql stable;
 
 /* This function should never appear in the schema */
-create function js_reserved.__proto__(yield int, constructor int,) returns int as $$
+create function js_reserved.__proto__(yield int, constructor int) returns int as $$
   select yield + constructor;
 $$ language sql stable;
