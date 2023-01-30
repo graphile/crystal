@@ -3,8 +3,8 @@ import { parse as parseQueryString } from "node:querystring";
 
 import { GrafservBase } from "../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
-import { getBodyFromRequest, processHeaders } from "../../utils.js";
 import type { OptionsFromConfig } from "../../options.js";
+import { getBodyFromRequest, processHeaders } from "../../utils.js";
 
 declare global {
   namespace Grafserv {

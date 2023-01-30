@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
-import { OptionsFromConfig } from "../../../options.js";
+import type { OptionsFromConfig } from "../../../options.js";
 import { getBodyFromRequest, processHeaders } from "../../../utils.js";
 import { NodeGrafserv } from "../../node/index.js";
 
