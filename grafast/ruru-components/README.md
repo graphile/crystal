@@ -1,6 +1,6 @@
 # ruru-components
 
-The React components behind [ruru](), in case you want to embed Ruru into an
+The React components behind [ruru][], in case you want to embed Ruru into an
 existing React project.
 
 **PRERELEASE**: this is pre-release software; use at your own risk and do not
