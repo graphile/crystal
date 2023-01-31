@@ -65,7 +65,8 @@
   "files": [
     "dist",
     "bundle",
-    "index.js"
+    "index.js",
+    "ruru.css"
   ],
   "devDependencies": {
     "@types/codemirror": "^5.60.5",
