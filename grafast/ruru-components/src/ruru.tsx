@@ -1,7 +1,3 @@
-import "graphiql/graphiql.css";
-import "@graphiql/plugin-explorer/dist/style.css";
-import "../ruru.css";
-
 import { useExplorerPlugin } from "@graphiql/plugin-explorer";
 import {
   CopyIcon,

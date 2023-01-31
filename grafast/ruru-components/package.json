@@ -1,0 +1,73 @@
+{
+  "name": "ruru-components",
+  "version": "2.0.0-0.4",
+  "description": "Grafast-flavoured GraphiQL distribution; the underlying React components",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./ruru.css": {
+      "default": "./ruru.css"
+    }
+  },
+  "scripts": {
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/heart.git"
+  },
+  "keywords": [
+    "graphile",
+    "graphql",
+    "graphiql",
+    "graphite",
+    "ruru",
+    "react",
+    "components"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/heart/issues"
+  },
+  "homepage": "https://grafast.org/ruru/",
+  "dependencies": {
+    "@graphiql/plugin-explorer": "^0.1.12",
+    "@graphiql/react": "^0.15.0",
+    "@graphiql/toolkit": "^0.8.0",
+    "@types/node": "^16.11.15",
+    "graphiql": "^2.2.0",
+    "mermaid": "^8.14.0",
+    "react": ">=16 <17",
+    "react-dom": ">=16 <17",
+    "tslib": "^2.4.0"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "peerDependencies": {
+    "graphql": "^16.1.0-experimental-stream-defer.6"
+  },
+  "files": [
+    "dist",
+    "index.js",
+    "ruru.css"
+  ],
+  "devDependencies": {
+    "@types/codemirror": "^5.60.5",
+    "@types/debug": "^4.1.7",
+    "@types/jest": "^27.5.1",
+    "@types/nodemon": "1.19.1",
+    "@types/react": "^18",
+    "@types/react-dom": "^18.0.0",
+    "graphql": "16.1.0-experimental-stream-defer.6",
+    "jest": "^28.1.0",
+    "nodemon": "^2.0.15",
+    "typescript": "^4.8.1-rc"
+  }
+}

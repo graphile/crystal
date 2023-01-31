@@ -43,18 +43,10 @@
   },
   "homepage": "https://grafast.org/ruru/",
   "dependencies": {
-    "@graphiql/plugin-explorer": "^0.1.12",
-    "@graphiql/react": "^0.15.0",
-    "@graphiql/toolkit": "^0.8.0",
-    "@types/node": "^16.11.15",
-    "@types/yargs": "^17.0.10",
     "graphile-config": "workspace:^",
-    "graphiql": "^2.2.0",
-    "mermaid": "^8.14.0",
-    "react": ">=16 <17",
-    "react-dom": ">=16 <17",
+    "http-proxy": "^1.18.1",
     "tslib": "^2.4.0",
-    "yargs": "^17.4.1"
+    "yargs": "^17.6.2"
   },
   "engines": {
     "node": ">=16"
@@ -65,27 +57,18 @@
   "files": [
     "dist",
     "bundle",
-    "index.js",
-    "ruru.css"
+    "index.js"
   ],
   "devDependencies": {
-    "@types/codemirror": "^5.60.5",
-    "@types/debug": "^4.1.7",
     "@types/http-proxy": "^1",
-    "@types/jest": "^27.5.1",
-    "@types/nodemon": "1.19.1",
-    "@types/react": "^18",
-    "@types/react-dom": "^18.0.0",
+    "@types/yargs": "^17.0.21",
     "css-loader": "^6.7.1",
     "file-loader": "^6.2.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
-    "http-proxy": "^1.18.1",
-    "jest": "^28.1.0",
-    "nodemon": "^2.0.15",
+    "ruru-components": "workspace:^",
     "style-loader": "^3.3.1",
     "svg-inline-loader": "^0.8.2",
     "ts-loader": "^9.3.1",
-    "ts-node": "^10.9.1",
     "typescript": "^4.8.1-rc",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2"
