@@ -1,6 +1,10 @@
 import type { GraphiQLProps } from "graphiql";
-import { GraphQLError, GraphQLSchema } from "graphql";
-import { buildClientSchema, getIntrospectionQuery } from "graphql";
+import type { GraphQLSchema } from "graphql";
+import {
+  buildClientSchema,
+  getIntrospectionQuery,
+  GraphQLError,
+} from "graphql";
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 

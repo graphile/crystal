@@ -1,8 +1,9 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
 import "graphiql/graphiql.css";
 import "@graphiql/plugin-explorer/dist/style.css";
 import "ruru-components/ruru.css";
+
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 // TODO: React 18:
 // import { createRoot } from "react-dom/client";
