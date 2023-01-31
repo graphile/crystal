@@ -1,5 +1,15 @@
 # ruru
 
+## 2.0.0-0.5
+
+### Patch Changes
+
+- [`9b296ba54`](undefined) - More secure, more compatible, and lots of fixes
+  across the monorepo
+
+- Updated dependencies [[`9b296ba54`](undefined)]:
+  - graphile-config@0.0.1-0.2
+
 ## 2.0.0-0.4
 
 ### Patch Changes

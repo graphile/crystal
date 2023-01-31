@@ -1,5 +1,12 @@
 # pg-introspection
 
+## 0.0.1-0.1
+
+### Patch Changes
+
+- [`9b296ba54`](undefined) - More secure, more compatible, and lots of fixes
+  across the monorepo
+
 ## 0.0.1-0.0
 
 ### Patch Changes

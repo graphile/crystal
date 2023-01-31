@@ -1,5 +1,17 @@
 # @dataplan/pg
 
+## 0.0.1-0.8
+
+### Patch Changes
+
+- [`9b296ba54`](undefined) - More secure, more compatible, and lots of fixes
+  across the monorepo
+
+- Updated dependencies [[`9b296ba54`](undefined)]:
+  - grafast@0.0.1-0.6
+  - pg-sql2@5.0.0-0.2
+  - @dataplan/json@0.0.1-0.6
+
 ## 0.0.1-0.7
 
 ### Patch Changes

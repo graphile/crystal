@@ -1,5 +1,17 @@
 # grafserv
 
+## 0.0.1-0.7
+
+### Patch Changes
+
+- [`9b296ba54`](undefined) - More secure, more compatible, and lots of fixes
+  across the monorepo
+
+- Updated dependencies [[`9b296ba54`](undefined)]:
+  - grafast@0.0.1-0.6
+  - ruru@2.0.0-0.5
+  - graphile-config@0.0.1-0.2
+
 ## 0.0.1-0.6
 
 ### Patch Changes

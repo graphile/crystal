@@ -1,5 +1,19 @@
 # graphile-utils
 
+## 5.0.0-0.9
+
+### Patch Changes
+
+- [`9b296ba54`](undefined) - More secure, more compatible, and lots of fixes
+  across the monorepo
+
+- Updated dependencies [[`9b296ba54`](undefined)]:
+  - grafast@0.0.1-0.6
+  - graphile-build@5.0.0-0.7
+  - graphile-build-pg@5.0.0-0.9
+  - graphile-config@0.0.1-0.2
+  - pg-introspection@0.0.1-0.1
+
 ## 5.0.0-0.8
 
 ### Patch Changes
