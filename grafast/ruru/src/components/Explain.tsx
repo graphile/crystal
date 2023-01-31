@@ -22,7 +22,9 @@ export const Explain: FC<{
               WARNING: you&apos;ve not enabled the &apos;explain&apos;
               functionality
             </p>
-            <button onClick={() => setExplain(true)}>Enable explain</button>
+            <p>
+              <button onClick={() => setExplain(true)}>Enable explain</button>
+            </p>
           </>
         ) : (
           <p>
@@ -33,7 +35,9 @@ export const Explain: FC<{
       ) : results.operations.length === 0 ? (
         <p>Empty explain results</p>
       ) : (
-        <ExplainMain helpers={helpers} results={results} />
+        <div>
+          <ExplainMain helpers={helpers} results={results} />
+        </div>
       )}
     </>
   );
@@ -118,69 +122,17 @@ export const ExplainMain: FC<{
             </div>
             {expanded
               ? createPortal(
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "1rem",
-                      left: "1rem",
-                      bottom: "1rem",
-                      right: "1rem",
-                      borderRadius: "1rem",
-                      backgroundColor: "white",
-                      border: "1px solid black",
-                      boxShadow: "rgba(0,0,0,0.8) 3px 3px 15px",
-                      overflow: "hidden",
-                      padding: "1rem",
-                      zIndex: 1000,
-                      fontFamily: '"Roboto", sans-serif',
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: "2rem",
-                        textAlign: "center",
-                        fontSize: "1.5rem",
-                      }}
-                    >
-                      Operation Plan
-                    </div>
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        right: 0,
-                      }}
-                    >
+                  <div className="explainExpandedContainer">
+                    <div className="explainExpandedTitle">Operation Plan</div>
+                    <div className="explainExpandedCloseContainer">
                       <button
-                        style={{
-                          fontSize: "2rem",
-                          padding: 0,
-                          margin: 0,
-                          background: "transparent",
-                          border: "none",
-                          outline: "none",
-                          width: "2rem",
-                          height: "2rem",
-                        }}
+                        className="explainExpandedCloseButton"
                         onClick={() => setExpanded(false)}
                       >
                         &times;
                       </button>
                     </div>
-                    <div
-                      style={{
-                        overflow: "auto",
-                        position: "absolute",
-                        top: "2rem",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                      }}
-                    >
+                    <div className="explainExpandedMain">
                       <Mermaid diagram={selectedResult.diagram} />
                     </div>
                   </div>,
