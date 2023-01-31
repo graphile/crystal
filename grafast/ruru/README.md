@@ -9,10 +9,10 @@ documentation.
 
 ## Usage - CLI
 
-We recommend that you install this alongside `http-proxy`:
+Install Ruru:
 
 ```
-yarn add http-proxy ruru
+yarn add ruru
 ```
 
 Then you can run something like the following to automatically proxy requests
@@ -64,7 +64,10 @@ Options:
 ## Usage - library
 
 ```js
-import { Ruru } from "ruru";
+import { Ruru } from "ruru-components";
+import "graphiql/graphiql.css";
+import "@graphiql/plugin-explorer/dist/style.css";
+import "ruru-components/ruru.css";
 
 React.render(<Ruru endpoint="/graphql" />);
 ```

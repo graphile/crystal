@@ -6532,7 +6532,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/yargs@npm:^17.0.10, @types/yargs@npm:^17.0.8":
+"@types/yargs@npm:^17.0.21":
+  version: 17.0.21
+  resolution: "@types/yargs@npm:17.0.21"
+  dependencies:
+    "@types/yargs-parser": "npm:*"
+  checksum: 21258d1405265499cbfa4c49aba511675707865a153645b5ffe8e8c0550605f22f0fcb46e0c9780deb9fd0d0caf484edd252ea815784c586013b0bd5b7288800
+  languageName: node
+  linkType: hard
+
+"@types/yargs@npm:^17.0.8":
   version: 17.0.10
   resolution: "@types/yargs@npm:17.0.10"
   dependencies:
@@ -19917,42 +19926,54 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ruru@workspace:^, ruru@workspace:grafast/ruru":
+"ruru-components@workspace:^, ruru-components@workspace:grafast/ruru-components":
   version: 0.0.0-use.local
-  resolution: "ruru@workspace:grafast/ruru"
+  resolution: "ruru-components@workspace:grafast/ruru-components"
   dependencies:
     "@graphiql/plugin-explorer": "npm:^0.1.12"
     "@graphiql/react": "npm:^0.15.0"
     "@graphiql/toolkit": "npm:^0.8.0"
     "@types/codemirror": "npm:^5.60.5"
     "@types/debug": "npm:^4.1.7"
-    "@types/http-proxy": "npm:^1"
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:^16.11.15"
     "@types/nodemon": "npm:1.19.1"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18.0.0"
-    "@types/yargs": "npm:^17.0.10"
-    css-loader: "npm:^6.7.1"
-    file-loader: "npm:^6.2.0"
-    graphile-config: "workspace:^"
     graphiql: "npm:^2.2.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
-    http-proxy: "npm:^1.18.1"
     jest: "npm:^28.1.0"
     mermaid: "npm:^8.14.0"
     nodemon: "npm:^2.0.15"
     react: "npm:>=16 <17"
     react-dom: "npm:>=16 <17"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^4.8.1-rc"
+  peerDependencies:
+    graphql: ^16.1.0-experimental-stream-defer.6
+  languageName: unknown
+  linkType: soft
+
+"ruru@workspace:^, ruru@workspace:grafast/ruru":
+  version: 0.0.0-use.local
+  resolution: "ruru@workspace:grafast/ruru"
+  dependencies:
+    "@types/http-proxy": "npm:^1"
+    "@types/yargs": "npm:^17.0.21"
+    css-loader: "npm:^6.7.1"
+    file-loader: "npm:^6.2.0"
+    graphile-config: "workspace:^"
+    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    http-proxy: "npm:^1.18.1"
+    ruru-components: "workspace:^"
     style-loader: "npm:^3.3.1"
     svg-inline-loader: "npm:^0.8.2"
     ts-loader: "npm:^9.3.1"
-    ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
     webpack: "npm:^5.72.0"
     webpack-cli: "npm:^4.9.2"
-    yargs: "npm:^17.4.1"
+    yargs: "npm:^17.6.2"
   peerDependencies:
     graphql: ^16.1.0-experimental-stream-defer.6
   bin:
@@ -23430,7 +23451,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^17.1.1":
+"yargs@npm:^17.1.1, yargs@npm:^17.6.2":
   version: 17.6.2
   resolution: "yargs@npm:17.6.2"
   dependencies:

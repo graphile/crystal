@@ -10,11 +10,8 @@
 
     "noUncheckedIndexedAccess": false,
     "moduleResolution": "Nodenext",
-    "module": "nodenext"
+    "module": "commonjs"
   },
   "include": ["src"],
-  "references": [
-    { "path": "../../utils/graphile-config" },
-    { "path": "../ruru-components" }
-  ]
+  "references": []
 }
