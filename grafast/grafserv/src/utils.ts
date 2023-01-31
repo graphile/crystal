@@ -5,6 +5,7 @@ import type { Readable } from "node:stream";
 
 import type {
   GrafservBody,
+  JSONValue,
   NormalizedRequestDigest,
   RequestDigest,
 } from "./interfaces.js";
@@ -73,6 +74,29 @@ export function getBodyFromRequest(
     req.on("error", reject);
     req.on("data", handleData);
   });
+}
+
+export function getBodyFromFrameworkBody(body: unknown): GrafservBody {
+  if (typeof body === "string") {
+    return {
+      type: "text",
+      text: body,
+    };
+  } else if (Buffer.isBuffer(body)) {
+    return {
+      type: "buffer",
+      buffer: body,
+    };
+  } else if (typeof body === "object" && body != null) {
+    return {
+      type: "json",
+      json: body as JSONValue,
+    };
+  } else {
+    throw new Error(
+      `Grafserv Express adaptor doesn't know how to interpret this request body`,
+    );
+  }
 }
 
 export function memo<T>(fn: () => T): () => T {

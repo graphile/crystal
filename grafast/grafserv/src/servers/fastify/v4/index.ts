@@ -11,7 +11,11 @@ import type {
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
-import { normalizeRequest, processHeaders } from "../../../utils.js";
+import {
+  getBodyFromFrameworkBody,
+  normalizeRequest,
+  processHeaders,
+} from "../../../utils.js";
 
 declare global {
   namespace GraphileConfig {
@@ -40,7 +44,7 @@ function getDigest(
       return request.query as Record<string, string>;
     },
     getBody() {
-      return { type: "json", json: request.body as any };
+      return getBodyFromFrameworkBody(request.body);
     },
     requestContext: {
       fastifyv4: {

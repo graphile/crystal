@@ -5,7 +5,11 @@ import { PassThrough } from "node:stream";
 import { GrafservBase } from "../../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
 import type { OptionsFromConfig } from "../../../options.js";
-import { getBodyFromRequest, processHeaders } from "../../../utils.js";
+import {
+  getBodyFromFrameworkBody,
+  getBodyFromRequest,
+  processHeaders,
+} from "../../../utils.js";
 
 declare global {
   namespace GraphileConfig {
@@ -34,8 +38,7 @@ function getDigest(
     },
     getBody() {
       if ("body" in ctx.request) {
-        // FIXME: not necessarily JSON, e.g. if parsing form?
-        return { type: "json", json: (ctx.request as any).body };
+        return getBodyFromFrameworkBody(ctx.request.body);
       } else {
         // No koa-bodyparser, let's just read the body ourself
         return getBodyFromRequest(ctx.req, dynamicOptions.maxRequestLength);

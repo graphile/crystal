@@ -2,7 +2,11 @@ import type { Express, Request, Response } from "express";
 
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
 import type { OptionsFromConfig } from "../../../options.js";
-import { getBodyFromRequest, processHeaders } from "../../../utils.js";
+import {
+  getBodyFromFrameworkBody,
+  getBodyFromRequest,
+  processHeaders,
+} from "../../../utils.js";
 import { NodeGrafserv } from "../../node/index.js";
 
 declare global {
@@ -33,9 +37,11 @@ export class ExpressGrafserv extends NodeGrafserv {
         return req.query as Record<string, string | string[]>;
       },
       getBody() {
-        return (
-          req.body ?? getBodyFromRequest(req, dynamicOptions.maxRequestLength)
-        );
+        if (req.body != null) {
+          return getBodyFromFrameworkBody(req.body);
+        } else {
+          return getBodyFromRequest(req, dynamicOptions.maxRequestLength);
+        }
       },
       requestContext: {
         expressv4: {
