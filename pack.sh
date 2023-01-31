@@ -25,6 +25,13 @@ yarn pack -o package.tgz
 mv package.tgz ../../builds/graphile-config.tgz
 cd -
 
+# ruru-components
+cd grafast/ruru-components
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/ruru-components.tgz
+cd -
+
 # ruru
 cd grafast/ruru
 rm -f *.tgz

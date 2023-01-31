@@ -5,6 +5,7 @@ cd ..
 tar tzf postgraphile-private/builds/graphile__lru.tgz
 tar tzf postgraphile-private/builds/tamedevil.tgz
 tar tzf postgraphile-private/builds/graphile-config.tgz
+tar tzf postgraphile-private/builds/ruru-components.tgz
 tar tzf postgraphile-private/builds/ruru.tgz
 tar tzf postgraphile-private/builds/grafast.tgz
 tar tzf postgraphile-private/builds/grafserv.tgz
@@ -27,6 +28,7 @@ case $doit in
     npm publish --access=public --tag=prealpha postgraphile-private/builds/graphile__lru.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/tamedevil.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/graphile-config.tgz
+    npm publish --access=public --tag=prealpha postgraphile-private/builds/ruru-components.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/ruru.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/grafast.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/grafserv.tgz
