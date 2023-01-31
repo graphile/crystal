@@ -22,7 +22,9 @@ export const Explain: FC<{
               WARNING: you&apos;ve not enabled the &apos;explain&apos;
               functionality
             </p>
-            <button onClick={() => setExplain(true)}>Enable explain</button>
+            <p>
+              <button onClick={() => setExplain(true)}>Enable explain</button>
+            </p>
           </>
         ) : (
           <p>
@@ -33,7 +35,9 @@ export const Explain: FC<{
       ) : results.operations.length === 0 ? (
         <p>Empty explain results</p>
       ) : (
-        <ExplainMain helpers={helpers} results={results} />
+        <div>
+          <ExplainMain helpers={helpers} results={results} />
+        </div>
       )}
     </>
   );
