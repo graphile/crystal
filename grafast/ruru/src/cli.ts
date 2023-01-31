@@ -66,7 +66,11 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const createProxyServer = enableProxy
     ? await tryLoadHttpProxyCreateProxyServer()
     : null;
-  const proxy = createProxyServer?.({ target: endpoint, ws: true });
+  const proxy = createProxyServer?.({
+    target: endpoint,
+    ws: true,
+    changeOrigin: true,
+  });
   if (enableProxy && !proxy) {
     throw new Error(
       "Failed to create a proxy - please be sure to install the 'http-proxy' module alongside 'ruru'",

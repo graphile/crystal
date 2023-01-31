@@ -7,6 +7,19 @@ embed into public-facing projects. This will likely change a lot before it's
 ultimately released. The pre-release nature also explains the shocking lack of
 documentation.
 
+## Usage - Instant!
+
+If you have Node installed, you can instantly run `ruru` without permanently
+installing it using the `npx` command. Here's an example command to explore
+[@trevorblades](https://twitter.com/trevorblades)'s countries API:
+
+```
+npx ruru -SPe https://countries.trevorblades.com/graphql
+```
+
+(`-S` enables subscriptions, `-P` proxies GraphQL requests; neither of these are
+needed for Trevor's API, but you might want them for your API.)
+
 ## Usage - CLI
 
 Install Ruru:
