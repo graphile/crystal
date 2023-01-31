@@ -23,7 +23,8 @@
     "@graphile/lru": "5.0.0-0.0",
     "pg-introspection": "0.0.0",
     "pg-sql2": "5.0.0-0.0",
-    "tamedevil": "0.0.0-0.0"
+    "tamedevil": "0.0.0-0.0",
+    "ruru-components": "2.0.0-0.4"
   },
   "changesets": [
     "fast-zoos-float",
@@ -33,6 +34,7 @@
     "itchy-waves-fetch",
     "lovely-zebras-visit",
     "rare-crabs-compare",
+    "serious-timers-thank",
     "shiny-teachers-double",
     "thick-taxis-sip",
     "tidy-dancers-turn",
