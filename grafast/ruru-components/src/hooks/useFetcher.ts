@@ -92,9 +92,10 @@ export const useFetcher = (
   options: { explain?: boolean; verbose?: boolean } = {},
 ) => {
   const [streamEndpoint, setStreamEndpoint] = useState<string | null>(null);
-  const url =
-    props.endpoint ??
-    (typeof window !== "undefined" ? window.location.origin : "") + "/graphql";
+  const endpoint = props.endpoint ?? "/graphql";
+  const url = endpoint.startsWith("/")
+    ? (typeof window !== "undefined" ? window.location.origin : "") + endpoint
+    : endpoint;
   const subscriptionUrl = props.subscriptionEndpoint
     ? makeWsUrl(props.subscriptionEndpoint)
     : undefined;
