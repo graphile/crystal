@@ -1,5 +1,5 @@
 import type { GraphiQLProps } from "graphiql";
-import type { GraphQLSchema } from "graphql";
+import { GraphQLError, GraphQLSchema } from "graphql";
 import { buildClientSchema, getIntrospectionQuery } from "graphql";
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -45,12 +45,21 @@ export const useSchema = (
       }
       const { data, errors } = payload;
       if (errors) {
-        throw (
-          errors[0] ??
-          new Error(
+        if (errors[0]) {
+          throw new GraphQLError(
+            errors[0].message ?? "Error has no message?!",
+            null,
+            null,
+            null,
+            errors[0].path,
+            null,
+            errors[0].extensions,
+          );
+        } else {
+          throw new Error(
             "'errors' was set on the payload, but was empty or contained null? This is forbidden by the GraphQL spec.",
-          )
-        );
+          );
+        }
       }
 
       // Use the data we got back from GraphQL to build a client schema (a
