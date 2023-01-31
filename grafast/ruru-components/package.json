@@ -15,7 +15,7 @@
     }
   },
   "scripts": {
-    "prepack": "rm -Rf dist tsconfig.tsbuildinfo && tsc -b && yarn webpack --mode=production"
+    "prepack": "tsc -b"
   },
   "repository": {
     "type": "git",
