@@ -457,9 +457,9 @@ export const makeGraphQLHandler = (
     if (request.method !== "POST") {
       // Forbid mutation
       const operation = getOperationAST(document, operationName);
-      if (operation?.operation === "mutation") {
+      if (!operation || operation.operation !== "query") {
         const error = new GraphQLError(
-          "Mutations may only take place over POST requests.",
+          "Only queries may take place over non-POST requests.",
           operation,
         );
         return {
