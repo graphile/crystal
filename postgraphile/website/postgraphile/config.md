@@ -97,13 +97,13 @@ const preset = {
 export default preset;
 ```
 
-## Inflection options
+## `inflection` options
 
 _(TypeScript type: `GraphileBuild.GraphileBuildInflectionOptions`)_
 
 _None at this time._
 
-## pgSources
+## `pgSources`
 
 _(TypeScript type: `ReadonlyArray<GraphileConfig.PgDatabaseConfiguration>`)_
 
@@ -152,7 +152,7 @@ const pgSources = [
 ];
 ```
 
-### makePgSources
+### `makePgSources`
 
 This simple function will take a PostgreSQL connection string and a list of
 schemas and will return an array containing a configuration object suitable for
@@ -169,7 +169,7 @@ that default over time.
 const pgSources = makePgSources(process.env.DATABASE_URL, ["app_public"]);
 ```
 
-## Gather options
+## `gather` options
 
 _(TypeScript type: `GraphileBuild.GraphileBuildGatherOptions`)_
 
@@ -188,7 +188,7 @@ Deprecated options:
   instead of the type name in the Node identifier (highly discouraged because it
   significantly increases the risk of NodeID conflicts)
 
-## Schema options
+## `schema` options
 
 _(TypeScript type: `GraphileBuild.GraphileBuildSchemaOptions`)_
 
@@ -226,7 +226,7 @@ to determine the options that they offer.
   more places.
 - `subscriptions`
 
-## Grafast options
+## `grafast` options
 
 _(TypeScript type: `import type { GrafastOptions } from "grafast"`)_
 
@@ -406,7 +406,7 @@ export default {
 
 <!-- TODO: verify the above works. -->
 
-## Server options
+## `server` options
 
 _(TypeScript type: `import { ServerOptions } from "grafserv"`)_
 
@@ -417,6 +417,8 @@ _(TypeScript type: `import { ServerOptions } from "grafserv"`)_
   `/graphql`
 - `eventStreamRoute: string` - The path at which the GraphQL event stream would
   be made available; usually `/graphql/stream`
+- `graphqlOverGET: boolean` - If true, we'll support GraphQL queries over the
+  GET method
 - `graphiql: boolean`
 - `graphiqlOnGraphQLGET: boolean` - If true, then we will render GraphiQL on GET
   requests to the `/graphql` endpoint
