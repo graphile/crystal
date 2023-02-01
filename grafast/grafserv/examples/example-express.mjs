@@ -12,10 +12,10 @@ app.use((req, _res, next) => {
 });
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Express app
-instance.addTo(app);
+serv.addTo(app);
 
 // Start the Express server
 app.listen(preset.server.port ?? 5678);

@@ -53,13 +53,13 @@ initial preset) to get a completed config:
 import "graphile-config";
 
 import { makePgSources } from "postgraphile";
-import postgraphilePresetAmber from "postgraphile/presets/amber";
+import PresetAmber from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
   extends: [
-    postgraphilePresetAmber,
+    PresetAmber.default ?? PresetAmber,
     makeV4Preset({
       /* PUT YOUR V4 OPTIONS HERE */
       simpleCollections: "both",
@@ -170,13 +170,15 @@ returns an object that contains the middleware under the `handler` key. Here's a
 simple example:
 
 ```ts title="server.js"
-import config from "./graphile.config.js";
+import preset from "./graphile.config.js";
 import { postgraphile } from "postgraphile";
+import { grafserv } from "grafserv/node";
 import { createServer } from "node:http";
 
-const instance = postgraphile(config);
+const pgl = postgraphile(preset);
+const serv = pgl.createServ(grafserv);
 
-const server = createServer(instance.handler);
+const server = createServer(serv.createHander());
 server.on("error", (e) => console.error(e));
 server.listen(port);
 ```
@@ -190,10 +192,10 @@ lifecycle that needs to be carefully managed - just run the query through
 ```ts title="schema-only.js"
 import { grafast, hookArgs } from "grafast";
 import { makeSchema } from "postgraphile";
-import config from "./graphile.config.js";
+import preset from "./graphile.config.js";
 
 async function main() {
-  const { schema, resolvedPreset } = await makeSchema(config);
+  const { schema, resolvedPreset } = await makeSchema(preset);
 
   const args = {
     schema,
@@ -379,10 +381,10 @@ and finally comes the shared object which contains inflection.
 ```js
 const preset = require("./graphile.config.js");
 
-const config = resolvePresets([preset]);
-const shared = { inflection: buildInflection(config) };
-const input = await gather(config, shared);
-const schema = buildSchema(config, input, shared);
+const resolvedPreset = resolvePresets([preset]);
+const shared = { inflection: buildInflection(resolvedPreset) };
+const input = await gather(resolvedPreset, shared);
+const schema = buildSchema(resolvedPreset, input, shared);
 ```
 
 ## `postgraphile-core`
@@ -406,9 +408,9 @@ const gqlSchema = await createPostGraphileSchema(DATABASE_URL, "public", {
 
 ```js
 import { makeSchema } from "postgraphile";
-import config from "./graphile.config.js";
+import preset from "./graphile.config.js";
 
-const { schema, contextCallback } = await makeSchema(config);
+const { schema, contextCallback } = await makeSchema(preset);
 ```
 
 [grafast]: https://grafast.org

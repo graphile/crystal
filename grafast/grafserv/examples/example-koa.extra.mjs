@@ -11,10 +11,10 @@ app.use(bodyParser());
 // (Add any Koa middleware you want here.)
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Koa app
-instance.addTo(app);
+serv.addTo(app);
 
 // Start the Koa server
 app.listen(preset.server.port ?? 5678);

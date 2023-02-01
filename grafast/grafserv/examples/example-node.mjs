@@ -4,10 +4,10 @@ import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Mount the request handler into a new HTTP server
-const server = createServer(instance.createHandler());
+const server = createServer(serv.createHandler());
 
 // Start the Node server
 server.listen(preset.server.port ?? 5678);

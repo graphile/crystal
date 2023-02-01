@@ -50,7 +50,7 @@ function from the relevant entrypoint for your server of choice and then create
 an instance:
 
 ```js
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 ```
 
 `grafserv` is passed the GraphQL schema to use (if it's available, otherwise
@@ -60,9 +60,9 @@ preset - i.e. your configuration.
 Calling `grafserv` will return an instance; this instance will have a number of
 helpers on it, including helpers specific to integrating it with your framework
 of choice. For servers that operate on a middleware basis this is typically
-`instance.addTo(app)` (which allows registering multiple route handlers), though
-different servers may have different APIs, such as `instance.createHandler()`
-for Node and `instance.createGraphQLHandler()` for Lambda and Next.js.
+`serv.addTo(app)` (which allows registering multiple route handlers), though
+different servers may have different APIs, such as `serv.createHandler()` for
+Node and `serv.createGraphQLHandler()` for Lambda and Next.js.
 
 Note: There is little value in Grafserv reimplementing every non-GraphQL concern
 your server may have, so instead it leans on the ecosystem of your chosen server
@@ -73,36 +73,36 @@ for Express, [`koa-compress`](https://www.npmjs.com/package/koa-compress) for
 Koa, or [`@fastify/compress`](https://www.npmjs.com/package/@fastify/compress)
 for Fastify.
 
-### instance.release()
+### serv.release()
 
 Releases any resources created by the instance; no further requests should be
 handled (though currently active requests will be allowed to complete).
 
 // TODO: consider terminating subscriptions or other long-lived things.
 
-### instance.onRelease(cb)
+### serv.onRelease(cb)
 
 Adds `cb` to the list of callbacks to be called when the server is released;
 useful for releasing resources you created only for the server. Callbacks will
 be called in reverse order that they were added.
 
-### instance.setSchema(newSchema)
+### serv.setSchema(newSchema)
 
 Replaces the schema to use for future requests (currently active requests are
 unaffected) - this is primarily used for "watch" mode.
 
-### instance.setPreset(newPreset)
+### serv.setPreset(newPreset)
 
 Replaces the config to use for future requests (currently active requests are
 unaffected) - this is primarily used for "watch" mode. Note that certain
 configuration changes might not be reflected by certain servers until a restart.
 
-### instance.getSchema()
+### serv.getSchema()
 
 Returns either the GraphQL schema that is currently in use, or a promise to the
 same.
 
-### instance.getPreset()
+### serv.getPreset()
 
 Returns the resolved `graphile-config` preset that is currently in use.
 
@@ -117,10 +117,10 @@ import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Mount the request handler into a new HTTP server
-const server = createServer(instance.createHandler());
+const server = createServer(serv.createHandler());
 
 // Start the Node server
 server.listen(preset.server.port ?? 5678);
@@ -139,10 +139,10 @@ const app = express();
 // (Add any Express middleware you want here.)
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Express app
-instance.addTo(app);
+serv.addTo(app);
 
 // Start the Express server
 app.listen(preset.server.port ?? 5678);
@@ -161,10 +161,10 @@ const app = new Koa();
 // (Add any Koa middleware you want here.)
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Koa app
-instance.addTo(app);
+serv.addTo(app);
 
 // Start the Koa server
 app.listen(preset.server.port ?? 5678);
@@ -185,10 +185,10 @@ const app = Fastify({
 // (Add any Fastify middleware you want here.)
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Fastify app
-instance.addTo(app);
+serv.addTo(app);
 
 // Start the Fastify server
 app.listen({ port: preset.server.port ?? 5678 }, (err, address) => {
@@ -212,24 +212,24 @@ import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
 // Create a shared Grafserv instance
-export const instance = grafserv({ schema, preset });
+export const serv = grafserv({ schema, preset });
 ```
 
 ```js
 // pages/api/graphql.mjs
-import { instance } from "../../utils/grafserv.mjs";
+import { serv } from "../../utils/grafserv.mjs";
 
 // Create and export the `/graphql` route handler
-const handler = instance.createGraphQLHandler();
+const handler = serv.createGraphQLHandler();
 export default handler;
 ```
 
 ```js
 // pages/api/ruru.mjs
-import { instance } from "../../utils/grafserv.mjs";
+import { serv } from "../../utils/grafserv.mjs";
 
 // Create and export the `/ruru` route handler
-const handler = instance.createRuruHandler();
+const handler = serv.createRuruHandler();
 export default handler;
 ```
 
@@ -241,8 +241,8 @@ import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Export a lambda handler for GraphQL
-export const handler = instance.createGraphQLHandler();
+export const handler = serv.createGraphQLHandler();
 ```

@@ -7,6 +7,10 @@ sidebar_position: 1
 Grafserv - an incredibly fast GraphQL server for Node.js powered by
 [Grafast](/grafast/).
 
+<!-- FIXME: actual documentation please! -->
+
+See: https://www.npmjs.com/package/grafserv/v/0.0.1-0.7
+
 <!--
 
 ### Mounting PostGraphile middleware under a subpath
