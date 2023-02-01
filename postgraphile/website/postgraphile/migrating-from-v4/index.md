@@ -165,9 +165,16 @@ postgraphile -P postgraphile/presets/amber -c postgres:///my_db_name -s public -
 ### Library mode
 
 Load your config from your `graphile.config.js` file and feed it into the
-`postgraphile` function. This function used to return a middleware, but now it
-returns an object that contains the middleware under the `handler` key. Here's a
-simple example:
+`postgraphile` function to get a `pgl` PostGraphile instance. In V4 this would
+have been a middleware, but [Grafserv][] has much more native support for the
+various JS webservers than we had in V5, which has necessitated a different
+approach, so instead you get a collection of helper methods.
+
+Load the correct [Grafserv][] adaptor for the JS server that you're using, and
+feed this into `pgl.createServ(grafserv)` to get a `serv` Grafserv instance.
+Finally mount the `serv` instance into your server of choice.
+
+Here's a simple example using the Node built-in HTTP server:
 
 ```ts title="server.js"
 import preset from "./graphile.config.js";
@@ -182,6 +189,13 @@ const server = createServer(serv.createHander());
 server.on("error", (e) => console.error(e));
 server.listen(port);
 ```
+
+:::note
+
+Other servers will have slightly different code, please see the [Grafserv][]
+documentation for details.
+
+:::
 
 ### Schema only mode
 
@@ -410,7 +424,7 @@ const gqlSchema = await createPostGraphileSchema(DATABASE_URL, "public", {
 import { makeSchema } from "postgraphile";
 import preset from "./graphile.config.js";
 
-const { schema, contextCallback } = await makeSchema(preset);
+const { schema, resolvedPreset } = await makeSchema(preset);
 ```
 
 [grafast]: https://grafast.org

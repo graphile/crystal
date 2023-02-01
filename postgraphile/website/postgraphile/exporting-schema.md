@@ -20,7 +20,7 @@ import { makeSchema } from "postgraphile";
 import config from "./graphile.config.js";
 import * as jsonwebtoken from "jsonwebtoken";
 
-const { schema, contextCallback } = makeSchema(config);
+const { schema, resolvedPreset } = makeSchema(config);
 const exportFileLocation = `${__dirname}/exported-schema.mjs`;
 exportSchema(schema, exportFileLocation, {
   mode: "graphql-js",
