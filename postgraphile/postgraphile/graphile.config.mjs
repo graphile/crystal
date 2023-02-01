@@ -36,7 +36,9 @@ const preset = {
   inflection: {},
   gather: {},
   schema: {},
-  server: {},
+  server: {
+    graphqlPath: "/v2/graphql",
+  },
   grafast: {
     context: {
       mol: 42,
