@@ -2,7 +2,8 @@ import type { HandlerResult, NormalizedRequestDigest } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 
 const ruruServer = import("ruru/server");
-let ruruHTML: Awaited<typeof ruruServer>["ruruHTML"] | undefined = undefined;
+type RuruHTMLFunction = Awaited<typeof ruruServer>["ruruHTML"];
+let ruruHTML: RuruHTMLFunction | undefined = undefined;
 
 // TODO: use a specific version of mermaid
 export function makeGraphiQLHandler(
@@ -13,7 +14,16 @@ export function makeGraphiQLHandler(
     if (!ruruHTML) {
       ruruHTML = (await ruruServer).ruruHTML;
     }
-    const config = {};
+    const config: Parameters<RuruHTMLFunction>[0] = {
+      endpoint: dynamicOptions.graphqlPath,
+      // TODO: websocket endpoint
+      debugTools:
+        dynamicOptions.explain === true
+          ? ["explain", "plan"]
+          : dynamicOptions.explain === false
+          ? []
+          : (dynamicOptions.explain as any[]),
+    };
     return {
       statusCode: 200,
       request,

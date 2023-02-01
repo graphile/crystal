@@ -11,6 +11,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     maxRequestLength = 100_000,
     outputDataAsString = false,
   } = config.server ?? {};
+  const { explain } = config.grafast ?? {};
   return {
     outputDataAsString,
     graphqlPath,
@@ -21,6 +22,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     watch,
     eventStreamRoute,
     maxRequestLength,
+    explain,
   };
 }
 export type OptionsFromConfig = ReturnType<typeof optionsFromConfig>;
