@@ -13,10 +13,10 @@ app.addHook("onRequest", async (request, _reply) => {
 });
 
 // Create a Grafserv instance
-const instance = grafserv({ schema, preset });
+const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Fastify app
-instance.addTo(app);
+serv.addTo(app);
 
 // Start the Fastify server
 app.listen({ port: preset.server.port ?? 5678 }, (err, address) => {

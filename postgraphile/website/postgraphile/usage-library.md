@@ -16,33 +16,51 @@ Library mode is configured using a preset (see [Configuration](./config.md) for
 the options) and returns a "PostGraphile Instance" which has various methods
 you can use depending on what you're trying to do.
 
-```js title="instance.js"
+```js title="pgl.js"
 import preset from "./graphile.config.js";
 import postgraphile from "postgraphile";
 
-export const instance = postgraphile(preset);
+export const pgl = postgraphile(preset);
 ```
 
-:::warning
+### pgl.createServ(grafserv)
 
-The `(await instance.getGrafserv()).handler` API is likely to change before the V5.0.0 release to
-allow for PostGraphile to be used with a wide array of JS webserver frameworks.
+[Grafserv][] supports a number of different servers in the JS ecosystem, you
+should import the `grafserv` function from the relevant grafserv subpath (e.g.
+for Express you would `import { grafserv } from "grafserv/express/v4"`) and
+feed that into the `pgl.createServ(grafserv)` method. This will return a
+Grafserv instance that can be mounted inside of your chosen server - for
+instructions on how to do that, please see the relevant entry for your server
+of choice in the Grafserv documentation.
 
-:::
+Here's an example with Node's HTTP server:
 
-### instance.getGrafserv()
-
-Builds and returns a [Grafserv][] instance (will always return the same
-instance after the first call). This is not itself a webserver, but it
-can be mounted inside one, for example in Node's HTTP server:
-
-```js title="server.js"
-import { instance } from "./instance.js";
+```js title="example-node.js"
 import { createServer } from "node:http";
+import { grafserv } from "grafserv/node";
+import { pgl } from "./pgl.js";
 
-const grafserv = await instance.getGrafserv();
-const server = createServer(grafserv.handler);
+const serv = pgl.createServ(grafserv);
+
+const server = createServer(serv.createHandler());
 server.listen(5678);
+
+console.log("Server listening at http://localhost:5678");
+```
+
+And an example for Express:
+
+```js title="example-express.js"
+import express from "express";
+import { grafserv } from "grafserv/express/v4";
+import { pgl } from "./pgl.js";
+
+const serv = pgl.createServ(grafserv);
+
+const app = express();
+serv.addTo(app);
+app.listen(5678);
+
 console.log("Server listening at http://localhost:5678");
 ```
 
@@ -50,7 +68,7 @@ For information about using PostGraphile with Connect, Express, Koa, Fastify,
 Restify, or any other HTTP servers, please see the [Grafserv
 documentation][grafserv].
 
-### instance.getServerParams()
+### pgl.getServerParams()
 
 :::warning
 
@@ -61,16 +79,16 @@ This will likely be renamed before the V5.0.0 release.
 Returns a promise to the server parameters - an object containing:
 
 - `schema` - the GraphQL schema
-- `config` - the resolved preset
+- `resolvedPreset` - the resolved preset
 
 Note that this may change over time, e.g. in watch mode.
 
-### instance.getSchema()
+### pgl.getSchema()
 
 Shortcut to `(await getServerParams()).schema` - the current GraphQL schema the
 instance represents (may change due to watch mode).
 
-### instance.release()
+### pgl.release()
 
 Call this when you don't need the PostGraphile instance any more and it will
 release any resources it holds (for example schema watching, etc).

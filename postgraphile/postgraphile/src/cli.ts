@@ -187,9 +187,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     process.exit(2);
   }
 
-  const instance = postgraphile(config);
+  const pgl = postgraphile(config);
 
-  const serv = instance.createServ(grafserv);
+  const serv = pgl.createServ(grafserv);
 
   const server = createServer(serv.createHandler());
   server.once("listening", () => {

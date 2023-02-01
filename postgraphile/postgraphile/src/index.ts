@@ -21,15 +21,16 @@ export function postgraphile(preset: GraphileConfig.Preset): {
   ): TGrafserv;
   getServerParams(): Promise<ServerParams>;
   getSchema(): Promise<GraphQLSchema>;
+  getResolvedPreset(): GraphileConfig.ResolvedPreset;
   release(): Promise<void>;
 } {
-  const config = resolvePresets([preset]);
+  const resolvedPreset = resolvePresets([preset]);
   let serverParams:
     | PromiseLike<ServerParams>
     | Deferred<ServerParams>
     | ServerParams;
   let stopWatchingPromise: Promise<() => void> | null = null;
-  if (config.server?.watch) {
+  if (resolvedPreset.server?.watch) {
     serverParams = defer<ServerParams>();
     stopWatchingPromise = watchSchema(preset, (error, newParams) => {
       if (error || !newParams) {
@@ -94,6 +95,9 @@ export function postgraphile(preset: GraphileConfig.Preset): {
     async getSchema() {
       assertAlive();
       return (await serverParams).schema;
+    },
+    getResolvedPreset() {
+      return resolvedPreset;
     },
     async release() {
       assertAlive();
