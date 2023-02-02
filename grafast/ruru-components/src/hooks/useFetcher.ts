@@ -4,7 +4,7 @@ import type {
   FetcherParams,
   FetcherReturnType,
 } from "@graphiql/toolkit";
-import { createGraphiQLFetcher } from "@graphiql/toolkit";
+import { isPromise, createGraphiQLFetcher } from "@graphiql/toolkit";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
@@ -159,14 +159,31 @@ export const useFetcher = (
 
   const wrappedFetcher = useMemo(() => {
     const processPayload = (
-      result: ExecutionResult | AsyncExecutionResult[] | AsyncExecutionResult,
-    ) => {
-      if (!result) {
-        return;
+      inResult:
+        | ExecutionResult
+        | AsyncExecutionResult[]
+        | AsyncExecutionResult
+        | null
+        | undefined,
+    ):
+      | ExecutionResult
+      | AsyncExecutionResult[]
+      | AsyncExecutionResult
+      | null
+      | undefined => {
+      if (inResult == null) {
+        return inResult;
       }
-      if (Array.isArray(result)) {
-        return result.forEach(processPayload);
+      if (Array.isArray(inResult)) {
+        return inResult.map(processPayload) as AsyncExecutionResult[];
       }
+      // Mutable result
+      const result = {
+        ...inResult,
+        ...(inResult.extensions
+          ? { extensions: { ...inResult.extensions } }
+          : null),
+      } as ExecutionResult | AsyncExecutionResult;
       // Legacy PostGraphile v4 support
       const legacy = (result as any).explain as
         | Array<{ query: string; plan?: string }>
@@ -203,6 +220,7 @@ export const useFetcher = (
           });
         }, 100);
       }
+      return result;
     };
     return async function (
       ...args: Parameters<Fetcher>
@@ -226,21 +244,22 @@ export const useFetcher = (
           return: result.return?.bind(result),
           next(...args) {
             const n = result.next(...args);
-            Promise.resolve(n).then(({ done: _done, value }) => {
-              if (value) {
-                processPayload(value);
-              }
-            });
-            return n;
+            if (typeof n.then === "function") {
+              return n.then(({ done, value }: any) => {
+                return { done, value: processPayload(value) };
+              });
+            } else {
+              const { done, value } = n;
+              return { done, value: processPayload(value) };
+            }
           },
           [Symbol.asyncIterator]() {
             return this;
           },
         } as AsyncIterableIterator<any>;
       } else {
-        processPayload(result);
+        return processPayload(result);
       }
-      return result;
     };
   }, [fetcher, verbose]);
 
