@@ -13,7 +13,7 @@ featured than [Schema-only Usage](./usage-schema/).
 ## Getting a PostGraphile instance
 
 Library mode is configured using a preset (see [Configuration](./config.md) for
-the options) and returns a "PostGraphile Instance" which has various methods
+the options) and returns a PostGraphile instance which has various methods
 you can use depending on what you're trying to do.
 
 ```js title="pgl.js"
@@ -23,7 +23,7 @@ import postgraphile from "postgraphile";
 export const pgl = postgraphile(preset);
 ```
 
-### pgl.createServ(grafserv)
+### `pgl.createServ(grafserv)`
 
 [Grafserv][] supports a number of different servers in the JS ecosystem, you
 should import the `grafserv` function from the relevant grafserv subpath (e.g.
@@ -68,7 +68,7 @@ For information about using PostGraphile with Connect, Express, Koa, Fastify,
 Restify, or any other HTTP servers, please see the [Grafserv
 documentation][grafserv].
 
-### pgl.getServerParams()
+### `pgl.getServerParams()`
 
 :::warning
 
@@ -83,12 +83,16 @@ Returns a promise to the server parameters - an object containing:
 
 Note that this may change over time, e.g. in watch mode.
 
-### pgl.getSchema()
+### `pgl.getSchema()`
 
 Shortcut to `(await getServerParams()).schema` - the current GraphQL schema the
 instance represents (may change due to watch mode).
 
-### pgl.release()
+### `pgl.getResolvedPreset()`
+
+Get the current resolved preset that PostGraphile is using.
+
+### `pgl.release()`
 
 Call this when you don't need the PostGraphile instance any more and it will
 release any resources it holds (for example schema watching, etc).
