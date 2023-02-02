@@ -87,7 +87,7 @@ declare global {
         [key in keyof GraphileBuild.Inflection]?: (
           this: GraphileBuild.Inflection,
           // TODO: should we wrap this in an object to allow future expansion?
-          options: Preset,
+          options: ResolvedPreset,
           ...args: Parameters<GraphileBuild.Inflection[key]>
         ) => ReturnType<GraphileBuild.Inflection[key]>;
       };
@@ -99,7 +99,7 @@ declare global {
         [key in keyof GraphileBuild.Inflection]?: (
           this: GraphileBuild.Inflection,
           previous: GraphileBuild.Inflection[key] | undefined,
-          options: Preset,
+          options: ResolvedPreset,
           ...args: Parameters<GraphileBuild.Inflection[key]>
         ) => ReturnType<GraphileBuild.Inflection[key]>;
       };
