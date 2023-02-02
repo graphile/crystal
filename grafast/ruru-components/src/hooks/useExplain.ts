@@ -26,7 +26,7 @@ export const ExplainContext = createContext<{
     setExplainAtBottom: () => {},
     setShowExplain: () => {},
   },
-  explain: false,
+  explain: true,
   setExplain: () => {},
   explainResults: null,
 });
