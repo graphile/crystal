@@ -27,7 +27,7 @@ export function withGraphileConfig<T>(
         resolve(require("graphile-config"));
       } catch (e) {
         if (e.code === "ERR_REQUIRE_ESM") {
-          return import(require("graphile-config")).then(resolve, reject);
+          return import("graphile-config").then(resolve, reject);
         } else {
           reject(e);
         }
