@@ -9,7 +9,7 @@ import { version } from "../index.js";
 
 declare global {
   namespace GraphileBuild {
-    interface GraphileBuildSchemaOptions {
+    interface SchemaOptions {
       // TODO:
       pgJwtSecret?: any;
       pgJwtSignOptions?: any;

@@ -16,7 +16,7 @@ import { buildSchema, defaultPreset } from "../index.js";
 
 declare global {
   namespace GraphileBuild {
-    interface GraphileBuildSchemaOptions {
+    interface SchemaOptions {
       myDefaultMin?: number;
       myDefaultMax?: number;
     }

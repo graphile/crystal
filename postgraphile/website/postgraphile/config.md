@@ -190,7 +190,7 @@ Deprecated options:
 
 ## `schema` options
 
-_(TypeScript type: `GraphileBuild.GraphileBuildSchemaOptions`)_
+_(TypeScript type: `GraphileBuild.SchemaOptions`)_
 
 :::tip
 

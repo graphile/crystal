@@ -179,7 +179,7 @@ function shouldUseCustomConnection(
 
 function defaultProcSourceBehavior(
   s: PgSource<any, any, any, any>,
-  options: GraphileBuild.GraphileBuildSchemaOptions,
+  options: GraphileBuild.SchemaOptions,
 ): string {
   const { simpleCollections } = options;
   const behavior = [];

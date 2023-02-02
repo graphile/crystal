@@ -8,7 +8,7 @@ import { version } from "../index.js";
 declare global {
   namespace GraphileBuild {
     interface ScopeScalar {}
-    interface GraphileBuildSchemaOptions {
+    interface SchemaOptions {
       /**
        * Set 'true' if you want JSON values to be stringified.
        */

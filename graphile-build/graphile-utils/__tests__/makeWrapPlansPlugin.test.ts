@@ -282,7 +282,7 @@ describe("wrapping named plans", () => {
       return lambda(result, (str) => str.toLowerCase());
     };
     const spy = makeEchoSpy();
-    let options: GraphileBuild.GraphileBuildSchemaOptions;
+    let options: GraphileBuild.SchemaOptions;
     const schema = makeSchemaWithSpyAndPlugins(spy, [
       makeWrapPlansPlugin((_options) => {
         options = _options;

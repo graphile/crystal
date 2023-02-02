@@ -76,7 +76,7 @@ declare global {
     interface Preset {
       inflection?: GraphileBuild.GraphileBuildInflectionOptions;
       gather?: GraphileBuild.GraphileBuildGatherOptions;
-      schema?: GraphileBuild.GraphileBuildSchemaOptions;
+      schema?: GraphileBuild.SchemaOptions;
     }
 
     interface PluginInflectionConfig {

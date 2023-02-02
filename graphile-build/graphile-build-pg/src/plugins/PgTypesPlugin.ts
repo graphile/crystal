@@ -21,7 +21,7 @@ declare global {
       isPgPointInputType?: boolean;
     }
     interface ScopeScalar {}
-    interface GraphileBuildSchemaOptions {
+    interface SchemaOptions {
       pgUseCustomNetworkScalars?: boolean;
     }
   }

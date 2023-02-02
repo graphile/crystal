@@ -32,14 +32,14 @@ export interface PlanWrapperRules {
 }
 
 export type PlanWrapperRulesGenerator = (
-  options: GraphileBuild.GraphileBuildSchemaOptions,
+  options: GraphileBuild.SchemaOptions,
 ) => PlanWrapperRules;
 
 export type PlanWrapperFilter<T> = (
   context: GraphileBuild.ContextObjectFieldsField,
   build: GraphileBuild.Build,
   field: GraphileFieldConfig<any, any, any, any, any>,
-  options: GraphileBuild.GraphileBuildSchemaOptions,
+  options: GraphileBuild.SchemaOptions,
 ) => T | null;
 
 export type PlanWrapperFilterRule<T> = (

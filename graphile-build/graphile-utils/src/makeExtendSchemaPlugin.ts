@@ -172,7 +172,7 @@ export function makeExtendSchemaPlugin(
     | ExtensionDefinition
     | ((
         build: Partial<GraphileBuild.Build> & GraphileBuild.BuildBase,
-        schemaOptions: GraphileBuild.GraphileBuildSchemaOptions,
+        schemaOptions: GraphileBuild.SchemaOptions,
       ) => ExtensionDefinition),
   uniquePluginName = `ExtendSchemaPlugin_${String(Math.random()).slice(2)}`,
 ): GraphileConfig.Plugin {

@@ -25,7 +25,7 @@ type PgSourceBuilderOptions = Omit<
 
 declare global {
   namespace GraphileBuild {
-    interface GraphileBuildSchemaOptions {
+    interface SchemaOptions {
       /**
        * If true, setof functions cannot return null, so our list and
        * connection types can use GraphQLNonNull in more places.

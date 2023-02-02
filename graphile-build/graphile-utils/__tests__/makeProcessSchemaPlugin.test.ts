@@ -15,7 +15,7 @@ import { makeProcessSchemaPlugin } from "../src/index.js";
 
 declare global {
   namespace GraphileBuild {
-    interface GraphileBuildSchemaOptions {
+    interface SchemaOptions {
       optionKey?: string;
     }
   }
