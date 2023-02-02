@@ -18,7 +18,8 @@ function exportAs<T>(thing: T, exportName: string) {
   return thing;
 }
 
-const isDev = process.env.GRAPHILE_ENV === "development";
+const isDev =
+  typeof process !== "undefined" && process.env.GRAPHILE_ENV === "development";
 
 /**
  * This is the secret to our safety; since this is a symbol it cannot be faked
