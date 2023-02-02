@@ -4,7 +4,7 @@ import type {
   FetcherParams,
   FetcherReturnType,
 } from "@graphiql/toolkit";
-import { isPromise, createGraphiQLFetcher } from "@graphiql/toolkit";
+import { createGraphiQLFetcher } from "@graphiql/toolkit";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
