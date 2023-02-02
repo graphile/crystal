@@ -5,6 +5,9 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror-graphql/hint";
 import "codemirror-graphql/lint";
 import "codemirror-graphql/mode";
+import "graphiql/graphiql.css";
+import "@graphiql/plugin-explorer/dist/style.css";
+import "ruru-components/ruru.css";
 
 // eslint-disable-next-line @typescript-eslint/no-duplicate-imports
 import CodeMirror from "@uiw/react-codemirror";
@@ -13,10 +16,6 @@ import { grafast, makeGrafastSchema } from "grafast";
 import { GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState } from "react";
 import { Ruru } from "ruru-components";
-
-import "graphiql/graphiql.css";
-import "@graphiql/plugin-explorer/dist/style.css";
-import "ruru-components/ruru.css";
 
 import styles from "./styles.module.css";
 
