@@ -14,6 +14,10 @@ import { GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState } from "react";
 import { Ruru } from "ruru-components";
 
+import "graphiql/graphiql.css";
+import "@graphiql/plugin-explorer/dist/style.css";
+import "ruru-components/ruru.css";
+
 import styles from "./styles.module.css";
 
 const INITIAL_QUERY = `\
