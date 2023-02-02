@@ -103,8 +103,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           spec.extensions = extensions;
         }
         const interfaceTag =
-          extensions.tags.interface ??
-          pgClass.getTagsAndDescription().tags.interface;
+          extensions.tags.interface ?? pgClass.getTags().interface;
         if (interfaceTag) {
           if (typeof interfaceTag !== "string") {
             throw new Error(

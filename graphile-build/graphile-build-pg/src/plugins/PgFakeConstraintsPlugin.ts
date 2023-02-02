@@ -79,7 +79,7 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
         }
 
         for (const pgAttr of introspection.attributes) {
-          const tags = pgAttr.getTagsAndDescription().tags;
+          const tags = pgAttr.getTags();
           if (tags?.notNull) {
             pgAttr.attnotnull = true;
           }

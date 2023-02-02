@@ -69,12 +69,12 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
     add: {
       enumTableCodec(preset, { databaseName, pgConstraint }) {
         const pgClass = pgConstraint.getClass()!;
-        const constraintTags = pgConstraint.getTagsAndDescription().tags;
+        const constraintTags = pgConstraint.getTags();
         if (typeof constraintTags.enumName === "string") {
           return constraintTags.enumName;
         }
         if (pgConstraint.contype === "p") {
-          const classTags = pgClass.getTagsAndDescription().tags;
+          const classTags = pgClass.getTags();
           if (typeof classTags.enumName === "string") {
             return classTags.enumName;
           }
@@ -187,9 +187,7 @@ Original error: ${e.message}
 
           // Get description column - first column with `@enumDescription` tag, or failing that the column called "description"
           const descriptionColumn =
-            enumTableColumns.find(
-              (attr) => attr.getTagsAndDescription().tags.enumDescription,
-            ) ||
+            enumTableColumns.find((attr) => attr.getTags().enumDescription) ||
             enumTableColumns.find((attr) => attr.attname === "description");
 
           if (isEnumTable || enumConstraints.length > 0) {
@@ -313,7 +311,7 @@ function isEnumConstraint(
     const isPrimaryKey = pgConstraint.contype === "p";
     const isUniqueConstraint = pgConstraint.contype === "u";
     if (isPrimaryKey || isUniqueConstraint) {
-      const conTags = pgConstraint.getTagsAndDescription().tags;
+      const conTags = pgConstraint.getTags();
       const isExplicitEnumConstraint =
         conTags.enum === true || typeof conTags.enum === "string";
       const isPrimaryKeyOfEnumTableConstraint =

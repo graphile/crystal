@@ -32,19 +32,19 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
         // memoizes because it mutates the return result; if this changes then
         // the code will no longer achieve its goal.
         for (const pgClass of introspection.classes) {
-          processTags(pgClass.getTagsAndDescription().tags);
+          processTags(pgClass.getTags());
         }
         for (const pgAttr of introspection.attributes) {
-          processTags(pgAttr.getTagsAndDescription().tags);
+          processTags(pgAttr.getTags());
         }
         for (const pgConstraint of introspection.constraints) {
-          processTags(pgConstraint.getTagsAndDescription().tags);
+          processTags(pgConstraint.getTags());
         }
         for (const pgProc of introspection.procs) {
-          processTags(pgProc.getTagsAndDescription().tags);
+          processTags(pgProc.getTags());
         }
         for (const pgType of introspection.types) {
-          processTags(pgType.getTagsAndDescription().tags);
+          processTags(pgType.getTags());
         }
       },
     },
