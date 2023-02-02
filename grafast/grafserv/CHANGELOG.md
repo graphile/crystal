@@ -1,5 +1,13 @@
 # grafserv
 
+## 0.0.1-0.8
+
+### Patch Changes
+
+- [`c4213e91d`](undefined) - Add pgl.getResolvedPreset() API; fix Ruru
+  respecting graphqlPath setting; replace 'instance' with 'pgl'/'serv' as
+  appropriate; forbid subscriptions on GET
+
 ## 0.0.1-0.7
 
 ### Patch Changes

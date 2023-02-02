@@ -1,5 +1,17 @@
 # postgraphile
 
+## 5.0.0-0.12
+
+### Patch Changes
+
+- [`c4213e91d`](undefined) - Add pgl.getResolvedPreset() API; fix Ruru
+  respecting graphqlPath setting; replace 'instance' with 'pgl'/'serv' as
+  appropriate; forbid subscriptions on GET
+- Updated dependencies [[`c4213e91d`](undefined)]:
+  - @dataplan/pg@0.0.1-0.9
+  - grafserv@0.0.1-0.8
+  - graphile-build-pg@5.0.0-0.10
+
 ## 5.0.0-0.11
 
 ### Patch Changes
