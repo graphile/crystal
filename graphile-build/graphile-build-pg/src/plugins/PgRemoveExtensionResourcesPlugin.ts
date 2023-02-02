@@ -49,7 +49,7 @@ export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
                   (p) => p._id === procId,
                 );
                 if (pgProc) {
-                  addBehaviorToTags(pgProc.getTagsAndDescription().tags, "-*");
+                  addBehaviorToTags(pgProc.getTags(), "-*");
                 }
                 // ...
                 break;
@@ -60,7 +60,7 @@ export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
                   (p) => p._id === relId,
                 );
                 if (pgClass) {
-                  addBehaviorToTags(pgClass.getTagsAndDescription().tags, "-*");
+                  addBehaviorToTags(pgClass.getTags(), "-*");
                 }
                 // ...
                 break;

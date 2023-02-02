@@ -96,6 +96,8 @@ declare module "./introspection" {
     getOwner(): PgRoles | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    /** Convenience method for getTagsAndDescription().tags */
+    getTags(): PgSmartTagsDict;
     getACL(): AclObject[];
 
     getClass(by: { name: string }): PgClass | undefined;
@@ -116,6 +118,8 @@ declare module "./introspection" {
     getIndexes(): PgIndex[];
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    /** Convenience method for getTagsAndDescription().tags */
+    getTags(): PgSmartTagsDict;
     getACL(): AclObject[];
     getInherited(): PgInherits[];
   }
@@ -139,6 +143,8 @@ declare module "./introspection" {
     getType(): PgType | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    /** Convenience method for getTagsAndDescription().tags */
+    getTags(): PgSmartTagsDict;
     getACL(): AclObject[];
   }
   interface PgConstraint {
@@ -150,6 +156,8 @@ declare module "./introspection" {
     getForeignAttributes(): PgAttribute[] | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    /** Convenience method for getTagsAndDescription().tags */
+    getTags(): PgSmartTagsDict;
   }
   interface PgProc {
     getNamespace(): PgNamespace | undefined;
@@ -157,6 +165,8 @@ declare module "./introspection" {
     getReturnType(): PgType | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    /** Convenience method for getTagsAndDescription().tags */
+    getTags(): PgSmartTagsDict;
     getArguments(): PgProcArgument[];
     getACL(): AclObject[];
   }
@@ -170,10 +180,14 @@ declare module "./introspection" {
     getRange(): PgRange | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    /** Convenience method for getTagsAndDescription().tags */
+    getTags(): PgSmartTagsDict;
   }
   interface PgEnum {
     getType(): PgType | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
+    /** Convenience method for getTagsAndDescription().tags */
+    getTags(): PgSmartTagsDict;
   }
   interface PgRange {
     getType(): PgType | undefined;

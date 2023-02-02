@@ -266,8 +266,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
       },
 
       tableSourceName(options, { pgClass, databaseName }) {
-        const typeTags = pgClass.getType()!.getTagsAndDescription().tags;
-        const classTags = pgClass.getTagsAndDescription().tags;
+        const typeTags = pgClass.getType()!.getTags();
+        const classTags = pgClass.getTags();
         if (typeof typeTags?.name === "string") {
           return typeTags.name;
         }
