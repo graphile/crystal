@@ -229,6 +229,7 @@ export function augmentIntrospection(
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_NAMESPACE, entity._id),
     );
+    entity.getTags = memo(() => entity.getTagsAndDescription().tags);
     entity.getACL = memo(() =>
       parseAcls(introspection, entity.nspacl, entity.nspowner, OBJECT_SCHEMA),
     );
@@ -269,6 +270,7 @@ export function augmentIntrospection(
         objoid: entity.reltype,
       }),
     );
+    entity.getTags = memo(() => entity.getTagsAndDescription().tags);
     entity.getACL = memo(() => aclsForTable(introspection, entity));
 
     entity.getAttribute = (by) => {
@@ -306,6 +308,7 @@ export function augmentIntrospection(
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_CLASS, entity.attrelid, entity.attnum),
     );
+    entity.getTags = memo(() => entity.getTagsAndDescription().tags);
     entity.getACL = memo(() =>
       parseAcls(
         introspection,
@@ -346,6 +349,7 @@ export function augmentIntrospection(
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_CONSTRAINT, entity._id),
     );
+    entity.getTags = memo(() => entity.getTagsAndDescription().tags);
   });
   introspection.procs.forEach((entity) => {
     entity.getNamespace = memo(() => getNamespace(entity.pronamespace));
@@ -355,6 +359,7 @@ export function augmentIntrospection(
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_PROC, entity._id),
     );
+    entity.getTags = memo(() => entity.getTagsAndDescription().tags);
     entity.getArguments = memo(() => {
       const args: PgProcArgument[] = [];
       const {
@@ -439,6 +444,7 @@ export function augmentIntrospection(
     entity.getTagsAndDescription = memo(() =>
       getTagsAndDescription(PG_TYPE, entity._id),
     );
+    entity.getTags = memo(() => entity.getTagsAndDescription().tags);
   });
   introspection.enums.forEach((entity) => {
     entity.getType = memo(() => getType(entity.enumtypid));
@@ -448,6 +454,7 @@ export function augmentIntrospection(
       tags: Object.create(null),
       description: "",
     }));
+    entity.getTags = memo(() => entity.getTagsAndDescription().tags);
   });
   introspection.ranges.forEach((entity) => {
     entity.getType = memo(() => getType(entity.rngtypid));
