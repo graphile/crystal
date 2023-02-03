@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/graphile/heart#readme",
   "files": [
-    "src"
+    "dist"
   ],
   "devDependencies": {
     "@types/node": "^18.11.18",
