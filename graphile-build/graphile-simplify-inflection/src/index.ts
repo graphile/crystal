@@ -4,8 +4,8 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import type {} from "graphile-build";
+import type {} from "graphile-build-pg";
 import type { GraphileConfig } from "graphile-config";
-import type {} from "postgraphile";
 
 /**
  * Returns true if array1 and array2 have the same length, and every pair of
