@@ -5,10 +5,13 @@ becomes simply `users`, `User.postsByAuthorId` becomes simply `User.posts`, and
 `Post.userByAuthorId` becomes simply `Post.author`.
 
 **Adding this preset to your schema is almost certainly a breaking change, so do
-it before you ship anything!** This is the primary reason this isn't enabled by
-default in PostGraphile.
+it before you ship anything!**
 
-_This preset is recommended for all PostGraphile users._
+**This preset is recommended for all PostGraphile users.** The main reason this
+preset is not enabled by default is because it increases the risk of conflicts
+where multiple relationships try and use the same field name. This can be
+avoided by careful use of naming conventions or by specifically tagging the
+conflicting relations with their preferred name.
 
 ## Customising
 
