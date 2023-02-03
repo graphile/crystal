@@ -231,7 +231,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           source.getRelation(relationName);
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
-          return this.connectionField(this.camelCase(baseOverride));
+          return this.camelCase(baseOverride);
         }
         return this.connectionField(this._manyRelation(details));
       },
