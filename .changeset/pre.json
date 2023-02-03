@@ -24,15 +24,21 @@
     "pg-introspection": "0.0.0",
     "pg-sql2": "5.0.0-0.0",
     "tamedevil": "0.0.0-0.0",
-    "ruru-components": "2.0.0-0.4"
+    "ruru-components": "2.0.0-0.4",
+    "@graphile/simplify-inflection": "8.0.0-0.0"
   },
   "changesets": [
     "fast-zoos-float",
     "forty-chefs-deliver",
     "fresh-gorillas-burn",
     "fuzzy-mangos-compete",
+    "giant-paws-count",
+    "good-ducks-tickle",
+    "hungry-donkeys-marry",
     "itchy-waves-fetch",
     "lovely-zebras-visit",
+    "mighty-seas-deny",
+    "proud-emus-speak",
     "quick-ants-relax",
     "rare-crabs-compare",
     "serious-timers-thank",
