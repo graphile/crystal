@@ -93,7 +93,7 @@ import { ruruHTML } from "ruru/server";
 // ...
 
 app.get("/", (req, res, next) => {
-  res.writeHead(200, { "Content-Type": "application/html" });
+  res.writeHead(200, { "Content-Type": "text/html" });
   return res.end(
     ruruHTML({
       endpoint: "/graphql",
