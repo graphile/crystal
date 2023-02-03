@@ -593,7 +593,11 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                 unique,
                 uniqueMode: "keys",
               })),
-            ];
+            ].filter((spec) => {
+              const unique = spec.unique as PgSourceUnique;
+              const behavior = unique.extensions?.tags?.behavior;
+              return !!build.behavior.matches(behavior, mode, mode);
+            });
             for (const spec of specs) {
               const { uniqueMode, unique } = spec;
               const details = {

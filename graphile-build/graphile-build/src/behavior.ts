@@ -23,13 +23,16 @@ export class Behavior {
    * @param defaultBehavior - allows the plugin to specify a default behavior for this in the event that it's not defined elsewhere (lowest priority)
    */
   public matches(
-    localBehaviorSpecsString: string | null | undefined,
+    localBehaviorSpecsString: string | string[] | null | undefined,
     filter: string,
     defaultBehavior = "",
   ): boolean | undefined {
+    const specString = Array.isArray(localBehaviorSpecsString)
+      ? localBehaviorSpecsString.join(" ")
+      : localBehaviorSpecsString;
     const finalBehaviorSpecsString = `${defaultBehavior} ${
       this.globalBehaviorDefaults
-    } ${localBehaviorSpecsString ?? ""}`;
+    } ${specString ?? ""}`;
     const specs = parseSpecs(finalBehaviorSpecsString);
     const filterScope = parseScope(filter);
     // Loop backwards through the specs
