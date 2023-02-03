@@ -3281,6 +3281,8 @@ type Query implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection
+
+  """Reads a set of `CompoundKey`."""
   allCompoundKeysList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3325,6 +3327,8 @@ type Query implements Node {
     """The method to use when ordering `EdgeCase`."""
     orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesConnection
+
+  """Reads a set of `EdgeCase`."""
   allEdgeCasesList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3369,6 +3373,8 @@ type Query implements Node {
     """The method to use when ordering `Issue756`."""
     orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
   ): Issue756SConnection
+
+  """Reads a set of `Issue756`."""
   allIssue756SList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3413,6 +3419,8 @@ type Query implements Node {
     """The method to use when ordering `LeftArm`."""
     orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
+
+  """Reads a set of `LeftArm`."""
   allLeftArmsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3457,6 +3465,8 @@ type Query implements Node {
     """The method to use when ordering `MyTable`."""
     orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
   ): MyTablesConnection
+
+  """Reads a set of `MyTable`."""
   allMyTablesList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3501,6 +3511,8 @@ type Query implements Node {
     """The method to use when ordering `NullTestRecord`."""
     orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
   ): NullTestRecordsConnection
+
+  """Reads a set of `NullTestRecord`."""
   allNullTestRecordsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3545,6 +3557,8 @@ type Query implements Node {
     """The method to use when ordering `Person`."""
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
+
+  """Reads a set of `Person`."""
   allPeopleList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -3589,6 +3603,8 @@ type Query implements Node {
     """The method to use when ordering `PersonSecret`."""
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PersonSecretsConnection @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Reads a set of `PersonSecret`."""
   allPersonSecretsList(
     """
     A condition to be used in determining which values should be returned by the collection.
