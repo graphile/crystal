@@ -107,6 +107,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     type: new GraphQLList(
                       new GraphQLNonNull(type),
                     ) as GraphQLOutputType,
+                    description: `Reads a set of \`${build.inflection.tableType(
+                      source.codec,
+                    )}\`.`,
                     deprecationReason: tagToString(
                       source.extensions?.tags?.deprecated,
                     ),
