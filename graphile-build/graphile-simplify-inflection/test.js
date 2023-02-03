@@ -9,7 +9,8 @@ const { makeV4Preset } = require("postgraphile/presets/v4");
 const { printSchema, lexicographicSortSchema } = require("graphql");
 
 const ROOT_CONNECTION_STRING = "postgres";
-const DATABASE_NAME = "pg_simplify_inflectors";
+const DATABASE_NAME =
+  process.env.TEST_SIMPLIFY_DATABASE_URL || "pg_simplify_inflectors";
 const ROOT = `${__dirname}/tests`;
 
 const withPool = async (connectionString, cb) => {
