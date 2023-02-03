@@ -321,6 +321,8 @@ type Person implements Node {
     """Skip the first `n` values."""
     offset: Int
   ): [Pet!]
+
+  """Reads and enables pagination through a set of `Pet`."""
   petsByOwnerIdList(
     """
     A condition to be used in determining which values should be returned by the collection.

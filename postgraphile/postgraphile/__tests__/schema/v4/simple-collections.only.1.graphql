@@ -2370,6 +2370,8 @@ enum PeopleOrderBy {
 type Person implements Node {
   about: String
   aliases: [String]!
+
+  """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId1List(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2385,6 +2387,8 @@ type Person implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!]
   ): [CompoundKey!]!
+
+  """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId2List(
     """
     A condition to be used in determining which values should be returned by the collection.
