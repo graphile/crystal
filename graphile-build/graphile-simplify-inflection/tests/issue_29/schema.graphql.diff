@@ -1,0 +1,418 @@
+--- unsimplified
++++ simplified
+@@ -24,7 +24,7 @@
+   query: Query
+ 
+   """Reads a single `Something` that is related to this `SomethingDatum`."""
+-  somethingBySomeId: Something
++  some: Something
+ 
+   """The `SomethingDatum` that was created by this mutation."""
+   somethingDatum: SomethingDatum
+@@ -74,24 +74,32 @@
+ """A location in a connection that can be used for resuming pagination."""
+ scalar Cursor
+ 
+-"""All input for the `deleteSomethingBySomeId` mutation."""
+-input DeleteSomethingBySomeIdInput {
++"""All input for the `deleteSomethingByNodeId` mutation."""
++input DeleteSomethingByNodeIdInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-  someId: Int!
++
++  """
++  The globally unique `ID` which will identify a single `Something` to be deleted.
++  """
++  nodeId: ID!
+ }
+ 
+-"""All input for the `deleteSomethingDatumBySomethingDataId` mutation."""
+-input DeleteSomethingDatumBySomethingDataIdInput {
++"""All input for the `deleteSomethingDatumByNodeId` mutation."""
++input DeleteSomethingDatumByNodeIdInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-  somethingDataId: Int!
++
++  """
++  The globally unique `ID` which will identify a single `SomethingDatum` to be deleted.
++  """
++  nodeId: ID!
+ }
+ 
+ """All input for the `deleteSomethingDatum` mutation."""
+@@ -101,11 +109,7 @@
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-
+-  """
+-  The globally unique `ID` which will identify a single `SomethingDatum` to be deleted.
+-  """
+-  nodeId: ID!
++  somethingDataId: Int!
+ }
+ 
+ """The output of our delete `SomethingDatum` mutation."""
+@@ -115,7 +119,7 @@
+   unchanged and unused. May be used by a client to track mutations.
+   """
+   clientMutationId: String
+-  deletedSomethingDatumId: ID
++  deletedSomethingDatumNodeId: ID
+ 
+   """
+   Our root query field type. Allows us to run any query from our mutation payload.
+@@ -123,7 +127,7 @@
+   query: Query
+ 
+   """Reads a single `Something` that is related to this `SomethingDatum`."""
+-  somethingBySomeId: Something
++  some: Something
+ 
+   """The `SomethingDatum` that was deleted by this mutation."""
+   somethingDatum: SomethingDatum
+@@ -142,11 +146,7 @@
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-
+-  """
+-  The globally unique `ID` which will identify a single `Something` to be deleted.
+-  """
+-  nodeId: ID!
++  someId: Int!
+ }
+ 
+ """The output of our delete `Something` mutation."""
+@@ -156,7 +156,7 @@
+   unchanged and unused. May be used by a client to track mutations.
+   """
+   clientMutationId: String
+-  deletedSomethingId: ID
++  deletedSomethingNodeId: ID
+ 
+   """
+   Our root query field type. Allows us to run any query from our mutation payload.
+@@ -193,7 +193,7 @@
+     input: CreateSomethingDatumInput!
+   ): CreateSomethingDatumPayload
+ 
+-  """Deletes a single `Something` using its globally unique id."""
++  """Deletes a single `Something` using a unique key."""
+   deleteSomething(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+@@ -201,15 +201,15 @@
+     input: DeleteSomethingInput!
+   ): DeleteSomethingPayload
+ 
+-  """Deletes a single `Something` using a unique key."""
+-  deleteSomethingBySomeId(
++  """Deletes a single `Something` using its globally unique id."""
++  deleteSomethingByNodeId(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: DeleteSomethingBySomeIdInput!
++    input: DeleteSomethingByNodeIdInput!
+   ): DeleteSomethingPayload
+ 
+-  """Deletes a single `SomethingDatum` using its globally unique id."""
++  """Deletes a single `SomethingDatum` using a unique key."""
+   deleteSomethingDatum(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+@@ -217,15 +217,15 @@
+     input: DeleteSomethingDatumInput!
+   ): DeleteSomethingDatumPayload
+ 
+-  """Deletes a single `SomethingDatum` using a unique key."""
+-  deleteSomethingDatumBySomethingDataId(
++  """Deletes a single `SomethingDatum` using its globally unique id."""
++  deleteSomethingDatumByNodeId(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: DeleteSomethingDatumBySomethingDataIdInput!
++    input: DeleteSomethingDatumByNodeIdInput!
+   ): DeleteSomethingDatumPayload
+ 
+-  """Updates a single `Something` using its globally unique id and a patch."""
++  """Updates a single `Something` using a unique key and a patch."""
+   updateSomething(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+@@ -233,17 +233,15 @@
+     input: UpdateSomethingInput!
+   ): UpdateSomethingPayload
+ 
+-  """Updates a single `Something` using a unique key and a patch."""
+-  updateSomethingBySomeId(
++  """Updates a single `Something` using its globally unique id and a patch."""
++  updateSomethingByNodeId(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: UpdateSomethingBySomeIdInput!
++    input: UpdateSomethingByNodeIdInput!
+   ): UpdateSomethingPayload
+ 
+-  """
+-  Updates a single `SomethingDatum` using its globally unique id and a patch.
+-  """
++  """Updates a single `SomethingDatum` using a unique key and a patch."""
+   updateSomethingDatum(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+@@ -251,12 +249,14 @@
+     input: UpdateSomethingDatumInput!
+   ): UpdateSomethingDatumPayload
+ 
+-  """Updates a single `SomethingDatum` using a unique key and a patch."""
+-  updateSomethingDatumBySomethingDataId(
++  """
++  Updates a single `SomethingDatum` using its globally unique id and a patch.
++  """
++  updateSomethingDatumByNodeId(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: UpdateSomethingDatumBySomethingDataIdInput!
++    input: UpdateSomethingDatumByNodeIdInput!
+   ): UpdateSomethingDatumPayload
+ }
+ 
+@@ -285,8 +285,34 @@
+ 
+ """The root query type which gives access points into the data universe."""
+ type Query implements Node {
++  """Fetches an object given its globally unique `ID`."""
++  node(
++    """The globally unique `ID`."""
++    nodeId: ID!
++  ): Node
++
++  """
++  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
++  """
++  nodeId: ID!
++
++  """
++  Exposes the root query type nested one level down. This is helpful for Relay 1
++  which can only query top level fields if they are in a particular form.
++  """
++  query: Query!
++
++  """Get a single `Something`."""
++  something(someId: Int!): Something
++
++  """Reads a single `Something` using its globally unique `ID`."""
++  somethingByNodeId(
++    """The globally unique `ID` to be used in selecting a single `Something`."""
++    nodeId: ID!
++  ): Something
++
+   """Reads and enables pagination through a set of `SomethingDatum`."""
+-  allSomethingData(
++  somethingData(
+     """Read all values in the set after (below) this cursor."""
+     after: Cursor
+ 
+@@ -315,7 +341,7 @@
+   ): SomethingDataConnection
+ 
+   """Reads a set of `SomethingDatum`."""
+-  allSomethingDataList(
++  somethingDataList(
+     """
+     A condition to be used in determining which values should be returned by the collection.
+     """
+@@ -331,8 +357,19 @@
+     orderBy: [SomethingDataOrderBy!]
+   ): [SomethingDatum!]
+ 
++  """Get a single `SomethingDatum`."""
++  somethingDatum(somethingDataId: Int!): SomethingDatum
++
++  """Reads a single `SomethingDatum` using its globally unique `ID`."""
++  somethingDatumByNodeId(
++    """
++    The globally unique `ID` to be used in selecting a single `SomethingDatum`.
++    """
++    nodeId: ID!
++  ): SomethingDatum
++
+   """Reads and enables pagination through a set of `Something`."""
+-  allSomethings(
++  somethings(
+     """Read all values in the set after (below) this cursor."""
+     after: Cursor
+ 
+@@ -361,7 +398,7 @@
+   ): SomethingsConnection
+ 
+   """Reads a set of `Something`."""
+-  allSomethingsList(
++  somethingsList(
+     """
+     A condition to be used in determining which values should be returned by the collection.
+     """
+@@ -376,43 +413,6 @@
+     """The method to use when ordering `Something`."""
+     orderBy: [SomethingsOrderBy!]
+   ): [Something!]
+-
+-  """Fetches an object given its globally unique `ID`."""
+-  node(
+-    """The globally unique `ID`."""
+-    nodeId: ID!
+-  ): Node
+-
+-  """
+-  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+-  """
+-  nodeId: ID!
+-
+-  """
+-  Exposes the root query type nested one level down. This is helpful for Relay 1
+-  which can only query top level fields if they are in a particular form.
+-  """
+-  query: Query!
+-
+-  """Reads a single `Something` using its globally unique `ID`."""
+-  something(
+-    """The globally unique `ID` to be used in selecting a single `Something`."""
+-    nodeId: ID!
+-  ): Something
+-
+-  """Get a single `Something`."""
+-  somethingBySomeId(someId: Int!): Something
+-
+-  """Reads a single `SomethingDatum` using its globally unique `ID`."""
+-  somethingDatum(
+-    """
+-    The globally unique `ID` to be used in selecting a single `SomethingDatum`.
+-    """
+-    nodeId: ID!
+-  ): SomethingDatum
+-
+-  """Get a single `SomethingDatum`."""
+-  somethingDatumBySomethingDataId(somethingDataId: Int!): SomethingDatum
+ }
+ 
+ type Something implements Node {
+@@ -529,10 +529,10 @@
+   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+   """
+   nodeId: ID!
+-  someId: Int!
+ 
+   """Reads a single `Something` that is related to this `SomethingDatum`."""
+-  somethingBySomeId: Something
++  some: Something
++  someId: Int!
+   somethingDataId: Int!
+ }
+ 
+@@ -618,34 +618,42 @@
+   SOME_ID_DESC
+ }
+ 
+-"""All input for the `updateSomethingBySomeId` mutation."""
+-input UpdateSomethingBySomeIdInput {
++"""All input for the `updateSomethingByNodeId` mutation."""
++input UpdateSomethingByNodeIdInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-  someId: Int!
++
++  """
++  The globally unique `ID` which will identify a single `Something` to be updated.
++  """
++  nodeId: ID!
+ 
+   """
+   An object where the defined keys will be set on the `Something` being updated.
+   """
+-  somethingPatch: SomethingPatch!
++  patch: SomethingPatch!
+ }
+ 
+-"""All input for the `updateSomethingDatumBySomethingDataId` mutation."""
+-input UpdateSomethingDatumBySomethingDataIdInput {
++"""All input for the `updateSomethingDatumByNodeId` mutation."""
++input UpdateSomethingDatumByNodeIdInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-  somethingDataId: Int!
++
++  """
++  The globally unique `ID` which will identify a single `SomethingDatum` to be updated.
++  """
++  nodeId: ID!
+ 
+   """
+   An object where the defined keys will be set on the `SomethingDatum` being updated.
+   """
+-  somethingDatumPatch: SomethingDatumPatch!
++  patch: SomethingDatumPatch!
+ }
+ 
+ """All input for the `updateSomethingDatum` mutation."""
+@@ -657,14 +665,10 @@
+   clientMutationId: String
+ 
+   """
+-  The globally unique `ID` which will identify a single `SomethingDatum` to be updated.
+-  """
+-  nodeId: ID!
+-
+-  """
+   An object where the defined keys will be set on the `SomethingDatum` being updated.
+   """
+-  somethingDatumPatch: SomethingDatumPatch!
++  patch: SomethingDatumPatch!
++  somethingDataId: Int!
+ }
+ 
+ """The output of our update `SomethingDatum` mutation."""
+@@ -681,7 +685,7 @@
+   query: Query
+ 
+   """Reads a single `Something` that is related to this `SomethingDatum`."""
+-  somethingBySomeId: Something
++  some: Something
+ 
+   """The `SomethingDatum` that was updated by this mutation."""
+   somethingDatum: SomethingDatum
+@@ -702,14 +706,10 @@
+   clientMutationId: String
+ 
+   """
+-  The globally unique `ID` which will identify a single `Something` to be updated.
+-  """
+-  nodeId: ID!
+-
+-  """
+   An object where the defined keys will be set on the `Something` being updated.
+   """
+-  somethingPatch: SomethingPatch!
++  patch: SomethingPatch!
++  someId: Int!
+ }
+ 
+ """The output of our update `Something` mutation."""

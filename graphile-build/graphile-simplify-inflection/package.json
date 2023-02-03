@@ -1,0 +1,42 @@
+{
+  "name": "@graphile/simplify-inflection",
+  "version": "8.0.0-0.0",
+  "description": "Simplifies the graphile-build/graphile-build-pg inflection to trim the `ByFooIdAndBarId` from relations, etc",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepack": "tsc -b",
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/heart.git"
+  },
+  "keywords": [
+    "graphile",
+    "postgraphile",
+    "preset",
+    "plugin",
+    "simple",
+    "simplify",
+    "inflection",
+    "inflector",
+    "pg"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/heart/issues"
+  },
+  "homepage": "https://github.com/graphile/heart#readme",
+  "files": [
+    "src"
+  ],
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "postgraphile": "workspace:^",
+    "typescript": "^4.8.1-rc"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

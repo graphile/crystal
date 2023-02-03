@@ -1,0 +1,2005 @@
+"""All input for the create `GoalContributor` mutation."""
+input CreateGoalContributorInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `GoalContributor` to be created by this mutation."""
+  goalContributor: GoalContributorInput!
+}
+
+"""The output of our create `GoalContributor` mutation."""
+type CreateGoalContributorPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Goal` that is related to this `GoalContributor`."""
+  goalByOrganizationIdAndTeamIdAndGoalUuid: Goal
+
+  """The `GoalContributor` that was created by this mutation."""
+  goalContributor: GoalContributor
+
+  """An edge for our `GoalContributor`. May be used by Relay 1."""
+  goalContributorEdge(
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GoalContributorsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GoalContributor`.
+  """
+  organizationByOrganizationId: Organization
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Team` that is related to this `GoalContributor`."""
+  teamByTeamId: Team
+
+  """Reads a single `User` that is related to this `GoalContributor`."""
+  userByContributorId: User
+}
+
+"""All input for the create `Goal` mutation."""
+input CreateGoalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Goal` to be created by this mutation."""
+  goal: GoalInput!
+}
+
+"""The output of our create `Goal` mutation."""
+type CreateGoalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Goal` that was created by this mutation."""
+  goal: Goal
+
+  """An edge for our `Goal`. May be used by Relay 1."""
+  goalEdge(
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GoalsEdge
+
+  """Reads a single `Organization` that is related to this `Goal`."""
+  organizationByOrganizationId: Organization
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Team` that is related to this `Goal`."""
+  teamByTeamId: Team
+}
+
+"""All input for the create `Organization` mutation."""
+input CreateOrganizationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Organization` to be created by this mutation."""
+  organization: OrganizationInput!
+}
+
+"""The output of our create `Organization` mutation."""
+type CreateOrganizationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Organization` that was created by this mutation."""
+  organization: Organization
+
+  """An edge for our `Organization`. May be used by Relay 1."""
+  organizationEdge(
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrganizationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Team` mutation."""
+input CreateTeamInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Team` to be created by this mutation."""
+  team: TeamInput!
+}
+
+"""The output of our create `Team` mutation."""
+type CreateTeamPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Team` that was created by this mutation."""
+  team: Team
+
+  """An edge for our `Team`. May be used by Relay 1."""
+  teamEdge(
+    """The method to use when ordering `Team`."""
+    orderBy: [TeamsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TeamsEdge
+}
+
+"""All input for the create `User` mutation."""
+input CreateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `User` to be created by this mutation."""
+  user: UserInput!
+}
+
+"""The output of our create `User` mutation."""
+type CreateUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `User` that was created by this mutation."""
+  user: User
+
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+All input for the `deleteGoalByOrganizationIdAndTeamIdAndGoalUuid` mutation.
+"""
+input DeleteGoalByOrganizationIdAndTeamIdAndGoalUuidInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  goalUuid: UUID!
+  organizationId: Int!
+  teamId: Int!
+}
+
+"""All input for the `deleteGoalContributorById` mutation."""
+input DeleteGoalContributorByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteGoalContributor` mutation."""
+input DeleteGoalContributorInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `GoalContributor` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `GoalContributor` mutation."""
+type DeleteGoalContributorPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedGoalContributorId: ID
+
+  """Reads a single `Goal` that is related to this `GoalContributor`."""
+  goalByOrganizationIdAndTeamIdAndGoalUuid: Goal
+
+  """The `GoalContributor` that was deleted by this mutation."""
+  goalContributor: GoalContributor
+
+  """An edge for our `GoalContributor`. May be used by Relay 1."""
+  goalContributorEdge(
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GoalContributorsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GoalContributor`.
+  """
+  organizationByOrganizationId: Organization
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Team` that is related to this `GoalContributor`."""
+  teamByTeamId: Team
+
+  """Reads a single `User` that is related to this `GoalContributor`."""
+  userByContributorId: User
+}
+
+"""All input for the `deleteGoal` mutation."""
+input DeleteGoalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Goal` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Goal` mutation."""
+type DeleteGoalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedGoalId: ID
+
+  """The `Goal` that was deleted by this mutation."""
+  goal: Goal
+
+  """An edge for our `Goal`. May be used by Relay 1."""
+  goalEdge(
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GoalsEdge
+
+  """Reads a single `Organization` that is related to this `Goal`."""
+  organizationByOrganizationId: Organization
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Team` that is related to this `Goal`."""
+  teamByTeamId: Team
+}
+
+"""All input for the `deleteOrganizationById` mutation."""
+input DeleteOrganizationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteOrganization` mutation."""
+input DeleteOrganizationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Organization` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Organization` mutation."""
+type DeleteOrganizationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedOrganizationId: ID
+
+  """The `Organization` that was deleted by this mutation."""
+  organization: Organization
+
+  """An edge for our `Organization`. May be used by Relay 1."""
+  organizationEdge(
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrganizationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteTeamById` mutation."""
+input DeleteTeamByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteTeam` mutation."""
+input DeleteTeamInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Team` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Team` mutation."""
+type DeleteTeamPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedTeamId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Team` that was deleted by this mutation."""
+  team: Team
+
+  """An edge for our `Team`. May be used by Relay 1."""
+  teamEdge(
+    """The method to use when ordering `Team`."""
+    orderBy: [TeamsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TeamsEdge
+}
+
+"""All input for the `deleteUserById` mutation."""
+input DeleteUserByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteUser` mutation."""
+input DeleteUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `User` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `User` mutation."""
+type DeleteUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedUserId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `User` that was deleted by this mutation."""
+  user: User
+
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+type Goal implements Node {
+  aim: String
+
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  goalContributorsByOrganizationIdAndTeamIdAndGoalUuid(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GoalContributorsConnection!
+
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  goalContributorsByOrganizationIdAndTeamIdAndGoalUuidList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!]
+  ): [GoalContributor!]!
+  goalUuid: UUID!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Organization` that is related to this `Goal`."""
+  organizationByOrganizationId: Organization
+  organizationId: Int!
+
+  """Reads a single `Team` that is related to this `Goal`."""
+  teamByTeamId: Team
+  teamId: Int!
+}
+
+"""
+A condition to be used against `Goal` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input GoalCondition {
+  """Checks for equality with the object’s `aim` field."""
+  aim: String
+
+  """Checks for equality with the object’s `goalUuid` field."""
+  goalUuid: UUID
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s `teamId` field."""
+  teamId: Int
+}
+
+type GoalContributor implements Node {
+  contribution: String
+  contributorId: Int!
+
+  """Reads a single `Goal` that is related to this `GoalContributor`."""
+  goalByOrganizationIdAndTeamIdAndGoalUuid: Goal
+  goalUuid: UUID!
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """
+  Reads a single `Organization` that is related to this `GoalContributor`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int!
+
+  """Reads a single `Team` that is related to this `GoalContributor`."""
+  teamByTeamId: Team
+  teamId: Int!
+
+  """Reads a single `User` that is related to this `GoalContributor`."""
+  userByContributorId: User
+}
+
+"""
+A condition to be used against `GoalContributor` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input GoalContributorCondition {
+  """Checks for equality with the object’s `contribution` field."""
+  contribution: String
+
+  """Checks for equality with the object’s `contributorId` field."""
+  contributorId: Int
+
+  """Checks for equality with the object’s `goalUuid` field."""
+  goalUuid: UUID
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s `teamId` field."""
+  teamId: Int
+}
+
+"""An input for mutations affecting `GoalContributor`"""
+input GoalContributorInput {
+  contribution: String
+  contributorId: Int!
+  goalUuid: UUID!
+  id: Int
+  organizationId: Int!
+  teamId: Int!
+}
+
+"""
+Represents an update to a `GoalContributor`. Fields that are set will be updated.
+"""
+input GoalContributorPatch {
+  contribution: String
+  contributorId: Int
+  goalUuid: UUID
+  id: Int
+  organizationId: Int
+  teamId: Int
+}
+
+"""A connection to a list of `GoalContributor` values."""
+type GoalContributorsConnection {
+  """
+  A list of edges which contains the `GoalContributor` and cursor to aid in pagination.
+  """
+  edges: [GoalContributorsEdge]!
+
+  """A list of `GoalContributor` objects."""
+  nodes: [GoalContributor]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `GoalContributor` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `GoalContributor` edge in the connection."""
+type GoalContributorsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `GoalContributor` at the end of the edge."""
+  node: GoalContributor
+}
+
+"""Methods to use when ordering `GoalContributor`."""
+enum GoalContributorsOrderBy {
+  CONTRIBUTION_ASC
+  CONTRIBUTION_DESC
+  CONTRIBUTOR_ID_ASC
+  CONTRIBUTOR_ID_DESC
+  GOAL_UUID_ASC
+  GOAL_UUID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TEAM_ID_ASC
+  TEAM_ID_DESC
+}
+
+"""An input for mutations affecting `Goal`"""
+input GoalInput {
+  aim: String
+  goalUuid: UUID
+  organizationId: Int!
+  teamId: Int!
+}
+
+"""Represents an update to a `Goal`. Fields that are set will be updated."""
+input GoalPatch {
+  aim: String
+  goalUuid: UUID
+  organizationId: Int
+  teamId: Int
+}
+
+"""A connection to a list of `Goal` values."""
+type GoalsConnection {
+  """
+  A list of edges which contains the `Goal` and cursor to aid in pagination.
+  """
+  edges: [GoalsEdge]!
+
+  """A list of `Goal` objects."""
+  nodes: [Goal]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Goal` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Goal` edge in the connection."""
+type GoalsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Goal` at the end of the edge."""
+  node: Goal
+}
+
+"""Methods to use when ordering `Goal`."""
+enum GoalsOrderBy {
+  AIM_ASC
+  AIM_DESC
+  GOAL_UUID_ASC
+  GOAL_UUID_DESC
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TEAM_ID_ASC
+  TEAM_ID_DESC
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Goal`."""
+  createGoal(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateGoalInput!
+  ): CreateGoalPayload
+
+  """Creates a single `GoalContributor`."""
+  createGoalContributor(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateGoalContributorInput!
+  ): CreateGoalContributorPayload
+
+  """Creates a single `Organization`."""
+  createOrganization(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrganizationInput!
+  ): CreateOrganizationPayload
+
+  """Creates a single `Team`."""
+  createTeam(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTeamInput!
+  ): CreateTeamPayload
+
+  """Creates a single `User`."""
+  createUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserInput!
+  ): CreateUserPayload
+
+  """Deletes a single `Goal` using its globally unique id."""
+  deleteGoal(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGoalInput!
+  ): DeleteGoalPayload
+
+  """Deletes a single `Goal` using a unique key."""
+  deleteGoalByOrganizationIdAndTeamIdAndGoalUuid(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGoalByOrganizationIdAndTeamIdAndGoalUuidInput!
+  ): DeleteGoalPayload
+
+  """Deletes a single `GoalContributor` using its globally unique id."""
+  deleteGoalContributor(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGoalContributorInput!
+  ): DeleteGoalContributorPayload
+
+  """Deletes a single `GoalContributor` using a unique key."""
+  deleteGoalContributorById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGoalContributorByIdInput!
+  ): DeleteGoalContributorPayload
+
+  """Deletes a single `Organization` using its globally unique id."""
+  deleteOrganization(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrganizationInput!
+  ): DeleteOrganizationPayload
+
+  """Deletes a single `Organization` using a unique key."""
+  deleteOrganizationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrganizationByIdInput!
+  ): DeleteOrganizationPayload
+
+  """Deletes a single `Team` using its globally unique id."""
+  deleteTeam(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTeamInput!
+  ): DeleteTeamPayload
+
+  """Deletes a single `Team` using a unique key."""
+  deleteTeamById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTeamByIdInput!
+  ): DeleteTeamPayload
+
+  """Deletes a single `User` using its globally unique id."""
+  deleteUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserInput!
+  ): DeleteUserPayload
+
+  """Deletes a single `User` using a unique key."""
+  deleteUserById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserByIdInput!
+  ): DeleteUserPayload
+
+  """Updates a single `Goal` using its globally unique id and a patch."""
+  updateGoal(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGoalInput!
+  ): UpdateGoalPayload
+
+  """Updates a single `Goal` using a unique key and a patch."""
+  updateGoalByOrganizationIdAndTeamIdAndGoalUuid(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGoalByOrganizationIdAndTeamIdAndGoalUuidInput!
+  ): UpdateGoalPayload
+
+  """
+  Updates a single `GoalContributor` using its globally unique id and a patch.
+  """
+  updateGoalContributor(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGoalContributorInput!
+  ): UpdateGoalContributorPayload
+
+  """Updates a single `GoalContributor` using a unique key and a patch."""
+  updateGoalContributorById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGoalContributorByIdInput!
+  ): UpdateGoalContributorPayload
+
+  """
+  Updates a single `Organization` using its globally unique id and a patch.
+  """
+  updateOrganization(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrganizationInput!
+  ): UpdateOrganizationPayload
+
+  """Updates a single `Organization` using a unique key and a patch."""
+  updateOrganizationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrganizationByIdInput!
+  ): UpdateOrganizationPayload
+
+  """Updates a single `Team` using its globally unique id and a patch."""
+  updateTeam(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTeamInput!
+  ): UpdateTeamPayload
+
+  """Updates a single `Team` using a unique key and a patch."""
+  updateTeamById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTeamByIdInput!
+  ): UpdateTeamPayload
+
+  """Updates a single `User` using its globally unique id and a patch."""
+  updateUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserInput!
+  ): UpdateUserPayload
+
+  """Updates a single `User` using a unique key and a patch."""
+  updateUserById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserByIdInput!
+  ): UpdateUserPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+type Organization implements Node {
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  goalContributorsByOrganizationId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GoalContributorsConnection!
+
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  goalContributorsByOrganizationIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!]
+  ): [GoalContributor!]!
+
+  """Reads and enables pagination through a set of `Goal`."""
+  goalsByOrganizationId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GoalsConnection!
+
+  """Reads and enables pagination through a set of `Goal`."""
+  goalsByOrganizationIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!]
+  ): [Goal!]!
+  id: Int!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Organization` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input OrganizationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""An input for mutations affecting `Organization`"""
+input OrganizationInput {
+  id: Int
+  name: String
+}
+
+"""
+Represents an update to a `Organization`. Fields that are set will be updated.
+"""
+input OrganizationPatch {
+  id: Int
+  name: String
+}
+
+"""A connection to a list of `Organization` values."""
+type OrganizationsConnection {
+  """
+  A list of edges which contains the `Organization` and cursor to aid in pagination.
+  """
+  edges: [OrganizationsEdge]!
+
+  """A list of `Organization` objects."""
+  nodes: [Organization]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Organization` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Organization` edge in the connection."""
+type OrganizationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Organization` at the end of the edge."""
+  node: Organization
+}
+
+"""Methods to use when ordering `Organization`."""
+enum OrganizationsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  allGoalContributors(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GoalContributorsConnection
+
+  """Reads a set of `GoalContributor`."""
+  allGoalContributorsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!]
+  ): [GoalContributor!]
+
+  """Reads and enables pagination through a set of `Goal`."""
+  allGoals(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GoalsConnection
+
+  """Reads a set of `Goal`."""
+  allGoalsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!]
+  ): [Goal!]
+
+  """Reads and enables pagination through a set of `Organization`."""
+  allOrganizations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: OrganizationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrganizationsConnection
+
+  """Reads a set of `Organization`."""
+  allOrganizationsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: OrganizationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!]
+  ): [Organization!]
+
+  """Reads and enables pagination through a set of `Team`."""
+  allTeams(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TeamCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Team`."""
+    orderBy: [TeamsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TeamsConnection
+
+  """Reads a set of `Team`."""
+  allTeamsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TeamCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Team`."""
+    orderBy: [TeamsOrderBy!]
+  ): [Team!]
+
+  """Reads and enables pagination through a set of `User`."""
+  allUsers(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UserCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UsersConnection
+
+  """Reads a set of `User`."""
+  allUsersList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UserCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!]
+  ): [User!]
+
+  """Reads a single `Goal` using its globally unique `ID`."""
+  goal(
+    """The globally unique `ID` to be used in selecting a single `Goal`."""
+    nodeId: ID!
+  ): Goal
+
+  """Get a single `Goal`."""
+  goalByOrganizationIdAndTeamIdAndGoalUuid(goalUuid: UUID!, organizationId: Int!, teamId: Int!): Goal
+
+  """Reads a single `GoalContributor` using its globally unique `ID`."""
+  goalContributor(
+    """
+    The globally unique `ID` to be used in selecting a single `GoalContributor`.
+    """
+    nodeId: ID!
+  ): GoalContributor
+
+  """Get a single `GoalContributor`."""
+  goalContributorById(id: Int!): GoalContributor
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """Reads a single `Organization` using its globally unique `ID`."""
+  organization(
+    """
+    The globally unique `ID` to be used in selecting a single `Organization`.
+    """
+    nodeId: ID!
+  ): Organization
+
+  """Get a single `Organization`."""
+  organizationById(id: Int!): Organization
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Reads a single `Team` using its globally unique `ID`."""
+  team(
+    """The globally unique `ID` to be used in selecting a single `Team`."""
+    nodeId: ID!
+  ): Team
+
+  """Get a single `Team`."""
+  teamById(id: Int!): Team
+
+  """Reads a single `User` using its globally unique `ID`."""
+  user(
+    """The globally unique `ID` to be used in selecting a single `User`."""
+    nodeId: ID!
+  ): User
+
+  """Get a single `User`."""
+  userById(id: Int!): User
+}
+
+type Team implements Node {
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  goalContributorsByTeamId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GoalContributorsConnection!
+
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  goalContributorsByTeamIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!]
+  ): [GoalContributor!]!
+
+  """Reads and enables pagination through a set of `Goal`."""
+  goalsByTeamId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GoalsConnection!
+
+  """Reads and enables pagination through a set of `Goal`."""
+  goalsByTeamIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!]
+  ): [Goal!]!
+  id: Int!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Team` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input TeamCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""An input for mutations affecting `Team`"""
+input TeamInput {
+  id: Int
+  name: String
+}
+
+"""Represents an update to a `Team`. Fields that are set will be updated."""
+input TeamPatch {
+  id: Int
+  name: String
+}
+
+"""A connection to a list of `Team` values."""
+type TeamsConnection {
+  """
+  A list of edges which contains the `Team` and cursor to aid in pagination.
+  """
+  edges: [TeamsEdge]!
+
+  """A list of `Team` objects."""
+  nodes: [Team]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Team` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Team` edge in the connection."""
+type TeamsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Team` at the end of the edge."""
+  node: Team
+}
+
+"""Methods to use when ordering `Team`."""
+enum TeamsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""
+All input for the `updateGoalByOrganizationIdAndTeamIdAndGoalUuid` mutation.
+"""
+input UpdateGoalByOrganizationIdAndTeamIdAndGoalUuidInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Goal` being updated.
+  """
+  goalPatch: GoalPatch!
+  goalUuid: UUID!
+  organizationId: Int!
+  teamId: Int!
+}
+
+"""All input for the `updateGoalContributorById` mutation."""
+input UpdateGoalContributorByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `GoalContributor` being updated.
+  """
+  goalContributorPatch: GoalContributorPatch!
+  id: Int!
+}
+
+"""All input for the `updateGoalContributor` mutation."""
+input UpdateGoalContributorInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `GoalContributor` being updated.
+  """
+  goalContributorPatch: GoalContributorPatch!
+
+  """
+  The globally unique `ID` which will identify a single `GoalContributor` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `GoalContributor` mutation."""
+type UpdateGoalContributorPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Goal` that is related to this `GoalContributor`."""
+  goalByOrganizationIdAndTeamIdAndGoalUuid: Goal
+
+  """The `GoalContributor` that was updated by this mutation."""
+  goalContributor: GoalContributor
+
+  """An edge for our `GoalContributor`. May be used by Relay 1."""
+  goalContributorEdge(
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GoalContributorsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GoalContributor`.
+  """
+  organizationByOrganizationId: Organization
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Team` that is related to this `GoalContributor`."""
+  teamByTeamId: Team
+
+  """Reads a single `User` that is related to this `GoalContributor`."""
+  userByContributorId: User
+}
+
+"""All input for the `updateGoal` mutation."""
+input UpdateGoalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Goal` being updated.
+  """
+  goalPatch: GoalPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Goal` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Goal` mutation."""
+type UpdateGoalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Goal` that was updated by this mutation."""
+  goal: Goal
+
+  """An edge for our `Goal`. May be used by Relay 1."""
+  goalEdge(
+    """The method to use when ordering `Goal`."""
+    orderBy: [GoalsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GoalsEdge
+
+  """Reads a single `Organization` that is related to this `Goal`."""
+  organizationByOrganizationId: Organization
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Team` that is related to this `Goal`."""
+  teamByTeamId: Team
+}
+
+"""All input for the `updateOrganizationById` mutation."""
+input UpdateOrganizationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Organization` being updated.
+  """
+  organizationPatch: OrganizationPatch!
+}
+
+"""All input for the `updateOrganization` mutation."""
+input UpdateOrganizationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Organization` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Organization` being updated.
+  """
+  organizationPatch: OrganizationPatch!
+}
+
+"""The output of our update `Organization` mutation."""
+type UpdateOrganizationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Organization` that was updated by this mutation."""
+  organization: Organization
+
+  """An edge for our `Organization`. May be used by Relay 1."""
+  organizationEdge(
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrganizationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateTeamById` mutation."""
+input UpdateTeamByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Team` being updated.
+  """
+  teamPatch: TeamPatch!
+}
+
+"""All input for the `updateTeam` mutation."""
+input UpdateTeamInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Team` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Team` being updated.
+  """
+  teamPatch: TeamPatch!
+}
+
+"""The output of our update `Team` mutation."""
+type UpdateTeamPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Team` that was updated by this mutation."""
+  team: Team
+
+  """An edge for our `Team`. May be used by Relay 1."""
+  teamEdge(
+    """The method to use when ordering `Team`."""
+    orderBy: [TeamsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TeamsEdge
+}
+
+"""All input for the `updateUserById` mutation."""
+input UpdateUserByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `User` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""All input for the `updateUser` mutation."""
+input UpdateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `User` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `User` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""The output of our update `User` mutation."""
+type UpdateUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `User` that was updated by this mutation."""
+  user: User
+
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+type User implements Node {
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  goalContributorsByContributorId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GoalContributorsConnection!
+
+  """Reads and enables pagination through a set of `GoalContributor`."""
+  goalContributorsByContributorIdList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoalContributorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `GoalContributor`."""
+    orderBy: [GoalContributorsOrderBy!]
+  ): [GoalContributor!]!
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  username: String
+}
+
+"""
+A condition to be used against `User` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input UserCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `username` field."""
+  username: String
+}
+
+"""An input for mutations affecting `User`"""
+input UserInput {
+  id: Int
+  username: String
+}
+
+"""Represents an update to a `User`. Fields that are set will be updated."""
+input UserPatch {
+  id: Int
+  username: String
+}
+
+"""A connection to a list of `User` values."""
+type UsersConnection {
+  """
+  A list of edges which contains the `User` and cursor to aid in pagination.
+  """
+  edges: [UsersEdge]!
+
+  """A list of `User` objects."""
+  nodes: [User]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `User` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `User` edge in the connection."""
+type UsersEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `User` at the end of the edge."""
+  node: User
+}
+
+"""Methods to use when ordering `User`."""
+enum UsersOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  USERNAME_ASC
+  USERNAME_DESC
+}

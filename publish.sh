@@ -21,6 +21,7 @@ tar tzf postgraphile-private/builds/pg-sql2.tgz
 tar tzf postgraphile-private/builds/dataplan__pg.tgz
 tar tzf postgraphile-private/builds/graphile-build-pg.tgz
 tar tzf postgraphile-private/builds/postgraphile.tgz
+tar tzf postgraphile-private/builds/graphile__simplify-inflection.tgz
 
 read -n1 -p "Publish? [y,n]" doit
 case $doit in
@@ -44,6 +45,7 @@ case $doit in
     npm publish --access=public --tag=prealpha postgraphile-private/builds/dataplan__pg.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/graphile-build-pg.tgz
     npm publish --access=public --tag=prealpha postgraphile-private/builds/postgraphile.tgz
+    npm publish --access=public --tag=prealpha postgraphile-private/builds/graphile__simplify-inflection.tgz
     ;;
   *) echo 'Not publishing' ;;
 esac
