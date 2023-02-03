@@ -1,0 +1,2 @@
+tests/*/schema.graphql linguist-generated=true
+tests/*/schema.simplified.graphql linguist-generated=true

@@ -1,0 +1,6 @@
+{
+  "disableDefaultMutations": true,
+  "graphileBuildOptions": {
+    "pgOmitListSuffix": true
+  }
+}
