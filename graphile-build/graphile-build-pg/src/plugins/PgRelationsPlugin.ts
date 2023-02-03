@@ -1362,7 +1362,9 @@ function addRelations(
               behavior,
             },
             {
-              description,
+              description:
+                description ??
+                `Reads and enables pagination through a set of \`${typeName}\`.`,
               type: new GraphQLNonNull(
                 new GraphQLList(new GraphQLNonNull(OtherType)),
               ),
