@@ -7,10 +7,13 @@ const { makeSchema, makePgSources } = require("postgraphile");
 const { postgraphilePresetAmber } = require("postgraphile/presets/amber");
 const { makeV4Preset } = require("postgraphile/presets/v4");
 const { printSchema, lexicographicSortSchema } = require("graphql");
+const { parse: parseConnectionString } = require("pg-connection-string");
 
-const ROOT_CONNECTION_STRING = "postgres";
-const DATABASE_NAME =
-  process.env.TEST_SIMPLIFY_DATABASE_URL || "pg_simplify_inflectors";
+const ROOT_CONNECTION_STRING = process.env.ROOT_DATABASE_URL || "postgres";
+const CONNECTION_STRING =
+  process.env.TEST_SIMPLIFY_DATABASE_URL ||
+  "postgres:///pg_simplify_inflectors";
+const DATABASE_NAME = parseConnectionString(CONNECTION_STRING).database;
 const ROOT = `${__dirname}/tests`;
 
 const withPool = async (connectionString, cb) => {
@@ -41,12 +44,16 @@ const withClient = async (pool, cb) => {
   }
 };
 
+const escapeIdentifier = (str) => `"${str.replace(/"/g, '""')}"`;
+
 async function withCleanDb(cb) {
   await withPool(ROOT_CONNECTION_STRING, async (pool) => {
-    await pool.query(`DROP DATABASE IF EXISTS ${DATABASE_NAME};`);
-    await pool.query(`CREATE DATABASE ${DATABASE_NAME};`);
+    await pool.query(
+      `DROP DATABASE IF EXISTS ${escapeIdentifier(DATABASE_NAME)};`,
+    );
+    await pool.query(`CREATE DATABASE ${escapeIdentifier(DATABASE_NAME)};`);
   });
-  await withPool(DATABASE_NAME, async (pool) => cb(pool));
+  await withPool(CONNECTION_STRING, async (pool) => cb(pool));
 }
 
 async function getSettings(dir) {
@@ -59,7 +66,7 @@ async function getSettings(dir) {
 }
 
 async function getSchema(client, withSimplify, settings) {
-  const pgSources = makePgSources(DATABASE_NAME, "app_public");
+  const pgSources = makePgSources(CONNECTION_STRING, "app_public");
   const result = await makeSchema({
     extends: [
       postgraphilePresetAmber,
