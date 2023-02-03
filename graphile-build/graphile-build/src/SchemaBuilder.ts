@@ -26,7 +26,7 @@ const INDENT = "  ";
 class SchemaBuilder<
   TBuild extends GraphileBuild.Build = GraphileBuild.Build,
 > extends EventEmitter {
-  options: GraphileBuild.GraphileBuildSchemaOptions;
+  options: GraphileBuild.SchemaOptions;
   depth: number;
   hooks: GraphileBuild.SchemaBuilderHooks<TBuild>;
 
@@ -39,7 +39,7 @@ class SchemaBuilder<
   newWithHooks: NewWithHooksFunction;
 
   constructor(
-    options: GraphileBuild.GraphileBuildSchemaOptions,
+    options: GraphileBuild.SchemaOptions,
     private inflection: GraphileBuild.Inflection,
   ) {
     super();

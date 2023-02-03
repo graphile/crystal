@@ -2370,6 +2370,8 @@ enum PeopleOrderBy {
 type Person implements Node {
   about: String
   aliases: [String]!
+
+  """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId1List(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2385,6 +2387,8 @@ type Person implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!]
   ): [CompoundKey!]!
+
+  """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId2List(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2630,6 +2634,7 @@ type Post {
 
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
+  """Reads a set of `CompoundKey`."""
   allCompoundKeysList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2645,6 +2650,8 @@ type Query implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!]
   ): [CompoundKey!]
+
+  """Reads a set of `EdgeCase`."""
   allEdgeCasesList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2660,6 +2667,8 @@ type Query implements Node {
     """The method to use when ordering `EdgeCase`."""
     orderBy: [EdgeCasesOrderBy!]
   ): [EdgeCase!]
+
+  """Reads a set of `Issue756`."""
   allIssue756SList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2675,6 +2684,8 @@ type Query implements Node {
     """The method to use when ordering `Issue756`."""
     orderBy: [Issue756SOrderBy!]
   ): [Issue756!]
+
+  """Reads a set of `LeftArm`."""
   allLeftArmsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2690,6 +2701,8 @@ type Query implements Node {
     """The method to use when ordering `LeftArm`."""
     orderBy: [LeftArmsOrderBy!]
   ): [LeftArm!]
+
+  """Reads a set of `MyTable`."""
   allMyTablesList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2705,6 +2718,8 @@ type Query implements Node {
     """The method to use when ordering `MyTable`."""
     orderBy: [MyTablesOrderBy!]
   ): [MyTable!]
+
+  """Reads a set of `NullTestRecord`."""
   allNullTestRecordsList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2720,6 +2735,8 @@ type Query implements Node {
     """The method to use when ordering `NullTestRecord`."""
     orderBy: [NullTestRecordsOrderBy!]
   ): [NullTestRecord!]
+
+  """Reads a set of `Person`."""
   allPeopleList(
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -2735,6 +2752,8 @@ type Query implements Node {
     """The method to use when ordering `Person`."""
     orderBy: [PeopleOrderBy!]
   ): [Person!]
+
+  """Reads a set of `PersonSecret`."""
   allPersonSecretsList(
     """
     A condition to be used in determining which values should be returned by the collection.

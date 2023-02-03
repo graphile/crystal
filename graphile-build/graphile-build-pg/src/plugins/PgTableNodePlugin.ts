@@ -18,7 +18,7 @@ import { tagToString } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
-    interface GraphileBuildSchemaOptions {
+    interface SchemaOptions {
       pgV4UseTableNameForNodeIdentifier?: boolean;
     }
   }

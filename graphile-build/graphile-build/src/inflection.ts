@@ -7,11 +7,26 @@ import { camelCase, constantCase, upperCamelCase } from "./utils.js";
  * phase to build the final inflectors.
  */
 export const makeInitialInflection = () => ({
-  pluralize,
-  singularize: pluralize.singular,
-  upperCamelCase,
-  camelCase,
-  constantCase,
+  pluralize: pluralize as (
+    this: GraphileBuild.Inflection,
+    text: string,
+  ) => string,
+  singularize: pluralize.singular as (
+    this: GraphileBuild.Inflection,
+    text: string,
+  ) => string,
+  upperCamelCase: upperCamelCase as (
+    this: GraphileBuild.Inflection,
+    text: string,
+  ) => string,
+  camelCase: camelCase as (
+    this: GraphileBuild.Inflection,
+    text: string,
+  ) => string,
+  constantCase: constantCase as (
+    this: GraphileBuild.Inflection,
+    text: string,
+  ) => string,
 
   /**
    * Built-in names (allows you to override these in the output schema)

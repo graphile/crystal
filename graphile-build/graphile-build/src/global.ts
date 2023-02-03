@@ -82,7 +82,7 @@ declare global {
 
     interface GraphileBuildInflectionOptions {}
     interface GraphileBuildGatherOptions {}
-    interface GraphileBuildSchemaOptions {
+    interface SchemaOptions {
       subscriptions?: boolean;
       nodeIdFieldName?: string;
       dontSwallowErrors?: boolean;
@@ -189,7 +189,7 @@ declare global {
       /**
        * The options that graphile-build was called with.
        */
-      options: GraphileBuildSchemaOptions;
+      options: SchemaOptions;
 
       /**
        * Version numbers of the various packages used in this build; plugins

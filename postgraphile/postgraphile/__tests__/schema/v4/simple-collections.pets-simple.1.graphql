@@ -347,6 +347,8 @@ type Person implements Node {
     """
     offset: Int
   ): PetsConnection!
+
+  """Reads and enables pagination through a set of `Pet`."""
   petsByOwnerIdList(
     """
     A condition to be used in determining which values should be returned by the collection.

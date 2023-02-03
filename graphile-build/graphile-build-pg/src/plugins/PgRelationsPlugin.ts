@@ -231,7 +231,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           source.getRelation(relationName);
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
-          return this.connectionField(this.camelCase(baseOverride));
+          return this.camelCase(baseOverride);
         }
         return this.connectionField(this._manyRelation(details));
       },
@@ -1362,7 +1362,9 @@ function addRelations(
               behavior,
             },
             {
-              description,
+              description:
+                description ??
+                `Reads and enables pagination through a set of \`${typeName}\`.`,
               type: new GraphQLNonNull(
                 new GraphQLList(new GraphQLNonNull(OtherType)),
               ),
