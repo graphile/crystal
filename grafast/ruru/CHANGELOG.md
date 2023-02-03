@@ -1,5 +1,16 @@
 # ruru
 
+## 2.0.0-0.6
+
+### Patch Changes
+
+- [`a40fa6966`](undefined) - Default to explain enabled. Fix issues with fetcher
+  mutating immutable objects. Fix typo in README. Fix playground on grafast
+  website.
+
+- [`8f04af08d`](https://github.com/benjie/postgraphile-private/commit/8f04af08da68baf7b2b4d508eac0d2a57064da7b)
+  Thanks [@benjie](https://github.com/benjie)! - Fix typo in README
+
 ## 2.0.0-0.5
 
 ### Patch Changes

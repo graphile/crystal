@@ -1,5 +1,11 @@
 # tamedevil
 
+## 0.0.0-0.3
+
+### Patch Changes
+
+- [`4ca7fce12`](undefined) - Make runnable in the browser for playground
+
 ## 0.0.0-0.2
 
 ### Patch Changes

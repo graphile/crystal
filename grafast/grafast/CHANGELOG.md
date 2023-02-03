@@ -1,5 +1,12 @@
 # grafast
 
+## 0.0.1-0.7
+
+### Patch Changes
+
+- Updated dependencies [[`4ca7fce12`](undefined)]:
+  - tamedevil@0.0.0-0.3
+
 ## 0.0.1-0.6
 
 ### Patch Changes

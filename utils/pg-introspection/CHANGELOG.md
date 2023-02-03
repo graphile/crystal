@@ -1,5 +1,16 @@
 # pg-introspection
 
+## 0.0.1-0.2
+
+### Patch Changes
+
+- [`677c8f5fc`](undefined) - Create new getTags() introspection helper and use
+  it. Rename GraphileBuild.GraphileBuildSchemaOptions to
+  GraphileBuild.SchemaOptions. Fix a couple minor inflection bugs. Add some
+  missing descriptions. Fix the initial inflection types to not leak
+  implementation details. Fix inflectors to use ResolvedPreset rather than
+  Preset.
+
 ## 0.0.1-0.1
 
 ### Patch Changes

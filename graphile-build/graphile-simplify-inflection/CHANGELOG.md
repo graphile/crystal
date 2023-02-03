@@ -1,5 +1,11 @@
 # v8.0.0
 
+## 8.0.0-0.1
+
+### Patch Changes
+
+- [`867121cfb`](undefined) - V5 port of @graphile-contrib/pg-simplify-inflector
+
 This is based on V7 of @graphile-contrib/pg-simplify-inflector, rewritten for
 PostGraphile V5. The previous versions relate to
 @graphile-contrib/pg-simplify-inflector instead.
