@@ -1713,7 +1713,7 @@ ${te.join(
     for (const step of this.stepTracker.activeSteps) {
       if (step.id < offset) continue;
       for (const key in step) {
-        const val = step[key];
+        const val = step[key as keyof typeof step];
         if (val instanceof ExecutableStep) {
           errors.push(
             new Error(

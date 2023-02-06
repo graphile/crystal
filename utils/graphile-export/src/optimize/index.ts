@@ -52,7 +52,10 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
         // console.log("Found IIFE", generate(node, {}).code);
 
         const calleePath = path.get("callee");
-        const paramsPaths = calleePath.get("params");
+        let rawParamsPaths = calleePath.get("params");
+        const paramsPaths = Array.isArray(rawParamsPaths)
+          ? rawParamsPaths
+          : [rawParamsPaths];
         const argumentsPaths = path.get("arguments");
         for (let i = params.length - 1; i >= 0; i--) {
           const param = params[i];
@@ -64,7 +67,11 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
             // const binding = calleePath.scope.bindings[param.name];
 
             // TODO: how do we correctly determine if this is safe?
-            if (!calleePath.scope[arg.name]) {
+
+            // FIXME: remove the next 2 comment if nothing broke when we ran the tests.
+            // TODO: previously we were doing this, but that seemed wrong.
+            // if (!calleePath.scope[arg.name]) {
+            if (!calleePath.scope.hasBinding(arg.name)) {
               // Rename the references to this arg to match the arg.
               calleePath.scope.rename(param.name, arg.name);
 

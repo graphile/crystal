@@ -2,7 +2,6 @@
 import chalk from "chalk";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import type { GrafastError } from "../error.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
@@ -30,7 +29,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
 }` as any;
   }
   // Fallback to slow conversion
-  return (obj: object | null | GrafastError): object | null | GrafastError => {
+  return (obj: Record<string, any> | null): Record<string, any> | null => {
     if (obj == null) {
       return obj;
     }

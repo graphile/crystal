@@ -358,7 +358,7 @@ export function executePreemptive(
           null, // extensions
         ),
       ];
-      const payload = Object.create(null);
+      const payload = Object.create(null) as ExecutionResult;
       payload.errors = errors;
       const extensions = bucketRootValue[$$extensions];
       if (extensions) {
@@ -446,6 +446,12 @@ export function executePreemptive(
     return bucketPromise.then(output);
   } else {
     return output();
+  }
+}
+
+declare module "./engine/OperationPlan.js" {
+  interface OperationPlan {
+    [$$contextPlanCache]?: string;
   }
 }
 

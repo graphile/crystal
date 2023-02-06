@@ -1,4 +1,4 @@
-export function EXPORTABLE<T, TScope extends any[]>(
+export function EXPORTABLE<T extends object, TScope extends any[]>(
   factory: (...args: TScope) => T,
   args: [...TScope],
 ): T {

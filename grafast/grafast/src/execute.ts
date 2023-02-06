@@ -52,8 +52,13 @@ export function withGrafastArgs(
   const eventEmitter: ExecutionEventEmitter | undefined = shouldExplain
     ? new EventEmitter()
     : undefined;
+
+  // FIXME: modifying rootValue like this is super dirty. Also, are we sure
+  // that rootValue will be different for each request? Seems risky if someone
+  // passes a constant...
+
   if (shouldExplain) {
-    args.rootValue[$$extensions] = {
+    (args.rootValue as any)[$$extensions] = {
       explain: {
         operations: [],
       },
@@ -61,7 +66,7 @@ export function withGrafastArgs(
   }
 
   const explainOperations = shouldExplain
-    ? args.rootValue[$$extensions].explain.operations
+    ? (args.rootValue as any)[$$extensions].explain.operations
     : undefined;
   const handleExplainOperation = ({
     operation,
@@ -71,7 +76,7 @@ export function withGrafastArgs(
     }
   };
   if (shouldExplain) {
-    args.rootValue[$$eventEmitter] = eventEmitter;
+    (args.rootValue as any)[$$eventEmitter] = eventEmitter;
     eventEmitter!.on("explainOperation", handleExplainOperation);
   }
   const unlisten = shouldExplain

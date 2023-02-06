@@ -177,7 +177,7 @@ function isTE(node: unknown): node is TE {
   return (
     typeof node === "object" &&
     node !== null &&
-    typeof node[$$type] === "string"
+    typeof (node as any)[$$type] === "string"
   );
 }
 

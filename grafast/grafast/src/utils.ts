@@ -103,13 +103,15 @@ function dangerousRawValueToValueNode(value: JSON): ValueNode {
       values: value.map(dangerousRawValueToValueNode),
     };
   }
-  if (typeof value === "object" && value) {
+  if (typeof value === "object" && value !== null) {
     return {
       kind: Kind.OBJECT,
       fields: Object.keys(value).map((key) => ({
         kind: Kind.OBJECT_FIELD,
         name: { kind: Kind.NAME, value: key },
-        value: dangerousRawValueToValueNode(value[key]),
+        value: dangerousRawValueToValueNode(
+          (value as Record<string, any>)[key],
+        ),
       })),
     };
   }
@@ -578,6 +580,12 @@ export function inputObjectFieldSpec<
     : spec;
 }
 
+declare module "graphql" {
+  interface GraphQLEnumType {
+    [$$valueConfigByValue]?: Record<string, GraphQLEnumValueConfig>;
+  }
+}
+
 const $$valueConfigByValue = Symbol("valueConfigByValue");
 /**
  * This would be equivalent to `enumType._valueLookup.get(outputValue)` except
@@ -587,7 +595,7 @@ const $$valueConfigByValue = Symbol("valueConfigByValue");
  */
 export function getEnumValueConfig(
   enumType: GraphQLEnumType,
-  outputValue: unknown,
+  outputValue: string,
 ): GraphQLEnumValueConfig | undefined {
   // We cache onto the enumType directly so that garbage collection can clear up after us easily.
   if (!enumType[$$valueConfigByValue]) {
@@ -600,7 +608,7 @@ export function getEnumValueConfig(
       Object.create(null),
     );
   }
-  return enumType[$$valueConfigByValue][outputValue];
+  return enumType[$$valueConfigByValue]![outputValue];
 }
 
 /**

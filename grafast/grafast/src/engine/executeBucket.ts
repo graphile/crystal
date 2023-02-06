@@ -60,6 +60,10 @@ function mergeErrorsBackIn(
   return finalResults;
 }
 
+type StreamMoreableArray<T> = Array<T> & {
+  [$$streamMore]?: AsyncIterator<any, any, any>;
+};
+
 /** @internal */
 export function executeBucket(
   bucket: Bucket,
@@ -215,9 +219,8 @@ export function executeBucket(
         ) {
           finalResult[resultIndex] = value;
         } else if (value instanceof Error) {
-          const e = value[$$error]
-            ? value
-            : newGrafastError(value, finishedStep.id);
+          const e =
+            $$error in value ? value : newGrafastError(value, finishedStep.id);
           finalResult[resultIndex] = e;
           bucket.hasErrors = true;
         } else if (
@@ -243,7 +246,7 @@ export function executeBucket(
 
           if (initialCount === 0) {
             // Optimization - defer everything
-            const arr: any[] = [];
+            const arr: StreamMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
             finalResult[resultIndex] = arr;
           } else {
@@ -251,7 +254,7 @@ export function executeBucket(
             const promise = (async () => {
               try {
                 let valuesSeen = 0;
-                const arr: any[] = [];
+                const arr: StreamMoreableArray<any> = [];
 
                 /*
                  * We need to "shift" a few entries off the top of the

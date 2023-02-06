@@ -95,8 +95,9 @@ export function _grafastPrint(
     if (symbol instanceof Error) {
       return chalk.red(
         `ERROR<${
-          stripAnsi(String(symbol.message)).replace(/\s+/g, " ").substr(0, 30) +
-          "..."
+          stripAnsi(String(symbol.message))
+            .replace(/\s+/g, " ")
+            .substring(0, 30) + "..."
         }>`,
       );
     }
@@ -115,7 +116,7 @@ export function _grafastPrint(
       .map((key, i) =>
         BG_COLORS[i % BG_COLORS.length](
           `${_grafastPrint(key, new Set(seen))}: ${_grafastPrint(
-            symbol[key],
+            (symbol as any)[key],
             new Set(seen),
           )}`,
         ),

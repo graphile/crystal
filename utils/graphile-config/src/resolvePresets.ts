@@ -178,16 +178,15 @@ function mergePreset(
   const sourceScopes = Object.keys(sourcePreset).filter(isScopeKeyForPreset);
   const scopes = [...new Set([...targetScopes, ...sourceScopes])];
   for (const scope of scopes) {
-    const targetScope = targetPreset[scope];
-    const sourceScope = sourcePreset[scope];
+    const targetScope =
+      targetPreset[scope as keyof GraphileConfig.ResolvedPreset];
+    const sourceScope = sourcePreset[scope as keyof GraphileConfig.Preset];
     if (targetScope && sourceScope) {
-      targetPreset[scope] = Object.assign(
-        Object.create(null),
-        targetScope,
-        sourceScope,
-      );
+      targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
+        Object.assign(Object.create(null), targetScope, sourceScope);
     } else {
-      targetPreset[scope] = targetScope || sourceScope;
+      targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
+        (targetScope || sourceScope) as any;
     }
   }
 }

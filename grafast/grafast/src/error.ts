@@ -1,3 +1,5 @@
+import { $$extensions } from "./interfaces.js";
+
 /**
  * Internally we wrap errors that occur in a GrafastError; this allows us to do
  * simple `instanceof` checks to see if a value is an actual value or an error.
@@ -7,6 +9,7 @@
  */
 export interface GrafastError extends Error {
   originalError: Error;
+  [$$extensions]?: Record<string, any>;
 }
 
 export const $$error = Symbol("isGrafastError");

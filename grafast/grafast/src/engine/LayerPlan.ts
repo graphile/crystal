@@ -319,7 +319,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return this.operationPlan._addModifierStep(step);
   }
 
-  public makeNewBucketCallback(inner: TE): typeof this.newBucket {
+  public makeNewBucketCallback(
+    this: LayerPlan<TReason>,
+    inner: TE,
+  ): typeof this.newBucket {
     return te.run`\
 const that = ${te.ref(this)};
 const newBucket = ${te.ref(newBucket)};

@@ -124,6 +124,12 @@ function isOpPlanCompatible<
  */
 const $$cacheByOperation = Symbol("cacheByOperation");
 
+declare module "graphql" {
+  interface GraphQLSchema {
+    [$$cacheByOperation]?: CacheByOperation;
+  }
+}
+
 /**
  * Implements the `EstablishOpPlan` algorithm.
  *
@@ -144,8 +150,7 @@ export function establishOperationPlan<
   context: TContext,
   rootValue: TRootValue,
 ): OperationPlan {
-  let cacheByOperation: CacheByOperation | undefined =
-    schema[$$cacheByOperation];
+  let cacheByOperation = schema[$$cacheByOperation];
 
   let cache = cacheByOperation?.get(operation);
 
