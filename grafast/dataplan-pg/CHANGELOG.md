@@ -1,5 +1,14 @@
 # @dataplan/pg
 
+## 0.0.1-0.11
+
+### Patch Changes
+
+- [`0e440a862`](https://github.com/benjie/postgraphile-private/commit/0e440a862d29e8db40fd72413223a10de885ef46)
+  Thanks [@benjie](https://github.com/benjie)! - Add new
+  `--superuser-connection` option to allow installing watch fixtures as
+  superuser.
+
 ## 0.0.1-0.10
 
 ### Patch Changes

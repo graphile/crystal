@@ -1,5 +1,34 @@
 # postgraphile
 
+## 5.0.0-0.14
+
+### Patch Changes
+
+- [`af9f11f28`](https://github.com/benjie/postgraphile-private/commit/af9f11f289b0029442c6cf4ededf86ee823a26c3)
+  Thanks [@benjie](https://github.com/benjie)! - 'preset.pgSources' renamed to
+  'preset.pgConfigs' to avoid confusion with PgSource class and
+  'input.pgSources' used for build.
+
+- [`6ebe3a13e`](https://github.com/benjie/postgraphile-private/commit/6ebe3a13e563f2bd665b24a5c84bbfc5eba1cc0a)
+  Thanks [@benjie](https://github.com/benjie)! - Enable omitting update/delete
+  mutations using behaviors on unique constraints.
+
+- [`0e440a862`](https://github.com/benjie/postgraphile-private/commit/0e440a862d29e8db40fd72413223a10de885ef46)
+  Thanks [@benjie](https://github.com/benjie)! - Add new
+  `--superuser-connection` option to allow installing watch fixtures as
+  superuser.
+
+- [`f7d885527`](https://github.com/benjie/postgraphile-private/commit/f7d8855276c3ab0bbcaf8505a1f2f6e872d53128)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in server startup
+  message where preset.server.graphqlPath was not respected.
+- Updated dependencies
+  [[`af9f11f28`](https://github.com/benjie/postgraphile-private/commit/af9f11f289b0029442c6cf4ededf86ee823a26c3),
+  [`6ebe3a13e`](https://github.com/benjie/postgraphile-private/commit/6ebe3a13e563f2bd665b24a5c84bbfc5eba1cc0a),
+  [`0e440a862`](https://github.com/benjie/postgraphile-private/commit/0e440a862d29e8db40fd72413223a10de885ef46)]:
+  - graphile-build-pg@5.0.0-0.12
+  - graphile-build@5.0.0-0.9
+  - @dataplan/pg@0.0.1-0.11
+
 ## 5.0.0-0.13
 
 ### Patch Changes

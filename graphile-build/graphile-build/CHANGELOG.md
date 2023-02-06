@@ -1,5 +1,13 @@
 # graphile-build
 
+## 5.0.0-0.9
+
+### Patch Changes
+
+- [`6ebe3a13e`](https://github.com/benjie/postgraphile-private/commit/6ebe3a13e563f2bd665b24a5c84bbfc5eba1cc0a)
+  Thanks [@benjie](https://github.com/benjie)! - Enable omitting update/delete
+  mutations using behaviors on unique constraints.
+
 ## 5.0.0-0.8
 
 ### Patch Changes
