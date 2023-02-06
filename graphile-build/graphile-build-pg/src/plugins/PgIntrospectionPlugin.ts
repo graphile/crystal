@@ -36,6 +36,7 @@ import type { KeysOfType } from "../interfaces.js";
 import {
   listenWithPgClientFromPgConfig,
   withPgClientFromPgConfig,
+  withSuperuserPgClientFromPgConfig,
 } from "../pgConfigs.js";
 import { watchFixtures } from "../watchFixtures.js";
 
@@ -578,12 +579,12 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         // install the watch fixtures
         if (info.options.installWatchFixtures ?? true) {
           try {
-            await withPgClientFromPgConfig(pgConfig, null, (client) =>
+            await withSuperuserPgClientFromPgConfig(pgConfig, null, (client) =>
               client.query({ text: watchFixtures }),
             );
           } catch (e) {
             console.warn(
-              `Failed to install watch fixtures into '${pgConfig.name}': ${e}`,
+              `Failed to install watch fixtures into '${pgConfig.name}'.\nInstalling watch fixtures requires superuser privileges; have you correctly configured a 'superuserConnectionString'?\nYou may also opt to configure 'installWatchFixtures: false' and install them yourself.\n\nPostgres says: ${e}`,
             );
           }
         }
