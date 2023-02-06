@@ -92,6 +92,19 @@ Note that the `appendPlugins`/`prependPlugins`/`skipPlugins` options require
 V5-compatible plugins, and `pluginHook` is no longer supported - please use the
 `plugins` configuration key instead.
 
+Note also that `PgNodeAliasPostGraphile` (plugin) no longer exists, so instead
+of skipping it with `skipPlugins` you should add the following to your preset:
+
+```js
+const preset = {
+  // ...
+  schema: {
+    // ...
+    pgV4UseTableNameForNodeIdentifier: false,
+  },
+};
+```
+
 :::info
 
 Right now, not many of the V4 plugins have been ported to V5, but with your help
