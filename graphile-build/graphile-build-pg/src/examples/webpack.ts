@@ -50,7 +50,7 @@ async function main() {
     {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
       plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
-      pgSources: [
+      pgConfigs: [
         // Configuration of our main (and only) Postgres database
         {
           name: "main",

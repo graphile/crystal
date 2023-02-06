@@ -6,7 +6,7 @@ import { createServer } from "node:http";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
-import { makePgSources } from "./schema.js";
+import { makePgConfigs } from "./schema.js";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";
@@ -158,8 +158,8 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   // Apply CLI options to preset
   if (connectionString || rawSchema) {
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const newPgSources = makePgSources(connectionString, schemas);
-    preset.pgSources = newPgSources;
+    const newPgConfigs = makePgConfigs(connectionString, schemas);
+    preset.pgConfigs = newPgConfigs;
   }
   preset.server = preset.server || {};
   if (rawPort != null) {
@@ -177,7 +177,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   }
 
   const config = resolvePresets([preset]);
-  if (!config.pgSources || config.pgSources.length === 0) {
+  if (!config.pgConfigs || config.pgConfigs.length === 0) {
     // TODO: respect envvars here?
     console.error(
       `ERROR: Please specify \`--connection\` so we know which database to connect to (or add details to your \`graphile.config.js\`):\n\n  postgraphile${

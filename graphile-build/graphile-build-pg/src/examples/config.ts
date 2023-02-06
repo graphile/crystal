@@ -15,7 +15,7 @@ import {
 import { Pool } from "pg";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
-import { getWithPgClientFromPgSource } from "../pgSources.js";
+import { getWithPgClientFromPgConfig } from "../pgConfigs.js";
 
 // You should set these to be the values you want to use for demonstration
 const DATABASE_CONNECTION_STRING = "postgres:///pagila";
@@ -71,7 +71,7 @@ export async function makeSharedPresetAndClient(pool: Pool) {
   const preset: GraphileConfig.Preset = {
     extends: [graphileBuildPreset, graphileBuildPgPreset],
     plugins: [QueryQueryPlugin, SwallowErrorsPlugin, EnumManglingPlugin],
-    pgSources: [
+    pgConfigs: [
       {
         name: "main",
         schemas: DATABASE_SCHEMAS,
@@ -91,7 +91,7 @@ export async function makeSharedPresetAndClient(pool: Pool) {
     },
   };
 
-  const withPgClient = await getWithPgClientFromPgSource(preset.pgSources![0]!);
+  const withPgClient = await getWithPgClientFromPgConfig(preset.pgConfigs![0]!);
 
   return {
     preset,

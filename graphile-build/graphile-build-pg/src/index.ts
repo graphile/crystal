@@ -8,9 +8,9 @@ export {
   PgTypeColumnTags,
 } from "./interfaces.js";
 export {
-  getWithPgClientFromPgSource,
-  withPgClientFromPgSource,
-} from "./pgSources.js";
+  getWithPgClientFromPgConfig,
+  withPgClientFromPgConfig,
+} from "./pgConfigs.js";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
 export { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";

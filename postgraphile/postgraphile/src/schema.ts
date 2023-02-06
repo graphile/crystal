@@ -25,7 +25,7 @@ declare global {
   }
 }
 
-export function makePgSources(
+export function makePgConfigs(
   connectionString?: string,
   schemas?: string | string[],
 ): ReadonlyArray<GraphileConfig.PgDatabaseConfiguration> {

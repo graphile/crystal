@@ -204,7 +204,7 @@ export async function runTestQuery(
   const preset: GraphileConfig.Preset = {
     extends: [AmberPreset],
     plugins: [StreamDeferPlugin],
-    pgSources: [
+    pgConfigs: [
       {
         adaptor: "@dataplan/pg/adaptors/node-postgres",
         name: "main",

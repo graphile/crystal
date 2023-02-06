@@ -52,7 +52,7 @@ initial preset) to get a completed config:
 ```ts title="graphile.config.js"
 import "graphile-config";
 
-import { makePgSources } from "postgraphile";
+import { makePgConfigs } from "postgraphile";
 import PresetAmber from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
@@ -75,7 +75,7 @@ const preset = {
   // If you're using the CLI you can skip this and use the `-c` and `-s`
   // options instead, but we advise configuring it here so all the modes of
   // running PostGraphile can share it.
-  pgSources: makePgSources(
+  pgConfigs: makePgConfigs(
     // Database connection string:
     process.env.DATABASE_URL,
     // List of schemas to expose:
