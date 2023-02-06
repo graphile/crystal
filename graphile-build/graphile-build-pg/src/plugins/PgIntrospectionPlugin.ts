@@ -34,9 +34,9 @@ import {
 import { version } from "../index.js";
 import type { KeysOfType } from "../interfaces.js";
 import {
-  listenWithPgClientFromPgSource,
-  withPgClientFromPgSource,
-} from "../pgSources.js";
+  listenWithPgClientFromPgConfig,
+  withPgClientFromPgConfig,
+} from "../pgConfigs.js";
 import { watchFixtures } from "../watchFixtures.js";
 
 export type PgEntityWithId =
@@ -71,12 +71,12 @@ declare global {
         getIntrospection(): Promise<
           Array<{
             introspection: Introspection;
-            database: GraphileConfig.PgDatabaseConfiguration;
+            pgConfig: GraphileConfig.PgDatabaseConfiguration;
           }>
         >;
         getDatabase(databaseName: string): Promise<{
           introspection: Introspection;
-          database: GraphileConfig.PgDatabaseConfiguration;
+          pgConfig: GraphileConfig.PgDatabaseConfiguration;
         }>;
         getExecutorForDatabase(databaseName: string): PgExecutor;
 
@@ -274,7 +274,7 @@ declare global {
 }
 
 type IntrospectionResults = Array<{
-  database: GraphileConfig.PgDatabaseConfiguration;
+  pgConfig: GraphileConfig.PgDatabaseConfiguration;
   introspection: Introspection;
 }>;
 
@@ -300,7 +300,7 @@ async function getDb(
 ) {
   const introspections = await info.helpers.pgIntrospection.getIntrospection();
   const relevant = introspections.find(
-    (intro) => intro.database.name === databaseName,
+    (intro) => intro.pgConfig.name === databaseName,
   );
   if (!relevant) {
     throw new Error(`Could not find database '${databaseName}'`);
@@ -371,13 +371,13 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         if (info.state.executors[databaseName]) {
           return info.state.executors[databaseName];
         }
-        const database = info.resolvedPreset.pgSources?.find(
+        const pgConfig = info.resolvedPreset.pgConfigs?.find(
           (db) => db.name === databaseName,
         );
-        if (!database) {
+        if (!pgConfig) {
           throw new Error(`Database '${databaseName}' not found`);
         }
-        const { pgSettingsKey, withPgClientKey } = database;
+        const { pgSettingsKey, withPgClientKey } = pgConfig;
         const executor = EXPORTABLE(
           (
             PgExecutor,
@@ -528,18 +528,18 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           if (info.cache.introspectionResultsPromise) {
             return info.cache.introspectionResultsPromise;
           }
-          if (!info.resolvedPreset.pgSources) {
+          if (!info.resolvedPreset.pgConfigs) {
             return [];
           }
           // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
           const introspectionPromise = Promise.all(
-            info.resolvedPreset.pgSources.map(async (database) => {
+            info.resolvedPreset.pgConfigs.map(async (pgConfig) => {
               const introspectionQuery = makeIntrospectionQuery();
               const {
                 rows: [row],
-              } = await withPgClientFromPgSource(
-                database,
-                database.pgSettingsForIntrospection ?? null,
+              } = await withPgClientFromPgConfig(
+                pgConfig,
+                pgConfig.pgSettingsForIntrospection ?? null,
                 (client) =>
                   client.query<{ introspection: string }>({
                     text: introspectionQuery,
@@ -551,7 +551,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               const introspection = parseIntrospectionResults(
                 row.introspection,
               );
-              return { database, introspection };
+              return { pgConfig, introspection };
             }),
           );
           info.cache.introspectionResultsPromise = introspectionPromise;
@@ -562,7 +562,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
       async getDatabase(info, databaseName) {
         const all = await info.helpers.pgIntrospection.getIntrospection();
-        const match = all.find((n) => n.database.name === databaseName);
+        const match = all.find((n) => n.pgConfig.name === databaseName);
         if (!match) {
           throw new Error(
             `Could not find results for database '${databaseName}'`,
@@ -574,23 +574,23 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 
     async watch(info, callback) {
       const unlistens: Array<() => void> = [];
-      for (const pgSource of info.resolvedPreset.pgSources ?? []) {
+      for (const pgConfig of info.resolvedPreset.pgConfigs ?? []) {
         // install the watch fixtures
         if (info.options.installWatchFixtures ?? true) {
           try {
-            await withPgClientFromPgSource(pgSource, null, (client) =>
+            await withPgClientFromPgConfig(pgConfig, null, (client) =>
               client.query({ text: watchFixtures }),
             );
           } catch (e) {
             console.warn(
-              `Failed to install watch fixtures into '${pgSource.name}': ${e}`,
+              `Failed to install watch fixtures into '${pgConfig.name}': ${e}`,
             );
           }
         }
         try {
           unlistens.push(
-            await listenWithPgClientFromPgSource(
-              pgSource,
+            await listenWithPgClientFromPgConfig(
+              pgConfig,
               "postgraphile_watch",
               (_event) => {
                 // Delete the introspection results
@@ -601,7 +601,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             ),
           );
         } catch (e) {
-          console.warn(`Failed to watch '${pgSource.name}': ${e}`);
+          console.warn(`Failed to watch '${pgConfig.name}': ${e}`);
         }
       }
       return () => {
@@ -620,7 +620,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         await info.helpers.pgIntrospection.getIntrospection();
       await Promise.all(
         introspections.map(async (result) => {
-          const { introspection, database } = result;
+          const { introspection, pgConfig } = result;
 
           const {
             namespaces,
@@ -658,7 +658,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               promises.push(
                 (info.process as any)(eventName, {
                   entity: entity,
-                  databaseName: database.name,
+                  databaseName: pgConfig.name,
                 }),
               );
             }
@@ -666,7 +666,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           }
           await info.process("pgIntrospection_introspection", {
             introspection,
-            databaseName: database.name,
+            databaseName: pgConfig.name,
           });
           await announce("pgIntrospection_namespace", namespaces);
           await announce("pgIntrospection_class", classes);

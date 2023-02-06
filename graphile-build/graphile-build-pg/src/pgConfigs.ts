@@ -62,7 +62,7 @@ declare global {
     }
 
     interface Preset {
-      pgSources?: ReadonlyArray<PgDatabaseConfiguration>;
+      pgConfigs?: ReadonlyArray<PgDatabaseConfiguration>;
     }
   }
 }
@@ -72,19 +72,19 @@ interface PgClientBySourceCacheValue {
   retainers: number;
 }
 
-const pgClientBySourceCache = new Map<
+const withPgClientDetailsByConfigCache = new Map<
   GraphileConfig.PgDatabaseConfiguration,
   PromiseOrDirect<PgClientBySourceCacheValue>
 >();
 
 /**
  * Get or build the 'withPgClient' callback function for a given database
- * source, caching it to make future lookups faster.
+ * config, caching it to make future lookups faster.
  */
-export function getWithPgClientFromPgSource(
-  source: GraphileConfig.PgDatabaseConfiguration,
+export function getWithPgClientFromPgConfig(
+  config: GraphileConfig.PgDatabaseConfiguration,
 ): PromiseOrDirect<WithPgClient> {
-  const existing = pgClientBySourceCache.get(source);
+  const existing = withPgClientDetailsByConfigCache.get(config);
   if (existing) {
     if (isPromiseLike(existing)) {
       return existing.then((v) => {
@@ -100,10 +100,10 @@ export function getWithPgClientFromPgSource(
       // PERF: We should cache imports
       let adaptor: any;
       try {
-        adaptor = require(source.adaptor);
+        adaptor = require(config.adaptor);
       } catch (e) {
         if (e.code === "ERR_REQUIRE_ESM") {
-          adaptor = await import(source.adaptor);
+          adaptor = await import(config.adaptor);
         } else {
           throw e;
         }
@@ -112,11 +112,11 @@ export function getWithPgClientFromPgSource(
         adaptor?.createWithPgClient ?? adaptor?.default?.createWithPgClient;
       if (typeof factory !== "function") {
         throw new Error(
-          `'${source.adaptor}' does not look like a withPgClient adaptor - please ensure it exports a method called 'createWithPgClient'`,
+          `'${config.adaptor}' does not look like a withPgClient adaptor - please ensure it exports a method called 'createWithPgClient'`,
         );
       }
 
-      const originalWithPgClient = await factory(source.adaptorSettings);
+      const originalWithPgClient = await factory(config.adaptorSettings);
       const withPgClient: WithPgClient = (...args) =>
         originalWithPgClient.apply(null, args);
       const cachedValue: PgClientBySourceCacheValue = {
@@ -132,7 +132,7 @@ export function getWithPgClientFromPgSource(
           () => {
             if (cachedValue.retainers === 0 && !released) {
               released = true;
-              pgClientBySourceCache.delete(source);
+              withPgClientDetailsByConfigCache.delete(config);
               return originalWithPgClient.release();
             }
             // TODO: this used to be zero, but that seems really inefficient...
@@ -142,28 +142,28 @@ export function getWithPgClientFromPgSource(
           isTest ? 500 : 5000,
         );
       };
-      pgClientBySourceCache.set(source, cachedValue);
+      withPgClientDetailsByConfigCache.set(config, cachedValue);
       return cachedValue;
     })();
-    if (!pgClientBySourceCache.has(source)) {
-      pgClientBySourceCache.set(source, promise);
+    if (!withPgClientDetailsByConfigCache.has(config)) {
+      withPgClientDetailsByConfigCache.set(config, promise);
     }
     promise.catch(() => {
-      pgClientBySourceCache.delete(source);
+      withPgClientDetailsByConfigCache.delete(config);
     });
     return promise.then((v) => v.withPgClient);
   }
 }
 
-export async function withPgClientFromPgSource<T>(
-  source: GraphileConfig.PgDatabaseConfiguration,
+export async function withPgClientFromPgConfig<T>(
+  config: GraphileConfig.PgDatabaseConfiguration,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
-  const withPgClientFromPgSource = getWithPgClientFromPgSource(source);
-  const withPgClient = isPromiseLike(withPgClientFromPgSource)
-    ? await withPgClientFromPgSource
-    : withPgClientFromPgSource;
+  const withPgClientFromPgConfig = getWithPgClientFromPgConfig(config);
+  const withPgClient = isPromiseLike(withPgClientFromPgConfig)
+    ? await withPgClientFromPgConfig
+    : withPgClientFromPgConfig;
   try {
     return await withPgClient(pgSettings, callback);
   } finally {
@@ -171,15 +171,15 @@ export async function withPgClientFromPgSource<T>(
   }
 }
 
-export async function listenWithPgClientFromPgSource(
-  source: GraphileConfig.PgDatabaseConfiguration,
+export async function listenWithPgClientFromPgConfig(
+  config: GraphileConfig.PgDatabaseConfiguration,
   topic: string,
   callback: (event: any) => void,
 ): Promise<() => void> {
   const deferredUnlisten = defer<() => void>();
-  withPgClientFromPgSource(source, null, async (client) => {
+  withPgClientFromPgConfig(config, null, async (client) => {
     if (!client.listen) {
-      throw new Error(`Client for '${source.name}' does not support listening`);
+      throw new Error(`Client for '${config.name}' does not support listening`);
     }
     const keepalive = defer();
     const unlisten = await client.listen!(topic, callback);

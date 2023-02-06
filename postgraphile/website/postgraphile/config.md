@@ -32,7 +32,7 @@ if the same plugin is referenced in multiple presets.
 The preset also accepts keys for each supported scope. `graphile-config` has no
 native scopes, but different Graphile projects can register their own scopes,
 for example `graphile-build` registers the `inflection`, `gather` and `schema`
-scopes, `graphile-build-pg` registers the `pgSources` scope, and PostGraphile
+scopes, `graphile-build-pg` registers the `pgConfigs` scope, and PostGraphile
 registers the `server` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
@@ -54,7 +54,7 @@ import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
 import { StreamDeferPlugin } from "graphile-build";
-import { makePgSources } from "postgraphile";
+import { makePgConfigs } from "postgraphile";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
@@ -71,9 +71,9 @@ const preset = {
   inflection: {
     /* options for the inflection system */
   },
-  pgSources: [
+  pgConfigs: [
     /* list of PG database configurations, e.g.: */
-    ...makePgSources(
+    ...makePgConfigs(
       // Database connection string:
       process.env.DATABASE_URL,
       // List of schemas to expose:
@@ -103,7 +103,7 @@ _(TypeScript type: `GraphileBuild.GraphileBuildInflectionOptions`)_
 
 _None at this time._
 
-## `pgSources`
+## `pgConfigs`
 
 _(TypeScript type: `ReadonlyArray<GraphileConfig.PgDatabaseConfiguration>`)_
 
@@ -111,11 +111,11 @@ Details the PostgreSQL database(s) for PostGraphile to connect to; this is a
 separate option because it's used in both the `gather` phase (for introspection)
 and at runtime.
 
-Generally it's best to construct this by using the `makePgSources` helper (see
+Generally it's best to construct this by using the `makePgConfigs` helper (see
 below), but if you want to know the nitty-gritty: each entry in the list is an
 object with the following keys (only `name` and `adaptor` are required):
 
-- `name: string` - an arbitrary unique name for this source; please keep it
+- `name: string` - an arbitrary unique name for this config; please keep it
   alphanumeric!
 - `adaptor: string` - the name of the module to use as the postgres adaptor;
   e.g. `@dataplan/pg/adaptors/node-postgres` for the `pg` module
@@ -138,7 +138,7 @@ object with the following keys (only `name` and `adaptor` are required):
 ```js title="Example manual configuration"
 import * as pg from "pg";
 
-const pgSources = [
+const pgConfigs = [
   {
     name: "main",
     schemas: ["app_public"],
@@ -152,11 +152,11 @@ const pgSources = [
 ];
 ```
 
-### `makePgSources`
+### `makePgConfigs`
 
 This simple function will take a PostgreSQL connection string and a list of
 schemas and will return an array containing a configuration object suitable for
-inclusion in `pgSources`.
+inclusion in `pgConfigs`.
 
 :::info
 
@@ -165,8 +165,8 @@ that default over time.
 
 :::
 
-```js title="Example configuration via makePgSources"
-const pgSources = makePgSources(process.env.DATABASE_URL, ["app_public"]);
+```js title="Example configuration via makePgConfigs"
+const pgConfigs = makePgConfigs(process.env.DATABASE_URL, ["app_public"]);
 ```
 
 ## `gather` options
@@ -298,7 +298,7 @@ for realtime). Instead, add helpers to get/set the data you need.
 
 ### Exposing HTTP request data to PostgreSQL
 
-Using the `pgSettings` functionality mentioned in the `pgSources` section above
+Using the `pgSettings` functionality mentioned in the `pgConfigs` section above
 you can extend the data made available within PostgreSQL through
 `current_setting(...)`. To do so, include a `pgSettings` entry in the GraphQL
 context mentioned in the "Grafast options" section above, the value for which

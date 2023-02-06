@@ -38,7 +38,7 @@ export const test =
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
         extends: [AmberPreset, v4Preset],
-        pgSources: [
+        pgConfigs: [
           {
             adaptor: "@dataplan/pg/adaptors/node-postgres",
             name: "main",

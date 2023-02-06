@@ -1,7 +1,7 @@
 import type {} from "grafast";
 
 import { version } from "../index.js";
-import { withPgClientFromPgSource } from "../pgSources.js";
+import { withPgClientFromPgConfig } from "../pgConfigs.js";
 
 export const PgContextPlugin: GraphileConfig.Plugin = {
   name: "PgContextPlugin",
@@ -17,12 +17,12 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
           args.contextValue = Object.create(null);
         }
         const contextValue = args.contextValue as Record<string, any>;
-        if (config.pgSources) {
-          for (const pgSource of config.pgSources) {
-            const { pgSettings, pgSettingsKey, withPgClientKey } = pgSource;
+        if (config.pgConfigs) {
+          for (const pgConfig of config.pgConfigs) {
+            const { pgSettings, pgSettingsKey, withPgClientKey } = pgConfig;
             if (pgSettings && pgSettingsKey == null) {
               throw new Error(
-                `pgSource '${pgSource.name}' specifies pgSettings, but has no pgSettingsKey.`,
+                `pgConfig '${pgConfig.name}' specifies pgSettings, but has no pgSettingsKey.`,
               );
             }
             if (pgSettingsKey != null) {
@@ -47,9 +47,9 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
                 `Key '${withPgClientKey}' already set on the context; refusing to overwrite - please check your configuration.`,
               );
             }
-            contextValue[withPgClientKey] = withPgClientFromPgSource.bind(
+            contextValue[withPgClientKey] = withPgClientFromPgConfig.bind(
               null,
-              pgSource,
+              pgConfig,
             );
           }
         }

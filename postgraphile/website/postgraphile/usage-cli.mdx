@@ -54,12 +54,12 @@ you can run PostGraphile with no (or minimal) CLI flags.
   enables "explain" mode, you won't want this in production but it's very helpful
   in development to know what's going on
 - `--connection <string>` (alias: `-c`)
-  <equivalent>{`{ pgSources: makePgSources('...') }`}</equivalent>
+  <equivalent>{`{ pgConfigs: makePgConfigs('...') }`}</equivalent>
   the PostgreSQL connection string. If omitted, inferred from environmental variables
   (see https://www.postgresql.org/docs/current/static/libpq-envars.html). Examples:
   'db', 'postgres:///db', 'postgres://user:password@domain:port/db?ssl=true'
 - `--schema <string>` (alias: `-s`)
-  <equivalent>{`{ pgSources: makePgSources(databaseUrl, ['...']) }`}</equivalent>
+  <equivalent>{`{ pgConfigs: makePgConfigs(databaseUrl, ['...']) }`}</equivalent>
   a comma-separated list of PostgreSQL schemas to be introspected.
 - `--watch` (alias: `-w`)
   <equivalent>{`{ server: { watch: true } }`}</equivalent>

@@ -9,7 +9,7 @@ import type {
 import { sql } from "pg-sql2";
 
 import { version } from "../index.js";
-import { withPgClientFromPgSource } from "../pgSources.js";
+import { withPgClientFromPgConfig } from "../pgConfigs.js";
 import { addBehaviorToTags } from "../utils.js";
 
 declare global {
@@ -109,12 +109,12 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           )};`,
         );
 
-        const database = info.resolvedPreset.pgSources!.find(
-          (database) => database.name === databaseName,
+        const pgConfig = info.resolvedPreset.pgConfigs!.find(
+          (pgConfig) => pgConfig.name === databaseName,
         );
         try {
-          const { rows } = await withPgClientFromPgSource(
-            database!,
+          const { rows } = await withPgClientFromPgConfig(
+            pgConfig!,
             null,
             (client) => client.query<Record<string, string>>(query),
           );
@@ -122,8 +122,8 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
         } catch (e) {
           let role = "RELEVANT_POSTGRES_USER";
           try {
-            const { rows } = await withPgClientFromPgSource(
-              database!,
+            const { rows } = await withPgClientFromPgConfig(
+              pgConfig!,
               null,
               (client) =>
                 client.query<{ user: string }>({
