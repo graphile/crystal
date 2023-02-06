@@ -396,8 +396,9 @@ export interface NodePostgresAdaptorOptions {
   /** ONLY FOR USE IN TESTS! */
   poolClientIsInTransaction?: boolean;
 
-  connectionString?: string;
   pool?: Pool;
+  poolConfig?: Omit<pg.PoolConfig, "connectionString">;
+  connectionString?: string;
 }
 
 export function createWithPgClient(
@@ -411,7 +412,10 @@ export function createWithPgClient(
       options.poolClientIsInTransaction,
     );
   } else {
-    const pool = new pg.Pool(options);
+    const pool = new pg.Pool({
+      ...options.poolConfig,
+      connectionString: options.connectionString,
+    });
     const release = () => pool.end();
     return makeNodePostgresWithPgClient(pool, release);
   }
