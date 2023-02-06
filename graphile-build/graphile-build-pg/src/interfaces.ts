@@ -1,5 +1,5 @@
-import { WithPgClient } from "@dataplan/pg";
-import { PromiseOrDirect } from "grafast";
+import type { WithPgClient } from "@dataplan/pg";
+import type { PromiseOrDirect } from "grafast";
 
 export interface PgSourceTags extends PgSmartTagsDict {
   name: string;

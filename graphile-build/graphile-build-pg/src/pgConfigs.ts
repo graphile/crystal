@@ -99,7 +99,7 @@ const loadAdaptorCache = new Map<string, PromiseOrDirect<PgAdaptor<any>>>();
 function loadAdaptor<
   TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
 >(adaptorString: TAdaptor): PromiseOrDirect<PgAdaptor<TAdaptor>> {
-  let cached = loadAdaptorCache.get(adaptorString);
+  const cached = loadAdaptorCache.get(adaptorString);
   if (cached) {
     return cached;
   } else {
