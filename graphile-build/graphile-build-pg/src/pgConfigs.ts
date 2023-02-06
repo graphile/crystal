@@ -4,7 +4,7 @@ import { defer, isPromiseLike } from "grafast";
 import type { IncomingMessage } from "node:http";
 import type { Socket } from "node:net";
 
-import type { KeysOfType } from "./interfaces.js";
+import type { KeysOfType, PgAdaptor } from "./interfaces.js";
 
 const isTest = process.env.NODE_ENV === "test";
 
@@ -77,6 +77,46 @@ const withPgClientDetailsByConfigCache = new Map<
   PromiseOrDirect<PgClientBySourceCacheValue>
 >();
 
+function reallyLoadAdaptor<
+  TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+>(adaptorString: TAdaptor): PromiseOrDirect<PgAdaptor<TAdaptor>> {
+  try {
+    const adaptor = require(adaptorString);
+    return adaptor?.createWithPgClient ? adaptor : adaptor?.default;
+  } catch (e) {
+    if (e.code === "ERR_REQUIRE_ESM") {
+      const adaptorPromise = import(adaptorString);
+      return adaptorPromise.then((adaptor) =>
+        adaptor?.createWithPgClient ? adaptor : adaptor?.default,
+      );
+    } else {
+      throw e;
+    }
+  }
+}
+
+const loadAdaptorCache = new Map<string, PromiseOrDirect<PgAdaptor<any>>>();
+function loadAdaptor<
+  TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+>(adaptorString: TAdaptor): PromiseOrDirect<PgAdaptor<TAdaptor>> {
+  let cached = loadAdaptorCache.get(adaptorString);
+  if (cached) {
+    return cached;
+  } else {
+    const result = reallyLoadAdaptor(adaptorString);
+    loadAdaptorCache.set(adaptorString, result);
+    if (isPromiseLike(result)) {
+      result.then(
+        (resolved) => {
+          loadAdaptorCache.set(adaptorString, resolved);
+        },
+        () => {},
+      );
+    }
+    return result;
+  }
+}
+
 /**
  * Get or build the 'withPgClient' callback function for a given database
  * config, caching it to make future lookups faster.
@@ -97,19 +137,8 @@ export function getWithPgClientFromPgConfig(
     }
   } else {
     const promise = (async () => {
-      // PERF: We should cache imports
-      let adaptor: any;
-      try {
-        adaptor = require(config.adaptor);
-      } catch (e) {
-        if (e.code === "ERR_REQUIRE_ESM") {
-          adaptor = await import(config.adaptor);
-        } else {
-          throw e;
-        }
-      }
-      const factory =
-        adaptor?.createWithPgClient ?? adaptor?.default?.createWithPgClient;
+      const adaptor = await loadAdaptor(config.adaptor);
+      const factory = adaptor?.createWithPgClient;
       if (typeof factory !== "function") {
         throw new Error(
           `'${config.adaptor}' does not look like a withPgClient adaptor - please ensure it exports a method called 'createWithPgClient'`,
@@ -117,8 +146,8 @@ export function getWithPgClientFromPgConfig(
       }
 
       const originalWithPgClient = await factory(config.adaptorSettings);
-      const withPgClient: WithPgClient = (...args) =>
-        originalWithPgClient.apply(null, args);
+      const withPgClient = ((...args) =>
+        originalWithPgClient.apply(null, args)) as WithPgClient;
       const cachedValue: PgClientBySourceCacheValue = {
         withPgClient,
         retainers: 1,
@@ -133,7 +162,7 @@ export function getWithPgClientFromPgConfig(
             if (cachedValue.retainers === 0 && !released) {
               released = true;
               withPgClientDetailsByConfigCache.delete(config);
-              return originalWithPgClient.release();
+              return originalWithPgClient.release?.();
             }
             // TODO: this used to be zero, but that seems really inefficient...
             // Figure out why I did that?

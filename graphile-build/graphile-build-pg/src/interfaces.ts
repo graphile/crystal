@@ -1,3 +1,6 @@
+import { WithPgClient } from "@dataplan/pg";
+import { PromiseOrDirect } from "grafast";
+
 export interface PgSourceTags extends PgSmartTagsDict {
   name: string;
 
@@ -53,6 +56,14 @@ export interface PgSmartTagsDict {
 export type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
 }[keyof TObject];
+
+export interface PgAdaptor<
+  TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+> {
+  createWithPgClient: (
+    adaptorSettings: GraphileConfig.PgDatabaseConfiguration<TAdaptor>["adaptorSettings"],
+  ) => PromiseOrDirect<WithPgClient>;
+}
 
 /*
  * Declaration merging to add graphile-build-pg 'tags' to @dataplan/pg
