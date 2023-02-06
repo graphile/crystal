@@ -147,6 +147,7 @@ const pgConfigs = [
     adaptor: "@dataplan/pg/adaptors/node-postgres",
     adaptorSettings: {
       pool: new pg.Pool({ connectionString: process.env.DATABASE_URL }),
+      // superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
     },
   },
 ];
@@ -155,8 +156,9 @@ const pgConfigs = [
 ### `makePgConfigs`
 
 This simple function will take a PostgreSQL connection string and a list of
-schemas and will return an array containing a configuration object suitable for
-inclusion in `pgConfigs`.
+schemas (and, optionally, a superuser connection string for watch mode) and
+will return an array containing a configuration object suitable for inclusion
+in `pgConfigs`.
 
 :::info
 
@@ -166,7 +168,14 @@ that default over time.
 :::
 
 ```js title="Example configuration via makePgConfigs"
-const pgConfigs = makePgConfigs(process.env.DATABASE_URL, ["app_public"]);
+const pgConfigs = makePgConfigs(
+  // Database connection string:
+  process.env.DATABASE_URL,
+  // List of database schemas:
+  ["app_public"],
+  // Optional, only needed for `--watch` mode:
+  process.env.SUPERUSER_DATABASE_URL,
+);
 ```
 
 ## `gather` options

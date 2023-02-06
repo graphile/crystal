@@ -80,6 +80,8 @@ const preset = {
     process.env.DATABASE_URL,
     // List of schemas to expose:
     ["app_public"],
+    // Superuser connection string, only needed if you're using watch mode:
+    // process.env.SUPERUSER_DATABASE_URL,
   ),
 };
 
@@ -150,6 +152,8 @@ the PostGraphile CLI. Currently the main options are:
 - `-n` - the host to listen on; defaults to 'localhost' (you may want to change
   to '0.0.0.0' in Docker or similar environments)
 - `-c postgres://...` - your connection string (same as in V4)
+- `-S postgres://...` - your superuser connection string (replaces V4's
+  `-C`/`--owner-connection` flag)
 - `-s app_public` - your list of PostgreSQL schemas (same as in V4)
 - `-e` - enable "explain" - this allows GraphiQL (now called Ruru) to render the
   operation plan and SQL queries that were executed

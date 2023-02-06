@@ -58,6 +58,10 @@ you can run PostGraphile with no (or minimal) CLI flags.
   the PostgreSQL connection string. If omitted, inferred from environmental variables
   (see https://www.postgresql.org/docs/current/static/libpq-envars.html). Examples:
   'db', 'postgres:///db', 'postgres://user:password@domain:port/db?ssl=true'
+- `--superuser-connection <string>` (alias: `-S`)
+  <equivalent>{`{ pgConfigs: makePgConfigs(databaseUrl, schemas, '...') }`}</equivalent>
+  the PostgreSQL superuser connection string to use for installing watch fixtures
+  (if `--watch` is enabled). If omitted, the regular connection string will be used.
 - `--schema <string>` (alias: `-s`)
   <equivalent>{`{ pgConfigs: makePgConfigs(databaseUrl, ['...']) }`}</equivalent>
   a comma-separated list of PostgreSQL schemas to be introspected.
