@@ -40,6 +40,7 @@
   "dependencies": {
     "debug": "^4.1.1",
     "graphile-config": "workspace:^",
+    "json5": "^2.2.3",
     "tslib": "^2.4.0"
   },
   "engines": {
