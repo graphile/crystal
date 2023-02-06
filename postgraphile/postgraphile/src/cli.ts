@@ -219,7 +219,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       const host =
         address.family === "IPv6" ? `[${address.address}]` : address.address;
       console.log(
-        `Server listening on port ${address.port} at http://${host}:${address.port}/graphql`,
+        `Server listening on port ${address.port} at http://${host}:${
+          address.port
+        }${config.server?.graphqlPath ?? "/graphql"}`,
       );
     } else {
       console.error(`Could not determine server address`);
