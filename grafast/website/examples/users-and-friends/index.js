@@ -246,7 +246,7 @@ async function runCompare() {
       source,
       contextValue: baseContext,
     },
-    { explain: ["mermaid-js"] },
+    { grafast: { explain: ["mermaid-js"] } },
   );
   await fsp.writeFile(
     `${__dirname}/plan.mermaid`,
