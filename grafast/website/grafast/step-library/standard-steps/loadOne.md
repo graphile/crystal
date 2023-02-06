@@ -30,10 +30,18 @@ defined inline. This will allow LoadOneStep to optimise calls to this function.
 An example of the callback function might be:
 
 ```ts
-const userByIdCallback = (ids, { attributes }) => {
+async function getUsersByIds(ids, { attributes }) {
   // Your business logic would be called here; e.g. this might be the same
   // function that your DataLoaders would call, except we can pass additional
-  // information to it:
-  return getUsersByIds(ids, { columns: attributes });
-};
+  // information to it.
+
+  // For example, load from the database
+  const rows = await db.query(
+    sql`SELECT id, ${columnsToSql(attributes)} FROM users WHERE id = ANY($1);`,
+    [ids],
+  );
+
+  // Ensure you return the same number of results, and in the same order!
+  return ids.map((id) => rows.find((row) => row.id === id));
+}
 ```
