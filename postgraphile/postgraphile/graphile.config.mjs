@@ -7,6 +7,35 @@ import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
+/** @type {GraphileConfig.Plugin } */
+/*
+const PrimaryKeyMutationsOnlyPlugin = {
+  name: "PrimaryKeyMutationsOnlyPlugin",
+  version: "0.0.0",
+
+  gather: {
+    hooks: {
+      pgIntrospection_introspection(info, event) {
+        const { introspection } = event;
+        for (const pgConstraint of introspection.constraints) {
+          if (pgConstraint.contype === "u") {
+            const tags = pgConstraint.getTags();
+            const newBehavior = ["-update", "-delete"];
+            if (typeof tags.behavior === "string") {
+              newBehavior.push(tags.behavior);
+            } else if (Array.isArray(tags.behavior)) {
+              newBehavior.push(...tags.behavior);
+            }
+            tags.behavior = newBehavior;
+            console.log(pgConstraint.getClass().relname, newBehavior);
+          }
+        }
+      },
+    },
+  },
+};
+*/
+
 /** @type {GraphileConfig.Preset} */
 const preset = {
   plugins: [
@@ -25,6 +54,7 @@ const preset = {
         },
       },
     }),
+    // PrimaryKeyMutationsOnlyPlugin,
   ],
   extends: [
     postgraphilePresetAmber,
