@@ -13292,6 +13292,7 @@ __metadata:
     graphile-config: "workspace:^"
     jest: "npm:^28.1.0"
     jest-serializer-graphql-schema: "workspace:^"
+    json5: "npm:^2.2.3"
     nodemon: "npm:^2.0.15"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
@@ -15404,14 +15405,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json5@npm:*, json5@npm:^2.1.2, json5@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "json5@npm:2.2.0"
-  dependencies:
-    minimist: "npm:^1.2.5"
+"json5@npm:*, json5@npm:^2.1.2, json5@npm:^2.2.0, json5@npm:^2.2.1, json5@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "json5@npm:2.2.3"
   bin:
     json5: lib/cli.js
-  checksum: 3459a4696949fcf8c03738446cd857b99a49a8957377c11138498e479bbc6d3effdbdc1f4d1471a67ea6d7198fccdcbe82eb3b39b20d252a721d09a8e533e986
+  checksum: e298f92c92197e956eb7a93304f74b5b80b4c3fe412f44a1f3d4c966e5ddf2e8ef2ac7ce0b0c40c78735bf2901c29257a653e1da684dae8e7835932e4904d6a0
   languageName: node
   linkType: hard
 
@@ -15423,15 +15422,6 @@ __metadata:
   bin:
     json5: lib/cli.js
   checksum: fd9492140ea8a1ec338c96e8527e940c9464ca3c7ef8fbf00b8bbbac1c6e60d612bf6640885e8a9108c3b71dc913f9a07a628df36f462853ea8c59bbce192e32
-  languageName: node
-  linkType: hard
-
-"json5@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "json5@npm:2.2.1"
-  bin:
-    json5: lib/cli.js
-  checksum: 8bb433c397375ec5b9150e08d1a323acf5258d51126c55e11e838136f201c197e1589cba42559c97d39bac54ed1293de1e5caff17ce0dc624bfd845c10d9eaba
   languageName: node
   linkType: hard
 

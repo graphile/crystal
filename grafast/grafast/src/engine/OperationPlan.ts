@@ -323,14 +323,16 @@ export class OperationPlan {
 
     // A JIT'd object constructor
     this.makeMetaByMetaKey = te.run`
-return () => ({
+return () => {
+  const metaByMetaKey = Object.create(null);
 ${te.join(
   allMetaKeysList.map(
-    (key) => te`  ${te.dangerousKey(key)}: Object.create(null),\n`,
+    (key) => te`  metaByMetaKey${te.set(key)} = Object.create(null);`,
   ),
-  "",
-)}\
-});`;
+  "\n",
+)}
+  return metaByMetaKey;
+};`;
   }
 
   /**
