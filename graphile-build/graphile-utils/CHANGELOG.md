@@ -1,5 +1,20 @@
 # graphile-utils
 
+## 5.0.0-0.13
+
+### Patch Changes
+
+- [#173](https://github.com/benjie/postgraphile-private/pull/173)
+  [`208166269`](https://github.com/benjie/postgraphile-private/commit/208166269177d6e278b056e1c77d26a2d8f59f49)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in grafast causing
+  loadOne to error. Add missing JSON5 dependency.
+
+- Updated dependencies
+  [[`208166269`](https://github.com/benjie/postgraphile-private/commit/208166269177d6e278b056e1c77d26a2d8f59f49)]:
+  - grafast@0.0.1-0.8
+  - graphile-build@5.0.0-0.10
+  - graphile-build-pg@5.0.0-0.13
+
 ## 5.0.0-0.12
 
 ### Patch Changes

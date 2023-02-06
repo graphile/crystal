@@ -1,5 +1,17 @@
 # postgraphile
 
+## 5.0.0-0.15
+
+### Patch Changes
+
+- Updated dependencies
+  [[`208166269`](https://github.com/benjie/postgraphile-private/commit/208166269177d6e278b056e1c77d26a2d8f59f49)]:
+  - grafast@0.0.1-0.8
+  - @dataplan/pg@0.0.1-0.12
+  - grafserv@0.0.1-0.10
+  - graphile-build@5.0.0-0.10
+  - graphile-build-pg@5.0.0-0.13
+
 ## 5.0.0-0.14
 
 ### Patch Changes
