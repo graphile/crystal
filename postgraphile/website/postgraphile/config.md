@@ -436,3 +436,19 @@ _(TypeScript type: `import { ServerOptions } from "grafserv"`)_
 - `watch: boolean` - Set true to enable watch mode
 - `maxRequestLength: number` - The length, in bytes, for the largest request
   body that the server will accept
+
+## Viewing your config
+
+In your `graphile.config.mjs` (or similar) file, append the following, replacing `preset` with the name of the variable in which your preset is stored:
+
+```js
+import { resolvePresets } from "graphile-config";
+const resolvedPreset = resolvePresets([preset]);
+console.dir(resolvedPreset);
+```
+
+:::info
+
+We're going to work on making this a bit nicer in future!
+
+:::
