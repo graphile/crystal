@@ -220,3 +220,21 @@ export async function listenWithPgClientFromPgConfig(
   }).catch((e) => deferredUnlisten.reject(e));
   return deferredUnlisten;
 }
+
+// We don't cache superuser withPgClients
+export async function withSuperuserPgClientFromPgConfig<T>(
+  config: GraphileConfig.PgDatabaseConfiguration,
+  pgSettings: { [key: string]: string } | null,
+  callback: (client: PgClient) => T | Promise<T>,
+): Promise<T> {
+  const adaptor = await loadAdaptor(config.adaptor);
+  const withPgClient = await adaptor.createWithPgClient(
+    config.adaptorSettings,
+    "SUPERUSER",
+  );
+  try {
+    return await withPgClient(pgSettings, callback);
+  } finally {
+    withPgClient.release?.();
+  }
+}

@@ -395,15 +395,43 @@ export interface NodePostgresAdaptorOptions {
   poolClient?: pg.PoolClient;
   /** ONLY FOR USE IN TESTS! */
   poolClientIsInTransaction?: boolean;
+  /** ONLY FOR USE IN TESTS! */
+  superuserPoolClient?: pg.PoolClient;
+  /** ONLY FOR USE IN TESTS! */
+  superuserPoolClientIsInTransaction?: boolean;
 
   pool?: Pool;
   poolConfig?: Omit<pg.PoolConfig, "connectionString">;
   connectionString?: string;
+
+  /** For installing the watch fixtures */
+  superuserPool?: Pool;
+  /** For installing the watch fixtures */
+  superuserConnectionString?: string;
 }
 
 export function createWithPgClient(
   options: NodePostgresAdaptorOptions,
+  variant?: "SUPERUSER" | string | null,
 ): WithPgClient {
+  if (variant === "SUPERUSER") {
+    if (options.superuserPool) {
+      return makeNodePostgresWithPgClient(options.superuserPool);
+    } else if (options.superuserPoolClient) {
+      return makeWithPgClientViaNodePostgresClientAlreadyInTransaction(
+        options.superuserPoolClient,
+        options.superuserPoolClientIsInTransaction,
+      );
+    } else if (options.superuserConnectionString) {
+      const pool = new pg.Pool({
+        ...options.poolConfig,
+        connectionString: options.superuserConnectionString,
+      });
+      const release = () => pool.end();
+      return makeNodePostgresWithPgClient(pool, release);
+    }
+    // Otherwise, fall through to default handling
+  }
   if (options.pool) {
     return makeNodePostgresWithPgClient(options.pool);
   } else if (options.poolClient) {

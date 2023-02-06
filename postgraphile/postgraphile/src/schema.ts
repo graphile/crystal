@@ -28,6 +28,7 @@ declare global {
 export function makePgConfigs(
   connectionString?: string,
   schemas?: string | string[],
+  superuserConnectionString?: string,
 ): ReadonlyArray<GraphileConfig.PgDatabaseConfiguration> {
   const pool = new Pool({
     connectionString,
@@ -43,6 +44,7 @@ export function makePgConfigs(
     adaptor: "@dataplan/pg/adaptors/node-postgres",
     adaptorSettings: {
       pool,
+      superuserConnectionString,
     },
   };
   return [source];

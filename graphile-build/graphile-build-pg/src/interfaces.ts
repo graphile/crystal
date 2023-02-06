@@ -62,6 +62,7 @@ export interface PgAdaptor<
 > {
   createWithPgClient: (
     adaptorSettings: GraphileConfig.PgDatabaseConfiguration<TAdaptor>["adaptorSettings"],
+    variant?: "SUPERUSER" | null,
   ) => PromiseOrDirect<WithPgClient>;
 }
 

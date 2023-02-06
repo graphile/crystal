@@ -27,6 +27,12 @@ export function options(yargs: Argv) {
       type: "string",
       description: "The PostgreSQL connection string to connect to",
     })
+    .option("superuser-connection", {
+      alias: "S",
+      type: "string",
+      description:
+        "The PostgreSQL connection string to use to install the watch fixtures, requires superuser privileges",
+    })
     .option("schema", {
       alias: "s",
       type: "string",
@@ -129,6 +135,7 @@ async function loadPresets(
 export async function run(args: ArgsFromOptions<typeof options>) {
   const {
     connection: connectionString,
+    superuserConnection: superuserConnectionString,
     schema: rawSchema,
     port: rawPort,
     host: rawHost,
@@ -156,9 +163,18 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   }
 
   // Apply CLI options to preset
-  if (connectionString || rawSchema) {
+  if (connectionString || rawSchema || superuserConnectionString) {
+    if (superuserConnectionString && !connectionString) {
+      throw new Error(
+        "--superuser-connection must not be specified without --connection",
+      );
+    }
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const newPgConfigs = makePgConfigs(connectionString, schemas);
+    const newPgConfigs = makePgConfigs(
+      connectionString,
+      schemas,
+      superuserConnectionString,
+    );
     preset.pgConfigs = newPgConfigs;
   }
   preset.server = preset.server || {};
