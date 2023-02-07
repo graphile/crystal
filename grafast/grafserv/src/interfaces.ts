@@ -77,6 +77,9 @@ declare global {
       http?: NormalizedRequestDigest;
     }
     interface Preset {
+      /**
+       * Configuration options for Grafserv
+       */
       server?: ServerOptions;
     }
   }

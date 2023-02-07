@@ -10,6 +10,11 @@ declare global {
       before?: string[];
     }
 
+    /**
+     * A Graphile Config Preset that can be combined with other presets to
+     * ultimately build a resolved preset: a combination of plugins and
+     * configuration options to be used by the various Graphile tools.
+     */
     interface Preset {
       extends?: ReadonlyArray<Preset>;
       plugins?: Plugin[];
