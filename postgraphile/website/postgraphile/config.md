@@ -120,7 +120,7 @@ object with the following keys (only `name` and `adaptor` are required):
 - `adaptor: string` - the name of the module to use as the postgres adaptor;
   e.g. `@dataplan/pg/adaptors/node-postgres` for the `pg` module
 - `adaptorSettings` - options to pass to the adaptor, these are different for
-  each adaptor
+  each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
 - `listen: (topic: string) => AsyncIterable<string>` - a callback function to
   use to listen to a particular topic
@@ -177,6 +177,30 @@ const pgConfigs = makePgConfigs(
   process.env.SUPERUSER_DATABASE_URL,
 );
 ```
+
+### `adaptorSettings`
+
+Each adaptor has its own adaptor-specific settings.
+
+#### `@dataplan/pg/adaptors/node-postgres`
+
+This adaptor uses the `pg` module under the hood and uses the `pg.Pool` API
+primarily, it accepts the following options:
+
+- `pool` - pass your own pre-built `pg.Pool` instance to use, in which case all
+  other (non-superuser) options will be ignored. You are responsible for
+  releasing this pool!
+- `superuserPool` - as `pool`, but for superuser connections (only needed to
+  install the watch fixtures in watch mode)
+- `connectionString` - the database connection string to use, we'll create a
+  pool for you automatically (and handle releasing it) using this connection
+  string
+- `poolConfig` - additional configuration options (options other than
+  `connectionString`) to pass through to `pg.Pool`; see the [pg.Pool
+  options](https://node-postgres.com/apis/pool) which inherit the [pg.Client
+  options](https://node-postgres.com/apis/client).
+- `superuserConnectionString` - as `connectionString`, but for superuser
+  connections (only needed to install the watch fixtures in watch mode)
 
 ## `gather` options
 
