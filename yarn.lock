@@ -13322,10 +13322,13 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:^16.11.15"
     "@typescript/vfs": "npm:^1.4.0"
+    graphile-config: "workspace:^"
     jest: "npm:^28.1.0"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
     typescript: "npm:^4.8.1-rc"
+  bin:
+    graphile: dist/cli-run.js
   languageName: unknown
   linkType: soft
 
