@@ -74,8 +74,26 @@ export interface GatherPluginContext<
 declare global {
   namespace GraphileConfig {
     interface Preset {
+      /**
+       * The inflection phase is the first phase that occurs when building a
+       * schema with Graphile Build. It is responsible for naming things - both
+       * things that are generated in the `gather` phase, and the ultimate
+       * types, fields, arguments, directives and so on in the GraphQL schema.
+       */
       inflection?: GraphileBuild.GraphileBuildInflectionOptions;
+      /**
+       * The `gather` phase is the second phase that occurs when building a
+       * schema with Graphile Build. It is responsible for looking at
+       * everything that can influence the shape of your schema, and turning
+       * that into an "input" for the `schema` phase.
+       */
       gather?: GraphileBuild.GraphileBuildGatherOptions;
+      /**
+       * The `schema` phase is the final phase that occurs when building a
+       * schema with Graphile Build. It is responsible for taking the inputs
+       * from the `gather` phase (and using the inflectors from the
+       * `inflection` phase) and generating a final GraphQL schema.
+       */
       schema?: GraphileBuild.SchemaOptions;
     }
 

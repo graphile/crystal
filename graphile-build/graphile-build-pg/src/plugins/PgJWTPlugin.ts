@@ -16,6 +16,13 @@ declare global {
     }
 
     interface GraphileBuildGatherOptions {
+      // TODO: we may want multiple of these!
+      /**
+       * If you would like PostGraphile to automatically recognize a PostgreSQL
+       * type as a JWT, you should pass a tuple of the
+       * `["<schema name>", "<type name>"]` so we can recognize it. This is
+       * case sensitive.
+       */
       pgJwtType?: [string, string];
     }
 

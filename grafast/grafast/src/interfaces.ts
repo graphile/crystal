@@ -63,6 +63,10 @@ declare global {
   namespace GraphileConfig {
     interface GraphQLRequestContext {}
     interface Preset {
+      /**
+       * Options that control how `grafast` should execute your GraphQL
+       * operations.
+       */
       grafast?: GrafastOptions;
     }
     interface GrafastHooks {

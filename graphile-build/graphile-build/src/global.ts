@@ -83,14 +83,32 @@ declare global {
     interface GraphileBuildInflectionOptions {}
     interface GraphileBuildGatherOptions {}
     interface SchemaOptions {
+      // TODO: review this option
+      /**
+       * Should we enable subscriptions in the schema?
+       */
       subscriptions?: boolean;
+      /**
+       * If your schema includes compatibility with the GraphQL Global Object
+       * Identification Specification, typically this will be called 'id'.
+       * However the term 'id' often conflicts with databases which commonly
+       * use 'id' as their primary key name, so we give you the option to
+       * rename it.
+       */
       nodeIdFieldName?: string;
+
+      /**
+       * `SwallowErrorsPlugin` by default will "swallow" errors, allowing you
+       * to continue building your GraphQL schema even if errors (such as
+       * naming conflicts) occur. It is recommended that you set this option to
+       * `true` in your production configuration to disable this behavior.
+       */
       dontSwallowErrors?: boolean;
 
       /**
-       * If set to 'only' then connections will be avoided, preferring lists.
-       * If set to 'omit' then lists will be avoided, preferring connections.
-       * If set to 'both' then both lists and connections will be generated.
+       * - 'only': connections will be avoided, preferring lists
+       * - 'omit': lists will be avoided, preferring connections
+       * - 'both': both lists and connections will be generated
        */
       simpleCollections?: "only" | "both" | "omit";
     }
