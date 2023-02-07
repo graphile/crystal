@@ -5,6 +5,16 @@ import {
 } from "@typescript/vfs";
 import ts, { isVariableStatement } from "typescript";
 
+const filename = "graphile.config.ts";
+const filenameInJs = filename.replace(/\.([mc]?)(ts)$/, ".$1js");
+
+let outputText = ``;
+function out(text: string = ""): void {
+  outputText += text + "\n";
+  console.log(text);
+}
+out(`# ${filename} Reference`);
+out();
 const compilerOpts: ts.CompilerOptions = {
   target: ts.ScriptTarget.ES2016,
   esModuleInterop: true,
@@ -30,7 +40,8 @@ const FAKE_FILENAME = "graphileConfigInspection.ts";
 const BASE_CONTENT = `\
 /// <reference types="node" />
 import "graphile-config";
-import {} from './graphile.config.js';
+import {} from './${filenameInJs}';
+type Digest<T> = { [TKey in keyof T]: T[TKey] } & {};
 const preset: GraphileConfig.Preset`;
 fsMap.set(FAKE_FILENAME, BASE_CONTENT);
 
@@ -51,7 +62,21 @@ const env = createVirtualTypeScriptEnvironment(
     FAKE_FILENAME,
     content.length,
   );
-  console.dir(info?.documentation);
+  out(prettyDocumentation(info?.documentation));
+  const content2 =
+    BASE_CONTENT + `;\ntype Config = Digest<GraphileConfig.Preset>;`;
+  env.updateFile(FAKE_FILENAME, content2);
+  const info2 = env.languageService.getQuickInfoAtPosition(
+    FAKE_FILENAME,
+    content.length + 8,
+  );
+
+  out();
+  out("```ts");
+  //console.dir(info2);
+  out(prettyDisplayParts(info2?.displayParts, "="));
+  out("```");
+  out();
 }
 
 let keys: string[] = [];
@@ -72,7 +97,6 @@ let keys: string[] = [];
   }
   //console.dir(completions);
 }
-console.log(keys);
 
 const accessKey = (key: string): string => {
   // TODO: improve?
@@ -113,10 +137,10 @@ for (const key of keys) {
     const relevant = completions?.entries
       .filter((e) => e.kind === "property")
       .map((r) => r.name);
-    console.log(`## ${key}`);
-    console.log();
-    console.log(prettyDocumentation(info?.documentation));
-    console.log();
+    out(`## ${key}`);
+    out();
+    out(prettyDocumentation(info?.documentation));
+    out();
     if (relevant) {
       for (const subkey of relevant) {
         const contentWithSubpropertyAccess =
@@ -145,14 +169,16 @@ for (const key of keys) {
         );
         console.log(key, subkey, info, def, hints, com);
         */
-        console.log(`### ${key}.${subkey}`);
-        console.log();
-        console.log(
-          `Type: \`${prettyDisplayParts(info?.displayParts) ?? "unknown"}\``,
+        out(`### ${key}.${subkey}`);
+        out();
+        out(
+          `Type: \`${
+            prettyDisplayParts(info?.displayParts, ":") ?? "unknown"
+          }\``,
         );
-        console.log();
-        console.log(prettyDocumentation(info?.documentation));
-        console.log();
+        out();
+        out(prettyDocumentation(info?.documentation));
+        out();
       }
     }
   }
@@ -209,11 +235,12 @@ ts.forEachChild(index, (node) => {
 
 function prettyDisplayParts(
   displayParts: ReadonlyArray<ts.SymbolDisplayPart> | undefined,
+  trimUntil = ":",
 ): string {
   if (!displayParts) {
     return "";
   }
-  let found = false;
+  let found = !trimUntil;
   let depth = 0;
   let str = "";
   for (const { text } of displayParts) {
@@ -223,7 +250,7 @@ function prettyDisplayParts(
       depth++;
     } else if (text === ")" || text === "]") {
       depth--;
-    } else if (text === ":") {
+    } else if (text === trimUntil) {
       found = true;
     }
   }
