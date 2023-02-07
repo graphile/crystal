@@ -9,9 +9,14 @@ const filename = "graphile.config.ts";
 const filenameInJs = filename.replace(/\.([mc]?)(ts)$/, ".$1js");
 
 let outputText = ``;
+let last = "";
 function out(text: string = ""): void {
+  if (text === "" && last === "") {
+    return;
+  }
   outputText += text + "\n";
   console.log(text);
+  last = text;
 }
 out(`# ${filename} Reference`);
 out();
@@ -63,6 +68,8 @@ const env = createVirtualTypeScriptEnvironment(
     content.length,
   );
   out(prettyDocumentation(info?.documentation));
+  out();
+  /*
   const content2 =
     BASE_CONTENT + `;\ntype Config = Digest<GraphileConfig.Preset>;`;
   env.updateFile(FAKE_FILENAME, content2);
@@ -71,12 +78,12 @@ const env = createVirtualTypeScriptEnvironment(
     content.length + 8,
   );
 
-  out();
   out("```ts");
   //console.dir(info2);
   out(prettyDisplayParts(info2?.displayParts, "="));
   out("```");
   out();
+  */
 }
 
 let keys: string[] = [];
@@ -107,6 +114,11 @@ const accessKey = (key: string): string => {
   }
 };
 
+let later: Array<string | undefined> = [];
+function outLater(str?: string): void {
+  later.push(str);
+}
+let entries: string[] = [];
 for (const key of keys) {
   // Always an object, unless...
   const isArray = [
@@ -117,7 +129,18 @@ for (const key of keys) {
   ].includes(key);
 
   if (isArray) {
-    // TODO!
+    const contentWithProperty =
+      BASE_CONTENT + ` = [];\npreset${accessKey(key)}`;
+    env.updateFile(FAKE_FILENAME, contentWithProperty);
+    const info = env.languageService.getQuickInfoAtPosition(
+      FAKE_FILENAME,
+      contentWithProperty.length,
+    );
+    entries.push(
+      `${key}?: ${prettyDisplayParts(info?.displayParts, ":")
+        .replace(/\| undefined$/, "")
+        .trim()}`,
+    );
   } else {
     const SUFFIX1 = ` = {`;
     const SUFFIX2 = `};\n`;
@@ -129,6 +152,8 @@ for (const key of keys) {
       FAKE_FILENAME,
       contentWithProperty.length - SUFFIX1.length - SUFFIX2.length,
     );
+    entries.push(`${key}?: ${prettyDisplayParts(info?.displayParts, ":")};`);
+
     const completions = env.languageService.getCompletionsAtPosition(
       FAKE_FILENAME,
       contentWithProperty.length - SUFFIX2.length,
@@ -137,11 +162,17 @@ for (const key of keys) {
     const relevant = completions?.entries
       .filter((e) => e.kind === "property")
       .map((r) => r.name);
-    out(`## ${key}`);
-    out();
-    out(prettyDocumentation(info?.documentation));
-    out();
+    outLater(`## ${key}`);
+    outLater();
+    outLater(prettyDocumentation(info?.documentation));
+    outLater();
+
     if (relevant) {
+      let subentries: string[] = [];
+      let laterStill: Array<string | undefined> = [];
+      const outLaterStill = (line?: string): void => {
+        laterStill.push(line);
+      };
       for (const subkey of relevant) {
         const contentWithSubpropertyAccess =
           contentWithProperty + `preset${accessKey(key)}!${accessKey(subkey)}`;
@@ -149,6 +180,11 @@ for (const key of keys) {
         const info = env.languageService.getQuickInfoAtPosition(
           FAKE_FILENAME,
           contentWithSubpropertyAccess.length,
+        );
+        subentries.push(
+          `${subkey}?: ${prettyDisplayParts(info?.displayParts, ":")
+            .replace(/\| undefined$/, "")
+            .trim()};`,
         );
         /*
         const def = env.languageService.getDefinitionAtPosition(
@@ -169,17 +205,32 @@ for (const key of keys) {
         );
         console.log(key, subkey, info, def, hints, com);
         */
-        out(`### ${key}.${subkey}`);
-        out();
-        out(
+        outLaterStill(`### ${key}.${subkey}`);
+        outLaterStill();
+        outLaterStill(
           `Type: \`${
             prettyDisplayParts(info?.displayParts, ":") ?? "unknown"
           }\``,
         );
-        out();
-        out(prettyDocumentation(info?.documentation));
-        out();
+        outLaterStill();
+        outLaterStill(prettyDocumentation(info?.documentation));
+        outLaterStill();
       }
+
+      if (subentries.length) {
+        outLater("```ts");
+        outLater(`{`);
+        for (const entry of subentries) {
+          outLater("  " + entry);
+        }
+        outLater("}");
+        outLater("```");
+        outLater();
+      }
+      for (const line of laterStill) {
+        outLater(line);
+      }
+      laterStill = [];
     }
   }
   /*
@@ -192,6 +243,21 @@ for (const key of keys) {
   }
 */
 }
+
+if (entries.length) {
+  out("```ts");
+  out(`{`);
+  for (const entry of entries) {
+    out("  " + entry);
+  }
+  out("}");
+  out("```");
+  out();
+}
+for (const line of later) {
+  out(line);
+}
+later = [];
 
 /*
 debugger;
