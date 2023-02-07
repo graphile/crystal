@@ -45,3 +45,5 @@ async function getUsersByIds(ids, { attributes }) {
   return ids.map((id) => rows.find((row) => row.id === id));
 }
 ```
+
+[dataloader]: https://github.com/graphql/dataloader
