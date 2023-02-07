@@ -67,6 +67,7 @@ const preset: GraphileConfig.Preset`;
     compilerOpts,
   );
 
+  /*
   {
     const content = BASE_CONTENT;
     env.updateFile(FAKE_FILENAME, content);
@@ -76,7 +77,6 @@ const preset: GraphileConfig.Preset`;
     );
     //out(prettyDocumentation(info?.documentation));
     //out();
-    /*
   const content2 =
     BASE_CONTENT + `;\ntype Config = Digest<GraphileConfig.Preset>;`;
   env.updateFile(FAKE_FILENAME, content2);
@@ -90,8 +90,8 @@ const preset: GraphileConfig.Preset`;
   out(prettyDisplayParts(info2?.displayParts, "="));
   out("```");
   out();
-  */
   }
+  */
 
   let keys: string[] = [];
   {
@@ -111,6 +111,14 @@ const preset: GraphileConfig.Preset`;
     }
     //console.dir(completions);
   }
+  keys.sort();
+  ["extends", "plugins", "disablePlugins"].reverse().forEach((key) => {
+    const i = keys.indexOf(key);
+    if (i >= 0) {
+      keys.splice(i, 1);
+    }
+    keys.unshift(key);
+  });
 
   const accessKey = (key: string): string => {
     // TODO: improve?
@@ -168,7 +176,8 @@ const preset: GraphileConfig.Preset`;
       );
       const relevant = completions?.entries
         .filter((e) => e.kind === "property")
-        .map((r) => r.name);
+        .map((r) => r.name)
+        .sort();
       outLater(`## ${key}`);
       outLater();
       outLater(prettyDocumentation(info?.documentation));
