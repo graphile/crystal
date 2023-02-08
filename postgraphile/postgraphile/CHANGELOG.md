@@ -1,5 +1,41 @@
 # postgraphile
 
+## 5.0.0-0.16
+
+### Patch Changes
+
+- [#178](https://github.com/benjie/postgraphile-private/pull/178)
+  [`1b040b3ba`](https://github.com/benjie/postgraphile-private/commit/1b040b3bad10ea42b01134e6bddaefaf604936c0)
+  Thanks [@benjie](https://github.com/benjie)! - `@omit` and similar smart tags
+  are now processed on `@foreignKey` and other fake constraints.
+
+- [#176](https://github.com/benjie/postgraphile-private/pull/176)
+  [`19e2961de`](https://github.com/benjie/postgraphile-private/commit/19e2961de67dc0b9601799bba256e4c4a23cc0cb)
+  Thanks [@benjie](https://github.com/benjie)! - Better graphile.config.\*
+  compatibility with ESM-emulation, so 'export default preset;' should work in
+  TypeScript even if outputting to CommonJS.
+
+- [#177](https://github.com/benjie/postgraphile-private/pull/177)
+  [`6be68a53e`](https://github.com/benjie/postgraphile-private/commit/6be68a53e21940406a9fd629ee15cb1673497a6e)
+  Thanks [@benjie](https://github.com/benjie)! - `@foreignFieldName` smart tag
+  is now fed into the `inflection.connectionField(...)` or
+  `inflection.listField(...)` inflector as appropriate. If you are using
+  `@foreignSimpleFieldName` you may be able to delete that now; alternatively
+  you should consider renaming `@foreignFieldName` to
+  `@foreignConnectionFieldName` for consistency.
+- Updated dependencies
+  [[`1b040b3ba`](https://github.com/benjie/postgraphile-private/commit/1b040b3bad10ea42b01134e6bddaefaf604936c0),
+  [`19e2961de`](https://github.com/benjie/postgraphile-private/commit/19e2961de67dc0b9601799bba256e4c4a23cc0cb),
+  [`6be68a53e`](https://github.com/benjie/postgraphile-private/commit/6be68a53e21940406a9fd629ee15cb1673497a6e),
+  [`11d6be65e`](https://github.com/benjie/postgraphile-private/commit/11d6be65e0da489f8ab3e3a8b8db145f8b2147ad)]:
+  - graphile-build-pg@5.0.0-0.14
+  - graphile-config@0.0.1-0.3
+  - grafast@0.0.1-0.9
+  - grafserv@0.0.1-0.11
+  - graphile-build@5.0.0-0.11
+  - ruru@2.0.0-0.7
+  - @dataplan/pg@0.0.1-0.13
+
 ## 5.0.0-0.15
 
 ### Patch Changes

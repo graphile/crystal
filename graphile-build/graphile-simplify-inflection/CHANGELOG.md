@@ -1,5 +1,23 @@
 # v8.0.0
 
+## 8.0.0-0.2
+
+### Patch Changes
+
+- [#177](https://github.com/benjie/postgraphile-private/pull/177)
+  [`6be68a53e`](https://github.com/benjie/postgraphile-private/commit/6be68a53e21940406a9fd629ee15cb1673497a6e)
+  Thanks [@benjie](https://github.com/benjie)! - `@foreignFieldName` smart tag
+  is now fed into the `inflection.connectionField(...)` or
+  `inflection.listField(...)` inflector as appropriate. If you are using
+  `@foreignSimpleFieldName` you may be able to delete that now; alternatively
+  you should consider renaming `@foreignFieldName` to
+  `@foreignConnectionFieldName` for consistency.
+
+- [#176](https://github.com/benjie/postgraphile-private/pull/176)
+  [`11d6be65e`](https://github.com/benjie/postgraphile-private/commit/11d6be65e0da489f8ab3e3a8b8db145f8b2147ad)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue with plugin
+  versioning. Add more TSDoc comments. New getTerminalWidth() helper.
+
 ## 8.0.0-0.1
 
 ### Patch Changes
