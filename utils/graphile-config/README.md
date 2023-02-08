@@ -108,6 +108,9 @@ MergePreset(basePreset, extendingPreset):
       {extendingScope} actually exist.
 1. Return {finalPreset}.
 
+**IMPORTANT**: the `default` name must not be used as a top-level key in a
+preset to enable compatibility with the various ESM emulations.
+
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software

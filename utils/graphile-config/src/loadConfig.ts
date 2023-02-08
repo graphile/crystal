@@ -43,6 +43,17 @@ async function registerLoader(loader: Extension | null): Promise<void> {
   }
 }
 
+function fixESMShenanigans(requiredModule: any): any {
+  if (
+    typeof requiredModule.default === "object" &&
+    requiredModule.default !== null &&
+    !Array.isArray(requiredModule.default)
+  ) {
+    return requiredModule.default;
+  }
+  return requiredModule;
+}
+
 export async function loadConfig(
   configPath?: string | null,
 ): Promise<GraphileConfig.Preset | null> {
@@ -56,7 +67,7 @@ export async function loadConfig(
       if (resolvedPath.endsWith(extension)) {
         registerLoader(jsVariants[extension]);
         try {
-          return require(resolvedPath);
+          return fixESMShenanigans(require(resolvedPath));
         } catch {
           /* continue to the next one */
         }
@@ -74,7 +85,7 @@ export async function loadConfig(
       if (await exists(resolvedPath)) {
         registerLoader(jsVariants[extension]);
         try {
-          return require(resolvedPath);
+          return fixESMShenanigans(require(resolvedPath));
         } catch (e) {
           if (e.code === "ERR_REQUIRE_ESM") {
             return (await import(resolvedPath)).default;
