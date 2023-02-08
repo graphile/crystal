@@ -55,7 +55,10 @@ export function EXPORTABLE<T, TScope extends any[]>(
   args: [...TScope],
 ): T {
   const fn: T = factory(...args);
-  if (!("$exporter$factory" in fn)) {
+  if (
+    (typeof fn === "function" || (typeof fn === "object" && fn !== null)) &&
+    !("$exporter$factory" in fn)
+  ) {
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
@@ -383,6 +386,12 @@ exportAs(PgSourceBuilder, "PgSourceBuilder");
 const $$codecSource = Symbol("codecSource");
 const $$codecCounter = Symbol("codecCounter");
 
+type CodecWithSource<TCodec extends PgTypeCodec<any, any, any, any>> =
+  TCodec & {
+    [$$codecSource]?: Map<any, any>;
+    [$$codecCounter]?: number;
+  };
+
 /**
  * PgSource represents any source of SELECT-able data in Postgres: tables,
  * views, functions, etc.
@@ -458,8 +467,9 @@ export class PgSource<
 
   static fromCodec<TColumns extends PgTypeColumns>(
     executor: PgExecutor,
-    codec: PgTypeCodec<TColumns, any, any>,
+    baseCodec: PgTypeCodec<TColumns, any, any>,
   ): PgSource<TColumns, any, any, undefined> {
+    const codec: CodecWithSource<typeof baseCodec> = baseCodec;
     if (!codec[$$codecSource]) {
       codec[$$codecSource] = new Map();
     }

@@ -463,6 +463,16 @@ export function isEnumCodec<TValue extends string = string>(
 
 const $$listCodec = Symbol("listCodec");
 
+type CodecWithListCodec<TCodec extends PgTypeCodec<any, any, any, any>> =
+  TCodec & {
+    [$$listCodec]?: PgTypeCodec<
+      undefined,
+      string,
+      TCodec extends PgTypeCodec<any, any, infer U> ? U[] : any[],
+      TCodec
+    >;
+  };
+
 // TODO: rename to listOfCodec
 /**
  * Given a PgTypeCodec, this returns a new PgTypeCodec that represents a list
@@ -480,16 +490,17 @@ const $$listCodec = Symbol("listCodec");
 export function listOfType<
   TInnerCodec extends PgTypeCodec<any, any, any, undefined>,
 >(
-  innerCodec: TInnerCodec,
+  listedCodec: TInnerCodec,
   extensions?: Partial<PgTypeCodecExtensions>,
   typeDelim = `,`,
-  identifier: SQL = sql`${innerCodec.sqlType}[]`,
+  identifier: SQL = sql`${listedCodec.sqlType}[]`,
 ): PgTypeCodec<
   undefined, // Array has no columns
   string,
   TInnerCodec extends PgTypeCodec<any, any, infer U> ? U[] : any[],
   TInnerCodec
 > {
+  const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
   if (innerCodec.arrayOfCodec) {
     throw new Error("Array types cannot be nested");
   }
@@ -1032,5 +1043,5 @@ export function getInnerCodec(
 exportAs(getInnerCodec, "getInnerCodec");
 
 for (const key of Object.keys(TYPES)) {
-  exportAs(TYPES[key], ["TYPES", key]);
+  exportAs(TYPES[key as keyof typeof TYPES], ["TYPES", key]);
 }

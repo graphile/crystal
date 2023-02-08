@@ -157,7 +157,7 @@ export class PgUpdateStep<
           );
         }
       }
-      const value = getBy![name as any];
+      const value = (getBy as any)![name as any];
       const depId = this.addDependency(value);
       const column = this.source.codec.columns![name] as PgTypeColumn;
       const pgCodec = column.codec;

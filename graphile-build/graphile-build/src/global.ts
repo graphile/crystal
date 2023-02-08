@@ -389,7 +389,9 @@ declare global {
         behaviourOnConflict?: "throw" | "recoverable",
       ) => Obj1 & Obj2;
 
-      getAllTypes(): { [typeName: string]: GraphQLNamedType };
+      getAllTypes(): {
+        [typeName: string]: GraphQLNamedType | null | undefined;
+      };
 
       /**
        * Useful for looking up the scope that a type was created with, e.g. for

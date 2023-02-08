@@ -220,6 +220,12 @@ function newNodePostgresPgClient(
 }
 
 const $$queue = Symbol("tag");
+declare module "pg" {
+  interface PoolClient {
+    [$$queue]?: Promise<any> | null;
+    [$$isSetup]?: true;
+  }
+}
 
 async function makeNodePostgresWithPgClient_inner<T>(
   pgClient: pg.PoolClient,

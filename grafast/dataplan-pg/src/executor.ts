@@ -363,11 +363,13 @@ ${duration}
       promises.push(
         (async () => {
           // FIXME: cache must factor in placeholders.
-          let cacheForContext = useCache ? context[this.$$cache] : null;
+          let cacheForContext = useCache
+            ? (context as any)[this.$$cache]
+            : null;
           if (!cacheForContext) {
             cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
             if (useCache) {
-              context[this.$$cache] = cacheForContext;
+              (context as any)[this.$$cache] = cacheForContext;
             }
           }
 
@@ -465,7 +467,9 @@ ${duration}
               for (let i = 0, l = rows.length; i < l; i++) {
                 const result = rows[i];
                 const valueIndex =
-                  identifierIndex != null ? result[identifierIndex] : 0;
+                  identifierIndex != null
+                    ? (result as number[])[identifierIndex]
+                    : 0;
                 if (!groups[valueIndex]) {
                   groups[valueIndex] = [result];
                 } else {
@@ -716,7 +720,9 @@ ${duration}
           for (let i = 0, l = rows.length; i < l; i++) {
             const result = rows[i];
             const valueIndex =
-              identifierIndex != null ? result[identifierIndex] : 0;
+              identifierIndex != null
+                ? (result as number[])[identifierIndex]
+                : 0;
             const batchIndexes = batchIndexesByValueIndex[valueIndex];
             if (!batchIndexes) {
               throw new Error(
@@ -772,8 +778,9 @@ ${duration}
         console.error(e);
         tx.resolve();
         batch.forEach(({ resultIndex }) => {
-          if (isAsyncIterable(streams[resultIndex])) {
-            streams[resultIndex]![Symbol.asyncIterator].throw?.(e);
+          const stream = streams[resultIndex];
+          if (isAsyncIterable(stream)) {
+            stream[Symbol.asyncIterator]().throw?.(e);
           }
           streams[resultIndex] = Promise.reject(e);
         });
@@ -800,7 +807,7 @@ ${duration}
 
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
-    context[this.$$cache]?.reset();
+    (context as any)[this.$$cache]?.reset();
 
     return queryResult;
   }
