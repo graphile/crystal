@@ -924,18 +924,19 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 ? inflection.builtin("MacAddress8")
                 : "String",
           };
-          for (const key in typeNameByTYPESKey) {
+          for (const rawKey in typeNameByTYPESKey) {
+            const key = rawKey as keyof typeof typeNameByTYPESKey;
             const val = typeNameByTYPESKey[key];
             const typeNameSpec =
               typeof val === "string" ? { input: val, output: val } : val;
             for (const situation in typeNameSpec) {
+              const typeName = typeNameSpec[situation];
               // Only register type if the user hasn't already done so
-              if (!build.hasGraphQLTypeForPgCodec(TYPES[key], situation)) {
-                build.setGraphQLTypeForPgCodec(
-                  TYPES[key],
-                  situation,
-                  typeNameSpec[situation],
-                );
+              if (
+                typeName &&
+                !build.hasGraphQLTypeForPgCodec(TYPES[key], situation)
+              ) {
+                build.setGraphQLTypeForPgCodec(TYPES[key], situation, typeName);
               }
             }
           }

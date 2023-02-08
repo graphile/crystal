@@ -1,3 +1,4 @@
+import type {} from "graphile-build";
 import type {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,

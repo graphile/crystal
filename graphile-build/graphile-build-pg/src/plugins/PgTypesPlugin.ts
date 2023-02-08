@@ -611,7 +611,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 // A hash with string/null values is also okay
                 const keys = Object.keys(obj);
                 for (const key of keys) {
-                  const val = obj[key];
+                  const val = (obj as any)[key];
                   if (val === null) {
                     // Null is okay
                   } else if (typeof val === "string") {
