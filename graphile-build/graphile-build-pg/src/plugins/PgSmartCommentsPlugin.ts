@@ -12,7 +12,7 @@ import type {
   PgType,
 } from "pg-introspection";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 import type { PgSmartTagsDict } from "../interfaces.js";
 import { mergeTags } from "../mergeTags.js";
 

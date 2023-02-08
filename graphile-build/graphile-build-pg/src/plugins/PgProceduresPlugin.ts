@@ -17,7 +17,7 @@ import { EXPORTABLE } from "graphile-export";
 import type { PgProc } from "pg-introspection";
 import sql from "pg-sql2";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 import { addBehaviorToTags } from "../utils.js";
 
 // TODO: these should be used, surely?

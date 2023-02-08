@@ -2,7 +2,7 @@ import "graphile-config";
 
 import { resolvePermissions } from "pg-introspection";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 import { addBehaviorToTags } from "../utils.js";
 
 declare global {

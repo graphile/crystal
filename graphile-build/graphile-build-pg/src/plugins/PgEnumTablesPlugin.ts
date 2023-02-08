@@ -8,7 +8,7 @@ import type {
 } from "pg-introspection";
 import { sql } from "pg-sql2";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 import { withPgClientFromPgConfig } from "../pgConfigs.js";
 import { addBehaviorToTags } from "../utils.js";
 

@@ -4,7 +4,7 @@ import "graphile-config";
 import type { PgSelectStep, PgSourceUnique } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

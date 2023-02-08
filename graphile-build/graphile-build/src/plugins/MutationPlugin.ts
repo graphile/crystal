@@ -2,7 +2,7 @@ import "graphile-config";
 
 import { __ValueStep } from "grafast";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 import { isValidObjectType } from "../utils.js";
 
 /**

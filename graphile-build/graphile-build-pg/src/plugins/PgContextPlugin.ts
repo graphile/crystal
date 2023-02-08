@@ -1,6 +1,6 @@
 import type {} from "grafast";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 import { withPgClientFromPgConfig } from "../pgConfigs.js";
 
 export const PgContextPlugin: GraphileConfig.Plugin = {

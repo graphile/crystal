@@ -11,7 +11,7 @@ import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import type { PgClass } from "pg-introspection";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 import {
   parseDatabaseIdentifierFromSmartTag,
   parseSmartTagsOptsString,

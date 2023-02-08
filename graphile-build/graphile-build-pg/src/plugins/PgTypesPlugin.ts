@@ -8,7 +8,7 @@ import { access, ExecutableStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

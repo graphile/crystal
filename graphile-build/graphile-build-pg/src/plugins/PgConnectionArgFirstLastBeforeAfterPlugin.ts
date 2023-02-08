@@ -9,7 +9,7 @@ import type {
 import type { ConnectionStep, GraphileFieldConfigArgumentMap } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

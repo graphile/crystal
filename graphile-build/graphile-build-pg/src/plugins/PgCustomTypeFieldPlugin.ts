@@ -45,7 +45,7 @@ import type { GraphQLInputType, GraphQLOutputType } from "graphql";
 import type { SQL } from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
+import { version } from "../version.js";
 import { tagToString } from "../utils.js";
 
 const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");

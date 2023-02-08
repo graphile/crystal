@@ -8,7 +8,7 @@ import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
+import { version } from "../version.js";
 import type { PgTypeCodecMetaLookup } from "../inputUtils.js";
 import {
   getCodecMetaLookupFromInput,

@@ -31,7 +31,7 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 import type { KeysOfType } from "../interfaces.js";
 import {
   listenWithPgClientFromPgConfig,

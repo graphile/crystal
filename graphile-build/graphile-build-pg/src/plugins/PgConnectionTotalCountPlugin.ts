@@ -13,7 +13,7 @@ import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

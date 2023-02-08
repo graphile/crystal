@@ -3,7 +3,7 @@ import "graphile-config";
 
 import type { GraphQLEnumType } from "graphql";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
   name: "PgConnectionArgOrderByDefaultValuePlugin",

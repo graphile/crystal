@@ -6,7 +6,7 @@ import { EXPORTABLE } from "graphile-export";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
+import { version } from "../version.js";
 import { tagToString } from "../utils.js";
 
 declare global {
