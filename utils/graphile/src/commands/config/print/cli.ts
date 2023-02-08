@@ -37,7 +37,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       continue;
     }
     console.log();
-    console.log(chalk.whiteBright.bold(key));
+    console.log(chalk.whiteBright.bold(key) + ":");
     const value = resolvedPreset[key];
     if (Array.isArray(value)) {
       console.log(inspect(value, inspectOpts));
@@ -61,7 +61,7 @@ function printPlugins(plugins: GraphileConfig.Plugin[] | undefined): string {
   if (!plugins || plugins.length === 0) {
     return "";
   }
-  return `${chalk.whiteBright.bold("Plugins")}:
+  return `${chalk.whiteBright.bold("plugins")}:
 ${plugins.map((p) => printPlugin(p)).join("\n")}`;
 }
 
