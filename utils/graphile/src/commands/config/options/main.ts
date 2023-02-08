@@ -30,6 +30,7 @@ modules).\
   const compilerOpts: ts.CompilerOptions = {
     target: ts.ScriptTarget.ES2016,
     esModuleInterop: true,
+    allowJs: true,
   };
   /*
 const compilerOptions = {
@@ -62,7 +63,7 @@ const preset: GraphileConfig.Preset`;
   const system = createFSBackedSystem(fsMap, projectRoot, ts);
   const env = createVirtualTypeScriptEnvironment(
     system,
-    [FAKE_FILENAME, "graphile.config.ts"],
+    [FAKE_FILENAME, filename],
     ts,
     compilerOpts,
   );
