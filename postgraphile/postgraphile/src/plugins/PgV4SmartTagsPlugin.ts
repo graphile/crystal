@@ -47,6 +47,10 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
           processTags(pgType.getTags());
         }
       },
+      pgFakeConstraints_constraint(info, event) {
+        const { entity } = event;
+        processTags(entity.getTags());
+      },
     },
   },
 };
