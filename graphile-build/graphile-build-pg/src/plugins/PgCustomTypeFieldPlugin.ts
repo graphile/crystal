@@ -43,7 +43,6 @@ import {
 } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type {
-  GraphQLFieldConfigMap,
   GraphQLInputFieldConfigMap,
   GraphQLInputType,
   GraphQLOutputType,

@@ -52,7 +52,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
         // console.log("Found IIFE", generate(node, {}).code);
 
         const calleePath = path.get("callee");
-        let rawParamsPaths = calleePath.get("params");
+        const rawParamsPaths = calleePath.get("params");
         const paramsPaths = Array.isArray(rawParamsPaths)
           ? rawParamsPaths
           : [rawParamsPaths];

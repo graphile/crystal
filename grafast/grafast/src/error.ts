@@ -1,4 +1,4 @@
-import { $$extensions } from "./interfaces.js";
+import type { $$extensions } from "./interfaces.js";
 
 /**
  * Internally we wrap errors that occur in a GrafastError; this allows us to do
