@@ -1,8 +1,8 @@
-import chalk from "chalk";
 import {
   createFSBackedSystem,
   createVirtualTypeScriptEnvironment,
 } from "@typescript/vfs";
+import chalk from "chalk";
 import * as ts from "typescript";
 
 export function main(options: { filename?: string }) {
