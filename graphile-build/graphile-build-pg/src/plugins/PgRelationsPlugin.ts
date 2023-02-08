@@ -229,9 +229,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const { source, relationName } = details;
         const relation: PgSourceRelation<any, any> =
           source.getRelation(relationName);
+        const override = relation.extensions?.tags.foreignConnectionFieldName;
+        if (typeof override === "string") {
+          return this.camelCase(override);
+        }
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
-          return this.camelCase(baseOverride);
+          return this.connectionField(this.camelCase(baseOverride));
         }
         return this.connectionField(this._manyRelation(details));
       },

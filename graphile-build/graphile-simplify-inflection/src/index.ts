@@ -58,7 +58,6 @@ declare global {
       ): string | null;
     }
     interface SchemaOptions {
-      pgSimpleCollections?: boolean;
       pgOmitListSuffix?: boolean;
       pgSimplifyPatch?: boolean;
       pgSimplifyAllRows?: boolean;
