@@ -31,13 +31,13 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import { version } from "../version.js";
 import type { KeysOfType } from "../interfaces.js";
 import {
   listenWithPgClientFromPgConfig,
   withPgClientFromPgConfig,
   withSuperuserPgClientFromPgConfig,
 } from "../pgConfigs.js";
+import { version } from "../version.js";
 import { watchFixtures } from "../watchFixtures.js";
 
 export type PgEntityWithId =

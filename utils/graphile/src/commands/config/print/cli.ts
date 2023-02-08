@@ -2,10 +2,11 @@ import chalk from "chalk";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { getTerminalWidth } from "graphile-config/cli";
-
 import { loadConfig } from "graphile-config/load";
-import { inspect, InspectOptions } from "util";
-import { stripAnsi } from "../../../stripAnsi";
+import type { InspectOptions } from "util";
+import { inspect } from "util";
+
+import { stripAnsi } from "../../../stripAnsi.js";
 
 const inspectOpts: InspectOptions = {
   colors: true,

@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import { version } from "../version.js";
 import { stringScalarSpec } from "../utils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

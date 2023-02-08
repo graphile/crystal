@@ -1,8 +1,8 @@
-import * as ts from "typescript";
 import {
   createFSBackedSystem,
   createVirtualTypeScriptEnvironment,
 } from "@typescript/vfs";
+import * as ts from "typescript";
 
 export function main(options: { filename?: string }) {
   const { filename = "graphile.config.ts" } = options;
@@ -10,7 +10,7 @@ export function main(options: { filename?: string }) {
 
   let outputText = ``;
   let last = "";
-  function out(text: string = ""): void {
+  function out(text = ""): void {
     if (text === "" && last === "") {
       return;
     }
@@ -93,7 +93,7 @@ const preset: GraphileConfig.Preset`;
   }
   */
 
-  let keys: string[] = [];
+  const keys: string[] = [];
   {
     const content = BASE_CONTENT + " = {";
     env.updateFile(FAKE_FILENAME, content);
@@ -133,7 +133,7 @@ const preset: GraphileConfig.Preset`;
   function outLater(str?: string): void {
     later.push(str);
   }
-  let entries: string[] = [];
+  const entries: string[] = [];
   for (const key of keys) {
     // Always an object, unless...
     const isArray = [
@@ -184,7 +184,7 @@ const preset: GraphileConfig.Preset`;
       outLater();
 
       if (relevant) {
-        let subentries: string[] = [];
+        const subentries: string[] = [];
         let laterStill: Array<string | undefined> = [];
         const outLaterStill = (line?: string): void => {
           laterStill.push(line);
@@ -335,7 +335,7 @@ function prettyDisplayParts(
       depth++;
     } else if (text === ")" || text === "]") {
       depth--;
-    } else if (text === trimUntil) {
+    } else if (text === trimUntil && depth === 0) {
       found = true;
     }
   }

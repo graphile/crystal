@@ -1,4 +1,3 @@
-export { defaultPreset } from "./preset.js";
 export {
   PgSmartTagsDict,
   PgSourceRelationTags,
@@ -39,4 +38,5 @@ export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
 export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
+export { defaultPreset } from "./preset.js";
 export { addBehaviorToTags } from "./utils.js";

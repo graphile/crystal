@@ -2,8 +2,8 @@ import "graphile-config";
 
 import { __ValueStep } from "grafast";
 
-import { version } from "../version.js";
 import { isValidObjectType } from "../utils.js";
+import { version } from "../version.js";
 
 /**
  * This plugin registers the operation type for the 'mutation' operation, and

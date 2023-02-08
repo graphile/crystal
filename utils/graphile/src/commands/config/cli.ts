@@ -1,4 +1,5 @@
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
+
 import * as optionsCmd from "./options/cli.js";
 import * as printCmd from "./print/cli.js";
 

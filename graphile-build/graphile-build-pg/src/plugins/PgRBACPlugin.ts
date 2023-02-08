@@ -2,8 +2,8 @@ import "graphile-config";
 
 import { resolvePermissions } from "pg-introspection";
 
-import { version } from "../version.js";
 import { addBehaviorToTags } from "../utils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {

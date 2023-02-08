@@ -8,12 +8,12 @@ import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../version.js";
 import type { PgTypeCodecMetaLookup } from "../inputUtils.js";
 import {
   getCodecMetaLookupFromInput,
   makePgTypeCodecMeta,
 } from "../inputUtils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

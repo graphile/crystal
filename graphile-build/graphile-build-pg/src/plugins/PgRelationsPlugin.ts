@@ -25,8 +25,8 @@ import type { TE } from "tamedevil";
 import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../version.js";
 import { tagToString } from "../utils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

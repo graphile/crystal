@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import { version } from "../version.js";
 import swallowError from "../swallowError.js";
+import { version } from "../version.js";
 
 /**
  * This plugin changes the default handling for "recoverable" errors from

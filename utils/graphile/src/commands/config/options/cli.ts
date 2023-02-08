@@ -1,5 +1,6 @@
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
-import { main } from "./main";
+import { main } from "./main.js";
+
 export function options(yargs: Argv) {
   return yargs
     .example(
