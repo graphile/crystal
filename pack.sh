@@ -162,5 +162,12 @@ yarn pack -o package.tgz
 mv package.tgz ../../builds/graphile__simplify-inflection.tgz
 cd -
 
+# graphile
+cd utils/graphile
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/graphile.tgz
+cd -
+
 echo "All packages packed into 'builds/'"
 echo "Now publish them with './publish.sh'"
