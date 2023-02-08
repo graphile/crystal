@@ -47,8 +47,8 @@ create table beverages (
   `company_id` column follows the `[table_name]_id` naming convention)
 - All update mutations now accept `patch` instead of `companyPatch` /
   `beveragePatch` (disable via `pgSimplifyPatch = false`)
-- If you are using `pgSimpleCollections = "only"` then you can set
-  `pgOmitListSuffix = true` to omit the `List` suffix
+- If you prefer lists then you can use `pgOmitListSuffix = true` to omit the
+  `List` suffix, and instead append `Connection` to connections
 - Fields where the singular and plural are the same and a distinct plural is
   required are force-pluralised ("fishes") to avoid conflicts (e.g.
   `singularize("fish") === pluralize("fish")`).
@@ -176,20 +176,6 @@ In most cases, the conflict errors will guide you on how to fix these issues
 using [smart comments](https://www.graphile.org/postgraphile/smart-comments/).
 
 ## Smart Tags
-
-### `@foreignSimpleFieldName`
-
-`@foreignSimpleFieldName` was added to override the naming of the foreign-side
-of a one-to-many relationship's simple collections field (if you're using simple
-collections). By default we'll take the `@foreignFieldName` and add the "list
-suffix" ("List" by default, but "" if `pgOmitListSuffix` is set), but if you
-prefer you can override it entirely with `@foreignSimpleFieldName`. If you set
-`@foreignSimpleFieldName` and you're using `simpleCollections 'both'` then you
-should also set `@foreignFieldName` explicitly or unexpected things may occur.
-
-Applies to:
-
-- foreign key constraints
 
 ### `@listSuffix`
 

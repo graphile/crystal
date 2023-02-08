@@ -211,7 +211,27 @@ foreignFieldName: "threads",
 fieldName: "author"
 ```
 
-See also: `@fieldName`
+This name will be fed through the `connectionField` (by default does nothing)
+or `listField` (by default appends 'List') inflector as appropriate. To
+specifically override the name of the connection field, use
+`@foreignConnectionFieldName`; and to specifically override the name of the
+list field, use `@foreignSimpleFieldName`.
+
+See also: `@fieldName`, `@foreignSimpleFieldName`, `@foreignConnectionFieldName`
+
+##### `@foreignSimpleFieldName`
+
+`foreignSimpleFieldName` applies to _list_ fields generated from
+
+- foreign key constraints: the field on the remote type (the "backwards"
+  relation)
+
+##### `@foreignConnectionFieldName`
+
+`foreignConnectionFieldName` applies to _connection_ fields generated from
+
+- foreign key constraints: the field on the remote type (the "backwards"
+  relation)
 
 #### @resultFieldName
 
