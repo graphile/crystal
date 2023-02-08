@@ -663,6 +663,12 @@ comment on materialized view my_materialized_view is E'@foreignKey (key_1, key_2
 comment on materialized view my_materialized_view is E'@foreignKey (key_1, key_2) references other_table (key_1, key_2)\n@foreignKey (key_3, key_4) references some_other_table (key_3, key_4)';
 ```
 
+:::note
+
+Fake constraints are treated as if they are indexed.
+
+:::
+
 ##### @unique
 
 _From PostGraphile 4.9.1_

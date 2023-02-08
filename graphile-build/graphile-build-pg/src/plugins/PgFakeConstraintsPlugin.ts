@@ -1,4 +1,6 @@
+import type { PromiseOrDirect } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
+import type { PluginHook } from "graphile-config";
 import type {
   Introspection,
   PgAttribute,
@@ -13,6 +15,15 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgFakeConstraints: Record<string, never>;
+    }
+    interface GatherHooks {
+      pgFakeConstraints_constraint: PluginHook<
+        (event: {
+          introspection: Introspection;
+          databaseName: string;
+          entity: PgConstraint;
+        }) => PromiseOrDirect<void>
+      >;
     }
   }
 }
@@ -144,7 +155,7 @@ async function processUnique(
 ) {
   const identity = () =>
     `${pgClass.getNamespace()!.nspname}.${pgClass.relname}`;
-  const { introspection } = event;
+  const { introspection, databaseName } = event;
   const tag = primaryKey ? "primaryKey" : "unique";
   if (typeof rawSpec !== "string") {
     throw new Error(
@@ -209,7 +220,7 @@ async function processUnique(
     getType: () => undefined,
   };
 
-  addConstraint(introspection, pgConstraint);
+  await addConstraint(info, introspection, databaseName, pgConstraint);
 }
 
 const removeQuotes = (str: string) => {
@@ -345,11 +356,13 @@ async function processFk(
     getType: () => undefined,
   };
 
-  addConstraint(introspection, pgConstraint);
+  await addConstraint(info, introspection, databaseName, pgConstraint);
 }
 
-function addConstraint(
+async function addConstraint(
+  info: GatherPluginContext<State, Cache>,
   introspection: Introspection,
+  databaseName: string,
   pgConstraint: PgConstraint,
 ) {
   introspection.constraints.push(pgConstraint);
@@ -360,6 +373,11 @@ function addConstraint(
     pgConstraint.confrelid,
     true,
   );
+  await info.process("pgFakeConstraints_constraint", {
+    introspection,
+    databaseName,
+    entity: pgConstraint,
+  });
 }
 
 function addConstraintToClass(
