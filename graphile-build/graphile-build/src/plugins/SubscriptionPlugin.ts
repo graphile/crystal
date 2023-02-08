@@ -2,8 +2,8 @@ import "graphile-config";
 
 import { __ValueStep } from "grafast";
 
-import { version } from "../index.js";
 import { isValidObjectType } from "../utils.js";
+import { version } from "../version.js";
 
 /**
  * This plugin registers the operation type for the 'subscription' operation, and

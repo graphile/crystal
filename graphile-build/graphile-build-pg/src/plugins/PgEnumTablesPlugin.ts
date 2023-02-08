@@ -8,9 +8,9 @@ import type {
 } from "pg-introspection";
 import { sql } from "pg-sql2";
 
-import { version } from "../index.js";
 import { withPgClientFromPgConfig } from "../pgConfigs.js";
 import { addBehaviorToTags } from "../utils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {

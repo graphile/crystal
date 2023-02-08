@@ -1,4 +1,4 @@
-import { version } from "..";
+import { version } from "../version.js";
 
 /**
  * Adds generic descriptions (where not already present) to:

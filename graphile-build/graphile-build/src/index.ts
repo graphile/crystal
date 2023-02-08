@@ -395,5 +395,3 @@ export {
 };
 export { GatherPluginContext } from "./interfaces.js";
 export { defaultPreset } from "./preset.js";
-// TODO: remove this hack!
-export const version = require("../package.json").version;

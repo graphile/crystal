@@ -33,3 +33,7 @@ Thank you for using our software.`,
     .wrap(yargs.terminalWidth()).argv;
   await run(argv);
 }
+
+export function getTerminalWidth() {
+  return yargs.terminalWidth();
+}

@@ -23,7 +23,7 @@ import { EXPORTABLE } from "graphile-export";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 interface State {
   codecByTypeIdByDatabaseName: Map<

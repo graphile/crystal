@@ -3,7 +3,7 @@ import "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLScalarLiteralParser } from "graphql";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

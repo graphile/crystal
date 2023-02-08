@@ -9,7 +9,7 @@ export function operationPlan(): OperationPlan {
 }
 
 export function context<
-  TContext extends BaseGraphQLContext = BaseGraphQLContext,
+  TContext extends BaseGraphQLContext = Record<string, any>,
 >(): __ValueStep<TContext> {
   return operationPlan().contextStep as __ValueStep<any>;
 }

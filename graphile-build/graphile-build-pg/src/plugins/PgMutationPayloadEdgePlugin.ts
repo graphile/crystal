@@ -13,8 +13,8 @@ import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
 import { tagToString } from "../utils.js";
+import { version } from "../version.js";
 import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
 
 declare global {

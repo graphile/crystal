@@ -18,7 +18,7 @@ import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

@@ -11,11 +11,11 @@ import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import type { PgClass } from "pg-introspection";
 
-import { version } from "../index.js";
 import {
   parseDatabaseIdentifierFromSmartTag,
   parseSmartTagsOptsString,
 } from "../utils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {

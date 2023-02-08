@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import { version } from "../index.js";
 import { addBehaviorToTags } from "../utils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {

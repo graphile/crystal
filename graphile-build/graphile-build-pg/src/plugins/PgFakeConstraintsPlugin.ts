@@ -9,7 +9,7 @@ import type {
 } from "pg-introspection";
 import { parseSmartComment } from "pg-introspection";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {

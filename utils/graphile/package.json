@@ -1,0 +1,46 @@
+{
+  "name": "graphile",
+  "version": "5.0.0-0.0",
+  "description": "Swiss army knife for dealing with all things Graphile",
+  "main": "dist/index.js",
+  "bin": "dist/cli-run.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "true",
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/heart.git"
+  },
+  "keywords": [
+    "lru",
+    "graphile",
+    "graphite"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/heart/issues"
+  },
+  "homepage": "https://github.com/graphile/heart/tree/main/utils/graphile",
+  "engines": {
+    "node": ">=14.17"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@typescript/vfs": "^1.4.0",
+    "chalk": "^4.1.2",
+    "graphile-config": "workspace:^",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.1-rc"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.1",
+    "@types/node": "^16.11.15",
+    "jest": "^28.1.0",
+    "ts-node": "^10.9.1"
+  }
+}

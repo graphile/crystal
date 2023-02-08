@@ -25,11 +25,11 @@ import type {
 } from "graphql";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
 import {
   parseDatabaseIdentifierFromSmartTag,
   parseSmartTagsOptsString,
 } from "../utils.js";
+import { version } from "../version.js";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;

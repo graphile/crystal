@@ -13,7 +13,7 @@ create table beverages (
 comment on constraint "beverages_company_id_fkey" on "beverages" is E'@listSuffix omit';
 -- @omitListSuffix has no effect when @foreignSimpleFieldName is set
 comment on constraint "beverages_distributor_id_fkey" on "beverages" is
-  E'@foreignFieldName distributedBeverages\n@foreignSimpleFieldName distributedBeveragesListing\n@listSuffix omit';
+  E'@foreignConnectionFieldName distributedBeverages\n@foreignSimpleFieldName distributedBeveragesListing\n@listSuffix omit';
 
 create function list_omit() returns setof beverages as $$
   select * from beverages;

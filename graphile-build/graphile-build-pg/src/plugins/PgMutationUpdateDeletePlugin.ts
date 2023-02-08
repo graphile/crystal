@@ -23,8 +23,8 @@ import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
 import { tagToString } from "../utils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

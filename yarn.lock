@@ -6755,6 +6755,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript/vfs@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@typescript/vfs@npm:1.4.0"
+  dependencies:
+    debug: "npm:^4.1.1"
+  checksum: 2b961e524818b84a0c3bdcf7974087d98453197504d51ac76944703a724f00be2a427afe19ef685085feab497f85cd02b848a9aaa3e12b35fa620fe9d6d2c659
+  languageName: node
+  linkType: hard
+
 "@uiw/react-codemirror@npm:^3.0.0":
   version: 3.2.9
   resolution: "@uiw/react-codemirror@npm:3.2.9"
@@ -13303,6 +13312,24 @@ __metadata:
     graphile-build-pg: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg-introspection: "workspace:^"
+  languageName: unknown
+  linkType: soft
+
+"graphile@workspace:utils/graphile":
+  version: 0.0.0-use.local
+  resolution: "graphile@workspace:utils/graphile"
+  dependencies:
+    "@types/jest": "npm:^27.5.1"
+    "@types/node": "npm:^16.11.15"
+    "@typescript/vfs": "npm:^1.4.0"
+    chalk: "npm:^4.1.2"
+    graphile-config: "workspace:^"
+    jest: "npm:^28.1.0"
+    ts-node: "npm:^10.9.1"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^4.8.1-rc"
+  bin:
+    graphile: dist/cli-run.js
   languageName: unknown
   linkType: soft
 

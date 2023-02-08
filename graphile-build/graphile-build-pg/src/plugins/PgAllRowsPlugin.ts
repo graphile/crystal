@@ -8,8 +8,8 @@ import { EXPORTABLE } from "graphile-export";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
 import { tagToString } from "../utils.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {

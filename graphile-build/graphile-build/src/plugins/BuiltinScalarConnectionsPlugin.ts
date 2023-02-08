@@ -1,7 +1,7 @@
 import "./ConnectionPlugin.js";
 import "graphile-config";
 
-import { version } from "../index.js";
+import { version } from "../version.js";
 
 export const BuiltinScalarConnectionsPlugin: GraphileConfig.Plugin = {
   name: "BuiltinScalarConnectionsPlugin",

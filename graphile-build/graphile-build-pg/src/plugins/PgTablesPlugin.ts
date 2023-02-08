@@ -15,8 +15,8 @@ import { EXPORTABLE } from "graphile-export";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";
-import { version } from "../index.js";
 import { addBehaviorToTags } from "../utils.js";
+import { version } from "../version.js";
 
 type PgSourceBuilderOptions = Omit<
   PgSourceOptions<any, any, any, any>,
