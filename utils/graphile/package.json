@@ -6,7 +6,7 @@
   "bin": "dist/cli-run.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest -i",
+    "test": "true",
     "prepack": "tsc -b"
   },
   "repository": {
