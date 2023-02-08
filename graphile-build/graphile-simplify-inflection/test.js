@@ -8,6 +8,14 @@ const { postgraphilePresetAmber } = require("postgraphile/presets/amber");
 const { makeV4Preset } = require("postgraphile/presets/v4");
 const { printSchema, lexicographicSortSchema } = require("graphql");
 const { parse: parseConnectionString } = require("pg-connection-string");
+const assert = require("assert");
+
+/**
+ * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
+ * If UPDATE_SNAPSHOTS is set then we'll write updated snapshots, otherwise
+ * we'll do the default behaviour of comparing to existing snapshots.
+ */
+const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
 const ROOT_CONNECTION_STRING = process.env.ROOT_DATABASE_URL || "postgres";
 const CONNECTION_STRING =
@@ -103,11 +111,8 @@ async function runTests(pool, dir) {
     const beforePath = `${ROOT}/${dir}/schema.unsimplified.graphql`;
     const afterPath = `${ROOT}/${dir}/schema.simplified.graphql`;
     const diffPath = `${ROOT}/${dir}/schema.graphql.diff`;
-    await fsp.writeFile(
-      beforePath,
-      printSchema(lexicographicSortSchema(before)),
-    );
-    await fsp.writeFile(afterPath, printSchema(lexicographicSortSchema(after)));
+    await snapshot(printSchema(lexicographicSortSchema(before)), beforePath);
+    await snapshot(printSchema(lexicographicSortSchema(after)), afterPath);
 
     const diff = await new Promise((resolve, reject) => {
       const child = child_process.spawn(
@@ -145,8 +150,30 @@ async function runTests(pool, dir) {
       });
     });
 
-    await fsp.writeFile(diffPath, diff);
+    await snapshot(diff, diffPath);
   });
+}
+
+/**
+ * If UPDATE_SNAPSHOTS is set then wrotes the given snapshot to the given
+ * filePath, otherwise it asserts that the snapshot matches the previous
+ * snapshot.
+ */
+async function snapshot(actual, filePath) {
+  let expected = null;
+  try {
+    expected = await fsp.readFile(filePath, "utf8");
+  } catch (e) {
+    /* noop */
+  }
+  if (expected == null || UPDATE_SNAPSHOTS) {
+    if (expected !== actual) {
+      console.warn(`Updated snapshot in '${filePath}'`);
+      await fsp.writeFile(filePath, actual);
+    }
+  } else {
+    assert.equal(actual, expected);
+  }
 }
 
 async function main() {
