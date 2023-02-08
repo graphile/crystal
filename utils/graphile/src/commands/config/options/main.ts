@@ -39,8 +39,14 @@ modules).\
 `);
   out();
   const compilerOpts: ts.CompilerOptions = {
-    target: ts.ScriptTarget.ES2016,
+    module: ts.ModuleKind.Node16,
+    target: ts.ScriptTarget.ESNext,
+
+    strict: true,
     esModuleInterop: true,
+    skipLibCheck: true,
+    skipDefaultLibCheck: true,
+    moduleResolution: ts.ModuleResolutionKind.Node16,
     allowJs: true,
   };
   /*
