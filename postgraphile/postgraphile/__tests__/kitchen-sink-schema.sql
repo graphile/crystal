@@ -418,6 +418,14 @@ create function b.type_function_mutation(id int) returns b.types as $$ select * 
 create function b.type_function_list_mutation() returns b.types[] as $$ select array_agg(types order by id) from b.types $$ language sql;
 create function b.type_function_connection_mutation() returns setof b.types as $$ select * from b.types order by id asc $$ language sql;
 
+create function a.assert_something(in_arg text) returns void as $$
+  begin raise exception 'Nope'; end;
+$$ stable language plpgsql;
+create function a.assert_something_nx(in_arg text) returns void as $$
+  begin raise exception 'Nope'; end;
+$$ stable language plpgsql;
+comment on function a.assert_something_nx(text) is '@omit execute';
+
 create type b.jwt_token as (
   role text,
   exp bigint,
