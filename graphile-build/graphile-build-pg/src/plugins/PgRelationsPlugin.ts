@@ -215,6 +215,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const { source, relationName } = details;
         const relation: PgSourceRelation<any, any> =
           source.getRelation(relationName);
+        const baseOverride = relation.extensions?.tags.foreignFieldName;
+        if (typeof baseOverride === "string") {
+          return baseOverride;
+        }
         // E.g. users(id) references posts(author_id)
         const remoteType = this.tableType(relation.source.codec);
         const remoteColumns = relation.remoteColumns as string[];
@@ -231,11 +235,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           source.getRelation(relationName);
         const override = relation.extensions?.tags.foreignConnectionFieldName;
         if (typeof override === "string") {
-          return this.camelCase(override);
-        }
-        const baseOverride = relation.extensions?.tags.foreignFieldName;
-        if (typeof baseOverride === "string") {
-          return this.connectionField(this.camelCase(baseOverride));
+          return override;
         }
         return this.connectionField(this._manyRelation(details));
       },
@@ -245,11 +245,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           source.getRelation(relationName);
         const override = relation.extensions?.tags.foreignSimpleFieldName;
         if (typeof override === "string") {
-          return this.camelCase(override);
-        }
-        const baseOverride = relation.extensions?.tags.foreignFieldName;
-        if (typeof baseOverride === "string") {
-          return this.listField(this.camelCase(baseOverride));
+          return override;
         }
         return this.listField(this._manyRelation(details));
       },
