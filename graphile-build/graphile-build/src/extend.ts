@@ -18,11 +18,10 @@ export function indent(text: string) {
  * when they were added. If a conflict is found (where `base` already has a key
  * in `extra`) an error will be thrown describing what happened.
  */
-export default function extend<Obj1 extends object, Obj2 extends object>(
-  base: Obj1,
-  extra: Obj2,
-  hint: string,
-): Obj1 & Obj2 {
+export default function extend<
+  Obj1 extends Record<string | number | symbol, any>,
+  Obj2 extends Record<string | number | symbol, any>,
+>(base: Obj1, extra: Obj2, hint: string): Obj1 & Obj2 {
   const hints = base[$$hints] || {};
 
   const keysB = Object.keys(extra);

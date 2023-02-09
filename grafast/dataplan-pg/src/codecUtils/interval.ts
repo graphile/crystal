@@ -61,7 +61,14 @@ export function parseInterval(interval: string): PgInterval {
  * @see {@link https://www.postgresql.org/docs/14/datatype-datetime.html#DATATYPE-INTERVAL-INPUT}
  */
 export function stringifyInterval(interval: PgInterval): string {
-  const keys = ["seconds", "minutes", "hours", "days", "months", "years"];
+  const keys = [
+    "seconds",
+    "minutes",
+    "hours",
+    "days",
+    "months",
+    "years",
+  ] as const;
   const parts = [];
   for (const key of keys) {
     if (interval[key]) {

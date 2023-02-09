@@ -307,7 +307,7 @@ function isSQL(node: unknown): node is SQL {
   return (
     typeof node === "object" &&
     node !== null &&
-    typeof node[$$type] === "string"
+    typeof (node as any)[$$type] === "string"
   );
 }
 

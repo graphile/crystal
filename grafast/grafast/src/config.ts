@@ -53,7 +53,17 @@ export function withGraphileConfig<T>(
   }
 }
 
-const hooksForPreset = Symbol("grafastHooks");
+const $$skipHooks = Symbol("skipHooks");
+const $$hooksForPreset = Symbol("grafastHooks");
+
+declare global {
+  namespace GraphileConfig {
+    interface ResolvedPreset {
+      [$$hooksForPreset]?: null | AsyncHooks<GraphileConfig.GrafastHooks>;
+      [$$skipHooks]?: Record<string, boolean>;
+    }
+  }
+}
 
 export function withHooks<TResult>(
   resolvedPreset: GraphileConfig.ResolvedPreset,
@@ -61,12 +71,12 @@ export function withHooks<TResult>(
     hooks: AsyncHooks<GraphileConfig.GrafastHooks> | null,
   ) => PromiseOrValue<TResult>,
 ) {
-  const existing = resolvedPreset[hooksForPreset];
+  const existing = resolvedPreset[$$hooksForPreset];
   if (existing !== undefined) {
     return callback(existing);
   }
   if (!resolvedPreset.plugins || resolvedPreset.plugins.length === 0) {
-    resolvedPreset[hooksForPreset] = null;
+    resolvedPreset[$$hooksForPreset] = null;
     return callback(null);
   }
   const plugins = resolvedPreset.plugins;
@@ -80,16 +90,14 @@ export function withHooks<TResult>(
           hooks.hook(name, fn);
         },
       );
-      resolvedPreset[hooksForPreset] = hooks;
+      resolvedPreset[$$hooksForPreset] = hooks;
       return callback(hooks);
     } else {
-      resolvedPreset[hooksForPreset] = null;
+      resolvedPreset[$$hooksForPreset] = null;
       return callback(null);
     }
   });
 }
-
-const skipHooks = Symbol("skipHooks");
 
 export function hook<THookName extends keyof GraphileConfig.GrafastHooks>(
   resolvedPreset: GraphileConfig.ResolvedPreset,
@@ -100,7 +108,7 @@ export function hook<THookName extends keyof GraphileConfig.GrafastHooks>(
       : never
   >
 ): PromiseOrValue<void> {
-  if (resolvedPreset[skipHooks]?.[hookName]) {
+  if (resolvedPreset[$$skipHooks]?.[hookName]) {
     return;
   }
   return withHooks(resolvedPreset, (hooks) => {
@@ -108,17 +116,17 @@ export function hook<THookName extends keyof GraphileConfig.GrafastHooks>(
       if (hooks.callbacks[hookName]) {
         return hooks.process(hookName, ...args);
       } else {
-        if (!resolvedPreset[skipHooks]) {
-          resolvedPreset[skipHooks] = Object.create(null);
+        if (!resolvedPreset[$$skipHooks]) {
+          resolvedPreset[$$skipHooks] = Object.create(null);
         }
-        resolvedPreset[skipHooks][hookName] = true;
+        resolvedPreset[$$skipHooks]![hookName] = true;
         return;
       }
     } else {
-      if (!resolvedPreset[skipHooks]) {
-        resolvedPreset[skipHooks] = Object.create(null);
+      if (!resolvedPreset[$$skipHooks]) {
+        resolvedPreset[$$skipHooks] = Object.create(null);
       }
-      resolvedPreset[skipHooks][hookName] = true;
+      resolvedPreset[$$skipHooks]![hookName] = true;
       return;
     }
   });

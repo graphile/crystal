@@ -53,6 +53,7 @@ export const Ruru: FC<RuruProps> = (props) => {
   const explorerPlugin = useExplorerPlugin({
     query,
     onEdit: setQuery,
+    showAttribution: false,
   });
   const plugins = useMemo(() => {
     return [explorerPlugin, EXPLAIN_PLUGIN];

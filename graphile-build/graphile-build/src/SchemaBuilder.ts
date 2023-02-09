@@ -204,7 +204,9 @@ class SchemaBuilder<
     // Bind all functions so they can be dereferenced
     bindAll(
       build,
-      Object.keys(build).filter((key) => typeof build[key] === "function"),
+      (Object.keys(build) as Array<keyof GraphileBuild.Build & string>).filter(
+        (key) => typeof build[key] === "function",
+      ),
     );
 
     const finalBuild = Object.freeze(build) as TBuild;

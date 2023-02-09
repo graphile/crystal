@@ -39,6 +39,12 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
   stream = undefined;
 }
 
+declare module "../step.js" {
+  interface ExecutableStep {
+    [$$proxy]?: any;
+  }
+}
+
 function makeProxyHandler<T>(
   $toStep: ExecutableStep<T>,
 ): ProxyHandler<ExecutableStep<T>> {
@@ -59,7 +65,7 @@ function makeProxyHandler<T>(
 
       if (p in $proxy) {
         // $proxy has this property ('id', 'layerPlan', etc) - use it
-        const val = $proxy[p];
+        const val = $proxy[p as keyof typeof $proxy];
         if (typeof val === "function") {
           return function (...args: any[]) {
             return val.apply($proxy, args);
@@ -69,7 +75,7 @@ function makeProxyHandler<T>(
         }
       } else {
         // $proxy doesn't understand this - delegate to $toStep
-        const val = $toStep[p];
+        const val = $toStep[p as keyof typeof $toStep];
         if (typeof val === "function") {
           return function (...args: any[]) {
             return val.apply($toStep, args);

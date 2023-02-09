@@ -31,6 +31,7 @@ import type {
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
+  GraphileFieldConfig,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -41,7 +42,11 @@ import {
   stepAMayDependOnStepB,
 } from "grafast";
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLInputType, GraphQLOutputType } from "graphql";
+import type {
+  GraphQLInputFieldConfigMap,
+  GraphQLInputType,
+  GraphQLOutputType,
+} from "graphql";
 import type { SQL } from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
@@ -613,7 +618,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           };
                           return memo;
                         },
-                        {
+                        Object.assign(Object.create(null), {
                           clientMutationId: {
                             type: GraphQLString,
                             applyPlan: EXPORTABLE(
@@ -627,7 +632,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               [],
                             ),
                           },
-                        },
+                        }) as GraphQLInputFieldConfigMap,
                       );
 
                       return {
@@ -670,7 +675,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     () => ({
                       description: `The output of our \`${fieldName}\` mutation.`,
                       fields: () => {
-                        const fields = {
+                        const fields = Object.assign(Object.create(null), {
                           clientMutationId: {
                             type: GraphQLString,
                             plan: EXPORTABLE(
@@ -686,7 +691,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               [constant],
                             ),
                           },
-                        };
+                        }) as Record<
+                          string,
+                          GraphileFieldConfig<any, any, any, any, any>
+                        >;
                         if (isVoid) {
                           return fields;
                         }

@@ -3,7 +3,10 @@ export function EXPORTABLE<T, TScope extends any[]>(
   args: [...TScope],
 ): T {
   const fn: T = factory(...args);
-  if (!("$exporter$factory" in fn)) {
+  if (
+    ((typeof fn === "object" && fn !== null) || typeof fn === "function") &&
+    !("$exporter$factory" in fn)
+  ) {
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },

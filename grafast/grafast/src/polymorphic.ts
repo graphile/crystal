@@ -6,7 +6,7 @@ export function isPolymorphicData(data: unknown): data is PolymorphicData {
   if (typeof data !== "object" || data == null) {
     return false;
   }
-  if (typeof data[$$concreteType] !== "string") {
+  if (typeof (data as any)[$$concreteType] !== "string") {
     return false;
   }
   return true;

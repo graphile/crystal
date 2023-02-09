@@ -101,7 +101,7 @@ export const buildInflection = (
           previous,
           preset,
         );
-        inflectors[inflectorName as any] = inflector;
+        inflectors[inflectorName as keyof GraphileBuild.Inflection] = inflector;
       },
     );
   }
@@ -174,7 +174,10 @@ const gatherBase = (
           const specHelpers = spec.helpers;
           for (const helperName of Object.keys(specHelpers)) {
             helpers[spec.namespace][helperName] = (...args: any[]): any => {
-              return specHelpers[helperName](context, ...args);
+              return (specHelpers as Record<string, any>)[helperName](
+                context,
+                ...args,
+              );
             };
           }
         }

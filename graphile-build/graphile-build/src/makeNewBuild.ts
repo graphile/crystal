@@ -52,7 +52,7 @@ export default function makeNewBuild(
     String: GraphQLString,
     Boolean: GraphQLBoolean,
     ID: GraphQLID,
-  };
+  } as Record<string, GraphQLNamedType | null | undefined>;
 
   const allTypesSources = {
     Int: "GraphQL Built-in",
@@ -60,7 +60,7 @@ export default function makeNewBuild(
     String: "GraphQL Built-in",
     Boolean: "GraphQL Built-in",
     ID: "GraphQL Built-in",
-  };
+  } as Record<string, string>;
 
   /**
    * Where the type factories are; so we don't construct types until they're needed.
@@ -161,7 +161,7 @@ export default function makeNewBuild(
     scopeByType,
     inflection,
     handleRecoverableError(e) {
-      e["recoverable"] = true;
+      (e as any)["recoverable"] = true;
       throw e;
     },
     recoverable(value, callback) {

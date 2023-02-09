@@ -33,7 +33,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   }
   const resolvedPreset = resolvePresets([userPreset]);
   console.log(printPlugins(resolvedPreset.plugins));
-  for (const key of Object.keys(resolvedPreset)) {
+  for (const key of Object.keys(
+    resolvedPreset,
+  ) as (keyof typeof resolvedPreset)[]) {
     if (key === "plugins" || key === "extends" || key === "disablePlugins") {
       continue;
     }

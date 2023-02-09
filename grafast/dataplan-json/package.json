@@ -43,6 +43,6 @@
     "@types/jest": "^27.5.1",
     "jest": "^28.1.0",
     "jest-serializer-simple": "workspace:^",
-    "typescript": "^4.8.1-rc"
+    "typescript": "^5.0.0-beta"
   }
 }

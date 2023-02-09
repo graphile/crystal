@@ -81,7 +81,7 @@ function makeWsUrl(url: string): string {
   }
 }
 
-function hideProperty(obj: object, property: string) {
+function hideProperty(obj: Record<string, any>, property: string) {
   const value = obj[property];
   delete obj[property];
   Object.defineProperty(obj, property, { value, enumerable: false });

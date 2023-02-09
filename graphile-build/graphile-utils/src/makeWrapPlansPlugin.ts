@@ -88,15 +88,16 @@ export function makeWrapPlansPlugin<T>(
             typeof rulesOrGenerator === "function"
               ? rulesOrGenerator(build.options)
               : rulesOrGenerator;
-          build[symbol] = {
+          (build as any)[symbol] = {
             rules,
             filter,
           };
           return build;
         },
         GraphQLObjectType_fields_field(field, build, context) {
-          const rules = build[symbol].rules as PlanWrapperRules | null;
-          const filter = build[symbol].filter as PlanWrapperFilter<T> | null;
+          const rules = (build as any)[symbol].rules as PlanWrapperRules | null;
+          const filter = (build as any)[symbol]
+            .filter as PlanWrapperFilter<T> | null;
           const {
             Self,
             scope: { fieldName },

@@ -192,7 +192,10 @@ export class __TrackedObjectStep<
     // users not to pass `{foo: undefined}` so we must do the more expensive
     // `value[key] !== undefined` check.
     const exists =
-      (typeof value === "object" && value && value[key] !== undefined) || false;
+      (typeof value === "object" &&
+        value &&
+        (value as any)[key] !== undefined) ||
+      false;
 
     this.constraints.push({
       type: "exists",

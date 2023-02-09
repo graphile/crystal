@@ -15,12 +15,15 @@ import plz from "pluralize";
 const bindAll = (obj: object, keys: Array<string>) => {
   keys.forEach((key) => {
     if (
-      typeof obj[key] === "function" &&
-      !("$$export" in obj[key]) &&
-      !("$exporter$factory" in obj[key])
+      typeof (obj as any)[key] === "function" &&
+      !("$$export" in (obj as any)[key]) &&
+      !("$exporter$factory" in (obj as any)[key])
     ) {
       // The Object.assign is to copy across any function properties
-      obj[key] = Object.assign(obj[key].bind(obj), obj[key]);
+      (obj as any)[key] = Object.assign(
+        (obj as any)[key].bind(obj),
+        (obj as any)[key],
+      );
     }
   });
   return obj;
@@ -194,7 +197,7 @@ export const stringTypeSpec = (
       ),
   extensions: {
     graphile: {
-      idempotent: !coerce || coerce[$$idempotent] ? true : false,
+      idempotent: !coerce || (coerce as any)[$$idempotent] ? true : false,
     },
   },
 });

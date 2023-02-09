@@ -62,7 +62,10 @@ export const mermaidEscape = (str: string): string => {
   return `"${stripAnsi(str.trim())
     .replace(
       /[#"<>]/g,
-      (l) => ({ "#": "ꖛ", '"': "”", "<": "ᐸ", ">": "ᐳ" }[l as any]),
+      (l) =>
+        ({ "#": "ꖛ", '"': "”", "<": "ᐸ", ">": "ᐳ" }[
+          l as "#" | '"' | "<" | ">"
+        ]),
     )
     .replace(/\r?\n/g, "<br />")}"`;
 };

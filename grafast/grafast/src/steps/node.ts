@@ -35,7 +35,7 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   private specPlanDep: number;
 
   constructor(
-    private codecs: TCodecs,
+    codecs: TCodecs,
     private possibleTypes: {
       [typeName: string]: NodeIdHandler<TCodecs>;
     },
@@ -46,13 +46,15 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
       return Object.entries(codecs).reduce(
         (memo, [codecName, codec]) => {
           try {
-            memo[codecName] = codec.decode(raw);
+            memo[codecName as keyof TCodecs] = codec.decode(raw);
           } catch (e) {
-            memo[codecName] = null;
+            memo[codecName as keyof TCodecs] = null;
           }
           return memo;
         },
-        { raw },
+        { raw } as {
+          [key in keyof TCodecs]: ReturnType<TCodecs[key]["decode"]> | null;
+        },
       );
     }
     decodeNodeIdWithCodecs.isSyncAndSafe = true; // Optimization

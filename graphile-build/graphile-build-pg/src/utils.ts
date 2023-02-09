@@ -61,7 +61,7 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
   let str = "";
   let name = "";
 
-  function validateParameterName(name: string) {
+  function validateParameterName(name: string): TParamName {
     if (name in result.params) {
       throw new Error(`Parameter '${name}' already set`);
     }
@@ -71,7 +71,7 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
     if (!SAFE_PARAMETER_NAME.test(name)) {
       throw new Error(`Invalid parameter name`);
     }
-    return name;
+    return name as TParamName;
   }
 
   function doneOne() {

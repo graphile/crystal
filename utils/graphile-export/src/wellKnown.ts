@@ -16,7 +16,7 @@ function makeWellKnownFromOptions(options: ExportOptions) {
   const wellKnownMap = new Map<unknown, $$Export>();
 
   function exportAll(
-    obj: object,
+    obj: Record<string, any>,
     moduleName: string,
     preferViaDefault = false,
   ) {
@@ -52,8 +52,8 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     "GraphQLFloat",
     "GraphQLString",
     "GraphQLID",
-  ]) {
-    for (const method of ["serialize", "parseValue", "parseLiteral"]) {
+  ] as const) {
+    for (const method of ["serialize", "parseValue", "parseLiteral"] as const) {
       wellKnownMap.set(graphqlStar[builtinScalarName][method], {
         moduleName: "graphql",
         exportName: [builtinScalarName, method],
@@ -75,6 +75,12 @@ function makeWellKnownFromOptions(options: ExportOptions) {
 }
 
 const $$wellKnown = Symbol("wellKnown");
+declare module "./interfaces.js" {
+  interface ExportOptions {
+    /** @internal */
+    [$$wellKnown]?: ReturnType<typeof makeWellKnownFromOptions>;
+  }
+}
 function getWellKnownFromOptions(
   options: ExportOptions,
 ): ReturnType<typeof makeWellKnownFromOptions> {
@@ -112,7 +118,7 @@ export function wellKnown(
   return undefined;
 }
 
-function isSameNamespace<TNamespace extends object>(
+function isSameNamespace<TNamespace extends Record<string, any>>(
   thing: unknown,
   namespace: TNamespace,
 ): thing is TNamespace {
@@ -125,7 +131,7 @@ function isSameNamespace<TNamespace extends object>(
     return false;
   }
   for (const key of nspKeys) {
-    if (thing[key] !== namespace[key]) {
+    if ((thing as Record<string, any>)[key] !== namespace[key]) {
       return false;
     }
   }
