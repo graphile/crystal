@@ -20,19 +20,33 @@ export function options(yargs: Argv) {
       type: "string",
       description: "The path to the config file",
       normalize: true,
+    })
+    .option("full", {
+      alias: "f",
+      type: "boolean",
+      description: "Print full details, do not summarize",
+      normalize: true,
+    })
+    .option("debug-order", {
+      alias: "o",
+      type: "boolean",
+      description: "Include details to help debug the ordering of plugins",
+      normalize: true,
     });
   // TODO: add options for debugging things like: where did this option come
   // from, why are the plugins in this order, etc.
 }
 
-export async function run(args: ArgsFromOptions<typeof options>) {
-  const userPreset = await loadConfig(args.config);
+type Opts = ArgsFromOptions<typeof options>;
+
+export async function run(opts: Opts) {
+  const userPreset = await loadConfig(opts.config);
   if (!userPreset) {
     console.error("Failed to load config, please check the file exists");
     process.exit(1);
   }
   const resolvedPreset = resolvePresets([userPreset]);
-  console.log(printPlugins(resolvedPreset.plugins));
+  console.log(printPlugins(opts, resolvedPreset.plugins));
   for (const key of Object.keys(
     resolvedPreset,
   ) as (keyof typeof resolvedPreset)[]) {
@@ -60,33 +74,44 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   }
 }
 
-function printPlugins(plugins: GraphileConfig.Plugin[] | undefined): string {
+function printPlugins(
+  opts: Opts,
+  plugins: GraphileConfig.Plugin[] | undefined,
+): string {
   if (!plugins || plugins.length === 0) {
     return "";
   }
   return `${chalk.whiteBright.bold("plugins")}:
-${plugins.map((p) => printPlugin(p)).join("\n")}`;
+${plugins.map((p) => printPlugin(opts, p)).join("\n")}`;
 }
 
-function printPlugin(plugin: GraphileConfig.Plugin): string {
+function printPlugin(opts: Opts, plugin: GraphileConfig.Plugin): string {
+  const { full } = opts;
   const left = `  ${chalk.greenBright.bold(plugin.name)}${chalk.whiteBright(
     "@",
-  )}${chalk.gray(plugin.version)}${plugin.description ? ": " : ""}`;
-  const l = stripAnsi(left).length;
-  const MAX = 50;
-  const SCREEN_WIDTH = getTerminalWidth();
-  const padL = Math.max(MAX, l) - l;
-  const pad = " ".repeat(Math.max(0, padL));
-  return `${left}${
-    plugin.description
-      ? `${pad}${chalk.dim(
-          oneLine(
-            plugin.description,
-            SCREEN_WIDTH - pad.length - stripAnsi(left).length,
-          ),
-        )}`
-      : ""
+  )}${chalk.gray(plugin.version)}${
+    plugin.description ? (full ? ":" : ": ") : ""
   }`;
+  if (full && plugin.description) {
+    return `${left}
+    ${chalk.dim(plugin.description.replace(/\n/g, "\n    "))}`;
+  } else {
+    const l = stripAnsi(left).length;
+    const MAX = 50;
+    const SCREEN_WIDTH = getTerminalWidth();
+    const padL = Math.max(MAX, l) - l;
+    const pad = " ".repeat(Math.max(0, padL));
+    return `${left}${
+      plugin.description
+        ? `${pad}${chalk.dim(
+            oneLine(
+              plugin.description,
+              SCREEN_WIDTH - pad.length - stripAnsi(left).length,
+            ),
+          )}`
+        : ""
+    }`;
+  }
 }
 
 function oneLine(str: string, max = 60, suffix = "..."): string {
