@@ -182,8 +182,17 @@ function mergePreset(
       targetPreset[scope as keyof GraphileConfig.ResolvedPreset];
     const sourceScope = sourcePreset[scope as keyof GraphileConfig.Preset];
     if (targetScope && sourceScope) {
-      targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
-        Object.assign(Object.create(null), targetScope, sourceScope);
+      if (Array.isArray(targetScope) !== Array.isArray(sourceScope)) {
+        throw new Error(
+          `${scope} contains an array entry in one preset and a non-array entry in another, this doesn't make sense`,
+        );
+      } else if (Array.isArray(sourceScope)) {
+        targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
+          sourceScope as any;
+      } else {
+        targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
+          Object.assign(Object.create(null), targetScope, sourceScope);
+      }
     } else {
       targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
         (targetScope || sourceScope) as any;
