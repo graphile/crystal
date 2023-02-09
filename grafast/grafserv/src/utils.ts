@@ -116,7 +116,7 @@ export function memo<T>(fn: () => T): () => T {
 export function normalizeRequest(
   request: RequestDigest | NormalizedRequestDigest,
 ): NormalizedRequestDigest {
-  if ($$normalizedHeaders in request) {
+  if (!request[$$normalizedHeaders]) {
     const r = request as NormalizedRequestDigest;
     const normalized = Object.create(null);
     for (const key in r.headers) {

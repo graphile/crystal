@@ -178,8 +178,11 @@ declare global {
 function shouldUseCustomConnection(
   pgSource: PgSource<any, any, any, any>,
 ): boolean {
+  const { codec } = pgSource;
   // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
-  return !pgSource.codec.columns || pgSource.codec.isAnonymous || false;
+  const setOrArray = !pgSource.isUnique || !!codec.arrayOfCodec;
+  const scalarOrAnonymous = !codec.columns || !!codec.isAnonymous;
+  return setOrArray && scalarOrAnonymous;
 }
 
 function defaultProcSourceBehavior(

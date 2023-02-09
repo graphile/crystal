@@ -118,6 +118,7 @@ export interface RequestDigest {
   requestContext: Partial<GraphileConfig.GraphQLRequestContext>;
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
+  [$$normalizedHeaders]?: any;
 }
 
 export interface NormalizedRequestDigest extends RequestDigest {
