@@ -312,45 +312,57 @@ export default function makeNewBuild(
         );
       } else {
         building.add(typeName);
-        const details = typeRegistry[typeName];
-        if (details != null) {
-          const { klass, scope, specGenerator, Step } = details;
+        try {
+          const details = typeRegistry[typeName];
+          if (details != null) {
+            const { klass, scope, specGenerator, Step } = details;
 
-          const spec = specGenerator();
-          // No need to have the user specify name, and they're forbidden from
-          // changing name (use inflection instead!) so we just set it
-          // ourselves:
-          spec.name = typeName;
+            const spec = specGenerator();
+            // No need to have the user specify name, and they're forbidden from
+            // changing name (use inflection instead!) so we just set it
+            // ourselves:
+            spec.name = typeName;
 
-          const finishedBuild = build as ReturnType<
-            typeof builder["createBuild"]
-          >;
-          const type = builder.newWithHooks<any>(
-            finishedBuild,
-            klass,
-            spec,
-            scope,
-            Step,
-          );
+            const finishedBuild = build as ReturnType<
+              typeof builder["createBuild"]
+            >;
+            const type = builder.newWithHooks<any>(
+              finishedBuild,
+              klass,
+              spec,
+              scope,
+              Step,
+            );
 
-          allTypes[typeName] = type;
+            allTypes[typeName] = type;
 
-          if (klass === GraphQLObjectType || klass === GraphQLInputObjectType) {
-            // Perform fields check. It's critical that `allTypes[typeName]` is
-            // set above this to prevent infinite loops in case one of our
-            // fields is dependent on another type, which is in turn dependent
-            // on this type - in this case we know there's at least one field
-            // otherwise the conflict would not occur?
-            if (Object.keys(type.getFields()).length === 0) {
-              allTypes[typeName] = null;
-              return null;
+            if (
+              klass === GraphQLObjectType ||
+              klass === GraphQLInputObjectType
+            ) {
+              // Perform fields check. It's critical that `allTypes[typeName]` is
+              // set above this to prevent infinite loops in case one of our
+              // fields is dependent on another type, which is in turn dependent
+              // on this type - in this case we know there's at least one field
+              // otherwise the conflict would not occur?
+              if (Object.keys(type.getFields()).length === 0) {
+                allTypes[typeName] = null;
+                return null;
+              }
             }
-          }
 
-          return type;
-        } else {
-          allTypes[typeName] = undefined;
-          return undefined;
+            return type;
+          } else {
+            allTypes[typeName] = undefined;
+            return undefined;
+          }
+        } catch (e) {
+          // Error occurred, store null
+          allTypes[typeName] = null;
+          // Rethrow error
+          throw e;
+        } finally {
+          building.delete(typeName);
         }
       }
     },
