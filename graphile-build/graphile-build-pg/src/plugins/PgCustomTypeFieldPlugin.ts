@@ -285,7 +285,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
       computedColumnField(options, details) {
         const explicitName = details.source.extensions?.tags?.fieldName;
         if (typeof explicitName === "string") {
-          return this.camelCase(explicitName);
+          return explicitName;
         }
         const name = details.source.name;
         const codecName =
