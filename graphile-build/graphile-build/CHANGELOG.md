@@ -1,5 +1,14 @@
 # graphile-build
 
+## 5.0.0-0.13
+
+### Patch Changes
+
+- Updated dependencies
+  [[`842f6ccbb`](https://github.com/benjie/postgraphile-private/commit/842f6ccbb3c9bd0c101c4f4df31c5ed1aea9b2ab)]:
+  - graphile-config@0.0.1-0.4
+  - grafast@0.0.1-0.10
+
 ## 5.0.0-0.12
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-0.4
+
+### Patch Changes
+
+- [#184](https://github.com/benjie/postgraphile-private/pull/184)
+  [`842f6ccbb`](https://github.com/benjie/postgraphile-private/commit/842f6ccbb3c9bd0c101c4f4df31c5ed1aea9b2ab)
+  Thanks [@benjie](https://github.com/benjie)! - Handle array-to-object issue in
+  graphile-config when multiple presets set an array key.
+
 ## 0.0.1-0.3
 
 ### Patch Changes
