@@ -193,7 +193,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   }
 
   const config = resolvePresets([preset]);
-  if (!config.pgConfigs || config.pgConfigs.length === 0) {
+  if (!Array.isArray(config.pgConfigs) || config.pgConfigs.length === 0) {
     // TODO: respect envvars here?
     console.error(
       `ERROR: Please specify \`--connection\` so we know which database to connect to (or add details to your \`graphile.config.js\`):\n\n  postgraphile${
