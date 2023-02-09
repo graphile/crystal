@@ -1,5 +1,14 @@
 # graphile
 
+## 5.0.0-0.2
+
+### Patch Changes
+
+- [#183](https://github.com/benjie/postgraphile-private/pull/183)
+  [`dc4ff1268`](https://github.com/benjie/postgraphile-private/commit/dc4ff12681eeaef3a493fea5481e31f13c9f1874)
+  Thanks [@benjie](https://github.com/benjie)! - Enhance config printing with
+  full description printer and plugin ordering debugger
+
 ## 5.0.0-0.1
 
 ### Patch Changes

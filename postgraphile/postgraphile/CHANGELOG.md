@@ -1,5 +1,34 @@
 # postgraphile
 
+## 5.0.0-0.17
+
+### Patch Changes
+
+- [#183](https://github.com/benjie/postgraphile-private/pull/183)
+  [`ebb24895c`](https://github.com/benjie/postgraphile-private/commit/ebb24895c3ee05c670ffb6c9b4fa4bd1328d9005)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug when handling stable
+  void functions
+
+- [#181](https://github.com/benjie/postgraphile-private/pull/181)
+  [`d3cba220c`](https://github.com/benjie/postgraphile-private/commit/d3cba220c5acb52bb45f1f82f599dd13e0340e65)
+  Thanks [@benjie](https://github.com/benjie)! - `*FieldName` smart tags are now
+  used verbatim rather than being piped through `inflection.camelCase(...)` -
+  you've explicitly stated a 'field name' so we should use that. This may be a
+  breaking change for you if your field names are currently different
+  before/after they are camelCase'd.
+
+- [#183](https://github.com/benjie/postgraphile-private/pull/183)
+  [`3eb9da95e`](https://github.com/benjie/postgraphile-private/commit/3eb9da95e6834d687972b112ee0c12b01c7d11c2)
+  Thanks [@benjie](https://github.com/benjie)! - Fix potential construction loop
+  on failure to construct a type
+
+- Updated dependencies
+  [[`ebb24895c`](https://github.com/benjie/postgraphile-private/commit/ebb24895c3ee05c670ffb6c9b4fa4bd1328d9005),
+  [`d3cba220c`](https://github.com/benjie/postgraphile-private/commit/d3cba220c5acb52bb45f1f82f599dd13e0340e65),
+  [`3eb9da95e`](https://github.com/benjie/postgraphile-private/commit/3eb9da95e6834d687972b112ee0c12b01c7d11c2)]:
+  - graphile-build-pg@5.0.0-0.15
+  - graphile-build@5.0.0-0.12
+
 ## 5.0.0-0.16
 
 ### Patch Changes

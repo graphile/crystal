@@ -1,5 +1,14 @@
 # graphile-build
 
+## 5.0.0-0.12
+
+### Patch Changes
+
+- [#183](https://github.com/benjie/postgraphile-private/pull/183)
+  [`3eb9da95e`](https://github.com/benjie/postgraphile-private/commit/3eb9da95e6834d687972b112ee0c12b01c7d11c2)
+  Thanks [@benjie](https://github.com/benjie)! - Fix potential construction loop
+  on failure to construct a type
+
 ## 5.0.0-0.11
 
 ### Patch Changes
