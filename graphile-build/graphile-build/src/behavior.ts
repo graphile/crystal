@@ -35,6 +35,11 @@ export class Behavior {
     } ${specString ?? ""}`;
     const specs = parseSpecs(finalBehaviorSpecsString);
     const filterScope = parseScope(filter);
+    if (filterScope[filterScope.length - 1] === "create") {
+      throw new Error(
+        `'create' filter scope is forbidden; did you mean 'insert'?`,
+      );
+    }
     // Loop backwards through the specs
     for (let i = specs.length - 1; i >= 0; i--) {
       const { positive, scope } = specs[i];
@@ -71,6 +76,9 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
       : ["+", fragment];
     const positive = pm === "+";
     const scope = parseScope(rest);
+    if (scope[scope.length - 1] === "create") {
+      throw new Error(`'create' behavior is forbidden; did you mean 'insert'?`);
+    }
     specs.push({ positive, scope });
   }
   return specs;
