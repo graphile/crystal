@@ -587,10 +587,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
             const primaryUnique = source.uniques.find(
               (u: PgSourceUnique) => u.isPrimary,
             );
-            const constraintMode =
-              mode === "source:update"
-                ? "source:constraint:update"
-                : "source:constraint:delete";
+            const constraintMode = `constraint:${mode}`;
             const specs = [
               ...(primaryUnique
                 ? [{ unique: primaryUnique, uniqueMode: "node" }]

@@ -1256,7 +1256,7 @@ function addRelations(
     }
     let fields = memo;
     const defaultBehavior = isUnique
-      ? "single -singularRelation:list -singularRelation:connection"
+      ? "single -singularRelation:source:list -singularRelation:source:connection"
       : simpleCollections === "both"
       ? "connection list"
       : simpleCollections === "only"

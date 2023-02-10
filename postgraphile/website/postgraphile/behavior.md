@@ -82,6 +82,14 @@ yourself in too hard.
 **TODO**: We really need an automated registry of this, and to validate plugins
 against it. But for now, this list will have to suffice.
 
+:::note
+
+Scopes are least specific on the right (broad operations like `select` or
+`update`) and narrow more as prefixes are added to the left (`source:update`
+is narrower than `update`; `constraint:source:update` is narrower still).
+
+:::
+
 The following are behaviors that the core
 PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 
@@ -95,8 +103,8 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `source:delete` - can delete a record in this source
 - `source:list` - "list" field for a source at any level
 - `source:connection` - "connection" field for a source at any level
-- `source:constraint:update` - can update a record by this constraint
-- `source:constraint:delete` - can delete a record by this constraint
+- `constraint:source:update` - can update a record by this constraint
+- `constraint:source:delete` - can delete a record by this constraint
 - `attribute:select` - can this attribute be selected?
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
@@ -125,15 +133,15 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `proc:filterBy` - can we filter by this proc (source)
 - `attribute:filterBy` - can we filter by this attribute (column, property)
 - `single` - can we get just one?
-- `query:single` - can we get a single one of these (source) at the root?
-- `singularRelation:single` - can we get a single one of these (source) from a
+- `query:source:single` - can we get a single one of these (source) at the root?
+- `singularRelation:source:single` - can we get a single one of these (source) from a
   type?
-- `singularRelation:list` - should we add a list field to navigate this singular
+- `singularRelation:source:list` - should we add a list field to navigate this singular
   relationship (when we know there can be at most one)?
-- `singularRelation:connection` - should we add a connection field to navigate
+- `singularRelation:source:connection` - should we add a connection field to navigate
   this singular relationship (when we know there can be at most one)?
-- `manyRelation:list`
-- `manyRelation:connection`
+- `manyRelation:source:list`
+- `manyRelation:source:connection`
 - `jwt` - should the given codec behave as if it were a JWT?
 
 - `insert:input:record` - input to the 'insert' mutation
@@ -196,9 +204,9 @@ if (
 
 ## Future expansions
 
-Would be good to add additional data, e.g. `query:single[pk]`,
-`query:single[node]`, `query:single[unique]` could all be be added, and would
-allow you to set a rule like `-query:single +query:single[node]` to only allow
+Would be good to add additional data, e.g. `query:source:single[pk]`,
+`query:source:single[node]`, `query:single[unique]` could all be be added, and would
+allow you to set a rule like `-query:source:single +query:single[node]` to only allow
 the node accessors.
 
 ## Behaviors to avoid

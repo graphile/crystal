@@ -190,7 +190,7 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
         }
         case "many": {
           behavior.push(
-            "-singularRelation:list -singularRelation:connection -manyRelation:list -manyRelation:connection",
+            "-singularRelation:source:list -singularRelation:source:connection -manyRelation:source:list -manyRelation:source:connection",
           );
           break;
         }

@@ -157,7 +157,7 @@ return function (source) {
                   source.extensions,
                   unique.extensions,
                 ]);
-                const fieldBehaviorScope = "query:single";
+                const fieldBehaviorScope = "query:source:single";
                 if (
                   !build.behavior.matches(
                     behavior,
