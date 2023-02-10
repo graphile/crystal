@@ -80,7 +80,10 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                   // TODO: move this to a separate plugin
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {
-                      const behavior = getBehavior(column.extensions);
+                      const behavior = getBehavior([
+                        codec.extensions,
+                        column.extensions,
+                      ]);
                       if (
                         !build.behavior.matches(
                           behavior,

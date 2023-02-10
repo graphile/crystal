@@ -52,7 +52,10 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
           if (!source.isUnique) return false;
-          const behavior = getBehavior([source.extensions]);
+          const behavior = getBehavior([
+            source.codec.extensions,
+            source.extensions,
+          ]);
           return build.behavior.matches(
             behavior,
             "proc:filterBy",

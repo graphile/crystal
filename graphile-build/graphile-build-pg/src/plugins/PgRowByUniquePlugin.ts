@@ -153,6 +153,7 @@ return function (source) {
                     );
 
                 const behavior = getBehavior([
+                  source.codec.extensions,
                   source.extensions,
                   unique.extensions,
                 ]);

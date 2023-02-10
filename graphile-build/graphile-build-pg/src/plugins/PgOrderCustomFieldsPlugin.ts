@@ -62,7 +62,10 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
           if (!source.isUnique) return false;
-          const behavior = getBehavior(source.extensions);
+          const behavior = getBehavior([
+            source.codec.extensions,
+            source.extensions,
+          ]);
           // TODO: should this be `proc:orderBy`? If so, should we make it so `getBehavior` accepts a prefix to prepend, so `"orderBy"` in a smart tag on a proc becomes `proc:orderBy`?
           return !!build.behavior.matches(behavior, "orderBy", "-orderBy");
         });

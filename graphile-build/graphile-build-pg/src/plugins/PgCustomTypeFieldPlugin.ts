@@ -587,7 +587,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               const isQuerySource =
                 source.parameters &&
                 build.behavior.matches(
-                  getBehavior(source.extensions),
+                  getBehavior([source.codec.extensions, source.extensions]),
                   "queryField",
                   defaultProcSourceBehavior(source, options),
                 );
@@ -603,7 +603,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 // source.isMutation &&
                 source.parameters &&
                 build.behavior.matches(
-                  getBehavior(source.extensions),
+                  getBehavior([source.codec.extensions, source.extensions]),
                   "mutationField",
                   defaultProcSourceBehavior(source, options),
                 );
@@ -763,7 +763,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               const isComputedSource =
                 source.parameters &&
                 build.behavior.matches(
-                  getBehavior(source.extensions),
+                  getBehavior([source.codec.extensions, source.extensions]),
                   "typeField",
                   defaultProcSourceBehavior(source, options),
                 );
@@ -1024,7 +1024,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 const canUseConnection =
                   !source.sqlPartitionByIndex && !source.isList;
 
-                const behavior = getBehavior(source.extensions);
+                const behavior = getBehavior([
+                  source.codec.extensions,
+                  source.extensions,
+                ]);
 
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
                 const connectionFieldBehaviorScope = `${baseScope}:connection`;

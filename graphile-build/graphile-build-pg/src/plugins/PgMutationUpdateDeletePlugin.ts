@@ -144,7 +144,7 @@ const isUpdatable = (
   if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
   if (!source.uniques || source.uniques.length < 1) return false;
-  const behavior = getBehavior(source.extensions);
+  const behavior = getBehavior([source.codec.extensions, source.extensions]);
   return !!build.behavior.matches(behavior, "source:update", "update");
 };
 
@@ -157,7 +157,7 @@ const isDeletable = (
   if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
   if (!source.uniques || source.uniques.length < 1) return false;
-  const behavior = getBehavior(source.extensions);
+  const behavior = getBehavior([source.codec.extensions, source.extensions]);
   return !!build.behavior.matches(behavior, "source:delete", "delete");
 };
 
@@ -601,7 +601,11 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               })),
             ].filter((spec) => {
               const unique = spec.unique as PgSourceUnique;
-              const behavior = unique.extensions?.tags?.behavior;
+              const behavior = getBehavior([
+                source.codec.extensions,
+                source.extensions,
+                unique.extensions,
+              ]);
               return !!build.behavior.matches(
                 behavior,
                 constraintMode,

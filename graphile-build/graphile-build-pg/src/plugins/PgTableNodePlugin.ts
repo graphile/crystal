@@ -42,7 +42,10 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           if (source.parameters) return false;
           if (!source.uniques) return false;
           if (!source.uniques[0]) return false;
-          const behavior = getBehavior(source.extensions);
+          const behavior = getBehavior([
+            source.codec.extensions,
+            source.extensions,
+          ]);
           // Needs the 'select' and 'node' behaviours for compatibility
           return (
             !!build.behavior.matches(behavior, "node", "node") &&

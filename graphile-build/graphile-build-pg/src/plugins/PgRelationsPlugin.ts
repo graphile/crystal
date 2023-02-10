@@ -740,7 +740,11 @@ function addRelations(
       // The behavior is the relation behavior PLUS the remote table
       // behavior. But the relation settings win.
       const behavior =
-        getBehavior(otherSource.extensions) + " " + getBehavior(extensions);
+        getBehavior([
+          otherSource.codec.extensions,
+          otherSource.extensions,
+          extensions,
+        ]) ?? "";
       const otherCodec = otherSource.codec;
       const typeName = build.inflection.tableType(otherCodec);
       const connectionTypeName =
@@ -867,9 +871,13 @@ function addRelations(
       // const isUnique = paths.every((p) => p.isUnique);
 
       // TODO: shouldn't the ref behavior override the source behavior?
-      behavior =
-        (hasExactlyOneSource ? getBehavior(firstSource.extensions) + " " : "") +
-        getBehavior(refSpec.extensions);
+      behavior = hasExactlyOneSource
+        ? getBehavior([
+            firstSource.codec.extensions,
+            firstSource.extensions,
+            refSpec.extensions,
+          ])
+        : getBehavior([sharedCodec?.extensions, refSpec.extensions]);
 
       // Shortcut simple relation alias
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {

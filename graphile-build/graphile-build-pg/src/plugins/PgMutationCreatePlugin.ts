@@ -42,7 +42,7 @@ const isInsertable = (
   if (!source.codec.columns) return false;
   if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
-  const behavior = getBehavior(source.extensions);
+  const behavior = getBehavior([source.codec.extensions, source.extensions]);
   return build.behavior.matches(behavior, "source:insert", "insert") === true;
 };
 
@@ -143,7 +143,10 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             );
 
             const payloadTypeName = inflection.createPayloadType(source);
-            const behavior = getBehavior(source.extensions);
+            const behavior = getBehavior([
+              source.codec.extensions,
+              source.extensions,
+            ]);
             build.registerObjectType(
               payloadTypeName,
               {
