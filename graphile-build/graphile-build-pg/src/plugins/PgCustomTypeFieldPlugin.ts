@@ -359,9 +359,20 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 paramBaseCodec,
                 variant,
               );
-              if (!baseInputType || !isInputType(baseInputType)) {
+              if (!baseInputType) {
+                const hint =
+                  variant === "input"
+                    ? ' (perhaps you used "-insert" behavior instead of "-source:insert")'
+                    : "";
+                // TODO: convert this to a diagnostic
                 throw new Error(
-                  `Failed to find a suitable type for argument codec '${param.codec.name}'; not adding function field for '${source}'`,
+                  `Failed to find a suitable type for argument codec '${param.codec.name}' variant '${variant}'${hint}; not adding function field for '${source}'`,
+                );
+              }
+              if (!isInputType(baseInputType)) {
+                // TODO: convert this to a diagnostic
+                throw new Error(
+                  `Variant '${variant}' for codec '${param.codec.name}' returned type '${baseInputType}', but that's not an input type so we cannot use it for an argument; not adding function field for '${source}'`,
                 );
               }
 
@@ -576,7 +587,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               const isQuerySource =
                 source.parameters &&
                 build.behavior.matches(
-                  getBehavior(source.extensions),
+                  getBehavior([source.codec.extensions, source.extensions]),
                   "queryField",
                   defaultProcSourceBehavior(source, options),
                 );
@@ -592,7 +603,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 // source.isMutation &&
                 source.parameters &&
                 build.behavior.matches(
-                  getBehavior(source.extensions),
+                  getBehavior([source.codec.extensions, source.extensions]),
                   "mutationField",
                   defaultProcSourceBehavior(source, options),
                 );
@@ -752,7 +763,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               const isComputedSource =
                 source.parameters &&
                 build.behavior.matches(
-                  getBehavior(source.extensions),
+                  getBehavior([source.codec.extensions, source.extensions]),
                   "typeField",
                   defaultProcSourceBehavior(source, options),
                 );
@@ -1013,11 +1024,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 const canUseConnection =
                   !source.sqlPartitionByIndex && !source.isList;
 
-                const behavior = getBehavior(source.extensions);
+                const behavior = getBehavior([
+                  source.codec.extensions,
+                  source.extensions,
+                ]);
 
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
-                const connectionFieldBehaviorScope = `${baseScope}:connection`;
-                const listFieldBehaviorScope = `${baseScope}:list`;
+                const connectionFieldBehaviorScope = `${baseScope}:source:connection`;
+                const listFieldBehaviorScope = `${baseScope}:source:list`;
                 if (
                   canUseConnection &&
                   build.behavior.matches(

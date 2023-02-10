@@ -11,7 +11,7 @@ are some examples:
 
 - `insert`
 - `+list -connection -list:filter`
-- `-insert -update -delete root:*:filter +connection -list`
+- `-insert -update -delete query:*:filter +connection -list`
 
 A behavior string is made of a list of "behavior fragments" separated by spaces.
 Each behavior fragment optionally starts with a `+` or `-` symbol (if neither is
@@ -82,6 +82,14 @@ yourself in too hard.
 **TODO**: We really need an automated registry of this, and to validate plugins
 against it. But for now, this list will have to suffice.
 
+:::note
+
+Scopes are least specific on the right (broad operations like `select` or
+`update`) and narrow more as prefixes are added to the left (`source:update`
+is narrower than `update`; `constraint:source:update` is narrower still).
+
+:::
+
 The following are behaviors that the core
 PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 
@@ -89,9 +97,14 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   mean you can do `select * from users` but it might mean that it's possible to
   see details about a `users` when it's returned by a function or similar. (In
   this case the `codec` has `select` but the `source` has `-select`.)
-- `insert` - can insert into this source/column/etc
-- `update` - can update this source/column/etc
-- `delete` - can delete this source
+- `source:select` - can insert into this source
+- `source:insert` - can insert into this source
+- `source:update` - can update a record in this source
+- `source:delete` - can delete a record in this source
+- `source:list` - "list" field for a source at any level
+- `source:connection` - "connection" field for a source at any level
+- `constraint:source:update` - can update a record by this constraint
+- `constraint:source:delete` - can delete a record by this constraint
 - `attribute:select` - can this attribute be selected?
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
@@ -100,16 +113,20 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   specification
 - `list` - list (simple collection)
 - `connection` - connection (GraphQL Cursor Pagination Spec)
-- `query:list` - "list" field for a source at the root Query level
-- `query:connection` - "connection" field for a source at the root Query level
+- `query:source:list` - "list" field for a source at the root Query level
+- `query:source:connection` - "connection" field for a source at the root Query level
 - `queryField` - for procedures: should it become a field on the `Query` type?
 - `typeField` - for procedures: should it become a field on a non-operation
   type?
+- `queryField:source:connection` - should we represent this source with a connection on the `Query` type?
+- `queryField:source:list` - should we represent this source with a list on the `Query` type?
+- `typeField:source:connection` - should we represent this source with a connection on a non-operation type
+- `typeField:source:list` - should we represent this source with a list on a non-operation type
 - `mutationField` - for procedures: should it become a mutation (field on
   `Mutation`)?
 - `order` - can we sort this thing? (source)
-- `query:list:order`
-- `query:connection:order`
+- `query:source:list:order`
+- `query:source:connection:order`
 - `orderBy` - can we order by this thing (e.g. column)?
 - `orderBy:array` - can we order by this thing that's an array?
 - `orderBy:range` - can we order by this thing that's a range?
@@ -120,15 +137,15 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `proc:filterBy` - can we filter by this proc (source)
 - `attribute:filterBy` - can we filter by this attribute (column, property)
 - `single` - can we get just one?
-- `query:single` - can we get a single one of these (source) at the root?
-- `singularRelation:single` - can we get a single one of these (source) from a
+- `query:source:single` - can we get a single one of these (source) at the root?
+- `singularRelation:source:single` - can we get a single one of these (source) from a
   type?
-- `singularRelation:list` - should we add a list field to navigate this singular
+- `singularRelation:source:list` - should we add a list field to navigate this singular
   relationship (when we know there can be at most one)?
-- `singularRelation:connection` - should we add a connection field to navigate
+- `singularRelation:source:connection` - should we add a connection field to navigate
   this singular relationship (when we know there can be at most one)?
-- `manyRelation:list`
-- `manyRelation:connection`
+- `manyRelation:source:list`
+- `manyRelation:source:connection`
 - `jwt` - should the given codec behave as if it were a JWT?
 
 - `insert:input:record` - input to the 'insert' mutation
@@ -191,9 +208,9 @@ if (
 
 ## Future expansions
 
-Would be good to add additional data, e.g. `query:single[pk]`,
-`query:single[node]`, `query:single[unique]` could all be be added, and would
-allow you to set a rule like `-query:single +query:single[node]` to only allow
+Would be good to add additional data, e.g. `query:source:single[pk]`,
+`query:source:single[node]`, `query:single[unique]` could all be be added, and would
+allow you to set a rule like `-query:source:single +query:single[node]` to only allow
 the node accessors.
 
 ## Behaviors to avoid

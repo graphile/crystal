@@ -42,8 +42,8 @@ const isInsertable = (
   if (!source.codec.columns) return false;
   if (source.codec.polymorphism) return false;
   if (source.codec.isAnonymous) return false;
-  const behavior = getBehavior(source.extensions);
-  return build.behavior.matches(behavior, "insert", "insert") === true;
+  const behavior = getBehavior([source.codec.extensions, source.extensions]);
+  return build.behavior.matches(behavior, "source:insert", "insert") === true;
 };
 
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
@@ -143,7 +143,10 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             );
 
             const payloadTypeName = inflection.createPayloadType(source);
-            const behavior = getBehavior(source.extensions);
+            const behavior = getBehavior([
+              source.codec.extensions,
+              source.extensions,
+            ]);
             build.registerObjectType(
               payloadTypeName,
               {
@@ -179,7 +182,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     build.behavior.matches(
                       behavior,
                       "insert:payload:record",
-                      "insert:payload:record",
+                      "record",
                     )
                       ? {
                           [tableFieldName]: fieldWithHooks(
@@ -248,7 +251,10 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
               memo,
               {
                 [createFieldName]: fieldWithHooks(
-                  { fieldName: createFieldName, fieldBehaviorScope: "insert" },
+                  {
+                    fieldName: createFieldName,
+                    fieldBehaviorScope: "source:insert",
+                  },
                   {
                     args: {
                       input: {

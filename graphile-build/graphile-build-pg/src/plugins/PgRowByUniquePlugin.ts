@@ -153,10 +153,11 @@ return function (source) {
                     );
 
                 const behavior = getBehavior([
+                  source.codec.extensions,
                   source.extensions,
                   unique.extensions,
                 ]);
-                const fieldBehaviorScope = "query:single";
+                const fieldBehaviorScope = "query:source:single";
                 if (
                   !build.behavior.matches(
                     behavior,

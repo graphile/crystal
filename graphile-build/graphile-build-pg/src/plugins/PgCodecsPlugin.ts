@@ -372,7 +372,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     behavior:
                       // Generated ALWAYS so no insert/update
                       columnAttribute.attidentity === "a"
-                        ? ["-insert -update"]
+                        ? ["-attribute:insert -attribute:update"]
                         : [],
                   },
                 },

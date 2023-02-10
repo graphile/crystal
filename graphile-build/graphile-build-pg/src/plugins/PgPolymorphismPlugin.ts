@@ -349,9 +349,11 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               relations,
             )) {
               const behavior =
-                getBehavior(relationSpec.source.extensions) +
-                " " +
-                getBehavior(relationSpec.extensions);
+                getBehavior([
+                  relationSpec.source.codec.extensions,
+                  relationSpec.source.extensions,
+                  relationSpec.extensions,
+                ]) ?? "";
               const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
                 {
                   source,

@@ -5,7 +5,7 @@ interface BehaviorSpec {
 }
 
 export class Behavior {
-  private globalBehaviorDefaults = "";
+  constructor(private globalBehaviorDefaults = "") {}
 
   // Should only be called during 'build' phase.
   public addDefaultBehavior(behavior: string) {
@@ -35,6 +35,11 @@ export class Behavior {
     } ${specString ?? ""}`;
     const specs = parseSpecs(finalBehaviorSpecsString);
     const filterScope = parseScope(filter);
+    if (filterScope[filterScope.length - 1] === "create") {
+      throw new Error(
+        `'create' filter scope is forbidden; did you mean 'insert'?`,
+      );
+    }
     // Loop backwards through the specs
     for (let i = specs.length - 1; i >= 0; i--) {
       const { positive, scope } = specs[i];
@@ -47,7 +52,7 @@ export class Behavior {
 }
 
 /**
- * Parses a scope like `root:connection:filter` into it's constituent parts.
+ * Parses a scope like `query:source:connection:filter` into it's constituent parts.
  *
  * @internal
  */
@@ -71,6 +76,9 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
       : ["+", fragment];
     const positive = pm === "+";
     const scope = parseScope(rest);
+    if (scope[scope.length - 1] === "create") {
+      throw new Error(`'create' behavior is forbidden; did you mean 'insert'?`);
+    }
     specs.push({ positive, scope });
   }
   return specs;
@@ -82,8 +90,8 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
  * If `filterScope` contains an `*` then we return true if any possible
  * `filterScope` can be matched by `specifiedScope` in a positive fashion.
  *
- * @param specifiedScope - the scope the user entered, e.g. from `+root:*:filter`
- * @param filterScope - the scope the plugin says we're in, e.g. from `root:connection:filter`
+ * @param specifiedScope - the scope the user entered, e.g. from `+query:*:filter`
+ * @param filterScope - the scope the plugin says we're in, e.g. from `query:source:connection:filter`
  *
  * @internal
  */

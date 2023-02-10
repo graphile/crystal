@@ -185,12 +185,12 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
           break;
         }
         case "all": {
-          behavior.push("-query:list -query:connection");
+          behavior.push("-query:source:list -query:source:connection");
           break;
         }
         case "many": {
           behavior.push(
-            "-singularRelation:list -singularRelation:connection -manyRelation:list -manyRelation:connection",
+            "-singularRelation:source:list -singularRelation:source:connection -manyRelation:source:list -manyRelation:source:connection",
           );
           break;
         }

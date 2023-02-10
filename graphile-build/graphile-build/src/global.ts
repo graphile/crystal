@@ -83,6 +83,13 @@ declare global {
     interface GraphileBuildInflectionOptions {}
     interface GraphileBuildGatherOptions {}
     interface SchemaOptions {
+      /**
+       * A behavior string to prepend to all behavior checks, can be overriden
+       * but is a great way to disable things by default and then re-enable
+       * them in specific locations.
+       */
+      defaultBehavior?: string;
+
       // TODO: review this option
       /**
        * Should we enable subscriptions in the schema?

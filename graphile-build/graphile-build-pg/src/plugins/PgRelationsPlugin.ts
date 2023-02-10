@@ -740,7 +740,11 @@ function addRelations(
       // The behavior is the relation behavior PLUS the remote table
       // behavior. But the relation settings win.
       const behavior =
-        getBehavior(otherSource.extensions) + " " + getBehavior(extensions);
+        getBehavior([
+          otherSource.codec.extensions,
+          otherSource.extensions,
+          extensions,
+        ]) ?? "";
       const otherCodec = otherSource.codec;
       const typeName = build.inflection.tableType(otherCodec);
       const connectionTypeName =
@@ -867,9 +871,13 @@ function addRelations(
       // const isUnique = paths.every((p) => p.isUnique);
 
       // TODO: shouldn't the ref behavior override the source behavior?
-      behavior =
-        (hasExactlyOneSource ? getBehavior(firstSource.extensions) + " " : "") +
-        getBehavior(refSpec.extensions);
+      behavior = hasExactlyOneSource
+        ? getBehavior([
+            firstSource.codec.extensions,
+            firstSource.extensions,
+            refSpec.extensions,
+          ])
+        : getBehavior([sharedCodec?.extensions, refSpec.extensions]);
 
       // Shortcut simple relation alias
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {
@@ -1248,7 +1256,7 @@ function addRelations(
     }
     let fields = memo;
     const defaultBehavior = isUnique
-      ? "single -singularRelation:list -singularRelation:connection"
+      ? "single -singularRelation:source:list -singularRelation:source:connection"
       : simpleCollections === "both"
       ? "connection list"
       : simpleCollections === "only"
@@ -1259,7 +1267,7 @@ function addRelations(
       isUnique &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:single`,
+        `${relationTypeScope}:source:single`,
         defaultBehavior,
       )
     ) {
@@ -1270,7 +1278,7 @@ function addRelations(
           [fieldName]: fieldWithHooks(
             {
               fieldName,
-              fieldBehaviorScope: `${relationTypeScope}:single`,
+              fieldBehaviorScope: `${relationTypeScope}:source:single`,
               isPgSingleRelationField: true,
               behavior,
               pgRelationDetails,
@@ -1295,7 +1303,7 @@ function addRelations(
       isReferencee &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:connection`,
+        `${relationTypeScope}:source:connection`,
         defaultBehavior,
       )
     ) {
@@ -1308,7 +1316,7 @@ function addRelations(
             [fieldName]: fieldWithHooks(
               {
                 fieldName,
-                fieldBehaviorScope: `${relationTypeScope}:connection`,
+                fieldBehaviorScope: `${relationTypeScope}:source:connection`,
                 // TODO: rename to pgFieldSource?
                 pgSource,
                 pgFieldCodec,
@@ -1342,7 +1350,7 @@ function addRelations(
       isReferencee &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:list`,
+        `${relationTypeScope}:source:list`,
         defaultBehavior,
       )
     ) {
@@ -1353,7 +1361,7 @@ function addRelations(
           [fieldName]: fieldWithHooks(
             {
               fieldName,
-              fieldBehaviorScope: `${relationTypeScope}:list`,
+              fieldBehaviorScope: `${relationTypeScope}:source:list`,
               pgSource,
               pgFieldCodec,
               isPgFieldSimpleCollection: true,

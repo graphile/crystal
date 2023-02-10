@@ -4,6 +4,7 @@ export NODE_ENV=development
 export DEBUG="${DEBUG:-graphile-build:warn}"
 
 yarn nodemon \
+  --watch "graphile.config.mjs" \
   --watch "../../grafast/*/dist/**/*" \
   --watch "../../graphile-build/*/dist/**/*" \
   --watch "../../postgraphile/*/dist/**/*" \

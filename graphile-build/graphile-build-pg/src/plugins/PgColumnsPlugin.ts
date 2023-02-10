@@ -129,7 +129,7 @@ function processColumn(
 
   const column = pgCodec.columns[columnName] as PgTypeColumn<any, any>;
 
-  const behavior = getBehavior(column.extensions);
+  const behavior = getBehavior([pgCodec.extensions, column.extensions]);
   if (!build.behavior.matches(behavior, "attribute:select", "select")) {
     // Don't allow selecting this column.
     return;
@@ -423,7 +423,10 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         return Object.entries(pgCodec.columns as PgTypeColumns).reduce(
           (memo, [columnName, column]) =>
             build.recoverable(memo, () => {
-              const behavior = getBehavior(column.extensions);
+              const behavior = getBehavior([
+                pgCodec.extensions,
+                column.extensions,
+              ]);
 
               const action = isPgBaseInput
                 ? "base"
