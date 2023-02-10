@@ -181,7 +181,7 @@ export default function makeNewBuild(
     wrapDescription,
     stringTypeSpec,
 
-    behavior: new Behavior(),
+    behavior: new Behavior(builder.options.defaultBehavior),
 
     registerObjectType(typeName, scope, Step, specGenerator, origin) {
       register.call(

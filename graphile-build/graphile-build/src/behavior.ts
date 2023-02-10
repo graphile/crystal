@@ -5,7 +5,7 @@ interface BehaviorSpec {
 }
 
 export class Behavior {
-  private globalBehaviorDefaults = "";
+  constructor(private globalBehaviorDefaults = "") {}
 
   // Should only be called during 'build' phase.
   public addDefaultBehavior(behavior: string) {
