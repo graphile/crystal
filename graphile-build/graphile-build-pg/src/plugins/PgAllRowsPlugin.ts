@@ -91,7 +91,13 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           ]);
           const defaultBehavior = "connection -list";
 
-          if (build.behavior.matches(behavior, "query:list", defaultBehavior)) {
+          if (
+            build.behavior.matches(
+              behavior,
+              "query:source:list",
+              defaultBehavior,
+            )
+          ) {
             const fieldName = build.inflection.allRowsList(source);
             fields = build.extend(
               fields,
@@ -99,7 +105,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                 [fieldName]: fieldWithHooks(
                   {
                     fieldName,
-                    fieldBehaviorScope: `query:list`,
+                    fieldBehaviorScope: `query:source:list`,
                     isPgFieldSimpleCollection: true,
                     pgSource: source,
                   },
@@ -130,7 +136,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           if (
             build.behavior.matches(
               behavior,
-              "query:connection",
+              "query:source:connection",
               defaultBehavior,
             )
           ) {
@@ -145,7 +151,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
-                      fieldBehaviorScope: `query:connection`,
+                      fieldBehaviorScope: `query:source:connection`,
                       isPgFieldConnection: true,
                       pgSource: source,
                     },

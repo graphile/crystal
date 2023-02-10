@@ -360,11 +360,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 variant,
               );
               if (!baseInputType) {
+                // TODO: convert this to a diagnostic
                 throw new Error(
                   `Failed to find a suitable type for argument codec '${param.codec.name}' variant '${variant}'; not adding function field for '${source}'`,
                 );
               }
               if (!isInputType(baseInputType)) {
+                // TODO: convert this to a diagnostic
                 throw new Error(
                   `Variant '${variant}' for codec '${param.codec.name}' returned type '${baseInputType}', but that's not an input type so we cannot use it for an argument; not adding function field for '${source}'`,
                 );

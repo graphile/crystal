@@ -89,9 +89,12 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   mean you can do `select * from users` but it might mean that it's possible to
   see details about a `users` when it's returned by a function or similar. (In
   this case the `codec` has `select` but the `source` has `-select`.)
-- `insert` - can insert into this source/column/etc
-- `update` - can update this source/column/etc
-- `delete` - can delete this source
+- `source:select` - can insert into this source
+- `source:insert` - can insert into this source
+- `source:update` - can update a record in this source
+- `source:delete` - can delete a record in this source
+- `source:list` - "list" field for a source at any level
+- `source:connection` - "connection" field for a source at any level
 - `attribute:select` - can this attribute be selected?
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
@@ -100,16 +103,16 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   specification
 - `list` - list (simple collection)
 - `connection` - connection (GraphQL Cursor Pagination Spec)
-- `query:list` - "list" field for a source at the root Query level
-- `query:connection` - "connection" field for a source at the root Query level
+- `query:source:list` - "list" field for a source at the root Query level
+- `query:source:connection` - "connection" field for a source at the root Query level
 - `queryField` - for procedures: should it become a field on the `Query` type?
 - `typeField` - for procedures: should it become a field on a non-operation
   type?
 - `mutationField` - for procedures: should it become a mutation (field on
   `Mutation`)?
 - `order` - can we sort this thing? (source)
-- `query:list:order`
-- `query:connection:order`
+- `query:source:list:order`
+- `query:source:connection:order`
 - `orderBy` - can we order by this thing (e.g. column)?
 - `orderBy:array` - can we order by this thing that's an array?
 - `orderBy:range` - can we order by this thing that's a range?
