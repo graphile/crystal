@@ -95,6 +95,8 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `source:delete` - can delete a record in this source
 - `source:list` - "list" field for a source at any level
 - `source:connection` - "connection" field for a source at any level
+- `source:constraint:update` - can update a record by this constraint
+- `source:constraint:delete` - can delete a record by this constraint
 - `attribute:select` - can this attribute be selected?
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?

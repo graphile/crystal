@@ -587,6 +587,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
             const primaryUnique = source.uniques.find(
               (u: PgSourceUnique) => u.isPrimary,
             );
+            const constraintMode =
+              mode === "source:update"
+                ? "source:constraint:update"
+                : "source:constraint:delete";
             const specs = [
               ...(primaryUnique
                 ? [{ unique: primaryUnique, uniqueMode: "node" }]
@@ -598,7 +602,11 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
             ].filter((spec) => {
               const unique = spec.unique as PgSourceUnique;
               const behavior = unique.extensions?.tags?.behavior;
-              return !!build.behavior.matches(behavior, mode, modeShort);
+              return !!build.behavior.matches(
+                behavior,
+                constraintMode,
+                modeShort,
+              );
             });
             for (const spec of specs) {
               const { uniqueMode, unique } = spec;
@@ -723,7 +731,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   fields,
                   {
                     [fieldName]: fieldWithHooks(
-                      { fieldName, fieldBehaviorScope: mode },
+                      { fieldName, fieldBehaviorScope: constraintMode },
                       {
                         args: {
                           input: {
