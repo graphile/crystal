@@ -1030,8 +1030,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 ]);
 
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
-                const connectionFieldBehaviorScope = `${baseScope}:connection`;
-                const listFieldBehaviorScope = `${baseScope}:list`;
+                const connectionFieldBehaviorScope = `${baseScope}:source:connection`;
+                const listFieldBehaviorScope = `${baseScope}:source:list`;
                 if (
                   canUseConnection &&
                   build.behavior.matches(

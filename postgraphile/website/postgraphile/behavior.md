@@ -11,7 +11,7 @@ are some examples:
 
 - `insert`
 - `+list -connection -list:filter`
-- `-insert -update -delete root:*:filter +connection -list`
+- `-insert -update -delete query:*:filter +connection -list`
 
 A behavior string is made of a list of "behavior fragments" separated by spaces.
 Each behavior fragment optionally starts with a `+` or `-` symbol (if neither is
@@ -118,6 +118,10 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `queryField` - for procedures: should it become a field on the `Query` type?
 - `typeField` - for procedures: should it become a field on a non-operation
   type?
+- `queryField:source:connection` - should we represent this source with a connection on the `Query` type?
+- `queryField:source:list` - should we represent this source with a list on the `Query` type?
+- `typeField:source:connection` - should we represent this source with a connection on a non-operation type
+- `typeField:source:list` - should we represent this source with a list on a non-operation type
 - `mutationField` - for procedures: should it become a mutation (field on
   `Mutation`)?
 - `order` - can we sort this thing? (source)
