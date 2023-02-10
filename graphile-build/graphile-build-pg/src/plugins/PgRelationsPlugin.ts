@@ -1267,7 +1267,7 @@ function addRelations(
       isUnique &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:single`,
+        `${relationTypeScope}:source:single`,
         defaultBehavior,
       )
     ) {
@@ -1278,7 +1278,7 @@ function addRelations(
           [fieldName]: fieldWithHooks(
             {
               fieldName,
-              fieldBehaviorScope: `${relationTypeScope}:single`,
+              fieldBehaviorScope: `${relationTypeScope}:source:single`,
               isPgSingleRelationField: true,
               behavior,
               pgRelationDetails,
@@ -1303,7 +1303,7 @@ function addRelations(
       isReferencee &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:connection`,
+        `${relationTypeScope}:source:connection`,
         defaultBehavior,
       )
     ) {
@@ -1316,7 +1316,7 @@ function addRelations(
             [fieldName]: fieldWithHooks(
               {
                 fieldName,
-                fieldBehaviorScope: `${relationTypeScope}:connection`,
+                fieldBehaviorScope: `${relationTypeScope}:source:connection`,
                 // TODO: rename to pgFieldSource?
                 pgSource,
                 pgFieldCodec,
@@ -1350,7 +1350,7 @@ function addRelations(
       isReferencee &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:list`,
+        `${relationTypeScope}:source:list`,
         defaultBehavior,
       )
     ) {
@@ -1361,7 +1361,7 @@ function addRelations(
           [fieldName]: fieldWithHooks(
             {
               fieldName,
-              fieldBehaviorScope: `${relationTypeScope}:list`,
+              fieldBehaviorScope: `${relationTypeScope}:source:list`,
               pgSource,
               pgFieldCodec,
               isPgFieldSimpleCollection: true,
