@@ -33,8 +33,13 @@ export function makePgConfigs(
   const pool = new Pool({
     connectionString,
   });
+  pool.on("connect", (client) => {
+    client.on("error", (e) => {
+      console.error("Client error (active)", e);
+    });
+  });
   pool.on("error", (e) => {
-    console.log("Client error", e);
+    console.error("Client error (in pool)", e);
   });
   const source: GraphileConfig.PgDatabaseConfiguration = {
     name: "main",
