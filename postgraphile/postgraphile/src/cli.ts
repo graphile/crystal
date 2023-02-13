@@ -169,14 +169,16 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       );
     }
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const { makePgConfigs } = await import(
+    const { makePgConfig } = await import(
       "@dataplan/pg/adaptors/node-postgres"
     );
-    const newPgConfigs = makePgConfigs(
-      connectionString,
-      schemas,
-      superuserConnectionString,
-    );
+    const newPgConfigs = [
+      makePgConfig({
+        connectionString,
+        schemas,
+        superuserConnectionString,
+      }),
+    ];
     preset.pgConfigs = newPgConfigs;
   }
   preset.server = preset.server || {};

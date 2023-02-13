@@ -6,7 +6,7 @@ import { StreamDeferPlugin } from "graphile-build";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
-import { makePgConfigs } from "@dataplan/pg/adaptors/node-postgres";
+import { makePgConfig } from "@dataplan/pg/adaptors/node-postgres";
 
 /** @type {GraphileConfig.Plugin } */
 /*
@@ -75,12 +75,14 @@ const preset = {
       mol: 42,
     },
   },
-  pgConfigs: makePgConfigs(
-    // Database connection string:
-    process.env.DATABASE_URL,
-    // List of schemas to expose:
-    process.env.DATABASE_SCHEMAS?.split(",") ?? ["public"],
-  ),
+  pgConfigs: [
+    makePgConfig({
+      // Database connection string:
+      connectionString: process.env.DATABASE_URL,
+      // List of schemas to expose:
+      schemas: process.env.DATABASE_SCHEMAS?.split(",") ?? ["public"],
+    }),
+  ],
 };
 
 export default preset;

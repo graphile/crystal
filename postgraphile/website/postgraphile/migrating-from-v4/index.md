@@ -52,7 +52,7 @@ initial preset) to get a completed config:
 ```ts title="graphile.config.js"
 import "graphile-config";
 
-import { makePgConfigs } from "postgraphile";
+import { makePgConfig } from "postgraphile";
 import PresetAmber from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
@@ -75,14 +75,16 @@ const preset = {
   // If you're using the CLI you can skip this and use the `-c` and `-s`
   // options instead, but we advise configuring it here so all the modes of
   // running PostGraphile can share it.
-  pgConfigs: makePgConfigs(
-    // Database connection string:
-    process.env.DATABASE_URL,
-    // List of schemas to expose:
-    ["app_public"],
-    // Superuser connection string, only needed if you're using watch mode:
-    // process.env.SUPERUSER_DATABASE_URL,
-  ),
+  pgConfigs: [
+    makePgConfig({
+      // Database connection string:
+      connectionString: process.env.DATABASE_URL,
+      // List of schemas to expose:
+      schemas: ["app_public"],
+      // Superuser connection string, only needed if you're using watch mode:
+      // superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
+    }),
+  ],
 };
 
 export default preset;

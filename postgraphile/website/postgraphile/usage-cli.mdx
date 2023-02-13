@@ -54,16 +54,16 @@ you can run PostGraphile with no (or minimal) CLI flags.
   enables "explain" mode, you won't want this in production but it's very helpful
   in development to know what's going on
 - `--connection <string>` (alias: `-c`)
-  <equivalent>{`{ pgConfigs: makePgConfigs('...') }`}</equivalent>
+  <equivalent>{`{ pgConfigs: [makePgConfig({ connectionString: '...' })] }`}</equivalent>
   the PostgreSQL connection string. If omitted, inferred from environmental variables
   (see https://www.postgresql.org/docs/current/static/libpq-envars.html). Examples:
   'db', 'postgres:///db', 'postgres://user:password@domain:port/db?ssl=true'
 - `--superuser-connection <string>` (alias: `-S`)
-  <equivalent>{`{ pgConfigs: makePgConfigs(databaseUrl, schemas, '...') }`}</equivalent>
+  <equivalent>{`{ pgConfigs: [makePgConfig({ superuserConnectionString:'...' })] }`}</equivalent>
   the PostgreSQL superuser connection string to use for installing watch fixtures
   (if `--watch` is enabled). If omitted, the regular connection string will be used.
 - `--schema <string>` (alias: `-s`)
-  <equivalent>{`{ pgConfigs: makePgConfigs(databaseUrl, ['...']) }`}</equivalent>
+  <equivalent>{`{ pgConfigs: [makePgConfig({ schemas: ['...'] })] }`}</equivalent>
   a comma-separated list of PostgreSQL schemas to be introspected.
 - `--watch` (alias: `-w`)
   <equivalent>{`{ server: { watch: true } }`}</equivalent>

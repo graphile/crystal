@@ -376,3 +376,9 @@ declare global {
     }
   }
 }
+
+export interface MakePgConfigsOptions {
+  connectionString?: string;
+  schemas?: string | string[];
+  superuserConnectionString?: string;
+}
