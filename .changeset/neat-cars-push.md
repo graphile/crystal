@@ -24,6 +24,7 @@
   - accepts an object parameter containing
     `{connectionString, schemas, superuserConnectionString}`, rather than
     multiple string parameters
+- `makeNodePostgresWithPgClient` -> `makePgAdaptorWithPgClient`
 - `postgraphile` CLI will now try and respect the adaptor stated in your preset
   when overriding connection arguments
 - Removed `Grafast.RequestContext.httpRequest` and instead use

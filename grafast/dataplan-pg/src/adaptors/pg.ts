@@ -312,7 +312,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
 /**
  * Returns a `withPgClient` for the given `pg.Pool` instance.
  */
-export function makeWithPgClient(
+export function makePgAdaptorWithPgClient(
   pool: Pool,
   release: () => PromiseOrDirect<void> = () => {},
 ): WithPgClient {
@@ -417,7 +417,7 @@ export function createWithPgClient(
 ): WithPgClient {
   if (variant === "SUPERUSER") {
     if (options.superuserPool) {
-      return makeWithPgClient(options.superuserPool);
+      return makePgAdaptorWithPgClient(options.superuserPool);
     } else if (options.superuserPoolClient) {
       return makeWithPgClientViaPgClientAlreadyInTransaction(
         options.superuserPoolClient,
@@ -429,12 +429,12 @@ export function createWithPgClient(
         connectionString: options.superuserConnectionString,
       });
       const release = () => pool.end();
-      return makeWithPgClient(pool, release);
+      return makePgAdaptorWithPgClient(pool, release);
     }
     // Otherwise, fall through to default handling
   }
   if (options.pool) {
-    return makeWithPgClient(options.pool);
+    return makePgAdaptorWithPgClient(options.pool);
   } else if (options.poolClient) {
     return makeWithPgClientViaPgClientAlreadyInTransaction(
       options.poolClient,
@@ -446,7 +446,7 @@ export function createWithPgClient(
       connectionString: options.connectionString,
     });
     const release = () => pool.end();
-    return makeWithPgClient(pool, release);
+    return makePgAdaptorWithPgClient(pool, release);
   }
 }
 
