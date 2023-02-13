@@ -171,7 +171,7 @@ as future core options).
 It will return a fully resolved configuration object, suitable for inclusion
 into the `pgConfigs` array in your `graphile.config.mjs` (or similar) file.
 
-:::hint
+:::info
 
 These common options are those that the `postgraphile` CLI will pass, which is
 why every adaptor should support them.
