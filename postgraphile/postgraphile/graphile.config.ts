@@ -7,6 +7,7 @@ import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 import { makePgConfig } from "@dataplan/pg/adaptors/pg";
+import "grafserv/node";
 
 /** @type {GraphileConfig.Plugin } */
 /*
