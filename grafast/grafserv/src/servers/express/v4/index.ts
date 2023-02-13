@@ -44,6 +44,10 @@ export class ExpressGrafserv extends NodeGrafserv {
         }
       },
       requestContext: {
+        node: {
+          req,
+          res,
+        },
         expressv4: {
           req,
           res,

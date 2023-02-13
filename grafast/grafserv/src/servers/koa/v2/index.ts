@@ -45,6 +45,10 @@ function getDigest(
       }
     },
     requestContext: {
+      node: {
+        req: ctx.req,
+        res: ctx.res,
+      },
       koav2: {
         ctx,
       },

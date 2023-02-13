@@ -31,12 +31,15 @@ export interface V4Options<
   skipPlugins?: GraphileConfig.Plugin[];
 
   /** @deprecated Please use grafast.context 'pgSettings' key instead */
-  pgSettings?: DirectOrCallback<Request, { [key: string]: string | undefined }>;
-  allowExplain?: DirectOrCallback<Request, boolean>;
+  pgSettings?: DirectOrCallback<
+    Request | undefined,
+    { [key: string]: string | undefined }
+  >;
+  // TODO: allowExplain?: DirectOrCallback<Request | undefined, boolean>;
   /** @deprecated Please use grafast.context callback instead */
   additionalGraphQLContextFromRequest?: (
-    req: Request,
-    res: Response,
+    req: Request | undefined,
+    res: Response | undefined,
   ) => Promise<Record<string, any>>;
 
   subscriptions?: boolean;
@@ -175,8 +178,8 @@ export const makeV4Preset = (
 
               if (options.additionalGraphQLContextFromRequest) {
                 const addl = await options.additionalGraphQLContextFromRequest(
-                  ctx.httpRequest as any,
-                  (ctx.httpRequest as any)?.res,
+                  ctx.node?.req,
+                  ctx.node?.res,
                 );
                 Object.assign(context, addl);
               }
@@ -184,7 +187,7 @@ export const makeV4Preset = (
               if (options.pgSettings) {
                 const pgSettings =
                   typeof options.pgSettings === "function"
-                    ? await options.pgSettings(ctx.httpRequest as any)
+                    ? await options.pgSettings(ctx.node?.req)
                     : options.pgSettings;
                 Object.assign(context, { pgSettings });
               }

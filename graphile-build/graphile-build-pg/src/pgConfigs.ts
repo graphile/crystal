@@ -1,39 +1,10 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 import { defer, isPromiseLike } from "grafast";
-import type { IncomingMessage } from "node:http";
-import type { Socket } from "node:net";
 
 import type { PgAdaptor } from "./interfaces.js";
 
 const isTest = process.env.NODE_ENV === "test";
-
-declare global {
-  namespace Grafast {
-    interface PgDatabaseAdaptorOptions {
-      /* This will be filled out via declaration merging */
-    }
-  }
-
-  namespace GraphileConfig {
-    /**
-     * Details about the incoming GraphQL request - e.g. if it was sent over an
-     * HTTP request, the request itself so headers can be interrogated.
-     *
-     * It's anticipated this will be expanded via declaration merging, e.g. if
-     * your server is Koa then a `koaCtx` might be added.
-     */
-    interface GraphQLRequestContext {
-      // TODO: add things like operationName, operation, etc?
-      httpRequest?: IncomingMessage;
-      socket?: Socket;
-    }
-
-    interface Preset {
-      pgConfigs?: ReadonlyArray<PgDatabaseConfiguration>;
-    }
-  }
-}
 
 interface PgClientBySourceCacheValue {
   withPgClient: WithPgClient;

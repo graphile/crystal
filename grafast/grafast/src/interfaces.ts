@@ -44,7 +44,7 @@ export interface GrafastOptions {
   context?:
     | Record<string, any>
     | (<TContext extends Record<string, any>>(
-        ctx: Grafast.RequestContext,
+        ctx: Partial<Grafast.RequestContext>,
         currentContext?: Partial<TContext>,
       ) => PromiseOrValue<Partial<TContext>>);
 
