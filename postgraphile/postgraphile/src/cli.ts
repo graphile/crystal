@@ -169,9 +169,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       );
     }
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const { makePgConfig } = await import(
-      "@dataplan/pg/adaptors/node-postgres"
-    );
+    const adaptor =
+      preset.pgConfigs?.[0]?.adaptor ?? "@dataplan/pg/adaptors/node-postgres";
+
+    const { makePgConfig } = await import(adaptor);
     const newPgConfigs = [
       makePgConfig({
         connectionString,
