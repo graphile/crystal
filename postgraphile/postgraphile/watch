@@ -9,4 +9,5 @@ yarn nodemon \
   --watch "../../graphile-build/*/dist/**/*" \
   --watch "../../postgraphile/*/dist/**/*" \
   --watch "../../utils/*/dist/**/*" \
+  --watch "../../grafast/ruru/bundle/**/*" \
   -x "node --enable-source-maps dist/cli-run.js -e --watch $@"
