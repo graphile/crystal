@@ -1,4 +1,4 @@
-import "@dataplan/pg/adaptors/node-postgres";
+import "@dataplan/pg/adaptors/pg";
 
 import {
   buildInflection,

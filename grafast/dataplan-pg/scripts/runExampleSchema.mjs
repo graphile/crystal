@@ -7,7 +7,7 @@ import JSON5 from "json5";
 import { strict as assert } from "node:assert";
 import pg from "pg";
 
-import { createWithPgClient } from "../dist/adaptors/node-postgres.js";
+import { createWithPgClient } from "../dist/adaptors/pg.js";
 import { schema } from "./exampleSchemaExport.mjs";
 
 const pool = new pg.Pool({

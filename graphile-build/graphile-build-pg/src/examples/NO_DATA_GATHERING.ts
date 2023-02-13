@@ -14,7 +14,7 @@ import {
   sqlFromArgDigests,
   TYPES,
 } from "@dataplan/pg";
-import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
+import { makeWithPgClient } from "@dataplan/pg/adaptors/pg";
 import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { context, object } from "grafast";
@@ -46,7 +46,7 @@ declare global {
 const pool = new Pool({
   connectionString: "pggql_test",
 });
-const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
+const withPgClient: WithPgClient = makeWithPgClient(pool);
 
 async function main() {
   // Create our GraphQL schema by applying all the plugins

@@ -77,7 +77,7 @@ export async function makeSharedPresetAndClient(pool: Pool) {
         schemas: DATABASE_SCHEMAS,
         pgSettingsKey: "pgSettings",
         withPgClientKey: "withPgClient",
-        adaptor: "@dataplan/pg/adaptors/node-postgres",
+        adaptor: "@dataplan/pg/adaptors/pg",
         adaptorSettings: {
           pool,
         },

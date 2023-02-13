@@ -62,9 +62,9 @@ export interface PgClientResult<TData> {
 
 /**
  * This is a generic interface that your Postgres client must honor; have a
- * look at adaptors/node-postgres.ts for an example of a compliant
- * implementation that uses the `pg` module, but you should be able to write
- * an adaptor for many different Postgres drivers.
+ * look at adaptors/pg.ts for an example of a compliant implementation that
+ * uses the `pg` module, but you should be able to write an adaptor for many
+ * different Postgres drivers.
  */
 export interface PgClient {
   query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;

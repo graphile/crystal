@@ -6,7 +6,7 @@ const LicenseCheckerWebpackPlugin = require("license-checker-webpack-plugin");
 module.exports = {
   entry: {
     index: "./dist/index.js",
-    "adaptors/node-postgres": "./dist/adaptors/node-postgres.js",
+    "adaptors/pg": "./dist/adaptors/pg.js",
   },
   output: {
     path: path.resolve(__dirname, "release/dist"),

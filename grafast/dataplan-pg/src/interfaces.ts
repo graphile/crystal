@@ -12,7 +12,7 @@ import type { PgInsertStep } from "./steps/pgInsert.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
 import type { PgUpdateStep } from "./steps/pgUpdate.js";
 import { WithPgClient } from "./executor.js";
-import type { NodePostgresAdaptorOptions } from "./adaptors/node-postgres.js";
+import type { PgAdaptorOptions } from "./adaptors/pg.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -381,7 +381,7 @@ declare global {
     }
 
     interface PgDatabaseAdaptorOptions {
-      "@dataplan/pg/adaptors/node-postgres": NodePostgresAdaptorOptions;
+      "@dataplan/pg/adaptors/pg": PgAdaptorOptions;
       /* Add your own via declaration merging */
     }
   }

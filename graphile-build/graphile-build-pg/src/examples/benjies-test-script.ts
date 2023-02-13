@@ -71,7 +71,7 @@ pool.on("error", (e) => {
           schemas: ["a", "b", "c"],
           pgSettingsKey: "pgSettings",
           withPgClientKey: "withPgClient",
-          adaptor: "@dataplan/pg/adaptors/node-postgres",
+          adaptor: "@dataplan/pg/adaptors/pg",
           adaptorSettings: {
             pool,
           },

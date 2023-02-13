@@ -18,7 +18,7 @@
  * column, but shows integration of external data into query planning.)
  */
 
-import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
+import { makeWithPgClient } from "@dataplan/pg/adaptors/pg";
 import type { BaseGraphQLContext } from "grafast";
 import {
   __TrackedObjectStep,
@@ -142,7 +142,7 @@ async function main() {
   }
 
   async function test(source: string, variableValues = Object.create(null)) {
-    const withPgClient = makeNodePostgresWithPgClient(testPool);
+    const withPgClient = makeWithPgClient(testPool);
     const pgSubscriber = new PgSubscriber(testPool);
     const contextValue: BaseGraphQLContext = {
       pgSettings: {},

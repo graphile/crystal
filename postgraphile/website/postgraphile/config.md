@@ -119,7 +119,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 - `name: string` - an arbitrary unique name for this config; please keep it
   alphanumeric!
 - `adaptor: string` - the name of the module to use as the postgres adaptor;
-  e.g. `@dataplan/pg/adaptors/node-postgres` for the `pg` module
+  e.g. `@dataplan/pg/adaptors/pg` for the `pg` module
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
@@ -145,7 +145,7 @@ const pgConfigs = [
     schemas: ["app_public"],
     pgSettingsKey: "pgSettings",
     withPgClientKey: "withPgClient",
-    adaptor: "@dataplan/pg/adaptors/node-postgres",
+    adaptor: "@dataplan/pg/adaptors/pg",
     adaptorSettings: {
       pool: new pg.Pool({ connectionString: process.env.DATABASE_URL }),
       // superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
@@ -194,7 +194,7 @@ const pgConfigs = [
 
 Each adaptor has its own adaptor-specific settings.
 
-#### `@dataplan/pg/adaptors/node-postgres`
+#### `@dataplan/pg/adaptors/pg`
 
 This adaptor uses the `pg` module under the hood and uses the `pg.Pool` API
 primarily, it accepts the following options:
