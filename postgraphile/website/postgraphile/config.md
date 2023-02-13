@@ -54,7 +54,8 @@ import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
 import { StreamDeferPlugin } from "graphile-build";
-import { makePgConfigs } from "postgraphile";
+// Use the 'pg' module to connect to the database
+import { makePgConfig } from "@dataplan/pg/adaptors/pg";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
@@ -73,12 +74,12 @@ const preset = {
   },
   pgConfigs: [
     /* list of PG database configurations, e.g.: */
-    ...makePgConfigs(
+    makePgConfig({
       // Database connection string:
-      process.env.DATABASE_URL,
+      connectionString: process.env.DATABASE_URL,
       // List of schemas to expose:
-      ["app_public"],
-    ),
+      schemas: ["app_public"],
+    }),
   ],
   gather: {
     /* options for the gather phase */
@@ -111,20 +112,21 @@ Details the PostgreSQL database(s) for PostGraphile to connect to; this is a
 separate option because it's used in both the `gather` phase (for introspection)
 and at runtime.
 
-Generally it's best to construct this by using the `makePgConfigs` helper (see
-below), but if you want to know the nitty-gritty: each entry in the list is an
-object with the following keys (only `name` and `adaptor` are required):
+Generally it's best to construct this by using the `makePgConfig` helper from
+the adaptor(s) you are using (see below), but if you want to know the
+nitty-gritty: each entry in the list is an object with the following keys (only
+`name` and `adaptor` are required):
 
 - `name: string` - an arbitrary unique name for this config; please keep it
   alphanumeric!
 - `adaptor: string` - the name of the module to use as the postgres adaptor;
-  e.g. `@dataplan/pg/adaptors/node-postgres` for the `pg` module
+  e.g. `@dataplan/pg/adaptors/pg` for the `pg` module
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
 - `listen: (topic: string) => AsyncIterable<string>` - a callback function to
   use to listen to a particular topic
-- `pgSettings: (ctx: GraphileConfig.GraphQLRequestContext) => Record<string, string> | null` -
+- `pgSettings: (ctx: Grafast.RequestContext) => Record<string, string> | null` -
   a callback function that will be called by the server to determine the
   pgSettings to use for a particular request
 - `pgSettingsForIntrospection: Record<string, string> | null` - the pgSettings
@@ -144,7 +146,7 @@ const pgConfigs = [
     schemas: ["app_public"],
     pgSettingsKey: "pgSettings",
     withPgClientKey: "withPgClient",
-    adaptor: "@dataplan/pg/adaptors/node-postgres",
+    adaptor: "@dataplan/pg/adaptors/pg",
     adaptorSettings: {
       pool: new pg.Pool({ connectionString: process.env.DATABASE_URL }),
       // superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
@@ -153,36 +155,47 @@ const pgConfigs = [
 ];
 ```
 
-### `makePgConfigs`
+### `makePgConfig`
 
-This simple function will take a PostgreSQL connection string and a list of
-schemas (and, optionally, a superuser connection string for watch mode) and
-will return an array containing a configuration object suitable for inclusion
-in `pgConfigs`.
+Every adaptor should expose a helper function that takes a common set of
+optional configuration parameters:
+
+- `connectionString`
+- `schemas`
+- `superuserConnectionString`
+
+It may additionally accept any other options it likes (but care should be taken
+to not conflict with options of other adaptors, or that we might want to add
+as future core options).
+
+It will return a fully resolved configuration object, suitable for inclusion
+into the `pgConfigs` array in your `graphile.config.mjs` (or similar) file.
 
 :::info
 
-Currently this uses the `pg` module, but we may change
-that default over time.
+These common options are those that the `postgraphile` CLI will pass, which is
+why every adaptor should support them.
 
 :::
 
-```js title="Example configuration via makePgConfigs"
-const pgConfigs = makePgConfigs(
-  // Database connection string:
-  process.env.DATABASE_URL,
-  // List of database schemas:
-  ["app_public"],
-  // Optional, only needed for `--watch` mode:
-  process.env.SUPERUSER_DATABASE_URL,
-);
+```js title="Example configuration via makePgConfig"
+const pgConfigs = [
+  makePgConfig({
+    // Database connection string:
+    connectionString: process.env.DATABASE_URL,
+    // List of database schemas:
+    schemas: ["app_public"],
+    // Optional, only needed for `--watch` mode:
+    superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
+  }),
+];
 ```
 
 ### `adaptorSettings`
 
 Each adaptor has its own adaptor-specific settings.
 
-#### `@dataplan/pg/adaptors/node-postgres`
+#### `@dataplan/pg/adaptors/pg`
 
 This adaptor uses the `pg` module under the hood and uses the `pg.Pool` API
 primarily, it accepts the following options:

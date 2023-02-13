@@ -18,8 +18,8 @@ import {
 } from "../../../utils.js";
 
 declare global {
-  namespace GraphileConfig {
-    interface GraphQLRequestContext {
+  namespace Grafast {
+    interface RequestContext {
       fastifyv4: {
         request: FastifyRequest;
         reply: FastifyReply;
@@ -47,6 +47,10 @@ function getDigest(
       return getBodyFromFrameworkBody(request.body);
     },
     requestContext: {
+      node: {
+        req: request.raw,
+        res: reply.raw,
+      },
       fastifyv4: {
         request,
         reply,

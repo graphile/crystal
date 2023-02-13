@@ -6,7 +6,7 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 
-import "@dataplan/pg/adaptors/node-postgres";
+import "@dataplan/pg/adaptors/pg";
 import "graphile-config";
 import "graphile-build-pg";
 
@@ -206,7 +206,7 @@ export async function runTestQuery(
     plugins: [StreamDeferPlugin],
     pgConfigs: [
       {
-        adaptor: "@dataplan/pg/adaptors/node-postgres",
+        adaptor: "@dataplan/pg/adaptors/pg",
         name: "main",
         withPgClientKey: "withPgClient",
         pgSettingsKey: "pgSettings",
@@ -227,7 +227,7 @@ export async function runTestQuery(
         adaptorSettings: {
           connectionString,
         },
-      } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
+      } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/pg">,
     ],
     schema: {
       pgForbidSetofFunctionsToReturnNull:

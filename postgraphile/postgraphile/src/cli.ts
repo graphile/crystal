@@ -1,3 +1,4 @@
+import type { MakePgConfigOptions } from "@dataplan/pg";
 import { grafserv } from "grafserv/node";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
@@ -6,7 +7,6 @@ import { createServer } from "node:http";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
-import { makePgConfigs } from "./schema.js";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";
@@ -170,11 +170,25 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       );
     }
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const newPgConfigs = makePgConfigs(
-      connectionString,
-      schemas,
-      superuserConnectionString,
-    );
+    const adaptor =
+      preset.pgConfigs?.[0]?.adaptor ?? "@dataplan/pg/adaptors/pg";
+
+    const mod = await import(adaptor);
+    const makePgConfig = (mod.makePgConfig ?? mod.default?.makePgConfig) as (
+      options: MakePgConfigOptions,
+    ) => GraphileConfig.PgDatabaseConfiguration;
+    if (typeof makePgConfig !== "function") {
+      throw new Error(
+        `Loaded adaptor '${adaptor}' but it does not export a 'makePgConfig' helper`,
+      );
+    }
+    const newPgConfigs = [
+      makePgConfig({
+        connectionString,
+        schemas,
+        superuserConnectionString,
+      }),
+    ];
     preset.pgConfigs = newPgConfigs;
   }
   preset.server = preset.server || {};

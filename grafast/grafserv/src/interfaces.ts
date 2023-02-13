@@ -10,8 +10,8 @@ import type {
 import type { OptionsFromConfig } from "./options";
 
 export type ContextCallback = (
-  graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
-) => object;
+  requestContext: Grafast.RequestContext,
+) => Grafast.Context;
 
 export interface GrafservConfig {
   schema: GraphQLSchema | PromiseLike<GraphQLSchema>;
@@ -64,18 +64,13 @@ export interface ServerOptions {
 }
 
 declare global {
-  namespace GraphileConfig {
-    /**
-     * Details about the incoming GraphQL request - e.g. if it was sent over an
-     * HTTP request, the request itself so headers can be interrogated.
-     *
-     * It's anticipated this will be expanded via declaration merging, e.g. if
-     * your server is Koa then a `koaCtx` might be added.
-     */
-    interface GraphQLRequestContext {
-      // TODO: add things like operationName, operation, etc?
+  namespace Grafast {
+    interface RequestContext {
       http?: NormalizedRequestDigest;
     }
+  }
+
+  namespace GraphileConfig {
     interface Preset {
       /**
        * Configuration options for Grafserv
@@ -115,7 +110,7 @@ export interface RequestDigest {
   headers: Record<string, string>;
   getQueryParams: () => PromiseOrDirect<Record<string, string | string[]>>;
   getBody(): PromiseOrDirect<GrafservBody>;
-  requestContext: Partial<GraphileConfig.GraphQLRequestContext>;
+  requestContext: Partial<Grafast.RequestContext>;
   // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
   [$$normalizedHeaders]?: any;

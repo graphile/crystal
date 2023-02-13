@@ -23,8 +23,8 @@ const DEBUG_MODE = true;
 
 // Our server will supply pgSettings/withPgClient on the GraphQL context
 declare global {
-  namespace GraphileBuild {
-    interface GraphileResolverContext {
+  namespace Grafast {
+    interface Context {
       pgSettings: {
         [key: string]: string;
       } | null;
@@ -42,7 +42,7 @@ pool.on("error", (e) => {
   console.log("Client error", e);
 });
 
-// We're using the node-postgres adaptor
+// We're using the 'pg' adaptor
 
 async function main() {
   // The Graphile configuration
@@ -57,7 +57,7 @@ async function main() {
           schemas: ["public"],
           pgSettingsKey: "pgSettings",
           withPgClientKey: "withPgClient",
-          adaptor: "@dataplan/pg/adaptors/node-postgres",
+          adaptor: "@dataplan/pg/adaptors/pg",
           adaptorSettings: {
             pool,
           },

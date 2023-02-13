@@ -14,7 +14,7 @@ import {
   sqlFromArgDigests,
   TYPES,
 } from "@dataplan/pg";
-import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
+import { makePgAdaptorWithPgClient } from "@dataplan/pg/adaptors/pg";
 import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { context, object } from "grafast";
@@ -33,8 +33,8 @@ import { inspect } from "util";
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
 declare global {
-  namespace GraphileBuild {
-    interface GraphileResolverContext {
+  namespace Grafast {
+    interface Context {
       pgSettings: {
         [key: string]: string;
       } | null;
@@ -46,7 +46,7 @@ declare global {
 const pool = new Pool({
   connectionString: "pggql_test",
 });
-const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
+const withPgClient: WithPgClient = makePgAdaptorWithPgClient(pool);
 
 async function main() {
   // Create our GraphQL schema by applying all the plugins
@@ -56,14 +56,8 @@ async function main() {
         name: "main",
         context: () =>
           object({
-            pgSettings:
-              context<GraphileBuild.GraphileResolverContext>().get(
-                "pgSettings",
-              ),
-            withPgClient:
-              context<GraphileBuild.GraphileResolverContext>().get(
-                "withPgClient",
-              ),
+            pgSettings: context<Grafast.Context>().get("pgSettings"),
+            withPgClient: context<Grafast.Context>().get("withPgClient"),
           } as PgExecutorContextPlans<any>),
       }),
     [PgExecutor, context, object],

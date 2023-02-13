@@ -40,7 +40,7 @@ export const test =
         extends: [AmberPreset, v4Preset],
         pgConfigs: [
           {
-            adaptor: "@dataplan/pg/adaptors/node-postgres",
+            adaptor: "@dataplan/pg/adaptors/pg",
             name: "main",
             withPgClientKey: "withPgClient",
             pgSettingsKey: "pgSettings",
@@ -61,7 +61,7 @@ export const test =
             adaptorSettings: {
               poolClient: client,
             },
-          } as any, //GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/node-postgres">,
+          } as any, //GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/pg">,
         ],
         schema: {
           ...graphileBuildOptions,

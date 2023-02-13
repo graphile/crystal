@@ -1,12 +1,14 @@
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
+import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type { PgTypeColumns } from "./codecs.js";
 import type {
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
 } from "./datasource.js";
+import type { WithPgClient } from "./executor.js";
 import type { PgDeleteStep } from "./steps/pgDelete.js";
 import type { PgInsertStep } from "./steps/pgInsert.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
@@ -339,3 +341,54 @@ export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
   where(condition: SQL): void;
   having(condition: SQL): void;
 };
+
+export type KeysOfType<TObject, TValueType> = {
+  [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
+}[keyof TObject];
+
+declare global {
+  namespace GraphileConfig {
+    interface PgDatabaseConfiguration<
+      TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
+    > {
+      name: string;
+      schemas?: string[];
+
+      adaptor: TAdaptor;
+      adaptorSettings?: GraphileConfig.PgDatabaseAdaptorOptions[TAdaptor];
+
+      /** The key on 'context' where the withPgClient function will be sourced */
+      withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
+      listen?(topic: string): AsyncIterable<string>;
+
+      /** Return settings to set in the session */
+      pgSettings?: (
+        requestContext: Grafast.RequestContext,
+      ) => { [key: string]: string } | null;
+
+      /** Settings to set in the session that performs introspection (during gather phase) */
+      pgSettingsForIntrospection?: { [key: string]: string } | null;
+
+      /** The key on 'context' where the pgSettings for this DB will be sourced */
+      pgSettingsKey?: KeysOfType<
+        Grafast.Context & object,
+        { [key: string]: string } | null | undefined
+      >;
+    }
+
+    interface Preset {
+      pgConfigs?: ReadonlyArray<PgDatabaseConfiguration>;
+    }
+
+    interface PgDatabaseAdaptorOptions {
+      "@dataplan/pg/adaptors/pg": PgAdaptorOptions;
+      /* Add your own via declaration merging */
+    }
+  }
+}
+
+export interface MakePgConfigOptions {
+  connectionString?: string;
+  schemas?: string | string[];
+  superuserConnectionString?: string;
+}

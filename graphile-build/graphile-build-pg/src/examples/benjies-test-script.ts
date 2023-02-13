@@ -42,8 +42,8 @@ import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 import { getWithPgClientFromPgConfig } from "../pgConfigs.js";
 
 declare global {
-  namespace GraphileBuild {
-    interface GraphileResolverContext {
+  namespace Grafast {
+    interface Context {
       pgSettings: {
         [key: string]: string;
       } | null;
@@ -71,7 +71,7 @@ pool.on("error", (e) => {
           schemas: ["a", "b", "c"],
           pgSettingsKey: "pgSettings",
           withPgClientKey: "withPgClient",
-          adaptor: "@dataplan/pg/adaptors/node-postgres",
+          adaptor: "@dataplan/pg/adaptors/pg",
           adaptorSettings: {
             pool,
           },

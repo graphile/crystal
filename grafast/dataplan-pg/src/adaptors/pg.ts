@@ -5,6 +5,8 @@
 // TODO: don't import 'pg' or '@graphile/lru', we don't want these to be dependencies of @dataplan/pg.
 // TODO: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
+import "../interfaces.js";
+
 import LRU from "@graphile/lru";
 import type { PromiseOrDirect } from "grafast";
 import type { Pool, QueryArrayConfig, QueryConfig, QueryResultRow } from "pg";
@@ -16,6 +18,7 @@ import type {
   PgClientResult,
   WithPgClient,
 } from "../executor.js";
+import type { MakePgConfigOptions } from "../interfaces.js";
 
 // NOTE: \0 is not valid in an SQL identifier and may cause 'invalid message
 // format' or worse error. However, it's exceedingly unlikely that it'll be
@@ -24,14 +27,6 @@ import type {
 // a quote mark in it.
 function escapeIdentifier(str: string): string {
   return '"' + str.replace(/["\0]/g, '""') + '"';
-}
-
-declare global {
-  namespace Grafast {
-    interface PgDatabaseAdaptorOptions {
-      "@dataplan/pg/adaptors/node-postgres": NodePostgresAdaptorOptions;
-    }
-  }
 }
 
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
@@ -258,7 +253,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
   // force test queries that were sharing the same client to run in series
   // rather than parallel (probably for the filter plugin test suite?) but it
   // adds a tiny bit of overhead and most likely is only needed for people
-  // using makeWithPgClientViaNodePostgresClientAlreadyInTransaction.
+  // using makeWithPgClientViaPgClientAlreadyInTransaction.
   while (pgClient[$$queue]) {
     await pgClient[$$queue];
   }
@@ -317,7 +312,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
 /**
  * Returns a `withPgClient` for the given `pg.Pool` instance.
  */
-export function makeNodePostgresWithPgClient(
+export function makePgAdaptorWithPgClient(
   pool: Pool,
   release: () => PromiseOrDirect<void> = () => {},
 ): WithPgClient {
@@ -366,7 +361,7 @@ export function makeNodePostgresWithPgClient(
  * SUITABLE FOR TESTS!
  *
  */
-export function makeWithPgClientViaNodePostgresClientAlreadyInTransaction(
+export function makeWithPgClientViaPgClientAlreadyInTransaction(
   pgClient: pg.PoolClient,
   alreadyInTransaction = false,
 ): WithPgClient {
@@ -396,7 +391,7 @@ export function makeWithPgClientViaNodePostgresClientAlreadyInTransaction(
   return withPgClient;
 }
 
-export interface NodePostgresAdaptorOptions {
+export interface PgAdaptorOptions {
   /** ONLY FOR USE IN TESTS! */
   poolClient?: pg.PoolClient;
   /** ONLY FOR USE IN TESTS! */
@@ -417,14 +412,14 @@ export interface NodePostgresAdaptorOptions {
 }
 
 export function createWithPgClient(
-  options: NodePostgresAdaptorOptions,
+  options: PgAdaptorOptions,
   variant?: "SUPERUSER" | string | null,
 ): WithPgClient {
   if (variant === "SUPERUSER") {
     if (options.superuserPool) {
-      return makeNodePostgresWithPgClient(options.superuserPool);
+      return makePgAdaptorWithPgClient(options.superuserPool);
     } else if (options.superuserPoolClient) {
-      return makeWithPgClientViaNodePostgresClientAlreadyInTransaction(
+      return makeWithPgClientViaPgClientAlreadyInTransaction(
         options.superuserPoolClient,
         options.superuserPoolClientIsInTransaction,
       );
@@ -434,14 +429,14 @@ export function createWithPgClient(
         connectionString: options.superuserConnectionString,
       });
       const release = () => pool.end();
-      return makeNodePostgresWithPgClient(pool, release);
+      return makePgAdaptorWithPgClient(pool, release);
     }
     // Otherwise, fall through to default handling
   }
   if (options.pool) {
-    return makeNodePostgresWithPgClient(options.pool);
+    return makePgAdaptorWithPgClient(options.pool);
   } else if (options.poolClient) {
-    return makeWithPgClientViaNodePostgresClientAlreadyInTransaction(
+    return makeWithPgClientViaPgClientAlreadyInTransaction(
       options.poolClient,
       options.poolClientIsInTransaction,
     );
@@ -451,6 +446,47 @@ export function createWithPgClient(
       connectionString: options.connectionString,
     });
     const release = () => pool.end();
-    return makeNodePostgresWithPgClient(pool, release);
+    return makePgAdaptorWithPgClient(pool, release);
   }
+}
+
+declare global {
+  namespace Grafast {
+    interface Context {
+      pgSettings: {
+        [key: string]: string;
+      } | null;
+      withPgClient: WithPgClient;
+    }
+  }
+}
+
+export function makePgConfig(
+  options: MakePgConfigOptions,
+): GraphileConfig.PgDatabaseConfiguration {
+  const { connectionString, schemas, superuserConnectionString } = options;
+  const Pool = pg.Pool || (pg as any).default?.Pool;
+  const pool = new Pool({
+    connectionString,
+  });
+  pool.on("connect", (client) => {
+    client.on("error", (e) => {
+      console.error("Client error (active)", e);
+    });
+  });
+  pool.on("error", (e) => {
+    console.error("Client error (in pool)", e);
+  });
+  const source: GraphileConfig.PgDatabaseConfiguration = {
+    name: "main",
+    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+    pgSettingsKey: "pgSettings",
+    withPgClientKey: "withPgClient",
+    adaptor: "@dataplan/pg/adaptors/pg",
+    adaptorSettings: {
+      pool,
+      superuserConnectionString,
+    },
+  };
+  return source;
 }

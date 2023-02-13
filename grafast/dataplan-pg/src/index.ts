@@ -82,6 +82,8 @@ import { ClassFilterStep } from "./filters/classFilter.js";
 import { ManyFilterStep } from "./filters/manyFilter.js";
 import { OrFilterStep } from "./filters/orFilter.js";
 import {
+  KeysOfType,
+  MakePgConfigOptions,
   PgClassSingleStep,
   PgConditionLikeStep,
   PgDecode,
@@ -183,7 +185,9 @@ export {
   getCodecByPgCatalogTypeName,
   getInnerCodec,
   isEnumCodec,
+  KeysOfType,
   listOfType,
+  MakePgConfigOptions,
   ManyFilterStep,
   OrFilterStep,
   PgBox,

@@ -7,8 +7,8 @@ import type { OptionsFromConfig } from "../../options.js";
 import { getBodyFromRequest, processHeaders } from "../../utils.js";
 
 declare global {
-  namespace GraphileConfig {
-    interface GraphQLRequestContext {
+  namespace Grafast {
+    interface RequestContext {
       node: {
         req: IncomingMessage;
         res: ServerResponse;

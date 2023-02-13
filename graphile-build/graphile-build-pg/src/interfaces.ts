@@ -53,12 +53,8 @@ export interface PgSmartTagsDict {
   [tagName: string]: null | true | string | (string | true)[];
 }
 
-export type KeysOfType<TObject, TValueType> = {
-  [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
-}[keyof TObject];
-
 export interface PgAdaptor<
-  TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+  TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
 > {
   createWithPgClient: (
     adaptorSettings: GraphileConfig.PgDatabaseConfiguration<TAdaptor>["adaptorSettings"],

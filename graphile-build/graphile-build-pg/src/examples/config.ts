@@ -28,8 +28,8 @@ const DATABASE_SCHEMAS: string[] = ["public", "app_public"];
 /* ************************************************************************** */
 
 declare global {
-  namespace GraphileBuild {
-    interface GraphileResolverContext {
+  namespace Grafast {
+    interface Context {
       pgSettings: {
         [key: string]: string;
       } | null;
@@ -77,7 +77,7 @@ export async function makeSharedPresetAndClient(pool: Pool) {
         schemas: DATABASE_SCHEMAS,
         pgSettingsKey: "pgSettings",
         withPgClientKey: "withPgClient",
-        adaptor: "@dataplan/pg/adaptors/node-postgres",
+        adaptor: "@dataplan/pg/adaptors/pg",
         adaptorSettings: {
           pool,
         },

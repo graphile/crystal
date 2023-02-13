@@ -1,6 +1,6 @@
 import "graphile-build";
 
-import type { WithPgClient } from "@dataplan/pg";
+import type { KeysOfType, WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
 import type { ExecutableStep, PromiseOrDirect } from "grafast";
 import { constant, context, object } from "grafast";
@@ -31,7 +31,6 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import type { KeysOfType } from "../interfaces.js";
 import {
   listenWithPgClientFromPgConfig,
   withPgClientFromPgConfig,
@@ -392,7 +391,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             new PgExecutor({
               name: databaseName,
               context: () => {
-                const ctx = context<GraphileBuild.GraphileResolverContext>();
+                const ctx = context<Grafast.Context>();
                 return object({
                   pgSettings:
                     pgSettingsKey != null
