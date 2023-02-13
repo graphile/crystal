@@ -464,7 +464,21 @@ declare global {
 export function makePgConfig(
   options: MakePgConfigOptions,
 ): GraphileConfig.PgDatabaseConfiguration {
-  const { connectionString, schemas, superuserConnectionString } = options;
+  const {
+    name,
+    connectionString,
+    schemas,
+    superuserConnectionString,
+    withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
+    pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
+    pgSettings,
+    pgSettingsForIntrospection,
+  } = options;
+  if (pgSettings !== undefined && typeof pgSettingsKey !== "string") {
+    throw new Error(
+      `makePgConfig called with pgSettings but no pgSettingsKey - please indicate where the settings should be stored, e.g. 'pgSettingsKey: "pgSettings"' (must be unique across sources)`,
+    );
+  }
   const Pool = pg.Pool || (pg as any).default?.Pool;
   const pool = new Pool({
     connectionString,
@@ -478,10 +492,12 @@ export function makePgConfig(
     console.error("Client error (in pool)", e);
   });
   const source: GraphileConfig.PgDatabaseConfiguration = {
-    name: "main",
+    name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
-    pgSettingsKey: "pgSettings",
-    withPgClientKey: "withPgClient",
+    withPgClientKey: withPgClientKey as any,
+    pgSettingsKey: pgSettingsKey as any,
+    pgSettings,
+    pgSettingsForIntrospection,
     adaptor: "@dataplan/pg/adaptors/pg",
     adaptorSettings: {
       pool,
