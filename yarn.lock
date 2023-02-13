@@ -5134,6 +5134,39 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@peculiar/asn1-schema@npm:^2.1.6, @peculiar/asn1-schema@npm:^2.3.0":
+  version: 2.3.3
+  resolution: "@peculiar/asn1-schema@npm:2.3.3"
+  dependencies:
+    asn1js: "npm:^3.0.5"
+    pvtsutils: "npm:^1.3.2"
+    tslib: "npm:^2.4.0"
+  checksum: f584f79d5a3652888452e72591cd5f910b1c4c59a359c7495a82d8f6463e3033a715bdd1954b52bcecb864f21f8844335025e84e782cc843c6649bc3304094ec
+  languageName: node
+  linkType: hard
+
+"@peculiar/json-schema@npm:^1.1.12":
+  version: 1.1.12
+  resolution: "@peculiar/json-schema@npm:1.1.12"
+  dependencies:
+    tslib: "npm:^2.0.0"
+  checksum: 968c0856e97e17541e781a9a8c32bca9e915798ce0e449cd1aa5747af84802b45188cc1e2cffa773063331b61b398100eb96ccacb971b4460ea5315fb1cf260c
+  languageName: node
+  linkType: hard
+
+"@peculiar/webcrypto@npm:^1.4.0":
+  version: 1.4.1
+  resolution: "@peculiar/webcrypto@npm:1.4.1"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.0"
+    "@peculiar/json-schema": "npm:^1.1.12"
+    pvtsutils: "npm:^1.3.2"
+    tslib: "npm:^2.4.1"
+    webcrypto-core: "npm:^1.7.4"
+  checksum: c256d4dd4292ca8b4282f4871d6751dbda5616eb0e9ad0aa04352f8044af03a4df6fadfc4d4565947f1fdcb248705427ebbcc1fa5119a3355f2e99a566752a49
+  languageName: node
+  linkType: hard
+
 "@polka/url@npm:^1.0.0-next.20":
   version: 1.0.0-next.21
   resolution: "@polka/url@npm:1.0.0-next.21"
@@ -7003,6 +7036,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@whatwg-node/events@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@whatwg-node/events@npm:0.0.2"
+  checksum: 04ca3fbb19f671c643f7820f05b177d0cc2a9ef5dae07ef93a30c553fcd0e0b3f52d56cb9f2d469b6a4bee7e52e4b3539c6c404cc5215fefcc39e19e18750fa5
+  languageName: node
+  linkType: hard
+
+"@whatwg-node/fetch@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@whatwg-node/fetch@npm:0.8.1"
+  dependencies:
+    "@peculiar/webcrypto": "npm:^1.4.0"
+    "@whatwg-node/node-fetch": "npm:^0.3.0"
+    busboy: "npm:^1.6.0"
+    urlpattern-polyfill: "npm:^6.0.2"
+    web-streams-polyfill: "npm:^3.2.1"
+  checksum: 25f6ce2d217751570416876cdbe502872a982841f6e905a5a10e6cfa9193d75a5b92dcb667bd47120bd6287997f8a8d4f03b7bd2b98c71932c23966a404d1710
+  languageName: node
+  linkType: hard
+
+"@whatwg-node/node-fetch@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@whatwg-node/node-fetch@npm:0.3.0"
+  dependencies:
+    "@whatwg-node/events": "npm:^0.0.2"
+    busboy: "npm:^1.6.0"
+    fast-querystring: "npm:^1.1.1"
+    fast-url-parser: "npm:^1.1.3"
+    tslib: "npm:^2.3.1"
+  peerDependencies:
+    "@types/node": ^18.0.6
+  checksum: 2cc78bde6ad94813305c897e6f2952222ec3312bd8b4479072a4cbe11ebcdcc8ba0d09e3b528844e9c51a092135246d6c0654e1e5668153f83ee9b7eac39866a
+  languageName: node
+  linkType: hard
+
 "@xstate/fsm@npm:1.4.0":
   version: 1.4.0
   resolution: "@xstate/fsm@npm:1.4.0"
@@ -7575,6 +7643,17 @@ __metadata:
   version: 2.0.6
   resolution: "asap@npm:2.0.6"
   checksum: 081b91072d2826810a8a48f4514b7b151b4771984a079005297bb9ebfa15bb4ff6ce065492933902fb12b4ab46bde204e22144d29ceca3a820f81748225cb684
+  languageName: node
+  linkType: hard
+
+"asn1js@npm:^3.0.1, asn1js@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "asn1js@npm:3.0.5"
+  dependencies:
+    pvtsutils: "npm:^1.3.2"
+    pvutils: "npm:^1.1.3"
+    tslib: "npm:^2.4.0"
+  checksum: d0bc57da97696cbf161ad24cb35f9442b59a9e59a30f30e13ba6e2fb9e69f417666d952cb436a9f309a3c88d4d89404493dcc277a5fdb4d0cdbeb03da0303bb1
   languageName: node
   linkType: hard
 
@@ -8216,6 +8295,15 @@ __metadata:
     base64-js: "npm:^1.3.1"
     ieee754: "npm:^1.2.1"
   checksum: 8384c4bf1042f6e927d650af0053c54e57734c195f29152921aaa9c6976208e7210ec9202b8cbdac27782e1955497cde631ac9566122ad67062ddc1a04a886c9
+  languageName: node
+  linkType: hard
+
+"busboy@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "busboy@npm:1.6.0"
+  dependencies:
+    streamsearch: "npm:^1.1.0"
+  checksum: 4f9b97d97465ab8d7da3f9ee34129e4e92e473451547f3960224f209249b2546006c0bc66842932c0646c98247facf7f3341a20966114fadd234434e319411ad
   languageName: node
   linkType: hard
 
@@ -12071,6 +12159,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-querystring@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "fast-querystring@npm:1.1.1"
+  dependencies:
+    fast-decode-uri-component: "npm:^1.0.1"
+  checksum: ff27977795e1f73c8626fc210a62d622305809d630953856b200ded990d3fcd616d267990578b8db42d33c3b0e8a368447e8b8652d6fa26d1eb4f3cb6bdf2113
+  languageName: node
+  linkType: hard
+
 "fast-redact@npm:^3.0.0":
   version: 3.1.0
   resolution: "fast-redact@npm:3.1.0"
@@ -12099,7 +12196,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-url-parser@npm:1.1.3":
+"fast-url-parser@npm:1.1.3, fast-url-parser@npm:^1.1.3":
   version: 1.1.3
   resolution: "fast-url-parser@npm:1.1.3"
   dependencies:
@@ -13148,12 +13245,14 @@ __metadata:
     "@types/express": "npm:^4"
     "@types/koa": "npm:^2"
     "@types/koa-bodyparser": "npm:^4"
+    "@whatwg-node/fetch": "npm:^0.8.1"
     debug: "npm:^4.1.1"
     eventemitter3: "npm:^4.0.7"
     express: "npm:^4.18.2"
     fastify: "npm:^4.12.0"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
+    graphql-http: "npm:^1.16.0"
     jest: "npm:^28.1.0"
     jest-serializer-graphql-schema: "workspace:^"
     koa: "npm:^2.14.1"
@@ -13397,6 +13496,15 @@ __metadata:
   peerDependencies:
     graphql: ^15.3.0 || ^16.0.0
   checksum: 1157fb2b2d1b9b29740930d87dfbbd09859152b306dd5c2cf76f7094be2f6a50418f280ca5a59d9f70be339fd59de7c5866ab0f533a673484a49fac6f4bb214c
+  languageName: node
+  linkType: hard
+
+"graphql-http@npm:^1.16.0":
+  version: 1.16.0
+  resolution: "graphql-http@npm:1.16.0"
+  peerDependencies:
+    graphql: ">=0.11 <=16"
+  checksum: a48a1f90c425d69faddf440ed870bbb56f56ec181cf49d212ca162607b30377f9a3126810fe45b758263e83f1a76564a4d2ad3654119c26c93551baac85e2495
   languageName: node
   linkType: hard
 
@@ -18789,6 +18897,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pvtsutils@npm:^1.3.2":
+  version: 1.3.2
+  resolution: "pvtsutils@npm:1.3.2"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: eb22d3df60a341da289c59b2a34e4e55cadc70bd43caeb5fdd14d28e40f54112142e0e8bd5906f3d756e2c38b651599243def3ced6f1169335feb7933e210fa7
+  languageName: node
+  linkType: hard
+
+"pvutils@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "pvutils@npm:1.1.3"
+  checksum: 0cb4f4878f535b07ad409df26b4e724582a50cc9ddd71375cc8d79dc79b9d712dcc0cbe52f4385c27abe6887aa88a94c98377746d95f35a88f96ebb8a585814c
+  languageName: node
+  linkType: hard
+
 "q@npm:^1.5.1":
   version: 1.5.1
   resolution: "q@npm:1.5.1"
@@ -20990,6 +21114,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"streamsearch@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "streamsearch@npm:1.1.0"
+  checksum: 8d7c4b5046cf7ff528421d6e2ee0d8335da82a34edca4c58e2022390f4f73be1c83deeb14010bf939bb71e7990bd06367ca0382b3c6df1b932ecb1b98bb50e22
+  languageName: node
+  linkType: hard
+
 "string-env-interpolation@npm:1.0.1":
   version: 1.0.1
   resolution: "string-env-interpolation@npm:1.0.1"
@@ -21899,6 +22030,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:^2.3.1, tslib@npm:^2.4.1":
+  version: 2.5.0
+  resolution: "tslib@npm:2.5.0"
+  checksum: 5a6ee935f56cd653af29de928483acbab7323f964b053e98b6b318abc69431fb0e4f660c4f4a396e2e93852510bef25eeb9f1d951d060b2d7bcc313811e5da6f
+  languageName: node
+  linkType: hard
+
 "tslib@npm:~2.0.1":
   version: 2.0.3
   resolution: "tslib@npm:2.0.3"
@@ -22422,6 +22560,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"urlpattern-polyfill@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "urlpattern-polyfill@npm:6.0.2"
+  dependencies:
+    braces: "npm:^3.0.2"
+  checksum: 336b75058ac882055a6369d3eaf4a14006e238258f338e27b5aaf5afecd7e0c6d0b707c4409472a71b12f06755be2bb2a533baa9947decdf30a0d782dbe23ad2
+  languageName: node
+  linkType: hard
+
 "use-callback-ref@npm:^1.3.0":
   version: 1.3.0
   resolution: "use-callback-ref@npm:1.3.0"
@@ -22723,10 +22870,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-streams-polyfill@npm:^3.0.3":
+"web-streams-polyfill@npm:^3.0.3, web-streams-polyfill@npm:^3.2.1":
   version: 3.2.1
   resolution: "web-streams-polyfill@npm:3.2.1"
   checksum: d0b6246240d181d6e2d8de6ded04938581bc5807da33ccd6f6b4a431c1f3fa3c04ffe0dfb739c7172d1208141717b4c80e8df7b300998fa9287ddb69bbaa0c68
+  languageName: node
+  linkType: hard
+
+"webcrypto-core@npm:^1.7.4":
+  version: 1.7.6
+  resolution: "webcrypto-core@npm:1.7.6"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.1.6"
+    "@peculiar/json-schema": "npm:^1.1.12"
+    asn1js: "npm:^3.0.1"
+    pvtsutils: "npm:^1.3.2"
+    tslib: "npm:^2.4.0"
+  checksum: 95e6bb892c87ed1c7d71656aaa5cf982a04fa2e49e5f93872ec954c8fdb3878075c8c27caee6b05eab4212649fd797ced640f4ab4c94647c07524847bbf92544
   languageName: node
   linkType: hard
 
