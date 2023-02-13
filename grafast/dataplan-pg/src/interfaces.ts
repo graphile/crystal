@@ -12,6 +12,7 @@ import type { PgInsertStep } from "./steps/pgInsert.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
 import type { PgUpdateStep } from "./steps/pgUpdate.js";
 import { WithPgClient } from "./executor.js";
+import type { NodePostgresAdaptorOptions } from "./adaptors/node-postgres.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -362,7 +363,7 @@ declare global {
 
       /** Return settings to set in the session */
       pgSettings?: (
-        graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
+        requestContext: Grafast.RequestContext,
       ) => { [key: string]: string } | null;
 
       /** Settings to set in the session that performs introspection (during gather phase) */
@@ -373,6 +374,17 @@ declare global {
         Grafast.Context & object,
         { [key: string]: string } | null | undefined
       >;
+    }
+
+    interface Preset {
+      pgConfigs?: ReadonlyArray<PgDatabaseConfiguration>;
+    }
+  }
+
+  namespace Grafast {
+    interface PgDatabaseAdaptorOptions {
+      "@dataplan/pg/adaptors/node-postgres": NodePostgresAdaptorOptions;
+      /* Add your own via declaration merging */
     }
   }
 }

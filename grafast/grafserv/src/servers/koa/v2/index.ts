@@ -12,8 +12,8 @@ import {
 } from "../../../utils.js";
 
 declare global {
-  namespace GraphileConfig {
-    interface GraphQLRequestContext {
+  namespace Grafast {
+    interface RequestContext {
       koav2: {
         ctx: Context;
       };

@@ -125,7 +125,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 - `schemas: string[]` - an array of PostgreSQL schema names to use
 - `listen: (topic: string) => AsyncIterable<string>` - a callback function to
   use to listen to a particular topic
-- `pgSettings: (ctx: GraphileConfig.GraphQLRequestContext) => Record<string, string> | null` -
+- `pgSettings: (ctx: Grafast.RequestContext) => Record<string, string> | null` -
   a callback function that will be called by the server to determine the
   pgSettings to use for a particular request
 - `pgSettingsForIntrospection: Record<string, string> | null` - the pgSettings

@@ -18,8 +18,8 @@ import {
 } from "../../../utils.js";
 
 declare global {
-  namespace GraphileConfig {
-    interface GraphQLRequestContext {
+  namespace Grafast {
+    interface RequestContext {
       fastifyv4: {
         request: FastifyRequest;
         reply: FastifyReply;

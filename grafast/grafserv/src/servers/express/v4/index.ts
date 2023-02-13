@@ -10,8 +10,8 @@ import {
 import { NodeGrafserv } from "../../node/index.js";
 
 declare global {
-  namespace GraphileConfig {
-    interface GraphQLRequestContext {
+  namespace Grafast {
+    interface RequestContext {
       expressv4: {
         req: Request;
         res: Response;

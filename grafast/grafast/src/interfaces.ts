@@ -44,7 +44,7 @@ export interface GrafastOptions {
   context?:
     | Record<string, any>
     | (<TContext extends Record<string, any>>(
-        ctx: GraphileConfig.GraphQLRequestContext,
+        ctx: Grafast.RequestContext,
         currentContext?: Partial<TContext>,
       ) => PromiseOrValue<Partial<TContext>>);
 
@@ -61,14 +61,24 @@ export interface GrafastOptions {
 
 declare global {
   namespace Grafast {
+    /**
+     * Details about the incoming GraphQL request - e.g. if it was sent over an
+     * HTTP request, the request itself so headers can be interrogated.
+     *
+     * It's anticipated this will be expanded via declaration merging, e.g. if
+     * your server is Koa then a `koaCtx` might be added.
+     */
+    interface RequestContext {
+      // TODO: add things like operationName, operation, etc?
+    }
+
     // TODO: context should probably be passed as a generic instead?
     /**
-     * The GraphQL context our schemas expect.
+     * The GraphQL context our schemas expect, generally generated from details in Grafast.RequestContext
      */
     interface Context {}
   }
   namespace GraphileConfig {
-    interface GraphQLRequestContext {}
     interface Preset {
       /**
        * Options that control how `grafast` should execute your GraphQL
@@ -80,7 +90,7 @@ declare global {
       args: PluginHook<
         (event: {
           args: ExecutionArgs;
-          ctx: GraphileConfig.GraphQLRequestContext;
+          ctx: Grafast.RequestContext;
           resolvedPreset: GraphileConfig.ResolvedPreset;
         }) => PromiseOrValue<ExecutionArgs>
       >;

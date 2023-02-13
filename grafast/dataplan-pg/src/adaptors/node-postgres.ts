@@ -28,14 +28,6 @@ function escapeIdentifier(str: string): string {
   return '"' + str.replace(/["\0]/g, '""') + '"';
 }
 
-declare global {
-  namespace Grafast {
-    interface PgDatabaseAdaptorOptions {
-      "@dataplan/pg/adaptors/node-postgres": NodePostgresAdaptorOptions;
-    }
-  }
-}
-
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
   ? parseInt(process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE, 10)
