@@ -54,7 +54,8 @@ import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
 import { StreamDeferPlugin } from "graphile-build";
-import { makePgConfig } from "postgraphile";
+// Use the 'pg' module to connect to the database
+import { makePgConfig } from "@dataplan/pg/adaptors/pg";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {

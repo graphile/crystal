@@ -52,9 +52,10 @@ initial preset) to get a completed config:
 ```ts title="graphile.config.js"
 import "graphile-config";
 
-import { makePgConfig } from "postgraphile";
 import PresetAmber from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
+// Use the 'pg' module to connect to the database
+import { makePgConfig } from "@dataplan/pg/adaptor/pg";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
