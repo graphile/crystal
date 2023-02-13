@@ -16,6 +16,7 @@ import type {
   PgClientResult,
   WithPgClient,
 } from "../executor.js";
+import "../interfaces.js";
 
 // NOTE: \0 is not valid in an SQL identifier and may cause 'invalid message
 // format' or worse error. However, it's exceedingly unlikely that it'll be
@@ -453,4 +454,46 @@ export function createWithPgClient(
     const release = () => pool.end();
     return makeNodePostgresWithPgClient(pool, release);
   }
+}
+
+declare global {
+  namespace Grafast {
+    interface Context {
+      pgSettings: {
+        [key: string]: string;
+      } | null;
+      withPgClient: WithPgClient;
+    }
+  }
+}
+
+export function makePgConfigs(
+  connectionString?: string,
+  schemas?: string | string[],
+  superuserConnectionString?: string,
+): ReadonlyArray<GraphileConfig.PgDatabaseConfiguration> {
+  const Pool = pg.Pool || (pg as any).default?.Pool;
+  const pool = new Pool({
+    connectionString,
+  });
+  pool.on("connect", (client) => {
+    client.on("error", (e) => {
+      console.error("Client error (active)", e);
+    });
+  });
+  pool.on("error", (e) => {
+    console.error("Client error (in pool)", e);
+  });
+  const source: GraphileConfig.PgDatabaseConfiguration = {
+    name: "main",
+    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+    pgSettingsKey: "pgSettings",
+    withPgClientKey: "withPgClient",
+    adaptor: "@dataplan/pg/adaptors/node-postgres",
+    adaptorSettings: {
+      pool,
+      superuserConnectionString,
+    },
+  };
+  return [source];
 }

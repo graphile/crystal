@@ -42,8 +42,8 @@ import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 import { getWithPgClientFromPgConfig } from "../pgConfigs.js";
 
 declare global {
-  namespace GraphileBuild {
-    interface GraphileResolverContext {
+  namespace Grafast {
+    interface Context {
       pgSettings: {
         [key: string]: string;
       } | null;

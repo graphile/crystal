@@ -1,6 +1,5 @@
 import "@dataplan/pg/adaptors/node-postgres";
 
-import type { WithPgClient } from "@dataplan/pg";
 import {
   buildInflection,
   buildSchema,
@@ -8,52 +7,8 @@ import {
   watchGather,
 } from "graphile-build";
 import { resolvePresets } from "graphile-config";
-import * as pg from "pg";
-
-const Pool = pg.Pool || (pg as any).default?.Pool;
 
 import type { ServerParams } from "./interfaces.js";
-
-declare global {
-  namespace GraphileBuild {
-    interface GraphileResolverContext {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient;
-    }
-  }
-}
-
-export function makePgConfigs(
-  connectionString?: string,
-  schemas?: string | string[],
-  superuserConnectionString?: string,
-): ReadonlyArray<GraphileConfig.PgDatabaseConfiguration> {
-  const pool = new Pool({
-    connectionString,
-  });
-  pool.on("connect", (client) => {
-    client.on("error", (e) => {
-      console.error("Client error (active)", e);
-    });
-  });
-  pool.on("error", (e) => {
-    console.error("Client error (in pool)", e);
-  });
-  const source: GraphileConfig.PgDatabaseConfiguration = {
-    name: "main",
-    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
-    pgSettingsKey: "pgSettings",
-    withPgClientKey: "withPgClient",
-    adaptor: "@dataplan/pg/adaptors/node-postgres",
-    adaptorSettings: {
-      pool,
-      superuserConnectionString,
-    },
-  };
-  return [source];
-}
 
 /**
  * Builds the GraphQL schema by resolving the preset, running inflection then

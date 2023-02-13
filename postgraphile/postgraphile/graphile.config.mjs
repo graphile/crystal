@@ -6,7 +6,7 @@ import { StreamDeferPlugin } from "graphile-build";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
-import { makePgConfigs } from "postgraphile";
+import { makePgConfigs } from "@dataplan/pg/adaptors/node-postgres";
 
 /** @type {GraphileConfig.Plugin } */
 /*

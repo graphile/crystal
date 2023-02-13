@@ -120,12 +120,6 @@ declare global {
       simpleCollections?: "only" | "both" | "omit";
     }
 
-    // TODO: context should probably be passed as a generic instead?
-    /**
-     * The GraphQL context our schemas expect.
-     */
-    interface GraphileResolverContext {}
-
     /**
      * Do not change this object, your changes will be ignored.
      */

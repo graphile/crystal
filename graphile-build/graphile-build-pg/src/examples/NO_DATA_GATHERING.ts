@@ -33,8 +33,8 @@ import { inspect } from "util";
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
 declare global {
-  namespace GraphileBuild {
-    interface GraphileResolverContext {
+  namespace Grafast {
+    interface Context {
       pgSettings: {
         [key: string]: string;
       } | null;
@@ -56,14 +56,8 @@ async function main() {
         name: "main",
         context: () =>
           object({
-            pgSettings:
-              context<GraphileBuild.GraphileResolverContext>().get(
-                "pgSettings",
-              ),
-            withPgClient:
-              context<GraphileBuild.GraphileResolverContext>().get(
-                "withPgClient",
-              ),
+            pgSettings: context<Grafast.Context>().get("pgSettings"),
+            withPgClient: context<Grafast.Context>().get("withPgClient"),
           } as PgExecutorContextPlans<any>),
       }),
     [PgExecutor, context, object],

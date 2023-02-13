@@ -60,6 +60,13 @@ export interface GrafastOptions {
 }
 
 declare global {
+  namespace Grafast {
+    // TODO: context should probably be passed as a generic instead?
+    /**
+     * The GraphQL context our schemas expect.
+     */
+    interface Context {}
+  }
   namespace GraphileConfig {
     interface GraphQLRequestContext {}
     interface Preset {

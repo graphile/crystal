@@ -28,8 +28,8 @@ const DATABASE_SCHEMAS: string[] = ["public", "app_public"];
 /* ************************************************************************** */
 
 declare global {
-  namespace GraphileBuild {
-    interface GraphileResolverContext {
+  namespace Grafast {
+    interface Context {
       pgSettings: {
         [key: string]: string;
       } | null;

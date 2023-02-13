@@ -6,7 +6,6 @@ import { createServer } from "node:http";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
-import { makePgConfigs } from "./schema.js";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";
@@ -170,6 +169,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       );
     }
     const schemas = rawSchema?.split(",") ?? ["public"];
+    const { makePgConfigs } = await import(
+      "@dataplan/pg/adaptors/node-postgres"
+    );
     const newPgConfigs = makePgConfigs(
       connectionString,
       schemas,

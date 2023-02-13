@@ -31,7 +31,7 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import type { KeysOfType } from "../interfaces.js";
+import type { KeysOfType } from "@dataplan/pg";
 import {
   listenWithPgClientFromPgConfig,
   withPgClientFromPgConfig,
@@ -392,7 +392,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             new PgExecutor({
               name: databaseName,
               context: () => {
-                const ctx = context<GraphileBuild.GraphileResolverContext>();
+                const ctx = context<Grafast.Context>();
                 return object({
                   pgSettings:
                     pgSettingsKey != null

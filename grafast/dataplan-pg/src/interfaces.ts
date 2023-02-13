@@ -11,6 +11,7 @@ import type { PgDeleteStep } from "./steps/pgDelete.js";
 import type { PgInsertStep } from "./steps/pgInsert.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
 import type { PgUpdateStep } from "./steps/pgUpdate.js";
+import { WithPgClient } from "./executor.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -339,3 +340,39 @@ export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
   where(condition: SQL): void;
   having(condition: SQL): void;
 };
+
+export type KeysOfType<TObject, TValueType> = {
+  [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
+}[keyof TObject];
+
+declare global {
+  namespace GraphileConfig {
+    interface PgDatabaseConfiguration<
+      TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+    > {
+      name: string;
+      schemas?: string[];
+
+      adaptor: TAdaptor;
+      adaptorSettings?: Grafast.PgDatabaseAdaptorOptions[TAdaptor];
+
+      /** The key on 'context' where the withPgClient function will be sourced */
+      withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
+      listen?(topic: string): AsyncIterable<string>;
+
+      /** Return settings to set in the session */
+      pgSettings?: (
+        graphqlRequestContext: GraphileConfig.GraphQLRequestContext,
+      ) => { [key: string]: string } | null;
+
+      /** Settings to set in the session that performs introspection (during gather phase) */
+      pgSettingsForIntrospection?: { [key: string]: string } | null;
+
+      /** The key on 'context' where the pgSettings for this DB will be sourced */
+      pgSettingsKey?: KeysOfType<
+        Grafast.Context & object,
+        { [key: string]: string } | null | undefined
+      >;
+    }
+  }
+}

@@ -105,6 +105,7 @@ import {
   PgTypedExecutableStep,
   PlanByUniques,
   TuplePlanMap,
+  KeysOfType,
 } from "./interfaces.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
 import { PgSubscriber } from "./PgSubscriber.js";
@@ -306,6 +307,7 @@ export {
   toPg,
   ToPgStep,
   TuplePlanMap,
+  KeysOfType,
   TYPES,
   WithPgClient,
   withPgClient,
