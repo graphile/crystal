@@ -173,9 +173,15 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     const adaptor =
       preset.pgConfigs?.[0]?.adaptor ?? "@dataplan/pg/adaptors/node-postgres";
 
-    const makePgConfig = (await import(adaptor)).makePgConfig as (
+    const mod = await import(adaptor);
+    const makePgConfig = (mod.makePgConfig ?? mod.default?.makePgConfig) as (
       options: MakePgConfigOptions,
     ) => GraphileConfig.PgDatabaseConfiguration;
+    if (typeof makePgConfig !== "function") {
+      throw new Error(
+        `Loaded adaptor '${adaptor}' but it does not export a 'makePgConfig' helper`,
+      );
+    }
     const newPgConfigs = [
       makePgConfig({
         connectionString,
