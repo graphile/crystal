@@ -163,6 +163,19 @@ optional configuration parameters:
 - `connectionString`
 - `schemas`
 - `superuserConnectionString`
+- pass-through options (same as in `pgConfigs` above):
+  - `name` (default: "main")
+  - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
+  - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
+  - `pgSettings`
+
+:::warning
+
+The `name` option must be unique across all your `pgConfigs`; therefore if you
+have more than one entry in `pgConfigs` you must give each additional entry an
+explicit and unique name.
+
+:::
 
 It may additionally accept any other options it likes (but care should be taken
 to not conflict with options of other adaptors, or that we might want to add

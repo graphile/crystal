@@ -531,9 +531,55 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           if (!info.resolvedPreset.pgConfigs) {
             return [];
           }
+          const seenNames = new Map<string, number>();
+          const seenPgSettingsKeys = new Map<string, number>();
+          const seenWithPgClientKeys = new Map<string, number>();
           // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
           const introspectionPromise = Promise.all(
-            info.resolvedPreset.pgConfigs.map(async (pgConfig) => {
+            info.resolvedPreset.pgConfigs.map(async (pgConfig, i) => {
+              // Validate there's no conflicts between pgConfigs
+              const { name, pgSettingsKey, withPgClientKey } = pgConfig;
+              if (!name) {
+                throw new Error(`pgConfigs[${i}] has no name`);
+              }
+              if (!withPgClientKey) {
+                throw new Error(`pgConfigs[${i}] has no withPgClientKey`);
+              }
+              {
+                const existingIndex = seenNames.get(name);
+                if (existingIndex != null) {
+                  throw new Error(
+                    `pgConfigs[${i}] has the same name as pgConfigs[${existingIndex}] (${JSON.stringify(
+                      name,
+                    )})`,
+                  );
+                }
+                seenNames.set(name, i);
+              }
+              {
+                const existingIndex = seenWithPgClientKeys.get(withPgClientKey);
+                if (existingIndex != null) {
+                  throw new Error(
+                    `pgConfigs[${i}] has the same withPgClientKey as pgConfigs[${existingIndex}] (${JSON.stringify(
+                      withPgClientKey,
+                    )})`,
+                  );
+                }
+                seenWithPgClientKeys.set(withPgClientKey, i);
+              }
+              if (pgSettingsKey) {
+                const existingIndex = seenPgSettingsKeys.get(pgSettingsKey);
+                if (existingIndex != null) {
+                  throw new Error(
+                    `pgConfigs[${i}] has the same pgSettingsKey as pgConfigs[${existingIndex}] (${JSON.stringify(
+                      pgSettingsKey,
+                    )})`,
+                  );
+                }
+                seenPgSettingsKeys.set(pgSettingsKey, i);
+              }
+
+              // Do the introspection
               const introspectionQuery = makeIntrospectionQuery();
               const {
                 rows: [row],

@@ -387,7 +387,17 @@ declare global {
   }
 }
 
-export interface MakePgConfigOptions {
+export interface MakePgConfigOptions
+  extends Partial<
+    Pick<
+      GraphileConfig.PgDatabaseConfiguration,
+      | "name"
+      | "pgSettings"
+      | "pgSettingsForIntrospection"
+      | "withPgClientKey"
+      | "pgSettingsKey"
+    >
+  > {
   connectionString?: string;
   schemas?: string | string[];
   superuserConnectionString?: string;
