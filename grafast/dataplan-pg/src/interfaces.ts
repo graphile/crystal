@@ -349,13 +349,13 @@ export type KeysOfType<TObject, TValueType> = {
 declare global {
   namespace GraphileConfig {
     interface PgDatabaseConfiguration<
-      TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+      TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
     > {
       name: string;
       schemas?: string[];
 
       adaptor: TAdaptor;
-      adaptorSettings?: Grafast.PgDatabaseAdaptorOptions[TAdaptor];
+      adaptorSettings?: GraphileConfig.PgDatabaseAdaptorOptions[TAdaptor];
 
       /** The key on 'context' where the withPgClient function will be sourced */
       withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
@@ -379,9 +379,7 @@ declare global {
     interface Preset {
       pgConfigs?: ReadonlyArray<PgDatabaseConfiguration>;
     }
-  }
 
-  namespace Grafast {
     interface PgDatabaseAdaptorOptions {
       "@dataplan/pg/adaptors/node-postgres": NodePostgresAdaptorOptions;
       /* Add your own via declaration merging */

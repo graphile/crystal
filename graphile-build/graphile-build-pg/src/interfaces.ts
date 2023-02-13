@@ -54,7 +54,7 @@ export interface PgSmartTagsDict {
 }
 
 export interface PgAdaptor<
-  TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+  TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
 > {
   createWithPgClient: (
     adaptorSettings: GraphileConfig.PgDatabaseConfiguration<TAdaptor>["adaptorSettings"],

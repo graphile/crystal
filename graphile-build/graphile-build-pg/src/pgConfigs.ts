@@ -17,7 +17,7 @@ const withPgClientDetailsByConfigCache = new Map<
 >();
 
 function reallyLoadAdaptor<
-  TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+  TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
 >(adaptorString: TAdaptor): PromiseOrDirect<PgAdaptor<TAdaptor>> {
   try {
     const adaptor = require(adaptorString);
@@ -36,7 +36,7 @@ function reallyLoadAdaptor<
 
 const loadAdaptorCache = new Map<string, PromiseOrDirect<PgAdaptor<any>>>();
 function loadAdaptor<
-  TAdaptor extends keyof Grafast.PgDatabaseAdaptorOptions = keyof Grafast.PgDatabaseAdaptorOptions,
+  TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
 >(adaptorString: TAdaptor): PromiseOrDirect<PgAdaptor<TAdaptor>> {
   const cached = loadAdaptorCache.get(adaptorString);
   if (cached) {
