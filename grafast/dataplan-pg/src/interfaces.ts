@@ -1,18 +1,18 @@
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
+import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type { PgTypeColumns } from "./codecs.js";
 import type {
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
 } from "./datasource.js";
+import type { WithPgClient } from "./executor.js";
 import type { PgDeleteStep } from "./steps/pgDelete.js";
 import type { PgInsertStep } from "./steps/pgInsert.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
 import type { PgUpdateStep } from "./steps/pgUpdate.js";
-import { WithPgClient } from "./executor.js";
-import type { PgAdaptorOptions } from "./adaptors/pg.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or

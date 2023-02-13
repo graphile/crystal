@@ -5,6 +5,8 @@
 // TODO: don't import 'pg' or '@graphile/lru', we don't want these to be dependencies of @dataplan/pg.
 // TODO: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
+import "../interfaces.js";
+
 import LRU from "@graphile/lru";
 import type { PromiseOrDirect } from "grafast";
 import type { Pool, QueryArrayConfig, QueryConfig, QueryResultRow } from "pg";
@@ -16,8 +18,7 @@ import type {
   PgClientResult,
   WithPgClient,
 } from "../executor.js";
-import "../interfaces.js";
-import { MakePgConfigOptions } from "../interfaces.js";
+import type { MakePgConfigOptions } from "../interfaces.js";
 
 // NOTE: \0 is not valid in an SQL identifier and may cause 'invalid message
 // format' or worse error. However, it's exceedingly unlikely that it'll be

@@ -82,6 +82,8 @@ import { ClassFilterStep } from "./filters/classFilter.js";
 import { ManyFilterStep } from "./filters/manyFilter.js";
 import { OrFilterStep } from "./filters/orFilter.js";
 import {
+  KeysOfType,
+  MakePgConfigOptions,
   PgClassSingleStep,
   PgConditionLikeStep,
   PgDecode,
@@ -105,8 +107,6 @@ import {
   PgTypedExecutableStep,
   PlanByUniques,
   TuplePlanMap,
-  KeysOfType,
-  MakePgConfigOptions,
 } from "./interfaces.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
 import { PgSubscriber } from "./PgSubscriber.js";
@@ -185,7 +185,9 @@ export {
   getCodecByPgCatalogTypeName,
   getInnerCodec,
   isEnumCodec,
+  KeysOfType,
   listOfType,
+  MakePgConfigOptions,
   ManyFilterStep,
   OrFilterStep,
   PgBox,
@@ -308,8 +310,6 @@ export {
   toPg,
   ToPgStep,
   TuplePlanMap,
-  MakePgConfigOptions,
-  KeysOfType,
   TYPES,
   WithPgClient,
   withPgClient,

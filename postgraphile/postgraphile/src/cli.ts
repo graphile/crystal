@@ -1,3 +1,4 @@
+import type { MakePgConfigOptions } from "@dataplan/pg";
 import { grafserv } from "grafserv/node";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
@@ -6,7 +7,6 @@ import { createServer } from "node:http";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
-import { MakePgConfigOptions } from "@dataplan/pg";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";

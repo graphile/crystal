@@ -1,6 +1,6 @@
 import "graphile-build";
 
-import type { WithPgClient } from "@dataplan/pg";
+import type { KeysOfType, WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
 import type { ExecutableStep, PromiseOrDirect } from "grafast";
 import { constant, context, object } from "grafast";
@@ -31,7 +31,6 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import type { KeysOfType } from "@dataplan/pg";
 import {
   listenWithPgClientFromPgConfig,
   withPgClientFromPgConfig,
