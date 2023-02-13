@@ -17,7 +17,7 @@ import type {
   WithPgClient,
 } from "../executor.js";
 import "../interfaces.js";
-import { MakePgConfigsOptions } from "../interfaces.js";
+import { MakePgConfigOptions } from "../interfaces.js";
 
 // NOTE: \0 is not valid in an SQL identifier and may cause 'invalid message
 // format' or worse error. However, it's exceedingly unlikely that it'll be
@@ -461,7 +461,7 @@ declare global {
 }
 
 export function makePgConfig(
-  options: MakePgConfigsOptions,
+  options: MakePgConfigOptions,
 ): GraphileConfig.PgDatabaseConfiguration {
   const { connectionString, schemas, superuserConnectionString } = options;
   const Pool = pg.Pool || (pg as any).default?.Pool;

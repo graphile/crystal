@@ -387,7 +387,7 @@ declare global {
   }
 }
 
-export interface MakePgConfigsOptions {
+export interface MakePgConfigOptions {
   connectionString?: string;
   schemas?: string | string[];
   superuserConnectionString?: string;
