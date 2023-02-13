@@ -465,7 +465,7 @@ export function makePgConfig(
   options: MakePgConfigOptions,
 ): GraphileConfig.PgDatabaseConfiguration {
   const {
-    name,
+    name = "main",
     connectionString,
     schemas,
     superuserConnectionString,

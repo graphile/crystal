@@ -546,7 +546,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 throw new Error(`pgConfigs[${i}] has no withPgClientKey`);
               }
               {
-                let existingIndex = seenNames.get(name);
+                const existingIndex = seenNames.get(name);
                 if (existingIndex != null) {
                   throw new Error(
                     `pgConfigs[${i}] has the same name as pgConfigs[${existingIndex}] (${JSON.stringify(
@@ -557,7 +557,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 seenNames.set(name, i);
               }
               {
-                let existingIndex = seenWithPgClientKeys.get(withPgClientKey);
+                const existingIndex = seenWithPgClientKeys.get(withPgClientKey);
                 if (existingIndex != null) {
                   throw new Error(
                     `pgConfigs[${i}] has the same withPgClientKey as pgConfigs[${existingIndex}] (${JSON.stringify(
@@ -568,7 +568,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 seenWithPgClientKeys.set(withPgClientKey, i);
               }
               if (pgSettingsKey) {
-                let existingIndex = seenPgSettingsKeys.get(pgSettingsKey);
+                const existingIndex = seenPgSettingsKeys.get(pgSettingsKey);
                 if (existingIndex != null) {
                   throw new Error(
                     `pgConfigs[${i}] has the same pgSettingsKey as pgConfigs[${existingIndex}] (${JSON.stringify(
