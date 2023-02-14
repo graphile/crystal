@@ -9,9 +9,8 @@ import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-/** @type {GraphileConfig.Plugin } */
 /*
-const PrimaryKeyMutationsOnlyPlugin = {
+const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
   name: "PrimaryKeyMutationsOnlyPlugin",
   version: "0.0.0",
 
@@ -38,7 +37,6 @@ const PrimaryKeyMutationsOnlyPlugin = {
 };
 */
 
-/** @type {GraphileConfig.Preset} */
 const preset = {
   plugins: [
     StreamDeferPlugin,
@@ -84,6 +82,6 @@ const preset = {
       schemas: process.env.DATABASE_SCHEMAS?.split(",") ?? ["public"],
     }),
   ],
-};
+} satisfies GraphileConfig.Preset;
 
 export default preset;
