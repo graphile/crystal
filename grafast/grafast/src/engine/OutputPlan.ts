@@ -1121,6 +1121,10 @@ const introspect = (
           kind: Kind.SELECTION_SET,
           selections: [field],
         },
+        variableDefinitions:
+          outputPlan.layerPlan.operationPlan.operation.variableDefinitions?.filter(
+            (d) => variableNames.includes(d.variable.name.value),
+          ),
       },
       ...Object.values(outputPlan.layerPlan.operationPlan.fragments),
     ],
