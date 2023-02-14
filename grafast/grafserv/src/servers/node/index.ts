@@ -116,6 +116,12 @@ export class NodeGrafserv extends GrafservBase {
             res.end(buffer);
             return;
           }
+          case "noContent": {
+            const { statusCode, headers } = result;
+            res.writeHead(statusCode, headers);
+            res.end();
+            return;
+          }
           case "bufferStream": {
             const { statusCode, headers, lowLatency, bufferIterator } = result;
             if (lowLatency) {

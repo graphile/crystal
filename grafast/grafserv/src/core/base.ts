@@ -11,6 +11,8 @@ import type {
   EventStreamEvent,
   GrafservConfig,
   HandlerResult,
+  NoContentHandlerResult,
+  NoContentResult,
   NormalizedRequestDigest,
   RequestDigest,
   Result,
@@ -397,6 +399,15 @@ export function convertHandlerResultToResult(
         headers,
         buffer: payload,
       } as BufferResult;
+    }
+    case "noContent": {
+      const { statusCode = 204 } = handlerResult;
+      const headers = Object.create(null);
+      return {
+        type: "noContent",
+        statusCode,
+        headers,
+      } as NoContentResult;
     }
     case "event-stream": {
       const {
