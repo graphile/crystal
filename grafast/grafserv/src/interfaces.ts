@@ -203,7 +203,7 @@ export interface ErrorResult {
   type: "error";
   statusCode: number;
   headers: Record<string, string>;
-  error: Error;
+  error: Error & { statusCode?: number; safeMessage?: boolean };
 }
 
 export interface BufferResult {

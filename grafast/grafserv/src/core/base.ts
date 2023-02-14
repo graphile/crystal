@@ -25,12 +25,26 @@ import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest } from "../utils.js";
 
-function handleGraphQLError(
+function handleGraphQLHandlerError(
   request: NormalizedRequestDigest,
   dynamicOptions: OptionsFromConfig,
-  e: Error,
+  e: Error & { statusCode?: number; safeMessage?: boolean },
 ) {
-  const error =
+  if (e.safeMessage && e.statusCode) {
+    return {
+      type: "graphql",
+      request,
+      dynamicOptions,
+      payload: {
+        errors: [new GraphQLError(e.message, null, null, null, null, e)],
+      },
+      statusCode: e.statusCode,
+      // TODO: we should respect the `accept` header here if we can.
+      contentType: APPLICATION_JSON,
+    } as HandlerResult;
+  }
+  // TODO: if a GraphQLError is thrown... WTF?
+  const graphqlError =
     e instanceof GraphQLError
       ? e
       : new GraphQLError("Unknown error occurred", null, null, null, null, e);
@@ -43,7 +57,7 @@ function handleGraphQLError(
     type: "graphql",
     request,
     dynamicOptions,
-    payload: { errors: [error] },
+    payload: { errors: [graphqlError] },
     statusCode: 500,
     // Fall back to application/json; this is when an unexpected error happens
     // so it shouldn't be hit.
@@ -102,7 +116,7 @@ export class GrafservBase {
       if (request.path === dynamicOptions.graphqlPath) {
         if (forceCORS) return optionsResponse(request, this.dynamicOptions);
         return this.graphqlHandler(request, this.graphiqlHandler).catch((e) =>
-          handleGraphQLError(request, dynamicOptions, e),
+          handleGraphQLHandlerError(request, dynamicOptions, e),
         );
       }
 
@@ -502,10 +516,11 @@ export function convertHandlerResultToResult(
   }
 }
 
-export const handleError = (error: Error): ErrorResult => {
-  const statusCode =
-    ((error as GraphQLError).extensions?.statusCode as number | undefined) ??
-    500;
+export const handleError = (
+  error: Error & { statusCode?: number },
+): ErrorResult => {
+  // TODO: need to assert `error` is not a GraphQLError, that should be handled elsewhere.
+  const statusCode = error.statusCode ?? 500;
   return {
     type: "error",
     statusCode,
