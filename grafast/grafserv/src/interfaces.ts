@@ -61,6 +61,11 @@ export interface ServerOptions {
    * objects would break.
    */
   outputDataAsString?: boolean;
+
+  /**
+   * Temporary hack to allow easy testing with graphql-http.com
+   */
+  dangerouslyAllowAllCORSRequests?: boolean;
 }
 
 declare global {
@@ -154,6 +159,9 @@ export interface GraphQLIncrementalHandlerResult extends IHandlerResult {
   iterator: AsyncGenerator<AsyncExecutionResult, void, undefined>;
   outputDataAsString?: boolean;
 }
+export interface NoContentHandlerResult extends IHandlerResult {
+  type: "noContent";
+}
 export interface EventStreamEvent {
   /** The name of the event. Use simple names. Don't put newlines in it! */
   event: string;
@@ -172,7 +180,8 @@ export type HandlerResult =
   | GraphQLHandlerResult
   | GraphQLIncrementalHandlerResult
   | TextHandlerResult
-  | EventStreamHeandlerResult;
+  | EventStreamHeandlerResult
+  | NoContentHandlerResult;
 
 export type SchemaChangeEvent = {
   event: "change";
@@ -194,7 +203,7 @@ export interface ErrorResult {
   type: "error";
   statusCode: number;
   headers: Record<string, string>;
-  error: Error;
+  error: Error & { statusCode?: number; safeMessage?: boolean };
 }
 
 export interface BufferResult {
@@ -221,6 +230,12 @@ export interface BufferStreamResult {
   bufferIterator: AsyncGenerator<Buffer, void, undefined>;
 }
 
+export interface NoContentResult {
+  type: "noContent";
+  statusCode: 204;
+  headers: Record<string, string>;
+}
+
 /*
 export interface JSONStreamResult {
   type: "jsonStream";
@@ -236,4 +251,5 @@ export type Result =
   | ErrorResult
   | BufferResult
   | JSONResult
-  | BufferStreamResult;
+  | BufferStreamResult
+  | NoContentResult;

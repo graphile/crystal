@@ -97,6 +97,13 @@ export class KoaGrafserv extends GrafservBase {
           ctx.response.body = json;
           return;
         }
+        case "noContent": {
+          const { statusCode, headers } = result;
+          ctx.response.set(headers);
+          ctx.response.status = statusCode;
+          ctx.response.body = null;
+          return;
+        }
         case "bufferStream": {
           const { statusCode, headers, lowLatency, bufferIterator } = result;
           if (lowLatency) {

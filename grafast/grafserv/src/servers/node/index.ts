@@ -90,11 +90,20 @@ export class NodeGrafserv extends GrafservBase {
 
         switch (result.type) {
           case "error": {
-            if (typeof next === "function") {
+            if (result.error.safeMessage && result.error.statusCode) {
+              const payload = Buffer.from(result.error.message, "utf8");
+              res.writeHead(result.statusCode, {
+                "Content-Type": "text/plain; charset=utf-8",
+                "Content-Length": payload.length,
+              });
+              res.end(payload);
+              return;
+            } else if (typeof next === "function") {
               return next(result.error);
             } else {
+              // TODO: catch all the code paths that lead here!
               const payload = Buffer.from("An error occurred", "utf8");
-              res.writeHead(500, {
+              res.writeHead(result.statusCode, {
                 "Content-Type": "text/plain; charset=utf-8",
                 "Content-Length": payload.length,
               });
@@ -114,6 +123,12 @@ export class NodeGrafserv extends GrafservBase {
             headers["Content-Length"] = String(buffer.length);
             res.writeHead(statusCode, headers);
             res.end(buffer);
+            return;
+          }
+          case "noContent": {
+            const { statusCode, headers } = result;
+            res.writeHead(statusCode, headers);
+            res.end();
             return;
           }
           case "bufferStream": {
