@@ -15,15 +15,17 @@ cheatsheets.
 
 :::
 
-When <grafast /> sees an operation for the first time, it builds an "operation
-plan." To do so, it walks the selection sets calling the user-provided `plan`
-method for each field to determine the _steps_ that need to be executed for that
-field. That series of steps, which we'll call the _field plan_, is then woven
-with all the other field plans in the operation, to form a directed acyclic
-graph we call the _operation plan_. Whilst doing this, <grafast /> keeps track
-of which fields returned which steps, and uses this information to form the
-_output plan_. Finally the _operation plan_ is optimized and finalized and the
-_output plan_ is finalized, then they are ready for execution.
+When <grafast /> sees an operation for the first time, it builds an _operation
+plan_, which is the combination of an [**execution plan**](#execution-plan) and
+an [**output plan**](#output-plan). To do so, it walks the selection sets
+calling the user-provided `plan` method for each field to determine the _steps_
+that need to be executed for that field. That series of steps, which we'll call
+the _field plan_, is then woven with all the other field plans in the
+operation, to form a directed acyclic graph we call the _execution plan_.
+Whilst doing this, <grafast /> keeps track of which fields returned which
+steps, and uses this information to form the _output plan_. Finally the
+_execution plan_ is optimized and finalized and the _output plan_ is finalized,
+then they are ready for execution.
 
 A simplified version of the process is this:
 
@@ -37,6 +39,30 @@ A simplified version of the process is this:
 1. **Optimise**
 1. **Tree shake**
 1. **Finalise**
+
+## Execution plan
+
+The _execution plan_ is (generally[^1]) asynchronous. It is responsible for
+fetching all the data required by the operation in as efficient a manner as
+possible, and can evolve quite significantly as a result of deduplication, tree
+shaking and optimization.
+
+[^1]: If the execution plan contains no asynchronous steps, then it can be
+executed synchronously. This is rare, though, as typically it will contain
+steps that fetch data from remote data sources such as databases or web
+services.
+
+## Output plan
+
+The data fetched by the execution plan will not be in any particular format,
+and may have been significantly deduplicated and simplified as part of the
+operations. The _output plan_ is responsible for taking this bundle of data and
+formatting it back out as a valid GraphQL response, including serializing all
+the leaves correctly and handling nulls and errors following the GraphQL
+specification. The output plan always runs synchronously, though in streaming
+situations such as GraphQL subscriptions or incremental delivery
+(`@stream`/`@defer`) part of the output plan may be executed for each payload
+in the underlying stream.
 
 ## Constraints
 

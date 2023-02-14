@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# Plan Resolvers
+# Plan resolvers
 
 Each field in the schema may implement a synchronous `plan` method, called a
 "plan resolver." At operation planning time, each time this field is referenced
