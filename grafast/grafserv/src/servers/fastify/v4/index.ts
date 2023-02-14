@@ -99,6 +99,12 @@ export class FastifyGrafserv extends GrafservBase {
         reply.statusCode = statusCode;
         return json;
       }
+      case "noContent": {
+        const { statusCode, headers } = result;
+        reply.headers(headers);
+        reply.statusCode = statusCode;
+        return null;
+      }
       case "bufferStream": {
         const { statusCode, headers, lowLatency, bufferIterator } = result;
         if (lowLatency) {

@@ -1,17 +1,16 @@
 /* eslint-disable import/no-unresolved */
 import "postgraphile";
+import "grafserv/node";
 
+import { makePgConfig } from "@dataplan/pg/adaptors/pg";
 import { context } from "grafast";
 import { StreamDeferPlugin } from "graphile-build";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
-import { makePgConfig } from "@dataplan/pg/adaptors/pg";
-import "grafserv/node";
 
-/** @type {GraphileConfig.Plugin } */
 /*
-const PrimaryKeyMutationsOnlyPlugin = {
+const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
   name: "PrimaryKeyMutationsOnlyPlugin",
   version: "0.0.0",
 
@@ -38,8 +37,7 @@ const PrimaryKeyMutationsOnlyPlugin = {
 };
 */
 
-/** @type {GraphileConfig.Preset} */
-const preset = {
+const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
     makeExtendSchemaPlugin({
@@ -84,6 +82,6 @@ const preset = {
       schemas: process.env.DATABASE_SCHEMAS?.split(",") ?? ["public"],
     }),
   ],
-};
+}; /* satisfies GraphileConfig.Preset */
 
 export default preset;
