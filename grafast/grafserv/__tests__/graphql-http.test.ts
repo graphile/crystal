@@ -5,8 +5,7 @@ import type { Server } from "node:http";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
-// eslint-disable-next-line import/extensions -- TODO: other problems when adding extension
-import { grafserv } from "../src/servers/node";
+import { grafserv } from "../src/servers/node/index.js";
 
 let server: Server | null = null;
 
