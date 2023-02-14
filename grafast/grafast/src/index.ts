@@ -74,6 +74,9 @@ import {
   StepOptimizeOptions,
   StepStreamOptions,
   TypedEventEmitter,
+  JSONObject,
+  JSONArray,
+  JSONValue,
 } from "./interfaces.js";
 import { polymorphicWrap, resolveType } from "./polymorphic.js";
 import {
@@ -388,6 +391,9 @@ export {
   stripAnsi,
   subscribe,
   TypedEventEmitter,
+  JSONObject,
+  JSONArray,
+  JSONValue,
   UnbatchedExecutableStep,
 };
 
