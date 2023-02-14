@@ -1,51 +1,23 @@
 import { fetch } from "@whatwg-node/fetch";
-import { makeGrafastSchema } from "grafast";
 import { serverAudits } from "graphql-http";
-import type { Server } from "node:http";
-import { createServer } from "node:http";
-import type { AddressInfo } from "node:net";
 
-import { grafserv } from "../src/servers/node/index.js";
+import { makeExampleServer } from "./exampleServer.js";
 
-let server: Server | null = null;
+let server: Awaited<ReturnType<typeof makeExampleServer>> | null = null;
 
-beforeAll(() => {
-  const schema = makeGrafastSchema({
-    typeDefs: `
-    type Query {
-      hello: String!
-    }
-  `,
-    plans: {
-      Query: {
-        hello() {
-          return "world";
-        },
-      },
-    },
-  });
-
-  const serv = grafserv({
-    schema,
-    preset: {
-      server: {
-        graphqlOverGET: true,
-      },
-    },
-  });
-  server = createServer(serv.createHandler());
-  server.listen();
+beforeAll(async () => {
+  server = await makeExampleServer();
 });
 
 afterAll(() => {
-  server?.close();
+  server?.release();
 });
 
-for (const audit of serverAudits({
-  url: () =>
-    `http://localhost:${(server!.address() as AddressInfo).port}/graphql`,
+const audits = serverAudits({
+  url: () => server!.url,
   fetchFn: fetch,
-})) {
+});
+for (const audit of audits) {
   it(audit.name, async () => {
     const result = await audit.fn();
     expect({
