@@ -95,8 +95,12 @@ export class GrafservBase {
   ): PromiseOrDirect<HandlerResult | null> {
     const request = normalizeRequest(inRequest);
     const dynamicOptions = this.dynamicOptions;
+    const forceCORS =
+      !!this.resolvedPreset.server?.dangerouslyAllowAllCORSRequests &&
+      request.method === "OPTIONS";
     try {
       if (request.path === dynamicOptions.graphqlPath) {
+        if (forceCORS) return optionsResponse(request, this.dynamicOptions);
         return this.graphqlHandler(request, this.graphiqlHandler).catch((e) =>
           handleGraphQLError(request, dynamicOptions, e),
         );
@@ -109,6 +113,7 @@ export class GrafservBase {
         request.method === "GET" &&
         request.path === dynamicOptions.graphiqlPath
       ) {
+        if (forceCORS) return optionsResponse(request, this.dynamicOptions);
         return this.graphiqlHandler(request);
       }
 
@@ -117,6 +122,7 @@ export class GrafservBase {
         request.method === "GET" &&
         request.path === dynamicOptions.eventStreamRoute
       ) {
+        if (forceCORS) return optionsResponse(request, this.dynamicOptions);
         const stream = this.makeStream();
         return {
           type: "event-stream",
@@ -144,15 +150,25 @@ export class GrafservBase {
   protected processRequest(
     request: RequestDigest,
   ): PromiseOrDirect<Result | null> {
+    let returnValue;
     try {
       const result = this._processRequest(request);
       if (isPromiseLike(result)) {
-        return result.then(convertHandlerResultToResult, handleError);
+        returnValue = result.then(convertHandlerResultToResult, handleError);
       } else {
-        return convertHandlerResultToResult(result);
+        returnValue = convertHandlerResultToResult(result);
       }
     } catch (e) {
-      return handleError(e);
+      returnValue = handleError(e);
+    }
+    if (this.resolvedPreset.server?.dangerouslyAllowAllCORSRequests) {
+      if (isPromiseLike(returnValue)) {
+        return returnValue.then(dangerousCorsWrap);
+      } else {
+        return dangerousCorsWrap(returnValue);
+      }
+    } else {
+      return returnValue;
     }
   }
 
@@ -497,3 +513,24 @@ export const handleError = (error: Error): ErrorResult => {
     error,
   };
 };
+
+function dangerousCorsWrap(result: Result | null) {
+  if (result === null) {
+    return result;
+  }
+  result.headers["Access-Control-Allow-Origin"] = "*";
+  result.headers["Access-Control-Allow-Headers"] = "*";
+  return result;
+}
+
+function optionsResponse(
+  request: NormalizedRequestDigest,
+  dynamicOptions: any,
+): NoContentHandlerResult {
+  return {
+    type: "noContent",
+    request,
+    dynamicOptions: dynamicOptions,
+    statusCode: 204,
+  };
+}

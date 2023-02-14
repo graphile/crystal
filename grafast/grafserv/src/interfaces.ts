@@ -61,6 +61,11 @@ export interface ServerOptions {
    * objects would break.
    */
   outputDataAsString?: boolean;
+
+  /**
+   * Temporary hack to allow easy testing with graphql-http.com
+   */
+  dangerouslyAllowAllCORSRequests?: boolean;
 }
 
 declare global {
