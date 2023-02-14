@@ -37,7 +37,7 @@ const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
 };
 */
 
-const preset = {
+const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
     makeExtendSchemaPlugin({
@@ -82,6 +82,6 @@ const preset = {
       schemas: process.env.DATABASE_SCHEMAS?.split(",") ?? ["public"],
     }),
   ],
-} satisfies GraphileConfig.Preset;
+}; /* satisfies GraphileConfig.Preset */
 
 export default preset;
