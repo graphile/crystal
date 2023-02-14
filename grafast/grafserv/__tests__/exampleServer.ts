@@ -24,6 +24,7 @@ export async function makeExampleServer() {
     server: {
       graphqlOverGET: true,
       graphqlPath: "/graphql",
+      dangerouslyAllowAllCORSRequests: true,
     },
   }; /*satisfies GraphileConfig.Preset*/
   const serv = grafserv({ schema, preset });
