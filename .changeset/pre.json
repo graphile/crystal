@@ -29,11 +29,14 @@
     "graphile": "5.0.0-0.0"
   },
   "changesets": [
+    "beige-cherries-nail",
+    "chilled-eagles-sneeze",
     "fair-ducks-travel",
     "fast-zoos-float",
     "flat-kiwis-fold",
     "forty-chefs-deliver",
     "fresh-gorillas-burn",
+    "fresh-paws-hide",
     "fuzzy-mangos-compete",
     "gentle-coats-happen",
     "giant-paws-count",
@@ -44,12 +47,14 @@
     "little-brooms-rush",
     "lovely-zebras-visit",
     "mighty-seas-deny",
+    "neat-cars-push",
     "ninety-bags-design",
     "proud-emus-speak",
     "quick-ants-relax",
     "rare-crabs-compare",
     "rotten-chairs-confess",
     "serious-timers-thank",
+    "shaggy-rats-joke",
     "shiny-cobras-tease",
     "shiny-teachers-double",
     "silent-camels-confess",
@@ -62,6 +67,7 @@
     "thirty-pianos-tickle",
     "tidy-dancers-turn",
     "wise-lizards-live",
+    "witty-adults-carry",
     "yellow-pumpkins-flash"
   ]
 }
