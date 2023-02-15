@@ -1,5 +1,12 @@
 # ruru
 
+## 2.0.0-0.9
+
+### Patch Changes
+
+- Updated dependencies [[`0ab95d0b1`](undefined)]:
+  - graphile-config@0.0.1-0.5
+
 ## 2.0.0-0.8
 
 ### Patch Changes

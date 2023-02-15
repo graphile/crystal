@@ -1,5 +1,61 @@
 # graphile-build-pg
 
+## 5.0.0-0.18
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- [#190](https://github.com/benjie/postgraphile-private/pull/190)
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Breaking changes around
+  types and postgres configuration:
+
+  - `GraphileBuild.GraphileResolverContext` renamed to `Grafast.Context`
+  - `GraphileConfig.GraphQLRequestContext` renamed to `Grafast.RequestContext`
+  - `Grafast.PgDatabaseAdaptorOptions` renaed to
+    `GraphileConfig.PgDatabaseAdaptorOptions`
+  - `@dataplan/pg/adaptors/node-postgres` is now `@dataplan/pg/adaptors/pg` due
+    to the bizarre naming of PostgreSQL clients on npm - we've decided to use
+    the module name as the unique identifier
+  - `makePgConfigs`:
+    - is now `makePgConfig` (singular) - so you'll need to wrap it in an array
+      where you use it
+    - no longer exported by `@dataplan/pg` (because it depended on `pg`) -
+      instead each adaptor exposes this helper - so import from
+      `@dataplan/pg/adaptors/node-postgres`
+    - accepts an object parameter containing
+      `{connectionString, schemas, superuserConnectionString}`, rather than
+      multiple string parameters
+  - `makeNodePostgresWithPgClient` -> `makePgAdaptorWithPgClient`
+  - `postgraphile` CLI will now try and respect the adaptor stated in your
+    preset when overriding connection arguments
+  - Removed `Grafast.RequestContext.httpRequest` and instead use
+    `Grafast.RequestContext.node.req/res`; all server adaptors should implement
+    this if appropriate
+
+- [#192](https://github.com/benjie/postgraphile-private/pull/192)
+  [`80091a8e0`](https://github.com/benjie/postgraphile-private/commit/80091a8e0343a162bf2b60cf619267a874a67e60)
+  Thanks [@benjie](https://github.com/benjie)! - - Conflicts in `pgConfigs`
+  (e.g. multiple sources using the same 'name') now detected and output
+  - Fix defaults for `pgSettingsKey` and `withPgClientKey` based on config name
+  - `makePgConfig` now allows passing `pgSettings` callback and
+    `pgSettingsForIntrospection` config object
+  - Multiple postgres sources now works nicely with multiple `makePgConfig`
+    calls
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`af9bc38c8`](https://github.com/benjie/postgraphile-private/commit/af9bc38c86dddfa776e5d8db117b5cb35dbe2cd7),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876),
+  [`80091a8e0`](https://github.com/benjie/postgraphile-private/commit/80091a8e0343a162bf2b60cf619267a874a67e60)]:
+  - @dataplan/pg@0.0.1-0.15
+  - grafast@0.0.1-0.11
+  - graphile-build@5.0.0-0.15
+  - graphile-config@0.0.1-0.5
+  - pg-introspection@0.0.1-0.3
+  - pg-sql2@5.0.0-0.3
+  - tamedevil@0.0.0-0.4
+
 ## 5.0.0-0.17
 
 ### Patch Changes

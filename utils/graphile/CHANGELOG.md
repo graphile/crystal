@@ -1,5 +1,12 @@
 # graphile
 
+## 5.0.0-0.4
+
+### Patch Changes
+
+- Updated dependencies [[`0ab95d0b1`](undefined)]:
+  - graphile-config@0.0.1-0.5
+
 ## 5.0.0-0.3
 
 ### Patch Changes

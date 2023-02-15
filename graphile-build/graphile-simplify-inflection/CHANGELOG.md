@@ -1,5 +1,11 @@
 # v8.0.0
 
+## 8.0.0-0.3
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
 ## 8.0.0-0.2
 
 ### Patch Changes

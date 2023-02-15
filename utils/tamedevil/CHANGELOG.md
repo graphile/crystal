@@ -1,5 +1,11 @@
 # tamedevil
 
+## 0.0.0-0.4
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
 ## 0.0.0-0.3
 
 ### Patch Changes

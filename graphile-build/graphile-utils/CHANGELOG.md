@@ -1,5 +1,21 @@
 # graphile-utils
 
+## 5.0.0-0.18
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876),
+  [`80091a8e0`](https://github.com/benjie/postgraphile-private/commit/80091a8e0343a162bf2b60cf619267a874a67e60)]:
+  - grafast@0.0.1-0.11
+  - graphile-build@5.0.0-0.15
+  - graphile-build-pg@5.0.0-0.18
+  - graphile-config@0.0.1-0.5
+  - pg-introspection@0.0.1-0.3
+
 ## 5.0.0-0.17
 
 ### Patch Changes

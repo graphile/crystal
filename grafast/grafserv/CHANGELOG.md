@@ -1,5 +1,23 @@
 # grafserv
 
+## 0.0.1-0.13
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- [#195](https://github.com/benjie/postgraphile-private/pull/195)
+  [`752ec9c51`](https://github.com/benjie/postgraphile-private/commit/752ec9c516add7c4617b426e97eccd1d4e5b7833)
+  Thanks [@benjie](https://github.com/benjie)! - Fix handling of HTTP errors and
+  allow for 204 status code responses. Add CORS hack to enable graphql-http
+  auditing.
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)]:
+  - grafast@0.0.1-0.11
+  - graphile-config@0.0.1-0.5
+  - ruru@2.0.0-0.9
+
 ## 0.0.1-0.12
 
 ### Patch Changes
