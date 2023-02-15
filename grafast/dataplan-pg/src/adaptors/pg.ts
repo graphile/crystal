@@ -462,7 +462,7 @@ declare global {
 }
 
 export function makePgConfig(
-  options: MakePgConfigOptions,
+  options: MakePgConfigOptions & { pool?: pg.Pool },
 ): GraphileConfig.PgDatabaseConfiguration {
   const {
     name = "main",
@@ -479,18 +479,23 @@ export function makePgConfig(
       `makePgConfig called with pgSettings but no pgSettingsKey - please indicate where the settings should be stored, e.g. 'pgSettingsKey: "pgSettings"' (must be unique across sources)`,
     );
   }
-  const Pool = pg.Pool || (pg as any).default?.Pool;
-  const pool = new Pool({
-    connectionString,
-  });
-  pool.on("connect", (client) => {
-    client.on("error", (e) => {
-      console.error("Client error (active)", e);
+  const Pool = pg.Pool ?? (pg as any).default?.Pool;
+  const pool =
+    options.pool ??
+    new Pool({
+      connectionString,
     });
-  });
-  pool.on("error", (e) => {
-    console.error("Client error (in pool)", e);
-  });
+  if (!options.pool) {
+    // If you pass your own pool, you're responsible for doing this yourself
+    pool.on("connect", (client) => {
+      client.on("error", (e) => {
+        console.error("Client error (active)", e);
+      });
+    });
+    pool.on("error", (e) => {
+      console.error("Client error (in pool)", e);
+    });
+  }
   const source: GraphileConfig.PgDatabaseConfiguration = {
     name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
