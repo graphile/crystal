@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+// import websocket from '@fastify/websocket'
 import { grafserv } from "grafserv/fastify/v4";
 import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
