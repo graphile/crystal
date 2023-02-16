@@ -71,12 +71,12 @@ import type {
   PgExecutorContextPlans,
   PgInsertStep,
   PgSelectStep,
-  PgSubscriber,
   PgTypeCodec,
   PgTypeColumn,
   PgTypeColumnVia,
   WithPgClient,
 } from "../";
+import type { PgSubscriber } from "../adaptors/pg.js";
 import type { PgTypeColumns } from "../codecs.js";
 import { listOfType } from "../codecs.js";
 import {

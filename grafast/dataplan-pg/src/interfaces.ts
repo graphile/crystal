@@ -1,4 +1,4 @@
-import type { ExecutableStep, ModifierStep } from "grafast";
+import type { ExecutableStep, GrafastSubscriber, ModifierStep } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgAdaptorOptions } from "./adaptors/pg.js";
@@ -374,6 +374,15 @@ declare global {
         Grafast.Context & object,
         { [key: string]: string } | null | undefined
       >;
+
+      /** The GrafastSubscriber to use for subscriptions */
+      pgSubscriber?: GrafastSubscriber<Record<string, string>> | null;
+
+      /** Where on the context should the PgSubscriber be stored? */
+      pgSubscriberKey?: KeysOfType<
+        Grafast.Context & object,
+        GrafastSubscriber<any> | null | undefined
+      >;
     }
 
     interface Preset {
@@ -396,9 +405,12 @@ export interface MakePgConfigOptions
       | "pgSettingsForIntrospection"
       | "withPgClientKey"
       | "pgSettingsKey"
+      | "pgSubscriber"
+      | "pgSubscriberKey"
     >
   > {
   connectionString?: string;
   schemas?: string | string[];
   superuserConnectionString?: string;
+  pubsub?: boolean;
 }

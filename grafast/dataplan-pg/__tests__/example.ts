@@ -33,7 +33,8 @@ import { Pool } from "pg";
 import prettier from "prettier";
 
 import { makeExampleSchema } from "../src/examples/exampleSchema.js";
-import { PgSubscriber, WithPgClient } from "../src/index.js";
+import { WithPgClient } from "../src/index.js";
+import { PgSubscriber } from "../src/adaptors/pg.js";
 
 const schema = makeExampleSchema();
 

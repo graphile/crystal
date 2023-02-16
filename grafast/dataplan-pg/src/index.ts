@@ -109,7 +109,6 @@ import {
   TuplePlanMap,
 } from "./interfaces.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
-import { PgSubscriber } from "./PgSubscriber.js";
 import {
   pgClassExpression,
   PgClassExpressionStep,
@@ -272,7 +271,6 @@ export {
   PgSourceRowAttribute,
   PgSourceUnique,
   PgSourceUniqueExtensions,
-  PgSubscriber,
   PgTypeCodec,
   PgTypeCodecExtensions,
   PgTypeCodecPolymorphism,
@@ -337,7 +335,6 @@ exportAsMany("@dataplan/pg", {
   ClassFilterStep,
   ManyFilterStep,
   OrFilterStep,
-  PgSubscriber,
   pgClassExpression,
   PgClassExpressionStep,
   PgConditionStep,

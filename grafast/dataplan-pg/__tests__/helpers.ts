@@ -32,7 +32,7 @@ import { Pool } from "pg";
 import { makeExampleSchema } from "../src/examples/exampleSchema.js";
 //import prettier from "prettier";
 import type { PgClientQuery } from "../src/index.js";
-import { PgSubscriber } from "../src/index.js";
+import { PgSubscriber } from "../src/adaptors/pg.js";
 import { withTestWithPgClient } from "./sharedHelpers.js";
 
 /**
