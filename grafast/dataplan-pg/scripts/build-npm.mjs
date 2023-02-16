@@ -22,3 +22,4 @@ await transformPackageJson(
   __dirname + "/../release/package.json",
 );
 await encryptSourceFile(__dirname + "/../release/dist/index.js");
+await encryptSourceFile(__dirname + "/../release/dist/adaptors/pg.js");
