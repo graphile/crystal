@@ -1,3 +1,4 @@
+import { CloseCode, makeServer } from "graphql-ws";
 import type {
   IncomingMessage,
   Server as HTTPServer,
@@ -5,7 +6,6 @@ import type {
 } from "node:http";
 import type { Server as HTTPSServer } from "node:https";
 import { parse as parseQueryString } from "node:querystring";
-import { makeServer, CloseCode } from "graphql-ws";
 
 import { GrafservBase } from "../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../interfaces.js";

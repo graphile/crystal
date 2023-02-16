@@ -6,7 +6,6 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 
-import "@dataplan/pg/adaptors/pg";
 import "graphile-config";
 import "graphile-build-pg";
 

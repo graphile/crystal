@@ -4,13 +4,15 @@ import type {
   FetcherParams,
   FetcherReturnType,
 } from "@graphiql/toolkit";
-import { isAsyncIterable, isPromise } from "@graphiql/toolkit";
-import { createGraphiQLFetcher } from "@graphiql/toolkit";
+import {
+  createGraphiQLFetcher,
+  isAsyncIterable,
+  isPromise,
+} from "@graphiql/toolkit";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
-import { useEffect, useMemo, useState } from "react";
-
 import { createClient } from "graphql-ws";
+import { useEffect, useMemo, useState } from "react";
 
 import type { RuruProps } from "../interfaces.js";
 

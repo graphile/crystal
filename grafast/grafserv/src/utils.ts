@@ -1,4 +1,4 @@
-import { hookArgs, stripAnsi, execute, subscribe } from "grafast";
+import { execute, hookArgs, stripAnsi, subscribe } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
@@ -7,6 +7,7 @@ import type {
 import { GraphQLError } from "graphql";
 import type { Readable } from "node:stream";
 
+import type { GrafservBase } from "./index.js";
 import type {
   GrafservBody,
   JSONValue,
@@ -14,7 +15,6 @@ import type {
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
-import { GrafservBase } from "./index.js";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,

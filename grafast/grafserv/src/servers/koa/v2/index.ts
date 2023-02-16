@@ -1,7 +1,7 @@
-import type { Server as HTTPServer } from "node:http";
-import type { Server as HTTPSServer } from "node:https";
 import type { Context } from "koa";
 import type Koa from "koa";
+import type { Server as HTTPServer } from "node:http";
+import type { Server as HTTPSServer } from "node:https";
 import { PassThrough } from "node:stream";
 
 import { GrafservBase } from "../../../core/base.js";
@@ -149,10 +149,9 @@ export class KoaGrafserv extends GrafservBase {
       } else {
         // If not, hope they're calling `app.listen()` and intercept that call.
         const oldListen = app.listen;
-        const that = this;
-        app.listen = function listen(...args: any) {
-          const server = oldListen.apply(this, args);
-          attachWebsocketsToServer(that, server);
+        app.listen = (...args: any) => {
+          const server = oldListen.apply(app, args);
+          attachWebsocketsToServer(this, server);
           return server;
         };
       }

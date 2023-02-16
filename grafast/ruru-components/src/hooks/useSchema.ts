@@ -1,3 +1,4 @@
+import { isAsyncIterable } from "@graphiql/toolkit";
 import type { GraphiQLProps } from "graphiql";
 import type { ExecutionResult, GraphQLSchema } from "graphql";
 import {
@@ -11,7 +12,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RuruProps } from "../interfaces.js";
 // import { updateGraphiQLDocExplorerNavStack } from "../updateGraphiQLDocExplorerNavStack.js";
 import { useGraphQLChangeStream } from "./useGraphQLChangeStream.js";
-import { isAsyncIterable } from "@graphiql/toolkit";
 
 export const useSchema = (
   props: RuruProps,

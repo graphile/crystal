@@ -8,19 +8,18 @@
 import "../interfaces.js";
 
 import LRU from "@graphile/lru";
-import type { PromiseOrDirect } from "grafast";
+import EventEmitter from "eventemitter3";
+import type { Deferred, GrafastSubscriber, PromiseOrDirect } from "grafast";
+import { defer } from "grafast";
 import type {
+  Notification,
   Pool,
+  PoolClient,
   QueryArrayConfig,
   QueryConfig,
   QueryResultRow,
-  Notification,
-  PoolClient,
 } from "pg";
 import * as pg from "pg";
-import EventEmitter from "eventemitter3";
-import type { Deferred, GrafastSubscriber } from "grafast";
-import { defer } from "grafast";
 
 import type {
   PgClient,

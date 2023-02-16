@@ -1,6 +1,6 @@
+import type { Express, Request, Response } from "express";
 import type { Server as HTTPServer } from "node:http";
 import type { Server as HTTPSServer } from "node:https";
-import type { Express, Request, Response } from "express";
 
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
 import type { OptionsFromConfig } from "../../../options.js";
@@ -10,8 +10,8 @@ import {
   processHeaders,
 } from "../../../utils.js";
 import {
-  NodeGrafservBase,
   attachWebsocketsToServer,
+  NodeGrafservBase,
 } from "../../node/index.js";
 
 declare global {
@@ -70,10 +70,9 @@ export class ExpressGrafserv extends NodeGrafservBase {
       } else {
         // If not, hope they're calling `app.listen()` and intercept that call.
         const oldListen = app.listen;
-        const that = this;
-        app.listen = function listen(...args: any) {
-          const server = oldListen.apply(this, args);
-          attachWebsocketsToServer(that, server);
+        app.listen = (...args: any) => {
+          const server = oldListen.apply(app, args);
+          attachWebsocketsToServer(this, server);
           return server;
         };
       }
