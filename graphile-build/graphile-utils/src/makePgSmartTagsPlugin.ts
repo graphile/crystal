@@ -230,6 +230,28 @@ export type SubscribeToPgSmartTagUpdatesCallback = (
   cb: UpdatePgSmartTagRulesCallback | null,
 ) => PromiseOrDirect<void>;
 
+interface Cache {
+  rulesPromise: PromiseOrDirect<PgSmartTagRule[]>;
+}
+interface State {
+  rules: PgSmartTagRule[];
+}
+
+async function resolveRules(
+  initialRules: ThunkOrDirect<
+    PromiseOrDirect<
+      | PgSmartTagRule<keyof PgEntityByKind>
+      | PgSmartTagRule<keyof PgEntityByKind>[]
+      | null
+    >
+  >,
+): Promise<PgSmartTagRule[]> {
+  const resolved = await (typeof initialRules === "function"
+    ? initialRules()
+    : initialRules);
+  return Array.isArray(resolved) ? resolved : resolved ? [resolved] : [];
+}
+
 let counter = 0;
 export function makePgSmartTagsPlugin(
   initialRules: ThunkOrDirect<
@@ -243,19 +265,24 @@ export function makePgSmartTagsPlugin(
     version: "0.0.0",
     before: ["smart-tags"],
 
-    gather: {
+    gather: <GraphileConfig.PluginGatherConfig<any, State, Cache>>{
       namespace:
         `pgSmartTags_${id}` as any /* Cannot make type safe because dynamic */,
       helpers: {},
-      initialCache: () => ({
-        rules: null as PgSmartTagRule[] | null,
-      }),
+      initialCache() {
+        return { rulesPromise: resolveRules(initialRules) };
+      },
+      async initialState(cache) {
+        return {
+          rules: await cache.rulesPromise,
+        };
+      },
       hooks: {
         // Run in the 'introspection' phase before anything uses the tags
         pgIntrospection_introspection(info, event) {
           const { introspection, databaseName } = event;
 
-          const [rules, rawRules] = rulesFrom(info.cache.rules);
+          const [rules, rawRules] = rulesFrom(info.state.rules);
 
           rules.forEach((rule, idx) => {
             if (
@@ -318,20 +345,23 @@ export function makePgSmartTagsPlugin(
         },
       },
 
-      async main(output, info) {
-        if (!info.cache.rules) {
-          info.cache.rules = await (typeof initialRules === "function"
-            ? initialRules()
-            : initialRules);
-        }
-      },
-
       ...(subscribeToUpdatesCallback
         ? {
             async watch(info, callback) {
               await subscribeToUpdatesCallback((newRuleOrRules) => {
-                info.cache.rules = newRuleOrRules;
-                callback();
+                const promise = resolveRules(newRuleOrRules);
+                promise.then(
+                  () => {
+                    info.cache.rulesPromise = promise;
+                    callback();
+                  },
+                  (e) => {
+                    console.error(
+                      `Error occurred during makePgSmartTagsPlugin watch mode: `,
+                      e,
+                    );
+                  },
+                );
               });
               return () => subscribeToUpdatesCallback(null);
             },
