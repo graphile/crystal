@@ -56,6 +56,11 @@ export function options(yargs: Argv) {
       description: "The host to bind our HTTP server to",
       default: "localhost",
     })
+    .option("subscriptions", {
+      type: "boolean",
+      description:
+        "Enable GraphQL subscriptions over websockets, if the schema supports them",
+    })
     .option("config", {
       alias: "C",
       type: "string",
@@ -143,6 +148,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     allowExplain: rawAllowExplain,
     watch,
     preset: rawPresets,
+    subscriptions: rawSubscriptions,
   } = args;
 
   const cliPresets = rawPresets ? await loadPresets(rawPresets) : [];
@@ -187,6 +193,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
         connectionString,
         schemas,
         superuserConnectionString,
+        ...(rawSubscriptions ? { pubsub: true } : null),
       }),
     ];
     preset.pgConfigs = newPgConfigs;
@@ -197,6 +204,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   }
   if (rawHost != null) {
     preset.server!.host = rawHost;
+  }
+  if (rawSubscriptions) {
+    preset.server!.websockets = true;
   }
   preset.grafast = preset.grafast || {};
   if (rawAllowExplain != null) {
@@ -221,7 +231,12 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const serv = pgl.createServ(grafserv);
 
-  const server = createServer(serv.createHandler());
+  const server = createServer();
+  serv.addTo(server).catch((e) => {
+    console.error("Initializing server failed");
+    console.error(e);
+    process.exit(1);
+  });
   server.once("listening", () => {
     server.on("error", (e) => {
       console.error("Server raised an error:", e);

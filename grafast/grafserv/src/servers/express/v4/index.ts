@@ -1,4 +1,6 @@
 import type { Express, Request, Response } from "express";
+import type { Server as HTTPServer } from "node:http";
+import type { Server as HTTPSServer } from "node:https";
 
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
 import type { OptionsFromConfig } from "../../../options.js";
@@ -7,7 +9,10 @@ import {
   getBodyFromRequest,
   processHeaders,
 } from "../../../utils.js";
-import { NodeGrafserv } from "../../node/index.js";
+import {
+  attachWebsocketsToServer,
+  NodeGrafservBase,
+} from "../../node/index.js";
 
 declare global {
   namespace Grafast {
@@ -20,7 +25,7 @@ declare global {
   }
 }
 
-export class ExpressGrafserv extends NodeGrafserv {
+export class ExpressGrafserv extends NodeGrafservBase {
   protected getDigest(
     dynamicOptions: OptionsFromConfig,
     req: Request,
@@ -56,8 +61,22 @@ export class ExpressGrafserv extends NodeGrafserv {
     };
   }
 
-  addTo(app: Express) {
-    app.use(this.createHandler());
+  async addTo(app: Express, server: HTTPServer | HTTPSServer | null) {
+    app.use(this._createHandler());
+    if (this.resolvedPreset.server?.websockets) {
+      if (server) {
+        // If user explicitly passes server, bind to it:
+        attachWebsocketsToServer(this, server);
+      } else {
+        // If not, hope they're calling `app.listen()` and intercept that call.
+        const oldListen = app.listen;
+        app.listen = (...args: any) => {
+          const server = oldListen.apply(app, args);
+          attachWebsocketsToServer(this, server);
+          return server;
+        };
+      }
+    }
   }
 }
 

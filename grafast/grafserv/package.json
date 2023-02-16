@@ -53,6 +53,7 @@
     "debug": "^4.1.1",
     "eventemitter3": "^4.0.7",
     "graphile-config": "workspace:^",
+    "graphql-ws": "^5.11.3",
     "ruru": "workspace:^",
     "tslib": "^2.4.0"
   },
@@ -61,7 +62,13 @@
   },
   "peerDependencies": {
     "grafast": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6"
+    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "ws": "^8.12.1"
+  },
+  "peerDependenciesMeta": {
+    "ws": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/express": "^4",

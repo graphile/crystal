@@ -1,5 +1,7 @@
 import type { Context } from "koa";
 import type Koa from "koa";
+import type { Server as HTTPServer } from "node:http";
+import type { Server as HTTPSServer } from "node:https";
 import { PassThrough } from "node:stream";
 
 import { GrafservBase } from "../../../core/base.js";
@@ -10,6 +12,7 @@ import {
   getBodyFromRequest,
   processHeaders,
 } from "../../../utils.js";
+import { attachWebsocketsToServer } from "../../node/index.js";
 
 declare global {
   namespace Grafast {
@@ -62,7 +65,10 @@ export class KoaGrafserv extends GrafservBase {
     super(config);
   }
 
-  public createHandler(): (ctx: Context, next: (err?: Error) => void) => void {
+  protected _createHandler(): (
+    ctx: Context,
+    next: (err?: Error) => void,
+  ) => void {
     const dynamicOptions = this.dynamicOptions;
     return async (ctx, next) => {
       const request = getDigest(dynamicOptions, ctx);
@@ -134,8 +140,22 @@ export class KoaGrafserv extends GrafservBase {
     };
   }
 
-  addTo(app: Koa) {
-    app.use(this.createHandler());
+  async addTo(app: Koa, server: HTTPServer | HTTPSServer | null) {
+    app.use(this._createHandler());
+    if (this.resolvedPreset.server?.websockets) {
+      if (server) {
+        // If user explicitly passes server, bind to it:
+        attachWebsocketsToServer(this, server);
+      } else {
+        // If not, hope they're calling `app.listen()` and intercept that call.
+        const oldListen = app.listen;
+        app.listen = (...args: any) => {
+          const server = oldListen.apply(app, args);
+          attachWebsocketsToServer(this, server);
+          return server;
+        };
+      }
+    }
   }
 }
 

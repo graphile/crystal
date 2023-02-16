@@ -59,8 +59,8 @@ Calling `grafserv` will return an instance; this instance will have a number of
 helpers on it, including helpers specific to integrating it with your framework
 of choice. For servers that operate on a middleware basis this is typically
 `serv.addTo(app)` (which allows registering multiple route handlers), though
-different servers may have different APIs, such as `serv.createHandler()` for
-Node and `serv.createGraphQLHandler()` for Lambda and Next.js.
+different servers may have different APIs, such as `serv.createGraphQLHandler()`
+for Lambda and Next.js.
 
 Note: There is little value in Grafserv reimplementing every non-GraphQL concern
 your server may have, so instead it leans on the ecosystem of your chosen server
@@ -114,11 +114,21 @@ import { grafserv } from "grafserv/node";
 import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
+// Create a Node HTTP server
+const server = createServer();
+server.on("error", (e) => {
+  console.error(e);
+});
+
 // Create a Grafserv instance
 const serv = grafserv({ schema, preset });
 
-// Mount the request handler into a new HTTP server
-const server = createServer(serv.createHandler());
+// Mount the request handler into a new HTTP server, and register websockets if
+// desired
+serv.addTo(server).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Node server
 server.listen(preset.server.port ?? 5678);
@@ -127,6 +137,7 @@ server.listen(preset.server.port ?? 5678);
 ### Express V4
 
 ```js
+import { createServer } from "node:http";
 import express from "express";
 import { grafserv } from "grafserv/express/v4";
 import preset from "./graphile.config.mjs";
@@ -136,19 +147,30 @@ import schema from "./schema.mjs";
 const app = express();
 // (Add any Express middleware you want here.)
 
+// Create a Node HTTP server, mounting Express into it
+const server = createServer(app);
+server.on("error", (e) => {
+  console.error(e);
+});
+
 // Create a Grafserv instance
 const serv = grafserv({ schema, preset });
 
-// Add the Grafserv instance's route handlers to the Express app
-serv.addTo(app);
+// Add the Grafserv instance's route handlers to the Express app, and register
+// websockets if desired
+serv.addTo(app, server).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Express server
-app.listen(preset.server.port ?? 5678);
+server.listen(preset.server.port ?? 5678);
 ```
 
 ### Koa V2
 
 ```js
+import { createServer } from "node:http";
 import Koa from "koa";
 import { grafserv } from "grafserv/koa/v2";
 import preset from "./graphile.config.mjs";
@@ -158,35 +180,50 @@ import schema from "./schema.mjs";
 const app = new Koa();
 // (Add any Koa middleware you want here.)
 
+// Create a Node HTTP server, mounting Koa into it
+const server = createServer(app);
+server.on("error", (e) => {
+  console.error(e);
+});
+
 // Create a Grafserv instance
 const serv = grafserv({ schema, preset });
 
-// Add the Grafserv instance's route handlers to the Koa app
-serv.addTo(app);
+// Add the Grafserv instance's route handlers to the Koa app, and register
+// websockets if desired
+serv.addTo(app, server).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Koa server
-app.listen(preset.server.port ?? 5678);
+server.listen(preset.server.port ?? 5678);
 ```
 
 ### Fastify V4
 
 ```js
 import Fastify from "fastify";
+// import websocket from '@fastify/websocket'
 import { grafserv } from "grafserv/fastify/v4";
 import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
-// Create a Koa app
+// Create a Fastify app
 const app = Fastify({
   logger: true,
 });
 // (Add any Fastify middleware you want here.)
+// await app.register(websocket);
 
 // Create a Grafserv instance
 const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Fastify app
-serv.addTo(app);
+serv.addTo(app).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Fastify server
 app.listen({ port: preset.server.port ?? 5678 }, (err, address) => {
@@ -196,6 +233,8 @@ app.listen({ port: preset.server.port ?? 5678 }, (err, address) => {
 ```
 
 ### Next.js API route
+
+**TODO: actually implement this!**
 
 Grafserv handles a number of API routes, so you should define one for each of
 the things you care about. It's critical that you ensure that the paths line up
@@ -232,6 +271,8 @@ export default handler;
 ```
 
 ### Lambda
+
+**TODO: actually implement this!**
 
 ```js
 import { grafserv } from "grafserv/lambda";
