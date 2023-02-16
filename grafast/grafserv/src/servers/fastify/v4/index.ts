@@ -154,7 +154,7 @@ export class FastifyGrafserv extends GrafservBase {
     }
   }
 
-  addTo(app: FastifyInstance) {
+  async addTo(app: FastifyInstance) {
     // application/graphql-request+json isn't currently an official serialization format:
     // https://graphql.github.io/graphql-over-http/draft/#sec-Media-Types
     /*

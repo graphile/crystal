@@ -7,7 +7,7 @@ import {
   getBodyFromRequest,
   processHeaders,
 } from "../../../utils.js";
-import { NodeGrafserv } from "../../node/index.js";
+import { NodeGrafservBase } from "../../node/index.js";
 
 declare global {
   namespace Grafast {
@@ -20,7 +20,7 @@ declare global {
   }
 }
 
-export class ExpressGrafserv extends NodeGrafserv {
+export class ExpressGrafserv extends NodeGrafservBase {
   protected getDigest(
     dynamicOptions: OptionsFromConfig,
     req: Request,
@@ -56,8 +56,8 @@ export class ExpressGrafserv extends NodeGrafserv {
     };
   }
 
-  addTo(app: Express) {
-    app.use(this.createHandler());
+  async addTo(app: Express) {
+    app.use(this._createHandler());
   }
 }
 

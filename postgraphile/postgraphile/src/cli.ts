@@ -221,7 +221,12 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const serv = pgl.createServ(grafserv);
 
-  const server = createServer(serv.createHandler());
+  const server = createServer();
+  serv.addTo(server).catch((e) => {
+    console.error("Initializing server failed");
+    console.error(e);
+    process.exit(1);
+  });
   server.once("listening", () => {
     server.on("error", (e) => {
       console.error("Server raised an error:", e);

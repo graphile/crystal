@@ -7,7 +7,8 @@ import schema from "./schema.mjs";
 const serv = grafserv({ schema, preset });
 
 // Mount the request handler into a new HTTP server
-const server = createServer(serv.createHandler());
+const server = createServer();
+serv.addTo(server);
 
 // Start the Node server
 server.listen(preset.server.port ?? 5678);

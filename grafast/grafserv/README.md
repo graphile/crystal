@@ -59,8 +59,8 @@ Calling `grafserv` will return an instance; this instance will have a number of
 helpers on it, including helpers specific to integrating it with your framework
 of choice. For servers that operate on a middleware basis this is typically
 `serv.addTo(app)` (which allows registering multiple route handlers), though
-different servers may have different APIs, such as `serv.createHandler()` for
-Node and `serv.createGraphQLHandler()` for Lambda and Next.js.
+different servers may have different APIs, such as `serv.createGraphQLHandler()`
+for Lambda and Next.js.
 
 Note: There is little value in Grafserv reimplementing every non-GraphQL concern
 your server may have, so instead it leans on the ecosystem of your chosen server
@@ -114,11 +114,20 @@ import { grafserv } from "grafserv/node";
 import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
+// Create a Node HTTP server
+const server = createServer();
+server.on("error", (e) => {
+  console.error(e);
+});
+
 // Create a Grafserv instance
 const serv = grafserv({ schema, preset });
 
 // Mount the request handler into a new HTTP server
-const server = createServer(serv.createHandler());
+serv.addTo(server).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Node server
 server.listen(preset.server.port ?? 5678);
@@ -140,7 +149,10 @@ const app = express();
 const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Express app
-serv.addTo(app);
+serv.addTo(app).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Express server
 app.listen(preset.server.port ?? 5678);
@@ -162,7 +174,10 @@ const app = new Koa();
 const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Koa app
-serv.addTo(app);
+serv.addTo(app).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Koa server
 app.listen(preset.server.port ?? 5678);
@@ -186,7 +201,10 @@ const app = Fastify({
 const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Fastify app
-serv.addTo(app);
+serv.addTo(app).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Fastify server
 app.listen({ port: preset.server.port ?? 5678 }, (err, address) => {

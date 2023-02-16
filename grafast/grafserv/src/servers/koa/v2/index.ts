@@ -62,7 +62,10 @@ export class KoaGrafserv extends GrafservBase {
     super(config);
   }
 
-  public createHandler(): (ctx: Context, next: (err?: Error) => void) => void {
+  protected _createHandler(): (
+    ctx: Context,
+    next: (err?: Error) => void,
+  ) => void {
     const dynamicOptions = this.dynamicOptions;
     return async (ctx, next) => {
       const request = getDigest(dynamicOptions, ctx);
@@ -134,8 +137,8 @@ export class KoaGrafserv extends GrafservBase {
     };
   }
 
-  addTo(app: Koa) {
-    app.use(this.createHandler());
+  async addTo(app: Koa) {
+    app.use(this._createHandler());
   }
 }
 

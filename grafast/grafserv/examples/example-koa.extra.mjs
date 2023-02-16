@@ -14,7 +14,11 @@ app.use(bodyParser());
 const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Koa app
-serv.addTo(app);
+serv.addTo(app).catch((e) => {
+  console.error("Initializing server failed");
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Koa server
 app.listen(preset.server.port ?? 5678);

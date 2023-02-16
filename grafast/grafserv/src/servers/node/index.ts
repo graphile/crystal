@@ -1,4 +1,4 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import { parse as parseQueryString } from "node:querystring";
 
 import { GrafservBase } from "../../core/base.js";
@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-export class NodeGrafserv extends GrafservBase {
+export class NodeGrafservBase extends GrafservBase {
   constructor(config: GrafservConfig) {
     super(config);
   }
@@ -57,7 +57,20 @@ export class NodeGrafserv extends GrafservBase {
     };
   }
 
+  /**
+   * @deprecated Please user serv.addTo instead, so that websockets can be automatically supported
+   */
   public createHandler(
+    isHTTPS = false,
+  ): (
+    req: IncomingMessage,
+    res: ServerResponse,
+    next?: (err?: Error) => void,
+  ) => void {
+    return this._createHandler(isHTTPS);
+  }
+
+  protected _createHandler(
     isHTTPS = false,
   ): (
     req: IncomingMessage,
@@ -212,6 +225,12 @@ export class NodeGrafserv extends GrafservBase {
         }
       }
     };
+  }
+}
+
+export class NodeGrafserv extends NodeGrafservBase {
+  async addTo(server: Server) {
+    server.on("request", this._createHandler());
   }
 }
 
