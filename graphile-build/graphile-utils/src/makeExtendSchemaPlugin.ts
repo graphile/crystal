@@ -1062,7 +1062,10 @@ export function makeExtendSchemaPlugin(
                 : null),
               ...resolversSpec,
               ...(possiblePlan
-                ? { plan: possiblePlan as FieldPlanResolver<any, any, any> }
+                ? {
+                    [isRootSubscription ? "subscribePlan" : "plan"]:
+                      possiblePlan as FieldPlanResolver<any, any, any>,
+                  }
                 : null),
             };
           };
