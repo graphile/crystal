@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { PassThrough } from "node:stream";
+import { makeHandler } from "graphql-ws/lib/use/@fastify/websocket";
 
 import {
   convertHandlerResultToResult,
@@ -13,6 +14,7 @@ import type {
 } from "../../../interfaces.js";
 import {
   getBodyFromFrameworkBody,
+  makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
 } from "../../../utils.js";
@@ -184,6 +186,11 @@ export class FastifyGrafserv extends GrafservBase {
         const result = await convertHandlerResultToResult(handlerResult);
         return this.send(request, reply, result);
       },
+      ...(this.resolvedPreset.server?.websockets
+        ? {
+            wsHandler: makeHandler(makeGraphQLWSConfig(this)),
+          }
+        : null),
     });
 
     if (dynamicOptions.graphiql) {

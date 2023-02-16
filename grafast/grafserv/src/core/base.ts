@@ -68,8 +68,9 @@ function handleGraphQLHandlerError(
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
   private releasing = false;
-  protected dynamicOptions!: OptionsFromConfig;
-  protected resolvedPreset!: GraphileConfig.ResolvedPreset;
+  /** @internal */
+  public dynamicOptions!: OptionsFromConfig;
+  public resolvedPreset!: GraphileConfig.ResolvedPreset;
   protected schema: GraphQLSchema | PromiseLike<GraphQLSchema> | null;
   protected schemaError: PromiseLike<GraphQLSchema> | null;
   protected eventEmitter: TypedEventEmitter<{

@@ -1,5 +1,9 @@
-import { stripAnsi } from "grafast";
-import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import { hookArgs, stripAnsi, execute, subscribe } from "grafast";
+import type {
+  AsyncExecutionResult,
+  ExecutionArgs,
+  ExecutionResult,
+} from "graphql";
 import { GraphQLError } from "graphql";
 import type { Readable } from "node:stream";
 
@@ -10,6 +14,7 @@ import type {
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
+import { GrafservBase } from "./index.js";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,
@@ -136,4 +141,31 @@ export function httpError(
   message: string,
 ): Error & { statusCode: number } {
   return Object.assign(new Error(message), { statusCode, safeMessage: true });
+}
+
+export function makeGraphQLWSConfig(instance: GrafservBase) {
+  return {
+    schema: async () => instance.getSchema(),
+    // PERF: we can remove the async/await and only use when context is async
+    execute: async (args: ExecutionArgs) => {
+      await hookArgs(
+        args,
+        {
+          // TODO: we need to pass through some request context here
+        },
+        instance.resolvedPreset,
+      );
+      return execute(args, instance.resolvedPreset);
+    },
+    subscribe: async (args: ExecutionArgs) => {
+      await hookArgs(
+        args,
+        {
+          // TODO: we need to pass through some request context here
+        },
+        instance.resolvedPreset,
+      );
+      return subscribe(args, instance.resolvedPreset);
+    },
+  };
 }
