@@ -153,6 +153,12 @@ const gatherBase = (
           ? (globalState[spec.namespace] =
               spec.initialCache?.() ?? Object.create(null))
           : EMPTY_OBJECT;
+      if (typeof cache.then === "function") {
+        // TODO: can we just make `initialCache` allow promises?
+        throw new Error(
+          `\`initialCache\` may not return a promise directly; instead set one of the keys on the object it returns to a promise and await that in \`initialState\` (which is allowed to be async)`,
+        );
+      }
       const state = EMPTY_OBJECT;
       const context: GatherPluginContext<any, any> = {
         helpers: helpers as GraphileConfig.GatherHelpers,
