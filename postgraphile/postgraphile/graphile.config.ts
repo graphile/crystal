@@ -3,11 +3,12 @@ import "postgraphile";
 import "grafserv/node";
 
 import { makePgConfig } from "@dataplan/pg/adaptors/pg";
-import { context } from "grafast";
+import { context, listen, object } from "grafast";
 import { StreamDeferPlugin } from "graphile-build";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
+import { jsonParse } from "@dataplan/json";
 
 /*
 const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
@@ -45,11 +46,24 @@ const preset: GraphileConfig.Preset = {
         extend type Query {
           mol: Int
         }
+        extend type Subscription {
+          sub(topic: String!): Int
+        }
       `,
       plans: {
         Query: {
           mol() {
             return context().get("mol");
+          },
+        },
+        Subscription: {
+          // Test via SQL: `NOTIFY test, '{"a":40}';`
+          sub(_$root, args) {
+            const $topic = args.get("topic");
+            const $pgSubscriber = context().get("pgSubscriber");
+            return listen($pgSubscriber, $topic, ($payload) =>
+              object({ sub: jsonParse($payload).get("a" as never) }),
+            );
           },
         },
       },
@@ -61,6 +75,7 @@ const preset: GraphileConfig.Preset = {
     makeV4Preset({
       simpleCollections: "both",
       jwtPgTypeIdentifier: '"b"."jwt_token"',
+      dynamicJson: true,
     }),
   ],
   inflection: {},
@@ -68,6 +83,7 @@ const preset: GraphileConfig.Preset = {
   schema: {},
   server: {
     graphqlPath: "/v2/graphql",
+    websockets: true,
   },
   grafast: {
     context: {
@@ -80,6 +96,8 @@ const preset: GraphileConfig.Preset = {
       connectionString: process.env.DATABASE_URL,
       // List of schemas to expose:
       schemas: process.env.DATABASE_SCHEMAS?.split(",") ?? ["public"],
+      // Enable LISTEN/NOTIFY client
+      pubsub: true,
     }),
   ],
 }; /* satisfies GraphileConfig.Preset */
