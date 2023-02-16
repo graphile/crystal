@@ -235,8 +235,9 @@ export class NodeGrafservBase extends GrafservBase {
     const { WebSocketServer } = ws;
     const graphqlWsServer = makeServer({
       schema: async () => this.getSchema(),
-      execute: (args) => {
-        hookArgs(
+      // PERF: we can remove the async/await and only use when context is async
+      execute: async (args) => {
+        await hookArgs(
           args,
           {
             // TODO: we need to pass through some request context here
@@ -245,8 +246,8 @@ export class NodeGrafservBase extends GrafservBase {
         );
         return execute(args, this.resolvedPreset);
       },
-      subscribe: (args) => {
-        hookArgs(
+      subscribe: async (args) => {
+        await hookArgs(
           args,
           {
             // TODO: we need to pass through some request context here
