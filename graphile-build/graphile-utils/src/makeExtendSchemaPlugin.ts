@@ -1019,37 +1019,22 @@ export function makeExtendSchemaPlugin(
             (d) => d.directiveName === "deprecated",
           );
           const deprecationReason = deprecatedDirective?.args.reason;
-          const functionToResolveObject = <TContext>(
-            functionOrResolveObject:
-              | GraphQLFieldResolver<TSource, TContext>
-              | ObjectFieldConfig<TSource, TContext>,
-          ): ObjectFieldConfig<TSource, TContext> =>
-            typeof functionOrResolveObject === "function"
-              ? { resolve: functionOrResolveObject }
-              : functionOrResolveObject;
 
           /*
-           * We accept a resolver function directly, or an object which can
-           * define 'resolve', 'subscribe' and other relevant methods.
+           * We accept a plan resolver function directly, or an object which
+           * can define 'plan', 'subscribePlan', 'resolve', 'subscribe' and
+           * other relevant methods.
            */
           const possiblePlan = plans[Self.name]?.[fieldName];
-          const possibleResolver = resolvers[Self.name]
-            ? resolvers[Self.name][fieldName]
-            : null;
-          const resolver =
-            possibleResolver &&
-            (typeof possibleResolver === "object" ||
-              typeof possibleResolver === "function")
-              ? possibleResolver
-              : null;
-          const rawResolversSpec = resolver
-            ? functionToResolveObject(resolver)
-            : null;
+          const possibleResolver = resolvers[Self.name]?.[fieldName];
+          if (possiblePlan && possibleResolver) {
+            throw new Error(
+              `You must set only plans.${Self.name}.${fieldName} or resolvers.${Self.name}.${fieldName} - not both!`,
+            );
+          }
+          const spec = possiblePlan ?? possibleResolver;
           const fieldSpecGenerator = () => {
-            const resolversSpec = rawResolversSpec;
             return {
-              type: type as GraphQLOutputType,
-              args,
               ...(deprecationReason
                 ? {
                     deprecationReason,
@@ -1060,13 +1045,19 @@ export function makeExtendSchemaPlugin(
                     description,
                   }
                 : null),
-              ...resolversSpec,
-              ...(possiblePlan
+              ...(typeof spec === "function"
                 ? {
-                    [isRootSubscription ? "subscribePlan" : "plan"]:
-                      possiblePlan as FieldPlanResolver<any, any, any>,
+                    [possiblePlan
+                      ? isRootSubscription
+                        ? "subscribePlan"
+                        : "plan"
+                      : "resolve"]: spec as any,
                   }
+                : typeof spec === "object" && spec
+                ? spec
                 : null),
+              type: type as GraphQLOutputType,
+              args,
             };
           };
           return build.extend(
