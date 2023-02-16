@@ -1,5 +1,11 @@
 # grafast
 
+## 0.0.1-0.13
+
+### Patch Changes
+
+- [`e5b664b6f`](undefined) - Fix "Cannot find module '../package.json'" error
+
 ## 0.0.1-0.12
 
 ### Patch Changes

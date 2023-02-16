@@ -1,5 +1,12 @@
 # graphile-build
 
+## 5.0.0-0.17
+
+### Patch Changes
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - grafast@0.0.1-0.13
+
 ## 5.0.0-0.16
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @dataplan/pg
 
+## 0.0.1-0.17
+
+### Patch Changes
+
+- [`e5b664b6f`](undefined) - Fix "Cannot find module '../package.json'" error
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - grafast@0.0.1-0.13
+  - @dataplan/json@0.0.1-0.13
+
 ## 0.0.1-0.16
 
 ### Patch Changes

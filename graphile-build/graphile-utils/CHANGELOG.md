@@ -1,5 +1,14 @@
 # graphile-utils
 
+## 5.0.0-0.20
+
+### Patch Changes
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - grafast@0.0.1-0.13
+  - graphile-build-pg@5.0.0-0.20
+  - graphile-build@5.0.0-0.17
+
 ## 5.0.0-0.19
 
 ### Patch Changes
