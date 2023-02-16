@@ -9,6 +9,8 @@ import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
 
+import { createClient } from "graphql-ws";
+
 import type { RuruProps } from "../interfaces.js";
 
 export interface IExplainedOperation {
