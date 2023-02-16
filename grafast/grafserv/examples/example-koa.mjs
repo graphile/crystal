@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import Koa from "koa";
 import { grafserv } from "grafserv/koa/v2";
 import preset from "./graphile.config.mjs";
@@ -11,11 +12,21 @@ app.use(async (ctx, next) => {
   return next();
 });
 
+// Create a Node HTTP server, mounting Koa into it
+const server = createServer(app);
+server.on("error", (e) => {
+  console.error(e);
+});
+
 // Create a Grafserv instance
 const serv = grafserv({ schema, preset });
 
-// Add the Grafserv instance's route handlers to the Koa app
-serv.addTo(app);
+// Add the Grafserv instance's route handlers to the Koa app, and register
+// websockets if desired
+serv.addTo(app, server).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Koa server
-app.listen(preset.server.port ?? 5678);
+server.listen(preset.server.port ?? 5678);

@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import Koa from "koa";
 import bodyParser from "koa-bodyparser";
 import { grafserv } from "grafserv/koa/v2";
@@ -10,15 +11,22 @@ const app = new Koa();
 app.use(bodyParser());
 // (Add any Koa middleware you want here.)
 
+// Create a Node HTTP server, mounting Koa into it
+const server = createServer(app);
+server.on("error", (e) => {
+  console.error(e);
+});
+
 // Create a Grafserv instance
 const serv = grafserv({ schema, preset });
 
-// Add the Grafserv instance's route handlers to the Koa app
-serv.addTo(app).catch((e) => {
+// Add the Grafserv instance's route handlers to the Koa app, and register
+// websockets if desired
+serv.addTo(app, server).catch((e) => {
   console.error("Initializing server failed");
   console.error(e);
   process.exit(1);
 });
 
 // Start the Koa server
-app.listen(preset.server.port ?? 5678);
+server.listen(preset.server.port ?? 5678);
