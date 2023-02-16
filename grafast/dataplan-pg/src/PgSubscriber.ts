@@ -3,6 +3,8 @@ import type { Deferred, GrafastSubscriber } from "grafast";
 import { defer } from "grafast";
 import type { Notification, Pool, PoolClient } from "pg";
 
+// FIXME: this needs moving into @dataplan/pg/adaptors/pg
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
