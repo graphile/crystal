@@ -1,5 +1,5 @@
 import type { GraphiQLProps } from "graphiql";
-import type { GraphQLSchema } from "graphql";
+import type { ExecutionResult, GraphQLSchema } from "graphql";
 import {
   buildClientSchema,
   getIntrospectionQuery,
@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RuruProps } from "../interfaces.js";
 // import { updateGraphiQLDocExplorerNavStack } from "../updateGraphiQLDocExplorerNavStack.js";
 import { useGraphQLChangeStream } from "./useGraphQLChangeStream.js";
+import { isAsyncIterable } from "@graphiql/toolkit";
 
 export const useSchema = (
   props: RuruProps,
@@ -39,7 +40,7 @@ export const useSchema = (
         operationName: null as unknown as string,
       });
       let payload;
-      if (typeof result.next === "function") {
+      if (isAsyncIterable(result)) {
         // Handle async iterator; we're only expecting a single payload.
         for await (const entry of result) {
           payload = entry;
@@ -47,7 +48,7 @@ export const useSchema = (
       } else {
         payload = result;
       }
-      const { data, errors } = payload;
+      const { data, errors } = payload as ExecutionResult;
       if (errors) {
         if (errors[0]) {
           throw new GraphQLError(
@@ -68,7 +69,7 @@ export const useSchema = (
 
       // Use the data we got back from GraphQL to build a client schema (a
       // schema without resolvers).
-      const schema = buildClientSchema(data);
+      const schema = buildClientSchema(data as any);
       setSchema(schema);
       setError(null);
 

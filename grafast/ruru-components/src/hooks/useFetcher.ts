@@ -4,6 +4,7 @@ import type {
   FetcherParams,
   FetcherReturnType,
 } from "@graphiql/toolkit";
+import { isAsyncIterable, isPromise } from "@graphiql/toolkit";
 import { createGraphiQLFetcher } from "@graphiql/toolkit";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
@@ -78,6 +79,8 @@ function makeWsUrl(url: string): string {
     return `ws${window.location.protocol === "https:" ? "s" : ""}://${
       window.location.host
     }${url}`;
+  } else if (/^https?:\/\//.test(url)) {
+    return `ws${url.substring(4)}`;
   } else {
     return url;
   }
@@ -100,6 +103,8 @@ export const useFetcher = (
     : endpoint;
   const subscriptionUrl = props.subscriptionEndpoint
     ? makeWsUrl(props.subscriptionEndpoint)
+    : props.endpoint
+    ? makeWsUrl(props.endpoint)
     : undefined;
   const [explainResults, setExplainResults] = useState<ExplainResults | null>(
     null,
@@ -140,7 +145,6 @@ export const useFetcher = (
   const fetcherOptions = useMemo<CreateFetcherOptions>(
     () => ({
       url,
-      subscriptionUrl,
       headers: {
         ...(explain
           ? {
@@ -150,6 +154,11 @@ export const useFetcher = (
           : null),
       },
       fetch: ourFetch,
+      wsClient: subscriptionUrl
+        ? createClient({
+            url: subscriptionUrl,
+          })
+        : undefined,
     }),
     [explain, url, subscriptionUrl, ourFetch],
   );
@@ -226,7 +235,7 @@ export const useFetcher = (
     };
     return async function (
       ...args: Parameters<Fetcher>
-    ): Promise<FetcherReturnType> {
+    ): Promise<Awaited<FetcherReturnType>> {
       const result = await fetcher(...args);
 
       // Short circuit the introspection query so as to not confuse people
@@ -239,19 +248,21 @@ export const useFetcher = (
       }, 100);
       if ("subscribe" in result) {
         // TODO: support wrapping subscriptions
-      } else if ("next" in result && typeof result.next === "function") {
+        return result;
+      } else if (isAsyncIterable(result)) {
+        const iterator = result[Symbol.asyncIterator]();
         // Return a new iterator, equivalent to the old, but that calls 'processPayload'
         return {
-          throw: result.throw?.bind(result),
-          return: result.return?.bind(result),
+          throw: iterator.throw?.bind(iterator),
+          return: iterator.return?.bind(iterator),
           next(...args) {
-            const n = result.next(...args);
-            if (typeof n.then === "function") {
+            const n = iterator.next(...args);
+            if (isPromise(n)) {
               return n.then(({ done, value }: any) => {
                 return { done, value: processPayload(value) };
               });
             } else {
-              const { done, value } = n;
+              const { done, value } = n as unknown as Awaited<typeof n>;
               return { done, value: processPayload(value) };
             }
           },
@@ -260,7 +271,7 @@ export const useFetcher = (
           },
         } as AsyncIterableIterator<any>;
       } else {
-        return processPayload(result);
+        return processPayload(result) as any;
       }
     };
   }, [fetcher, verbose]);

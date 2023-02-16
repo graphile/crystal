@@ -66,6 +66,11 @@ export interface ServerOptions {
    * Temporary hack to allow easy testing with graphql-http.com
    */
   dangerouslyAllowAllCORSRequests?: boolean;
+
+  /**
+   * Should we enable a websockets transport if available?
+   */
+  websockets?: boolean;
 }
 
 declare global {

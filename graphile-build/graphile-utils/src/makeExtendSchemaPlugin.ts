@@ -976,11 +976,14 @@ export function makeExtendSchemaPlugin(
     fields: ReadonlyArray<FieldDefinitionNode> | undefined,
     resolvers: Resolvers,
     plans: Plans,
-    {
-      fieldWithHooks,
-    }: GraphileBuild.ContextInterfaceFields | GraphileBuild.ContextObjectFields,
+    context:
+      | GraphileBuild.ContextInterfaceFields
+      | GraphileBuild.ContextObjectFields,
     build: GraphileBuild.Build,
   ) {
+    const { fieldWithHooks } = context;
+    const isRootSubscription =
+      "isRootSubscription" in context.scope && context.scope.isRootSubscription;
     if (!build.graphql.isNamedType(SelfGeneric)) {
       throw new Error("getFields only supports named types");
     }

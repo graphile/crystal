@@ -1,5 +1,7 @@
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import { parse as parseQueryString } from "node:querystring";
+import { makeServer, CloseCode } from "graphql-ws";
+import { execute, hookArgs, subscribe } from "grafast";
 
 import { GrafservBase } from "../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
@@ -226,11 +228,93 @@ export class NodeGrafservBase extends GrafservBase {
       }
     };
   }
+
+  async attachWebsocketsToServer(server: Server) {
+    const graphqlPath = this.resolvedPreset.server?.graphqlPath ?? "/graphql";
+    const ws = await import("ws");
+    const { WebSocketServer } = ws;
+    const graphqlWsServer = makeServer({
+      schema: async () => this.getSchema(),
+      execute: (args) => {
+        hookArgs(
+          args,
+          {
+            // TODO: we need to pass through some request context here
+          },
+          this.resolvedPreset,
+        );
+        return execute(args, this.resolvedPreset);
+      },
+      subscribe: (args) => {
+        hookArgs(
+          args,
+          {
+            // TODO: we need to pass through some request context here
+          },
+          this.resolvedPreset,
+        );
+        return subscribe(args, this.resolvedPreset);
+      },
+    });
+    const wsServer = new WebSocketServer({ noServer: true });
+    server.on("upgrade", (req, socket, head) =>
+      wsServer.handleUpgrade(req, socket, head, function done(ws) {
+        wsServer.emit("connection", ws, req);
+      }),
+    );
+    wsServer.on("connection", (socket, request) => {
+      const fullUrl = request.url;
+      if (!fullUrl) {
+        return;
+      }
+      const q = fullUrl.indexOf("?");
+      const url = q >= 0 ? fullUrl.substring(0, q) : fullUrl;
+      if (url === graphqlPath) {
+        // a new socket opened, let graphql-ws take over
+        const closed = graphqlWsServer.opened(
+          {
+            protocol: socket.protocol, // will be validated
+            send: (data) =>
+              new Promise((resolve, reject) => {
+                socket.send(data, (err) => (err ? reject(err) : resolve()));
+              }), // control your data flow by timing the promise resolve
+            close: (code, reason) => socket.close(code, reason), // there are protocol standard closures
+            onMessage: (cb) =>
+              socket.on("message", async (event) => {
+                try {
+                  // wait for the the operation to complete
+                  // - if init message, waits for connect
+                  // - if query/mutation, waits for result
+                  // - if subscription, waits for complete
+                  await cb(event.toString());
+                } catch (err) {
+                  try {
+                    // all errors that could be thrown during the
+                    // execution of operations will be caught here
+                    socket.close(CloseCode.InternalServerError, err.message);
+                  } catch {
+                    /*noop*/
+                  }
+                }
+              }),
+          },
+          // pass values to the `extra` field in the context
+          { socket, request },
+        );
+
+        // notify server that the socket closed
+        socket.once("close", closed);
+      }
+    });
+  }
 }
 
 export class NodeGrafserv extends NodeGrafservBase {
   async addTo(server: Server) {
     server.on("request", this._createHandler());
+    if (this.resolvedPreset.server?.websockets) {
+      this.attachWebsocketsToServer(server);
+    }
   }
 }
 
