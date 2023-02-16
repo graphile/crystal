@@ -1,5 +1,35 @@
 # postgraphile
 
+## 5.0.0-0.21
+
+### Patch Changes
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`1e5671cdb`](https://github.com/benjie/postgraphile-private/commit/1e5671cdbbf9f4600b74c43eaa7e33b7bfd75fb9)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for websocket
+  GraphQL subscriptions (via graphql-ws) to grafserv and PostGraphile (currently
+  supporting Node, Express, Koa and Fastify)
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`5b634a78e`](https://github.com/benjie/postgraphile-private/commit/5b634a78e51816071447aceb1edfb813d77d563b)
+  Thanks [@benjie](https://github.com/benjie)! - Standardize on `serv.addTo`
+  interface, even for Node
+
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`e11698473`](https://github.com/benjie/postgraphile-private/commit/e1169847303790570bfafa07eb25d8fce53a0391),
+  [`1e5671cdb`](https://github.com/benjie/postgraphile-private/commit/1e5671cdbbf9f4600b74c43eaa7e33b7bfd75fb9),
+  [`fb40bd97b`](https://github.com/benjie/postgraphile-private/commit/fb40bd97b8a36da91c6b08e0ce67f1a9419ad91f),
+  [`a1158d83e`](https://github.com/benjie/postgraphile-private/commit/a1158d83e2d26f7da0182ec2b651f7f1ec202f14),
+  [`5b634a78e`](https://github.com/benjie/postgraphile-private/commit/5b634a78e51816071447aceb1edfb813d77d563b),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - @dataplan/pg@0.0.1-0.16
+  - grafast@0.0.1-0.12
+  - ruru@2.0.0-0.10
+  - grafserv@0.0.1-0.14
+  - graphile-build@5.0.0-0.16
+  - graphile-build-pg@5.0.0-0.19
+
 ## 5.0.0-0.20
 
 ### Patch Changes

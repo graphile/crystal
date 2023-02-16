@@ -1,5 +1,19 @@
 # graphile-build
 
+## 5.0.0-0.16
+
+### Patch Changes
+
+- [#198](https://github.com/benjie/postgraphile-private/pull/198)
+  [`a1158d83e`](https://github.com/benjie/postgraphile-private/commit/a1158d83e2d26f7da0182ec2b651f7f1ec202f14)
+  Thanks [@benjie](https://github.com/benjie)! - Gather phase initialState may
+  now be asynchronous. If initialCache returns a promise, a helpful error
+  message with advice is now raised.
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - grafast@0.0.1-0.12
+
 ## 5.0.0-0.15
 
 ### Patch Changes

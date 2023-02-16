@@ -1,5 +1,24 @@
 # @dataplan/pg
 
+## 0.0.1-0.16
+
+### Patch Changes
+
+- [#197](https://github.com/benjie/postgraphile-private/pull/197)
+  [`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36)
+  Thanks [@benjie](https://github.com/benjie)! - Fix importing subpaths via ESM
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`fb40bd97b`](https://github.com/benjie/postgraphile-private/commit/fb40bd97b8a36da91c6b08e0ce67f1a9419ad91f)
+  Thanks [@benjie](https://github.com/benjie)! - Move PgSubscriber to
+  @dataplan/pg/adaptors/pg and automatically build it if you set `pubsub: true`
+  in your `makePgConfig` call.
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - grafast@0.0.1-0.12
+  - @dataplan/json@0.0.1-0.12
+
 ## 0.0.1-0.15
 
 ### Patch Changes

@@ -1,5 +1,27 @@
 # graphile-utils
 
+## 5.0.0-0.19
+
+### Patch Changes
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`9f85b0308`](https://github.com/benjie/postgraphile-private/commit/9f85b030896d335ee2d0da2b93c3784d0eb841ea)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bugs around handling of the
+  plans/resolvers objects.
+
+- [#198](https://github.com/benjie/postgraphile-private/pull/198)
+  [`f9948e4e9`](https://github.com/benjie/postgraphile-private/commit/f9948e4e913299ca4f3858d45105790df2acaa89)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in
+  makePgSmartTagsPlugin that prevented smart tags being loaded early enough from
+  files.
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`a1158d83e`](https://github.com/benjie/postgraphile-private/commit/a1158d83e2d26f7da0182ec2b651f7f1ec202f14),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - grafast@0.0.1-0.12
+  - graphile-build@5.0.0-0.16
+  - graphile-build-pg@5.0.0-0.19
+
 ## 5.0.0-0.18
 
 ### Patch Changes

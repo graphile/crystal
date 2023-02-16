@@ -1,5 +1,18 @@
 # grafast
 
+## 0.0.1-0.12
+
+### Patch Changes
+
+- [#197](https://github.com/benjie/postgraphile-private/pull/197)
+  [`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36)
+  Thanks [@benjie](https://github.com/benjie)! - Fix importing subpaths via ESM
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in 'listen' error
+  message causing additional error to be thrown.
+
 ## 0.0.1-0.11
 
 ### Patch Changes
