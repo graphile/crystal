@@ -1084,13 +1084,19 @@ on (${sql.indent(
     for (let i = 0; i < orderCount; i++) {
       const order = this.orders[i];
       if (i === orderCount - 1) {
-        // PK
-        identifierPlaceholders[i] = this.placeholder(
-          toPg(access($parsedCursorPlan, [i + 1]), TYPES.json),
-          TYPES.json,
-        );
+        // PK (within that polymorphic type)
+
+        // NOTE: this is a JSON-encoded string containing all the PK values. We
+        // don't want to parse it and then re-stringify it, so we'll just feed
+        // it in as text and then cast it ourself:
+        // HACK: would be better to have the placeholder be 'json' type, not
+        // 'text' type.
+        identifierPlaceholders[i] = sql`(${this.placeholder(
+          access($parsedCursorPlan, [i + 1]),
+          TYPES.text,
+        )})::json`;
       } else if (i === orderCount - 2) {
-        // Type
+        // Polymorphic type
         identifierPlaceholders[i] = this.placeholder(
           toPg(access($parsedCursorPlan, [i + 1]), TYPES.text),
           TYPES.text,

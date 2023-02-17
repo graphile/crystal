@@ -1,7 +1,10 @@
 import "graphile-config";
 
 import { EXPORTABLE } from "graphile-export";
-import type { GraphQLScalarLiteralParser } from "graphql";
+import type {
+  GraphQLScalarLiteralParser,
+  GraphQLScalarValueParser,
+} from "graphql";
 
 import { version } from "../version.js";
 
@@ -139,7 +142,37 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           nonNullNode: false,
         });
 
-        if (jsonScalarAsString !== true) {
+        if (jsonScalarAsString === true) {
+          build.registerScalarType(
+            inflection.builtin("JSON"),
+            {},
+            () => ({
+              description: build.wrapDescription(
+                "A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).",
+                "type",
+              ),
+              parseLiteral: EXPORTABLE(
+                (Kind) =>
+                  ((ast, _variables) => {
+                    if (ast.kind === Kind.STRING) {
+                      return JSON.parse(ast.value);
+                    } else {
+                      return undefined;
+                    }
+                  }) as GraphQLScalarLiteralParser<any>,
+                [Kind],
+              ),
+              parseValue: EXPORTABLE(
+                () =>
+                  ((value) =>
+                    JSON.parse(value as any)) as GraphQLScalarValueParser<any>,
+                [],
+              ),
+              serialize: EXPORTABLE(() => (value) => JSON.stringify(value), []),
+            }),
+            "graphile-build built-in (JSON type; simple)",
+          );
+        } else {
           const parseLiteral: GraphQLScalarLiteralParser<any> = EXPORTABLE(
             (Kind) => {
               const parseLiteralToObject: GraphQLScalarLiteralParser<any> = (
@@ -178,15 +211,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                     return undefined;
                 }
               };
-              const parseLiteral: GraphQLScalarLiteralParser<any> = (
-                ast,
-                variables,
-              ): any => {
-                const obj = parseLiteralToObject(ast, variables);
-                return JSON.stringify(obj);
-              };
-
-              return parseLiteral;
+              return parseLiteralToObject;
             },
             [Kind],
           );
@@ -198,30 +223,11 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 `Represents JSON values as specified by ` +
                 "[ECMA-404](http://www.ecma-international.org/" +
                 "publications/files/ECMA-ST/ECMA-404.pdf).",
-              serialize: EXPORTABLE(
-                () => (value) => value == null ? value : JSON.parse("" + value),
-                [],
-              ),
-              parseValue: EXPORTABLE(
-                () => (value) => JSON.stringify(value),
-                [],
-              ),
+              serialize: EXPORTABLE(() => (value) => value, []),
+              parseValue: EXPORTABLE(() => (value) => value, []),
               parseLiteral,
             }),
             "graphile-build built-in (JSON type; extended)",
-          );
-        } else {
-          build.registerScalarType(
-            inflection.builtin("JSON"),
-            {},
-            () =>
-              stringTypeSpec(
-                build.wrapDescription(
-                  "A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).",
-                  "type",
-                ),
-              ),
-            "graphile-build built-in (JSON type; simple)",
           );
         }
         build.registerCursorConnection?.({
