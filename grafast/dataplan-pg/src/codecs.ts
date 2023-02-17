@@ -793,6 +793,8 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
 };
 
 const parseAsInt = (n: string) => parseInt(n, 10);
+const jsonParse = (s: string) => JSON.parse(s);
+const jsonStringify = (o: any) => JSON.stringify(o);
 
 const stripSubnet32 = {
   fromPg(value: string) {
@@ -833,8 +835,8 @@ export const TYPES = {
   varchar: t<string>("1043", "varchar", verbatim),
   text: t<string>("25", "text", verbatim),
   name: t<string>("19", "name", verbatim),
-  json: t<string>("114", "json"),
-  jsonb: t<string>("3802", "jsonb"),
+  json: t<string>("114", "json", { fromPg: jsonParse, toPg: jsonStringify }),
+  jsonb: t<string>("3802", "jsonb", { fromPg: jsonParse, toPg: jsonStringify }),
   xml: t<string>("142", "xml"),
   citext: t<string>(undefined, "citext", verbatim),
   uuid: t<string>("2950", "uuid", verbatim),

@@ -3,22 +3,22 @@
     json: "{\"a\":1,\"b\":2,\"c\":3}",
   },
   jsonbIdentityMutation: {
-    json: "{\"a\": 1, \"b\": 2, \"c\": 3}",
+    json: "{\"a\":1,\"b\":2,\"c\":3}",
   },
   jsonIdentityMutationIssue85: {
     json: "[{\"amount\":\"44\"},{\"amount\":null}]",
   },
   jsonbIdentityMutationIssue85: {
-    json: "[{\"amount\": \"44\"}, {\"amount\": null}]",
+    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
   },
   jsonbIdentityMutationPlpgsqlIssue85: {
-    json: "[{\"amount\": \"44\"}, {\"amount\": null}]",
+    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
   },
   jsonbIdentityMutationPlpgsqlWithDefaultIssue85: {
     json: "[]",
   },
   jsonbIdentityMutationPlpgsqlOverridingDefaultIssue85: {
-    json: "[{\"amount\": \"44\"}, {\"amount\": null}]",
+    json: "[{\"amount\":\"44\"},{\"amount\":null}]",
   },
   add1Mutation: {
     clientMutationId: null,
