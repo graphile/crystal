@@ -116,8 +116,8 @@ import {
 import {
   PgConditionCapableParentStep,
   PgConditionStep,
-  pgWhereConditionSpecListToSQL,
   PgConditionStepExtensions,
+  pgWhereConditionSpecListToSQL,
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
 import { pgDelete, PgDeleteStep } from "./steps/pgDelete.js";
@@ -201,7 +201,6 @@ export {
   PgConditionCapableParentStep,
   PgConditionLikeStep,
   PgConditionStep,
-  pgWhereConditionSpecListToSQL,
   PgConditionStepExtensions,
   PgCursorStep,
   PgDecode,
@@ -301,6 +300,7 @@ export {
   PgUpdateStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
+  pgWhereConditionSpecListToSQL,
   PlanByUniques,
   rangeOfCodec,
   recordType,
