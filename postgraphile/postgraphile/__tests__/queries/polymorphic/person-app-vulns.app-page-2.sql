@@ -12,7 +12,7 @@ from (
     (ids.value->>0)::"int4" as "id0",
     (ids.value->>1)::"int4" as "id1",
     (ids.value->>2)::"text" as "id2",
-    (ids.value->>3)::"json" as "id3"
+    (ids.value->>3)::"text" as "id3"
   from json_array_elements($1::json) with ordinality as ids
 ) as __union_identifiers__,
 lateral (
@@ -40,7 +40,7 @@ lateral (
           or (
             'AwsApplication' = __union_identifiers__."id2"
             and (
-              __aws_applications__."id" > (__union_identifiers__."id3"->>0)::"int4"
+              __aws_applications__."id" > ((__union_identifiers__."id3")::json->>0)::"int4"
             )
           )
         )
@@ -68,7 +68,7 @@ lateral (
           or (
             'GcpApplication' = __union_identifiers__."id2"
             and (
-              __gcp_applications__."id" > (__union_identifiers__."id3"->>0)::"int4"
+              __gcp_applications__."id" > ((__union_identifiers__."id3")::json->>0)::"int4"
             )
           )
         )
