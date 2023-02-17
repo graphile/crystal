@@ -117,6 +117,7 @@ import {
   PgConditionCapableParentStep,
   PgConditionStep,
   PgConditionStepExtensions,
+  pgWhereConditionSpecListToSQL,
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
 import { pgDelete, PgDeleteStep } from "./steps/pgDelete.js";
@@ -299,6 +300,7 @@ export {
   PgUpdateStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
+  pgWhereConditionSpecListToSQL,
   PlanByUniques,
   rangeOfCodec,
   recordType,
@@ -338,6 +340,7 @@ exportAsMany("@dataplan/pg", {
   pgClassExpression,
   PgClassExpressionStep,
   PgConditionStep,
+  pgWhereConditionSpecListToSQL,
   PgCursorStep,
   pgDelete,
   PgDeleteStep,

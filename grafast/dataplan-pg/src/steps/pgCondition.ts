@@ -50,9 +50,10 @@ export type PgConditionStepMode =
   | "NOT"
   | PgConditionStepResolvedMode;
 
-export class PgConditionStep<
-  TParentStep extends PgConditionCapableParentStep,
-> extends ModifierStep<TParentStep> {
+export class PgConditionStep<TParentStep extends PgConditionCapableParentStep>
+  extends ModifierStep<TParentStep>
+  implements PgConditionCapableParentStep
+{
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgConditionStep",
@@ -141,47 +142,17 @@ export class PgConditionStep<
   }
 
   private transform(conditions: PgWhereConditionSpec<any>[]): SQL | null {
-    const mappedConditions = [];
-    for (const c of conditions) {
-      if (sql.isSQL(c)) {
-        if (sql.isEquivalent(c, sql.blank)) {
-          continue;
-        }
-        const frag = sql.parens(c);
-        mappedConditions.push(
-          sql.indent(
-            this.mode.mode === "NOT" ? sql.parens(sql`not ${frag}`) : frag,
-          ),
-        );
-        continue;
-      } else {
-        switch (c.type) {
-          case "attribute": {
-            const frag = c.callback(
-              sql`${this.alias}.${sql.identifier(c.attribute)}`,
-            );
-            mappedConditions.push(
-              sql.indent(
-                this.mode.mode === "NOT" ? sql.parens(sql`not ${frag}`) : frag,
-              ),
-            );
-            continue;
-          }
-          default: {
-            const never: never = c.type;
-            throw new Error(`Unsupported condition: ` + (never as any));
-          }
-        }
-      }
-    }
-    if (mappedConditions.length === 0) {
+    const sqlCondition = pgWhereConditionSpecListToSQL(
+      this.alias,
+      conditions,
+      this.mode.mode === "OR" ? "or" : "and",
+      this.mode.mode === "NOT"
+        ? (frag) => sql.parens(sql`not ${sql.parens(frag)}`)
+        : (frag) => frag,
+    );
+    if (sqlCondition === null) {
       return null;
     }
-    const joined = sql.join(
-      mappedConditions,
-      this.mode.mode === "OR" ? "\nor\n" : "\nand\n",
-    );
-    const sqlCondition = sql.parens(joined);
 
     switch (this.mode.mode) {
       case "PASS_THRU": {
@@ -242,4 +213,41 @@ where ${sqlCondition}`})`;
       }
     }
   }
+}
+
+export function pgWhereConditionSpecListToSQL(
+  alias: SQL,
+  conditions: PgWhereConditionSpec<any>[],
+  andOr: "and" | "or" = "and",
+  transform: (frag: SQL) => SQL = (frag) => frag,
+): SQL | null {
+  const mappedConditions = [];
+  for (const c of conditions) {
+    if (sql.isSQL(c)) {
+      if (sql.isEquivalent(c, sql.blank)) {
+        continue;
+      }
+      const frag = sql.parens(c);
+      mappedConditions.push(sql.indent(transform(frag)));
+      continue;
+    } else {
+      switch (c.type) {
+        case "attribute": {
+          const frag = c.callback(sql`${alias}.${sql.identifier(c.attribute)}`);
+          mappedConditions.push(sql.indent(transform(frag)));
+          continue;
+        }
+        default: {
+          const never: never = c.type;
+          throw new Error(`Unsupported condition: ` + (never as any));
+        }
+      }
+    }
+  }
+  if (mappedConditions.length === 0) {
+    return null;
+  }
+  const joined = sql.join(mappedConditions, `\n${andOr}\n`);
+  const sqlCondition = sql.parens(joined);
+  return sqlCondition;
 }
