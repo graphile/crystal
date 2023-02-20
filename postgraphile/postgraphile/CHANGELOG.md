@@ -1,5 +1,21 @@
 # postgraphile
 
+## 5.0.0-0.23
+
+### Patch Changes
+
+- [#201](https://github.com/benjie/postgraphile-private/pull/201)
+  [`dca706ad9`](https://github.com/benjie/postgraphile-private/commit/dca706ad99b1cd2b98872581b86bd4b22c7fd5f4)
+  Thanks [@benjie](https://github.com/benjie)! - JSON now works how most users
+  would expect it to.
+
+- Updated dependencies
+  [[`a14bd2288`](https://github.com/benjie/postgraphile-private/commit/a14bd2288532b0977945d1c0508e51baef6dba2b),
+  [`dca706ad9`](https://github.com/benjie/postgraphile-private/commit/dca706ad99b1cd2b98872581b86bd4b22c7fd5f4)]:
+  - @dataplan/pg@0.0.1-0.18
+  - graphile-build@5.0.0-0.18
+  - graphile-build-pg@5.0.0-0.21
+
 ## 5.0.0-0.22
 
 ### Patch Changes
