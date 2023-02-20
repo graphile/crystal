@@ -117,6 +117,8 @@ import {
   PgConditionCapableParentStep,
   PgConditionStep,
   PgConditionStepExtensions,
+  PgHavingConditionSpec,
+  PgWhereConditionSpec,
   pgWhereConditionSpecListToSQL,
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
@@ -220,6 +222,7 @@ export {
   PgExecutorOptions,
   PgFunctionSourceOptions,
   PgGroupSpec,
+  PgHavingConditionSpec,
   PgHStore,
   pgInsert,
   PgInsertStep,
@@ -300,6 +303,7 @@ export {
   PgUpdateStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
+  PgWhereConditionSpec,
   pgWhereConditionSpecListToSQL,
   PlanByUniques,
   rangeOfCodec,
