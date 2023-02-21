@@ -1335,9 +1335,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
                 context,
                 queryValues:
                   identifierIndex != null
-                    ? this.queryValues.map(({ dependencyIndex, codec }) =>
-                        codec.toPg(values[dependencyIndex][i]),
-                      )
+                    ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                        const val = values[dependencyIndex][i];
+                        return val == null ? null : codec.toPg(val);
+                      })
                     : EMPTY_ARRAY,
               };
             }),
@@ -1360,9 +1361,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             context,
             queryValues:
               identifierIndex != null
-                ? this.queryValues.map(({ dependencyIndex, codec }) =>
-                    codec.toPg(values[dependencyIndex][i]),
-                  )
+                ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                    const val = values[dependencyIndex][i];
+                    return val == null ? val : codec.toPg(val);
+                  })
                 : EMPTY_ARRAY,
           };
         }),

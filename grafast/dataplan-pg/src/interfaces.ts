@@ -139,11 +139,15 @@ export interface PgTypeCodec<
   /**
    * Given a value of type TFromJavaScript, returns an `SQL` value to insert into an SQL
    * statement.
+   *
+   * **IMPORTANT**: nulls must already be handled!
    */
   toPg: PgEncode<TFromJavaScript>;
 
   /**
    * Given a text value from PostgreSQL, returns the value cast to TCanonical.
+   *
+   * **IMPORTANT**: nulls must already be handled!
    */
   fromPg: PgDecode<TFromJavaScript, TFromPostgres>;
 

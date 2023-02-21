@@ -1,7 +1,7 @@
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
-import { parse as rangeParse } from "postgres-range";
+import { Range, parse as rangeParse } from "postgres-range";
 
 import type {
   PgBox,
@@ -44,13 +44,10 @@ import type {
   PgTypeCodecExtensions,
   PgTypeCodecPolymorphism,
 } from "./interfaces.js";
+import { JSONValue } from "grafast";
 
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
-
-// FIXME: the `toPg` method should currently never be called with
-// null/undefined; but this does happen quite often. Instead we should
-// auto-handle null/undefined in toPg.
 
 export type PgTypeColumnViaExplicit = { relation: string; attribute: string };
 export type PgTypeColumnVia = string | PgTypeColumnViaExplicit;
@@ -315,7 +312,7 @@ function realColumnDefs(
  */
 function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
   columns: TColumns,
-): (value: any) => SQLRawValue {
+): PgEncode<Record<string, unknown>> {
   const columnDefs = realColumnDefs(columns);
   return (value) => {
     const values = columnDefs.map(([columnName, spec]) => {
@@ -387,7 +384,7 @@ export function recordType<TColumns extends PgTypeColumns>(
   columns?: TColumns,
   extensions?: Partial<PgTypeCodecExtensions>,
   isAnonymous?: boolean,
-): PgTypeCodec<TColumns, string, object> {
+): PgTypeCodec<TColumns, string, Record<string, any>> {
   if (typeof configOrName === "string") {
     return realRecordType({
       name: configOrName,
@@ -517,25 +514,25 @@ export function listOfType<
   > = {
     name: innerCodec.name + "[]",
     sqlType: identifier,
-    // FIXME: this does __NOT__ handle nulls safely!
     fromPg: (value) =>
-      value == null
-        ? null
-        : (arrayParse(value)
-            .flat(100)
-            .map((v) => innerCodec.fromPg(v)) as any),
-    // FIXME: this does __NOT__ handle nulls safely!
+      arrayParse(value)
+        .flat(100)
+        .map((v) => (v == null ? null : innerCodec.fromPg(v))) as any,
     toPg: (value) => {
-      if (!value) {
-        return null;
-      }
-      const encoded = value.map((v) => {
+      let result = "{";
+      for (let i = 0, l = value.length; i < l; i++) {
+        if (i > 0) {
+          result += typeDelim;
+        }
+        const v = value[i];
         if (v == null) {
-          return "NULL";
+          result += "NULL";
+          continue;
         }
         const str = innerCodec.toPg(v);
         if (str == null) {
-          return "NULL";
+          result += "NULL";
+          continue;
         }
         if (typeof str !== "string" && typeof str !== "number") {
           throw new Error(
@@ -547,10 +544,10 @@ export function listOfType<
         // > To put a double quote or backslash in a quoted array element
         // > value, precede it with a backslash.
         // -- https://www.postgresql.org/docs/current/arrays.html#ARRAYS-IO
-        return `"${String(str).replace(/[\\"]/g, "\\$&")}"`;
-      });
-
-      return `{${encoded.join(typeDelim)}}`;
+        result += `"${String(str).replace(/[\\"]/g, "\\$&")}"`;
+      }
+      result += "}";
+      return result;
     },
     columns: undefined,
     extensions,
@@ -616,9 +613,14 @@ function escapeRangeValue(
   if (value == null) {
     return "";
   }
-  const encoded = "" + innerCodec.toPg(value);
+  const encoded = "" + (innerCodec.toPg(value) ?? "");
   // PERF: we don't always need to do this
   return `"${encoded.replace(/"/g, '""')}"`;
+}
+
+interface PgRange<T> {
+  start: { value: T; inclusive: boolean } | null;
+  end: { value: T; inclusive: boolean } | null;
 }
 
 /**
@@ -637,12 +639,7 @@ export function rangeOfCodec<
   name: string,
   identifier: SQL,
   config: { extensions?: Partial<PgTypeCodecExtensions> } = {},
-): PgTypeCodec<
-  undefined,
-  any, // TODO
-  any, // TODO
-  undefined
-> {
+): PgTypeCodec<undefined, string, PgRange<unknown>, undefined> {
   const { extensions } = config;
   const needsCast = innerCodec.castFromPg;
 
@@ -675,6 +672,7 @@ export function rangeOfCodec<
           },
         }
       : null),
+    // TODO: shouldn't these include `innerCodec.fromPg` calls for internal values?
     fromPg: needsCast
       ? function (value) {
           const json = JSON.parse(value);
@@ -794,7 +792,7 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
 
 const parseAsInt = (n: string) => parseInt(n, 10);
 const jsonParse = (s: string) => JSON.parse(s);
-const jsonStringify = (o: any) => JSON.stringify(o);
+const jsonStringify = (o: JSONValue) => JSON.stringify(o);
 
 const stripSubnet32 = {
   fromPg(value: string) {
@@ -835,8 +833,14 @@ export const TYPES = {
   varchar: t<string>("1043", "varchar", verbatim),
   text: t<string>("25", "text", verbatim),
   name: t<string>("19", "name", verbatim),
-  json: t<string>("114", "json", { fromPg: jsonParse, toPg: jsonStringify }),
-  jsonb: t<string>("3802", "jsonb", { fromPg: jsonParse, toPg: jsonStringify }),
+  json: t<JSONValue, string>("114", "json", {
+    fromPg: jsonParse,
+    toPg: jsonStringify,
+  }),
+  jsonb: t<JSONValue, string>("3802", "jsonb", {
+    fromPg: jsonParse,
+    toPg: jsonStringify,
+  }),
   xml: t<string>("142", "xml"),
   citext: t<string>(undefined, "citext", verbatim),
   uuid: t<string>("2950", "uuid", verbatim),

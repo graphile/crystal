@@ -1,4 +1,4 @@
-import type { GrafastResultsList, GrafastValuesList } from "grafast";
+import { ExecutionExtra, UnbatchedExecutableStep } from "grafast";
 import { ExecutableStep } from "grafast";
 
 import type { PgTypeCodec } from "../interfaces.js";
@@ -11,7 +11,7 @@ import type { PgTypeCodec } from "../interfaces.js";
  *
  * @internal
  */
-export class ToPgStep extends ExecutableStep<any> {
+export class ToPgStep extends UnbatchedExecutableStep<any> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ToPgStep",
@@ -28,8 +28,8 @@ export class ToPgStep extends ExecutableStep<any> {
     return peers.filter((peer) => peer.codec === this.codec);
   }
 
-  execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
-    return values[0].map(this.codec.toPg);
+  unbatchedExecute(_extra: ExecutionExtra, v: any) {
+    return v == null ? null : this.codec.toPg(v);
   }
 }
 
