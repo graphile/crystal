@@ -573,7 +573,7 @@ ${te.join(
     const fieldName = field.name.value; // Unaffected by alias.
     const rootTypeFields = rootType.getFields();
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
-    const subscriptionPlanResolver =
+    const rawSubscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
     const path = [field.alias?.value ?? fieldName];
     const locationDetails: LocationDetails = {
@@ -581,13 +581,16 @@ ${te.join(
       fieldName,
       node: this.operation.selectionSet.selections,
     };
+
+    const subscriptionPlanResolver = rawSubscriptionPlanResolver;
+
+    const trackedArguments = withGlobalLayerPlan(
+      this.rootLayerPlan,
+      POLYMORPHIC_ROOT_PATHS,
+      () => this.getTrackedArguments(rootType, field),
+    );
     if (subscriptionPlanResolver) {
       // PERF: optimize this
-      const trackedArguments = withGlobalLayerPlan(
-        this.rootLayerPlan,
-        POLYMORPHIC_ROOT_PATHS,
-        () => this.getTrackedArguments(rootType, field),
-      );
       const { haltTree, step: subscribeStep } = this.planField(
         this.rootLayerPlan,
         path,
@@ -665,11 +668,49 @@ ${te.join(
         selectionSet.selections,
       );
     } else {
-      // FIXME: take the regular GraphQL subscription resolver and convert it to a plan. (Lambda plan?)
-      const subscribeStep = this.trackedRootValueStep;
-      this.rootLayerPlan.setRootStep(subscribeStep);
+      const subscribeStep = withGlobalLayerPlan(
+        this.rootLayerPlan,
+        POLYMORPHIC_ROOT_PATHS,
+        () => {
+          const $args = object(
+            field.arguments?.reduce((memo, arg) => {
+              memo[arg.name.value] = trackedArguments.get(arg.name.value);
+              return memo;
+            }, Object.create(null)) ?? Object.create(null),
+          );
+          const rawResolver = fieldSpec.resolve;
+          const rawSubscriber = fieldSpec.subscribe;
+          return graphqlResolver(
+            rawResolver,
+            rawSubscriber,
+            this.trackedRootValueStep,
+            $args,
+            {
+              fieldName,
+              fieldNodes: fields,
+              fragments: this.fragments,
+              operation: this.operation,
+              parentType: this.subscriptionType!,
+              returnType: fieldSpec.type,
+              schema: this.schema,
+              // @ts-ignore
+              path: {
+                typename: this.subscriptionType!.name,
+                key: fieldName,
+                prev: undefined,
+              },
+            },
+          );
+        },
+      );
+      const stepOptions: StepOptions = {
+        stream: isStreamableStep(subscribeStep as ExecutableStep<any>)
+          ? { initialCount: 0 }
+          : null,
+      };
+      subscribeStep._stepOptions = stepOptions;
 
-      this.deduplicateSteps();
+      this.rootLayerPlan.setRootStep(subscribeStep);
 
       const subscriptionEventLayerPlan = new LayerPlan(
         this,
@@ -679,14 +720,39 @@ ${te.join(
         },
         this.rootLayerPlan.polymorphicPaths,
       );
-      subscriptionEventLayerPlan.setRootStep(
-        withGlobalLayerPlan(
-          subscriptionEventLayerPlan,
-          POLYMORPHIC_ROOT_PATHS,
-          // FIXME: is this right?
-          () => new __ItemStep(this.rootValueStep),
-        ),
+
+      // TODO: move this somewhere else
+      const hasItemPlan = (
+        step: ExecutableStep,
+      ): step is ExecutableStep & {
+        itemPlan: ($item: ExecutableStep) => ExecutableStep;
+      } => {
+        return (
+          "itemPlan" in (subscribeStep as any) &&
+          typeof (subscribeStep as any).itemPlan === "function"
+        );
+      };
+
+      const $__item = withGlobalLayerPlan(
+        subscriptionEventLayerPlan,
+        POLYMORPHIC_ROOT_PATHS,
+        () => new __ItemStep(subscribeStep),
       );
+
+      subscriptionEventLayerPlan.setRootStep($__item);
+
+      let streamItemPlan = hasItemPlan(subscribeStep)
+        ? withGlobalLayerPlan(
+            subscriptionEventLayerPlan,
+            POLYMORPHIC_ROOT_PATHS,
+            () => subscribeStep.itemPlan($__item),
+          )
+        : $__item;
+
+      // WE MUST RE-FETCH STEPS AFTER DEDUPLICATION!
+      this.deduplicateSteps();
+      streamItemPlan = this.stepTracker.getStepById(streamItemPlan.id);
+
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
         this.rootValueStep,
@@ -698,13 +764,9 @@ ${te.join(
         outputPlan,
         [],
         POLYMORPHIC_ROOT_PATH,
-        subscribeStep,
+        streamItemPlan,
         rootType,
         selectionSet.selections,
-      );
-      // This is untested, so abort.
-      throw new Error(
-        "GraphileInternalError<2335c655-c656-4e5d-b8f4-d649340bfaea>: using a GraphQL subscribe isn't yet supported",
       );
     }
     if (this.loc) this.loc.pop();
@@ -914,6 +976,7 @@ ${te.join(
          * nothing.
          */
         const rawResolver = objectField.resolve;
+        const rawSubscriber = objectField.subscribe;
 
         /**
          * This will never be the grafast resolver - only ever the user-supplied
@@ -926,6 +989,7 @@ ${te.join(
 
         const resolver =
           resolvedResolver && !usesDefaultResolver ? resolvedResolver : null;
+        const subscriber = rawSubscriber;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
@@ -1063,7 +1127,7 @@ ${te.join(
                 return memo;
               }, Object.create(null)) ?? Object.create(null),
             );
-            return graphqlResolver(resolver, step, $args, {
+            return graphqlResolver(resolver, subscriber, step, $args, {
               fieldName,
               fieldNodes,
               fragments: this.fragments,
