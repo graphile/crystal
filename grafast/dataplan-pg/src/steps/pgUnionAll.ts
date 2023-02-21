@@ -1139,7 +1139,6 @@ on (${sql.indent(
             const pkCol = pk.columns[pkIndex];
             return [
               sql`${digest.alias}.${sql.identifier(pkCol)}`,
-              // FIXME: this is not the correct way of casting.
               sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
                 pkColumns[pkCol].codec.sqlType
               }`,
