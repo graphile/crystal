@@ -750,7 +750,6 @@ ${duration}
 
         // Registers the cursor
         await execute<TOutput>(declareCursorSQL, sqlValues);
-        // FIXME: if the above statement(s) throw an error, is the resulting stream being null okay?
 
         // Ensure we release the cursor now we've registered it.
         try {
@@ -793,7 +792,9 @@ ${duration}
     // Avoids UnhandledPromiseRejection error.
     await Promise.allSettled(promises);
 
-    return { streams: streams as Array<AsyncIterable<TOutput> | GrafastError> };
+    return {
+      streams: streams as Array<AsyncIterable<TOutput> | PromiseLike<never>>,
+    };
   }
 
   public async executeMutation<TData>(

@@ -251,7 +251,7 @@ export type GrafastValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
 export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 export type GrafastResultStreamList<T> = ReadonlyArray<
-  AsyncIterable<PromiseOrDirect<T>> | GrafastError
+  AsyncIterable<PromiseOrDirect<T>> | PromiseLike<never>
 >;
 
 export type BaseGraphQLRootValue = any;
