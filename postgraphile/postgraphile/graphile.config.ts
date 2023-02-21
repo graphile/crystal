@@ -10,6 +10,8 @@ import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /*
 const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
   name: "PrimaryKeyMutationsOnlyPlugin",
@@ -48,6 +50,7 @@ const preset: GraphileConfig.Preset = {
         }
         extend type Subscription {
           sub(topic: String!): Int
+          gql: Int
         }
       `,
       plans: {
@@ -64,6 +67,17 @@ const preset: GraphileConfig.Preset = {
             return listen($pgSubscriber, $topic, ($payload) =>
               object({ sub: jsonParse($payload).get("a" as never) }),
             );
+          },
+          gql: {
+            resolve(e) {
+              return e;
+            },
+            async *subscribe() {
+              for (let i = 0; i < 10; i++) {
+                yield i;
+                await sleep(1000);
+              }
+            },
           },
         },
       },
