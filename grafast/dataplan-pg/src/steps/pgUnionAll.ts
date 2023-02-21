@@ -1160,7 +1160,9 @@ on (${sql.indent(
             return [frag, identifierPlaceholders[i], order.direction];
           }
         })();
-        // FIXME: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
+        // FIXME: _iff_ `orderFragment` is nullable _and_ `order.nulls` is
+        // non-null then we need to factor `NULLS LAST` / `NULLS FIRST` into
+        // this calculation.
         const gt =
           (direction === "ASC" && beforeOrAfter === "after") ||
           (direction === "DESC" && beforeOrAfter === "before");
