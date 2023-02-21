@@ -1791,18 +1791,23 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
     const { text, values: rawSqlValues } = sql.compile(finalQuery, {
       placeholderValues: this.placeholderValues,
     });
+
+    const shouldReverseOrder = this.shouldReverseOrder();
+
+    // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
+
     this.finalizeResults = {
       text,
       rawSqlValues,
       identifierIndex,
-      // FIXME: when streaming we must not set this to true
-      shouldReverseOrder: this.shouldReverseOrder(),
+      shouldReverseOrder,
       name: hash(text),
     };
 
     super.finalize();
   }
 
+  // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
   async execute(
     values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
