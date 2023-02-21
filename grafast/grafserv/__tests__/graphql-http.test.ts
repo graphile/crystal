@@ -30,6 +30,7 @@ for (const audit of audits) {
         }),
       );
     } else {
+      // TODO: remove this, we should allow failing tests even if they're not MUSTs
       console.warn(`Allowing failed test: ${audit.name}`);
     }
   });
