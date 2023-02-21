@@ -362,7 +362,6 @@ ${duration}
     for (const [context, batch] of batches) {
       promises.push(
         (async () => {
-          // FIXME: cache must factor in placeholders.
           let cacheForContext = useCache
             ? (context as any)[this.$$cache]
             : null;
@@ -382,6 +381,9 @@ ${duration}
 
           const scopedCache = cacheForQuery;
 
+          /**
+           * The `identifiersJSON` (`JSON.stringify(queryValues)`) that don't exist in the cache currently.
+           */
           const remaining: string[] = [];
           const remainingDeferreds: Array<Deferred<any[]>> = [];
 
