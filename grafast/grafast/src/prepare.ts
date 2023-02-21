@@ -27,7 +27,7 @@ import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
 import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
-import { $$eventEmitter, $$extensions } from "./interfaces.js";
+import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
 const isTest =
@@ -370,10 +370,12 @@ export function executePreemptive(
     if (
       bucketRootValue != null &&
       subscriptionLayerPlan != null &&
-      !isIterable(bucketRootValue) &&
-      isAsyncIterable(bucketRootValue)
+      Array.isArray(bucketRootValue) &&
+      $$streamMore in bucketRootValue
     ) {
-      const stream = bucketRootValue[Symbol.asyncIterator]();
+      const stream = (bucketRootValue[$$streamMore] as AsyncIterable<any>)[
+        Symbol.asyncIterator
+      ]();
       // Do the async iterable
       let stopped = false;
       const abort = defer<undefined>();

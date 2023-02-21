@@ -211,18 +211,11 @@ export function executeBucket(
       ) => {
         let proto: any;
         if (
-          // Fast-lane for non-objects and simple objects
+          // Fast-lane for non-objects
           typeof value !== "object" ||
-          value === null ||
-          (proto = Object.getPrototypeOf(value)) === null ||
-          proto === Object.prototype
+          value === null
         ) {
           finalResult[resultIndex] = value;
-        } else if (value instanceof Error) {
-          const e =
-            $$error in value ? value : newGrafastError(value, finishedStep.id);
-          finalResult[resultIndex] = e;
-          bucket.hasErrors = true;
         } else if (
           // Detects async iterables (but excludes all the basic types
           // like arrays, Maps, Sets, etc that are also iterables) and
@@ -291,6 +284,16 @@ export function executeBucket(
               promises.push(promise);
             }
           }
+        } else if (
+          (proto = Object.getPrototypeOf(value)) === null ||
+          proto === Object.prototype
+        ) {
+          finalResult[resultIndex] = value;
+        } else if (value instanceof Error) {
+          const e =
+            $$error in value ? value : newGrafastError(value, finishedStep.id);
+          finalResult[resultIndex] = e;
+          bucket.hasErrors = true;
         } else {
           finalResult[resultIndex] = value;
         }
