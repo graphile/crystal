@@ -13253,6 +13253,7 @@ __metadata:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql-http: "npm:^1.16.0"
+    graphql-ws: "npm:^5.11.3"
     jest: "npm:^28.1.0"
     jest-serializer-graphql-schema: "workspace:^"
     koa: "npm:^2.14.1"
@@ -13265,6 +13266,10 @@ __metadata:
   peerDependencies:
     grafast: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
+    ws: ^8.12.1
+  peerDependenciesMeta:
+    ws:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -13542,6 +13547,15 @@ __metadata:
   peerDependencies:
     graphql: ">=0.11 <=15"
   checksum: b3344fb9f625c634caa81855deab2258941e07a48ffba8d2112390c3f38cfd403011acd789abfc4a8d5ea80910bb180240637dfb9e752f928facf3e986078b70
+  languageName: node
+  linkType: hard
+
+"graphql-ws@npm:^5.11.3":
+  version: 5.11.3
+  resolution: "graphql-ws@npm:5.11.3"
+  peerDependencies:
+    graphql: ">=0.11 <=16"
+  checksum: fa652f9c6cae64ddb5afa5ce966e37997581c6f6fb7d69c0736a20a198b81a0c2a125da877ceaec156bc02191f01098a9c145e4c5c23226d06ae109549912939
   languageName: node
   linkType: hard
 
@@ -20100,6 +20114,7 @@ __metadata:
     "@types/react-dom": "npm:^18.0.0"
     graphiql: "npm:^2.2.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql-ws: "npm:^5.11.3"
     jest: "npm:^28.1.0"
     mermaid: "npm:^8.14.0"
     nodemon: "npm:^2.0.15"

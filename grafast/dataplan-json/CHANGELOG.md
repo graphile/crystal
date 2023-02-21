@@ -1,5 +1,32 @@
 # @dataplan/json
 
+## 0.0.1-0.13
+
+### Patch Changes
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - grafast@0.0.1-0.13
+
+## 0.0.1-0.12
+
+### Patch Changes
+
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - grafast@0.0.1-0.12
+
+## 0.0.1-0.11
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)]:
+  - grafast@0.0.1-0.11
+
 ## 0.0.1-0.10
 
 ### Patch Changes

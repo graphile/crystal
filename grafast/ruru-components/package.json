@@ -1,6 +1,6 @@
 {
   "name": "ruru-components",
-  "version": "2.0.0-0.6",
+  "version": "2.0.0-0.7",
   "description": "Grafast-flavoured GraphiQL distribution; the underlying React components",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -42,6 +42,7 @@
     "@graphiql/toolkit": "^0.8.0",
     "@types/node": "^16.11.15",
     "graphiql": "^2.2.0",
+    "graphql-ws": "^5.11.3",
     "mermaid": "^8.14.0",
     "react": ">=16 <17",
     "react-dom": ">=16 <17",

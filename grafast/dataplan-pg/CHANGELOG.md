@@ -1,5 +1,103 @@
 # @dataplan/pg
 
+## 0.0.1-0.18
+
+### Patch Changes
+
+- [#202](https://github.com/benjie/postgraphile-private/pull/202)
+  [`a14bd2288`](https://github.com/benjie/postgraphile-private/commit/a14bd2288532b0977945d1c0508e51baef6dba2b)
+  Thanks [@benjie](https://github.com/benjie)! - Expose
+  pgWhereConditionSpecListToSQL helper function.
+
+- [#201](https://github.com/benjie/postgraphile-private/pull/201)
+  [`dca706ad9`](https://github.com/benjie/postgraphile-private/commit/dca706ad99b1cd2b98872581b86bd4b22c7fd5f4)
+  Thanks [@benjie](https://github.com/benjie)! - JSON now works how most users
+  would expect it to.
+
+## 0.0.1-0.17
+
+### Patch Changes
+
+- [`e5b664b6f`](undefined) - Fix "Cannot find module '../package.json'" error
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - grafast@0.0.1-0.13
+  - @dataplan/json@0.0.1-0.13
+
+## 0.0.1-0.16
+
+### Patch Changes
+
+- [#197](https://github.com/benjie/postgraphile-private/pull/197)
+  [`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36)
+  Thanks [@benjie](https://github.com/benjie)! - Fix importing subpaths via ESM
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`fb40bd97b`](https://github.com/benjie/postgraphile-private/commit/fb40bd97b8a36da91c6b08e0ce67f1a9419ad91f)
+  Thanks [@benjie](https://github.com/benjie)! - Move PgSubscriber to
+  @dataplan/pg/adaptors/pg and automatically build it if you set `pubsub: true`
+  in your `makePgConfig` call.
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - grafast@0.0.1-0.12
+  - @dataplan/json@0.0.1-0.12
+
+## 0.0.1-0.15
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- [#196](https://github.com/benjie/postgraphile-private/pull/196)
+  [`af9bc38c8`](https://github.com/benjie/postgraphile-private/commit/af9bc38c86dddfa776e5d8db117b5cb35dbe2cd7)
+  Thanks [@benjie](https://github.com/benjie)! - Allow passing `pool` directly
+  to `makePgConfig`.
+
+- [#190](https://github.com/benjie/postgraphile-private/pull/190)
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Breaking changes around
+  types and postgres configuration:
+
+  - `GraphileBuild.GraphileResolverContext` renamed to `Grafast.Context`
+  - `GraphileConfig.GraphQLRequestContext` renamed to `Grafast.RequestContext`
+  - `Grafast.PgDatabaseAdaptorOptions` renaed to
+    `GraphileConfig.PgDatabaseAdaptorOptions`
+  - `@dataplan/pg/adaptors/node-postgres` is now `@dataplan/pg/adaptors/pg` due
+    to the bizarre naming of PostgreSQL clients on npm - we've decided to use
+    the module name as the unique identifier
+  - `makePgConfigs`:
+    - is now `makePgConfig` (singular) - so you'll need to wrap it in an array
+      where you use it
+    - no longer exported by `@dataplan/pg` (because it depended on `pg`) -
+      instead each adaptor exposes this helper - so import from
+      `@dataplan/pg/adaptors/node-postgres`
+    - accepts an object parameter containing
+      `{connectionString, schemas, superuserConnectionString}`, rather than
+      multiple string parameters
+  - `makeNodePostgresWithPgClient` -> `makePgAdaptorWithPgClient`
+  - `postgraphile` CLI will now try and respect the adaptor stated in your
+    preset when overriding connection arguments
+  - Removed `Grafast.RequestContext.httpRequest` and instead use
+    `Grafast.RequestContext.node.req/res`; all server adaptors should implement
+    this if appropriate
+
+- [#192](https://github.com/benjie/postgraphile-private/pull/192)
+  [`80091a8e0`](https://github.com/benjie/postgraphile-private/commit/80091a8e0343a162bf2b60cf619267a874a67e60)
+  Thanks [@benjie](https://github.com/benjie)! - - Conflicts in `pgConfigs`
+  (e.g. multiple sources using the same 'name') now detected and output
+  - Fix defaults for `pgSettingsKey` and `withPgClientKey` based on config name
+  - `makePgConfig` now allows passing `pgSettings` callback and
+    `pgSettingsForIntrospection` config object
+  - Multiple postgres sources now works nicely with multiple `makePgConfig`
+    calls
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)]:
+  - @dataplan/json@0.0.1-0.11
+  - grafast@0.0.1-0.11
+  - pg-sql2@5.0.0-0.3
+
 ## 0.0.1-0.14
 
 ### Patch Changes

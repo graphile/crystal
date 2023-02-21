@@ -1,5 +1,61 @@
 # graphile-utils
 
+## 5.0.0-0.21
+
+### Patch Changes
+
+- Updated dependencies
+  [[`dca706ad9`](https://github.com/benjie/postgraphile-private/commit/dca706ad99b1cd2b98872581b86bd4b22c7fd5f4)]:
+  - graphile-build@5.0.0-0.18
+  - graphile-build-pg@5.0.0-0.21
+
+## 5.0.0-0.20
+
+### Patch Changes
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - grafast@0.0.1-0.13
+  - graphile-build-pg@5.0.0-0.20
+  - graphile-build@5.0.0-0.17
+
+## 5.0.0-0.19
+
+### Patch Changes
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`9f85b0308`](https://github.com/benjie/postgraphile-private/commit/9f85b030896d335ee2d0da2b93c3784d0eb841ea)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bugs around handling of the
+  plans/resolvers objects.
+
+- [#198](https://github.com/benjie/postgraphile-private/pull/198)
+  [`f9948e4e9`](https://github.com/benjie/postgraphile-private/commit/f9948e4e913299ca4f3858d45105790df2acaa89)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in
+  makePgSmartTagsPlugin that prevented smart tags being loaded early enough from
+  files.
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`a1158d83e`](https://github.com/benjie/postgraphile-private/commit/a1158d83e2d26f7da0182ec2b651f7f1ec202f14),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - grafast@0.0.1-0.12
+  - graphile-build@5.0.0-0.16
+  - graphile-build-pg@5.0.0-0.19
+
+## 5.0.0-0.18
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876),
+  [`80091a8e0`](https://github.com/benjie/postgraphile-private/commit/80091a8e0343a162bf2b60cf619267a874a67e60)]:
+  - grafast@0.0.1-0.11
+  - graphile-build@5.0.0-0.15
+  - graphile-build-pg@5.0.0-0.18
+  - graphile-config@0.0.1-0.5
+  - pg-introspection@0.0.1-0.3
+
 ## 5.0.0-0.17
 
 ### Patch Changes

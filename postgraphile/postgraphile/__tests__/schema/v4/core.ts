@@ -23,6 +23,7 @@ export const test =
     setup?: string | ((pgClient: PoolClient) => PromiseOrDirect<unknown>),
     finalCheck?: (schema: GraphQLSchema) => PromiseOrDirect<unknown>,
     sort = true,
+    additionalPreset: GraphileConfig.Preset = {},
   ) =>
   () =>
     withPoolClientTransaction(async (client) => {
@@ -37,7 +38,7 @@ export const test =
       const schemas = Array.isArray(schemata) ? schemata : [schemata];
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
-        extends: [AmberPreset, v4Preset],
+        extends: [AmberPreset, v4Preset, additionalPreset],
         pgConfigs: [
           {
             adaptor: "@dataplan/pg/adaptors/pg",

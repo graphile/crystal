@@ -1,5 +1,75 @@
 # graphile-build
 
+## 5.0.0-0.18
+
+### Patch Changes
+
+- [#201](https://github.com/benjie/postgraphile-private/pull/201)
+  [`dca706ad9`](https://github.com/benjie/postgraphile-private/commit/dca706ad99b1cd2b98872581b86bd4b22c7fd5f4)
+  Thanks [@benjie](https://github.com/benjie)! - JSON now works how most users
+  would expect it to.
+
+## 5.0.0-0.17
+
+### Patch Changes
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - grafast@0.0.1-0.13
+
+## 5.0.0-0.16
+
+### Patch Changes
+
+- [#198](https://github.com/benjie/postgraphile-private/pull/198)
+  [`a1158d83e`](https://github.com/benjie/postgraphile-private/commit/a1158d83e2d26f7da0182ec2b651f7f1ec202f14)
+  Thanks [@benjie](https://github.com/benjie)! - Gather phase initialState may
+  now be asynchronous. If initialCache returns a promise, a helpful error
+  message with advice is now raised.
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - grafast@0.0.1-0.12
+
+## 5.0.0-0.15
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- [#190](https://github.com/benjie/postgraphile-private/pull/190)
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Breaking changes around
+  types and postgres configuration:
+
+  - `GraphileBuild.GraphileResolverContext` renamed to `Grafast.Context`
+  - `GraphileConfig.GraphQLRequestContext` renamed to `Grafast.RequestContext`
+  - `Grafast.PgDatabaseAdaptorOptions` renaed to
+    `GraphileConfig.PgDatabaseAdaptorOptions`
+  - `@dataplan/pg/adaptors/node-postgres` is now `@dataplan/pg/adaptors/pg` due
+    to the bizarre naming of PostgreSQL clients on npm - we've decided to use
+    the module name as the unique identifier
+  - `makePgConfigs`:
+    - is now `makePgConfig` (singular) - so you'll need to wrap it in an array
+      where you use it
+    - no longer exported by `@dataplan/pg` (because it depended on `pg`) -
+      instead each adaptor exposes this helper - so import from
+      `@dataplan/pg/adaptors/node-postgres`
+    - accepts an object parameter containing
+      `{connectionString, schemas, superuserConnectionString}`, rather than
+      multiple string parameters
+  - `makeNodePostgresWithPgClient` -> `makePgAdaptorWithPgClient`
+  - `postgraphile` CLI will now try and respect the adaptor stated in your
+    preset when overriding connection arguments
+  - Removed `Grafast.RequestContext.httpRequest` and instead use
+    `Grafast.RequestContext.node.req/res`; all server adaptors should implement
+    this if appropriate
+
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)]:
+  - grafast@0.0.1-0.11
+  - graphile-config@0.0.1-0.5
+
 ## 5.0.0-0.14
 
 ### Patch Changes

@@ -1,5 +1,52 @@
 # grafserv
 
+## 0.0.1-0.15
+
+### Patch Changes
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - grafast@0.0.1-0.13
+
+## 0.0.1-0.14
+
+### Patch Changes
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`1e5671cdb`](https://github.com/benjie/postgraphile-private/commit/1e5671cdbbf9f4600b74c43eaa7e33b7bfd75fb9)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for websocket
+  GraphQL subscriptions (via graphql-ws) to grafserv and PostGraphile (currently
+  supporting Node, Express, Koa and Fastify)
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`5b634a78e`](https://github.com/benjie/postgraphile-private/commit/5b634a78e51816071447aceb1edfb813d77d563b)
+  Thanks [@benjie](https://github.com/benjie)! - Standardize on `serv.addTo`
+  interface, even for Node
+
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`e11698473`](https://github.com/benjie/postgraphile-private/commit/e1169847303790570bfafa07eb25d8fce53a0391),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - grafast@0.0.1-0.12
+  - ruru@2.0.0-0.10
+
+## 0.0.1-0.13
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- [#195](https://github.com/benjie/postgraphile-private/pull/195)
+  [`752ec9c51`](https://github.com/benjie/postgraphile-private/commit/752ec9c516add7c4617b426e97eccd1d4e5b7833)
+  Thanks [@benjie](https://github.com/benjie)! - Fix handling of HTTP errors and
+  allow for 204 status code responses. Add CORS hack to enable graphql-http
+  auditing.
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)]:
+  - grafast@0.0.1-0.11
+  - graphile-config@0.0.1-0.5
+  - ruru@2.0.0-0.9
+
 ## 0.0.1-0.12
 
 ### Patch Changes

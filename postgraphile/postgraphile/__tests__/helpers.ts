@@ -6,7 +6,6 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 
-import "@dataplan/pg/adaptors/pg";
 import "graphile-config";
 import "graphile-build-pg";
 
@@ -16,7 +15,7 @@ import type {
   PgClientResult,
   WithPgClient,
 } from "@dataplan/pg";
-import { PgSubscriber } from "@dataplan/pg";
+import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "grafast";
 import {

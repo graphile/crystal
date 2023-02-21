@@ -109,7 +109,6 @@ import {
   TuplePlanMap,
 } from "./interfaces.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
-import { PgSubscriber } from "./PgSubscriber.js";
 import {
   pgClassExpression,
   PgClassExpressionStep,
@@ -118,6 +117,9 @@ import {
   PgConditionCapableParentStep,
   PgConditionStep,
   PgConditionStepExtensions,
+  PgHavingConditionSpec,
+  PgWhereConditionSpec,
+  pgWhereConditionSpecListToSQL,
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
 import { pgDelete, PgDeleteStep } from "./steps/pgDelete.js";
@@ -220,6 +222,7 @@ export {
   PgExecutorOptions,
   PgFunctionSourceOptions,
   PgGroupSpec,
+  PgHavingConditionSpec,
   PgHStore,
   pgInsert,
   PgInsertStep,
@@ -272,7 +275,6 @@ export {
   PgSourceRowAttribute,
   PgSourceUnique,
   PgSourceUniqueExtensions,
-  PgSubscriber,
   PgTypeCodec,
   PgTypeCodecExtensions,
   PgTypeCodecPolymorphism,
@@ -301,6 +303,8 @@ export {
   PgUpdateStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
+  PgWhereConditionSpec,
+  pgWhereConditionSpecListToSQL,
   PlanByUniques,
   rangeOfCodec,
   recordType,
@@ -337,10 +341,10 @@ exportAsMany("@dataplan/pg", {
   ClassFilterStep,
   ManyFilterStep,
   OrFilterStep,
-  PgSubscriber,
   pgClassExpression,
   PgClassExpressionStep,
   PgConditionStep,
+  pgWhereConditionSpecListToSQL,
   PgCursorStep,
   pgDelete,
   PgDeleteStep,

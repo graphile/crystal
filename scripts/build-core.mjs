@@ -82,8 +82,18 @@ export async function transformPackageJson(sourceFilePath, targetFilePath) {
   await fsp.writeFile(targetFilePath, JSON.stringify(newJson, null, 2));
 }
 
+function loadPackageJson(codePath) {
+  const pkgPath = path.dirname(codePath) + "/package.json";
+  try {
+    return require(pkgPath);
+  } catch (e) {
+    return loadPackageJson(path.dirname(codePath));
+  }
+}
+
 export async function encryptSourceFile(codePath) {
   const pkg = require(codePath);
+  const packageJSON = loadPackageJson(codePath);
   const code = await fsp.readFile(codePath, "utf8");
   // I_SPONSOR_GRAPHILE=and_acknowledge_prerelease_caveats
   const password = "and_acknowledge_prerelease_caveats";
@@ -103,7 +113,8 @@ export async function encryptSourceFile(codePath) {
     `\
 const { Buffer } = require('node:buffer');
 const { scryptSync, createDecipheriv } = require('node:crypto');
-const pkg = require('../package.json');
+const pkgName = ${JSON.stringify(packageJSON.name)};
+const pkgVersion = ${JSON.stringify(packageJSON.version)};
 
 const RESET = '\\x1b[0m';
 const BOLD_BLACK_ON_RED = '\\x1b[40;31;1;7m';
@@ -115,7 +126,7 @@ const BOLD_BLUE_UNDERLINED = '\\x1b[34;1;4m';
 const iSponsorGraphile = \`\${RESET}\${BOLD_BLUE}I_SPONSOR_GRAPHILE\${RESET}\${RED}\`;
 const website = \`\${RESET}\${BOLD_BLUE_UNDERLINED}https://grafast.org\${RESET}\`;
 const errorPrefix = \`\${BOLD_BLACK_ON_RED}[  ERROR  ]\${RESET} \${RED}\`;
-const errorSuffix = \`\${RESET}\n\${BOLD_BLACK_ON_RED}[ CONTEXT ]\${RESET} \${RED}You are attempting to run pre-release software that is only available to Graphile sponsors.\${RESET}\n\nPlease refer to the \${website} documentation for the right code to use with this version '\${BOLD}\${pkg.name}@\${pkg.version}\${RESET}'.\${RESET}\n\`;
+const errorSuffix = \`\${RESET}\n\${BOLD_BLACK_ON_RED}[ CONTEXT ]\${RESET} \${RED}You are attempting to run pre-release software that is only available to Graphile sponsors.\${RESET}\n\nPlease refer to the \${website} documentation for the right code to use with this version '\${BOLD}\${pkgName}@\${pkgVersion}\${RESET}'.\${RESET}\n\`;
 
 const password = process.env.I_SPONSOR_GRAPHILE;
 if (typeof password !== 'string') {

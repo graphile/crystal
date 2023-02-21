@@ -1,5 +1,125 @@
 # postgraphile
 
+## 5.0.0-0.23
+
+### Patch Changes
+
+- [#201](https://github.com/benjie/postgraphile-private/pull/201)
+  [`dca706ad9`](https://github.com/benjie/postgraphile-private/commit/dca706ad99b1cd2b98872581b86bd4b22c7fd5f4)
+  Thanks [@benjie](https://github.com/benjie)! - JSON now works how most users
+  would expect it to.
+
+- Updated dependencies
+  [[`a14bd2288`](https://github.com/benjie/postgraphile-private/commit/a14bd2288532b0977945d1c0508e51baef6dba2b),
+  [`dca706ad9`](https://github.com/benjie/postgraphile-private/commit/dca706ad99b1cd2b98872581b86bd4b22c7fd5f4)]:
+  - @dataplan/pg@0.0.1-0.18
+  - graphile-build@5.0.0-0.18
+  - graphile-build-pg@5.0.0-0.21
+
+## 5.0.0-0.22
+
+### Patch Changes
+
+- Updated dependencies [[`e5b664b6f`](undefined)]:
+  - @dataplan/pg@0.0.1-0.17
+  - grafast@0.0.1-0.13
+  - graphile-build-pg@5.0.0-0.20
+  - grafserv@0.0.1-0.15
+  - graphile-build@5.0.0-0.17
+
+## 5.0.0-0.21
+
+### Patch Changes
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`1e5671cdb`](https://github.com/benjie/postgraphile-private/commit/1e5671cdbbf9f4600b74c43eaa7e33b7bfd75fb9)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for websocket
+  GraphQL subscriptions (via graphql-ws) to grafserv and PostGraphile (currently
+  supporting Node, Express, Koa and Fastify)
+
+- [#200](https://github.com/benjie/postgraphile-private/pull/200)
+  [`5b634a78e`](https://github.com/benjie/postgraphile-private/commit/5b634a78e51816071447aceb1edfb813d77d563b)
+  Thanks [@benjie](https://github.com/benjie)! - Standardize on `serv.addTo`
+  interface, even for Node
+
+- Updated dependencies
+  [[`4f5d5bec7`](https://github.com/benjie/postgraphile-private/commit/4f5d5bec72f949b17b39cd07acc848ce7a8bfa36),
+  [`e11698473`](https://github.com/benjie/postgraphile-private/commit/e1169847303790570bfafa07eb25d8fce53a0391),
+  [`1e5671cdb`](https://github.com/benjie/postgraphile-private/commit/1e5671cdbbf9f4600b74c43eaa7e33b7bfd75fb9),
+  [`fb40bd97b`](https://github.com/benjie/postgraphile-private/commit/fb40bd97b8a36da91c6b08e0ce67f1a9419ad91f),
+  [`a1158d83e`](https://github.com/benjie/postgraphile-private/commit/a1158d83e2d26f7da0182ec2b651f7f1ec202f14),
+  [`5b634a78e`](https://github.com/benjie/postgraphile-private/commit/5b634a78e51816071447aceb1edfb813d77d563b),
+  [`25f5a6cbf`](https://github.com/benjie/postgraphile-private/commit/25f5a6cbff6cd5a94ebc4f411f7fa89c209fc383)]:
+  - @dataplan/pg@0.0.1-0.16
+  - grafast@0.0.1-0.12
+  - ruru@2.0.0-0.10
+  - grafserv@0.0.1-0.14
+  - graphile-build@5.0.0-0.16
+  - graphile-build-pg@5.0.0-0.19
+
+## 5.0.0-0.20
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
+- [#196](https://github.com/benjie/postgraphile-private/pull/196)
+  [`af9bc38c8`](https://github.com/benjie/postgraphile-private/commit/af9bc38c86dddfa776e5d8db117b5cb35dbe2cd7)
+  Thanks [@benjie](https://github.com/benjie)! - Allow passing `pool` directly
+  to `makePgConfig`.
+
+- [#190](https://github.com/benjie/postgraphile-private/pull/190)
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Breaking changes around
+  types and postgres configuration:
+
+  - `GraphileBuild.GraphileResolverContext` renamed to `Grafast.Context`
+  - `GraphileConfig.GraphQLRequestContext` renamed to `Grafast.RequestContext`
+  - `Grafast.PgDatabaseAdaptorOptions` renaed to
+    `GraphileConfig.PgDatabaseAdaptorOptions`
+  - `@dataplan/pg/adaptors/node-postgres` is now `@dataplan/pg/adaptors/pg` due
+    to the bizarre naming of PostgreSQL clients on npm - we've decided to use
+    the module name as the unique identifier
+  - `makePgConfigs`:
+    - is now `makePgConfig` (singular) - so you'll need to wrap it in an array
+      where you use it
+    - no longer exported by `@dataplan/pg` (because it depended on `pg`) -
+      instead each adaptor exposes this helper - so import from
+      `@dataplan/pg/adaptors/node-postgres`
+    - accepts an object parameter containing
+      `{connectionString, schemas, superuserConnectionString}`, rather than
+      multiple string parameters
+  - `makeNodePostgresWithPgClient` -> `makePgAdaptorWithPgClient`
+  - `postgraphile` CLI will now try and respect the adaptor stated in your
+    preset when overriding connection arguments
+  - Removed `Grafast.RequestContext.httpRequest` and instead use
+    `Grafast.RequestContext.node.req/res`; all server adaptors should implement
+    this if appropriate
+
+- [#192](https://github.com/benjie/postgraphile-private/pull/192)
+  [`80091a8e0`](https://github.com/benjie/postgraphile-private/commit/80091a8e0343a162bf2b60cf619267a874a67e60)
+  Thanks [@benjie](https://github.com/benjie)! - - Conflicts in `pgConfigs`
+  (e.g. multiple sources using the same 'name') now detected and output
+  - Fix defaults for `pgSettingsKey` and `withPgClientKey` based on config name
+  - `makePgConfig` now allows passing `pgSettings` callback and
+    `pgSettingsForIntrospection` config object
+  - Multiple postgres sources now works nicely with multiple `makePgConfig`
+    calls
+- Updated dependencies [[`0ab95d0b1`](undefined),
+  [`af9bc38c8`](https://github.com/benjie/postgraphile-private/commit/af9bc38c86dddfa776e5d8db117b5cb35dbe2cd7),
+  [`4783bdd7c`](https://github.com/benjie/postgraphile-private/commit/4783bdd7cc28ac8b497fdd4d6f1024d80cb432ef),
+  [`652cf1073`](https://github.com/benjie/postgraphile-private/commit/652cf107316ea5832f69c6a55574632187f5c876),
+  [`752ec9c51`](https://github.com/benjie/postgraphile-private/commit/752ec9c516add7c4617b426e97eccd1d4e5b7833),
+  [`80091a8e0`](https://github.com/benjie/postgraphile-private/commit/80091a8e0343a162bf2b60cf619267a874a67e60)]:
+  - @dataplan/pg@0.0.1-0.15
+  - grafast@0.0.1-0.11
+  - grafserv@0.0.1-0.13
+  - graphile-build@5.0.0-0.15
+  - graphile-build-pg@5.0.0-0.18
+  - graphile-config@0.0.1-0.5
+  - pg-introspection@0.0.1-0.3
+  - ruru@2.0.0-0.9
+
 ## 5.0.0-0.19
 
 ### Patch Changes

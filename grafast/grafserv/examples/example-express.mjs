@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import express from "express";
 import { grafserv } from "grafserv/express/v4";
 import preset from "./graphile.config.mjs";
@@ -11,11 +12,21 @@ app.use((req, _res, next) => {
   next();
 });
 
+// Create a Node HTTP server, mounting Express into it
+const server = createServer(app);
+server.on("error", (e) => {
+  console.error(e);
+});
+
 // Create a Grafserv instance
 const serv = grafserv({ schema, preset });
 
-// Add the Grafserv instance's route handlers to the Express app
-serv.addTo(app);
+// Add the Grafserv instance's route handlers to the Express app, and register
+// websockets if desired
+serv.addTo(app, server).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 
 // Start the Express server
-app.listen(preset.server.port ?? 5678);
+server.listen(preset.server.port ?? 5678);

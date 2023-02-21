@@ -1,5 +1,11 @@
 # eslint-plugin-graphile-export
 
+## 0.0.2-0.1
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
 ## 0.0.2-0.0
 
 ### Patch Changes

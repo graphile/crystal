@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { makeHandler } from "graphql-ws/lib/use/@fastify/websocket";
 import { PassThrough } from "node:stream";
 
 import {
@@ -13,6 +14,7 @@ import type {
 } from "../../../interfaces.js";
 import {
   getBodyFromFrameworkBody,
+  makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
 } from "../../../utils.js";
@@ -154,7 +156,7 @@ export class FastifyGrafserv extends GrafservBase {
     }
   }
 
-  addTo(app: FastifyInstance) {
+  async addTo(app: FastifyInstance) {
     // application/graphql-request+json isn't currently an official serialization format:
     // https://graphql.github.io/graphql-over-http/draft/#sec-Media-Types
     /*
@@ -184,6 +186,11 @@ export class FastifyGrafserv extends GrafservBase {
         const result = await convertHandlerResultToResult(handlerResult);
         return this.send(request, reply, result);
       },
+      ...(this.resolvedPreset.server?.websockets
+        ? {
+            wsHandler: makeHandler(makeGraphQLWSConfig(this)),
+          }
+        : null),
     });
 
     if (dynamicOptions.graphiql) {

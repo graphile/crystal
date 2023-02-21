@@ -1,5 +1,11 @@
 # pg-sql2
 
+## 5.0.0-0.3
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
 ## 5.0.0-0.2
 
 ### Patch Changes

@@ -66,19 +66,19 @@ export class ListenStep<
     ],
   ): GrafastResultStreamList<TTopics[TTopic]> {
     return values[this.pubsubDep as 0].map((pubsub, i) => {
-      const topic = values[this.topicDep as 1][i];
       if (!pubsub) {
         throw Object.assign(
           new Error("Subscription not supported"),
           isDev
             ? {
-                hint: `${this.opPlan.dangerouslyGetStep(
-                  this.pubsubDep,
-                )} did not provide a GrafastSubscriber; perhaps you forgot to add the relevant property to context?`,
+                hint: `${
+                  this.dependencies[this.pubsubDep]
+                } did not provide a GrafastSubscriber; perhaps you forgot to add the relevant property to context?`,
               }
             : {},
         );
       }
+      const topic = values[this.topicDep as 1][i];
       return pubsub.subscribe(topic);
     });
   }

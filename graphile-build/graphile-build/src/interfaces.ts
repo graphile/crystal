@@ -158,7 +158,7 @@ declare global {
        * The initial value to use for this plugin when a new gather run
        * executes.
        */
-      initialState?: () => TState;
+      initialState?: (cache: TCache) => PromiseOrDirect<TState>;
 
       /**
        * The plugin must register helpers to allow other plugins to access its

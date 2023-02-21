@@ -1,5 +1,11 @@
 # pg-introspection
 
+## 0.0.1-0.3
+
+### Patch Changes
+
+- [`0ab95d0b1`](undefined) - Update sponsors.
+
 ## 0.0.1-0.2
 
 ### Patch Changes
