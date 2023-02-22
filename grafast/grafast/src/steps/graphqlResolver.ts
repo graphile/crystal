@@ -20,7 +20,6 @@ import type {
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastValuesList,
-  PolymorphicData,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
@@ -191,29 +190,6 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
 }
 
 /** @internal */
-export class GraphQLPolymorphicUnwrap extends UnbatchedExecutableStep {
-  static $$export = {
-    moduleName: "grafast",
-    exportName: "GraphQLPolymorphicUnwrap",
-  };
-  public isSyncAndSafe = true;
-  constructor($parent: ExecutableStep) {
-    super();
-    this.addDependency($parent);
-  }
-  execute(values: [GrafastValuesList<PolymorphicData>]) {
-    return values[0];
-  }
-  unbatchedExecute(extra: ExecutionExtra, v: PolymorphicData) {
-    return v;
-  }
-}
-
-export function graphqlPolymorphicUnwrap($parent: ExecutableStep) {
-  return new GraphQLPolymorphicUnwrap($parent);
-}
-
-/** @internal */
 export class GraphQLItemHandler
   extends ExecutableStep
   implements PolymorphicStep
@@ -245,7 +221,7 @@ export class GraphQLItemHandler
   }
 
   planForType() {
-    return graphqlPolymorphicUnwrap(this);
+    return this;
   }
 
   listItem($item: __ItemStep<any>) {
