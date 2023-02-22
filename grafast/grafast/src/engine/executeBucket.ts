@@ -230,12 +230,12 @@ export function executeBucket(
             ? streamOptions.initialCount
             : Infinity;
 
-          // FIXME: need to ensure that iterator is terminated
-          // even if the stream is never consumed (e.g. if something else
-          // errors). For query/mutation we can do this when operation
-          // completes, for subscription we should do it after each
-          // individual payload (and all its streamed/deferred children)
-          // are complete before processing the next subscription event.
+          // FIXME: potential memory leak; need to ensure that iterator is
+          // terminated even if the stream is never consumed (e.g. if something
+          // else errors). For query/mutation we can do this when operation
+          // completes, for subscription we should do it after each individual
+          // payload (and all its streamed/deferred children) are complete
+          // before processing the next subscription event.
 
           if (initialCount === 0) {
             // Optimization - defer everything
@@ -400,8 +400,8 @@ export function executeBucket(
       }
 
       if (pendingPromises) {
-        return Promise.allSettled(pendingPromises).then(
-          (resultSettledResult) => {
+        return Promise.allSettled(pendingPromises)
+          .then((resultSettledResult) => {
             for (
               let i = 0, pendingPromisesLength = resultSettledResult.length;
               i < pendingPromisesLength;
@@ -431,28 +431,31 @@ export function executeBucket(
               handleSideEffectPlanIds();
             }
             return promises ? awaitPromises() : runSyncSteps();
-          },
-        );
-        // FIXME: rehandle this!
-        /*
+          })
           .then(null, (e) => {
             // THIS SHOULD NEVER HAPPEN!
             console.error(
-              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: this error should never occur! Please file an issue against grafast. Details: ${e}`,
             );
-            const grafastError = newGrafastError(
-              new Error(
-                `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-              ),
-              finishedStep.id,
-            );
-            console.error(`${grafastError.originalError}\n  ${e}`);
-            store.set(
-              finishedStep.id,
-              arrayOfLength(finalResult.length, grafastError),
-            );
+
+            bucket.hasErrors = true;
+            for (
+              let i = 0, pendingPromisesLength = pendingPromises!.length;
+              i < pendingPromisesLength;
+              i++
+            ) {
+              const { s: allStepsIndex, i: dataIndex } =
+                pendingPromiseIndexes![i];
+              const finishedStep = _allSteps[allStepsIndex];
+              const storeEntry = bucket.store.get(finishedStep.id)!;
+              storeEntry[dataIndex] = newGrafastError(
+                new Error(
+                  `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+                ),
+                finishedStep.id,
+              );
+            }
           });
-          */
       } else {
         if (bucket.hasErrors && sideEffectPlanIds) {
           handleSideEffectPlanIds();
