@@ -2058,11 +2058,14 @@ ${te.join(
       }
       case "polymorphic": {
         // May only need to be evaluated for certain types, so avoid hoisting anything expensive.
-        if (step.isSyncAndSafe) {
-          // It's cheap, try and hoist it.
-          // NOTE: this means this will run for non-matching types, which is
-          // not ideal. We may need to revert this.
-          // FIXME: ensure this is safe.
+        if (
+          step.isSyncAndSafe &&
+          step.polymorphicPaths.size === step.layerPlan.polymorphicPaths.size
+        ) {
+          // It's cheap and covers all types, try and hoist it.
+          // NOTE: I have concerns about whether this is safe or not, but I
+          // have not been able to come up with a counterexample that is
+          // unsafe. Should we do so, we should remove this.
           break;
         } else {
           return;
