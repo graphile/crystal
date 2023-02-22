@@ -27,8 +27,6 @@ import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
 import {
   $$bypassGraphQL,
-  $$concreteType,
-  $$data,
   $$eventEmitter,
   $$extensions,
   $$idempotent,
@@ -211,8 +209,6 @@ export {
   __TrackedObjectStep,
   __ValueStep,
   $$bypassGraphQL,
-  $$concreteType, // FIXME: we really oughtn't export this
-  $$data,
   $$eventEmitter,
   $$extensions,
   $$idempotent,

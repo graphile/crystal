@@ -14,7 +14,6 @@ import type {
 } from "grafast";
 import {
   __ItemStep,
-  $$data,
   access,
   constant,
   ExecutableStep,
@@ -250,7 +249,7 @@ export class PgUnionAllSingleStep
       );
     }
     const spec = Object.create(null);
-    const $parsed = jsonParse(access(this, [$$data, this.pkKey]));
+    const $parsed = jsonParse(access(this, [this.pkKey]));
     for (let i = 0, l = pk.columns.length; i < l; i++) {
       const col = pk.columns[i];
       spec[col] = access($parsed, [i]);
@@ -269,12 +268,12 @@ export class PgUnionAllSingleStep
     const classPlan = this.getClassStep();
     const digest = classPlan.getOrderByDigest();
     const orders = classPlan.getOrderByWithoutType().map((o, i) => {
-      return access(this, [$$data, classPlan.selectOrderValue(i)]);
+      return access(this, [classPlan.selectOrderValue(i)]);
     });
     // Add the type to the cursor
-    orders.push(access(this, [$$data, classPlan.selectType()]));
+    orders.push(access(this, [classPlan.selectType()]));
     // Add the pk to the cursor
-    orders.push(access(this, [$$data, classPlan.selectPk()]));
+    orders.push(access(this, [classPlan.selectPk()]));
     const step = list(orders);
     return [digest, step];
   }

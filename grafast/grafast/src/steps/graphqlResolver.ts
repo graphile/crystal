@@ -22,7 +22,6 @@ import type {
   GrafastValuesList,
   PolymorphicData,
 } from "../interfaces.js";
-import { $$data } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
 import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
@@ -203,10 +202,10 @@ export class GraphQLPolymorphicUnwrap extends UnbatchedExecutableStep {
     this.addDependency($parent);
   }
   execute(values: [GrafastValuesList<PolymorphicData>]) {
-    return values[0].map((v) => (v ? v[$$data] : null));
+    return values[0];
   }
   unbatchedExecute(extra: ExecutionExtra, v: PolymorphicData) {
-    return v ? v[$$data] : null;
+    return v;
   }
 }
 

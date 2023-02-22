@@ -916,6 +916,11 @@ const stringLeafExecutorString = makeExecutor(
 `,
 );
 
+// NOTE: the reference to $$concreteType here is a (temporary) optimization; it
+// should be `resolveType(bucketRootValue)` but it's not worth the function
+// call overhead. Longer term it should just be read directly from a different
+// store.
+
 function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
