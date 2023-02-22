@@ -1144,7 +1144,9 @@ export class PgSelectStep<
         toPg(access($parsedCursorPlan, [i + 1]), orderCodec),
         orderCodec,
       );
-      // FIXME: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
+      // FIXME: _iff_ `orderFragment` is nullable _and_ `order.nulls` is
+      // non-null then we need to factor `NULLS LAST` / `NULLS FIRST` into
+      // this calculation.
       const gt =
         (order.direction === "ASC" && beforeOrAfter === "after") ||
         (order.direction === "DESC" && beforeOrAfter === "before");
