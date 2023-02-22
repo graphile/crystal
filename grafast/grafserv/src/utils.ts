@@ -68,8 +68,7 @@ export function getBodyFromRequest(
         req.off("end", done);
         req.off("error", reject);
         req.off("data", handleData);
-        // FIXME: validate this approach
-        reject(new Error("Too much data"));
+        reject(httpError(413, "Too much data"));
       }
     };
     const done = () => {
