@@ -120,7 +120,7 @@ export interface RequestDigest {
   getQueryParams: () => PromiseOrDirect<Record<string, string | string[]>>;
   getBody(): PromiseOrDirect<GrafservBody>;
   requestContext: Partial<Grafast.RequestContext>;
-  // FIXME: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
+  // TODO: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
   preferJSON?: boolean;
   [$$normalizedHeaders]?: any;
 }
