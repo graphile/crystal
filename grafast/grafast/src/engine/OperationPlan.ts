@@ -2353,7 +2353,8 @@ ${te.join(
 
     const stepOptions = this.getStepOptionsForStep(step);
     const shouldStream = !!stepOptions?.stream;
-    // FIXME: revisit this decision in the context of SAGE.
+    // OPTIMIZE: Past Benjie thought we might want to revisit this under the
+    // new Grafast system. No idea what he had in mind there though...
     if (shouldStream) {
       // Never deduplicate streaming plans, we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
