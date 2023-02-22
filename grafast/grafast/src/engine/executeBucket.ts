@@ -69,6 +69,12 @@ export function executeBucket(
   bucket: Bucket,
   requestContext: RequestContext,
 ): PromiseOrDirect<void> {
+  /**
+   * Execute the step directly; since there's no errors we can pass the
+   * dependencies through verbatim!
+   */
+  const reallyExecuteStepWithNoErrors = executeOrStream;
+
   const { metaByMetaKey } = requestContext;
   const {
     size,
@@ -595,19 +601,6 @@ export function executeBucket(
     } else {
       return reallyExecuteStepWithNoErrors(step, dependencies, extra);
     }
-  }
-
-  // FIXME: if this is what we end up with, remove the indirection.
-  /**
-   * Execute the step directly; since there's no errors we can pass the
-   * dependencies through verbatim!
-   */
-  function reallyExecuteStepWithNoErrors(
-    step: ExecutableStep,
-    dependencies: ReadonlyArray<any>[],
-    extra: ExecutionExtra,
-  ) {
-    return executeOrStream(step, dependencies, extra);
   }
 
   // FIXME: this function used to state that it would never throw/reject... but,
