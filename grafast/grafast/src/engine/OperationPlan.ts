@@ -2197,13 +2197,11 @@ ${te.join(
       case "mutationField": {
         // NOTE: It's the user's responsibility to ensure that steps that have
         // side effects are marked as such via `step.hasSideEffects = true`.
-        if (step.isSyncAndSafe) {
-          // FIXME: warn user we're hoisting from a mutationField?
+        if (step.isSyncAndSafe && !step.hasSideEffects) {
           break;
         } else {
-          // Plans that rely on external state shouldn't be hoisted because
-          // their results may change after a mutation, so the mutation should
-          // run first.
+          // Side effects should take place inside the mutation field plan
+          // (that's the whole point), so we should not push these down.
           return;
         }
       }
@@ -2216,8 +2214,6 @@ ${te.join(
         );
       }
     }
-
-    // FIXME: don't allow pushing down into mutationField?
 
     // Now find the lowest bucket that still satisfies all of it's dependents.
     const dependentLayerPlans = new Set<LayerPlan>();
