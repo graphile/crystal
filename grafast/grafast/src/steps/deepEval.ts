@@ -166,8 +166,13 @@ export class DeepEvalStep extends ExecutableStep {
         );
         return null;
       }
-      // FIXME: if an error is found; this whole thing should throw!
-      const values = indexes.map((idx) => depResults[idx]);
+      const values = indexes.map((idx) => {
+        const val = depResults[idx];
+        if (val instanceof Error) {
+          throw val;
+        }
+        return val;
+      });
       if (isDev) {
         assert.strictEqual(
           list.length,
