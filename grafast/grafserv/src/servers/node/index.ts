@@ -88,7 +88,6 @@ export class NodeGrafservBase extends GrafservBase {
     next?: (err?: Error) => void,
   ) => void {
     const dynamicOptions = this.dynamicOptions;
-    // FIXME: 'async' here is risky
     return async (req, res, next) => {
       try {
         const request = this.getDigest(dynamicOptions, req, res, isHTTPS);
