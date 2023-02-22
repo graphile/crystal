@@ -1096,6 +1096,14 @@ const arrayExecutorString_nonNullable_streaming = makeArrayExecutor(
   true,
 );
 
+/**
+ * This piggy-backs off of GraphQL.js by rewriting the request, executing it in
+ * GraphQL.js, and then patching it into our response. It's a temporary
+ * workaround until we can afford the time to write our own introspection
+ * execution.
+ *
+ * TODO: write our own introspection execution!
+ */
 const introspect = (
   root: PayloadRoot,
   outputPlan: OutputPlan<OutputPlanTypeIntrospection>,
@@ -1135,7 +1143,7 @@ const introspect = (
   for (const variableName of variableNames) {
     variableValues[variableName] = root.variables[variableName];
   }
-  // PERF: make this canonical
+  // PERF: make this canonical, so that cache hits are more likely.
   const canonical = JSON.stringify(variableValues);
   const cached = introspectionCacheByVariableValues.get(canonical);
   if (cached) {
@@ -1147,7 +1155,13 @@ const introspect = (
     variableValues,
   });
   if (graphqlResult.errors) {
-    // FIXME: we should map the introspection path
+    // NOTE: we should map the introspection path, however that might require
+    // us to be able to raise multiple errors. Theoretically if the query
+    // validates we shouldn't be able to get errors out of the introspection
+    // system, so we'll skip over this for now. When we get around to
+    // implementing introspection natively in Grafast rather than piggy-backing
+    // off of GraphQL.js then this problem will go away on its own.
+
     console.error("INTROSPECTION FAILED!");
     console.error(graphqlResult);
     const { node } = locationDetails;
