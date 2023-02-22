@@ -76,7 +76,7 @@ import {
   JSONArray,
   JSONValue,
 } from "./interfaces.js";
-import { polymorphicWrap, resolveType } from "./polymorphic.js";
+import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertListCapableStep,
   BaseStep,
@@ -367,7 +367,6 @@ export {
   PromiseOrDirect,
   proxy,
   ProxyStep,
-  resolveType,
   reverse,
   reverseArray,
   ReverseStep,
@@ -468,7 +467,6 @@ exportAsMany("grafast", {
   listen,
   ListenStep,
   polymorphicWrap,
-  resolveType,
   stripAnsi,
   arraysMatch,
   inputObjectFieldSpec,

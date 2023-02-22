@@ -45,7 +45,6 @@ import {
   newObjectTypeBuilder,
   object,
   operationPlan,
-  resolveType,
 } from "grafast";
 import type { GraphQLOutputType } from "graphql";
 import {
@@ -3428,7 +3427,6 @@ export function makeExampleSchema(
       isExplicitlyArchived: { type: GraphQLBoolean },
       archivedAt: { type: GraphQLString },
     }),
-    resolveType,
   });
 
   const commonSingleTableItemFields = {
@@ -3535,7 +3533,6 @@ export function makeExampleSchema(
       isExplicitlyArchived: { type: GraphQLBoolean },
       archivedAt: { type: GraphQLString },
     }),
-    resolveType,
   });
 
   const RelationalCommentable: GraphQLInterfaceType = new GraphQLInterfaceType({
@@ -3545,7 +3542,6 @@ export function makeExampleSchema(
       type: { type: GraphQLString },
       type2: { type: EnumTableItemType },
     }),
-    resolveType,
   });
 
   // NOTE: the `| any`s below are because of co/contravariance woes.
@@ -3687,7 +3683,6 @@ export function makeExampleSchema(
 
   const UnionItem: GraphQLUnionType = new GraphQLUnionType({
     name: "UnionItem",
-    resolveType,
     types: () => [
       UnionTopic,
       UnionPost,
@@ -3758,7 +3753,6 @@ export function makeExampleSchema(
 
   const Entity: GraphQLUnionType = new GraphQLUnionType({
     name: "Entity",
-    resolveType,
     types: () => [Person, Post, Comment],
   });
 

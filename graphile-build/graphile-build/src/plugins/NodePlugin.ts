@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type { NodeIdCodec, NodeIdHandler } from "grafast";
-import { node, resolveType } from "grafast";
+import { node } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
 
@@ -126,7 +126,6 @@ export const NodePlugin: GraphileConfig.Plugin = {
               "An object with a globally unique `ID`.",
               "type",
             ),
-            resolveType,
             fields: {
               [nodeIdFieldName]: {
                 description: build.wrapDescription(
