@@ -121,8 +121,6 @@ export class GrafservBase {
         );
       }
 
-      // FIXME: handle 'HEAD' requests
-
       if (
         dynamicOptions.graphiql &&
         request.method === "GET" &&

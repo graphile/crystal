@@ -98,6 +98,7 @@ const preset: GraphileConfig.Preset = {
   server: {
     graphqlPath: "/v2/graphql",
     websockets: true,
+    graphqlOverGET: true,
   },
   grafast: {
     context: {

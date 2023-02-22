@@ -101,6 +101,7 @@ async function main() {
   app.route({
     method: ["GET"],
     url: "/",
+    exposeHeadRoute: true,
     async handler(req, res) {
       res.type("text/html").send(
         ruruHTML({

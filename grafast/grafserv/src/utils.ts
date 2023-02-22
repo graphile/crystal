@@ -132,6 +132,12 @@ export function normalizeRequest(
     r.getHeader = (key) => normalized[key.toLowerCase()];
     r.getBody = memo(r.getBody);
     r.getQueryParams = memo(r.getQueryParams);
+
+    if (r.method === "HEAD") {
+      // Pretend that 'HEAD' requests are actually 'GET' requests; Node will
+      // take care of stripping the response body for us.
+      r.method = "GET";
+    }
   }
   return request as NormalizedRequestDigest;
 }

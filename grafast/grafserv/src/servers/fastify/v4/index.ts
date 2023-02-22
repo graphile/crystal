@@ -176,6 +176,7 @@ export class FastifyGrafserv extends GrafservBase {
           ? ["GET", "POST"]
           : ["POST"],
       url: this.dynamicOptions.graphqlPath,
+      exposeHeadRoute: true,
       bodyLimit: this.dynamicOptions.maxRequestLength,
       handler: async (request, reply) => {
         const digest = getDigest(request, reply);
@@ -197,6 +198,7 @@ export class FastifyGrafserv extends GrafservBase {
       app.route({
         method: "GET",
         url: this.dynamicOptions.graphiqlPath,
+        exposeHeadRoute: true,
         bodyLimit: this.dynamicOptions.maxRequestLength,
         handler: async (request, reply) => {
           const digest = getDigest(request, reply);
@@ -213,6 +215,7 @@ export class FastifyGrafserv extends GrafservBase {
       app.route({
         method: "GET",
         url: this.dynamicOptions.eventStreamRoute,
+        exposeHeadRoute: true,
         bodyLimit: this.dynamicOptions.maxRequestLength,
         handler: async (request, reply) => {
           const digest = getDigest(request, reply);

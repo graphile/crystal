@@ -127,6 +127,7 @@ export interface RequestDigest {
 }
 
 export interface NormalizedRequestDigest extends RequestDigest {
+  method: "GET" | "POST" | string;
   preferJSON: boolean;
   /**
    * As 'headers', but with the keys lowercased
