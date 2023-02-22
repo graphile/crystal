@@ -142,7 +142,6 @@ export class StepTracker {
   public deleteLayerPlan(layerPlan: LayerPlan) {
     this.assertPhaseNot("finalize");
     if (isDev) {
-      // FIXME: validate assertions
       if (layerPlan.children.length > 0) {
         throw new Error(
           "This layer plan has children... should we really be deleting it?!",
@@ -238,8 +237,16 @@ export class StepTracker {
     }
     const $existing = outputPlan.rootStep;
     if ($existing) {
-      // FIXME: Cleanup, tree shake, etc
-      this.outputPlansByRootStep.get($existing)?.delete(outputPlan);
+      const outputPlansBy$existing = this.outputPlansByRootStep.get($existing);
+      if (!outputPlansBy$existing) {
+        throw new Error(
+          `GraphileInternalError<f39690fc-f565-40d9-a781-e68a3bf5e84a>: ${outputPlan}.rootStep (${$existing}) isn't in 'outputPlansByRootStep'`,
+        );
+      }
+      outputPlansBy$existing.delete(outputPlan);
+      if (outputPlansBy$existing.size === 0) {
+        // TODO: Cleanup, tree shake, etc
+      }
     }
     (outputPlan.rootStep as any) = $dependency;
     const store = this.outputPlansByRootStep.get($dependency);
@@ -262,8 +269,16 @@ export class StepTracker {
     }
     const $existing = layerPlan.rootStep;
     if ($existing) {
-      // FIXME: Cleanup, tree shake, etc
-      this.layerPlansByRootStep.get($existing)!.delete(layerPlan);
+      const layerPlansBy$existing = this.layerPlansByRootStep.get($existing);
+      if (!layerPlansBy$existing) {
+        throw new Error(
+          `GraphileInternalError<7b5b7fe6-d403-48bd-a75f-1c9557b9a030>: ${layerPlan}.rootStep (${$existing}) isn't in 'layerPlansByRootStep'`,
+        );
+      }
+      layerPlansBy$existing.delete(layerPlan);
+      if (layerPlansBy$existing.size === 0) {
+        // TODO: Cleanup, tree shake, etc
+      }
     }
     (layerPlan.rootStep as any) = $dependency;
     const store = this.layerPlansByRootStep.get($dependency);
