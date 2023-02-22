@@ -10,6 +10,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     eventStreamRoute = "/graphql/stream",
     maxRequestLength = 100_000,
     outputDataAsString = false,
+    schemaWaitTime = 15000,
   } = config.server ?? {};
   const { explain } = config.grafast ?? {};
   return {
@@ -23,6 +24,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     eventStreamRoute,
     maxRequestLength,
     explain,
+    schemaWaitTime,
   };
 }
 export type OptionsFromConfig = ReturnType<typeof optionsFromConfig>;

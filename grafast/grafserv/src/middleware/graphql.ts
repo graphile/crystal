@@ -29,6 +29,8 @@ import { $$normalizedHeaders } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 import { httpError } from "../utils.js";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 let lastString: string;
 let lastHash: string;
 const calculateQueryHash = (queryString: string): string => {
@@ -410,7 +412,11 @@ export const makeGraphQLHandler = (
     const isLegacy = chosenContentType === APPLICATION_JSON;
 
     if (wait) {
-      await wait;
+      await Promise.race([wait, sleep(dynamicOptions.schemaWaitTime)]);
+      if (!latestSchema) {
+        // Handle missing schema
+        throw httpError(502, `Schema isn't ready`);
+      }
     }
     // Get a reference to the latest versions to use for this entire operation
     const schema = latestSchema;
