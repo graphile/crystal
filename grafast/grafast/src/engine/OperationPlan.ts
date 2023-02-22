@@ -915,6 +915,8 @@ ${te.join(
       outputPlan: OutputPlan,
       groupedFieldSet: SelectionSetDigest,
     ) => {
+      // `__typename` shouldn't bump the mutation index since it has no side effects.
+      let mutationIndex = -1;
       for (const [
         responseKey,
         fieldNodes,
@@ -1092,6 +1094,7 @@ ${te.join(
               outputPlan.layerPlan,
               {
                 type: "mutationField",
+                mutationIndex: ++mutationIndex,
               },
               outputPlan.layerPlan.polymorphicPaths,
             )
@@ -2094,9 +2097,14 @@ ${te.join(
       case "mutationField": {
         // NOTE: It's the user's responsibility to ensure that steps that have
         // side effects are marked as such via `step.hasSideEffects = true`.
-        if (step.isSyncAndSafe) {
-          // FIXME: warn user we're hoisting from a mutationField?
-          break;
+        if (step.isSyncAndSafe && !step.hasSideEffects) {
+          if (step.layerPlan.reason.mutationIndex === 0) {
+            // Safe to hoist inside first mutation; but all later mutations may be impacted by previous actions.
+            break;
+          }
+          // OPTIMIZE: figure out under which circumstances it is safe to hoist here.
+          // break;
+          return;
         } else {
           // Plans that rely on external state shouldn't be hoisted because
           // their results may change after a mutation, so the mutation should

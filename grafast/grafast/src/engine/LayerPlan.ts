@@ -72,6 +72,7 @@ export interface LayerPlanReasonSubscription {
 /** Non-branching, deferred */
 export interface LayerPlanReasonMutationField {
   type: "mutationField";
+  mutationIndex: number;
 }
 /** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
