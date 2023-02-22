@@ -603,9 +603,6 @@ export function executeBucket(
     }
   }
 
-  // FIXME: this function used to state that it would never throw/reject... but,
-  // no code is perfect... so that just seemed like it was asking for
-  // trouble. Lets make sure if it throws/rejects that nothing bad will happen.
   /**
    * This function MIGHT throw or reject, so be sure to handle that.
    */
