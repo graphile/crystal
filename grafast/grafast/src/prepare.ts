@@ -5,7 +5,7 @@ import type {
   ExecutionResult,
 } from "graphql/execution/execute";
 import { buildExecutionContext } from "graphql/execution/execute";
-import { isAsyncIterable, isIterable } from "iterall";
+import { isAsyncIterable } from "iterall";
 
 import * as assert from "./assert.js";
 import type { Bucket, RequestContext } from "./bucket.js";

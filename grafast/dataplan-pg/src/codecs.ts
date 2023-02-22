@@ -1,7 +1,8 @@
+import type { JSONValue } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
-import { Range, parse as rangeParse } from "postgres-range";
+import { parse as rangeParse } from "postgres-range";
 
 import type {
   PgBox,
@@ -44,7 +45,6 @@ import type {
   PgTypeCodecExtensions,
   PgTypeCodecPolymorphism,
 } from "./interfaces.js";
-import { JSONValue } from "grafast";
 
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;

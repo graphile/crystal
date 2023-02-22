@@ -1,5 +1,5 @@
-import { ExecutionExtra, UnbatchedExecutableStep } from "grafast";
-import { ExecutableStep } from "grafast";
+import type { ExecutableStep, ExecutionExtra } from "grafast";
+import { UnbatchedExecutableStep } from "grafast";
 
 import type { PgTypeCodec } from "../interfaces.js";
 

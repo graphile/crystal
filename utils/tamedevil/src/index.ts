@@ -1003,6 +1003,7 @@ export default te;
 export {
   compile,
   dangerousKey,
+  dangerouslyIncludeRawCode,
   run as eval,
   get,
   identifier,
@@ -1011,7 +1012,6 @@ export {
   lit,
   lit as literal,
   optionalGet,
-  dangerouslyIncludeRawCode,
   ref,
   run,
   set,

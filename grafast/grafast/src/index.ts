@@ -63,6 +63,9 @@ import {
   InputObjectFieldApplyPlanResolver,
   InputObjectFieldInputPlanResolver,
   InputObjectTypeInputPlanResolver,
+  JSONArray,
+  JSONObject,
+  JSONValue,
   NodeIdCodec,
   NodeIdHandler,
   OutputPlanForType,
@@ -72,9 +75,6 @@ import {
   StepOptimizeOptions,
   StepStreamOptions,
   TypedEventEmitter,
-  JSONObject,
-  JSONArray,
-  JSONValue,
 } from "./interfaces.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
@@ -305,6 +305,9 @@ export {
   isObjectLikeStep,
   isPromiseLike,
   isStreamableStep,
+  JSONArray,
+  JSONObject,
+  JSONValue,
   lambda,
   LambdaStep,
   last,
@@ -382,9 +385,6 @@ export {
   stripAnsi,
   subscribe,
   TypedEventEmitter,
-  JSONObject,
-  JSONArray,
-  JSONValue,
   UnbatchedExecutableStep,
 };
 

@@ -69,15 +69,23 @@ const preset: GraphileConfig.Preset = {
             );
           },
           gql: {
-            resolve(e) {
-              return e;
-            },
-            async *subscribe() {
-              for (let i = 0; i < 10; i++) {
-                yield i;
-                await sleep(1000);
-              }
-            },
+            resolve: EXPORTABLE(
+              () =>
+                function resolve(e) {
+                  return e;
+                },
+              [],
+            ),
+            subscribe: EXPORTABLE(
+              (sleep) =>
+                async function* subscribe() {
+                  for (let i = 0; i < 10; i++) {
+                    yield i;
+                    await sleep(1000);
+                  }
+                },
+              [sleep],
+            ),
           },
         },
       },

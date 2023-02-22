@@ -20,7 +20,6 @@ import type {
 } from "graphql";
 
 import type { Bucket, RequestContext } from "./bucket.js";
-import type { GrafastError } from "./error.js";
 import type { InputStep } from "./input.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
