@@ -36,6 +36,9 @@ graph TD
     PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgClassExpression48{{"PgClassExpression[48∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     __InputStaticLeaf50{{"__InputStaticLeaf[50∈0]"}}:::plan
+    Access52{{"Access[52∈5]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access53{{"Access[53∈5]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object54{{"Object[54∈5]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgDelete51[["PgDelete[51∈5]"]]:::sideeffectplan
     PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__relational_posts__ᐳ"}}:::plan
@@ -79,10 +82,13 @@ graph TD
     Map91 --> PgSelectSingle46
     PgSelectSingle46 --> PgClassExpression47
     PgSelectSingle46 --> PgClassExpression48
-    Object12 & __InputStaticLeaf50 --> PgDelete51
+    __Value3 --> Access52
+    __Value3 --> Access53
+    Access52 & Access53 --> Object54
+    Object54 & __InputStaticLeaf50 --> PgDelete51
     PgDelete51 --> PgClassExpression55
     PgDelete51 --> PgClassExpression56
-    Object12 & PgClassExpression56 --> PgSelect57
+    Object54 & PgClassExpression56 --> PgSelect57
     PgSelect57 --> First61
     First61 --> PgSelectSingle62
     PgSelectSingle62 --> PgClassExpression63
@@ -115,10 +121,10 @@ graph TD
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 46<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[46]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression47,PgClassExpression48 bucket4
-    Bucket5("Bucket 5 (mutationField)<br />Deps: 12, 50"):::bucket
+    Bucket5("Bucket 5 (mutationField)<br />Deps: 50, 3<br /><br />1: Access[52]<br />2: Access[53]<br />3: Object[54]<br />4: PgDelete[51]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgDelete51 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 12<br /><br />ROOT PgDelete{5}[51]<br />1: <br />ᐳ: 55, 56<br />2: PgSelect[57]<br />ᐳ: First[61], PgSelectSingle[62]"):::bucket
+    class Bucket5,PgDelete51,Access52,Access53,Object54 bucket5
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 54<br /><br />ROOT PgDelete{5}[51]<br />1: <br />ᐳ: 55, 56<br />2: PgSelect[57]<br />ᐳ: First[61], PgSelectSingle[62]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression55,PgClassExpression56,PgSelect57,First61,PgSelectSingle62 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 62<br /><br />ROOT PgSelectSingle{6}ᐸrelational_postsᐳ[62]"):::bucket

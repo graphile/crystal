@@ -21,12 +21,18 @@ graph TD
     PgClassExpression16{{"PgClassExpression[16∈3]<br />ᐸ__always_a...ity__.”id”ᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈3]<br />ᐸ__always_a...tity__.”t”ᐳ"}}:::plan
     __InputStaticLeaf22{{"__InputStaticLeaf[22∈0]"}}:::plan
+    Access24{{"Access[24∈4]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access25{{"Access[25∈4]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object26{{"Object[26∈4]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgInsert23[["PgInsert[23∈4]"]]:::sideeffectplan
     Object27{{"Object[27∈4]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression28{{"PgClassExpression[28∈6]<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
     PgClassExpression29{{"PgClassExpression[29∈6]<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
     __InputStaticLeaf33{{"__InputStaticLeaf[33∈0]"}}:::plan
     __InputStaticLeaf34{{"__InputStaticLeaf[34∈0]"}}:::plan
+    Access36{{"Access[36∈7]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access37{{"Access[37∈7]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object38{{"Object[38∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgInsert35[["PgInsert[35∈7]"]]:::sideeffectplan
     Object39{{"Object[39∈7]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression40{{"PgClassExpression[40∈9]<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
@@ -40,11 +46,17 @@ graph TD
     PgInsert11 --> Object15
     PgInsert11 --> PgClassExpression16
     PgInsert11 --> PgClassExpression17
-    Object14 & __InputStaticLeaf22 --> PgInsert23
+    __Value3 --> Access24
+    __Value3 --> Access25
+    Access24 & Access25 --> Object26
+    Object26 & __InputStaticLeaf22 --> PgInsert23
     PgInsert23 --> Object27
     PgInsert23 --> PgClassExpression28
     PgInsert23 --> PgClassExpression29
-    Object14 & __InputStaticLeaf33 & __InputStaticLeaf34 --> PgInsert35
+    __Value3 --> Access36
+    __Value3 --> Access37
+    Access36 & Access37 --> Object38
+    Object38 & __InputStaticLeaf33 & __InputStaticLeaf34 --> PgInsert35
     PgInsert35 --> Object39
     PgInsert35 --> PgClassExpression40
     PgInsert35 --> PgClassExpression41
@@ -62,18 +74,18 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11<br /><br />ROOT PgInsert{1}[11]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression16,PgClassExpression17 bucket3
-    Bucket4("Bucket 4 (mutationField)<br />Deps: 14, 22<br /><br />1: PgInsert[23]<br />2: <br />ᐳ: Object[27]"):::bucket
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 22, 3<br /><br />1: Access[24]<br />2: Access[25]<br />3: Object[26]<br />4: PgInsert[23]<br />5: <br />ᐳ: Object[27]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgInsert23,Object27 bucket4
+    class Bucket4,PgInsert23,Access24,Access25,Object26,Object27 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 27, 23<br /><br />ROOT Object{4}ᐸ{result}ᐳ[27]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 23<br /><br />ROOT PgInsert{4}[23]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression28,PgClassExpression29 bucket6
-    Bucket7("Bucket 7 (mutationField)<br />Deps: 14, 33, 34<br /><br />1: PgInsert[35]<br />2: <br />ᐳ: Object[39]"):::bucket
+    Bucket7("Bucket 7 (mutationField)<br />Deps: 33, 34, 3<br /><br />1: Access[36]<br />2: Access[37]<br />3: Object[38]<br />4: PgInsert[35]<br />5: <br />ᐳ: Object[39]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgInsert35,Object39 bucket7
+    class Bucket7,PgInsert35,Access36,Access37,Object38,Object39 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 39, 35<br /><br />ROOT Object{7}ᐸ{result}ᐳ[39]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8 bucket8
