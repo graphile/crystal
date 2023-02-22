@@ -54,15 +54,14 @@ export function withGrafastArgs(
   if (shouldExplain) {
     const eventEmitter: ExecutionEventEmitter | undefined = new EventEmitter();
     const explainOperations: any[] = [];
-    args.rootValue = {
-      ...args.rootValue,
+    args.rootValue = Object.assign(Object.create(null), args.rootValue, {
       [$$eventEmitter]: eventEmitter,
       [$$extensions]: {
         explain: {
           operations: explainOperations,
         },
       },
-    };
+    });
     const handleExplainOperation = ({
       operation,
     }: ExecutionEventMap["explainOperation"]) => {
