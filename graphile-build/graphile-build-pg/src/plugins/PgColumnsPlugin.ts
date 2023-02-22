@@ -145,7 +145,7 @@ function processColumn(
   const baseType = getGraphQLTypeByPgCodec(baseCodec, "output")!;
   const arrayOrNotType = column.codec.arrayOfCodec
     ? new GraphQLList(
-        baseType, // FIXME: nullability
+        baseType, // TODO: nullability
       )
     : baseType;
   if (!arrayOrNotType) {

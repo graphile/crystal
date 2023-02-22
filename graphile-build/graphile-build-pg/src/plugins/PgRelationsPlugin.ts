@@ -977,7 +977,6 @@ function addRelations(
                   [localColumns, remoteColumns],
                 );
 
-                // FIXME: the non-clean branch of this does not currently have any tests, it might not work. Hence the throw above, out of an abundance of caution.
                 const specString = clean
                   ? makeSpecString(
                       previousIdentifier,
