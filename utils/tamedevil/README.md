@@ -266,8 +266,9 @@ in a minor release.
 
 This is not intended to be used with untrusted user data, it's just a
 convenience method to use for example if you want to map the (string) keys of an
-object into variable name TE nodes without using `te.raw`. Normally you'd just
-use `` te`myVarNameHere` `` to define a variable name (as just regular code).
+object into variable name TE nodes without using `te.dangerouslyIncludeRawCode`.
+Normally you'd just use `` te`myVarNameHere` `` to define a variable name (as
+just regular code).
 
 ### `te.dangerousKey(ident, forceQuotes = false)`
 
