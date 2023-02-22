@@ -412,7 +412,10 @@ export function executePreemptive(
             break;
           }
           if (isAsyncIterable(payload)) {
-            // FIXME: avoid 'for await' because it can cause the stream to exit late if we're waiting on a promise and the stream exits in the interrim
+            // TODO: do we need to avoid 'for await' because it can cause the
+            // stream to exit late if we're waiting on a promise and the stream
+            // exits in the interrim? We're assuming that no promises will be
+            // sufficiently long-lived for this to be an issue right now.
             for await (const entry of payload) {
               iterator.push(entry);
             }
