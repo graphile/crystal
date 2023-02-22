@@ -1140,10 +1140,13 @@ const introspect = (
     kind: Kind.DOCUMENT,
   };
   const variableValues: Record<string, any> = Object.create(null);
-  for (const variableName of variableNames) {
+  const sortedVariableNames = [...variableNames].sort();
+  for (const variableName of sortedVariableNames) {
     variableValues[variableName] = root.variables[variableName];
   }
-  // PERF: make this canonical, so that cache hits are more likely.
+  // "canonical" only to one level, but given introspection doesn't really
+  // accept objects this should be mostly sufficient for decent optimization
+  // level.
   const canonical = JSON.stringify(variableValues);
   const cached = introspectionCacheByVariableValues.get(canonical);
   if (cached) {
