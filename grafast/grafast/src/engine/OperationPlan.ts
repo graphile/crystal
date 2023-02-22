@@ -1702,7 +1702,6 @@ ${te.join(
       }
     }
     return {
-      // FIXME: should this be FieldArgs?
       get(name) {
         return trackedArgumentValues[name];
       },
