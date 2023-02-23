@@ -1,19 +1,38 @@
 import { isAsyncIterable } from "grafast";
 import { AsyncExecutionResult, ExecutionResult, GraphQLError } from "graphql";
 
+// Only the non-ambiguous characters
+const RANDOM_STRING_LETTERS = "ABCDEFGHJKLMNPQRTUVWXYZ2346789";
+const RANDOM_STRING_LETTERS_LENGTH = RANDOM_STRING_LETTERS.length;
+
+const randomString = (length = 10) => {
+  let str = "";
+  for (let i = 0; i < length; i++) {
+    str +=
+      RANDOM_STRING_LETTERS[
+        Math.floor(Math.random() * RANDOM_STRING_LETTERS_LENGTH)
+      ];
+  }
+  return str;
+};
+
 export function defaultMaskError(error: GraphQLError): GraphQLError {
   if (error.originalError instanceof GraphQLError) {
     return error;
   } else {
+    const errorId = randomString();
+    console.error(`Masked GraphQL error (code: '${errorId}')`, error);
     return new GraphQLError(
-      "An error occurred",
+      `An error occurred (code: '${errorId}')`,
       error.nodes,
       error.source,
       error.positions,
       error.path,
       error.originalError,
       // Deliberately wipe the extensions
-      null,
+      {
+        errorId,
+      },
     );
   }
 }
