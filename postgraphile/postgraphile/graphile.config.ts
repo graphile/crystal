@@ -82,7 +82,7 @@ const preset: GraphileConfig.Preset = {
                 async function* subscribe() {
                   for (let i = 0; i < 10; i++) {
                     yield i;
-                    await sleep(1000);
+                    await sleep(300);
                   }
                 },
               [sleep],
