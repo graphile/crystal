@@ -41,6 +41,7 @@ import {
   error,
   ExecutableStep,
   object,
+  SafeError,
 } from "../index.js";
 import { inputPlan } from "../input.js";
 import { inspect } from "../inspect.js";
@@ -1681,7 +1682,7 @@ ${te.join(
       for (const argumentDefinition of argumentDefinitions) {
         const argumentName = argumentDefinition.name;
         if (seenNames.has(argumentName)) {
-          throw new Error(
+          throw new SafeError(
             `Argument name '${argumentName}' seen twice; aborting.`,
           );
         }

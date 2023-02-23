@@ -718,7 +718,9 @@ export function executeBucket(
         default: {
           const never: never = childLayerPlan.reason;
           throw new Error(
-            `GraphileInternalError<>: unhandled reason '${inspect(never)}'`,
+            `GraphileInternalError<c6984a96-050e-4d40-ab18-a8c5dc7e239b>: unhandled reason '${inspect(
+              never,
+            )}'`,
           );
         }
       }

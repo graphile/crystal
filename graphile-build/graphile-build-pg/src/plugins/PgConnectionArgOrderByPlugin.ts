@@ -12,7 +12,7 @@ import type {
   GraphileFieldConfigArgumentMap,
   InputStep,
 } from "grafast";
-import { getEnumValueConfig } from "grafast";
+import { getEnumValueConfig, SafeError } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
@@ -237,7 +237,7 @@ export const applyOrderToPlan = EXPORTABLE(
               plan,
             )}`,
           );
-          throw new Error(
+          throw new SafeError(
             "Internal server error: invalid orderBy configuration",
           );
         }
