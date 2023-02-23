@@ -34,6 +34,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
 
         const introspectionRole = introspection.getCurrentUser();
         if (!introspectionRole) {
+          // https://youtu.be/3kx7tgkJbjo?t=11
           throw new Error("WHO AM I?");
         }
         const columnPermissions = resolvePermissions(
@@ -99,6 +100,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
 
         const introspectionRole = introspection.getCurrentUser();
         if (!introspectionRole) {
+          // https://youtu.be/3kx7tgkJbjo?t=11
           throw new Error("WHO AM I?");
         }
         const permissions = resolvePermissions(
@@ -130,6 +132,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
 
         const introspectionRole = introspection.getCurrentUser();
         if (!introspectionRole) {
+          // https://youtu.be/3kx7tgkJbjo?t=11
           throw new Error("WHO AM I?");
         }
         const tablePermissions = resolvePermissions(
