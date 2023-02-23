@@ -4,6 +4,7 @@ import type { PromiseOrDirect } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
+  GraphQLError,
   GraphQLSchema,
 } from "graphql";
 
@@ -70,6 +71,13 @@ export interface ServerOptions {
    * Should we enable a websockets transport if available?
    */
   websockets?: boolean;
+
+  /**
+   * If you would like to customize the way in which errors are masked, you may
+   * pass your own error masking function here. You can also import
+   * `defaultMaskError` from `grafserv`.
+   */
+  maskError?: (error: GraphQLError) => GraphQLError;
 }
 
 declare global {

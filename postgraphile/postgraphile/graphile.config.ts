@@ -10,6 +10,7 @@ import { EXPORTABLE } from "graphile-export";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
+import { GraphQLError } from "graphql";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

@@ -347,6 +347,7 @@ export const makeGraphQLHandler = (
   }
 
   const outputDataAsString = dynamicOptions.outputDataAsString;
+  const { maskIterator, maskPayload, maskError } = dynamicOptions;
 
   return async (
     request: NormalizedRequestDigest,
@@ -509,7 +510,7 @@ export const makeGraphQLHandler = (
           request,
           dynamicOptions,
           statusCode: 200,
-          iterator: result,
+          iterator: maskIterator(result),
           outputDataAsString,
         };
       }
@@ -524,7 +525,7 @@ export const makeGraphQLHandler = (
             ? 400
             : 200,
         contentType: chosenContentType,
-        payload: result,
+        payload: maskPayload(result),
         outputDataAsString,
       };
     } catch (e) {
@@ -538,7 +539,7 @@ export const makeGraphQLHandler = (
         statusCode: e.statusCode ?? (isLegacy ? 200 : 500),
         contentType: chosenContentType,
         payload: {
-          errors: [new GraphQLError(e.message)],
+          errors: [maskError(new GraphQLError(e.message))],
           extensions: (args.rootValue as any)?.[$$extensions],
         },
       };
