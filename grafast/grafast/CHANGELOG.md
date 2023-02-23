@@ -1,5 +1,31 @@
 # grafast
 
+## 0.0.1-0.14
+
+### Patch Changes
+
+- [#204](https://github.com/benjie/postgraphile-private/pull/204)
+  [`d76043453`](https://github.com/benjie/postgraphile-private/commit/d7604345362c58bf7eb43ef1ac1795a2ac22ae79)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for GraphQL
+  subscribe method (in addition to Grafast's subscribePlan).
+
+- [#207](https://github.com/benjie/postgraphile-private/pull/207)
+  [`afa0ea5f6`](https://github.com/benjie/postgraphile-private/commit/afa0ea5f6c508d9a0ba5946ab153b13ddbd274a0)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in subscriptions where
+  termination of underlying stream wouldn't terminate the subscription.
+
+- [#206](https://github.com/benjie/postgraphile-private/pull/206)
+  [`851b78ef2`](https://github.com/benjie/postgraphile-private/commit/851b78ef20d430164507ec9b3f41a5a0b8a18ed7)
+  Thanks [@benjie](https://github.com/benjie)! - Grafserv now masks untrusted
+  errors by default; trusted errors are constructed via GraphQL's GraphQLError
+  or Grafast's SafeError.
+
+- [#204](https://github.com/benjie/postgraphile-private/pull/204)
+  [`384b3594f`](https://github.com/benjie/postgraphile-private/commit/384b3594f543d113650c1b6b02b276360dd2d15f)
+  Thanks [@benjie](https://github.com/benjie)! - Allow subscriptions to come
+  from async generator functions (previous detection of this was broken, only
+  our manual async iterator objects were working).
+
 ## 0.0.1-0.13
 
 ### Patch Changes

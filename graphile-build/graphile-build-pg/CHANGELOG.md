@@ -1,5 +1,24 @@
 # graphile-build-pg
 
+## 5.0.0-0.22
+
+### Patch Changes
+
+- [#206](https://github.com/benjie/postgraphile-private/pull/206)
+  [`851b78ef2`](https://github.com/benjie/postgraphile-private/commit/851b78ef20d430164507ec9b3f41a5a0b8a18ed7)
+  Thanks [@benjie](https://github.com/benjie)! - Grafserv now masks untrusted
+  errors by default; trusted errors are constructed via GraphQL's GraphQLError
+  or Grafast's SafeError.
+- Updated dependencies
+  [[`d76043453`](https://github.com/benjie/postgraphile-private/commit/d7604345362c58bf7eb43ef1ac1795a2ac22ae79),
+  [`afa0ea5f6`](https://github.com/benjie/postgraphile-private/commit/afa0ea5f6c508d9a0ba5946ab153b13ddbd274a0),
+  [`92c2378f2`](https://github.com/benjie/postgraphile-private/commit/92c2378f297cc917f542b126e1cdddf58e1f0fc3),
+  [`851b78ef2`](https://github.com/benjie/postgraphile-private/commit/851b78ef20d430164507ec9b3f41a5a0b8a18ed7),
+  [`384b3594f`](https://github.com/benjie/postgraphile-private/commit/384b3594f543d113650c1b6b02b276360dd2d15f)]:
+  - grafast@0.0.1-0.14
+  - @dataplan/pg@0.0.1-0.19
+  - graphile-build@5.0.0-0.19
+
 ## 5.0.0-0.21
 
 ### Patch Changes

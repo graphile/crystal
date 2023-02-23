@@ -1,5 +1,31 @@
 # grafserv
 
+## 0.0.1-0.16
+
+### Patch Changes
+
+- [#207](https://github.com/benjie/postgraphile-private/pull/207)
+  [`c850dd4ec`](https://github.com/benjie/postgraphile-private/commit/c850dd4ec0e42e37122f5bca55a079b53bfd895e)
+  Thanks [@benjie](https://github.com/benjie)! - Rename 'preset.server' to
+  'preset.grafserv'.
+
+- [#207](https://github.com/benjie/postgraphile-private/pull/207)
+  [`afa0ea5f6`](https://github.com/benjie/postgraphile-private/commit/afa0ea5f6c508d9a0ba5946ab153b13ddbd274a0)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in subscriptions where
+  termination of underlying stream wouldn't terminate the subscription.
+
+- [#206](https://github.com/benjie/postgraphile-private/pull/206)
+  [`851b78ef2`](https://github.com/benjie/postgraphile-private/commit/851b78ef20d430164507ec9b3f41a5a0b8a18ed7)
+  Thanks [@benjie](https://github.com/benjie)! - Grafserv now masks untrusted
+  errors by default; trusted errors are constructed via GraphQL's GraphQLError
+  or Grafast's SafeError.
+- Updated dependencies
+  [[`d76043453`](https://github.com/benjie/postgraphile-private/commit/d7604345362c58bf7eb43ef1ac1795a2ac22ae79),
+  [`afa0ea5f6`](https://github.com/benjie/postgraphile-private/commit/afa0ea5f6c508d9a0ba5946ab153b13ddbd274a0),
+  [`851b78ef2`](https://github.com/benjie/postgraphile-private/commit/851b78ef20d430164507ec9b3f41a5a0b8a18ed7),
+  [`384b3594f`](https://github.com/benjie/postgraphile-private/commit/384b3594f543d113650c1b6b02b276360dd2d15f)]:
+  - grafast@0.0.1-0.14
+
 ## 0.0.1-0.15
 
 ### Patch Changes
