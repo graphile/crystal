@@ -21,7 +21,12 @@ import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
-import { GrafastError, isGrafastError } from "./error.js";
+import {
+  GrafastError,
+  isGrafastError,
+  isSafeError,
+  SafeError,
+} from "./error.js";
 import { execute } from "./execute.js";
 import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
@@ -304,6 +309,7 @@ export {
   isModifierStep,
   isObjectLikeStep,
   isPromiseLike,
+  isSafeError,
   isStreamableStep,
   JSONArray,
   JSONObject,
@@ -369,6 +375,7 @@ export {
   reverse,
   reverseArray,
   ReverseStep,
+  SafeError,
   ScalarPlanResolver,
   ScalarPlans,
   setter,

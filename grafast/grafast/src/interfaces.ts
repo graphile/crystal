@@ -233,6 +233,12 @@ export const $$streamMore = Symbol("streamMore");
 export const $$proxy = Symbol("proxy");
 
 /**
+ * If an error has this property set then it's safe to send through to the user
+ * without being masked.
+ */
+export const $$safeError = Symbol("safeError");
+
+/**
  * When dealing with a polymorphic thing we need to be able to determine what
  * the concrete type of it is, we use the $$concreteType property for that.
  */

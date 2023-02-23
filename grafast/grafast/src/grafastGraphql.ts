@@ -10,6 +10,7 @@ import { GraphQLError, parse, Source, validate, validateSchema } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import { NULL_PRESET } from "./config.js";
+import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -157,7 +158,7 @@ export function grafastGraphqlSync(
 ): ExecutionResult {
   const result = grafastGraphql(args, resolvedPreset);
   if (isPromiseLike(result)) {
-    throw new Error("Grafast execution failed to complete synchronously.");
+    throw new SafeError("Grafast execution failed to complete synchronously.");
   }
   return result as ExecutionResult;
 }

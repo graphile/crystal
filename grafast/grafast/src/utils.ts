@@ -39,6 +39,7 @@ import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
+import { SafeError } from "./error.js";
 import type { InputStep } from "./input.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -769,7 +770,7 @@ function findVariableNamesUsedInSelectionNode(
       const fragment = operationPlan.fragments[fragmentName];
       findVariableNamesUsedInDirectives(fragment.directives, variableNames);
       if (fragment.variableDefinitions?.length) {
-        throw new Error(
+        throw new SafeError(
           "Grafast doesn't support variable definitions on fragments yet.",
         );
       }

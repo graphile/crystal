@@ -12,7 +12,7 @@ import type {
   GraphileFieldConfigArgumentMap,
   InputStep,
 } from "grafast";
-import { getEnumValueConfig } from "grafast";
+import { getEnumValueConfig, SafeError } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
@@ -218,7 +218,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
 };
 
 export const applyOrderToPlan = EXPORTABLE(
-  (getEnumValueConfig, inspect) =>
+  (SafeError, getEnumValueConfig, inspect) =>
     (
       $select: PgSelectStep<any, any, any, any>,
       $value: InputStep,
@@ -237,12 +237,12 @@ export const applyOrderToPlan = EXPORTABLE(
               plan,
             )}`,
           );
-          throw new Error(
+          throw new SafeError(
             "Internal server error: invalid orderBy configuration",
           );
         }
         plan($select);
       });
     },
-  [getEnumValueConfig, inspect],
+  [SafeError, getEnumValueConfig, inspect],
 );

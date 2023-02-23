@@ -5,6 +5,7 @@ import type {
   SelectionSetNode,
 } from "graphql";
 import {
+  GraphQLError,
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLUnionType,
@@ -14,6 +15,7 @@ import {
 } from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
+import { SafeError } from "./error.js";
 import type { __TrackedObjectStep } from "./steps/index.js";
 
 /**
@@ -67,7 +69,7 @@ export function evalDirectiveArg<T = unknown>(
         return null as any;
       }
       default: {
-        throw new Error(
+        throw new SafeError(
           `Unsupported @${directiveName}(${argumentName}:) argument; expected Variable, Boolean or null; but received '${value.kind}'`,
         );
       }
@@ -244,7 +246,9 @@ export function graphqlCollectFields(
           const fragmentTypeName = fragmentTypeAst.name.value;
           const fragmentType = operationPlan.schema.getType(fragmentTypeName);
           if (fragmentType == null) {
-            throw new Error(`We don't have a type named '${fragmentTypeName}'`);
+            throw new GraphQLError(
+              `We don't have a type named '${fragmentTypeName}'`,
+            );
           }
           if (
             !(

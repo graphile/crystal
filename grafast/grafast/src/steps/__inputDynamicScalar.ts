@@ -6,6 +6,7 @@ import type {
 } from "graphql";
 import { Kind } from "graphql";
 
+import { SafeError } from "../error.js";
 import type { ExecutionExtra } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __TrackedObjectStep } from "./__trackedObject.js";
@@ -60,11 +61,13 @@ export class __InputDynamicScalarStep<
           return;
         }
         case Kind.ENUM: {
-          throw new Error("Enum values cannot be included within scalars");
+          throw new SafeError("Enum values cannot be included within scalars");
         }
         default: {
           const never: never = inputValue;
-          throw new Error(`Unsupported kind '${(never as ValueNode).kind}'`);
+          throw new SafeError(
+            `Unsupported kind '${(never as ValueNode).kind}'`,
+          );
         }
       }
     };
@@ -105,11 +108,13 @@ export class __InputDynamicScalarStep<
           return obj;
         }
         case Kind.ENUM: {
-          throw new Error("Enum values cannot be included within scalars");
+          throw new SafeError("Enum values cannot be included within scalars");
         }
         default: {
           const never: never = inputValue;
-          throw new Error(`Unsupported kind '${(never as ValueNode).kind}'`);
+          throw new SafeError(
+            `Unsupported kind '${(never as ValueNode).kind}'`,
+          );
         }
       }
     };

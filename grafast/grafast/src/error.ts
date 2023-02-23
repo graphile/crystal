@@ -1,4 +1,5 @@
 import type { $$extensions } from "./interfaces.js";
+import { $$safeError } from "./interfaces.js";
 
 /**
  * Internally we wrap errors that occur in a GrafastError; this allows us to do
@@ -56,4 +57,15 @@ export function newGrafastError(error: Error, planId: number | null) {
  */
 export function isGrafastError(value: any): value is GrafastError {
   return typeof value === "object" && value !== null && $$error in value;
+}
+
+export class SafeError extends Error {
+  [$$safeError] = true;
+  constructor(message: string, public extensions?: Record<string, any>) {
+    super(message);
+  }
+}
+
+export function isSafeError(error: Error): error is SafeError {
+  return (error as any)[$$safeError];
 }

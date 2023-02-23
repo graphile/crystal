@@ -1,5 +1,5 @@
 import type { GrafastResultsList, GrafastValuesList } from "grafast";
-import { ExecutableStep, isDev } from "grafast";
+import { ExecutableStep, isDev, SafeError } from "grafast";
 
 /**
  * Lightweight plan to validate cursor. We couldn't do this with a lambda
@@ -66,7 +66,7 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
           console.error("Invalid cursor:");
           console.error(e);
         }
-        throw new Error(
+        throw new SafeError(
           `Invalid '${this.beforeOrAfter}' cursor - a cursor is only valid within a specific ordering, if you change the order then you'll need different cursors.`,
         );
       }

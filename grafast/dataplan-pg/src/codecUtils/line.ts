@@ -1,4 +1,4 @@
-import { inspect } from "../inspect.js";
+import { SafeError } from "grafast";
 
 export interface PgLine {
   a: { x: number; y: number };
@@ -24,7 +24,7 @@ export function parseLine(f: string): PgLine {
       b: { x: 0, y: B === 0 ? 1 : -C / B },
     };
   } else {
-    throw new Error(`Failed to parse line ${inspect(f)}`);
+    throw new SafeError(`Failed to parse line ${f}`);
   }
 }
 

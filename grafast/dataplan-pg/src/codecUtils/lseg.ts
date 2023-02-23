@@ -1,4 +1,4 @@
-import { inspect } from "../inspect.js";
+import { SafeError } from "grafast";
 
 export interface PgLseg {
   a: { x: number; y: number };
@@ -22,7 +22,7 @@ export function parseLseg(f: string): PgLseg {
       b: { x: x2, y: y2 },
     };
   } else {
-    throw new Error(`Failed to parse lseg ${inspect(f)}`);
+    throw new SafeError(`Failed to parse lseg ${f}`);
   }
 }
 

@@ -5,6 +5,7 @@ import type {
   ExecutionResult,
 } from "graphql";
 import { GraphQLError } from "graphql";
+import type { ServerOptions } from "graphql-ws";
 import type { Readable } from "node:stream";
 
 import type { GrafservBase } from "./index.js";
@@ -148,7 +149,11 @@ export function httpError(
   return Object.assign(new Error(message), { statusCode, safeMessage: true });
 }
 
-export function makeGraphQLWSConfig(instance: GrafservBase) {
+export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
+  const {
+    resolvedPreset,
+    dynamicOptions: { maskExecutionResult },
+  } = instance;
   return {
     schema: async () => instance.getSchema(),
     // PERF: we can remove the async/await and only use when context is async
@@ -160,7 +165,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase) {
         },
         instance.resolvedPreset,
       );
-      return execute(args, instance.resolvedPreset);
+      return maskExecutionResult(await execute(args, resolvedPreset));
     },
     subscribe: async (args: ExecutionArgs) => {
       await hookArgs(
@@ -170,7 +175,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase) {
         },
         instance.resolvedPreset,
       );
-      return subscribe(args, instance.resolvedPreset);
+      return maskExecutionResult(await subscribe(args, resolvedPreset));
     },
   };
 }

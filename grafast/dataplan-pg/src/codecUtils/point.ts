@@ -1,4 +1,4 @@
-import { inspect } from "../inspect.js";
+import { SafeError } from "grafast";
 
 export interface PgPoint {
   x: number;
@@ -18,7 +18,7 @@ export function parsePoint(f: string): PgPoint {
       .map((f) => parseFloat(f));
     return { x, y };
   } else {
-    throw new Error(`Failed to parse point ${inspect(f)}`);
+    throw new SafeError(`Failed to parse point ${f}`);
   }
 }
 

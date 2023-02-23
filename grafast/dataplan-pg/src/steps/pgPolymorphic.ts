@@ -4,7 +4,12 @@ import type {
   PolymorphicData,
   PolymorphicStep,
 } from "grafast";
-import { isDev, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
+import {
+  isDev,
+  polymorphicWrap,
+  SafeError,
+  UnbatchedExecutableStep,
+} from "grafast";
 import type { GraphQLObjectType } from "graphql";
 
 import { inspect } from "../inspect.js";
@@ -111,7 +116,7 @@ export class PgPolymorphicStep<
           )}'`,
         );
       }
-      throw new Error(
+      throw new SafeError(
         "Could not determine the type to use for this polymorphic value.",
       );
     }

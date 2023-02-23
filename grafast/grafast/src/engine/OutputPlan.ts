@@ -587,8 +587,8 @@ export function coerceError(
         null,
         null,
         path,
-        error.originalError,
-        null,
+        error.originalError ?? error,
+        error.extensions,
       );
     }
   } else {

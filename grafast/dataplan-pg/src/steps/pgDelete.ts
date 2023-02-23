@@ -1,5 +1,5 @@
 import type { GrafastResultsList, GrafastValuesList } from "grafast";
-import { ExecutableStep, isDev } from "grafast";
+import { ExecutableStep, isDev, SafeError } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -330,7 +330,7 @@ export class PgDeleteStep<
       const getByColumnsCount = this.getBys.length;
       if (getByColumnsCount === 0) {
         // No columns specified to find the row?! This is forbidden.
-        throw new Error(
+        throw new SafeError(
           "Attempted to delete a record, but no information on uniquely determining the record was specified.",
         );
       } else {

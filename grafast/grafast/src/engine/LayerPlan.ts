@@ -712,7 +712,9 @@ ${te.join(
       default: {
         const never: never = this.reason;
         throw new Error(
-          `GraphileInternalError<>: unhandled reason '${inspect(never)}'`,
+          `GraphileInternalError<8162e6c2-3d66-4d67-ba03-5310a4f9a6d4>: unhandled reason '${inspect(
+            never,
+          )}'`,
         );
       }
     }

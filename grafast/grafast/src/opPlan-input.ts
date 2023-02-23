@@ -488,7 +488,7 @@ function withFieldArgsForArgumentsOrInputObject<
             const inputObjectType = getNullableType(field.type);
             if (!isInputObjectType(inputObjectType)) {
               throw new Error(
-                `GraphileInternalError<1ac45a76-a21e-4f25-841c-59c73ddcf70c>: How could this not be an object type given we have a path that uses it?!`,
+                `GraphileInternalError<1ac45a76-a21e-4f25-841c-59c73ddcf70c>: How could this not be an input object type given we have a path that uses it?!`,
               );
             }
             process(inputObjectType.getFields(), newPath);

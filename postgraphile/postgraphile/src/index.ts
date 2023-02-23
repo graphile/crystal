@@ -68,7 +68,7 @@ export function postgraphile(preset: GraphileConfig.Preset): {
       assertAlive();
       if (server) {
         throw new Error(
-          `createGrafserv is currently only allowed to be called once; if you'd like to call it multiple times please file an issue with your use case and we can discuss implementing that.`,
+          `createServ is currently only allowed to be called once; if you'd like to call it multiple times please file an issue with your use case and we can discuss implementing that.`,
         );
       }
       const schema = isPromiseLike(serverParams)

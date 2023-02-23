@@ -41,6 +41,7 @@ import {
   error,
   ExecutableStep,
   object,
+  SafeError,
 } from "../index.js";
 import { inputPlan } from "../input.js";
 import { inspect } from "../inspect.js";
@@ -440,7 +441,7 @@ ${te.join(
         }
         default: {
           const never: never = this.operationType;
-          throw new Error(`Unsupported operation type '${never}'.`);
+          throw new SafeError(`Unsupported operation type '${never}'.`);
         }
       }
     } catch (e) {
@@ -452,7 +453,7 @@ ${te.join(
           )}): \n${e.stack || e}`,
         );
       }
-      throw new Error(`Failed to plan this query.`);
+      throw new SafeError(`Failed to plan this query.`);
     }
   }
 
@@ -463,7 +464,7 @@ ${te.join(
     if (this.loc) this.loc.push("planQuery()");
     const rootType = this.queryType;
     if (!rootType) {
-      throw new Error("No query type found in schema");
+      throw new SafeError("No query type found in schema");
     }
     const locationDetails: LocationDetails = {
       node: this.operation.selectionSet.selections,
@@ -499,7 +500,7 @@ ${te.join(
     if (this.loc) this.loc.push("planMutation()");
     const rootType = this.mutationType;
     if (!rootType) {
-      throw new Error("No mutation type found in schema");
+      throw new SafeError("No mutation type found in schema");
     }
 
     this.deduplicateSteps();
@@ -539,7 +540,7 @@ ${te.join(
     if (this.loc) this.loc.push("planSubscription");
     const rootType = this.subscriptionType;
     if (!rootType) {
-      throw new Error("No subscription type found in schema");
+      throw new SafeError("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
     const groupedFieldSet = withGlobalLayerPlan(
@@ -554,19 +555,21 @@ ${te.join(
         ),
     );
     if (groupedFieldSet.deferred.length > 0) {
-      throw new Error("@defer forbidden on subscription root selection set");
+      throw new SafeError(
+        "@defer forbidden on subscription root selection set",
+      );
     }
     let firstKey: string | undefined = undefined;
     for (const key of groupedFieldSet.fields.keys()) {
       if (firstKey !== undefined) {
-        throw new Error("subscriptions may only have one top-level field");
+        throw new SafeError("subscriptions may only have one top-level field");
       }
       firstKey = key;
     }
     assert.ok(firstKey != null, "selection set cannot be empty");
     const fields = groupedFieldSet.fields.get(firstKey);
     if (!fields) {
-      throw new Error("Consistency error.");
+      throw new SafeError("Consistency error.");
     }
     // All grouped fields are equivalent, as mandated by GraphQL validation rules. Thus we can take the first one.
     const field = fields[0];
@@ -603,7 +606,7 @@ ${te.join(
         trackedArguments,
       );
       if (haltTree) {
-        throw new Error("Failed to setup subscription");
+        throw new SafeError("Failed to setup subscription");
       }
       const stepOptions: StepOptions = {
         stream: isStreamableStep(subscribeStep as ExecutableStep<any>)
@@ -1681,7 +1684,7 @@ ${te.join(
       for (const argumentDefinition of argumentDefinitions) {
         const argumentName = argumentDefinition.name;
         if (seenNames.has(argumentName)) {
-          throw new Error(
+          throw new SafeError(
             `Argument name '${argumentName}' seen twice; aborting.`,
           );
         }

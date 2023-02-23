@@ -1,3 +1,5 @@
+import { SafeError } from "grafast";
+
 import { isDev } from "../dev.js";
 import type {
   GrafastResultStreamList,
@@ -67,8 +69,8 @@ export class ListenStep<
   ): GrafastResultStreamList<TTopics[TTopic]> {
     return values[this.pubsubDep as 0].map((pubsub, i) => {
       if (!pubsub) {
-        throw Object.assign(
-          new Error("Subscription not supported"),
+        throw new SafeError(
+          "Subscription not supported",
           isDev
             ? {
                 hint: `${
