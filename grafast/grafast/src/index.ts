@@ -21,7 +21,12 @@ import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
-import { GrafastError, isGrafastError } from "./error.js";
+import {
+  GrafastError,
+  isGrafastError,
+  SafeError,
+  isSafeError,
+} from "./error.js";
 import { execute } from "./execute.js";
 import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
@@ -31,7 +36,6 @@ import {
   $$extensions,
   $$idempotent,
   $$verbatim,
-  $$safeError,
   ArgumentApplyPlanResolver,
   ArgumentInputPlanResolver,
   BaseEventMap,
@@ -208,7 +212,6 @@ export {
   __TrackedObjectStep,
   __ValueStep,
   $$bypassGraphQL,
-  $$safeError,
   $$eventEmitter,
   $$extensions,
   $$idempotent,
@@ -248,6 +251,8 @@ export {
   EventCallback,
   EventMapKey,
   ExecutableStep,
+  SafeError,
+  isSafeError,
   execute,
   ExecutionEventEmitter,
   ExecutionEventMap,

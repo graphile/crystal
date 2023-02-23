@@ -13,7 +13,7 @@ import type {
   StreamableStep,
 } from "grafast";
 import {
-  $$safeError,
+  SafeError,
   __InputListStep,
   __InputObjectStep,
   __InputStaticLeafStep,
@@ -104,11 +104,8 @@ function parseCursor(cursor: string | null) {
     }
     return decoded;
   } catch (e) {
-    throw Object.assign(
-      new Error(
-        "Invalid cursor, please enter a cursor from a previous request, or null.",
-      ),
-      { [$$safeError]: true },
+    throw new SafeError(
+      "Invalid cursor, please enter a cursor from a previous request, or null.",
     );
   }
 }

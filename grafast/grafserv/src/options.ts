@@ -1,5 +1,5 @@
 import { AsyncExecutionResult, ExecutionResult, GraphQLError } from "graphql";
-import { isAsyncIterable, $$safeError } from "grafast";
+import { isAsyncIterable, isSafeError } from "grafast";
 
 // Only the non-ambiguous characters
 const RANDOM_STRING_LETTERS = "ABCDEFGHJKLMNPQRTUVWXYZ2346789";
@@ -16,17 +16,10 @@ const randomString = (length = 10) => {
   return str;
 };
 
-function isSafeError(error: Error | null | undefined): error is Error & {
-  [$$safeError]: true;
-  extensions?: Record<string, any> | null;
-} {
-  return (error as any)?.[$$safeError];
-}
-
 export function defaultMaskError(error: GraphQLError): GraphQLError {
   if (error.originalError instanceof GraphQLError) {
     return error;
-  } else if (isSafeError(error.originalError)) {
+  } else if (error.originalError != null && isSafeError(error.originalError)) {
     return new GraphQLError(
       error.originalError.message,
       error.nodes,

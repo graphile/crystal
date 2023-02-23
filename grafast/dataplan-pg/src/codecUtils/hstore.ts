@@ -1,3 +1,5 @@
+import { SafeError } from "grafast";
+
 export interface PgHStore {
   [key: string]: string | null;
 }
@@ -76,7 +78,7 @@ export function parseHstore(hstoreString: string): PgHStore {
           ++i;
           mode = "EXPECT_VALUE";
         } else {
-          throw new Error("Invalid hstore value - expected '=>'");
+          throw new SafeError("Invalid hstore value - expected '=>'");
         }
         break;
       }
@@ -97,7 +99,7 @@ export function parseHstore(hstoreString: string): PgHStore {
       }
       case "VALUE_QUOTES": {
         if (char === '"') {
-          if (key == null) throw new Error("No key");
+          if (key == null) throw new SafeError("No key");
           hstore[key] = value;
           key = null;
           value = null;
@@ -111,7 +113,7 @@ export function parseHstore(hstoreString: string): PgHStore {
       }
       case "VALUE_RAW": {
         if (char === "," || /\s/.test(char)) {
-          if (key == null) throw new Error("No key");
+          if (key == null) throw new SafeError("No key");
           hstore[key] = value === "NULL" ? null : value;
           key = null;
           value = null;
@@ -130,13 +132,13 @@ export function parseHstore(hstoreString: string): PgHStore {
         } else if (char === ",") {
           mode = "EXPECT_KEY";
         } else {
-          throw new Error("Invalid hstore value - expected comma");
+          throw new SafeError("Invalid hstore value - expected comma");
         }
         break;
       }
       default: {
         const never: never = mode;
-        throw new Error(`Reached invalid mode ${never}`);
+        throw new SafeError(`Reached invalid mode ${never}`);
       }
     }
   }
@@ -164,7 +166,7 @@ export function stringifyHstore(o: PgHStore | null): string | null {
     return null;
   }
   if (typeof o !== "object") {
-    throw new TypeError("Expected an hstore object");
+    throw new SafeError("Expected an hstore object");
   }
   const keys = Object.keys(o);
   const encodeKeyValue = (key: string) => {

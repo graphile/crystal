@@ -5,6 +5,7 @@ import type {
   SelectionSetNode,
 } from "graphql";
 import {
+  GraphQLError,
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLUnionType,
@@ -244,7 +245,9 @@ export function graphqlCollectFields(
           const fragmentTypeName = fragmentTypeAst.name.value;
           const fragmentType = operationPlan.schema.getType(fragmentTypeName);
           if (fragmentType == null) {
-            throw new Error(`We don't have a type named '${fragmentTypeName}'`);
+            throw new GraphQLError(
+              `We don't have a type named '${fragmentTypeName}'`,
+            );
           }
           if (
             !(

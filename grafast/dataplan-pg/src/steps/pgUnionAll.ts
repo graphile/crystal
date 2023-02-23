@@ -13,7 +13,6 @@ import type {
   PolymorphicStep,
 } from "grafast";
 import {
-  $$safeError,
   __ItemStep,
   access,
   constant,
@@ -24,6 +23,7 @@ import {
   list,
   polymorphicWrap,
   reverseArray,
+  SafeError,
 } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -101,11 +101,8 @@ function parseCursor(cursor: string | null) {
     }
     return decoded;
   } catch (e) {
-    throw Object.assign(
-      new Error(
-        "Invalid cursor, please enter a cursor from a previous request, or null.",
-      ),
-      { [$$safeError]: true },
+    throw new SafeError(
+      "Invalid cursor, please enter a cursor from a previous request, or null.",
     );
   }
 }
