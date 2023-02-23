@@ -24,7 +24,7 @@ serv.addTo(app).catch((e) => {
 });
 
 // Start the Fastify server
-app.listen({ port: preset.server.port ?? 5678 }, (err, address) => {
+app.listen({ port: preset.grafserv.port ?? 5678 }, (err, address) => {
   if (err) throw err;
   console.log(`Server is now listening on ${address}`);
 });

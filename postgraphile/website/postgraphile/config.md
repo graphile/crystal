@@ -467,7 +467,7 @@ export default {
 
 ## `server` options
 
-_(TypeScript type: `import { ServerOptions } from "grafserv"`)_
+_(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
 
 - `port: number` - Port number to listen on (default: 5678)
 - `host: string` - Host to listen on (default: '127.0.0.1'; consider setting to

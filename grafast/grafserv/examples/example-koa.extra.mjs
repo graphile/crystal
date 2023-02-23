@@ -29,4 +29,4 @@ serv.addTo(app, server).catch((e) => {
 });
 
 // Start the Koa server
-server.listen(preset.server.port ?? 5678);
+server.listen(preset.grafserv.port ?? 5678);

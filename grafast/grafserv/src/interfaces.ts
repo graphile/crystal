@@ -19,7 +19,7 @@ export interface GrafservConfig {
   preset?: GraphileConfig.Preset;
 }
 
-export interface ServerOptions {
+export interface GrafservOptions {
   /** Port number to listen on */
   port?: number;
   /** Host to listen on */
@@ -42,7 +42,7 @@ export interface ServerOptions {
   /** Set true to enable watch mode */
   watch?: boolean;
 
-  /** The length, in bytes, for the largest request body that the server will accept */
+  /** The length, in bytes, for the largest request body that grafserv will accept */
   maxRequestLength?: number;
 
   /** How long (in milliseconds) should we wait for a schema promise to resolve before sending a failure to the client? */
@@ -54,7 +54,7 @@ export interface ServerOptions {
    *
    * @remarks
    *
-   * This is a `server` option rather than a `grafast` option because the
+   * This is a `grafserv` option rather than a `grafast` option because the
    * server is responsible for stringifying the body before sending it to the
    * user, via `stringifyPayload`. If we were to make this a `grafast` option
    * then everything using grafast would be affected by it, and code expecting
@@ -92,7 +92,7 @@ declare global {
       /**
        * Configuration options for Grafserv
        */
-      server?: ServerOptions;
+      grafserv?: GrafservOptions;
     }
   }
 }
