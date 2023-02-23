@@ -243,7 +243,7 @@ export class NodeGrafservBase extends GrafservBase {
 export class NodeGrafserv extends NodeGrafservBase {
   async addTo(server: HTTPServer | HTTPSServer) {
     server.on("request", this._createHandler());
-    if (this.resolvedPreset.server?.websockets) {
+    if (this.resolvedPreset.grafserv?.websockets) {
       attachWebsocketsToServer(this, server);
     }
   }

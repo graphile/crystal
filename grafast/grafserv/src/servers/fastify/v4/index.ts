@@ -187,7 +187,7 @@ export class FastifyGrafserv extends GrafservBase {
         const result = await convertHandlerResultToResult(handlerResult);
         return this.send(request, reply, result);
       },
-      ...(this.resolvedPreset.server?.websockets
+      ...(this.resolvedPreset.grafserv?.websockets
         ? {
             wsHandler: makeHandler(makeGraphQLWSConfig(this)),
           }

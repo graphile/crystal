@@ -63,7 +63,7 @@ export class ExpressGrafserv extends NodeGrafservBase {
 
   async addTo(app: Express, server: HTTPServer | HTTPSServer | null) {
     app.use(this._createHandler());
-    if (this.resolvedPreset.server?.websockets) {
+    if (this.resolvedPreset.grafserv?.websockets) {
       if (server) {
         // If user explicitly passes server, bind to it:
         attachWebsocketsToServer(this, server);

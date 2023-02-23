@@ -21,7 +21,7 @@ export async function makeExampleServer() {
   });
 
   const preset = {
-    server: {
+    grafserv: {
       graphqlOverGET: true,
       graphqlPath: "/graphql",
       dangerouslyAllowAllCORSRequests: true,
@@ -43,7 +43,7 @@ export async function makeExampleServer() {
     info.family === "IPv6"
       ? `[${info.address === "::" ? "::1" : info.address}]`
       : info.address
-  }:${info.port}${preset.server.graphqlPath}`;
+  }:${info.port}${preset.grafserv.graphqlPath}`;
 
   const release = () => server.close();
   return { url, release };

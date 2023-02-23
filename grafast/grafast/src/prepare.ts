@@ -424,9 +424,12 @@ export function executePreemptive(
           }
           i++;
         }
-      })().catch((e) => {
-        iterator.throw(e);
-      });
+      })().then(
+        () => iterator.return(),
+        (e) => {
+          iterator.throw(e);
+        },
+      );
       return iterator;
     }
 

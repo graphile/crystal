@@ -111,7 +111,7 @@ export class GrafservBase {
     const request = normalizeRequest(inRequest);
     const dynamicOptions = this.dynamicOptions;
     const forceCORS =
-      !!this.resolvedPreset.server?.dangerouslyAllowAllCORSRequests &&
+      !!this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests &&
       request.method === "OPTIONS";
     try {
       if (request.path === dynamicOptions.graphqlPath) {
@@ -174,7 +174,7 @@ export class GrafservBase {
     } catch (e) {
       returnValue = handleError(e);
     }
-    if (this.resolvedPreset.server?.dangerouslyAllowAllCORSRequests) {
+    if (this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
       if (isPromiseLike(returnValue)) {
         return returnValue.then(dangerousCorsWrap);
       } else {

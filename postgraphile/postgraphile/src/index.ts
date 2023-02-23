@@ -30,7 +30,7 @@ export function postgraphile(preset: GraphileConfig.Preset): {
     | Deferred<ServerParams>
     | ServerParams;
   let stopWatchingPromise: Promise<() => void> | null = null;
-  if (resolvedPreset.server?.watch) {
+  if (resolvedPreset.grafserv?.watch) {
     serverParams = defer<ServerParams>();
     stopWatchingPromise = watchSchema(preset, (error, newParams) => {
       if (error || !newParams) {

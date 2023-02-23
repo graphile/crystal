@@ -198,22 +198,22 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     ];
     preset.pgConfigs = newPgConfigs;
   }
-  preset.server = preset.server || {};
+  preset.grafserv = preset.grafserv || {};
   if (rawPort != null) {
-    preset.server!.port = rawPort;
+    preset.grafserv!.port = rawPort;
   }
   if (rawHost != null) {
-    preset.server!.host = rawHost;
+    preset.grafserv!.host = rawHost;
   }
   if (rawSubscriptions) {
-    preset.server!.websockets = true;
+    preset.grafserv!.websockets = true;
   }
   preset.grafast = preset.grafast || {};
   if (rawAllowExplain != null) {
     preset.grafast!.explain = rawAllowExplain;
   }
   if (watch != null) {
-    preset.server!.watch = watch;
+    preset.grafserv!.watch = watch;
   }
 
   const config = resolvePresets([preset]);
@@ -250,15 +250,15 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       console.log(
         `Server listening on port ${address.port} at http://${host}:${
           address.port
-        }${config.server?.graphqlPath ?? "/graphql"}`,
+        }${config.grafserv?.graphqlPath ?? "/graphql"}`,
       );
     } else {
       console.error(`Could not determine server address`);
     }
   });
 
-  const port = config.server?.port;
-  const host = config.server?.host;
+  const port = config.grafserv?.port;
+  const host = config.grafserv?.host;
 
   const listenFailed = (e: Error) => {
     // Listen failed; exit

@@ -79,7 +79,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     outputDataAsString = false,
     schemaWaitTime = 15000,
     maskError: rawMaskError,
-  } = config.server ?? {};
+  } = config.grafserv ?? {};
   const { explain } = config.grafast ?? {};
   const maskError = rawMaskError
     ? makeMaskError(rawMaskError)
