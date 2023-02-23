@@ -1,4 +1,4 @@
-import { $$idempotent } from "grafast";
+import { $$idempotent, SafeError } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLError, GraphQLObjectType, Kind } from "graphql";
@@ -97,7 +97,7 @@ export const stringScalarSpec = Object.freeze({
   parseLiteral: EXPORTABLE(
     (Kind) => (ast) => {
       if (ast.kind !== Kind.STRING) {
-        throw new Error("Can only parse string values");
+        throw new SafeError("Can only parse string values");
       }
       return ast.value;
     },

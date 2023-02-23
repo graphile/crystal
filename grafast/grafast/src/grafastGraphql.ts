@@ -12,6 +12,7 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { NULL_PRESET } from "./config.js";
 import { execute } from "./execute.js";
 import { isPromiseLike } from "./utils.js";
+import { SafeError } from "./error.js";
 
 /** Rough average size per query */
 const CACHE_MULTIPLIER = 100000;
@@ -157,7 +158,7 @@ export function grafastGraphqlSync(
 ): ExecutionResult {
   const result = grafastGraphql(args, resolvedPreset);
   if (isPromiseLike(result)) {
-    throw new Error("Grafast execution failed to complete synchronously.");
+    throw new SafeError("Grafast execution failed to complete synchronously.");
   }
   return result as ExecutionResult;
 }

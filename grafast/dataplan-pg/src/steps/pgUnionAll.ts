@@ -928,7 +928,7 @@ on (${sql.indent(
   groupBy(group: PgGroupSpec): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
-      throw new Error(`Cannot add groupBy to a non-aggregate query`);
+      throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
     this.groups.push(group);
   }
@@ -940,7 +940,7 @@ on (${sql.indent(
       );
     }
     if (this.mode !== "aggregate") {
-      throw new Error(`Cannot add having to a non-aggregate query`);
+      throw new SafeError(`Cannot add having to a non-aggregate query`);
     }
     return new PgConditionStep(this, true);
   }
@@ -952,7 +952,7 @@ on (${sql.indent(
       );
     }
     if (this.mode !== "aggregate") {
-      throw new Error(`Cannot add having to a non-aggregate query`);
+      throw new SafeError(`Cannot add having to a non-aggregate query`);
     }
     if (sql.isSQL(condition)) {
       this.havingConditions.push(condition);
@@ -1248,7 +1248,7 @@ and ${condition(i + 1)}`}
     if (this.offset !== null) {
       this.locker.lockParameter("last");
       if (this.last != null) {
-        throw new Error("Cannot use 'offset' with 'last'");
+        throw new SafeError("Cannot use 'offset' with 'last'");
       }
     }
     this.locker.lockParameter("offset");

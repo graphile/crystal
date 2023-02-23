@@ -3,7 +3,7 @@ import type {
   GrafastValuesList,
   SetterStep,
 } from "grafast";
-import { ExecutableStep, isDev, setter } from "grafast";
+import { ExecutableStep, SafeError, isDev, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -377,12 +377,12 @@ export class PgUpdateStep<
       const columnsCount = this.columns.length;
       if (columnsCount === 0) {
         // No columns to update?! This isn't allowed.
-        throw new Error(
+        throw new SafeError(
           "Attempted to update a record, but no new values were specified.",
         );
       } else if (getByColumnsCount === 0) {
         // No columns specified to find the row?! This is forbidden.
-        throw new Error(
+        throw new SafeError(
           "Attempted to update a record, but no information on uniquely determining the record was specified.",
         );
       } else {

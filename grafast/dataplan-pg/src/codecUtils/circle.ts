@@ -1,4 +1,4 @@
-import { inspect } from "../inspect.js";
+import { SafeError } from "grafast";
 import type { PgPoint } from "./point.js";
 import { stringifyPoint } from "./point.js";
 
@@ -24,7 +24,7 @@ export function parseCircle(f: string): PgCircle {
       radius: r,
     };
   } else {
-    throw new Error(`Failed to parse circle ${inspect(f)}`);
+    throw new SafeError(`Failed to parse circle ${f}`);
   }
 }
 

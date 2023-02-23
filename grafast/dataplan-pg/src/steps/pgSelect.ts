@@ -778,7 +778,7 @@ export class PgSelectStep<
     if (this.offset !== null) {
       this.locker.lockParameter("last");
       if (this.last != null) {
-        throw new Error("Cannot use 'offset' with 'last'");
+        throw new SafeError("Cannot use 'offset' with 'last'");
       }
     }
     this.locker.lockParameter("offset");
@@ -1024,7 +1024,7 @@ export class PgSelectStep<
   groupBy(group: PgGroupSpec): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
-      throw new Error(`Cannot add groupBy to a non-aggregate query`);
+      throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
     this.groups.push(group);
   }
@@ -1041,7 +1041,7 @@ export class PgSelectStep<
       );
     }
     if (this.mode !== "aggregate") {
-      throw new Error(`Cannot add having to a non-aggregate query`);
+      throw new SafeError(`Cannot add having to a non-aggregate query`);
     }
     return new PgConditionStep(this, true);
   }
@@ -1053,7 +1053,7 @@ export class PgSelectStep<
       );
     }
     if (this.mode !== "aggregate") {
-      throw new Error(`Cannot add having to a non-aggregate query`);
+      throw new SafeError(`Cannot add having to a non-aggregate query`);
     }
     if (sql.isSQL(condition)) {
       this.havingConditions.push(condition);
@@ -1082,7 +1082,7 @@ export class PgSelectStep<
 
   private assertCursorPaginationAllowed(): void {
     if (this.mode === "aggregate") {
-      throw new Error(
+      throw new SafeError(
         "Cannot use cursor pagination on an aggregate PgSelectStep",
       );
     }
@@ -1119,7 +1119,7 @@ export class PgSelectStep<
     }
     if (!this.isOrderUnique) {
       // TODO: make this smarter
-      throw new Error(
+      throw new SafeError(
         `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
       );
     }
@@ -1455,7 +1455,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         // The maximum number of arguments you can pass to a PostgreSQL
         // function is 100, so we need to concatenate multiple arrays
         // TODO: concatenate via `(jsonb_build_array(...) || jsonb_build_array(...))::json`
-        throw new Error(
+        throw new SafeError(
           "Please select fewer fields, support for this many fields has not yet been added.",
         );
       }

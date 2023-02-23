@@ -1,4 +1,4 @@
-import { inspect } from "../inspect.js";
+import { SafeError } from "grafast";
 
 export interface PgBox {
   a: { x: number; y: number };
@@ -22,7 +22,7 @@ export function parseBox(f: string): PgBox {
       b: { x: x2, y: y2 },
     };
   } else {
-    throw new Error(`Failed to parse box ${inspect(f)}`);
+    throw new SafeError(`Failed to parse box ${f}`);
   }
 }
 

@@ -1,4 +1,4 @@
-import { inspect } from "../inspect.js";
+import { SafeError } from "grafast";
 import type { PgPoint } from "./point.js";
 import { stringifyPoint } from "./point.js";
 
@@ -26,7 +26,7 @@ export function parsePath(f: string): PgPath {
       .split(",")
       .map((f) => parseFloat(f));
     if (xsAndYs.length % 2 !== 0) {
-      throw new Error("Invalid path representation");
+      throw new SafeError("Invalid path representation");
     }
     const points = [];
     for (let i = 0, l = xsAndYs.length; i < l; i += 2) {
@@ -37,7 +37,7 @@ export function parsePath(f: string): PgPath {
       points,
     };
   } else {
-    throw new Error(`Failed to parse path ${inspect(f)}`);
+    throw new SafeError(`Failed to parse path ${f}`);
   }
 }
 

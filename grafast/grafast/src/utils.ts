@@ -49,6 +49,7 @@ import type {
   OutputPlanForType,
 } from "./interfaces.js";
 import type { ExecutableStep, ModifierStep } from "./step.js";
+import { SafeError } from "./error.js";
 
 /**
  * The parent object is used as the key in `GetValueStepId()`; for root level
@@ -769,7 +770,7 @@ function findVariableNamesUsedInSelectionNode(
       const fragment = operationPlan.fragments[fragmentName];
       findVariableNamesUsedInDirectives(fragment.directives, variableNames);
       if (fragment.variableDefinitions?.length) {
-        throw new Error(
+        throw new SafeError(
           "Grafast doesn't support variable definitions on fragments yet.",
         );
       }

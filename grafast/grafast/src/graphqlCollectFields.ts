@@ -16,6 +16,7 @@ import {
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { __TrackedObjectStep } from "./steps/index.js";
+import { SafeError } from "./error.js";
 
 /**
  * Given a selection, finds the first directive named `directiveName`.
@@ -68,7 +69,7 @@ export function evalDirectiveArg<T = unknown>(
         return null as any;
       }
       default: {
-        throw new Error(
+        throw new SafeError(
           `Unsupported @${directiveName}(${argumentName}:) argument; expected Variable, Boolean or null; but received '${value.kind}'`,
         );
       }

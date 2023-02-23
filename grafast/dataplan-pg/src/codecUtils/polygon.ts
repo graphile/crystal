@@ -1,3 +1,4 @@
+import { SafeError } from "grafast";
 import { inspect } from "../inspect.js";
 import type { PgPoint } from "./point.js";
 import { stringifyPoint } from "./point.js";
@@ -19,7 +20,7 @@ export function parsePolygon(f: string): PgPolygon {
       .split(",")
       .map((f) => parseFloat(f));
     if (xsAndYs.length % 2 !== 0) {
-      throw new Error("Invalid polygon representation");
+      throw new SafeError("Invalid polygon representation");
     }
     const points = [];
     for (let i = 0, l = xsAndYs.length; i < l; i += 2) {
@@ -29,7 +30,7 @@ export function parsePolygon(f: string): PgPolygon {
       points,
     };
   } else {
-    throw new Error(`Failed to parse polygon ${inspect(f)}`);
+    throw new SafeError(`Failed to parse polygon`);
   }
 }
 

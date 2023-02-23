@@ -14,7 +14,7 @@ import {
 } from "graphql";
 
 import type { __ItemStep, ObjectStep } from "../index.js";
-import { context } from "../index.js";
+import { context, SafeError } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
@@ -371,7 +371,7 @@ export function graphqlResolver(
   );
   if (isAbstract) {
     if (subscriber) {
-      throw new Error(
+      throw new SafeError(
         `GraphQL subscribe function emulation currently doesn't support polymorphism`,
       );
     }
