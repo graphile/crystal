@@ -1,36 +1,33 @@
 # Pre-release caveats
 
 Gra*fast*, PostGraphile V5 and most other things in the same repository are all
-pre-release software right now.
+pre-release software right now. Though we're now at a stage where the scarier
+warnings have been dealt with, it hasn't been battle-tested yet.
 
-Here's a selection of the reasons **you should not expose this pre-release
-software to the internet or other untrusted inputs**:
+Further, the software is still undergoing heavy iteration, so it's likely that
+many APIs will evolve over time, breaking code that you've written that relies
+on the older interfaces. In particular, we are expecting to change the
+TypeScript types very heavily, and it's also likely that a number of the APIs
+and configuration options will be renamed or relocated for organization and
+clarity reasons. For other expected changes, check out the issues on the
+repository.
 
-🚨 Errors contain too much detail - more than you would want a user/attacker to
-know.
-
-🚨 It hasn't been battle-tested yet.
-
-In addition to the issues above, the software is also still undergoing heavy
-iteration, so it's likely that certain APIs will evolve over time, breaking
-code that you've written that relies on the older interfaces. In particular, we
-are expecting to change the TypeScript types very heavily, and it's also likely
-that a number of the APIs will be renamed. For other expected changes, check
-out the issues on the repository.
+To stay up to date with the breaking changes, we recommend that you follow the
+'sponsors-only-announcements' channel on Discord: https://discord.gg/graphile -
+we summarize the major changes every week or so. For cutting edge info, see the
+#🔮 channel.
 
 :::tip
 
-PostGraphile V5 is already passing the V4 test suite and uses Gra*fast*
-heavily, so the above disclaimers might be a little over-dramatised. You should
-absolutely feel comfortable running this software on your own machine with
-queries that you are building yourself. Just be aware that a potential attacker
-may be able to glean more from it than they will be able to when it's deemed
-production ready.
+If your PostGraphile usage is mostly database driven then, other than changing
+a few lines in your config from time to time, you should find V5 relatively
+stable. If you have a lot of custom plugins then you may need to pay a lot
+closer attention to the changelogs.
 
 :::
 
 If you acknowledge all of the above and still wish to proceed then you may set
-the following environmental variable to be able to run the code:
+the following environmental variable to be able to run the `@prealpha` modules:
 
 ```
 I_SPONSOR_GRAPHILE=and_acknowledge_prerelease_caveats
@@ -57,3 +54,5 @@ set I_SPONSOR_GRAPHILE=and_acknowledge_prerelease_caveats & postgraphile -c post
 # Windows PowerShell
 $env:I_SPONSOR_GRAPHILE='and_acknowledge_prerelease_caveats'; postgraphile -c postgres://...
 ```
+
+Check out a PostGraphile V5 example repo here: https://github.com/benjie/ouch-my-finger
