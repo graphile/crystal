@@ -701,6 +701,7 @@ export class PgSubscriber<
           } else if (asyncIterableIterator.throw) {
             asyncIterableIterator.throw(new Error("Released"));
           } else {
+            // TODO: what happens now?
             console.error(
               `Could not return or throw from iterator for topic '${topic}'`,
             );
