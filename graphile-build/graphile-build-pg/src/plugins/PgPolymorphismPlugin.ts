@@ -17,7 +17,7 @@ import type {
   PgTypeCodecPolymorphismSingleTypeSpec,
   PgTypeColumn,
 } from "@dataplan/pg";
-import { ExecutableStep } from "grafast";
+import { ExecutableStep, arraysMatch } from "grafast";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
@@ -299,16 +299,35 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             const pk = pgRelatedClass
               .getConstraints()
               .find((c) => c.contype === "p");
-            const pgConstraint = pgRelatedClass.getConstraints().find(
-              (c) =>
-                // TODO: this isn't safe, we should also check that the columns match up
-                c.contype === "f" && c.confrelid === pgClass._id,
-            );
+            if (!pk) {
+              throw new Error(
+                `Invalid polymorphic relation; ${pgRelatedClass.relname} has no primary key`,
+              );
+            }
             const remotePk = pgClass
               .getConstraints()
               .find((c) => c.contype === "p");
-            if (!pk || !remotePk || !pgConstraint) {
-              throw new Error("Invalid relational something something");
+            if (!remotePk) {
+              throw new Error(
+                `Invalid polymorphic relation; ${pgClass.relname} has no primary key`,
+              );
+            }
+            const pgConstraint = pgRelatedClass
+              .getConstraints()
+              .find(
+                (c) =>
+                  c.contype === "f" &&
+                  c.confrelid === pgClass._id &&
+                  arraysMatch(
+                    c.getForeignAttributes()!,
+                    remotePk.getAttributes()!,
+                  ) &&
+                  arraysMatch(c.getAttributes()!, pk.getAttributes()!),
+              );
+            if (!pgConstraint) {
+              throw new Error(
+                `Invalid polymorphic relation; could not find matching relation between ${pgClass.relname} and ${pgRelatedClass.relname}`,
+              );
             }
             const sharedRelationName = info.inflection.sourceRelationName({
               databaseName,
