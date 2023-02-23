@@ -218,7 +218,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
 };
 
 export const applyOrderToPlan = EXPORTABLE(
-  (getEnumValueConfig, inspect) =>
+  (SafeError, getEnumValueConfig, inspect) =>
     (
       $select: PgSelectStep<any, any, any, any>,
       $value: InputStep,
@@ -244,5 +244,5 @@ export const applyOrderToPlan = EXPORTABLE(
         plan($select);
       });
     },
-  [getEnumValueConfig, inspect],
+  [SafeError, getEnumValueConfig, inspect],
 );

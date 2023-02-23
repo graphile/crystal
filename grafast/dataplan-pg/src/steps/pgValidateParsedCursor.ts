@@ -1,5 +1,5 @@
 import type { GrafastResultsList, GrafastValuesList } from "grafast";
-import { SafeError, ExecutableStep, isDev } from "grafast";
+import { ExecutableStep, isDev, SafeError } from "grafast";
 
 /**
  * Lightweight plan to validate cursor. We couldn't do this with a lambda

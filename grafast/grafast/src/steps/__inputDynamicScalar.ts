@@ -6,10 +6,10 @@ import type {
 } from "graphql";
 import { Kind } from "graphql";
 
+import { SafeError } from "../error.js";
 import type { ExecutionExtra } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __TrackedObjectStep } from "./__trackedObject.js";
-import { SafeError } from "../error.js";
 
 /**
  * Handles "leaves" (scalars)

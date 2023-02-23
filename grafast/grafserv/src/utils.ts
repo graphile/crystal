@@ -5,6 +5,7 @@ import type {
   ExecutionResult,
 } from "graphql";
 import { GraphQLError } from "graphql";
+import type { ServerOptions } from "graphql-ws";
 import type { Readable } from "node:stream";
 
 import type { GrafservBase } from "./index.js";
@@ -15,7 +16,6 @@ import type {
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
-import { ServerOptions } from "graphql-ws";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,

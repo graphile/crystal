@@ -13,7 +13,6 @@ import type {
   StreamableStep,
 } from "grafast";
 import {
-  SafeError,
   __InputListStep,
   __InputObjectStep,
   __InputStaticLeafStep,
@@ -34,6 +33,7 @@ import {
   map,
   reverse,
   reverseArray,
+  SafeError,
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
 } from "grafast";

@@ -1,5 +1,6 @@
-import { AsyncExecutionResult, ExecutionResult, GraphQLError } from "graphql";
 import { isAsyncIterable, isSafeError } from "grafast";
+import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import { GraphQLError } from "graphql";
 
 // Only the non-ambiguous characters
 const RANDOM_STRING_LETTERS = "ABCDEFGHJKLMNPQRTUVWXYZ2346789";

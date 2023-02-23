@@ -546,7 +546,7 @@ export function makeExtendSchemaPlugin(
                     [],
                   ),
                   parseLiteral: EXPORTABLE(
-                    (Kind) => (ast: any) => {
+                    (GraphQLError, Kind, name) => (ast: any) => {
                       if (ast.kind !== Kind.STRING) {
                         throw new GraphQLError(
                           `${name} can only parse string values`,
@@ -554,7 +554,7 @@ export function makeExtendSchemaPlugin(
                       }
                       return ast.value;
                     },
-                    [Kind],
+                    [GraphQLError, Kind, name],
                   ),
                 }),
                 uniquePluginName,

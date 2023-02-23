@@ -24,8 +24,8 @@ import { OperationPlan } from "./engine/OperationPlan.js";
 import {
   GrafastError,
   isGrafastError,
-  SafeError,
   isSafeError,
+  SafeError,
 } from "./error.js";
 import { execute } from "./execute.js";
 import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
@@ -251,8 +251,6 @@ export {
   EventCallback,
   EventMapKey,
   ExecutableStep,
-  SafeError,
-  isSafeError,
   execute,
   ExecutionEventEmitter,
   ExecutionEventMap,
@@ -311,6 +309,7 @@ export {
   isModifierStep,
   isObjectLikeStep,
   isPromiseLike,
+  isSafeError,
   isStreamableStep,
   JSONArray,
   JSONObject,
@@ -376,6 +375,7 @@ export {
   reverse,
   reverseArray,
   ReverseStep,
+  SafeError,
   ScalarPlanResolver,
   ScalarPlans,
   setter,

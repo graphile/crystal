@@ -95,13 +95,13 @@ export const stringScalarSpec = Object.freeze({
   serialize: toString,
   parseValue: toString,
   parseLiteral: EXPORTABLE(
-    (Kind) => (ast) => {
+    (Kind, SafeError) => (ast) => {
       if (ast.kind !== Kind.STRING) {
         throw new SafeError("Can only parse string values");
       }
       return ast.value;
     },
-    [Kind],
+    [Kind, SafeError],
   ),
   extensions: {
     graphile: {
@@ -178,23 +178,23 @@ export const stringTypeSpec = (
     : toString,
   parseLiteral: coerce
     ? EXPORTABLE(
-        (Kind, coerce) => (ast) => {
+        (GraphQLError, Kind, coerce) => (ast) => {
           if (ast.kind !== Kind.STRING) {
             // TODO: add name to this error
             throw new GraphQLError("Can only parse string values");
           }
           return coerce(ast.value);
         },
-        [Kind, coerce],
+        [GraphQLError, Kind, coerce],
       )
     : EXPORTABLE(
-        (Kind) => (ast) => {
+        (GraphQLError, Kind) => (ast) => {
           if (ast.kind !== Kind.STRING) {
             throw new GraphQLError("Can only parse string values");
           }
           return ast.value;
         },
-        [Kind],
+        [GraphQLError, Kind],
       ),
   extensions: {
     graphile: {

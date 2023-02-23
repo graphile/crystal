@@ -4178,7 +4178,7 @@ export function makeExampleSchema(
           orderBy: {
             type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
             applyPlan: EXPORTABLE(
-              (MessagesOrderBy, getEnumValueConfig, inspect) =>
+              (GraphQLError, MessagesOrderBy, getEnumValueConfig, inspect) =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
@@ -4208,7 +4208,7 @@ export function makeExampleSchema(
                   });
                   return null;
                 },
-              [MessagesOrderBy, getEnumValueConfig, inspect],
+              [GraphQLError, MessagesOrderBy, getEnumValueConfig, inspect],
             ),
           },
         },
@@ -4871,7 +4871,12 @@ export function makeExampleSchema(
           orderBy: {
             type: new GraphQLList(new GraphQLNonNull(VulnerabilitiesOrderBy)),
             applyPlan: EXPORTABLE(
-              (VulnerabilitiesOrderBy, getEnumValueConfig, inspect) =>
+              (
+                GraphQLError,
+                VulnerabilitiesOrderBy,
+                getEnumValueConfig,
+                inspect,
+              ) =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
@@ -4902,7 +4907,12 @@ export function makeExampleSchema(
                   });
                   return null;
                 },
-              [VulnerabilitiesOrderBy, getEnumValueConfig, inspect],
+              [
+                GraphQLError,
+                VulnerabilitiesOrderBy,
+                getEnumValueConfig,
+                inspect,
+              ],
             ),
           },
         },

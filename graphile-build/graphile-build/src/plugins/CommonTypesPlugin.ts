@@ -119,7 +119,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 "type",
               ),
               EXPORTABLE(
-                () => (string) => {
+                (GraphQLError) => (string) => {
                   if (
                     !/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(
                       string,
@@ -131,7 +131,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                   }
                   return string;
                 },
-                [],
+                [GraphQLError],
               ),
             ),
           "graphile-build built-in (UUID type)",

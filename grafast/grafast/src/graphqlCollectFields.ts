@@ -15,8 +15,8 @@ import {
 } from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { __TrackedObjectStep } from "./steps/index.js";
 import { SafeError } from "./error.js";
+import type { __TrackedObjectStep } from "./steps/index.js";
 
 /**
  * Given a selection, finds the first directive named `directiveName`.

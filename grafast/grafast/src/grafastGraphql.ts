@@ -10,9 +10,9 @@ import { GraphQLError, parse, Source, validate, validateSchema } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import { NULL_PRESET } from "./config.js";
+import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { isPromiseLike } from "./utils.js";
-import { SafeError } from "./error.js";
 
 /** Rough average size per query */
 const CACHE_MULTIPLIER = 100000;

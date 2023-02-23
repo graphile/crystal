@@ -669,7 +669,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 ),
                 serialize: EXPORTABLE(() => (value) => value, []),
                 parseValue: EXPORTABLE(
-                  (hstoreTypeName, isValidHstoreObject) =>
+                  (GraphQLError, hstoreTypeName, isValidHstoreObject) =>
                     function parseValue(obj) {
                       if (isValidHstoreObject(obj)) {
                         return obj;
@@ -678,7 +678,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                         `This is not a valid ${hstoreTypeName} object, it must be a key/value hash where keys and values are both strings (or null).`,
                       );
                     },
-                  [hstoreTypeName, isValidHstoreObject],
+                  [GraphQLError, hstoreTypeName, isValidHstoreObject],
                 ),
                 parseLiteral: EXPORTABLE(
                   (Kind, isValidHstoreObject, parseValueLiteral) =>

@@ -3,7 +3,7 @@ import type {
   GrafastValuesList,
   SetterStep,
 } from "grafast";
-import { ExecutableStep, SafeError, isDev, setter } from "grafast";
+import { ExecutableStep, isDev, SafeError, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 

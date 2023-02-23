@@ -1,4 +1,5 @@
 import { SafeError } from "grafast";
+
 import type { PgPoint } from "./point.js";
 import { stringifyPoint } from "./point.js";
 

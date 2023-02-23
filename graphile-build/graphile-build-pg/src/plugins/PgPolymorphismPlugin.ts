@@ -17,7 +17,7 @@ import type {
   PgTypeCodecPolymorphismSingleTypeSpec,
   PgTypeColumn,
 } from "@dataplan/pg";
-import { ExecutableStep, arraysMatch } from "grafast";
+import { arraysMatch, ExecutableStep } from "grafast";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
