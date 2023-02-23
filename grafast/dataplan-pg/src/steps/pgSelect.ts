@@ -1144,7 +1144,9 @@ export class PgSelectStep<
         toPg(access($parsedCursorPlan, [i + 1]), orderCodec),
         orderCodec,
       );
-      // FIXME: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
+      // FIXME: _iff_ `orderFragment` is nullable _and_ `order.nulls` is
+      // non-null then we need to factor `NULLS LAST` / `NULLS FIRST` into
+      // this calculation.
       const gt =
         (order.direction === "ASC" && beforeOrAfter === "after") ||
         (order.direction === "DESC" && beforeOrAfter === "before");
@@ -1335,9 +1337,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
                 context,
                 queryValues:
                   identifierIndex != null
-                    ? this.queryValues.map(({ dependencyIndex, codec }) =>
-                        codec.toPg(values[dependencyIndex][i]),
-                      )
+                    ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                        const val = values[dependencyIndex][i];
+                        return val == null ? null : codec.toPg(val);
+                      })
                     : EMPTY_ARRAY,
               };
             }),
@@ -1360,9 +1363,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             context,
             queryValues:
               identifierIndex != null
-                ? this.queryValues.map(({ dependencyIndex, codec }) =>
-                    codec.toPg(values[dependencyIndex][i]),
-                  )
+                ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                    const val = values[dependencyIndex][i];
+                    return val == null ? val : codec.toPg(val);
+                  })
                 : EMPTY_ARRAY,
           };
         }),

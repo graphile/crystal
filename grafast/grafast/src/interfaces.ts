@@ -20,7 +20,6 @@ import type {
 } from "graphql";
 
 import type { Bucket, RequestContext } from "./bucket.js";
-import type { GrafastError } from "./error.js";
 import type { InputStep } from "./input.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
@@ -251,7 +250,7 @@ export type GrafastValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
 export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 export type GrafastResultStreamList<T> = ReadonlyArray<
-  AsyncIterable<PromiseOrDirect<T>> | GrafastError
+  AsyncIterable<PromiseOrDirect<T>> | PromiseLike<never>
 >;
 
 export type BaseGraphQLRootValue = any;

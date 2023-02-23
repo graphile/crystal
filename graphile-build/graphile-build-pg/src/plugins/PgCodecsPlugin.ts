@@ -455,6 +455,17 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
+          const citextExt =
+            await info.helpers.pgIntrospection.getExtensionByName(
+              databaseName,
+              "citext",
+            );
+          const hstoreExt =
+            await info.helpers.pgIntrospection.getExtensionByName(
+              databaseName,
+              "hstore",
+            );
+
           const pgCatalog =
             await info.helpers.pgIntrospection.getNamespaceByName(
               databaseName,
@@ -491,11 +502,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               }
             }
 
-            // FIXME: this is technically unsafe; we should check the namespace
-            // matches the citext extension namespace
-            if (type.typname === "citext") {
+            if (
+              type.typname === "citext" &&
+              type.typnamespace === citextExt?.extnamespace
+            ) {
               return TYPES.citext;
-            } else if (type.typname === "hstore") {
+            } else if (
+              type.typname === "hstore" &&
+              type.typnamespace === hstoreExt?.extnamespace
+            ) {
               return TYPES.hstore;
             }
 

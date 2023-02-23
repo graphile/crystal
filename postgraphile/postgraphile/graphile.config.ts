@@ -6,9 +6,12 @@ import { jsonParse } from "@dataplan/json";
 import { makePgConfig } from "@dataplan/pg/adaptors/pg";
 import { context, listen, object } from "grafast";
 import { StreamDeferPlugin } from "graphile-build";
+import { EXPORTABLE } from "graphile-export";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /*
 const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
@@ -48,6 +51,7 @@ const preset: GraphileConfig.Preset = {
         }
         extend type Subscription {
           sub(topic: String!): Int
+          gql: Int
         }
       `,
       plans: {
@@ -64,6 +68,25 @@ const preset: GraphileConfig.Preset = {
             return listen($pgSubscriber, $topic, ($payload) =>
               object({ sub: jsonParse($payload).get("a" as never) }),
             );
+          },
+          gql: {
+            resolve: EXPORTABLE(
+              () =>
+                function resolve(e) {
+                  return e;
+                },
+              [],
+            ),
+            subscribe: EXPORTABLE(
+              (sleep) =>
+                async function* subscribe() {
+                  for (let i = 0; i < 10; i++) {
+                    yield i;
+                    await sleep(1000);
+                  }
+                },
+              [sleep],
+            ),
           },
         },
       },
@@ -84,6 +107,7 @@ const preset: GraphileConfig.Preset = {
   server: {
     graphqlPath: "/v2/graphql",
     websockets: true,
+    graphqlOverGET: true,
   },
   grafast: {
     context: {

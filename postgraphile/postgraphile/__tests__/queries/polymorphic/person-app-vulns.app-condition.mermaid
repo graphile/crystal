@@ -29,13 +29,13 @@ graph TD
     Connection41{{"Connection[41∈1]<br />ᐸ37ᐳ"}}:::plan
     PgValidateParsedCursor47["PgValidateParsedCursor[47∈1]"]:::plan
     Access48{{"Access[48∈1]<br />ᐸ42.1ᐳ"}}:::plan
-    ToPg49["ToPg[49∈1]"]:::plan
+    ToPg49{{"ToPg[49∈1]"}}:::plan
     Access50{{"Access[50∈1]<br />ᐸ42.2ᐳ"}}:::plan
     PgUnionAll43[["PgUnionAll[43∈3]"]]:::plan
     __Item44[/"__Item[44∈4]<br />ᐸ43ᐳ"\]:::itemplan
     PgUnionAllSingle45["PgUnionAllSingle[45∈4]"]:::plan
-    Access51{{"Access[51∈5]<br />ᐸ45.Symbol(data).0ᐳ"}}:::plan
-    Access52{{"Access[52∈5]<br />ᐸ45.Symbol(data).1ᐳ"}}:::plan
+    Access51{{"Access[51∈5]<br />ᐸ45.0ᐳ"}}:::plan
+    Access52{{"Access[52∈5]<br />ᐸ45.1ᐳ"}}:::plan
     List53{{"List[53∈5]<br />ᐸ51,52ᐳ"}}:::plan
     PgCursor46{{"PgCursor[46∈5]"}}:::plan
     JSONParse55[["JSONParse[55∈6]<br />ᐸ52ᐳ<br />ᐳAwsApplication"]]:::plan
@@ -95,7 +95,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,Access16,Access17,Object18,Connection19,__InputStaticLeaf29,Lambda42 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 42<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: 20, 47<br />ᐳ: 25, 33, 48, 50, 41<br />2: ToPg[49]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 42<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,__InputStaticLeaf25,__InputStaticLeaf33,Connection41,PgValidateParsedCursor47,Access48,ToPg49,Access50 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 18, 33, 42, 47, 49, 50, 41<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket

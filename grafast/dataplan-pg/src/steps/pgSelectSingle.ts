@@ -1,5 +1,5 @@
 import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
-import { $$concreteType, list, UnbatchedExecutableStep } from "grafast";
+import { list, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -640,7 +640,7 @@ export class PgSelectSingleStep<
         const key = String(typeList);
         const entry = poly.types[key];
         if (entry) {
-          return Object.assign(val, { [$$concreteType]: entry.name });
+          return polymorphicWrap(entry.name, val);
         }
         return null;
       };

@@ -293,7 +293,8 @@ export class PgInsertStep<
               if (!details) {
                 throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
               }
-              return details.processor(value[details.depId]);
+              const val = value[details.depId];
+              return val == null ? null : details.processor(val);
             } else {
               return v;
             }

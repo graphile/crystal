@@ -1,18 +1,4 @@
-import debugFactory from "debug";
 import { exportAsMany } from "grafast";
-import type { SQL } from "pg-sql2";
-import sql from "pg-sql2";
-
-import { formatSQLForDebugging } from "./formatSQLForDebugging.js";
-
-function sqlPrint(fragment: SQL): string {
-  const { text } = sql.compile(fragment);
-  return formatSQLForDebugging(text);
-}
-
-// FIXME: polluting the global 'debug' namespace might be a bad idea...
-// Registers the '%S' SQL formatter with the 'debug' module.
-debugFactory.formatters.S = sqlPrint;
 
 import {
   domainOfCodec,

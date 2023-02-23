@@ -1,5 +1,5 @@
 import type { ExecutionExtra } from "grafast";
-import { $$data, UnbatchedExecutableStep } from "grafast";
+import { UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -218,10 +218,7 @@ export class PgClassExpressionStep<
     return this;
   }
 
-  public unbatchedExecute(extra: ExecutionExtra, rawV: any): any {
-    // HACK: this feels like a hack; should we really have to manually unwrap
-    // PgUnionAllStep polymorphism here?
-    const v = this.needsPolymorphicUnwrap ? rawV?.[$$data] : rawV;
+  public unbatchedExecute(extra: ExecutionExtra, v: any): any {
     if (v == null) {
       return null;
     }

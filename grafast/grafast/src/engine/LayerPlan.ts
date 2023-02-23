@@ -7,8 +7,7 @@ import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
-import { $$concreteType } from "../interfaces.js";
-import { assertPolymorphicData } from "../polymorphic.js";
+import { resolveType } from "../polymorphic.js";
 import type {
   ExecutableStep,
   ModifierStep,
@@ -72,6 +71,7 @@ export interface LayerPlanReasonSubscription {
 /** Non-branching, deferred */
 export interface LayerPlanReasonMutationField {
   type: "mutationField";
+  mutationIndex: number;
 }
 /** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
@@ -673,8 +673,7 @@ ${te.join(
           if (isGrafastError(value)) {
             continue;
           }
-          assertPolymorphicData(value);
-          const typeName = value[$$concreteType];
+          const typeName = resolveType(value);
           if (!targetTypeNames.includes(typeName)) {
             continue;
           }

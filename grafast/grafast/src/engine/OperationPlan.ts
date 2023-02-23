@@ -573,7 +573,7 @@ ${te.join(
     const fieldName = field.name.value; // Unaffected by alias.
     const rootTypeFields = rootType.getFields();
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
-    const subscriptionPlanResolver =
+    const rawSubscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
     const path = [field.alias?.value ?? fieldName];
     const locationDetails: LocationDetails = {
@@ -581,13 +581,16 @@ ${te.join(
       fieldName,
       node: this.operation.selectionSet.selections,
     };
+
+    const subscriptionPlanResolver = rawSubscriptionPlanResolver;
+
+    const trackedArguments = withGlobalLayerPlan(
+      this.rootLayerPlan,
+      POLYMORPHIC_ROOT_PATHS,
+      () => this.getTrackedArguments(rootType, field),
+    );
     if (subscriptionPlanResolver) {
       // PERF: optimize this
-      const trackedArguments = withGlobalLayerPlan(
-        this.rootLayerPlan,
-        POLYMORPHIC_ROOT_PATHS,
-        () => this.getTrackedArguments(rootType, field),
-      );
       const { haltTree, step: subscribeStep } = this.planField(
         this.rootLayerPlan,
         path,
@@ -665,11 +668,49 @@ ${te.join(
         selectionSet.selections,
       );
     } else {
-      // FIXME: take the regular GraphQL subscription resolver and convert it to a plan. (Lambda plan?)
-      const subscribeStep = this.trackedRootValueStep;
-      this.rootLayerPlan.setRootStep(subscribeStep);
+      const subscribeStep = withGlobalLayerPlan(
+        this.rootLayerPlan,
+        POLYMORPHIC_ROOT_PATHS,
+        () => {
+          const $args = object(
+            field.arguments?.reduce((memo, arg) => {
+              memo[arg.name.value] = trackedArguments.get(arg.name.value);
+              return memo;
+            }, Object.create(null)) ?? Object.create(null),
+          );
+          const rawResolver = fieldSpec.resolve;
+          const rawSubscriber = fieldSpec.subscribe;
+          return graphqlResolver(
+            rawResolver,
+            rawSubscriber,
+            this.trackedRootValueStep,
+            $args,
+            {
+              fieldName,
+              fieldNodes: fields,
+              fragments: this.fragments,
+              operation: this.operation,
+              parentType: this.subscriptionType!,
+              returnType: fieldSpec.type,
+              schema: this.schema,
+              // @ts-ignore
+              path: {
+                typename: this.subscriptionType!.name,
+                key: fieldName,
+                prev: undefined,
+              },
+            },
+          );
+        },
+      );
+      const stepOptions: StepOptions = {
+        stream: isStreamableStep(subscribeStep as ExecutableStep<any>)
+          ? { initialCount: 0 }
+          : null,
+      };
+      subscribeStep._stepOptions = stepOptions;
 
-      this.deduplicateSteps();
+      this.rootLayerPlan.setRootStep(subscribeStep);
 
       const subscriptionEventLayerPlan = new LayerPlan(
         this,
@@ -679,14 +720,39 @@ ${te.join(
         },
         this.rootLayerPlan.polymorphicPaths,
       );
-      subscriptionEventLayerPlan.setRootStep(
-        withGlobalLayerPlan(
-          subscriptionEventLayerPlan,
-          POLYMORPHIC_ROOT_PATHS,
-          // FIXME: is this right?
-          () => new __ItemStep(this.rootValueStep),
-        ),
+
+      // TODO: move this somewhere else
+      const hasItemPlan = (
+        step: ExecutableStep,
+      ): step is ExecutableStep & {
+        itemPlan: ($item: ExecutableStep) => ExecutableStep;
+      } => {
+        return (
+          "itemPlan" in (subscribeStep as any) &&
+          typeof (subscribeStep as any).itemPlan === "function"
+        );
+      };
+
+      const $__item = withGlobalLayerPlan(
+        subscriptionEventLayerPlan,
+        POLYMORPHIC_ROOT_PATHS,
+        () => new __ItemStep(subscribeStep),
       );
+
+      subscriptionEventLayerPlan.setRootStep($__item);
+
+      let streamItemPlan = hasItemPlan(subscribeStep)
+        ? withGlobalLayerPlan(
+            subscriptionEventLayerPlan,
+            POLYMORPHIC_ROOT_PATHS,
+            () => subscribeStep.itemPlan($__item),
+          )
+        : $__item;
+
+      // WE MUST RE-FETCH STEPS AFTER DEDUPLICATION!
+      this.deduplicateSteps();
+      streamItemPlan = this.stepTracker.getStepById(streamItemPlan.id);
+
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
         this.rootValueStep,
@@ -698,13 +764,9 @@ ${te.join(
         outputPlan,
         [],
         POLYMORPHIC_ROOT_PATH,
-        subscribeStep,
+        streamItemPlan,
         rootType,
         selectionSet.selections,
-      );
-      // This is untested, so abort.
-      throw new Error(
-        "GraphileInternalError<2335c655-c656-4e5d-b8f4-d649340bfaea>: using a GraphQL subscribe isn't yet supported",
       );
     }
     if (this.loc) this.loc.pop();
@@ -853,6 +915,8 @@ ${te.join(
       outputPlan: OutputPlan,
       groupedFieldSet: SelectionSetDigest,
     ) => {
+      // `__typename` shouldn't bump the mutation index since it has no side effects.
+      let mutationIndex = -1;
       for (const [
         responseKey,
         fieldNodes,
@@ -914,6 +978,7 @@ ${te.join(
          * nothing.
          */
         const rawResolver = objectField.resolve;
+        const rawSubscriber = objectField.subscribe;
 
         /**
          * This will never be the grafast resolver - only ever the user-supplied
@@ -926,6 +991,7 @@ ${te.join(
 
         const resolver =
           resolvedResolver && !usesDefaultResolver ? resolvedResolver : null;
+        const subscriber = rawSubscriber;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
@@ -1028,6 +1094,7 @@ ${te.join(
               outputPlan.layerPlan,
               {
                 type: "mutationField",
+                mutationIndex: ++mutationIndex,
               },
               outputPlan.layerPlan.polymorphicPaths,
             )
@@ -1063,7 +1130,7 @@ ${te.join(
                 return memo;
               }, Object.create(null)) ?? Object.create(null),
             );
-            return graphqlResolver(resolver, step, $args, {
+            return graphqlResolver(resolver, subscriber, step, $args, {
               fieldName,
               fieldNodes,
               fragments: this.fragments,
@@ -1638,7 +1705,6 @@ ${te.join(
       }
     }
     return {
-      // FIXME: should this be FieldArgs?
       get(name) {
         return trackedArgumentValues[name];
       },
@@ -1995,11 +2061,14 @@ ${te.join(
       }
       case "polymorphic": {
         // May only need to be evaluated for certain types, so avoid hoisting anything expensive.
-        if (step.isSyncAndSafe) {
-          // It's cheap, try and hoist it.
-          // NOTE: this means this will run for non-matching types, which is
-          // not ideal. We may need to revert this.
-          // FIXME: ensure this is safe.
+        if (
+          step.isSyncAndSafe &&
+          step.polymorphicPaths.size === step.layerPlan.polymorphicPaths.size
+        ) {
+          // It's cheap and covers all types, try and hoist it.
+          // NOTE: I have concerns about whether this is safe or not, but I
+          // have not been able to come up with a counterexample that is
+          // unsafe. Should we do so, we should remove this.
           break;
         } else {
           return;
@@ -2028,9 +2097,14 @@ ${te.join(
       case "mutationField": {
         // NOTE: It's the user's responsibility to ensure that steps that have
         // side effects are marked as such via `step.hasSideEffects = true`.
-        if (step.isSyncAndSafe) {
-          // FIXME: warn user we're hoisting from a mutationField?
-          break;
+        if (step.isSyncAndSafe && !step.hasSideEffects) {
+          if (step.layerPlan.reason.mutationIndex === 0) {
+            // Safe to hoist inside first mutation; but all later mutations may be impacted by previous actions.
+            break;
+          }
+          // OPTIMIZE: figure out under which circumstances it is safe to hoist here.
+          // break;
+          return;
         } else {
           // Plans that rely on external state shouldn't be hoisted because
           // their results may change after a mutation, so the mutation should
@@ -2123,13 +2197,11 @@ ${te.join(
       case "mutationField": {
         // NOTE: It's the user's responsibility to ensure that steps that have
         // side effects are marked as such via `step.hasSideEffects = true`.
-        if (step.isSyncAndSafe) {
-          // FIXME: warn user we're hoisting from a mutationField?
+        if (step.isSyncAndSafe && !step.hasSideEffects) {
           break;
         } else {
-          // Plans that rely on external state shouldn't be hoisted because
-          // their results may change after a mutation, so the mutation should
-          // run first.
+          // Side effects should take place inside the mutation field plan
+          // (that's the whole point), so we should not push these down.
           return;
         }
       }
@@ -2142,8 +2214,6 @@ ${te.join(
         );
       }
     }
-
-    // FIXME: don't allow pushing down into mutationField?
 
     // Now find the lowest bucket that still satisfies all of it's dependents.
     const dependentLayerPlans = new Set<LayerPlan>();
@@ -2283,7 +2353,8 @@ ${te.join(
 
     const stepOptions = this.getStepOptionsForStep(step);
     const shouldStream = !!stepOptions?.stream;
-    // FIXME: revisit this decision in the context of SAGE.
+    // OPTIMIZE: Past Benjie thought we might want to revisit this under the
+    // new Grafast system. No idea what he had in mind there though...
     if (shouldStream) {
       // Never deduplicate streaming plans, we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its

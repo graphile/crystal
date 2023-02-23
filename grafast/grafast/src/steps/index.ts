@@ -70,8 +70,6 @@ export { deepEval, DeepEvalStep } from "./deepEval.js";
 export {
   GraphQLItemHandler,
   graphqlItemHandler,
-  GraphQLPolymorphicUnwrap,
-  graphqlPolymorphicUnwrap,
   graphqlResolver,
   GraphQLResolverStep,
 } from "./graphqlResolver.js";

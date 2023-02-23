@@ -169,6 +169,10 @@ declare global {
           databaseName: string,
           typeId: string,
         ): Promise<PgRange | null>;
+        getExtensionByName(
+          databaseName: string,
+          extensionName: string,
+        ): Promise<PgExtension | undefined>;
       };
     }
 
@@ -514,6 +518,13 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         const list = relevant.introspection.ranges;
         // TODO: cache
         return list.find((entity) => entity.rngtypid === typeId);
+      },
+
+      async getExtensionByName(info, databaseName, extensionName) {
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.extensions;
+        // TODO: cache
+        return list.find((entity) => entity.extname === extensionName);
       },
 
       getIntrospection(info) {

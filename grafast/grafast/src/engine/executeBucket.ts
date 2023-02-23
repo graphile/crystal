@@ -69,6 +69,12 @@ export function executeBucket(
   bucket: Bucket,
   requestContext: RequestContext,
 ): PromiseOrDirect<void> {
+  /**
+   * Execute the step directly; since there's no errors we can pass the
+   * dependencies through verbatim!
+   */
+  const reallyExecuteStepWithNoErrors = executeOrStream;
+
   const { metaByMetaKey } = requestContext;
   const {
     size,
@@ -211,18 +217,11 @@ export function executeBucket(
       ) => {
         let proto: any;
         if (
-          // Fast-lane for non-objects and simple objects
+          // Fast-lane for non-objects
           typeof value !== "object" ||
-          value === null ||
-          (proto = Object.getPrototypeOf(value)) === null ||
-          proto === Object.prototype
+          value === null
         ) {
           finalResult[resultIndex] = value;
-        } else if (value instanceof Error) {
-          const e =
-            $$error in value ? value : newGrafastError(value, finishedStep.id);
-          finalResult[resultIndex] = e;
-          bucket.hasErrors = true;
         } else if (
           // Detects async iterables (but excludes all the basic types
           // like arrays, Maps, Sets, etc that are also iterables) and
@@ -237,12 +236,12 @@ export function executeBucket(
             ? streamOptions.initialCount
             : Infinity;
 
-          // FIXME: need to ensure that iterator is terminated
-          // even if the stream is never consumed (e.g. if something else
-          // errors). For query/mutation we can do this when operation
-          // completes, for subscription we should do it after each
-          // individual payload (and all its streamed/deferred children)
-          // are complete before processing the next subscription event.
+          // FIXME: potential memory leak; need to ensure that iterator is
+          // terminated even if the stream is never consumed (e.g. if something
+          // else errors). For query/mutation we can do this when operation
+          // completes, for subscription we should do it after each individual
+          // payload (and all its streamed/deferred children) are complete
+          // before processing the next subscription event.
 
           if (initialCount === 0) {
             // Optimization - defer everything
@@ -291,6 +290,16 @@ export function executeBucket(
               promises.push(promise);
             }
           }
+        } else if (
+          (proto = Object.getPrototypeOf(value)) === null ||
+          proto === Object.prototype
+        ) {
+          finalResult[resultIndex] = value;
+        } else if (value instanceof Error) {
+          const e =
+            $$error in value ? value : newGrafastError(value, finishedStep.id);
+          finalResult[resultIndex] = e;
+          bucket.hasErrors = true;
         } else {
           finalResult[resultIndex] = value;
         }
@@ -397,8 +406,8 @@ export function executeBucket(
       }
 
       if (pendingPromises) {
-        return Promise.allSettled(pendingPromises).then(
-          (resultSettledResult) => {
+        return Promise.allSettled(pendingPromises)
+          .then((resultSettledResult) => {
             for (
               let i = 0, pendingPromisesLength = resultSettledResult.length;
               i < pendingPromisesLength;
@@ -428,28 +437,31 @@ export function executeBucket(
               handleSideEffectPlanIds();
             }
             return promises ? awaitPromises() : runSyncSteps();
-          },
-        );
-        // FIXME: rehandle this!
-        /*
+          })
           .then(null, (e) => {
             // THIS SHOULD NEVER HAPPEN!
             console.error(
-              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: this error should never occur! Please file an issue against grafast. Details: ${e}`,
             );
-            const grafastError = newGrafastError(
-              new Error(
-                `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-              ),
-              finishedStep.id,
-            );
-            console.error(`${grafastError.originalError}\n  ${e}`);
-            store.set(
-              finishedStep.id,
-              arrayOfLength(finalResult.length, grafastError),
-            );
+
+            bucket.hasErrors = true;
+            for (
+              let i = 0, pendingPromisesLength = pendingPromises!.length;
+              i < pendingPromisesLength;
+              i++
+            ) {
+              const { s: allStepsIndex, i: dataIndex } =
+                pendingPromiseIndexes![i];
+              const finishedStep = _allSteps[allStepsIndex];
+              const storeEntry = bucket.store.get(finishedStep.id)!;
+              storeEntry[dataIndex] = newGrafastError(
+                new Error(
+                  `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+                ),
+                finishedStep.id,
+              );
+            }
           });
-          */
       } else {
         if (bucket.hasErrors && sideEffectPlanIds) {
           handleSideEffectPlanIds();
@@ -591,22 +603,6 @@ export function executeBucket(
     }
   }
 
-  // FIXME: if this is what we end up with, remove the indirection.
-  /**
-   * Execute the step directly; since there's no errors we can pass the
-   * dependencies through verbatim!
-   */
-  function reallyExecuteStepWithNoErrors(
-    step: ExecutableStep,
-    dependencies: ReadonlyArray<any>[],
-    extra: ExecutionExtra,
-  ) {
-    return executeOrStream(step, dependencies, extra);
-  }
-
-  // FIXME: this function used to state that it would never throw/reject... but,
-  // no code is perfect... so that just seemed like it was asking for
-  // trouble. Lets make sure if it throws/rejects that nothing bad will happen.
   /**
    * This function MIGHT throw or reject, so be sure to handle that.
    */

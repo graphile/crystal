@@ -67,10 +67,6 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
             // const binding = calleePath.scope.bindings[param.name];
 
             // TODO: how do we correctly determine if this is safe?
-
-            // FIXME: remove the next 2 comment if nothing broke when we ran the tests.
-            // TODO: previously we were doing this, but that seemed wrong.
-            // if (!calleePath.scope[arg.name]) {
             if (!calleePath.scope.hasBinding(arg.name)) {
               // Rename the references to this arg to match the arg.
               calleePath.scope.rename(param.name, arg.name);

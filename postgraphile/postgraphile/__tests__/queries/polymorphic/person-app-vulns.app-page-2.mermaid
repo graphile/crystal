@@ -28,13 +28,13 @@ graph TD
     Connection38{{"Connection[38∈1]<br />ᐸ34ᐳ"}}:::plan
     PgValidateParsedCursor44["PgValidateParsedCursor[44∈1]"]:::plan
     Access45{{"Access[45∈1]<br />ᐸ39.1ᐳ"}}:::plan
-    ToPg46["ToPg[46∈1]"]:::plan
+    ToPg46{{"ToPg[46∈1]"}}:::plan
     Access47{{"Access[47∈1]<br />ᐸ39.2ᐳ"}}:::plan
     PgUnionAll40[["PgUnionAll[40∈3]"]]:::plan
     __Item41[/"__Item[41∈4]<br />ᐸ40ᐳ"\]:::itemplan
     PgUnionAllSingle42["PgUnionAllSingle[42∈4]"]:::plan
-    Access48{{"Access[48∈5]<br />ᐸ42.Symbol(data).0ᐳ"}}:::plan
-    Access49{{"Access[49∈5]<br />ᐸ42.Symbol(data).1ᐳ"}}:::plan
+    Access48{{"Access[48∈5]<br />ᐸ42.0ᐳ"}}:::plan
+    Access49{{"Access[49∈5]<br />ᐸ42.1ᐳ"}}:::plan
     List50{{"List[50∈5]<br />ᐸ48,49ᐳ"}}:::plan
     PgCursor43{{"PgCursor[43∈5]"}}:::plan
     JSONParse52[["JSONParse[52∈6]<br />ᐸ49ᐳ<br />ᐳAwsApplication"]]:::plan
@@ -48,8 +48,8 @@ graph TD
     PgUnionAll75[["PgUnionAll[75∈6]<br />ᐳAwsApplication"]]:::plan
     __Item76[/"__Item[76∈7]<br />ᐸ75ᐳ"\]:::itemplan
     PgUnionAllSingle77["PgUnionAllSingle[77∈7]"]:::plan
-    Access79{{"Access[79∈8]<br />ᐸ77.Symbol(data).0ᐳ"}}:::plan
-    Access80{{"Access[80∈8]<br />ᐸ77.Symbol(data).1ᐳ"}}:::plan
+    Access79{{"Access[79∈8]<br />ᐸ77.0ᐳ"}}:::plan
+    Access80{{"Access[80∈8]<br />ᐸ77.1ᐳ"}}:::plan
     List81{{"List[81∈8]<br />ᐸ79,80ᐳ<br />ᐳAwsApplication"}}:::plan
     PgCursor78{{"PgCursor[78∈8]"}}:::plan
     JSONParse83[["JSONParse[83∈9]<br />ᐸ80ᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
@@ -75,8 +75,8 @@ graph TD
     PgUnionAll126[["PgUnionAll[126∈6]<br />ᐳGcpApplication"]]:::plan
     __Item127[/"__Item[127∈10]<br />ᐸ126ᐳ"\]:::itemplan
     PgUnionAllSingle128["PgUnionAllSingle[128∈10]"]:::plan
-    Access130{{"Access[130∈11]<br />ᐸ128.Symbol(data).0ᐳ"}}:::plan
-    Access131{{"Access[131∈11]<br />ᐸ128.Symbol(data).1ᐳ"}}:::plan
+    Access130{{"Access[130∈11]<br />ᐸ128.0ᐳ"}}:::plan
+    Access131{{"Access[131∈11]<br />ᐸ128.1ᐳ"}}:::plan
     List132{{"List[132∈11]<br />ᐸ130,131ᐳ<br />ᐳGcpApplication"}}:::plan
     PgCursor129{{"PgCursor[129∈11]"}}:::plan
     JSONParse134[["JSONParse[134∈12]<br />ᐸ131ᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
@@ -172,7 +172,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,Access16,Access17,Object18,Connection19,__InputStaticLeaf29,Lambda39,__InputStaticLeaf61,__InputStaticLeaf112 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 39, 61, 112<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: 20, 44<br />ᐳ: 25, 45, 47, 38<br />2: ToPg[46]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 39, 61, 112<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,__InputStaticLeaf25,Connection38,PgValidateParsedCursor44,Access45,ToPg46,Access47 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 18, 39, 44, 46, 47, 61, 112, 38<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket

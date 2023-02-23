@@ -494,15 +494,13 @@ export class PgSubscriber<
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     const { eventEmitter, topics } = this;
-    let waiting: Deferred<any> | null = null;
     const stack: any[] = [];
+    const queue: Deferred<any>[] = [];
 
     function doFinally() {
-      if (waiting) {
-        const p = waiting;
-        waiting = null;
-        // FIXME: Is this right?!
-        p.reject(new Error("Terminated"));
+      if (queue) {
+        const promises = queue.splice(0, queue.length);
+        promises.forEach((p) => p.reject(new Error("Terminated")));
       }
       eventEmitter.removeListener(topic as string, recv);
       // Every code path above this has to go through a `yield` and thus
@@ -522,19 +520,16 @@ export class PgSubscriber<
         return this;
       },
       async next() {
-        if (stack.length) {
-          return Promise.resolve(stack.shift()).then((value) => ({
-            done: false,
-            value,
-          }));
+        if (stack.length > 0) {
+          const value = await stack.shift();
+          return { done: false, value };
         } else {
-          if (waiting) {
-            return waiting.then(() => this.next());
-          } else {
-            waiting = defer();
-            const value = await waiting;
-            return { done: false, value };
-          }
+          // This must be done synchronously - there must be **NO AWAIT BEFORE THIS**
+          const waiting = defer();
+          queue.push(waiting);
+
+          const value = await waiting;
+          return { done: false, value };
         }
       },
       async return(value) {
@@ -548,10 +543,9 @@ export class PgSubscriber<
     };
 
     function recv(payload: any) {
-      if (waiting) {
-        const p = waiting;
-        waiting = null;
-        p.resolve(payload);
+      if (queue.length > 0) {
+        const first = queue.shift();
+        first!.resolve(payload);
       } else {
         stack.push(payload);
       }

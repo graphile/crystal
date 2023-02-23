@@ -14,7 +14,6 @@ import type {
 } from "grafast";
 import {
   __ItemStep,
-  $$data,
   access,
   constant,
   ExecutableStep,
@@ -250,7 +249,7 @@ export class PgUnionAllSingleStep
       );
     }
     const spec = Object.create(null);
-    const $parsed = jsonParse(access(this, [$$data, this.pkKey]));
+    const $parsed = jsonParse(access(this, [this.pkKey]));
     for (let i = 0, l = pk.columns.length; i < l; i++) {
       const col = pk.columns[i];
       spec[col] = access($parsed, [i]);
@@ -269,12 +268,12 @@ export class PgUnionAllSingleStep
     const classPlan = this.getClassStep();
     const digest = classPlan.getOrderByDigest();
     const orders = classPlan.getOrderByWithoutType().map((o, i) => {
-      return access(this, [$$data, classPlan.selectOrderValue(i)]);
+      return access(this, [classPlan.selectOrderValue(i)]);
     });
     // Add the type to the cursor
-    orders.push(access(this, [$$data, classPlan.selectType()]));
+    orders.push(access(this, [classPlan.selectType()]));
     // Add the pk to the cursor
-    orders.push(access(this, [$$data, classPlan.selectPk()]));
+    orders.push(access(this, [classPlan.selectPk()]));
     const step = list(orders);
     return [digest, step];
   }
@@ -1139,7 +1138,6 @@ on (${sql.indent(
             const pkCol = pk.columns[pkIndex];
             return [
               sql`${digest.alias}.${sql.identifier(pkCol)}`,
-              // FIXME: this is not the correct way of casting.
               sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
                 pkColumns[pkCol].codec.sqlType
               }`,
@@ -1161,7 +1159,9 @@ on (${sql.indent(
             return [frag, identifierPlaceholders[i], order.direction];
           }
         })();
-        // FIXME: how does `NULLS LAST` / `NULLS FIRST` affect this? (See: order.nulls.)
+        // FIXME: _iff_ `orderFragment` is nullable _and_ `order.nulls` is
+        // non-null then we need to factor `NULLS LAST` / `NULLS FIRST` into
+        // this calculation.
         const gt =
           (direction === "ASC" && beforeOrAfter === "after") ||
           (direction === "DESC" && beforeOrAfter === "before");
@@ -1790,18 +1790,23 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
     const { text, values: rawSqlValues } = sql.compile(finalQuery, {
       placeholderValues: this.placeholderValues,
     });
+
+    const shouldReverseOrder = this.shouldReverseOrder();
+
+    // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
+
     this.finalizeResults = {
       text,
       rawSqlValues,
       identifierIndex,
-      // FIXME: when streaming we must not set this to true
-      shouldReverseOrder: this.shouldReverseOrder(),
+      shouldReverseOrder,
       name: hash(text),
     };
 
     super.finalize();
   }
 
+  // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
   async execute(
     values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,

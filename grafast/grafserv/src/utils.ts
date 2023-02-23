@@ -68,8 +68,7 @@ export function getBodyFromRequest(
         req.off("end", done);
         req.off("error", reject);
         req.off("data", handleData);
-        // FIXME: validate this approach
-        reject(new Error("Too much data"));
+        reject(httpError(413, "Too much data"));
       }
     };
     const done = () => {
@@ -132,6 +131,12 @@ export function normalizeRequest(
     r.getHeader = (key) => normalized[key.toLowerCase()];
     r.getBody = memo(r.getBody);
     r.getQueryParams = memo(r.getQueryParams);
+
+    if (r.method === "HEAD") {
+      // Pretend that 'HEAD' requests are actually 'GET' requests; Node will
+      // take care of stripping the response body for us.
+      r.method = "GET";
+    }
   }
   return request as NormalizedRequestDigest;
 }

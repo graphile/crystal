@@ -18,10 +18,9 @@ import { context } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
+  GrafastResultStreamList,
   GrafastValuesList,
-  PolymorphicData,
 } from "../interfaces.js";
-import { $$data } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
 import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
@@ -65,7 +64,14 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   /** root fields can have null parent */
   private isNotRoot: boolean;
   constructor(
-    private resolver: GraphQLFieldResolver<any, any> & { displayName?: string },
+    private resolver:
+      | (GraphQLFieldResolver<any, any> & { displayName?: string })
+      | null
+      | undefined,
+    private subscriber:
+      | (GraphQLFieldResolver<any, any> & { displayName?: string })
+      | null
+      | undefined,
     $plan: ExecutableStep,
     $args: ObjectStep,
     private resolveInfoBase: ResolveInfoBase,
@@ -85,11 +91,20 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   toStringMeta() {
-    return this.resolver.displayName || this.resolver.name;
+    return (
+      this.resolver?.displayName ||
+      this.resolver?.name ||
+      this.subscriber?.displayName ||
+      this.subscriber?.name ||
+      null
+    );
   }
 
   deduplicate(peers: GraphQLResolverStep[]): GraphQLResolverStep[] {
-    return peers.filter((peer) => peer.resolver === this.resolver);
+    return peers.filter(
+      (peer) =>
+        peer.resolver === this.resolver && peer.subscriber === this.subscriber,
+    );
   }
 
   unbatchedExecute(
@@ -111,7 +126,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
         rootValue,
       },
     );
-    const data = this.resolver(source, args, context, resolveInfo);
+    const data = this.resolver?.(source, args, context, resolveInfo);
     if (this.returnContextAndResolveInfo) {
       if (isPromiseLike(data)) {
         return data.then((data) => dcr(data, context, resolveInfo));
@@ -122,29 +137,56 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
       return data;
     }
   }
-}
 
-/** @internal */
-export class GraphQLPolymorphicUnwrap extends UnbatchedExecutableStep {
-  static $$export = {
-    moduleName: "grafast",
-    exportName: "GraphQLPolymorphicUnwrap",
-  };
-  public isSyncAndSafe = true;
-  constructor($parent: ExecutableStep) {
-    super();
-    this.addDependency($parent);
+  unbatchedStream(
+    extra: ExecutionExtra,
+    source: any,
+    args: any,
+    context: any,
+    variableValues: any,
+    rootValue: any,
+  ): any {
+    if (this.isNotRoot) {
+      return Promise.reject(new Error(`Invalid non-root subscribe`));
+    }
+    if (this.subscriber == null) {
+      return Promise.reject(new Error(`Cannot subscribe to field`));
+    }
+    if (this.returnContextAndResolveInfo) {
+      return Promise.reject(
+        new Error(
+          `Subscription with returnContextAndResolveInfo is not supported`,
+        ),
+      );
+    }
+    const resolveInfo: GraphQLResolveInfo = Object.assign(
+      Object.create(this.resolveInfoBase),
+      {
+        // TODO: add support for path
+        variableValues,
+        rootValue,
+      },
+    );
+    const data = this.subscriber(source, args, context, resolveInfo);
+    return data;
   }
-  execute(values: [GrafastValuesList<PolymorphicData>]) {
-    return values[0].map((v) => (v ? v[$$data] : null));
-  }
-  unbatchedExecute(extra: ExecutionExtra, v: PolymorphicData) {
-    return v ? v[$$data] : null;
-  }
-}
 
-export function graphqlPolymorphicUnwrap($parent: ExecutableStep) {
-  return new GraphQLPolymorphicUnwrap($parent);
+  async stream(
+    values: ReadonlyArray<GrafastValuesList<any>>,
+    extra: ExecutionExtra,
+  ): Promise<GrafastResultStreamList<any>> {
+    const count = values[0].length;
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      try {
+        const tuple = values.map((list) => list[i]);
+        results[i] = (this.unbatchedStream as any)(extra, ...tuple);
+      } catch (e) {
+        results[i] = e instanceof Error ? (e as never) : Promise.reject(e);
+      }
+    }
+    return results;
+  }
 }
 
 /** @internal */
@@ -179,7 +221,7 @@ export class GraphQLItemHandler
   }
 
   planForType() {
-    return graphqlPolymorphicUnwrap(this);
+    return this;
   }
 
   listItem($item: __ItemStep<any>) {
@@ -310,7 +352,8 @@ export function graphqlItemHandler(
  * @internal
  */
 export function graphqlResolver(
-  resolver: GraphQLFieldResolver<any, any>,
+  resolver: GraphQLFieldResolver<any, any> | null | undefined,
+  subscriber: GraphQLFieldResolver<any, any> | null | undefined,
   $step: ExecutableStep,
   $args: ObjectStep,
   resolveInfoBase: ResolveInfoBase,
@@ -318,15 +361,21 @@ export function graphqlResolver(
   const { returnType } = resolveInfoBase;
   const namedType = getNamedType(returnType);
   const isAbstract = isAbstractType(namedType);
-  const nullableType = getNullableType(returnType);
   const $resolverResult = new GraphQLResolverStep(
     resolver,
+    subscriber,
     $step,
     $args,
     resolveInfoBase,
     isAbstract,
   );
   if (isAbstract) {
+    if (subscriber) {
+      throw new Error(
+        `GraphQL subscribe function emulation currently doesn't support polymorphism`,
+      );
+    }
+    const nullableType = getNullableType(returnType);
     return graphqlItemHandler($resolverResult, nullableType);
   } else {
     return $resolverResult;

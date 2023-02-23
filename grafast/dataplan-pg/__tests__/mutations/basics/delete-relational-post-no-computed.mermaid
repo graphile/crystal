@@ -19,6 +19,9 @@ graph TD
     PgDelete9[["PgDelete[9∈1]"]]:::sideeffectplan
     PgClassExpression13{{"PgClassExpression[13∈2]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     __InputStaticLeaf15{{"__InputStaticLeaf[15∈0]"}}:::plan
+    Access17{{"Access[17∈3]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈3]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object19{{"Object[19∈3]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgDelete16[["PgDelete[16∈3]"]]:::sideeffectplan
     PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
 
@@ -28,7 +31,10 @@ graph TD
     Access10 & Access11 --> Object12
     Object12 & __InputStaticLeaf8 --> PgDelete9
     PgDelete9 --> PgClassExpression13
-    Object12 & __InputStaticLeaf15 --> PgDelete16
+    __Value3 --> Access17
+    __Value3 --> Access18
+    Access17 & Access18 --> Object19
+    Object19 & __InputStaticLeaf15 --> PgDelete16
     PgDelete16 --> PgClassExpression20
 
     subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
@@ -41,9 +47,9 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9<br /><br />ROOT PgDelete{1}[9]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression13 bucket2
-    Bucket3("Bucket 3 (mutationField)<br />Deps: 12, 15"):::bucket
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 15, 3<br /><br />1: Access[17]<br />2: Access[18]<br />3: Object[19]<br />4: PgDelete[16]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgDelete16 bucket3
+    class Bucket3,PgDelete16,Access17,Access18,Object19 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 16<br /><br />ROOT PgDelete{3}[16]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression20 bucket4

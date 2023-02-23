@@ -88,7 +88,6 @@ export class NodeGrafservBase extends GrafservBase {
     next?: (err?: Error) => void,
   ) => void {
     const dynamicOptions = this.dynamicOptions;
-    // FIXME: 'async' here is risky
     return async (req, res, next) => {
       try {
         const request = this.getDigest(dynamicOptions, req, res, isHTTPS);
@@ -189,12 +188,15 @@ export class NodeGrafservBase extends GrafservBase {
 
             try {
               for await (const buffer of bufferIterator) {
-                res.write(buffer);
-                // FIXME: Technically we should see if `.write()` returned
-                // false, and if so we should pause the stream.
+                const bufferIsBelowWatermark = res.write(buffer);
 
                 if (flush) {
                   flush();
+                }
+
+                if (!bufferIsBelowWatermark) {
+                  // Wait for drain before pumping more data through
+                  await new Promise((resolve) => res.once("drain", resolve));
                 }
               }
             } catch (e) {

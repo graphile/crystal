@@ -1,13 +1,3 @@
-select
-  (count(*))::text as "0"
-from app_public.messages as __messages__
-where
-  (
-    __messages__.archived_at is null
-  ) and (
-    true /* authorization checks */
-  );
-
 select __messages_result__.*
 from (
   select
@@ -36,3 +26,13 @@ lateral (
   order by __messages__."id" desc
   limit 4
 ) as __messages_result__;
+
+select
+  (count(*))::text as "0"
+from app_public.messages as __messages__
+where
+  (
+    __messages__.archived_at is null
+  ) and (
+    true /* authorization checks */
+  );

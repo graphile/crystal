@@ -916,6 +916,11 @@ const stringLeafExecutorString = makeExecutor(
 `,
 );
 
+// NOTE: the reference to $$concreteType here is a (temporary) optimization; it
+// should be `resolveType(bucketRootValue)` but it's not worth the function
+// call overhead. Longer term it should just be read directly from a different
+// store.
+
 function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
@@ -1096,6 +1101,14 @@ const arrayExecutorString_nonNullable_streaming = makeArrayExecutor(
   true,
 );
 
+/**
+ * This piggy-backs off of GraphQL.js by rewriting the request, executing it in
+ * GraphQL.js, and then patching it into our response. It's a temporary
+ * workaround until we can afford the time to write our own introspection
+ * execution.
+ *
+ * TODO: write our own introspection execution!
+ */
 const introspect = (
   root: PayloadRoot,
   outputPlan: OutputPlan<OutputPlanTypeIntrospection>,
@@ -1132,10 +1145,13 @@ const introspect = (
     kind: Kind.DOCUMENT,
   };
   const variableValues: Record<string, any> = Object.create(null);
-  for (const variableName of variableNames) {
+  const sortedVariableNames = [...variableNames].sort();
+  for (const variableName of sortedVariableNames) {
     variableValues[variableName] = root.variables[variableName];
   }
-  // PERF: make this canonical
+  // "canonical" only to one level, but given introspection doesn't really
+  // accept objects this should be mostly sufficient for decent optimization
+  // level.
   const canonical = JSON.stringify(variableValues);
   const cached = introspectionCacheByVariableValues.get(canonical);
   if (cached) {
@@ -1147,7 +1163,13 @@ const introspect = (
     variableValues,
   });
   if (graphqlResult.errors) {
-    // FIXME: we should map the introspection path
+    // NOTE: we should map the introspection path, however that might require
+    // us to be able to raise multiple errors. Theoretically if the query
+    // validates we shouldn't be able to get errors out of the introspection
+    // system, so we'll skip over this for now. When we get around to
+    // implementing introspection natively in Grafast rather than piggy-backing
+    // off of GraphQL.js then this problem will go away on its own.
+
     console.error("INTROSPECTION FAILED!");
     console.error(graphqlResult);
     const { node } = locationDetails;

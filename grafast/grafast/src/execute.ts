@@ -49,44 +49,31 @@ export function withGrafastArgs(
   }
   const explain = options?.explain;
   const shouldExplain = !!explain;
-  const eventEmitter: ExecutionEventEmitter | undefined = shouldExplain
-    ? new EventEmitter()
-    : undefined;
 
-  // FIXME: modifying rootValue like this is super dirty. Also, are we sure
-  // that rootValue will be different for each request? Seems risky if someone
-  // passes a constant...
-
+  let unlisten: (() => void) | null = null;
   if (shouldExplain) {
-    (args.rootValue as any)[$$extensions] = {
-      explain: {
-        operations: [],
+    const eventEmitter: ExecutionEventEmitter | undefined = new EventEmitter();
+    const explainOperations: any[] = [];
+    args.rootValue = Object.assign(Object.create(null), args.rootValue, {
+      [$$eventEmitter]: eventEmitter,
+      [$$extensions]: {
+        explain: {
+          operations: explainOperations,
+        },
       },
+    });
+    const handleExplainOperation = ({
+      operation,
+    }: ExecutionEventMap["explainOperation"]) => {
+      if (explain === true || (explain && explain.includes(operation.type))) {
+        explainOperations.push(operation);
+      }
+    };
+    eventEmitter!.on("explainOperation", handleExplainOperation);
+    unlisten = () => {
+      eventEmitter!.removeListener("explainOperation", handleExplainOperation);
     };
   }
-
-  const explainOperations = shouldExplain
-    ? (args.rootValue as any)[$$extensions].explain.operations
-    : undefined;
-  const handleExplainOperation = ({
-    operation,
-  }: ExecutionEventMap["explainOperation"]) => {
-    if (explain === true || (explain && explain.includes(operation.type))) {
-      explainOperations.push(operation);
-    }
-  };
-  if (shouldExplain) {
-    (args.rootValue as any)[$$eventEmitter] = eventEmitter;
-    eventEmitter!.on("explainOperation", handleExplainOperation);
-  }
-  const unlisten = shouldExplain
-    ? () => {
-        eventEmitter!.removeListener(
-          "explainOperation",
-          handleExplainOperation,
-        );
-      }
-    : undefined;
 
   const rootValue = grafastPrepare(args, {
     explain: options?.explain,

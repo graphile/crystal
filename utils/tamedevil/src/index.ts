@@ -426,7 +426,6 @@ const teBase = function te(
 };
 
 let rawWarningOutput = false;
-// FIXME: should we just straight up remove this method?
 /**
  * Creates a TE node for a raw code string. Just plain ol‘ raw code - EXTREMELY
  * DANGEROUS.
@@ -437,20 +436,20 @@ let rawWarningOutput = false;
  * It's very very rarely warranted to use this - there is likely a safer way of
  * achieving your goal. DO NOT USE THIS WITH UNTRUSTED INPUT!
  */
-function raw(text: string): TE {
+function dangerouslyIncludeRawCode(text: string): TE {
   if (!rawWarningOutput) {
     rawWarningOutput = true;
     try {
-      throw new Error("te.raw first invoked here");
+      throw new Error("te.dangerouslyIncludeRawCode first invoked here");
     } catch (e: any) {
       console.warn(
-        `[tamedevil] WARNING: you're using the te.raw escape hatch, usage of this API is rarely required and is highly discouraged due to the potential security ramifications. Please be sure this is what you intend. ${e.stack}`,
+        `[tamedevil] WARNING: you're using the te.dangerouslyIncludeRawCode escape hatch, usage of this API is rarely required and is highly discouraged due to the potential security ramifications. Please be sure this is what you intend. ${e.stack}`,
       );
     }
   }
   if (typeof text !== "string") {
     throw new Error(
-      `[tamedevil] te.raw must be passed a string, but it was passed '${String(
+      `[tamedevil] te.dangerouslyIncludeRawCode must be passed a string, but it was passed '${String(
         text,
       )}'.`,
     );
@@ -1004,6 +1003,7 @@ export default te;
 export {
   compile,
   dangerousKey,
+  dangerouslyIncludeRawCode,
   run as eval,
   get,
   identifier,
@@ -1012,7 +1012,6 @@ export {
   lit,
   lit as literal,
   optionalGet,
-  raw,
   ref,
   run,
   set,
@@ -1055,7 +1054,7 @@ export interface TamedEvil {
   undefined: TE;
   blank: TE;
   isTE: typeof isTE;
-  raw: typeof raw;
+  dangerouslyIncludeRawCode: typeof dangerouslyIncludeRawCode;
 }
 
 const attributes = {
@@ -1082,7 +1081,7 @@ const attributes = {
   undefined: undefinedNode,
   blank: blankNode,
   isTE,
-  raw,
+  dangerouslyIncludeRawCode,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {
