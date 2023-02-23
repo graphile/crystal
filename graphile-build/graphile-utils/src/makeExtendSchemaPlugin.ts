@@ -322,6 +322,7 @@ export function makeExtendSchemaPlugin(
             },
             graphql: {
               GraphQLEnumType,
+              GraphQLError,
               GraphQLObjectType,
               GraphQLInputObjectType,
               GraphQLUnionType,
@@ -547,7 +548,9 @@ export function makeExtendSchemaPlugin(
                   parseLiteral: EXPORTABLE(
                     (Kind) => (ast: any) => {
                       if (ast.kind !== Kind.STRING) {
-                        throw new Error("Can only parse string values");
+                        throw new GraphQLError(
+                          `${name} can only parse string values`,
+                        );
                       }
                       return ast.value;
                     },

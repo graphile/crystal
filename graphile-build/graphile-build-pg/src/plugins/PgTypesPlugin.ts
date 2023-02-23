@@ -51,6 +51,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
               GraphQLList,
               GraphQLBoolean,
               Kind,
+              GraphQLError,
             },
             getInputTypeByName,
             getOutputTypeByName,
@@ -673,7 +674,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                       if (isValidHstoreObject(obj)) {
                         return obj;
                       }
-                      throw new TypeError(
+                      throw new GraphQLError(
                         `This is not a valid ${hstoreTypeName} object, it must be a key/value hash where keys and values are both strings (or null).`,
                       );
                     },

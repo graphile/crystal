@@ -13,6 +13,7 @@ import type {
   PolymorphicStep,
 } from "grafast";
 import {
+  $$safeError,
   __ItemStep,
   access,
   constant,
@@ -100,8 +101,11 @@ function parseCursor(cursor: string | null) {
     }
     return decoded;
   } catch (e) {
-    throw new Error(
-      "Invalid cursor, please enter a cursor from a previous request, or null.",
+    throw Object.assign(
+      new Error(
+        "Invalid cursor, please enter a cursor from a previous request, or null.",
+      ),
+      { [$$safeError]: true },
     );
   }
 }

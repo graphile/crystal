@@ -50,6 +50,7 @@ import type { GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLError,
   GraphQLFloat,
   GraphQLInt,
   GraphQLInterfaceType,
@@ -4186,7 +4187,9 @@ export function makeExampleSchema(
                   const $messages = $connection.getSubplan();
                   const val = arg.getRaw().eval();
                   if (!Array.isArray(val)) {
-                    throw new Error("Invalid!");
+                    throw new GraphQLError(
+                      "Invalid valus supplied to 'orderBy'",
+                    );
                   }
                   val.forEach((order) => {
                     const config = getEnumValueConfig(MessagesOrderBy, order);
@@ -4197,7 +4200,7 @@ export function makeExampleSchema(
                           plan,
                         )}`,
                       );
-                      throw new Error(
+                      throw new GraphQLError(
                         "Internal server error: invalid orderBy configuration",
                       );
                     }
@@ -4891,7 +4894,7 @@ export function makeExampleSchema(
                           plan,
                         )}`,
                       );
-                      throw new Error(
+                      throw new GraphQLError(
                         "Internal server error: invalid orderBy configuration",
                       );
                     }

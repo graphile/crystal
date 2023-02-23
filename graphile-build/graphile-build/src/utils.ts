@@ -1,7 +1,7 @@
 import { $$idempotent } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
-import { GraphQLObjectType, Kind } from "graphql";
+import { GraphQLError, GraphQLObjectType, Kind } from "graphql";
 // TODO: remove 'lodash' dependency
 import camelCaseAll from "lodash/camelCase.js";
 import upperFirstAll from "lodash/upperFirst.js";
@@ -180,7 +180,8 @@ export const stringTypeSpec = (
     ? EXPORTABLE(
         (Kind, coerce) => (ast) => {
           if (ast.kind !== Kind.STRING) {
-            throw new Error("Can only parse string values");
+            // TODO: add name to this error
+            throw new GraphQLError("Can only parse string values");
           }
           return coerce(ast.value);
         },
@@ -189,7 +190,7 @@ export const stringTypeSpec = (
     : EXPORTABLE(
         (Kind) => (ast) => {
           if (ast.kind !== Kind.STRING) {
-            throw new Error("Can only parse string values");
+            throw new GraphQLError("Can only parse string values");
           }
           return ast.value;
         },

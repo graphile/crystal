@@ -34,7 +34,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           options: { jsonScalarAsString },
           inflection,
           stringTypeSpec,
-          graphql: { Kind },
+          graphql: { Kind, GraphQLError },
         } = build;
 
         build.registerScalarType(
@@ -125,7 +125,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                       string,
                     )
                   ) {
-                    throw new Error(
+                    throw new GraphQLError(
                       "Invalid UUID, expected 32 hexadecimal characters, optionally with hypens",
                     );
                   }
