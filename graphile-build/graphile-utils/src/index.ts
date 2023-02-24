@@ -7,7 +7,16 @@ export {
   NullabilitySpec,
   NullabilitySpecString,
 } from "./makeChangeNullabilityPlugin.js";
-export { makeExtendSchemaPlugin } from "./makeExtendSchemaPlugin.js";
+export {
+  makeExtendSchemaPlugin,
+  Plans,
+  Resolvers,
+  ObjectFieldConfig,
+  ObjectResolver,
+  ObjectPlan,
+  EnumResolver,
+  ExtensionDefinition,
+} from "./makeExtendSchemaPlugin.js";
 export {
   makeJSONPgSmartTagsPlugin,
   makePgSmartTagsFromFilePlugin,
