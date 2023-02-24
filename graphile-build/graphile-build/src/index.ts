@@ -423,14 +423,15 @@ export async function makeSchema(
   // TODO: AbortSignal
 ): Promise<SchemaResult> {
   const resolvedPreset = resolvePresets([preset]);
-  const retryOnInitFail = resolvedPreset.schema?.retryOnInitFail;
-  let phase: "INFLECTION" | "GATHER" | "SCHEMA" | "UNKNOWN" = "UNKNOWN";
-  const make = async () => {
-    phase = "INFLECTION";
-    const inflection = buildInflection(resolvedPreset);
+  // An error caused here cannot be solved by retrying, so don't catch it.
+  const inflection = buildInflection(resolvedPreset);
+  const shared = { inflection };
 
+  const retryOnInitFail = resolvedPreset.schema?.retryOnInitFail;
+
+  let phase: "GATHER" | "SCHEMA" | "UNKNOWN" = "UNKNOWN";
+  const make = async () => {
     phase = "GATHER";
-    const shared = { inflection };
     const input = await gather(resolvedPreset, shared);
 
     phase = "SCHEMA";
