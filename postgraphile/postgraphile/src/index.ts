@@ -2,7 +2,7 @@
 import "graphile-build";
 import "graphile-build-pg";
 
-import type { Deferred } from "grafast";
+import type { Deferred, PromiseOrDirect } from "grafast";
 import { defer, isPromiseLike } from "grafast";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import { resolvePresets } from "graphile-config";
@@ -15,15 +15,19 @@ export { makeSchema } from "./schema.js";
 
 export { GraphileBuild, GraphileConfig };
 
-export function postgraphile(preset: GraphileConfig.Preset): {
+export interface PostGraphileInstance {
   createServ<TGrafserv extends GrafservBase>(
     grafserv: (config: GrafservConfig) => TGrafserv,
   ): TGrafserv;
-  getServerParams(): Promise<ServerParams>;
-  getSchema(): Promise<GraphQLSchema>;
+  getServerParams(): PromiseOrDirect<ServerParams>;
+  getSchema(): PromiseOrDirect<GraphQLSchema>;
   getResolvedPreset(): GraphileConfig.ResolvedPreset;
-  release(): Promise<void>;
-} {
+  release(): PromiseOrDirect<void>;
+}
+
+export function postgraphile(
+  preset: GraphileConfig.Preset,
+): PostGraphileInstance {
   const resolvedPreset = resolvePresets([preset]);
   let serverParams:
     | PromiseLike<ServerParams>
