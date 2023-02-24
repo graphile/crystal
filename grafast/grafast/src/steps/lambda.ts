@@ -18,11 +18,16 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
   private planDep: number | null;
   constructor(
     $plan: ExecutableStep<TIn> | null | undefined,
-    private fn: (value: TIn) => TOut,
+    private fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
     this.planDep = $plan != null ? this.addDependency($plan) : null;
     if ((fn as any).isSyncAndSafe) {
+      if (fn.constructor.name === "AsyncFunction") {
+        throw new Error(
+          `${this}'s callback claims to be syncAndSafe, however it is asynchronous`,
+        );
+      }
       this.isSyncAndSafe = true;
     }
   }
@@ -35,7 +40,7 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
     return peers.filter((peer) => peer.fn === this.fn);
   }
 
-  unbatchedExecute(extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
+  unbatchedExecute(_extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
     return this.fn(value);
   }
 }
@@ -47,12 +52,12 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
  */
 function lambda<TIn extends [...any[]], TOut>(
   plans: { [Index in keyof TIn]: ExecutableStep<TIn[Index]> },
-  fn: (value: TIn) => TOut,
+  fn: (value: TIn) => PromiseOrDirect<TOut>,
   isSyncAndSafe?: boolean,
 ): LambdaStep<TIn, TOut>;
 function lambda<TIn, TOut>(
   $plan: ExecutableStep<TIn> | null | undefined,
-  fn: (value: TIn) => TOut,
+  fn: (value: TIn) => PromiseOrDirect<TOut>,
   isSyncAndSafe?: boolean,
 ): LambdaStep<TIn, TOut>;
 function lambda(
@@ -69,6 +74,11 @@ function lambda(
     ? new LambdaStep<any, any>(list(planOrPlans), fn)
     : new LambdaStep<any, any>(planOrPlans, fn);
   if (isSyncAndSafe) {
+    if (fn.constructor.name === "AsyncFunction") {
+      throw new Error(
+        `lambda call claims to be syncAndSafe, however the callback function is asynchronous`,
+      );
+    }
     $lambda.isSyncAndSafe = true;
   }
   return $lambda;
