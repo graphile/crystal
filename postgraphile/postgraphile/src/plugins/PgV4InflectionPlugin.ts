@@ -71,7 +71,7 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         // Silly V4 behavior
         return this.camelCase(
           `deleted-${this.singularize(
-            source.extensions?.tags?.originalName ?? this._sourceName(source),
+            source.extensions?.pg?.name ?? this._sourceName(source),
           )}-id`,
         );
       },

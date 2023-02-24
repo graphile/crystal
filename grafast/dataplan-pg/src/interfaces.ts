@@ -64,6 +64,11 @@ export interface PgRefDefinitions {
  */
 export interface PgTypeCodecExtensions {
   oid?: string;
+  pg?: {
+    databaseName: string;
+    schemaName: string;
+    name: string;
+  };
   description?: string;
   listItemNonNull?: boolean;
 }

@@ -402,9 +402,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const extensions: PgTypeCodecExtensions = {
             oid: pgClass.reltype,
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
-            tags: Object.assign(Object.create(null), {
-              originalName: pgClass.relname,
-            }),
+            pg: {
+              databaseName,
+              schemaName: pgClass.getNamespace()!.nspname,
+              name: pgClass.relname,
+            },
+            tags: Object.create(null),
           };
           const spec = {
             name: codecName,
@@ -527,7 +530,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
               const enumLabels = enumValues.map((e) => e.enumlabel);
-              const extensions = { oid: type._id, tags: Object.create(null) };
+              const extensions = {
+                oid: type._id,
+                pg: {
+                  databaseName,
+                  schemaName: type.getNamespace()!.nspname,
+                  name: type.typname,
+                },
+                tags: Object.create(null),
+              };
               await info.process("pgCodecs_enumType_extensions", {
                 databaseName,
                 pgType: type,
@@ -589,7 +600,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
 
-              const extensions = { oid: type._id, tags: Object.create(null) };
+              const extensions = {
+                oid: type._id,
+                pg: {
+                  databaseName,
+                  schemaName: type.getNamespace()!.nspname,
+                  name: type.typname,
+                },
+                tags: Object.create(null),
+              };
               await info.process("pgCodecs_rangeOfCodec_extensions", {
                 databaseName,
                 pgType: type,
@@ -645,7 +664,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               const namespaceName = namespace.nspname;
               const typeName = type.typname;
               if (innerCodec) {
-                const extensions = { oid: type._id, tags: Object.create(null) };
+                const extensions = {
+                  oid: type._id,
+                  pg: {
+                    databaseName,
+                    schemaName: type.getNamespace()!.nspname,
+                    name: type.typname,
+                  },
+                  tags: Object.create(null),
+                };
                 await info.process("pgCodecs_domainOfCodec_extensions", {
                   databaseName,
                   pgType: type,
@@ -708,6 +735,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   const typeDelim = innerType.typdelim!;
                   const extensions = {
                     oid: type._id,
+                    pg: {
+                      databaseName,
+                      schemaName: type.getNamespace()!.nspname,
+                      name: type.typname,
+                    },
                     tags: Object.create(null),
                   };
                   await info.process("pgCodecs_listOfCodec_extensions", {
