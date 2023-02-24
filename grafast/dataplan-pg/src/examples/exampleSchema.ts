@@ -18,7 +18,6 @@ import type {
   __InputStaticLeafStep,
   __TrackedObjectStep,
   AccessStep,
-  BaseGraphQLContext,
   BaseGraphQLRootValue,
   GrafastSubscriber,
   GraphileArgumentConfig,
@@ -142,7 +141,7 @@ declare module ".." {
 // These are what the generics extend from
 
 // This is the actual runtime context; we should not use a global for this.
-export interface OurGraphQLContext extends BaseGraphQLContext {
+export interface OurGraphQLContext extends Grafast.Context {
   pgSettings: { [key: string]: string };
   withPgClient: WithPgClient;
   pgSubscriber: PgSubscriber;

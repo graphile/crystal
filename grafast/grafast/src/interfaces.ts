@@ -260,7 +260,6 @@ export type GrafastResultStreamList<T> = ReadonlyArray<
 >;
 
 export type BaseGraphQLRootValue = any;
-export interface BaseGraphQLContext {}
 export interface BaseGraphQLVariables {
   [key: string]: unknown;
 }
@@ -544,7 +543,7 @@ type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
  */
 export type GraphileFieldConfig<
   TType extends GraphQLOutputType,
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ExecutableStep<any> | null,
   TFieldStep extends ExecutableStep<any>, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
   TArgs extends BaseGraphQLArguments,
@@ -565,7 +564,7 @@ export type GraphileFieldConfig<
  */
 export type GraphileFieldConfigArgumentMap<
   _TType extends GraphQLOutputType,
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ExecutableStep<any> | null,
   TFieldStep extends ExecutableStep<any>, // TODO: should be OutputPlanForType<_TType>, but that results in everything thinking it should be a ListStep
 > = {
@@ -584,7 +583,7 @@ export type GraphileFieldConfigArgumentMap<
  */
 export type GraphileArgumentConfig<
   TInputType extends GraphQLInputType,
-  _TContext extends BaseGraphQLContext,
+  _TContext extends Grafast.Context,
   _TParentStep extends ExecutableStep<any> | null,
   TFieldStep extends ExecutableStep<any>,
   _TArgumentStep extends TFieldStep extends ExecutableStep<any>
@@ -602,7 +601,7 @@ export type GraphileArgumentConfig<
  */
 export type GraphileInputFieldConfig<
   TInputType extends GraphQLInputType,
-  _TContext extends BaseGraphQLContext,
+  _TContext extends Grafast.Context,
   _TParentStep extends ModifierStep<any>,
   _TResultStep extends InputPlanForType<TInputType>,
   _TInput extends InputTypeFor<TInputType>,

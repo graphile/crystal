@@ -10,7 +10,6 @@ import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
 import { OperationPlan } from "./index.js";
 import type {
-  BaseGraphQLContext,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
 } from "./interfaces.js";
@@ -92,7 +91,7 @@ const assertFragmentsMatch = !isDev ? noop : reallyAssertFragmentsMatch;
  */
 function isOpPlanCompatible<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
-  TContext extends BaseGraphQLContext = BaseGraphQLContext,
+  TContext extends Grafast.Context = Grafast.Context,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 >(
   opPlan: OperationPlan,
@@ -140,7 +139,7 @@ declare module "graphql" {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function establishOperationPlan<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
-  TContext extends BaseGraphQLContext = BaseGraphQLContext,
+  TContext extends Grafast.Context = Grafast.Context,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 >(
   schema: GraphQLSchema,

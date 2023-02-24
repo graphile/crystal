@@ -10,7 +10,6 @@ if (process.env.DEBUG) {
 }
 
 import { promises as fsp } from "fs";
-import type { BaseGraphQLContext } from "grafast";
 import {
   execute as grafastExecute,
   stringifyPayload,
@@ -153,7 +152,7 @@ export async function runTestQuery(
     async (withPgClient) => {
       const pgSubscriber = new PgSubscriber(testPool);
       try {
-        const contextValue: BaseGraphQLContext = {
+        const contextValue: Grafast.Context = {
           pgSettings: {},
           withPgClient,
           pgSubscriber,

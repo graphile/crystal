@@ -1,6 +1,5 @@
 import type {
   BaseGraphQLArguments,
-  BaseGraphQLContext,
   ExecutableStep,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
@@ -137,7 +136,7 @@ declare global {
     /** Our take on GraphQLFieldConfigMap that allows for plans */
     type GraphileFieldConfigMap<
       TParentStep extends ExecutableStep<any> | null,
-      TContext extends BaseGraphQLContext,
+      TContext extends Grafast.Context,
     > = {
       [fieldName: string]: GraphileFieldConfig<
         any,
@@ -151,7 +150,7 @@ declare global {
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
     interface GraphileObjectTypeConfig<
       TParentStep extends ExecutableStep<any> | null,
-      TContext extends BaseGraphQLContext,
+      TContext extends Grafast.Context,
     > extends Omit<
         GraphQLObjectTypeConfig<unknown, TContext>,
         "fields" | "interfaces"
@@ -683,7 +682,7 @@ declare global {
      */
     type FieldWithHooksFunction = <
       TType extends GraphQLOutputType,
-      TContext extends BaseGraphQLContext,
+      TContext extends Grafast.Context,
       TParentStep extends ExecutableStep<any>,
       TFieldStep extends OutputPlanForType<TType>,
       TArgs extends BaseGraphQLArguments,

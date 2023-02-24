@@ -44,7 +44,6 @@ import type { InputStep } from "./input.js";
 import { inspect } from "./inspect.js";
 import type {
   BaseGraphQLArguments,
-  BaseGraphQLContext,
   GraphileFieldConfig,
   GraphileInputFieldConfig,
   OutputPlanForType,
@@ -325,7 +324,7 @@ export function arraysMatch<T>(
 }
 
 export type ObjectTypeFields<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ExecutableStep<any>,
 > = {
   [key: string]: GraphileFieldConfig<
@@ -338,7 +337,7 @@ export type ObjectTypeFields<
 };
 
 export type ObjectTypeSpec<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ExecutableStep<any>,
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 > = Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
@@ -349,7 +348,7 @@ export type ObjectTypeSpec<
  * Saves us having to write `extensions: {graphile: {...}}` everywhere.
  */
 export function objectSpec<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ExecutableStep<any>,
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 >(
@@ -383,7 +382,7 @@ export function objectSpec<
 }
 
 export type GraphileObjectType<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ExecutableStep<any>,
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 > = GraphQLObjectType<
@@ -395,7 +394,7 @@ export type GraphileObjectType<
  * @remarks This is a mess because the first two generics need to be specified manually, but the latter one we want inferred.
  */
 export function newObjectTypeBuilder<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ExecutableStep<any>,
 >(Step: {
   new (...args: any[]): TParentStep;
@@ -414,7 +413,7 @@ export function newObjectTypeBuilder<
  * Saves us having to write `extensions: {graphile: {...}}` everywhere.
  */
 export function objectFieldSpec<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TSource extends ExecutableStep<any>,
   TResult extends ExecutableStep<any> = ExecutableStep<any>,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
@@ -473,7 +472,7 @@ export function objectFieldSpec<
  * @see {@link https://kentcdodds.com/blog/how-to-write-a-constrained-identity-function-in-typescript}
  */
 export function newGraphileFieldConfigBuilder<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ExecutableStep<any>,
 >(): <
   TType extends GraphQLOutputType,
@@ -486,7 +485,7 @@ export function newGraphileFieldConfigBuilder<
 }
 
 export type GraphileInputFieldConfigMap<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ModifierStep<any>,
 > = {
   [key: string]: GraphileInputFieldConfig<
@@ -499,7 +498,7 @@ export type GraphileInputFieldConfigMap<
 };
 
 export type InputObjectTypeSpec<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ModifierStep<any>,
   TFields extends GraphileInputFieldConfigMap<TContext, TParentStep>,
 > = Omit<GraphQLInputObjectTypeConfig, "fields"> & {
@@ -507,7 +506,7 @@ export type InputObjectTypeSpec<
 };
 
 function inputObjectSpec<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ModifierStep<any>,
   TFields extends GraphileInputFieldConfigMap<TContext, TParentStep>,
 >(
@@ -529,7 +528,7 @@ function inputObjectSpec<
 }
 
 export type GraphileInputObjectType<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ModifierStep<any>,
   TFields extends GraphileInputFieldConfigMap<TContext, TParentStep>,
 > = GraphQLInputObjectType & {
@@ -539,7 +538,7 @@ export type GraphileInputObjectType<
 };
 
 export function newInputObjectTypeBuilder<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParentStep extends ModifierStep<any>,
 >(): <TFields extends GraphileInputFieldConfigMap<TContext, TParentStep>>(
   spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
@@ -554,7 +553,7 @@ export function newInputObjectTypeBuilder<
  * Saves us having to write `extensions: {graphile: {...}}` everywhere.
  */
 export function inputObjectFieldSpec<
-  TContext extends BaseGraphQLContext,
+  TContext extends Grafast.Context,
   TParent extends ModifierStep<any>,
   TResult extends ModifierStep<TParent> = ModifierStep<TParent>,
   TInput extends InputStep = InputStep,

@@ -17,7 +17,6 @@ import type {
 } from "@dataplan/pg";
 import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
 import { promises as fsp } from "fs";
-import type { BaseGraphQLContext } from "grafast";
 import {
   $$bypassGraphQL,
   execute as grafastExecute,
