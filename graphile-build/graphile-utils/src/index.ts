@@ -24,3 +24,4 @@ export {
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
 } from "./makeWrapPlansPlugin.js";
+export { EXPORTABLE } from "./exportable.js";
