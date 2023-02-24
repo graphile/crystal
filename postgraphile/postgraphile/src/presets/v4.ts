@@ -8,11 +8,19 @@ import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4NoIgnoreIndexesPlugin } from "../plugins/PgV4NoIgnoreIndexesPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 
+export {
+  PgV4BehaviorPlugin,
+  PgV4InflectionPlugin,
+  PgV4NoIgnoreIndexesPlugin,
+  PgV4SmartTagsPlugin,
+};
+
 type PromiseOrDirect<T> = T | Promise<T>;
 type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
 
 export interface V4GraphileBuildOptions {
   pgUseCustomNetworkScalars?: boolean;
+  pgStrictFunctions?: boolean;
 }
 
 export interface V4Options<
@@ -132,8 +140,11 @@ function parseJWTType(type: string): [string, string] {
 export const makeV4Preset = (
   options: V4Options = {},
 ): GraphileConfig.Preset => {
-  const { pgUseCustomNetworkScalars, ...otherGraphileBuildOptions } =
-    options.graphileBuildOptions ?? {};
+  const {
+    pgUseCustomNetworkScalars,
+    pgStrictFunctions,
+    ...otherGraphileBuildOptions
+  } = options.graphileBuildOptions ?? {};
   return {
     plugins: [
       ...(options.ignoreRBAC === false ? [PgRBACPlugin] : []),
@@ -164,6 +175,7 @@ export const makeV4Preset = (
         : null),
     },
     gather: {
+      pgStrictFunctions,
       ...(options.jwtPgTypeIdentifier
         ? {
             pgJwtType: parseJWTType(options.jwtPgTypeIdentifier),
