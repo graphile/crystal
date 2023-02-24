@@ -5,7 +5,7 @@ import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
-import { PgV4NoIgnoreIndexesPlugin } from "../plugins/PgV4NoIgnoreIndexes.js";
+import { PgV4NoIgnoreIndexesPlugin } from "../plugins/PgV4NoIgnoreIndexesPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 
 type PromiseOrDirect<T> = T | Promise<T>;
