@@ -15,6 +15,8 @@ import {
   makeGraphQLWSConfig,
   processHeaders,
 } from "../../utils.js";
+import WebSocket from "ws";
+import { Duplex } from "node:stream";
 
 declare global {
   namespace Grafast {
@@ -242,7 +244,11 @@ export class NodeGrafservBase extends GrafservBase {
 
 export class NodeGrafserv extends NodeGrafservBase {
   async addTo(server: HTTPServer | HTTPSServer) {
-    server.on("request", this._createHandler());
+    const handler = this._createHandler();
+    server.on("request", handler);
+    this.onRelease(() => {
+      server.off("request", handler);
+    });
     if (this.resolvedPreset.grafserv?.websockets) {
       attachWebsocketsToServer(this, server);
     }
@@ -260,14 +266,11 @@ export async function attachWebsocketsToServer(
   const graphqlPath = instance.dynamicOptions.graphqlPath;
   const ws = await import("ws");
   const { WebSocketServer } = ws;
-  const graphqlWsServer = makeServer(makeGraphQLWSConfig(instance));
-  const wsServer = new WebSocketServer({ noServer: true });
-  server.on("upgrade", (req, socket, head) =>
+  const onUpgrade = (req: IncomingMessage, socket: Duplex, head: Buffer) =>
     wsServer.handleUpgrade(req, socket, head, function done(ws) {
       wsServer.emit("connection", ws, req);
-    }),
-  );
-  wsServer.on("connection", (socket, request) => {
+    });
+  const onConnection = (socket: WebSocket, request: IncomingMessage) => {
     const fullUrl = request.url;
     if (!fullUrl) {
       return;
@@ -310,5 +313,16 @@ export async function attachWebsocketsToServer(
       // notify server that the socket closed
       socket.once("close", closed);
     }
+  };
+
+  const graphqlWsServer = makeServer(makeGraphQLWSConfig(instance));
+  const wsServer = new WebSocketServer({ noServer: true });
+  server.on("upgrade", onUpgrade);
+  wsServer.on("connection", onConnection);
+
+  instance.onRelease(() => {
+    wsServer.off("connection", onConnection);
+    server.off("upgrade", onUpgrade);
+    wsServer.close();
   });
 }
