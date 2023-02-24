@@ -1,5 +1,12 @@
 # postgraphile
 
+## 5.0.0-0.25
+
+### Patch Changes
+
+- [`9a6b18fd9`](undefined) - Give postgraphile() a named return type and export
+  the V4 plugins from the V4 preset.
+
 ## 5.0.0-0.24
 
 ### Patch Changes
