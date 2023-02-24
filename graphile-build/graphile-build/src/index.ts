@@ -40,12 +40,15 @@ export {
 } from "./utils.js";
 import type { GatherPluginContext } from "./interfaces.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
+import { isPromiseLike } from "grafast";
 // export globals for TypeDoc
 export { GraphileBuild, GraphileConfig };
 
 export { NewWithHooksFunction, SchemaBuilder };
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
 
@@ -417,12 +420,80 @@ export interface SchemaResult {
  */
 export async function makeSchema(
   preset: GraphileConfig.Preset,
+  // TODO: AbortSignal
 ): Promise<SchemaResult> {
   const resolvedPreset = resolvePresets([preset]);
-  const shared = { inflection: buildInflection(resolvedPreset) };
-  const input = await gather(resolvedPreset, shared);
-  const schema = buildSchema(resolvedPreset, input, shared);
-  return { schema, resolvedPreset };
+  const retryOnInitFail = resolvedPreset.schema?.retryOnInitFail;
+  let phase: "INFLECTION" | "GATHER" | "SCHEMA" | "UNKNOWN" = "UNKNOWN";
+  const make = async () => {
+    phase = "INFLECTION";
+    const inflection = buildInflection(resolvedPreset);
+
+    phase = "GATHER";
+    const shared = { inflection };
+    const input = await gather(resolvedPreset, shared);
+
+    phase = "SCHEMA";
+    const schema = buildSchema(resolvedPreset, input, shared);
+
+    return { schema, resolvedPreset };
+  };
+  if (retryOnInitFail) {
+    for (let attempts = 1; true; attempts++) {
+      try {
+        const result = await make();
+        if (attempts > 1) {
+          console.warn(
+            `Schema constructed successfully on attempt ${attempts}.`,
+          );
+        }
+        return result;
+      } catch (error) {
+        const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
+
+        const start = process.hrtime();
+        const retryOrPromise =
+          typeof retryOnInitFail === "function"
+            ? retryOnInitFail(error, attempts, delay)
+            : retryOnInitFail;
+
+        if (retryOrPromise === false) {
+          throw error;
+        }
+
+        console.warn(
+          `Error occurred whilst building the schema (phase = ${phase}; attempt ${attempts}). We'll try again ${
+            retryOrPromise === true ? `in ${delay}ms` : `shortly`
+          }.\n  ${String(error).replace(/\n/g, "\n  ")}`,
+        );
+
+        if (retryOrPromise === true) {
+          await sleep(delay);
+        } else if (!isPromiseLike(retryOrPromise)) {
+          throw new Error(
+            `Invalid retryOnInitFail setting; must be true, false, or an optionally async function that resolves to true/false`,
+          );
+        } else {
+          const retry = await retryOrPromise;
+          const diff = process.hrtime(start);
+          const dur = diff[0] * 1e3 + diff[1] * 1e-6;
+          if (!retry) {
+            throw error;
+          } else if (dur < 50) {
+            // retryOnInitFail didn't wait long enough; use default wait.
+            console.error(
+              `Your retryOnInitFail function should include a delay of at least 50ms before resolving; falling back to a ${delay}ms wait (attempts = ${attempts}) to avoid overwhelming the database.`,
+            );
+            await sleep(delay);
+          } else {
+            // The promise already waited long enough, continue
+          }
+        }
+      }
+    }
+  } else {
+    return make();
+  }
 }
 
 /**

@@ -130,7 +130,11 @@ declare global {
        */
       retryOnInitFail?:
         | boolean
-        | ((error: Error, attempts: number) => boolean | Promise<boolean>);
+        | ((
+            error: Error,
+            attempts: number,
+            delay: number,
+          ) => boolean | Promise<boolean>);
     }
 
     /**

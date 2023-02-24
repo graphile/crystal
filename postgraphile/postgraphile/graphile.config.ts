@@ -111,7 +111,9 @@ const preset: GraphileConfig.Preset = {
   ],
   inflection: {},
   gather: {},
-  schema: {},
+  schema: {
+    retryOnInitFail: true,
+  },
   grafserv: {
     graphqlPath: "/v2/graphql",
     websockets: true,
