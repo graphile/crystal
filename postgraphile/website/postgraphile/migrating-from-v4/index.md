@@ -199,15 +199,23 @@ Here's a simple example using the Node built-in HTTP server:
 ```ts title="server.js"
 import preset from "./graphile.config.js";
 import { postgraphile } from "postgraphile";
+// This is the import for 'node', there are many other adaptors for different frameworks
 import { grafserv } from "grafserv/node";
 import { createServer } from "node:http";
 
-const pgl = postgraphile(preset);
-const serv = pgl.createServ(grafserv);
-
-const server = createServer(serv.createHander());
+// Create an HTTP server
+const server = createServer();
 server.on("error", (e) => console.error(e));
-server.listen(port);
+
+// Create a PostGraphile instance (pgl)
+const pgl = postgraphile(preset);
+// Create a Grafserv (server adaptor) instance for this PostGraphile instance
+const serv = pgl.createServ(grafserv);
+// Attach a request handler to the server
+serv.addTo(server);
+
+// Start the server
+server.listen(preset.grafserv?.port ?? 5678);
 ```
 
 :::note
