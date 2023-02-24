@@ -42,8 +42,9 @@ export class ListenStep<
 
   constructor(
     pubsubOrPlan:
-      | ExecutableStep<GrafastSubscriber<TTopics>>
-      | GrafastSubscriber<TTopics>,
+      | ExecutableStep<GrafastSubscriber<TTopics> | null>
+      | GrafastSubscriber<TTopics>
+      | null,
     topicOrPlan: ExecutableStep<TTopic> | string,
     public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
   ) {
@@ -97,8 +98,9 @@ export function listen<
   TPayloadStep extends ExecutableStep,
 >(
   pubsubOrPlan:
-    | ExecutableStep<GrafastSubscriber<TTopics>>
-    | GrafastSubscriber<TTopics>,
+    | ExecutableStep<GrafastSubscriber<TTopics> | null>
+    | GrafastSubscriber<TTopics>
+    | null,
   topicOrPlan: ExecutableStep<TTopic> | string,
   itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
 ): ListenStep<TTopics, TTopic, TPayloadStep> {
