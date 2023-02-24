@@ -117,6 +117,20 @@ declare global {
        * - 'both': both lists and connections will be generated
        */
       simpleCollections?: "only" | "both" | "omit";
+
+      /**
+       * When false (default), Grafserv will exit if it fails to build the
+       * initial schema (for example if it cannot connect to the database, or if
+       * there are fatal naming conflicts in the schema). When true, PostGraphile
+       * will keep trying to rebuild the schema indefinitely, using an exponential
+       * backoff between attempts, starting at 100ms and increasing up to 30s delay
+       * between retries. When a function, the function will be called passing the
+       * error and the number of attempts, and it should return true to retry,
+       * false to permanently abort trying.
+       */
+      retryOnInitFail?:
+        | boolean
+        | ((error: Error, attempts: number) => boolean | Promise<boolean>);
     }
 
     /**
