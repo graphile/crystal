@@ -1,5 +1,23 @@
 # grafserv
 
+## 0.0.1-0.17
+
+### Patch Changes
+
+- [#210](https://github.com/benjie/postgraphile-private/pull/210)
+  [`b523118fe`](https://github.com/benjie/postgraphile-private/commit/b523118fe6217c027363fea91252a3a1764e17df)
+  Thanks [@benjie](https://github.com/benjie)! - Replace BaseGraphQLContext with
+  Grafast.Context throughout.
+
+- [#210](https://github.com/benjie/postgraphile-private/pull/210)
+  [`461c03b72`](https://github.com/benjie/postgraphile-private/commit/461c03b72477821ec26cbf703011542e453d083c)
+  Thanks [@benjie](https://github.com/benjie)! - Make servers releasable where
+  possible.
+
+- Updated dependencies
+  [[`b523118fe`](https://github.com/benjie/postgraphile-private/commit/b523118fe6217c027363fea91252a3a1764e17df)]:
+  - grafast@0.0.1-0.15
+
 ## 0.0.1-0.16
 
 ### Patch Changes

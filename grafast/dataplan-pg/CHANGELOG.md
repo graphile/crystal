@@ -1,5 +1,26 @@
 # @dataplan/pg
 
+## 0.0.1-0.20
+
+### Patch Changes
+
+- [#210](https://github.com/benjie/postgraphile-private/pull/210)
+  [`2bd4b619e`](https://github.com/benjie/postgraphile-private/commit/2bd4b619ee0f6054e14da3ac4885ec55d944cd99)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `extensions.pg = { databaseName, schemaName, name }` to various DB-derived
+  resources (codecs, sources, etc); this replaces the `originalName` temporary
+  solution that we had previously.
+
+- [#210](https://github.com/benjie/postgraphile-private/pull/210)
+  [`b523118fe`](https://github.com/benjie/postgraphile-private/commit/b523118fe6217c027363fea91252a3a1764e17df)
+  Thanks [@benjie](https://github.com/benjie)! - Replace BaseGraphQLContext with
+  Grafast.Context throughout.
+
+- Updated dependencies
+  [[`b523118fe`](https://github.com/benjie/postgraphile-private/commit/b523118fe6217c027363fea91252a3a1764e17df)]:
+  - grafast@0.0.1-0.15
+  - @dataplan/json@0.0.1-0.15
+
 ## 0.0.1-0.19
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # v8.0.0
 
+## 8.0.0-0.4
+
+### Patch Changes
+
+- [#211](https://github.com/benjie/postgraphile-private/pull/211)
+  [`f9c523bb6`](https://github.com/benjie/postgraphile-private/commit/f9c523bb66e91686ef43ed9fec4e4589c826bee2)
+  Thanks [@benjie](https://github.com/benjie)! - Simplified relations should
+  still respect foreignFieldName if present
+
 ## 8.0.0-0.3
 
 ### Patch Changes

@@ -1,5 +1,22 @@
 # graphile-utils
 
+## 5.0.0-0.23
+
+### Patch Changes
+
+- [#210](https://github.com/benjie/postgraphile-private/pull/210)
+  [`b523118fe`](https://github.com/benjie/postgraphile-private/commit/b523118fe6217c027363fea91252a3a1764e17df)
+  Thanks [@benjie](https://github.com/benjie)! - Replace BaseGraphQLContext with
+  Grafast.Context throughout.
+
+- Updated dependencies
+  [[`2fb5001b4`](https://github.com/benjie/postgraphile-private/commit/2fb5001b4aaac07942b2e9b0398a996f9aa8b15d),
+  [`2bd4b619e`](https://github.com/benjie/postgraphile-private/commit/2bd4b619ee0f6054e14da3ac4885ec55d944cd99),
+  [`b523118fe`](https://github.com/benjie/postgraphile-private/commit/b523118fe6217c027363fea91252a3a1764e17df)]:
+  - graphile-build@5.0.0-0.20
+  - graphile-build-pg@5.0.0-0.23
+  - grafast@0.0.1-0.15
+
 ## 5.0.0-0.22
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # graphile-build
 
+## 5.0.0-0.20
+
+### Patch Changes
+
+- [#210](https://github.com/benjie/postgraphile-private/pull/210)
+  [`2fb5001b4`](https://github.com/benjie/postgraphile-private/commit/2fb5001b4aaac07942b2e9b0398a996f9aa8b15d)
+  Thanks [@benjie](https://github.com/benjie)! - retryOnInitFail implemented,
+  and bug in introspection cache on error resolved.
+
+- [#210](https://github.com/benjie/postgraphile-private/pull/210)
+  [`b523118fe`](https://github.com/benjie/postgraphile-private/commit/b523118fe6217c027363fea91252a3a1764e17df)
+  Thanks [@benjie](https://github.com/benjie)! - Replace BaseGraphQLContext with
+  Grafast.Context throughout.
+
+- Updated dependencies
+  [[`b523118fe`](https://github.com/benjie/postgraphile-private/commit/b523118fe6217c027363fea91252a3a1764e17df)]:
+  - grafast@0.0.1-0.15
+
 ## 5.0.0-0.19
 
 ### Patch Changes
