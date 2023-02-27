@@ -612,6 +612,12 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             }),
           );
           info.cache.introspectionResultsPromise = introspectionPromise;
+
+          // Don't cache errors
+          introspectionPromise.then(null, () => {
+            info.cache.introspectionResultsPromise = null;
+          });
+
           return introspectionPromise;
         })();
 
