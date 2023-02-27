@@ -5,4 +5,5 @@
 ---
 
 Add `extensions.pg = { databaseName, schemaName, name }` to various DB-derived
-resources (codecs, sources, etc).
+resources (codecs, sources, etc); this replaces the `originalName` temporary
+solution that we had previously.
