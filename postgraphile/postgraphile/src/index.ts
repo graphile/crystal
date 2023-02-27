@@ -1,10 +1,11 @@
+// Copy the types through for our dependents
+import "graphile-build-pg";
+
 import type { Deferred, PromiseOrDirect } from "grafast";
 import { defer, isPromiseLike } from "grafast";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import type { SchemaResult } from "graphile-build";
 import { makeSchema, watchSchema } from "graphile-build";
-// Copy the types through for our dependents
-import type {} from "graphile-build-pg";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 
