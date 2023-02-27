@@ -71,7 +71,8 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     version: "0.0.0",
     inflection: {
       replace: {
-        ...(classicIds
+        ...(classicIds ||
+        options.skipPlugins?.some((p) => p.name === "NodePlugin")
           ? null
           : {
               // Rename GraphQL Global Object Identification 'id' to 'nodeId'
@@ -79,6 +80,10 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
               nodeIdFieldName() {
                 return "nodeId";
               },
+            }),
+        ...(classicIds
+          ? null
+          : {
               // Don't rename 'id' to 'rowId'
               column(previous, options, details) {
                 const columnFieldName = this.camelCase(

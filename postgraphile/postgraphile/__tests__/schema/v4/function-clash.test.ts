@@ -2,6 +2,16 @@ import { stripAnsi } from "grafast";
 
 import * as core from "./core.js";
 
+if (process.env.DEBUG) {
+  console.warn(`\
+🚨🚨🚨🚨🚨🚨🚨🚨
+
+Setting the DEBUG envvar could make this test fail.
+
+🚨🚨🚨🚨🚨🚨🚨🚨
+`);
+}
+
 let consoleWarnSpy: ReturnType<typeof jest.spyOn>;
 beforeAll(() => {
   consoleWarnSpy = jest.spyOn(global.console, "warn");
