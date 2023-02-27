@@ -8,7 +8,7 @@ import type { GrafservBase, GrafservConfig } from "grafserv";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 
-import type { ServerParams } from "./interfaces.js";
+import type { SchemaResult } from "graphile-build";
 import { makeSchema, watchSchema } from "graphile-build";
 
 export { makeSchema, watchSchema };
@@ -19,7 +19,7 @@ export interface PostGraphileInstance {
   createServ<TGrafserv extends GrafservBase>(
     grafserv: (config: GrafservConfig) => TGrafserv,
   ): TGrafserv;
-  getServerParams(): PromiseOrDirect<ServerParams>;
+  getServerParams(): PromiseOrDirect<SchemaResult>;
   getSchema(): PromiseOrDirect<GraphQLSchema>;
   getResolvedPreset(): GraphileConfig.ResolvedPreset;
   release(): PromiseOrDirect<void>;
@@ -31,14 +31,14 @@ export function postgraphile(
 ): PostGraphileInstance {
   const resolvedPreset = resolvePresets([preset]);
   let serverParams:
-    | PromiseLike<ServerParams>
-    | Deferred<ServerParams>
-    | ServerParams;
+    | PromiseLike<SchemaResult>
+    | Deferred<SchemaResult>
+    | SchemaResult;
   let stopWatchingPromise: Promise<() => void> | null = null;
   let released = false;
   let server: GrafservBase | undefined;
   if (resolvedPreset.grafserv?.watch) {
-    serverParams = defer<ServerParams>();
+    serverParams = defer<SchemaResult>();
     stopWatchingPromise = watchSchema(preset, (error, newParams) => {
       if (error || !newParams) {
         console.error("Watch error: ", error);

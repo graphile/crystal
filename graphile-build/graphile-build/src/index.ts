@@ -537,7 +537,7 @@ async function sleepFromRetryOnInitFail(
 
 /**
  * Runs the "gather" phase in watch mode and calls 'callback' with the
- * generated ServerParams each time a new schema is generated.
+ * generated SchemaResult each time a new schema is generated.
  *
  * It is guaranteed that `callback` will be called at least once before the
  * promise resolves.
