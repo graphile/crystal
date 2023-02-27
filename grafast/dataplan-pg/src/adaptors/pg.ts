@@ -745,6 +745,7 @@ declare global {
         [key: string]: string;
       } | null;
       withPgClient: WithPgClient;
+      pgSubscriber: PgSubscriber | null;
     }
   }
 }

@@ -1,3 +1,4 @@
+export { EXPORTABLE } from "./exportable.js";
 export { gql } from "./gql.js";
 export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.js";
 export {
@@ -7,7 +8,16 @@ export {
   NullabilitySpec,
   NullabilitySpecString,
 } from "./makeChangeNullabilityPlugin.js";
-export { makeExtendSchemaPlugin } from "./makeExtendSchemaPlugin.js";
+export {
+  EnumResolver,
+  ExtensionDefinition,
+  makeExtendSchemaPlugin,
+  ObjectFieldConfig,
+  ObjectPlan,
+  ObjectResolver,
+  Plans,
+  Resolvers,
+} from "./makeExtendSchemaPlugin.js";
 export {
   makeJSONPgSmartTagsPlugin,
   makePgSmartTagsFromFilePlugin,

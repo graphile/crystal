@@ -13,6 +13,14 @@ import { makeV4Preset } from "postgraphile/presets/v4";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+declare global {
+  namespace Grafast {
+    interface Context {
+      mol?: number;
+    }
+  }
+}
+
 /*
 const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
   name: "PrimaryKeyMutationsOnlyPlugin",
@@ -103,7 +111,9 @@ const preset: GraphileConfig.Preset = {
   ],
   inflection: {},
   gather: {},
-  schema: {},
+  schema: {
+    retryOnInitFail: true,
+  },
   grafserv: {
     graphqlPath: "/v2/graphql",
     websockets: true,

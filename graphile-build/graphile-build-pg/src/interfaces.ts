@@ -4,9 +4,6 @@ import type { PromiseOrDirect } from "grafast";
 export interface PgSourceTags extends PgSmartTagsDict {
   name: string;
 
-  /** For v4 compatibility, what's the name of the actual table. */
-  originalName: string;
-
   /** For a computed column function/etc, what field name should we use? */
   fieldName: string;
   /** For a computed column function that performs a mutation, what field name should we use on the payload to store the result? */
@@ -71,6 +68,12 @@ declare module "@dataplan/pg" {
     tags: Partial<PgSourceTags>;
     description?: string;
     singleOutputParameterName?: string;
+    /** For v4 compatibility, what's the name of the actual table. */
+    pg?: {
+      databaseName: string;
+      schemaName: string;
+      name: string;
+    };
   }
 
   interface PgSourceUniqueExtensions {

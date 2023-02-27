@@ -1,6 +1,5 @@
 import type {
   BaseGraphQLArguments,
-  BaseGraphQLContext,
   ExecutableStep,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
@@ -118,6 +117,24 @@ declare global {
        * - 'both': both lists and connections will be generated
        */
       simpleCollections?: "only" | "both" | "omit";
+
+      /**
+       * When false (default), Grafserv will exit if it fails to build the
+       * initial schema (for example if it cannot connect to the database, or if
+       * there are fatal naming conflicts in the schema). When true, PostGraphile
+       * will keep trying to rebuild the schema indefinitely, using an exponential
+       * backoff between attempts, starting at 100ms and increasing up to 30s delay
+       * between retries. When a function, the function will be called passing the
+       * error and the number of attempts, and it should return true to retry,
+       * false to permanently abort trying.
+       */
+      retryOnInitFail?:
+        | boolean
+        | ((
+            error: Error,
+            attempts: number,
+            delay: number,
+          ) => boolean | Promise<boolean>);
     }
 
     /**
@@ -137,7 +154,7 @@ declare global {
     /** Our take on GraphQLFieldConfigMap that allows for plans */
     type GraphileFieldConfigMap<
       TParentStep extends ExecutableStep<any> | null,
-      TContext extends BaseGraphQLContext,
+      TContext extends Grafast.Context,
     > = {
       [fieldName: string]: GraphileFieldConfig<
         any,
@@ -151,7 +168,7 @@ declare global {
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
     interface GraphileObjectTypeConfig<
       TParentStep extends ExecutableStep<any> | null,
-      TContext extends BaseGraphQLContext,
+      TContext extends Grafast.Context,
     > extends Omit<
         GraphQLObjectTypeConfig<unknown, TContext>,
         "fields" | "interfaces"
@@ -683,7 +700,7 @@ declare global {
      */
     type FieldWithHooksFunction = <
       TType extends GraphQLOutputType,
-      TContext extends BaseGraphQLContext,
+      TContext extends Grafast.Context,
       TParentStep extends ExecutableStep<any>,
       TFieldStep extends OutputPlanForType<TType>,
       TArgs extends BaseGraphQLArguments,

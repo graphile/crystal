@@ -86,10 +86,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           const identifier =
             // Yes, this behaviour in V4 was ridiculous. Alas.
             build.options.pgV4UseTableNameForNodeIdentifier &&
-            pgSource.extensions?.tags?.originalName
-              ? build.inflection.pluralize(
-                  pgSource.extensions?.tags?.originalName,
-                )
+            pgSource.extensions?.pg?.name
+              ? build.inflection.pluralize(pgSource.extensions.pg.name)
               : tableTypeName;
 
           const clean =

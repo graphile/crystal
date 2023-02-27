@@ -232,6 +232,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const serv = pgl.createServ(grafserv);
 
   const server = createServer();
+  serv.onRelease(() => {
+    server.close();
+    process.exitCode = 1;
+  });
   serv.addTo(server).catch((e) => {
     console.error("Initializing server failed");
     console.error(e);

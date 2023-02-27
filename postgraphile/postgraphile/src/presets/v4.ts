@@ -54,6 +54,10 @@ export interface V4Options<
   ignoreRBAC?: boolean;
 
   graphileBuildOptions?: V4GraphileBuildOptions;
+
+  retryOnInitFail?:
+    | boolean
+    | ((error: Error, attempts: number) => boolean | Promise<boolean>);
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -172,6 +176,9 @@ export const makeV4Preset = (
         ? {
             pgJwtSecret: options.jwtSecret,
           }
+        : null),
+      ...(options.retryOnInitFail
+        ? { retryOnInitFail: options.retryOnInitFail }
         : null),
     },
     gather: {

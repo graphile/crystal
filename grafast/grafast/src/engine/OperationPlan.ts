@@ -179,7 +179,7 @@ export class OperationPlan {
   /** Constraints based on evaluating context. @internal */
   public readonly contextConstraints: Constraint[] = [];
   /** Stores the actual value of the context. @internal */
-  public readonly contextStep: __ValueStep<{ [key: string]: any }>;
+  public readonly contextStep: __ValueStep<Grafast.Context>;
   /** Allows accessing context in a tracked manner (allowing eval). @internal */
   public readonly trackedContextStep: __TrackedObjectStep<{
     [key: string]: any;

@@ -47,6 +47,8 @@ import type {
   ValueNode,
 } from "graphql";
 
+import { EXPORTABLE } from "./exportable.js";
+
 export interface ObjectFieldConfig<TSource = any, TContext = any> {
   plan?: FieldPlanResolver<any, any, any>;
   subscribePlan?: FieldPlanResolver<any, any, any>;
@@ -88,23 +90,6 @@ export interface ExtensionDefinition {
   /** @deprecated Use 'plans' instead */
   resolvers?: Resolvers;
   plans?: Plans;
-}
-
-export function EXPORTABLE<T, TScope extends any[]>(
-  factory: (...args: TScope) => T,
-  args: [...TScope],
-): T {
-  const fn: T = factory(...args);
-  if (
-    (typeof fn === "function" || (typeof fn === "object" && fn !== null)) &&
-    !("$exporter$factory" in fn)
-  ) {
-    Object.defineProperties(fn, {
-      $exporter$args: { value: args },
-      $exporter$factory: { value: factory },
-    });
-  }
-  return fn;
 }
 
 type ParentConstructors<T> = { new (...args: any[]): T };

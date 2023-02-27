@@ -1,7 +1,6 @@
 import { currentLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import { getDebug, setDebug } from "../global.js";
 import type { OperationPlan } from "../index.js";
-import type { BaseGraphQLContext } from "../interfaces.js";
 import type { __ValueStep } from "./__value.js";
 
 export function operationPlan(): OperationPlan {
@@ -9,7 +8,7 @@ export function operationPlan(): OperationPlan {
 }
 
 export function context<
-  TContext extends BaseGraphQLContext = Record<string, any>,
+  TContext extends Grafast.Context = Grafast.Context,
 >(): __ValueStep<TContext> {
   return operationPlan().contextStep as __ValueStep<any>;
 }

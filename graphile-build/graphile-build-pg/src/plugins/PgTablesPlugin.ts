@@ -504,9 +504,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             uniques,
             isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             extensions: {
+              pg: {
+                databaseName,
+                schemaName: pgClass.getNamespace()!.nspname,
+                name: pgClass.relname,
+              },
               tags: {
                 ...tags,
-                originalName: pgClass.relname,
               },
             },
           };

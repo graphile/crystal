@@ -1,6 +1,5 @@
 import type {
   BaseGraphQLArguments,
-  BaseGraphQLContext,
   ExecutableStep,
   GraphileFieldConfig,
   OutputPlanForType,
@@ -175,7 +174,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               >[] = [];
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
-                TContext extends BaseGraphQLContext,
+                TContext extends Grafast.Context,
                 TParentStep extends ExecutableStep<any>,
                 TFieldStep extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
