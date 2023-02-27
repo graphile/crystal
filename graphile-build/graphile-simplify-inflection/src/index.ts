@@ -203,6 +203,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         return null;
       },
     },
+    ignoreReplaceIfNotExists: ["deletedNodeId"],
     replace: {
       /*
        * This solves the issue with `blah-table1s` becoming `blahTable1S`

@@ -95,17 +95,22 @@ export const buildInflection = (
       (inflectorName, replacementFunction, plugin) => {
         const previous = inflectors[inflectorName];
         const ignore = plugin.inflection?.ignoreReplaceIfNotExists ?? [];
-        if (!previous && !ignore?.includes(inflectorName)) {
-          console.warn(
-            `Plugin '${plugin.name}' attempted to overwrite inflector '${inflectorName}', but no such inflector exists.`,
+        if (!previous && ignore?.includes(inflectorName)) {
+          // Do nothing
+        } else {
+          if (!previous) {
+            console.warn(
+              `Plugin '${plugin.name}' attempted to overwrite inflector '${inflectorName}', but no such inflector exists.`,
+            );
+          }
+          const inflector = (replacementFunction as any).bind(
+            inflectors as GraphileBuild.Inflection,
+            previous,
+            preset,
           );
+          inflectors[inflectorName as keyof GraphileBuild.Inflection] =
+            inflector;
         }
-        const inflector = (replacementFunction as any).bind(
-          inflectors as GraphileBuild.Inflection,
-          previous,
-          preset,
-        );
-        inflectors[inflectorName as keyof GraphileBuild.Inflection] = inflector;
       },
     );
   }

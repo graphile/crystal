@@ -70,6 +70,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     name: "PostGraphileV4CompatibilityPlugin",
     version: "0.0.0",
     inflection: {
+      ignoreReplaceIfNotExists: ["nodeIdFieldName"],
       replace: {
         ...(classicIds ||
         options.skipPlugins?.some((p) => p.name === "NodePlugin")
