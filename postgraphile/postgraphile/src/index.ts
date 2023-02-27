@@ -9,9 +9,9 @@ import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 
 import type { ServerParams } from "./interfaces.js";
-import { makeSchema, watchSchema } from "./schema.js";
+import { makeSchema, watchSchema } from "graphile-build";
 
-export { makeSchema } from "./schema.js";
+export { makeSchema, watchSchema };
 
 export { GraphileBuild, GraphileConfig };
 
