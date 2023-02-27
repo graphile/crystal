@@ -1,3 +1,4 @@
+export { EXPORTABLE } from "./exportable.js";
 export { gql } from "./gql.js";
 export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.js";
 export {
@@ -8,14 +9,14 @@ export {
   NullabilitySpecString,
 } from "./makeChangeNullabilityPlugin.js";
 export {
-  makeExtendSchemaPlugin,
-  Plans,
-  Resolvers,
-  ObjectFieldConfig,
-  ObjectResolver,
-  ObjectPlan,
   EnumResolver,
   ExtensionDefinition,
+  makeExtendSchemaPlugin,
+  ObjectFieldConfig,
+  ObjectPlan,
+  ObjectResolver,
+  Plans,
+  Resolvers,
 } from "./makeExtendSchemaPlugin.js";
 export {
   makeJSONPgSmartTagsPlugin,
@@ -33,4 +34,3 @@ export {
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
 } from "./makeWrapPlansPlugin.js";
-export { EXPORTABLE } from "./exportable.js";

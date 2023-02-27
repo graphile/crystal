@@ -38,9 +38,10 @@ export {
   upperCamelCase,
   upperFirst,
 } from "./utils.js";
+import { isPromiseLike } from "grafast";
+
 import type { GatherPluginContext } from "./interfaces.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
-import { isPromiseLike } from "grafast";
 // export globals for TypeDoc
 export { GraphileBuild, GraphileConfig };
 
@@ -461,6 +462,7 @@ export async function makeSchema(
     return { schema, resolvedPreset };
   };
   if (retryOnInitFail) {
+    // eslint-disable-next-line no-constant-condition
     for (let attempts = 1; true; attempts++) {
       try {
         const result = await make();
