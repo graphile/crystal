@@ -1,5 +1,12 @@
 # graphile-utils
 
+## 5.0.0-0.25
+
+### Patch Changes
+
+- Updated dependencies [[`a8d26b30a`](undefined)]:
+  - graphile-build-pg@5.0.0-0.25
+
 ## 5.0.0-0.24
 
 ### Patch Changes

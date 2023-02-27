@@ -1,5 +1,12 @@
 # v8.0.0
 
+## 8.0.0-0.5
+
+### Patch Changes
+
+- [`a8d26b30a`](undefined) - `ignoreReplaceIfNotExists` now truly ignores
+  replacement inflectors. Better handle disabled NodePlugin.
+
 ## 8.0.0-0.4
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # graphile-build-pg
 
+## 5.0.0-0.25
+
+### Patch Changes
+
+- [`a8d26b30a`](undefined) - `ignoreReplaceIfNotExists` now truly ignores
+  replacement inflectors. Better handle disabled NodePlugin.
+
 ## 5.0.0-0.24
 
 ### Patch Changes
