@@ -361,6 +361,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           any,
           any
         >;
+        const baseOverride = relation.extensions?.tags.foreignFieldName;
+        if (typeof baseOverride === "string") {
+          return baseOverride;
+        }
         const detailedKeys = (relation.remoteColumns as string[]).map(
           (columnName) => ({
             codec: relation.source.codec,

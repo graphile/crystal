@@ -213,8 +213,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       _manyRelation(options, details) {
         const { source, relationName } = details;
-        const relation: PgSourceRelation<any, any> =
-          source.getRelation(relationName);
+        const relation = source.getRelation(relationName) as PgSourceRelation<
+          any,
+          any
+        >;
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
