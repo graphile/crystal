@@ -272,11 +272,12 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     source.codec.extensions,
                     source.extensions,
                   ]);
-                  const deletedNodeIdFieldName = !!build.getNodeIdHandler
-                    ? inflection.deletedNodeId({
-                        source,
-                      })
-                    : null;
+                  const deletedNodeIdFieldName =
+                    build.getNodeIdHandler !== undefined
+                      ? inflection.deletedNodeId({
+                          source,
+                        })
+                      : null;
                   const TableType = build.getGraphQLTypeByPgCodec(
                     source.codec,
                     "output",
