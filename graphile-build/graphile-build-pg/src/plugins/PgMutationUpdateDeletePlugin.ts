@@ -272,9 +272,11 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     source.codec.extensions,
                     source.extensions,
                   ]);
-                  const deletedNodeIdFieldName = inflection.deletedNodeId({
-                    source,
-                  });
+                  const deletedNodeIdFieldName = !!build.getNodeIdHandler
+                    ? inflection.deletedNodeId({
+                        source,
+                      })
+                    : null;
                   const TableType = build.getGraphQLTypeByPgCodec(
                     source.codec,
                     "output",
@@ -326,6 +328,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         }
                       : {}),
                     ...(mode === "source:delete" &&
+                    deletedNodeIdFieldName &&
                     handler &&
                     nodeIdCodec &&
                     build.behavior.matches(behavior, "node", "node")
@@ -593,7 +596,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
             );
             const constraintMode = `constraint:${mode}`;
             const specs = [
-              ...(primaryUnique
+              ...(primaryUnique && !!build.getNodeIdHandler
                 ? [{ unique: primaryUnique, uniqueMode: "node" }]
                 : []),
               ...source.uniques.map((unique: PgSourceUnique) => ({
