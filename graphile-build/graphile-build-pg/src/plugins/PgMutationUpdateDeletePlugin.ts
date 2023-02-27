@@ -377,7 +377,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
             (u: PgSourceUnique) => u.isPrimary,
           );
           const specs = [
-            ...(primaryUnique
+            ...(primaryUnique && build.getNodeIdCodec !== undefined
               ? [{ unique: primaryUnique, uniqueMode: "node" }]
               : []),
             ...source.uniques.map((unique: PgSourceUnique) => ({
@@ -391,6 +391,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               source,
               unique,
             };
+            if (uniqueMode === "node" && !build.getNodeIdHandler) {
+              continue;
+            }
             build.recoverable(null, () => {
               const tablePatchName = build.getGraphQLTypeNameByPgCodec(
                 source.codec,
@@ -415,7 +418,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   : uniqueMode === "node"
                   ? inflection.deleteNodeField(details)
                   : inflection.deleteByKeysField(details);
-              const nodeIdFieldName = inflection.nodeIdFieldName();
+              const nodeIdFieldName =
+                uniqueMode === "node" ? inflection.nodeIdFieldName() : null;
 
               build.registerInputObjectType(
                 inputTypeName,
@@ -465,7 +469,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         },
                         ...(uniqueMode === "node"
                           ? {
-                              [nodeIdFieldName]: {
+                              [nodeIdFieldName!]: {
                                 description: build.wrapDescription(
                                   `The globally unique \`ID\` which will identify a single \`${tableTypeName}\` to be ${modeText}d.`,
                                   "field",
