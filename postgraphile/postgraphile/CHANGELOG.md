@@ -1,5 +1,14 @@
 # postgraphile
 
+## 5.0.0-0.27
+
+### Patch Changes
+
+- [`5812ad277`](undefined) - Deal better with NodePlugin being disabled.
+
+- Updated dependencies [[`5812ad277`](undefined)]:
+  - graphile-build-pg@5.0.0-0.24
+
 ## 5.0.0-0.26
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # graphile-build-pg
 
+## 5.0.0-0.24
+
+### Patch Changes
+
+- [`5812ad277`](undefined) - Deal better with NodePlugin being disabled.
+
 ## 5.0.0-0.23
 
 ### Patch Changes
