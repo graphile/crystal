@@ -235,44 +235,61 @@ const gatherBase = (
   }
 
   async function watch(
-    callback: (gather: GraphileBuild.BuildInput | null, error?: Error) => void,
+    callback: (
+      gather: GraphileBuild.BuildInput | null,
+      error: Error | undefined,
+      retry: () => void,
+    ) => void,
   ): Promise<() => void> {
     let stopped = false;
     const unlisten: Array<() => void> = [];
     let runAgain = false;
     let runInProgress = true;
+    let counter = 0;
     const handleChange = () => {
-      if (stopped) return;
+      if (stopped) {
+        return;
+      }
       if (runInProgress) {
         runAgain = true;
         return;
       }
+      ++counter;
       runAgain = false;
       runInProgress = true;
       run().then(
         (v) => {
+          runInProgress = false;
           if (stopped) return;
           try {
-            callback(v);
+            callback(v, undefined, makeRetry(counter));
           } catch {
             // TODO: this indicates a bug in user code; how to handle?
             /*nom nom nom*/
           }
-          runInProgress = false;
           if (runAgain) handleChange();
         },
         (e) => {
+          runInProgress = false;
           if (stopped) return;
           try {
-            callback(null, e);
+            callback(null, e, makeRetry(counter));
           } catch {
             // TODO: this indicates a bug in user code; how to handle?
             /*nom nom nom*/
           }
-          runInProgress = false;
           if (runAgain) handleChange();
         },
       );
+    };
+    const makeRetry = (currentCounter: number): (() => void) => {
+      return () => {
+        if (currentCounter === counter) {
+          handleChange();
+        } else {
+          // Another change was already registered; ignore
+        }
+      };
     };
 
     if (gatherPlugins) {
@@ -291,9 +308,9 @@ const gatherBase = (
       // Clear 'runAgain' since we're starting now
       runAgain = false;
       const firstResult = await run();
-      callback(firstResult);
+      callback(firstResult, undefined, makeRetry(counter));
     } catch (e) {
-      callback(null, e);
+      callback(null, e, makeRetry(counter));
     }
     runInProgress = false;
 
@@ -342,7 +359,11 @@ export const watchGather = (
         inflection: GraphileBuild.Inflection;
       }
     | undefined,
-  callback: (gather: GraphileBuild.BuildInput | null, error?: Error) => void,
+  callback: (
+    gather: GraphileBuild.BuildInput | null,
+    error: Error | undefined,
+    retry: () => void,
+  ) => void,
 ): Promise<() => void> => {
   const { watch } = gatherBase(preset, helpers);
   return watch(callback);
@@ -450,50 +471,65 @@ export async function makeSchema(
         }
         return result;
       } catch (error) {
-        const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
-
-        const start = process.hrtime();
-        const retryOrPromise =
-          typeof retryOnInitFail === "function"
-            ? retryOnInitFail(error, attempts, delay)
-            : retryOnInitFail;
-
-        if (retryOrPromise === false) {
-          throw error;
-        }
-
-        console.warn(
-          `Error occurred whilst building the schema (phase = ${phase}; attempt ${attempts}). We'll try again ${
-            retryOrPromise === true ? `in ${delay}ms` : `shortly`
-          }.\n  ${String(error).replace(/\n/g, "\n  ")}`,
-        );
-
-        if (retryOrPromise === true) {
-          await sleep(delay);
-        } else if (!isPromiseLike(retryOrPromise)) {
-          throw new Error(
-            `Invalid retryOnInitFail setting; must be true, false, or an optionally async function that resolves to true/false`,
-          );
-        } else {
-          const retry = await retryOrPromise;
-          const diff = process.hrtime(start);
-          const dur = diff[0] * 1e3 + diff[1] * 1e-6;
-          if (!retry) {
-            throw error;
-          } else if (dur < 50) {
-            // retryOnInitFail didn't wait long enough; use default wait.
-            console.error(
-              `Your retryOnInitFail function should include a delay of at least 50ms before resolving; falling back to a ${delay}ms wait (attempts = ${attempts}) to avoid overwhelming the database.`,
-            );
-            await sleep(delay);
-          } else {
-            // The promise already waited long enough, continue
-          }
-        }
+        await sleepFromRetryOnInitFail(retryOnInitFail, phase, attempts, error);
       }
     }
   } else {
     return make();
+  }
+}
+
+async function sleepFromRetryOnInitFail(
+  retryOnInitFail:
+    | boolean
+    | ((
+        error: Error,
+        attempts: number,
+        delay: number,
+      ) => boolean | Promise<boolean>),
+  phase: "GATHER" | "SCHEMA" | "UNKNOWN",
+  attempts: number,
+  error: Error,
+) {
+  const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
+
+  const start = process.hrtime();
+  const retryOrPromise =
+    typeof retryOnInitFail === "function"
+      ? retryOnInitFail(error, attempts, delay)
+      : retryOnInitFail;
+
+  if (retryOrPromise === false) {
+    throw error;
+  }
+
+  console.warn(
+    `Error occurred whilst building the schema (phase = ${phase}; attempt ${attempts}). We'll try again ${
+      retryOrPromise === true ? `in ${delay}ms` : `shortly`
+    }.\n  ${String(error).replace(/\n/g, "\n  ")}`,
+  );
+
+  if (retryOrPromise === true) {
+    await sleep(delay);
+  } else if (!isPromiseLike(retryOrPromise)) {
+    throw new Error(
+      `Invalid retryOnInitFail setting; must be true, false, or an optionally async function that resolves to true/false`,
+    );
+  } else {
+    const retry = await retryOrPromise;
+    const diff = process.hrtime(start);
+    const dur = diff[0] * 1e3 + diff[1] * 1e-6;
+    if (!retry) {
+      throw error;
+    } else if (dur < 50) {
+      // retryOnInitFail didn't wait long enough; use default wait.
+      console.error(
+        `Your retryOnInitFail function should include a delay of at least 50ms before resolving; falling back to a ${delay}ms wait (attempts = ${attempts}) to avoid overwhelming the database.`,
+      );
+      await sleep(delay);
+    } else {
+      // The promise already waited long enough, continue
+    }
   }
 }
 
@@ -510,19 +546,58 @@ export async function makeSchema(
  */
 export async function watchSchema(
   preset: GraphileConfig.Preset,
-  callback: (error: Error | null, params?: SchemaResult) => void,
+  callback: (fatalError: Error | null, params?: SchemaResult) => void,
 ): Promise<() => void> {
   const resolvedPreset = resolvePresets([preset]);
   const shared = { inflection: buildInflection(resolvedPreset) };
+
+  const retryOnInitFail = resolvedPreset.schema?.retryOnInitFail;
+  let attempts = 0;
+  let haveHadSuccess = false;
+
+  const handleErrorWithRetry = (error: Error, retry: () => void) => {
+    if (retryOnInitFail) {
+      sleepFromRetryOnInitFail(retryOnInitFail, "GATHER", attempts, error).then(
+        retry,
+        callback,
+      );
+    } else {
+      if (!haveHadSuccess) {
+        // Inability to gather is fatal - database connection issue?
+        callback(error);
+      } else {
+        console.error(`Error occurred during watch gather: ${error}`);
+      }
+    }
+  };
+
   const stopWatching = await watchGather(
     resolvedPreset,
     shared,
-    (input, error) => {
+    (input, error, retry) => {
+      ++attempts;
       if (error) {
-        callback(error);
+        // An error here could be a database connectivity issue or similar
+        // issue, if retryOnInitFail is set we should automatically retry.
+        handleErrorWithRetry(error, retry);
       } else {
-        const schema = buildSchema(resolvedPreset, input!, shared);
-        callback(null, { schema, resolvedPreset });
+        if (attempts > 1) {
+          console.warn(`Gather completed successfully on attempt ${attempts}.`);
+        }
+        attempts = 0;
+        haveHadSuccess = true;
+        try {
+          const schema = buildSchema(resolvedPreset, input!, shared);
+          callback(null, { schema, resolvedPreset });
+        } catch (e) {
+          // Retrying this on its own is pointless, we need the gather phase to
+          // give us more data so we can just await regular watch for that.
+          console.error(
+            `Error occurred during watch schema generation:\n  ${String(
+              e,
+            ).replace(/\n/g, "\n  ")}`,
+          );
+        }
       }
     },
   );
