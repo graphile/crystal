@@ -1,9 +1,9 @@
 import type { PromiseOrDirect } from "grafast";
+import { makeSchema } from "graphile-build";
 import type { GraphQLSchema } from "graphql";
 import { lexicographicSortSchema, printSchema } from "graphql";
 import type { PoolClient } from "pg";
 
-import { makeSchema } from "graphile-build";
 import AmberPreset from "../../../src/presets/amber.js";
 import type { V4Options } from "../../../src/presets/v4.js";
 import { makeV4Preset } from "../../../src/presets/v4.js";
