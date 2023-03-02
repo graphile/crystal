@@ -8,9 +8,9 @@ import type {
   PgConstraint,
 } from "pg-introspection";
 import { parseSmartComment } from "pg-introspection";
+import { escapeSqlIdentifier } from "pg-sql2";
 
 import { version } from "../version.js";
-import { escapeSqlIdentifier } from "pg-sql2";
 
 declare global {
   namespace GraphileConfig {
