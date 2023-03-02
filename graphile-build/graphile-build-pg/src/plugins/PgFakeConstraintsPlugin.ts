@@ -326,7 +326,7 @@ async function processFk(
     return (
       attrs &&
       attrs.length === foreignKeyAttibutes.length &&
-      attrs.every((attr, i) => attr === foreignKeyAttibutes[i])
+      attrs.every((attr) => foreignKeyAttibutes.includes(attr))
     );
   });
 
