@@ -239,9 +239,13 @@ async function makeNodePostgresWithPgClient_inner<T>(
   alreadyInTransaction: boolean,
 ) {
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
-  const pgSettingsEntries = pgSettings
-    ? Object.entries(pgSettings).map(([k, v]) => [k, "" + v])
-    : [];
+  const pgSettingsEntries: Array<[string, string]> = [];
+  if (pgSettings) {
+    for (const [key, value] of Object.entries(pgSettings)) {
+      if (value == null) continue;
+      pgSettingsEntries.push([key, "" + value]);
+    }
+  }
 
   const subscriptions = new Map<string, ((notification: any) => void)[]>();
 

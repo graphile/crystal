@@ -58,6 +58,7 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
 export default PgV4SmartTagsPlugin;
 
 function processTags(tags: Partial<PgSmartTagsDict> | undefined): void {
+  processUniqueKey(tags);
   processOmit(tags);
   convertBoolean(tags, "sortable", "orderBy order");
   convertBoolean(tags, "filterable", "filter filterBy");
@@ -96,6 +97,19 @@ function convertBoolean(
 ): void {
   if (tags && tags[key]) {
     addBehaviorToTags(tags, behavior, true);
+  }
+}
+
+function processUniqueKey(tags: Partial<PgSmartTagsDict> | undefined) {
+  if (tags && typeof tags.uniqueKey === "string") {
+    const newUnique = `${tags.uniqueKey}|@behavior -single -update -delete`;
+    if (Array.isArray(tags.unique)) {
+      tags.unique.push(newUnique);
+    } else if (typeof tags.unique === "string") {
+      tags.unique = [tags.unique, newUnique];
+    } else {
+      tags.unique = newUnique;
+    }
   }
 }
 

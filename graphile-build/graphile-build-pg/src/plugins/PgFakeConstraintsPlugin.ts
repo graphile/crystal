@@ -8,6 +8,7 @@ import type {
   PgConstraint,
 } from "pg-introspection";
 import { parseSmartComment } from "pg-introspection";
+import { escapeSqlIdentifier } from "pg-sql2";
 
 import { version } from "../version.js";
 
@@ -312,6 +313,47 @@ async function processFk(
     foreignColumns,
     () => `'@foreignKey' smart tag on ${identity()} remote columns`,
   );
+
+  // Check that this is unique
+  const isUnique = foreignPgClass.getConstraints().some((foreignConstraint) => {
+    if (
+      foreignConstraint.contype !== "p" &&
+      foreignConstraint.contype !== "u"
+    ) {
+      return false;
+    }
+    const attrs = foreignConstraint.getAttributes();
+    return (
+      attrs &&
+      attrs.length === foreignKeyAttibutes.length &&
+      attrs.every((attr) => foreignKeyAttibutes.includes(attr))
+    );
+  });
+
+  if (!isUnique) {
+    throw new Error(
+      `Invalid @foreignKey on '${identity()}'; referenced non-unique combination of columns '${foreignSchema}.${foreignTable}' (${foreignKeyAttibutes
+        .map((k) => k.attname)
+        .join(
+          ", ",
+        )}). If this list of columns is truly unique you should add a unique constraint to the table:
+
+ALTER TABLE ${escapeSqlIdentifier(foreignSchema)}.${escapeSqlIdentifier(
+        foreignTable,
+      )}
+  ADD UNIQUE (${foreignKeyAttibutes
+    .map((k) => escapeSqlIdentifier(k.attname))
+    .join(", ")});
+
+or use a '@unique ${foreignKeyAttibutes
+        .map((k) => k.attname)
+        .join(
+          ",",
+        )}' smart tag to emulate this. (Original spec: ${JSON.stringify(
+        rawSpec,
+      )})`,
+    );
+  }
 
   const tagsAndDescription = parseSmartComment(extraDescription);
 

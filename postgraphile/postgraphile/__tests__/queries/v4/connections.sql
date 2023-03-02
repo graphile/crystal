@@ -60,12 +60,12 @@ from "c"."person" as __person__
 order by __person__."person_full_name" desc, __person__."id" asc;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __updatable_view__."x"::text as "1",
-  __updatable_view__."name" as "2",
-  __updatable_view__."constant"::text as "3",
-  (not (__updatable_view__ is null))::text as "4"
-from "b"."updatable_view" as __updatable_view__;
+  __updatable_view__."x"::text as "0",
+  __updatable_view__."name" as "1",
+  __updatable_view__."constant"::text as "2",
+  (not (__updatable_view__ is null))::text as "3"
+from "b"."updatable_view" as __updatable_view__
+order by __updatable_view__."x" asc;
 
 select
   __updatable_view__."constant"::text as "0",
@@ -73,7 +73,7 @@ select
   __updatable_view__."name" as "2",
   (not (__updatable_view__ is null))::text as "3"
 from "b"."updatable_view" as __updatable_view__
-order by __updatable_view__."constant" asc;
+order by __updatable_view__."constant" asc, __updatable_view__."x" asc;
 
 select __post_result__.*
 from (

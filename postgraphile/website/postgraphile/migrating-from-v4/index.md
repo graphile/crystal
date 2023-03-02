@@ -152,6 +152,8 @@ Other changes:
 
 - The values generated for `cursor` differ. This is not deemed to be a breaking
   change, as these may change from one release to the next (even patch versions)
+- The `@uniqueKey` smart key is no more, but our V4 preset converts it to
+  `@unique ...|@behavior -single -update -delete` for you
 
 ## Running
 
