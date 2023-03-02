@@ -5,8 +5,8 @@ test(
   core.test(__filename, ["c"], {}, (pgClient) => {
     return pgClient.query(
       `\
-comment on table c.person is E'@unique about\\nPerson test comment';
 comment on table c.person_secret is E'@foreignKey (sekrit) references c.person (about)\\n@deprecated This is deprecated (comment on table c.person_secret).\\nTracks the person''s secret';
+ALTER TABLE "c"."person" ADD UNIQUE ("about");
 `,
     );
   }),
