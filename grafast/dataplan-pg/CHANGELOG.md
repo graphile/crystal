@@ -1,5 +1,19 @@
 # @dataplan/pg
 
+## 0.0.1-0.21
+
+### Patch Changes
+
+- [#214](https://github.com/benjie/postgraphile-private/pull/214)
+  [`7e3bfef04`](https://github.com/benjie/postgraphile-private/commit/7e3bfef04ebb76fbde8273341ec92073b9e9f04d)
+  Thanks [@benjie](https://github.com/benjie)! - Correctly drop null/undefined
+  pgSettings keys
+
+- Updated dependencies
+  [[`df89aba52`](https://github.com/benjie/postgraphile-private/commit/df89aba524270e52f82987fcc4ab5d78ce180fc5)]:
+  - grafast@0.0.1-0.16
+  - @dataplan/json@0.0.1-0.16
+
 ## 0.0.1-0.20
 
 ### Patch Changes

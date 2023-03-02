@@ -1,5 +1,24 @@
 # postgraphile
 
+## 5.0.0-0.29
+
+### Patch Changes
+
+- [#214](https://github.com/benjie/postgraphile-private/pull/214)
+  [`3ed7d3349`](https://github.com/benjie/postgraphile-private/commit/3ed7d334939e5e0ab2f63b2fde202884cc2daa74)
+  Thanks [@benjie](https://github.com/benjie)! - @uniqueKey smart tag now
+  converted via V4 preset to @unique.
+
+- Updated dependencies
+  [[`7e3bfef04`](https://github.com/benjie/postgraphile-private/commit/7e3bfef04ebb76fbde8273341ec92073b9e9f04d),
+  [`df89aba52`](https://github.com/benjie/postgraphile-private/commit/df89aba524270e52f82987fcc4ab5d78ce180fc5),
+  [`3ed7d3349`](https://github.com/benjie/postgraphile-private/commit/3ed7d334939e5e0ab2f63b2fde202884cc2daa74)]:
+  - @dataplan/pg@0.0.1-0.21
+  - grafast@0.0.1-0.16
+  - graphile-build-pg@5.0.0-0.26
+  - grafserv@0.0.1-0.18
+  - graphile-build@5.0.0-0.21
+
 ## 5.0.0-0.28
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # grafast
 
+## 0.0.1-0.16
+
+### Patch Changes
+
+- [#214](https://github.com/benjie/postgraphile-private/pull/214)
+  [`df89aba52`](https://github.com/benjie/postgraphile-private/commit/df89aba524270e52f82987fcc4ab5d78ce180fc5)
+  Thanks [@benjie](https://github.com/benjie)! - Query planning errors now
+  output (to console) in production too
+
 ## 0.0.1-0.15
 
 ### Patch Changes
