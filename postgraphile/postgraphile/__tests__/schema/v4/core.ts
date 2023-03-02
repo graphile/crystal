@@ -7,11 +7,7 @@ import type { PoolClient } from "pg";
 import AmberPreset from "../../../src/presets/amber.js";
 import type { V4Options } from "../../../src/presets/v4.js";
 import { makeV4Preset } from "../../../src/presets/v4.js";
-import {
-  connectionString,
-  snapshot,
-  withPoolClientTransaction,
-} from "../../helpers.js";
+import { snapshot, withPoolClientTransaction } from "../../helpers.js";
 
 let countByPath = Object.create(null);
 
