@@ -1068,6 +1068,15 @@ ${te.join(
         const resultIsPlanned = isTypePlanned(this.schema, namedReturnType);
         const fieldHasPlan = !!planResolver;
 
+        // TODO: delete this. Or uncomment it. One or the other.
+        // Context: if the parent type has a plan then it's likely that all
+        // child fields will need a plan to extract the relevant data from the
+        // parent, a resolver alone might not receive what it expects. However,
+        // `Query` needs a plan so it can be part of `Node`, and adding
+        // resolver-only fields to `Query` makes sense... And really this is
+        // just a recommendation to the user, not a hard requirement... So we
+        // should remove it.
+        /*
         if (typePlan && !fieldHasPlan) {
           throw new Error(
             `Every field within a planned type must have a plan; object type ${
@@ -1079,6 +1088,7 @@ ${te.join(
             }.${fieldName} has no plan. Please add an 'extensions.graphile.plan' callback to this field.`,
           );
         }
+        */
 
         if (!typePlan && resultIsPlanned && !fieldHasPlan) {
           throw new Error(
