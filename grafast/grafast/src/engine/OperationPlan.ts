@@ -452,6 +452,10 @@ ${te.join(
             " > ",
           )}): \n${e.stack || e}`,
         );
+      } else {
+        console.error(
+          `Error occurred during query planning: \n${e.stack || e}`,
+        );
       }
       throw new SafeError(`Failed to plan this query.`);
     }
