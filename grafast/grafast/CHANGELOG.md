@@ -1,5 +1,11 @@
 # grafast
 
+## 0.0.1-0.17
+
+### Patch Changes
+
+- [`f48860d4f`](undefined) - Allow adding resolver-only fields to planned types.
+
 ## 0.0.1-0.16
 
 ### Patch Changes

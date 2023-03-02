@@ -1,5 +1,12 @@
 # @dataplan/json
 
+## 0.0.1-0.17
+
+### Patch Changes
+
+- Updated dependencies [[`f48860d4f`](undefined)]:
+  - grafast@0.0.1-0.17
+
 ## 0.0.1-0.16
 
 ### Patch Changes

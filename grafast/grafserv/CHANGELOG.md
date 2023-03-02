@@ -1,5 +1,12 @@
 # grafserv
 
+## 0.0.1-0.19
+
+### Patch Changes
+
+- Updated dependencies [[`f48860d4f`](undefined)]:
+  - grafast@0.0.1-0.17
+
 ## 0.0.1-0.18
 
 ### Patch Changes

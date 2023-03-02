@@ -1,5 +1,14 @@
 # graphile-build
 
+## 5.0.0-0.22
+
+### Patch Changes
+
+- [`f48860d4f`](undefined) - Allow adding resolver-only fields to planned types.
+
+- Updated dependencies [[`f48860d4f`](undefined)]:
+  - grafast@0.0.1-0.17
+
 ## 5.0.0-0.21
 
 ### Patch Changes
