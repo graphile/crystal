@@ -124,7 +124,7 @@ export interface GrafastInputFieldExtensions {
 }
 
 export interface GrafastObjectTypeExtensions {
-  Step?: { new (...args: any[]): ExecutableStep };
+  Step?: { new (...args: any[]): ExecutableStep; displayName?: string };
 }
 
 export interface GrafastEnumTypeExtensions {}

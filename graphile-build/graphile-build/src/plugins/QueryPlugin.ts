@@ -31,7 +31,7 @@ export const QueryPlugin: GraphileConfig.Plugin = {
             {
               isRootQuery: true,
             },
-            __ValueStep,
+            null,
             () => {
               return {
                 description:

@@ -31,7 +31,7 @@ export const MutationPlugin: GraphileConfig.Plugin = {
             {
               isRootMutation: true,
             },
-            __ValueStep,
+            null,
             () => {
               return {
                 description:

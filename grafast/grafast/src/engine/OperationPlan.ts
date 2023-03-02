@@ -1072,7 +1072,9 @@ ${te.join(
           throw new Error(
             `Every field within a planned type must have a plan; object type ${
               objectType.name
-            } expects a ${typePlan.name || "ExecutableStep"} however field ${
+            } represents an instance of '${
+              typePlan.displayName || typePlan.name || "ExecutableStep"
+            }', however field ${
               objectType.name
             }.${fieldName} has no plan. Please add an 'extensions.graphile.plan' callback to this field.`,
           );
