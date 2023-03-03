@@ -483,6 +483,9 @@ type CreatePersonSecretPayload {
   """The `Person` this `PersonSecret` belongs to."""
   personByPersonId: Person
 
+  """Reads a single `Person` that is related to this `PersonSecret`."""
+  personBySecret: Person
+
   """The `PersonSecret` that was created by this mutation."""
   personSecret: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
@@ -885,6 +888,9 @@ type DeletePersonSecretPayload {
 
   """The `Person` this `PersonSecret` belongs to."""
   personByPersonId: Person
+
+  """Reads a single `Person` that is related to this `PersonSecret`."""
+  personBySecret: Person
 
   """The `PersonSecret` that was deleted by this mutation."""
   personSecret: PersonSecret
@@ -2974,6 +2980,35 @@ type Person implements Node {
 
   """This `Person`'s `PersonSecret`."""
   personSecretByPersonId: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Reads and enables pagination through a set of `PersonSecret`."""
+  personSecretsBySecret(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonSecretCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PersonSecret`."""
+    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PersonSecretsConnection! @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
   site: WrappedUrl @deprecated(reason: "Don’t use me")
   typeFunction(id: Int): Type
 
@@ -3112,6 +3147,9 @@ type PersonSecret implements Node {
 
   """The `Person` this `PersonSecret` belongs to."""
   personByPersonId: Person
+
+  """Reads a single `Person` that is related to this `PersonSecret`."""
+  personBySecret: Person
   personId: Int!
 
   """A secret held by the associated Person"""
@@ -4431,6 +4469,9 @@ type UpdatePersonSecretPayload {
 
   """The `Person` this `PersonSecret` belongs to."""
   personByPersonId: Person
+
+  """Reads a single `Person` that is related to this `PersonSecret`."""
+  personBySecret: Person
 
   """The `PersonSecret` that was updated by this mutation."""
   personSecret: PersonSecret
