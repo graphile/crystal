@@ -188,6 +188,7 @@ export const makeV4Preset = (
         : null),
     },
     gather: {
+      pgFakeConstraintsAutofixForeignKeyUniqueness: true,
       pgStrictFunctions,
       ...(options.jwtPgTypeIdentifier
         ? {
