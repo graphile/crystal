@@ -100,7 +100,7 @@ export default preset;
 
 ## `inflection` options
 
-_(TypeScript type: `GraphileBuild.GraphileBuildInflectionOptions`)_
+_(TypeScript type: `GraphileBuild.InflectionOptions`)_
 
 _None at this time._
 
@@ -230,7 +230,7 @@ primarily, it accepts the following options:
 
 ## `gather` options
 
-_(TypeScript type: `GraphileBuild.GraphileBuildGatherOptions`)_
+_(TypeScript type: `GraphileBuild.GatherOptions`)_
 
 - `pgStrictFunctions: boolean` - if true, we'll treat all PostgreSQL function
   arguments that don't have defaults as being required (non-nullable)

@@ -79,8 +79,8 @@ declare global {
 
     // Options in the config
 
-    interface GraphileBuildInflectionOptions {}
-    interface GraphileBuildGatherOptions {}
+    interface InflectionOptions {}
+    interface GatherOptions {}
     interface SchemaOptions {
       /**
        * A behavior string to prepend to all behavior checks, can be overriden

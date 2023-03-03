@@ -48,7 +48,7 @@ declare global {
         },
       ): string;
     }
-    interface GraphileBuildGatherOptions {
+    interface GatherOptions {
       /**
        * If true, we'll treat all arguments that don't have defaults as being
        * required.
