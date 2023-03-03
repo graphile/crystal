@@ -27,6 +27,12 @@ declare global {
       >;
     }
   }
+  namespace GraphileBuild {
+    interface GraphileBuildGatherOptions {
+      /** @deprecated We strongly recommend that you fix the uniqueness yourself. */
+      pgFakeConstraintsAutofixForeignKeyUniqueness?: boolean;
+    }
+  }
 }
 
 interface State {
@@ -331,28 +337,43 @@ async function processFk(
   });
 
   if (!isUnique) {
-    throw new Error(
-      `Invalid @foreignKey on '${identity()}'; referenced non-unique combination of columns '${foreignSchema}.${foreignTable}' (${foreignKeyAttibutes
-        .map((k) => k.attname)
-        .join(
-          ", ",
-        )}). If this list of columns is truly unique you should add a unique constraint to the table:
+    if (
+      info.resolvedPreset.gather?.pgFakeConstraintsAutofixForeignKeyUniqueness
+    ) {
+      // Auto-add unique
+      await processUnique(
+        info,
+        event,
+        foreignPgClass,
+        `${foreignKeyAttibutes
+          .map((attr) => attr.attname)
+          .join(",")}|@behavior -single -update -delete`,
+        false,
+      );
+    } else {
+      throw new Error(
+        `Invalid @foreignKey on '${identity()}'; referenced non-unique combination of columns '${foreignSchema}.${foreignTable}' (${foreignKeyAttibutes
+          .map((k) => k.attname)
+          .join(
+            ", ",
+          )}). If this list of columns is truly unique you should add a unique constraint to the table:
 
 ALTER TABLE ${escapeSqlIdentifier(foreignSchema)}.${escapeSqlIdentifier(
-        foreignTable,
-      )}
+          foreignTable,
+        )}
   ADD UNIQUE (${foreignKeyAttibutes
     .map((k) => escapeSqlIdentifier(k.attname))
     .join(", ")});
 
 or use a '@unique ${foreignKeyAttibutes
-        .map((k) => k.attname)
-        .join(
-          ",",
-        )}' smart tag to emulate this. (Original spec: ${JSON.stringify(
-        rawSpec,
-      )})`,
-    );
+          .map((k) => k.attname)
+          .join(
+            ",",
+          )}' smart tag to emulate this. (Original spec: ${JSON.stringify(
+          rawSpec,
+        )}).\nTo temporarily fix this you can set 'preset.gather.pgFaceConstraintsAutofixForeignKeyUniqueness' to 'true', but we strongly recommend against using this long term.'`,
+      );
+    }
   }
 
   const tagsAndDescription = parseSmartComment(extraDescription);
