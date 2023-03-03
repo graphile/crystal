@@ -1,5 +1,27 @@
 # postgraphile
 
+## 5.0.0-0.31
+
+### Patch Changes
+
+- [#218](https://github.com/benjie/postgraphile-private/pull/218)
+  [`f2c1423fb`](https://github.com/benjie/postgraphile-private/commit/f2c1423fbd6c354146a70a9a2ebabd97370b9b05)
+  Thanks [@benjie](https://github.com/benjie)! - Option for `@foreignKey` smart
+  tag to have unique auto-created for it to ease transition from V4:
+  `{ gather: { pgFakeConstraintsAutofixForeignKeyUniqueness: true } }`
+
+- [#219](https://github.com/benjie/postgraphile-private/pull/219)
+  [`b58f5dfac`](https://github.com/benjie/postgraphile-private/commit/b58f5dfac6ead1efb8bb56b5cfdfd6a0040a60b5)
+  Thanks [@benjie](https://github.com/benjie)! - Rename
+  `GraphileBuild.GraphileBuildGatherOptions` to `GraphileBuild.GatherOptions`.
+  Rename `GraphileBuild.GraphileBuildInflectionOptions` to
+  `GraphileBuild.InflectionOptions`.
+- Updated dependencies
+  [[`f2c1423fb`](https://github.com/benjie/postgraphile-private/commit/f2c1423fbd6c354146a70a9a2ebabd97370b9b05),
+  [`b58f5dfac`](https://github.com/benjie/postgraphile-private/commit/b58f5dfac6ead1efb8bb56b5cfdfd6a0040a60b5)]:
+  - graphile-build-pg@5.0.0-0.28
+  - graphile-build@5.0.0-0.23
+
 ## 5.0.0-0.30
 
 ### Patch Changes

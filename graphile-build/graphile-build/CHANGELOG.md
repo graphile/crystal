@@ -1,5 +1,16 @@
 # graphile-build
 
+## 5.0.0-0.23
+
+### Patch Changes
+
+- [#219](https://github.com/benjie/postgraphile-private/pull/219)
+  [`b58f5dfac`](https://github.com/benjie/postgraphile-private/commit/b58f5dfac6ead1efb8bb56b5cfdfd6a0040a60b5)
+  Thanks [@benjie](https://github.com/benjie)! - Rename
+  `GraphileBuild.GraphileBuildGatherOptions` to `GraphileBuild.GatherOptions`.
+  Rename `GraphileBuild.GraphileBuildInflectionOptions` to
+  `GraphileBuild.InflectionOptions`.
+
 ## 5.0.0-0.22
 
 ### Patch Changes
