@@ -7,6 +7,7 @@ import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4NoIgnoreIndexesPlugin } from "../plugins/PgV4NoIgnoreIndexesPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
+import { GraphQLError } from "graphql";
 
 export {
   PgV4BehaviorPlugin,
@@ -58,6 +59,14 @@ export interface V4Options<
   retryOnInitFail?:
     | boolean
     | ((error: Error, attempts: number) => boolean | Promise<boolean>);
+
+  graphqlRoute?: string;
+  graphiqlRoute?: string;
+  graphiql?: boolean;
+  /** Always ignored, ruru is always enhanced. */
+  enhanceGraphiql?: boolean;
+  allowExplain?: boolean;
+  handleErrors?: (error: readonly GraphQLError[]) => readonly GraphQLError[];
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -219,6 +228,23 @@ export const makeV4Preset = (
               }
 
               return context;
+            },
+          }
+        : null),
+      ...(options.allowExplain
+        ? {
+            explain: true,
+          }
+        : null),
+    },
+    grafserv: {
+      graphqlPath: options.graphqlRoute ?? "/graphql",
+      graphiqlPath: options.graphiqlRoute ?? "/graphiql",
+      graphiql: options.graphiql ?? false,
+      ...(options.handleErrors
+        ? {
+            maskError(error) {
+              return options.handleErrors!([error])[0];
             },
           }
         : null),
