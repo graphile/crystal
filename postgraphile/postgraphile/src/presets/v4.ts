@@ -67,6 +67,18 @@ export interface V4Options<
   enhanceGraphiql?: boolean;
   allowExplain?: boolean;
   handleErrors?: (error: readonly GraphQLError[]) => readonly GraphQLError[];
+
+  /**
+   * As of PostGraphile v5, query batching is no longer supported. Query batching
+   * has not been standardized as part of the GraphQL-over-HTTP specification
+   * efforts, and the need for it has been significantly reduced with the ubiquity
+   * of HTTP2+ servers. Further, with incremental delivery (@stream/@defer) on the
+   * horizon, query batching will develop a lot of unnecessary complexity that
+   * handling at the network layer would bypass.
+   *
+   * @deprecated Use HTTP2+ instead
+   */
+  enableQueryBatching?: never;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -164,6 +176,11 @@ export const makeV4Preset = (
     pgStrictFunctions,
     ...otherGraphileBuildOptions
   } = options.graphileBuildOptions ?? {};
+  if (options.enableQueryBatching) {
+    throw new Error(
+      `As of PostGraphile v5, query batching is no longer supported. Query batching has not been standardized as part of the GraphQL-over-HTTP specification efforts, and the need for it has been significantly reduced with the ubiquity of HTTP2+ servers. Further, with incremental delivery (@stream/@defer) on the horizon, query batching will develop a lot of unnecessary complexity that handling at the network layer would bypass.`,
+    );
+  }
   return {
     plugins: [
       ...(options.ignoreRBAC === false ? [PgRBACPlugin] : []),
