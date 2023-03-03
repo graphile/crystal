@@ -15,7 +15,7 @@ declare global {
       pgJwtSignOptions?: any;
     }
 
-    interface GraphileBuildGatherOptions {
+    interface GatherOptions {
       // TODO: we may want multiple of these!
       /**
        * If you would like PostGraphile to automatically recognize a PostgreSQL

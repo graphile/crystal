@@ -38,7 +38,7 @@ export interface GatherPluginContext<
   /**
    * The 'gather' phase options from the resolved preset.
    */
-  options: GraphileBuild.GraphileBuildGatherOptions;
+  options: GraphileBuild.GatherOptions;
 
   /**
    * The full resolved preset (generally you'll want `options` instead).
@@ -80,14 +80,14 @@ declare global {
        * things that are generated in the `gather` phase, and the ultimate
        * types, fields, arguments, directives and so on in the GraphQL schema.
        */
-      inflection?: GraphileBuild.GraphileBuildInflectionOptions;
+      inflection?: GraphileBuild.InflectionOptions;
       /**
        * The `gather` phase is the second phase that occurs when building a
        * schema with Graphile Build. It is responsible for looking at
        * everything that can influence the shape of your schema, and turning
        * that into an "input" for the `schema` phase.
        */
-      gather?: GraphileBuild.GraphileBuildGatherOptions;
+      gather?: GraphileBuild.GatherOptions;
       /**
        * The `schema` phase is the final phase that occurs when building a
        * schema with Graphile Build. It is responsible for taking the inputs

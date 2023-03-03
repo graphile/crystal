@@ -28,7 +28,7 @@ declare global {
     }
   }
   namespace GraphileBuild {
-    interface GraphileBuildGatherOptions {
+    interface GatherOptions {
       /** @deprecated We strongly recommend that you fix the uniqueness yourself. */
       pgFakeConstraintsAutofixForeignKeyUniqueness?: boolean;
     }
