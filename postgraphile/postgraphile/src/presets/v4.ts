@@ -42,7 +42,7 @@ export interface V4Options<
   /** @deprecated Please use grafast.context 'pgSettings' key instead */
   pgSettings?: DirectOrCallback<
     Request | undefined,
-    { [key: string]: string | undefined }
+    { [key: string]: string | null | undefined }
   >;
   // TODO: allowExplain?: DirectOrCallback<Request | undefined, boolean>;
   /** @deprecated Please use grafast.context callback instead */
