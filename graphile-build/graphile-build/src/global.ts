@@ -450,6 +450,10 @@ declare global {
         condition: boolean,
         type: T,
       ): T | GraphQLNonNull<T>;
+
+      _pluginMeta: {
+        [pluginName: string]: Record<string, any> | undefined;
+      };
     }
 
     /**

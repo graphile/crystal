@@ -408,6 +408,8 @@ export default function makeNewBuild(
         return new graphql.GraphQLNonNull(type);
       }
     },
+
+    _pluginMeta: Object.create(null),
   };
   return build;
 }

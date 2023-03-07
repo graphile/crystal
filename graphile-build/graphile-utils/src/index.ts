@@ -1,6 +1,14 @@
 export { EXPORTABLE } from "./exportable.js";
 export { gql } from "./gql.js";
 export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.js";
+export { makeAddPgTableConditionPlugin } from "./makeAddPgTableConditionPlugin.js";
+export {
+  makeAddPgTableOrderByPlugin,
+  MakeAddPgTableOrderByPluginOrders,
+  NullsSortMethod,
+  orderByAscDesc,
+  OrderByAscDescOptions,
+} from "./makeAddPgTableOrderByPlugin.js";
 export {
   ChangeNullabilityRules,
   ChangeNullabilityTypeRules,
