@@ -2,6 +2,7 @@ import LRU from "@graphile/lru";
 import type {
   AsyncExecutionResult,
   DocumentNode,
+  ExecutionArgs,
   ExecutionResult,
   GraphQLArgs,
   GraphQLSchema,
@@ -13,6 +14,7 @@ import { NULL_PRESET } from "./config.js";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { isPromiseLike } from "./utils.js";
+import { hookArgs } from "./index.js";
 
 /** Rough average size per query */
 const CACHE_MULTIPLIER = 100000;
@@ -108,7 +110,8 @@ const parseAndValidate = (
  */
 export function grafastGraphql(
   args: GraphQLArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
+  resolvedPreset?: GraphileConfig.ResolvedPreset,
+  ctx?: Partial<Grafast.RequestContext>,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
@@ -136,20 +139,31 @@ export function grafastGraphql(
   }
   const document = documentOrErrors as DocumentNode;
 
-  // Execute
-  return execute(
-    {
-      schema,
-      document,
-      rootValue,
-      contextValue,
-      variableValues,
-      operationName,
-      fieldResolver,
-      typeResolver,
-    },
-    resolvedPreset,
-  );
+  const executionArgs: ExecutionArgs = {
+    schema,
+    document,
+    rootValue,
+    contextValue,
+    variableValues,
+    operationName,
+    fieldResolver,
+    typeResolver,
+  };
+
+  if (resolvedPreset && ctx) {
+    const argsOrPromise = hookArgs(executionArgs, ctx, resolvedPreset);
+    if (isPromiseLike(argsOrPromise)) {
+      return Promise.resolve(argsOrPromise).then((hookedArgs) =>
+        execute(hookedArgs, resolvedPreset),
+      );
+    } else {
+      // Execute
+      return execute(argsOrPromise, resolvedPreset);
+    }
+  } else {
+    // Execute
+    return execute(executionArgs, resolvedPreset ?? NULL_PRESET);
+  }
 }
 
 export function grafastGraphqlSync(
