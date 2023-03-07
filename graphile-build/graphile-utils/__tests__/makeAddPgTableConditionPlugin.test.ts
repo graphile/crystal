@@ -2,7 +2,7 @@ import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 import { makeSchema } from "postgraphile";
 import pg, { Pool } from "pg";
-import { ExecutionResult } from "graphql";
+import { ExecutionResult, lexicographicSortSchema } from "graphql";
 import { makeAddPgTableConditionPlugin } from "../";
 import { TYPES } from "@dataplan/pg";
 import { makePgConfig } from "@dataplan/pg/adaptors/pg";
@@ -78,7 +78,7 @@ it("allows adding a condition to a Relay connection", async () => {
     ],
   };
   const { schema, resolvedPreset } = await makeSchema(preset);
-  expect(schema).toMatchSnapshot();
+  expect(lexicographicSortSchema(schema)).toMatchSnapshot();
   const result = await grafast(
     {
       schema,
@@ -128,7 +128,7 @@ it("allows adding a condition to a simple collection", async () => {
     ],
   };
   const { schema, resolvedPreset } = await makeSchema(preset);
-  expect(schema).toMatchSnapshot();
+  expect(lexicographicSortSchema(schema)).toMatchSnapshot();
   const result = await grafast(
     {
       schema,
