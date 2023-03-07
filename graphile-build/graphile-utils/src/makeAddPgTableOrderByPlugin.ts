@@ -111,31 +111,28 @@ export function orderByAscDesc(
       `Invalid value for "nulls" passed to orderByAscDesc for ${baseName}. Nulls must be sorted by one of: undefined | "first" | "last" | "first-iff-ascending" | "last-iff-ascending".`,
     );
   }
-  const ascendingNulls: Pick<PgOrderSpec, "nulls"> =
+  const ascendingNulls: PgOrderSpec["nulls"] =
     typeof nulls === "undefined"
-      ? {}
-      : {
-          nulls: ["first", "first-iff-ascending"].includes(nulls)
-            ? "FIRST"
-            : "LAST",
-        };
-  const descendingNulls: Pick<PgOrderSpec, "nulls"> =
+      ? undefined
+      : ["first", "first-iff-ascending"].includes(nulls)
+      ? "FIRST"
+      : "LAST";
+  const descendingNulls: PgOrderSpec["nulls"] =
     typeof nulls === "undefined"
-      ? {}
-      : {
-          nulls: ["first", "last-iff-ascending"].includes(nulls)
-            ? "FIRST"
-            : "LAST",
-        };
+      ? undefined
+      : ["first", "last-iff-ascending"].includes(nulls)
+      ? "FIRST"
+      : "LAST";
 
   type Plan = ($select: PgSelectStep<any, any, any, any>) => void;
 
   const ascendingPlan: Plan =
     typeof columnOrSqlFragment === "string"
       ? EXPORTABLE(
-          (ascendingNulls, columnOrSqlFragment, unique) => function applyPlan($select) {
+          (ascendingNulls, columnOrSqlFragment, unique) =>
+            function applyPlan($select) {
               $select.orderBy({
-                ...ascendingNulls,
+                nulls: ascendingNulls,
                 attribute: columnOrSqlFragment,
                 direction: "ASC",
               });
@@ -147,9 +144,10 @@ export function orderByAscDesc(
         )
       : typeof columnOrSqlFragment === "function"
       ? EXPORTABLE(
-          (ascendingNulls, columnOrSqlFragment, unique) => function applyPlan($select) {
+          (ascendingNulls, columnOrSqlFragment, unique) =>
+            function applyPlan($select) {
               $select.orderBy({
-                ...ascendingNulls,
+                nulls: ascendingNulls,
                 ...columnOrSqlFragment($select),
                 direction: "ASC",
               } as PgOrderSpec);
@@ -160,9 +158,10 @@ export function orderByAscDesc(
           [ascendingNulls, columnOrSqlFragment, unique],
         )
       : EXPORTABLE(
-          (ascendingNulls, columnOrSqlFragment, unique) => function applyPlan($select) {
+          (ascendingNulls, columnOrSqlFragment, unique) =>
+            function applyPlan($select) {
               $select.orderBy({
-                ...ascendingNulls,
+                nulls: ascendingNulls,
                 ...columnOrSqlFragment,
                 direction: "ASC",
               } as PgOrderSpec);
@@ -175,9 +174,10 @@ export function orderByAscDesc(
   const descendingPlan: Plan =
     typeof columnOrSqlFragment === "string"
       ? EXPORTABLE(
-          (columnOrSqlFragment, descendingNulls, unique) => function applyPlan($select) {
+          (columnOrSqlFragment, descendingNulls, unique) =>
+            function applyPlan($select) {
               $select.orderBy({
-                ...descendingNulls,
+                nulls: descendingNulls,
                 attribute: columnOrSqlFragment,
                 direction: "DESC",
               });
@@ -189,9 +189,10 @@ export function orderByAscDesc(
         )
       : typeof columnOrSqlFragment === "function"
       ? EXPORTABLE(
-          (columnOrSqlFragment, descendingNulls, unique) => function applyPlan($select) {
+          (columnOrSqlFragment, descendingNulls, unique) =>
+            function applyPlan($select) {
               $select.orderBy({
-                ...descendingNulls,
+                nulls: descendingNulls,
                 ...columnOrSqlFragment($select),
                 direction: "DESC",
               } as PgOrderSpec);
@@ -202,9 +203,10 @@ export function orderByAscDesc(
           [columnOrSqlFragment, descendingNulls, unique],
         )
       : EXPORTABLE(
-          (columnOrSqlFragment, descendingNulls, unique) => function applyPlan($select) {
+          (columnOrSqlFragment, descendingNulls, unique) =>
+            function applyPlan($select) {
               $select.orderBy({
-                ...descendingNulls,
+                nulls: descendingNulls,
                 ...columnOrSqlFragment,
                 direction: "DESC",
               } as PgOrderSpec);
