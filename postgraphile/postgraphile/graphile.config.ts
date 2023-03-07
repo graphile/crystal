@@ -113,6 +113,9 @@ const preset: GraphileConfig.Preset = {
   gather: {},
   schema: {
     retryOnInitFail: true,
+    exportSchemaSDLPath: `${__dirname}/latestSchema.graphql`,
+    exportSchemaIntrospectionResultPath: `${__dirname}/latestSchema.json`,
+    sortExport: true,
   },
   grafserv: {
     graphqlPath: "/v2/graphql",

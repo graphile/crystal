@@ -79,6 +79,10 @@ export interface V4Options<
    * @deprecated Use HTTP2+ instead
    */
   enableQueryBatching?: never;
+
+  sortExport?: boolean;
+  exportGqlSchemaPath?: string;
+  exportJsonSchemaPath?: string;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -212,6 +216,9 @@ export const makeV4Preset = (
       ...(options.retryOnInitFail
         ? { retryOnInitFail: options.retryOnInitFail }
         : null),
+      exportSchemaSDLPath: options.exportGqlSchemaPath,
+      exportSchemaIntrospectionResultPath: options.exportJsonSchemaPath,
+      sortExport: options.sortExport,
     },
     gather: {
       pgFakeConstraintsAutofixForeignKeyUniqueness: true,
