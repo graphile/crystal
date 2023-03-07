@@ -83,6 +83,7 @@ export interface V4Options<
   sortExport?: boolean;
   exportGqlSchemaPath?: string;
   exportJsonSchemaPath?: string;
+  watchPg?: boolean;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -272,6 +273,7 @@ export const makeV4Preset = (
             },
           }
         : null),
+      watch: options.watchPg,
     },
   };
 };
