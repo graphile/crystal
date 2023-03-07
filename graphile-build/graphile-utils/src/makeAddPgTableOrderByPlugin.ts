@@ -6,7 +6,7 @@ type OrderBySpecIdentity =
   | string // Column name
   | Omit<PgOrderSpec, "direction"> // Expression
   | ((
-      step: PgSelectStep<any, any, any, any>,
+      $select: PgSelectStep<any, any, any, any>,
     ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
