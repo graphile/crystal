@@ -13,8 +13,8 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { NULL_PRESET } from "./config.js";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
-import { isPromiseLike } from "./utils.js";
 import { hookArgs } from "./index.js";
+import { isPromiseLike } from "./utils.js";
 
 /** Rough average size per query */
 const CACHE_MULTIPLIER = 100000;

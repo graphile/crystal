@@ -1,14 +1,16 @@
-import { postgraphilePresetAmber } from "postgraphile/presets/amber";
-import { makeV4Preset } from "postgraphile/presets/v4";
-import { makeSchema } from "postgraphile";
-import pg, { Pool } from "pg";
-import { ExecutionResult } from "graphql";
-import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "../";
+import { TYPES } from "@dataplan/pg";
 import { makePgConfig } from "@dataplan/pg/adaptors/pg";
 import { grafast } from "grafast";
-import { NullsSortMethod } from "../src";
-import { SchemaResult } from "graphile-build";
-import { TYPES } from "@dataplan/pg";
+import type { SchemaResult } from "graphile-build";
+import type { ExecutionResult } from "graphql";
+import type { Pool } from "pg";
+import pg from "pg";
+import { makeSchema } from "postgraphile";
+import { postgraphilePresetAmber } from "postgraphile/presets/amber";
+import { makeV4Preset } from "postgraphile/presets/v4";
+
+import type { NullsSortMethod } from "../src/index.js";
+import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "../src/index.js";
 
 let pgPool: Pool | null = null;
 
