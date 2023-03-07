@@ -34,3 +34,9 @@ export {
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
 } from "./makeWrapPlansPlugin.js";
+export {
+  orderByAscDesc,
+  NullsSortMethod,
+  OrderByAscDescOptions,
+  MakeAddPgTableOrderByPluginOrders,
+} from "./makeAddPgTableOrderByPlugin.js";
