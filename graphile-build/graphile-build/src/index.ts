@@ -3,6 +3,12 @@ import "./interfaces.js";
 
 import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
+import {
+  getIntrospectionQuery,
+  graphqlSync,
+  lexicographicSortSchema,
+  printSchema,
+} from "graphql";
 
 import extend from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
@@ -396,6 +402,23 @@ export const getBuilder = (
   return builder;
 };
 
+async function writeFileIfDiffers(
+  path: string,
+  contents: string,
+): Promise<void> {
+  // TODO: support other environments than Node
+  const { readFile, writeFile } = await import("node:fs/promises");
+  let oldContents: string | null = null;
+  try {
+    oldContents = await readFile(path, "utf8");
+  } catch (e) {
+    /* noop */
+  }
+  if (oldContents !== contents) {
+    await writeFile(path, contents);
+  }
+}
+
 /**
  * Builds a GraphQL schema according to the given preset and input data.
  */
@@ -407,7 +430,39 @@ export const buildSchema = (
   } = {},
 ): GraphQLSchema => {
   const builder = getBuilder(preset, shared.inflection);
-  return builder.buildSchema(input);
+  const schema = builder.buildSchema(input);
+  const {
+    exportSchemaSDLPath,
+    exportSchemaIntrospectionResultPath,
+    sortExport = false,
+  } = builder.options;
+  const schemaToExport =
+    (exportSchemaSDLPath || exportSchemaIntrospectionResultPath) && sortExport
+      ? lexicographicSortSchema(schema)
+      : schema;
+  if (exportSchemaSDLPath) {
+    const text = printSchema(schemaToExport) + "\n";
+    writeFileIfDiffers(exportSchemaSDLPath, text).catch((e) => {
+      console.error(
+        `Failed to write schema in GraphQL format to '${exportSchemaSDLPath}': ${e}`,
+      );
+    });
+  }
+  if (exportSchemaIntrospectionResultPath) {
+    const introspectionQuery = getIntrospectionQuery();
+    const introspectionResult = graphqlSync({
+      source: introspectionQuery,
+      schema: schemaToExport,
+    });
+    const text = JSON.stringify(introspectionResult, null, 2) + "\n";
+    writeFileIfDiffers(exportSchemaIntrospectionResultPath, text).catch((e) => {
+      console.error(
+        `Failed to write schema introspection results in JSON format to '${exportSchemaIntrospectionResultPath}': ${e}`,
+      );
+    });
+  }
+
+  return schema;
 };
 
 export {

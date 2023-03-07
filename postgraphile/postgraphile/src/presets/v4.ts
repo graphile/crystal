@@ -1,6 +1,7 @@
 import "graphile-config";
 
 import { PgRBACPlugin } from "graphile-build-pg";
+import type { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
@@ -41,7 +42,7 @@ export interface V4Options<
   /** @deprecated Please use grafast.context 'pgSettings' key instead */
   pgSettings?: DirectOrCallback<
     Request | undefined,
-    { [key: string]: string | undefined }
+    { [key: string]: string | null | undefined }
   >;
   // TODO: allowExplain?: DirectOrCallback<Request | undefined, boolean>;
   /** @deprecated Please use grafast.context callback instead */
@@ -58,6 +59,31 @@ export interface V4Options<
   retryOnInitFail?:
     | boolean
     | ((error: Error, attempts: number) => boolean | Promise<boolean>);
+
+  graphqlRoute?: string;
+  graphiqlRoute?: string;
+  graphiql?: boolean;
+  /** Always ignored, ruru is always enhanced. */
+  enhanceGraphiql?: boolean;
+  allowExplain?: boolean;
+  handleErrors?: (error: readonly GraphQLError[]) => readonly GraphQLError[];
+
+  /**
+   * As of PostGraphile v5, query batching is no longer supported. Query batching
+   * has not been standardized as part of the GraphQL-over-HTTP specification
+   * efforts, and the need for it has been significantly reduced with the ubiquity
+   * of HTTP2+ servers. Further, with incremental delivery (`@stream`/`@defer`)
+   * on the horizon, query batching will develop a lot of unnecessary complexity
+   * that handling at the network layer would bypass.
+   *
+   * @deprecated Use HTTP2+ instead
+   */
+  enableQueryBatching?: never;
+
+  sortExport?: boolean;
+  exportGqlSchemaPath?: string;
+  exportJsonSchemaPath?: string;
+  watchPg?: boolean;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -155,6 +181,11 @@ export const makeV4Preset = (
     pgStrictFunctions,
     ...otherGraphileBuildOptions
   } = options.graphileBuildOptions ?? {};
+  if (options.enableQueryBatching) {
+    throw new Error(
+      `As of PostGraphile v5, query batching is no longer supported. Query batching has not been standardized as part of the GraphQL-over-HTTP specification efforts, and the need for it has been significantly reduced with the ubiquity of HTTP2+ servers. Further, with incremental delivery (@stream/@defer) on the horizon, query batching will develop a lot of unnecessary complexity that handling at the network layer would bypass.`,
+    );
+  }
   return {
     plugins: [
       ...(options.ignoreRBAC === false ? [PgRBACPlugin] : []),
@@ -186,6 +217,9 @@ export const makeV4Preset = (
       ...(options.retryOnInitFail
         ? { retryOnInitFail: options.retryOnInitFail }
         : null),
+      exportSchemaSDLPath: options.exportGqlSchemaPath,
+      exportSchemaIntrospectionResultPath: options.exportJsonSchemaPath,
+      sortExport: options.sortExport,
     },
     gather: {
       pgFakeConstraintsAutofixForeignKeyUniqueness: true,
@@ -222,6 +256,24 @@ export const makeV4Preset = (
             },
           }
         : null),
+      ...(options.allowExplain
+        ? {
+            explain: true,
+          }
+        : null),
+    },
+    grafserv: {
+      graphqlPath: options.graphqlRoute ?? "/graphql",
+      graphiqlPath: options.graphiqlRoute ?? "/graphiql",
+      graphiql: options.graphiql ?? false,
+      ...(options.handleErrors
+        ? {
+            maskError(error) {
+              return options.handleErrors!([error])[0];
+            },
+          }
+        : null),
+      watch: options.watchPg,
     },
   };
 };

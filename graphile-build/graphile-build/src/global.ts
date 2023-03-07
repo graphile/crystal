@@ -135,6 +135,10 @@ declare global {
             attempts: number,
             delay: number,
           ) => boolean | Promise<boolean>);
+
+      exportSchemaSDLPath?: string;
+      exportSchemaIntrospectionResultPath?: string;
+      sortExport?: boolean;
     }
 
     /**
