@@ -22,13 +22,17 @@ export interface MakeAddPgTableOrderByPluginOrders {
 const counterByName = new Map<string, number>();
 
 export default function makeAddPgTableOrderByPlugin(
-  schemaName: string,
-  tableName: string,
+  match: {
+    databaseName?: string;
+    schemaName: string;
+    tableName: string;
+  },
   ordersGenerator: (
     build: GraphileBuild.Build,
   ) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with makeAddPgTableOrderByPlugin to "${schemaName}"."${tableName}"`,
+  hint = `Adding orders with makeAddPgTableOrderByPlugin to "${match.schemaName}"."${match.tableName}"`,
 ): GraphileConfig.Plugin {
+  const { databaseName = "main", schemaName, tableName } = match;
   const baseDisplayName = `makeAddPgTableOrderByPlugin_${schemaName}_${tableName}`;
   let counter = counterByName.get(baseDisplayName);
   if (!counter) {
@@ -54,6 +58,7 @@ export default function makeAddPgTableOrderByPlugin(
             !isPgRowSortEnum ||
             !table ||
             !table.columns ||
+            table.extensions?.pg?.databaseName !== databaseName ||
             table.extensions?.pg?.schemaName !== schemaName ||
             table.extensions?.pg?.name !== tableName
           ) {
@@ -164,7 +169,8 @@ export function orderByAscDesc(
           direction: "ASC",
         } as PgOrderSpec),
         EXPORTABLE(
-          (spec, unique) => function applyPlan($select) {
+          (spec, unique) =>
+            function applyPlan($select) {
               $select.orderBy(spec);
               if (unique) {
                 $select.setOrderIsUnique();
@@ -209,7 +215,8 @@ export function orderByAscDesc(
           direction: "DESC",
         } as PgOrderSpec),
         EXPORTABLE(
-          (spec, unique) => function applyPlan($select) {
+          (spec, unique) =>
+            function applyPlan($select) {
               $select.orderBy(spec);
               if (unique) {
                 $select.setOrderIsUnique();
