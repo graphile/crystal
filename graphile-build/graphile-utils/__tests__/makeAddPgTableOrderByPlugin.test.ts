@@ -34,14 +34,14 @@ const makePetsPlugin = (nullsSortMethod: NullsSortMethod) =>
 
       const customOrderBy = orderByAscDesc(
         "PET_ID_AVERAGE", // this is a ridiculous and unrealistic column but it will serve for testing purposes
-        ($condition) => {
+        ($select) => {
           const orderByFrag = sql`(
             select avg(${sqlIdentifier}.id)
             from graphile_utils.pets as ${sqlIdentifier}
-            where ${sqlIdentifier}.user_id = ${$condition.alias}.id
+            where ${sqlIdentifier}.user_id = ${$select.alias}.id
           )`;
 
-          return { expression: orderByFrag, codec: TYPES.int };
+          return { fragment: orderByFrag, codec: TYPES.int };
         },
         { nulls: nullsSortMethod },
       );
