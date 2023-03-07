@@ -59,6 +59,7 @@
     "jest": "^28.1.0",
     "jest-serializer-graphql-schema": "workspace:^",
     "nodemon": "^2.0.15",
+    "postgraphile": "workspace:^",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.0-beta"
   },
