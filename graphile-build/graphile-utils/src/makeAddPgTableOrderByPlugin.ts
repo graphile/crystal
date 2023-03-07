@@ -126,6 +126,7 @@ export function orderByAscDesc(
 
   type Plan = ($select: PgSelectStep<any, any, any, any>) => void;
 
+  let spec: PgOrderSpec;
   const ascendingPlan: Plan =
     typeof columnOrSqlFragment === "string"
       ? EXPORTABLE(
@@ -157,20 +158,20 @@ export function orderByAscDesc(
             },
           [ascendingNulls, columnOrSqlFragment, unique],
         )
-      : EXPORTABLE(
-          (ascendingNulls, columnOrSqlFragment, unique) =>
-            function applyPlan($select) {
-              $select.orderBy({
-                nulls: ascendingNulls,
-                ...columnOrSqlFragment,
-                direction: "ASC",
-              } as PgOrderSpec);
+      : ((spec = {
+          nulls: ascendingNulls,
+          ...columnOrSqlFragment,
+          direction: "ASC",
+        } as PgOrderSpec),
+        EXPORTABLE(
+          (spec, unique) => function applyPlan($select) {
+              $select.orderBy(spec);
               if (unique) {
                 $select.setOrderIsUnique();
               }
             },
-          [ascendingNulls, columnOrSqlFragment, unique],
-        );
+          [spec, unique],
+        ));
   const descendingPlan: Plan =
     typeof columnOrSqlFragment === "string"
       ? EXPORTABLE(
@@ -202,20 +203,20 @@ export function orderByAscDesc(
             },
           [columnOrSqlFragment, descendingNulls, unique],
         )
-      : EXPORTABLE(
-          (columnOrSqlFragment, descendingNulls, unique) =>
-            function applyPlan($select) {
-              $select.orderBy({
-                nulls: descendingNulls,
-                ...columnOrSqlFragment,
-                direction: "DESC",
-              } as PgOrderSpec);
+      : ((spec = {
+          nulls: descendingNulls,
+          ...columnOrSqlFragment,
+          direction: "DESC",
+        } as PgOrderSpec),
+        EXPORTABLE(
+          (spec, unique) => function applyPlan($select) {
+              $select.orderBy(spec);
               if (unique) {
                 $select.setOrderIsUnique();
               }
             },
-          [columnOrSqlFragment, descendingNulls, unique],
-        );
+          [spec, unique],
+        ));
 
   const orders: MakeAddPgTableOrderByPluginOrders = {
     [`${baseName}_ASC`]: {
