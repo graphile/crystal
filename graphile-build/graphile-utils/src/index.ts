@@ -39,4 +39,6 @@ export {
   NullsSortMethod,
   OrderByAscDescOptions,
   MakeAddPgTableOrderByPluginOrders,
+  makeAddPgTableOrderByPlugin,
 } from "./makeAddPgTableOrderByPlugin.js";
+export { makeAddPgTableConditionPlugin } from "./makeAddPgTableConditionPlugin.js";

@@ -21,7 +21,7 @@ export interface MakeAddPgTableOrderByPluginOrders {
 
 const counterByName = new Map<string, number>();
 
-export default function makeAddPgTableOrderByPlugin(
+export function makeAddPgTableOrderByPlugin(
   match: {
     databaseName?: string;
     schemaName: string;

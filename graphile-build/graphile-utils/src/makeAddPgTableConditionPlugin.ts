@@ -4,7 +4,7 @@ import type { SQL, sql } from "pg-sql2";
 
 import { EXPORTABLE } from "./exportable.js";
 
-export default function makeAddPgTableConditionPlugin(
+export function makeAddPgTableConditionPlugin(
   match: { databaseName?: string; schemaName: string; tableName: string },
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
