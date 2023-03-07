@@ -2,9 +2,9 @@ import "./global.js";
 import "./interfaces.js";
 
 import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
+import type { GraphQLSchema } from "graphql";
 import {
   getIntrospectionQuery,
-  GraphQLSchema,
   graphqlSync,
   lexicographicSortSchema,
   printSchema,

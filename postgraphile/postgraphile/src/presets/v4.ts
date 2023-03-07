@@ -1,13 +1,13 @@
 import "graphile-config";
 
 import { PgRBACPlugin } from "graphile-build-pg";
+import type { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4NoIgnoreIndexesPlugin } from "../plugins/PgV4NoIgnoreIndexesPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
-import { GraphQLError } from "graphql";
 
 export {
   PgV4BehaviorPlugin,
@@ -72,9 +72,9 @@ export interface V4Options<
    * As of PostGraphile v5, query batching is no longer supported. Query batching
    * has not been standardized as part of the GraphQL-over-HTTP specification
    * efforts, and the need for it has been significantly reduced with the ubiquity
-   * of HTTP2+ servers. Further, with incremental delivery (@stream/@defer) on the
-   * horizon, query batching will develop a lot of unnecessary complexity that
-   * handling at the network layer would bypass.
+   * of HTTP2+ servers. Further, with incremental delivery (`@stream`/`@defer`)
+   * on the horizon, query batching will develop a lot of unnecessary complexity
+   * that handling at the network layer would bypass.
    *
    * @deprecated Use HTTP2+ instead
    */
