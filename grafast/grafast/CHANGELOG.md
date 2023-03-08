@@ -1,5 +1,15 @@
 # grafast
 
+## 0.0.1-0.19
+
+### Patch Changes
+
+- [#225](https://github.com/benjie/postgraphile-private/pull/225)
+  [`397e8bb40`](https://github.com/benjie/postgraphile-private/commit/397e8bb40fe3783995172356a39ab7cb33e3bd36)
+  Thanks [@benjie](https://github.com/benjie)! - Gra*fast* will no longer hoist
+  steps into a mutationField layer plan making it safer to mutate `context` and
+  similar things during a mutation.
+
 ## 0.0.1-0.18
 
 ### Patch Changes
