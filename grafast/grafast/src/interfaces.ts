@@ -268,6 +268,13 @@ export interface BaseGraphQLArguments {
 }
 export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
+// TODO: we need to work some TypeScript magic to know which callback forms are
+// appropriate. Or split up FieldArgs.apply/applyEach/applyField or whatever.
+export type TargetStepOrCallback =
+  | ExecutableStep
+  | ModifierStep
+  | ((indexOrFieldName: number | string) => TargetStepOrCallback);
+
 // TODO: rename
 export interface FieldArgs {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
@@ -275,7 +282,7 @@ export interface FieldArgs {
   /** Gets the value *without* calling any `inputPlan`s */
   getRaw(path?: string | string[]): InputStep;
   /** This also works (without path) to apply each list entry against $target */
-  apply($target: ExecutableStep | ModifierStep, path?: string | string[]): void;
+  apply($target: TargetStepOrCallback, path?: string | string[]): void;
 }
 
 export interface FieldInfo {
