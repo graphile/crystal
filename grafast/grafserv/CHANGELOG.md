@@ -1,5 +1,14 @@
 # grafserv
 
+## 0.0.1-0.20
+
+### Patch Changes
+
+- Updated dependencies
+  [[`4c2b7d1ca`](https://github.com/benjie/postgraphile-private/commit/4c2b7d1ca1afbda1e47da22c346cc3b03d01b7f0),
+  [`c8a56cdc8`](https://github.com/benjie/postgraphile-private/commit/c8a56cdc83390e5735beb9b90f004e7975cab28c)]:
+  - grafast@0.0.1-0.18
+
 ## 0.0.1-0.19
 
 ### Patch Changes

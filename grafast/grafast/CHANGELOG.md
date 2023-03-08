@@ -1,5 +1,23 @@
 # grafast
 
+## 0.0.1-0.18
+
+### Patch Changes
+
+- [#223](https://github.com/benjie/postgraphile-private/pull/223)
+  [`4c2b7d1ca`](https://github.com/benjie/postgraphile-private/commit/4c2b7d1ca1afbda1e47da22c346cc3b03d01b7f0)
+  Thanks [@benjie](https://github.com/benjie)! - In addition to `GraphQLArgs`,
+  `grafast` now accepts `resolvedPreset` and `requestContext`; if both of these
+  are set then `grafast` will perform `hookArgs` for you, this makes running
+  tests a lot less boiler-plate-y (you no longer need to
+  `parse`/`validate`/`execute` - just `grafast`).
+
+- [#224](https://github.com/benjie/postgraphile-private/pull/224)
+  [`c8a56cdc8`](https://github.com/benjie/postgraphile-private/commit/c8a56cdc83390e5735beb9b90f004e7975cab28c)
+  Thanks [@benjie](https://github.com/benjie)! - FieldArgs.apply can now accept
+  a callback so each list entry can have its own step (solves the OR vs AND
+  issue in postgraphile-plugin-connection-filter).
+
 ## 0.0.1-0.17
 
 ### Patch Changes

@@ -1,5 +1,30 @@
 # graphile-build
 
+## 5.0.0-0.24
+
+### Patch Changes
+
+- [#220](https://github.com/benjie/postgraphile-private/pull/220)
+  [`2abc58cf6`](https://github.com/benjie/postgraphile-private/commit/2abc58cf61e78e77b2ba44a875f0ef5b3f98b245)
+  Thanks [@benjie](https://github.com/benjie)! - Convert a few more more options
+  from V4 to V5.
+
+  Explicitly remove query batching functionality, instead use HTTP2+ or
+  websockets or similar.
+
+  Add schema exporting.
+
+- [#223](https://github.com/benjie/postgraphile-private/pull/223)
+  [`df8c06657`](https://github.com/benjie/postgraphile-private/commit/df8c06657e6f5a7d1444d86dc32fd750d1433223)
+  Thanks [@benjie](https://github.com/benjie)! - `graphile-utils` now includes
+  the `makeAddPgTableConditionPlugin` and `makeAddPgTableOrderByPlugin`
+  generators, freshly ported from V4. The signatures of these functions has
+  changed slightly, but the functionality is broadly the same.
+- Updated dependencies
+  [[`4c2b7d1ca`](https://github.com/benjie/postgraphile-private/commit/4c2b7d1ca1afbda1e47da22c346cc3b03d01b7f0),
+  [`c8a56cdc8`](https://github.com/benjie/postgraphile-private/commit/c8a56cdc83390e5735beb9b90f004e7975cab28c)]:
+  - grafast@0.0.1-0.18
+
 ## 5.0.0-0.23
 
 ### Patch Changes
