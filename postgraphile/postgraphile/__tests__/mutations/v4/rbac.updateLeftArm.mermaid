@@ -19,7 +19,7 @@ graph TD
     Object15{{"Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgUpdate12[["PgUpdate[12∈1]"]]:::sideeffectplan
     Object16{{"Object[16∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    Constant17{{"Constant[17∈2]"}}:::plan
+    Constant17{{"Constant[17∈3]"}}:::plan
     PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     List19{{"List[19∈3]<br />ᐸ17,18ᐳ"}}:::plan
     Lambda20{{"Lambda[20∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
@@ -49,10 +49,10 @@ graph TD
     class Bucket1,PgUpdate12,Object16 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 12<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Constant17 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 17<br /><br />ROOT PgUpdate{1}[12]"):::bucket
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgUpdate{1}[12]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression18,List19,Lambda20,PgClassExpression22,PgClassExpression23,PgClassExpression24 bucket3
+    class Bucket3,Constant17,PgClassExpression18,List19,Lambda20,PgClassExpression22,PgClassExpression23,PgClassExpression24 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
