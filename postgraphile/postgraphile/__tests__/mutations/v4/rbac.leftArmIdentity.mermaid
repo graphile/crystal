@@ -24,7 +24,7 @@ graph TD
     First19{{"First[19∈1]"}}:::plan
     PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸleft_arm_identityᐳ"}}:::plan
     Object21{{"Object[21∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    Constant22{{"Constant[22∈2]"}}:::plan
+    Constant22{{"Constant[22∈3]"}}:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__left_arm...ity__.”id”ᐳ"}}:::plan
     List24{{"List[24∈3]<br />ᐸ22,23ᐳ"}}:::plan
     Lambda25{{"Lambda[25∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
@@ -57,10 +57,10 @@ graph TD
     class Bucket1,PgSelect15,First19,PgSelectSingle20,Object21 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 20<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Constant22 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 22<br /><br />ROOT PgSelectSingle{1}ᐸleft_arm_identityᐳ[20]"):::bucket
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{1}ᐸleft_arm_identityᐳ[20]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,List24,Lambda25,PgClassExpression27,PgClassExpression28,PgClassExpression29 bucket3
+    class Bucket3,Constant22,PgClassExpression23,List24,Lambda25,PgClassExpression27,PgClassExpression28,PgClassExpression29 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
