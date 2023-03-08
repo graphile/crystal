@@ -2063,6 +2063,10 @@ ${te.join(
     if (this.isImmoveable(step)) {
       return;
     }
+    if (step.layerPlan.parentLayerPlan?.reason.type === "mutationField") {
+      // Never hoist into a mutation layer
+      return;
+    }
     switch (step.layerPlan.reason.type) {
       case "root": {
         // There is no higher layerPlan
