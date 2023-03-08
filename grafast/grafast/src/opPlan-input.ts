@@ -15,10 +15,12 @@ import {
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { __InputObjectStep, __TrackedObjectStep } from "./index.js";
+import { BaseStep } from "./index.js";
 import type { InputStep } from "./input.js";
 import type {
   FieldArgs,
   InputObjectTypeInputPlanResolver,
+  TargetStepOrCallback,
   TrackedArguments,
 } from "./interfaces.js";
 import type { ModifierStep } from "./step.js";
@@ -165,7 +167,7 @@ function withFieldArgsForArgumentsOrInputObject<
 
   function planArgumentOrInputField(
     details: ReturnType<typeof getArgOnceOnly>,
-    $toPlan: ExecutableStep | ModifierStep | null,
+    $toStep: ExecutableStep | ModifierStep | null,
   ) {
     if (operationPlan.loc)
       operationPlan.loc.push(
@@ -182,15 +184,15 @@ function withFieldArgsForArgumentsOrInputObject<
         (fieldArgs) => {
           if (!parentType) {
             const arg = argOrField as GraphQLArgument;
-            if ($toPlan) {
+            if ($toStep) {
               const argResolver = arg.extensions.graphile?.applyPlan;
               if (argResolver && notUndefined($value)) {
-                return argResolver(parentPlan, $toPlan, fieldArgs, {
+                return argResolver(parentPlan, $toStep, fieldArgs, {
                   schema,
                   entity: argOrField as GraphQLArgument,
                 });
               } else {
-                return $toPlan;
+                return $toStep;
               }
             } else {
               const argResolver = arg.extensions.graphile?.inputPlan;
@@ -205,15 +207,15 @@ function withFieldArgsForArgumentsOrInputObject<
             }
           } else {
             const field = argOrField as GraphQLInputField;
-            if ($toPlan) {
+            if ($toStep) {
               const fieldResolver = field.extensions.graphile?.applyPlan;
               if (fieldResolver && notUndefined($value)) {
-                return fieldResolver($toPlan, fieldArgs, {
+                return fieldResolver($toStep, fieldArgs, {
                   schema,
                   entity: argOrField as GraphQLInputField,
                 });
               } else {
-                return $toPlan;
+                return $toStep;
               }
             } else {
               const fieldResolver = field.extensions.graphile?.inputPlan;
@@ -313,10 +315,10 @@ function withFieldArgsForArgumentsOrInputObject<
   function applyPlannedValue(
     $value: InputStep,
     currentType: GraphQLInputType,
-    $toPlan: ExecutableStep | ModifierStep,
+    toStepOrCallback: TargetStepOrCallback,
   ): void {
     if (isNonNullType(currentType)) {
-      applyPlannedValue($value, currentType.ofType, $toPlan);
+      applyPlannedValue($value, currentType.ofType, toStepOrCallback);
       return;
     } else if (isListType(currentType)) {
       if (!("evalLength" in $value)) {
@@ -328,8 +330,13 @@ function withFieldArgsForArgumentsOrInputObject<
       if (l == null) {
         return;
       }
+      const innerType = currentType.ofType;
       for (let i = 0; i < l; i++) {
-        applyPlannedValue($value.at(i), currentType.ofType, $toPlan);
+        const $toStep =
+          typeof toStepOrCallback === "function"
+            ? toStepOrCallback(i)
+            : toStepOrCallback;
+        applyPlannedValue($value.at(i), innerType, $toStep);
       }
       return;
     } else if (isInputObjectType(currentType)) {
@@ -345,6 +352,15 @@ function withFieldArgsForArgumentsOrInputObject<
             );
           }
           const $field = $value.get(fieldName);
+          const $toStep =
+            typeof toStepOrCallback === "function"
+              ? toStepOrCallback(fieldName)
+              : toStepOrCallback;
+          if (!($toStep instanceof BaseStep)) {
+            throw new Error(
+              `Invalid 'toStepOrCallback' passed to 'apply()', should resolve to an ExecutableStep or ModifierStep`,
+            );
+          }
           if (notUndefined($field)) {
             withFieldArgsForArgumentsOrInputObject(
               operationPlan,
@@ -353,7 +369,7 @@ function withFieldArgsForArgumentsOrInputObject<
               $field,
               isInputObjectType(fieldType) ? fieldType.getFields() : null,
               (fieldArgs) =>
-                resolver($toPlan, fieldArgs, {
+                resolver($toStep, fieldArgs, {
                   schema,
                   entity: field,
                 }),
@@ -370,7 +386,13 @@ function withFieldArgsForArgumentsOrInputObject<
       const enumValue = currentType.getValues().find((v) => v.value === value);
       const enumResolver = enumValue?.extensions.graphile?.applyPlan;
       if (enumResolver) {
-        enumResolver($toPlan);
+        const $toStep = toStepOrCallback;
+        if (!($toStep instanceof BaseStep)) {
+          throw new Error(
+            `Invalid 'toStepOrCallback' passed to 'apply()', should resolve to an ExecutableStep or ModifierStep`,
+          );
+        }
+        enumResolver($toStep);
       }
       return;
     } else {
@@ -418,7 +440,7 @@ function withFieldArgsForArgumentsOrInputObject<
       const details = getArgOnceOnly(path);
       return details.$value; // details ? details.$value : undefined;
     },
-    apply($target, path) {
+    apply(targetStepOrCallback, path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
         analyzedCoordinates.push("");
         if (typeContainingFields && ($current as InputStep).evalIs(undefined)) {
@@ -426,7 +448,11 @@ function withFieldArgsForArgumentsOrInputObject<
         }
         if (fields) {
           for (const fieldName of Object.keys(fields)) {
-            fieldArgs.apply($target, fieldName);
+            const target =
+              typeof targetStepOrCallback === "function"
+                ? targetStepOrCallback(fieldName)
+                : targetStepOrCallback;
+            fieldArgs.apply(target, fieldName);
           }
           return;
         } else {
@@ -438,7 +464,7 @@ function withFieldArgsForArgumentsOrInputObject<
             return applyPlannedValue(
               $current as InputStep,
               typeContainingFields,
-              $target,
+              targetStepOrCallback,
             );
           }
         }
@@ -447,9 +473,15 @@ function withFieldArgsForArgumentsOrInputObject<
       if (details.$value.evalIs(undefined)) {
         return;
       }
+      const $target = targetStepOrCallback;
+      if (!($target instanceof BaseStep)) {
+        throw new Error(
+          "Callback not supported here, please revisit your apply() call.",
+        );
+      }
       const step = planArgumentOrInputField(details, $target);
       /*
-      if (step && step !== $target) {
+      if (step && step !== targetStepOrCallback) {
         assertModifierStep(
           step,
           `UNKNOWN` /* TODO : `${objectType.name}.${field.name}(${argName}:)` * /,
