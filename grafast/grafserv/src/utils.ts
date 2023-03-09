@@ -16,6 +16,7 @@ import type {
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
+import { Extra } from "graphql-ws/lib/use/ws";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,
@@ -149,19 +150,26 @@ export function httpError(
   return Object.assign(new Error(message), { statusCode, safeMessage: true });
 }
 
+const $$extra = Symbol("ws-extra");
+
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   const {
     resolvedPreset,
     dynamicOptions: { maskExecutionResult },
   } = instance;
   return {
+    context(ctx, msg, args) {
+      const context = args.contextValue ?? Object.create(null);
+      context[$$extra] = ctx.extra;
+      return context;
+    },
     schema: async () => instance.getSchema(),
     // PERF: we can remove the async/await and only use when context is async
     execute: async (args: ExecutionArgs) => {
       await hookArgs(
         args,
         {
-          // TODO: we need to pass through some request context here
+          ws: (args.contextValue as any)?.[$$extra],
         },
         instance.resolvedPreset,
       );
@@ -171,7 +179,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       await hookArgs(
         args,
         {
-          // TODO: we need to pass through some request context here
+          ws: (args.contextValue as any)?.[$$extra],
         },
         instance.resolvedPreset,
       );

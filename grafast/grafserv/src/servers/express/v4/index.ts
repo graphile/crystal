@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from "express";
-import type { Server as HTTPServer } from "node:http";
+import type { Server as HTTPServer, IncomingMessage } from "node:http";
 import type { Server as HTTPSServer } from "node:https";
 
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
@@ -9,10 +9,8 @@ import {
   getBodyFromRequest,
   processHeaders,
 } from "../../../utils.js";
-import {
-  attachWebsocketsToServer,
-  NodeGrafservBase,
-} from "../../node/index.js";
+import { NodeGrafservBase } from "../../node/index.js";
+import { Duplex } from "node:stream";
 
 declare global {
   namespace Grafast {
@@ -61,20 +59,48 @@ export class ExpressGrafserv extends NodeGrafservBase {
     };
   }
 
-  async addTo(app: Express, server: HTTPServer | HTTPSServer | null) {
+  async addTo(
+    app: Express,
+    server: HTTPServer | HTTPSServer | null,
+    addExclusiveWebsocketHandler = true,
+  ) {
     app.use(this._createHandler());
-    if (this.resolvedPreset.grafserv?.websockets) {
-      if (server) {
-        // If user explicitly passes server, bind to it:
-        attachWebsocketsToServer(this, server);
-      } else {
-        // If not, hope they're calling `app.listen()` and intercept that call.
-        const oldListen = app.listen;
-        app.listen = (...args: any) => {
-          const server = oldListen.apply(app, args);
-          attachWebsocketsToServer(this, server);
-          return server;
+    // Alias this just to make it easier for users to copy/paste the code below
+    const serv = this;
+    if (addExclusiveWebsocketHandler) {
+      const grafservUpgradeHandler = await serv.getUpgradeHandler();
+      if (grafservUpgradeHandler) {
+        const upgrade = (
+          req: IncomingMessage,
+          socket: Duplex,
+          head: Buffer,
+        ) => {
+          if (serv.shouldHandleUpgrade(req, socket, head)) {
+            grafservUpgradeHandler(req, socket, head);
+          } else {
+            socket.destroy();
+          }
         };
+
+        const attachWebsocketsToServer = (server: HTTPServer | HTTPSServer) => {
+          server.on("upgrade", upgrade);
+          serv.onRelease(() => {
+            server.off("upgrade", upgrade);
+          });
+        };
+
+        if (server) {
+          // If user explicitly passes server, bind to it:
+          attachWebsocketsToServer(server);
+        } else {
+          // If not, hope they're calling `app.listen()` and intercept that call.
+          const oldListen = app.listen;
+          app.listen = function (...args: any) {
+            const server = oldListen.apply(this, args);
+            attachWebsocketsToServer(server);
+            return server;
+          };
+        }
       }
     }
   }
