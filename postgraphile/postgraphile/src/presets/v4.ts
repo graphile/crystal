@@ -236,18 +236,32 @@ export const makeV4Preset = (
             async context(ctx) {
               const context = Object.create(null);
 
+              const req = ctx.node?.req ?? ctx.ws?.request;
+              const res = ctx.node?.res ?? (ctx.ws?.request as any)?.res;
               if (options.additionalGraphQLContextFromRequest) {
+                if (!req || !res) {
+                  console.warn(
+                    `Could not determine req/res to use for additionalGraphQLContextFromRequest call.`,
+                  );
+                  console.warn(ctx);
+                }
                 const addl = await options.additionalGraphQLContextFromRequest(
-                  ctx.node?.req,
-                  ctx.node?.res,
+                  req,
+                  res,
                 );
                 Object.assign(context, addl);
               }
 
               if (options.pgSettings) {
+                if (!req && typeof options.pgSettings === "function") {
+                  console.warn(
+                    `Could not determine req to use for pgSettings call.`,
+                  );
+                  console.warn(ctx);
+                }
                 const pgSettings =
                   typeof options.pgSettings === "function"
-                    ? await options.pgSettings(ctx.node?.req)
+                    ? await options.pgSettings(req)
                     : options.pgSettings;
                 Object.assign(context, { pgSettings });
               }
