@@ -1,5 +1,27 @@
 # postgraphile
 
+## 5.0.0-0.34
+
+### Patch Changes
+
+- [#226](https://github.com/benjie/postgraphile-private/pull/226)
+  [`2a7c682f4`](https://github.com/benjie/postgraphile-private/commit/2a7c682f46ff916c040732d91510fb19f639955e)
+  Thanks [@benjie](https://github.com/benjie)! - Enable websockets and add
+  better compatibility with V4's pgSettings/additionalGraphQLContextFromRequest
+  for websockets when using `makeV4Preset({subscriptions: true})`.
+
+- [#226](https://github.com/benjie/postgraphile-private/pull/226)
+  [`6a846e009`](https://github.com/benjie/postgraphile-private/commit/6a846e00945ba2dcea0cd89f5e6a8ecc5a32775d)
+  Thanks [@benjie](https://github.com/benjie)! - Enable users to use Grafserv
+  alongside other websocket-enabled entities in their final server.
+- Updated dependencies [[`aac8732f9`](undefined),
+  [`6a846e009`](https://github.com/benjie/postgraphile-private/commit/6a846e00945ba2dcea0cd89f5e6a8ecc5a32775d)]:
+  - grafast@0.0.1-0.20
+  - grafserv@0.0.1-0.22
+  - @dataplan/pg@0.0.1-0.25
+  - graphile-build@5.0.0-0.26
+  - graphile-build-pg@5.0.0-0.31
+
 ## 5.0.0-0.33
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # grafast
 
+## 0.0.1-0.20
+
+### Patch Changes
+
+- [`aac8732f9`](undefined) - Make item callback optional in listen() step.
+
 ## 0.0.1-0.19
 
 ### Patch Changes

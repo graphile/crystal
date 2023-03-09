@@ -1,5 +1,14 @@
 # graphile-utils
 
+## 5.0.0-0.31
+
+### Patch Changes
+
+- Updated dependencies [[`aac8732f9`](undefined)]:
+  - grafast@0.0.1-0.20
+  - graphile-build@5.0.0-0.26
+  - graphile-build-pg@5.0.0-0.31
+
 ## 5.0.0-0.30
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # grafserv
 
+## 0.0.1-0.22
+
+### Patch Changes
+
+- [#226](https://github.com/benjie/postgraphile-private/pull/226)
+  [`6a846e009`](https://github.com/benjie/postgraphile-private/commit/6a846e00945ba2dcea0cd89f5e6a8ecc5a32775d)
+  Thanks [@benjie](https://github.com/benjie)! - Enable users to use Grafserv
+  alongside other websocket-enabled entities in their final server.
+- Updated dependencies [[`aac8732f9`](undefined)]:
+  - grafast@0.0.1-0.20
+
 ## 0.0.1-0.21
 
 ### Patch Changes
