@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
-import type { Server as HTTPServer, IncomingMessage } from "node:http";
+import type { IncomingMessage, Server as HTTPServer } from "node:http";
 import type { Server as HTTPSServer } from "node:https";
+import type { Duplex } from "node:stream";
 
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
 import type { OptionsFromConfig } from "../../../options.js";
@@ -10,7 +11,6 @@ import {
   processHeaders,
 } from "../../../utils.js";
 import { NodeGrafservBase } from "../../node/index.js";
-import { Duplex } from "node:stream";
 
 declare global {
   namespace Grafast {
@@ -66,6 +66,7 @@ export class ExpressGrafserv extends NodeGrafservBase {
   ) {
     app.use(this._createHandler());
     // Alias this just to make it easier for users to copy/paste the code below
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const serv = this;
     if (addExclusiveWebsocketHandler) {
       const grafservUpgradeHandler = await serv.getUpgradeHandler();

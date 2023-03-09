@@ -1,4 +1,5 @@
 import { CloseCode, makeServer } from "graphql-ws";
+import type { Extra } from "graphql-ws/lib/use/ws";
 import type {
   IncomingMessage,
   Server as HTTPServer,
@@ -17,7 +18,6 @@ import {
   makeGraphQLWSConfig,
   processHeaders,
 } from "../../utils.js";
-import type { Extra } from "graphql-ws/lib/use/ws";
 
 declare global {
   namespace Grafast {
@@ -249,7 +249,7 @@ export class NodeGrafservBase extends GrafservBase {
       return null;
     }
   }
-  shouldHandleUpgrade(req: IncomingMessage, socket: Duplex, head: Buffer) {
+  shouldHandleUpgrade(req: IncomingMessage, _socket: Duplex, _head: Buffer) {
     const fullUrl = req.url;
     if (!fullUrl) {
       return false;
@@ -279,6 +279,7 @@ export class NodeGrafserv extends NodeGrafservBase {
       server.off("request", handler);
     });
     // Alias this just to make it easier for users to copy/paste the code below
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const serv = this;
     if (addExclusiveWebsocketHandler) {
       const grafservUpgradeHandler = await serv.getUpgradeHandler();

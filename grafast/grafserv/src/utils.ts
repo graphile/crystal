@@ -16,7 +16,6 @@ import type {
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
-import { Extra } from "graphql-ws/lib/use/ws";
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,
