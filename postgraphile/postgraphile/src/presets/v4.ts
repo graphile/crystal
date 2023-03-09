@@ -274,6 +274,7 @@ export const makeV4Preset = (
           }
         : null),
       watch: options.watchPg,
+      websockets: options.subscriptions,
     },
   };
 };
