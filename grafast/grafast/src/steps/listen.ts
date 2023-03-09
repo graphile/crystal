@@ -46,7 +46,9 @@ export class ListenStep<
       | GrafastSubscriber<TTopics>
       | null,
     topicOrPlan: ExecutableStep<TTopic> | string,
-    public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
+    public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep = (
+      $item,
+    ) => $item as any,
   ) {
     super();
     const $topic =
@@ -102,7 +104,7 @@ export function listen<
     | GrafastSubscriber<TTopics>
     | null,
   topicOrPlan: ExecutableStep<TTopic> | string,
-  itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
+  itemPlan?: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
 ): ListenStep<TTopics, TTopic, TPayloadStep> {
   return new ListenStep<TTopics, TTopic, TPayloadStep>(
     pubsubOrPlan,
