@@ -1,4 +1,5 @@
 import { CloseCode, makeServer } from "graphql-ws";
+import type { Extra } from "graphql-ws/lib/use/ws";
 import type {
   IncomingMessage,
   Server as HTTPServer,
@@ -25,6 +26,7 @@ declare global {
         req: IncomingMessage;
         res: ServerResponse;
       };
+      ws: Extra;
     }
   }
 }
@@ -240,17 +242,64 @@ export class NodeGrafservBase extends GrafservBase {
       }
     };
   }
+  async getUpgradeHandler() {
+    if (this.resolvedPreset.grafserv?.websockets) {
+      return makeNodeUpgradeHandler(this);
+    } else {
+      return null;
+    }
+  }
+  shouldHandleUpgrade(req: IncomingMessage, _socket: Duplex, _head: Buffer) {
+    const fullUrl = req.url;
+    if (!fullUrl) {
+      return false;
+    }
+    const q = fullUrl.indexOf("?");
+    const url = q >= 0 ? fullUrl.substring(0, q) : fullUrl;
+    const graphqlPath = this.dynamicOptions.graphqlPath;
+    return url === graphqlPath;
+    /*
+      const protocol = req.headers["sec-websocket-protocol"];
+      const protocols = Array.isArray(protocol)
+        ? protocol
+        : protocol?.split(",").map((p) => p.trim()) ?? [];
+      if (protocols.includes(GRAPHQL_TRANSPORT_WS_PROTOCOL)) ...
+      */
+  }
 }
 
 export class NodeGrafserv extends NodeGrafservBase {
-  async addTo(server: HTTPServer | HTTPSServer) {
+  async addTo(
+    server: HTTPServer | HTTPSServer,
+    addExclusiveWebsocketHandler = true,
+  ) {
     const handler = this._createHandler();
     server.on("request", handler);
     this.onRelease(() => {
       server.off("request", handler);
     });
-    if (this.resolvedPreset.grafserv?.websockets) {
-      attachWebsocketsToServer(this, server);
+    // Alias this just to make it easier for users to copy/paste the code below
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const serv = this;
+    if (addExclusiveWebsocketHandler) {
+      const grafservUpgradeHandler = await serv.getUpgradeHandler();
+      if (grafservUpgradeHandler) {
+        const upgrade = (
+          req: IncomingMessage,
+          socket: Duplex,
+          head: Buffer,
+        ) => {
+          if (serv.shouldHandleUpgrade(req, socket, head)) {
+            grafservUpgradeHandler(req, socket, head);
+          } else {
+            socket.destroy();
+          }
+        };
+        server.on("upgrade", upgrade);
+        serv.onRelease(() => {
+          server.off("upgrade", upgrade);
+        });
+      }
     }
   }
 }
@@ -259,70 +308,58 @@ export function grafserv(config: GrafservConfig) {
   return new NodeGrafserv(config);
 }
 
-export async function attachWebsocketsToServer(
-  instance: GrafservBase,
-  server: HTTPServer | HTTPSServer,
-) {
-  const graphqlPath = instance.dynamicOptions.graphqlPath;
+export async function makeNodeUpgradeHandler(instance: GrafservBase) {
   const ws = await import("ws");
   const { WebSocketServer } = ws;
-  const onUpgrade = (req: IncomingMessage, socket: Duplex, head: Buffer) =>
-    wsServer.handleUpgrade(req, socket, head, function done(ws) {
-      wsServer.emit("connection", ws, req);
-    });
-  const onConnection = (socket: WebSocket, request: IncomingMessage) => {
-    const fullUrl = request.url;
-    if (!fullUrl) {
-      return;
-    }
-    const q = fullUrl.indexOf("?");
-    const url = q >= 0 ? fullUrl.substring(0, q) : fullUrl;
-    if (url === graphqlPath) {
-      // a new socket opened, let graphql-ws take over
-      const closed = graphqlWsServer.opened(
-        {
-          protocol: socket.protocol, // will be validated
-          send: (data) =>
-            new Promise((resolve, reject) => {
-              socket.send(data, (err) => (err ? reject(err) : resolve()));
-            }), // control your data flow by timing the promise resolve
-          close: (code, reason) => socket.close(code, reason), // there are protocol standard closures
-          onMessage: (cb) =>
-            socket.on("message", async (event) => {
-              try {
-                // wait for the the operation to complete
-                // - if init message, waits for connect
-                // - if query/mutation, waits for result
-                // - if subscription, waits for complete
-                await cb(event.toString());
-              } catch (err) {
-                try {
-                  // all errors that could be thrown during the
-                  // execution of operations will be caught here
-                  socket.close(CloseCode.InternalServerError, err.message);
-                } catch {
-                  /*noop*/
-                }
-              }
-            }),
-        },
-        // pass values to the `extra` field in the context
-        { socket, request },
-      );
-
-      // notify server that the socket closed
-      socket.once("close", closed);
-    }
-  };
 
   const graphqlWsServer = makeServer(makeGraphQLWSConfig(instance));
   const wsServer = new WebSocketServer({ noServer: true });
-  server.on("upgrade", onUpgrade);
+  const onUpgrade = (req: IncomingMessage, socket: Duplex, head: Buffer) => {
+    wsServer.handleUpgrade(req, socket, head, function done(ws) {
+      wsServer.emit("connection", ws, req);
+    });
+  };
+  const onConnection = (socket: WebSocket, request: IncomingMessage) => {
+    // a new socket opened, let graphql-ws take over
+    const closed = graphqlWsServer.opened(
+      {
+        protocol: socket.protocol, // will be validated
+        send: (data) =>
+          new Promise((resolve, reject) => {
+            socket.send(data, (err) => (err ? reject(err) : resolve()));
+          }), // control your data flow by timing the promise resolve
+        close: (code, reason) => socket.close(code, reason), // there are protocol standard closures
+        onMessage: (cb) =>
+          socket.on("message", async (event) => {
+            try {
+              // wait for the the operation to complete
+              // - if init message, waits for connect
+              // - if query/mutation, waits for result
+              // - if subscription, waits for complete
+              await cb(event.toString());
+            } catch (err) {
+              try {
+                // all errors that could be thrown during the
+                // execution of operations will be caught here
+                socket.close(CloseCode.InternalServerError, err.message);
+              } catch {
+                /*noop*/
+              }
+            }
+          }),
+      },
+      // pass values to the `extra` field in the context
+      { socket, request },
+    );
+
+    // notify server that the socket closed
+    socket.once("close", closed);
+  };
   wsServer.on("connection", onConnection);
 
   instance.onRelease(() => {
     wsServer.off("connection", onConnection);
-    server.off("upgrade", onUpgrade);
     wsServer.close();
   });
+  return onUpgrade;
 }

@@ -1,7 +1,8 @@
 import type { Context } from "koa";
 import type Koa from "koa";
-import type { Server as HTTPServer } from "node:http";
+import type { IncomingMessage, Server as HTTPServer } from "node:http";
 import type { Server as HTTPSServer } from "node:https";
+import type { Duplex } from "node:stream";
 import { PassThrough } from "node:stream";
 
 import { GrafservBase } from "../../../core/base.js";
@@ -12,7 +13,7 @@ import {
   getBodyFromRequest,
   processHeaders,
 } from "../../../utils.js";
-import { attachWebsocketsToServer } from "../../node/index.js";
+import { makeNodeUpgradeHandler } from "../../node/index.js";
 
 declare global {
   namespace Grafast {
@@ -140,20 +141,67 @@ export class KoaGrafserv extends GrafservBase {
     };
   }
 
-  async addTo(app: Koa, server: HTTPServer | HTTPSServer | null) {
-    app.use(this._createHandler());
+  async getUpgradeHandler() {
     if (this.resolvedPreset.grafserv?.websockets) {
-      if (server) {
-        // If user explicitly passes server, bind to it:
-        attachWebsocketsToServer(this, server);
-      } else {
-        // If not, hope they're calling `app.listen()` and intercept that call.
-        const oldListen = app.listen;
-        app.listen = (...args: any) => {
-          const server = oldListen.apply(app, args);
-          attachWebsocketsToServer(this, server);
-          return server;
+      return makeNodeUpgradeHandler(this);
+    } else {
+      return null;
+    }
+  }
+  shouldHandleUpgrade(req: IncomingMessage, _socket: Duplex, _head: Buffer) {
+    const fullUrl = req.url;
+    if (!fullUrl) {
+      return false;
+    }
+    const q = fullUrl.indexOf("?");
+    const url = q >= 0 ? fullUrl.substring(0, q) : fullUrl;
+    const graphqlPath = this.dynamicOptions.graphqlPath;
+    return url === graphqlPath;
+  }
+
+  async addTo(
+    app: Koa,
+    server: HTTPServer | HTTPSServer | null,
+    addExclusiveWebsocketHandler = true,
+  ) {
+    app.use(this._createHandler());
+    // Alias this just to make it easier for users to copy/paste the code below
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const serv = this;
+    if (addExclusiveWebsocketHandler) {
+      const grafservUpgradeHandler = await serv.getUpgradeHandler();
+      if (grafservUpgradeHandler) {
+        const upgrade = (
+          req: IncomingMessage,
+          socket: Duplex,
+          head: Buffer,
+        ) => {
+          if (serv.shouldHandleUpgrade(req, socket, head)) {
+            grafservUpgradeHandler(req, socket, head);
+          } else {
+            socket.destroy();
+          }
         };
+
+        const attachWebsocketsToServer = (server: HTTPServer | HTTPSServer) => {
+          server.on("upgrade", upgrade);
+          serv.onRelease(() => {
+            server.off("upgrade", upgrade);
+          });
+        };
+
+        if (server) {
+          // If user explicitly passes server, bind to it:
+          attachWebsocketsToServer(server);
+        } else {
+          // If not, hope they're calling `app.listen()` and intercept that call.
+          const oldListen = app.listen;
+          app.listen = function (...args: any) {
+            const server = oldListen.apply(this, args);
+            attachWebsocketsToServer(server);
+            return server;
+          };
+        }
       }
     }
   }
