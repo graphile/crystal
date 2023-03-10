@@ -67,20 +67,20 @@ Some of the features we offer:
 
 - [Incredible performance](./performance/) - even for your custom logic!
 - Full GraphQL feature-set, including advanced topics such as:
-  - polymorphism (interfaces and unions)
-  - [Real-time](./realtime/) features (subscriptions and soon: live queries)
+  - [polymorphism](./polymorphism.md) (interfaces and unions)
+  - [Real-time](./realtime.md) features (subscriptions and soon: live queries)
   - `@stream` / `@defer` support
 - Massively reduced load on your database (and other data stores!)
 - Integrates with any authentication middleware available in Node.
 - Easily add fields and mutations via [JS/TS plugins](./extending/) or
   [database functions](./functions)
 - Written in pure TypeScript - no binary modules!
-- Export your executable schema as JavaScript
+- [Export](./exporting-schema.md) your schema as executable JavaScript code
 - Very fast startup in serverless
 - Bring your own PostgreSQL driver/adaptor
 - Run as a CLI, as a Node.js middleware, or a standalone GraphQL schema
 - Easy customization via [smart tags](./smart-tags)
-- Insight into your operations ("explain") via [Ruru](https://grafast.org/ruru/)
+- Explain your operations via [Ruru](https://grafast.org/ruru/) (our Gra*fast*-enhanced Graph*i*QL)
 - [Auto-discovered relations](./relations/)
 - [Automatic CRUD mutations](./crud-mutations/) e.g. `updatePost`
 - Incredible versatility via a wide array of plugins:
