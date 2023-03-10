@@ -17,7 +17,7 @@ export interface PostGraphileInstance {
   createServ<TGrafserv extends GrafservBase>(
     grafserv: (config: GrafservConfig) => TGrafserv,
   ): TGrafserv;
-  getServerParams(): PromiseOrDirect<SchemaResult>;
+  getSchemaResult(): PromiseOrDirect<SchemaResult>;
   getSchema(): PromiseOrDirect<GraphQLSchema>;
   getResolvedPreset(): GraphileConfig.ResolvedPreset;
   release(): PromiseOrDirect<void>;
@@ -28,7 +28,7 @@ export function postgraphile(
   preset: GraphileConfig.Preset,
 ): PostGraphileInstance {
   const resolvedPreset = resolvePresets([preset]);
-  let serverParams:
+  let schemaResult:
     | PromiseLike<SchemaResult>
     | Deferred<SchemaResult>
     | SchemaResult;
@@ -36,7 +36,7 @@ export function postgraphile(
   let released = false;
   let server: GrafservBase | undefined;
   if (resolvedPreset.grafserv?.watch) {
-    serverParams = defer<SchemaResult>();
+    schemaResult = defer<SchemaResult>();
     stopWatchingPromise = watchSchema(preset, (error, newParams) => {
       if (error || !newParams) {
         console.error("Watch error: ", error);
@@ -48,22 +48,22 @@ export function postgraphile(
         }
         return;
       }
-      const oldServerParams = serverParams;
-      serverParams = newParams;
+      const oldSchemaResult = schemaResult;
+      schemaResult = newParams;
       if (
-        oldServerParams !== null &&
-        "resolve" in oldServerParams &&
-        typeof oldServerParams.resolve === "function"
+        oldSchemaResult !== null &&
+        "resolve" in oldSchemaResult &&
+        typeof oldSchemaResult.resolve === "function"
       ) {
-        oldServerParams.resolve(serverParams);
+        oldSchemaResult.resolve(schemaResult);
       }
       if (server) {
-        server.setPreset(serverParams.resolvedPreset);
-        server.setSchema(serverParams.schema);
+        server.setPreset(schemaResult.resolvedPreset);
+        server.setSchema(schemaResult.schema);
       }
     });
   } else {
-    serverParams = makeSchema(preset);
+    schemaResult = makeSchema(preset);
   }
 
   function assertAlive() {
@@ -80,9 +80,9 @@ export function postgraphile(
           `createServ is currently only allowed to be called once; if you'd like to call it multiple times please file an issue with your use case and we can discuss implementing that.`,
         );
       }
-      const schema = isPromiseLike(serverParams)
-        ? serverParams.then((p) => p.schema)
-        : serverParams.schema;
+      const schema = isPromiseLike(schemaResult)
+        ? schemaResult.then((p) => p.schema)
+        : schemaResult.schema;
       const newServer = grafserv({
         preset,
         schema,
@@ -97,13 +97,13 @@ export function postgraphile(
       server = newServer;
       return newServer;
     },
-    async getServerParams() {
+    async getSchemaResult() {
       assertAlive();
-      return serverParams;
+      return schemaResult;
     },
     async getSchema() {
       assertAlive();
-      return (await serverParams).schema;
+      return (await schemaResult).schema;
     },
     getResolvedPreset() {
       return resolvedPreset;

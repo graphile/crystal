@@ -83,7 +83,7 @@ For information about using PostGraphile with Connect, Express, Koa, Fastify,
 Restify, or any other HTTP servers, please see the [Grafserv
 documentation][grafserv].
 
-### `pgl.getServerParams()`
+### `pgl.getSchemaResult()`
 
 :::warning
 
@@ -100,7 +100,7 @@ Note that this may change over time, e.g. in watch mode.
 
 ### `pgl.getSchema()`
 
-Shortcut to `(await getServerParams()).schema` - the current GraphQL schema the
+Shortcut to `(await getSchemaResult()).schema` - the current GraphQL schema the
 instance represents (may change due to watch mode).
 
 ### `pgl.getResolvedPreset()`
