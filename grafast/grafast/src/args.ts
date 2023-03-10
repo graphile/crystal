@@ -12,9 +12,11 @@ import { isPromiseLike } from "./utils.js";
  */
 export function hookArgs(
   args: ExecutionArgs,
+  resolvedPreset: GraphileConfig.ResolvedPreset,
   ctx: Partial<Grafast.RequestContext>,
-  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
 ): ExecutionArgs | PromiseLike<ExecutionArgs> {
+  // TODO: assert that args haven't already been hooked
+
   // Make context mutable
   args.contextValue = Object.assign(Object.create(null), args.contextValue);
 

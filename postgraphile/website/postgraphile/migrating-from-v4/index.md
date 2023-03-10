@@ -251,13 +251,9 @@ async function main() {
   };
 
   // Merge in the context and anything else plugins/presets want to add
-  await hookArgs(
-    args,
-    {
-      /* optional details for your context callback(s) to use */
-    },
-    resolvedPreset,
-  );
+  await hookArgs(args, resolvedPreset, {
+    /* optional details for your context callback(s) to use */
+  });
 
   const result = await grafast(args);
 

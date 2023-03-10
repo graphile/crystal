@@ -10,7 +10,6 @@ import type {
 import { GraphQLError, parse, Source, validate, validateSchema } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
-import { NULL_PRESET } from "./config.js";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
@@ -151,7 +150,7 @@ export function grafastGraphql(
   };
 
   if (resolvedPreset && ctx) {
-    const argsOrPromise = hookArgs(executionArgs, ctx, resolvedPreset);
+    const argsOrPromise = hookArgs(executionArgs, resolvedPreset, ctx);
     if (isPromiseLike(argsOrPromise)) {
       return Promise.resolve(argsOrPromise).then((hookedArgs) =>
         execute(hookedArgs, resolvedPreset),
@@ -162,15 +161,16 @@ export function grafastGraphql(
     }
   } else {
     // Execute
-    return execute(executionArgs, resolvedPreset ?? NULL_PRESET);
+    return execute(executionArgs, resolvedPreset);
   }
 }
 
 export function grafastGraphqlSync(
   args: GraphQLArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
+  resolvedPreset?: GraphileConfig.ResolvedPreset,
+  ctx?: Partial<Grafast.RequestContext>,
 ): ExecutionResult {
-  const result = grafastGraphql(args, resolvedPreset);
+  const result = grafastGraphql(args, resolvedPreset, ctx);
   if (isPromiseLike(result)) {
     throw new SafeError("Grafast execution failed to complete synchronously.");
   }
