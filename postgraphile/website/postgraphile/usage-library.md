@@ -86,7 +86,7 @@ documentation][grafserv].
 
 ### `pgl.getSchemaResult()`
 
-:::warning
+:::caution
 
 This will likely be renamed before the V5.0.0 release.
 

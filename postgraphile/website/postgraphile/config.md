@@ -10,11 +10,18 @@ PostGraphile.
 
 (TODO: expand here with different use cases and presets that support them.)
 
-PostGraphile presets are named after crystals; the first preset available is
-`postgraphile/presets/amber`, so you'll definitely want that. If you're coming
-from PostGraphile V4 you may also want to make your own preset with the
+The PostGraphile base presets are named after crystals; the first preset available is
+`postgraphile/presets/amber`, so you'll definitely want that. **If you're coming
+from PostGraphile V4** you may also want to make your own preset with the
 `makeV4Preset()` factory - see the
 [V4 migration docs](./migrating-from-v4/index.md) for more information.
+
+:::caution
+
+Please don't name your own presets after crystals, or we may end up having
+confusion!
+
+:::
 
 ## General structure
 
@@ -32,7 +39,7 @@ if the same plugin is referenced in multiple presets.
 The preset also accepts keys for each supported scope. `graphile-config` has no
 native scopes, but different Graphile projects can register their own scopes,
 for example `graphile-build` registers the `inflection`, `gather` and `schema`
-scopes, `graphile-build-pg` registers the `pgConfigs` scope, and PostGraphile
+scopes, `graphile-build-pg` registers the `pgConfigs` scope, and Grafserv
 registers the `server` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
@@ -40,13 +47,45 @@ get auto-completion for the options available in each scope. It may be necessary
 to add `import "postgraphile"` at the top of the configuration file so that
 TypeScript imports all the available scopes.
 
-Note that the schema build process in PostGraphile is:
+:::note
 
-- Synchronously build the inflectors via the "inflection" phase - inflectors are
+The schema build process in PostGraphile is:
+
+- Synchronously build the inflectors via the `inflection` phase - inflectors are
   used throughout all other phases
 - Asynchronously build the data sources by performing database introspection in
-  the "gather" phase
-- Synchronously build the GraphQL schema during the "schema" phase
+  the `gather` phase
+- Synchronously build the GraphQL schema during the `schema` phase
+
+:::
+
+### Viewing the available options
+
+Once you have a basic configuration file, you can use the `graphile` CLI to
+find out what options are available to you:
+
+```sh
+graphile config options
+```
+
+Note that the options available will be influenced by the modules that you are
+using, so be sure to import any plugins and presets at the top of your config
+file.
+
+TODO: add screenshot of command output
+
+### Viewing the resolved configuration
+
+You can also use the `graphile` CLI to print out your resolved configuration
+(once all the presets have been applied). This can help with debugging:
+
+```sh
+graphile config print
+```
+
+TODO: add screenshot of command output
+
+### Example
 
 ```ts
 // Only needed for TypeScript types support
@@ -77,8 +116,12 @@ const preset = {
     makePgConfig({
       // Database connection string:
       connectionString: process.env.DATABASE_URL,
+
       // List of schemas to expose:
       schemas: ["app_public"],
+
+      // Enable LISTEN/NOTIFY:
+      pubsub: true,
     }),
   ],
   gather: {
@@ -98,13 +141,21 @@ const preset = {
 export default preset;
 ```
 
-## `inflection` options
+## Option reference
+
+What follows are some of the more commonly used options to serve as a quick
+reference, but this list can quickly become out of date (feel free to send a
+PR!). You should use the `graphile config options` command mentioned above to
+see what options are available to you - different presets and plugins make
+different options available.
+
+### `inflection` options
 
 _(TypeScript type: `GraphileBuild.InflectionOptions`)_
 
 _None at this time._
 
-## `pgConfigs`
+### `pgConfigs`
 
 _(TypeScript type: `ReadonlyArray<GraphileConfig.PgDatabaseConfiguration>`)_
 
@@ -169,7 +220,7 @@ optional configuration parameters:
   - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
   - `pgSettings`
 
-:::warning
+:::caution
 
 The `name` option must be unique across all your `pgConfigs`; therefore if you
 have more than one entry in `pgConfigs` you must give each additional entry an
@@ -196,8 +247,13 @@ const pgConfigs = [
   makePgConfig({
     // Database connection string:
     connectionString: process.env.DATABASE_URL,
+
     // List of database schemas:
     schemas: ["app_public"],
+
+    // Enable LISTEN/NOTIFY:
+    pubsub: true,
+
     // Optional, only needed for `--watch` mode:
     superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
   }),
@@ -228,7 +284,7 @@ primarily, it accepts the following options:
 - `superuserConnectionString` - as `connectionString`, but for superuser
   connections (only needed to install the watch fixtures in watch mode)
 
-## `gather` options
+### `gather` options
 
 _(TypeScript type: `GraphileBuild.GatherOptions`)_
 
@@ -247,7 +303,7 @@ Deprecated options:
   instead of the type name in the Node identifier (highly discouraged because it
   significantly increases the risk of NodeID conflicts)
 
-## `schema` options
+### `schema` options
 
 _(TypeScript type: `GraphileBuild.SchemaOptions`)_
 
@@ -285,7 +341,7 @@ to determine the options that they offer.
   more places.
 - `subscriptions`
 
-## `grafast` options
+### `grafast` options
 
 _(TypeScript type: `import type { GrafastOptions } from "grafast"`)_
 
@@ -465,7 +521,7 @@ export default {
 
 <!-- TODO: verify the above works. -->
 
-## `server` options
+### `server` options
 
 _(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
 
@@ -486,19 +542,3 @@ _(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
 - `watch: boolean` - Set true to enable watch mode
 - `maxRequestLength: number` - The length, in bytes, for the largest request
   body that the server will accept
-
-## Viewing your config
-
-In your `graphile.config.mjs` (or similar) file, append the following, replacing `preset` with the name of the variable in which your preset is stored:
-
-```js
-import { resolvePresets } from "graphile-config";
-const resolvedPreset = resolvePresets([preset]);
-console.dir(resolvedPreset);
-```
-
-:::info
-
-We're going to work on making this a bit nicer in future!
-
-:::

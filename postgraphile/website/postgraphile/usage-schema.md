@@ -75,7 +75,7 @@ optional parameters: the `resolvedPreset` and the _request context_ `ctx`. If yo
 pass these parameters then `grafast` will take care of building the _GraphQL
 context_ for you based on what is in your preset.
 
-:::warning
+:::caution
 
 Do not confuse `ctx` with the GraphQL context; `ctx` is the parameter passed to
 your `preset.grafast.context()` callback (and any plugins that need it)
