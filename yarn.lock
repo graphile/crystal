@@ -13420,7 +13420,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile@workspace:utils/graphile":
+"graphile@workspace:^, graphile@workspace:utils/graphile":
   version: 0.0.0-use.local
   resolution: "graphile@workspace:utils/graphile"
   dependencies:
@@ -18532,6 +18532,7 @@ __metadata:
     debug: "npm:^4.3.3"
     grafast: "workspace:^"
     grafserv: "workspace:^"
+    graphile: "workspace:^"
     graphile-build: "workspace:*"
     graphile-build-pg: "workspace:*"
     graphile-config: "workspace:^"

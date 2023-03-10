@@ -88,6 +88,7 @@
     "@types/jest": "^27.5.1",
     "@types/jsonwebtoken": "^8",
     "@types/nodemon": "1.19.1",
+    "graphile": "workspace:^",
     "jest": "^28.1.0",
     "nodemon": "^2.0.15",
     "ts-node": "^10.9.1",
