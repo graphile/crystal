@@ -50,15 +50,16 @@ depend on `postgraphile`, `graphile-build`, `graphile-build-pg`,
 references to what is necessary for it to execute in production, such as
 `graphql`, `grafast`, `@dataplan/pg` and `jsonwebtoken`.
 
-**Most users will never use this level.**
+**Few users need this**, but it is helpful for server-side GraphQL resolution
+without the overhead of a network layer.
 
 ## Use the config, Luke!
 
-By storing most of your configuration into a `graphile.config.js` file, you will
-be able to run PostGraphile in any of these three modes and still leverage a
-similar setup in each. This file also saves us from having to offer tens of CLI
-options as we have in previous releases, instead only offering the most
-essential options.
+By storing most of your configuration into a `graphile.config.js` (or similar)
+file, you will be able to run PostGraphile in any of these three modes and
+still leverage a similar setup in each. This file also saves us from having to
+offer tens of CLI options as we have in previous releases, instead only
+offering the most essential options.
 
 ## Which one should I use?
 
