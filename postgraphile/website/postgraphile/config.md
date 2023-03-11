@@ -175,18 +175,21 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
-- `listen: (topic: string) => AsyncIterable<string>` - a callback function to
-  use to listen to a particular topic
 - `pgSettings: (ctx: Grafast.RequestContext) => Record<string, string> | null` -
   a callback function that will be called by the server to determine the
   pgSettings to use for a particular request
 - `pgSettingsForIntrospection: Record<string, string> | null` - the pgSettings
   to use when introspecting the database (for example if you want to change
   roles)
+- `pgSubscriber: PgSubscriber` - a `PgSubscriber` instance that allows code to
+  subscribe to LISTEN/NOTIFY events in the database - useful for GraphQL
+  subscriptions, and also for schema watch mode.
 - `withPgClientKey: string` - the key on the `context` object to store the
   `withPgClient` method the schema uses for communicating with the database
 - `pgSettingsKey: string` - the key on the `context` object to store the
   `pgSettings` configuration to use when communicating with the database
+- `pgSubscriberKey: string` - the key on the `context` object to store the
+  `pgSubscriber` instance to, for use during GraphQL subscriptions
 
 ```js title="Example manual configuration"
 import * as pg from "pg";
@@ -218,6 +221,7 @@ optional configuration parameters:
   - `name` (default: "main")
   - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
   - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
+  - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
   - `pgSettings`
 
 :::caution
