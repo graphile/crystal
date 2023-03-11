@@ -217,6 +217,7 @@ optional configuration parameters:
 - `connectionString`
 - `schemas`
 - `superuserConnectionString`
+- `pubsub` (create a pgSubscriber entry; should default to `true`)
 - pass-through options (same as in `pgConfigs` above):
   - `name` (default: "main")
   - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
@@ -264,11 +265,11 @@ const pgConfigs = [
 ];
 ```
 
-### `adaptorSettings`
+#### `adaptorSettings`
 
 Each adaptor has its own adaptor-specific settings.
 
-#### `@dataplan/pg/adaptors/pg`
+##### `@dataplan/pg/adaptors/pg`
 
 This adaptor uses the `pg` module under the hood and uses the `pg.Pool` API
 primarily, it accepts the following options:
@@ -287,6 +288,8 @@ primarily, it accepts the following options:
   options](https://node-postgres.com/apis/client).
 - `superuserConnectionString` - as `connectionString`, but for superuser
   connections (only needed to install the watch fixtures in watch mode)
+- `pubsub` (default: `true`) - enable LISTEN/NOTIFY via creation of a
+  `pgSubscriber`
 
 ### `gather` options
 
@@ -360,7 +363,29 @@ _(TypeScript type: `import type { GrafastOptions } from "grafast"`)_
   context object that your results will be merged into (overwriting
   pre-existing keys).
 
-### Making HTTP data available to plan resolvers
+### `server` options
+
+_(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
+
+- `port: number` - Port number to listen on (default: 5678)
+- `host: string` - Host to listen on (default: '127.0.0.1'; consider setting to
+  '0.0.0.0' in Docker and similar environments)
+- `graphqlPath: string` - The path at which GraphQL will be available; usually
+  `/graphql`
+- `eventStreamRoute: string` - The path at which the GraphQL event stream would
+  be made available; usually `/graphql/stream`
+- `graphqlOverGET: boolean` - If true, we'll support GraphQL queries over the
+  GET method
+- `graphiql: boolean`
+- `graphiqlOnGraphQLGET: boolean` - If true, then we will render GraphiQL on GET
+  requests to the `/graphql` endpoint
+- `graphiqlPath: string` - The path at which GraphiQL will be available; usually
+  `/`
+- `watch: boolean` - Set true to enable watch mode
+- `maxRequestLength: number` - The length, in bytes, for the largest request
+  body that the server will accept
+
+## Making HTTP data available to plan resolvers
 
 Using the `grafast.context` callback we can extract data from the incoming HTTP
 request and make it accessible from within the Gra*fast* schema via the GraphQL context.
@@ -415,7 +440,7 @@ for realtime). Instead, add helpers to get/set the data you need.
 
 :::
 
-### Exposing HTTP request data to PostgreSQL
+## Exposing HTTP request data to PostgreSQL
 
 Using the `pgSettings` functionality mentioned in the `pgConfigs` section above
 you can extend the data made available within PostgreSQL through
@@ -524,25 +549,3 @@ export default {
 ```
 
 <!-- TODO: verify the above works. -->
-
-### `server` options
-
-_(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
-
-- `port: number` - Port number to listen on (default: 5678)
-- `host: string` - Host to listen on (default: '127.0.0.1'; consider setting to
-  '0.0.0.0' in Docker and similar environments)
-- `graphqlPath: string` - The path at which GraphQL will be available; usually
-  `/graphql`
-- `eventStreamRoute: string` - The path at which the GraphQL event stream would
-  be made available; usually `/graphql/stream`
-- `graphqlOverGET: boolean` - If true, we'll support GraphQL queries over the
-  GET method
-- `graphiql: boolean`
-- `graphiqlOnGraphQLGET: boolean` - If true, then we will render GraphiQL on GET
-  requests to the `/graphql` endpoint
-- `graphiqlPath: string` - The path at which GraphiQL will be available; usually
-  `/`
-- `watch: boolean` - Set true to enable watch mode
-- `maxRequestLength: number` - The length, in bytes, for the largest request
-  body that the server will accept
