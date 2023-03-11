@@ -256,7 +256,7 @@ export type GrafastValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
 export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 export type GrafastResultStreamList<T> = ReadonlyArray<
-  AsyncIterable<PromiseOrDirect<T>> | PromiseLike<never>
+  PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>>> | PromiseLike<never>
 >;
 
 export type BaseGraphQLRootValue = any;
@@ -661,7 +661,7 @@ export type GrafastSubscriber<
 > = {
   subscribe<TTopic extends keyof TTopics = keyof TTopics>(
     topic: TTopic,
-  ): AsyncIterableIterator<TTopics[TTopic]>;
+  ): PromiseOrDirect<AsyncIterableIterator<TTopics[TTopic]>>;
 };
 
 /**

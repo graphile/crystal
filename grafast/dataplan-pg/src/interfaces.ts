@@ -368,7 +368,6 @@ declare global {
 
       /** The key on 'context' where the withPgClient function will be sourced */
       withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
-      listen?(topic: string): AsyncIterable<string>;
 
       /** Return settings to set in the session */
       pgSettings?: (

@@ -139,27 +139,6 @@ export async function withPgClientFromPgConfig<T>(
   }
 }
 
-export async function listenWithPgClientFromPgConfig(
-  config: GraphileConfig.PgDatabaseConfiguration,
-  topic: string,
-  callback: (event: any) => void,
-): Promise<() => void> {
-  const deferredUnlisten = defer<() => void>();
-  withPgClientFromPgConfig(config, null, async (client) => {
-    if (!client.listen) {
-      throw new Error(`Client for '${config.name}' does not support listening`);
-    }
-    const keepalive = defer();
-    const unlisten = await client.listen!(topic, callback);
-    deferredUnlisten.resolve(() => {
-      unlisten();
-      keepalive.resolve();
-    });
-    return keepalive;
-  }).catch((e) => deferredUnlisten.reject(e));
-  return deferredUnlisten;
-}
-
 // We don't cache superuser withPgClients
 export async function withSuperuserPgClientFromPgConfig<T>(
   config: GraphileConfig.PgDatabaseConfiguration,
