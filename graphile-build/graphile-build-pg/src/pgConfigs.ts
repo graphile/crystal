@@ -1,6 +1,6 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
-import { defer, isPromiseLike } from "grafast";
+import { isPromiseLike } from "grafast";
 
 import type { PgAdaptor } from "./interfaces.js";
 

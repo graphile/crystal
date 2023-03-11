@@ -29,15 +29,6 @@ import type {
 } from "../executor.js";
 import type { MakePgConfigOptions } from "../interfaces.js";
 
-// NOTE: \0 is not valid in an SQL identifier and may cause 'invalid message
-// format' or worse error. However, it's exceedingly unlikely that it'll be
-// present in any legitimate code. As such, we'll just replace it with a `"` to
-// save on processing - it's already unlikely that an SQL identifier would have
-// a quote mark in it.
-function escapeIdentifier(str: string): string {
-  return '"' + str.replace(/["\0]/g, '""') + '"';
-}
-
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
   ? parseInt(process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE, 10)
