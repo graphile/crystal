@@ -716,7 +716,7 @@ export function makePgConfig(
     withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
     pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
     pgSubscriberKey = name === "main" ? "pgSubscriber" : `${name}_pgSubscriber`,
-    pubsub,
+    pubsub = true,
     pgSettings,
     pgSettingsForIntrospection,
   } = options;
@@ -743,7 +743,7 @@ export function makePgConfig(
     });
   }
   const pgSubscriber =
-    options.pgSubscriber ?? (pubsub ?? true ? new PgSubscriber(pool) : null);
+    options.pgSubscriber ?? (pubsub ? new PgSubscriber(pool) : null);
   const source: GraphileConfig.PgDatabaseConfiguration = {
     name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
