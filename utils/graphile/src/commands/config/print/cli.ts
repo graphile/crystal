@@ -64,7 +64,7 @@ export async function run(args: Opts) {
     if (Array.isArray(value)) {
       console.log(inspect(value, inspectOpts));
     } else if (typeof value === "object" && value !== null) {
-      const keys = Object.keys(value);
+      const keys = Object.keys(value).filter((key) => value[key] !== undefined);
       if (keys.length) {
         for (const key of keys) {
           const val = value[key];
