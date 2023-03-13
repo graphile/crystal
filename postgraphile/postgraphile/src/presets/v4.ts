@@ -1,6 +1,5 @@
 import "graphile-config";
 
-import { PgRBACPlugin } from "graphile-build-pg";
 import type { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
@@ -192,7 +191,6 @@ export const makeV4Preset = (
   const eventStreamPath = options.eventStreamRoute ?? `${graphqlPath}/stream`;
   return {
     plugins: [
-      ...(options.ignoreRBAC === false ? [PgRBACPlugin] : []),
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
       PgV4BehaviorPlugin,
@@ -205,6 +203,7 @@ export const makeV4Preset = (
         ? ["PgMutationCreatePlugin", "PgMutationUpdateDeletePlugin"]
         : []),
       ...(options.skipPlugins ? options.skipPlugins.map((p) => p.name) : []),
+      ...(options.ignoreRBAC !== false ? ["PgRBACPlugin"] : []),
     ],
     schema: {
       ...otherGraphileBuildOptions,
