@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import { PgRBACPlugin } from "./index.js";
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 import { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
 import { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
@@ -33,7 +34,6 @@ import { PgSmartCommentsPlugin } from "./plugins/PgSmartCommentsPlugin.js";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
-import { PgRBACPlugin } from "./index.js";
 
 // TODO: version this.
 export const defaultPreset: GraphileConfig.Preset = {
