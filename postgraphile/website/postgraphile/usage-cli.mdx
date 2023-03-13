@@ -59,9 +59,7 @@ you can run PostGraphile with no (or minimal) CLI flags.
     environmental variables
   </a>
   .<br />
-  Examples: <code>db</code>, <code>postgres:///db</code>, <code>
-    postgres://user:password@domain:port/db?ssl=true
-  </code>
+  Examples: <code>db</code>, <code>postgres:///db</code>, <code>postgres://user:password@domain:port/db?ssl=true</code>
 - `--superuser-connection <string>` (alias: `-S`)
   <equivalent>{`{ pgConfigs: [makePgConfig({ superuserConnectionString:'...' })] }`}</equivalent>
   the PostgreSQL superuser connection string to use for installing watch fixtures
