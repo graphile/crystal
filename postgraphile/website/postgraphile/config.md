@@ -72,7 +72,7 @@ Note that the options available will be influenced by the modules that you are
 using, so be sure to import any plugins and presets at the top of your config
 file.
 
-TODO: add screenshot of command output
+![Cropped screenshot of 'graphile config options'](./graphile-config-options-screenshot.png)
 
 ### Viewing the resolved configuration
 
@@ -83,7 +83,7 @@ You can also use the `graphile` CLI to print out your resolved configuration
 graphile config print
 ```
 
-TODO: add screenshot of command output
+![Cropped screenshot of 'graphile config print'](./graphile-config-print-screenshot.png)
 
 ### Example
 
