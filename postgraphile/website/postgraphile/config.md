@@ -185,7 +185,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
-- `pgSettings: (ctx: Grafast.RequestContext) => Record<string, string> | null` -
+- `pgSettings: (requestCtx: Grafast.RequestContext) => Record<string, string> | null` -
   a callback function that will be called by the server to determine the
   pgSettings to use for a particular request
 - `pgSettingsForIntrospection: Record<string, string> | null` - the pgSettings
@@ -383,31 +383,21 @@ _(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
   requests to the `/graphql` endpoint
 - `watch: boolean` - Set true to enable watch mode
 - `maxRequestLength: number` - The length, in bytes, for the largest request
-  body that the server will accept
+  body that the server will accept, only used if the framework of choice
+  doesn't already handle input parsing
 
 ## Making HTTP data available to plan resolvers
 
 Using the `grafast.context` callback we can extract data from the incoming HTTP
 request and make it accessible from within the Gra*fast* schema via the GraphQL context.
 
-:::warning
-
-Be careful to not clash with system context keys such as `withPgClient`,
-`pgSettings` and `jwtClaims` (you can see the existing context keys by
-inspecting the second argument to the `context` function).
-
-For the absolute best future compatibility, we recommend that you prefix your
-context keys with your initials, company name, or similar.
-
-:::
-
 Example:
 
 ```js title="graphile.config.js"
 export default {
   grafast: {
-    async context(requestContext) {
-      const req = requestContext.httpRequest;
+    async context(requestCtx) {
+      const req = requestCtx.node?.req;
       // You can perform asynchronous actions here if you need to; for example
       // looking up the current user in the database.
 
@@ -430,6 +420,18 @@ export default {
 };
 ```
 
+:::warning
+
+When adding details to `context`, you must careful to not add properties that
+will clash with system context keys such as `withPgClient`, `pgSettings`,
+`pgSubscriber` and `jwtClaims` (you can see the existing context keys by
+inspecting the second argument to the `context` callback).
+
+For the absolute best future compatibility, we recommend that you prefix your
+context keys with your initials, company name, or similar.
+
+:::
+
 :::tip
 
 It's _not_ a good idea to give direct access to the `req` or `res` objects
@@ -448,7 +450,7 @@ you can extend the data made available within PostgreSQL through
 context mentioned in the "Grafast options" section above, the value for which
 should be a POJO (plain old JavaScript object) with string keys and values.
 
-:::warning
+:::caution
 
 You can use `pgSettings` to define variables that your Postgres
 functions/policies depend on, or to tweak internal Postgres settings.
@@ -478,8 +480,11 @@ export default {
 
   grafast: {
     async context(requestCtx, graphqlContext) {
-      // Extract details from the requestCtx
-      const req = requestCtx.httpRequest;
+      // Extract details from the requestCtx:
+      const req = requestCtx.node?.req;
+      // Or: const req = requestCtx.expressv4?.req;
+      // Or: const ctx = requestCtx.koav2?.ctx;
+
       const auth = req.getHeader("authorization");
 
       const context = {};
@@ -492,6 +497,7 @@ export default {
           const claims = jwt.verify(token, process.env.JWT_SECRET);
           const userId = claims.uid;
           context.pgSettings = {
+            ...graphqlContext.pgSettings,
             "myapp.user_id": userId,
             "myapp.headers.x_something": req.getHeader("x-something"),
           };
@@ -507,9 +513,9 @@ export default {
 :::tip
 
 GraphQL itself is transport agnostic, as is `grafast`, so depending on how you
-choose to use your PostGraphile schema you may or may not have access to an
-`httpRequest` or similar. Your `context` callback should be written to support
-all the different ways that your schema may be used: directly, over HTTP, using
+choose to use your PostGraphile schema you may or may not have access to an the
+HTTP request. Your `context` callback should be written to support all the
+different ways that your schema may be used: directly, over HTTP, using
 websockets, etc.
 
 :::
@@ -537,13 +543,22 @@ object from an Express server:
 ```js title="graphile.config.js"
 export default {
   grafast: {
-    context: ({ httpRequest: req }) => ({
-      pgSettings: {
-        role: "visitor",
-        "jwt.claims.user_id": `${req.user.id}`,
-        //...
-      },
-    }),
+    context(requestCtx, graphqlContext) {
+      // Base context used for all GraphQL requests
+      const context = {
+        pgSettings: { ...graphqlContext.pgSettings, role: "visitor" },
+      };
+
+      // Extract the current user from the Express request:
+      const user = requestCtx.expressv4?.req.user;
+
+      // If there's a user, pass additional data to Postgres:
+      if (user) {
+        context.pgSettings["jwt.claims.user_id"] = String(user.id);
+      }
+
+      return context;
+    },
   },
 };
 ```
