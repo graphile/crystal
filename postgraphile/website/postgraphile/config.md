@@ -235,6 +235,13 @@ optional configuration parameters:
   - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
   - `pgSettings`
 
+:::info
+
+These common options are those that the `postgraphile` CLI will pass, which is
+why every adaptor should support them.
+
+:::
+
 :::caution
 
 The `name` option must be unique across all your `pgConfigs`; therefore if you
@@ -244,18 +251,12 @@ explicit and unique name.
 :::
 
 It may additionally accept any other options it likes (but care should be taken
-to not conflict with options of other adaptors, or that we might want to add
-as future core options).
+to not conflict with options of other adaptors, or options that we might want
+to add to core in future).
 
-It will return a fully resolved configuration object, suitable for inclusion
-into the `pgConfigs` array in your `graphile.config.mjs` (or similar) file.
-
-:::info
-
-These common options are those that the `postgraphile` CLI will pass, which is
-why every adaptor should support them.
-
-:::
+`makePgConfig` will return a fully resolved configuration object, suitable for
+inclusion into the `pgConfigs` array in your `graphile.config.mjs` (or similar)
+file.
 
 ```js title="Example configuration via makePgConfig"
 const pgConfigs = [
@@ -333,19 +334,9 @@ to determine the options that they offer.
 
 - `jsonScalarAsString: boolean` - if true, JSON values will be stringified
   rather than returned as "dynamic" objects.
-- `nodeIdFieldName: string` - the name for the `id: ID` field; typically this is
-  `id` but you may wish to set it to `_id` or `nodeId` to avoid conflicts with
-  your `id` database columns
 - `dontSwallowErrors: boolean` - if true, errors during the schema build process
   will throw rather than the system trying to recover from them. Recommended,
   but not enabled by default as it can be a barrier to entry to new users.
-- `simpleCollections: 'only' | 'both' | 'omit'` - defaults to omit; changes the
-  default behavior for collection generation
-  - `only` - does not build Relay connections, instead just simple GraphQL lists
-  - `omit` - does not build simple lists, instead builds Relay connections
-    (recommended)
-  - `both` - supplies both lists and connections, making your schema somewhat
-    larger (not recommended)
 - `pgJwtSecret`
 - `pgJwtSignOptions`
 - `pgUseCustomNetworkScalars: boolean` - if not false, adds the `CidrAddress`,
