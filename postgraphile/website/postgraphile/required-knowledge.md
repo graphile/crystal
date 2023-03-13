@@ -4,13 +4,6 @@ path: /postgraphile/required-knowledge/
 title: Required Knowledge
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 **WORK IN PROGRESS**: PR's welcome!
 
 PostGraphile builds upon other technologies such as PostgreSQL and GraphQL, and
@@ -62,8 +55,8 @@ create table "user" ( ... );
 Here's a full list of reserved keywords:
 https://www.postgresql.org/docs/current/sql-keywords-appendix.html
 
-Most keywords are singular, which is why Benjie prefers to use plurals when
-naming tables as it helps avoid potential keyword clashes.
+Most PostgreSQL keywords are singular, which is why Benjie prefers to use
+plurals when naming tables as it helps avoid potential keyword clashes.
 
 #### PostgreSQL doc versioning
 
@@ -110,6 +103,17 @@ create table users (
   https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_timestamp_.28without_time_zone.29
 - `default` if the column is not specified, what should its value default to
   (only applies to `INSERT`)
+
+:::tip
+
+Rather than using the `serial` type (as in `id serial primary key`), it is
+typically better to use the `int` type directly and add a column generation
+expression such as `generated always as identity` (as in
+`id int primary key generated always as identity`). You may find a mixture of
+these two techniques in this documentation, mostly because `serial` is older
+and faster to type.
+
+:::
 
 #### Creating roles
 

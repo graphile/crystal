@@ -52,11 +52,35 @@ earlier in the behavior string) otherwise it does.
 ## Global default behavior
 
 If you want to make wide-sweeping changes to behaviors, you can add "default
-behaviors" via the `build.behavior.addDefaultBehavior("...")` API. You should do
-so during the `build` phase.
+behaviors" via the `preset.schema.defaultBehavior` setting. For example if you
+want your schema to use lists by default, eschewing the superior connections
+pattern, you might have a configuration something like this:
 
-For example if you want your schema to use lists by default, eschewing the
-superior connections pattern, you might use this plugin:
+```js
+// graphile.config.mjs
+
+const preset = {
+  //...
+  schema: {
+    //...
+    defaultBehavior: "-connection +list",
+  },
+};
+
+export default preset;
+```
+
+These global defaults can still be overridden by each entity, so they're a
+really good way of making wide ranging "default" behaviors without locking
+yourself in too hard.
+
+:::info
+
+If you're authoring a preset that is not the final configuration for a schema
+then this kind of default behavior is likely to be overridden by the user's
+configuration. Instead, preset authors should add a plugin that uses the
+`build.behavior.addDefaultBehavior("...")` API during the `build` phase. A
+similar "lists by default" plugin might look like this:
 
 ```js
 const FavourListsPlugin = {
@@ -73,9 +97,7 @@ const FavourListsPlugin = {
 };
 ```
 
-These global defaults can still be overridden by each entity, so they're a
-really good way of making wide ranging "default" behaviors without locking
-yourself in too hard.
+:::
 
 ## Core behaviors
 
