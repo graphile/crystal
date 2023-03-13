@@ -26,7 +26,9 @@ confusion!
 ## General structure
 
 A preset is a plain JavaScript object, and every key in the preset is optional.
-`{}` is a valid (but not very useful!) preset.
+`{}` is a valid (but not very useful!) preset. The key `default` is forbidden
+at the top level of a preset, this allows us to detect common issues with
+ESM/CommonJS interoperability.
 
 The value for the `extends` key, if specified, must be an array of other presets
 your preset wishes to extend.
@@ -59,32 +61,6 @@ The schema build process in PostGraphile is:
 
 :::
 
-### Viewing the available options
-
-Once you have a basic configuration file, you can use the `graphile` CLI to
-find out what options are available to you:
-
-```sh
-graphile config options
-```
-
-Note that the options available will be influenced by the modules that you are
-using, so be sure to import any plugins and presets at the top of your config
-file.
-
-![Cropped screenshot of 'graphile config options'](./graphile-config-options-screenshot.png)
-
-### Viewing the resolved configuration
-
-You can also use the `graphile` CLI to print out your resolved configuration
-(once all the presets have been applied). This can help with debugging:
-
-```sh
-graphile config print
-```
-
-![Cropped screenshot of 'graphile config print'](./graphile-config-print-screenshot.png)
-
 ### Example
 
 ```ts
@@ -92,7 +68,6 @@ graphile config print
 import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
-import { StreamDeferPlugin } from "graphile-build";
 // Use the 'pg' module to connect to the database
 import { makePgConfig } from "@dataplan/pg/adaptors/pg";
 
@@ -104,8 +79,7 @@ const preset = {
   ],
 
   plugins: [
-    /* Add plugins here, e.g.: */
-    StreamDeferPlugin,
+    /* Add plugins here */
   ],
 
   inflection: {
@@ -117,7 +91,7 @@ const preset = {
       // Database connection string:
       connectionString: process.env.DATABASE_URL,
 
-      // List of schemas to expose:
+      // List of database schemas to expose:
       schemas: ["app_public"],
 
       // Enable LISTEN/NOTIFY:
@@ -140,6 +114,42 @@ const preset = {
 
 export default preset;
 ```
+
+### Viewing the available options
+
+Once you have a basic configuration file, you can use the `graphile` CLI to
+find out what options are available to you:
+
+```sh
+graphile config options
+```
+
+Note that the options available will be influenced by the modules that you are
+using, so be sure to import any plugins and presets at the top of your config
+file.
+
+<figure>
+
+[![Cropped screenshot of 'graphile config options'](./graphile-config-options-screenshot.png)](./graphile-config-options-screenshot.png)
+
+<figcaption>Screenshot of part of the coloured markdown output from executing <code>graphile config options</code> showing the options available to be set inside the config file.</figcaption>
+</figure>
+
+### Viewing the resolved configuration
+
+You can also use the `graphile` CLI to print out your resolved configuration
+(once all the presets have been applied). This can help with debugging:
+
+```sh
+graphile config print
+```
+
+<figure>
+
+[![Cropped screenshot of 'graphile config print'](./graphile-config-print-screenshot.png)](./graphile-config-print-screenshot.png)
+
+<figcaption>Screenshot of part of the coloured output from executing <code>graphile config print</code> showing the options that the local configuration file is using.</figcaption>
+</figure>
 
 ## Option reference
 
