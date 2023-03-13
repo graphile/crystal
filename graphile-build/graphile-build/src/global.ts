@@ -89,11 +89,6 @@ declare global {
        */
       defaultBehavior?: string;
 
-      // TODO: review this option
-      /**
-       * Should we enable subscriptions in the schema?
-       */
-      subscriptions?: boolean;
       /**
        * If your schema includes compatibility with the GraphQL Global Object
        * Identification Specification, typically this will be called 'id'.

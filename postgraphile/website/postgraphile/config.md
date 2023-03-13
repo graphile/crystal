@@ -356,7 +356,6 @@ to determine the options that they offer.
 - `pgForbidSetofFunctionsToReturnNull: boolean` - if true, setof functions
   cannot return null, so our list and connection types can be non-nullable in
   more places.
-- `subscriptions`
 
 ### `grafast` options
 
