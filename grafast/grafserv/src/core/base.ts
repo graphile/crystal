@@ -133,7 +133,7 @@ export class GrafservBase {
       if (
         dynamicOptions.watch &&
         request.method === "GET" &&
-        request.path === dynamicOptions.eventStreamRoute
+        request.path === dynamicOptions.eventStreamPath
       ) {
         if (forceCORS) return optionsResponse(request, this.dynamicOptions);
         const stream = this.makeStream();
@@ -352,7 +352,7 @@ export function convertHandlerResultToResult(
       const headers = Object.create(null);
       headers["Content-Type"] = contentType;
       if (dynamicOptions.watch) {
-        headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamRoute;
+        headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamPath;
       }
       if (preferJSON && !outputDataAsString) {
         return {
@@ -386,7 +386,7 @@ export function convertHandlerResultToResult(
       (headers["Content-Type"] = 'multipart/mixed; boundary="-"'),
         (headers["Transfer-Encoding"] = "chunked");
       if (dynamicOptions.watch) {
-        headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamRoute;
+        headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamPath;
       }
 
       const bufferIterator = mapIterator(

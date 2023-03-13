@@ -372,15 +372,15 @@ _(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
   '0.0.0.0' in Docker and similar environments)
 - `graphqlPath: string` - The path at which GraphQL will be available; usually
   `/graphql`
-- `eventStreamRoute: string` - The path at which the GraphQL event stream would
+- `graphiqlPath: string` - The path at which GraphiQL will be available; usually
+  `/`
+- `eventStreamPath: string` - The path at which the GraphQL event stream would
   be made available; usually `/graphql/stream`
 - `graphqlOverGET: boolean` - If true, we'll support GraphQL queries over the
   GET method
 - `graphiql: boolean`
 - `graphiqlOnGraphQLGET: boolean` - If true, then we will render GraphiQL on GET
   requests to the `/graphql` endpoint
-- `graphiqlPath: string` - The path at which GraphiQL will be available; usually
-  `/`
 - `watch: boolean` - Set true to enable watch mode
 - `maxRequestLength: number` - The length, in bytes, for the largest request
   body that the server will accept

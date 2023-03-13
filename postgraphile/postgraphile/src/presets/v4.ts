@@ -62,6 +62,7 @@ export interface V4Options<
 
   graphqlRoute?: string;
   graphiqlRoute?: string;
+  eventStreamRoute?: string;
   graphiql?: boolean;
   /** Always ignored, ruru is always enhanced. */
   enhanceGraphiql?: boolean;
@@ -186,6 +187,9 @@ export const makeV4Preset = (
       `As of PostGraphile v5, query batching is no longer supported. Query batching has not been standardized as part of the GraphQL-over-HTTP specification efforts, and the need for it has been significantly reduced with the ubiquity of HTTP2+ servers. Further, with incremental delivery (@stream/@defer) on the horizon, query batching will develop a lot of unnecessary complexity that handling at the network layer would bypass.`,
     );
   }
+  const graphqlPath = options.graphqlRoute ?? "/graphql";
+  const graphiqlPath = options.graphiqlRoute ?? "/graphiql";
+  const eventStreamPath = options.eventStreamRoute ?? `${graphqlPath}/stream`;
   return {
     plugins: [
       ...(options.ignoreRBAC === false ? [PgRBACPlugin] : []),
@@ -277,8 +281,9 @@ export const makeV4Preset = (
         : null),
     },
     grafserv: {
-      graphqlPath: options.graphqlRoute ?? "/graphql",
-      graphiqlPath: options.graphiqlRoute ?? "/graphiql",
+      graphqlPath,
+      graphiqlPath,
+      eventStreamPath,
       graphiql: options.graphiql ?? false,
       ...(options.handleErrors
         ? {

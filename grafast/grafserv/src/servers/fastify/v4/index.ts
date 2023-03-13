@@ -214,7 +214,7 @@ export class FastifyGrafserv extends GrafservBase {
     if (dynamicOptions.watch) {
       app.route({
         method: "GET",
-        url: this.dynamicOptions.eventStreamRoute,
+        url: this.dynamicOptions.eventStreamPath,
         exposeHeadRoute: true,
         bodyLimit: this.dynamicOptions.maxRequestLength,
         handler: async (request, reply) => {
