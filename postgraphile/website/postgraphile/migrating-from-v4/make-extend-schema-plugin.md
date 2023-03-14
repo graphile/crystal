@@ -16,14 +16,14 @@ longer needed, including:
 - QueryBuilder "named children"
 - QueryBuilder itself
 - `build.getTypeAndIdentifiersFromNodeId`
+- hacks to ensure the type is loaded before we reference it by name
 
 TODO: find an alternative to the `@scope` directive.
 
-The other major change, and the reason for the above changes, is that instead of
-using resolvers, Version 5 uses plans. _Technically_ you can continue to use
-resolvers when dealing with external systems, but you will need to use plans to
-replace the above directive behavior so you might as well adopt plans, right?
-:wink:
+The reason for the above changes is that instead of using resolvers, Version 5
+uses plans. _Technically_ you can continue to use resolvers when dealing with
+external systems, but you will need to use plans to replace the above directive
+behavior so you might as well adopt plans, right? :wink:
 
 ## `@requires`
 
@@ -86,6 +86,14 @@ This directive was always a workaround and is no longer meaningful in V5 - just
 make sure you add the right plans to the right fields and everything should work
 how you desire, and in a much more efficient and straightforward way than many
 patterns (particularly around mutation payloads) in V4.
+
+:::tip
+
+Don't always try to do everything in one field. It's better to give the
+subfields plans so that the related logic only needs to be executed if the
+field is actually requested, and it can also simplify the code.
+
+:::
 
 ## `@pgQuery`
 
@@ -165,11 +173,15 @@ TODO: once `@dataplan/pg` documentation is written, add links to it here.
 
 In version 4, this method was needed to kick off a "look-ahead" enhanced data
 fetch from a GraphQL resolver, but was always at risk of introducing the N+1
-problem.
+problem. Many users found it confusing, and would often try and use it to
+retrieve data for themselves to use inside a resolver, which did not align with
+its intent at all.
 
 In Version 5 there is no need for this helper any more - every plan step is
 opted into the planning system without any ceremony, and the N+1 problem is
-automatically solved by Gra*fast*.
+automatically solved by Gra*fast*. And requesting data to use in the plan
+versus to use as the result of the field is exactly the same, so no more
+confusion.
 
 Here's an example of porting an example from the Version 4 documentation to
 Version 5. First we find the `pgSource` that represents the `match_user`
@@ -213,8 +225,9 @@ function, passing through the `searchText` argument.
 
 ## `embed`
 
-There is currently no replacement for `embed`; hopefully you don't need it any
-more.
+There is currently no replacement for `embed`. You shouldn't need it any more;
+if you think you do, please come ask in [the
+Discord](https://discord.gg/graphile).
 
 ## Savepoints
 

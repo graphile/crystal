@@ -2,7 +2,7 @@
 title: makePluginByCombiningPlugins
 ---
 
-# No makePluginByCombiningPlugins
+# makePluginByCombiningPlugins
 
 There's no need for the `makePluginByCombiningPlugins` helper any more; instead
 you can just build a preset instead:

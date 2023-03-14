@@ -93,6 +93,13 @@ const plugin = makeWrapPlansPlugin({
 });
 ```
 
+:::caution
+
+Plans with side effects are only expected/supported in field plans on the
+`Mutation` type. Side effect plans elsewhere may lead to unexpected results.
+
+:::
+
 ## Manipulating the data a field will return
 
 It's quite common for developers to store a users `email` into the `users` table
