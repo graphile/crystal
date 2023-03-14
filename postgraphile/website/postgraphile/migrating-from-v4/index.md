@@ -69,6 +69,8 @@ In PostGraphile V5, we have split things up into more packages that each have sp
 - `graphile-utils` - a collection of plugin generators to help you extend your `graphile-build`-based schema
 - `eslint-plugin-graphile-export` - ESLint plugin to help ensure your code is compatible with being exported via `graphile-export`
 
+One major advantage of this approach is that when you export your GraphQL schema as executable code, very few of these dependencies will be needed, making your runtime dependencies much smaller. Another advantage is that it increases the audience for a lot of these modules, for example `grafast` contains a drop-in replacement for `graphql`'s `execute` method and can result in much faster GraphQL schemas even without going anywhere near schema autogeneration. A larger audience means more eyes on the code and ultimately higher quality software for everyone.
+
 ## Basic configuration
 
 PostGraphile V5 requires a "preset" to be specified; this allows users to start
