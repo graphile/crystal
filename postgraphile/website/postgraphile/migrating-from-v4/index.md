@@ -39,6 +39,36 @@ that need their own V5 migration strategy.
 
 Let's get started.
 
+## Module landscape
+
+In PostGraphile V4 the main modules you'd deal with were:
+
+- `postgraphile` - orchestration layer and CLI/server/middleware for our GraphQL schema, plus `pluginHook` "server plugins" functionality, and the home of "PostGraphiQL" our embedded PostGraphile-flavoured GraphiQL.
+- `postgraphile-core` - integration layer between the `postgraphile` module and the `graphile-build` system that builds our GraphQL schema.
+- `graphile-build` - contains the schema plugin system, ability to build a GraphQL schema from plugins, basic plugins for all GraphQL schemas, and of course the complex lookahead system. Nothing specific to databases at all.
+- `graphile-build-pg` - a collection of plugins for `graphile-build` that teach it about PostgreSQL databases, including introspecting the database and generating all the GraphQL types/fields/etc and their resolvers and look-ahead information
+- `pg-sql2` - build SQL via template literals.
+- `graphile-utils` - a collection of plugin generators to help you extend your `graphile-engine`-based schema
+
+In PostGraphile V5, we have split things up into more packages that each have specific focusses:
+
+- `postgraphile` - much thinner now, acts as just the orchestration layer and CLI
+- `graphile-config` - system for managing presets and plugins
+- `grafserv` - our Gra*fast* optimized Node.js webserver interface layer - replaces the server/middleware that was previously in `postgraphile`
+- `grafast` - the runtime for our GraphQL schemas - performs planning and execution of GraphQL requests - replaces the "lookahead" system that was previously in `graphile-build`; not related to automatically building a GraphQL schema; completely generic - has no knowledge of databases
+- `@dataplan/pg` - "step classes" for Gra*fast* to use to communicate with PostgreSQL databases; not related to automatically building a GraphQL schema
+- `@dataplan/json` - "step classes" for Gra*fast* to use to parse/stringify JSON
+- `ruru` - our Gra*fast* enhanced GraphiQL distribution that can either be served by `grafserv` directly or used standalone on the CLI
+- `ruru-components` - the underlying React components used in `ruru`
+- `graphile-build` - ability to build a GraphQL schema from `graphile-config` plugins via the `gather` and `schema` phases, basic plugins for all GraphQL schemas
+- `graphile-build-pg` - a collection of plugins for `graphile-build` that teach it about PostgreSQL databases, including introspecting the database and generating all the GraphQL types/fields/etc and their plans.
+- `pg-introspection` - a strongly typed PostgreSQL introspection library
+- `pg-sql2` - build SQL via template literals.
+- `graphile-export` - ability to export an in-memory PostGraphile GraphQL schema to executable code that can be written to a file
+- `graphile` - swiss army knife CLI with utilities for dealing with everything else
+- `graphile-utils` - a collection of plugin generators to help you extend your `graphile-build`-based schema
+- `eslint-plugin-graphile-export` - ESLint plugin to help ensure your code is compatible with being exported via `graphile-export`
+
 ## Basic configuration
 
 PostGraphile V5 requires a "preset" to be specified; this allows users to start
