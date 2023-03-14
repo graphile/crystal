@@ -71,6 +71,31 @@ In PostGraphile V5, we have split things up into more packages that each have sp
 
 One major advantage of this approach is that when you export your GraphQL schema as executable code, very few of these dependencies will be needed, making your runtime dependencies much smaller. Another advantage is that it increases the audience for a lot of these modules, for example `grafast` contains a drop-in replacement for `graphql`'s `execute` method and can result in much faster GraphQL schemas even without going anywhere near schema autogeneration. A larger audience means more eyes on the code and ultimately higher quality software for everyone.
 
+```mermaid
+graph TD;
+  postgraphile-->grafserv;
+  grafserv-->ruru;
+  ruru-->ruru-components;
+  postgraphile-->graphile-build;
+  postgraphile-->graphile-config;
+  graphile-config-->CONFIG["graphile.config.js"];
+  CONFIG-->AMBER["postgraphile/presets/amber"];
+  AMBER-->graphile-build;
+  AMBER-->graphile-build-pg;
+  CONFIG-->graphile-utils;
+  CONFIG-->dataplan__pg_adaptors_pg["@dataplan/pg/adaptors/pg"];
+  grafserv-->grafast;
+  graphile-build-->grafast;
+  graphile-build-pg-->grafast;
+  %% graphile;
+  %% graphile-export;
+  %% eslint-plugin-graphile-export;
+  graphile-build-pg-->pg-introspection;
+  graphile-build-pg-->pg-sql2;
+  graphile-build-pg-->dataplan__pg["@dataplan/pg"];
+  graphile-build-pg-->dataplan__json["@dataplan/json"];
+```
+
 ## Basic configuration
 
 PostGraphile V5 requires a "preset" to be specified; this allows users to start
