@@ -42,7 +42,7 @@ The preset also accepts keys for each supported scope. `graphile-config` has no
 native scopes, but different Graphile projects can register their own scopes,
 for example `graphile-build` registers the `inflection`, `gather` and `schema`
 scopes, `graphile-build-pg` registers the `pgConfigs` scope, and Grafserv
-registers the `server` scope.
+registers the `grafserv` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
 get auto-completion for the options available in each scope. It may be necessary
@@ -363,7 +363,7 @@ _(TypeScript type: `import type { GrafastOptions } from "grafast"`)_
   context object that your results will be merged into (overwriting
   pre-existing keys).
 
-### `server` options
+### `grafserv` options
 
 _(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
 
