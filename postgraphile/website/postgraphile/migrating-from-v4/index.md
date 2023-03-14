@@ -10,24 +10,34 @@ everything else that's coming down the GraphQL pipeline).
 We didn't set out to do so, but ultimately this ended up with us writing our own
 GraphQL runtime, called [Gra*fast*][grafast]. This runtime is built around a
 carefully engineered planning phase followed by an highly optimized execution
-phase. By happy coincidence this also allowed us to generate much more efficient
-SQL queries, and to execute requests much faster than in V4.
+phase. This much more powerful system allowed us to generate much more
+efficient SQL queries, and to execute requests much faster than in V4, which
+was already pretty fast!
 
-However, Grafast was completely different (not similar in the slightest) to V4's
+However, Gra*fast* was completely different (not similar in the slightest) to V4's
 lookahead engine, and that lookahead engine was the beating heart of V4.
 Replacing it required us to rebuild the entire stack from scratch on top of
 these new foundations.
 
 Since we had to rebuild everything anyway, we decided to fix a large number of
-issues that had been bugging us for a while now... The plugin system has been
-transformed, the configuration system has been consolidated and transformed, the
-smart tags have been replaced with behaviors, all the plugins have been
-rewritten or replaced, ... but I'm getting ahead of myself.
+issues that had been bugging us for a while... The plugin system has been
+consolidated and transformed, the configuration system has been consolidated
+and transformed, some of the smart tags (`@omit`, `@simpleCollections`, etc)
+have been replaced with behaviors (`@behavior`), all the plugins have been
+rewritten or replaced, the defaults have evolved, ... but I'm getting ahead of
+myself.
 
 If you're reading this, you probably want to know how to take your PostGraphile
-V4 project and run it in PostGraphile V5 instead with the minimal of fuss, so
-let's get started. Note that there are subpages dedicated to particular
-plugin/plugin generators that need their own V5 migration strategy.
+V4 project and run it in PostGraphile V5 instead with the minimal of fuss. One
+of the reasons that V5 took so long, other than that we invented an entirely
+new set of technologies and then rebuilt the entire Graphile GraphQL ecosystem
+from scratch on top of them, was the amount of effort that we put into trying
+to minimize the amount of effort it will take _you_ to move to V5.
+
+Note that there are subpages dedicated to particular plugin/plugin generators
+that need their own V5 migration strategy.
+
+Let's get started.
 
 ## Basic configuration
 
@@ -40,8 +50,9 @@ without breaking existing users schemas - ultimately meaning we no longer need a
 To achieve this, we've introduced a new module: `graphile-config`. This module
 takes care of the common concerns relating to configuration, in particular:
 presets, plugins and options. You store your config into a `graphile.config.js`
-file and this can then be used from the command line, library mode, or even
-schema-only mode - they all share the same config.
+(or `.ts`, `.mjs`, `.mts`) file and this can then be used from the command
+line, library mode, or even schema-only mode - they all share the same
+configuration.
 
 To make the transition to this new system easier, we've built a `makeV4Preset`
 preset factory for you that converts a number of the options that you are
@@ -60,22 +71,38 @@ import { makePgConfig } from "@dataplan/pg/adaptor/pg";
 /** @type {GraphileConfig.Preset} */
 const preset = {
   extends: [
+    // The initial PostGraphile V5 preset
     PresetAmber.default ?? PresetAmber,
+
+    // Change the options and add/remove plugins based on your V4 configuration:
     makeV4Preset({
-      /* PUT YOUR V4 OPTIONS HERE */
+      /* PUT YOUR V4 OPTIONS HERE, e.g.: */
       simpleCollections: "both",
       jwtPgTypeIdentifier: '"b"."jwt_token"',
+      appendPlugins: [
+        /*...*/
+      ],
     }),
+
+    // Note some plugins are now "presets", e.g.
+    // `@graphile/simplify-inflection`, those should be listed here instead of `appendPlugins`
   ],
 
   plugins: [
-    // Add V5 equivalents of your
-    // appendPlugins/prependPlugins/skipPlugins/pluginHook plugins here.
+    /*
+     * If you were using `pluginHook` before, the relevant plugins will need
+     * listing here instead. You can also move the `appendPlugins` list here
+     * for consistency if you like.
+     */
   ],
 
-  // If you're using the CLI you can skip this and use the `-c` and `-s`
-  // options instead, but we advise configuring it here so all the modes of
-  // running PostGraphile can share it.
+  /*
+   * PostgreSQL database configuration.
+   *
+   * If you're using the CLI you can skip this and use the `-c` and `-s`
+   * options instead, but we advise configuring it here so all the modes of
+   * running PostGraphile can share it.
+   */
   pgConfigs: [
     makePgConfig({
       // Database connection string:
@@ -110,50 +137,126 @@ const preset = {
 
 :::info
 
-Right now, not many of the V4 plugins have been ported to V5, but with your help
-hopefully we can fix that!
+Not all of the community's V4 plugins have been ported to V5 at time of
+writing, but with your help hopefully we can fix that!
 
 :::
 
 ### additionalGraphQLContextFromRequest
 
-This has been replaced with the 'grafast.context' option; please see
-[configuration - context](../config.md#grafast-options).
+You can provide this to `makeV4Preset({ additionalGraphQLContextFromRequest })`, so no specific action is required.
+
+:::info
+
+If you want to do this the V5 way then the replacement is the
+'grafast.context' option; please see [configuration -
+context](../config.md#grafast-options).
+
+```ts
+const preset = {
+  //...
+  grafast: {
+    context(ctx) {
+      // Other servers/transports add different details to `ctx`.
+      const { req, res } = ctx.node ?? {};
+      return additionalGraphQLContextFromRequest(req, res);
+    },
+  },
+};
+```
+
+:::
 
 ### pgSettings
 
-This is now a regular entry inside the GraphQL context returned from your
-'grafast.context' configuration, for more details see
-[configuration - context](../config.md#grafast-options).
+You can provide this to `makeV4Preset({ pgSettings })`, so no specific action is required.
 
-## Breaking changes
+:::info
+
+If you want to do this the V5 way then the replacement is to
+return a `pgSettings` key from the GraphQL context returned from your
+'grafast.context' configuration, for more details see [configuration -
+context](../config.md#grafast-options).
+
+```ts
+const preset = {
+  //...
+  grafast: {
+    context(ctx) {
+      // Other servers/transports add different details to `ctx`.
+      const { req } = ctx.node ?? {};
+      return {
+        pgSettings: pgSettings(req);
+      };
+    },
+  },
+};
+```
+
+:::
+
+## Breaking GraphQL schema changes
 
 We've done our best to maintain as much compatibility with a V4 GraphQL schema
-as possible, but some breaking changes persist (we'd argue they're for the
-better!). Of course if any of these are critical issues to you they can all be
-solved by writing a plugin to shape the GraphQL API how you need, but we suggest
-that if possible you accept these new changes.
+as possible when you use `makeV4Preset()`, but some breaking changes persist
+(we'd argue they're for the better!). Of course if any of these are critical
+issues to you they can all be solved by writing a plugin to shape the GraphQL
+API how you need, but we suggest that if possible you accept these new changes.
 
 - The long deprecated "legacy relations" are no longer generated.
 - Node IDs for bigint columns have changed (specifically numbers under
   `MAX_SAFE_INT` now have quote marks inside the encoding too)
-- The `@foreignKey` smart tag must reference a unique constraint or primary key
 - In alignment with the
   [Cursor connections specification](https://relay.dev/graphql/connections.htm),
   connection edges are nullable and cursors are not. It seems we implemented
   this the wrong way around in V4.
 - For `fooEdge` fields on mutation payloads, the `orderBy` argument is now
   non-nullable. It still has a default, so this will only affect you if you were
-  explicitly passing `null` (why would you do that?!)
+  explicitly passing `null` (why would you do that?!).
 - The `fooEdge` fields on mutation payloads now only exist if the table has a
   primary key.
+- If you disable `NodePlugin` then the `deletedFooId` field on mutation
+  payloads now will not be added to the schema (it never should have been).
+
+Many of the above issues will not cause any problems for the vast majority of
+your operations - an engineer from our sponsor Netflix reported that all 4,000
+unique queries that their very large and complex V4 internal schema received in
+Feb 2023 validated successfully against their V5 schema - zero breakage!
+Despite the query compatibility, you may still need to migrate some types on
+the client side.
 
 Other changes:
 
 - The values generated for `cursor` differ. This is not deemed to be a breaking
-  change, as these may change from one release to the next (even patch versions)
-- The `@uniqueKey` smart key is no more, but our V4 preset converts it to
-  `@unique ...|@behavior -single -update -delete` for you
+  change, as these may change from one release to the next (even patch versions).
+- In some circumstances the location where a `null` is returned or an error is
+  thrown may differ slightly between V4 and V5; this will still respect the
+  GraphQL schema though, of course.
+
+## Smart tag changes
+
+Despite the following changes, if you're using `makeV4Preset` then you should
+not need to take any action - the established V4 behavior should be
+automatically emulated.
+
+- The `@uniqueKey` smart tag is no more; the V4 preset converts it to
+  `@unique ...|@behavior -single -update -delete` for you.
+- The `@omit` smart tag is no more; the V4 preset converts it to the
+  relevant [behavior](../behavior.md) for you.
+- The `@simpleCollections` smart tag is no more; the V4 preset converts it to the
+  relevant [behavior](../behavior.md) for you.
+- The `@foreignKey` smart tag must reference a unique constraint or primary
+  key; the V4 preset automatically sets
+  `pgFakeConstraintsAutofixForeignKeyUniqueness: true` which creates this
+  `unique` for you (via a smart tag) and gives it the relevant behaviors so
+  that it doesn't turn into more fields/arguments/etc.
+
+The behavior system gives much finer grained control over which things
+should/should not be exposed in the schema, and how. If you use the V4 preset
+then we'll automatically translate the old smart tags into their behavior
+equivalents, so you shouldn't need to worry too much about this right now. We
+do advise that you migrate to the behavior system though, it's much more
+powerful.
 
 ## Running
 
@@ -161,7 +264,9 @@ Other changes:
 
 You can run V5 with the `postgraphile` command. Now that it automatically reads
 the `graphile.config.js` file you should use that for advanced configuration of
-the PostGraphile CLI. Currently the main options are:
+the PostGraphile CLI rather than sending loads of CLI flags.
+
+Currently the main options are:
 
 - `-P` - the preset to use, e.g. `-P postgraphile/presets/amber`
 - `-p` - the port to listen on; if not set then it will try and use `5678` but
@@ -176,7 +281,7 @@ the PostGraphile CLI. Currently the main options are:
 - `-e` - enable "explain" - this allows GraphiQL (now called Ruru) to render the
   operation plan and SQL queries that were executed
 - `-C` - the config file to load; if not set we'll try and load
-  `graphile.config.js` but won't raise an error if it doesn't exist
+  `graphile.config.js` (or similar) but won't raise an error if it doesn't exist
 
 Example:
 
@@ -194,7 +299,8 @@ approach, so instead you get a collection of helper methods.
 
 Load the correct [Grafserv][] adaptor for the JS server that you're using, and
 feed this into `pgl.createServ(grafserv)` to get a `serv` Grafserv instance.
-Finally mount the `serv` instance into your server of choice.
+Finally mount the `serv` instance into your server of choice using the API your
+chosen Grafserv adaptor recommends (typically `serv.addTo(...)`).
 
 Here's a simple example using the Node built-in HTTP server:
 
@@ -227,49 +333,60 @@ documentation for details.
 
 :::
 
+:::tip
+
+Node.js' `http.createServer()` does _not_ need to be passed a request handler -
+you can attach one later via `server.on('request', handler)` - this is exactly
+what we do behind the scenes in the example above. The reason for this approach
+is that it gives us a chance to also add a `server.on('upgrade', ...)` handler
+for dealing with websockets if `preset.grafserv.websockets` is `true`.
+
+:::
+
 ### Schema only mode
 
-No need for `withPostGraphileContext` any more; the context no longer has a
-lifecycle that needs to be carefully managed - just run the query through
+`createPostGraphileSchema` is now just `makeSchema` (and can be imported from
+`postgraphile` or `graphile-build` - your choice). It only accepts one argument
+now - the preset that you'd load from your `graphile.config.js` (or similar)
+file.
+
+There is no need for `withPostGraphileContext` any more; the context no longer
+has a lifecycle that needs to be carefully managed. Just run the query through
 `grafast` as you normally would through `graphql`.
 
-```ts title="schema-only.js"
-import { grafast, hookArgs } from "grafast";
+The `context` will still need to be generated however. The easy option is to
+have this done automatically by additionally passing the `resolvedPreset` and a
+`requestCtx` object to `grafast`:
+
+```ts title="schema-only.mjs"
+import { grafast } from "grafast";
 import { makeSchema } from "postgraphile";
 import preset from "./graphile.config.js";
 
-async function main() {
-  const { schema, resolvedPreset } = await makeSchema(preset);
+const { schema, resolvedPreset } = await makeSchema(preset);
 
-  const args = {
-    schema,
-    source: /* GraphQL */ `
-      query MyQuery {
-        __typename
-      }
-    `,
-  };
-
-  // Merge in the context and anything else plugins/presets want to add
-  await hookArgs(args, resolvedPreset, {
-    /* optional details for your context callback(s) to use */
-  });
-
-  const result = await grafast(args);
-
-  console.dir(result);
-}
-
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+const args = {
+  schema,
+  source: /* GraphQL */ `
+    query MyQuery {
+      __typename
+    }
+  `,
+};
+const requestCtx = {};
+const result = await grafast(args, resolvedPreset, requestCtx);
+console.dir(result);
 ```
+
+Alternatively, you can use the `hookArgs` method to hook the execution args and
+attach all the relevant context data to it based on your preset and its
+plugins. This is somewhat more involved, please see the [schema only
+usage](../usage-schema.md) documentation for that.
 
 ## Server
 
 PostGraphile's HTTP server has been replaced with [Grafserv][], our new
-ultra-fast general purpose Grafast-powered GraphQL server. Currently this
+ultra-fast general purpose Gra*fast*-powered GraphQL server. Currently this
 doesn't support the same hooks that V4's server did, but we can certainly extend
 the hooks support over time. If there's a particular hook you need, please reach
 out.
@@ -357,14 +474,14 @@ actually running it, and can improve the debugging messages when things go
 wrong.
 
 Keep in mind that we no longer have the lookahead system (so
-`addArgDataGenerator` and its ilk no longer exist), instead we use [Grafast plan
+`addArgDataGenerator` and its ilk no longer exist), instead we use [Gra*fast* plan
 resolvers][].
 
 ## Plans, not resolvers
 
 The new system uses [Gra*fast*][grafast] which has a plan based system, so
 rather than writing traditional GraphQL resolvers for each field, you will write
-[Grafast plan resolvers][]. This lends a lot more power to the system, and is a
+[Gra*fast* plan resolvers][]. This makes the system a lot more powerful and is a
 lot more intuitive than our lookahead system once you've spent a little time
 learning it. It also completely removes the need for old awkward-to-use
 directives such as `@pgQuery` and `@requires`! (See
@@ -393,22 +510,11 @@ them independent of what your PostgreSQL schema actually is!
 
 There is no introspection cache any more, so no `--read-cache`, `--write-cache`,
 `readCache` or `writeCache`. Instead you can build the GraphQL schema and then
-export it as executable code to a file using
-[graphile-export][exporting schema]. In production you simply run this exported
+[export it as executable code](../exporting-schema.md) using
+`graphile-export`. In production you simply run this exported
 code - there's no need for database introspection, schema building plugins,
-etc - and you instantly get your schema without the complexities of building it
-dynamically.
-
-## Smart tags
-
-Smart tags are still a thing, and they mostly behave the same, except we've
-replaced the `@omit` and `@simpleCollections` smart tags and a few others with a
-[behavior system](../behavior). This system gives much finer grained control
-over which things should/should not be exposed in the schema, and how. If you
-use the V4 preset then we'll automatically translate the old smart tags into
-their behavior equivalents, so you shouldn't need to worry too much about this
-right now. We do advise that you migrate to the behavior system though, it's
-much more powerful.
+etc - and you instantly get your schema without the complexities (or
+dependencies!) required in building it dynamically.
 
 ## `buildSchema`
 
@@ -419,7 +525,9 @@ which were previously the second argument), second comes the result of gather
 and finally comes the shared object which contains inflection.
 
 ```js
-const preset = require("./graphile.config.js");
+import { resolvePresets } from "graphile-config";
+import { buildInflection, gather, buildSchema } from "graphile-build";
+import preset from "./graphile.config.js";
 
 const resolvedPreset = resolvePresets([preset]);
 const shared = { inflection: buildInflection(resolvedPreset) };
@@ -429,10 +537,8 @@ const schema = buildSchema(resolvedPreset, input, shared);
 
 ## `postgraphile-core`
 
-`postgraphile-core` is no more (look ma, I'm a poet!); here's how to replace a
-few of the methods there.
-
-### `createPostGraphileSchema`
+`postgraphile-core` is no more (look ma, I'm a poet!); here's how to replace
+`createPostGraphileSchema`:
 
 Before:
 
@@ -441,10 +547,12 @@ import { createPostGraphileSchema } from "postgraphile-core";
 
 // ...
 
-const gqlSchema = await createPostGraphileSchema(DATABASE_URL, "public", {
+const schema = await createPostGraphileSchema(DATABASE_URL, "public", {
   // options
 });
 ```
+
+After:
 
 ```js
 import { makeSchema } from "postgraphile";
@@ -455,7 +563,7 @@ const { schema, resolvedPreset } = await makeSchema(preset);
 
 [grafast]: https://grafast.org
 [ruru]: https://grafast.org/ruru
-[grafast plan resolvers]: https://grafast.org/grafast/plan-resolvers
+[gra*fast* plan resolvers]: https://grafast.org/grafast/plan-resolvers
 [grafserv]: https://grafast.org/grafserv
 [pg-introspection]: https://npmjs.com/package/pg-introspection
 [exporting schema]: ../exporting-schema
