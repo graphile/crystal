@@ -39,3 +39,57 @@ Run this file, and you should see a `exported-schema.mjs` file containing your
 executable schema. You'll notice that this schema does not import
 graphile-build, graphile-build-pg, etc - it just imports what it needs from
 `graphql`, `grafast` and similar runtime modules.
+
+:::warning
+
+Not all PostGraphile plugins support exporting the schema, if you use plugins
+that don't support exporting then your exported schema is likely to have
+runtime or even security issues. It is essential that you thoroughly test
+your exported schema before relying on it.
+
+:::
+
+:::warning
+
+Exporting a GraphQL schema is error-prone, so you should test your exported
+schema thoroughly. The main failure mode for exported schemas is runtime errors
+or incorrect variable references when an exported function attempts to
+reference a variable in the parent scope and that variable wasn't correctly
+handled via the `EXPORTABLE()` function from `graphile-export`. Using
+`eslint-plugin-graphile-export` will help catch most of these kinds of errors,
+but you should be careful to ensure that every function that will be exported
+is either wrapped with `EXPORTABLE` (with the correct args) or is from a
+declared module - see the `graphile-export` documentation.
+
+:::
+
+:::tip
+
+If you will be exporting your GraphQL schema we **highly recommend** that you
+adopt the exported schema into every facet of your development lifecycle: you
+should use the exported schema in development, you should use it when running
+tests, and you should use it on your staging environments. This will give lots
+of opportunity for you and your QA engineer colleagues to catch any bugs in the
+export.
+
+:::
+
+:::tip
+
+We **highly recommend** that plugin authors (both for internal project plugins
+and plugins distributed via `npm`) use the
+[eslint-plugin-graphile-export](http://www.npmjs.com/package/eslint-plugin-graphile-export)
+ESLint plugin to ensure that your methods are correctly exported. This plugin
+is still experimental so limit it to only running against your plugin code, but
+it really helps to catch a variety of issues that may prevent your schema from
+being exported correctly.
+
+:::
+
+:::tip
+
+You may get value from running ESLint, TypeScript, and/or other code validation
+tooling against the exported code to ensure there are no undefined variable
+references or similar.
+
+:::

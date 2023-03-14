@@ -4,13 +4,6 @@ path: /postgraphile/namespaces/
 title: Namespaces (PostgreSQL "schemas")
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 In PostgreSQL, each database consists of a number of "schemas". The default
 schema is named "public" and many users only ever deal with this one schema.
 
@@ -70,9 +63,9 @@ Here's some other schemas you might see (but should not modify):
   https://github.com/graphile/worker
 - `graphile_migrate` - a schema used and managed by
   https://github.com/graphile/migrate
-- `postgraphile_watch` - if you're using PostGraphile in watch mode (`--watch`
-  or `watchPg: true`), PostGraphile will install this schema to create
-  [PostgreSQL Event Triggers](https://www.postgresql.org/docs/current/sql-createeventtrigger.html)
+- `postgraphile_watch` - if you're using PostGraphile in watch mode
+  PostGraphile will attempt to install this schema to create [PostgreSQL Event
+  Triggers](https://www.postgresql.org/docs/current/sql-createeventtrigger.html)
   to enable watch mode.
 - `information_schema` - a SQL standard schema for reflection over the database:
   https://www.postgresql.org/docs/current/information-schema.html

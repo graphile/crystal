@@ -29,15 +29,6 @@ import type {
 } from "../executor.js";
 import type { MakePgConfigOptions } from "../interfaces.js";
 
-// NOTE: \0 is not valid in an SQL identifier and may cause 'invalid message
-// format' or worse error. However, it's exceedingly unlikely that it'll be
-// present in any legitimate code. As such, we'll just replace it with a `"` to
-// save on processing - it's already unlikely that an SQL identifier would have
-// a quote mark in it.
-function escapeIdentifier(str: string): string {
-  return '"' + str.replace(/["\0]/g, '""') + '"';
-}
-
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
   ? parseInt(process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE, 10)
@@ -73,7 +64,6 @@ const DONT_DISABLE_JIT = process.env.DATAPLAN_PG_DONT_DISABLE_JIT === "1";
 
 function newNodePostgresPgClient(
   pgClient: pg.PoolClient,
-  subscriptions: Map<string, ((notification: any) => void)[]>,
   txLevel: number,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
@@ -107,7 +97,6 @@ function newNodePostgresPgClient(
         try {
           const newClient = newNodePostgresPgClient(
             pgClient,
-            subscriptions,
             txLevel + 1,
             alwaysQueue,
             alreadyInTransaction,
@@ -193,33 +182,6 @@ function newNodePostgresPgClient(
         );
       }
     },
-    async listen(topic, callback) {
-      const subs = subscriptions.get(topic) ?? [];
-      if (subs.length === 0) {
-        subs.push(callback);
-        subscriptions.set(topic, subs);
-        pgClient
-          .query({ text: `listen ${escapeIdentifier(topic)}` })
-          .catch(() => {
-            /*nom nom nom*/
-          });
-      } else {
-        subs.push(callback);
-      }
-      return () => {
-        const i = subs.indexOf(callback);
-        if (i >= 0) {
-          subs.splice(i, 1);
-          if (subs.length === 0) {
-            pgClient
-              .query({ text: `unlisten ${escapeIdentifier(topic)}` })
-              .catch(() => {
-                /*nom nom nom*/
-              });
-          }
-        }
-      };
-    },
   };
 }
 
@@ -247,21 +209,6 @@ async function makeNodePostgresWithPgClient_inner<T>(
     }
   }
 
-  const subscriptions = new Map<string, ((notification: any) => void)[]>();
-
-  const notificationCallback = (notification: pg.Notification) => {
-    const subs = subscriptions.get(notification.channel);
-    if (subs) {
-      for (const cb of subs) {
-        try {
-          cb(notification);
-        } catch {
-          /*nom nom nom*/
-        }
-      }
-    }
-  };
-
   // PERF: under what situations is this actually required? We added it to
   // force test queries that were sharing the same client to run in series
   // rather than parallel (probably for the filter plugin test suite?) but it
@@ -272,8 +219,6 @@ async function makeNodePostgresWithPgClient_inner<T>(
   }
 
   return (pgClient[$$queue] = (async () => {
-    pgClient.on("notification", notificationCallback);
-
     try {
       // If there's pgSettings; create a transaction and set them, otherwise no transaction needed
       if (pgSettingsEntries.length > 0) {
@@ -287,7 +232,6 @@ async function makeNodePostgresWithPgClient_inner<T>(
           });
           const client = newNodePostgresPgClient(
             pgClient,
-            subscriptions,
             1,
             alwaysQueue,
             alreadyInTransaction,
@@ -308,7 +252,6 @@ async function makeNodePostgresWithPgClient_inner<T>(
       } else {
         const client = newNodePostgresPgClient(
           pgClient,
-          subscriptions,
           0,
           alwaysQueue,
           alreadyInTransaction,
@@ -317,7 +260,6 @@ async function makeNodePostgresWithPgClient_inner<T>(
       }
     } finally {
       pgClient[$$queue] = null;
-      pgClient.removeListener("notification", notificationCallback);
     }
   })());
 }
@@ -765,7 +707,7 @@ export function makePgConfig(
     withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
     pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
     pgSubscriberKey = name === "main" ? "pgSubscriber" : `${name}_pgSubscriber`,
-    pubsub,
+    pubsub = true,
     pgSettings,
     pgSettingsForIntrospection,
   } = options;

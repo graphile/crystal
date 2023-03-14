@@ -267,7 +267,7 @@ export async function runTestQuery(
           variableValues,
         };
 
-        await hookArgs(args, {}, resolvedPreset);
+        await hookArgs(args, resolvedPreset, {});
 
         // We must override the context so that we can listen to the SQL queries.
         args.contextValue = {

@@ -4,6 +4,7 @@ import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByMetaKey } from "./engine/OperationPlan";
 import type { ExecutionEventEmitter } from "./interfaces.js";
 
+// TODO: rename this, it clashes with Grafast.RequestContext.
 /**
  * @internal
  */

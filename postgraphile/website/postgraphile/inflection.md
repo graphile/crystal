@@ -4,18 +4,15 @@ path: /postgraphile/inflection/
 title: Inflection
 ---
 
-:::caution
+Inflection governs how things are named whilst building your PostGraphile
+schema. "Inflection" is the system of naming things; it's composed of a large
+set of named functions, and we call each of these inflection functions an
+"inflector."
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
-In PostGraphile, we have the concept of "inflection" which details how things in
-PostgreSQL are named in the generated GraphQL schema.
-
-The default inflections in PostGraphile attempts to map things to natural names
-in GraphQL whilst attempting to avoid naming conflicts. For example:
+In GraphQL types typically use `PascalCase`; fields, arguments and directives
+typically use `camelCase`; and enum values typically use `CONSTANT_CASE`. The
+default inflectors attempt to map things to natural names in GraphQL whilst
+avoiding naming conflicts. For example:
 
 - Table names are singularised and changed to UpperCamelCase: `pending_users` →
   `PendingUser`
@@ -26,36 +23,51 @@ in GraphQL whilst attempting to avoid naming conflicts. For example:
 ### Overriding Naming - One-off
 
 If you want to rename just one field or type, your best bet is to use a
-[smart comment](./smart-comments/); e.g. for a table you might do:
+[smart tag](./smart-tags.md); e.g. for a table you might do:
 
 ```sql
 COMMENT ON TABLE post IS E'@name message';
 ```
 
-NOTE: this still uses the inflectors, but it pretends that the tables name is
-different, so the input to the inflectors differs.
+:::note
 
-### Overriding Inflection - General
+Each inflector is responsible for checking for any relevant smart tags and
+honouring them.
 
-It's possible to override individual inflectors with a plugin. Doing so is
-documented in the
-[`makeAddInflectorsPlugin` article](./make-add-inflectors-plugin/).
+:::
 
-An example plugin looks something like this:
+### Overriding Inflection
 
-```js{2-4}
-module.exports = makeAddInflectorsPlugin(
-  {
-    patchType(typeName: string) {
-      return this.upperCamelCase(`${typeName}-change-set`);
-    },
-  },
-  true
+You can easily write a plugin to override an individual inflector, it just
+needs to add the new inflector under the `inflection.replace` object; an
+example might look like:
+
+```js
+export default {
+  name: 'ReplacePatchTypeInflectorPlugin',
+  version: '0.0.0',
+
+  inflection: {
+    replace: {
+      patchType(previous, resolvedPreset, typeName) {
+        return this.upperCamelCase(`${typeName}-change-set`);
+      },
+    }
+  }
 );
 ```
 
-See there also for
-[which inflectors to overwrite](./make-add-inflectors-plugin/#where-are-the-default-inflectors-defined).
+In this example, `previous` is the previous inflector (in case you only want to
+override in certain circumstances) - you would call it using the same
+arguments, just dropping the first two - so in this case: `previous(typeName)`.
+
+:::tip
+
+TypeScript is your friend when replacing inflectors, it should know what
+inflectors are available, their documentation, and the types of all their
+arguments.
+
+:::
 
 ### Advice
 
@@ -65,12 +77,12 @@ can make your schema quite verbose, e.g. `userByAuthorId`, `userByEditorId`,
 
 Some people like this verbosity, however if you prefer shorter names we
 encourage you use
-[the `@graphile-contrib/pg-simplify-inflector` plugin](https://github.com/graphile-contrib/pg-simplify-inflector).
+[the `@graphile/simplify-inflection` plugin](https://github.com/graphile/simplify-inflection).
 This would automatically change those fields to be named `author`, `editor` and
 `publisher` respectively.
 
 ```
-postgraphile --append-plugins @graphile-contrib/pg-simplify-inflector
+postgraphile --append-plugins @graphile/simplify-inflection
 ```
 
-I, Benjie, prefer to use the pg-simplify-inflector in all my projects.
+I, Benjie, prefer to use this plugin in all my projects.

@@ -7,19 +7,20 @@ title: Usage - Library
 Library mode is the most popular way of running PostGraphile; it gives more
 power than using the CLI (see [CLI usage](./usage-cli/)) because you can
 leverage the capabilities and ecosystems of your chosen Node.js webserver
-(Express, Koa, Fastify, etc), but is much easier to setup and more fully
-featured than [Schema-only Usage](./usage-schema/).
+(Express, Koa, Fastify, etc), but is more fully featured than [Schema-only
+Usage](./usage-schema/).
 
-## Getting a PostGraphile instance
+## PostGraphile instance
 
 Library mode is configured using a preset (see [Configuration](./config.md) for
-the options) and returns a PostGraphile instance which has various methods
-you can use depending on what you're trying to do.
+the options) and returns a PostGraphile instance which has various
+methods you can use depending on what you're trying to do.
 
 ```js title="pgl.js"
 import preset from "./graphile.config.js";
 import postgraphile from "postgraphile";
 
+// Our PostGraphile instance:
 export const pgl = postgraphile(preset);
 ```
 
@@ -83,15 +84,15 @@ For information about using PostGraphile with Connect, Express, Koa, Fastify,
 Restify, or any other HTTP servers, please see the [Grafserv
 documentation][grafserv].
 
-### `pgl.getServerParams()`
+### `pgl.getSchemaResult()`
 
-:::warning
+:::caution
 
 This will likely be renamed before the V5.0.0 release.
 
 :::
 
-Returns a promise to the server parameters - an object containing:
+Returns a promise to the schema result - an object containing:
 
 - `schema` - the GraphQL schema
 - `resolvedPreset` - the resolved preset
@@ -100,12 +101,12 @@ Note that this may change over time, e.g. in watch mode.
 
 ### `pgl.getSchema()`
 
-Shortcut to `(await getServerParams()).schema` - the current GraphQL schema the
+Shortcut to `(await getSchemaResult()).schema` - the current GraphQL schema the
 instance represents (may change due to watch mode).
 
 ### `pgl.getResolvedPreset()`
 
-Get the current resolved preset that PostGraphile is using.
+Get the current resolved preset that PostGraphile is using. Synchronous.
 
 ### `pgl.release()`
 

@@ -10,16 +10,25 @@ PostGraphile.
 
 (TODO: expand here with different use cases and presets that support them.)
 
-PostGraphile presets are named after crystals; the first preset available is
-`postgraphile/presets/amber`, so you'll definitely want that. If you're coming
-from PostGraphile V4 you may also want to make your own preset with the
+The PostGraphile base presets are named after crystals; the first preset available is
+`postgraphile/presets/amber`, so you'll definitely want that. **If you're coming
+from PostGraphile V4** you may also want to make your own preset with the
 `makeV4Preset()` factory - see the
 [V4 migration docs](./migrating-from-v4/index.md) for more information.
+
+:::caution
+
+Please don't name your own presets after crystals, or we may end up having
+confusion!
+
+:::
 
 ## General structure
 
 A preset is a plain JavaScript object, and every key in the preset is optional.
-`{}` is a valid (but not very useful!) preset.
+`{}` is a valid (but not very useful!) preset. The key `default` is forbidden
+at the top level of a preset, this allows us to detect common issues with
+ESM/CommonJS interoperability.
 
 The value for the `extends` key, if specified, must be an array of other presets
 your preset wishes to extend.
@@ -32,7 +41,7 @@ if the same plugin is referenced in multiple presets.
 The preset also accepts keys for each supported scope. `graphile-config` has no
 native scopes, but different Graphile projects can register their own scopes,
 for example `graphile-build` registers the `inflection`, `gather` and `schema`
-scopes, `graphile-build-pg` registers the `pgConfigs` scope, and PostGraphile
+scopes, `graphile-build-pg` registers the `pgConfigs` scope, and Grafserv
 registers the `server` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
@@ -40,20 +49,25 @@ get auto-completion for the options available in each scope. It may be necessary
 to add `import "postgraphile"` at the top of the configuration file so that
 TypeScript imports all the available scopes.
 
-Note that the schema build process in PostGraphile is:
+:::note
 
-- Synchronously build the inflectors via the "inflection" phase - inflectors are
+The schema build process in PostGraphile is:
+
+- Synchronously build the inflectors via the `inflection` phase - inflectors are
   used throughout all other phases
 - Asynchronously build the data sources by performing database introspection in
-  the "gather" phase
-- Synchronously build the GraphQL schema during the "schema" phase
+  the `gather` phase
+- Synchronously build the GraphQL schema during the `schema` phase
+
+:::
+
+### Example
 
 ```ts
 // Only needed for TypeScript types support
 import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
-import { StreamDeferPlugin } from "graphile-build";
 // Use the 'pg' module to connect to the database
 import { makePgConfig } from "@dataplan/pg/adaptors/pg";
 
@@ -65,8 +79,7 @@ const preset = {
   ],
 
   plugins: [
-    /* Add plugins here, e.g.: */
-    StreamDeferPlugin,
+    /* Add plugins here */
   ],
 
   inflection: {
@@ -77,8 +90,12 @@ const preset = {
     makePgConfig({
       // Database connection string:
       connectionString: process.env.DATABASE_URL,
-      // List of schemas to expose:
+
+      // List of database schemas to expose:
       schemas: ["app_public"],
+
+      // Enable LISTEN/NOTIFY:
+      pubsub: true,
     }),
   ],
   gather: {
@@ -98,13 +115,57 @@ const preset = {
 export default preset;
 ```
 
-## `inflection` options
+### Viewing the available options
+
+Once you have a basic configuration file, you can use the `graphile` CLI to
+find out what options are available to you:
+
+```sh
+graphile config options
+```
+
+Note that the options available will be influenced by the modules that you are
+using, so be sure to import any plugins and presets at the top of your config
+file.
+
+<figure>
+
+[![Cropped screenshot of 'graphile config options'](./graphile-config-options-screenshot.png)](./graphile-config-options-screenshot.png)
+
+<figcaption>Screenshot of part of the coloured markdown output from executing <code>graphile config options</code> showing the options available to be set inside the config file.</figcaption>
+</figure>
+
+### Viewing the resolved configuration
+
+You can also use the `graphile` CLI to print out your resolved configuration
+(once all the presets have been applied). This can help with debugging:
+
+```sh
+graphile config print
+```
+
+<figure>
+
+[![Cropped screenshot of 'graphile config print'](./graphile-config-print-screenshot.png)](./graphile-config-print-screenshot.png)
+
+<figcaption>Screenshot of part of the coloured output from executing <code>graphile config print</code> showing the options that the local configuration file is using.</figcaption>
+</figure>
+
+## Option reference
+
+What follows are some of the more commonly used options to serve as a quick
+reference, but this list can quickly become out of date (feel free to send a
+PR!). You should use the `graphile config options` command mentioned above to
+see what options are available to you - different presets and plugins make
+different options available.
+
+### `inflection` options
 
 _(TypeScript type: `GraphileBuild.InflectionOptions`)_
 
 _None at this time._
 
-## `pgConfigs`
+### `pgConfigs`
 
 _(TypeScript type: `ReadonlyArray<GraphileConfig.PgDatabaseConfiguration>`)_
 
@@ -124,18 +185,21 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
-- `listen: (topic: string) => AsyncIterable<string>` - a callback function to
-  use to listen to a particular topic
-- `pgSettings: (ctx: Grafast.RequestContext) => Record<string, string> | null` -
+- `pgSettings: (requestCtx: Grafast.RequestContext) => Record<string, string> | null` -
   a callback function that will be called by the server to determine the
   pgSettings to use for a particular request
 - `pgSettingsForIntrospection: Record<string, string> | null` - the pgSettings
   to use when introspecting the database (for example if you want to change
   roles)
+- `pgSubscriber: PgSubscriber` - a `PgSubscriber` instance that allows code to
+  subscribe to LISTEN/NOTIFY events in the database - useful for GraphQL
+  subscriptions, and also for schema watch mode.
 - `withPgClientKey: string` - the key on the `context` object to store the
   `withPgClient` method the schema uses for communicating with the database
 - `pgSettingsKey: string` - the key on the `context` object to store the
   `pgSettings` configuration to use when communicating with the database
+- `pgSubscriberKey: string` - the key on the `context` object to store the
+  `pgSubscriber` instance to, for use during GraphQL subscriptions
 
 ```js title="Example manual configuration"
 import * as pg from "pg";
@@ -163,26 +227,13 @@ optional configuration parameters:
 - `connectionString`
 - `schemas`
 - `superuserConnectionString`
+- `pubsub` (create a pgSubscriber entry; should default to `true`)
 - pass-through options (same as in `pgConfigs` above):
   - `name` (default: "main")
   - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
   - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
+  - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
   - `pgSettings`
-
-:::warning
-
-The `name` option must be unique across all your `pgConfigs`; therefore if you
-have more than one entry in `pgConfigs` you must give each additional entry an
-explicit and unique name.
-
-:::
-
-It may additionally accept any other options it likes (but care should be taken
-to not conflict with options of other adaptors, or that we might want to add
-as future core options).
-
-It will return a fully resolved configuration object, suitable for inclusion
-into the `pgConfigs` array in your `graphile.config.mjs` (or similar) file.
 
 :::info
 
@@ -191,24 +242,45 @@ why every adaptor should support them.
 
 :::
 
+:::caution
+
+The `name` option must be unique across all your `pgConfigs`; therefore if you
+have more than one entry in `pgConfigs` you must give each additional entry an
+explicit and unique name.
+
+:::
+
+It may additionally accept any other options it likes (but care should be taken
+to not conflict with options of other adaptors, or options that we might want
+to add to core in future).
+
+`makePgConfig` will return a fully resolved configuration object, suitable for
+inclusion into the `pgConfigs` array in your `graphile.config.mjs` (or similar)
+file.
+
 ```js title="Example configuration via makePgConfig"
 const pgConfigs = [
   makePgConfig({
     // Database connection string:
     connectionString: process.env.DATABASE_URL,
+
     // List of database schemas:
     schemas: ["app_public"],
+
+    // Enable LISTEN/NOTIFY:
+    pubsub: true,
+
     // Optional, only needed for `--watch` mode:
     superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
   }),
 ];
 ```
 
-### `adaptorSettings`
+#### `adaptorSettings`
 
 Each adaptor has its own adaptor-specific settings.
 
-#### `@dataplan/pg/adaptors/pg`
+##### `@dataplan/pg/adaptors/pg`
 
 This adaptor uses the `pg` module under the hood and uses the `pg.Pool` API
 primarily, it accepts the following options:
@@ -227,8 +299,10 @@ primarily, it accepts the following options:
   options](https://node-postgres.com/apis/client).
 - `superuserConnectionString` - as `connectionString`, but for superuser
   connections (only needed to install the watch fixtures in watch mode)
+- `pubsub` (default: `true`) - enable LISTEN/NOTIFY via creation of a
+  `pgSubscriber`
 
-## `gather` options
+### `gather` options
 
 _(TypeScript type: `GraphileBuild.GatherOptions`)_
 
@@ -247,7 +321,7 @@ Deprecated options:
   instead of the type name in the Node identifier (highly discouraged because it
   significantly increases the risk of NodeID conflicts)
 
-## `schema` options
+### `schema` options
 
 _(TypeScript type: `GraphileBuild.SchemaOptions`)_
 
@@ -260,19 +334,9 @@ to determine the options that they offer.
 
 - `jsonScalarAsString: boolean` - if true, JSON values will be stringified
   rather than returned as "dynamic" objects.
-- `nodeIdFieldName: string` - the name for the `id: ID` field; typically this is
-  `id` but you may wish to set it to `_id` or `nodeId` to avoid conflicts with
-  your `id` database columns
 - `dontSwallowErrors: boolean` - if true, errors during the schema build process
   will throw rather than the system trying to recover from them. Recommended,
   but not enabled by default as it can be a barrier to entry to new users.
-- `simpleCollections: 'only' | 'both' | 'omit'` - defaults to omit; changes the
-  default behavior for collection generation
-  - `only` - does not build Relay connections, instead just simple GraphQL lists
-  - `omit` - does not build simple lists, instead builds Relay connections
-    (recommended)
-  - `both` - supplies both lists and connections, making your schema somewhat
-    larger (not recommended)
 - `pgJwtSecret`
 - `pgJwtSignOptions`
 - `pgUseCustomNetworkScalars: boolean` - if not false, adds the `CidrAddress`,
@@ -283,9 +347,8 @@ to determine the options that they offer.
 - `pgForbidSetofFunctionsToReturnNull: boolean` - if true, setof functions
   cannot return null, so our list and connection types can be non-nullable in
   more places.
-- `subscriptions`
 
-## `grafast` options
+### `grafast` options
 
 _(TypeScript type: `import type { GrafastOptions } from "grafast"`)_
 
@@ -300,29 +363,41 @@ _(TypeScript type: `import type { GrafastOptions } from "grafast"`)_
   context object that your results will be merged into (overwriting
   pre-existing keys).
 
-### Making HTTP data available to plan resolvers
+### `server` options
+
+_(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
+
+- `port: number` - Port number to listen on (default: 5678)
+- `host: string` - Host to listen on (default: '127.0.0.1'; consider setting to
+  '0.0.0.0' in Docker and similar environments)
+- `graphqlPath: string` - The path at which GraphQL will be available; usually
+  `/graphql`
+- `graphiqlPath: string` - The path at which GraphiQL will be available; usually
+  `/`
+- `eventStreamPath: string` - The path at which the GraphQL event stream would
+  be made available; usually `/graphql/stream`
+- `graphqlOverGET: boolean` - If true, we'll support GraphQL queries over the
+  GET method
+- `graphiql: boolean`
+- `graphiqlOnGraphQLGET: boolean` - If true, then we will render GraphiQL on GET
+  requests to the `/graphql` endpoint
+- `watch: boolean` - Set true to enable watch mode
+- `maxRequestLength: number` - The length, in bytes, for the largest request
+  body that the server will accept, only used if the framework of choice
+  doesn't already handle input parsing
+
+## Making HTTP data available to plan resolvers
 
 Using the `grafast.context` callback we can extract data from the incoming HTTP
 request and make it accessible from within the Gra*fast* schema via the GraphQL context.
-
-:::warning
-
-Be careful to not clash with system context keys such as `withPgClient`,
-`pgSettings` and `jwtClaims` (you can see the existing context keys by
-inspecting the second argument to the `context` function).
-
-For the absolute best future compatibility, we recommend that you prefix your
-context keys with your initials, company name, or similar.
-
-:::
 
 Example:
 
 ```js title="graphile.config.js"
 export default {
   grafast: {
-    async context(requestContext) {
-      const req = requestContext.httpRequest;
+    async context(requestCtx) {
+      const req = requestCtx.node?.req;
       // You can perform asynchronous actions here if you need to; for example
       // looking up the current user in the database.
 
@@ -345,6 +420,18 @@ export default {
 };
 ```
 
+:::warning
+
+When adding details to `context`, you must careful to not add properties that
+will clash with system context keys such as `withPgClient`, `pgSettings`,
+`pgSubscriber` and `jwtClaims` (you can see the existing context keys by
+inspecting the second argument to the `context` callback).
+
+For the absolute best future compatibility, we recommend that you prefix your
+context keys with your initials, company name, or similar.
+
+:::
+
 :::tip
 
 It's _not_ a good idea to give direct access to the `req` or `res` objects
@@ -355,7 +442,7 @@ for realtime). Instead, add helpers to get/set the data you need.
 
 :::
 
-### Exposing HTTP request data to PostgreSQL
+## Exposing HTTP request data to PostgreSQL
 
 Using the `pgSettings` functionality mentioned in the `pgConfigs` section above
 you can extend the data made available within PostgreSQL through
@@ -363,7 +450,7 @@ you can extend the data made available within PostgreSQL through
 context mentioned in the "Grafast options" section above, the value for which
 should be a POJO (plain old JavaScript object) with string keys and values.
 
-:::warning
+:::caution
 
 You can use `pgSettings` to define variables that your Postgres
 functions/policies depend on, or to tweak internal Postgres settings.
@@ -393,8 +480,11 @@ export default {
 
   grafast: {
     async context(requestCtx, graphqlContext) {
-      // Extract details from the requestCtx
-      const req = requestCtx.httpRequest;
+      // Extract details from the requestCtx:
+      const req = requestCtx.node?.req;
+      // Or: const req = requestCtx.expressv4?.req;
+      // Or: const ctx = requestCtx.koav2?.ctx;
+
       const auth = req.getHeader("authorization");
 
       const context = {};
@@ -407,6 +497,7 @@ export default {
           const claims = jwt.verify(token, process.env.JWT_SECRET);
           const userId = claims.uid;
           context.pgSettings = {
+            ...graphqlContext.pgSettings,
             "myapp.user_id": userId,
             "myapp.headers.x_something": req.getHeader("x-something"),
           };
@@ -422,9 +513,9 @@ export default {
 :::tip
 
 GraphQL itself is transport agnostic, as is `grafast`, so depending on how you
-choose to use your PostGraphile schema you may or may not have access to an
-`httpRequest` or similar. Your `context` callback should be written to support
-all the different ways that your schema may be used: directly, over HTTP, using
+choose to use your PostGraphile schema you may or may not have access to an the
+HTTP request. Your `context` callback should be written to support all the
+different ways that your schema may be used: directly, over HTTP, using
 websockets, etc.
 
 :::
@@ -452,53 +543,24 @@ object from an Express server:
 ```js title="graphile.config.js"
 export default {
   grafast: {
-    context: ({ httpRequest: req }) => ({
-      pgSettings: {
-        role: "visitor",
-        "jwt.claims.user_id": `${req.user.id}`,
-        //...
-      },
-    }),
+    context(requestCtx, graphqlContext) {
+      // Base context used for all GraphQL requests
+      const context = {
+        pgSettings: { ...graphqlContext.pgSettings, role: "visitor" },
+      };
+
+      // Extract the current user from the Express request:
+      const user = requestCtx.expressv4?.req.user;
+
+      // If there's a user, pass additional data to Postgres:
+      if (user) {
+        context.pgSettings["jwt.claims.user_id"] = String(user.id);
+      }
+
+      return context;
+    },
   },
 };
 ```
 
 <!-- TODO: verify the above works. -->
-
-## `server` options
-
-_(TypeScript type: `import { GrafservOptions } from "grafserv"`)_
-
-- `port: number` - Port number to listen on (default: 5678)
-- `host: string` - Host to listen on (default: '127.0.0.1'; consider setting to
-  '0.0.0.0' in Docker and similar environments)
-- `graphqlPath: string` - The path at which GraphQL will be available; usually
-  `/graphql`
-- `eventStreamRoute: string` - The path at which the GraphQL event stream would
-  be made available; usually `/graphql/stream`
-- `graphqlOverGET: boolean` - If true, we'll support GraphQL queries over the
-  GET method
-- `graphiql: boolean`
-- `graphiqlOnGraphQLGET: boolean` - If true, then we will render GraphiQL on GET
-  requests to the `/graphql` endpoint
-- `graphiqlPath: string` - The path at which GraphiQL will be available; usually
-  `/`
-- `watch: boolean` - Set true to enable watch mode
-- `maxRequestLength: number` - The length, in bytes, for the largest request
-  body that the server will accept
-
-## Viewing your config
-
-In your `graphile.config.mjs` (or similar) file, append the following, replacing `preset` with the name of the variable in which your preset is stored:
-
-```js
-import { resolvePresets } from "graphile-config";
-const resolvedPreset = resolvePresets([preset]);
-console.dir(resolvedPreset);
-```
-
-:::info
-
-We're going to work on making this a bit nicer in future!
-
-:::

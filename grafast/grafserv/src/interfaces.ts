@@ -28,7 +28,7 @@ export interface GrafservOptions {
   /** The path at which GraphQL will be available; usually /graphql */
   graphqlPath?: string;
   /** The path at which the GraphQL event stream would be made available; usually /graphql/stream */
-  eventStreamRoute?: string;
+  eventStreamPath?: string;
 
   /** If true, allow GraphQL over GET requests. This has security ramifications, exercise caution. */
   graphqlOverGET?: boolean;

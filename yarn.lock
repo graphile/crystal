@@ -4137,48 +4137,49 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphiql/plugin-explorer@npm:^0.1.12":
-  version: 0.1.12
-  resolution: "@graphiql/plugin-explorer@npm:0.1.12"
+"@graphiql/plugin-explorer@npm:^0.1.14":
+  version: 0.1.14
+  resolution: "@graphiql/plugin-explorer@npm:0.1.14"
   dependencies:
-    "@graphiql/react": "npm:^0.15.0"
+    "@graphiql/react": "npm:^0.17.0"
     graphiql-explorer: "npm:^0.9.0"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 0d22ad45de4aeec65d49caa70421b84ee7fc413b2d115cedaa6314ae025b77821a5c42b587cd271d91b6f6476ae4bf69b1651e67aa1efb9463dd7e718aa078a0
+  checksum: 317429d3cef7c9b160416e837fae241f73415d41c4cb6dc8a8ee207ff441705495c0dee0dd2c4278c216f697a611443b737be333ab166c7b2a21cdc1e0ff789d
   languageName: node
   linkType: hard
 
-"@graphiql/react@npm:^0.15.0":
-  version: 0.15.0
-  resolution: "@graphiql/react@npm:0.15.0"
+"@graphiql/react@npm:^0.17.0":
+  version: 0.17.0
+  resolution: "@graphiql/react@npm:0.17.0"
   dependencies:
-    "@graphiql/toolkit": "npm:^0.8.0"
+    "@graphiql/toolkit": "npm:^0.8.2"
     "@reach/combobox": "npm:^0.17.0"
     "@reach/dialog": "npm:^0.17.0"
     "@reach/listbox": "npm:^0.17.0"
     "@reach/menu-button": "npm:^0.17.0"
     "@reach/tooltip": "npm:^0.17.0"
     "@reach/visually-hidden": "npm:^0.17.0"
+    clsx: "npm:^1.2.1"
     codemirror: "npm:^5.65.3"
-    codemirror-graphql: "npm:^2.0.2"
+    codemirror-graphql: "npm:^2.0.4"
     copy-to-clipboard: "npm:^3.2.0"
-    graphql-language-service: "npm:^5.1.0"
+    graphql-language-service: "npm:^5.1.2"
     markdown-it: "npm:^12.2.0"
     set-value: "npm:^4.1.0"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: e5e2030bf603f7f85f048f03776d139e4f79bee61f2226f9d6a5885865c53501042afa65350e0483dedbb65c8321e18d672b94ca2088a80517f3886f125c6ef9
+  checksum: 9b1fa806c10fd34d409e8ddf0f03e28c1164da992a8fda16623c1b726ccc50fe534f7c931e01be5ffdd03dddffc27ad1cf4b0595c13549aeab57f5aac0535d51
   languageName: node
   linkType: hard
 
-"@graphiql/toolkit@npm:^0.8.0":
-  version: 0.8.0
-  resolution: "@graphiql/toolkit@npm:0.8.0"
+"@graphiql/toolkit@npm:^0.8.2":
+  version: 0.8.2
+  resolution: "@graphiql/toolkit@npm:0.8.2"
   dependencies:
     "@n1ru4l/push-pull-async-iterable-iterator": "npm:^3.1.0"
     meros: "npm:^1.1.4"
@@ -4188,7 +4189,7 @@ __metadata:
   peerDependenciesMeta:
     graphql-ws:
       optional: true
-  checksum: 521e06b3ac1563cfe30fc184c318163e9ab8eae910068852af7d04afe1ce55b603c64b384ca089686a6997ca6dfef2dc7f17ca54720f9e9305b5849b7322cdea
+  checksum: 95d5afd426988da6b299fbd3314574dac6e82683be6b3799f7959b150e13c9502ad7cb1f5a4702797a1479f3285af205244242c80f118ac6432f762949257530
   languageName: node
   linkType: hard
 
@@ -8801,7 +8802,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codemirror-graphql@npm:^2.0.0, codemirror-graphql@npm:^2.0.2":
+"codemirror-graphql@npm:^2.0.0":
   version: 2.0.2
   resolution: "codemirror-graphql@npm:2.0.2"
   dependencies:
@@ -8811,6 +8812,19 @@ __metadata:
     codemirror: ^5.65.3
     graphql: ^15.5.0 || ^16.0.0
   checksum: 96e6e5771cb2119ccda04724cb5c7933c39c462cdc1fb3b6692a8d277b198c2705af070d4d2a191dd1800d55fa132a5b63158991be049be8b32f94b993cf4c53
+  languageName: node
+  linkType: hard
+
+"codemirror-graphql@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "codemirror-graphql@npm:2.0.4"
+  dependencies:
+    graphql-language-service: "npm:5.1.2"
+  peerDependencies:
+    "@codemirror/language": 6.0.0
+    codemirror: ^5.65.3
+    graphql: ^15.5.0 || ^16.0.0
+  checksum: 6766c5b327273c75f1d2bdba5846d67707c5df06c1faf7d79148fc0b6f1ff85c070939a73d75d769ec6f4c6a7d75aa705b1b7f819bb06571c24ee6be87a31c23
   languageName: node
   linkType: hard
 
@@ -13420,7 +13434,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"graphile@workspace:utils/graphile":
+"graphile@workspace:^, graphile@workspace:utils/graphile":
   version: 0.0.0-use.local
   resolution: "graphile@workspace:utils/graphile"
   dependencies:
@@ -13449,20 +13463,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphiql@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "graphiql@npm:2.2.0"
+"graphiql@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "graphiql@npm:2.4.0"
   dependencies:
-    "@graphiql/react": "npm:^0.15.0"
-    "@graphiql/toolkit": "npm:^0.8.0"
+    "@graphiql/react": "npm:^0.17.0"
+    "@graphiql/toolkit": "npm:^0.8.2"
     entities: "npm:^2.0.0"
-    graphql-language-service: "npm:^5.1.0"
+    graphql-language-service: "npm:^5.1.2"
     markdown-it: "npm:^12.2.0"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: f792ac1ccb0dd78344cf14186c9b14235833d4e3abe7c5f69f77ebdcb1bb76e1cdd18cb6c73cc13d5f3c48155452cd6ffbe913988fb0b9e1b087d4d15e819300
+  checksum: 60710cabbc15cec8cc2113c7a597cb7a9ec5bd7fe5302b62e28a118f41c020da9bfb48b63cad27e6b2ac796a4fc3723f0ed7211d6378142ceb0275bd076600d5
   languageName: node
   linkType: hard
 
@@ -13528,9 +13542,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-language-service@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "graphql-language-service@npm:5.1.0"
+"graphql-language-service@npm:5.1.2, graphql-language-service@npm:^5.1.2":
+  version: 5.1.2
+  resolution: "graphql-language-service@npm:5.1.2"
   dependencies:
     nullthrows: "npm:^1.0.0"
     vscode-languageserver-types: "npm:^3.17.1"
@@ -13538,7 +13552,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0
   bin:
     graphql: dist/temp-bin.js
-  checksum: b5439bc86888f7fe0683d3753dd090d3ecd4563fc67c67f0548a0f912a1449d19a975bdb422a64e9c8c1392b04d2a554fa671b3366aada8e040aef22aa8a876c
+  checksum: dea7d5625b2e5c7f9bffb61dbb049f1b4c90c4ae448cd5d0239d3692f72f2fe105775f39fd23ceb392d1c08f86d58fe18278a191fa473035512c02cb2299ae6a
   languageName: node
   linkType: hard
 
@@ -18532,6 +18546,7 @@ __metadata:
     debug: "npm:^4.3.3"
     grafast: "workspace:^"
     grafserv: "workspace:^"
+    graphile: "workspace:^"
     graphile-build: "workspace:*"
     graphile-build-pg: "workspace:*"
     graphile-config: "workspace:^"
@@ -20103,9 +20118,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ruru-components@workspace:grafast/ruru-components"
   dependencies:
-    "@graphiql/plugin-explorer": "npm:^0.1.12"
-    "@graphiql/react": "npm:^0.15.0"
-    "@graphiql/toolkit": "npm:^0.8.0"
+    "@graphiql/plugin-explorer": "npm:^0.1.14"
+    "@graphiql/react": "npm:^0.17.0"
+    "@graphiql/toolkit": "npm:^0.8.2"
     "@types/codemirror": "npm:^5.60.5"
     "@types/debug": "npm:^4.1.7"
     "@types/jest": "npm:^27.5.1"
@@ -20113,7 +20128,7 @@ __metadata:
     "@types/nodemon": "npm:1.19.1"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18.0.0"
-    graphiql: "npm:^2.2.0"
+    graphiql: "npm:^2.4.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^5.11.3"
     jest: "npm:^28.1.0"

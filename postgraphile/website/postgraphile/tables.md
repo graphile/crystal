@@ -4,13 +4,6 @@ path: /postgraphile/tables/
 title: PostgreSQL Tables
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 PostGraphile automatically adds a number of elements to the generated GraphQL
 schema based on the tables and columns found in the inspected schema.
 
@@ -67,8 +60,6 @@ type Query implements Node {
 }
 ```
 
--->
-
 - An `allUsers` [connection](./connections/) field with pagination, filtering,
   and ordering (inflector: `allRows`)
 - A number of `userByKey(key: ...)` fields (e.g. `userById`, `userByUsername`),
@@ -78,29 +69,34 @@ type Query implements Node {
 - Add [CRUD Mutations](./crud-mutations/) to the root `Mutation` type
 
 \* Remember these fields can be simplified by loading the
-`@graphile-contrib/pg-simplify-inflector` plugin.
+`@graphile/simplify-inflection` plugin.
 
 Read more about [relations](./relations/), [connections](./connections/),
 [filtering](./filtering/) and [CRUD Mutations](./crud-mutations/).
 
 ### Permissions
 
-If you're using `--no-ignore-rbac` or `ignoreRBAC: false` (highly recommended)
-then PostGraphile will only expose the tables/columns/fields you have access to.
-For example if you perform
+If you're using `PgRBACPlugin` (enabled by default if you're not using
+`makeV4Preset()`) then PostGraphile will only expose the tables/columns/fields
+you have access to. For example if you perform
 `GRANT UPDATE (username, name) ON users TO graphql_visitor;` then the
-`updateUser` mutations will only accept `username` and `name` fields - the other
-columns will not be present.
+`updateUser` mutations will only accept `username` and `name` fields - the
+other columns will not be present.
 
-Note that the `--no-ignore-rbac` (or `ignoreRBAC: false` in the library)
-inspects the RBAC (GRANT / REVOKE) privileges in the database and reflects these
-in your GraphQL schema. As is GraphQL best practices, this still only results in
-one GraphQL schema (not one per user), so it takes the user account you connect
-to PostgreSQL with (from your connection string) and walks all the roles that
-this user can become within the database, and uses the union of all these
-permissions. Using this flag is recommended, as it results in a much leaner
-schema that doesn't contain functionality that you can't actually use.
+Note that `PgRBACPlugin` inspects the RBAC (GRANT / REVOKE) privileges in the
+database and reflects these in your GraphQL schema. As is GraphQL best
+practices, this still only results in one GraphQL schema (not one per user), so
+it takes the user account you connect to PostgreSQL with (from your connection
+string) and walks all the roles that this user can become within the database,
+and uses the union of all these permissions. You can influence the settings
+used for this via the `pgConfig.pgSettingsForIntrospection` object. Using this
+plugin is recommended as it results in a much leaner schema that doesn't
+contain functionality that you can't actually use.
 
-\* **_NOTE: We strongly [advise against](./requirements/) using column-based
+:::note
+
+We strongly [advise against](./requirements.md) using column-based
 `SELECT` grants with PostGraphile. Instead, split your permission concerns into
-separate tables and join them with one-to-one relations._**
+separate tables and join them with one-to-one relations.
+
+:::

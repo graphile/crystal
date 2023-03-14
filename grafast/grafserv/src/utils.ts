@@ -165,23 +165,15 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
     schema: async () => instance.getSchema(),
     // PERF: we can remove the async/await and only use when context is async
     execute: async (args: ExecutionArgs) => {
-      await hookArgs(
-        args,
-        {
-          ws: (args.contextValue as any)?.[$$extra],
-        },
-        instance.resolvedPreset,
-      );
+      await hookArgs(args, instance.resolvedPreset, {
+        ws: (args.contextValue as any)?.[$$extra],
+      });
       return maskExecutionResult(await execute(args, resolvedPreset));
     },
     subscribe: async (args: ExecutionArgs) => {
-      await hookArgs(
-        args,
-        {
-          ws: (args.contextValue as any)?.[$$extra],
-        },
-        instance.resolvedPreset,
-      );
+      await hookArgs(args, instance.resolvedPreset, {
+        ws: (args.contextValue as any)?.[$$extra],
+      });
       return maskExecutionResult(await subscribe(args, resolvedPreset));
     },
   };

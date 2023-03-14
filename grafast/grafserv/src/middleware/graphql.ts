@@ -493,14 +493,10 @@ export const makeGraphQLHandler = (
       operationName,
     };
 
-    await hookArgs(
-      args,
-      {
-        ...request.requestContext,
-        http: request,
-      },
-      resolvedPreset,
-    );
+    await hookArgs(args, resolvedPreset, {
+      ...request.requestContext,
+      http: request,
+    });
 
     try {
       const result = await grafastExecute(args, resolvedPreset);

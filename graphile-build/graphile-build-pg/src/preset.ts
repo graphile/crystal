@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import { PgRBACPlugin } from "./index.js";
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 import { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
 import { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
@@ -70,5 +71,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgRemoveExtensionResourcesPlugin,
     PgEnumTablesPlugin,
     PgPolymorphismPlugin,
+    PgRBACPlugin,
   ],
 };

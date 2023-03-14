@@ -3,7 +3,7 @@ import "graphile-build";
 import type { KeysOfType, WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
 import type { ExecutableStep, PromiseOrDirect } from "grafast";
-import { constant, context, object } from "grafast";
+import { constant, context, defer, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
@@ -32,7 +32,6 @@ import {
 } from "pg-introspection";
 
 import {
-  listenWithPgClientFromPgConfig,
   withPgClientFromPgConfig,
   withSuperuserPgClientFromPgConfig,
 } from "../pgConfigs.js";
@@ -638,6 +637,12 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     async watch(info, callback) {
       const unlistens: Array<() => void> = [];
       for (const pgConfig of info.resolvedPreset.pgConfigs ?? []) {
+        if (!pgConfig.pgSubscriber) {
+          console.warn(
+            `pgConfig '${pgConfig.name}' does not have a pgSubscriber, and thus cannot be used for watch mode`,
+          );
+          continue;
+        }
         // install the watch fixtures
         if (info.options.installWatchFixtures ?? true) {
           try {
@@ -651,18 +656,47 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           }
         }
         try {
-          unlistens.push(
-            await listenWithPgClientFromPgConfig(
-              pgConfig,
-              "postgraphile_watch",
-              (_event) => {
-                // Delete the introspection results
-                info.cache.introspectionResultsPromise = null;
-                // Trigger re-gather
-                callback();
-              },
-            ),
+          const eventStream = await pgConfig.pgSubscriber.subscribe(
+            "postgraphile_watch",
           );
+          const $$stop = Symbol("stop");
+          const abort = defer<typeof $$stop>();
+          unlistens.push(() => abort.resolve($$stop));
+          const waitNext = () => {
+            const next = Promise.race([abort, eventStream.next()]);
+            next.then(
+              (event) => {
+                if (event === $$stop) {
+                  // Terminate the stream
+                  if (eventStream.return) {
+                    eventStream.return();
+                  } else if (eventStream.throw) {
+                    eventStream.throw(
+                      new Error("Please stop streaming events now."),
+                    );
+                  }
+                } else {
+                  try {
+                    // Delete the introspection results
+                    info.cache.introspectionResultsPromise = null;
+                    // Trigger re-gather
+                    callback();
+                  } finally {
+                    // Wait for the next event
+                    waitNext();
+                  }
+                }
+              },
+              (e) => {
+                console.error(
+                  `Unexpected error occurred while watching pgConfig '${pgConfig.name}' for schema changes.`,
+                  e,
+                );
+                abort.resolve($$stop);
+              },
+            );
+          };
+          waitNext();
         } catch (e) {
           console.warn(`Failed to watch '${pgConfig.name}': ${e}`);
         }
