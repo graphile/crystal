@@ -347,22 +347,27 @@ export default makeExtendSchemaPlugin((build) => {
 ## QueryBuilder "named children"
 
 This concept is no longer useful or needed, and can be ported to much more
-direct Gra*fast* steps.
+direct Gra*fast* steps. If you need help, do reach out on [the
+Discord](https://discord.gg/graphile).
 
 ## QueryBuilder itself
 
 QueryBuilder no longer exists, instead you'll mostly be using the helpers on
-`pgSelect` and similar steps.
+[`pgSelect`](https://grafast.org/grafast/step-library/dataplan-pg/) and similar steps.
+
+<!-- TODO: update link to pgSelect once written -->
 
 ## `build.getTypeAndIdentifiersFromNodeId`
 
-This helper has been replaced with `specFromNodeId`. Each GraphQL type that
-implements Node registers a "node ID handler"; if you know the `typeName` you're
-expecting you can get this via `build.getNodeIdHandler(typeName)`. From this,
-you can determine the "codec" that was used to encode the NodeID, and passing
-these two things to `specFromNodeId` along with the node ID itself should return
-a specification of your node, typically something like `{id: 27}` (but can vary
-significantly depending on the node type).
+This helper has been replaced with
+[`specFromNodeId`](https://grafast.org/grafast/step-library/standard-steps/node).
+Each GraphQL type that implements Node registers a "node ID handler"; if you
+know the `typeName` you're expecting you can get this via
+`build.getNodeIdHandler(typeName)`. From this, you can determine the "codec"
+that was used to encode the NodeID, and passing these two things to
+`specFromNodeId` along with the node ID itself should return a specification of
+your node, typically something like `{id: $id}` (where `$id` is an executable
+step), but can vary significantly depending on the node type.
 
 Here's an example:
 
