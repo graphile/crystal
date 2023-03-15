@@ -256,8 +256,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     resolvedFieldSpec.args,
                     build,
                     argsContext,
-
-                    `|${Self.name}.fields.${fieldName}`,
+                    `|${Self.name}.fields.${fieldName}.args`,
                   ),
                 };
 
@@ -271,6 +270,21 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       }'s '${fieldName}' field; ${inspect(argSpec)}`,
                     );
                   }
+                  const argContext = {
+                    ...argsContext,
+                    scope: {
+                      ...argsContext.scope,
+                      argName,
+                    },
+                  };
+
+                  finalFieldSpec.args[argName] = builder.applyHooks(
+                    "GraphQLObjectType_fields_field_args_arg",
+                    argSpec,
+                    build,
+                    argContext,
+                    `|${Self.name}.fields.${fieldName}.args.${argName}`,
+                  );
                 }
 
                 processedFields.push(finalFieldSpec);
@@ -405,15 +419,43 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     ...newSpec,
                     args: builder.applyHooks(
                       "GraphQLInterfaceType_fields_field_args",
-                      newSpec.args,
+                      newSpec.args ?? Object.create(null),
                       build,
                       argsContext,
-                      `|${Self.name}.fields.${fieldName}`,
+                      `|${Self.name}.fields.${fieldName}.args`,
                     ),
                   };
-                  const finalSpec = newSpec;
-                  processedFields.push(finalSpec);
-                  return finalSpec;
+                  const finalFieldSpec = newSpec;
+
+                  for (const [argName, argSpec] of Object.entries(
+                    finalFieldSpec.args!,
+                  )) {
+                    if (!argName) {
+                      throw new Error(
+                        `Attempted to add empty/falsy argName to GraphQLInterfaceType ${
+                          Self.name
+                        }'s '${fieldName}' field; ${inspect(argSpec)}`,
+                      );
+                    }
+                    const argContext = {
+                      ...argsContext,
+                      scope: {
+                        ...argsContext.scope,
+                        argName,
+                      },
+                    };
+
+                    finalFieldSpec.args![argName] = builder.applyHooks(
+                      "GraphQLInterfaceType_fields_field_args_arg",
+                      argSpec,
+                      build,
+                      argContext,
+                      `|${Self.name}.fields.${fieldName}.args.${argName}`,
+                    );
+                  }
+
+                  processedFields.push(finalFieldSpec);
+                  return finalFieldSpec;
                 },
               };
               const rawFields =

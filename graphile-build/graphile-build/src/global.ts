@@ -1,6 +1,7 @@
 import type {
   BaseGraphQLArguments,
   ExecutableStep,
+  GraphileArgumentConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
   GraphileInputFieldConfig,
@@ -8,6 +9,7 @@ import type {
   OutputPlanForType,
 } from "grafast";
 import type {
+  GraphQLArgumentConfig,
   GraphQLEnumType,
   GraphQLEnumTypeConfig,
   GraphQLEnumValueConfig,
@@ -562,6 +564,14 @@ declare global {
       scope: ScopeObjectFieldsFieldArgs;
     }
 
+    interface ScopeObjectFieldsFieldArgsArg extends ScopeObjectFieldsFieldArgs {
+      argName: string;
+    }
+    interface ContextObjectFieldsFieldArgsArg
+      extends ContextObjectFieldsFieldArgs {
+      scope: ScopeObjectFieldsFieldArgsArg;
+    }
+
     interface ScopeInterface extends Scope {}
     interface ContextInterface extends Context {
       scope: ScopeInterface;
@@ -586,6 +596,15 @@ declare global {
     interface ContextInterfaceFieldsFieldArgs
       extends ContextInterfaceFieldsField {
       scope: ScopeInterfaceFieldsFieldArgs;
+    }
+
+    interface ScopeInterfaceFieldsFieldArgsArg
+      extends ScopeInterfaceFieldsFieldArgs {
+      argName: string;
+    }
+    interface ContextInterfaceFieldsFieldArgsArg
+      extends ContextInterfaceFieldsFieldArgs {
+      scope: ScopeInterfaceFieldsFieldArgsArg;
     }
 
     interface ScopeInterfaceInterfaces extends ScopeInterface {}
@@ -838,6 +857,11 @@ declare global {
         GraphileBuild.ContextObjectFieldsFieldArgs,
         TBuild
       >[];
+      GraphQLObjectType_fields_field_args_arg: GraphileBuild.Hook<
+        GraphileArgumentConfig<any, any, any, any, any, any>,
+        GraphileBuild.ContextObjectFieldsFieldArgsArg,
+        TBuild
+      >[];
 
       /**
        * When creating a GraphQLInputObjectType via `newWithHooks`, we'll
@@ -932,6 +956,11 @@ declare global {
       GraphQLInterfaceType_fields_field_args: GraphileBuild.Hook<
         GraphQLFieldConfigArgumentMap,
         GraphileBuild.ContextInterfaceFieldsFieldArgs,
+        TBuild
+      >[];
+      GraphQLInterfaceType_fields_field_args_arg: GraphileBuild.Hook<
+        GraphQLArgumentConfig,
+        GraphileBuild.ContextInterfaceFieldsFieldArgsArg,
         TBuild
       >[];
       GraphQLInterfaceType_interfaces: GraphileBuild.Hook<
