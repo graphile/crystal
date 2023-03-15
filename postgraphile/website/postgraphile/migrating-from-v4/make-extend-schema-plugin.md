@@ -251,56 +251,97 @@ in mutation step, or for more complex mutations you can use `withPgClient` to
 run arbitrary (asynchronous) code with access to a pgClient (which you may place
 in a transaction if you like), or `withPgClientTransaction` to do the same with
 a client that's already in a transaction. Note that this pgClient is a generic
-adaptor, so if you want to deal with your Postgres client of choice here you can
-do so!
+adaptor, so if you want to deal with your Postgres client of choice here (`pg`,
+`postgres`, `pg-promise`, etc) you can do so!
 
 ```js
-const { withPgClientTransaction } = require("grafast");
-const plans = {
-  Mutation: {
-    myCustomMutation(_$root, fieldArgs) {
-      const $transactionResult = withPgClientTransaction(
-        // Get the 'executor' that tells us which database we're talking to.
-        // You can get this from any source via `pgSource.executor`.
-        executor,
+import { withPgClientTransaction, object } from "grafast";
+import { makeExtendSchemaPlugin } from "graphile-utils";
 
-        // Use this step to pass any existing data into your callback, e.g.
-        // args, other steps, etc. The result will be passed as the second
-        // argument to your callback
-        object({
-          a: fieldArgs.get(["input", "a"]),
-        }),
+export default makeExtendSchemaPlugin((build) => {
+  const { sql } = build;
+  /**
+   * The 'executor' tells us which database we're talking to.
+   * You can get this from any source via `pgSource.executor`.
+   */
+  const executor = build.input.pgSources[0].executor;
 
-        // Callback will be called with a client that's in a transaction,
-        // whatever it returns (plain data) will be the result of the
-        // `withPgClientTransaction` step; if it throws an error then the
-        // transaction will roll back and the error will be the result of the
-        // step.
-        async (client, data) => {
-          // The data from the `object` step above
-          const { a } = data;
+  return {
+    typeDefs: /* GraphQL */ `
+      input MyCustomMutationInput {
+        count: Int
+      }
+      type MyCustomMutationPayload {
+        numbers: [Int!]
+      }
+      extend type Mutation {
+        """
+        An example mutation that doesn't really do anything; uses Postgres'
+        generate_series() to return a list of numbers.
+        """
+        myCustomMutation(input: MyCustomMutationInput!): MyCustomMutationPayload
+      }
+    `,
 
-          // Run some SQL
-          const { rows } = await client.query(
-            sql.compile(
-              sql`select * from generate_series(1, ${sql.value(a ?? 1)}) as i;`,
-            ),
+    plans: {
+      Mutation: {
+        myCustomMutation(_$root, fieldArgs) {
+          // A step that represents the `input.count` property from the arguments.
+          const $count = fieldArgs.get(["input", "count"]);
+
+          /**
+           * This step dictates the data that will be passed as the second argument
+           * to the `withPgClientTransaction` callback. This is typically
+           * information about the field arguments, details from the GraphQL
+           * context, or data from previously executed steps.
+           */
+          const $data = object({
+            count: $count,
+          });
+
+          // Callback will be called with a client that's in a transaction,
+          // whatever it returns (plain data) will be the result of the
+          // `withPgClientTransaction` step; if it throws an error then the
+          // transaction will roll back and the error will be the result of the
+          // step.
+          const $transactionResult = withPgClientTransaction(
+            executor,
+            $data,
+            async (client, data) => {
+              // The data from the `$data` step above
+              const { count } = data;
+
+              // Run some SQL
+              const { rows } = await client.query(
+                sql.compile(
+                  sql`select i from generate_series(1, ${sql.value(
+                    count ?? 1,
+                  )}) as i;`,
+                ),
+              );
+
+              // Do some asynchronous work (e.g. talk to Stripe or whatever)
+              await sleep(2);
+
+              // Maybe run some more SQL as part of the transaction
+              await client.query(sql.compile(sql`select 1;`));
+
+              // Return whatever data you'll need later
+              return rows.map((row) => row.i);
+            },
           );
 
-          // Do some asynchronous work (e.g. talk to Stripe or whatever)
-          await sleep(2);
-
-          // Maybe run some more SQL as part of the transaction
-          await client.query(sql.compile(sql`select 1;`));
-
-          // Return whatever data you'll need later
-          return rows2.map((row) => row.i);
+          return $transactionResult;
         },
-      );
-      return $transactionResult;
+      },
+      MyCustomMutationPayload: {
+        numbers($transactionResult) {
+          return $transactionResult;
+        },
+      },
     },
-  },
-};
+  };
+});
 ```
 
 ## QueryBuilder "named children"
