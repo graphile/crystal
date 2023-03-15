@@ -142,7 +142,7 @@ type Query implements Node {
     offset: Int
 
     """The method to use when ordering \`Pet\`."""
-    orderBy: [PetsOrderBy!]
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PetsConnection
 
   """Reads and enables pagination through a set of \`User\`."""
@@ -171,7 +171,7 @@ type Query implements Node {
     offset: Int
 
     """The method to use when ordering \`User\`."""
-    orderBy: [UsersOrderBy!]
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
   ): UsersConnection
 
   """Fetches an object given its globally unique \`ID\`."""
