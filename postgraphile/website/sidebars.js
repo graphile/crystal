@@ -159,6 +159,8 @@ const sidebars = {
         "migrating-from-v4/make-wrap-resolvers-plugin",
         "migrating-from-v4/make-add-inflectors-plugin",
         "migrating-from-v4/make-extend-schema-plugin",
+        "migrating-from-v4/make-add-pg-table-condition-plugin",
+        "migrating-from-v4/make-add-pg-table-order-by-plugin",
       ],
     },
     {

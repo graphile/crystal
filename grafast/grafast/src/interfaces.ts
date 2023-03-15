@@ -690,6 +690,8 @@ export type NodeIdHandler<
    */
   typeName: string;
 
+  // TODO: this should use the codec directly, since Grafast has no codec
+  // lookup by name functionality?
   /**
    * Which codec are we using to encode/decode the NodeID string?
    */

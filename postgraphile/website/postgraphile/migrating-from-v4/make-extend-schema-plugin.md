@@ -16,14 +16,14 @@ longer needed, including:
 - QueryBuilder "named children"
 - QueryBuilder itself
 - `build.getTypeAndIdentifiersFromNodeId`
+- hacks to ensure the type is loaded before we reference it by name
 
 TODO: find an alternative to the `@scope` directive.
 
-The other major change, and the reason for the above changes, is that instead of
-using resolvers, Version 5 uses plans. _Technically_ you can continue to use
-resolvers when dealing with external systems, but you will need to use plans to
-replace the above directive behavior so you might as well adopt plans, right?
-:wink:
+The reason for the above changes is that instead of using resolvers, Version 5
+uses plans. _Technically_ you can continue to use resolvers when dealing with
+external systems, but you will need to use plans to replace the above directive
+behavior so you might as well adopt plans, right? :wink:
 
 ## `@requires`
 
@@ -86,6 +86,14 @@ This directive was always a workaround and is no longer meaningful in V5 - just
 make sure you add the right plans to the right fields and everything should work
 how you desire, and in a much more efficient and straightforward way than many
 patterns (particularly around mutation payloads) in V4.
+
+:::tip
+
+Don't always try to do everything in one field. It's better to give the
+subfields plans so that the related logic only needs to be executed if the
+field is actually requested, and it can also simplify the code.
+
+:::
 
 ## `@pgQuery`
 
@@ -165,11 +173,15 @@ TODO: once `@dataplan/pg` documentation is written, add links to it here.
 
 In version 4, this method was needed to kick off a "look-ahead" enhanced data
 fetch from a GraphQL resolver, but was always at risk of introducing the N+1
-problem.
+problem. Many users found it confusing, and would often try and use it to
+retrieve data for themselves to use inside a resolver, which did not align with
+its intent at all.
 
 In Version 5 there is no need for this helper any more - every plan step is
 opted into the planning system without any ceremony, and the N+1 problem is
-automatically solved by Gra*fast*.
+automatically solved by Gra*fast*. And requesting data to use in the plan
+versus to use as the result of the field is exactly the same, so no more
+confusion.
 
 Here's an example of porting an example from the Version 4 documentation to
 Version 5. First we find the `pgSource` that represents the `match_user`
@@ -213,8 +225,9 @@ function, passing through the `searchText` argument.
 
 ## `embed`
 
-There is currently no replacement for `embed`; hopefully you don't need it any
-more.
+There is currently no replacement for `embed`. You shouldn't need it any more;
+if you think you do, please come ask in [the
+Discord](https://discord.gg/graphile).
 
 ## Savepoints
 
@@ -238,77 +251,123 @@ in mutation step, or for more complex mutations you can use `withPgClient` to
 run arbitrary (asynchronous) code with access to a pgClient (which you may place
 in a transaction if you like), or `withPgClientTransaction` to do the same with
 a client that's already in a transaction. Note that this pgClient is a generic
-adaptor, so if you want to deal with your Postgres client of choice here you can
-do so!
+adaptor, so if you want to deal with your Postgres client of choice here (`pg`,
+`postgres`, `pg-promise`, etc) you can do so!
 
 ```js
-const { withPgClientTransaction } = require("grafast");
-const plans = {
-  Mutation: {
-    myCustomMutation(_$root, fieldArgs) {
-      const $transactionResult = withPgClientTransaction(
-        // Get the 'executor' that tells us which database we're talking to.
-        // You can get this from any source via `pgSource.executor`.
-        executor,
+import { withPgClientTransaction, object } from "grafast";
+import { makeExtendSchemaPlugin } from "graphile-utils";
 
-        // Use this step to pass any existing data into your callback, e.g.
-        // args, other steps, etc. The result will be passed as the second
-        // argument to your callback
-        object({
-          a: fieldArgs.get(["input", "a"]),
-        }),
+export default makeExtendSchemaPlugin((build) => {
+  const { sql } = build;
+  /**
+   * The 'executor' tells us which database we're talking to.
+   * You can get this from any source via `pgSource.executor`.
+   */
+  const executor = build.input.pgSources[0].executor;
 
-        // Callback will be called with a client that's in a transaction,
-        // whatever it returns (plain data) will be the result of the
-        // `withPgClientTransaction` step; if it throws an error then the
-        // transaction will roll back and the error will be the result of the
-        // step.
-        async (client, data) => {
-          // The data from the `object` step above
-          const { a } = data;
+  return {
+    typeDefs: /* GraphQL */ `
+      input MyCustomMutationInput {
+        count: Int
+      }
+      type MyCustomMutationPayload {
+        numbers: [Int!]
+      }
+      extend type Mutation {
+        """
+        An example mutation that doesn't really do anything; uses Postgres'
+        generate_series() to return a list of numbers.
+        """
+        myCustomMutation(input: MyCustomMutationInput!): MyCustomMutationPayload
+      }
+    `,
 
-          // Run some SQL
-          const { rows } = await client.query(
-            sql.compile(
-              sql`select * from generate_series(1, ${sql.value(a ?? 1)}) as i;`,
-            ),
+    plans: {
+      Mutation: {
+        myCustomMutation(_$root, fieldArgs) {
+          // A step that represents the `input.count` property from the arguments.
+          const $count = fieldArgs.get(["input", "count"]);
+
+          /**
+           * This step dictates the data that will be passed as the second argument
+           * to the `withPgClientTransaction` callback. This is typically
+           * information about the field arguments, details from the GraphQL
+           * context, or data from previously executed steps.
+           */
+          const $data = object({
+            count: $count,
+          });
+
+          // Callback will be called with a client that's in a transaction,
+          // whatever it returns (plain data) will be the result of the
+          // `withPgClientTransaction` step; if it throws an error then the
+          // transaction will roll back and the error will be the result of the
+          // step.
+          const $transactionResult = withPgClientTransaction(
+            executor,
+            $data,
+            async (client, data) => {
+              // The data from the `$data` step above
+              const { count } = data;
+
+              // Run some SQL
+              const { rows } = await client.query(
+                sql.compile(
+                  sql`select i from generate_series(1, ${sql.value(
+                    count ?? 1,
+                  )}) as i;`,
+                ),
+              );
+
+              // Do some asynchronous work (e.g. talk to Stripe or whatever)
+              await sleep(2);
+
+              // Maybe run some more SQL as part of the transaction
+              await client.query(sql.compile(sql`select 1;`));
+
+              // Return whatever data you'll need later
+              return rows.map((row) => row.i);
+            },
           );
 
-          // Do some asynchronous work (e.g. talk to Stripe or whatever)
-          await sleep(2);
-
-          // Maybe run some more SQL as part of the transaction
-          await client.query(sql.compile(sql`select 1;`));
-
-          // Return whatever data you'll need later
-          return rows2.map((row) => row.i);
+          return $transactionResult;
         },
-      );
-      return $transactionResult;
+      },
+      MyCustomMutationPayload: {
+        numbers($transactionResult) {
+          return $transactionResult;
+        },
+      },
     },
-  },
-};
+  };
+});
 ```
 
 ## QueryBuilder "named children"
 
 This concept is no longer useful or needed, and can be ported to much more
-direct Gra*fast* steps.
+direct Gra*fast* steps. If you need help, do reach out on [the
+Discord](https://discord.gg/graphile).
 
 ## QueryBuilder itself
 
 QueryBuilder no longer exists, instead you'll mostly be using the helpers on
-`pgSelect` and similar steps.
+[`pgSelect`](https://grafast.org/grafast/step-library/dataplan-pg/) and similar steps.
+
+<!-- TODO: update link to pgSelect once written -->
 
 ## `build.getTypeAndIdentifiersFromNodeId`
 
-This helper has been replaced with `specFromNodeId`. Each GraphQL type that
-implements Node registers a "node ID handler"; if you know the `typeName` you're
-expecting you can get this via `build.getNodeIdHandler(typeName)`. From this,
-you can determine the "codec" that was used to encode the NodeID, and passing
-these two things to `specFromNodeId` along with the node ID itself should return
-a specification of your node, typically something like `{id: 27}` (but can vary
-significantly depending on the node type).
+This helper has been replaced with
+[`specFromNodeId`](https://grafast.org/grafast/step-library/standard-steps/node).
+Each GraphQL type that implements Node registers a "node ID handler"; if you
+know the `typeName` you're expecting you can get this via
+`build.getNodeIdHandler(typeName)`. From this, you can determine the "codec"
+that was used to encode the NodeID, and passing these two things to
+`specFromNodeId` along with the node ID itself should return a specification of
+your node, typically something like `{id: $id}` (where `$id` is an executable
+step), but can vary significantly depending on the node type.
 
 Here's an example:
 
