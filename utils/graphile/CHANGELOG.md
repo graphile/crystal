@@ -1,5 +1,14 @@
 # graphile
 
+## 5.0.0-0.5
+
+### Patch Changes
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`d94f0eae6`](https://github.com/benjie/postgraphile-private/commit/d94f0eae68013fbf146187d40aaecdacefeea639)
+  Thanks [@benjie](https://github.com/benjie)! - Strip 'undefined' values from
+  'graphile config print'
+
 ## 5.0.0-0.4
 
 ### Patch Changes

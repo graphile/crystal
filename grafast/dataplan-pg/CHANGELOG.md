@@ -1,5 +1,19 @@
 # @dataplan/pg
 
+## 0.0.1-0.26
+
+### Patch Changes
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`13cfc7501`](https://github.com/benjie/postgraphile-private/commit/13cfc75019d42353c1e6be394c28c6ba61ab32d0)
+  Thanks [@benjie](https://github.com/benjie)! - pgConfig.listen is no more; it
+  was redundant versus PgSubscriber. Have migrated PgIntrospectionPlugin to use
+  PgSubscriber instead.
+- Updated dependencies
+  [[`f5a04cf66`](https://github.com/benjie/postgraphile-private/commit/f5a04cf66f220c11a6a82db8c1a78b1d91606faa)]:
+  - grafast@0.0.1-0.21
+  - @dataplan/json@0.0.1-0.21
+
 ## 0.0.1-0.25
 
 ### Patch Changes

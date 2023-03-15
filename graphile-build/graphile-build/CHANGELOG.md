@@ -1,5 +1,18 @@
 # graphile-build
 
+## 5.0.0-0.27
+
+### Patch Changes
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`b9a2236d4`](https://github.com/benjie/postgraphile-private/commit/b9a2236d43cc92e06085298e379de71f7fdedcb7)
+  Thanks [@benjie](https://github.com/benjie)! - Remove deprecated
+  'subscriptions' option
+
+- Updated dependencies
+  [[`f5a04cf66`](https://github.com/benjie/postgraphile-private/commit/f5a04cf66f220c11a6a82db8c1a78b1d91606faa)]:
+  - grafast@0.0.1-0.21
+
 ## 5.0.0-0.26
 
 ### Patch Changes

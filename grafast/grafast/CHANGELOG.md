@@ -1,5 +1,16 @@
 # grafast
 
+## 0.0.1-0.21
+
+### Patch Changes
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`f5a04cf66`](https://github.com/benjie/postgraphile-private/commit/f5a04cf66f220c11a6a82db8c1a78b1d91606faa)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **BREAKING CHANGE**
+  `hookArgs()` now accepts arguments in the same order as `grafast()`:
+  `hookArgs(args, resolvedPreset, ctx)`. Please update all your `hookArgs`
+  calls.
+
 ## 0.0.1-0.20
 
 ### Patch Changes

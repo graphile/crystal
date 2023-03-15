@@ -1,5 +1,14 @@
 # ruru
 
+## 2.0.0-0.11
+
+### Patch Changes
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`b795b3da5`](https://github.com/benjie/postgraphile-private/commit/b795b3da5f8e8f13c495be3a8cf71667f3d149f8)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade GraphiQL, gaining the
+  watch mode fix.
+
 ## 2.0.0-0.10
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # graphile-utils
 
+## 5.0.0-0.32
+
+### Patch Changes
+
+- Updated dependencies
+  [[`f5a04cf66`](https://github.com/benjie/postgraphile-private/commit/f5a04cf66f220c11a6a82db8c1a78b1d91606faa),
+  [`13cfc7501`](https://github.com/benjie/postgraphile-private/commit/13cfc75019d42353c1e6be394c28c6ba61ab32d0),
+  [`b9a2236d4`](https://github.com/benjie/postgraphile-private/commit/b9a2236d43cc92e06085298e379de71f7fdedcb7),
+  [`ac6137bb6`](https://github.com/benjie/postgraphile-private/commit/ac6137bb60a34a3ebf5fad3c6ac153c95acb6158)]:
+  - grafast@0.0.1-0.21
+  - graphile-build-pg@5.0.0-0.32
+  - graphile-build@5.0.0-0.27
+
 ## 5.0.0-0.31
 
 ### Patch Changes

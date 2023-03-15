@@ -1,5 +1,47 @@
 # postgraphile
 
+## 5.0.0-0.35
+
+### Patch Changes
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`f5a04cf66`](https://github.com/benjie/postgraphile-private/commit/f5a04cf66f220c11a6a82db8c1a78b1d91606faa)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **BREAKING CHANGE**
+  `hookArgs()` now accepts arguments in the same order as `grafast()`:
+  `hookArgs(args, resolvedPreset, ctx)`. Please update all your `hookArgs`
+  calls.
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`a06b8933f`](https://github.com/benjie/postgraphile-private/commit/a06b8933f9365627c2eab019af0c12393e29e509)
+  Thanks [@benjie](https://github.com/benjie)! - Rename 'eventStreamRoute' to
+  'eventStreamPath' for consistency with 'graphqlPath' and 'graphiqlPath'. V4
+  preset unaffected.
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`ac6137bb6`](https://github.com/benjie/postgraphile-private/commit/ac6137bb60a34a3ebf5fad3c6ac153c95acb6158)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 PgRBACPlugin is now included
+  in the default `graphile-build-pg` (and thus PostGraphile amber) preset. Users
+  of the V4 preset are unaffected.
+
+- [#229](https://github.com/benjie/postgraphile-private/pull/229)
+  [`9edf7511a`](https://github.com/benjie/postgraphile-private/commit/9edf7511ae71928390213ff9c807b7cc7e3174fa)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 pgl.getServerParams() has
+  been renamed to pgl.getSchemaResult()
+
+- Updated dependencies
+  [[`f5a04cf66`](https://github.com/benjie/postgraphile-private/commit/f5a04cf66f220c11a6a82db8c1a78b1d91606faa),
+  [`13cfc7501`](https://github.com/benjie/postgraphile-private/commit/13cfc75019d42353c1e6be394c28c6ba61ab32d0),
+  [`b795b3da5`](https://github.com/benjie/postgraphile-private/commit/b795b3da5f8e8f13c495be3a8cf71667f3d149f8),
+  [`a06b8933f`](https://github.com/benjie/postgraphile-private/commit/a06b8933f9365627c2eab019af0c12393e29e509),
+  [`b9a2236d4`](https://github.com/benjie/postgraphile-private/commit/b9a2236d43cc92e06085298e379de71f7fdedcb7),
+  [`ac6137bb6`](https://github.com/benjie/postgraphile-private/commit/ac6137bb60a34a3ebf5fad3c6ac153c95acb6158)]:
+  - grafast@0.0.1-0.21
+  - @dataplan/pg@0.0.1-0.26
+  - graphile-build-pg@5.0.0-0.32
+  - ruru@2.0.0-0.11
+  - grafserv@0.0.1-0.23
+  - graphile-build@5.0.0-0.27
+
 ## 5.0.0-0.34
 
 ### Patch Changes
