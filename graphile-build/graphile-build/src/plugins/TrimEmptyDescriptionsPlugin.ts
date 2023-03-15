@@ -71,6 +71,8 @@ export const TrimEmptyDescriptionsPlugin: GraphileConfig.Plugin = {
       GraphQLInputObjectType_fields_field: rmEmptyFieldDescription,
       GraphQLUnionType: rmEmptyTypeDescription,
       GraphQLInterfaceType: rmEmptyTypeDescription,
+      GraphQLInterfaceType_fields_field: rmEmptyFieldDescription,
+      GraphQLInterfaceType_fields_field_args_arg: rmEmptyArgDescriptions,
       GraphQLEnumType: rmEmptyTypeDescription,
     },
   },
