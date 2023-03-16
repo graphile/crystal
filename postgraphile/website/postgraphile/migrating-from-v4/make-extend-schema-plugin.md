@@ -256,7 +256,7 @@ adaptor, so if you want to deal with your Postgres client of choice here (`pg`,
 
 ```js
 import { object } from "grafast";
-import {  withPgClientTransaction } from "@dataplan/pg";
+import { withPgClientTransaction } from "@dataplan/pg";
 import { makeExtendSchemaPlugin } from "graphile-utils";
 
 export default makeExtendSchemaPlugin((build) => {
