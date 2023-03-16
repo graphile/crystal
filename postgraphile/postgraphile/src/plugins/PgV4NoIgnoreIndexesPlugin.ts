@@ -46,6 +46,7 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
             addBehaviorToTags(
               relation.extensions.tags,
               "-list -connection -single -manyToMany",
+              true,
             );
           }
         }
@@ -72,7 +73,11 @@ export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
           if (!column.extensions!.tags) {
             column.extensions!.tags = Object.create(null);
           }
-          addBehaviorToTags(column.extensions!.tags!, "-filterBy -orderBy");
+          addBehaviorToTags(
+            column.extensions!.tags!,
+            "-filterBy -orderBy",
+            true,
+          );
         }
       },
     },
