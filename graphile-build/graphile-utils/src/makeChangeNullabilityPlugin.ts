@@ -1,8 +1,4 @@
-import type {
-  GraphileArgumentConfig,
-  GraphileFieldConfig,
-  GraphileFieldConfigArgumentMap,
-} from "grafast";
+import type { GraphileArgumentConfig, GraphileFieldConfig } from "grafast";
 import type {} from "graphile-build";
 import type * as AllGraphQL from "graphql";
 import type { GraphQLInputType, GraphQLOutputType, GraphQLType } from "graphql";

@@ -1,10 +1,9 @@
-import { GraphileArgumentConfig } from "grafast";
 import "graphile-config";
 
+import type { GraphileArgumentConfig } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
   GraphQLInputFieldConfig,
 } from "graphql";
 
