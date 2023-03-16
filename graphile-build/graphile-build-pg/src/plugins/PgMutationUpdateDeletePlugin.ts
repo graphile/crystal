@@ -165,7 +165,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
   version: version,
-  after: ["smart-tags"],
+  after: ["smart-tags", "PgTablesPlugin", "PgCodecsPlugin", "PgTypesPlugin"],
 
   inflection: {
     add: {
