@@ -18,6 +18,7 @@ export function makeSchemaBuilderHooks<
     GraphQLObjectType_fields: [],
     GraphQLObjectType_fields_field: [],
     GraphQLObjectType_fields_field_args: [],
+    GraphQLObjectType_fields_field_args_arg: [],
     GraphQLInputObjectType: [],
     GraphQLInputObjectType_fields: [],
     GraphQLInputObjectType_fields_field: [],
@@ -30,6 +31,7 @@ export function makeSchemaBuilderHooks<
     GraphQLInterfaceType_fields: [],
     GraphQLInterfaceType_fields_field: [],
     GraphQLInterfaceType_fields_field_args: [],
+    GraphQLInterfaceType_fields_field_args_arg: [],
     GraphQLInterfaceType_interfaces: [],
     GraphQLScalarType: [],
   };

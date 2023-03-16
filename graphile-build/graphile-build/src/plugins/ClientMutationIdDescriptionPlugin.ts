@@ -77,33 +77,30 @@ export const ClientMutationIdDescriptionPlugin: GraphileConfig.Plugin = {
         provides: ["ClientMutationIdDescription"],
       },
 
-      GraphQLObjectType_fields_field_args: {
-        callback: (args, build, context) => {
+      GraphQLObjectType_fields_field_args_arg: {
+        callback: (arg, build, context) => {
           const { extend } = build;
           const {
-            scope: { isRootMutation, fieldName },
+            scope: { isRootMutation, fieldName, argName },
             Self,
           } = context;
 
           if (
             isRootMutation !== true ||
-            args.input == null ||
-            args.input.description != null
+            argName !== "input" ||
+            arg.description != null
           ) {
-            return args;
+            return arg;
           }
 
-          return {
-            ...args,
-            input: extend(
-              args.input,
-              {
-                description:
-                  "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
-              },
-              `Adding a description to input arg for field '${fieldName}' field in '${Self.name}'`,
-            ),
-          };
+          return extend(
+            arg,
+            {
+              description:
+                "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
+            },
+            `Adding a description to input arg for field '${fieldName}' field in '${Self.name}'`,
+          );
         },
         provides: ["ClientMutationIdDescription"],
       },

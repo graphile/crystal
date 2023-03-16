@@ -387,6 +387,9 @@ type CompoundKey implements Node {
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
   personByPersonId1: Person
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId2: Person
   personId1: Int!
   personId2: Int!
 
@@ -625,6 +628,9 @@ type CreateCompoundKeyPayload {
   """Reads a single `Person` that is related to this `CompoundKey`."""
   personByPersonId1: Person
 
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId2: Person
+
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
@@ -715,8 +721,14 @@ type CreateForeignKeyPayload {
   """
   clientMutationId: String
 
+  """Reads a single `CompoundKey` that is related to this `ForeignKey`."""
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+
   """The `ForeignKey` that was created by this mutation."""
   foreignKey: ForeignKey
+
+  """Reads a single `Person` that is related to this `ForeignKey`."""
+  personByPersonId: Person
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -1551,6 +1563,9 @@ type DeleteCompoundKeyPayload {
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
   personByPersonId1: Person
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId2: Person
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2521,6 +2536,12 @@ input FloatRangeInput {
 type ForeignKey {
   compoundKey1: Int
   compoundKey2: Int
+
+  """Reads a single `CompoundKey` that is related to this `ForeignKey`."""
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+
+  """Reads a single `Person` that is related to this `ForeignKey`."""
+  personByPersonId: Person
   personId: Int
 }
 
@@ -8330,6 +8351,9 @@ type UpdateCompoundKeyPayload {
 
   """Reads a single `Person` that is related to this `CompoundKey`."""
   personByPersonId1: Person
+
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId2: Person
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

@@ -1,10 +1,12 @@
 import type {
+  GraphileArgumentConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
   PromiseOrDirect,
 } from "grafast";
 import type { AsyncHooks, PluginHook } from "graphile-config";
 import type {
+  GraphQLArgumentConfig,
   GraphQLEnumTypeConfig,
   GraphQLEnumValueConfig,
   GraphQLEnumValueConfigMap,
@@ -284,7 +286,8 @@ declare global {
            *   ran asynchronously and gets a reference to the final GraphQL Object as
            *   `Self` in the context)
            * - 'GraphQLObjectType_fields_field' to customize an individual field from above
-           * - 'GraphQLObjectType_fields_field_args' to customize the arguments to a field
+           * - 'GraphQLObjectType_fields_field_args' to add additional arguments to a field
+           * - 'GraphQLObjectType_fields_field_args_arg' to customize an individual argument from above
            */
           GraphQLObjectType?: PluginHook<
             GraphileBuild.Hook<
@@ -318,6 +321,13 @@ declare global {
             GraphileBuild.Hook<
               GraphileFieldConfigArgumentMap<any, any, any, any>,
               GraphileBuild.ContextObjectFieldsFieldArgs,
+              GraphileBuild.Build
+            >
+          >;
+          GraphQLObjectType_fields_field_args_arg?: PluginHook<
+            GraphileBuild.Hook<
+              GraphileArgumentConfig<any, any, any, any, any, any>,
+              GraphileBuild.ContextObjectFieldsFieldArgsArg,
               GraphileBuild.Build
             >
           >;
@@ -411,7 +421,8 @@ declare global {
            *    ran asynchronously and gets a reference to the final GraphQL Interface as
            *    `Self` in the context)
            *  - 'GraphQLInterfaceType_fields_field' to customise an individual field from above
-           *  - 'GraphQLInterfaceType_fields_field_args' to customize the arguments to a field
+           *  - 'GraphQLInterfaceType_fields_field_args' to add additional arguments to a field
+           *  - 'GraphQLInterfaceType_fields_field_args_arg' to customize an individual arguments from the above
            */
           GraphQLInterfaceType?: PluginHook<
             GraphileBuild.Hook<
@@ -438,6 +449,13 @@ declare global {
             GraphileBuild.Hook<
               GraphQLFieldConfigArgumentMap,
               GraphileBuild.ContextInterfaceFieldsFieldArgs,
+              GraphileBuild.Build
+            >
+          >;
+          GraphQLInterfaceType_fields_field_args_arg?: PluginHook<
+            GraphileBuild.Hook<
+              GraphQLArgumentConfig,
+              GraphileBuild.ContextInterfaceFieldsFieldArgsArg,
               GraphileBuild.Build
             >
           >;

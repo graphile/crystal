@@ -24,8 +24,12 @@ export function addBehaviorToTags(
     tags.behavior = prepend
       ? [behavior, tags.behavior]
       : [tags.behavior, behavior];
-  } else {
+  } else if (!tags.behavior) {
     tags.behavior = [behavior];
+  } else {
+    throw new Error(
+      `Did not understand tags.behavior - it wasn't an array or a string`,
+    );
   }
 }
 

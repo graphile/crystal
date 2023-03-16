@@ -30,7 +30,6 @@ import { PgRefsPlugin } from "./plugins/PgRefsPlugin.js";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
 import { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionResourcesPlugin.js";
 import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
-import { PgSmartCommentsPlugin } from "./plugins/PgSmartCommentsPlugin.js";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
@@ -48,7 +47,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgMutationCreatePlugin,
     PgProceduresPlugin,
     PgColumnsPlugin,
-    PgSmartCommentsPlugin,
     PgAllRowsPlugin,
     PgRowByUniquePlugin,
     PgConnectionTotalCountPlugin,

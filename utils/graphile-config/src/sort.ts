@@ -8,64 +8,55 @@ export function sortWithBeforeAfterProvides<
     [id in TIdKey]: string;
   },
 >(rawList: TSortable[], idKey: TIdKey): TSortable[] {
-  const list = rawList.map((listEntry) => {
-    if (!listEntry.after) {
-      listEntry.after = [];
+  const list = rawList.map((thing) => {
+    const before = [...(thing.before ?? [])];
+    const after = [...(thing.after ?? [])];
+    const provides = [...(thing.provides ?? [])];
+
+    if (!provides.includes(thing[idKey])) {
+      provides.push(thing[idKey]);
     }
-    if (!listEntry.provides) {
-      listEntry.provides = [];
-    }
-    if (!listEntry.provides.includes(listEntry[idKey])) {
-      listEntry.provides.push(listEntry[idKey]);
-    }
-    return listEntry as TSortable & {
-      after: string[];
-      provides: string[];
-    };
+
+    return { thing, before, after, provides };
   });
 
   // "before" and "after" are very similar, lets simplify them into one
   // concept by converting all the "befores" into "afters" on their targets.
-  for (const listEntry of list) {
-    const { [idKey]: id, before = [] } = listEntry;
+  for (const { thing, before } of list) {
+    const { [idKey]: id } = thing;
     if (before.length) {
       const previousBefore = before.splice(0, before.length);
-      for (const otherListEntry of list) {
+      for (const {
+        thing: otherThing,
+        provides: otherProvides,
+        after: otherAfter,
+      } of list) {
         if (
-          otherListEntry !== listEntry &&
+          otherThing !== thing &&
           previousBefore.some((beforeValue) =>
-            otherListEntry.provides.includes(beforeValue),
+            otherProvides.includes(beforeValue),
           )
         ) {
-          if (!otherListEntry.after) {
-            otherListEntry.after = [id];
-          } else {
-            otherListEntry.after.push(id);
-          }
+          otherAfter.push(id);
         }
       }
     }
   }
 
   // Now lets figure out all the possible provides values:
-  const providers: {
-    [key: string]: typeof list;
-  } = Object.create(null);
-  for (const listEntry of list) {
-    const { provides } = listEntry;
+  const validProvides = new Set<string>();
+  for (const { provides } of list) {
     for (const provide of provides) {
-      if (!providers[provide]) {
-        providers[provide] = [];
-      }
-      providers[provide]!.push(listEntry);
+      validProvides.add(provide);
     }
   }
 
   // And ignore any "afters" with no providers:
-  const validProviders = Object.keys(providers);
-  for (const listEntry of list) {
-    listEntry.after = listEntry.after.filter((afterValue) =>
-      validProviders.includes(afterValue),
+  for (const { after } of list) {
+    after.splice(
+      0,
+      after.length,
+      ...after.filter((afterValue) => validProvides.has(afterValue)),
     );
   }
 
@@ -87,17 +78,18 @@ export function sortWithBeforeAfterProvides<
       if (!listEntry) {
         continue;
       }
+      const { thing, after } = listEntry;
       const dependsOnRemaining = remaining.some(
-        (otherListEntry) =>
-          otherListEntry !== listEntry &&
-          otherListEntry.provides.some((otherHookProvide) =>
-            listEntry.after.includes(otherHookProvide),
+        ({ thing: otherThing, provides: otherProvides }) =>
+          otherThing !== thing &&
+          otherProvides.some((otherHookProvide) =>
+            after.includes(otherHookProvide),
           ),
       );
       if (!dependsOnRemaining) {
         changes++;
         remaining.splice(i, 1);
-        final.push(listEntry);
+        final.push(thing);
         i--;
       }
     }
@@ -106,7 +98,8 @@ export function sortWithBeforeAfterProvides<
       throw new Error(
         `Infinite loop in dependencies detected; remaining items:\n  ${remaining
           .map(
-            (r) => `${r[idKey]} (after: ${r.after}; provides: ${r.provides})`,
+            (r) =>
+              `${r.thing[idKey]} (after: ${r.after}; provides: ${r.provides})`,
           )
           .join("\n  ")}`,
       );

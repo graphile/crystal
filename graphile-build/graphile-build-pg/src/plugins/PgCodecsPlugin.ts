@@ -23,6 +23,7 @@ import { EXPORTABLE } from "graphile-export";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
+import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
 interface State {
@@ -350,11 +351,24 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               columnAttribute.atttypid,
               columnAttribute.atttypmod,
             );
+            const { tags: rawTags, description } =
+              columnAttribute.getTagsAndDescription();
             if (columnCodec) {
               hasAtLeastOneColumn = true;
+
+              // Mutate at will!
+              const tags = JSON.parse(JSON.stringify(rawTags));
+              if (columnAttribute.attidentity === "a") {
+                // Generated ALWAYS so no insert/update
+                addBehaviorToTags(
+                  tags,
+                  "-attribute:insert -attribute:update",
+                  true,
+                );
+              }
+
               columns[columnAttribute.attname] = {
-                description:
-                  columnAttribute.getTagsAndDescription().description,
+                description,
                 codec: columnCodec,
                 notNull:
                   columnAttribute.attnotnull === true ||
@@ -368,13 +382,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   columnAttribute.getType()?.typdefault != null,
                 // TODO: identicalVia,
                 extensions: {
-                  tags: {
-                    behavior:
-                      // Generated ALWAYS so no insert/update
-                      columnAttribute.attidentity === "a"
-                        ? ["-attribute:insert -attribute:update"]
-                        : [],
-                  },
+                  tags,
                 },
               };
               await info.process("pgCodecs_column", {
@@ -399,6 +407,19 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             pgClass,
           });
 
+          const pgType = pgClass.getType()!;
+          const typeTagsAndDescription = pgType.getTagsAndDescription();
+          const classTagsAndDescription = pgClass.getTagsAndDescription();
+          // Copy tags from the PgClass, but tags on PgType overwrite
+          const tags = Object.assign(
+            Object.create(null),
+            classTagsAndDescription.tags,
+            typeTagsAndDescription.tags,
+          );
+          const description =
+            typeTagsAndDescription.description ??
+            classTagsAndDescription.description;
+
           const extensions: PgTypeCodecExtensions = {
             oid: pgClass.reltype,
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
@@ -407,9 +428,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
             },
-            tags: Object.create(null),
+            tags,
+            description,
           };
-          const spec = {
+          const spec: PgRecordTypeCodecSpec<any> = {
             name: codecName,
             identifier: sql.identifier(nspName, className),
             columns,
@@ -600,14 +622,17 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
 
-              const extensions = {
+              const { tags, description } = type.getTagsAndDescription();
+
+              const extensions: PgTypeCodecExtensions = {
                 oid: type._id,
                 pg: {
                   databaseName,
                   schemaName: type.getNamespace()!.nspname,
                   name: type.typname,
                 },
-                tags: Object.create(null),
+                tags,
+                description,
               };
               await info.process("pgCodecs_rangeOfCodec_extensions", {
                 databaseName,
@@ -664,14 +689,16 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               const namespaceName = namespace.nspname;
               const typeName = type.typname;
               if (innerCodec) {
-                const extensions = {
+                const { tags, description } = type.getTagsAndDescription();
+                const extensions: PgTypeCodecExtensions = {
                   oid: type._id,
                   pg: {
                     databaseName,
                     schemaName: type.getNamespace()!.nspname,
                     name: type.typname,
                   },
-                  tags: Object.create(null),
+                  tags,
+                  description,
                 };
                 await info.process("pgCodecs_domainOfCodec_extensions", {
                   databaseName,
@@ -733,14 +760,16 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 );
                 if (innerCodec) {
                   const typeDelim = innerType.typdelim!;
-                  const extensions = {
+                  const { tags, description } = type.getTagsAndDescription();
+                  const extensions: PgTypeCodecExtensions = {
                     oid: type._id,
                     pg: {
                       databaseName,
                       schemaName: type.getNamespace()!.nspname,
                       name: type.typname,
                     },
-                    tags: Object.create(null),
+                    tags,
+                    description,
                   };
                   await info.process("pgCodecs_listOfCodec_extensions", {
                     databaseName,

@@ -85,12 +85,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
   name: "PgPolymorphismPlugin",
   description: "Adds polymorphism",
   version,
-  after: [
-    "PgSmartCommentsPlugin",
-    "PgV4SmartTagsPlugin",
-    "PgTablesPlugin",
-    "PgCodecsPlugin",
-  ],
+  after: ["smart-tags", "PgTablesPlugin", "PgCodecsPlugin"],
   gather: {
     namespace: "pgPolymorphism",
     helpers: {},

@@ -1,9 +1,9 @@
 import "graphile-config";
 
+import type { GraphileArgumentConfig } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
   GraphQLInputFieldConfig,
 } from "graphql";
 
@@ -46,19 +46,13 @@ function rmEmptyFieldDescription<
  * for cleaning up the schema as printing a schema with a lot of empty string
  * descriptions is u.g.l.y.
  */
-function rmEmptyArgDescriptions<T extends GraphQLFieldConfigArgumentMap>(
-  args: T,
-): T {
-  if (!args) {
-    return args;
+function rmEmptyArgDescriptions<
+  T extends GraphileArgumentConfig<any, any, any, any, any, any>,
+>(arg: T): T {
+  if (arg.description === "") {
+    arg.description = null;
   }
-  for (const argName in args) {
-    const arg = args[argName];
-    if (arg.description === "") {
-      arg.description = null;
-    }
-  }
-  return args;
+  return arg;
 }
 
 export const TrimEmptyDescriptionsPlugin: GraphileConfig.Plugin = {
@@ -71,11 +65,13 @@ export const TrimEmptyDescriptionsPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType: rmEmptyTypeDescription,
       GraphQLObjectType_fields_field: rmEmptyFieldDescription,
-      GraphQLObjectType_fields_field_args: rmEmptyArgDescriptions,
+      GraphQLObjectType_fields_field_args_arg: rmEmptyArgDescriptions,
       GraphQLInputObjectType: rmEmptyTypeDescription,
       GraphQLInputObjectType_fields_field: rmEmptyFieldDescription,
       GraphQLUnionType: rmEmptyTypeDescription,
       GraphQLInterfaceType: rmEmptyTypeDescription,
+      GraphQLInterfaceType_fields_field: rmEmptyFieldDescription,
+      GraphQLInterfaceType_fields_field_args_arg: rmEmptyArgDescriptions,
       GraphQLEnumType: rmEmptyTypeDescription,
     },
   },

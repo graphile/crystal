@@ -1,7 +1,4 @@
-import type {
-  GraphileFieldConfig,
-  GraphileFieldConfigArgumentMap,
-} from "grafast";
+import type { GraphileArgumentConfig, GraphileFieldConfig } from "grafast";
 import type {} from "graphile-build";
 import type * as AllGraphQL from "graphql";
 import type { GraphQLInputType, GraphQLOutputType, GraphQLType } from "graphql";
@@ -160,51 +157,38 @@ export function makeChangeNullabilityPlugin(
     return field;
   }
 
-  function objectOrInterfaceArgsCallback<
-    T extends GraphileFieldConfigArgumentMap<any, any, any, any>,
+  function objectOrInterfaceArgsArgCallback<
+    T extends GraphileArgumentConfig<any, any, any, any, any, any>,
   >(
-    args: T,
+    arg: T,
     build: GraphileBuild.Build,
     context:
-      | GraphileBuild.ContextObjectFieldsField
-      | GraphileBuild.ContextInterfaceFieldsField,
+      | GraphileBuild.ContextObjectFieldsFieldArgsArg
+      | GraphileBuild.ContextInterfaceFieldsFieldArgsArg,
   ) {
     const {
       Self,
-      scope: { fieldName },
+      scope: { fieldName, argName },
     } = context;
     const typeRules = rules[Self.name];
     if (!typeRules) {
-      return args;
+      return arg;
     }
     const rawRule = typeRules[fieldName];
     if (rawRule == null) {
-      return args;
+      return arg;
     }
     const rule = typeof rawRule !== "object" ? { type: rawRule } : rawRule;
-    if (rule.args) {
-      for (const [argName, spec] of Object.entries(rule.args)) {
-        const arg = args?.[argName];
-        if (!arg) {
-          throw new Error(
-            `Could not find ${
-              Self.name
-            }.${fieldName} argument named '${argName}' (names: ${
-              Object.keys(args).length > 0
-                ? `'${Object.keys(args).join("', '")}'`
-                : "none"
-            })`,
-          );
-        }
-        arg.type = doIt(
-          arg.type,
-          spec,
-          build.graphql,
-          `${Self.name}.${fieldName}(${argName}:)`,
-        );
-      }
+    const spec = rule.args?.[argName];
+    if (spec) {
+      arg.type = doIt(
+        arg.type,
+        spec,
+        build.graphql,
+        `${Self.name}.${fieldName}(${argName}:)`,
+      );
     }
-    return args;
+    return arg;
   }
 
   return {
@@ -248,9 +232,11 @@ export function makeChangeNullabilityPlugin(
           return field;
         },
         GraphQLInterfaceType_fields_field: objectOrInterfaceFieldCallback,
-        GraphQLInterfaceType_fields_field_args: objectOrInterfaceArgsCallback,
+        GraphQLInterfaceType_fields_field_args_arg:
+          objectOrInterfaceArgsArgCallback,
         GraphQLObjectType_fields_field: objectOrInterfaceFieldCallback,
-        GraphQLObjectType_fields_field_args: objectOrInterfaceArgsCallback,
+        GraphQLObjectType_fields_field_args_arg:
+          objectOrInterfaceArgsArgCallback,
         finalize(schema) {
           if (pendingMatches.size > 0) {
             throw new Error(

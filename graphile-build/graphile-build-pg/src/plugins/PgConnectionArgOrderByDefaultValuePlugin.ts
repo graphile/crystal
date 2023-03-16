@@ -12,15 +12,15 @@ export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
 
   schema: {
     hooks: {
-      GraphQLObjectType_fields_field_args(args, build, context) {
+      GraphQLObjectType_fields_field_args_arg(arg, build, context) {
         const { extend, getTypeByName, inflection } = build;
         const {
-          scope: { fieldName, isPgFieldConnection, pgSource },
+          scope: { fieldName, isPgFieldConnection, pgSource, argName },
           Self,
         } = context;
 
-        if (!args.orderBy) {
-          return args;
+        if (argName !== "orderBy") {
+          return arg;
         }
 
         if (
@@ -29,7 +29,7 @@ export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
           !pgSource.codec.columns ||
           pgSource.parameters
         ) {
-          return args;
+          return arg;
         }
 
         const tableTypeName = inflection.tableType(pgSource.codec);
@@ -37,7 +37,7 @@ export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
           inflection.orderByType(tableTypeName),
         ) as GraphQLEnumType;
         if (!TableOrderByType) {
-          return args;
+          return arg;
         }
 
         const primaryKeyAsc = inflection.builtin("PRIMARY_KEY_ASC");
@@ -45,21 +45,15 @@ export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
           TableOrderByType.getValues().find((v) => v.name === primaryKeyAsc) ||
           TableOrderByType.getValues()[0];
         if (!defaultValueEnum) {
-          return args;
+          return arg;
         }
 
         return extend(
-          args,
+          arg,
           {
-            orderBy: extend(
-              args.orderBy,
-              {
-                defaultValue: defaultValueEnum && [defaultValueEnum.value],
-              },
-              `Adding defaultValue to orderBy for field '${fieldName}' of '${Self.name}'`,
-            ),
+            defaultValue: defaultValueEnum && [defaultValueEnum.value],
           },
-          `Adding defaultValue to '${Self.name}.${fieldName}.orderBy'`,
+          `Adding defaultValue to orderBy for field '${fieldName}' of '${Self.name}'`,
         );
       },
     },

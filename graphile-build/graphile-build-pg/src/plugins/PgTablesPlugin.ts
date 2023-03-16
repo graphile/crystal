@@ -455,11 +455,17 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
           const uniques = await Promise.all(
             uniqueColumnOnlyConstraints.map(async (pgConstraint) => {
+              const { tags, description } =
+                pgConstraint.getTagsAndDescription();
               const unique: PgSourceUnique = {
                 isPrimary: pgConstraint.contype === "p",
                 columns: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
                 ),
+                extensions: {
+                  description,
+                  tags,
+                },
               };
               await info.process("pgTables_unique", {
                 databaseName,
@@ -479,7 +485,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           });
           const identifier = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
-          const { tags } = pgClass.getTagsAndDescription();
+          const { tags, description } = pgClass.getTagsAndDescription();
 
           const mask = pgClass.updatable_mask ?? 2 ** 8 - 1;
           const isInsertable = mask & (1 << 3);
@@ -503,7 +509,10 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             codec,
             uniques,
             isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
+            // TODO: consistency: either remove `description` from here or from `extensions` throughout.
+            description,
             extensions: {
+              description,
               pg: {
                 databaseName,
                 schemaName: pgClass.getNamespace()!.nspname,
