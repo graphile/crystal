@@ -335,10 +335,15 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           isReferencee,
         });
         const existingRelation = relations[relationName];
-        const { tags } = pgConstraint.getTagsAndDescription();
+        const { tags: rawTags, description: constraintDescription } =
+          pgConstraint.getTagsAndDescription();
+        // Clone the tags because we use the same tags on both relations
+        // (in both directions) but don't want modifications made to one
+        // to affect the other.
+        const tags = JSON.parse(JSON.stringify(rawTags));
         const description = isReferencee
           ? tags.backwardDescription
-          : tags.forwardDescription;
+          : tags.forwardDescription ?? constraintDescription;
         const newRelation: PgSourceRelation<any, any> = {
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),

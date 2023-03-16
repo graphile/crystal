@@ -328,6 +328,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const numberOfRequiredArguments =
             numberOfArguments - numberOfArgumentsWithDefaults;
           const { tags: rawTags, description } = pgProc.getTagsAndDescription();
+          const tags = JSON.parse(JSON.stringify(rawTags));
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
@@ -407,14 +408,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             [namespaceName, procName, sql, sqlFromArgDigests],
           );
 
-          const tags = { ...rawTags };
-
           addBehaviorToTags(tags, "-filter -order", true);
 
           const extensions: PgSourceExtensions = {
-            tags: {
-              ...tags,
-            },
+            tags,
+            description,
           };
 
           if (outOrInoutOrTableArgModes.length === 1) {
