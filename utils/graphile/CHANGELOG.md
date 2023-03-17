@@ -1,5 +1,12 @@
 # graphile
 
+## 5.0.0-0.7
+
+### Patch Changes
+
+- [`dad8c0695`](undefined) - Fix bug in 'graphile config print' where plugins
+  weren't treated as providing themselves.
+
 ## 5.0.0-0.6
 
 ### Patch Changes
