@@ -32,14 +32,13 @@ export interface PlanWrapperRules {
 }
 
 export type PlanWrapperRulesGenerator = (
-  options: GraphileBuild.SchemaOptions,
+  build: Partial<GraphileBuild.Build> & GraphileBuild.BuildBase,
 ) => PlanWrapperRules;
 
 export type PlanWrapperFilter<T> = (
   context: GraphileBuild.ContextObjectFieldsField,
   build: GraphileBuild.Build,
   field: GraphileFieldConfig<any, any, any, any, any>,
-  options: GraphileBuild.SchemaOptions,
 ) => T | null;
 
 export type PlanWrapperFilterRule<T> = (
@@ -86,7 +85,7 @@ export function makeWrapPlansPlugin<T>(
 
           const rules: PlanWrapperRules | null =
             typeof rulesOrGenerator === "function"
-              ? rulesOrGenerator(build.options)
+              ? rulesOrGenerator(build)
               : rulesOrGenerator;
           (build as any)[symbol] = {
             rules,
@@ -104,12 +103,7 @@ export function makeWrapPlansPlugin<T>(
           } = context;
           let planWrapperOrSpec;
           if (filter) {
-            const filterResult: any = filter(
-              context,
-              build,
-              field,
-              build.options,
-            );
+            const filterResult: any = filter(context, build, field);
             if (!filterResult) {
               if (filterResult !== null) {
                 // eslint-disable-next-line no-console
