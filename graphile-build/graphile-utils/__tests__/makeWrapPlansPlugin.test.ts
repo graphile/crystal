@@ -284,8 +284,8 @@ describe("wrapping named plans", () => {
     const spy = makeEchoSpy();
     let options: GraphileBuild.SchemaOptions;
     const schema = makeSchemaWithSpyAndPlugins(spy, [
-      makeWrapPlansPlugin((_options) => {
-        options = _options;
+      makeWrapPlansPlugin((build) => {
+        options = build.options;
         return {
           Query: {
             echo: {
@@ -329,8 +329,8 @@ describe("wrapping plans matching a filter", () => {
       }
       return null;
     };
-    const before = [];
-    const after = [];
+    const before: any[] = [];
+    const after: any[] = [];
     const rule: PlanWrapperFilterRule<{
       scope: GraphileBuild.ScopeObjectFieldsField;
     }> =
