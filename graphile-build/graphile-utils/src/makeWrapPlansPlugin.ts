@@ -32,7 +32,7 @@ export interface PlanWrapperRules {
 }
 
 export type PlanWrapperRulesGenerator = (
-  options: GraphileBuild.SchemaOptions,
+  build: Partial<GraphileBuild.Build> & GraphileBuild.BuildBase,
 ) => PlanWrapperRules;
 
 export type PlanWrapperFilter<T> = (
@@ -86,7 +86,7 @@ export function makeWrapPlansPlugin<T>(
 
           const rules: PlanWrapperRules | null =
             typeof rulesOrGenerator === "function"
-              ? rulesOrGenerator(build.options)
+              ? rulesOrGenerator(build)
               : rulesOrGenerator;
           (build as any)[symbol] = {
             rules,
