@@ -98,7 +98,7 @@ function printAPB(
         }[] = [];
         for (let i = 0, l = plugins.length; i < l; i++) {
           const plugin = plugins[i];
-          if (plugin.provides?.includes(str)) {
+          if (plugin.provides?.includes(str) || plugin.name === str) {
             const good = type === "after" ? i < index : i > index;
             hits.push({
               plugin,
