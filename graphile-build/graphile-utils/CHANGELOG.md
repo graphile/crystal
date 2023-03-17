@@ -1,5 +1,17 @@
 # graphile-utils
 
+## 5.0.0-0.34
+
+### Patch Changes
+
+- [#236](https://github.com/benjie/postgraphile-private/pull/236)
+  [`c802cb307`](https://github.com/benjie/postgraphile-private/commit/c802cb307da0ee69fb8bd0eba4cde8984855ddfa)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 makeWrapPlansPlugin callback
+  is now passed `build` rather than `options` - use `build.options` to get the
+  options object. 🚨 makeWrapPlansPlugin filters now accept only three args
+  (`context`, `build`, `field`) since the fourth argument (`options`) was
+  redundant - get it from `build.options` instead.
+
 ## 5.0.0-0.33
 
 ### Patch Changes
