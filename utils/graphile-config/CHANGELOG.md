@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-0.6
+
+### Patch Changes
+
+- [#233](https://github.com/benjie/postgraphile-private/pull/233)
+  [`11e7c12c5`](https://github.com/benjie/postgraphile-private/commit/11e7c12c5a3545ee24b5e39392fbec190aa1cf85)
+  Thanks [@benjie](https://github.com/benjie)! - Solve mutation issue in plugin
+  ordering code which lead to heisenbugs.
+
 ## 0.0.1-0.5
 
 ### Patch Changes

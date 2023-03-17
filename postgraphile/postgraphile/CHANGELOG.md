@@ -1,5 +1,45 @@
 # postgraphile
 
+## 5.0.0-0.36
+
+### Patch Changes
+
+- [#233](https://github.com/benjie/postgraphile-private/pull/233)
+  [`a50bc5be4`](https://github.com/benjie/postgraphile-private/commit/a50bc5be4b4be344203f4acd0ffd5ad8b90d89b8)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce new
+  GraphQLObjectType_fields_field_args_arg and
+  GraphQLInterfaceType_fields_field_args_arg hooks to resolve some plugin
+  ordering issues.
+
+- [#233](https://github.com/benjie/postgraphile-private/pull/233)
+  [`11e7c12c5`](https://github.com/benjie/postgraphile-private/commit/11e7c12c5a3545ee24b5e39392fbec190aa1cf85)
+  Thanks [@benjie](https://github.com/benjie)! - Solve mutation issue in plugin
+  ordering code which lead to heisenbugs.
+
+- [#233](https://github.com/benjie/postgraphile-private/pull/233)
+  [`2f50a633a`](https://github.com/benjie/postgraphile-private/commit/2f50a633acab7c112413ec4576beeec2efef24df)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug where plugin ordering
+  could result in update mutations not being created.
+
+- [#233](https://github.com/benjie/postgraphile-private/pull/233)
+  [`005e5cea0`](https://github.com/benjie/postgraphile-private/commit/005e5cea01224533282bc4d0f3516368fb8db81a)
+  Thanks [@benjie](https://github.com/benjie)! - Eradicate
+  PgSmartCommentsPlugin, it is no longer needed. Solves some plugin ordering
+  issues.
+- Updated dependencies
+  [[`a50bc5be4`](https://github.com/benjie/postgraphile-private/commit/a50bc5be4b4be344203f4acd0ffd5ad8b90d89b8),
+  [`6fb7ef449`](https://github.com/benjie/postgraphile-private/commit/6fb7ef4494b4f61b3b1aa36642e51eb9ec99a941),
+  [`11e7c12c5`](https://github.com/benjie/postgraphile-private/commit/11e7c12c5a3545ee24b5e39392fbec190aa1cf85),
+  [`2f50a633a`](https://github.com/benjie/postgraphile-private/commit/2f50a633acab7c112413ec4576beeec2efef24df),
+  [`005e5cea0`](https://github.com/benjie/postgraphile-private/commit/005e5cea01224533282bc4d0f3516368fb8db81a)]:
+  - graphile-build@5.0.0-0.28
+  - graphile-build-pg@5.0.0-0.33
+  - graphile-config@0.0.1-0.6
+  - grafast@0.0.1-0.22
+  - grafserv@0.0.1-0.24
+  - ruru@2.0.0-0.12
+  - @dataplan/pg@0.0.1-0.27
+
 ## 5.0.0-0.35
 
 ### Patch Changes

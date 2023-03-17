@@ -1,5 +1,32 @@
 # graphile-build
 
+## 5.0.0-0.28
+
+### Patch Changes
+
+- [#233](https://github.com/benjie/postgraphile-private/pull/233)
+  [`a50bc5be4`](https://github.com/benjie/postgraphile-private/commit/a50bc5be4b4be344203f4acd0ffd5ad8b90d89b8)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce new
+  GraphQLObjectType_fields_field_args_arg and
+  GraphQLInterfaceType_fields_field_args_arg hooks to resolve some plugin
+  ordering issues.
+
+- [#233](https://github.com/benjie/postgraphile-private/pull/233)
+  [`6fb7ef449`](https://github.com/benjie/postgraphile-private/commit/6fb7ef4494b4f61b3b1aa36642e51eb9ec99a941)
+  Thanks [@benjie](https://github.com/benjie)! - Also trim the empty
+  descriptions from interface fields/args in addition to all the existing places
+  empty descriptions are trimmed.
+
+- [#233](https://github.com/benjie/postgraphile-private/pull/233)
+  [`11e7c12c5`](https://github.com/benjie/postgraphile-private/commit/11e7c12c5a3545ee24b5e39392fbec190aa1cf85)
+  Thanks [@benjie](https://github.com/benjie)! - Solve mutation issue in plugin
+  ordering code which lead to heisenbugs.
+
+- Updated dependencies
+  [[`11e7c12c5`](https://github.com/benjie/postgraphile-private/commit/11e7c12c5a3545ee24b5e39392fbec190aa1cf85)]:
+  - graphile-config@0.0.1-0.6
+  - grafast@0.0.1-0.22
+
 ## 5.0.0-0.27
 
 ### Patch Changes

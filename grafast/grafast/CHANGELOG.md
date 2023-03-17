@@ -1,5 +1,13 @@
 # grafast
 
+## 0.0.1-0.22
+
+### Patch Changes
+
+- Updated dependencies
+  [[`11e7c12c5`](https://github.com/benjie/postgraphile-private/commit/11e7c12c5a3545ee24b5e39392fbec190aa1cf85)]:
+  - graphile-config@0.0.1-0.6
+
 ## 0.0.1-0.21
 
 ### Patch Changes

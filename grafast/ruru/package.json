@@ -1,6 +1,6 @@
 {
   "name": "ruru",
-  "version": "2.0.0-0.11",
+  "version": "2.0.0-0.12",
   "description": "Grafast-flavoured GraphiQL distribution",
   "type": "module",
   "main": "./dist/index.js",
