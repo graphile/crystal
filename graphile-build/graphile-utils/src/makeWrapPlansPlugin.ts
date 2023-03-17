@@ -39,7 +39,6 @@ export type PlanWrapperFilter<T> = (
   context: GraphileBuild.ContextObjectFieldsField,
   build: GraphileBuild.Build,
   field: GraphileFieldConfig<any, any, any, any, any>,
-  options: GraphileBuild.SchemaOptions,
 ) => T | null;
 
 export type PlanWrapperFilterRule<T> = (
@@ -104,12 +103,7 @@ export function makeWrapPlansPlugin<T>(
           } = context;
           let planWrapperOrSpec;
           if (filter) {
-            const filterResult: any = filter(
-              context,
-              build,
-              field,
-              build.options,
-            );
+            const filterResult: any = filter(context, build, field);
             if (!filterResult) {
               if (filterResult !== null) {
                 // eslint-disable-next-line no-console
