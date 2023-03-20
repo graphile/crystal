@@ -119,7 +119,7 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   mean you can do `select * from users` but it might mean that it's possible to
   see details about a `users` when it's returned by a function or similar. (In
   this case the `codec` has `select` but the `source` has `-select`.)
-- `source:select` - can insert into this source
+- `source:select` - can select rows from this source
 - `source:insert` - can insert into this source
 - `source:update` - can update a record in this source
 - `source:delete` - can delete a record in this source
