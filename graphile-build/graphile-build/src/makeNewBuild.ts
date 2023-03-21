@@ -330,7 +330,7 @@ export default function makeNewBuild(
             spec.name = typeName;
 
             const finishedBuild = build as ReturnType<
-              typeof builder["createBuild"]
+              (typeof builder)["createBuild"]
             >;
             const type = builder.newWithHooks<any>(
               finishedBuild,

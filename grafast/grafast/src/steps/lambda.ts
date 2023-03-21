@@ -1,4 +1,8 @@
-import type { ExecutionExtra, PromiseOrDirect, UnwrapPlanTuple } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  PromiseOrDirect,
+  UnwrapPlanTuple,
+} from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { list } from "./list.js";
@@ -54,10 +58,7 @@ function lambda<const TIn extends readonly ExecutableStep<any>[], TOut>(
   plans: TIn,
   fn: (value: UnwrapPlanTuple<TIn>) => PromiseOrDirect<TOut>,
   isSyncAndSafe?: boolean,
-): LambdaStep<
-  UnwrapPlanTuple<TIn>,
-  TOut
->;
+): LambdaStep<UnwrapPlanTuple<TIn>, TOut>;
 function lambda<const TIn, TOut>(
   $plan: ExecutableStep<TIn> | null | undefined,
   fn: (value: TIn) => PromiseOrDirect<TOut>,

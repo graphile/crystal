@@ -61,7 +61,7 @@
     "jest": "^28.1.0",
     "mock-fs": "^5.1.2",
     "pg": "^8.7.1",
-    "prettier": "^2.5.1",
+    "prettier": "^2.8.6",
     "typedoc": "^0.22.15",
     "typedoc-monorepo-link-types": "^0.0.2",
     "typescript": "^5.0.0-beta",

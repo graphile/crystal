@@ -46,7 +46,7 @@
     "@babel/traverse": "^7.16.0",
     "@babel/types": "^7.16.0",
     "@types/node": "^18.15.5",
-    "prettier": "^2.5.1",
+    "prettier": "^2.8.6",
     "tslib": "^2.4.0"
   },
   "engines": {

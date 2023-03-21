@@ -299,7 +299,7 @@ class CodegenFile {
       this._imports[fromModule] ??
       (this._imports[fromModule] = Object.create(
         null,
-      ) as typeof this._imports[string]);
+      ) as (typeof this._imports)[string]);
     const existing = importedModule[exportName];
     if (existing) {
       if (!asType) {
