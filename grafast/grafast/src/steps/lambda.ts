@@ -1,4 +1,4 @@
-import type { ExecutionExtra, PromiseOrDirect } from "../interfaces.js";
+import type { ExecutionExtra, PromiseOrDirect, UnwrapPlanTuple } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { list } from "./list.js";
@@ -50,12 +50,15 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
  * callback. Note: if you need to pass more than one value, pass a `ListStep`
  * as the `$plan` argument.
  */
-function lambda<TIn extends [...any[]], TOut>(
-  plans: { [Index in keyof TIn]: ExecutableStep<TIn[Index]> },
-  fn: (value: TIn) => PromiseOrDirect<TOut>,
+function lambda<const TIn extends readonly ExecutableStep<any>[], TOut>(
+  plans: TIn,
+  fn: (value: UnwrapPlanTuple<TIn>) => PromiseOrDirect<TOut>,
   isSyncAndSafe?: boolean,
-): LambdaStep<TIn, TOut>;
-function lambda<TIn, TOut>(
+): LambdaStep<
+  UnwrapPlanTuple<TIn>,
+  TOut
+>;
+function lambda<const TIn extends any, TOut>(
   $plan: ExecutableStep<TIn> | null | undefined,
   fn: (value: TIn) => PromiseOrDirect<TOut>,
   isSyncAndSafe?: boolean,

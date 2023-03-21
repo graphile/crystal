@@ -1,15 +1,9 @@
-import type { ExecutionExtra } from "../interfaces.js";
+import type { ExecutionExtra, UnwrapPlanTuple } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 
-type UnwrapPlanTuple<TPlanTuple extends readonly ExecutableStep<any>[]> = [
-  ...(TPlanTuple extends readonly ExecutableStep<infer U>[]
-    ? readonly U[]
-    : never)
-];
-
 export class ListStep<
-  TPlanTuple extends readonly ExecutableStep<any>[],
+  const TPlanTuple extends readonly ExecutableStep<any>[],
 > extends UnbatchedExecutableStep<UnwrapPlanTuple<TPlanTuple>> {
   static $$export = {
     moduleName: "grafast",
@@ -18,7 +12,7 @@ export class ListStep<
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
-  constructor(list: readonly [...TPlanTuple]) {
+  constructor(list: TPlanTuple) {
     super();
     for (let i = 0, l = list.length; i < l; i++) {
       this.addDependency(list[i]);
@@ -95,7 +89,7 @@ export class ListStep<
  * Takes a list of plans and turns it into a single plan that represents the
  * list of their values.
  */
-export function list<TPlanTuple extends ExecutableStep<any>[]>(
+export function list<const TPlanTuple extends readonly ExecutableStep<any>[]>(
   list: TPlanTuple,
 ): ListStep<TPlanTuple> {
   return new ListStep<TPlanTuple>(list);

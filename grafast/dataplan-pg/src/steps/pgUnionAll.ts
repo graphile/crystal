@@ -108,7 +108,7 @@ function parseCursor(cursor: string | null) {
 }
 parseCursor.isSyncAndSafe = true; // Optimization
 
-function add([a, b]: [a: number, b: number]): number {
+function add([a, b]: readonly [a: number, b: number]): number {
   return a + b;
 }
 add.isSyncAndSafe = true;
@@ -1310,16 +1310,20 @@ and ${condition(i + 1)}`}
 
       const $lower =
         this.lowerIndexStepId != null
-          ? this.getDep(this.lowerIndexStepId)
+          ? (this.getDep(this.lowerIndexStepId) as ExecutableStep<
+              number | null | undefined
+            >)
           : constant(null);
       const $upper =
         this.upperIndexStepId != null
-          ? this.getDep(this.upperIndexStepId)
+          ? (this.getDep(this.upperIndexStepId) as ExecutableStep<
+              number | null | undefined
+            >)
           : constant(null);
 
       const limitAndOffsetLambda = lambda(
         list([$lower, $upper]),
-        ([cursorLower, cursorUpper]: Array<number | null>) => {
+        ([cursorLower, cursorUpper]) => {
           /** lower bound - exclusive (1-indexed) */
           let lower = 0;
           /** upper bound - exclusive (1-indexed) */
@@ -1379,13 +1383,13 @@ and ${condition(i + 1)}`}
         true,
       );
       this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
-      const limitLambda = access<number>(limitAndOffsetLambda, [0]);
-      const offsetLambda = access<number>(limitAndOffsetLambda, [1]);
-      const limitPlusOffsetLambda = lambda([limitLambda, offsetLambda], add);
+      const $limitLambda = access<number>(limitAndOffsetLambda, [0]);
+      const $offsetLambda = access<number>(limitAndOffsetLambda, [1]);
+      const limitPlusOffsetLambda = lambda([$limitLambda, $offsetLambda], add);
       this.limitAndOffsetSQL = sql`\nlimit ${this.placeholder(
-        limitLambda,
+        $limitLambda,
         TYPES.int,
-      )}\noffset ${this.placeholder(offsetLambda, TYPES.int)}`;
+      )}\noffset ${this.placeholder($offsetLambda, TYPES.int)}`;
       this.innerLimitSQL = sql`\nlimit ${this.placeholder(
         limitPlusOffsetLambda,
         TYPES.int,

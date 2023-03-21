@@ -814,3 +814,9 @@ export interface JSONObject {
   [key: string]: JSONValue;
 }
 export interface JSONArray extends Array<JSONValue> {}
+
+export type UnwrapPlanTuple<
+  /* const */ TIn extends readonly ExecutableStep<any>[],
+> = {
+  [Index in keyof TIn]: TIn[Index] extends ExecutableStep<infer U> ? U : never;
+} & { length: number };
