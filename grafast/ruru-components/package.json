@@ -40,7 +40,7 @@
     "@graphiql/plugin-explorer": "^0.1.14",
     "@graphiql/react": "^0.17.0",
     "@graphiql/toolkit": "^0.8.2",
-    "@types/node": "^16.11.15",
+    "@types/node": "^18.15.5",
     "graphiql": "^2.4.0",
     "graphql-ws": "^5.11.3",
     "mermaid": "^8.14.0",

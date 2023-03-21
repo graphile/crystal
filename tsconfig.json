@@ -11,7 +11,8 @@
 
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "target": "ESNext",
+    "target": "ES2022",
+    "lib": ["ES2022"],
 
     "sourceMap": true,
     "pretty": true,

@@ -38,7 +38,7 @@
     "@tsconfig/node16": "^1.0.2",
     "@types/jest": "^27.5.1",
     "@types/mock-fs": "4.13.1",
-    "@types/node": "^16.11.15",
+    "@types/node": "^18.15.5",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
     "@typescript-eslint/typescript-estree": "^5.37.0",
