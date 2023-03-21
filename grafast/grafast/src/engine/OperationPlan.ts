@@ -457,7 +457,7 @@ ${te.join(
           `Error occurred during query planning: \n${e.stack || e}`,
         );
       }
-      throw new SafeError(`Failed to plan this query.`);
+      throw new Error(`Query planning error: ${e.message}`, { cause: e });
     }
   }
 

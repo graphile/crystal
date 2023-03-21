@@ -28,7 +28,18 @@ export function handleErrors(
           : { message: (e as any).message, ...(e as object) };
       return Object.assign(obj, {
         message: stripAnsi(obj.message),
-        extensions: { stack: stripAnsi(e.stack ?? "").split("\n") },
+        extensions: {
+          ...(e.stack
+            ? {
+                stack: stripAnsi(e.stack).split("\n"),
+              }
+            : null),
+          ...(e.cause
+            ? {
+                cause: stripAnsi(String(e.cause)),
+              }
+            : null),
+        },
       });
     });
   }
