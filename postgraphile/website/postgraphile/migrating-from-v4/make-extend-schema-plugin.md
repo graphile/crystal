@@ -345,6 +345,8 @@ export default makeExtendSchemaPlugin((build) => {
 });
 ```
 
+Another example of makeExtendSchemaPlugin being used can be found [`here`](https://gist.github.com/jamesallain/ca09979840c4530f72ce16378e49b927).
+
 ## QueryBuilder "named children"
 
 This concept is no longer useful or needed, and can be ported to much more
