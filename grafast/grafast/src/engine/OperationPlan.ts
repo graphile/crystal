@@ -70,6 +70,7 @@ import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
 import {
+  assertNotAsync,
   defaultValueToValueNode,
   findVariableNamesUsed,
   isTypePlanned,
@@ -457,7 +458,7 @@ ${te.join(
           `Error occurred during query planning: \n${e.stack || e}`,
         );
       }
-      throw new SafeError(`Failed to plan this query.`);
+      throw new Error(`Query planning error: ${e.message}`, { cause: e });
     }
   }
 
@@ -978,6 +979,7 @@ ${te.join(
 
         const fieldType = objectField.type;
         const rawPlanResolver = objectField.extensions?.graphile?.plan;
+        assertNotAsync(rawPlanResolver, `${objectType.name}.${fieldName}.plan`);
         const namedReturnType = getNamedType(fieldType);
 
         /**
@@ -1282,6 +1284,7 @@ ${te.join(
       );
     } else if (isScalarType(nullableFieldType)) {
       const scalarPlanResolver = nullableFieldType.extensions?.graphile?.plan;
+      assertNotAsync(scalarPlanResolver, `${nullableFieldType.name}.plan`);
       const $leaf =
         typeof scalarPlanResolver === "function"
           ? withGlobalLayerPlan(parentLayerPlan, polymorphicPaths, () =>
@@ -1322,21 +1325,42 @@ ${te.join(
         locationDetails,
       });
     } else if (isObjectType(nullableFieldType)) {
-      if (isDev) {
-        // Check that the plan we're dealing with is the one the user declared
-        const ExpectedStep = nullableFieldType.extensions?.graphile?.Step;
-        if (ExpectedStep && !($step instanceof ExpectedStep)) {
+      // Check that the plan we're dealing with is the one the user declared
+      /** Either an assertion function or a step class */
+      const stepAssertion = nullableFieldType.extensions?.graphile?.Step;
+      if (stepAssertion) {
+        try {
+          if (
+            stepAssertion === ExecutableStep ||
+            stepAssertion.prototype instanceof ExecutableStep
+          ) {
+            if (!($step instanceof stepAssertion)) {
+              throw new Error(
+                `Step mis-match: expected ${
+                  stepAssertion.name
+                }, but instead found ${
+                  ($step as ExecutableStep).constructor.name
+                } (${$step})`,
+              );
+            }
+          } else {
+            (stepAssertion as ($step: ExecutableStep) => void)($step);
+          }
+        } catch (e) {
           throw new Error(
-            `Step mis-match: expected ${ExpectedStep.name}, but instead found ${
-              ($step as ExecutableStep).constructor.name
-            } (${$step})`,
+            `The step returned by '${path.join(
+              ".",
+            )}' is not compatible with the GraphQL object type '${
+              nullableFieldType.name
+            }': ${e.message}`,
+            { cause: e },
           );
         }
-        if (!selections) {
-          throw new Error(
-            `GraphileInternalError<7fe4f7d1-01d2-4f1e-add6-5aa6936938c9>: no selections on a GraphQLObjectType?!`,
-          );
-        }
+      }
+      if (!selections) {
+        throw new Error(
+          `GraphileInternalError<7fe4f7d1-01d2-4f1e-add6-5aa6936938c9>: no selections on a GraphQLObjectType?!`,
+        );
       }
 
       let objectLayerPlan: LayerPlan;

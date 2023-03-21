@@ -58,7 +58,7 @@
   "dependencies": {
     "@dataplan/pg": "workspace:*",
     "@graphile/lru": "workspace:^",
-    "@types/node": "^16.11.15",
+    "@types/node": "^18.15.5",
     "@types/pg": "^8.6.2",
     "debug": "^4.3.3",
     "grafast": "workspace:^",

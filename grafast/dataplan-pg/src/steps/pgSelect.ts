@@ -1716,16 +1716,20 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
       const $lower =
         this.lowerIndexStepId != null
-          ? this.getDep(this.lowerIndexStepId)
+          ? (this.getDep(this.lowerIndexStepId) as ExecutableStep<
+              number | null | undefined
+            >)
           : constant(null);
       const $upper =
         this.upperIndexStepId != null
-          ? this.getDep(this.upperIndexStepId)
+          ? (this.getDep(this.upperIndexStepId) as ExecutableStep<
+              number | null | undefined
+            >)
           : constant(null);
 
       const limitAndOffsetLambda = lambda(
         list([$lower, $upper]),
-        ([cursorLower, cursorUpper]: Array<number | null>) => {
+        ([cursorLower, cursorUpper]) => {
           /** lower bound - exclusive (1-indexed) */
           let lower = 0;
           /** upper bound - exclusive (1-indexed) */

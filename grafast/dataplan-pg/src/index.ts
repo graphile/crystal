@@ -163,8 +163,10 @@ import {
   WithPgClientStepCallback,
   withPgClientTransaction,
 } from "./steps/withPgClient.js";
+import { assertPgClassSingleStep } from "./utils.js";
 
 export {
+  assertPgClassSingleStep,
   BooleanFilterStep,
   ClassFilterStep,
   digestsFromArgumentSpecs,
@@ -309,6 +311,7 @@ export {
 };
 
 exportAsMany("@dataplan/pg", {
+  assertPgClassSingleStep,
   domainOfCodec,
   getInnerCodec,
   enumType,

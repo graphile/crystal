@@ -61,8 +61,12 @@ export function isGrafastError(value: any): value is GrafastError {
 
 export class SafeError extends Error {
   [$$safeError] = true;
-  constructor(message: string, public extensions?: Record<string, any>) {
-    super(message);
+  constructor(
+    message: string,
+    public extensions?: Record<string, any>,
+    errorOptions?: ErrorOptions,
+  ) {
+    super(message, errorOptions);
   }
 }
 

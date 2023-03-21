@@ -3371,7 +3371,7 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/json5": "npm:^2.2.0"
     "@types/license-checker-webpack-plugin": "npm:^0"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@types/nodemon": "npm:1.19.1"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.3"
@@ -3389,6 +3389,7 @@ __metadata:
     pg-sql2: "workspace:^"
     postgres-array: "npm:~2.0.0"
     postgres-range: "npm:^1.1.1"
+    terser-webpack-plugin: "npm:^5.1.3"
     ts-loader: "npm:^9.4.1"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
@@ -4156,7 +4157,7 @@ __metadata:
   resolution: "@graphile/lru@workspace:utils/lru"
   dependencies:
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     jest: "npm:^28.1.0"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
@@ -4168,7 +4169,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@graphile/simplify-inflection@workspace:graphile-build/graphile-simplify-inflection"
   dependencies:
-    "@types/node": "npm:^18.11.18"
+    "@types/node": "npm:^18.15.5"
     postgraphile: "workspace:^"
     typescript: "npm:^5.0.0-beta"
   languageName: unknown
@@ -4816,6 +4817,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jridgewell/resolve-uri@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@jridgewell/resolve-uri@npm:3.1.0"
+  checksum: 6b641bb7e25bc92a9848898cc91a77a390f393f086297ec2336d911387bdd708919c418e74a22732cfc21d0e7300b94306f437d2e9de5ab58b33ebc6c39d6f9d
+  languageName: node
+  linkType: hard
+
 "@jridgewell/resolve-uri@npm:^3.0.3":
   version: 3.0.7
   resolution: "@jridgewell/resolve-uri@npm:3.0.7"
@@ -4847,6 +4855,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jridgewell/sourcemap-codec@npm:1.4.14":
+  version: 1.4.14
+  resolution: "@jridgewell/sourcemap-codec@npm:1.4.14"
+  checksum: 2147ea75c966fed8a7d9ed6679b7e8c380fa790a9bea5a64f4ec1c26d24e44b461aa60fc3b228cea03a46708d9d1bcf19508035bf27ad5e8f63d0998ed1d1117
+  languageName: node
+  linkType: hard
+
 "@jridgewell/sourcemap-codec@npm:^1.4.10":
   version: 1.4.13
   resolution: "@jridgewell/sourcemap-codec@npm:1.4.13"
@@ -4864,13 +4879,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jridgewell/trace-mapping@npm:^0.3.14":
-  version: 0.3.15
-  resolution: "@jridgewell/trace-mapping@npm:0.3.15"
+"@jridgewell/trace-mapping@npm:^0.3.17":
+  version: 0.3.17
+  resolution: "@jridgewell/trace-mapping@npm:0.3.17"
   dependencies:
-    "@jridgewell/resolve-uri": "npm:^3.0.3"
-    "@jridgewell/sourcemap-codec": "npm:^1.4.10"
-  checksum: a11b95f877537f116c1a2297ad712df69a8928f33076cfc95702cfbb53854e370a6e62447f12f9c495b40ba92b0c0eed6ab18eaf2e7cae7e62d30ffb7975d30b
+    "@jridgewell/resolve-uri": "npm:3.1.0"
+    "@jridgewell/sourcemap-codec": "npm:1.4.14"
+  checksum: 388a2f604c1159dd29fdf3077c2a21fd2d322145f24cade868c0a7c55cfc993f3af82dd2e979438d9f06148c38af780abc7c0aa2eddbb34fab41698bb86d82e1
   languageName: node
   linkType: hard
 
@@ -6239,10 +6254,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:16.11.15, @types/node@npm:^16.11.15":
-  version: 16.11.15
-  resolution: "@types/node@npm:16.11.15"
-  checksum: d5223a14a53ef76326cf02e39e536c95e6b29b7d67230456d492f2a53a5301de2645fa30bbe41d5d3cafdaccbdb1f74d24dd7402bf19880d912f02a87d601731
+"@types/node@npm:18.15.5, @types/node@npm:^18.15.5":
+  version: 18.15.5
+  resolution: "@types/node@npm:18.15.5"
+  checksum: b046d8e4ebb94c1f811743d8be63b7e76fa03db9117ae1a7bc4589fddbb13b70c24fd5d2d4f674032b8a0ceb4db2e74725d241ccdf99f8ec61e357de2e2bbebb
   languageName: node
   linkType: hard
 
@@ -6257,13 +6272,6 @@ __metadata:
   version: 17.0.45
   resolution: "@types/node@npm:17.0.45"
   checksum: c0e9a6e94e1d37dd9ccb6be305f9a1500968624a58c93bc3cbffaebcebcb6774add768db664e74867d99185c7a66e00fb12df6185d4e46bde170159ef0990071
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^18.11.18":
-  version: 18.11.18
-  resolution: "@types/node@npm:18.11.18"
-  checksum: bd39552701928d4a1613bc46adf8b65f8212064c2b5475a67161b6c4cef21ddb0a5c2ba062673213f8f5301ef6e171241a9e274a9b59c9fc1f5e2b69764740eb
   languageName: node
   linkType: hard
 
@@ -13390,7 +13398,7 @@ __metadata:
     "@types/lodash": "npm:^4.14.178"
     "@types/mermaid": "npm:^8"
     "@types/mocha": "npm:^9.1.1"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@types/nodemon": "npm:1.19.1"
     chai: "npm:^4.3.6"
     chalk: "npm:^4.1.2"
@@ -13407,6 +13415,7 @@ __metadata:
     pg-sql2: "workspace:^"
     spec-md: "npm:^3.0.2"
     tamedevil: "workspace:^"
+    terser-webpack-plugin: "npm:^5.1.3"
     ts-loader: "npm:^9.4.1"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
@@ -13481,7 +13490,7 @@ __metadata:
     "@types/express": "npm:^4"
     "@types/jest": "npm:^27.5.1"
     "@types/jsonwebtoken": "npm:^8"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.3"
     express: "npm:^4.17.2"
@@ -13515,7 +13524,7 @@ __metadata:
   dependencies:
     "@types/debug": "npm:^4.1.7"
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@types/pluralize": "npm:^0.0.29"
     "@types/semver": "npm:^7.3.9"
     chalk: "npm:^4.1.2"
@@ -13543,7 +13552,7 @@ __metadata:
     "@types/debug": "npm:^4.1.7"
     "@types/interpret": "npm:^1.1.1"
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@types/semver": "npm:^7.3.9"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.3"
@@ -13569,11 +13578,11 @@ __metadata:
     "@types/babel__generator": "npm:^7.6.3"
     "@types/babel__template": "npm:^7.4.1"
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@types/prettier": "npm:^2"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^28.1.0"
-    prettier: "npm:^2.5.1"
+    prettier: "npm:^2.8.6"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
     typescript: "npm:^5.0.0-beta"
@@ -13614,7 +13623,7 @@ __metadata:
   resolution: "graphile@workspace:utils/graphile"
   dependencies:
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@typescript/vfs": "npm:^1.4.0"
     chalk: "npm:^4.1.2"
     graphile-config: "workspace:^"
@@ -15500,7 +15509,7 @@ __metadata:
     "@types/json5": "npm:^2.2.0"
     jest: "npm:^28.1.0"
     json5: "npm:^2.2.0"
-    prettier: "npm:^2.5.1"
+    prettier: "npm:^2.8.6"
     pretty-format: "npm:^27.4.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
@@ -15580,17 +15589,6 @@ __metadata:
     jest-util: "npm:^28.1.0"
     string-length: "npm:^4.0.1"
   checksum: aab0da345218b64a142a1df4a9143ac0a5a4775a48699f25c479d30a804978849fb21b6c08cd4f28ee3e9838e02c22e3b1d4d7024b4f56109c976fc5416f85cb
-  languageName: node
-  linkType: hard
-
-"jest-worker@npm:^27.4.1":
-  version: 27.4.5
-  resolution: "jest-worker@npm:27.4.5"
-  dependencies:
-    "@types/node": "npm:*"
-    merge-stream: "npm:^2.0.0"
-    supports-color: "npm:^8.0.0"
-  checksum: be99e63affac4b0d0b7958831169894486469859338eb67bdf623a9f95a38f892fb0e6804140bdd4ac2d3bae98aded48f79db6095eb82e2c435d0b0513570e62
   languageName: node
   linkType: hard
 
@@ -18092,7 +18090,7 @@ __metadata:
   dependencies:
     "@types/debug": "npm:4.1.7"
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:16.11.15"
+    "@types/node": "npm:18.15.5"
     jest: "npm:^28.1.0"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.4.0"
@@ -18123,7 +18121,7 @@ __metadata:
     "@graphile/lru": "workspace:^"
     "@types/debug": "npm:4.1.7"
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:16.11.15"
+    "@types/node": "npm:18.15.5"
     jest: "npm:^28.1.0"
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.9.1"
@@ -18774,7 +18772,7 @@ __metadata:
     "@types/express": "npm:^4"
     "@types/jest": "npm:^27.5.1"
     "@types/jsonwebtoken": "npm:^8"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@types/nodemon": "npm:1.19.1"
     "@types/pg": "npm:^8.6.2"
     debug: "npm:^4.3.3"
@@ -18864,21 +18862,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.5.1":
-  version: 2.5.1
-  resolution: "prettier@npm:2.5.1"
-  bin:
-    prettier: bin-prettier.js
-  checksum: d0ad8c8b8a6375aefc5e7d3a12b72ed218ad58952a4ab083701ec8899cb496823a71dcc52e076813ae7930f57220a94c929df7c995a7037b1319f8e05555636a
-  languageName: node
-  linkType: hard
-
 "prettier@npm:^2.7.1":
   version: 2.8.1
   resolution: "prettier@npm:2.8.1"
   bin:
     prettier: bin-prettier.js
   checksum: 06a74a0f7aa5877a3912aeeeae3558014b10e438d945f88bd313222e75e7282eb7f41299d204353ec7d00b208377ddc36ffe4c7d2151f0502e783139b934d66d
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^2.8.6":
+  version: 2.8.6
+  resolution: "prettier@npm:2.8.6"
+  bin:
+    prettier: bin-prettier.js
+  checksum: 349cf6e60e9e816aedede90186fbd77a169d81ef55ae319e9528012ea610dde8f96d93188435153d2c92772ee9ff6869def1035e2beb7ece779da4f7ca8ee532
   languageName: node
   linkType: hard
 
@@ -20287,7 +20285,7 @@ __metadata:
     "@tsconfig/node16": "npm:^1.0.2"
     "@types/jest": "npm:^27.5.1"
     "@types/mock-fs": "npm:4.13.1"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@typescript-eslint/eslint-plugin": "npm:^5.37.0"
     "@typescript-eslint/parser": "npm:^5.37.0"
     "@typescript-eslint/typescript-estree": "npm:^5.37.0"
@@ -20310,7 +20308,7 @@ __metadata:
     jest: "npm:^28.1.0"
     mock-fs: "npm:^5.1.2"
     pg: "npm:^8.7.1"
-    prettier: "npm:^2.5.1"
+    prettier: "npm:^2.8.6"
     typedoc: "npm:^0.22.15"
     typedoc-monorepo-link-types: "npm:^0.0.2"
     typescript: "npm:^5.0.0-beta"
@@ -20358,7 +20356,7 @@ __metadata:
     "@types/codemirror": "npm:^5.60.5"
     "@types/debug": "npm:^4.1.7"
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:^16.11.15"
+    "@types/node": "npm:^18.15.5"
     "@types/nodemon": "npm:1.19.1"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18.0.0"
@@ -20692,6 +20690,15 @@ __metadata:
   dependencies:
     randombytes: "npm:^2.1.0"
   checksum: c54759aaf8581cc1509e838a9a1eb340b0addaf8103f1d7795af0cd2319475e43cc31793fbe2db72aa8059a93218dc22b79ae8277b0e69de474a4f79800cf54f
+  languageName: node
+  linkType: hard
+
+"serialize-javascript@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "serialize-javascript@npm:6.0.1"
+  dependencies:
+    randombytes: "npm:^2.1.0"
+  checksum: 918ab48d613d8d7ae3bd0a12da50961f7710dd5f7ec7ffea12c03017c11b02c3d8355b672d6aabef67c2c539ebd1d6665b10748760221df3fc299eb43705412e
   languageName: node
   linkType: hard
 
@@ -21103,13 +21110,6 @@ __metadata:
   version: 0.7.4
   resolution: "source-map@npm:0.7.4"
   checksum: 97353dd6ffe747221f810400254a2c0110d745758aa094d3efe697d15c7697bb9bf49fea7028e88e97f973af53ac98cf69522ced606a4b46428fdd3e0d759280
-  languageName: node
-  linkType: hard
-
-"source-map@npm:~0.7.2":
-  version: 0.7.3
-  resolution: "source-map@npm:0.7.3"
-  checksum: 5a00dce8ee0de43b5218608798422304d30f86ee551d8896b638606ceea90712323af12c52b6728e72214be8548c5c4bf230dca85bbbd03756b038b91c992d3e
   languageName: node
   linkType: hard
 
@@ -21777,7 +21777,7 @@ __metadata:
     "@graphile/lru": "workspace:^"
     "@types/debug": "npm:4.1.7"
     "@types/jest": "npm:^27.5.1"
-    "@types/node": "npm:16.11.15"
+    "@types/node": "npm:18.15.5"
     jest: "npm:^28.1.0"
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.9.1"
@@ -21873,37 +21873,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:^5.1.3":
-  version: 5.3.0
-  resolution: "terser-webpack-plugin@npm:5.3.0"
+"terser-webpack-plugin@npm:^5.1.3, terser-webpack-plugin@npm:^5.3.3":
+  version: 5.3.7
+  resolution: "terser-webpack-plugin@npm:5.3.7"
   dependencies:
-    jest-worker: "npm:^27.4.1"
-    schema-utils: "npm:^3.1.1"
-    serialize-javascript: "npm:^6.0.0"
-    source-map: "npm:^0.6.1"
-    terser: "npm:^5.7.2"
-  peerDependencies:
-    webpack: ^5.1.0
-  peerDependenciesMeta:
-    "@swc/core":
-      optional: true
-    esbuild:
-      optional: true
-    uglify-js:
-      optional: true
-  checksum: e294a3be6d99116a799028dbb9428676ae65f828763172730106c8f579f33c60788f0b1bb7e48818dd8d2a289e1dc53a27dc83b695b0bdc7b9fc3eeb89267393
-  languageName: node
-  linkType: hard
-
-"terser-webpack-plugin@npm:^5.3.3":
-  version: 5.3.6
-  resolution: "terser-webpack-plugin@npm:5.3.6"
-  dependencies:
-    "@jridgewell/trace-mapping": "npm:^0.3.14"
+    "@jridgewell/trace-mapping": "npm:^0.3.17"
     jest-worker: "npm:^27.4.5"
     schema-utils: "npm:^3.1.1"
-    serialize-javascript: "npm:^6.0.0"
-    terser: "npm:^5.14.1"
+    serialize-javascript: "npm:^6.0.1"
+    terser: "npm:^5.16.5"
   peerDependencies:
     webpack: ^5.1.0
   peerDependenciesMeta:
@@ -21913,13 +21891,13 @@ __metadata:
       optional: true
     uglify-js:
       optional: true
-  checksum: 4594d51d1d5dc6be17e4fc126fd3067328d2ba2596df0993a19e0d94d07ed17fec377c3fbbf8879d082ca20dfb9a66aa7fb42aef5ac61282c0b4e6f69c6729af
+  checksum: d9a53e18366f053fabe191d3a32808ce0a52df2d4bc001786ae20da4c41215a8b75fb0ab5a1222690e32bf4611a870afe6ee4d9a79145f33e242b7a9e9760dca
   languageName: node
   linkType: hard
 
-"terser@npm:^5.10.0, terser@npm:^5.14.1":
-  version: 5.15.0
-  resolution: "terser@npm:5.15.0"
+"terser@npm:^5.10.0, terser@npm:^5.16.5":
+  version: 5.16.6
+  resolution: "terser@npm:5.16.6"
   dependencies:
     "@jridgewell/source-map": "npm:^0.3.2"
     acorn: "npm:^8.5.0"
@@ -21927,25 +21905,7 @@ __metadata:
     source-map-support: "npm:~0.5.20"
   bin:
     terser: bin/terser
-  checksum: f051544d6ce1673e2755345e3cd846994afcedf3bbb634bc364a01e183a9a9d2236f94e742ef524615da67b545cd4327f2f11e8aafbebd11fda9458428aa3e23
-  languageName: node
-  linkType: hard
-
-"terser@npm:^5.7.2":
-  version: 5.10.0
-  resolution: "terser@npm:5.10.0"
-  dependencies:
-    commander: "npm:^2.20.0"
-    source-map: "npm:~0.7.2"
-    source-map-support: "npm:~0.5.20"
-  peerDependencies:
-    acorn: ^8.5.0
-  peerDependenciesMeta:
-    acorn:
-      optional: true
-  bin:
-    terser: bin/terser
-  checksum: 504725b86a3bef183e1db2268b68c88d56efa932c162bcc7e24a0c71fbcfec4bfc6ff8ad302488d30d610c8a01940d7590189c586103d8a5bd60a5509c9c36c3
+  checksum: 3ee9b14fd17ff9bfc9b931180580e50251b67409a8941ab40bfdfbe2725592f5ad9bf92a81740198d3c2eb976a56f33bce8f4a493d5e30b688a7ad03ba2c8276
   languageName: node
   linkType: hard
 

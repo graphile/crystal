@@ -26,7 +26,8 @@ export function currentLayerPlan(): LayerPlan {
   const lp = globalData?.layerPlan;
   if (!lp) {
     throw new Error(
-      "GraphileInternalError<6101a346-cfe6-4da7-8e63-010e36fd7f37>: currentLayerPlan called out of turn; must only called within a withGlobalLayerPlan callback",
+      // Must only be called from inside `withGlobalLayerPlan`!
+      "Now is not a valid time to call `currentLayerPlan`. This error typically occurs when you attempt to call a Grafast step function from outside of the planning lifecycle - it's important to note that Grafast plans must be resolved synchronously, so check for 'async' or 'setTimeout' or any location where a step function is called outside of a plan resolver. For more information, read about plan resolvers: https://grafast.org/grafast/plan-resolvers",
     );
   }
   return lp;

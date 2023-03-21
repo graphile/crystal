@@ -313,7 +313,9 @@ declare global {
         typeName: string,
         scope: ScopeObject,
         Step: TStep extends ExecutableStep<any>
-          ? { new (...args: any[]): TStep }
+          ?
+              | ((step: ExecutableStep<any>) => asserts step is TStep)
+              | { new (...args: any[]): TStep }
           : null,
         specGenerator: () => Omit<GraphileObjectTypeConfig<TStep, any>, "name">,
         origin: string | null | undefined,

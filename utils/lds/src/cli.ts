@@ -100,15 +100,15 @@ async function main() {
       const stringifiedKey = key ? stringify(key) : "";
       const tableMap =
         channels[schema] ??
-        (channels[schema] = Object.create(null) as typeof channels[string]);
+        (channels[schema] = Object.create(null) as (typeof channels)[string]);
       const clientsMap =
         tableMap[table] ??
-        (tableMap[table] = Object.create(null) as typeof tableMap[string]);
+        (tableMap[table] = Object.create(null) as (typeof tableMap)[string]);
       const channelClients =
         clientsMap[stringifiedKey] ??
         (clientsMap[stringifiedKey] = new Array(
           SLOTS,
-        ) as typeof clientsMap[string]);
+        ) as (typeof clientsMap)[string]);
       const i = channelClients.indexOf(ws);
       if (sub) {
         if (i >= 0) {

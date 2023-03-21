@@ -1,4 +1,5 @@
 const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
 const path = require("path");
 const LicenseCheckerWebpackPlugin = require("license-checker-webpack-plugin");
 
@@ -79,5 +80,14 @@ module.exports = {
   },
   performance: {
     maxEntrypointSize: 215000,
+  },
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          keep_classnames: true,
+        },
+      }),
+    ],
   },
 };

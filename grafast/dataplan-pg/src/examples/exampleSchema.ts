@@ -3231,8 +3231,8 @@ export function makeExampleSchema(
           any,
           any
         >,
-      number[],
-      ListStep<ExecutableStep<number>[]>
+      readonly number[],
+      ListStep<readonly ExecutableStep<any>[]>
     > => ({
       Person: {
         match: (v) => v[0] != null,

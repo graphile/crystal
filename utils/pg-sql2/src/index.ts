@@ -1,3 +1,5 @@
+import "./thereCanBeOnlyOne.js";
+
 import LRU from "@graphile/lru";
 import * as assert from "assert";
 import { inspect } from "util";

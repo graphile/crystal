@@ -40,7 +40,7 @@
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
     "@dataplan/pg": "workspace:^",
-    "@types/node": "^16.11.15",
+    "@types/node": "^18.15.5",
     "debug": "^4.3.3",
     "grafast": "workspace:^",
     "graphile-build": "workspace:*",

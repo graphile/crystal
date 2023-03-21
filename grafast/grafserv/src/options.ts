@@ -31,10 +31,12 @@ export function defaultMaskError(error: GraphQLError): GraphQLError {
       error.originalError.extensions ?? null,
     );
   } else {
+    // TODO: would it be good to do a hash instead, that way similar errors can
+    // easily be grouped?
     const errorId = randomString();
     console.error(`Masked GraphQL error (code: '${errorId}')`, error);
     return new GraphQLError(
-      `An error occurred (code: '${errorId}')`,
+      `An error occurred (logged with code: '${errorId}')`,
       error.nodes,
       error.source,
       error.positions,

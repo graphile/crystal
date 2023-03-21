@@ -124,7 +124,9 @@ export interface GrafastInputFieldExtensions {
 }
 
 export interface GrafastObjectTypeExtensions {
-  Step?: { new (...args: any[]): ExecutableStep; displayName?: string };
+  Step?:
+    | ((step: ExecutableStep<any>) => asserts step is ExecutableStep<any>)
+    | { new (...args: any[]): ExecutableStep; displayName?: string };
 }
 
 export interface GrafastEnumTypeExtensions {}
@@ -814,3 +816,9 @@ export interface JSONObject {
   [key: string]: JSONValue;
 }
 export interface JSONArray extends Array<JSONValue> {}
+
+export type UnwrapPlanTuple<
+  /* const */ TIn extends readonly ExecutableStep<any>[],
+> = {
+  [Index in keyof TIn]: TIn[Index] extends ExecutableStep<infer U> ? U : never;
+} & { length: number };
