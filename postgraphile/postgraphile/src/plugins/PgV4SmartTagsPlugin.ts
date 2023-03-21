@@ -38,6 +38,24 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
         }
         for (const pgConstraint of introspection.constraints) {
           processTags(pgConstraint.getTags());
+
+          // In V4, if a column has `@omit read` then any constraint that uses that column also has `@omit read`
+          if (pgConstraint.contype === "f") {
+            for (const attr of [
+              ...pgConstraint.getAttributes()!,
+              ...pgConstraint.getForeignAttributes()!,
+            ]) {
+              const attrOmit = attr.getTags().omit;
+              if (!attrOmit) continue;
+              const arr = Array.isArray(attrOmit) ? attrOmit : [attrOmit];
+              const omitRead = arr.some(
+                (omit) => omit === true || expandOmit(omit).includes("read"),
+              );
+              if (omitRead) {
+                addBehaviorToTags(pgConstraint.getTags(), "-select", true);
+              }
+            }
+          }
         }
         for (const pgProc of introspection.procs) {
           processTags(pgProc.getTags());
@@ -112,6 +130,42 @@ function processUniqueKey(tags: Partial<PgSmartTagsDict> | undefined) {
   }
 }
 
+function expandOmit(omit: string) {
+  if (omit[0] === ":") {
+    // Convert ':' string into longhand
+    const letters = omit.slice(1).split("");
+    return letters.map((l) => {
+      switch (l) {
+        case "C":
+          return "create";
+        case "R":
+          return "read";
+        case "U":
+          return "update";
+        case "D":
+          return "delete";
+        case "X":
+          return "execute";
+        case "F":
+          return "filter";
+        case "O":
+          return "order";
+        case "A":
+          return "all";
+        case "M":
+          return "many";
+        default:
+          console.warn(
+            `Abbreviation '${l}' in '@omit' string '${omit}' not recognized.`,
+          );
+          return l;
+      }
+    });
+  }
+  const parts = omit.split(",");
+  return parts;
+}
+
 function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
   const omit = tags?.omit;
   if (!omit) {
@@ -126,45 +180,11 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
     if (typeof omit !== "string") {
       throw new Error(
         `Issue in smart tags; expected omit to be true/string/string[], but found something unexpected: ${inspect(
-          tags.omit,
+          omit,
         )}`,
       );
     }
-    if (omit[0] === ":") {
-      // Convert ':' string into longhand
-      const letters = omit.slice(1).split("");
-      const string = letters
-        .map((l) => {
-          switch (l) {
-            case "C":
-              return "create";
-            case "R":
-              return "read";
-            case "U":
-              return "update";
-            case "D":
-              return "delete";
-            case "X":
-              return "execute";
-            case "F":
-              return "filter";
-            case "O":
-              return "order";
-            case "A":
-              return "all";
-            case "M":
-              return "many";
-            default:
-              console.warn(
-                `Abbreviation '${l}' in '@omit' string '${omit}' not recognized.`,
-              );
-              return l;
-          }
-        })
-        .join(",");
-      return processOmit(string);
-    }
-    const parts = omit.split(",");
+    const parts = expandOmit(omit);
     for (const part of parts) {
       switch (part) {
         case "create": {
