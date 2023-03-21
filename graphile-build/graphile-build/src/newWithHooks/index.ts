@@ -670,6 +670,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 }
                 fieldsSpec[fieldName] = inputObjectFieldSpec(
                   fieldsSpec[fieldName],
+                  `${Self.name}.${fieldName}`,
                 );
               }
               return fieldsSpec;

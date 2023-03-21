@@ -375,7 +375,10 @@ export function objectSpec<
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = objectFieldSpec<TContext, TParentStep>(fields[key]);
+        o[key] = objectFieldSpec<TContext, TParentStep>(
+          fields[key],
+          `${spec.name}.${key}`,
+        );
         return o;
       }, {} as GraphQLFieldConfigMap<any, TContext>);
       return modifiedFields;
@@ -428,12 +431,18 @@ export function objectFieldSpec<
     TResult,
     TArgs
   >,
+  path: string,
 ): GraphQLFieldConfig<any, TContext, TArgs> {
   const { plan, subscribePlan, args, ...spec } = graphileSpec;
+
+  assertNotAsync(plan, `${path ?? "?"}.plan`);
+  assertNotAsync(subscribePlan, `${path ?? "?"}.subscribePlan`);
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
         const { inputPlan, applyPlan, ...argSpec } = args[argName];
+        assertNotAsync(inputPlan, `${path ?? "?"}(${argName}:).inputPlan`);
+        assertNotAsync(applyPlan, `${path ?? "?"}(${argName}:).applyPlan`);
         memo[argName] = {
           ...argSpec,
           ...(inputPlan || applyPlan
@@ -521,7 +530,10 @@ function inputObjectSpec<
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = inputObjectFieldSpec<TContext, TParentStep>(fields[key]);
+        o[key] = inputObjectFieldSpec<TContext, TParentStep>(
+          fields[key],
+          `${spec.name}.${key}`,
+        );
         return o;
       }, {} as GraphQLInputFieldConfigMap);
       return modifiedFields;
@@ -568,8 +580,11 @@ export function inputObjectFieldSpec<
     TResult,
     TInput
   >,
+  path: string,
 ): GraphQLInputFieldConfig {
   const { inputPlan, applyPlan, ...spec } = graphileSpec;
+  assertNotAsync(inputPlan, `${path ?? "?"}.inputPlan`);
+  assertNotAsync(applyPlan, `${path ?? "?"}.applyPlan`);
   return inputPlan || applyPlan
     ? {
         ...spec,
@@ -950,3 +965,11 @@ export function stepsAreInSamePhase(
 
 // TODO: implement this!
 export const canonicalJSONStringify = (o: object) => JSON.stringify(o);
+
+export function assertNotAsync(fn: any, name: string): void {
+  if (fn?.constructor?.name === "AsyncFunction") {
+    throw new Error(
+      `Plans must be synchronous, but this schema has an async function at '${name}': ${fn.toString()}`,
+    );
+  }
+}
