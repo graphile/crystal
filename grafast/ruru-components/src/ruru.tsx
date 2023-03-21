@@ -35,6 +35,7 @@ export const Ruru: FC<RuruProps> = (props) => {
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
   const verbose = storage.get("verbose") === "true";
+  const saveHeaders = storage.get("saveHeaders") === "true";
   const setExplain = useCallback(
     (newExplain: boolean) => {
       storage.set("explain", newExplain ? "true" : "");
@@ -73,6 +74,7 @@ export const Ruru: FC<RuruProps> = (props) => {
         defaultQuery={defaultQuery}
         query={query}
         plugins={plugins}
+        shouldPersistHeaders={saveHeaders}
       >
         <RuruInner
           storage={storage}
