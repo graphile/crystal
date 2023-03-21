@@ -58,7 +58,7 @@ function lambda<const TIn extends readonly ExecutableStep<any>[], TOut>(
   UnwrapPlanTuple<TIn>,
   TOut
 >;
-function lambda<const TIn extends any, TOut>(
+function lambda<const TIn, TOut>(
   $plan: ExecutableStep<TIn> | null | undefined,
   fn: (value: TIn) => PromiseOrDirect<TOut>,
   isSyncAndSafe?: boolean,

@@ -8,7 +8,7 @@ import type {
   PgTypeCodec,
   PgTypeColumn,
 } from "@dataplan/pg";
-import { PgSourceBuilder, assertPgClassSingleStep } from "@dataplan/pg";
+import { assertPgClassSingleStep, PgSourceBuilder } from "@dataplan/pg";
 import { object } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";

@@ -94,7 +94,6 @@ import {
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";
-import { assertPgClassSingleStep } from "./utils.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
 import {
   pgClassExpression,
@@ -164,6 +163,7 @@ import {
   WithPgClientStepCallback,
   withPgClientTransaction,
 } from "./steps/withPgClient.js";
+import { assertPgClassSingleStep } from "./utils.js";
 
 export {
   assertPgClassSingleStep,
