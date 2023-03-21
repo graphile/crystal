@@ -70,6 +70,7 @@ import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
 import {
+  assertNotAsync,
   defaultValueToValueNode,
   findVariableNamesUsed,
   isTypePlanned,
@@ -978,6 +979,7 @@ ${te.join(
 
         const fieldType = objectField.type;
         const rawPlanResolver = objectField.extensions?.graphile?.plan;
+        assertNotAsync(rawPlanResolver, `${objectType.name}.${fieldName}.plan`);
         const namedReturnType = getNamedType(fieldType);
 
         /**
@@ -1282,6 +1284,7 @@ ${te.join(
       );
     } else if (isScalarType(nullableFieldType)) {
       const scalarPlanResolver = nullableFieldType.extensions?.graphile?.plan;
+      assertNotAsync(scalarPlanResolver, `${nullableFieldType.name}.plan`);
       const $leaf =
         typeof scalarPlanResolver === "function"
           ? withGlobalLayerPlan(parentLayerPlan, polymorphicPaths, () =>
