@@ -1,3 +1,4 @@
+import "./thereCanBeOnlyOne.js";
 import debugFactory from "debug";
 
 import { exportAsMany } from "./exportAs.js";
