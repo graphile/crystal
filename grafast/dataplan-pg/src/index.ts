@@ -94,6 +94,7 @@ import {
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";
+import { assertPgClassSingleStep } from "./utils.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
 import {
   pgClassExpression,
@@ -165,6 +166,7 @@ import {
 } from "./steps/withPgClient.js";
 
 export {
+  assertPgClassSingleStep,
   BooleanFilterStep,
   ClassFilterStep,
   digestsFromArgumentSpecs,
@@ -309,6 +311,7 @@ export {
 };
 
 exportAsMany("@dataplan/pg", {
+  assertPgClassSingleStep,
   domainOfCodec,
   getInnerCodec,
   enumType,

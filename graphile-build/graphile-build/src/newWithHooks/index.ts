@@ -55,7 +55,10 @@ export type NewWithHooksFunction = <
   klass: { new (spec: SpecForType<TType>): TType },
   spec: SpecForType<TType>,
   scope: ScopeForType<TType>,
-  Step?: { new (...args: any[]): ExecutableStep<any> } | null,
+  Step?:
+    | ((step: ExecutableStep<any>) => asserts step is ExecutableStep<any>)
+    | { new (...args: any[]): ExecutableStep<any> }
+    | null,
 ) => TType;
 
 /**

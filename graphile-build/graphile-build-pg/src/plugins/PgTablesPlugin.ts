@@ -8,8 +8,8 @@ import type {
   PgTypeCodec,
   PgTypeColumn,
 } from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
-import { ExecutableStep, object } from "grafast";
+import { PgSourceBuilder, assertPgClassSingleStep } from "@dataplan/pg";
+import { object } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
@@ -651,8 +651,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   pgCodec: codec,
                   isPgTableType: true,
                 },
-                // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
-                ExecutableStep, // PgClassSingleStep<any, any, any, any>
+                assertPgClassSingleStep,
                 () => ({
                   description: codec.extensions?.description,
                 }),

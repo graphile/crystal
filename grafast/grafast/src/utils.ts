@@ -353,7 +353,10 @@ export function objectSpec<
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 >(
   spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
-  Step: { new (...args: any[]): TParentStep } | null,
+  Step:
+    | ((step: ExecutableStep<any>) => asserts step is ExecutableStep<any>)
+    | { new (...args: any[]): TParentStep }
+    | null,
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
     ...spec,

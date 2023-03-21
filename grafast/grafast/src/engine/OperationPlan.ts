@@ -1324,13 +1324,36 @@ ${te.join(
     } else if (isObjectType(nullableFieldType)) {
       if (isDev) {
         // Check that the plan we're dealing with is the one the user declared
-        const ExpectedStep = nullableFieldType.extensions?.graphile?.Step;
-        if (ExpectedStep && !($step instanceof ExpectedStep)) {
-          throw new Error(
-            `Step mis-match: expected ${ExpectedStep.name}, but instead found ${
-              ($step as ExecutableStep).constructor.name
-            } (${$step})`,
-          );
+        /** Either an assertion function or a step class */
+        const stepAssertion = nullableFieldType.extensions?.graphile?.Step;
+        if (stepAssertion) {
+          try {
+            if (
+              stepAssertion === ExecutableStep ||
+              stepAssertion.prototype instanceof ExecutableStep
+            ) {
+              if (!($step instanceof stepAssertion)) {
+                throw new Error(
+                  `Step mis-match: expected ${
+                    stepAssertion.name
+                  }, but instead found ${
+                    ($step as ExecutableStep).constructor.name
+                  } (${$step})`,
+                );
+              }
+            } else {
+              (stepAssertion as ($step: ExecutableStep) => void)($step);
+            }
+          } catch (e) {
+            throw new Error(
+              `The step returned by '${path.join(
+                ".",
+              )}' is not compatible with the GraphQL object type '${
+                nullableFieldType.name
+              }': ${e.message}`,
+              { cause: e },
+            );
+          }
         }
         if (!selections) {
           throw new Error(
