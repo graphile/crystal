@@ -554,7 +554,9 @@ export function assertExecutableStep<TData>(
 ): asserts step is ExecutableStep<TData> {
   if (!isExecutableStep(step)) {
     throw new Error(
-      `The step returned should be an executable step, but it does not implement the 'execute' method.`,
+      `Expected an executable step, but received something else: ${inspect(
+        step,
+      )}`,
     );
   }
 }
