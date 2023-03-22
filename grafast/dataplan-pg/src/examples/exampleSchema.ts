@@ -867,11 +867,11 @@ export function makeExampleSchema(
   const itemTypeEnumSource = EXPORTABLE(
     (PgEnumSource, enumCodec, sql) =>
       new PgEnumSource({
-        codec: enumCodec(
-          `interfaces_and_unions.item_type`,
-          sql`interfaces_and_unions.item_type`,
-          ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
-        ),
+        codec: enumCodec({
+          name: `interfaces_and_unions.item_type`,
+          identifier: sql`interfaces_and_unions.item_type`,
+          values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
+        }),
       }),
     [PgEnumSource, enumCodec, sql],
   );
@@ -930,13 +930,11 @@ export function makeExampleSchema(
   const enumTableItemTypeEnumSource = EXPORTABLE(
     (PgEnumSource, enumTableItemTypeSource, enumCodec, sql) =>
       new PgEnumSource({
-        codec: enumCodec("text", sql`text`, [
-          "TOPIC",
-          "POST",
-          "DIVIDER",
-          "CHECKLIST",
-          "CHECKLIST_ITEM",
-        ]),
+        codec: enumCodec({
+          name: "text",
+          identifier: sql`text`,
+          values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
+        }),
         extensions: {
           tableSource: enumTableItemTypeSource,
         },
@@ -1723,7 +1721,14 @@ export function makeExampleSchema(
         name: "union_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [PgSourceBuilder, executor, recordCodec, selectAuth, sql, unionItemsColumns],
+    [
+      PgSourceBuilder,
+      executor,
+      recordCodec,
+      selectAuth,
+      sql,
+      unionItemsColumns,
+    ],
   );
 
   const unionTopicsColumns = EXPORTABLE(
@@ -1809,7 +1814,14 @@ export function makeExampleSchema(
     [TYPES, col],
   );
   const unionChecklistsSource = EXPORTABLE(
-    (PgSource, executor, recordCodec, selectAuth, sql, unionChecklistsColumns) =>
+    (
+      PgSource,
+      executor,
+      recordCodec,
+      selectAuth,
+      sql,
+      unionChecklistsColumns,
+    ) =>
       new PgSource({
         executor,
         selectAuth,

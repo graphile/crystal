@@ -246,16 +246,16 @@ Original error: ${e.message}
               );
 
               // Build the codec
-              const codec = enumCodec(
-                info.inflection.enumTableCodec({
+              const codec = enumCodec({
+                name: info.inflection.enumTableCodec({
                   databaseName,
                   pgClass,
                   pgConstraint,
                 }),
-                originalCodec.sqlType,
+                identifier: originalCodec.sqlType,
                 values,
                 // TODO: extensions?
-              );
+              });
 
               // Associate this constraint with our new codec
               info.state.codecByPgConstraint.set(pgConstraint, codec);

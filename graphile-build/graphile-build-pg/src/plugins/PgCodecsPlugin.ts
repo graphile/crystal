@@ -576,12 +576,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   sql,
                   typeName,
                 ) =>
-                  enumCodec(
-                    codecName,
-                    sql.identifier(namespaceName, typeName),
-                    enumLabels,
+                  enumCodec({
+                    name: codecName,
+                    identifier: sql.identifier(namespaceName, typeName),
+                    values: enumLabels,
                     extensions,
-                  ),
+                  }),
                 [
                   codecName,
                   enumLabels,

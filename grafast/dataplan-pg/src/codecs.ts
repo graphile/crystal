@@ -391,20 +391,25 @@ export function recordCodec<TColumns extends PgTypeColumns>(
 }
 exportAs(recordCodec, "recordCodec");
 
+export type PgEnumCodecSpec<TValue extends string> = {
+  name: string;
+  identifier: SQL;
+  values: Array<PgEnumValue<TValue> | TValue>;
+  extensions?: Partial<PgTypeCodecExtensions>;
+};
+
 /**
  * Returns a PgTypeCodec that represents a Postgres enum type.
  *
- * @param name - the name of the enum
- * @param identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
- * @param values - a list of the values that this enum can represent
- * @param extensions - an optional object that you can use to associate arbitrary data with this type
+ * - name - the name of the enum
+ * - identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
+ * - values - a list of the values that this enum can represent
+ * - extensions - an optional object that you can use to associate arbitrary data with this type
  */
 export function enumCodec<TValue extends string>(
-  name: string,
-  identifier: SQL,
-  values: Array<PgEnumValue<TValue> | TValue>,
-  extensions?: Partial<PgTypeCodecExtensions>,
+  config: PgEnumCodecSpec<TValue>,
 ): PgEnumTypeCodec<TValue> {
+  const { name, identifier, values, extensions } = config;
   return {
     name,
     sqlType: identifier,
