@@ -3,4 +3,6 @@
 "graphile-build-pg": patch
 ---
 
-recordType codec now only accepts a single object argument
+Renamed `recordType` codec factory to `recordCodec`. `recordCodec()` now only
+accepts a single object argument. Renamed `enumType` codec factory to
+`enumCodec`. `enumCodec()` now only accepts a single object argument.
