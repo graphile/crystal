@@ -2,7 +2,7 @@ import { exportAsMany } from "grafast";
 
 import {
   domainOfCodec,
-  enumType,
+  enumCodec,
   getCodecByPgCatalogTypeName,
   getInnerCodec,
   isEnumCodec,
@@ -171,7 +171,7 @@ export {
   ClassFilterStep,
   digestsFromArgumentSpecs,
   domainOfCodec,
-  enumType,
+  enumCodec,
   getCodecByPgCatalogTypeName,
   getInnerCodec,
   isEnumCodec,
@@ -314,7 +314,7 @@ exportAsMany("@dataplan/pg", {
   assertPgClassSingleStep,
   domainOfCodec,
   getInnerCodec,
-  enumType,
+  enumCodec,
   getCodecByPgCatalogTypeName,
   isEnumCodec,
   listOfType,

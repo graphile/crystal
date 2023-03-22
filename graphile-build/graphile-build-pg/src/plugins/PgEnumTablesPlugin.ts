@@ -1,5 +1,5 @@
 import type { PgEnumValue, PgTypeCodec } from "@dataplan/pg";
-import { enumType } from "@dataplan/pg";
+import { enumCodec } from "@dataplan/pg";
 import type {
   Introspection,
   PgAttribute,
@@ -246,7 +246,7 @@ Original error: ${e.message}
               );
 
               // Build the codec
-              const codec = enumType(
+              const codec = enumCodec(
                 info.inflection.enumTableCodec({
                   databaseName,
                   pgClass,

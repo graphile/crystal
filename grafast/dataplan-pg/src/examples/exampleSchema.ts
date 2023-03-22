@@ -81,7 +81,7 @@ import { listOfType } from "../codecs.js";
 import {
   BooleanFilterStep,
   ClassFilterStep,
-  enumType,
+  enumCodec,
   ManyFilterStep,
   pgClassExpression,
   PgClassExpressionStep,
@@ -865,15 +865,15 @@ export function makeExampleSchema(
   );
 
   const itemTypeEnumSource = EXPORTABLE(
-    (PgEnumSource, enumType, sql) =>
+    (PgEnumSource, enumCodec, sql) =>
       new PgEnumSource({
-        codec: enumType(
+        codec: enumCodec(
           `interfaces_and_unions.item_type`,
           sql`interfaces_and_unions.item_type`,
           ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
         ),
       }),
-    [PgEnumSource, enumType, sql],
+    [PgEnumSource, enumCodec, sql],
   );
 
   const enumTablesItemTypeColumns = EXPORTABLE(
@@ -928,9 +928,9 @@ export function makeExampleSchema(
   );
 
   const enumTableItemTypeEnumSource = EXPORTABLE(
-    (PgEnumSource, enumTableItemTypeSource, enumType, sql) =>
+    (PgEnumSource, enumTableItemTypeSource, enumCodec, sql) =>
       new PgEnumSource({
-        codec: enumType("text", sql`text`, [
+        codec: enumCodec("text", sql`text`, [
           "TOPIC",
           "POST",
           "DIVIDER",
@@ -941,7 +941,7 @@ export function makeExampleSchema(
           tableSource: enumTableItemTypeSource,
         },
       }),
-    [PgEnumSource, enumTableItemTypeSource, enumType, sql],
+    [PgEnumSource, enumTableItemTypeSource, enumCodec, sql],
   );
 
   const EnumTableItemType = new GraphQLEnumType({

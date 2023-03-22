@@ -10,7 +10,7 @@ import type {
 } from "@dataplan/pg";
 import {
   domainOfCodec,
-  enumType,
+  enumCodec,
   getCodecByPgCatalogTypeName,
   isEnumCodec,
   listOfType,
@@ -570,13 +570,13 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 (
                   codecName,
                   enumLabels,
-                  enumType,
+                  enumCodec,
                   extensions,
                   namespaceName,
                   sql,
                   typeName,
                 ) =>
-                  enumType(
+                  enumCodec(
                     codecName,
                     sql.identifier(namespaceName, typeName),
                     enumLabels,
@@ -585,7 +585,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 [
                   codecName,
                   enumLabels,
-                  enumType,
+                  enumCodec,
                   extensions,
                   namespaceName,
                   sql,

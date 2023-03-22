@@ -391,8 +391,6 @@ export function recordCodec<TColumns extends PgTypeColumns>(
 }
 exportAs(recordCodec, "recordCodec");
 
-// TODO: rename to enumCodec
-// TODO: enum values should not be strings but objects so that they can have descriptions, tags, etc.
 /**
  * Returns a PgTypeCodec that represents a Postgres enum type.
  *
@@ -401,7 +399,7 @@ exportAs(recordCodec, "recordCodec");
  * @param values - a list of the values that this enum can represent
  * @param extensions - an optional object that you can use to associate arbitrary data with this type
  */
-export function enumType<TValue extends string>(
+export function enumCodec<TValue extends string>(
   name: string,
   identifier: SQL,
   values: Array<PgEnumValue<TValue> | TValue>,
@@ -419,7 +417,7 @@ export function enumType<TValue extends string>(
     extensions,
   };
 }
-exportAs(enumType, "enumType");
+exportAs(enumCodec, "enumCodec");
 
 export function isEnumCodec<TValue extends string = string>(
   t: PgTypeCodec<any, any, any, any>,
