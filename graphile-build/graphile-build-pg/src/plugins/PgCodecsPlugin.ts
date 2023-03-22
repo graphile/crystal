@@ -29,11 +29,11 @@ import { version } from "../version.js";
 interface State {
   codecByTypeIdByDatabaseName: Map<
     string,
-    Map<string, Promise<PgTypeCodec<any, any, any, any> | null>>
+    Map<string, Promise<PgTypeCodec<any, any, any, any, any, any> | null>>
   >;
   codecByClassIdByDatabaseName: Map<
     string,
-    Map<string, Promise<PgTypeCodec<any, any, any, any> | null>>
+    Map<string, Promise<PgTypeCodec<any, any, any, any, any, any> | null>>
   >;
 }
 
@@ -800,7 +800,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           if (codec) {
             // Be careful not to call this for class codecs!
             info.process("pgCodecs_PgTypeCodec", {
-              pgCodec: codec,
+              pgCodec: codec as PgTypeCodec<any, any, any, any, any, any>,
               pgType: type,
               databaseName,
             });
@@ -1019,8 +1019,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           // Now walk over all the codecs and ensure that each on has an associated type
           function prepareTypeForCodec(
-            codec: PgTypeCodec<any, any, any, any>,
-            visited: Set<PgTypeCodec<any, any, any, any>>,
+            codec: PgTypeCodec<any, any, any, any, any, any>,
+            visited: Set<PgTypeCodec<any, any, any, any, any, any>>,
           ): void {
             if (visited.has(codec)) {
               return;

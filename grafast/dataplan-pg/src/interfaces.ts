@@ -133,7 +133,13 @@ export interface PgTypeCodec<
   TFromPostgres,
   TFromJavaScript = TFromPostgres,
   TArrayItemCodec extends
-    | PgTypeCodec<any, any, any, undefined>
+    | PgTypeCodec<any, any, any, undefined, any, any>
+    | undefined = undefined,
+  TDomainItemCodec extends
+    | PgTypeCodec<any, any, any, any, any, any>
+    | undefined = undefined,
+  TRangeItemCodec extends
+    | PgTypeCodec<undefined, any, any, undefined, any, undefined>
     | undefined = undefined,
 > {
   /**
@@ -221,7 +227,7 @@ export interface PgTypeCodec<
   /**
    * The underlying codec that this type is a domain over.
    */
-  domainOfCodec?: PgTypeCodec<any, any, any, any>;
+  domainOfCodec?: TDomainItemCodec;
   /**
    * If this is a domain, does it add a non-null constraint?
    */
@@ -230,7 +236,7 @@ export interface PgTypeCodec<
   /**
    * The underlying codec that this type is a range over.
    */
-  rangeOfCodec?: PgTypeCodec<undefined, any, any, undefined>;
+  rangeOfCodec?: TRangeItemCodec;
 
   polymorphism?: PgTypeCodecPolymorphism<any>;
 

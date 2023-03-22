@@ -157,7 +157,7 @@ declare global {
       // TODO: put 'field' into all these names?
       pgSource?: PgSource<any, any, any, any>;
       pgFieldCodec?: PgTypeCodec<any, any, any>;
-      pgColumn?: PgTypeColumn<any, any>;
+      pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -165,7 +165,7 @@ declare global {
       // TODO: put 'field' into all these names?
       pgSource?: PgSource<any, any, any, any>;
       pgFieldCodec?: PgTypeCodec<any, any, any>;
-      pgColumn?: PgTypeColumn<any, any>;
+      pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }

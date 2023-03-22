@@ -67,6 +67,7 @@ import { inspect } from "util";
 
 import type {
   PgConditionStep,
+  PgEnumTypeCodec,
   PgExecutorContextPlans,
   PgInsertStep,
   PgSelectStep,
@@ -324,7 +325,7 @@ export function makeExampleSchema(
 
   const col = <
     TOptions extends {
-      codec: PgTypeCodec<any, any, any>;
+      codec: PgTypeCodec<any, any, any, any, any, any>;
       notNull?: boolean;
       expression?: PgTypeColumn<any>["expression"];
       // TODO: we could make TypeScript understand the relations on the object
@@ -334,12 +335,10 @@ export function makeExampleSchema(
     },
   >(
     options: TOptions,
-  ): PgTypeColumn<
-    NullableUnless<TOptions["notNull"], ReturnType<TOptions["codec"]["fromPg"]>>
-  > => {
+  ): PgTypeColumn<TOptions extends { codec: infer U } ? U : never> => {
     const { notNull, codec, expression, via, identicalVia } = options;
     return {
-      codec,
+      codec: codec as TOptions extends { codec: infer U } ? U : never,
       notNull: !!notNull,
       expression,
       via,
@@ -472,7 +471,15 @@ export function makeExampleSchema(
         parameters: [],
         isUnique: true, // No setof
       }),
-    [PgSource, TYPES, executor, listOfCodec, selectAuth, sql, sqlFromArgDigests],
+    [
+      PgSource,
+      TYPES,
+      executor,
+      listOfCodec,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ],
   );
 
   const forumNamesCasesSource = EXPORTABLE(
@@ -494,7 +501,15 @@ export function makeExampleSchema(
         name: "forum_names_cases",
         parameters: [],
       }),
-    [PgSource, TYPES, executor, listOfCodec, selectAuth, sql, sqlFromArgDigests],
+    [
+      PgSource,
+      TYPES,
+      executor,
+      listOfCodec,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ],
   );
 
   const forumsUniqueAuthorCountSource = EXPORTABLE(
@@ -3570,14 +3585,18 @@ export function makeExampleSchema(
 
   // NOTE: the `| any`s below are because of co/contravariance woes.
   type CommonRelationalItemColumns = {
-    id: PgTypeColumn<number>;
-    type: PgTypeColumn<string>;
-    type2: PgTypeColumn<string>;
-    position: PgTypeColumn<string>;
-    created_at: PgTypeColumn<Date>;
-    updated_at: PgTypeColumn<Date>;
-    is_explicitly_archived: PgTypeColumn<boolean>;
-    archived_at: PgTypeColumn<Date>;
+    id: PgTypeColumn<typeof TYPES.int>;
+    type: PgTypeColumn<
+      PgEnumTypeCodec<
+        "TOPIC" | "POST" | "DIVIDER" | "CHECKLIST" | "CHECKLIST_ITEM"
+      >
+    >;
+    type2: PgTypeColumn<typeof TYPES.text>;
+    position: PgTypeColumn<typeof TYPES.bigint>;
+    created_at: PgTypeColumn<typeof TYPES.timestamptz>;
+    updated_at: PgTypeColumn<typeof TYPES.timestamptz>;
+    is_explicitly_archived: PgTypeColumn<typeof TYPES.boolean>;
+    archived_at: PgTypeColumn<typeof TYPES.timestamptz>;
   };
   const commonRelationalItemFields = () => ({
     id: attrField<CommonRelationalItemColumns>("id", GraphQLInt),

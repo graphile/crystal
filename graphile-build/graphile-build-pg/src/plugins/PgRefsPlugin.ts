@@ -259,7 +259,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             for (const rawPart of parts) {
               type RelationEntry = [
                 string,
-                PgSourceRelation<PgTypeColumns<string>, PgTypeColumns<string>>,
+                PgSourceRelation<PgTypeColumns, PgTypeColumns>,
               ];
               const relationEntries = Object.entries(
                 currentSource.getRelations(),
