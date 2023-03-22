@@ -127,7 +127,9 @@ function processColumn(
 
   const isInterface = context.type === "GraphQLInterfaceType";
 
-  const column = pgCodec.columns[columnName] as PgTypeColumn<any, any>;
+  const column = pgCodec.columns[columnName] as PgTypeColumn<
+    PgTypeCodec<any, any, any, any, any, any>
+  >;
 
   const behavior = getBehavior([pgCodec.extensions, column.extensions]);
   if (!build.behavior.matches(behavior, "attribute:select", "select")) {

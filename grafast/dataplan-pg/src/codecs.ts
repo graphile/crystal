@@ -54,16 +54,26 @@ export type PgTypeColumnVia = string | PgTypeColumnViaExplicit;
 
 export interface PgTypeColumnExtensions {}
 
-export interface PgTypeColumn<TCanonical = any, TInput = TCanonical> {
+export interface PgTypeColumn<
+  TCodec extends PgTypeCodec<any, any, any, any, any, any> = PgTypeCodec<
+    any,
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
+  TNotNull extends boolean = boolean,
+> {
   /**
    * How to translate to/from PG and how to cast.
    */
-  codec: PgTypeCodec<any, TCanonical, TInput>;
+  codec: TCodec;
 
   /**
    * Is the column/attribute guaranteed to not be null?
    */
-  notNull: boolean;
+  notNull: TNotNull;
   hasDefault?: boolean;
 
   /**
@@ -123,9 +133,19 @@ export interface PgTypeColumn<TCanonical = any, TInput = TCanonical> {
   extensions?: Partial<PgTypeColumnExtensions>;
 }
 
-export type PgTypeColumns<TColumnName extends string = string> = {
-  [columnName in TColumnName]: PgTypeColumn<any>;
-};
+export type PgTypeColumns<
+  TCodecMap extends {
+    [columnName in string]: PgTypeColumn<
+      PgTypeCodec<any, any, any, any, any, any>,
+      boolean
+    >;
+  } = {
+    [columnName in string]: PgTypeColumn<
+      PgTypeCodec<any, any, any, any, any, any>,
+      boolean
+    >;
+  },
+> = TCodecMap;
 
 /**
  * Returns a PgTypeCodec for the given builtin Postgres scalar type, optionally
@@ -294,10 +314,12 @@ function recordStringToTuple(value: string): Array<string | null> {
   return tuple;
 }
 
-function realColumnDefs(
-  columns: PgTypeColumns,
-): Array<[string, PgTypeColumn<any, any>]> {
-  const columnDefs = Object.entries(columns);
+function realColumnDefs<TColumns extends PgTypeColumns>(
+  columns: TColumns,
+): Array<[string, TColumns[keyof TColumns]]> {
+  const columnDefs = Object.entries(columns) as Array<
+    [string, TColumns extends infer U ? U[keyof U] : never]
+  >;
   return columnDefs.filter(
     ([_columnName, spec]) => !spec.expression && !spec.via,
   );
@@ -312,7 +334,7 @@ function realColumnDefs(
  */
 function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
   columns: TColumns,
-): PgEncode<Record<string, unknown>> {
+): PgEncode<ObjectFromPgTypeColumns<TColumns>> {
   const columnDefs = realColumnDefs(columns);
   return (value) => {
     const values = columnDefs.map(([columnName, spec]) => {
@@ -324,6 +346,19 @@ function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
   };
 }
 
+export type ObjectFromPgTypeColumns<TColumns extends PgTypeColumns> = {
+  [columnName in keyof TColumns]: TColumns[columnName] extends PgTypeColumn<
+    infer UCodec,
+    infer UNonNull
+  >
+    ? UCodec extends PgTypeCodec<any, any, infer U, any, any, any>
+      ? UNonNull extends true
+        ? U
+        : U | null
+      : never
+    : never;
+};
+
 /**
  * Takes a list of columns and returns a mapping function that takes a
  * PostgreSQL record string value (e.g. `(1,2,"hi")`) and turns it into a
@@ -333,7 +368,7 @@ function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
  */
 function makeSQLValueToRecord<TColumns extends PgTypeColumns>(
   columns: TColumns,
-): (value: string) => object {
+): (value: string) => ObjectFromPgTypeColumns<TColumns> {
   const columnDefs = realColumnDefs(columns);
   const columnCount = columnDefs.length;
   return (value) => {
@@ -357,7 +392,6 @@ export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
   isAnonymous?: boolean;
 };
 
-// TODO: Replace this entire function with `realRecordType` (remove overloading)
 /**
  * Returns a PgTypeCodec that represents a composite type (a type with
  * attributes).
@@ -368,40 +402,16 @@ export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
  * extensions - an optional object that you can use to associate arbitrary data with this type
  * isAnonymous - if true, this represents an "anonymous" type, typically the return value of a function or something like that. If this is true, then name and identifier are ignored.
  */
-export function recordType<TColumns extends PgTypeColumns>(
-  name: string,
-  identifier: SQL,
-  columns: TColumns,
-  extensions?: Partial<PgTypeCodecExtensions>,
-  isAnonymous?: boolean,
-): PgTypeCodec<TColumns, string, object>;
-export function recordType<TColumns extends PgTypeColumns>(
+export function recordCodec<TColumns extends PgTypeColumns>(
   config: PgRecordTypeCodecSpec<TColumns>,
-): PgTypeCodec<TColumns, string, object>;
-export function recordType<TColumns extends PgTypeColumns>(
-  configOrName: PgRecordTypeCodecSpec<TColumns> | string,
-  identifier?: SQL,
-  columns?: TColumns,
-  extensions?: Partial<PgTypeCodecExtensions>,
-  isAnonymous?: boolean,
-): PgTypeCodec<TColumns, string, Record<string, any>> {
-  if (typeof configOrName === "string") {
-    return realRecordType({
-      name: configOrName,
-      identifier: identifier!,
-      columns: columns!,
-      extensions,
-      isAnonymous,
-    });
-  } else {
-    return realRecordType(configOrName);
-  }
-}
-exportAs(recordType, "recordType");
-
-function realRecordType<TColumns extends PgTypeColumns>(
-  config: PgRecordTypeCodecSpec<TColumns>,
-) {
+): PgTypeCodec<
+  TColumns,
+  string,
+  ObjectFromPgTypeColumns<TColumns>,
+  undefined,
+  undefined,
+  undefined
+> {
   const {
     name,
     identifier,
@@ -421,23 +431,27 @@ function realRecordType<TColumns extends PgTypeColumns>(
     extensions,
   };
 }
+exportAs(recordCodec, "recordCodec");
 
-// TODO: rename to enumCodec
-// TODO: enum values should not be strings but objects so that they can have descriptions, tags, etc.
+export type PgEnumCodecSpec<TValue extends string> = {
+  name: string;
+  identifier: SQL;
+  values: Array<PgEnumValue<TValue> | TValue>;
+  extensions?: Partial<PgTypeCodecExtensions>;
+};
+
 /**
  * Returns a PgTypeCodec that represents a Postgres enum type.
  *
- * @param name - the name of the enum
- * @param identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
- * @param values - a list of the values that this enum can represent
- * @param extensions - an optional object that you can use to associate arbitrary data with this type
+ * - name - the name of the enum
+ * - identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
+ * - values - a list of the values that this enum can represent
+ * - extensions - an optional object that you can use to associate arbitrary data with this type
  */
-export function enumType<TValue extends string>(
-  name: string,
-  identifier: SQL,
-  values: Array<PgEnumValue<TValue> | TValue>,
-  extensions?: Partial<PgTypeCodecExtensions>,
+export function enumCodec<TValue extends string>(
+  config: PgEnumCodecSpec<TValue>,
 ): PgEnumTypeCodec<TValue> {
+  const { name, identifier, values, extensions } = config;
   return {
     name,
     sqlType: identifier,
@@ -450,27 +464,31 @@ export function enumType<TValue extends string>(
     extensions,
   };
 }
-exportAs(enumType, "enumType");
+exportAs(enumCodec, "enumCodec");
 
 export function isEnumCodec<TValue extends string = string>(
-  t: PgTypeCodec<any, any, any, any>,
+  t: PgTypeCodec<any, any, any, any, any, any>,
 ): t is PgEnumTypeCodec<TValue> {
   return "values" in t;
 }
 
 const $$listCodec = Symbol("listCodec");
 
-type CodecWithListCodec<TCodec extends PgTypeCodec<any, any, any, any>> =
-  TCodec & {
-    [$$listCodec]?: PgTypeCodec<
-      undefined,
-      string,
-      TCodec extends PgTypeCodec<any, any, infer U> ? U[] : any[],
-      TCodec
-    >;
-  };
+type CodecWithListCodec<
+  TCodec extends PgTypeCodec<any, any, any, any, any, any>,
+> = TCodec & {
+  [$$listCodec]?: PgTypeCodec<
+    undefined,
+    string,
+    TCodec extends PgTypeCodec<any, any, infer U, undefined, any, any>
+      ? U[]
+      : any[],
+    TCodec,
+    undefined,
+    undefined
+  >;
+};
 
-// TODO: rename to listOfCodec
 /**
  * Given a PgTypeCodec, this returns a new PgTypeCodec that represents a list
  * of the former.
@@ -484,8 +502,8 @@ type CodecWithListCodec<TCodec extends PgTypeCodec<any, any, any, any>> =
  * @param typeDelim - the delimeter used to separate entries in this list when Postgres stringifies it
  * @param identifier - a pg-sql2 fragment that represents the name of this type
  */
-export function listOfType<
-  TInnerCodec extends PgTypeCodec<any, any, any, undefined>,
+export function listOfCodec<
+  TInnerCodec extends PgTypeCodec<any, any, any, undefined, any, any>,
 >(
   listedCodec: TInnerCodec,
   extensions?: Partial<PgTypeCodecExtensions>,
@@ -494,8 +512,12 @@ export function listOfType<
 ): PgTypeCodec<
   undefined, // Array has no columns
   string,
-  TInnerCodec extends PgTypeCodec<any, any, infer U> ? U[] : any[],
-  TInnerCodec
+  TInnerCodec extends PgTypeCodec<any, any, infer U, undefined, any, any>
+    ? U[]
+    : any[],
+  TInnerCodec,
+  undefined,
+  undefined
 > {
   const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
   if (innerCodec.arrayOfCodec) {
@@ -509,7 +531,9 @@ export function listOfType<
   const listCodec: PgTypeCodec<
     undefined, // Array has no columns
     string,
-    TInnerCodec extends PgTypeCodec<any, any, infer U> ? U[] : any[],
+    TInnerCodec extends PgTypeCodec<any, any, infer U, undefined, any, any>
+      ? U[]
+      : any[],
     TInnerCodec
   > = {
     name: innerCodec.name + "[]",
@@ -555,12 +579,12 @@ export function listOfType<
     castFromPg: innerCodec.listCastFromPg,
   };
 
-  // Memoize such that every `listOfType(foo)` returns the same object.
+  // Memoize such that every `listOfCodec(foo)` returns the same object.
   Object.defineProperty(innerCodec, $$listCodec, { value: listCodec });
 
   return listCodec;
 }
-exportAs(listOfType, "listOfType");
+exportAs(listOfCodec, "listOfCodec");
 
 /**
  * Represents a PostgreSQL `DOMAIN` over the given codec
@@ -571,7 +595,7 @@ exportAs(listOfType, "listOfType");
  * @param config - extra details about this domain
  */
 export function domainOfCodec<
-  TInnerCodec extends PgTypeCodec<any, any, any, any>,
+  TInnerCodec extends PgTypeCodec<any, any, any, any, any, any>,
 >(
   innerCodec: TInnerCodec,
   name: string,
@@ -581,10 +605,12 @@ export function domainOfCodec<
     notNull?: boolean | null;
   } = {},
 ): PgTypeCodec<
-  TInnerCodec extends PgTypeCodec<infer U, any, any, any> ? U : any,
-  TInnerCodec extends PgTypeCodec<any, infer U, any, any> ? U : any,
-  TInnerCodec extends PgTypeCodec<any, any, infer U, any> ? U : any,
-  TInnerCodec extends PgTypeCodec<any, any, any, infer U> ? U : any
+  TInnerCodec extends PgTypeCodec<infer U, any, any, any, any, any> ? U : any,
+  TInnerCodec extends PgTypeCodec<any, infer U, any, any, any, any> ? U : any,
+  TInnerCodec extends PgTypeCodec<any, any, infer U, any, any, any> ? U : any,
+  undefined,
+  TInnerCodec,
+  undefined
 > {
   const { extensions, notNull } = config;
   return {
@@ -606,10 +632,9 @@ exportAs(domainOfCodec, "domainOfCodec");
  *
  * @internal
  */
-function escapeRangeValue(
-  value: null | any,
-  innerCodec: PgTypeCodec<undefined, any, any, undefined>,
-): string {
+function escapeRangeValue<
+  TInnerCodec extends PgTypeCodec<undefined, any, any, undefined, any, any>,
+>(value: null | any, innerCodec: TInnerCodec): string {
   if (value == null) {
     return "";
   }
@@ -633,13 +658,27 @@ interface PgRange<T> {
  * @param config - extra details about this range
  */
 export function rangeOfCodec<
-  TInnerCodec extends PgTypeCodec<undefined, any, any, undefined>,
+  TInnerCodec extends PgTypeCodec<
+    undefined,
+    any,
+    any,
+    undefined,
+    any,
+    undefined
+  >,
 >(
   innerCodec: TInnerCodec,
   name: string,
   identifier: SQL,
   config: { extensions?: Partial<PgTypeCodecExtensions> } = {},
-): PgTypeCodec<undefined, string, PgRange<unknown>, undefined> {
+): PgTypeCodec<
+  undefined,
+  string,
+  PgRange<unknown>,
+  undefined,
+  undefined,
+  TInnerCodec
+> {
   const { extensions } = config;
   const needsCast = innerCodec.castFromPg;
 
@@ -920,7 +959,7 @@ exportAs(TYPES, "TYPES");
  */
 export function getCodecByPgCatalogTypeName(
   pgCatalogTypeName: string,
-): PgTypeCodec<undefined, any, any, undefined> | null {
+): PgTypeCodec<undefined, any, any, undefined, undefined, undefined> | null {
   switch (pgCatalogTypeName) {
     case "void":
       return TYPES.void;
@@ -1032,19 +1071,30 @@ export function getCodecByPgCatalogTypeName(
   return null;
 }
 
-export function getInnerCodec(
-  codec: PgTypeCodec<any, any, any, any>,
-): PgTypeCodec<any, any, any, any> {
+export function getInnerCodec<
+  TCodec extends PgTypeCodec<any, any, any, any, any, any>,
+>(
+  codec: TCodec,
+): TCodec extends PgTypeCodec<
+  any,
+  any,
+  any,
+  infer UArray,
+  infer UDomain,
+  infer URange
+>
+  ? Exclude<UDomain | UArray | URange, undefined>
+  : TCodec {
   if (codec.domainOfCodec) {
-    return getInnerCodec(codec.domainOfCodec);
+    return getInnerCodec(codec.domainOfCodec) as any;
   }
   if (codec.arrayOfCodec) {
-    return getInnerCodec(codec.arrayOfCodec);
+    return getInnerCodec(codec.arrayOfCodec) as any;
   }
   if (codec.rangeOfCodec) {
-    return getInnerCodec(codec.rangeOfCodec);
+    return getInnerCodec(codec.rangeOfCodec) as any;
   }
-  return codec;
+  return codec as any;
 }
 exportAs(getInnerCodec, "getInnerCodec");
 

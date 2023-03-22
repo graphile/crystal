@@ -10,12 +10,12 @@ import type {
 } from "@dataplan/pg";
 import {
   domainOfCodec,
-  enumType,
+  enumCodec,
   getCodecByPgCatalogTypeName,
   isEnumCodec,
-  listOfType,
+  listOfCodec,
   rangeOfCodec,
-  recordType,
+  recordCodec,
   TYPES,
 } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
@@ -29,11 +29,11 @@ import { version } from "../version.js";
 interface State {
   codecByTypeIdByDatabaseName: Map<
     string,
-    Map<string, Promise<PgTypeCodec<any, any, any, any> | null>>
+    Map<string, Promise<PgTypeCodec<any, any, any, any, any, any> | null>>
   >;
   codecByClassIdByDatabaseName: Map<
     string,
-    Map<string, Promise<PgTypeCodec<any, any, any, any> | null>>
+    Map<string, Promise<PgTypeCodec<any, any, any, any, any, any> | null>>
   >;
 }
 
@@ -444,8 +444,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           });
 
           const codec = EXPORTABLE(
-            (recordType, spec) => recordType(spec),
-            [recordType, spec],
+            (recordCodec, spec) => recordCodec(spec),
+            [recordCodec, spec],
           );
           info.process("pgCodecs_PgTypeCodec", {
             pgCodec: codec,
@@ -569,23 +569,23 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               return EXPORTABLE(
                 (
                   codecName,
+                  enumCodec,
                   enumLabels,
-                  enumType,
                   extensions,
                   namespaceName,
                   sql,
                   typeName,
                 ) =>
-                  enumType(
-                    codecName,
-                    sql.identifier(namespaceName, typeName),
-                    enumLabels,
+                  enumCodec({
+                    name: codecName,
+                    identifier: sql.identifier(namespaceName, typeName),
+                    values: enumLabels,
                     extensions,
-                  ),
+                  }),
                 [
                   codecName,
+                  enumCodec,
                   enumLabels,
-                  enumType,
                   extensions,
                   namespaceName,
                   sql,
@@ -744,7 +744,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               }
             }
 
-            // Array types are just listOfType() of their inner type
+            // Array types are just listOfCodec() of their inner type
             if (type.typcategory === "A") {
               const innerType =
                 await info.helpers.pgIntrospection.getTypeByArray(
@@ -778,9 +778,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     extensions,
                   });
                   return EXPORTABLE(
-                    (extensions, innerCodec, listOfType, typeDelim) =>
-                      listOfType(innerCodec, extensions, typeDelim),
-                    [extensions, innerCodec, listOfType, typeDelim],
+                    (extensions, innerCodec, listOfCodec, typeDelim) =>
+                      listOfCodec(innerCodec, extensions, typeDelim),
+                    [extensions, innerCodec, listOfCodec, typeDelim],
                   );
                 }
               }
@@ -800,7 +800,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           if (codec) {
             // Be careful not to call this for class codecs!
             info.process("pgCodecs_PgTypeCodec", {
-              pgCodec: codec,
+              pgCodec: codec as PgTypeCodec<any, any, any, any, any, any>,
               pgType: type,
               databaseName,
             });
@@ -1019,8 +1019,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           // Now walk over all the codecs and ensure that each on has an associated type
           function prepareTypeForCodec(
-            codec: PgTypeCodec<any, any, any, any>,
-            visited: Set<PgTypeCodec<any, any, any, any>>,
+            codec: PgTypeCodec<any, any, any, any, any, any>,
+            visited: Set<PgTypeCodec<any, any, any, any, any, any>>,
           ): void {
             if (visited.has(codec)) {
               return;

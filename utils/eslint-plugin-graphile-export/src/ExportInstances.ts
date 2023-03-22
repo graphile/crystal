@@ -12,7 +12,7 @@ const KNOWN_IMPORTS: Array<[string, string]> = [
   ["@dataplan/pg", "PgSource"],
   ["@dataplan/pg", "PgSourceBuilder"],
   ["@dataplan/pg", "PgExecutor"],
-  ["@dataplan/pg", "recordType"],
+  ["@dataplan/pg", "recordCodec"],
 ];
 
 export const ExportInstances: Rule.RuleModule = {

@@ -11,7 +11,7 @@ import type {
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { PgSource, recordType, sqlFromArgDigests } from "@dataplan/pg";
+import { PgSource, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgProc } from "pg-introspection";
@@ -275,21 +275,21 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
             return EXPORTABLE(
-              (columns, recordCodecName, recordType, sql) =>
-                recordType(
-                  recordCodecName,
-                  sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+              (columns, recordCodec, recordCodecName, sql) =>
+                recordCodec({
+                  name: recordCodecName,
+                  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
-                  {
+                  extensions: {
                     description: undefined,
                     // TODO: we should figure out what field this is going to use, and reference that
                     /* `The return type of our \`${name}\` ${
                       pgProc.provolatile === "v" ? "mutation" : "query"
                     }.`, */
                   },
-                  true,
-                ),
-              [columns, recordCodecName, recordType, sql],
+                  isAnonymous: true,
+                }),
+              [columns, recordCodec, recordCodecName, sql],
             );
           };
 

@@ -67,20 +67,6 @@ export function EXPORTABLE<T, TScope extends any[]>(
   return fn;
 }
 
-// TODO: PgSourceRow and PgSourceRowAttribute are lies; we don't use them even
-// though we claim to. Everything that references them needs to be typed in a
-// different way.
-export type PgSourceRowAttribute<
-  TColumns extends PgTypeColumns,
-  TAttribute extends keyof TColumns,
-> = ReturnType<TColumns[TAttribute]["codec"]["fromPg"]>;
-export type PgSourceRow<TColumns extends PgTypeColumns | undefined> =
-  TColumns extends PgTypeColumns
-    ? {
-        [key in keyof TColumns]: PgSourceRowAttribute<TColumns, key>;
-      }
-    : undefined;
-
 /**
  * Extra metadata you can attach to a source relation.
  */

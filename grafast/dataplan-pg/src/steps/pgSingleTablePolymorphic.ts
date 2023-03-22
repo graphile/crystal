@@ -7,11 +7,10 @@ import type {
 import { ExecutableStep, polymorphicWrap } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 
-import type { PgTypeColumns } from "../codecs.js";
+import type { ObjectFromPgTypeColumns, PgTypeColumns } from "../codecs.js";
 import type {
   PgSourceParameter,
   PgSourceRelation,
-  PgSourceRow,
   PgSourceUnique,
 } from "../datasource.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
@@ -35,7 +34,7 @@ export class PgSingleTablePolymorphicStep<
     },
     TParameters extends PgSourceParameter[] | undefined = undefined,
   >
-  extends ExecutableStep<any>
+  extends ExecutableStep<unknown>
   implements PolymorphicStep
 {
   static $$export = {
@@ -81,7 +80,9 @@ export class PgSingleTablePolymorphicStep<
     values: Array<GrafastValuesList<any>>,
   ): GrafastResultsList<PolymorphicData<
     string,
-    ReadonlyArray<PgSourceRow<TColumns>>
+    ReadonlyArray<
+      TColumns extends PgTypeColumns ? ObjectFromPgTypeColumns<TColumns> : never
+    >
   > | null> {
     return values[this.typeStepId].map((v) => (v ? polymorphicWrap(v) : null));
   }

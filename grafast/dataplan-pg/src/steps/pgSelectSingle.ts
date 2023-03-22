@@ -4,13 +4,16 @@ import type { GraphQLObjectType } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgTypeColumn, PgTypeColumns } from "../codecs.js";
+import type {
+  ObjectFromPgTypeColumns,
+  PgTypeColumn,
+  PgTypeColumns,
+} from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type {
   PgSource,
   PgSourceParameter,
   PgSourceRelation,
-  PgSourceRow,
   PgSourceUnique,
 } from "../datasource.js";
 import { PgSourceBuilder } from "../datasource.js";
@@ -66,7 +69,11 @@ export class PgSelectSingleStep<
     },
     TParameters extends PgSourceParameter[] | undefined = undefined,
   >
-  extends UnbatchedExecutableStep<PgSourceRow<TColumns> | null>
+  extends UnbatchedExecutableStep<
+    TColumns extends PgTypeColumns
+      ? ObjectFromPgTypeColumns<TColumns> | null
+      : unknown
+  >
   implements
     PgTypedExecutableStep<PgTypeCodec<TColumns, any, any>>,
     EdgeCapableStep<any>
@@ -88,7 +95,11 @@ export class PgSelectSingleStep<
 
   constructor(
     $class: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
-    $item: ExecutableStep<PgSourceRow<TColumns>>,
+    $item: ExecutableStep<
+      TColumns extends PgTypeColumns
+        ? ObjectFromPgTypeColumns<TColumns>
+        : unknown
+    >,
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
@@ -125,7 +136,9 @@ export class PgSelectSingleStep<
     return plan;
   }
 
-  private getItemStep(): ExecutableStep<PgSourceRow<TColumns>> {
+  private getItemStep(): ExecutableStep<
+    TColumns extends PgTypeColumns ? ObjectFromPgTypeColumns<TColumns> : unknown
+  > {
     const plan = this.getDep(this.itemStepId);
     return plan;
   }
@@ -652,8 +665,12 @@ export class PgSelectSingleStep<
 
   unbatchedExecute(
     extra: ExecutionExtra,
-    result: PgSourceRow<TColumns>,
-  ): PgSourceRow<TColumns> | null {
+    result: TColumns extends PgTypeColumns
+      ? ObjectFromPgTypeColumns<TColumns>
+      : never,
+  ): TColumns extends PgTypeColumns
+    ? ObjectFromPgTypeColumns<TColumns> | null
+    : unknown {
     if (result == null) {
       return this._coalesceToEmptyObject ? Object.create(null) : null;
     } else if (this.nullCheckAttributeIndex != null) {

@@ -10,7 +10,7 @@ import {
   PgExecutor,
   PgSource,
   PgSourceBuilder,
-  recordType,
+  recordCodec,
   sqlFromArgDigests,
   TYPES,
 } from "@dataplan/pg";
@@ -92,11 +92,11 @@ async function main() {
   ]);
 
   const usersCodec = EXPORTABLE(
-    (TYPES, recordType, sql) =>
-      recordType(
-        `app_public.users`,
-        sql`app_public.users`,
-        {
+    (TYPES, recordCodec, sql) =>
+      recordCodec({
+        name: `app_public.users`,
+        identifier: sql`app_public.users`,
+        columns: {
           id: {
             codec: TYPES.uuid,
             notNull: true,
@@ -119,21 +119,21 @@ async function main() {
             notNull: true,
           },
         },
-        {
+        extensions: {
           tags: {
             name: "users",
           },
         },
-      ),
-    [TYPES, recordType, sql],
+      }),
+    [TYPES, recordCodec, sql],
   );
 
   const forumsCodec = EXPORTABLE(
-    (TYPES, recordType, sql) =>
-      recordType(
-        `app_public.forums`,
-        sql`app_public.forums`,
-        {
+    (TYPES, recordCodec, sql) =>
+      recordCodec({
+        name: `app_public.forums`,
+        identifier: sql`app_public.forums`,
+        columns: {
           id: {
             codec: TYPES.uuid,
             notNull: true,
@@ -152,21 +152,21 @@ async function main() {
             notNull: false,
           },
         },
-        {
+        extensions: {
           tags: {
             name: "forums",
           },
         },
-      ),
-    [TYPES, recordType, sql],
+      }),
+    [TYPES, recordCodec, sql],
   );
 
   const messagesCodec = EXPORTABLE(
-    (TYPES, recordType, sql) =>
-      recordType(
-        `app_public.messages`,
-        sql`app_public.messages`,
-        {
+    (TYPES, recordCodec, sql) =>
+      recordCodec({
+        name: `app_public.messages`,
+        identifier: sql`app_public.messages`,
+        columns: {
           id: {
             codec: TYPES.uuid,
             notNull: true,
@@ -201,13 +201,13 @@ async function main() {
             notNull: false,
           },
         },
-        {
+        extensions: {
           tags: {
             name: "messages",
           },
         },
-      ),
-    [TYPES, recordType, sql],
+      }),
+    [TYPES, recordCodec, sql],
   );
 
   const usersSourceBuilder = EXPORTABLE(
