@@ -63,6 +63,7 @@ export interface PgTypeColumn<
     any,
     any
   >,
+  TNotNull extends boolean = boolean,
 > {
   /**
    * How to translate to/from PG and how to cast.
@@ -72,7 +73,7 @@ export interface PgTypeColumn<
   /**
    * Is the column/attribute guaranteed to not be null?
    */
-  notNull: boolean;
+  notNull: TNotNull;
   hasDefault?: boolean;
 
   /**
@@ -134,13 +135,17 @@ export interface PgTypeColumn<
 
 export type PgTypeColumns<
   TCodecMap extends {
-    [columnName in string]: PgTypeCodec<any, any, any, any, any, any>;
+    [columnName in string]: PgTypeColumn<
+      PgTypeCodec<any, any, any, any, any, any>,
+      boolean
+    >;
   } = {
-    [columnName in string]: PgTypeCodec<any, any, any, any, any, any>;
+    [columnName in string]: PgTypeColumn<
+      PgTypeCodec<any, any, any, any, any, any>,
+      boolean
+    >;
   },
-> = {
-  [columnName in keyof TCodecMap]: PgTypeColumn<TCodecMap[columnName]>;
-};
+> = TCodecMap;
 
 /**
  * Returns a PgTypeCodec for the given builtin Postgres scalar type, optionally
@@ -311,19 +316,9 @@ function recordStringToTuple(value: string): Array<string | null> {
 
 function realColumnDefs<TColumns extends PgTypeColumns>(
   columns: TColumns,
-): Array<
-  [
-    string,
-    TColumns extends PgTypeColumns<infer U> ? PgTypeColumn<U[keyof U]> : never,
-  ]
-> {
+): Array<[string, TColumns[keyof TColumns]]> {
   const columnDefs = Object.entries(columns) as Array<
-    [
-      string,
-      TColumns extends PgTypeColumns<infer U>
-        ? PgTypeColumn<U[keyof U]>
-        : never,
-    ]
+    [string, TColumns extends infer U ? U[keyof U] : never]
   >;
   return columnDefs.filter(
     ([_columnName, spec]) => !spec.expression && !spec.via,
@@ -353,10 +348,13 @@ function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
 
 type ObjectFromColumns<TColumns extends PgTypeColumns> = {
   [columnName in keyof TColumns]: TColumns[columnName] extends PgTypeColumn<
-    infer UCodec
+    infer UCodec,
+    infer UNonNull
   >
     ? UCodec extends PgTypeCodec<any, any, infer U, any, any, any>
-      ? U
+      ? UNonNull extends true
+        ? U
+        : U | null
       : never
     : never;
 };
