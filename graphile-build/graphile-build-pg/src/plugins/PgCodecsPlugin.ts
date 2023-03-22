@@ -3,6 +3,7 @@ import "graphile-build";
 import type {
   PgEnumTypeCodec,
   PgRecordTypeCodecSpec,
+  PgSource,
   PgTypeCodec,
   PgTypeCodecExtensions,
   PgTypeColumn,
@@ -65,15 +66,6 @@ declare global {
         codec: PgTypeCodec<undefined, any, any, undefined>;
         underlyingTypeName: string;
       }): string;
-    }
-
-    interface BuildInput {
-      /**
-       * A non-exhaustive list of codecs, please walk pgSources for more.
-       * Typically useful for the codecs that aren't linked to a source (e.g.
-       * those defining an union or interface)
-       */
-      pgCodecs?: PgTypeCodec<any, any, any, any>[];
     }
 
     interface Build {
@@ -846,8 +838,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
-        build.allPgCodecs = new Set();
-        function walkCodec(codec: PgTypeCodec<any, any, any, any>): void {
+        build.allPgCodecs = new Set<
+          PgTypeCodec<any, any, any, any, any, any>
+        >();
+        function walkCodec(
+          codec: PgTypeCodec<any, any, any, any, any, any>,
+        ): void {
           if (build.allPgCodecs!.has(codec)) {
             return;
           }
@@ -886,6 +882,51 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         if (build.input.pgCodecs) {
           for (const codec of build.input.pgCodecs) {
             walkCodec(codec);
+          }
+        }
+
+        // TODO: find a better word than 'realm'... or at least define it
+        // somewhere.
+
+        // Ensure all sources are uniquely named
+        const knownCodecByName = new Map<
+          string,
+          PgTypeCodec<any, any, any, any, any, any>
+        >();
+        for (const codec of build.allPgCodecs) {
+          const known = knownCodecByName.get(codec.name);
+          if (known) {
+            console.error({
+              error: `Two different codecs were created with the same name:`,
+              first: known,
+              second: codec,
+            });
+            throw new Error(
+              "Two different codecs were created with the same name; please ensure all codec names are unique. If you are creating codecs from multiple realms, consider prefixing the codec names with the realm name.",
+            );
+          } else {
+            knownCodecByName.set(codec.name, codec);
+          }
+        }
+
+        // Now ensure all codecs are uniquely named
+        const knownSourceByName = new Map<
+          string,
+          PgSource<any, any, any, any>
+        >();
+        for (const source of build.input.pgSources) {
+          const known = knownSourceByName.get(source.name);
+          if (known) {
+            console.error({
+              error: `Two different sources were created with the same name:`,
+              first: known,
+              second: source,
+            });
+            throw new Error(
+              "Two different sources were created with the same name; please ensure all source names are unique. If you are creating sources from multiple realms, consider prefixing the source names with the realm name.",
+            );
+          } else {
+            knownSourceByName.set(source.name, source);
           }
         }
 

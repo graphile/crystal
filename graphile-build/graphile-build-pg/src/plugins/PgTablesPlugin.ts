@@ -33,10 +33,6 @@ declare global {
       pgForbidSetofFunctionsToReturnNull?: boolean;
     }
 
-    interface BuildInput {
-      pgSources: PgSource<any, any, any, any>[];
-    }
-
     interface Inflection {
       /**
        * A PgSource represents a single way of getting a number of values of

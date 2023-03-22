@@ -1,4 +1,4 @@
-import type { WithPgClient } from "@dataplan/pg";
+import type { PgSource, PgTypeCodec, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 
 export interface PgSourceTags extends PgSmartTagsDict {
@@ -101,5 +101,20 @@ declare module "@dataplan/pg" {
     isTableLike?: boolean;
     tags: Partial<PgTypeCodecTags>;
     description?: string;
+  }
+}
+
+declare global {
+  namespace GraphileBuild {
+    interface BuildInput {
+      pgSources: PgSource<any, any, any, any>[];
+
+      /**
+       * A non-exhaustive list of codecs, please walk pgSources for more.
+       * Typically useful for the codecs that aren't linked to a source (e.g.
+       * those defining an union or interface)
+       */
+      pgCodecs?: PgTypeCodec<any, any, any, any>[];
+    }
   }
 }
