@@ -16,6 +16,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
+  PgTypeColumn,
   PgTypeColumns,
   PgTypeColumnVia,
   PgTypeColumnViaExplicit,
@@ -73,7 +74,11 @@ export function EXPORTABLE<T, TScope extends any[]>(
 export type PgSourceRowAttribute<
   TColumns extends PgTypeColumns,
   TAttribute extends keyof TColumns,
-> = ReturnType<TColumns[TAttribute]["codec"]["fromPg"]>;
+> = TColumns[TAttribute] extends PgTypeColumn<infer UCodec>
+  ? UCodec extends PgTypeCodec<any, any, infer UFromJS, any, any, any>
+    ? UFromJS
+    : never
+  : never;
 export type PgSourceRow<TColumns extends PgTypeColumns | undefined> =
   TColumns extends PgTypeColumns
     ? {
