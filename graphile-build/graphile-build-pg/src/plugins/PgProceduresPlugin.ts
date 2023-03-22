@@ -276,19 +276,19 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               });
             return EXPORTABLE(
               (columns, recordCodecName, recordType, sql) =>
-                recordType(
-                  recordCodecName,
-                  sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+                recordType({
+                  name: recordCodecName,
+                  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
-                  {
+                  extensions: {
                     description: undefined,
                     // TODO: we should figure out what field this is going to use, and reference that
                     /* `The return type of our \`${name}\` ${
                       pgProc.provolatile === "v" ? "mutation" : "query"
                     }.`, */
                   },
-                  true,
-                ),
+                  isAnonymous: true,
+                }),
               [columns, recordCodecName, recordType, sql],
             );
           };

@@ -371,7 +371,11 @@ export function makeExampleSchema(
   );
   const forumCodec = EXPORTABLE(
     (forumColumns, recordType, sql) =>
-      recordType("forums", sql`app_public.forums`, forumColumns),
+      recordType({
+        name: "forums",
+        identifier: sql`app_public.forums`,
+        columns: forumColumns,
+      }),
     [forumColumns, recordType, sql],
   );
 
@@ -546,7 +550,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType("messages", sql`app_public.messages`, messageColumns),
+        codec: recordType({
+          name: "messages",
+          identifier: sql`app_public.messages`,
+          columns: messageColumns,
+        }),
         source: sql`app_public.messages`,
         name: "messages",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -559,7 +567,11 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType("users", sql`app_public.users`, userColumns),
+        codec: recordType({
+          name: "users",
+          identifier: sql`app_public.users`,
+          columns: userColumns,
+        }),
         source: sql`app_public.users`,
         name: "users",
         uniques: [
@@ -718,11 +730,11 @@ export function makeExampleSchema(
         identicalVia: { relation: "person", attribute: "id" },
       }),
       bookmarked_entity: col({
-        codec: recordType(
-          "union__entity",
-          sql`interfaces_and_unions.union__entity`,
-          unionEntityColumns,
-        ),
+        codec: recordType({
+          name: "union__entity",
+          identifier: sql`interfaces_and_unions.union__entity`,
+          columns: unionEntityColumns,
+        }),
         notNull: true,
       }),
     }),
@@ -740,11 +752,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          "person_bookmarks",
-          sql`interfaces_and_unions.person_bookmarks`,
-          personBookmarkColumns,
-        ),
+        codec: recordType({
+          name: "person_bookmarks",
+          identifier: sql`interfaces_and_unions.person_bookmarks`,
+          columns: personBookmarkColumns,
+        }),
         source: sql`interfaces_and_unions.person_bookmarks`,
         name: "person_bookmarks",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -772,11 +784,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          "interfaces_and_unions.people",
-          sql`interfaces_and_unions.people`,
-          personColumns,
-        ),
+        codec: recordType({
+          name: "interfaces_and_unions.people",
+          identifier: sql`interfaces_and_unions.people`,
+          columns: personColumns,
+        }),
         source: sql`interfaces_and_unions.people`,
         name: "people",
         uniques: [
@@ -805,11 +817,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          "interfaces_and_unions.posts",
-          sql`interfaces_and_unions.posts`,
-          postColumns,
-        ),
+        codec: recordType({
+          name: "interfaces_and_unions.posts",
+          identifier: sql`interfaces_and_unions.posts`,
+          columns: postColumns,
+        }),
         source: sql`interfaces_and_unions.posts`,
         name: "posts",
         uniques: [{ columns: ["post_id"], isPrimary: true }],
@@ -840,11 +852,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          "interfaces_and_unions.comments",
-          sql`interfaces_and_unions.comments`,
-          commentColumns,
-        ),
+        codec: recordType({
+          name: "interfaces_and_unions.comments",
+          identifier: sql`interfaces_and_unions.comments`,
+          columns: commentColumns,
+        }),
         source: sql`interfaces_and_unions.comments`,
         name: "comments",
         uniques: [{ columns: ["comment_id"], isPrimary: true }],
@@ -890,11 +902,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.enum_table_item_type`,
-          sql`interfaces_and_unions.enum_table_item_type`,
-          enumTablesItemTypeColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.enum_table_item_type`,
+          identifier: sql`interfaces_and_unions.enum_table_item_type`,
+          columns: enumTablesItemTypeColumns,
+        }),
         source: sql`interfaces_and_unions.enum_table_item_type`,
         name: "enum_table_item_type",
         uniques: [{ columns: ["type"], isPrimary: true }],
@@ -990,11 +1002,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.single_table_items`,
-          sql`interfaces_and_unions.single_table_items`,
-          singleTableItemColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.single_table_items`,
+          identifier: sql`interfaces_and_unions.single_table_items`,
+          columns: singleTableItemColumns,
+        }),
         source: sql`interfaces_and_unions.single_table_items`,
         name: "single_table_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1179,11 +1191,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.relational_items`,
-          sql`interfaces_and_unions.relational_items`,
-          relationalItemColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.relational_items`,
+          identifier: sql`interfaces_and_unions.relational_items`,
+          columns: relationalItemColumns,
+        }),
         source: sql`interfaces_and_unions.relational_items`,
         name: "relational_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1225,11 +1237,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.relational_commentables`,
-          sql`interfaces_and_unions.relational_commentables`,
-          relationalCommentableColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.relational_commentables`,
+          identifier: sql`interfaces_and_unions.relational_commentables`,
+          columns: relationalCommentableColumns,
+        }),
         source: sql`interfaces_and_unions.relational_commentables`,
         name: "relational_commentables",
       }),
@@ -1332,11 +1344,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.relational_topics`,
-          sql`interfaces_and_unions.relational_topics`,
-          relationalTopicsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.relational_topics`,
+          identifier: sql`interfaces_and_unions.relational_topics`,
+          columns: relationalTopicsColumns,
+        }),
         source: sql`interfaces_and_unions.relational_topics`,
         name: "relational_topics",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1372,11 +1384,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.relational_posts`,
-          sql`interfaces_and_unions.relational_posts`,
-          relationalPostsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.relational_posts`,
+          identifier: sql`interfaces_and_unions.relational_posts`,
+          columns: relationalPostsColumns,
+        }),
         source: sql`interfaces_and_unions.relational_posts`,
         name: "relational_posts",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1411,11 +1423,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.relational_dividers`,
-          sql`interfaces_and_unions.relational_dividers`,
-          relationalDividersColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.relational_dividers`,
+          identifier: sql`interfaces_and_unions.relational_dividers`,
+          columns: relationalDividersColumns,
+        }),
         source: sql`interfaces_and_unions.relational_dividers`,
         name: "relational_dividers",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1449,11 +1461,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.relational_checklists`,
-          sql`interfaces_and_unions.relational_checklists`,
-          relationalChecklistsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.relational_checklists`,
+          identifier: sql`interfaces_and_unions.relational_checklists`,
+          columns: relationalChecklistsColumns,
+        }),
         source: sql`interfaces_and_unions.relational_checklists`,
         name: "relational_checklists",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1488,11 +1500,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.relational_checklist_items`,
-          sql`interfaces_and_unions.relational_checklist_items`,
-          relationalChecklistItemsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.relational_checklist_items`,
+          identifier: sql`interfaces_and_unions.relational_checklist_items`,
+          columns: relationalChecklistItemsColumns,
+        }),
         source: sql`interfaces_and_unions.relational_checklist_items`,
         name: "relational_checklist_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1702,11 +1714,11 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.union_items`,
-          sql`interfaces_and_unions.union_items`,
-          unionItemsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.union_items`,
+          identifier: sql`interfaces_and_unions.union_items`,
+          columns: unionItemsColumns,
+        }),
         source: sql`interfaces_and_unions.union_items`,
         name: "union_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1726,11 +1738,11 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.union_topics`,
-          sql`interfaces_and_unions.union_topics`,
-          unionTopicsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.union_topics`,
+          identifier: sql`interfaces_and_unions.union_topics`,
+          columns: unionTopicsColumns,
+        }),
         source: sql`interfaces_and_unions.union_topics`,
         name: "union_topics",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1752,11 +1764,11 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.union_posts`,
-          sql`interfaces_and_unions.union_posts`,
-          unionPostsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.union_posts`,
+          identifier: sql`interfaces_and_unions.union_posts`,
+          columns: unionPostsColumns,
+        }),
         source: sql`interfaces_and_unions.union_posts`,
         name: "union_posts",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1777,11 +1789,11 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.union_dividers`,
-          sql`interfaces_and_unions.union_dividers`,
-          unionDividersColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.union_dividers`,
+          identifier: sql`interfaces_and_unions.union_dividers`,
+          columns: unionDividersColumns,
+        }),
         source: sql`interfaces_and_unions.union_dividers`,
         name: "union_dividers",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1801,11 +1813,11 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.union_checklists`,
-          sql`interfaces_and_unions.union_checklists`,
-          unionChecklistsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.union_checklists`,
+          identifier: sql`interfaces_and_unions.union_checklists`,
+          columns: unionChecklistsColumns,
+        }),
         source: sql`interfaces_and_unions.union_checklists`,
         name: "union_checklists",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1833,11 +1845,11 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.union_checklist_items`,
-          sql`interfaces_and_unions.union_checklist_items`,
-          unionChecklistItemsColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.union_checklist_items`,
+          identifier: sql`interfaces_and_unions.union_checklist_items`,
+          columns: unionChecklistItemsColumns,
+        }),
         source: sql`interfaces_and_unions.union_checklist_items`,
         name: "union_checklist_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1857,11 +1869,11 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType(
-          `interfaces_and_unions.union__entity`,
-          sql`interfaces_and_unions.union__entity`,
-          unionEntityColumns,
-        ),
+        codec: recordType({
+          name: `interfaces_and_unions.union__entity`,
+          identifier: sql`interfaces_and_unions.union__entity`,
+          columns: unionEntityColumns,
+        }),
         source: sql`(select null::interfaces_and_unions.union__entity)`,
         name: "union__entity",
       }),
@@ -1947,10 +1959,10 @@ export function makeExampleSchema(
       return new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          "interfaces_and_unions.aws_applications",
-          sql`interfaces_and_unions.aws_applications`,
-          {
+        codec: recordType({
+          name: "interfaces_and_unions.aws_applications",
+          identifier: sql`interfaces_and_unions.aws_applications`,
+          columns: {
             id: col({ codec: TYPES.int, notNull: true }),
             name: col({
               codec: TYPES.text,
@@ -1959,7 +1971,7 @@ export function makeExampleSchema(
             last_deployed: col({ codec: TYPES.timestamptz, notNull: false }),
             aws_id: col({ codec: TYPES.text, notNull: false }),
           },
-        ),
+        }),
         source: sql`interfaces_and_unions.aws_applications`,
         name: "aws_applications",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1973,10 +1985,10 @@ export function makeExampleSchema(
       return new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          "interfaces_and_unions.gcp_applications",
-          sql`interfaces_and_unions.gcp_applications`,
-          {
+        codec: recordType({
+          name: "interfaces_and_unions.gcp_applications",
+          identifier: sql`interfaces_and_unions.gcp_applications`,
+          columns: {
             id: col({ codec: TYPES.int, notNull: true }),
             name: col({
               codec: TYPES.text,
@@ -1985,7 +1997,7 @@ export function makeExampleSchema(
             last_deployed: col({ codec: TYPES.timestamptz, notNull: false }),
             gcp_id: col({ codec: TYPES.text, notNull: false }),
           },
-        ),
+        }),
         source: sql`interfaces_and_unions.gcp_applications`,
         name: "gcp_applications",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -1999,10 +2011,10 @@ export function makeExampleSchema(
       return new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          "interfaces_and_unions.first_party_vulnerabilities",
-          sql`interfaces_and_unions.first_party_vulnerabilities`,
-          {
+        codec: recordType({
+          name: "interfaces_and_unions.first_party_vulnerabilities",
+          identifier: sql`interfaces_and_unions.first_party_vulnerabilities`,
+          columns: {
             id: col({ codec: TYPES.int, notNull: true }),
             name: col({
               codec: TYPES.text,
@@ -2011,7 +2023,7 @@ export function makeExampleSchema(
             cvss_score: col({ codec: TYPES.float, notNull: true }),
             team_name: col({ codec: TYPES.text, notNull: false }),
           },
-        ),
+        }),
         source: sql`interfaces_and_unions.first_party_vulnerabilities`,
         name: "first_party_vulnerabilities",
         uniques: [{ columns: ["id"], isPrimary: true }],
@@ -2025,10 +2037,10 @@ export function makeExampleSchema(
       return new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType(
-          "interfaces_and_unions.third_party_vulnerabilities",
-          sql`interfaces_and_unions.third_party_vulnerabilities`,
-          {
+        codec: recordType({
+          name: "interfaces_and_unions.third_party_vulnerabilities",
+          identifier: sql`interfaces_and_unions.third_party_vulnerabilities`,
+          columns: {
             id: col({ codec: TYPES.int, notNull: true }),
             name: col({
               codec: TYPES.text,
@@ -2037,7 +2049,7 @@ export function makeExampleSchema(
             cvss_score: col({ codec: TYPES.float, notNull: true }),
             vendor_name: col({ codec: TYPES.text, notNull: false }),
           },
-        ),
+        }),
         source: sql`interfaces_and_unions.third_party_vulnerabilities`,
         name: "third_party_vulnerabilities",
         uniques: [{ columns: ["id"], isPrimary: true }],

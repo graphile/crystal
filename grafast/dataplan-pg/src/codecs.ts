@@ -357,7 +357,6 @@ export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
   isAnonymous?: boolean;
 };
 
-// TODO: Replace this entire function with `realRecordType` (remove overloading)
 /**
  * Returns a PgTypeCodec that represents a composite type (a type with
  * attributes).
@@ -369,37 +368,6 @@ export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
  * isAnonymous - if true, this represents an "anonymous" type, typically the return value of a function or something like that. If this is true, then name and identifier are ignored.
  */
 export function recordType<TColumns extends PgTypeColumns>(
-  name: string,
-  identifier: SQL,
-  columns: TColumns,
-  extensions?: Partial<PgTypeCodecExtensions>,
-  isAnonymous?: boolean,
-): PgTypeCodec<TColumns, string, object>;
-export function recordType<TColumns extends PgTypeColumns>(
-  config: PgRecordTypeCodecSpec<TColumns>,
-): PgTypeCodec<TColumns, string, object>;
-export function recordType<TColumns extends PgTypeColumns>(
-  configOrName: PgRecordTypeCodecSpec<TColumns> | string,
-  identifier?: SQL,
-  columns?: TColumns,
-  extensions?: Partial<PgTypeCodecExtensions>,
-  isAnonymous?: boolean,
-): PgTypeCodec<TColumns, string, Record<string, any>> {
-  if (typeof configOrName === "string") {
-    return realRecordType({
-      name: configOrName,
-      identifier: identifier!,
-      columns: columns!,
-      extensions,
-      isAnonymous,
-    });
-  } else {
-    return realRecordType(configOrName);
-  }
-}
-exportAs(recordType, "recordType");
-
-function realRecordType<TColumns extends PgTypeColumns>(
   config: PgRecordTypeCodecSpec<TColumns>,
 ) {
   const {
@@ -421,6 +389,7 @@ function realRecordType<TColumns extends PgTypeColumns>(
     extensions,
   };
 }
+exportAs(recordType, "recordType");
 
 // TODO: rename to enumCodec
 // TODO: enum values should not be strings but objects so that they can have descriptions, tags, etc.
