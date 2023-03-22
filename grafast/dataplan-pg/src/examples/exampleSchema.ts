@@ -77,7 +77,7 @@ import type {
 } from "../";
 import type { PgSubscriber } from "../adaptors/pg.js";
 import type { PgTypeColumns } from "../codecs.js";
-import { listOfType } from "../codecs.js";
+import { listOfCodec } from "../codecs.js";
 import {
   BooleanFilterStep,
   ClassFilterStep,
@@ -457,7 +457,7 @@ export function makeExampleSchema(
       PgSource,
       TYPES,
       executor,
-      listOfType,
+      listOfCodec,
       selectAuth,
       sql,
       sqlFromArgDigests,
@@ -465,14 +465,14 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: listOfType(TYPES.text),
+        codec: listOfCodec(TYPES.text),
         source: (...args) =>
           sql`app_public.forum_names_array(${sqlFromArgDigests(args)})`,
         name: "forum_names_array",
         parameters: [],
         isUnique: true, // No setof
       }),
-    [PgSource, TYPES, executor, listOfType, selectAuth, sql, sqlFromArgDigests],
+    [PgSource, TYPES, executor, listOfCodec, selectAuth, sql, sqlFromArgDigests],
   );
 
   const forumNamesCasesSource = EXPORTABLE(
@@ -480,7 +480,7 @@ export function makeExampleSchema(
       PgSource,
       TYPES,
       executor,
-      listOfType,
+      listOfCodec,
       selectAuth,
       sql,
       sqlFromArgDigests,
@@ -488,13 +488,13 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: listOfType(TYPES.text),
+        codec: listOfCodec(TYPES.text),
         source: (...args) =>
           sql`app_public.forum_names_cases(${sqlFromArgDigests(args)})`,
         name: "forum_names_cases",
         parameters: [],
       }),
-    [PgSource, TYPES, executor, listOfType, selectAuth, sql, sqlFromArgDigests],
+    [PgSource, TYPES, executor, listOfCodec, selectAuth, sql, sqlFromArgDigests],
   );
 
   const forumsUniqueAuthorCountSource = EXPORTABLE(

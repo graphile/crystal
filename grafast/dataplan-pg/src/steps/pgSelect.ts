@@ -41,7 +41,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
-import { listOfType, TYPES } from "../codecs.js";
+import { listOfCodec, TYPES } from "../codecs.js";
 import type {
   PgSource,
   PgSourceParameter,
@@ -2925,7 +2925,7 @@ export function pgSelectFromRecords<
     source,
     identifiers: [],
     from: (records) => sql`unnest(${records.placeholder})`,
-    args: [{ step: records, pgCodec: listOfType(source.codec) }],
+    args: [{ step: records, pgCodec: listOfCodec(source.codec) }],
   }) as PgSelectStep<TColumns, TUniques, TRelations, TParameters>;
 }
 

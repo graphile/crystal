@@ -13,7 +13,7 @@ import {
   enumCodec,
   getCodecByPgCatalogTypeName,
   isEnumCodec,
-  listOfType,
+  listOfCodec,
   rangeOfCodec,
   recordCodec,
   TYPES,
@@ -744,7 +744,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               }
             }
 
-            // Array types are just listOfType() of their inner type
+            // Array types are just listOfCodec() of their inner type
             if (type.typcategory === "A") {
               const innerType =
                 await info.helpers.pgIntrospection.getTypeByArray(
@@ -778,9 +778,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     extensions,
                   });
                   return EXPORTABLE(
-                    (extensions, innerCodec, listOfType, typeDelim) =>
-                      listOfType(innerCodec, extensions, typeDelim),
-                    [extensions, innerCodec, listOfType, typeDelim],
+                    (extensions, innerCodec, listOfCodec, typeDelim) =>
+                      listOfCodec(innerCodec, extensions, typeDelim),
+                    [extensions, innerCodec, listOfCodec, typeDelim],
                   );
                 }
               }

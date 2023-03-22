@@ -442,7 +442,6 @@ type CodecWithListCodec<TCodec extends PgTypeCodec<any, any, any, any>> =
     >;
   };
 
-// TODO: rename to listOfCodec
 /**
  * Given a PgTypeCodec, this returns a new PgTypeCodec that represents a list
  * of the former.
@@ -456,7 +455,7 @@ type CodecWithListCodec<TCodec extends PgTypeCodec<any, any, any, any>> =
  * @param typeDelim - the delimeter used to separate entries in this list when Postgres stringifies it
  * @param identifier - a pg-sql2 fragment that represents the name of this type
  */
-export function listOfType<
+export function listOfCodec<
   TInnerCodec extends PgTypeCodec<any, any, any, undefined>,
 >(
   listedCodec: TInnerCodec,
@@ -527,12 +526,12 @@ export function listOfType<
     castFromPg: innerCodec.listCastFromPg,
   };
 
-  // Memoize such that every `listOfType(foo)` returns the same object.
+  // Memoize such that every `listOfCodec(foo)` returns the same object.
   Object.defineProperty(innerCodec, $$listCodec, { value: listCodec });
 
   return listCodec;
 }
-exportAs(listOfType, "listOfType");
+exportAs(listOfCodec, "listOfCodec");
 
 /**
  * Represents a PostgreSQL `DOMAIN` over the given codec
