@@ -14,7 +14,7 @@ import {
   PgTypeColumnVia,
   PgTypeColumnViaExplicit,
   rangeOfCodec,
-  recordType,
+  recordCodec,
   TYPES,
 } from "./codecs.js";
 import {
@@ -295,7 +295,7 @@ export {
   pgWhereConditionSpecListToSQL,
   PlanByUniques,
   rangeOfCodec,
-  recordType,
+  recordCodec,
   resolveSource,
   sqlFromArgDigests,
   TempTableStep,
@@ -319,7 +319,7 @@ exportAsMany("@dataplan/pg", {
   isEnumCodec,
   listOfType,
   rangeOfCodec,
-  recordType,
+  recordCodec,
   TYPES,
   PgEnumSource,
   PgSource,

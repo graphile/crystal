@@ -367,7 +367,7 @@ export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
  * extensions - an optional object that you can use to associate arbitrary data with this type
  * isAnonymous - if true, this represents an "anonymous" type, typically the return value of a function or something like that. If this is true, then name and identifier are ignored.
  */
-export function recordType<TColumns extends PgTypeColumns>(
+export function recordCodec<TColumns extends PgTypeColumns>(
   config: PgRecordTypeCodecSpec<TColumns>,
 ) {
   const {
@@ -389,7 +389,7 @@ export function recordType<TColumns extends PgTypeColumns>(
     extensions,
   };
 }
-exportAs(recordType, "recordType");
+exportAs(recordCodec, "recordCodec");
 
 // TODO: rename to enumCodec
 // TODO: enum values should not be strings but objects so that they can have descriptions, tags, etc.

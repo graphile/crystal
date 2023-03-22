@@ -15,7 +15,7 @@ import {
   isEnumCodec,
   listOfType,
   rangeOfCodec,
-  recordType,
+  recordCodec,
   TYPES,
 } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
@@ -444,8 +444,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           });
 
           const codec = EXPORTABLE(
-            (recordType, spec) => recordType(spec),
-            [recordType, spec],
+            (recordCodec, spec) => recordCodec(spec),
+            [recordCodec, spec],
           );
           info.process("pgCodecs_PgTypeCodec", {
             pgCodec: codec,

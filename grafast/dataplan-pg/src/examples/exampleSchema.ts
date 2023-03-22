@@ -99,7 +99,7 @@ import {
   PgSourceBuilder,
   pgUpdate,
   PgUpdateStep,
-  recordType,
+  recordCodec,
   TYPES,
 } from "../index.js";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
@@ -370,13 +370,13 @@ export function makeExampleSchema(
     [TYPES, col, sql],
   );
   const forumCodec = EXPORTABLE(
-    (forumColumns, recordType, sql) =>
-      recordType({
+    (forumColumns, recordCodec, sql) =>
+      recordCodec({
         name: "forums",
         identifier: sql`app_public.forums`,
         columns: forumColumns,
       }),
-    [forumColumns, recordType, sql],
+    [forumColumns, recordCodec, sql],
   );
 
   const messageColumns = EXPORTABLE(
@@ -546,11 +546,11 @@ export function makeExampleSchema(
   );
 
   const messageSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, messageColumns, recordType, selectAuth, sql) =>
+    (PgSourceBuilder, executor, messageColumns, recordCodec, selectAuth, sql) =>
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "messages",
           identifier: sql`app_public.messages`,
           columns: messageColumns,
@@ -559,15 +559,15 @@ export function makeExampleSchema(
         name: "messages",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [PgSourceBuilder, executor, messageColumns, recordType, selectAuth, sql],
+    [PgSourceBuilder, executor, messageColumns, recordCodec, selectAuth, sql],
   );
 
   const userSource = EXPORTABLE(
-    (PgSource, executor, recordType, selectAuth, sql, userColumns) =>
+    (PgSource, executor, recordCodec, selectAuth, sql, userColumns) =>
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "users",
           identifier: sql`app_public.users`,
           columns: userColumns,
@@ -579,7 +579,7 @@ export function makeExampleSchema(
           { columns: ["username"] },
         ],
       }),
-    [PgSource, executor, recordType, selectAuth, sql, userColumns],
+    [PgSource, executor, recordCodec, selectAuth, sql, userColumns],
   );
 
   const forumSource = EXPORTABLE(
@@ -722,7 +722,7 @@ export function makeExampleSchema(
   );
 
   const personBookmarkColumns = EXPORTABLE(
-    (TYPES, col, recordType, sql, unionEntityColumns) => ({
+    (TYPES, col, recordCodec, sql, unionEntityColumns) => ({
       id: col({ codec: TYPES.int, notNull: true }),
       person_id: col({
         codec: TYPES.int,
@@ -730,7 +730,7 @@ export function makeExampleSchema(
         identicalVia: { relation: "person", attribute: "id" },
       }),
       bookmarked_entity: col({
-        codec: recordType({
+        codec: recordCodec({
           name: "union__entity",
           identifier: sql`interfaces_and_unions.union__entity`,
           columns: unionEntityColumns,
@@ -738,21 +738,21 @@ export function makeExampleSchema(
         notNull: true,
       }),
     }),
-    [TYPES, col, recordType, sql, unionEntityColumns],
+    [TYPES, col, recordCodec, sql, unionEntityColumns],
   );
   const personBookmarksSourceBuilder = EXPORTABLE(
     (
       PgSourceBuilder,
       executor,
       personBookmarkColumns,
-      recordType,
+      recordCodec,
       selectAuth,
       sql,
     ) =>
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "person_bookmarks",
           identifier: sql`interfaces_and_unions.person_bookmarks`,
           columns: personBookmarkColumns,
@@ -765,7 +765,7 @@ export function makeExampleSchema(
       PgSourceBuilder,
       executor,
       personBookmarkColumns,
-      recordType,
+      recordCodec,
       selectAuth,
       sql,
     ],
@@ -780,11 +780,11 @@ export function makeExampleSchema(
   );
 
   const personSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, personColumns, recordType, selectAuth, sql) =>
+    (PgSourceBuilder, executor, personColumns, recordCodec, selectAuth, sql) =>
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "interfaces_and_unions.people",
           identifier: sql`interfaces_and_unions.people`,
           columns: personColumns,
@@ -796,7 +796,7 @@ export function makeExampleSchema(
           { columns: ["username"] },
         ],
       }),
-    [PgSourceBuilder, executor, personColumns, recordType, selectAuth, sql],
+    [PgSourceBuilder, executor, personColumns, recordCodec, selectAuth, sql],
   );
 
   const postColumns = EXPORTABLE(
@@ -813,11 +813,11 @@ export function makeExampleSchema(
   );
 
   const postSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, postColumns, recordType, selectAuth, sql) =>
+    (PgSourceBuilder, executor, postColumns, recordCodec, selectAuth, sql) =>
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "interfaces_and_unions.posts",
           identifier: sql`interfaces_and_unions.posts`,
           columns: postColumns,
@@ -826,7 +826,7 @@ export function makeExampleSchema(
         name: "posts",
         uniques: [{ columns: ["post_id"], isPrimary: true }],
       }),
-    [PgSourceBuilder, executor, postColumns, recordType, selectAuth, sql],
+    [PgSourceBuilder, executor, postColumns, recordCodec, selectAuth, sql],
   );
 
   const commentColumns = EXPORTABLE(
@@ -848,11 +848,11 @@ export function makeExampleSchema(
   );
 
   const commentSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, commentColumns, executor, recordType, selectAuth, sql) =>
+    (PgSourceBuilder, commentColumns, executor, recordCodec, selectAuth, sql) =>
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "interfaces_and_unions.comments",
           identifier: sql`interfaces_and_unions.comments`,
           columns: commentColumns,
@@ -861,7 +861,7 @@ export function makeExampleSchema(
         name: "comments",
         uniques: [{ columns: ["comment_id"], isPrimary: true }],
       }),
-    [PgSourceBuilder, commentColumns, executor, recordType, selectAuth, sql],
+    [PgSourceBuilder, commentColumns, executor, recordCodec, selectAuth, sql],
   );
 
   const itemTypeEnumSource = EXPORTABLE(
@@ -895,14 +895,14 @@ export function makeExampleSchema(
       PgSourceBuilder,
       enumTablesItemTypeColumns,
       executor,
-      recordType,
+      recordCodec,
       selectAuth,
       sql,
     ) =>
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.enum_table_item_type`,
           identifier: sql`interfaces_and_unions.enum_table_item_type`,
           columns: enumTablesItemTypeColumns,
@@ -915,7 +915,7 @@ export function makeExampleSchema(
       PgSourceBuilder,
       enumTablesItemTypeColumns,
       executor,
-      recordType,
+      recordCodec,
       selectAuth,
       sql,
     ],
@@ -994,7 +994,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       selectAuth,
       singleTableItemColumns,
       sql,
@@ -1002,7 +1002,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.single_table_items`,
           identifier: sql`interfaces_and_unions.single_table_items`,
           columns: singleTableItemColumns,
@@ -1014,7 +1014,7 @@ export function makeExampleSchema(
     [
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       selectAuth,
       singleTableItemColumns,
       sql,
@@ -1183,7 +1183,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalItemColumns,
       selectAuth,
       sql,
@@ -1191,7 +1191,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.relational_items`,
           identifier: sql`interfaces_and_unions.relational_items`,
           columns: relationalItemColumns,
@@ -1203,7 +1203,7 @@ export function makeExampleSchema(
     [
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalItemColumns,
       selectAuth,
       sql,
@@ -1229,7 +1229,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalCommentableColumns,
       selectAuth,
       sql,
@@ -1237,7 +1237,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.relational_commentables`,
           identifier: sql`interfaces_and_unions.relational_commentables`,
           columns: relationalCommentableColumns,
@@ -1248,7 +1248,7 @@ export function makeExampleSchema(
     [
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalCommentableColumns,
       selectAuth,
       sql,
@@ -1336,7 +1336,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalTopicsColumns,
       selectAuth,
       sql,
@@ -1344,7 +1344,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.relational_topics`,
           identifier: sql`interfaces_and_unions.relational_topics`,
           columns: relationalTopicsColumns,
@@ -1356,7 +1356,7 @@ export function makeExampleSchema(
     [
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalTopicsColumns,
       selectAuth,
       sql,
@@ -1376,7 +1376,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalPostsColumns,
       selectAuth,
       sql,
@@ -1384,7 +1384,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.relational_posts`,
           identifier: sql`interfaces_and_unions.relational_posts`,
           columns: relationalPostsColumns,
@@ -1396,7 +1396,7 @@ export function makeExampleSchema(
     [
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalPostsColumns,
       selectAuth,
       sql,
@@ -1415,7 +1415,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalDividersColumns,
       selectAuth,
       sql,
@@ -1423,7 +1423,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.relational_dividers`,
           identifier: sql`interfaces_and_unions.relational_dividers`,
           columns: relationalDividersColumns,
@@ -1435,7 +1435,7 @@ export function makeExampleSchema(
     [
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalDividersColumns,
       selectAuth,
       sql,
@@ -1453,7 +1453,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalChecklistsColumns,
       selectAuth,
       sql,
@@ -1461,7 +1461,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.relational_checklists`,
           identifier: sql`interfaces_and_unions.relational_checklists`,
           columns: relationalChecklistsColumns,
@@ -1473,7 +1473,7 @@ export function makeExampleSchema(
     [
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalChecklistsColumns,
       selectAuth,
       sql,
@@ -1492,7 +1492,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalChecklistItemsColumns,
       selectAuth,
       sql,
@@ -1500,7 +1500,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.relational_checklist_items`,
           identifier: sql`interfaces_and_unions.relational_checklist_items`,
           columns: relationalChecklistItemsColumns,
@@ -1512,7 +1512,7 @@ export function makeExampleSchema(
     [
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       relationalChecklistItemsColumns,
       selectAuth,
       sql,
@@ -1706,7 +1706,7 @@ export function makeExampleSchema(
     (
       PgSourceBuilder,
       executor,
-      recordType,
+      recordCodec,
       selectAuth,
       sql,
       unionItemsColumns,
@@ -1714,7 +1714,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.union_items`,
           identifier: sql`interfaces_and_unions.union_items`,
           columns: unionItemsColumns,
@@ -1723,7 +1723,7 @@ export function makeExampleSchema(
         name: "union_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [PgSourceBuilder, executor, recordType, selectAuth, sql, unionItemsColumns],
+    [PgSourceBuilder, executor, recordCodec, selectAuth, sql, unionItemsColumns],
   );
 
   const unionTopicsColumns = EXPORTABLE(
@@ -1734,11 +1734,11 @@ export function makeExampleSchema(
     [TYPES, col],
   );
   const unionTopicsSource = EXPORTABLE(
-    (PgSource, executor, recordType, selectAuth, sql, unionTopicsColumns) =>
+    (PgSource, executor, recordCodec, selectAuth, sql, unionTopicsColumns) =>
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.union_topics`,
           identifier: sql`interfaces_and_unions.union_topics`,
           columns: unionTopicsColumns,
@@ -1747,7 +1747,7 @@ export function makeExampleSchema(
         name: "union_topics",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [PgSource, executor, recordType, selectAuth, sql, unionTopicsColumns],
+    [PgSource, executor, recordCodec, selectAuth, sql, unionTopicsColumns],
   );
 
   const unionPostsColumns = EXPORTABLE(
@@ -1760,11 +1760,11 @@ export function makeExampleSchema(
     [TYPES, col],
   );
   const unionPostsSource = EXPORTABLE(
-    (PgSource, executor, recordType, selectAuth, sql, unionPostsColumns) =>
+    (PgSource, executor, recordCodec, selectAuth, sql, unionPostsColumns) =>
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.union_posts`,
           identifier: sql`interfaces_and_unions.union_posts`,
           columns: unionPostsColumns,
@@ -1773,7 +1773,7 @@ export function makeExampleSchema(
         name: "union_posts",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [PgSource, executor, recordType, selectAuth, sql, unionPostsColumns],
+    [PgSource, executor, recordCodec, selectAuth, sql, unionPostsColumns],
   );
 
   const unionDividersColumns = EXPORTABLE(
@@ -1785,11 +1785,11 @@ export function makeExampleSchema(
     [TYPES, col],
   );
   const unionDividersSource = EXPORTABLE(
-    (PgSource, executor, recordType, selectAuth, sql, unionDividersColumns) =>
+    (PgSource, executor, recordCodec, selectAuth, sql, unionDividersColumns) =>
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.union_dividers`,
           identifier: sql`interfaces_and_unions.union_dividers`,
           columns: unionDividersColumns,
@@ -1798,7 +1798,7 @@ export function makeExampleSchema(
         name: "union_dividers",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [PgSource, executor, recordType, selectAuth, sql, unionDividersColumns],
+    [PgSource, executor, recordCodec, selectAuth, sql, unionDividersColumns],
   );
 
   const unionChecklistsColumns = EXPORTABLE(
@@ -1809,11 +1809,11 @@ export function makeExampleSchema(
     [TYPES, col],
   );
   const unionChecklistsSource = EXPORTABLE(
-    (PgSource, executor, recordType, selectAuth, sql, unionChecklistsColumns) =>
+    (PgSource, executor, recordCodec, selectAuth, sql, unionChecklistsColumns) =>
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.union_checklists`,
           identifier: sql`interfaces_and_unions.union_checklists`,
           columns: unionChecklistsColumns,
@@ -1822,7 +1822,7 @@ export function makeExampleSchema(
         name: "union_checklists",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [PgSource, executor, recordType, selectAuth, sql, unionChecklistsColumns],
+    [PgSource, executor, recordCodec, selectAuth, sql, unionChecklistsColumns],
   );
 
   const unionChecklistItemsColumns = EXPORTABLE(
@@ -1837,7 +1837,7 @@ export function makeExampleSchema(
     (
       PgSource,
       executor,
-      recordType,
+      recordCodec,
       selectAuth,
       sql,
       unionChecklistItemsColumns,
@@ -1845,7 +1845,7 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.union_checklist_items`,
           identifier: sql`interfaces_and_unions.union_checklist_items`,
           columns: unionChecklistItemsColumns,
@@ -1857,7 +1857,7 @@ export function makeExampleSchema(
     [
       PgSource,
       executor,
-      recordType,
+      recordCodec,
       selectAuth,
       sql,
       unionChecklistItemsColumns,
@@ -1865,11 +1865,11 @@ export function makeExampleSchema(
   );
 
   const unionEntitySource = EXPORTABLE(
-    (PgSource, executor, recordType, selectAuth, sql, unionEntityColumns) =>
+    (PgSource, executor, recordCodec, selectAuth, sql, unionEntityColumns) =>
       new PgSource({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: `interfaces_and_unions.union__entity`,
           identifier: sql`interfaces_and_unions.union__entity`,
           columns: unionEntityColumns,
@@ -1877,7 +1877,7 @@ export function makeExampleSchema(
         source: sql`(select null::interfaces_and_unions.union__entity)`,
         name: "union__entity",
       }),
-    [PgSource, executor, recordType, selectAuth, sql, unionEntityColumns],
+    [PgSource, executor, recordCodec, selectAuth, sql, unionEntityColumns],
   );
 
   const entitySearchSource = EXPORTABLE(
@@ -1955,11 +1955,11 @@ export function makeExampleSchema(
   ////////////////////////////////////////
 
   const awsApplicationsSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+    (PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql) => {
       return new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "interfaces_and_unions.aws_applications",
           identifier: sql`interfaces_and_unions.aws_applications`,
           columns: {
@@ -1977,15 +1977,15 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
     },
-    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+    [PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql],
   );
 
   const gcpApplicationsSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+    (PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql) => {
       return new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "interfaces_and_unions.gcp_applications",
           identifier: sql`interfaces_and_unions.gcp_applications`,
           columns: {
@@ -2003,15 +2003,15 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
     },
-    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+    [PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql],
   );
 
   const firstPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+    (PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql) => {
       return new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "interfaces_and_unions.first_party_vulnerabilities",
           identifier: sql`interfaces_and_unions.first_party_vulnerabilities`,
           columns: {
@@ -2029,15 +2029,15 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
     },
-    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+    [PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql],
   );
 
   const thirdPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql) => {
+    (PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql) => {
       return new PgSourceBuilder({
         executor,
         selectAuth,
-        codec: recordType({
+        codec: recordCodec({
           name: "interfaces_and_unions.third_party_vulnerabilities",
           identifier: sql`interfaces_and_unions.third_party_vulnerabilities`,
           columns: {
@@ -2055,7 +2055,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
     },
-    [PgSourceBuilder, TYPES, col, executor, recordType, selectAuth, sql],
+    [PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql],
   );
 
   const firstPartyVulnerabilitiesSource = EXPORTABLE(

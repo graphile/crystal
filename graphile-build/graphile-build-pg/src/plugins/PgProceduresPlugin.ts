@@ -11,7 +11,7 @@ import type {
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { PgSource, recordType, sqlFromArgDigests } from "@dataplan/pg";
+import { PgSource, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgProc } from "pg-introspection";
@@ -275,8 +275,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
             return EXPORTABLE(
-              (columns, recordCodecName, recordType, sql) =>
-                recordType({
+              (columns, recordCodecName, recordCodec, sql) =>
+                recordCodec({
                   name: recordCodecName,
                   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
@@ -289,7 +289,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   },
                   isAnonymous: true,
                 }),
-              [columns, recordCodecName, recordType, sql],
+              [columns, recordCodecName, recordCodec, sql],
             );
           };
 
