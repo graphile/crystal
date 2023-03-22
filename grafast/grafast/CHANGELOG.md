@@ -1,5 +1,25 @@
 # grafast
 
+## 0.0.1-0.23
+
+### Patch Changes
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`89d16c972`](https://github.com/benjie/postgraphile-private/commit/89d16c972f12659de091b0b866768cacfccc8f6b)
+  Thanks [@benjie](https://github.com/benjie)! - PgClassSinglePlan is now
+  enforced, users will be informed if plans return a step incompatible with the
+  given GraphQL object type.
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`8f323bdc8`](https://github.com/benjie/postgraphile-private/commit/8f323bdc88e39924de50775891bd40f1acb9b7cf)
+  Thanks [@benjie](https://github.com/benjie)! - When multiple versions of
+  grafast or pg-sql2 are detected, a warning will be raised.
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`9e7183c02`](https://github.com/benjie/postgraphile-private/commit/9e7183c02cb82d5f5c684c4f73962035e0267c83)
+  Thanks [@benjie](https://github.com/benjie)! - Don't mangle class names, we
+  want them for debugging.
+
 ## 0.0.1-0.22
 
 ### Patch Changes

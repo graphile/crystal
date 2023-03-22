@@ -1,5 +1,11 @@
 # ruru-components
 
+## 2.0.0-0.9
+
+### Patch Changes
+
+- [`612092359`](undefined) - Fix header saving
+
 ## 2.0.0-0.8
 
 ### Patch Changes

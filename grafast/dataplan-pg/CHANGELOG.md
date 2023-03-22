@@ -1,5 +1,27 @@
 # @dataplan/pg
 
+## 0.0.1-0.28
+
+### Patch Changes
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`9e7183c02`](https://github.com/benjie/postgraphile-private/commit/9e7183c02cb82d5f5c684c4f73962035e0267c83)
+  Thanks [@benjie](https://github.com/benjie)! - Don't mangle class names, we
+  want them for debugging.
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`fce77f40e`](https://github.com/benjie/postgraphile-private/commit/fce77f40efb194a3dfa7f38bfe20eb99e09efa70)
+  Thanks [@benjie](https://github.com/benjie)! - Maintain types through
+  lambda/list (if you get type errors after this update, you may need to put
+  'readonly' in more of your types).
+- Updated dependencies
+  [[`89d16c972`](https://github.com/benjie/postgraphile-private/commit/89d16c972f12659de091b0b866768cacfccc8f6b),
+  [`8f323bdc8`](https://github.com/benjie/postgraphile-private/commit/8f323bdc88e39924de50775891bd40f1acb9b7cf),
+  [`9e7183c02`](https://github.com/benjie/postgraphile-private/commit/9e7183c02cb82d5f5c684c4f73962035e0267c83)]:
+  - grafast@0.0.1-0.23
+  - pg-sql2@5.0.0-0.4
+  - @dataplan/json@0.0.1-0.23
+
 ## 0.0.1-0.27
 
 ### Patch Changes

@@ -1,5 +1,37 @@
 # postgraphile
 
+## 5.0.0-0.37
+
+### Patch Changes
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`89d16c972`](https://github.com/benjie/postgraphile-private/commit/89d16c972f12659de091b0b866768cacfccc8f6b)
+  Thanks [@benjie](https://github.com/benjie)! - PgClassSinglePlan is now
+  enforced, users will be informed if plans return a step incompatible with the
+  given GraphQL object type.
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`8f323bdc8`](https://github.com/benjie/postgraphile-private/commit/8f323bdc88e39924de50775891bd40f1acb9b7cf)
+  Thanks [@benjie](https://github.com/benjie)! - When multiple versions of
+  grafast or pg-sql2 are detected, a warning will be raised.
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`dd5464e39`](https://github.com/benjie/postgraphile-private/commit/dd5464e3986fcc917c8e2dadcec6bfe6bc451e56)
+  Thanks [@benjie](https://github.com/benjie)! - `@omit read` on a column now
+  omits constraints using that column, as it did in V4.
+- Updated dependencies
+  [[`89d16c972`](https://github.com/benjie/postgraphile-private/commit/89d16c972f12659de091b0b866768cacfccc8f6b),
+  [`8f323bdc8`](https://github.com/benjie/postgraphile-private/commit/8f323bdc88e39924de50775891bd40f1acb9b7cf),
+  [`9e7183c02`](https://github.com/benjie/postgraphile-private/commit/9e7183c02cb82d5f5c684c4f73962035e0267c83),
+  [`fce77f40e`](https://github.com/benjie/postgraphile-private/commit/fce77f40efb194a3dfa7f38bfe20eb99e09efa70),
+  [`612092359`](undefined)]:
+  - grafast@0.0.1-0.23
+  - graphile-build-pg@5.0.0-0.34
+  - @dataplan/pg@0.0.1-0.28
+  - ruru@2.0.0-0.13
+  - grafserv@0.0.1-0.25
+  - graphile-build@5.0.0-0.29
+
 ## 5.0.0-0.36
 
 ### Patch Changes

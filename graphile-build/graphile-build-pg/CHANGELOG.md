@@ -1,5 +1,24 @@
 # graphile-build-pg
 
+## 5.0.0-0.34
+
+### Patch Changes
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`89d16c972`](https://github.com/benjie/postgraphile-private/commit/89d16c972f12659de091b0b866768cacfccc8f6b)
+  Thanks [@benjie](https://github.com/benjie)! - PgClassSinglePlan is now
+  enforced, users will be informed if plans return a step incompatible with the
+  given GraphQL object type.
+- Updated dependencies
+  [[`89d16c972`](https://github.com/benjie/postgraphile-private/commit/89d16c972f12659de091b0b866768cacfccc8f6b),
+  [`8f323bdc8`](https://github.com/benjie/postgraphile-private/commit/8f323bdc88e39924de50775891bd40f1acb9b7cf),
+  [`9e7183c02`](https://github.com/benjie/postgraphile-private/commit/9e7183c02cb82d5f5c684c4f73962035e0267c83),
+  [`fce77f40e`](https://github.com/benjie/postgraphile-private/commit/fce77f40efb194a3dfa7f38bfe20eb99e09efa70)]:
+  - grafast@0.0.1-0.23
+  - pg-sql2@5.0.0-0.4
+  - @dataplan/pg@0.0.1-0.28
+  - graphile-build@5.0.0-0.29
+
 ## 5.0.0-0.33
 
 ### Patch Changes

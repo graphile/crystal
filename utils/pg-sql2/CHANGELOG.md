@@ -1,5 +1,14 @@
 # pg-sql2
 
+## 5.0.0-0.4
+
+### Patch Changes
+
+- [#257](https://github.com/benjie/postgraphile-private/pull/257)
+  [`8f323bdc8`](https://github.com/benjie/postgraphile-private/commit/8f323bdc88e39924de50775891bd40f1acb9b7cf)
+  Thanks [@benjie](https://github.com/benjie)! - When multiple versions of
+  grafast or pg-sql2 are detected, a warning will be raised.
+
 ## 5.0.0-0.3
 
 ### Patch Changes
