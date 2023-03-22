@@ -7,11 +7,14 @@ import { ExecutableStep, isDev, SafeError, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgTypeColumn, PgTypeColumns } from "../codecs.js";
+import type {
+  ObjectFromPgTypeColumns,
+  PgTypeColumn,
+  PgTypeColumns,
+} from "../codecs.js";
 import type {
   PgSource,
   PgSourceRelation,
-  PgSourceRow,
   PgSourceUnique,
 } from "../datasource.js";
 import { inspect } from "../inspect.js";
@@ -46,7 +49,9 @@ export class PgUpdateStep<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-> extends ExecutableStep<PgSourceRow<TColumns>> {
+> extends ExecutableStep<
+  TColumns extends PgTypeColumns ? ObjectFromPgTypeColumns<TColumns> : unknown
+> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUpdateStep",

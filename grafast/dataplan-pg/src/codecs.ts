@@ -334,7 +334,7 @@ function realColumnDefs<TColumns extends PgTypeColumns>(
  */
 function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
   columns: TColumns,
-): PgEncode<ObjectFromColumns<TColumns>> {
+): PgEncode<ObjectFromPgTypeColumns<TColumns>> {
   const columnDefs = realColumnDefs(columns);
   return (value) => {
     const values = columnDefs.map(([columnName, spec]) => {
@@ -346,7 +346,7 @@ function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
   };
 }
 
-type ObjectFromColumns<TColumns extends PgTypeColumns> = {
+export type ObjectFromPgTypeColumns<TColumns extends PgTypeColumns> = {
   [columnName in keyof TColumns]: TColumns[columnName] extends PgTypeColumn<
     infer UCodec,
     infer UNonNull
@@ -368,7 +368,7 @@ type ObjectFromColumns<TColumns extends PgTypeColumns> = {
  */
 function makeSQLValueToRecord<TColumns extends PgTypeColumns>(
   columns: TColumns,
-): (value: string) => ObjectFromColumns<TColumns> {
+): (value: string) => ObjectFromPgTypeColumns<TColumns> {
   const columnDefs = realColumnDefs(columns);
   const columnCount = columnDefs.length;
   return (value) => {
@@ -407,7 +407,7 @@ export function recordCodec<TColumns extends PgTypeColumns>(
 ): PgTypeCodec<
   TColumns,
   string,
-  ObjectFromColumns<TColumns>,
+  ObjectFromPgTypeColumns<TColumns>,
   undefined,
   undefined,
   undefined

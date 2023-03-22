@@ -40,13 +40,12 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
-import type { PgTypeColumns } from "../codecs.js";
+import type { ObjectFromPgTypeColumns, PgTypeColumns } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
 import type {
   PgSource,
   PgSourceParameter,
   PgSourceRelation,
-  PgSourceRow,
   PgSourceUnique,
 } from "../datasource.js";
 import { PgSourceBuilder } from "../datasource.js";
@@ -284,9 +283,19 @@ export class PgSelectStep<
     },
     TParameters extends PgSourceParameter[] | undefined = undefined,
   >
-  extends ExecutableStep<ReadonlyArray<PgSourceRow<TColumns>>>
+  extends ExecutableStep<
+    ReadonlyArray<
+      TColumns extends PgTypeColumns
+        ? ObjectFromPgTypeColumns<TColumns>
+        : unknown
+    >
+  >
   implements
-    StreamableStep<PgSourceRow<TColumns>>,
+    StreamableStep<
+      TColumns extends PgTypeColumns
+        ? ObjectFromPgTypeColumns<TColumns>
+        : unknown
+    >,
     ConnectionCapableStep<
       PgSelectSingleStep<TColumns, any, any, any>,
       PgSelectParsedCursorStep
@@ -1234,7 +1243,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   async execute(
     values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
-  ): Promise<GrafastResultsList<ReadonlyArray<PgSourceRow<TColumns>>>> {
+  ): Promise<
+    GrafastResultsList<
+      ReadonlyArray<
+        TColumns extends PgTypeColumns
+          ? ObjectFromPgTypeColumns<TColumns>
+          : unknown
+      >
+    >
+  > {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -1308,7 +1325,13 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   async stream(
     values: ReadonlyArray<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
-  ): Promise<GrafastResultStreamList<PgSourceRow<TColumns>>> {
+  ): Promise<
+    GrafastResultStreamList<
+      TColumns extends PgTypeColumns
+        ? ObjectFromPgTypeColumns<TColumns>
+        : unknown
+    >
+  > {
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectStep before finalizing it.");
     }
