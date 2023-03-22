@@ -275,7 +275,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 databaseName,
               });
             return EXPORTABLE(
-              (columns, recordCodecName, recordCodec, sql) =>
+              (columns, recordCodec, recordCodecName, sql) =>
                 recordCodec({
                   name: recordCodecName,
                   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
@@ -289,7 +289,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   },
                   isAnonymous: true,
                 }),
-              [columns, recordCodecName, recordCodec, sql],
+              [columns, recordCodec, recordCodecName, sql],
             );
           };
 

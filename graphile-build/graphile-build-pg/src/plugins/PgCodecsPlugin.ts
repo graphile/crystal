@@ -569,8 +569,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               return EXPORTABLE(
                 (
                   codecName,
-                  enumLabels,
                   enumCodec,
+                  enumLabels,
                   extensions,
                   namespaceName,
                   sql,
@@ -584,8 +584,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   }),
                 [
                   codecName,
-                  enumLabels,
                   enumCodec,
+                  enumLabels,
                   extensions,
                   namespaceName,
                   sql,

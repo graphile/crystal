@@ -165,11 +165,6 @@ export interface GraphQLTypeFromPostgresType {
   boolean: boolean;
 }
 
-type NullableUnless<
-  TCondition extends boolean | undefined,
-  TType,
-> = TCondition extends true ? TType : TType | null | undefined;
-
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
@@ -943,7 +938,7 @@ export function makeExampleSchema(
   );
 
   const enumTableItemTypeEnumSource = EXPORTABLE(
-    (PgEnumSource, enumTableItemTypeSource, enumCodec, sql) =>
+    (PgEnumSource, enumCodec, enumTableItemTypeSource, sql) =>
       new PgEnumSource({
         codec: enumCodec({
           name: "text",
@@ -954,7 +949,7 @@ export function makeExampleSchema(
           tableSource: enumTableItemTypeSource,
         },
       }),
-    [PgEnumSource, enumTableItemTypeSource, enumCodec, sql],
+    [PgEnumSource, enumCodec, enumTableItemTypeSource, sql],
   );
 
   const EnumTableItemType = new GraphQLEnumType({
