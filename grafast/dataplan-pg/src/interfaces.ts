@@ -4,6 +4,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type { PgTypeColumns } from "./codecs.js";
 import type {
+  PgSource,
   PgSourceParameter,
   PgSourceRelation,
   PgSourceUnique,
@@ -427,4 +428,66 @@ export interface MakePgConfigOptions
   schemas?: string | string[];
   superuserConnectionString?: string;
   pubsub?: boolean;
+}
+
+declare global {
+  namespace Grafast {
+    interface PgCodecRelationExtensions {}
+  }
+}
+
+/**
+ * Describes a relation to another source
+ */
+export interface PgCodecRelation<
+  TCodec extends PgTypeCodec<
+    PgTypeColumns,
+    any,
+    any,
+    undefined,
+    any,
+    undefined
+  >,
+  TSource extends PgSource<PgTypeColumns, any, any, any>,
+> {
+  /* Where the relationship starts */
+  fromCodec: TCodec;
+
+  /**
+   * The remote source this relation relates to.
+   */
+  toSource: TSource;
+
+  /**
+   * The columns locally used in this relationship.
+   */
+  fromColumns: TCodec extends PgTypeCodec<infer U, any, any, any, any, any>
+    ? readonly (keyof U)[]
+    : never;
+
+  /**
+   * The remote columns that are joined against.
+   */
+  toColumns: TSource extends PgSource<infer U, any, any, any>
+    ? readonly (keyof U)[]
+    : never;
+
+  /**
+   * If true then there's at most one record this relationship will find.
+   */
+  isUnique: boolean;
+
+  /**
+   * If true then this is a reverse lookup (where our local columns are
+   * referenced by the remote tables remote columns, rather than the other way
+   * around), so multiple rows may be found (unless isUnique is true).
+   */
+  isReferencee?: boolean;
+
+  /**
+   * Space for you to add your own metadata.
+   */
+  extensions?: Grafast.PgCodecRelationExtensions;
+
+  description?: string;
 }

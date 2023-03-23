@@ -1,4 +1,10 @@
-import type { PgSource, PgTypeCodec, WithPgClient } from "@dataplan/pg";
+import type {
+  PgCodecRelation,
+  PgSource,
+  PgTypeCodec,
+  PgTypeColumns,
+  WithPgClient,
+} from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 
 export interface PgSourceTags extends PgSmartTagsDict {
@@ -106,6 +112,14 @@ declare module "@dataplan/pg" {
 
 declare global {
   namespace GraphileBuild {
+    interface PgRelations {
+      [codecName: string]: {
+        [relationName: string]: PgCodecRelation<
+          PgTypeCodec<PgTypeColumns, any, any, undefined, any, undefined>,
+          PgSource<PgTypeColumns, any, any, any>
+        >;
+      };
+    }
     interface BuildInput {
       pgSources: PgSource<any, any, any, any>[];
 
@@ -114,7 +128,9 @@ declare global {
        * Typically useful for the codecs that aren't linked to a source (e.g.
        * those defining an union or interface)
        */
-      pgCodecs?: PgTypeCodec<any, any, any, any>[];
+      pgCodecs?: PgTypeCodec<any, any, any, any, any, any>[];
+
+      pgRelations?: GraphileBuild.PgRelations;
     }
   }
 }
