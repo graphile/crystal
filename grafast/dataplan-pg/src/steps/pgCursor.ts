@@ -10,7 +10,7 @@ import type { PgUnionAllSingleStep } from "./pgUnionAll.js";
  * them.
  */
 export class PgCursorStep<
-  TStep extends PgSelectSingleStep<any, any, any, any> | PgUnionAllSingleStep,
+  TStep extends PgSelectSingleStep<any> | PgUnionAllSingleStep,
 > extends UnbatchedExecutableStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",

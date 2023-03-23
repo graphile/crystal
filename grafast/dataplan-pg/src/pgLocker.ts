@@ -9,11 +9,11 @@ export type PgLockableParameter =
   | "offset"
   | "groupBy";
 export type PgLockCallback<
-  TStep extends PgSelectStep<any, any, any, any> | PgUnionAllStep<any, any>,
+  TStep extends PgSelectStep<any> | PgUnionAllStep<any, any>,
 > = (step: TStep) => void;
 
 export class PgLocker<
-  TStep extends PgSelectStep<any, any, any, any> | PgUnionAllStep<any, any>,
+  TStep extends PgSelectStep<any> | PgUnionAllStep<any, any>,
 > {
   /**
    * Determines if the PgSelectStep is "locked" - i.e. its

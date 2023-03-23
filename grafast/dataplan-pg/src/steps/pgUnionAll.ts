@@ -31,19 +31,14 @@ import { sql } from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
 import { TYPES } from "../codecs.js";
-import type {
-  PgSource,
-  PgSourceRefPath,
-  PgSourceRelation,
-  PgSourceUnique,
-} from "../datasource.js";
-import { PgSourceBuilder } from "../datasource.js";
+import type { PgSource, PgSourceUnique } from "../datasource.js";
 import type { PgExecutor } from "../executor.js";
-import type { PgGroupSpec } from "../index.js";
+import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
   PgOrderFragmentSpec,
   PgOrderSpec,
   PgTypeCodec,
+  PgTypeCodecAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -133,7 +128,7 @@ type PgUnionAllStepSelect<TAttributes extends string> =
     };
 
 export interface PgUnionAllSourceSpec {
-  source: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+  source: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any>;
 }
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
@@ -144,7 +139,7 @@ export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
 
 export interface PgUnionAllStepMember<TTypeNames extends string> {
   typeName: TTypeNames;
-  source: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+  source: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any>;
   match?: {
     [sourceColumnName: string]:
       | {
@@ -156,7 +151,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
           codec: PgTypeCodec<any, any, any, any>;
         };
   };
-  path?: PgSourceRefPath;
+  path?: PgCodecRefPath;
 }
 
 export interface PgUnionAllStepConfig<
@@ -166,8 +161,8 @@ export interface PgUnionAllStepConfig<
   sourceByTypeName: {
     [typeName in TTypeNames]: PgSource<
       any,
-      ReadonlyArray<PgSourceUnique<any>>,
       any,
+      ReadonlyArray<PgSourceUnique<any>>,
       any
     >;
   };
@@ -300,28 +295,11 @@ export class PgUnionAllSingleStep
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<
-    TExpressionColumns extends PgTypeColumns | undefined,
-    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  >(
+  expression<TExpressionCodec extends PgTypeCodecAny>(
     expression: SQL,
     codec: TExpressionCodec,
-  ): PgClassExpressionStep<
-    TExpressionColumns,
-    TExpressionCodec,
-    any,
-    any,
-    any,
-    any
-  > {
-    return pgClassExpression<
-      TExpressionColumns,
-      TExpressionCodec,
-      any,
-      any,
-      any,
-      any
-    >(this, codec)`${expression}`;
+  ): PgClassExpressionStep<TExpressionCodec, any> {
+    return pgClassExpression<TExpressionCodec, any>(this, codec)`${expression}`;
   }
 
   /**
@@ -334,28 +312,11 @@ export class PgUnionAllSingleStep
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
-  public select<
-    TExpressionColumns extends PgTypeColumns | undefined,
-    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  >(
+  public select<TExpressionCodec extends PgTypeCodecAny>(
     fragment: SQL,
     codec: TExpressionCodec,
-  ): PgClassExpressionStep<
-    TExpressionColumns,
-    TExpressionCodec,
-    any,
-    any,
-    any,
-    any
-  > {
-    const sqlExpr = pgClassExpression<
-      TExpressionColumns,
-      TExpressionCodec,
-      any,
-      any,
-      any,
-      any
-    >(this, codec);
+  ): PgClassExpressionStep<TExpressionCodec, any> {
+    const sqlExpr = pgClassExpression<TExpressionCodec, any>(this, codec);
     return sqlExpr`${fragment}`;
   }
 
@@ -374,7 +335,7 @@ export class PgUnionAllSingleStep
 
 interface MemberDigest<TTypeNames extends string> {
   member: PgUnionAllStepMember<TTypeNames>;
-  finalSource: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+  finalSource: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any>;
   sqlSource: SQL;
   symbol: symbol;
   alias: SQL;
@@ -394,10 +355,7 @@ export class PgUnionAllStep<
   >
   extends ExecutableStep
   implements
-    ConnectionCapableStep<
-      PgSelectSingleStep<any, any, any, any>,
-      PgSelectParsedCursorStep
-    >
+    ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -686,12 +644,10 @@ export class PgUnionAllStep<
         let sqlSource = sql`${currentSource.source} as ${currentAlias}`;
 
         for (const pathEntry of path) {
-          const relation: PgSourceRelation<any, any> =
-            currentSource.getRelation(pathEntry.relationName);
-          const nextSource =
-            relation.source instanceof PgSourceBuilder
-              ? relation.source.get()
-              : relation.source;
+          const relation: PgCodecRelation<any, any> = currentSource.getRelation(
+            pathEntry.relationName,
+          );
+          const nextSource = relation.remoteSource;
           const nextSymbol = Symbol(nextSource.name);
           const nextAlias = sql.identifier(nextSymbol);
 
@@ -1116,7 +1072,7 @@ on (${sql.indent(
         );
         identifierPlaceholders[i] = this.placeholder(
           toPg(access($parsedCursorPlan, [i + 1]), codec),
-          codec,
+          codec as PgTypeCodec<any, any, any, any, any, any, any>,
         );
       }
     }
@@ -1553,7 +1509,10 @@ and ${condition(i + 1)}`}
                     orderSpec,
                     digest.finalSource.codec,
                   );
-                  return [frag, codec];
+                  return [
+                    frag,
+                    codec as PgTypeCodec<any, any, any, any, any, any, any>,
+                  ];
                 }
                 default: {
                   const never: never = s;

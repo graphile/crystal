@@ -42,6 +42,7 @@ import type {
   PgEnumTypeCodec,
   PgEnumValue,
   PgTypeCodec,
+  PgTypeCodecAny,
   PgTypeCodecExtensions,
   PgTypeCodecPolymorphism,
 } from "./interfaces.js";
@@ -55,14 +56,7 @@ export type PgTypeColumnVia = string | PgTypeColumnViaExplicit;
 export interface PgTypeColumnExtensions {}
 
 export interface PgTypeColumn<
-  TCodec extends PgTypeCodec<any, any, any, any, any, any> = PgTypeCodec<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >,
+  TCodec extends PgTypeCodecAny = PgTypeCodecAny,
   TNotNull extends boolean = boolean,
 > {
   /**
@@ -136,12 +130,12 @@ export interface PgTypeColumn<
 export type PgTypeColumns<
   TCodecMap extends {
     [columnName in string]: PgTypeColumn<
-      PgTypeCodec<any, any, any, any, any, any>,
+      PgTypeCodec<string, any, any, any, any, any, any>,
       boolean
     >;
   } = {
     [columnName in string]: PgTypeColumn<
-      PgTypeCodec<any, any, any, any, any, any>,
+      PgTypeCodec<string, any, any, any, any, any, any>,
       boolean
     >;
   },
@@ -159,24 +153,36 @@ export type PgTypeColumns<
  * - fromPg: parse the value from Postgres into JS format
  * - toPg: serialize the value from JS into a format Postgres will understand
  *
- * @param type - the name of the Postgres type - see the `pg_type` table
- * @param options - the configuration options described above
+ * param type - the name of the Postgres type - see the `pg_type` table
+ * param options - the configuration options described above
  */
-function t<TFromJavaScript = any, TFromPostgres = string>(
+function t<TFromJavaScript = any, TFromPostgres = string>(): <
+  const TName extends string,
+>(
   oid: string | undefined,
-  type: string,
-  options: Cast<TFromJavaScript, TFromPostgres> = {},
-): PgTypeCodec<undefined, TFromPostgres, TFromJavaScript> {
-  const { castFromPg, listCastFromPg, fromPg, toPg } = options;
-  return {
-    name: type,
-    sqlType: sql.identifier(...type.split(".")),
-    fromPg: fromPg ?? (identity as any),
-    toPg: toPg ?? (identity as any),
-    columns: undefined,
-    extensions: { oid: oid },
-    castFromPg,
-    listCastFromPg,
+  type: TName,
+  options?: Cast<TFromJavaScript, TFromPostgres>,
+) => PgTypeCodec<
+  TName,
+  undefined,
+  TFromPostgres,
+  TFromJavaScript,
+  undefined,
+  undefined,
+  undefined
+> {
+  return (oid, type, options = {}) => {
+    const { castFromPg, listCastFromPg, fromPg, toPg } = options;
+    return {
+      name: type,
+      sqlType: sql.identifier(...type.split(".")),
+      fromPg: fromPg ?? (identity as any),
+      toPg: toPg ?? (identity as any),
+      columns: undefined,
+      extensions: { oid: oid },
+      castFromPg,
+      listCastFromPg,
+    };
   };
 }
 
@@ -351,10 +357,10 @@ export type ObjectFromPgTypeColumns<TColumns extends PgTypeColumns> = {
     infer UCodec,
     infer UNonNull
   >
-    ? UCodec extends PgTypeCodec<any, any, infer U, any, any, any>
+    ? UCodec extends PgTypeCodec<string, any, any, infer UFromJs, any, any, any>
       ? UNonNull extends true
-        ? U
-        : U | null
+        ? UFromJs
+        : UFromJs | null
       : never
     : never;
 };
@@ -405,6 +411,7 @@ export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
 export function recordCodec<TColumns extends PgTypeColumns>(
   config: PgRecordTypeCodecSpec<TColumns>,
 ): PgTypeCodec<
+  string,
   TColumns,
   string,
   ObjectFromPgTypeColumns<TColumns>,
@@ -467,7 +474,7 @@ export function enumCodec<TValue extends string>(
 exportAs(enumCodec, "enumCodec");
 
 export function isEnumCodec<TValue extends string = string>(
-  t: PgTypeCodec<any, any, any, any, any, any>,
+  t: PgTypeCodec<string, any, any, any, any, any, any>,
 ): t is PgEnumTypeCodec<TValue> {
   return "values" in t;
 }
@@ -475,13 +482,24 @@ export function isEnumCodec<TValue extends string = string>(
 const $$listCodec = Symbol("listCodec");
 
 type CodecWithListCodec<
-  TCodec extends PgTypeCodec<any, any, any, any, any, any>,
+  TCodec extends PgTypeCodec<any, any, any, any, any, any, any>,
 > = TCodec & {
   [$$listCodec]?: PgTypeCodec<
+    `${TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+      ? UName
+      : never}[]`,
     undefined,
     string,
-    TCodec extends PgTypeCodec<any, any, infer U, undefined, any, any>
-      ? U[]
+    TCodec extends PgTypeCodec<
+      any,
+      any,
+      any,
+      infer UFromJs,
+      undefined,
+      any,
+      any
+    >
+      ? UFromJs[]
       : any[],
     TCodec,
     undefined,
@@ -503,17 +521,28 @@ type CodecWithListCodec<
  * @param identifier - a pg-sql2 fragment that represents the name of this type
  */
 export function listOfCodec<
-  TInnerCodec extends PgTypeCodec<any, any, any, undefined, any, any>,
+  TInnerCodec extends PgTypeCodec<string, any, any, any, undefined, any, any>,
 >(
   listedCodec: TInnerCodec,
   extensions?: Partial<PgTypeCodecExtensions>,
   typeDelim = `,`,
   identifier: SQL = sql`${listedCodec.sqlType}[]`,
 ): PgTypeCodec<
+  `${TInnerCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+    ? UName
+    : never}[]`,
   undefined, // Array has no columns
   string,
-  TInnerCodec extends PgTypeCodec<any, any, infer U, undefined, any, any>
-    ? U[]
+  TInnerCodec extends PgTypeCodec<
+    any,
+    any,
+    any,
+    infer UFromJs,
+    undefined,
+    any,
+    any
+  >
+    ? UFromJs[]
     : any[],
   TInnerCodec,
   undefined,
@@ -529,14 +558,45 @@ export function listOfCodec<
   }
 
   const listCodec: PgTypeCodec<
+    `${TInnerCodec extends PgTypeCodec<
+      infer UName,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    >
+      ? UName
+      : never}[]`,
     undefined, // Array has no columns
     string,
-    TInnerCodec extends PgTypeCodec<any, any, infer U, undefined, any, any>
-      ? U[]
+    TInnerCodec extends PgTypeCodec<
+      any,
+      any,
+      any,
+      infer UFromJs,
+      undefined,
+      any,
+      any
+    >
+      ? UFromJs[]
       : any[],
     TInnerCodec
   > = {
-    name: innerCodec.name + "[]",
+    name: `${
+      innerCodec.name as TInnerCodec extends PgTypeCodec<
+        infer UName,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any
+      >
+        ? UName
+        : never
+    }[]`,
     sqlType: identifier,
     fromPg: (value) =>
       arrayParse(value)
@@ -633,7 +693,15 @@ exportAs(domainOfCodec, "domainOfCodec");
  * @internal
  */
 function escapeRangeValue<
-  TInnerCodec extends PgTypeCodec<undefined, any, any, undefined, any, any>,
+  TInnerCodec extends PgTypeCodec<
+    any,
+    undefined,
+    any,
+    any,
+    undefined,
+    any,
+    any
+  >,
 >(value: null | any, innerCodec: TInnerCodec): string {
   if (value == null) {
     return "";
@@ -659,6 +727,7 @@ interface PgRange<T> {
  */
 export function rangeOfCodec<
   TInnerCodec extends PgTypeCodec<
+    any,
     undefined,
     any,
     any,
@@ -666,12 +735,14 @@ export function rangeOfCodec<
     any,
     undefined
   >,
+  TName extends string,
 >(
   innerCodec: TInnerCodec,
-  name: string,
+  name: TName,
   identifier: SQL,
   config: { extensions?: Partial<PgTypeCodecExtensions> } = {},
 ): PgTypeCodec<
+  TName,
   undefined,
   string,
   PgRange<unknown>,
@@ -845,8 +916,8 @@ const stripSubnet32 = {
  * names (those that would be found in the `pg_type` table).
  */
 export const TYPES = {
-  void: t<void>("2278", "void"), // void: 2278
-  boolean: t<boolean>("16", "bool", {
+  void: t<void>()("2278", "void"), // void: 2278
+  boolean: t<boolean>()("16", "bool", {
     fromPg: (value) => value[0] === "t",
     toPg: (v) => {
       if (v === true) {
@@ -860,65 +931,65 @@ export const TYPES = {
       }
     },
   }),
-  int2: t<number>("21", "int2", { fromPg: parseAsInt }),
-  int: t<number>("23", "int4", { fromPg: parseAsInt }),
-  bigint: t<string>("20", "int8"),
-  float4: t<number>("700", "float4", { fromPg: parseFloat }),
-  float: t<number>("701", "float8", { fromPg: parseFloat }),
-  money: t<string>("790", "money", viaNumeric),
-  numeric: t<string>("1700", "numeric"),
-  char: t<string>("18", "char", verbatim),
-  bpchar: t<string>("1042", "bpchar", verbatim),
-  varchar: t<string>("1043", "varchar", verbatim),
-  text: t<string>("25", "text", verbatim),
-  name: t<string>("19", "name", verbatim),
-  json: t<JSONValue, string>("114", "json", {
+  int2: t<number>()("21", "int2", { fromPg: parseAsInt }),
+  int: t<number>()("23", "int4", { fromPg: parseAsInt }),
+  bigint: t<string>()("20", "int8"),
+  float4: t<number>()("700", "float4", { fromPg: parseFloat }),
+  float: t<number>()("701", "float8", { fromPg: parseFloat }),
+  money: t<string>()("790", "money", viaNumeric),
+  numeric: t<string>()("1700", "numeric"),
+  char: t<string>()("18", "char", verbatim),
+  bpchar: t<string>()("1042", "bpchar", verbatim),
+  varchar: t<string>()("1043", "varchar", verbatim),
+  text: t<string>()("25", "text", verbatim),
+  name: t<string>()("19", "name", verbatim),
+  json: t<JSONValue, string>()("114", "json", {
     fromPg: jsonParse,
     toPg: jsonStringify,
   }),
-  jsonb: t<JSONValue, string>("3802", "jsonb", {
+  jsonb: t<JSONValue, string>()("3802", "jsonb", {
     fromPg: jsonParse,
     toPg: jsonStringify,
   }),
-  xml: t<string>("142", "xml"),
-  citext: t<string>(undefined, "citext", verbatim),
-  uuid: t<string>("2950", "uuid", verbatim),
-  timestamp: t<string>(
+  xml: t<string>()("142", "xml"),
+  citext: t<string>()(undefined, "citext", verbatim),
+  uuid: t<string>()("2950", "uuid", verbatim),
+  timestamp: t<string>()(
     "1114",
     "timestamp",
     viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.US'),
   ),
-  timestamptz: t<string>(
+  timestamptz: t<string>()(
     "1184",
     "timestamptz",
     viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
   ),
-  date: t<string>("1082", "date", viaDateFormat("YYYY-MM-DD")),
-  time: t<string>(
+  date: t<string>()("1082", "date", viaDateFormat("YYYY-MM-DD")),
+  time: t<string>()(
     "1083",
     "time",
     viaDateFormat("HH24:MI:SS.US", sql`date '1970-01-01' + `),
   ),
-  timetz: t<string>(
+  timetz: t<string>()(
     "1266",
     "timetz",
     viaDateFormat("HH24:MI:SS.USTZHTZM", sql`date '1970-01-01' + `),
   ),
-  inet: t<string>("869", "inet", stripSubnet32),
-  regproc: t<string>("24", "regproc"),
-  regprocedure: t<string>("2202", "regprocedure"),
-  regoper: t<string>("2203", "regoper"),
-  regoperator: t<string>("2204", "regoperator"),
-  regclass: t<string>("2205", "regclass"),
-  regtype: t<string>("2206", "regtype"),
-  regrole: t<string>("4096", "regrole"),
-  regnamespace: t<string>("4089", "regnamespace"),
-  regconfig: t<string>("3734", "regconfig"),
-  regdictionary: t<string>("3769", "regdictionary"),
-  cidr: t<string>("650", "cidr"),
-  macaddr: t<string>("829", "macaddr"),
-  macaddr8: t<string>("774", "macaddr8"),
-  interval: t<PgInterval, string>("1186", "interval", {
+  inet: t<string>()("869", "inet", stripSubnet32),
+  regproc: t<string>()("24", "regproc"),
+  regprocedure: t<string>()("2202", "regprocedure"),
+  regoper: t<string>()("2203", "regoper"),
+  regoperator: t<string>()("2204", "regoperator"),
+  regclass: t<string>()("2205", "regclass"),
+  regtype: t<string>()("2206", "regtype"),
+  regrole: t<string>()("4096", "regrole"),
+  regnamespace: t<string>()("4089", "regnamespace"),
+  regconfig: t<string>()("3734", "regconfig"),
+  regdictionary: t<string>()("3769", "regdictionary"),
+  cidr: t<string>()("650", "cidr"),
+  macaddr: t<string>()("829", "macaddr"),
+  macaddr8: t<string>()("774", "macaddr8"),
+  interval: t<PgInterval, string>()("1186", "interval", {
     ...viaDateFormat(`YYYY_MM_DD_HH24_MI_SS.US`),
     fromPg(value: string): PgInterval {
       const parts = value.split("_").map(parseFloat);
@@ -928,25 +999,25 @@ export const TYPES = {
     },
     toPg: stringifyInterval,
   }),
-  bit: t<string>("1560", "bit"),
-  varbit: t<string>("1562", "varbit"),
-  point: t<PgPoint>("600", "point", {
+  bit: t<string>()("1560", "bit"),
+  varbit: t<string>()("1562", "varbit"),
+  point: t<PgPoint>()("600", "point", {
     fromPg: parsePoint,
     toPg: stringifyPoint,
   }),
-  line: t<PgLine>("628", "line", { fromPg: parseLine, toPg: stringifyLine }),
-  lseg: t<PgLseg>("601", "lseg", { fromPg: parseLseg, toPg: stringifyLseg }),
-  box: t<PgBox>("603", "box", { fromPg: parseBox, toPg: stringifyBox }),
-  path: t<PgPath>("602", "path", { fromPg: parsePath, toPg: stringifyPath }),
-  polygon: t<PgPolygon>("604", "polygon", {
+  line: t<PgLine>()("628", "line", { fromPg: parseLine, toPg: stringifyLine }),
+  lseg: t<PgLseg>()("601", "lseg", { fromPg: parseLseg, toPg: stringifyLseg }),
+  box: t<PgBox>()("603", "box", { fromPg: parseBox, toPg: stringifyBox }),
+  path: t<PgPath>()("602", "path", { fromPg: parsePath, toPg: stringifyPath }),
+  polygon: t<PgPolygon>()("604", "polygon", {
     fromPg: parsePolygon,
     toPg: stringifyPolygon,
   }),
-  circle: t<PgCircle>("718", "circle", {
+  circle: t<PgCircle>()("718", "circle", {
     fromPg: parseCircle,
     toPg: stringifyCircle,
   }),
-  hstore: t<PgHStore>(undefined, "hstore", {
+  hstore: t<PgHStore>()(undefined, "hstore", {
     fromPg: parseHstore,
     toPg: stringifyHstore,
   }),
@@ -957,9 +1028,7 @@ exportAs(TYPES, "TYPES");
  * For supported builtin type names ('void', 'bool', etc) that will be found in
  * the `pg_catalog` table this will return a PgTypeCodec.
  */
-export function getCodecByPgCatalogTypeName(
-  pgCatalogTypeName: string,
-): PgTypeCodec<undefined, any, any, undefined, undefined, undefined> | null {
+export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
   switch (pgCatalogTypeName) {
     case "void":
       return TYPES.void;

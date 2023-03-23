@@ -31,10 +31,18 @@ import type {
 } from "./executor.js";
 import { exportAs } from "./exportAs.js";
 import type {
+  GetPgCodecColumns,
+  GetPgRegistryCodecs,
+  GetPgRegistryCodecRelations,
   PgEnumTypeCodec,
   PgRefDefinition,
+  PgRegistry,
+  PgRegistryAny,
   PgTypeCodec,
+  PgTypeCodecAny,
   PlanByUniques,
+  PgSourceParameterAny,
+  PgSourceAny,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
@@ -68,57 +76,9 @@ export function EXPORTABLE<T, TScope extends any[]>(
 }
 
 /**
- * Extra metadata you can attach to a source relation.
- */
-export interface PgSourceRelationExtensions {}
-/**
  * Extra metadata you can attach to a unique constraint.
  */
 export interface PgSourceUniqueExtensions {}
-
-/**
- * Describes a relation to another source
- */
-export interface PgSourceRelation<
-  TLocalColumns extends PgTypeColumns,
-  TRemoteColumns extends PgTypeColumns,
-> {
-  /**
-   * The remote source this relation relates to.
-   */
-  source:
-    | PgSourceBuilder<TRemoteColumns, any, any>
-    | PgSource<TRemoteColumns, any, any, any>;
-
-  /**
-   * The columns locally used in this relationship.
-   */
-  localColumns: readonly (keyof TLocalColumns)[];
-
-  /**
-   * The remote columns that are joined against.
-   */
-  remoteColumns: ReadonlyArray<keyof TRemoteColumns>;
-
-  /**
-   * If true then there's at most one record this relationship will find.
-   */
-  isUnique: boolean;
-
-  /**
-   * If true then this is a reverse lookup (where our local columns are
-   * referenced by the remote tables remote columns, rather than the other way
-   * around), so multiple rows may be found (unless isUnique is true).
-   */
-  isReferencee?: boolean;
-
-  /**
-   * Space for you to add your own metadata.
-   */
-  extensions?: PgSourceRelationExtensions;
-
-  description?: string;
-}
 
 /**
  * Space for extra metadata about this source
@@ -133,16 +93,19 @@ export interface PgSourceParameterExtensions {
  * If this is a functional (rather than static) source, this describes one of
  * the parameters it accepts.
  */
-export interface PgSourceParameter {
+export interface PgSourceParameter<
+  TName extends string | null,
+  TCodec extends PgTypeCodecAny,
+> {
   /**
    * Name of the parameter, if null then we must use positional rather than
    * named arguments
    */
-  name: string | null;
+  name: TName;
   /**
    * The type of this parameter
    */
-  codec: PgTypeCodec<any, any, any>;
+  codec: TCodec;
   /**
    * If true, then this parameter must be supplied, otherwise it's optional.
    */
@@ -175,41 +138,39 @@ export interface PgSourceUnique<
   extensions?: PgSourceUniqueExtensions;
 }
 
-export interface PgSourceRefPathEntry {
+export interface PgCodecRefPathEntry {
   relationName: string;
   // Could add conditions here
 }
 
-export type PgSourceRefPath = PgSourceRefPathEntry[];
-export interface PgSourceRefExtensions {}
+export type PgCodecRefPath = PgCodecRefPathEntry[];
+export interface PgCodecRefExtensions {}
 
-export interface PgSourceRef {
+export interface PgCodecRef {
   definition: PgRefDefinition;
-  paths: Array<PgSourceRefPath>;
-  extensions?: PgSourceRefExtensions;
+  paths: Array<PgCodecRefPath>;
+  extensions?: PgCodecRefExtensions;
 }
 
-export interface PgSourceRefs {
-  [refName: string]: PgSourceRef;
+export interface PgCodecRefs {
+  [refName: string]: PgCodecRef;
 }
 
 /**
  * Configuration options for your PgSource
  */
 export interface PgSourceOptions<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
+  TRegistry extends PgRegistryAny,
+  TCodec extends PgTypeCodecAny,
+  TUniques extends ReadonlyArray<PgSourceUnique<GetPgCodecColumns<TCodec>>>,
+  TParameters extends readonly PgSourceParameterAny[] | undefined = undefined,
 > {
+  registry: TRegistry;
+
   /**
    * The associated codec for thsi source
    */
-  codec: PgTypeCodec<TColumns, any, any, any>;
+  codec: TCodec;
   /**
    * The PgExecutor to use when servicing this source; different executors can
    * have different caching rules. A plan that uses one executor cannot be
@@ -218,16 +179,16 @@ export interface PgSourceOptions<
   executor: PgExecutor;
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
-  selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
+  selectAuth?: (
+    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any>>,
+  ) => void;
 
   name: string;
   identifier?: string;
-  source: TParameters extends PgSourceParameter[]
+  source: TParameters extends readonly PgSourceParameterAny[]
     ? (...args: PgSelectArgumentDigest[]) => SQL
     : SQL;
   uniques?: TUniques;
-  relations?: TRelations | (() => TRelations);
-  refs?: PgSourceRefs;
   extensions?: PgSourceExtensions;
   parameters?: TParameters;
   description?: string;
@@ -255,9 +216,10 @@ export interface PgSourceOptions<
 }
 
 export interface PgFunctionSourceOptions<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TNewParameters extends PgSourceParameter[],
+  TRegistry extends PgRegistry<any, any, any>,
+  TCodec extends PgTypeCodecAny,
+  TUniques extends ReadonlyArray<PgSourceUnique<GetPgCodecColumns<TCodec>>>,
+  TNewParameters extends readonly PgSourceParameterAny[],
 > {
   name: string;
   identifier?: string;
@@ -268,158 +230,49 @@ export interface PgFunctionSourceOptions<
   uniques?: TUniques;
   extensions?: PgSourceExtensions;
   isMutation?: boolean;
-  selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
+  selectAuth?: (
+    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any>>,
+  ) => void;
   description?: string;
 }
-// FIXME: is there a better way? Maybe relations should be separate from sources, then PgSourceBuilder wouldn't be needed? See: https://github.com/benjie/postgraphile-private/issues/117
-/**
- * This class hacks around TypeScript inference issues by allowing us to define
- * the relations at a later step to avoid circular references.
- */
-export class PgSourceBuilder<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TParameters extends PgSourceParameter[] | undefined = undefined,
-> {
-  /** TypeScript hack, avoid. @internal */
-  TColumns!: TColumns;
-  /** TypeScript hack, avoid. @internal */
-  TUniques!: TUniques;
-  /** TypeScript hack, avoid. @internal */
-  TRelations!: never;
-  /** TypeScript hack, avoid. @internal */
-  TParameters!: TParameters;
-
-  private built: PgSource<TColumns, TUniques, any, TParameters> | null = null;
-  public codec: PgTypeCodec<TColumns, any, any>;
-  public uniques: TUniques | undefined;
-  public readonly extensions: Partial<PgSourceExtensions> | undefined;
-  public readonly name: string;
-  public readonly isVirtual: boolean;
-  public readonly refs: PgSourceRefs;
-  constructor(
-    private options: Omit<
-      PgSourceOptions<TColumns, TUniques, any, TParameters>,
-      "relations"
-    >,
-  ) {
-    this.codec = options.codec;
-    this.uniques = options.uniques;
-    this.extensions = options.extensions;
-    this.name = options.name;
-    options.isVirtual = options.isVirtual ?? false;
-    this.isVirtual = options.isVirtual;
-    options.refs = options.refs ?? Object.create(null);
-    this.refs = options.refs!;
-  }
-
-  public toString(): string {
-    return chalk.bold.blueBright(`PgSourceBuilder(${this.options.name})`);
-  }
-
-  build<
-    TRelations extends {
-      [identifier: string]: TColumns extends PgTypeColumns
-        ? PgSourceRelation<TColumns, any>
-        : never;
-    },
-  >({
-    relations,
-  }: {
-    relations?: TRelations;
-  }): PgSource<TColumns, TUniques, TRelations, TParameters> {
-    if (this.built) {
-      throw new Error("This builder has already been built!");
-    }
-    this.built = new PgSource({
-      ...this.options,
-      ...(relations
-        ? {
-            relations: () => {
-              // Replace the PgSourceBuilders with PgSources
-              return Object.keys(relations).reduce((memo, key) => {
-                const spec = relations[key];
-                if (spec.source instanceof PgSourceBuilder) {
-                  const { source: sourceBuilder, ...rest } = spec;
-                  const source = sourceBuilder.get();
-                  memo[key] = {
-                    source,
-                    ...rest,
-                  };
-                } else {
-                  memo[key] = spec;
-                }
-                return memo;
-              }, Object.create(null));
-            },
-          }
-        : null),
-    });
-    return this.built;
-  }
-
-  get(): PgSource<TColumns, TUniques, any, TParameters> {
-    if (!this.built) {
-      throw new Error(
-        `This builder (${this.options.name}) has not been built!`,
-      );
-    }
-    return this.built;
-  }
-}
-exportAs(PgSourceBuilder, "PgSourceBuilder");
 
 const $$codecSource = Symbol("codecSource");
 const $$codecCounter = Symbol("codecCounter");
 
-type CodecWithSource<TCodec extends PgTypeCodec<any, any, any, any>> =
-  TCodec & {
-    [$$codecSource]?: Map<any, any>;
-    [$$codecCounter]?: number;
-  };
+// TODO: is this needed any more, now that we've moved codecs to owning relations?
+type CodecWithSource<TCodec extends PgTypeCodecAny> = TCodec & {
+  [$$codecSource]?: Map<any, any>;
+  [$$codecCounter]?: number;
+};
 
 /**
  * PgSource represents any source of SELECT-able data in Postgres: tables,
  * views, functions, etc.
  */
 export class PgSource<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
+  TRegistry extends PgRegistry<any, any, any>,
+  TCodec extends PgTypeCodecAny,
+  TUniques extends ReadonlyArray<PgSourceUnique<GetPgCodecColumns<TCodec>>>,
+  TParameters extends readonly PgSourceParameterAny[] | undefined = undefined,
 > {
-  /** TypeScript hack, avoid. @internal */
-  TColumns!: TColumns;
-  /** TypeScript hack, avoid. @internal */
-  TUniques!: TUniques;
-  /** TypeScript hack, avoid. @internal */
-  TRelations!: TRelations;
-  /** TypeScript hack, avoid. @internal */
-  TParameters!: TParameters;
-
-  public readonly codec: PgTypeCodec<TColumns, any, any, any>;
+  public readonly registry: TRegistry;
+  public readonly codec: TCodec;
   public readonly executor: PgExecutor;
   public readonly name: string;
   public readonly identifier: string;
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
-  public readonly uniques: TUniques;
+  public readonly uniques: ReadonlyArray<
+    PgSourceUnique<GetPgCodecColumns<TCodec>>
+  >;
   private readonly _options: PgSourceOptions<
-    TColumns,
+    TRegistry,
+    TCodec,
     TUniques,
-    TRelations,
     TParameters
   >;
-  private relationsThunk: (() => TRelations) | null;
-  private _relations: TRelations | null = null;
-  /**
-   * Relations to follow for shortcut references, can be polymorphic, can be many-to-many.
-   */
-  public refs: PgSourceRefs;
-  private selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
+  private selectAuth?: (
+    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any>>,
+  ) => void;
 
   // TODO: make a public interface for this information
   /**
@@ -451,10 +304,14 @@ export class PgSource<
 
   public extensions: Partial<PgSourceExtensions> | undefined;
 
-  static fromCodec<TColumns extends PgTypeColumns>(
+  static fromCodec<
+    TRegistry extends PgRegistryAny,
+    TCodec extends PgTypeCodecAny,
+  >(
+    registry: TRegistry,
     executor: PgExecutor,
-    baseCodec: PgTypeCodec<TColumns, any, any>,
-  ): PgSource<TColumns, any, any, undefined> {
+    baseCodec: TCodec,
+  ): PgSource<TRegistry, TCodec, never[]> {
     const codec: CodecWithSource<typeof baseCodec> = baseCodec;
     if (!codec[$$codecSource]) {
       codec[$$codecSource] = new Map();
@@ -475,7 +332,8 @@ export class PgSource<
     const name = `frmcdc_${codec.name}_${counter}`;
     const source = EXPORTABLE(
       (PgSource, codec, executor, name, sql) =>
-        new PgSource({
+        new PgSource<TRegistry, TCodec, never[]>({
+          registry,
           executor,
           source: sql`(select 1/0 /* codec-only source; should not select directly */)`,
           codec,
@@ -498,17 +356,16 @@ export class PgSource<
    * to understand.
    */
   constructor(
-    options: PgSourceOptions<TColumns, TUniques, TRelations, TParameters>,
+    options: PgSourceOptions<TRegistry, TCodec, TUniques, TParameters>,
   ) {
     const {
+      registry,
       codec,
       executor,
       name,
       identifier,
       source,
       uniques,
-      relations,
-      refs,
       extensions,
       parameters,
       description,
@@ -519,6 +376,7 @@ export class PgSource<
       isList,
       isVirtual,
     } = options;
+    this.registry = registry;
     this._options = options;
     this.extensions = extensions;
     this.codec = codec;
@@ -526,14 +384,7 @@ export class PgSource<
     this.name = name;
     this.identifier = identifier ?? name;
     this.source = source;
-    this.uniques =
-      uniques ?? ([] as TUniques extends never[] ? TUniques : never);
-    this.relationsThunk = typeof relations === "function" ? relations : null;
-    if (typeof relations !== "function") {
-      this._relations = relations || ({} as TRelations);
-      this.validateRelations();
-    }
-    this.refs = refs ?? Object.create(null);
+    this.uniques = uniques ?? [];
     this.parameters = parameters as TParameters;
     this.description = description;
     this.isUnique = !!isUnique;
@@ -576,27 +427,26 @@ export class PgSource<
    * type/relations/etc.
    */
   public alternativeSource<
-    TUniques extends ReadonlyArray<
-      PgSourceUnique<Exclude<TColumns, undefined>>
+    const TNewUniques extends ReadonlyArray<
+      PgSourceUnique<GetPgCodecColumns<TCodec>>
     >,
   >(overrideOptions: {
     name: string;
     identifier?: string;
     source: SQL;
-    uniques?: TUniques;
+    uniques?: TNewUniques;
     extensions?: PgSourceExtensions;
-  }): PgSource<TColumns, TUniques, TRelations, undefined> {
+  }): PgSource<TRegistry, TCodec, TNewUniques, undefined> {
     const { name, identifier, source, uniques, extensions } = overrideOptions;
-    const { codec, executor, relations, refs, selectAuth } = this._options;
-    return new PgSource({
+    const { registry, codec, executor, selectAuth } = this._options;
+    return new PgSource<TRegistry, TCodec, TNewUniques, undefined>({
+      registry,
       codec,
       executor,
       name,
       identifier,
-      source: source as any,
+      source,
       uniques,
-      relations,
-      refs,
       parameters: undefined,
       extensions,
       selectAuth,
@@ -610,14 +460,15 @@ export class PgSource<
    * type/relations/etc but pull their rows from functions.
    */
   public functionSource<
-    TUniques extends ReadonlyArray<
-      PgSourceUnique<Exclude<TColumns, undefined>>
+    const TNewParameters extends readonly PgSourceParameterAny[],
+    const TNewUniques extends ReadonlyArray<
+      PgSourceUnique<GetPgCodecColumns<TCodec>>
     >,
-    TNewParameters extends PgSourceParameter[],
   >(
     overrideOptions: PgFunctionSourceOptions<
-      TColumns,
-      TUniques,
+      TRegistry,
+      TCodec,
+      TNewUniques,
       TNewParameters
     >,
   ) {
@@ -634,18 +485,17 @@ export class PgSource<
       selectAuth: overrideSelectAuth,
       description,
     } = overrideOptions;
-    const { codec, executor, relations, refs, selectAuth } = this._options;
+    const { registry, codec, executor, selectAuth } = this._options;
     if (!returnsArray) {
       // This is the easy case
-      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+      return new PgSource<TRegistry, TCodec, TNewUniques, TNewParameters>({
+        registry,
         codec,
         executor,
         name,
         identifier,
         source: fnSource as any,
         uniques,
-        relations,
-        refs,
         parameters,
         extensions,
         isUnique: !returnsSetof,
@@ -661,15 +511,14 @@ export class PgSource<
             sql`unnest(${fnSource(...args)})`,
         [fnSource, sql],
       );
-      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+      return new PgSource<TRegistry, TCodec, TNewUniques, TNewParameters>({
+        registry,
         codec,
         executor,
         name,
         identifier,
         source: source as any,
         uniques,
-        relations,
-        refs,
         parameters,
         extensions,
         isUnique: false, // set now, not unique
@@ -690,15 +539,14 @@ export class PgSource<
             )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`,
         [fnSource, sql, sqlPartitionByIndex, sqlTmp],
       );
-      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+      return new PgSource<TRegistry, TCodec, TNewUniques, TNewParameters>({
+        registry,
         codec,
         executor,
         name,
         identifier,
         source: source as any,
         uniques,
-        relations,
-        refs,
         parameters,
         extensions,
         isUnique: false, // set now, not unique
@@ -714,67 +562,15 @@ export class PgSource<
     return chalk.bold.blue(`PgSource(${this.name})`);
   }
 
-  private validateRelations(): void {
-    // PERF: skip this if not isDev?
-
-    if (!this._relations) {
-      return;
-    }
-
-    // Check that all the `via` and `identicalVia` match actual relations.
-    const relationKeys = Object.keys(this._relations);
-    if (this.codec.columns) {
-      Object.entries(this.codec.columns).forEach(([columnName, col]) => {
-        const { via, identicalVia } = col;
-        if (via) {
-          if (typeof via === "string") {
-            if (!relationKeys.includes(via)) {
-              throw new Error(
-                `${this} claims column '${columnName}' is via relation '${via}', but there is no such relation.`,
-              );
-            }
-          } else {
-            if (!relationKeys.includes(via.relation)) {
-              throw new Error(
-                `${this} claims column '${columnName}' is via relation '${via.relation}', but there is no such relation.`,
-              );
-            }
-          }
-        }
-        if (identicalVia) {
-          if (typeof identicalVia === "string") {
-            if (!relationKeys.includes(identicalVia)) {
-              throw new Error(
-                `${this} claims column '${columnName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
-              );
-            }
-          } else {
-            if (!relationKeys.includes(identicalVia.relation)) {
-              throw new Error(
-                `${this} claims column '${columnName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
-              );
-            }
-          }
-        }
-      });
-    }
+  public getRelations(): GetPgRegistryCodecRelations<TRegistry, TCodec> {
+    return this.registry.pgRelations[this.codec.name];
   }
 
-  public getRelations(): TRelations {
-    if (typeof this.relationsThunk === "function") {
-      this._relations = this.relationsThunk();
-      this.relationsThunk = null;
-      this.validateRelations();
-    }
-    if (!this._relations) {
-      throw new Error("PgSource relations must not be null");
-    }
-    return this._relations;
-  }
-
-  public getRelation<TRelationName extends keyof TRelations>(
+  public getRelation<
+    TRelationName extends keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
+  >(
     name: TRelationName,
-  ): TRelations[TRelationName] {
+  ): GetPgRegistryCodecRelations<TRegistry, TCodec>[TRelationName] {
     return this.getRelations()[name];
   }
 
@@ -803,25 +599,43 @@ export class PgSource<
   }
 
   public getReciprocal<
-    TOtherDataSource extends PgSource<any, any, any, any>,
-    TOtherRelationName extends Parameters<TOtherDataSource["getRelation"]>[0],
+    TOtherCodec extends GetPgRegistryCodecs<TRegistry>[keyof GetPgRegistryCodecs<TRegistry>],
+    TOtherRelationName extends keyof GetPgRegistryCodecRelations<
+      TRegistry,
+      TOtherCodec
+    >,
   >(
-    otherDataSource: TOtherDataSource,
+    otherCodec: TOtherCodec,
     otherRelationName: TOtherRelationName,
-  ): [keyof TRelations, TRelations[keyof TRelations]] | null {
+  ):
+    | [
+        relationName: keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
+        relation: GetPgRegistryCodecRelations<
+          TRegistry,
+          TCodec
+        >[keyof GetPgRegistryCodecRelations<TRegistry, TCodec>],
+      ]
+    | null {
     if (this.parameters) {
       throw new Error(
         ".getReciprocal() cannot be used with functional sources; please use .execute()",
       );
     }
-    const otherRelation = otherDataSource.getRelation(otherRelationName);
+    const otherRelation =
+      this.registry.pgRelations[otherCodec.name]?.[otherRelationName];
     const relations = this.getRelations();
     const reciprocal = (
       Object.entries(relations) as Array<
-        [keyof TRelations, TRelations[keyof TRelations]]
+        [
+          relationName: keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
+          relation: GetPgRegistryCodecRelations<
+            TRegistry,
+            TCodec
+          >[keyof GetPgRegistryCodecRelations<TRegistry, TCodec>],
+        ]
       >
     ).find(([_relationName, relation]) => {
-      if (relation.source !== otherDataSource) {
+      if (relation.source.codec !== otherCodec) {
         return false;
       }
       if (!arraysMatch(relation.localColumns, otherRelation.remoteColumns)) {
@@ -836,19 +650,12 @@ export class PgSource<
   }
 
   public get(
-    spec: PlanByUniques<TColumns, TUniques>,
+    spec: PlanByUniques<GetPgCodecColumns<TCodec>, TUniques>,
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
-  ): TColumns extends PgTypeColumns
-    ? PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>
-    : PgClassExpressionStep<
-        undefined,
-        PgTypeCodec<undefined, any, any>,
-        TColumns,
-        TUniques,
-        TRelations,
-        TParameters
-      > {
+  ): GetPgCodecColumns<TCodec> extends PgTypeColumns
+    ? PgSelectSingleStep<this>
+    : PgClassExpressionStep<TCodec, this> {
     if (this.parameters) {
       throw new Error(
         ".get() cannot be used with functional sources; please use .execute()",
@@ -858,7 +665,7 @@ export class PgSource<
       throw new Error(`Cannot ${this}.get without a valid spec`);
     }
     const keys = Object.keys(spec) as ReadonlyArray<string> as ReadonlyArray<
-      keyof TColumns
+      keyof GetPgCodecColumns<TCodec>
     >;
     if (
       !this.uniques.some((uniq) =>
@@ -873,14 +680,17 @@ export class PgSource<
         )}). Did you mean to call .find() instead?`,
       );
     }
-    return this.find(spec).single(_internalOptionsDoNotPass);
+    return this.find(spec).single(_internalOptionsDoNotPass) as any;
   }
 
   public find(
     spec: {
-      [key in keyof TColumns]?: ExecutableStep | string | number;
+      [key in keyof GetPgCodecColumns<TCodec>]?:
+        | ExecutableStep
+        | string
+        | number;
     } = Object.create(null),
-  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
+  ): PgSelectStep<this> {
     if (this.parameters) {
       throw new Error(
         ".get() cannot be used with functional sources; please use .execute()",
@@ -889,7 +699,9 @@ export class PgSource<
     if (!this.codec.columns) {
       throw new Error("Cannot call find if there's no columns");
     }
-    const columns = this.codec.columns as NonNullable<TColumns>;
+    const columns = this.codec.columns as NonNullable<
+      GetPgCodecColumns<TCodec>
+    >;
     const keys = Object.keys(spec); /* as Array<keyof typeof columns>*/
     const invalidKeys = keys.filter((key) => columns[key] == null);
     if (invalidKeys.length > 0) {
@@ -914,7 +726,7 @@ export class PgSource<
         );
       }
       const { codec } = column;
-      const stepOrConstant = spec[key as keyof TColumns];
+      const stepOrConstant = spec[key];
       if (stepOrConstant == undefined) {
         throw new Error(
           `Attempted to call ${this}.find({${keys.join(
@@ -934,13 +746,13 @@ export class PgSource<
             : sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
-    return pgSelect({ source: this, identifiers });
+    return pgSelect({ source: this, identifiers }) as PgSelectStep<this>;
   }
 
   execute(
     args: Array<PgSelectArgumentSpec> = [],
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
-  ) {
+  ): ExecutableStep<unknown> {
     const $select = pgSelect({
       source: this,
       identifiers: [],
@@ -956,7 +768,7 @@ export class PgSource<
       return partitionByIndex(
         $select,
         ($row) =>
-          ($row as PgSelectSingleStep<any, any, any, any>).select(
+          ($row as PgSelectSingleStep<any>).select(
             sqlPartitionByIndex,
             TYPES.int,
           ),
@@ -968,11 +780,11 @@ export class PgSource<
     }
   }
 
-  public applyAuthorizationChecksToPlan(
-    $step: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
-  ): void {
+  public applyAuthorizationChecksToPlan($step: PgSelectStep<this>): void {
     if (this.selectAuth) {
-      this.selectAuth($step);
+      this.selectAuth(
+        $step as unknown as PgSelectStep<PgSource<TRegistry, TCodec, any, any>>,
+      );
     }
     // e.g. $step.where(sql`user_id = ${me}`);
     return;
@@ -1068,21 +880,3 @@ export class PgEnumSource<TValue extends string> {
   }
 }
 exportAs(PgEnumSource, "PgEnumSource");
-
-export function resolveSource<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
->(
-  s:
-    | PgSourceBuilder<TColumns, TUniques, TParameters>
-    | PgSource<TColumns, TUniques, TRelations, TParameters>,
-): PgSource<TColumns, TUniques, TRelations, TParameters> {
-  return s instanceof PgSourceBuilder ? s.get() : s;
-}
-exportAs(resolveSource, "resolveSource");

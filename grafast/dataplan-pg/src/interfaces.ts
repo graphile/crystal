@@ -6,7 +6,6 @@ import type { PgTypeColumns } from "./codecs.js";
 import type {
   PgSource,
   PgSourceParameter,
-  PgSourceRelation,
   PgSourceUnique,
 } from "./datasource.js";
 import type { WithPgClient } from "./executor.js";
@@ -19,20 +18,11 @@ import type { PgUpdateStep } from "./steps/pgUpdate.js";
  * A class-like source of information - could be from `SELECT`-ing a row, or
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
-export type PgClassSingleStep<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
-> =
-  | PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>
-  | PgInsertStep<TColumns, TUniques, TRelations>
-  | PgUpdateStep<TColumns, TUniques, TRelations>
-  | PgDeleteStep<TColumns, TUniques, TRelations>;
+export type PgClassSingleStep<TSource extends PgSource<any, any, any, any>> =
+  | PgSelectSingleStep<TSource>
+  | PgInsertStep<TSource>
+  | PgUpdateStep<TSource>
+  | PgDeleteStep<TSource>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
@@ -130,23 +120,24 @@ export type PgTypeCodecPolymorphism<TColumnName extends string> =
  * about the type, for example any of the attributes it has.
  */
 export interface PgTypeCodec<
+  TName extends string,
   TColumns extends PgTypeColumns | undefined,
   TFromPostgres,
   TFromJavaScript = TFromPostgres,
   TArrayItemCodec extends
-    | PgTypeCodec<any, any, any, undefined, any, any>
+    | PgTypeCodec<string, any, any, any, undefined, any, any>
     | undefined = undefined,
   TDomainItemCodec extends
-    | PgTypeCodec<any, any, any, any, any, any>
+    | PgTypeCodec<string, any, any, any, any, any, any>
     | undefined = undefined,
   TRangeItemCodec extends
-    | PgTypeCodec<undefined, any, any, undefined, any, undefined>
+    | PgTypeCodec<string, undefined, any, any, undefined, any, undefined>
     | undefined = undefined,
 > {
   /**
    * Unique name to identify this codec.
    */
-  name: string;
+  name: TName;
 
   /**
    * Given a value of type TFromJavaScript, returns an `SQL` value to insert into an SQL
@@ -247,6 +238,36 @@ export interface PgTypeCodec<
   extensions?: Partial<PgTypeCodecExtensions>;
 }
 
+export type PgTypeCodecAny = PgTypeCodec<
+  string,
+  PgTypeColumns | undefined,
+  any,
+  any,
+  | PgTypeCodec<
+      string,
+      PgTypeColumns | undefined,
+      any,
+      any,
+      undefined,
+      any,
+      any
+    >
+  | undefined,
+  | PgTypeCodec<string, PgTypeColumns | undefined, any, any, any, any, any>
+  | undefined,
+  PgTypeCodec<string, undefined, any, any, any, any, any> | undefined
+>;
+export type PgTypeCodecWithColumns = PgTypeCodec<
+  string,
+  PgTypeColumns,
+  any,
+  any,
+  undefined,
+  | PgTypeCodec<string, PgTypeColumns | undefined, any, any, any, any, any>
+  | undefined,
+  undefined
+>;
+
 export type PgEnumValue<TValue extends string = string> = {
   value: TValue;
   description?: string;
@@ -256,7 +277,7 @@ export type PgEnumValue<TValue extends string = string> = {
  * A PgTypeCodec specifically for enums
  */
 export interface PgEnumTypeCodec<TValue extends string>
-  extends PgTypeCodec<undefined, string, TValue> {
+  extends PgTypeCodec<string, undefined, string, TValue> {
   values: PgEnumValue<TValue>[];
 }
 
@@ -264,9 +285,8 @@ export interface PgEnumTypeCodec<TValue extends string>
  * A PgTypedExecutableStep has a 'pgCodec' property which means we don't need
  * to also state the pgCodec to use, this can be an added convenience.
  */
-export interface PgTypedExecutableStep<
-  TCodec extends PgTypeCodec<any, any, any>,
-> extends ExecutableStep<any> {
+export interface PgTypedExecutableStep<TCodec extends PgTypeCodecAny>
+  extends ExecutableStep<any> {
   pgCodec: TCodec;
 }
 
@@ -280,7 +300,7 @@ export type PgOrderFragmentSpec = {
   /** The expression we're ordering by. */
   fragment: SQL;
   /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
-  codec: PgTypeCodec<any, any, any>;
+  codec: PgTypeCodec<string, any, any, any>;
 
   attribute?: never;
   callback?: never;
@@ -292,8 +312,8 @@ export type PgOrderAttributeSpec = {
   /** An optional expression to wrap this column with, and the type that expression returns */
   callback?: (
     attributeExpression: SQL,
-    attributeCodec: PgTypeCodec<any, any, any>,
-  ) => [SQL, PgTypeCodec<any, any, any>];
+    attributeCodec: PgTypeCodec<string, any, any, any>,
+  ) => [SQL, PgTypeCodec<string, any, any, any>];
 
   fragment?: never;
   codec?: never;
@@ -309,7 +329,7 @@ export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
  */
 export interface PgGroupSpec {
   fragment: SQL;
-  // codec: PgTypeCodec<any, any, any>;
+  // codec: PgTypeCodec<string, any, any, any>;
   // TODO: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
@@ -340,10 +360,8 @@ export type TuplePlanMap<
  * to.
  */
 export type PlanByUniques<
-  TColumns extends PgTypeColumns | undefined,
-  TUniqueColumns extends ReadonlyArray<
-    PgSourceUnique<Exclude<TColumns, undefined>>
-  >,
+  TColumns extends PgTypeColumns,
+  TUniqueColumns extends ReadonlyArray<PgSourceUnique<TColumns>>,
 > = TColumns extends PgTypeColumns
   ? TuplePlanMap<TColumns, TUniqueColumns[number]["columns"] & string[]>[number]
   : undefined;
@@ -352,7 +370,7 @@ export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
   alias: SQL;
   placeholder(
     $step: ExecutableStep,
-    codec: PgTypeCodec<any, any, any, any>,
+    codec: PgTypeCodec<string, any, any, any, any>,
   ): SQL;
   where(condition: SQL): void;
   having(condition: SQL): void;
@@ -440,7 +458,8 @@ declare global {
  * Describes a relation to another source
  */
 export interface PgCodecRelation<
-  TCodec extends PgTypeCodec<
+  TLocalCodec extends PgTypeCodec<
+    string,
     PgTypeColumns,
     any,
     any,
@@ -448,27 +467,35 @@ export interface PgCodecRelation<
     any,
     undefined
   >,
-  TSource extends PgSource<PgTypeColumns, any, any, any>,
+  TRemoteSource extends PgSource<any, PgTypeCodecWithColumns, any, any>,
 > {
   /* Where the relationship starts */
-  fromCodec: TCodec;
+  localCodec: TLocalCodec;
 
   /**
    * The remote source this relation relates to.
    */
-  toSource: TSource;
+  remoteSource: TRemoteSource;
 
   /**
    * The columns locally used in this relationship.
    */
-  fromColumns: TCodec extends PgTypeCodec<infer U, any, any, any, any, any>
+  localColumns: TLocalCodec extends PgTypeCodec<
+    string,
+    infer U,
+    any,
+    any,
+    any,
+    any,
+    any
+  >
     ? readonly (keyof U)[]
     : never;
 
   /**
    * The remote columns that are joined against.
    */
-  toColumns: TSource extends PgSource<infer U, any, any, any>
+  remoteColumns: TRemoteSource extends PgSource<infer U, any, any, any>
     ? readonly (keyof U)[]
     : never;
 
@@ -491,3 +518,130 @@ export interface PgCodecRelation<
 
   description?: string;
 }
+
+export interface PgRegistry<
+  TCodecs extends {
+    [name in string]: PgTypeCodec<
+      name,
+      PgTypeColumns | undefined,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  },
+  TSources extends {
+    [name in string]: PgSource<
+      PgRegistry<TCodecs, any, any>,
+      TCodecs[keyof TCodecs],
+      ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+      readonly PgSourceParameterAny[] | undefined
+    >;
+  },
+  TRelations extends {
+    [codecName in keyof TCodecs]: {
+      [relationName in string]: PgCodecRelation<
+        PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgSource<any, PgTypeCodecWithColumns, any, any>
+      >;
+    };
+  },
+> {
+  pgCodecs: TCodecs;
+  pgSources: TSources;
+  pgRelations: TRelations;
+}
+
+export type PgSourceParameterAny = PgSourceParameter<
+  string | null,
+  PgTypeCodecAny
+>;
+
+export type PgSourceAny = PgSource<
+  PgRegistry<any, any, any>,
+  PgTypeCodecAny,
+  ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+  readonly PgSourceParameterAny[] | undefined
+>;
+
+export type PgRegistryAny = PgRegistry<
+  {
+    [name in string]: PgTypeCodec<
+      name,
+      PgTypeColumns | undefined,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  },
+  {
+    [name in string]: PgSourceAny;
+  },
+  {
+    [codecName in string]: {
+      [relationName in string]: PgCodecRelation<
+        PgTypeCodec<any, any, any, any, any, any, any>,
+        PgSource<any, any, any, any>
+      >;
+    };
+  }
+>;
+
+/*
+  /**
+   * Relations to follow for shortcut references, can be polymorphic, can be many-to-many.
+   * /
+  public refs: PgCodecRefs;
+      refs,
+*/
+
+export type GetPgRegistryCodecs<TRegistry extends PgRegistry<any, any, any>> =
+  TRegistry extends PgRegistry<infer UCodecs, any, any> ? UCodecs : never;
+
+export type GetPgRegistrySources<TRegistry extends PgRegistry<any, any, any>> =
+  TRegistry extends PgRegistry<any, infer USources, any> ? USources : never;
+
+export type GetPgRegistryCodecRelations<
+  TRegistry extends PgRegistry<any, any, any>,
+  TCodec extends GetPgRegistryCodecs<TRegistry>[keyof GetPgRegistryCodecs<TRegistry>],
+> = TRegistry extends PgRegistry<any, any, infer URelations>
+  ? URelations[TCodec extends PgTypeCodec<
+      infer UCodecName,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    >
+      ? UCodecName
+      : never]
+  : never;
+
+export type GetPgCodecColumns<TCodec extends PgTypeCodecAny> =
+  TCodec extends PgTypeCodec<string, infer UColumns, any, any, any, any, any>
+    ? UColumns extends PgTypeColumns
+      ? UColumns
+      : never
+    : never;
+
+export type GetPgSourceRegistry<TSource extends PgSourceAny> =
+  TSource extends PgSource<infer URegistry, any, any, any> ? URegistry : never;
+
+export type GetPgSourceCodec<TSource extends PgSourceAny> =
+  TSource extends PgSource<any, infer UCodec, any, any> ? UCodec : never;
+
+export type GetPgSourceColumns<TSource extends PgSourceAny> = GetPgCodecColumns<
+  GetPgSourceCodec<TSource>
+>;
+
+export type GetPgSourceRelations<TSource extends PgSourceAny> =
+  TSource extends PgSource<infer URegistry, infer UCodec, any, any>
+    ? GetPgRegistryCodecRelations<URegistry, UCodec>
+    : never;
+
+export type GetPgSourceUniques<TSource extends PgSourceAny> =
+  TSource extends PgSource<any, any, infer UUniques, any> ? UUniques : never;

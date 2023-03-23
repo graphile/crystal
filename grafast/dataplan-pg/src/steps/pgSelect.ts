@@ -40,19 +40,21 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
-import type { ObjectFromPgTypeColumns, PgTypeColumns } from "../codecs.js";
+import type { PgTypeColumns } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
+import type { PgSource, PgSourceUnique } from "../datasource.js";
 import type {
-  PgSource,
-  PgSourceParameter,
-  PgSourceRelation,
-  PgSourceUnique,
-} from "../datasource.js";
-import { PgSourceBuilder } from "../datasource.js";
-import type {
+  GetPgSourceCodec,
+  GetPgSourceColumns,
+  GetPgSourceRegistry,
+  GetPgSourceRelations,
+  PgCodecRelation,
   PgGroupSpec,
   PgOrderSpec,
+  PgSourceAny,
   PgTypeCodec,
+  PgTypeCodecAny,
+  PgTypeCodecWithColumns,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -161,7 +163,7 @@ type PgSelectPlanJoin =
  */
 type PgSelectPlaceholder = {
   dependencyIndex: number;
-  codec: PgTypeCodec<any, any, any, any>;
+  codec: PgTypeCodecAny;
   symbol: symbol;
 };
 
@@ -196,7 +198,7 @@ export interface PgSelectArgumentDigest {
 
 interface QueryValue {
   dependencyIndex: number;
-  codec: PgTypeCodec<any, any, any>;
+  codec: PgTypeCodecAny;
 }
 
 function assertSensible(step: ExecutableStep): void {
@@ -214,13 +216,13 @@ function assertSensible(step: ExecutableStep): void {
 
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
-export interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
+export interface PgSelectOptions<TSource extends PgSource<any, any, any, any>> {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
    * below.
    */
-  source: PgSource<TColumns, any, any, any>;
+  source: TSource;
 
   /**
    * The identifiers to limit the results down to just the row(s) you care
@@ -271,33 +273,14 @@ export interface PgSelectOptions<TColumns extends PgTypeColumns | undefined> {
  * don't allow `UNION`/`INTERSECT`/`EXCEPT`/`FOR UPDATE`/etc at this time,
  * purely because it hasn't been sufficiently considered.
  */
-export class PgSelectStep<
-    TColumns extends PgTypeColumns | undefined,
-    TUniques extends ReadonlyArray<
-      PgSourceUnique<Exclude<TColumns, undefined>>
-    >,
-    TRelations extends {
-      [identifier: string]: TColumns extends PgTypeColumns
-        ? PgSourceRelation<TColumns, any>
-        : never;
-    },
-    TParameters extends PgSourceParameter[] | undefined = undefined,
-  >
+export class PgSelectStep<TSource extends PgSource<any, any, any, any>>
   extends ExecutableStep<
-    ReadonlyArray<
-      TColumns extends PgTypeColumns
-        ? ObjectFromPgTypeColumns<TColumns>
-        : unknown
-    >
+    ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
   implements
-    StreamableStep<
-      TColumns extends PgTypeColumns
-        ? ObjectFromPgTypeColumns<TColumns>
-        : unknown
-    >,
+    StreamableStep<unknown[]>,
     ConnectionCapableStep<
-      PgSelectSingleStep<TColumns, any, any, any>,
+      PgSelectSingleStep<TSource>,
       PgSelectParsedCursorStep
     >
 {
@@ -337,11 +320,11 @@ export class PgSelectStep<
   /**
    * The data source from which we are selecting: table, view, etc
    */
-  public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
+  public readonly source: TSource;
 
   // JOIN
 
-  private relationJoins: Map<keyof TRelations, SQL>;
+  private relationJoins: Map<keyof GetPgSourceRelations<TSource>, SQL>;
   private joins: Array<PgSelectPlanJoin>;
 
   // WHERE
@@ -506,15 +489,10 @@ export class PgSelectStep<
 
   private locker: PgLocker<this> = new PgLocker(this);
 
-  constructor(options: PgSelectOptions<TColumns>);
+  constructor(options: PgSelectOptions<TSource>);
+  constructor(cloneFrom: PgSelectStep<TSource>, mode?: PgSelectMode);
   constructor(
-    cloneFrom: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
-    mode?: PgSelectMode,
-  );
-  constructor(
-    optionsOrCloneFrom:
-      | PgSelectStep<TColumns, TUniques, TRelations, TParameters>
-      | PgSelectOptions<TColumns>,
+    optionsOrCloneFrom: PgSelectStep<TSource> | PgSelectOptions<TSource>,
     overrideMode?: PgSelectMode,
   ) {
     super();
@@ -579,7 +557,7 @@ export class PgSelectStep<
 
     this.contextId = cloneFrom
       ? cloneFrom.contextId
-      : this.addDependency(this.source.context());
+      : this.addDependency(this.source.executor.context());
 
     this.name = customName ?? source.name;
     this.queryValuesSymbol = cloneFrom
@@ -823,14 +801,11 @@ export class PgSelectStep<
     return this.isUnique;
   }
 
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: PgTypedExecutableStep<PgTypeCodecAny>): SQL;
+  public placeholder($step: ExecutableStep<any>, codec: PgTypeCodecAny): SQL;
   public placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
-  ): SQL;
-  public placeholder(
-    $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
-    overrideCodec?: PgTypeCodec<any, any, any>,
+    $step: ExecutableStep<any> | PgTypedExecutableStep<PgTypeCodecAny>,
+    overrideCodec?: PgTypeCodecAny,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -872,10 +847,15 @@ export class PgSelectStep<
    * Join to a named relationship and return the alias that can be used in
    * SELECT, WHERE and ORDER BY.
    */
-  public singleRelation<TRelationName extends keyof TRelations>(
-    relationIdentifier: TRelationName,
-  ): SQL {
-    const relation = this.source.getRelation(relationIdentifier);
+  public singleRelation<
+    TRelationName extends keyof GetPgSourceRelations<TSource> & string,
+  >(relationIdentifier: TRelationName): SQL {
+    const relation = this.source.getRelation(
+      relationIdentifier,
+    ) as PgCodecRelation<
+      PgTypeCodecWithColumns,
+      PgSource<GetPgSourceRegistry<TSource>, PgTypeCodecWithColumns, any, any>
+    >;
     if (!relation) {
       throw new Error(
         `${this.source} does not have a relation named '${String(
@@ -890,11 +870,7 @@ export class PgSelectStep<
         )}' is not unique so cannot be used with singleRelation`,
       );
     }
-    const { source: rawRelationSource, localColumns, remoteColumns } = relation;
-    const relationSource =
-      rawRelationSource instanceof PgSourceBuilder
-        ? rawRelationSource.get()
-        : rawRelationSource;
+    const { remoteSource, localColumns, remoteColumns } = relation;
 
     // Join to this relation if we haven't already
     const cachedAlias = this.relationJoins.get(relationIdentifier);
@@ -902,7 +878,7 @@ export class PgSelectStep<
       return cachedAlias;
     }
     const alias = sql.identifier(Symbol(relationIdentifier as string));
-    if (typeof relationSource.source === "function") {
+    if (typeof remoteSource.source === "function") {
       throw new Error(
         "Callback sources not currently supported via singleRelation",
       );
@@ -910,7 +886,7 @@ export class PgSelectStep<
     this.joins.push({
       type: "left",
       // TODO: `source.source` is confusing, rename one of these!
-      source: relationSource.source,
+      source: remoteSource.source,
       alias,
       conditions: localColumns.map(
         (col, i) =>
@@ -978,23 +954,23 @@ export class PgSelectStep<
    * connections/etc (e.g. copying `where` conditions but adding more, or
    * pagination, or grouping, aggregates, etc)
    */
-  clone(
-    mode?: PgSelectMode,
-  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
+  clone(mode?: PgSelectMode): PgSelectStep<TSource> {
     return new PgSelectStep(this, mode);
   }
 
   connectionClone(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgSelectMode,
-  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
+  ): PgSelectStep<TSource> {
     const $plan = this.clone(mode);
     // In case any errors are raised
     $plan.addDependency($connection);
     return $plan;
   }
 
-  where(condition: PgWhereConditionSpec<keyof TColumns & string>): void {
+  where(
+    condition: PgWhereConditionSpec<keyof GetPgSourceColumns<TSource> & string>,
+  ): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('where')`,
@@ -1055,7 +1031,11 @@ export class PgSelectStep<
     return new PgConditionStep(this, true);
   }
 
-  having(condition: PgHavingConditionSpec<keyof TColumns & string>): void {
+  having(
+    condition: PgHavingConditionSpec<
+      keyof GetPgSourceColumns<TSource> & string
+    >,
+  ): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add having conditions once plan is locked ('having')`,
@@ -1243,15 +1223,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   async execute(
     values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
-  ): Promise<
-    GrafastResultsList<
-      ReadonlyArray<
-        TColumns extends PgTypeColumns
-          ? ObjectFromPgTypeColumns<TColumns>
-          : unknown
-      >
-    >
-  > {
+  ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -1325,13 +1297,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   async stream(
     values: ReadonlyArray<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
-  ): Promise<
-    GrafastResultStreamList<
-      TColumns extends PgTypeColumns
-        ? ObjectFromPgTypeColumns<TColumns>
-        : unknown
-    >
-  > {
+  ): Promise<GrafastResultStreamList<unknown[]>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectStep before finalizing it.");
     }
@@ -2189,14 +2155,13 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     super.finalize();
   }
 
-  deduplicate(
-    peers: PgSelectStep<any, any, any, any>[],
-  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters>[] {
+  deduplicate(peers: PgSelectStep<any>[]): PgSelectStep<TSource>[] {
     this.locker.lockAllParameters();
-    return peers.filter((p) => {
-      if (p === this) {
+    return peers.filter(($p): $p is PgSelectStep<TSource> => {
+      if ($p === this) {
         return true;
       }
+      const p = $p as PgSelectStep<PgSourceAny>;
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
       // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
@@ -2358,9 +2323,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     });
   }
 
-  public deduplicatedWith(
-    replacement: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
-  ): void {
+  public deduplicatedWith(replacement: PgSelectStep<TSource>): void {
     if (
       typeof this.symbol === "symbol" &&
       typeof replacement.symbol === "symbol"
@@ -2377,7 +2340,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     }
   }
 
-  private mergeSelectsWith<TOtherStep extends PgSelectStep<any, any, any, any>>(
+  private mergeSelectsWith<TOtherStep extends PgSelectStep<PgSourceAny>>(
     otherPlan: TOtherStep,
   ): {
     [desiredIndex: string]: string;
@@ -2401,9 +2364,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     return actualKeyByDesiredKey;
   }
 
-  private mergePlaceholdersInto<
-    TOtherStep extends PgSelectStep<any, any, any, any>,
-  >(otherPlan: TOtherStep): void {
+  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<PgSourceAny>>(
+    otherPlan: TOtherStep,
+  ): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, symbol, codec } = placeholder;
       const dep = this.getDep(dependencyIndex);
@@ -2479,7 +2442,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       !this.isNullFetch()
     ) {
       // Inline ourself into our parent if we can.
-      let t: PgSelectStep<any, any, any, any> | null | undefined = undefined;
+      let t: PgSelectStep<PgSourceAny> | null | undefined = undefined;
       let p: ExecutableStep<any> | undefined = undefined;
       for (
         let dependencyIndex = 0, l = this.dependencies.length;
@@ -2585,7 +2548,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
         const table = t;
         const parent = p;
 
-        if (table === this) {
+        if ((table as PgSelectStep<any>) === this) {
           throw new Error(
             `Something's gone catastrophically wrong - ${this} is trying to merge with itself!`,
           );
@@ -2779,7 +2742,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
    */
   singleAsRecord(
     options?: PgSelectSinglePlanOptions,
-  ): PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters> {
+  ): PgSelectSingleStep<TSource> {
     this.setUnique(true);
     // TODO: should this be on a clone plan? I don't currently think so since
     // PgSelectSingleStep does not allow for `.where` divergence (since it
@@ -2798,16 +2761,19 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
    */
   single(
     options?: PgSelectSinglePlanOptions,
-  ): TColumns extends PgTypeColumns
-    ? PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>
-    : PgClassExpressionStep<
-        undefined,
-        PgTypeCodec<undefined, any, any>,
-        TColumns,
-        TUniques,
-        TRelations,
-        TParameters
-      > {
+  ): TSource extends PgSource<
+    any,
+    PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+    any,
+    any
+  >
+    ? UColumns extends PgTypeColumns
+      ? PgSelectSingleStep<TSource>
+      : PgClassExpressionStep<
+          PgTypeCodec<string, undefined, any, any, any, any, any>,
+          TSource
+        >
+    : never {
     const $single = this.singleAsRecord(options);
     const isScalar = !this.source.codec.columns;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
@@ -2828,16 +2794,19 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
    */
   listItem(
     itemPlan: ExecutableStep,
-  ): TColumns extends PgTypeColumns
-    ? PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>
-    : PgClassExpressionStep<
-        undefined,
-        PgTypeCodec<undefined, any, any>,
-        TColumns,
-        TUniques,
-        TRelations,
-        TParameters
-      > {
+  ): TSource extends PgSource<
+    any,
+    PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+    any,
+    any
+  >
+    ? UColumns extends PgTypeColumns
+      ? PgSelectSingleStep<TSource>
+      : PgClassExpressionStep<
+          PgTypeCodec<string, undefined, any, any, any, any, any>,
+          TSource
+        >
+    : never {
     const $single = new PgSelectSingleStep(this, itemPlan);
     const isScalar = !this.source.codec.columns;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
@@ -2882,7 +2851,7 @@ function joinMatches(
 /**
  * Apply a default order in case our default is not unique.
  */
-function ensureOrderIsUnique(step: PgSelectStep<any, any, any, any>) {
+function ensureOrderIsUnique(step: PgSelectStep<any>) {
   const unique = (step.source.uniques as PgSourceUnique[])[0];
   if (unique) {
     const ordersIsUnique = step.orderIsUnique();
@@ -2890,7 +2859,7 @@ function ensureOrderIsUnique(step: PgSelectStep<any, any, any, any>) {
       unique.columns.forEach((c) => {
         step.orderBy({
           fragment: sql`${step.alias}.${sql.identifier(c as string)}`,
-          codec: step.source.codec.columns[c].codec,
+          codec: step.source.codec.columns![c].codec,
           direction: "ASC",
         });
       });
@@ -2899,18 +2868,9 @@ function ensureOrderIsUnique(step: PgSelectStep<any, any, any, any>) {
   }
 }
 
-export function pgSelect<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
->(
-  options: PgSelectOptions<TColumns>,
-): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
+export function pgSelect<TSource extends PgSource<any, any, any, any>>(
+  options: PgSelectOptions<TSource>,
+): PgSelectStep<TSource> {
   return new PgSelectStep(options);
 }
 
@@ -2925,31 +2885,20 @@ Object.defineProperty(pgSelect, "$$export", {
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
  */
 export function pgSelectFromRecords<
-  TColumns extends PgTypeColumns,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
+  TSource extends PgSource<any, any, any, any>,
 >(
-  source: PgSource<TColumns, TUniques, TRelations, TParameters>,
+  source: TSource,
   records: PgClassExpressionStep<
-    undefined,
-    PgTypeCodec<undefined, any, any, PgTypeCodec<TColumns, any, any>>,
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
+    PgTypeCodec<any, undefined, any, any, GetPgSourceCodec<TSource>, any, any>,
+    TSource
   >,
-): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
-  return new PgSelectStep<TColumns, TUniques, TRelations, TParameters>({
+): PgSelectStep<TSource> {
+  return new PgSelectStep<TSource>({
     source,
     identifiers: [],
     from: (records) => sql`unnest(${records.placeholder})`,
     args: [{ step: records, pgCodec: listOfCodec(source.codec) }],
-  }) as PgSelectStep<TColumns, TUniques, TRelations, TParameters>;
+  }) as PgSelectStep<TSource>;
 }
 
 Object.defineProperty(pgSelectFromRecords, "$$export", {
@@ -3016,8 +2965,8 @@ export function digestsFromArgumentSpecs(
 export function getFragmentAndCodecFromOrder(
   alias: SQL,
   order: PgOrderSpec,
-  codec: PgTypeCodec<any, any, any, any>,
-) {
+  codec: PgTypeCodecAny,
+): [SQL, PgTypeCodecAny] {
   if (order.attribute != null) {
     const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
     const colCodec = codec.columns![order.attribute].codec;

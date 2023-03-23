@@ -3,15 +3,13 @@ import { UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgTypeColumns } from "../codecs.js";
+import type { PgTypeColumn } from "../codecs.js";
+import type { PgSource } from "../datasource.js";
 import type {
-  PgSourceParameter,
-  PgSourceRelation,
-  PgSourceUnique,
-} from "../datasource.js";
-import type {
+  GetPgCodecColumns,
   PgClassSingleStep,
-  PgTypeCodec,
+  PgSourceAny,
+  PgTypeCodecAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgDeleteStep } from "./pgDelete.js";
@@ -32,18 +30,8 @@ import { PgUpdateStep } from "./pgUpdate.js";
  * of another layer of plan.
  */
 export class PgClassExpressionStep<
-    TExpressionColumns extends PgTypeColumns | undefined,
-    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any, any>,
-    TSourceColumns extends PgTypeColumns | undefined,
-    TUniques extends ReadonlyArray<
-      PgSourceUnique<Exclude<TSourceColumns, undefined>>
-    >,
-    TRelations extends {
-      [identifier: string]: TSourceColumns extends PgTypeColumns
-        ? PgSourceRelation<TSourceColumns, any>
-        : never;
-    },
-    TParameters extends PgSourceParameter[] | undefined = undefined,
+    TExpressionCodec extends PgTypeCodecAny,
+    TSource extends PgSource<any, any, any, any>,
   >
   extends UnbatchedExecutableStep<any>
   implements PgTypedExecutableStep<TExpressionCodec>
@@ -75,9 +63,7 @@ export class PgClassExpressionStep<
   private needsPolymorphicUnwrap: boolean;
 
   constructor(
-    $table:
-      | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
-      | PgUnionAllSingleStep,
+    $table: PgClassSingleStep<TSource> | PgUnionAllSingleStep,
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
@@ -143,15 +129,16 @@ export class PgClassExpressionStep<
     }
   }
 
-  public get<TAttr extends keyof TExpressionColumns>(
+  public get<TAttr extends keyof GetPgCodecColumns<TExpressionCodec>>(
     attributeName: TAttr,
   ): PgClassExpressionStep<
-    any,
-    any,
-    TSourceColumns,
-    TUniques,
-    TRelations,
-    TParameters
+    GetPgCodecColumns<TExpressionCodec>[TAttr] extends PgTypeColumn<
+      infer UCodec,
+      any
+    >
+      ? UCodec
+      : never,
+    TSource
   > {
     const columns = this.pgCodec.columns;
     if (!columns) {
@@ -191,9 +178,7 @@ export class PgClassExpressionStep<
     )}` as any;
   }
 
-  public getParentStep():
-    | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
-    | PgUnionAllSingleStep {
+  public getParentStep(): PgClassSingleStep<TSource> | PgUnionAllSingleStep {
     const step = this.getDep(this.tableId);
     if (
       !(step instanceof PgSelectSingleStep) &&
@@ -232,15 +217,8 @@ export class PgClassExpressionStep<
   }
 
   public deduplicate(
-    peers: Array<PgClassExpressionStep<any, any, any, any, any, any>>,
-  ): PgClassExpressionStep<
-    TExpressionColumns,
-    TExpressionCodec,
-    TSourceColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  >[] {
+    peers: Array<PgClassExpressionStep<any, any>>,
+  ): PgClassExpressionStep<TExpressionCodec, TSource>[] {
     const parentPlan = this.getParentStep();
     const classPlan =
       parentPlan instanceof PgSelectSingleStep
@@ -266,34 +244,15 @@ export class PgClassExpressionStep<
  * that will be selected.
  */
 function pgClassExpression<
-  TExpressionColumns extends PgTypeColumns | undefined,
-  TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  TSourceColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<
-    PgSourceUnique<Exclude<TSourceColumns, undefined>>
-  >,
-  TRelations extends {
-    [identifier: string]: TSourceColumns extends PgTypeColumns
-      ? PgSourceRelation<TSourceColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
+  TExpressionCodec extends PgTypeCodecAny,
+  TSource extends PgSourceAny,
 >(
-  table:
-    | PgClassSingleStep<TSourceColumns, TUniques, TRelations, TParameters>
-    | PgUnionAllSingleStep,
+  table: PgClassSingleStep<TSource> | PgUnionAllSingleStep,
   codec: TExpressionCodec,
 ): (
   strings: TemplateStringsArray,
   ...dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL>
-) => PgClassExpressionStep<
-  TExpressionColumns,
-  TExpressionCodec,
-  TSourceColumns,
-  TUniques,
-  TRelations,
-  TParameters
-> {
+) => PgClassExpressionStep<TExpressionCodec, TSource> {
   return (strings, ...dependencies) => {
     return new PgClassExpressionStep(table, codec, strings, dependencies);
   };
