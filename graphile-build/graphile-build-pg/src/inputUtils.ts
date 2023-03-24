@@ -8,7 +8,6 @@ import type {
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
 
 /**
  * Metadata for a specific PgTypeCodec
@@ -53,7 +52,7 @@ export function getCodecMetaLookupFromInput(
   input: GraphileBuild.BuildInput,
 ): PgTypeCodecMetaLookup {
   const metaLookup: PgTypeCodecMetaLookup = new Map();
-  const seenSources = new Set<PgSource<any, any, any, any>>();
+  const seenSources = new Set<PgSource<any, any, any, any, any>>();
   if (input.pgCodecs) {
     for (const codec of input.pgCodecs) {
       walkCodec(codec, metaLookup);
@@ -72,9 +71,9 @@ export function getCodecMetaLookupFromInput(
  * @internal
  */
 function walkSource(
-  source: PgSource<any, any, any, any>,
+  source: PgSource<any, any, any, any, any>,
   metaLookup: PgTypeCodecMetaLookup,
-  seenSources: Set<PgSource<any, any, any, any>>,
+  seenSources: Set<PgSource<any, any, any, any, any>>,
 ): void {
   if (seenSources.has(source)) {
     return;
@@ -123,25 +122,4 @@ function walkCodec(
   if (codec.rangeOfCodec) {
     walkCodec(codec.rangeOfCodec, metaLookup);
   }
-}
-
-/**
- * Where a source might be a PgSource or a PgSourceBuilder, this ensures we
- * return a PgSource.
- */
-function resolveSource<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
->(
-  source:
-    | PgSource<TColumns, TUniques, TRelations, TParameters>
-    | PgSourceBuilder<TColumns, TUniques, TParameters>,
-): PgSource<TColumns, TUniques, TRelations, TParameters> {
-  return source instanceof PgSourceBuilder ? source.get() : source;
 }

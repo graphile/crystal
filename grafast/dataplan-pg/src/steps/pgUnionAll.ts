@@ -128,7 +128,7 @@ type PgUnionAllStepSelect<TAttributes extends string> =
     };
 
 export interface PgUnionAllSourceSpec {
-  source: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any>;
+  source: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
 }
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
@@ -139,7 +139,7 @@ export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
 
 export interface PgUnionAllStepMember<TTypeNames extends string> {
   typeName: TTypeNames;
-  source: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any>;
+  source: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
   match?: {
     [sourceColumnName: string]:
       | {
@@ -163,6 +163,7 @@ export interface PgUnionAllStepConfig<
       any,
       any,
       ReadonlyArray<PgSourceUnique<any>>,
+      any,
       any
     >;
   };
@@ -335,7 +336,7 @@ export class PgUnionAllSingleStep
 
 interface MemberDigest<TTypeNames extends string> {
   member: PgUnionAllStepMember<TTypeNames>;
-  finalSource: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any>;
+  finalSource: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
   sqlSource: SQL;
   symbol: symbol;
   alias: SQL;
@@ -588,7 +589,7 @@ export class PgUnionAllStep<
         spec.members ??
         (
           Object.entries(spec.sourceByTypeName) as Array<
-            [typeName: TTypeNames, source: PgSource<any, any, any, any>]
+            [typeName: TTypeNames, source: PgSource<any, any, any, any, any>]
           >
         ).map(
           ([typeName, source]): PgUnionAllStepMember<TTypeNames> => ({

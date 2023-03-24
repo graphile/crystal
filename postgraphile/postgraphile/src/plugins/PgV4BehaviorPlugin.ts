@@ -14,7 +14,7 @@ declare global {
 }
 
 const v4ComputedColumnChecks = (
-  s: PgSource<any, any, any, any>,
+  s: PgSource<any, any, any, any, any>,
   pgProc: PgProc,
 ): boolean => {
   const args = pgProc.getArguments();
@@ -46,7 +46,13 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
         // Apply default behavior
         const behavior = [];
         const firstParameter = (
-          s as PgSource<any, any, any, PgSourceParameter[]>
+          s as PgSource<
+            any,
+            any,
+            any,
+            readonly PgSourceParameter<any, any>[],
+            any
+          >
         ).parameters[0];
         if (s.isMutation && s.parameters) {
           behavior.push("-queryField mutationField -typeField");

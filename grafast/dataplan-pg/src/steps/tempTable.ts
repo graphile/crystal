@@ -9,7 +9,9 @@ import type { PgTypeCodec } from "../interfaces.js";
 import type { PgConditionCapableParentStep } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 
-export class TempTableStep<TDataSource extends PgSource<any, any, any, any>>
+export class TempTableStep<
+    TDataSource extends PgSource<any, any, any, any, any>,
+  >
   extends BaseStep
   implements PgConditionCapableParentStep
 {

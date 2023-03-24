@@ -180,7 +180,7 @@ export interface PgSourceOptions<
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
   selectAuth?: (
-    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any>>,
+    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any, any>>,
   ) => void;
 
   name: string;
@@ -220,8 +220,9 @@ export interface PgFunctionSourceOptions<
   TCodec extends PgTypeCodecAny,
   TUniques extends ReadonlyArray<PgSourceUnique<GetPgCodecColumns<TCodec>>>,
   TNewParameters extends readonly PgSourceParameterAny[],
+  TNewName extends string,
 > {
-  name: string;
+  name: TNewName;
   identifier?: string;
   source: (...args: PgSelectArgumentDigest[]) => SQL;
   parameters: TNewParameters;
@@ -231,7 +232,7 @@ export interface PgFunctionSourceOptions<
   extensions?: PgSourceExtensions;
   isMutation?: boolean;
   selectAuth?: (
-    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any>>,
+    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any, any>>,
   ) => void;
   description?: string;
 }
@@ -254,11 +255,12 @@ export class PgSource<
   TCodec extends PgTypeCodecAny,
   TUniques extends ReadonlyArray<PgSourceUnique<GetPgCodecColumns<TCodec>>>,
   TParameters extends readonly PgSourceParameterAny[] | undefined = undefined,
+  TName extends string = string,
 > {
   public readonly registry: TRegistry;
   public readonly codec: TCodec;
   public readonly executor: PgExecutor;
-  public readonly name: string;
+  public readonly name: TName;
   public readonly identifier: string;
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: ReadonlyArray<
@@ -271,7 +273,7 @@ export class PgSource<
     TParameters
   >;
   private selectAuth?: (
-    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any>>,
+    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any, any>>,
   ) => void;
 
   // TODO: make a public interface for this information
@@ -430,16 +432,17 @@ export class PgSource<
     const TNewUniques extends ReadonlyArray<
       PgSourceUnique<GetPgCodecColumns<TCodec>>
     >,
+    const TNewName extends string,
   >(overrideOptions: {
-    name: string;
+    name: TName;
     identifier?: string;
     source: SQL;
     uniques?: TNewUniques;
     extensions?: PgSourceExtensions;
-  }): PgSource<TRegistry, TCodec, TNewUniques, undefined> {
+  }): PgSource<TRegistry, TCodec, TNewUniques, undefined, TNewName> {
     const { name, identifier, source, uniques, extensions } = overrideOptions;
     const { registry, codec, executor, selectAuth } = this._options;
-    return new PgSource<TRegistry, TCodec, TNewUniques, undefined>({
+    return new PgSource<TRegistry, TCodec, TNewUniques, undefined, TNewName>({
       registry,
       codec,
       executor,
@@ -464,12 +467,14 @@ export class PgSource<
     const TNewUniques extends ReadonlyArray<
       PgSourceUnique<GetPgCodecColumns<TCodec>>
     >,
+    const TNewName extends string,
   >(
     overrideOptions: PgFunctionSourceOptions<
       TRegistry,
       TCodec,
       TNewUniques,
-      TNewParameters
+      TNewParameters,
+      TNewName
     >,
   ) {
     const {
@@ -488,7 +493,13 @@ export class PgSource<
     const { registry, codec, executor, selectAuth } = this._options;
     if (!returnsArray) {
       // This is the easy case
-      return new PgSource<TRegistry, TCodec, TNewUniques, TNewParameters>({
+      return new PgSource<
+        TRegistry,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        TNewName
+      >({
         registry,
         codec,
         executor,
@@ -511,7 +522,13 @@ export class PgSource<
             sql`unnest(${fnSource(...args)})`,
         [fnSource, sql],
       );
-      return new PgSource<TRegistry, TCodec, TNewUniques, TNewParameters>({
+      return new PgSource<
+        TRegistry,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        TNewName
+      >({
         registry,
         codec,
         executor,
@@ -539,7 +556,13 @@ export class PgSource<
             )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`,
         [fnSource, sql, sqlPartitionByIndex, sqlTmp],
       );
-      return new PgSource<TRegistry, TCodec, TNewUniques, TNewParameters>({
+      return new PgSource<
+        TRegistry,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        TNewName
+      >({
         registry,
         codec,
         executor,
@@ -783,7 +806,9 @@ export class PgSource<
   public applyAuthorizationChecksToPlan($step: PgSelectStep<this>): void {
     if (this.selectAuth) {
       this.selectAuth(
-        $step as unknown as PgSelectStep<PgSource<TRegistry, TCodec, any, any>>,
+        $step as unknown as PgSelectStep<
+          PgSource<TRegistry, TCodec, any, any, any>
+        >,
       );
     }
     // e.g. $step.where(sql`user_id = ${me}`);

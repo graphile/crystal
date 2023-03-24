@@ -18,7 +18,7 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
  * that represents a row from this table.
  */
 export class PgSingleTablePolymorphicStep<
-    TSource extends PgSource<any, any, any, any>,
+    TSource extends PgSource<any, any, any, any, any>,
   >
   extends ExecutableStep<unknown>
   implements PolymorphicStep
@@ -68,7 +68,7 @@ export class PgSingleTablePolymorphicStep<
 }
 
 export function pgSingleTablePolymorphic<
-  TSource extends PgSource<any, any, any, any>,
+  TSource extends PgSource<any, any, any, any, any>,
 >(
   $typeName: ExecutableStep<string | null>,
   $row: PgSelectSingleStep<TSource>,

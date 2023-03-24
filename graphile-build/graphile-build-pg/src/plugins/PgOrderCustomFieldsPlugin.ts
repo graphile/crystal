@@ -13,7 +13,13 @@ declare global {
       computedColumnOrder(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, PgSourceParameter[]>;
+          source: PgSource<
+            any,
+            any,
+            any,
+            readonly PgSourceParameter<any, any>[],
+            any
+          >;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;

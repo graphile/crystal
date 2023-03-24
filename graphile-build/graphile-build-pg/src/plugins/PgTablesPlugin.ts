@@ -50,7 +50,7 @@ declare global {
        */
       _sourceName(
         this: Inflection,
-        source: PgSource<any, any, any, any>,
+        source: PgSource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -58,7 +58,7 @@ declare global {
        */
       _singularizedSourceName(
         this: Inflection,
-        source: PgSource<any, any, any, any>,
+        source: PgSource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -151,7 +151,7 @@ declare global {
     }
     interface ScopeObjectFieldsField {
       // TODO: put 'field' into all these names?
-      pgSource?: PgSource<any, any, any, any>;
+      pgSource?: PgSource<any, any, any, any, any>;
       pgFieldCodec?: PgTypeCodec<any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
@@ -159,7 +159,7 @@ declare global {
     }
     interface ScopeInterfaceFieldsField {
       // TODO: put 'field' into all these names?
-      pgSource?: PgSource<any, any, any, any>;
+      pgSource?: PgSource<any, any, any, any, any>;
       pgFieldCodec?: PgTypeCodec<any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
@@ -182,7 +182,7 @@ declare global {
         ): Promise<PgSourceBuilder<any, any, any> | null>;
         getSource(
           sourceBuilder: PgSourceBuilder<any, any, any>,
-        ): Promise<PgSource<any, any, any, any> | null>;
+        ): Promise<PgSource<any, any, any, any, any> | null>;
       };
     }
 
@@ -199,7 +199,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          source: PgSource<any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           relations: PgTablesPluginSourceRelations;
         }) => Promise<void> | void
       >;
@@ -229,7 +229,7 @@ interface State {
   >;
   sourceBySourceBuilder: Map<
     PgSourceBuilder<any, any, any>,
-    Promise<PgSource<any, any, any, any> | null>
+    Promise<PgSource<any, any, any, any, any> | null>
   >;
   detailsBySourceBuilder: Map<
     PgSourceBuilder<any, any, any>,
@@ -558,7 +558,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         output.pgSources = [];
       }
       const toProcess: Array<{
-        source: PgSource<any, any, any, any>;
+        source: PgSource<any, any, any, any, any>;
         pgClass: PgClass;
         databaseName: string;
       }> = [];

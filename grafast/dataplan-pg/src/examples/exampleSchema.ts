@@ -113,6 +113,7 @@ import {
   WithPgClientStep,
   withPgClientTransaction,
 } from "../steps/withPgClient.js";
+import { GetPgSourceColumns } from "../interfaces";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -135,7 +136,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
 
 declare module ".." {
   interface PgEnumSourceExtensions {
-    tableSource?: PgSource<any, any, any, any>;
+    tableSource?: PgSource<any, any, any, any, any>;
   }
 }
 
@@ -159,15 +160,10 @@ export function makeExampleSchema(
     (__ListTransformStep, options) =>
       <
         TStep extends
-          | PgSelectStep<any, any, any, any>
-          | PgSelectSingleStep<any, any, any, any>
-          | PgClassExpressionStep<any, any, any, any, any, any>
-          | __ListTransformStep<
-              PgSelectStep<any, any, any, any>,
-              any,
-              any,
-              any
-            >,
+          | PgSelectStep<any>
+          | PgSelectSingleStep<any>
+          | PgClassExpressionStep<any, any>
+          | __ListTransformStep<PgSelectStep<any>, any, any, any>,
       >(
         step: TStep,
       ): TStep => {
@@ -175,9 +171,7 @@ export function makeExampleSchema(
           const innerPlan =
             step instanceof __ListTransformStep
               ? step.getListStep()
-              : (step as
-                  | PgSelectStep<any, any, any, any>
-                  | PgSelectSingleStep<any, any, any, any>);
+              : (step as PgSelectStep<any> | PgSelectSingleStep<any>);
           if ("getClassStep" in innerPlan) {
             innerPlan.getClassStep().setInliningForbidden();
           } else if ("setInliningForbidden" in innerPlan) {
@@ -188,120 +182,54 @@ export function makeExampleSchema(
       },
     [__ListTransformStep, options],
   );
-  type PgSelectPlanFromSource<TSource extends PgSource<any, any, any, any>> =
-    PgSelectStep<
-      TSource["TColumns"],
-      TSource["TUniques"],
-      TSource["TRelations"],
-      TSource["TParameters"]
-    >;
-  type PgSelectSinglePlanFromSource<
-    TSource extends PgSource<any, any, any, any>,
-  > = PgSelectSingleStep<
-    TSource["TColumns"],
-    TSource["TUniques"],
-    TSource["TRelations"],
-    TSource["TParameters"]
-  >;
   type PgConnectionPlanFromSource<
-    TSource extends PgSource<any, any, any, any>,
+    TSource extends PgSource<any, any, any, any, any>,
   > = ConnectionStep<
-    PgSelectSingleStep<
-      TSource["TColumns"],
-      TSource["TUniques"],
-      TSource["TRelations"],
-      TSource["TParameters"]
-    >,
+    PgSelectSingleStep<TSource>,
     PgSelectParsedCursorStep,
-    PgSelectStep<
-      TSource["TColumns"],
-      TSource["TUniques"],
-      TSource["TRelations"],
-      TSource["TParameters"]
-    >,
-    PgSelectSingleStep<
-      TSource["TColumns"],
-      TSource["TUniques"],
-      TSource["TRelations"],
-      TSource["TParameters"]
-    >
+    PgSelectStep<TSource>,
+    PgSelectSingleStep<TSource>
   >;
-  type PgInsertPlanFromSource<TSource extends PgSource<any, any, any, any>> =
-    PgInsertStep<
-      TSource["TColumns"],
-      TSource["TUniques"],
-      TSource["TRelations"]
-    >;
-  type PgUpdatePlanFromSource<TSource extends PgSource<any, any, any, any>> =
-    PgUpdateStep<
-      TSource["TColumns"],
-      TSource["TUniques"],
-      TSource["TRelations"]
-    >;
-  type PgDeletePlanFromSource<TSource extends PgSource<any, any, any, any>> =
-    PgDeleteStep<
-      TSource["TColumns"],
-      TSource["TUniques"],
-      TSource["TRelations"]
-    >;
 
-  // type MessagesStep = PgSelectPlanFromSource<typeof messageSource>;
+  // type MessagesStep = PgSelectStep<typeof messageSource>;
   type MessageConnectionStep = PgConnectionPlanFromSource<typeof messageSource>;
-  type MessageStep = PgSelectSinglePlanFromSource<typeof messageSource>;
-  // type UsersStep = PgSelectPlanFromSource<typeof userSource>;
-  type UserStep = PgSelectSinglePlanFromSource<typeof userSource>;
-  // type ForumsStep = PgSelectPlanFromSource<typeof forumSource>;
-  type ForumStep = PgSelectSinglePlanFromSource<typeof forumSource>;
-  type PersonStep = PgSelectSinglePlanFromSource<typeof personSource>;
-  type PersonBookmarkStep = PgSelectSinglePlanFromSource<
-    typeof personBookmarksSource
-  >;
-  type PostStep = PgSelectSinglePlanFromSource<typeof postSource>;
-  type CommentStep = PgSelectSinglePlanFromSource<typeof commentSource>;
-  type SingleTableItemsStep = PgSelectPlanFromSource<
-    typeof singleTableItemsSource
-  >;
-  type SingleTableItemStep = PgSelectSinglePlanFromSource<
-    typeof singleTableItemsSource
-  >;
-  type RelationalItemsStep = PgSelectPlanFromSource<
-    typeof relationalItemsSource
-  >;
-  type RelationalItemStep = PgSelectSinglePlanFromSource<
-    typeof relationalItemsSource
-  >;
-  type RelationalTopicStep = PgSelectSinglePlanFromSource<
-    typeof relationalTopicsSource
-  >;
-  type RelationalPostStep = PgSelectSinglePlanFromSource<
-    typeof relationalPostsSource
-  >;
-  type RelationalDividerStep = PgSelectSinglePlanFromSource<
+  type MessageStep = PgSelectSingleStep<typeof messageSource>;
+  // type UsersStep = PgSelectStep<typeof userSource>;
+  type UserStep = PgSelectSingleStep<typeof userSource>;
+  // type ForumsStep = PgSelectStep<typeof forumSource>;
+  type ForumStep = PgSelectSingleStep<typeof forumSource>;
+  type PersonStep = PgSelectSingleStep<typeof personSource>;
+  type PersonBookmarkStep = PgSelectSingleStep<typeof personBookmarksSource>;
+  type PostStep = PgSelectSingleStep<typeof postSource>;
+  type CommentStep = PgSelectSingleStep<typeof commentSource>;
+  type SingleTableItemsStep = PgSelectStep<typeof singleTableItemsSource>;
+  type SingleTableItemStep = PgSelectSingleStep<typeof singleTableItemsSource>;
+  type RelationalItemsStep = PgSelectStep<typeof relationalItemsSource>;
+  type RelationalItemStep = PgSelectSingleStep<typeof relationalItemsSource>;
+  type RelationalTopicStep = PgSelectSingleStep<typeof relationalTopicsSource>;
+  type RelationalPostStep = PgSelectSingleStep<typeof relationalPostsSource>;
+  type RelationalDividerStep = PgSelectSingleStep<
     typeof relationalDividersSource
   >;
-  type RelationalChecklistStep = PgSelectSinglePlanFromSource<
+  type RelationalChecklistStep = PgSelectSingleStep<
     typeof relationalChecklistsSource
   >;
-  type RelationalChecklistItemStep = PgSelectSinglePlanFromSource<
+  type RelationalChecklistItemStep = PgSelectSingleStep<
     typeof relationalChecklistItemsSource
   >;
-  type UnionItemsStep = PgSelectPlanFromSource<typeof unionItemsSource>;
-  type UnionItemStep = PgSelectSinglePlanFromSource<typeof unionItemsSource>;
-  type UnionTopicStep = PgSelectSinglePlanFromSource<typeof unionTopicsSource>;
-  type UnionPostStep = PgSelectSinglePlanFromSource<typeof unionPostsSource>;
-  type UnionDividerStep = PgSelectSinglePlanFromSource<
-    typeof unionDividersSource
-  >;
-  type UnionChecklistStep = PgSelectSinglePlanFromSource<
-    typeof unionChecklistsSource
-  >;
-  type UnionChecklistItemStep = PgSelectSinglePlanFromSource<
+  type UnionItemsStep = PgSelectStep<typeof unionItemsSource>;
+  type UnionItemStep = PgSelectSingleStep<typeof unionItemsSource>;
+  type UnionTopicStep = PgSelectSingleStep<typeof unionTopicsSource>;
+  type UnionPostStep = PgSelectSingleStep<typeof unionPostsSource>;
+  type UnionDividerStep = PgSelectSingleStep<typeof unionDividersSource>;
+  type UnionChecklistStep = PgSelectSingleStep<typeof unionChecklistsSource>;
+  type UnionChecklistItemStep = PgSelectSingleStep<
     typeof unionChecklistItemsSource
   >;
-  type RelationalCommentablesStep = PgSelectPlanFromSource<
+  type RelationalCommentablesStep = PgSelectStep<
     typeof relationalCommentableSource
   >;
-  type RelationalCommentableStep = PgSelectSinglePlanFromSource<
+  type RelationalCommentableStep = PgSelectSingleStep<
     typeof relationalCommentableSource
   >;
 
@@ -406,7 +334,7 @@ export function makeExampleSchema(
    * Applies auth checks to the plan; we are using a placeholder here for now.
    */
   const selectAuth = EXPORTABLE(
-    (sql) => ($step: PgSelectStep<any, any, any, any>) => {
+    (sql) => ($step: PgSelectStep<any>) => {
       $step.where(sql`true /* authorization checks */`);
     },
     [sql],
@@ -2107,14 +2035,14 @@ export function makeExampleSchema(
   }
 
   function singleRelationField<
-    TMyDataSource extends PgSource<any, any, any, any>,
+    TMyDataSource extends PgSource<any, any, any, any, any>,
     TRelationName extends Parameters<TMyDataSource["getRelation"]>[0],
   >(relation: TRelationName, type: GraphQLOutputType) {
     return {
       type,
       plan: EXPORTABLE(
         (deoptimizeIfAppropriate, relation) =>
-          function plan($entity: PgSelectSinglePlanFromSource<TMyDataSource>) {
+          function plan($entity: PgSelectSingleStep<TMyDataSource>) {
             const $plan = $entity.singleRelation(relation);
             deoptimizeIfAppropriate($plan);
             return $plan;
@@ -2280,14 +2208,13 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              (TYPES, sql) =>
-                (step: PgSelectPlanFromSource<typeof messageSource>) => {
-                  step.orderBy({
-                    codec: TYPES.text,
-                    fragment: sql`${step.alias}.body`,
-                    direction: "ASC",
-                  });
-                },
+              (TYPES, sql) => (step: PgSelectStep<typeof messageSource>) => {
+                step.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${step.alias}.body`,
+                  direction: "ASC",
+                });
+              },
               [TYPES, sql],
             ),
           },
@@ -2297,14 +2224,13 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              (TYPES, sql) =>
-                (step: PgSelectPlanFromSource<typeof messageSource>) => {
-                  step.orderBy({
-                    codec: TYPES.text,
-                    fragment: sql`${step.alias}.body`,
-                    direction: "DESC",
-                  });
-                },
+              (TYPES, sql) => (step: PgSelectStep<typeof messageSource>) => {
+                step.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${step.alias}.body`,
+                  direction: "DESC",
+                });
+              },
               [TYPES, sql],
             ),
           },
@@ -2314,15 +2240,14 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              (TYPES, sql) =>
-                (step: PgSelectPlanFromSource<typeof messageSource>) => {
-                  const authorAlias = step.singleRelation("author");
-                  step.orderBy({
-                    codec: TYPES.text,
-                    fragment: sql`${authorAlias}.username`,
-                    direction: "ASC",
-                  });
-                },
+              (TYPES, sql) => (step: PgSelectStep<typeof messageSource>) => {
+                const authorAlias = step.singleRelation("author");
+                step.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${authorAlias}.username`,
+                  direction: "ASC",
+                });
+              },
               [TYPES, sql],
             ),
           },
@@ -2332,15 +2257,14 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              (TYPES, sql) =>
-                (step: PgSelectPlanFromSource<typeof messageSource>) => {
-                  const authorAlias = step.singleRelation("author");
-                  step.orderBy({
-                    codec: TYPES.text,
-                    fragment: sql`${authorAlias}.username`,
-                    direction: "DESC",
-                  });
-                },
+              (TYPES, sql) => (step: PgSelectStep<typeof messageSource>) => {
+                const authorAlias = step.singleRelation("author");
+                step.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${authorAlias}.username`,
+                  direction: "DESC",
+                });
+              },
               [TYPES, sql],
             ),
           },
@@ -2502,7 +2426,7 @@ export function makeExampleSchema(
   });
 
   function makeIncludeArchivedArg<TFieldStep>(
-    getClassStep: ($fieldPlan: TFieldStep) => PgSelectPlanFromSource<any>,
+    getClassStep: ($fieldPlan: TFieldStep) => PgSelectStep<any>,
   ): GraphileArgumentConfig<any, any, any, any, any, any> {
     return {
       type: IncludeArchived,
@@ -2781,7 +2705,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum: ForumStep,
-                  $messages: PgSelectPlanFromSource<typeof messageSource>,
+                  $messages: PgSelectStep<typeof messageSource>,
                   arg,
                 ) {
                   $messages.setFirst(arg.getRaw());
@@ -2796,7 +2720,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum: ForumStep,
-                  $messages: PgSelectPlanFromSource<typeof messageSource>,
+                  $messages: PgSelectStep<typeof messageSource>,
                 ) {
                   return $messages.wherePlan();
                 },
@@ -2809,7 +2733,7 @@ export function makeExampleSchema(
               (ClassFilterStep) =>
                 function plan(
                   _$forum: ForumStep,
-                  $messages: PgSelectPlanFromSource<typeof messageSource>,
+                  $messages: PgSelectStep<typeof messageSource>,
                 ) {
                   return new ClassFilterStep(
                     $messages.wherePlan(),
@@ -2820,7 +2744,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedArg<
-            PgSelectPlanFromSource<typeof messageSource>
+            PgSelectStep<typeof messageSource>
           >(($messages) => $messages),
         },
         plan: EXPORTABLE(
@@ -4025,7 +3949,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: __ValueStep<BaseGraphQLRootValue>,
-                  $forums: PgSelectPlanFromSource<typeof forumSource>,
+                  $forums: PgSelectStep<typeof forumSource>,
                   arg,
                 ) {
                   $forums.setFirst(arg.getRaw());
@@ -4035,7 +3959,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedArg<
-            PgSelectPlanFromSource<typeof forumSource>
+            PgSelectStep<typeof forumSource>
           >(($forums) => $forums),
           condition: {
             type: ForumCondition,
@@ -4043,7 +3967,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $forums: PgSelectPlanFromSource<typeof forumSource>,
+                  $forums: PgSelectStep<typeof forumSource>,
                 ) {
                   return $forums.wherePlan();
                 },
@@ -4056,7 +3980,7 @@ export function makeExampleSchema(
               (ClassFilterStep) =>
                 function plan(
                   _$root,
-                  $forums: PgSelectPlanFromSource<typeof forumSource>,
+                  $forums: PgSelectStep<typeof forumSource>,
                 ) {
                   return new ClassFilterStep(
                     $forums.wherePlan(),
@@ -5027,14 +4951,18 @@ export function makeExampleSchema(
     },
   });
 
-  type PgRecord<TDataSource extends PgSource<any, any, any, any>> =
+  type PgRecord<TDataSource extends PgSource<any, any, any, any, any>> =
     PgClassExpressionStep<
-      TDataSource["TColumns"],
-      PgTypeCodec<TDataSource["TColumns"], any, any>,
-      TDataSource["TColumns"],
-      TDataSource["TUniques"],
-      TDataSource["TRelations"],
-      TDataSource["TParameters"]
+      PgTypeCodec<
+        any,
+        GetPgSourceColumns<TDataSource>,
+        any,
+        any,
+        any,
+        any,
+        any
+      >,
+      TDataSource
     >;
 
   const CreateRelationalPostPayload = newObjectTypeBuilder<
@@ -5078,7 +5006,7 @@ export function makeExampleSchema(
 
   const UpdateRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgUpdatePlanFromSource<typeof relationalPostsSource>
+    PgUpdateStep<typeof relationalPostsSource>
   >(PgUpdateStep)({
     name: "UpdateRelationalPostByIdPayload",
     fields: {
@@ -5117,7 +5045,7 @@ export function makeExampleSchema(
 
   const DeleteRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgDeletePlanFromSource<typeof relationalPostsSource>
+    PgDeleteStep<typeof relationalPostsSource>
   >(PgDeleteStep)({
     name: "DeleteRelationalPostByIdPayload",
     fields: {
@@ -5250,7 +5178,7 @@ export function makeExampleSchema(
               // Only the _last_ post plan is returned; there's no dependency on
               // the first two posts, and yet they should not be tree-shaken
               // because they're mutations.
-              let $post: PgInsertPlanFromSource<typeof relationalPostsSource>;
+              let $post: PgInsertStep<typeof relationalPostsSource>;
               for (let i = 0; i < 3; i++) {
                 const $item = pgInsert(relationalItemsSource, {
                   type: constant`POST`,
@@ -5282,7 +5210,7 @@ export function makeExampleSchema(
               // Only the _last_ post plan is returned; there's no dependency on
               // the first two posts, and yet they should not be tree-shaken
               // because they're mutations.
-              let $post: PgSelectPlanFromSource<typeof relationalPostsSource>;
+              let $post: PgSelectStep<typeof relationalPostsSource>;
               for (let i = 0; i < 3; i++) {
                 $post = pgSelect({
                   source: relationalPostsSource,

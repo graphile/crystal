@@ -31,7 +31,7 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
-      source: PgSource<any, any, any, any>;
+      source: PgSource<any, any, any, any, any>;
       relationName: string;
     }
 
@@ -450,7 +450,7 @@ function makeSpecString(
 function makeRelationPlans(
   localColumns: readonly string[],
   remoteColumns: readonly string[],
-  otherSource: PgSource<any, any, any, any>,
+  otherSource: PgSource<any, any, any, any, any>,
   isMutationPayload: boolean,
 ) {
   const recordOrResult = isMutationPayload
@@ -652,7 +652,7 @@ function addRelations(
   type Layer = {
     relationName: string;
     localColumns: string[];
-    source: PgSource<any, any, any, any>;
+    source: PgSource<any, any, any, any, any>;
     remoteColumns: string[];
     isUnique: boolean;
   };
@@ -718,7 +718,7 @@ function addRelations(
     listFieldName: string;
     connectionFieldName: string;
     description?: string;
-    pgSource?: PgSource<any, any, any, any>;
+    pgSource?: PgSource<any, any, any, any, any>;
     pgCodec: PgTypeCodec<any, any, any, any> | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     relatedTypeName: string;
@@ -810,7 +810,7 @@ function addRelations(
   } of refDefinitionList) {
     let hasReferencee;
     let sharedCodec: PgTypeCodec<any, any, any, any> | undefined = undefined;
-    let sharedSource: PgSource<any, any, any, any> | undefined = undefined;
+    let sharedSource: PgSource<any, any, any, any, any> | undefined = undefined;
     let behavior;
     let typeName;
     let singleRecordPlan;
@@ -1067,7 +1067,7 @@ function addRelations(
             const attributes: PgUnionAllStepConfigAttributes<string> =
               unionAttributes ?? {};
             const sourceByTypeName: {
-              [typeName: string]: PgSource<any, any, any, any>;
+              [typeName: string]: PgSource<any, any, any, any, any>;
             } = Object.create(null);
             const members: PgUnionAllStepMember<string>[] = [];
             for (const path of paths) {

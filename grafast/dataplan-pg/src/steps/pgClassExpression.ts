@@ -31,7 +31,7 @@ import { PgUpdateStep } from "./pgUpdate.js";
  */
 export class PgClassExpressionStep<
     TExpressionCodec extends PgTypeCodecAny,
-    TSource extends PgSource<any, any, any, any>,
+    TSource extends PgSource<any, any, any, any, any>,
   >
   extends UnbatchedExecutableStep<any>
   implements PgTypedExecutableStep<TExpressionCodec>

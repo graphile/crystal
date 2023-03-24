@@ -57,13 +57,17 @@ const CHEAP_COLUMN_TYPES = new Set([
  * such as `.get` and `.cursor` which can receive specific properties by
  * telling the PgSelectStep to select the relevant expressions.
  */
-export class PgSelectSingleStep<TSource extends PgSource<any, any, any, any>>
+export class PgSelectSingleStep<
+    TSource extends PgSource<any, any, any, any, any>,
+  >
   extends UnbatchedExecutableStep<
     unknown[] /* What we return will be a tuple based on the values selected */
   >
   implements
     PgTypedExecutableStep<
-      TSource extends PgSource<any, infer UCodec, any, any> ? UCodec : never
+      TSource extends PgSource<any, infer UCodec, any, any, any>
+        ? UCodec
+        : never
     >,
     EdgeCapableStep<any>
 {
@@ -597,6 +601,7 @@ export function pgSelectFromRecord<
   TSource extends PgSource<
     PgRegistryAny,
     PgTypeCodec<any, any, any, any, any, any, any>,
+    any,
     any,
     any
   >,

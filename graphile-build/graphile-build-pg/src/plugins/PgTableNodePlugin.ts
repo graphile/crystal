@@ -55,7 +55,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
         const sourcesByCodec = new Map<
           PgTypeCodec<any, any, any, any>,
-          PgSource<any, any, any, any>[]
+          PgSource<any, any, any, any, any>[]
         >();
         for (const source of tableSources) {
           let list = sourcesByCodec.get(source.codec);

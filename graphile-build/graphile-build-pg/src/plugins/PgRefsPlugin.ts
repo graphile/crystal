@@ -64,7 +64,7 @@ interface State {
   sourceEvents: Array<{
     databaseName: string;
     pgClass: PgClass;
-    source: PgSource<any, any, any, undefined>;
+    source: PgSource<any, any, any, undefined, any>;
     relations: GraphileConfig.PgTablesPluginSourceRelations;
   }>;
 }
@@ -255,7 +255,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           outerLoop: for (const via of vias) {
             const path: PgSourceRefPath = [];
             const parts = via.split(";");
-            let currentSource: PgSource<any, any, any, any> = source;
+            let currentSource: PgSource<any, any, any, any, any> = source;
             for (const rawPart of parts) {
               type RelationEntry = [
                 string,

@@ -6,6 +6,7 @@ import "graphile-config";
 import type {
   PgSelectSingleStep,
   PgTypeCodec,
+  PgTypeCodecAny,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
@@ -88,9 +89,9 @@ function unwrapCodec(
 const getSource = EXPORTABLE(
   (PgSource) =>
     (
-      baseCodec: PgTypeCodec<any, any, any, any>,
-      pgSources: PgSource<any, any, any, any>[],
-      $record: PgSelectSingleStep<any, any, any, any>,
+      baseCodec: PgTypeCodecAny,
+      pgSources: PgSource<any, any, any, any, any>[],
+      $record: PgSelectSingleStep<any>,
     ) => {
       const executor = $record.source.executor;
       const source =

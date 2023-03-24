@@ -8,7 +8,7 @@ import { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
 import { PgUpdateStep } from "./steps/pgUpdate.js";
 
 export function assertPgClassSingleStep<
-  TSource extends PgSource<any, any, any, any>,
+  TSource extends PgSource<any, any, any, any, any>,
 >(
   step: ExecutableStep<any> | PgClassSingleStep<TSource>,
 ): asserts step is PgClassSingleStep<TSource> {

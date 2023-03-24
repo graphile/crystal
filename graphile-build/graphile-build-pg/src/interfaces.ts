@@ -2,6 +2,7 @@ import type {
   PgCodecRelation,
   PgSource,
   PgTypeCodec,
+  PgTypeCodecWithColumns,
   PgTypeColumns,
   WithPgClient,
 } from "@dataplan/pg";
@@ -115,20 +116,20 @@ declare global {
     interface PgRelations {
       [codecName: string]: {
         [relationName: string]: PgCodecRelation<
-          PgTypeCodec<PgTypeColumns, any, any, undefined, any, undefined>,
-          PgSource<PgTypeColumns, any, any, any>
+          PgTypeCodec<any, PgTypeColumns, any, any, undefined, any, undefined>,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
         >;
       };
     }
     interface BuildInput {
-      pgSources: PgSource<any, any, any, any>[];
+      pgSources: PgSource<any, any, any, any, any>[];
 
       /**
        * A non-exhaustive list of codecs, please walk pgSources for more.
        * Typically useful for the codecs that aren't linked to a source (e.g.
        * those defining an union or interface)
        */
-      pgCodecs?: PgTypeCodec<any, any, any, any, any, any>[];
+      pgCodecs?: PgTypeCodec<any, any, any, any, any, any, any>[];
 
       pgRelations?: GraphileBuild.PgRelations;
     }

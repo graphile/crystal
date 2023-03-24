@@ -61,8 +61,8 @@ declare global {
   namespace GraphileBuild {
     interface Build {
       pgGetArgDetailsFromParameters(
-        source: PgSource<any, any, any, any>,
-        parameters?: PgSourceParameter[],
+        source: PgSource<any, any, any, any, any>,
+        parameters?: readonly PgSourceParameter<any, any>[],
       ): {
         makeFieldArgs(): {
           [graphqlArgName: string]: {
@@ -85,7 +85,7 @@ declare global {
               codec: PgTypeCodec<any, any, any, any>,
             ): SQL;
           };
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           fieldArgs: FieldArgs;
           path?: string[];
           initialArgs?: SQL[];
@@ -94,15 +94,33 @@ declare global {
     }
 
     interface InflectionCustomFieldProcedureDetails {
-      source: PgSource<any, any, any, PgSourceParameter[]>;
+      source: PgSource<
+        any,
+        any,
+        any,
+        readonly PgSourceParameter<any, any>[],
+        any
+      >;
     }
     interface InflectionCustomFieldArgumentDetails {
-      source: PgSource<any, any, any, PgSourceParameter[]>;
-      param: PgSourceParameter;
+      source: PgSource<
+        any,
+        any,
+        any,
+        readonly PgSourceParameter<any, any>[],
+        any
+      >;
+      param: PgSourceParameter<any, any>;
       index: number;
     }
     interface InflectionCustomFieldMutationResult {
-      source: PgSource<any, any, any, PgSourceParameter[]>;
+      source: PgSource<
+        any,
+        any,
+        any,
+        readonly PgSourceParameter<any, any>[],
+        any
+      >;
       returnGraphQLTypeName: string;
     }
 
@@ -176,7 +194,7 @@ declare global {
 }
 
 function shouldUseCustomConnection(
-  pgSource: PgSource<any, any, any, any>,
+  pgSource: PgSource<any, any, any, any, any>,
 ): boolean {
   const { codec } = pgSource;
   // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
@@ -186,13 +204,14 @@ function shouldUseCustomConnection(
 }
 
 function defaultProcSourceBehavior(
-  s: PgSource<any, any, any, any>,
+  s: PgSource<any, any, any, any, any>,
   options: GraphileBuild.SchemaOptions,
 ): string {
   const { simpleCollections } = options;
   const behavior = [];
-  const firstParameter = (s as PgSource<any, any, any, PgSourceParameter[]>)
-    .parameters[0];
+  const firstParameter = (
+    s as PgSource<any, any, any, readonly PgSourceParameter<any, any>[], any>
+  ).parameters[0];
   if (
     !s.isMutation &&
     s.parameters &&
@@ -236,21 +255,21 @@ function defaultProcSourceBehavior(
 function hasRecord(
   $row: ExecutableStep,
 ): $row is
-  | PgSelectSingleStep<any, any, any, any>
-  | PgInsertStep<any, any, any>
-  | PgUpdateStep<any, any, any>
-  | PgDeleteStep<any, any, any> {
+  | PgSelectSingleStep<any>
+  | PgInsertStep<any>
+  | PgUpdateStep<any>
+  | PgDeleteStep<any> {
   return "record" in $row && typeof ($row as any).record === "function";
 }
 
 declare global {
   namespace GraphileBuild {
     interface Build {
-      [$$rootQuery]: Array<PgSource<any, any, any, any>>;
-      [$$rootMutation]: Array<PgSource<any, any, any, any>>;
+      [$$rootQuery]: Array<PgSource<any, any, any, any, any>>;
+      [$$rootMutation]: Array<PgSource<any, any, any, any, any>>;
       [$$computed]: Map<
-        PgTypeCodec<any, any, any, any>,
-        Array<PgSource<any, any, any, any>>
+        PgTypeCodec<any, any, any, any, any>,
+        Array<PgSource<any, any, any, any, any>>
       >;
     }
   }
@@ -1182,9 +1201,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
 function getFunctionSourceReturnGraphQLType(
   build: GraphileBuild.Build,
-  source: PgSource<any, any, any, any>,
+  source: PgSource<any, any, any, any, any>,
 ): GraphQLOutputType | null {
-  const sourceInnerCodec: PgTypeCodec<any, any, any> =
+  const sourceInnerCodec: PgTypeCodec<any, any, any, any, undefined, any, any> =
     source.codec.arrayOfCodec ?? source.codec;
   if (!sourceInnerCodec) {
     return null;

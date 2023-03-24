@@ -20,7 +20,7 @@ declare global {
        */
       allRowsConnection(
         this: Inflection,
-        source: PgSource<any, any, any, any>,
+        source: PgSource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -29,7 +29,7 @@ declare global {
        */
       allRowsList(
         this: Inflection,
-        source: PgSource<any, any, any, any>,
+        source: PgSource<any, any, any, any, any>,
       ): string;
     }
   }

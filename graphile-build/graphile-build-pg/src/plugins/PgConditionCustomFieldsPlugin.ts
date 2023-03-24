@@ -15,7 +15,7 @@ declare global {
   namespace GraphileBuild {
     interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;
-      pgFieldSource?: PgSource<any, any, any, any>;
+      pgFieldSource?: PgSource<any, any, any, any, any>;
     }
   }
 }

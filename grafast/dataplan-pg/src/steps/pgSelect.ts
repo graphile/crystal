@@ -216,7 +216,9 @@ function assertSensible(step: ExecutableStep): void {
 
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
-export interface PgSelectOptions<TSource extends PgSource<any, any, any, any>> {
+export interface PgSelectOptions<
+  TSource extends PgSource<any, any, any, any, any>,
+> {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
@@ -273,7 +275,7 @@ export interface PgSelectOptions<TSource extends PgSource<any, any, any, any>> {
  * don't allow `UNION`/`INTERSECT`/`EXCEPT`/`FOR UPDATE`/etc at this time,
  * purely because it hasn't been sufficiently considered.
  */
-export class PgSelectStep<TSource extends PgSource<any, any, any, any>>
+export class PgSelectStep<TSource extends PgSource<any, any, any, any, any>>
   extends ExecutableStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
@@ -854,7 +856,13 @@ export class PgSelectStep<TSource extends PgSource<any, any, any, any>>
       relationIdentifier,
     ) as PgCodecRelation<
       PgTypeCodecWithColumns,
-      PgSource<GetPgSourceRegistry<TSource>, PgTypeCodecWithColumns, any, any>
+      PgSource<
+        GetPgSourceRegistry<TSource>,
+        PgTypeCodecWithColumns,
+        any,
+        any,
+        any
+      >
     >;
     if (!relation) {
       throw new Error(
@@ -2765,6 +2773,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     any,
     PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
     any,
+    any,
     any
   >
     ? UColumns extends PgTypeColumns
@@ -2797,6 +2806,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
   ): TSource extends PgSource<
     any,
     PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+    any,
     any,
     any
   >
@@ -2885,7 +2895,7 @@ Object.defineProperty(pgSelect, "$$export", {
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
  */
 export function pgSelectFromRecords<
-  TSource extends PgSource<any, any, any, any>,
+  TSource extends PgSource<any, any, any, any, any>,
 >(
   source: TSource,
   records: PgClassExpressionStep<

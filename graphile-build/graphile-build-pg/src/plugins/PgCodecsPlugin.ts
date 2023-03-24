@@ -912,7 +912,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         // Now ensure all codecs are uniquely named
         const knownSourceByName = new Map<
           string,
-          PgSource<any, any, any, any>
+          PgSource<any, any, any, any, any>
         >();
         for (const source of build.input.pgSources) {
           const known = knownSourceByName.get(source.name);

@@ -18,7 +18,9 @@ import type { PgUpdateStep } from "./steps/pgUpdate.js";
  * A class-like source of information - could be from `SELECT`-ing a row, or
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
-export type PgClassSingleStep<TSource extends PgSource<any, any, any, any>> =
+export type PgClassSingleStep<
+  TSource extends PgSource<any, any, any, any, any>,
+> =
   | PgSelectSingleStep<TSource>
   | PgInsertStep<TSource>
   | PgUpdateStep<TSource>
@@ -467,7 +469,7 @@ export interface PgCodecRelation<
     any,
     undefined
   >,
-  TRemoteSource extends PgSource<any, PgTypeCodecWithColumns, any, any>,
+  TRemoteSource extends PgSource<any, PgTypeCodecWithColumns, any, any, any>,
 > {
   /* Where the relationship starts */
   localCodec: TLocalCodec;
@@ -495,7 +497,7 @@ export interface PgCodecRelation<
   /**
    * The remote columns that are joined against.
    */
-  remoteColumns: TRemoteSource extends PgSource<infer U, any, any, any>
+  remoteColumns: TRemoteSource extends PgSource<infer U, any, any, any, any>
     ? readonly (keyof U)[]
     : never;
 
@@ -536,14 +538,15 @@ export interface PgRegistry<
       PgRegistry<TCodecs, any, any>,
       TCodecs[keyof TCodecs],
       ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
-      readonly PgSourceParameterAny[] | undefined
+      readonly PgSourceParameterAny[] | undefined,
+      name
     >;
   },
   TRelations extends {
     [codecName in keyof TCodecs]: {
       [relationName in string]: PgCodecRelation<
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
-        PgSource<any, PgTypeCodecWithColumns, any, any>
+        PgSource<any, PgTypeCodecWithColumns, any, any, any>
       >;
     };
   },
@@ -562,7 +565,8 @@ export type PgSourceAny = PgSource<
   PgRegistry<any, any, any>,
   PgTypeCodecAny,
   ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
-  readonly PgSourceParameterAny[] | undefined
+  readonly PgSourceParameterAny[] | undefined,
+  string
 >;
 
 export type PgRegistryAny = PgRegistry<
@@ -584,7 +588,7 @@ export type PgRegistryAny = PgRegistry<
     [codecName in string]: {
       [relationName in string]: PgCodecRelation<
         PgTypeCodec<any, any, any, any, any, any, any>,
-        PgSource<any, any, any, any>
+        PgSource<any, any, any, any, any>
       >;
     };
   }
@@ -629,19 +633,23 @@ export type GetPgCodecColumns<TCodec extends PgTypeCodecAny> =
     : never;
 
 export type GetPgSourceRegistry<TSource extends PgSourceAny> =
-  TSource extends PgSource<infer URegistry, any, any, any> ? URegistry : never;
+  TSource extends PgSource<infer URegistry, any, any, any, any>
+    ? URegistry
+    : never;
 
 export type GetPgSourceCodec<TSource extends PgSourceAny> =
-  TSource extends PgSource<any, infer UCodec, any, any> ? UCodec : never;
+  TSource extends PgSource<any, infer UCodec, any, any, any> ? UCodec : never;
 
 export type GetPgSourceColumns<TSource extends PgSourceAny> = GetPgCodecColumns<
   GetPgSourceCodec<TSource>
 >;
 
 export type GetPgSourceRelations<TSource extends PgSourceAny> =
-  TSource extends PgSource<infer URegistry, infer UCodec, any, any>
+  TSource extends PgSource<infer URegistry, infer UCodec, any, any, any>
     ? GetPgRegistryCodecRelations<URegistry, UCodec>
     : never;
 
 export type GetPgSourceUniques<TSource extends PgSourceAny> =
-  TSource extends PgSource<any, any, infer UUniques, any> ? UUniques : never;
+  TSource extends PgSource<any, any, infer UUniques, any, any>
+    ? UUniques
+    : never;

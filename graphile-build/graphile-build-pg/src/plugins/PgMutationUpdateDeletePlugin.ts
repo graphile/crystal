@@ -31,7 +31,7 @@ declare global {
     interface ScopeObject {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;
-      pgTypeSource?: PgSource<any, any, any, any>;
+      pgTypeSource?: PgSource<any, any, any, any, any>;
     }
 
     interface ScopeObjectFieldsField {
@@ -45,7 +45,7 @@ declare global {
       isPgDeleteInputType?: boolean;
       isPgDeleteByKeysInputType?: boolean;
       isPgDeleteNodeInputType?: boolean;
-      pgSource?: PgSource<any, any, any, any>;
+      pgSource?: PgSource<any, any, any, any, any>;
       pgSourceUnique?: PgSourceUnique;
     }
 
@@ -53,27 +53,27 @@ declare global {
       updatePayloadType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
         },
       ): string;
       deletePayloadType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
         },
       ): string;
 
       updateNodeField(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           unique: PgSourceUnique;
         },
       ): string;
       updateNodeInputType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           unique: PgSourceUnique;
         },
       ): string;
@@ -81,21 +81,21 @@ declare global {
       deletedNodeId(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
         },
       ): string;
 
       deleteNodeField(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           unique: PgSourceUnique;
         },
       ): string;
       deleteNodeInputType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           unique: PgSourceUnique;
         },
       ): string;
@@ -103,14 +103,14 @@ declare global {
       updateByKeysField(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           unique: PgSourceUnique;
         },
       ): string;
       updateByKeysInputType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           unique: PgSourceUnique;
         },
       ): string;
@@ -118,14 +118,14 @@ declare global {
       deleteByKeysField(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           unique: PgSourceUnique;
         },
       ): string;
       deleteByKeysInputType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           unique: PgSourceUnique;
         },
       ): string;
@@ -137,7 +137,7 @@ declare global {
 
 const isUpdatable = (
   build: GraphileBuild.Build,
-  source: PgSource<any, any, any, any>,
+  source: PgSource<any, any, any, any, any>,
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
@@ -150,7 +150,7 @@ const isUpdatable = (
 
 const isDeletable = (
   build: GraphileBuild.Build,
-  source: PgSource<any, any, any, any>,
+  source: PgSource<any, any, any, any, any>,
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
@@ -239,7 +239,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         } = build;
 
         const process = (
-          source: PgSource<any, any, any, any>,
+          source: PgSource<any, any, any, any, any>,
           mode: "source:update" | "source:delete",
         ) => {
           const modeText = mode === "source:update" ? "update" : "delete";
@@ -583,7 +583,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
         const process = (
           fields: GraphQLFieldConfigMap<any, any>,
-          sources: PgSource<any, any, any, any>[],
+          sources: PgSource<any, any, any, any, any>[],
           mode: "source:update" | "source:delete",
         ) => {
           const modeShort = mode === "source:update" ? "update" : "delete";

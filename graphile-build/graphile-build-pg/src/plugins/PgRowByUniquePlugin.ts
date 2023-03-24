@@ -16,7 +16,7 @@ declare global {
         this: Inflection,
         details: {
           unique: PgSourceUnique;
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
         },
       ): string;
     }

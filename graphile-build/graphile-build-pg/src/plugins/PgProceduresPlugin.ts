@@ -22,11 +22,11 @@ import { version } from "../version.js";
 
 // TODO: these should be used, surely?
 interface _ComputedColumnDetails {
-  source: PgSource<any, any, any, PgSourceParameter[]>;
+  source: PgSource<any, any, any, readonly PgSourceParameter<any, any>[], any>;
 }
 interface _ArgumentDetails {
-  source: PgSource<any, any, any, PgSourceParameter[]>;
-  param: PgSourceParameter;
+  source: PgSource<any, any, any, readonly PgSourceParameter<any, any>[], any>;
+  param: PgSourceParameter<any, any>;
   index: number;
 }
 
@@ -72,14 +72,14 @@ declare global {
         getSource(
           databaseName: string,
           pgProc: PgProc,
-        ): Promise<PgSource<any, any, any, any> | null>;
+        ): Promise<PgSource<any, any, any, any, any> | null>;
       };
     }
 
     interface GatherHooks {
       pgProcedures_PgSource: PluginHook<
         (event: {
-          source: PgSource<any, any, any, any>;
+          source: PgSource<any, any, any, any, any>;
           pgProc: PgProc;
           databaseName: string;
         }) => void | Promise<void>
@@ -90,7 +90,7 @@ declare global {
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          options: PgFunctionSourceOptions<any, any, any>;
+          options: PgFunctionSourceOptions<any, any, any, any, any>;
         }) => void | Promise<void>
       >;
 
@@ -108,7 +108,7 @@ declare global {
 interface State {
   sourceByPgProcByDatabase: Map<
     string,
-    Map<PgProc, Promise<PgSource<any, any, any, any> | null>>
+    Map<PgProc, Promise<PgSource<any, any, any, any, any> | null>>
   >;
 }
 interface Cache {}
