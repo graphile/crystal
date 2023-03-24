@@ -179,7 +179,7 @@ declare global {
         getSourceBuilder(
           databaseName: string,
           pgClass: PgClass,
-        ): Promise<PgSourceBuilder<any, any, any> | null>;
+        ): Promise<PgSourceOptions<any, any, any, any> | null>;
         getSource(
           sourceBuilder: PgSourceBuilder<any, any, any>,
         ): Promise<PgSource<any, any, any, any, any> | null>;

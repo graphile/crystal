@@ -5,6 +5,7 @@ import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type { PgTypeColumns } from "./codecs.js";
 import type {
   PgSource,
+  PgSourceOptions,
   PgSourceParameter,
   PgSourceUnique,
 } from "./datasource.js";
@@ -469,7 +470,7 @@ export interface PgCodecRelation<
     any,
     undefined
   >,
-  TRemoteSource extends PgSource<any, any, any, any, any>,
+  TRemoteSource extends PgSourceOptions<any, any, any, any>,
 > {
   /* Where the relationship starts */
   localCodec: TLocalCodec;
@@ -483,22 +484,29 @@ export interface PgCodecRelation<
    * The columns locally used in this relationship.
    */
   localColumns: TLocalCodec extends PgTypeCodec<
-    string,
-    infer U,
+    any,
+    infer UColumns,
     any,
     any,
     any,
     any,
     any
   >
-    ? readonly (keyof U)[]
+    ? readonly (keyof UColumns)[]
     : never;
 
   /**
    * The remote columns that are joined against.
    */
-  remoteColumns: TRemoteSource extends PgSource<infer U, any, any, any, any>
-    ? readonly (keyof U)[]
+  remoteColumns: TRemoteSource extends PgSourceOptions<
+    infer UCodec,
+    any,
+    any,
+    any
+  >
+    ? UCodec extends PgTypeCodec<any, infer UColumns, any, any, any, any, any>
+      ? readonly (keyof UColumns)[]
+      : never
     : never;
 
   /**
@@ -534,8 +542,7 @@ export interface PgRegistry<
     >;
   },
   TSources extends {
-    [name in string]: PgSource<
-      PgRegistry<any, any, any>,
+    [name in string]: PgSourceOptions<
       PgTypeCodecAny,
       ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
       readonly PgSourceParameterAny[] | undefined,
@@ -546,7 +553,7 @@ export interface PgRegistry<
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelation<
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
-        PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
       >;
     };
   },
@@ -582,13 +589,13 @@ export type PgRegistryAny = PgRegistry<
     >;
   },
   {
-    [name in string]: PgSourceAny;
+    [name in string]: PgSourceOptions<any, any, any, any>;
   },
   {
     [codecName in string]: {
       [relationName in string]: PgCodecRelation<
         PgTypeCodec<any, any, any, any, any, any, any>,
-        PgSource<any, any, any, any, any>
+        PgSourceOptions<any, any, any, any>
       >;
     };
   }

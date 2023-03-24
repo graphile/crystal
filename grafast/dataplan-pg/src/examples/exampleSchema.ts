@@ -65,7 +65,8 @@ import sql from "pg-sql2";
 //import prettier from "prettier";
 import { inspect } from "util";
 
-import type {
+import {
+  makePgSourceOptions,
   PgConditionStep,
   PgEnumTypeCodec,
   PgExecutorContextPlans,
@@ -78,7 +79,7 @@ import type {
 } from "../";
 import { makeRegistryBuilder } from "../";
 import type { PgSubscriber } from "../adaptors/pg.js";
-import type { PgBaseCodecsObject, PgTypeColumns } from "../codecs.js";
+import type { PgTypeColumns } from "../codecs.js";
 import { listOfCodec } from "../codecs.js";
 import {
   BooleanFilterStep,
@@ -105,7 +106,6 @@ import {
 } from "../index.js";
 import type { PgTypeCodecAny } from "../interfaces";
 import type { GetPgSourceColumns } from "../interfaces";
-import { PgRegistry, PgRegistryAny } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -187,7 +187,6 @@ export function makeExampleSchema(
 
   const registry = EXPORTABLE(
     (
-      PgSource,
       TYPES,
       executor,
       listOfCodec,
@@ -220,62 +219,58 @@ export function makeExampleSchema(
         };
       };
 
-      const userColumns = {
-        id: col({ notNull: true, codec: TYPES.uuid }),
-        username: col({ notNull: true, codec: TYPES.citext }),
-        gravatar_url: col({ codec: TYPES.text }),
-        created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-      };
-
-      const messageColumns = {
-        id: col({ notNull: true, codec: TYPES.uuid }),
-        body: col({ notNull: true, codec: TYPES.text }),
-        author_id: col({
-          notNull: true,
-          codec: TYPES.uuid,
-          identicalVia: { relation: "author", attribute: "person_id" },
-        }),
-        forum_id: col({
-          notNull: true,
-          codec: TYPES.uuid,
-          identicalVia: { relation: "forum", attribute: "id" },
-        }),
-        created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-        archived_at: col({ codec: TYPES.timestamptz }),
-        featured: col({ codec: TYPES.boolean }),
-        is_archived: col({
-          codec: TYPES.boolean,
-          expression: (alias) => sql`${alias}.archived_at is not null`,
-        }),
-      };
-
-      const forumColumns = {
-        id: col({ notNull: true, codec: TYPES.uuid }),
-        name: col({ notNull: true, codec: TYPES.citext }),
-        archived_at: col({ codec: TYPES.timestamptz }),
-        is_archived: col({
-          codec: TYPES.boolean,
-          expression: (alias) => sql`${alias}.archived_at is not null`,
-        }),
-      };
       const forumCodec = recordCodec({
         name: "forums",
         identifier: sql`app_public.forums`,
-        columns: forumColumns,
+        columns: {
+          id: col({ notNull: true, codec: TYPES.uuid }),
+          name: col({ notNull: true, codec: TYPES.citext }),
+          archived_at: col({ codec: TYPES.timestamptz }),
+          is_archived: col({
+            codec: TYPES.boolean,
+            expression: (alias) => sql`${alias}.archived_at is not null`,
+          }),
+        },
       });
+
       const userCodec = recordCodec({
         name: "users",
         identifier: sql`app_public.users`,
-        columns: userColumns,
+        columns: {
+          id: col({ notNull: true, codec: TYPES.uuid }),
+          username: col({ notNull: true, codec: TYPES.citext }),
+          gravatar_url: col({ codec: TYPES.text }),
+          created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+        },
       });
+
       const messagesCodec = recordCodec({
         name: "messages",
         identifier: sql`app_public.messages`,
-        columns: messageColumns,
+        columns: {
+          id: col({ notNull: true, codec: TYPES.uuid }),
+          body: col({ notNull: true, codec: TYPES.text }),
+          author_id: col({
+            notNull: true,
+            codec: TYPES.uuid,
+            identicalVia: { relation: "author", attribute: "person_id" },
+          }),
+          forum_id: col({
+            notNull: true,
+            codec: TYPES.uuid,
+            identicalVia: { relation: "forum", attribute: "id" },
+          }),
+          created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+          archived_at: col({ codec: TYPES.timestamptz }),
+          featured: col({ codec: TYPES.boolean }),
+          is_archived: col({
+            codec: TYPES.boolean,
+            expression: (alias) => sql`${alias}.archived_at is not null`,
+          }),
+        },
       });
 
-      const uniqueAuthorCountSource = new PgSource({
-        registry,
+      const uniqueAuthorCountSourceOptions = makePgSourceOptions({
         executor,
         selectAuth,
         codec: TYPES.int,
@@ -292,8 +287,7 @@ export function makeExampleSchema(
         isUnique: true,
       });
 
-      const forumNamesArraySource = new PgSource({
-        registry,
+      const forumNamesArraySourceOptions = makePgSourceOptions({
         executor,
         selectAuth,
         codec: listOfCodec(TYPES.text),
@@ -304,8 +298,7 @@ export function makeExampleSchema(
         isUnique: true, // No setof
       });
 
-      const forumNamesCasesSource = new PgSource({
-        registry,
+      const forumNamesCasesSourceOptions = makePgSourceOptions({
         executor,
         selectAuth,
         codec: listOfCodec(TYPES.text),
@@ -315,8 +308,7 @@ export function makeExampleSchema(
         parameters: [],
       });
 
-      const forumsUniqueAuthorCountSource = new PgSource({
-        registry,
+      const forumsUniqueAuthorCountSourceOptions = makePgSourceOptions({
         executor,
         selectAuth,
         codec: TYPES.int,
@@ -340,8 +332,7 @@ export function makeExampleSchema(
         isUnique: true,
       });
 
-      const scalarTextSource = new PgSource({
-        registry,
+      const scalarTextSourceOptions = makePgSourceOptions({
         executor,
         selectAuth,
         codec: TYPES.text,
@@ -349,8 +340,7 @@ export function makeExampleSchema(
         name: "text",
       });
 
-      const messageSourceBuilder = new PgSource({
-        registry,
+      const messageSourceOptions = makePgSourceOptions({
         executor,
         selectAuth,
         codec: messagesCodec,
@@ -359,8 +349,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const userSource = new PgSource({
-        registry,
+      const userSourceOptions = makePgSourceOptions({
         executor,
         selectAuth,
         codec: userCodec,
@@ -372,8 +361,7 @@ export function makeExampleSchema(
         ],
       });
 
-      const forumSource = new PgSource({
-        registry,
+      const forumSourceOptions = makePgSourceOptions({
         executor,
         selectAuth,
         codec: forumCodec,
@@ -382,116 +370,129 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const usersMostRecentForumSource = forumSource.functionSource({
-        name: "users_most_recent_forum",
-        source: (...args) =>
-          sql`app_public.users_most_recent_forum(${sqlFromArgDigests(args)})`,
-        returnsArray: false,
-        returnsSetof: false,
-        parameters: [
-          {
-            name: "u",
-            codec: userSource.codec,
-            required: true,
-            notNull: true,
-          },
-        ],
-      });
+      const usersMostRecentForumSourceOptions = PgSource.functionSourceOptions(
+        forumSourceOptions,
+        {
+          name: "users_most_recent_forum",
+          source: (...args) =>
+            sql`app_public.users_most_recent_forum(${sqlFromArgDigests(args)})`,
+          returnsArray: false,
+          returnsSetof: false,
+          parameters: [
+            {
+              name: "u",
+              codec: userSource.codec,
+              required: true,
+              notNull: true,
+            },
+          ],
+        },
+      );
 
-      const featuredMessages = messageSource.functionSource({
-        name: "featured_messages",
-        source: (...args) =>
-          sql`app_public.featured_messages(${sqlFromArgDigests(args)})`,
-        returnsSetof: true,
-        returnsArray: false,
-        parameters: [],
-      });
+      const featuredMessagesSourceOptions = PgSource.functionSourceOptions(
+        messageSourceOptions,
+        {
+          name: "featured_messages",
+          source: (...args) =>
+            sql`app_public.featured_messages(${sqlFromArgDigests(args)})`,
+          returnsSetof: true,
+          returnsArray: false,
+          parameters: [],
+        },
+      );
 
-      const forumsFeaturedMessages = messageSource.functionSource({
-        name: "forums_featured_messages",
-        source: (...args) =>
-          sql`app_public.forums_featured_messages(${sqlFromArgDigests(args)})`,
-        returnsSetof: true,
-        returnsArray: false,
-        parameters: [
-          {
-            name: "forum",
-            required: true,
-            codec: forumCodec,
-          },
-        ],
-      });
+      const forumsFeaturedMessagesSourceOptions =
+        PgSource.functionSourceOptions(messageSourceOptions, {
+          name: "forums_featured_messages",
+          source: (...args) =>
+            sql`app_public.forums_featured_messages(${sqlFromArgDigests(
+              args,
+            )})`,
+          returnsSetof: true,
+          returnsArray: false,
+          parameters: [
+            {
+              name: "forum",
+              required: true,
+              codec: forumCodec,
+            },
+          ],
+        });
 
-      const randomUserArraySource = userSource.functionSource({
-        name: "random_user_array",
-        source: (...args) =>
-          sql`app_public.random_user_array(${sqlFromArgDigests(args)})`,
-        returnsArray: true,
-        returnsSetof: false,
-        parameters: [],
-      });
+      const randomUserArraySourceOptions = PgSource.functionSourceOptions(
+        userSourceOptions,
+        {
+          name: "random_user_array",
+          source: (...args) =>
+            sql`app_public.random_user_array(${sqlFromArgDigests(args)})`,
+          returnsArray: true,
+          returnsSetof: false,
+          parameters: [],
+        },
+      );
 
-      const randomUserArraySetSource = userSource.functionSource({
-        name: "random_user_array_set",
-        source: (...args) =>
-          sql`app_public.random_user_array_set(${sqlFromArgDigests(args)})`,
-        returnsSetof: true,
-        returnsArray: true,
-        parameters: [],
-      });
+      const randomUserArraySetSourceOptions = PgSource.functionSourceOptions(
+        userSourceOptions,
+        {
+          name: "random_user_array_set",
+          source: (...args) =>
+            sql`app_public.random_user_array_set(${sqlFromArgDigests(args)})`,
+          returnsSetof: true,
+          returnsArray: true,
+          parameters: [],
+        },
+      );
 
-      const forumsMessagesListSetSource = messageSource.functionSource({
-        name: "forums_messages_list_set",
-        source: (...args) =>
-          sql`app_public.forums_messages_list_set(${sqlFromArgDigests(args)})`,
-        parameters: [],
-        returnsArray: true,
-        returnsSetof: true,
-        extensions: {
-          tags: {
-            name: "messagesListSet",
+      const forumsMessagesListSetSourceOptions = PgSource.functionSourceOptions(
+        messageSourceOptions,
+        {
+          name: "forums_messages_list_set",
+          source: (...args) =>
+            sql`app_public.forums_messages_list_set(${sqlFromArgDigests(
+              args,
+            )})`,
+          parameters: [],
+          returnsArray: true,
+          returnsSetof: true,
+          extensions: {
+            tags: {
+              name: "messagesListSet",
+            },
           },
         },
-      });
+      );
 
       return makeRegistryBuilder()
-        .addCodecs([forumCodec, userCodec, messagesCodec])
-        .addSources([
-          uniqueAuthorCountSource,
-          forumNamesArraySource,
-          forumNamesCasesSource,
-          forumsUniqueAuthorCountSource,
-          scalarTextSource,
-          messageSourceBuilder,
-          userSource,
-          forumSource,
-          usersMostRecentForumSource,
-          featuredMessages,
-          forumsFeaturedMessages,
-          randomUserArraySource,
-          randomUserArraySetSource,
-          forumsMessagesListSetSource,
-        ])
-        .addRelations(messagesCodec, {
-          author: {
-            localCodec: messagesCodec,
-            remoteSource: userSource,
-            localColumns: [`author_id`],
-            remoteColumns: [`id`],
-            isUnique: true,
-          },
-          forum: {
-            localCodec: messagesCodec,
-            remoteSource: forumSource,
-            localColumns: ["forum_id"],
-            remoteColumns: ["id"],
-            isUnique: true,
-          },
+        .addCodec(forumCodec)
+        .addCodec(userCodec)
+        .addCodec(messagesCodec)
+        .addSource(uniqueAuthorCountSourceOptions)
+        .addSource(forumNamesArraySourceOptions)
+        .addSource(forumNamesCasesSourceOptions)
+        .addSource(forumsUniqueAuthorCountSourceOptions)
+        .addSource(scalarTextSourceOptions)
+        .addSource(messageSourceOptions)
+        .addSource(userSourceOptions)
+        .addSource(forumSourceOptions)
+        .addSource(usersMostRecentForumSourceOptions)
+        .addSource(featuredMessagesSourceOptions)
+        .addSource(forumsFeaturedMessagesSourceOptions)
+        .addSource(randomUserArraySourceOptions)
+        .addSource(randomUserArraySetSourceOptions)
+        .addSource(forumsMessagesListSetSourceOptions)
+        .addRelation(messagesCodec, "author", userSourceOptions, {
+          localColumns: [`author_id`],
+          remoteColumns: [`id`],
+          isUnique: true,
+        })
+        .addRelation(messagesCodec, "forum", forumSourceOptions, {
+          localColumns: ["forum_id"],
+          remoteColumns: ["id"],
+          isUnique: true,
         })
         .build();
     },
     [
-      PgSource,
       TYPES,
       executor,
       listOfCodec,
@@ -503,7 +504,9 @@ export function makeExampleSchema(
     ],
   );
 
-  // registry.p
+  registry.pgCodecs.messages.columns.id;
+  registry.pgCodecs.forums.columns;
+  registry.pgSources.forums.codec.name;
 
   const deoptimizeIfAppropriate = EXPORTABLE(
     (__ListTransformStep, options) =>
@@ -581,39 +584,6 @@ export function makeExampleSchema(
   type RelationalCommentableStep = PgSelectSingleStep<
     typeof relationalCommentableSource
   >;
-  /*
-  type MyRegistry = PgRegistry<
-    PgBaseCodecsObject & {
-      forums: typeof forumCodec;
-      users: typeof userCodec;
-      messages: typeof messagesCodec;
-    },
-    {
-      unique_author_count: typeof uniqueAuthorCountSource;
-      forum_names_array: typeof forumNamesArraySource;
-      forum_names_cases: typeof forumNamesCasesSource;
-      forums_unique_author_count: typeof forumsUniqueAuthorCountSource;
-      text: typeof scalarTextSource;
-      messages: typeof messageSourceBuilder;
-      users: typeof userSource;
-      forums: typeof forumSource;
-      users_most_recent_forum: typeof usersMostRecentForumSource;
-      person: typeof personSource;
-    },
-    {
-      person: {};
-      forums: {};
-    }
-  >;
-  */
-
-  /*
-  const registry: MyRegistry = {
-    pgCodecs: { forums: forumCodec, users: userCodec },
-    pgSources: {} as any,
-    pgRelations: {} as any,
-  };
-  */
 
   const unionEntityColumns = EXPORTABLE(
     (TYPES, col) => ({

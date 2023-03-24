@@ -2878,7 +2878,7 @@ function ensureOrderIsUnique(step: PgSelectStep<any>) {
   }
 }
 
-export function pgSelect<TSource extends PgSource<any, any, any, any>>(
+export function pgSelect<TSource extends PgSource<any, any, any, any, any>>(
   options: PgSelectOptions<TSource>,
 ): PgSelectStep<TSource> {
   return new PgSelectStep(options);

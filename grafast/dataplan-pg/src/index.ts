@@ -48,6 +48,7 @@ import {
   PgSourceUnique,
   PgSourceUniqueExtensions,
   makeRegistryBuilder,
+  makePgSourceOptions,
   PgRegistryBuilder,
 } from "./datasource.js";
 import {
@@ -299,6 +300,7 @@ export {
   rangeOfCodec,
   recordCodec,
   makeRegistryBuilder,
+  makePgSourceOptions,
   PgRegistryBuilder,
   sqlFromArgDigests,
   TempTableStep,
@@ -325,6 +327,7 @@ exportAsMany("@dataplan/pg", {
   rangeOfCodec,
   recordCodec,
   makeRegistryBuilder,
+  makePgSourceOptions,
   TYPES,
   PgEnumSource,
   PgSource,
