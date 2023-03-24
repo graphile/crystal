@@ -887,11 +887,6 @@ TInSource
 */
 
 export type Simplify<T> = { [TKey in keyof T]: T[TKey] } & {};
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I,
-) => void
-  ? I
-  : never;
 
 export interface PgRegistryBuilder<
   TCodecs extends {
@@ -926,98 +921,19 @@ export interface PgRegistryBuilder<
     codec: TCodec,
   ): PgRegistryBuilder<
     TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
-      ? TCodecs & {
-          [name in UName]: TCodec;
-        }
+      ? Simplify<
+          TCodecs & {
+            [name in UName]: TCodec;
+          }
+        >
       : never,
     TSources,
     TRelations
   >;
-  /*
-  addCodecs<const TCodec extends PgTypeCodecAny>(
-    codec: readonly [...TCodec[]],
-  ): PgRegistryBuilder<
-    Simplify<
-      UnionToIntersection<
-        TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
-          ? TCodecs & {
-              [name in UName]: TCodec;
-            }
-          : never
-      >
-    >,
-    TSources,
-    TRelations
-  >;
-  addCodecs<
-    const TNewCodecs extends PgTypeCodec<any, any, any, any, any, any, any>,
-  >(
-    codec: [...TNewCodecs[]],
-  ): PgRegistryBuilder<
-    Simplify<
-      UnionToIntersection<
-        TNewCodecs extends PgTypeCodec<
-          infer UName,
-          any,
-          any,
-          any,
-          any,
-          any,
-          any
-        >
-          ? TCodecs & {
-              [name in UName]: TNewCodecs;
-            }
-          : never
-      >
-    >,
-    TSources,
-    TRelations
-  >;
-    TCodecs & {
-      [TIndex in keyof TNewCodecs as TNewCodecs[TIndex] extends PgTypeCodec<
-        infer UName,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      >
-        ? UName
-        : never]: TNewCodecs[TIndex];
-    },
-  */
   addSource<const TSource extends PgSourceOptions<any, any, any, any>>(
     source: TSource,
   ): PgRegistryBuilder<
     TSource extends PgSourceOptions<infer UCodec, any, any, any>
-      ? UCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
-        ? TCodecs & {
-            [name in UName]: UCodec;
-          }
-        : never
-      : never,
-    TSource extends PgSourceOptions<any, any, any, infer UName>
-      ? TSources & {
-          [name in UName]: TSource;
-        }
-      : never,
-    TRelations
-  >;
-  /*
-  addSources<const TNewSource extends PgSourceOptions<any, any, any, any>>(
-    source: readonly [...TNewSource[]],
-  ): PgRegistryBuilder<
-    TCodecs,
-    TNewSource extends PgSourceOptions<any, any, any, infer UName>
-      ? TSources & {
-          [name in UName]: TNewSource;
-        }
-      : never,
-    TRelations
-  >;
-    TNewSource extends PgSourceOptions<infer UCodec, any, any, any>
       ? UCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
         ? Simplify<
             TCodecs & {
@@ -1026,7 +942,15 @@ export interface PgRegistryBuilder<
           >
         : never
       : never,
-    */
+    TSource extends PgSourceOptions<any, any, any, infer UName>
+      ? Simplify<
+          TSources & {
+            [name in UName]: TSource;
+          }
+        >
+      : never,
+    TRelations
+  >;
   addRelation<
     TCodec extends PgTypeCodec<
       string,
@@ -1052,10 +976,12 @@ export interface PgRegistryBuilder<
     TCodecs,
     TSources,
     TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
-      ? TRelations & {
-          [relationName in TCodecRelationName]: TRelations[UName] &
-            TCodecRelation;
-        }
+      ? Simplify<
+          TRelations & {
+            [relationName in TCodecRelationName]: TRelations[UName] &
+              TCodecRelation;
+          }
+        >
       : never
   >;
 
