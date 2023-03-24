@@ -930,6 +930,7 @@ export interface PgRegistryBuilder<
     TSources,
     TRelations
   >;
+
   addSource<const TSource extends PgSourceOptions<any, any, any, any>>(
     source: TSource,
   ): PgRegistryBuilder<
@@ -951,6 +952,7 @@ export interface PgRegistryBuilder<
       : never,
     TRelations
   >;
+
   addRelation<
     TCodec extends PgTypeCodec<
       string,
@@ -985,8 +987,6 @@ export interface PgRegistryBuilder<
       : never
   >;
 
-  /** Only use this for building sources */
-  getUntypedRegistry(): PgRegistry<any, any, any>;
   build(): PgRegistry<TCodecs, TSources, TRelations>;
 }
 
@@ -1001,22 +1001,26 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       registry.pgCodecs[codec.name] = codec;
       return builder;
     },
+    /*
     addCodecs(codecs) {
       for (const codec of codecs) {
         registry.pgCodecs[codec.name] = codec;
       }
       return builder;
     },
+    */
     addSource(source) {
       registry.pgSources[source.name] = source;
       return builder;
     },
+    /*
     addSources(sources) {
       for (const source of sources) {
         registry.pgSources[source.name] = source;
       }
       return builder;
     },
+    */
     addRelation(localCodec, relationName, remoteSource, relation) {
       if (!registry.pgRelations[localCodec.name]) {
         registry.pgRelations[localCodec.name] = Object.create(null);
@@ -1027,9 +1031,6 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
         ...relation,
       };
       return builder;
-    },
-    getUntypedRegistry() {
-      return registry;
     },
     build() {
       return registry;
