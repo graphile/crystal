@@ -607,6 +607,7 @@ export function makeExampleSchema(
     ],
   );
 
+  /*
   registry.pgCodecs.messages.columns.id;
   registry.pgCodecs.forums.columns;
   registry.pgSources.messages.getRelations();
@@ -630,6 +631,8 @@ export function makeExampleSchema(
   type CCC = typeof registry extends PgRegistry<any, any, infer URelations>
     ? URelations
     : never;
+  type DDD = typeof registry.pgRelations
+*/
 
   const deoptimizeIfAppropriate = EXPORTABLE(
     (__ListTransformStep, options) =>
