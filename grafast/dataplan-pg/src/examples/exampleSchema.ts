@@ -104,7 +104,12 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type { PgTypeCodecAny } from "../interfaces";
+import type {
+  GetPgRegistryCodecRelations,
+  GetPgRegistryCodecs,
+  PgRegistry,
+  PgTypeCodecAny,
+} from "../interfaces";
 import type { GetPgSourceColumns } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
@@ -462,6 +467,94 @@ export function makeExampleSchema(
         },
       );
 
+      const unionEntityColumns = EXPORTABLE(
+        (TYPES, col) => ({
+          person_id: col({ codec: TYPES.int, notNull: false }),
+          post_id: col({ codec: TYPES.int, notNull: false }),
+          comment_id: col({ codec: TYPES.int, notNull: false }),
+        }),
+        [TYPES, col],
+      );
+
+      const personBookmarkColumns = EXPORTABLE(
+        (TYPES, col, recordCodec, sql, unionEntityColumns) => ({
+          id: col({ codec: TYPES.int, notNull: true }),
+          person_id: col({
+            codec: TYPES.int,
+            notNull: true,
+            identicalVia: { relation: "person", attribute: "id" },
+          }),
+          bookmarked_entity: col({
+            codec: recordCodec({
+              name: "union__entity",
+              identifier: sql`interfaces_and_unions.union__entity`,
+              columns: unionEntityColumns,
+            }),
+            notNull: true,
+          }),
+        }),
+        [TYPES, col, recordCodec, sql, unionEntityColumns],
+      );
+
+      const personBookmarksSourceOptions = EXPORTABLE(
+        (
+          PgSource,
+          executor,
+          personBookmarkColumns,
+          recordCodec,
+          selectAuth,
+          sql,
+        ) =>
+          makePgSourceOptions({
+            executor,
+            selectAuth,
+            codec: recordCodec({
+              name: "person_bookmarks",
+              identifier: sql`interfaces_and_unions.person_bookmarks`,
+              columns: personBookmarkColumns,
+            }),
+            source: sql`interfaces_and_unions.person_bookmarks`,
+            name: "person_bookmarks",
+            uniques: [{ columns: ["id"], isPrimary: true }],
+          }),
+        [
+          PgSource,
+          executor,
+          personBookmarkColumns,
+          recordCodec,
+          selectAuth,
+          sql,
+        ],
+      );
+
+      const personColumns = EXPORTABLE(
+        (TYPES, col) => ({
+          person_id: col({ codec: TYPES.int, notNull: true }),
+          username: col({ codec: TYPES.text, notNull: true }),
+        }),
+        [TYPES, col],
+      );
+
+      const personSourceOptions = EXPORTABLE(
+        (PgSource, executor, personColumns, recordCodec, selectAuth, sql) =>
+          makePgSourceOptions({
+            executor,
+            selectAuth,
+            codec: recordCodec({
+              name: "interfaces_and_unions.people",
+              identifier: sql`interfaces_and_unions.people`,
+              columns: personColumns,
+            }),
+            source: sql`interfaces_and_unions.people`,
+            name: "people",
+            uniques: [
+              { columns: ["person_id"], isPrimary: true },
+              { columns: ["username"] },
+            ],
+          }),
+        [PgSource, executor, personColumns, recordCodec, selectAuth, sql],
+      );
+
       return makeRegistryBuilder()
         .addCodec(forumCodec)
         .addCodec(userCodec)
@@ -490,6 +583,16 @@ export function makeExampleSchema(
           remoteColumns: ["id"],
           isUnique: true,
         })
+        .addRelation(
+          personBookmarksSourceOptions.codec,
+          "person",
+          personSourceOptions,
+          {
+            isUnique: true,
+            localColumns: ["person_id"],
+            remoteColumns: ["person_id"],
+          },
+        )
         .build();
     },
     [
@@ -506,7 +609,27 @@ export function makeExampleSchema(
 
   registry.pgCodecs.messages.columns.id;
   registry.pgCodecs.forums.columns;
-  registry.pgSources.forums.codec.name;
+  registry.pgSources.messages.getRelations();
+  registry.pgSources.messages.getRelation("author").localColumns;
+  registry.pgRelations.messages.author.localColumns;
+
+  type Bar = GetPgRegistryCodecs<typeof registry>[keyof GetPgRegistryCodecs<
+    typeof registry
+  >];
+  type Foo = GetPgRegistryCodecRelations<
+    typeof registry,
+    typeof registry.pgSources.messages.codec
+  >;
+
+  type BBB = typeof registry.pgSources.messages.codec;
+  type Baz = BBB extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+    ? typeof registry extends PgRegistry<any, any, infer URelations>
+      ? URelations[UName]
+      : never
+    : never;
+  type CCC = typeof registry extends PgRegistry<any, any, infer URelations>
+    ? URelations
+    : never;
 
   const deoptimizeIfAppropriate = EXPORTABLE(
     (__ListTransformStep, options) =>
@@ -584,79 +707,6 @@ export function makeExampleSchema(
   type RelationalCommentableStep = PgSelectSingleStep<
     typeof relationalCommentableSource
   >;
-
-  const unionEntityColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      person_id: col({ codec: TYPES.int, notNull: false }),
-      post_id: col({ codec: TYPES.int, notNull: false }),
-      comment_id: col({ codec: TYPES.int, notNull: false }),
-    }),
-    [TYPES, col],
-  );
-
-  const personBookmarkColumns = EXPORTABLE(
-    (TYPES, col, recordCodec, sql, unionEntityColumns) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      person_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "person", attribute: "id" },
-      }),
-      bookmarked_entity: col({
-        codec: recordCodec({
-          name: "union__entity",
-          identifier: sql`interfaces_and_unions.union__entity`,
-          columns: unionEntityColumns,
-        }),
-        notNull: true,
-      }),
-    }),
-    [TYPES, col, recordCodec, sql, unionEntityColumns],
-  );
-  const personBookmarksSourceBuilder = EXPORTABLE(
-    (PgSource, executor, personBookmarkColumns, recordCodec, selectAuth, sql) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "person_bookmarks",
-          identifier: sql`interfaces_and_unions.person_bookmarks`,
-          columns: personBookmarkColumns,
-        }),
-        source: sql`interfaces_and_unions.person_bookmarks`,
-        name: "person_bookmarks",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, personBookmarkColumns, recordCodec, selectAuth, sql],
-  );
-
-  const personColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      person_id: col({ codec: TYPES.int, notNull: true }),
-      username: col({ codec: TYPES.text, notNull: true }),
-    }),
-    [TYPES, col],
-  );
-
-  const personSourceBuilder = EXPORTABLE(
-    (PgSource, executor, personColumns, recordCodec, selectAuth, sql) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "interfaces_and_unions.people",
-          identifier: sql`interfaces_and_unions.people`,
-          columns: personColumns,
-        }),
-        source: sql`interfaces_and_unions.people`,
-        name: "people",
-        uniques: [
-          { columns: ["person_id"], isPrimary: true },
-          { columns: ["username"] },
-        ],
-      }),
-    [PgSource, executor, personColumns, recordCodec, selectAuth, sql],
-  );
 
   const postColumns = EXPORTABLE(
     (TYPES, col) => ({
@@ -869,21 +919,6 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSource, executor, recordCodec, selectAuth, singleTableItemColumns, sql],
-  );
-
-  const personBookmarksSource = EXPORTABLE(
-    (personBookmarksSourceBuilder, personSourceBuilder) =>
-      personBookmarksSourceBuilder.build({
-        relations: {
-          person: {
-            source: personSourceBuilder,
-            isUnique: true,
-            localColumns: ["person_id"],
-            remoteColumns: ["person_id"],
-          },
-        },
-      }),
-    [personBookmarksSourceBuilder, personSourceBuilder],
   );
 
   const personSource = EXPORTABLE(

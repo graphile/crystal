@@ -43,6 +43,7 @@ import type {
   PgSourceParameterAny,
   PgCodecRelation,
   PgTypeCodecWithColumns,
+  PgRegistryConfig,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
@@ -551,15 +552,37 @@ export class PgSource<
     return chalk.bold.blue(`PgSource(${this.name})`);
   }
 
-  public getRelations(): GetPgRegistryCodecRelations<TRegistry, TCodec> {
+  public getRelations(): TRegistry["pgRelations"][TCodec extends PgTypeCodec<
+    infer UName,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any
+  >
+    ? UName
+    : never] {
     return this.registry.pgRelations[this.codec.name];
   }
 
   public getRelation<
-    TRelationName extends keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
+    TRelationName extends keyof TRegistry["pgRelations"][TCodec extends PgTypeCodec<
+      infer UName,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    >
+      ? UName
+      : never],
   >(
     name: TRelationName,
-  ): GetPgRegistryCodecRelations<TRegistry, TCodec>[TRelationName] {
+  ): TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+    ? TRegistry["pgRelations"][UName][TRelationName]
+    : never {
     return this.getRelations()[name];
   }
 
@@ -980,52 +1003,121 @@ export interface PgRegistryBuilder<
     TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
       ? Simplify<
           TRelations & {
-            [relationName in TCodecRelationName]: TRelations[UName] &
-              TCodecRelation;
+            [codecName in UName]: {
+              [relationName in TCodecRelationName]: TCodecRelation;
+            };
           }
         >
       : never
+    /*
+    TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+      ? TRelations extends { [codecName in UName]: infer UExist }
+        ? Simplify<
+            TRelations & {
+              [codecName in UName]: Simplify<
+                UExist & {
+                  [relationName in TCodecRelationName]: TCodecRelation;
+                }
+              >;
+            }
+          >
+        : Simplify<
+            TRelations & {
+              [codecName in UName]: {
+                [relationName in TCodecRelationName]: TCodecRelation;
+              };
+            }
+          >
+      : never
+*/
   >;
 
   build(): PgRegistry<TCodecs, TSources, TRelations>;
 }
 
+export function makeRegistry<
+  TCodecs extends {
+    [name in string]: PgTypeCodec<
+      name,
+      PgTypeColumns | undefined,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  },
+  TSourceOptions extends {
+    [name in string]: PgSourceOptions<
+      PgTypeCodecAny,
+      ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+      readonly PgSourceParameterAny[] | undefined,
+      name
+    >;
+  },
+  TRelations extends {
+    [codecName in keyof TCodecs]?: {
+      [relationName in string]: PgCodecRelation<
+        PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+      >;
+    };
+  },
+>(
+  config: PgRegistryConfig<TCodecs, TSourceOptions, TRelations>,
+): PgRegistry<TCodecs, TSourceOptions, TRelations> {
+  const registry: PgRegistry<TCodecs, TSourceOptions, TRelations> = {
+    pgCodecs: config.pgCodecs,
+    pgSources: Object.create(null) as any,
+    pgRelations: config.pgRelations,
+  };
+
+  for (const key of Object.keys(config.pgSources) as (keyof TSourceOptions)[]) {
+    registry.pgSources[key] = new PgSource(
+      registry,
+      config.pgSources[key],
+    ) as any;
+  }
+
+  return registry;
+}
+
 export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
-  const registry: PgRegistry<any, any, any> = {
+  const registryConfig: PgRegistryConfig<any, any, any> = {
     pgCodecs: {},
     pgSources: {},
     pgRelations: {},
   };
   const builder: PgRegistryBuilder<any, any, any> = {
     addCodec(codec) {
-      registry.pgCodecs[codec.name] = codec;
+      registryConfig.pgCodecs[codec.name] = codec;
       return builder;
     },
     /*
     addCodecs(codecs) {
       for (const codec of codecs) {
-        registry.pgCodecs[codec.name] = codec;
+        registryConfig.pgCodecs[codec.name] = codec;
       }
       return builder;
     },
     */
     addSource(source) {
-      registry.pgSources[source.name] = source;
+      registryConfig.pgSources[source.name] = source;
       return builder;
     },
     /*
     addSources(sources) {
       for (const source of sources) {
-        registry.pgSources[source.name] = source;
+        registryConfig.pgSources[source.name] = source;
       }
       return builder;
     },
     */
     addRelation(localCodec, relationName, remoteSource, relation) {
-      if (!registry.pgRelations[localCodec.name]) {
-        registry.pgRelations[localCodec.name] = Object.create(null);
+      if (!registryConfig.pgRelations[localCodec.name]) {
+        registryConfig.pgRelations[localCodec.name] = Object.create(null);
       }
-      registry.pgRelations[localCodec.name][relationName] = {
+      registryConfig.pgRelations[localCodec.name][relationName] = {
         localCodec,
         remoteSource,
         ...relation,
@@ -1033,7 +1125,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return builder;
     },
     build() {
-      return registry;
+      return makeRegistry(registryConfig);
     },
   };
   return builder;

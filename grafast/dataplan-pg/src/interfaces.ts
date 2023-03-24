@@ -529,7 +529,7 @@ export interface PgCodecRelation<
   description?: string;
 }
 
-export interface PgRegistry<
+export interface PgRegistryConfig<
   TCodecs extends {
     [name in string]: PgTypeCodec<
       name,
@@ -541,7 +541,7 @@ export interface PgRegistry<
       any
     >;
   },
-  TSources extends {
+  TSourceOptions extends {
     [name in string]: PgSourceOptions<
       PgTypeCodecAny,
       ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
@@ -559,7 +559,57 @@ export interface PgRegistry<
   },
 > {
   pgCodecs: TCodecs;
-  pgSources: TSources;
+  // TODO: Rename to pgSourceOptions?
+  pgSources: TSourceOptions;
+  pgRelations: TRelations;
+}
+
+export interface PgRegistry<
+  TCodecs extends {
+    [name in string]: PgTypeCodec<
+      name,
+      PgTypeColumns | undefined,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  },
+  TSourceOptions extends {
+    [name in string]: PgSourceOptions<
+      PgTypeCodecAny,
+      ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+      readonly PgSourceParameterAny[] | undefined,
+      name
+    >;
+  },
+  TRelations extends {
+    [codecName in keyof TCodecs]?: {
+      [relationName in string]: PgCodecRelation<
+        PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+      >;
+    };
+  },
+> {
+  pgCodecs: TCodecs;
+  pgSources: {
+    [name in keyof TSourceOptions]: TSourceOptions[name] extends PgSourceOptions<
+      infer UCodec,
+      infer UUniques,
+      infer UParameters,
+      infer UName
+    >
+      ? PgSource<
+          PgRegistry<TCodecs, TSourceOptions, TRelations>,
+          UCodec,
+          UUniques,
+          UParameters,
+          UName
+        >
+      : never;
+  };
   pgRelations: TRelations;
 }
 
@@ -619,17 +669,9 @@ export type GetPgRegistryCodecRelations<
   TRegistry extends PgRegistry<any, any, any>,
   TCodec extends GetPgRegistryCodecs<TRegistry>[keyof GetPgRegistryCodecs<TRegistry>],
 > = TRegistry extends PgRegistry<any, any, infer URelations>
-  ? URelations[TCodec extends PgTypeCodec<
-      infer UCodecName,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any
-    >
-      ? UCodecName
-      : never]
+  ? TCodec extends PgTypeCodec<infer UCodecName, any, any, any, any, any, any>
+    ? URelations[UCodecName]
+    : never
   : never;
 
 export type GetPgCodecColumns<TCodec extends PgTypeCodecAny> =
