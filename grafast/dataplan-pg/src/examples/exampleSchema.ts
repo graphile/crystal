@@ -152,19 +152,6 @@ export interface OurGraphQLContext extends Grafast.Context {
   |                               DATA SOURCES                               |
   +--------------------------------------------------------------------------+*/
 
-/**
- * Expand this interface with your own types.
- */
-export interface GraphQLTypeFromPostgresType {
-  text: string;
-  citext: string;
-  uuid: string;
-  timestamptz: string;
-  int: number;
-  float: number;
-  boolean: boolean;
-}
-
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
