@@ -469,7 +469,7 @@ export interface PgCodecRelation<
     any,
     undefined
   >,
-  TRemoteSource extends PgSource<any, PgTypeCodecWithColumns, any, any, any>,
+  TRemoteSource extends PgSource<any, any, any, any, any>,
 > {
   /* Where the relationship starts */
   localCodec: TLocalCodec;
@@ -535,15 +535,15 @@ export interface PgRegistry<
   },
   TSources extends {
     [name in string]: PgSource<
-      PgRegistry<TCodecs, any, any>,
-      TCodecs[keyof TCodecs],
+      PgRegistry<any, any, any>,
+      PgTypeCodecAny,
       ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
       readonly PgSourceParameterAny[] | undefined,
       name
     >;
   },
   TRelations extends {
-    [codecName in keyof TCodecs]: {
+    [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelation<
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
         PgSource<any, PgTypeCodecWithColumns, any, any, any>

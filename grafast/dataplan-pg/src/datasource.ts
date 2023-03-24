@@ -43,6 +43,8 @@ import type {
   PlanByUniques,
   PgSourceParameterAny,
   PgSourceAny,
+  PgCodecRelation,
+  PgTypeCodecWithColumns,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
@@ -263,9 +265,7 @@ export class PgSource<
   public readonly name: TName;
   public readonly identifier: string;
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
-  public readonly uniques: ReadonlyArray<
-    PgSourceUnique<GetPgCodecColumns<TCodec>>
-  >;
+  public readonly uniques: TUniques;
   private readonly _options: PgSourceOptions<
     TRegistry,
     TCodec,
@@ -905,3 +905,217 @@ export class PgEnumSource<TValue extends string> {
   }
 }
 exportAs(PgEnumSource, "PgEnumSource");
+
+export function addRelations<
+  TRegistry extends PgRegistry<any, any, any>,
+  TCodec extends TRegistry extends PgRegistry<infer UCodecs, any, any>
+    ? UCodecs[keyof UCodecs]
+    : never,
+>(
+  registry: TRegistry,
+  codec: TCodec,
+  relations: TRegistry extends PgRegistry<any, any, infer URelations>
+    ? Partial<URelations[TCodec["name"]]>
+    : never,
+) {
+  if (!registry.pgRelations[codec.name]) {
+    registry.pgRelations[codec.name] = Object.create(null);
+  }
+  Object.assign(registry.pgRelations[codec.name], relations);
+}
+exportAs(addRelations, "addRelations");
+
+/*
+export function makeRegistry<
+TInCodec,
+TInSource
+>(codecs: TCodecs[], sources: TSources[]) {
+  const foo = {
+    withRelation(relation: PgCodecRelation<>):
+  };
+  return foo;
+  return function withRelations(relations: TRelations):  {
+  }
+}
+*/
+
+export type Simplify<T> = { [TKey in keyof T]: T[TKey] } & {};
+
+interface PgRegistryBuilder<
+  TCodecs extends {
+    [name in string]: PgTypeCodec<
+      name,
+      PgTypeColumns | undefined,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  },
+  TSources extends {
+    [name in string]: PgSource<
+      PgRegistry<any, any, any>,
+      PgTypeCodecAny,
+      ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+      readonly PgSourceParameterAny[] | undefined
+    >;
+  },
+  TRelations extends {
+    [codecName in keyof TCodecs]?: {
+      [relationName in string]: PgCodecRelation<
+        PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgSource<any, PgTypeCodecWithColumns, any, any>
+      >;
+    };
+  },
+> {
+  addCodec<const TCodec extends PgTypeCodecAny>(
+    codec: TCodec,
+  ): PgRegistryBuilder<
+    TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+      ? Simplify<
+          TCodecs & {
+            [name in UName]: TCodec;
+          }
+        >
+      : never,
+    TSources,
+    TRelations
+  >;
+  addCodecs<const TCodec extends PgTypeCodecAny>(
+    codec: readonly TCodec[],
+  ): PgRegistryBuilder<
+    TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+      ? Simplify<
+          TCodecs & {
+            [name in UName]: TCodec;
+          }
+        >
+      : never,
+    TSources,
+    TRelations
+  >;
+  addSource<const TSource extends PgSource<any, any, any, any>>(
+    source: TSource,
+  ): PgRegistryBuilder<
+    TSource extends PgSource<any, infer UCodec, any, any>
+      ? UCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+        ? Simplify<
+            TCodecs & {
+              [name in UName]: UCodec;
+            }
+          >
+        : never
+      : never,
+    TSource extends PgSource<any, any, any, any, infer UName>
+      ? Simplify<
+          TSources & {
+            [name in UName]: TSource;
+          }
+        >
+      : never,
+    TRelations
+  >;
+  addSources<const TSource extends PgSource<any, any, any, any>>(
+    source: TSource[],
+  ): PgRegistryBuilder<
+    TSource extends PgSource<any, infer UCodec, any, any>
+      ? UCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+        ? Simplify<
+            TCodecs & {
+              [name in UName]: UCodec;
+            }
+          >
+        : never
+      : never,
+    Simplify<
+      TSource extends PgSource<any, any, any, any, infer UName>
+        ? TSources & {
+            [name in UName]: TSource;
+          }
+        : never
+    >,
+    TRelations
+  >;
+  addRelations<
+    TCodec extends PgTypeCodec<
+      string,
+      PgTypeColumns,
+      any,
+      any,
+      undefined,
+      any,
+      undefined
+    >,
+    TCodecRelations extends {
+      [relationName in string]: PgCodecRelation<
+        TCodec,
+        PgSource<any, any, any, any, any>
+      >;
+    },
+  >(
+    codec: TCodec,
+    relations: TCodecRelations,
+  ): PgRegistryBuilder<
+    TCodecs,
+    TSources,
+    TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+      ? Simplify<
+          TRelations & {
+            [relationName in UName]: TRelations[UName] & TCodecRelations;
+          }
+        >
+      : never
+  >;
+
+  /** Only use this for building sources */
+  getUntypedRegistry(): PgRegistry<any, any, any>;
+  build(): PgRegistry<TCodecs, TSources, TRelations>;
+}
+
+export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
+  const registry: PgRegistry<any, any, any> = {
+    pgCodecs: {},
+    pgSources: {},
+    pgRelations: {},
+  };
+  const builder: PgRegistryBuilder<any, any, any> = {
+    addCodec(codec) {
+      registry.pgCodecs[codec.name] = codec;
+      return builder;
+    },
+    addCodecs(codecs) {
+      for (const codec of codecs) {
+        registry.pgCodecs[codec.name] = codec;
+      }
+      return builder;
+    },
+    addSource(source) {
+      registry.pgSources[source.name] = source;
+      return builder;
+    },
+    addSources(sources) {
+      for (const source of sources) {
+        registry.pgSources[source.name] = source;
+      }
+      return builder;
+    },
+    addRelations(codec, relations) {
+      if (!registry.pgRelations[codec.name]) {
+        registry.pgRelations[codec.name] = Object.create(null);
+      }
+      Object.assign(registry.pgRelations[codec.name], relations);
+      return builder;
+    },
+    getUntypedRegistry() {
+      return registry;
+    },
+    build() {
+      return registry;
+    },
+  };
+  return builder;
+}
+
+exportAs(makeRegistryBuilder, "makeRegistryBuilder");

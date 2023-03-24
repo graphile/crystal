@@ -389,8 +389,11 @@ function makeSQLValueToRecord<TColumns extends PgTypeColumns>(
   };
 }
 
-export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
-  name: string;
+export type PgRecordTypeCodecSpec<
+  TName extends string,
+  TColumns extends PgTypeColumns,
+> = {
+  name: TName;
   identifier: SQL;
   columns: TColumns;
   polymorphism?: PgTypeCodecPolymorphism<any>;
@@ -408,10 +411,13 @@ export type PgRecordTypeCodecSpec<TColumns extends PgTypeColumns> = {
  * extensions - an optional object that you can use to associate arbitrary data with this type
  * isAnonymous - if true, this represents an "anonymous" type, typically the return value of a function or something like that. If this is true, then name and identifier are ignored.
  */
-export function recordCodec<TColumns extends PgTypeColumns>(
-  config: PgRecordTypeCodecSpec<TColumns>,
+export function recordCodec<
+  const TName extends string,
+  const TColumns extends PgTypeColumns,
+>(
+  config: PgRecordTypeCodecSpec<TName, TColumns>,
 ): PgTypeCodec<
-  string,
+  TName,
   TColumns,
   string,
   ObjectFromPgTypeColumns<TColumns>,
@@ -1023,6 +1029,11 @@ export const TYPES = {
   }),
 } as const;
 exportAs(TYPES, "TYPES");
+
+type PgBaseCodecs = (typeof TYPES)[keyof typeof TYPES];
+export type PgBaseCodecsObject = {
+  [codecName in PgBaseCodecs as PgBaseCodecs["name"]]: PgBaseCodecs;
+};
 
 /**
  * For supported builtin type names ('void', 'bool', etc) that will be found in

@@ -76,8 +76,9 @@ import type {
   PgTypeColumnVia,
   WithPgClient,
 } from "../";
+import { makeRegistryBuilder } from "../";
 import type { PgSubscriber } from "../adaptors/pg.js";
-import type { PgTypeColumns } from "../codecs.js";
+import type { PgBaseCodecsObject, PgTypeColumns } from "../codecs.js";
 import { listOfCodec } from "../codecs.js";
 import {
   BooleanFilterStep,
@@ -97,12 +98,14 @@ import {
   PgSelectSingleStep,
   pgSingleTablePolymorphic,
   PgSource,
-  PgSourceBuilder,
   pgUpdate,
   PgUpdateStep,
   recordCodec,
   TYPES,
 } from "../index.js";
+import type { PgTypeCodecAny } from "../interfaces";
+import type { GetPgSourceColumns } from "../interfaces";
+import { PgRegistry, PgRegistryAny } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -113,7 +116,6 @@ import {
   WithPgClientStep,
   withPgClientTransaction,
 } from "../steps/withPgClient.js";
-import { GetPgSourceColumns } from "../interfaces";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -156,6 +158,353 @@ export interface OurGraphQLContext extends Grafast.Context {
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
+  const executor = EXPORTABLE(
+    (PgExecutor, context, object) =>
+      new PgExecutor({
+        name: "default",
+        context: () => {
+          const $context = context<OurGraphQLContext>();
+          return object<
+            PgExecutorContextPlans<OurGraphQLContext["pgSettings"]>
+          >({
+            pgSettings: $context.get("pgSettings"),
+            withPgClient: $context.get("withPgClient"),
+          });
+        },
+      }),
+    [PgExecutor, context, object],
+  );
+
+  /**
+   * Applies auth checks to the plan; we are using a placeholder here for now.
+   */
+  const selectAuth = EXPORTABLE(
+    (sql) => ($step: PgSelectStep<any>) => {
+      $step.where(sql`true /* authorization checks */`);
+    },
+    [sql],
+  );
+
+  const registry = EXPORTABLE(
+    (
+      PgSource,
+      TYPES,
+      executor,
+      listOfCodec,
+      makeRegistryBuilder,
+      recordCodec,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ) => {
+      const col = <
+        TOptions extends {
+          codec: PgTypeCodecAny;
+          notNull?: boolean;
+          expression?: PgTypeColumn<any>["expression"];
+          // TODO: we could make TypeScript understand the relations on the object
+          // rather than just being string.
+          via?: PgTypeColumnVia;
+          identicalVia?: PgTypeColumnVia;
+        },
+      >(
+        options: TOptions,
+      ): PgTypeColumn<TOptions extends { codec: infer U } ? U : never> => {
+        const { notNull, codec, expression, via, identicalVia } = options;
+        return {
+          codec: codec as TOptions extends { codec: infer U } ? U : never,
+          notNull: !!notNull,
+          expression,
+          via,
+          identicalVia,
+        };
+      };
+
+      const userColumns = {
+        id: col({ notNull: true, codec: TYPES.uuid }),
+        username: col({ notNull: true, codec: TYPES.citext }),
+        gravatar_url: col({ codec: TYPES.text }),
+        created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+      };
+
+      const messageColumns = {
+        id: col({ notNull: true, codec: TYPES.uuid }),
+        body: col({ notNull: true, codec: TYPES.text }),
+        author_id: col({
+          notNull: true,
+          codec: TYPES.uuid,
+          identicalVia: { relation: "author", attribute: "person_id" },
+        }),
+        forum_id: col({
+          notNull: true,
+          codec: TYPES.uuid,
+          identicalVia: { relation: "forum", attribute: "id" },
+        }),
+        created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+        archived_at: col({ codec: TYPES.timestamptz }),
+        featured: col({ codec: TYPES.boolean }),
+        is_archived: col({
+          codec: TYPES.boolean,
+          expression: (alias) => sql`${alias}.archived_at is not null`,
+        }),
+      };
+
+      const forumColumns = {
+        id: col({ notNull: true, codec: TYPES.uuid }),
+        name: col({ notNull: true, codec: TYPES.citext }),
+        archived_at: col({ codec: TYPES.timestamptz }),
+        is_archived: col({
+          codec: TYPES.boolean,
+          expression: (alias) => sql`${alias}.archived_at is not null`,
+        }),
+      };
+      const forumCodec = recordCodec({
+        name: "forums",
+        identifier: sql`app_public.forums`,
+        columns: forumColumns,
+      });
+      const userCodec = recordCodec({
+        name: "users",
+        identifier: sql`app_public.users`,
+        columns: userColumns,
+      });
+      const messagesCodec = recordCodec({
+        name: "messages",
+        identifier: sql`app_public.messages`,
+        columns: messageColumns,
+      });
+
+      const uniqueAuthorCountSource = new PgSource({
+        registry,
+        executor,
+        selectAuth,
+        codec: TYPES.int,
+        source: (...args) =>
+          sql`app_public.unique_author_count(${sqlFromArgDigests(args)})`,
+        name: "unique_author_count",
+        parameters: [
+          {
+            name: "featured",
+            required: false,
+            codec: TYPES.boolean,
+          },
+        ],
+        isUnique: true,
+      });
+
+      const forumNamesArraySource = new PgSource({
+        registry,
+        executor,
+        selectAuth,
+        codec: listOfCodec(TYPES.text),
+        source: (...args) =>
+          sql`app_public.forum_names_array(${sqlFromArgDigests(args)})`,
+        name: "forum_names_array",
+        parameters: [],
+        isUnique: true, // No setof
+      });
+
+      const forumNamesCasesSource = new PgSource({
+        registry,
+        executor,
+        selectAuth,
+        codec: listOfCodec(TYPES.text),
+        source: (...args) =>
+          sql`app_public.forum_names_cases(${sqlFromArgDigests(args)})`,
+        name: "forum_names_cases",
+        parameters: [],
+      });
+
+      const forumsUniqueAuthorCountSource = new PgSource({
+        registry,
+        executor,
+        selectAuth,
+        codec: TYPES.int,
+        source: (...args) =>
+          sql`app_public.forums_unique_author_count(${sqlFromArgDigests(
+            args,
+          )})`,
+        name: "forums_unique_author_count",
+        parameters: [
+          {
+            name: "forums",
+            required: true,
+            codec: forumCodec,
+          },
+          {
+            name: "featured",
+            required: false,
+            codec: TYPES.boolean,
+          },
+        ],
+        isUnique: true,
+      });
+
+      const scalarTextSource = new PgSource({
+        registry,
+        executor,
+        selectAuth,
+        codec: TYPES.text,
+        source: sql`(select '')`,
+        name: "text",
+      });
+
+      const messageSourceBuilder = new PgSource({
+        registry,
+        executor,
+        selectAuth,
+        codec: messagesCodec,
+        source: sql`app_public.messages`,
+        name: "messages",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+
+      const userSource = new PgSource({
+        registry,
+        executor,
+        selectAuth,
+        codec: userCodec,
+        source: sql`app_public.users`,
+        name: "users",
+        uniques: [
+          { columns: ["id"], isPrimary: true },
+          { columns: ["username"] },
+        ],
+      });
+
+      const forumSource = new PgSource({
+        registry,
+        executor,
+        selectAuth,
+        codec: forumCodec,
+        source: sql`app_public.forums`,
+        name: "forums",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+
+      const usersMostRecentForumSource = forumSource.functionSource({
+        name: "users_most_recent_forum",
+        source: (...args) =>
+          sql`app_public.users_most_recent_forum(${sqlFromArgDigests(args)})`,
+        returnsArray: false,
+        returnsSetof: false,
+        parameters: [
+          {
+            name: "u",
+            codec: userSource.codec,
+            required: true,
+            notNull: true,
+          },
+        ],
+      });
+
+      const featuredMessages = messageSource.functionSource({
+        name: "featured_messages",
+        source: (...args) =>
+          sql`app_public.featured_messages(${sqlFromArgDigests(args)})`,
+        returnsSetof: true,
+        returnsArray: false,
+        parameters: [],
+      });
+
+      const forumsFeaturedMessages = messageSource.functionSource({
+        name: "forums_featured_messages",
+        source: (...args) =>
+          sql`app_public.forums_featured_messages(${sqlFromArgDigests(args)})`,
+        returnsSetof: true,
+        returnsArray: false,
+        parameters: [
+          {
+            name: "forum",
+            required: true,
+            codec: forumCodec,
+          },
+        ],
+      });
+
+      const randomUserArraySource = userSource.functionSource({
+        name: "random_user_array",
+        source: (...args) =>
+          sql`app_public.random_user_array(${sqlFromArgDigests(args)})`,
+        returnsArray: true,
+        returnsSetof: false,
+        parameters: [],
+      });
+
+      const randomUserArraySetSource = userSource.functionSource({
+        name: "random_user_array_set",
+        source: (...args) =>
+          sql`app_public.random_user_array_set(${sqlFromArgDigests(args)})`,
+        returnsSetof: true,
+        returnsArray: true,
+        parameters: [],
+      });
+
+      const forumsMessagesListSetSource = messageSource.functionSource({
+        name: "forums_messages_list_set",
+        source: (...args) =>
+          sql`app_public.forums_messages_list_set(${sqlFromArgDigests(args)})`,
+        parameters: [],
+        returnsArray: true,
+        returnsSetof: true,
+        extensions: {
+          tags: {
+            name: "messagesListSet",
+          },
+        },
+      });
+
+      return makeRegistryBuilder()
+        .addCodecs([forumCodec, userCodec, messagesCodec])
+        .addSources([
+          uniqueAuthorCountSource,
+          forumNamesArraySource,
+          forumNamesCasesSource,
+          forumsUniqueAuthorCountSource,
+          scalarTextSource,
+          messageSourceBuilder,
+          userSource,
+          forumSource,
+          usersMostRecentForumSource,
+          featuredMessages,
+          forumsFeaturedMessages,
+          randomUserArraySource,
+          randomUserArraySetSource,
+          forumsMessagesListSetSource,
+        ])
+        .addRelations(messagesCodec, {
+          author: {
+            localCodec: messagesCodec,
+            remoteSource: userSource,
+            localColumns: [`author_id`],
+            remoteColumns: [`id`],
+            isUnique: true,
+          },
+          forum: {
+            localCodec: messagesCodec,
+            remoteSource: forumSource,
+            localColumns: ["forum_id"],
+            remoteColumns: ["id"],
+            isUnique: true,
+          },
+        })
+        .build();
+    },
+    [
+      PgSource,
+      TYPES,
+      executor,
+      listOfCodec,
+      makeRegistryBuilder,
+      recordCodec,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ],
+  );
+
+  // registry.p
+
   const deoptimizeIfAppropriate = EXPORTABLE(
     (__ListTransformStep, options) =>
       <
@@ -232,410 +581,39 @@ export function makeExampleSchema(
   type RelationalCommentableStep = PgSelectSingleStep<
     typeof relationalCommentableSource
   >;
-
-  const col = <
-    TOptions extends {
-      codec: PgTypeCodec<any, any, any, any, any, any>;
-      notNull?: boolean;
-      expression?: PgTypeColumn<any>["expression"];
-      // TODO: we could make TypeScript understand the relations on the object
-      // rather than just being string.
-      via?: PgTypeColumnVia;
-      identicalVia?: PgTypeColumnVia;
+  /*
+  type MyRegistry = PgRegistry<
+    PgBaseCodecsObject & {
+      forums: typeof forumCodec;
+      users: typeof userCodec;
+      messages: typeof messagesCodec;
     },
-  >(
-    options: TOptions,
-  ): PgTypeColumn<TOptions extends { codec: infer U } ? U : never> => {
-    const { notNull, codec, expression, via, identicalVia } = options;
-    return {
-      codec: codec as TOptions extends { codec: infer U } ? U : never,
-      notNull: !!notNull,
-      expression,
-      via,
-      identicalVia,
-    };
+    {
+      unique_author_count: typeof uniqueAuthorCountSource;
+      forum_names_array: typeof forumNamesArraySource;
+      forum_names_cases: typeof forumNamesCasesSource;
+      forums_unique_author_count: typeof forumsUniqueAuthorCountSource;
+      text: typeof scalarTextSource;
+      messages: typeof messageSourceBuilder;
+      users: typeof userSource;
+      forums: typeof forumSource;
+      users_most_recent_forum: typeof usersMostRecentForumSource;
+      person: typeof personSource;
+    },
+    {
+      person: {};
+      forums: {};
+    }
+  >;
+  */
+
+  /*
+  const registry: MyRegistry = {
+    pgCodecs: { forums: forumCodec, users: userCodec },
+    pgSources: {} as any,
+    pgRelations: {} as any,
   };
-
-  const userColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      id: col({ notNull: true, codec: TYPES.uuid }),
-      username: col({ notNull: true, codec: TYPES.citext }),
-      gravatar_url: col({ codec: TYPES.text }),
-      created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-    }),
-    [TYPES, col],
-  );
-
-  const forumColumns = EXPORTABLE(
-    (TYPES, col, sql) => ({
-      id: col({ notNull: true, codec: TYPES.uuid }),
-      name: col({ notNull: true, codec: TYPES.citext }),
-      archived_at: col({ codec: TYPES.timestamptz }),
-      is_archived: col({
-        codec: TYPES.boolean,
-        expression: (alias) => sql`${alias}.archived_at is not null`,
-      }),
-    }),
-    [TYPES, col, sql],
-  );
-  const forumCodec = EXPORTABLE(
-    (forumColumns, recordCodec, sql) =>
-      recordCodec({
-        name: "forums",
-        identifier: sql`app_public.forums`,
-        columns: forumColumns,
-      }),
-    [forumColumns, recordCodec, sql],
-  );
-
-  const messageColumns = EXPORTABLE(
-    (TYPES, col, sql) => ({
-      id: col({ notNull: true, codec: TYPES.uuid }),
-      body: col({ notNull: true, codec: TYPES.text }),
-      author_id: col({
-        notNull: true,
-        codec: TYPES.uuid,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      forum_id: col({
-        notNull: true,
-        codec: TYPES.uuid,
-        identicalVia: { relation: "forum", attribute: "id" },
-      }),
-      created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-      archived_at: col({ codec: TYPES.timestamptz }),
-      featured: col({ codec: TYPES.boolean }),
-      is_archived: col({
-        codec: TYPES.boolean,
-        expression: (alias) => sql`${alias}.archived_at is not null`,
-      }),
-    }),
-    [TYPES, col, sql],
-  );
-
-  const executor = EXPORTABLE(
-    (PgExecutor, context, object) =>
-      new PgExecutor({
-        name: "default",
-        context: () => {
-          const $context = context<OurGraphQLContext>();
-          return object<
-            PgExecutorContextPlans<OurGraphQLContext["pgSettings"]>
-          >({
-            pgSettings: $context.get("pgSettings"),
-            withPgClient: $context.get("withPgClient"),
-          });
-        },
-      }),
-    [PgExecutor, context, object],
-  );
-
-  /**
-   * Applies auth checks to the plan; we are using a placeholder here for now.
-   */
-  const selectAuth = EXPORTABLE(
-    (sql) => ($step: PgSelectStep<any>) => {
-      $step.where(sql`true /* authorization checks */`);
-    },
-    [sql],
-  );
-
-  const uniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, selectAuth, sql, sqlFromArgDigests) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: TYPES.int,
-        source: (...args) =>
-          sql`app_public.unique_author_count(${sqlFromArgDigests(args)})`,
-        name: "unique_author_count",
-        parameters: [
-          {
-            name: "featured",
-            required: false,
-            codec: TYPES.boolean,
-          },
-        ],
-        isUnique: true,
-      }),
-    [PgSource, TYPES, executor, selectAuth, sql, sqlFromArgDigests],
-  );
-
-  const forumNamesArraySource = EXPORTABLE(
-    (
-      PgSource,
-      TYPES,
-      executor,
-      listOfCodec,
-      selectAuth,
-      sql,
-      sqlFromArgDigests,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: listOfCodec(TYPES.text),
-        source: (...args) =>
-          sql`app_public.forum_names_array(${sqlFromArgDigests(args)})`,
-        name: "forum_names_array",
-        parameters: [],
-        isUnique: true, // No setof
-      }),
-    [
-      PgSource,
-      TYPES,
-      executor,
-      listOfCodec,
-      selectAuth,
-      sql,
-      sqlFromArgDigests,
-    ],
-  );
-
-  const forumNamesCasesSource = EXPORTABLE(
-    (
-      PgSource,
-      TYPES,
-      executor,
-      listOfCodec,
-      selectAuth,
-      sql,
-      sqlFromArgDigests,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: listOfCodec(TYPES.text),
-        source: (...args) =>
-          sql`app_public.forum_names_cases(${sqlFromArgDigests(args)})`,
-        name: "forum_names_cases",
-        parameters: [],
-      }),
-    [
-      PgSource,
-      TYPES,
-      executor,
-      listOfCodec,
-      selectAuth,
-      sql,
-      sqlFromArgDigests,
-    ],
-  );
-
-  const forumsUniqueAuthorCountSource = EXPORTABLE(
-    (
-      PgSource,
-      TYPES,
-      executor,
-      forumCodec,
-      selectAuth,
-      sql,
-      sqlFromArgDigests,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: TYPES.int,
-        source: (...args) =>
-          sql`app_public.forums_unique_author_count(${sqlFromArgDigests(
-            args,
-          )})`,
-        name: "forums_unique_author_count",
-        parameters: [
-          {
-            name: "forums",
-            required: true,
-            codec: forumCodec,
-          },
-          {
-            name: "featured",
-            required: false,
-            codec: TYPES.boolean,
-          },
-        ],
-        isUnique: true,
-      }),
-    [PgSource, TYPES, executor, forumCodec, selectAuth, sql, sqlFromArgDigests],
-  );
-
-  const scalarTextSource = EXPORTABLE(
-    (PgSource, TYPES, executor, selectAuth, sql) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: TYPES.text,
-        source: sql`(select '')`,
-        name: "text",
-      }),
-    [PgSource, TYPES, executor, selectAuth, sql],
-  );
-
-  const messageSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, messageColumns, recordCodec, selectAuth, sql) =>
-      new PgSourceBuilder({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "messages",
-          identifier: sql`app_public.messages`,
-          columns: messageColumns,
-        }),
-        source: sql`app_public.messages`,
-        name: "messages",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSourceBuilder, executor, messageColumns, recordCodec, selectAuth, sql],
-  );
-
-  const userSource = EXPORTABLE(
-    (PgSource, executor, recordCodec, selectAuth, sql, userColumns) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "users",
-          identifier: sql`app_public.users`,
-          columns: userColumns,
-        }),
-        source: sql`app_public.users`,
-        name: "users",
-        uniques: [
-          { columns: ["id"], isPrimary: true },
-          { columns: ["username"] },
-        ],
-      }),
-    [PgSource, executor, recordCodec, selectAuth, sql, userColumns],
-  );
-
-  const forumSource = EXPORTABLE(
-    (PgSource, executor, forumCodec, selectAuth, sql) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: forumCodec,
-        source: sql`app_public.forums`,
-        name: "forums",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, forumCodec, selectAuth, sql],
-  );
-
-  const usersMostRecentForumSource = EXPORTABLE(
-    (forumSource, sql, sqlFromArgDigests, userSource) =>
-      forumSource.functionSource({
-        name: "users_most_recent_forum",
-        source: (...args) =>
-          sql`app_public.users_most_recent_forum(${sqlFromArgDigests(args)})`,
-        returnsArray: false,
-        returnsSetof: false,
-        parameters: [
-          {
-            name: "u",
-            codec: userSource.codec,
-            required: true,
-            notNull: true,
-          },
-        ],
-      }),
-    [forumSource, sql, sqlFromArgDigests, userSource],
-  );
-
-  const messageSource = EXPORTABLE(
-    (forumSource, messageSourceBuilder, userSource) =>
-      messageSourceBuilder.build({
-        relations: {
-          author: {
-            source: userSource,
-            localColumns: [`author_id`],
-            remoteColumns: [`id`],
-            isUnique: true,
-          },
-          forum: {
-            source: forumSource,
-            localColumns: ["forum_id"],
-            remoteColumns: ["id"],
-            isUnique: true,
-          },
-        },
-      }),
-    [forumSource, messageSourceBuilder, userSource],
-  );
-
-  const featuredMessages = EXPORTABLE(
-    (messageSource, sql, sqlFromArgDigests) =>
-      messageSource.functionSource({
-        name: "featured_messages",
-        source: (...args) =>
-          sql`app_public.featured_messages(${sqlFromArgDigests(args)})`,
-        returnsSetof: true,
-        returnsArray: false,
-        parameters: [],
-      }),
-    [messageSource, sql, sqlFromArgDigests],
-  );
-
-  const forumsFeaturedMessages = EXPORTABLE(
-    (forumCodec, messageSource, sql, sqlFromArgDigests) =>
-      messageSource.functionSource({
-        name: "forums_featured_messages",
-        source: (...args) =>
-          sql`app_public.forums_featured_messages(${sqlFromArgDigests(args)})`,
-        returnsSetof: true,
-        returnsArray: false,
-        parameters: [
-          {
-            name: "forum",
-            required: true,
-            codec: forumCodec,
-          },
-        ],
-      }),
-    [forumCodec, messageSource, sql, sqlFromArgDigests],
-  );
-
-  const randomUserArraySource = EXPORTABLE(
-    (sql, sqlFromArgDigests, userSource) =>
-      userSource.functionSource({
-        name: "random_user_array",
-        source: (...args) =>
-          sql`app_public.random_user_array(${sqlFromArgDigests(args)})`,
-        returnsArray: true,
-        returnsSetof: false,
-        parameters: [],
-      }),
-    [sql, sqlFromArgDigests, userSource],
-  );
-
-  const randomUserArraySetSource = EXPORTABLE(
-    (sql, sqlFromArgDigests, userSource) =>
-      userSource.functionSource({
-        name: "random_user_array_set",
-        source: (...args) =>
-          sql`app_public.random_user_array_set(${sqlFromArgDigests(args)})`,
-        returnsSetof: true,
-        returnsArray: true,
-        parameters: [],
-      }),
-    [sql, sqlFromArgDigests, userSource],
-  );
-
-  const forumsMessagesListSetSource = EXPORTABLE(
-    (messageSource, sql, sqlFromArgDigests) =>
-      messageSource.functionSource({
-        name: "forums_messages_list_set",
-        source: (...args) =>
-          sql`app_public.forums_messages_list_set(${sqlFromArgDigests(args)})`,
-        parameters: [],
-        returnsArray: true,
-        returnsSetof: true,
-        extensions: {
-          tags: {
-            name: "messagesListSet",
-          },
-        },
-      }),
-    [messageSource, sql, sqlFromArgDigests],
-  );
+  */
 
   const unionEntityColumns = EXPORTABLE(
     (TYPES, col) => ({
@@ -666,15 +644,8 @@ export function makeExampleSchema(
     [TYPES, col, recordCodec, sql, unionEntityColumns],
   );
   const personBookmarksSourceBuilder = EXPORTABLE(
-    (
-      PgSourceBuilder,
-      executor,
-      personBookmarkColumns,
-      recordCodec,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSourceBuilder({
+    (PgSource, executor, personBookmarkColumns, recordCodec, selectAuth, sql) =>
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -686,14 +657,7 @@ export function makeExampleSchema(
         name: "person_bookmarks",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [
-      PgSourceBuilder,
-      executor,
-      personBookmarkColumns,
-      recordCodec,
-      selectAuth,
-      sql,
-    ],
+    [PgSource, executor, personBookmarkColumns, recordCodec, selectAuth, sql],
   );
 
   const personColumns = EXPORTABLE(
@@ -705,8 +669,8 @@ export function makeExampleSchema(
   );
 
   const personSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, personColumns, recordCodec, selectAuth, sql) =>
-      new PgSourceBuilder({
+    (PgSource, executor, personColumns, recordCodec, selectAuth, sql) =>
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -721,7 +685,7 @@ export function makeExampleSchema(
           { columns: ["username"] },
         ],
       }),
-    [PgSourceBuilder, executor, personColumns, recordCodec, selectAuth, sql],
+    [PgSource, executor, personColumns, recordCodec, selectAuth, sql],
   );
 
   const postColumns = EXPORTABLE(
@@ -738,8 +702,8 @@ export function makeExampleSchema(
   );
 
   const postSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, postColumns, recordCodec, selectAuth, sql) =>
-      new PgSourceBuilder({
+    (PgSource, executor, postColumns, recordCodec, selectAuth, sql) =>
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -751,7 +715,7 @@ export function makeExampleSchema(
         name: "posts",
         uniques: [{ columns: ["post_id"], isPrimary: true }],
       }),
-    [PgSourceBuilder, executor, postColumns, recordCodec, selectAuth, sql],
+    [PgSource, executor, postColumns, recordCodec, selectAuth, sql],
   );
 
   const commentColumns = EXPORTABLE(
@@ -773,8 +737,8 @@ export function makeExampleSchema(
   );
 
   const commentSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, commentColumns, executor, recordCodec, selectAuth, sql) =>
-      new PgSourceBuilder({
+    (PgSource, commentColumns, executor, recordCodec, selectAuth, sql) =>
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -786,7 +750,7 @@ export function makeExampleSchema(
         name: "comments",
         uniques: [{ columns: ["comment_id"], isPrimary: true }],
       }),
-    [PgSourceBuilder, commentColumns, executor, recordCodec, selectAuth, sql],
+    [PgSource, commentColumns, executor, recordCodec, selectAuth, sql],
   );
 
   const itemTypeEnumSource = EXPORTABLE(
@@ -817,14 +781,14 @@ export function makeExampleSchema(
 
   const enumTableItemTypeSourceBuilder = EXPORTABLE(
     (
-      PgSourceBuilder,
+      PgSource,
       enumTablesItemTypeColumns,
       executor,
       recordCodec,
       selectAuth,
       sql,
     ) =>
-      new PgSourceBuilder({
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -837,7 +801,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["type"], isPrimary: true }],
       }),
     [
-      PgSourceBuilder,
+      PgSource,
       enumTablesItemTypeColumns,
       executor,
       recordCodec,
@@ -915,14 +879,14 @@ export function makeExampleSchema(
   );
   const singleTableItemsSourceBuilder = EXPORTABLE(
     (
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       selectAuth,
       singleTableItemColumns,
       sql,
     ) =>
-      new PgSourceBuilder({
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -934,14 +898,7 @@ export function makeExampleSchema(
         name: "single_table_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [
-      PgSourceBuilder,
-      executor,
-      recordCodec,
-      selectAuth,
-      singleTableItemColumns,
-      sql,
-    ],
+    [PgSource, executor, recordCodec, selectAuth, singleTableItemColumns, sql],
   );
 
   const personBookmarksSource = EXPORTABLE(
@@ -1103,15 +1060,8 @@ export function makeExampleSchema(
   );
 
   const relationalItemsSourceBuilder = EXPORTABLE(
-    (
-      PgSourceBuilder,
-      executor,
-      recordCodec,
-      relationalItemColumns,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSourceBuilder({
+    (PgSource, executor, recordCodec, relationalItemColumns, selectAuth, sql) =>
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1123,14 +1073,7 @@ export function makeExampleSchema(
         name: "relational_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [
-      PgSourceBuilder,
-      executor,
-      recordCodec,
-      relationalItemColumns,
-      selectAuth,
-      sql,
-    ],
+    [PgSource, executor, recordCodec, relationalItemColumns, selectAuth, sql],
   );
 
   const relationalCommentableColumns = EXPORTABLE(
@@ -1150,14 +1093,14 @@ export function makeExampleSchema(
 
   const relationalCommentableSourceBuilder = EXPORTABLE(
     (
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalCommentableColumns,
       selectAuth,
       sql,
     ) =>
-      new PgSourceBuilder({
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1169,7 +1112,7 @@ export function makeExampleSchema(
         name: "relational_commentables",
       }),
     [
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalCommentableColumns,
@@ -1257,14 +1200,14 @@ export function makeExampleSchema(
   );
   const relationalTopicsSourceBuilder = EXPORTABLE(
     (
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalTopicsColumns,
       selectAuth,
       sql,
     ) =>
-      new PgSourceBuilder({
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1276,14 +1219,7 @@ export function makeExampleSchema(
         name: "relational_topics",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [
-      PgSourceBuilder,
-      executor,
-      recordCodec,
-      relationalTopicsColumns,
-      selectAuth,
-      sql,
-    ],
+    [PgSource, executor, recordCodec, relationalTopicsColumns, selectAuth, sql],
   );
 
   const relationalPostsColumns = EXPORTABLE(
@@ -1297,14 +1233,14 @@ export function makeExampleSchema(
   );
   const relationalPostsSourceBuilder = EXPORTABLE(
     (
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalPostsColumns,
       selectAuth,
       sql,
     ) =>
-      new PgSourceBuilder({
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1316,14 +1252,7 @@ export function makeExampleSchema(
         name: "relational_posts",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [
-      PgSourceBuilder,
-      executor,
-      recordCodec,
-      relationalPostsColumns,
-      selectAuth,
-      sql,
-    ],
+    [PgSource, executor, recordCodec, relationalPostsColumns, selectAuth, sql],
   );
 
   const relationalDividersColumns = EXPORTABLE(
@@ -1336,14 +1265,14 @@ export function makeExampleSchema(
   );
   const relationalDividersSourceBuilder = EXPORTABLE(
     (
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalDividersColumns,
       selectAuth,
       sql,
     ) =>
-      new PgSourceBuilder({
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1356,7 +1285,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalDividersColumns,
@@ -1374,14 +1303,14 @@ export function makeExampleSchema(
   );
   const relationalChecklistsSourceBuilder = EXPORTABLE(
     (
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalChecklistsColumns,
       selectAuth,
       sql,
     ) =>
-      new PgSourceBuilder({
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1394,7 +1323,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalChecklistsColumns,
@@ -1413,14 +1342,14 @@ export function makeExampleSchema(
   );
   const relationalChecklistItemsSourceBuilder = EXPORTABLE(
     (
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalChecklistItemsColumns,
       selectAuth,
       sql,
     ) =>
-      new PgSourceBuilder({
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1433,7 +1362,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [
-      PgSourceBuilder,
+      PgSource,
       executor,
       recordCodec,
       relationalChecklistItemsColumns,
@@ -1626,15 +1555,8 @@ export function makeExampleSchema(
     [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
   );
   const unionItemsSourceBuilder = EXPORTABLE(
-    (
-      PgSourceBuilder,
-      executor,
-      recordCodec,
-      selectAuth,
-      sql,
-      unionItemsColumns,
-    ) =>
-      new PgSourceBuilder({
+    (PgSource, executor, recordCodec, selectAuth, sql, unionItemsColumns) =>
+      new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1646,14 +1568,7 @@ export function makeExampleSchema(
         name: "union_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       }),
-    [
-      PgSourceBuilder,
-      executor,
-      recordCodec,
-      selectAuth,
-      sql,
-      unionItemsColumns,
-    ],
+    [PgSource, executor, recordCodec, selectAuth, sql, unionItemsColumns],
   );
 
   const unionTopicsColumns = EXPORTABLE(
@@ -1892,8 +1807,8 @@ export function makeExampleSchema(
   ////////////////////////////////////////
 
   const awsApplicationsSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql) => {
-      return new PgSourceBuilder({
+    (PgSource, TYPES, col, executor, recordCodec, selectAuth, sql) => {
+      return new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1914,12 +1829,12 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
     },
-    [PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql],
+    [PgSource, TYPES, col, executor, recordCodec, selectAuth, sql],
   );
 
   const gcpApplicationsSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql) => {
-      return new PgSourceBuilder({
+    (PgSource, TYPES, col, executor, recordCodec, selectAuth, sql) => {
+      return new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1940,12 +1855,12 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
     },
-    [PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql],
+    [PgSource, TYPES, col, executor, recordCodec, selectAuth, sql],
   );
 
   const firstPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql) => {
-      return new PgSourceBuilder({
+    (PgSource, TYPES, col, executor, recordCodec, selectAuth, sql) => {
+      return new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1966,12 +1881,12 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
     },
-    [PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql],
+    [PgSource, TYPES, col, executor, recordCodec, selectAuth, sql],
   );
 
   const thirdPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql) => {
-      return new PgSourceBuilder({
+    (PgSource, TYPES, col, executor, recordCodec, selectAuth, sql) => {
+      return new PgSource({
         executor,
         selectAuth,
         codec: recordCodec({
@@ -1992,7 +1907,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
     },
-    [PgSourceBuilder, TYPES, col, executor, recordCodec, selectAuth, sql],
+    [PgSource, TYPES, col, executor, recordCodec, selectAuth, sql],
   );
 
   const firstPartyVulnerabilitiesSource = EXPORTABLE(
