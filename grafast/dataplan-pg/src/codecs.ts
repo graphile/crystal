@@ -446,8 +446,8 @@ export function recordCodec<
 }
 exportAs(recordCodec, "recordCodec");
 
-export type PgEnumCodecSpec<TValue extends string> = {
-  name: string;
+export type PgEnumCodecSpec<TName extends string, TValue extends string> = {
+  name: TName;
   identifier: SQL;
   values: Array<PgEnumValue<TValue> | TValue>;
   extensions?: Partial<PgTypeCodecExtensions>;
@@ -461,9 +461,10 @@ export type PgEnumCodecSpec<TValue extends string> = {
  * - values - a list of the values that this enum can represent
  * - extensions - an optional object that you can use to associate arbitrary data with this type
  */
-export function enumCodec<TValue extends string>(
-  config: PgEnumCodecSpec<TValue>,
-): PgEnumTypeCodec<TValue> {
+export function enumCodec<
+  const TName extends string,
+  const TValue extends string,
+>(config: PgEnumCodecSpec<TName, TValue>): PgEnumTypeCodec<TName, TValue> {
   const { name, identifier, values, extensions } = config;
   return {
     name,

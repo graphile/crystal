@@ -798,7 +798,7 @@ export function makeExampleSchema(
           notNull: false,
           via: "item",
         }),
-      };
+      } as const;
 
       const relationalTopicsCodec = recordCodec({
         name: `interfaces_and_unions.relational_topics`,
@@ -3191,6 +3191,7 @@ export function makeExampleSchema(
     id: PgTypeColumn<typeof TYPES.int>;
     type: PgTypeColumn<
       PgEnumTypeCodec<
+        string,
         "TOPIC" | "POST" | "DIVIDER" | "CHECKLIST" | "CHECKLIST_ITEM"
       >
     >;

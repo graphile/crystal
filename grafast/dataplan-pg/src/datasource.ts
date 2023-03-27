@@ -34,7 +34,6 @@ import type {
   GetPgCodecColumns,
   GetPgRegistryCodecs,
   GetPgRegistryCodecRelations,
-  PgEnumTypeCodec,
   PgRefDefinition,
   PgRegistry,
   PgTypeCodec,
