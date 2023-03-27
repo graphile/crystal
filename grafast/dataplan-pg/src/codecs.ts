@@ -480,9 +480,12 @@ export function enumCodec<
 }
 exportAs(enumCodec, "enumCodec");
 
-export function isEnumCodec<TValue extends string = string>(
-  t: PgTypeCodec<string, any, any, any, any, any, any>,
-): t is PgEnumTypeCodec<TValue> {
+export function isEnumCodec<
+  TName extends string,
+  TValue extends string = string,
+>(
+  t: PgTypeCodec<TName, any, any, any, any, any, any>,
+): t is PgEnumTypeCodec<TName, TValue> {
   return "values" in t;
 }
 

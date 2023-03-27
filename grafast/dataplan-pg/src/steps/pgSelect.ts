@@ -42,7 +42,11 @@ import sql, { arraysMatch } from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
-import type { PgSource, PgSourceUnique } from "../datasource.js";
+import type {
+  PgSource,
+  PgSourceOptions,
+  PgSourceUnique,
+} from "../datasource.js";
 import type {
   GetPgSourceCodec,
   GetPgSourceColumns,
@@ -856,13 +860,7 @@ export class PgSelectStep<TSource extends PgSource<any, any, any, any, any>>
       relationIdentifier,
     ) as PgCodecRelation<
       PgTypeCodecWithColumns,
-      PgSource<
-        GetPgSourceRegistry<TSource>,
-        PgTypeCodecWithColumns,
-        any,
-        any,
-        any
-      >
+      PgSourceOptions<any, any, any, any>
     >;
     if (!relation) {
       throw new Error(

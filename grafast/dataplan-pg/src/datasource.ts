@@ -562,7 +562,7 @@ export class PgSource<
   >
     ? UName
     : never] {
-    return this.registry.pgRelations[this.codec.name];
+    return this.registry.pgRelations[this.codec.name] as any;
   }
 
   public getRelation<
@@ -610,21 +610,26 @@ export class PgSource<
   }
 
   public getReciprocal<
-    TOtherCodec extends GetPgRegistryCodecs<TRegistry>[keyof GetPgRegistryCodecs<TRegistry>],
-    TOtherRelationName extends keyof GetPgRegistryCodecRelations<
-      TRegistry,
-      TOtherCodec
-    >,
+    TOtherCodec extends TRegistry["pgCodecs"][keyof TRegistry["pgCodecs"]],
+    TOtherRelationName extends keyof TRegistry["pgRelations"][TOtherCodec extends PgTypeCodec<
+      infer UCodecName,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    >
+      ? UCodecName
+      : never],
   >(
     otherCodec: TOtherCodec,
     otherRelationName: TOtherRelationName,
   ):
     | [
-        relationName: keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
-        relation: GetPgRegistryCodecRelations<
-          TRegistry,
-          TCodec
-        >[keyof GetPgRegistryCodecRelations<TRegistry, TCodec>],
+        // TODO: tighten these types up
+        relationName: string,
+        relation: PgCodecRelation<any, any>,
       ]
     | null {
     if (this.parameters) {
@@ -657,7 +662,7 @@ export class PgSource<
       }
       return true;
     });
-    return reciprocal || null;
+    return (reciprocal as [string, PgCodecRelation<any, any>]) || null;
   }
 
   public get(
@@ -1046,7 +1051,7 @@ export function makeRegistry<
   const registry: PgRegistry<TCodecs, TSourceOptions, TRelations> = {
     pgCodecs: config.pgCodecs,
     pgSources: Object.create(null) as any,
-    pgRelations: config.pgRelations,
+    pgRelations: Object.create(null) as any, //config.pgRelations,
   };
 
   for (const key of Object.keys(config.pgSources) as (keyof TSourceOptions)[]) {
@@ -1054,6 +1059,28 @@ export function makeRegistry<
       registry,
       config.pgSources[key],
     ) as any;
+  }
+
+  for (const codecName of Object.keys(
+    config.pgRelations,
+  ) as (keyof typeof config.pgRelations)[]) {
+    const relations = config.pgRelations[codecName];
+    if (!relations) {
+      continue;
+    }
+    registry.pgRelations[codecName] = Object.create(null);
+    for (const relationName of Object.keys(
+      relations,
+    ) as (keyof typeof relations)[]) {
+      const relation = relations![relationName];
+      if (!relation) {
+        continue;
+      }
+      (registry.pgRelations as any)[codecName][relationName] = {
+        ...relation,
+        source: registry.pgSources[relation.remoteSource.name],
+      } as PgCodecRelation<any, any>;
+    }
   }
 
   return registry;

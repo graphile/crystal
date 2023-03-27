@@ -564,6 +564,58 @@ export interface PgRegistryConfig<
   pgRelations: TRelations;
 }
 
+export type SourceFromOptions<
+  TCodecs extends {
+    [name in string]: PgTypeCodec<
+      name,
+      PgTypeColumns | undefined,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  },
+  TSourceOptions extends {
+    [name in string]: PgSourceOptions<
+      PgTypeCodecAny, // TCodecs[keyof TCodecs],
+      ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+      readonly PgSourceParameterAny[] | undefined,
+      name
+    >;
+  },
+  TRelations extends {
+    [codecName in keyof TCodecs]?: {
+      [relationName in string]: PgCodecRelation<
+        // TCodecs[keyof TCodecs] &
+        PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        // TSourceOptions[keyof TSourceOptions] &
+        PgSourceOptions<
+          // TCodecs[keyof TCodecs] &
+          PgTypeCodecWithColumns,
+          any,
+          any,
+          any
+        >
+      >;
+    };
+  },
+  TSourceName extends keyof TSourceOptions,
+> = TSourceOptions[TSourceName] extends PgSourceOptions<
+  infer UCodec,
+  infer UUniques,
+  infer UParameters,
+  infer UName
+>
+  ? PgSource<
+      PgRegistry<TCodecs, TSourceOptions, TRelations>,
+      UCodec,
+      UUniques,
+      UParameters,
+      UName
+    >
+  : never;
+
 export interface PgRegistry<
   TCodecs extends {
     [name in string]: PgTypeCodec<
@@ -578,7 +630,7 @@ export interface PgRegistry<
   },
   TSourceOptions extends {
     [name in string]: PgSourceOptions<
-      PgTypeCodecAny,
+      PgTypeCodecAny, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
       readonly PgSourceParameterAny[] | undefined,
       name
@@ -587,30 +639,46 @@ export interface PgRegistry<
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelation<
+        // TCodecs[keyof TCodecs] &
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
-        PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+        // TSourceOptions[keyof TSourceOptions] &
+        PgSourceOptions<
+          // TCodecs[keyof TCodecs] &
+          PgTypeCodecWithColumns,
+          any,
+          any,
+          any
+        >
       >;
     };
   },
 > {
   pgCodecs: TCodecs;
   pgSources: {
-    [name in keyof TSourceOptions]: TSourceOptions[name] extends PgSourceOptions<
-      infer UCodec,
-      infer UUniques,
-      infer UParameters,
-      infer UName
-    >
-      ? PgSource<
-          PgRegistry<TCodecs, TSourceOptions, TRelations>,
-          UCodec,
-          UUniques,
-          UParameters,
-          UName
-        >
-      : never;
+    [name in keyof TSourceOptions]: SourceFromOptions<
+      TCodecs,
+      TSourceOptions,
+      TRelations,
+      name
+    >;
   };
-  pgRelations: TRelations;
+  pgRelations: {
+    [codecName in keyof TRelations]: {
+      [relationName in keyof TRelations[codecName]]: TRelations[codecName][relationName] & {
+        remoteSource: SourceFromOptions<
+          TCodecs,
+          TSourceOptions,
+          TRelations,
+          TRelations[codecName][relationName] extends PgCodecRelation<
+            any,
+            PgSourceOptions<any, any, any, infer USourceName>
+          >
+            ? USourceName
+            : never
+        >;
+      };
+    };
+  };
 }
 
 export type PgSourceParameterAny = PgSourceParameter<
@@ -620,10 +688,10 @@ export type PgSourceParameterAny = PgSourceParameter<
 
 export type PgSourceAny = PgSource<
   PgRegistry<any, any, any>,
-  PgTypeCodecAny,
-  ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+  PgTypeCodecAny & any,
+  ReadonlyArray<PgSourceUnique<PgTypeColumns>> & any,
   readonly PgSourceParameterAny[] | undefined,
-  string
+  string & any
 >;
 
 export type PgRegistryAny = PgRegistry<

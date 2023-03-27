@@ -21,6 +21,7 @@ import type {
   BaseGraphQLRootValue,
   GrafastSubscriber,
   GraphileArgumentConfig,
+  GraphileFieldConfig,
   ListStep,
 } from "grafast";
 import {
@@ -1634,7 +1635,8 @@ export function makeExampleSchema(
           | PgSelectStep<any>
           | PgSelectSingleStep<any>
           | PgClassExpressionStep<any, any>
-          | __ListTransformStep<PgSelectStep<any>, any, any, any>,
+          | __ListTransformStep<PgSelectStep<any>, any, any, any>
+          | ExecutableStep<any>,
       >(
         step: TStep,
       ): TStep => {
@@ -1661,6 +1663,50 @@ export function makeExampleSchema(
     PgSelectStep<TSource>,
     PgSelectSingleStep<TSource>
   >;
+
+  const {
+    pgCodecs: {
+      union__entity: unionEntityCodec,
+      relational_items: relationalItemsCodec,
+    },
+    pgSources: {
+      messages: messageSource,
+      users: userSource,
+      forums: forumSource,
+      people: personSource,
+      person_bookmarks: personBookmarksSource,
+      posts: postSource,
+      comments: commentSource,
+      single_table_items: singleTableItemsSource,
+      relational_items: relationalItemsSource,
+      relational_topics: relationalTopicsSource,
+      relational_posts: relationalPostsSource,
+      relational_dividers: relationalDividersSource,
+      relational_checklists: relationalChecklistsSource,
+      relational_checklist_items: relationalChecklistItemsSource,
+      union_items: unionItemsSource,
+      union_topics: unionTopicsSource,
+      union_posts: unionPostsSource,
+      union_dividers: unionDividersSource,
+      union_checklists: unionChecklistsSource,
+      union_checklist_items: unionChecklistItemsSource,
+      relational_commentables: relationalCommentableSource,
+      users_most_recent_forum: usersMostRecentForumSource,
+      forums_unique_author_count: forumsUniqueAuthorCountSource,
+      forums_featured_messages: forumsFeaturedMessagesSource,
+      forums_messages_list_set: forumsMessagesListSetSource,
+      text: scalarTextSource,
+      unique_author_count: uniqueAuthorCountSource,
+      forum_names_array: forumNamesArraySource,
+      forum_names_cases: forumNamesCasesSource,
+      random_user_array: randomUserArraySource,
+      random_user_array_set: randomUserArraySetSource,
+      featured_messages: featuredMessagesSource,
+      entity_search: entitySearchSource,
+      first_party_vulnerabilities: firstPartyVulnerabilitiesSource,
+      third_party_vulnerabilities: thirdPartyVulnerabilitiesSource,
+    },
+  } = registry;
 
   // type MessagesStep = PgSelectStep<typeof messageSource>;
   type MessageConnectionStep = PgConnectionPlanFromSource<typeof messageSource>;
@@ -1717,15 +1763,23 @@ export function makeExampleSchema(
     },
   });
 
-  function attrField<TColumns extends PgTypeColumns>(
-    attrName: keyof TColumns,
-    type: GraphQLOutputType,
-  ) {
+  function attrField<
+    TMyDataSource extends PgSource<any, any, any, any, any>,
+    TAttrName extends TMyDataSource extends PgSource<
+      any,
+      PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+      any,
+      any,
+      any
+    >
+      ? keyof UColumns
+      : never,
+  >(attrName: TAttrName, type: GraphQLOutputType) {
     return {
       type,
       plan: EXPORTABLE(
         (attrName) =>
-          function plan($entity: PgSelectSingleStep<any, any, any, any>) {
+          function plan($entity: PgSelectSingleStep<TMyDataSource>) {
             return $entity.get(attrName);
           },
         [attrName],
@@ -1735,7 +1789,16 @@ export function makeExampleSchema(
 
   function singleRelationField<
     TMyDataSource extends PgSource<any, any, any, any, any>,
-    TRelationName extends Parameters<TMyDataSource["getRelation"]>[0],
+    TRelationName extends TMyDataSource extends PgSource<
+      any,
+      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
+      any,
+      any,
+      any
+    >
+      ? keyof (typeof registry.pgRelations)[UCodecName &
+          keyof typeof registry.pgRelations]
+      : never,
   >(relation: TRelationName, type: GraphQLOutputType) {
     return {
       type,
@@ -1845,7 +1908,7 @@ export function makeExampleSchema(
           (deoptimizeIfAppropriate, usersMostRecentForumSource) => ($user) => {
             const $forum = usersMostRecentForumSource.execute([
               { step: $user.record() },
-            ]);
+            ]) as PgSelectStep<typeof forumSource>;
             deoptimizeIfAppropriate($forum);
             return $forum;
           },
@@ -2618,9 +2681,9 @@ export function makeExampleSchema(
       featuredMessages: {
         type: new GraphQLList(Message),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, forumsFeaturedMessages) =>
+          (deoptimizeIfAppropriate, forumsFeaturedMessagesSource) =>
             function plan($forum) {
-              const $messages = forumsFeaturedMessages.execute([
+              const $messages = forumsFeaturedMessagesSource.execute([
                 {
                   step: $forum.record(),
                 },
@@ -2628,7 +2691,7 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate($messages);
               return $messages;
             },
-          [deoptimizeIfAppropriate, forumsFeaturedMessages],
+          [deoptimizeIfAppropriate, forumsFeaturedMessagesSource],
         ),
       },
 
@@ -2866,15 +2929,7 @@ export function makeExampleSchema(
       personSource,
       postSource,
     ): PgPolymorphicTypeMap<
-      | PgSelectSingleStep<any, any, any, any>
-      | PgClassExpressionStep<
-          any,
-          PgTypeCodec<any, any, any>,
-          any,
-          any,
-          any,
-          any
-        >,
+      PgSelectSingleStep<any> | PgClassExpressionStep<PgTypeCodecAny, any>,
       readonly number[],
       ListStep<readonly ExecutableStep<any>[]>
     > => ({
@@ -2908,8 +2963,8 @@ export function makeExampleSchema(
     (PgSelectSingleStep, entityPolymorphicTypeMap, list, pgPolymorphic) =>
       <TCodec extends typeof unionEntityCodec>(
         $item:
-          | PgSelectSingleStep<PgSource<TCodec, any, any, any>>
-          | PgClassExpressionStep<TCodec, PgSource<TCodec, any, any, any>>,
+          | PgSelectSingleStep<PgSource<any, TCodec, any, any, any>>
+          | PgClassExpressionStep<TCodec, PgSource<any, any, any, any, any>>,
       ) =>
         pgPolymorphic(
           $item,
@@ -3074,7 +3129,7 @@ export function makeExampleSchema(
       type: SingleTableItem,
       plan: EXPORTABLE(
         (deoptimizeIfAppropriate, singleTableItemInterface) =>
-          function plan($entity: SingleTableItemStep) {
+          function plan($entity) {
             const $plan = $entity.singleRelation("parent");
             deoptimizeIfAppropriate($plan);
             return singleTableItemInterface($plan);
@@ -3088,6 +3143,30 @@ export function makeExampleSchema(
     updatedAt: attrField("updated_at", GraphQLString),
     isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
     archivedAt: attrField("archived_at", GraphQLString),
+  } satisfies {
+    [fieldName: string]: GraphileFieldConfig<
+      any,
+      any,
+      PgSelectSingleStep<
+        PgSource<
+          any,
+          PgTypeCodec<
+            any,
+            typeof singleTableItemsSource.codec.columns,
+            any,
+            any,
+            any,
+            any,
+            any
+          >,
+          any,
+          any,
+          any
+        >
+      >,
+      any,
+      any
+    >;
   };
 
   const SingleTableTopic = newObjectTypeBuilder<
@@ -3181,57 +3260,52 @@ export function makeExampleSchema(
     }),
   });
 
-  // NOTE: the `| any`s below are because of co/contravariance woes.
-  type CommonRelationalItemColumns = {
-    id: PgTypeColumn<typeof TYPES.int>;
-    type: PgTypeColumn<
-      PgEnumTypeCodec<
-        string,
-        "TOPIC" | "POST" | "DIVIDER" | "CHECKLIST" | "CHECKLIST_ITEM"
-      >
-    >;
-    type2: PgTypeColumn<typeof TYPES.text>;
-    position: PgTypeColumn<typeof TYPES.bigint>;
-    created_at: PgTypeColumn<typeof TYPES.timestamptz>;
-    updated_at: PgTypeColumn<typeof TYPES.timestamptz>;
-    is_explicitly_archived: PgTypeColumn<typeof TYPES.boolean>;
-    archived_at: PgTypeColumn<typeof TYPES.timestamptz>;
-  };
-  const commonRelationalItemFields = () => ({
-    id: attrField<CommonRelationalItemColumns>("id", GraphQLInt),
-    type: attrField<CommonRelationalItemColumns>("type", GraphQLString),
-    type2: attrField<CommonRelationalItemColumns>("type2", EnumTableItemType),
-    parent: {
-      type: RelationalItem,
-      plan: EXPORTABLE(
-        (deoptimizeIfAppropriate, relationalItemInterface) =>
-          function plan($entity: PgSelectSingleStep<any, any, any, any>) {
-            const $plan = $entity.singleRelation("parent");
-            deoptimizeIfAppropriate($plan);
-            return relationalItemInterface($plan);
-          },
-        [deoptimizeIfAppropriate, relationalItemInterface],
-      ),
+  const commonRelationalItemFields = <
+    TColumns extends {
+      [key in string]: key extends keyof typeof relationalItemsCodec.columns
+        ? (typeof relationalItemsCodec.columns)[key]
+        : any;
     },
-    author: singleRelationField("author", Person),
-    position: attrField<CommonRelationalItemColumns>("position", GraphQLString),
-    createdAt: attrField<CommonRelationalItemColumns>(
-      "created_at",
-      GraphQLString,
-    ),
-    updatedAt: attrField<CommonRelationalItemColumns>(
-      "updated_at",
-      GraphQLString,
-    ),
-    isExplicitlyArchived: attrField<CommonRelationalItemColumns>(
-      "is_explicitly_archived",
-      GraphQLBoolean,
-    ),
-    archivedAt: attrField<CommonRelationalItemColumns>(
-      "archived_at",
-      GraphQLString,
-    ),
-  });
+  >() =>
+    ({
+      id: attrField("id", GraphQLInt),
+      type: attrField("type", GraphQLString),
+      type2: attrField("type2", EnumTableItemType),
+      parent: {
+        type: RelationalItem,
+        plan: EXPORTABLE(
+          (deoptimizeIfAppropriate, relationalItemInterface) =>
+            function plan($entity) {
+              const $plan = $entity.singleRelation("parent");
+              deoptimizeIfAppropriate($plan);
+              return relationalItemInterface($plan);
+            },
+          [deoptimizeIfAppropriate, relationalItemInterface],
+        ),
+      },
+      author: singleRelationField("author", Person),
+      position: attrField("position", GraphQLString),
+      createdAt: attrField("created_at", GraphQLString),
+      updatedAt: attrField("updated_at", GraphQLString),
+      isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
+      archivedAt: attrField("archived_at", GraphQLString),
+    } satisfies {
+      [fieldName: string]: GraphileFieldConfig<
+        any,
+        any,
+        PgSelectSingleStep<
+          PgSource<
+            any,
+            PgTypeCodec<any, TColumns, any, any, any, any, any>,
+            any,
+            any,
+            any
+          >
+        >,
+        any,
+        any
+      >;
+    });
 
   const RelationalTopic = newObjectTypeBuilder<
     OurGraphQLContext,
@@ -3240,7 +3314,9 @@ export function makeExampleSchema(
     name: "RelationalTopic",
     interfaces: [RelationalItem],
     fields: () => ({
-      ...commonRelationalItemFields(),
+      ...commonRelationalItemFields<
+        typeof relationalTopicsSource.codec.columns
+      >(),
       title: attrField("title", GraphQLString),
     }),
   });
@@ -3252,7 +3328,9 @@ export function makeExampleSchema(
     name: "RelationalPost",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields(),
+      ...commonRelationalItemFields<
+        typeof relationalPostsSource.codec.columns
+      >(),
       title: attrField("title", GraphQLString),
       description: attrField("description", GraphQLString),
       note: attrField("note", GraphQLString),
@@ -3290,7 +3368,9 @@ export function makeExampleSchema(
     name: "RelationalDivider",
     interfaces: [RelationalItem],
     fields: () => ({
-      ...commonRelationalItemFields(),
+      ...commonRelationalItemFields<
+        typeof relationalDividersSource.codec.columns
+      >(),
       title: attrField("title", GraphQLString),
       color: attrField("color", GraphQLString),
     }),
@@ -3303,7 +3383,9 @@ export function makeExampleSchema(
     name: "RelationalChecklist",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields(),
+      ...commonRelationalItemFields<
+        typeof relationalChecklistsSource.codec.columns
+      >(),
       title: attrField("title", GraphQLString),
     }),
   });
@@ -3315,7 +3397,9 @@ export function makeExampleSchema(
     name: "RelationalChecklistItem",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields(),
+      ...commonRelationalItemFields<
+        typeof relationalChecklistItemsSource.codec.columns
+      >(),
       description: attrField("description", GraphQLString),
       note: attrField("note", GraphQLString),
     }),
@@ -4020,16 +4104,16 @@ export function makeExampleSchema(
       featuredMessages: {
         type: new GraphQLList(Message),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, featuredMessages, pgSelect) =>
+          (deoptimizeIfAppropriate, featuredMessagesSource, pgSelect) =>
             function plan() {
               const $messages = pgSelect({
-                source: featuredMessages,
+                source: featuredMessagesSource,
                 identifiers: [],
               });
               deoptimizeIfAppropriate($messages);
               return $messages;
             },
-          [deoptimizeIfAppropriate, featuredMessages, pgSelect],
+          [deoptimizeIfAppropriate, featuredMessagesSource, pgSelect],
         ),
       },
 
@@ -4249,9 +4333,9 @@ export function makeExampleSchema(
                   pgCodec: TYPES.text,
                   name: "query",
                 },
-              ]) as PgSelectStep<any, any, any, any>;
+              ]) as PgSelectStep<any>;
               deoptimizeIfAppropriate($step);
-              return each($step, ($item) => entityUnion($item));
+              return each($step, ($item) => entityUnion($item as any));
             },
           [
             TYPES,

@@ -176,7 +176,7 @@ export class PgSelectSingleStep<
         dataSourceColumn.via,
         attr as string,
       );
-      return this.singleRelation(relation).get(attribute) as any;
+      return this.singleRelation(relation as any).get(attribute) as any;
     }
 
     if (dataSourceColumn?.identicalVia) {
@@ -185,7 +185,7 @@ export class PgSelectSingleStep<
         attr as string,
       );
 
-      const $existingPlan = this.existingSingleRelation(relation);
+      const $existingPlan = this.existingSingleRelation(relation as any);
       if ($existingPlan) {
         // Relation exists already; load it from there for efficiency
         return $existingPlan.get(attribute) as any;
@@ -288,15 +288,26 @@ export class PgSelectSingleStep<
   }
 
   private existingSingleRelation<
-    TRelationName extends keyof GetPgSourceRelations<TSource>,
+    TRelationName extends TSource extends PgSource<
+      infer URegistry,
+      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
+      any,
+      any,
+      any
+    >
+      ? keyof URegistry["pgRelations"][UCodecName]
+      : never,
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    GetPgSourceRelations<TSource>[TRelationName] extends PgCodecRelation<
+    TSource extends PgSource<
+      infer URegistry,
+      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
-      infer URemoteSource
+      any,
+      any
     >
-      ? URemoteSource
+      ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteSource"]
       : never
   > | null {
     if (this.options.fromRelation) {
@@ -320,22 +331,35 @@ export class PgSelectSingleStep<
   }
 
   public singleRelation<
-    TRelationName extends keyof GetPgSourceRelations<TSource>,
+    TRelationName extends TSource extends PgSource<
+      infer URegistry,
+      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
+      any,
+      any,
+      any
+    >
+      ? keyof URegistry["pgRelations"][UCodecName]
+      : never,
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    GetPgSourceRelations<TSource>[TRelationName] extends PgCodecRelation<
+    TSource extends PgSource<
+      infer URegistry,
+      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
-      infer URemoteSource
+      any,
+      any
     >
-      ? URemoteSource
+      ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteSource"]
       : never
   > {
     const $existingPlan = this.existingSingleRelation(relationIdentifier);
     if ($existingPlan) {
       return $existingPlan;
     }
-    const relation = this.source.getRelation(relationIdentifier as string);
+    const relation: PgCodecRelation<any, any> = this.source.getRelation(
+      relationIdentifier as string,
+    );
     if (!relation || !relation.isUnique) {
       throw new Error(
         `${String(relationIdentifier)} is not a unique relation on ${
@@ -361,16 +385,12 @@ export class PgSelectSingleStep<
   }
 
   public manyRelation<
-    TRelationName extends keyof GetPgSourceRelations<TSource>,
+    TRelationName extends keyof TSource["registry"]["pgRelations"][TSource["codec"]["name"]],
   >(
     relationIdentifier: TRelationName,
-  ): GetPgSourceRelations<TSource>[TRelationName] extends PgCodecRelation<
-    any,
-    infer URemoteSource
-  >
-    ? PgSelectStep<URemoteSource>
-    : never {
-    const relation = this.source.getRelation(relationIdentifier as string);
+  ): TSource["registry"]["pgRelations"][TSource["codec"]["name"]][TRelationName] {
+    const relation: PgCodecRelation<any, any> =
+      this.source.getRelation(relationIdentifier);
     if (!relation) {
       throw new Error(
         `${String(relationIdentifier)} is not a relation on ${this.source}`,
@@ -471,7 +491,7 @@ export class PgSelectSingleStep<
     } else if (poly?.mode === "relational") {
       for (const spec of Object.values(poly.types)) {
         if (spec.name === type.name) {
-          return this.singleRelation(spec.relationName);
+          return this.singleRelation(spec.relationName as any);
         }
       }
       throw new Error(

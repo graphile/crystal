@@ -159,13 +159,7 @@ export interface PgUnionAllStepConfig<
   TTypeNames extends string,
 > {
   sourceByTypeName: {
-    [typeName in TTypeNames]: PgSource<
-      any,
-      any,
-      ReadonlyArray<PgSourceUnique<any>>,
-      any,
-      any
-    >;
+    [typeName in TTypeNames]: PgSource<any, any, any, any, any>;
   };
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
@@ -239,7 +233,9 @@ export class PgUnionAllSingleStep
       // This type isn't handled; so it should never occur
       return constant(null);
     }
-    const pk = source.uniques?.find((u) => u.isPrimary === true);
+    const pk = (source.uniques as PgSourceUnique[] | undefined)?.find(
+      (u) => u.isPrimary === true,
+    );
     if (!pk) {
       throw new Error(
         `No PK found for ${objectType.name}; this should have been caught earlier?!`,

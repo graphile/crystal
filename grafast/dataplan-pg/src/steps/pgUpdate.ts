@@ -19,6 +19,7 @@ import type {
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
+import { PgSourceUnique } from "../index.js";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
@@ -132,7 +133,7 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
       : [];
 
     if (
-      !this.source.uniques.some((uniq) =>
+      !(this.source.uniques as PgSourceUnique[]).some((uniq) =>
         uniq.columns.every((key) => keys.includes(key as any)),
       )
     ) {
