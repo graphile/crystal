@@ -1005,7 +1005,11 @@ export interface PgRegistryBuilder<
 */
   >;
 
-  build(): PgRegistry<TCodecs, TSources, TRelations>;
+  build(): PgRegistry<
+    Simplify<TCodecs>,
+    Simplify<TSources>,
+    Simplify<TRelations>
+  >;
 }
 
 export function makeRegistry<

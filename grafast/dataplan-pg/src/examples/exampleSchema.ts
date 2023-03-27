@@ -497,7 +497,7 @@ export function makeExampleSchema(
       });
 
       const personCodec = recordCodec({
-        name: "interfaces_and_unions.people",
+        name: "people",
         identifier: sql`interfaces_and_unions.people`,
         columns: {
           person_id: col({ codec: TYPES.int, notNull: true }),
@@ -518,7 +518,7 @@ export function makeExampleSchema(
       });
 
       const postCodec = recordCodec({
-        name: "interfaces_and_unions.posts",
+        name: "posts",
         identifier: sql`interfaces_and_unions.posts`,
         columns: {
           post_id: col({ codec: TYPES.int, notNull: true }),
@@ -541,7 +541,7 @@ export function makeExampleSchema(
       });
 
       const commentCodec = recordCodec({
-        name: "interfaces_and_unions.comments",
+        name: "comments",
         identifier: sql`interfaces_and_unions.comments`,
         columns: {
           comment_id: col({ codec: TYPES.int, notNull: true }),
@@ -569,13 +569,13 @@ export function makeExampleSchema(
       });
 
       const itemTypeEnumCodec = enumCodec({
-        name: `interfaces_and_unions.item_type`,
+        name: "item_type",
         identifier: sql`interfaces_and_unions.item_type`,
         values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
       });
 
       const enumTableItemTypeCodec = recordCodec({
-        name: `interfaces_and_unions.enum_table_item_type`,
+        name: "enum_table_item_type",
         identifier: sql`interfaces_and_unions.enum_table_item_type`,
         columns: {
           type: {
@@ -605,7 +605,7 @@ export function makeExampleSchema(
       });
 
       const singleTableItemsCodec = recordCodec({
-        name: `interfaces_and_unions.single_table_items`,
+        name: "single_table_items",
         identifier: sql`interfaces_and_unions.single_table_items`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -654,7 +654,7 @@ export function makeExampleSchema(
       });
 
       const relationalItemsCodec = recordCodec({
-        name: `interfaces_and_unions.relational_items`,
+        name: "relational_items",
         identifier: sql`interfaces_and_unions.relational_items`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -698,7 +698,7 @@ export function makeExampleSchema(
       });
 
       const relationalCommentableCodec = recordCodec({
-        name: `interfaces_and_unions.relational_commentables`,
+        name: "relational_commentables",
         identifier: sql`interfaces_and_unions.relational_commentables`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -763,7 +763,7 @@ export function makeExampleSchema(
       } as const;
 
       const relationalTopicsCodec = recordCodec({
-        name: `interfaces_and_unions.relational_topics`,
+        name: "relational_topics",
         identifier: sql`interfaces_and_unions.relational_topics`,
         columns: {
           ...itemColumns,
@@ -781,7 +781,7 @@ export function makeExampleSchema(
       });
 
       const relationalPostsCodec = recordCodec({
-        name: `interfaces_and_unions.relational_posts`,
+        name: "relational_posts",
         identifier: sql`interfaces_and_unions.relational_posts`,
         columns: {
           ...itemColumns,
@@ -801,7 +801,7 @@ export function makeExampleSchema(
       });
 
       const relationalDividersCodec = recordCodec({
-        name: `interfaces_and_unions.relational_dividers`,
+        name: "relational_dividers",
         identifier: sql`interfaces_and_unions.relational_dividers`,
         columns: {
           ...itemColumns,
@@ -820,7 +820,7 @@ export function makeExampleSchema(
       });
 
       const relationalChecklistsCodec = recordCodec({
-        name: `interfaces_and_unions.relational_checklists`,
+        name: "relational_checklists",
         identifier: sql`interfaces_and_unions.relational_checklists`,
         columns: {
           ...itemColumns,
@@ -838,7 +838,7 @@ export function makeExampleSchema(
       });
 
       const relationalChecklistItemsCodec = recordCodec({
-        name: `interfaces_and_unions.relational_checklist_items`,
+        name: "relational_checklist_items",
         identifier: sql`interfaces_and_unions.relational_checklist_items`,
         columns: {
           ...itemColumns,
@@ -859,7 +859,7 @@ export function makeExampleSchema(
       ////////////////////////////////////////
 
       const unionItemsCodec = recordCodec({
-        name: `interfaces_and_unions.union_items`,
+        name: "union_items",
         identifier: sql`interfaces_and_unions.union_items`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -884,7 +884,7 @@ export function makeExampleSchema(
       });
 
       const unionTopicsCodec = recordCodec({
-        name: `interfaces_and_unions.union_topics`,
+        name: "union_topics",
         identifier: sql`interfaces_and_unions.union_topics`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -902,7 +902,7 @@ export function makeExampleSchema(
       });
 
       const unionPostsCodec = recordCodec({
-        name: `interfaces_and_unions.union_posts`,
+        name: "union_posts",
         identifier: sql`interfaces_and_unions.union_posts`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -922,7 +922,7 @@ export function makeExampleSchema(
       });
 
       const unionDividersCodec = recordCodec({
-        name: `interfaces_and_unions.union_dividers`,
+        name: "union_dividers",
         identifier: sql`interfaces_and_unions.union_dividers`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -941,7 +941,7 @@ export function makeExampleSchema(
       });
 
       const unionChecklistsCodec = recordCodec({
-        name: `interfaces_and_unions.union_checklists`,
+        name: "union_checklists",
         identifier: sql`interfaces_and_unions.union_checklists`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -959,7 +959,7 @@ export function makeExampleSchema(
       });
 
       const unionChecklistItemsCodec = recordCodec({
-        name: `interfaces_and_unions.union_checklist_items`,
+        name: "union_checklist_items",
         identifier: sql`interfaces_and_unions.union_checklist_items`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -1006,7 +1006,7 @@ export function makeExampleSchema(
       ////////////////////////////////////////
 
       const awsApplicationsCodec = recordCodec({
-        name: "interfaces_and_unions.aws_applications",
+        name: "aws_applications",
         identifier: sql`interfaces_and_unions.aws_applications`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -1032,7 +1032,7 @@ export function makeExampleSchema(
       });
 
       const gcpApplicationsCodec = recordCodec({
-        name: "interfaces_and_unions.gcp_applications",
+        name: "gcp_applications",
         identifier: sql`interfaces_and_unions.gcp_applications`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -1058,7 +1058,7 @@ export function makeExampleSchema(
       });
 
       const firstPartyVulnerabilitiesCodec = recordCodec({
-        name: "interfaces_and_unions.first_party_vulnerabilities",
+        name: "first_party_vulnerabilities",
         identifier: sql`interfaces_and_unions.first_party_vulnerabilities`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -1081,7 +1081,7 @@ export function makeExampleSchema(
       });
 
       const thirdPartyVulnerabilitiesCodec = recordCodec({
-        name: "interfaces_and_unions.third_party_vulnerabilities",
+        name: "third_party_vulnerabilities",
         identifier: sql`interfaces_and_unions.third_party_vulnerabilities`,
         columns: {
           id: col({ codec: TYPES.int, notNull: true }),
@@ -1599,8 +1599,6 @@ export function makeExampleSchema(
       sqlFromArgDigests,
     ],
   );
-
-  registry.pgSources.single_table_items.getRelation("parent").localColumns;
 
   /*
   registry.pgCodecs.messages.columns.id;
