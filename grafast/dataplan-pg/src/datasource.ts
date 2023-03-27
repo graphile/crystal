@@ -877,24 +877,6 @@ export class PgSource<
 }
 exportAs(PgSource, "PgSource");
 
-export interface PgEnumSourceExtensions {}
-
-export interface PgEnumSourceOptions<TValue extends string> {
-  codec: PgEnumTypeCodec<TValue>;
-  extensions?: PgEnumSourceExtensions;
-}
-
-// TODO: is this the best way of solving the problem of enums vs sources?
-export class PgEnumSource<TValue extends string> {
-  public readonly codec: PgEnumTypeCodec<TValue>;
-  public readonly extensions: PgEnumSourceExtensions | undefined;
-  constructor(options: PgEnumSourceOptions<TValue>) {
-    this.codec = options.codec;
-    this.extensions = options.extensions || {};
-  }
-}
-exportAs(PgEnumSource, "PgEnumSource");
-
 /*
 export function makeRegistry<
 TInCodec,

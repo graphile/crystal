@@ -65,8 +65,7 @@ import sql from "pg-sql2";
 //import prettier from "prettier";
 import { inspect } from "util";
 
-import {
-  makePgSourceOptions,
+import type {
   PgConditionStep,
   PgEnumTypeCodec,
   PgExecutorContextPlans,
@@ -77,6 +76,7 @@ import {
   PgTypeColumnVia,
   WithPgClient,
 } from "../";
+import { makePgSourceOptions } from "../";
 import { makeRegistryBuilder } from "../";
 import type { PgSubscriber } from "../adaptors/pg.js";
 import type { PgTypeColumns } from "../codecs.js";
@@ -90,7 +90,6 @@ import {
   PgClassExpressionStep,
   pgDelete,
   PgDeleteStep,
-  PgEnumSource,
   PgExecutor,
   pgInsert,
   pgPolymorphic,
@@ -104,12 +103,7 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type {
-  GetPgRegistryCodecRelations,
-  GetPgRegistryCodecs,
-  PgRegistry,
-  PgTypeCodecAny,
-} from "../interfaces";
+import type { PgTypeCodecAny } from "../interfaces";
 import type { GetPgSourceColumns } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
@@ -139,12 +133,6 @@ export function EXPORTABLE<T, TScope extends any[]>(
     });
   }
   return fn;
-}
-
-declare module ".." {
-  interface PgEnumSourceExtensions {
-    tableSource?: PgSource<any, any, any, any, any>;
-  }
 }
 
 // These are what the generics extend from
@@ -192,9 +180,14 @@ export function makeExampleSchema(
 
   const registry = EXPORTABLE(
     (
+      EXPORTABLE,
+      GraphQLEnumType,
+      PgSource,
       TYPES,
+      enumCodec,
       executor,
       listOfCodec,
+      makePgSourceOptions,
       makeRegistryBuilder,
       recordCodec,
       selectAuth,
@@ -224,6 +217,8 @@ export function makeExampleSchema(
         };
       };
 
+      let builder = makeRegistryBuilder();
+
       const forumCodec = recordCodec({
         name: "forums",
         identifier: sql`app_public.forums`,
@@ -237,6 +232,7 @@ export function makeExampleSchema(
           }),
         },
       });
+      builder = builder.addCodec(forumCodec);
 
       const userCodec = recordCodec({
         name: "users",
@@ -248,6 +244,7 @@ export function makeExampleSchema(
           created_at: col({ notNull: true, codec: TYPES.timestamptz }),
         },
       });
+      builder = builder.addCodec(userCodec);
 
       const messagesCodec = recordCodec({
         name: "messages",
@@ -274,6 +271,7 @@ export function makeExampleSchema(
           }),
         },
       });
+      builder = builder.addCodec(messagesCodec);
 
       const uniqueAuthorCountSourceOptions = makePgSourceOptions({
         executor,
@@ -291,6 +289,7 @@ export function makeExampleSchema(
         ],
         isUnique: true,
       });
+      builder = builder.addSource(uniqueAuthorCountSourceOptions);
 
       const forumNamesArraySourceOptions = makePgSourceOptions({
         executor,
@@ -302,6 +301,7 @@ export function makeExampleSchema(
         parameters: [],
         isUnique: true, // No setof
       });
+      builder = builder.addSource(forumNamesArraySourceOptions);
 
       const forumNamesCasesSourceOptions = makePgSourceOptions({
         executor,
@@ -312,6 +312,7 @@ export function makeExampleSchema(
         name: "forum_names_cases",
         parameters: [],
       });
+      builder = builder.addSource(forumNamesCasesSourceOptions);
 
       const forumsUniqueAuthorCountSourceOptions = makePgSourceOptions({
         executor,
@@ -336,6 +337,7 @@ export function makeExampleSchema(
         ],
         isUnique: true,
       });
+      builder = builder.addSource(forumsUniqueAuthorCountSourceOptions);
 
       const scalarTextSourceOptions = makePgSourceOptions({
         executor,
@@ -344,6 +346,7 @@ export function makeExampleSchema(
         source: sql`(select '')`,
         name: "text",
       });
+      builder = builder.addSource(scalarTextSourceOptions);
 
       const messageSourceOptions = makePgSourceOptions({
         executor,
@@ -353,6 +356,7 @@ export function makeExampleSchema(
         name: "messages",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
+      builder = builder.addSource(messageSourceOptions);
 
       const userSourceOptions = makePgSourceOptions({
         executor,
@@ -365,6 +369,7 @@ export function makeExampleSchema(
           { columns: ["username"] },
         ],
       });
+      builder = builder.addSource(userSourceOptions);
 
       const forumSourceOptions = makePgSourceOptions({
         executor,
@@ -374,6 +379,7 @@ export function makeExampleSchema(
         name: "forums",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
+      builder = builder.addSource(forumSourceOptions);
 
       const usersMostRecentForumSourceOptions = PgSource.functionSourceOptions(
         forumSourceOptions,
@@ -386,13 +392,14 @@ export function makeExampleSchema(
           parameters: [
             {
               name: "u",
-              codec: userSource.codec,
+              codec: userSourceOptions.codec,
               required: true,
               notNull: true,
             },
           ],
         },
       );
+      builder = builder.addSource(usersMostRecentForumSourceOptions);
 
       const featuredMessagesSourceOptions = PgSource.functionSourceOptions(
         messageSourceOptions,
@@ -405,6 +412,7 @@ export function makeExampleSchema(
           parameters: [],
         },
       );
+      builder = builder.addSource(featuredMessagesSourceOptions);
 
       const forumsFeaturedMessagesSourceOptions =
         PgSource.functionSourceOptions(messageSourceOptions, {
@@ -423,6 +431,7 @@ export function makeExampleSchema(
             },
           ],
         });
+      builder = builder.addSource(forumsFeaturedMessagesSourceOptions);
 
       const randomUserArraySourceOptions = PgSource.functionSourceOptions(
         userSourceOptions,
@@ -435,6 +444,7 @@ export function makeExampleSchema(
           parameters: [],
         },
       );
+      builder = builder.addSource(randomUserArraySourceOptions);
 
       const randomUserArraySetSourceOptions = PgSource.functionSourceOptions(
         userSourceOptions,
@@ -447,6 +457,7 @@ export function makeExampleSchema(
           parameters: [],
         },
       );
+      builder = builder.addSource(randomUserArraySetSourceOptions);
 
       const forumsMessagesListSetSourceOptions = PgSource.functionSourceOptions(
         messageSourceOptions,
@@ -466,18 +477,23 @@ export function makeExampleSchema(
           },
         },
       );
+      builder = builder.addSource(forumsMessagesListSetSourceOptions);
 
-      const unionEntityColumns = EXPORTABLE(
-        (TYPES, col) => ({
+      const unionEntityCodec = recordCodec({
+        name: "union__entity",
+        identifier: sql`interfaces_and_unions.union__entity`,
+        columns: {
           person_id: col({ codec: TYPES.int, notNull: false }),
           post_id: col({ codec: TYPES.int, notNull: false }),
           comment_id: col({ codec: TYPES.int, notNull: false }),
-        }),
-        [TYPES, col],
-      );
+        },
+      });
+      builder = builder.addCodec(unionEntityCodec);
 
-      const personBookmarkColumns = EXPORTABLE(
-        (TYPES, col, recordCodec, sql, unionEntityColumns) => ({
+      const personBookmarksCodec = recordCodec({
+        name: "person_bookmarks",
+        identifier: sql`interfaces_and_unions.person_bookmarks`,
+        columns: {
           id: col({ codec: TYPES.int, notNull: true }),
           person_id: col({
             codec: TYPES.int,
@@ -485,94 +501,679 @@ export function makeExampleSchema(
             identicalVia: { relation: "person", attribute: "id" },
           }),
           bookmarked_entity: col({
-            codec: recordCodec({
-              name: "union__entity",
-              identifier: sql`interfaces_and_unions.union__entity`,
-              columns: unionEntityColumns,
-            }),
+            codec: unionEntityCodec,
             notNull: true,
           }),
-        }),
-        [TYPES, col, recordCodec, sql, unionEntityColumns],
-      );
+        },
+      });
+      builder = builder.addCodec(personBookmarksCodec);
 
-      const personBookmarksSourceOptions = EXPORTABLE(
-        (
-          PgSource,
-          executor,
-          personBookmarkColumns,
-          recordCodec,
-          selectAuth,
-          sql,
-        ) =>
-          makePgSourceOptions({
-            executor,
-            selectAuth,
-            codec: recordCodec({
-              name: "person_bookmarks",
-              identifier: sql`interfaces_and_unions.person_bookmarks`,
-              columns: personBookmarkColumns,
-            }),
-            source: sql`interfaces_and_unions.person_bookmarks`,
-            name: "person_bookmarks",
-            uniques: [{ columns: ["id"], isPrimary: true }],
-          }),
-        [
-          PgSource,
-          executor,
-          personBookmarkColumns,
-          recordCodec,
-          selectAuth,
-          sql,
-        ],
-      );
+      const personBookmarksSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: personBookmarksCodec,
+        source: sql`interfaces_and_unions.person_bookmarks`,
+        name: "person_bookmarks",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(personBookmarksSourceOptions);
 
-      const personColumns = EXPORTABLE(
-        (TYPES, col) => ({
+      const personCodec = recordCodec({
+        name: "interfaces_and_unions.people",
+        identifier: sql`interfaces_and_unions.people`,
+        columns: {
           person_id: col({ codec: TYPES.int, notNull: true }),
           username: col({ codec: TYPES.text, notNull: true }),
-        }),
-        [TYPES, col],
-      );
+        },
+      });
+      builder = builder.addCodec(personCodec);
 
-      const personSourceOptions = EXPORTABLE(
-        (PgSource, executor, personColumns, recordCodec, selectAuth, sql) =>
-          makePgSourceOptions({
-            executor,
-            selectAuth,
-            codec: recordCodec({
-              name: "interfaces_and_unions.people",
-              identifier: sql`interfaces_and_unions.people`,
-              columns: personColumns,
-            }),
-            source: sql`interfaces_and_unions.people`,
-            name: "people",
-            uniques: [
-              { columns: ["person_id"], isPrimary: true },
-              { columns: ["username"] },
-            ],
+      const personSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: personCodec,
+        source: sql`interfaces_and_unions.people`,
+        name: "people",
+        uniques: [
+          { columns: ["person_id"], isPrimary: true },
+          { columns: ["username"] },
+        ],
+      });
+      builder = builder.addSource(personSourceOptions);
+
+      const postCodec = recordCodec({
+        name: "interfaces_and_unions.posts",
+        identifier: sql`interfaces_and_unions.posts`,
+        columns: {
+          post_id: col({ codec: TYPES.int, notNull: true }),
+          author_id: col({
+            codec: TYPES.int,
+            notNull: true,
+            identicalVia: { relation: "author", attribute: "person_id" },
           }),
-        [PgSource, executor, personColumns, recordCodec, selectAuth, sql],
-      );
+          body: col({ codec: TYPES.text, notNull: true }),
+        },
+      });
+      builder = builder.addCodec(postCodec);
 
-      return makeRegistryBuilder()
-        .addCodec(forumCodec)
-        .addCodec(userCodec)
-        .addCodec(messagesCodec)
-        .addSource(uniqueAuthorCountSourceOptions)
-        .addSource(forumNamesArraySourceOptions)
-        .addSource(forumNamesCasesSourceOptions)
-        .addSource(forumsUniqueAuthorCountSourceOptions)
-        .addSource(scalarTextSourceOptions)
-        .addSource(messageSourceOptions)
-        .addSource(userSourceOptions)
-        .addSource(forumSourceOptions)
-        .addSource(usersMostRecentForumSourceOptions)
-        .addSource(featuredMessagesSourceOptions)
-        .addSource(forumsFeaturedMessagesSourceOptions)
-        .addSource(randomUserArraySourceOptions)
-        .addSource(randomUserArraySetSourceOptions)
-        .addSource(forumsMessagesListSetSourceOptions)
+      const postSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: postCodec,
+        source: sql`interfaces_and_unions.posts`,
+        name: "posts",
+        uniques: [{ columns: ["post_id"], isPrimary: true }],
+      });
+      builder = builder.addSource(postSourceOptions);
+
+      const commentCodec = recordCodec({
+        name: "interfaces_and_unions.comments",
+        identifier: sql`interfaces_and_unions.comments`,
+        columns: {
+          comment_id: col({ codec: TYPES.int, notNull: true }),
+          author_id: col({
+            codec: TYPES.int,
+            notNull: true,
+            identicalVia: { relation: "author", attribute: "person_id" },
+          }),
+          post_id: col({
+            codec: TYPES.int,
+            notNull: true,
+            identicalVia: { relation: "post", attribute: "id" },
+          }),
+          body: col({ codec: TYPES.text, notNull: true }),
+        },
+      });
+      builder = builder.addCodec(commentCodec);
+
+      const commentSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: commentCodec,
+        source: sql`interfaces_and_unions.comments`,
+        name: "comments",
+        uniques: [{ columns: ["comment_id"], isPrimary: true }],
+      });
+      builder = builder.addSource(commentSourceOptions);
+
+      const itemTypeEnumCodec = enumCodec({
+        name: `interfaces_and_unions.item_type`,
+        identifier: sql`interfaces_and_unions.item_type`,
+        values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
+      });
+      builder = builder.addCodec(itemTypeEnumCodec);
+
+      const enumTableItemTypeCodec = recordCodec({
+        name: `interfaces_and_unions.enum_table_item_type`,
+        identifier: sql`interfaces_and_unions.enum_table_item_type`,
+        columns: {
+          type: {
+            codec: TYPES.text,
+            notNull: true,
+          },
+          description: {
+            codec: TYPES.text,
+            notNull: false,
+          },
+        },
+      });
+      builder = builder.addCodec(enumTableItemTypeCodec);
+
+      const enumTableItemTypeSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: enumTableItemTypeCodec,
+        source: sql`interfaces_and_unions.enum_table_item_type`,
+        name: "enum_table_item_type",
+        uniques: [{ columns: ["type"], isPrimary: true }],
+      });
+      builder = builder.addSource(enumTableItemTypeSourceOptions);
+
+      const enumTableItemTypeEnumCodec = enumCodec({
+        name: "text",
+        identifier: sql`text`,
+        values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
+      });
+      builder = builder.addCodec(enumTableItemTypeEnumCodec);
+
+      const singleTableItemsCodec = recordCodec({
+        name: `interfaces_and_unions.single_table_items`,
+        identifier: sql`interfaces_and_unions.single_table_items`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          type: col({
+            codec: itemTypeEnumCodec,
+            notNull: true,
+          }),
+          type2: col({
+            codec: enumTableItemTypeEnumCodec,
+            notNull: true,
+          }),
+
+          parent_id: col({
+            codec: TYPES.int,
+            notNull: false,
+            identicalVia: { relation: "parent", attribute: "id" },
+          }),
+          author_id: col({
+            codec: TYPES.int,
+            notNull: true,
+            identicalVia: { relation: "author", attribute: "person_id" },
+          }),
+          position: col({ codec: TYPES.bigint, notNull: true }),
+          created_at: col({ codec: TYPES.timestamptz, notNull: true }),
+          updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
+          is_explicitly_archived: col({
+            codec: TYPES.boolean,
+            notNull: true,
+          }),
+          archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
+
+          title: col({ codec: TYPES.text, notNull: false }),
+          description: col({ codec: TYPES.text, notNull: false }),
+          note: col({ codec: TYPES.text, notNull: false }),
+          color: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(singleTableItemsCodec);
+
+      const singleTableItemsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: singleTableItemsCodec,
+        source: sql`interfaces_and_unions.single_table_items`,
+        name: "single_table_items",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(singleTableItemsSourceOptions);
+
+      const relationalItemsCodec = recordCodec({
+        name: `interfaces_and_unions.relational_items`,
+        identifier: sql`interfaces_and_unions.relational_items`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          type: col({
+            codec: itemTypeEnumCodec,
+            notNull: true,
+          }),
+          type2: col({
+            codec: enumTableItemTypeEnumCodec,
+            notNull: true,
+          }),
+
+          parent_id: col({
+            codec: TYPES.int,
+            notNull: false,
+            identicalVia: { relation: "parent", attribute: "id" },
+          }),
+          author_id: col({
+            codec: TYPES.int,
+            notNull: true,
+            identicalVia: { relation: "author", attribute: "person_id" },
+          }),
+          position: col({ codec: TYPES.bigint, notNull: true }),
+          created_at: col({ codec: TYPES.timestamptz, notNull: true }),
+          updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
+          is_explicitly_archived: col({
+            codec: TYPES.boolean,
+            notNull: true,
+          }),
+          archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(relationalItemsCodec);
+
+      const relationalItemsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: relationalItemsCodec,
+        source: sql`interfaces_and_unions.relational_items`,
+        name: "relational_items",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(relationalItemsSourceOptions);
+
+      const relationalCommentableCodec = recordCodec({
+        name: `interfaces_and_unions.relational_commentables`,
+        identifier: sql`interfaces_and_unions.relational_commentables`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          type: col({
+            codec: itemTypeEnumCodec,
+            notNull: true,
+          }),
+          type2: col({
+            codec: enumTableItemTypeEnumCodec,
+            notNull: true,
+          }),
+        },
+      });
+      builder = builder.addCodec(relationalCommentableCodec);
+
+      const relationalCommentableSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: relationalCommentableCodec,
+        source: sql`interfaces_and_unions.relational_commentables`,
+        name: "relational_commentables",
+      });
+      builder = builder.addSource(relationalCommentableSourceOptions);
+
+      const itemColumns = {
+        id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
+        type: col({ codec: TYPES.text, notNull: true, via: "item" }),
+        type2: col({
+          codec: enumTableItemTypeEnumCodec,
+          notNull: true,
+          via: "item",
+        }),
+        parent_id: col({
+          codec: TYPES.int,
+          notNull: false,
+          via: "item",
+        }),
+        author_id: col({
+          codec: TYPES.int,
+          notNull: true,
+          via: "item",
+        }),
+        position: col({ codec: TYPES.bigint, notNull: true, via: "item" }),
+        created_at: col({
+          codec: TYPES.timestamptz,
+          notNull: true,
+          via: "item",
+        }),
+        updated_at: col({
+          codec: TYPES.timestamptz,
+          notNull: true,
+          via: "item",
+        }),
+        is_explicitly_archived: col({
+          codec: TYPES.boolean,
+          notNull: true,
+          via: "item",
+        }),
+        archived_at: col({
+          codec: TYPES.timestamptz,
+          notNull: false,
+          via: "item",
+        }),
+      };
+
+      const relationalTopicsCodec = recordCodec({
+        name: `interfaces_and_unions.relational_topics`,
+        identifier: sql`interfaces_and_unions.relational_topics`,
+        columns: {
+          ...itemColumns,
+          title: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(relationalTopicsCodec);
+
+      const relationalTopicsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: relationalTopicsCodec,
+        source: sql`interfaces_and_unions.relational_topics`,
+        name: "relational_topics",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(relationalTopicsSourceOptions);
+
+      const relationalPostsCodec = recordCodec({
+        name: `interfaces_and_unions.relational_posts`,
+        identifier: sql`interfaces_and_unions.relational_posts`,
+        columns: {
+          ...itemColumns,
+          title: col({ codec: TYPES.text, notNull: false }),
+          description: col({ codec: TYPES.text, notNull: false }),
+          note: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(relationalPostsCodec);
+
+      const relationalPostsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: relationalPostsCodec,
+        source: sql`interfaces_and_unions.relational_posts`,
+        name: "relational_posts",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(relationalPostsSourceOptions);
+
+      const relationalDividersCodec = recordCodec({
+        name: `interfaces_and_unions.relational_dividers`,
+        identifier: sql`interfaces_and_unions.relational_dividers`,
+        columns: {
+          ...itemColumns,
+          title: col({ codec: TYPES.text, notNull: false }),
+          color: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(relationalDividersCodec);
+
+      const relationalDividersSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: relationalDividersCodec,
+        source: sql`interfaces_and_unions.relational_dividers`,
+        name: "relational_dividers",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(relationalDividersSourceOptions);
+
+      const relationalChecklistsCodec = recordCodec({
+        name: `interfaces_and_unions.relational_checklists`,
+        identifier: sql`interfaces_and_unions.relational_checklists`,
+        columns: {
+          ...itemColumns,
+          title: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(relationalChecklistsCodec);
+
+      const relationalChecklistsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: relationalChecklistsCodec,
+        source: sql`interfaces_and_unions.relational_checklists`,
+        name: "relational_checklists",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(relationalChecklistsSourceOptions);
+
+      const relationalChecklistItemsCodec = recordCodec({
+        name: `interfaces_and_unions.relational_checklist_items`,
+        identifier: sql`interfaces_and_unions.relational_checklist_items`,
+        columns: {
+          ...itemColumns,
+          description: col({ codec: TYPES.text, notNull: true }),
+          note: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(relationalChecklistItemsCodec);
+
+      const relationalChecklistItemsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: relationalChecklistItemsCodec,
+        source: sql`interfaces_and_unions.relational_checklist_items`,
+        name: "relational_checklist_items",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(relationalChecklistItemsSourceOptions);
+
+      ////////////////////////////////////////
+
+      const unionItemsCodec = recordCodec({
+        name: `interfaces_and_unions.union_items`,
+        identifier: sql`interfaces_and_unions.union_items`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          type: col({
+            codec: itemTypeEnumCodec,
+            notNull: true,
+          }),
+          type2: col({
+            codec: enumTableItemTypeEnumCodec,
+            notNull: true,
+          }),
+        },
+      });
+      builder = builder.addCodec(unionItemsCodec);
+
+      const unionItemsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: unionItemsCodec,
+        source: sql`interfaces_and_unions.union_items`,
+        name: "union_items",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(unionItemsSourceOptions);
+
+      const unionTopicsCodec = recordCodec({
+        name: `interfaces_and_unions.union_topics`,
+        identifier: sql`interfaces_and_unions.union_topics`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          title: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(unionTopicsCodec);
+
+      const unionTopicsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: unionTopicsCodec,
+        source: sql`interfaces_and_unions.union_topics`,
+        name: "union_topics",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(unionTopicsSourceOptions);
+
+      const unionPostsCodec = recordCodec({
+        name: `interfaces_and_unions.union_posts`,
+        identifier: sql`interfaces_and_unions.union_posts`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          title: col({ codec: TYPES.text, notNull: false }),
+          description: col({ codec: TYPES.text, notNull: false }),
+          note: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(unionPostsCodec);
+
+      const unionPostsSource = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: unionPostsCodec,
+        source: sql`interfaces_and_unions.union_posts`,
+        name: "union_posts",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(unionPostsSource);
+
+      const unionDividersCodec = recordCodec({
+        name: `interfaces_and_unions.union_dividers`,
+        identifier: sql`interfaces_and_unions.union_dividers`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          title: col({ codec: TYPES.text, notNull: false }),
+          color: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(unionDividersCodec);
+
+      const unionDividersSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: unionDividersCodec,
+        source: sql`interfaces_and_unions.union_dividers`,
+        name: "union_dividers",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(unionDividersSourceOptions);
+
+      const unionChecklistsCodec = recordCodec({
+        name: `interfaces_and_unions.union_checklists`,
+        identifier: sql`interfaces_and_unions.union_checklists`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          title: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(unionChecklistsCodec);
+
+      const unionChecklistsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: unionChecklistsCodec,
+        source: sql`interfaces_and_unions.union_checklists`,
+        name: "union_checklists",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(unionChecklistsSourceOptions);
+
+      const unionChecklistItemsCodec = recordCodec({
+        name: `interfaces_and_unions.union_checklist_items`,
+        identifier: sql`interfaces_and_unions.union_checklist_items`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          description: col({ codec: TYPES.text, notNull: true }),
+          note: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(unionChecklistItemsCodec);
+
+      const unionChecklistItemsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: unionChecklistItemsCodec,
+        source: sql`interfaces_and_unions.union_checklist_items`,
+        name: "union_checklist_items",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(unionChecklistItemsSourceOptions);
+
+      const unionEntitySourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: unionEntityCodec,
+        source: sql`(select null::interfaces_and_unions.union__entity)`,
+        name: "union__entity",
+      });
+      builder = builder.addSource(unionEntitySourceOptions);
+
+      const entitySearchSourceOptions = PgSource.functionSourceOptions(
+        unionEntitySourceOptions,
+        {
+          source: (...args) =>
+            sql`interfaces_and_unions.search(${sqlFromArgDigests(args)})`,
+          returnsSetof: true,
+          returnsArray: false,
+          name: "entity_search",
+          parameters: [
+            {
+              name: "query",
+              required: true,
+              codec: TYPES.text,
+            },
+          ],
+        },
+      );
+      builder = builder.addSource(entitySearchSourceOptions);
+
+      ////////////////////////////////////////
+
+      const awsApplicationsCodec = recordCodec({
+        name: "interfaces_and_unions.aws_applications",
+        identifier: sql`interfaces_and_unions.aws_applications`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          name: col({
+            codec: TYPES.text,
+            notNull: true,
+          }),
+          last_deployed: col({
+            codec: TYPES.timestamptz,
+            notNull: false,
+          }),
+          aws_id: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(awsApplicationsCodec);
+
+      const awsApplicationsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: awsApplicationsCodec,
+        source: sql`interfaces_and_unions.aws_applications`,
+        name: "aws_applications",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(awsApplicationsSourceOptions);
+
+      const gcpApplicationsCodec = recordCodec({
+        name: "interfaces_and_unions.gcp_applications",
+        identifier: sql`interfaces_and_unions.gcp_applications`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          name: col({
+            codec: TYPES.text,
+            notNull: true,
+          }),
+          last_deployed: col({
+            codec: TYPES.timestamptz,
+            notNull: false,
+          }),
+          gcp_id: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(gcpApplicationsCodec);
+
+      const gcpApplicationsSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: gcpApplicationsCodec,
+        source: sql`interfaces_and_unions.gcp_applications`,
+        name: "gcp_applications",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(gcpApplicationsSourceOptions);
+
+      const firstPartyVulnerabilitiesCodec = recordCodec({
+        name: "interfaces_and_unions.first_party_vulnerabilities",
+        identifier: sql`interfaces_and_unions.first_party_vulnerabilities`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          name: col({
+            codec: TYPES.text,
+            notNull: true,
+          }),
+          cvss_score: col({ codec: TYPES.float, notNull: true }),
+          team_name: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(firstPartyVulnerabilitiesCodec);
+
+      const firstPartyVulnerabilitiesSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: firstPartyVulnerabilitiesCodec,
+        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
+        name: "first_party_vulnerabilities",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(firstPartyVulnerabilitiesSourceOptions);
+
+      const thirdPartyVulnerabilitiesCodec = recordCodec({
+        name: "interfaces_and_unions.third_party_vulnerabilities",
+        identifier: sql`interfaces_and_unions.third_party_vulnerabilities`,
+        columns: {
+          id: col({ codec: TYPES.int, notNull: true }),
+          name: col({
+            codec: TYPES.text,
+            notNull: true,
+          }),
+          cvss_score: col({ codec: TYPES.float, notNull: true }),
+          vendor_name: col({ codec: TYPES.text, notNull: false }),
+        },
+      });
+      builder = builder.addCodec(thirdPartyVulnerabilitiesCodec);
+
+      const thirdPartyVulnerabilitiesSourceOptions = makePgSourceOptions({
+        executor,
+        selectAuth,
+        codec: thirdPartyVulnerabilitiesCodec,
+        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
+        name: "third_party_vulnerabilities",
+        uniques: [{ columns: ["id"], isPrimary: true }],
+      });
+      builder = builder.addSource(thirdPartyVulnerabilitiesSourceOptions);
+
+      return builder
         .addRelation(messagesCodec, "author", userSourceOptions, {
           localColumns: [`author_id`],
           remoteColumns: [`id`],
@@ -593,12 +1194,407 @@ export function makeExampleSchema(
             remoteColumns: ["person_id"],
           },
         )
+        .addRelation(
+          personCodec,
+          "singleTableItems",
+          singleTableItemsSourceOptions,
+          {
+            isUnique: false,
+            localColumns: ["person_id"],
+            remoteColumns: ["author_id"],
+          },
+        )
+        .addRelation(personCodec, "posts", postSourceOptions, {
+          isUnique: false,
+          localColumns: ["person_id"],
+          remoteColumns: ["author_id"],
+        })
+        .addRelation(personCodec, "comments", postSourceOptions, {
+          isUnique: false,
+          localColumns: ["person_id"],
+          remoteColumns: ["author_id"],
+        })
+        .addRelation(
+          personCodec,
+          "personBookmarks",
+          personBookmarksSourceOptions,
+          {
+            isUnique: false,
+            localColumns: ["person_id"],
+            remoteColumns: ["person_id"],
+          },
+        )
+        .addRelation(postCodec, "author", personSourceOptions, {
+          isUnique: true,
+          localColumns: ["author_id"],
+          remoteColumns: ["person_id"],
+        })
+        .addRelation(postCodec, "comments", commentSourceOptions, {
+          isUnique: false,
+          localColumns: ["post_id"],
+          remoteColumns: ["post_id"],
+        })
+        .addRelation(commentCodec, "author", personSourceOptions, {
+          isUnique: true,
+          localColumns: ["author_id"],
+          remoteColumns: ["person_id"],
+        })
+        .addRelation(commentCodec, "post", postSourceOptions, {
+          isUnique: true,
+          localColumns: ["post_id"],
+          remoteColumns: ["post_id"],
+        })
+        .addRelation(
+          singleTableItemsCodec,
+          "parent",
+          singleTableItemsSourceOptions,
+          {
+            isUnique: true,
+            localColumns: ["parent_id"],
+            remoteColumns: ["id"],
+          },
+        )
+        .addRelation(
+          singleTableItemsCodec,
+          "children",
+          singleTableItemsSourceOptions,
+          {
+            isUnique: false,
+            localColumns: ["id"],
+            remoteColumns: ["parent_id"],
+          },
+        )
+        .addRelation(singleTableItemsCodec, "author", personSourceOptions, {
+          isUnique: true,
+          localColumns: ["author_id"],
+          remoteColumns: ["person_id"],
+        })
+
+        .addRelation(
+          relationalTopicsCodec,
+          "item",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          relationalTopicsCodec,
+          "parent",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`parent_id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(relationalTopicsCodec, "author", personSourceOptions, {
+          localColumns: [`author_id`] as const,
+          remoteColumns: [`person_id`] as const,
+          isUnique: true,
+        })
+
+        .addRelation(
+          relationalPostsCodec,
+          "item",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          relationalPostsCodec,
+          "parent",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`parent_id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(relationalPostsCodec, "author", personSourceOptions, {
+          localColumns: [`author_id`] as const,
+          remoteColumns: [`person_id`] as const,
+          isUnique: true,
+        })
+        .addRelation(
+          relationalPostsCodec,
+          "commentable",
+          relationalCommentableSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+
+        .addRelation(
+          relationalDividersCodec,
+          "item",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          relationalDividersCodec,
+          "parent",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`parent_id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(relationalDividersCodec, "author", personSourceOptions, {
+          localColumns: [`author_id`] as const,
+          remoteColumns: [`person_id`] as const,
+          isUnique: true,
+        })
+        .addRelation(
+          relationalChecklistsCodec,
+          "item",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          relationalChecklistsCodec,
+          "parent",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`parent_id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(relationalChecklistsCodec, "author", personSourceOptions, {
+          localColumns: [`author_id`] as const,
+          remoteColumns: [`person_id`] as const,
+          isUnique: true,
+        })
+        .addRelation(
+          relationalChecklistsCodec,
+          "commentable",
+          relationalCommentableSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          relationalChecklistItemsCodec,
+          "item",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          relationalChecklistItemsCodec,
+          "parent",
+          relationalItemsSourceOptions,
+          {
+            localColumns: [`parent_id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          relationalChecklistItemsCodec,
+          "author",
+          personSourceOptions,
+          {
+            localColumns: [`author_id`] as const,
+            remoteColumns: [`person_id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          relationalChecklistItemsCodec,
+          "commentable",
+          relationalCommentableSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+
+        .addRelation(
+          relationalItemsCodec,
+          "parent",
+          relationalItemsSourceOptions,
+          {
+            isUnique: true,
+            localColumns: ["parent_id"] as const,
+            remoteColumns: ["id"] as const,
+          },
+        )
+        .addRelation(
+          relationalItemsCodec,
+          "children",
+          relationalItemsSourceOptions,
+          {
+            isUnique: false,
+            localColumns: ["id"] as const,
+            remoteColumns: ["parent_id"] as const,
+          },
+        )
+        .addRelation(relationalItemsCodec, "author", personSourceOptions, {
+          isUnique: true,
+          localColumns: ["author_id"] as const,
+          remoteColumns: ["person_id"] as const,
+        })
+        .addRelation(
+          relationalItemsCodec,
+          "topic",
+          relationalTopicsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+            // reciprocal: 'item',
+          },
+        )
+        .addRelation(
+          relationalItemsCodec,
+          "post",
+          relationalPostsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+            // reciprocal: 'item',
+          },
+        )
+        .addRelation(
+          relationalItemsCodec,
+          "divider",
+          relationalDividersSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+            // reciprocal: 'item',
+          },
+        )
+        .addRelation(
+          relationalItemsCodec,
+          "checklist",
+          relationalChecklistsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+            // reciprocal: 'item',
+          },
+        )
+        .addRelation(
+          relationalItemsCodec,
+          "checklistItem",
+          relationalChecklistItemsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+            // reciprocal: 'item',
+          },
+        )
+
+        .addRelation(
+          relationalCommentableCodec,
+          "post",
+          relationalPostsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+            // reciprocal: 'item',
+          },
+        )
+        .addRelation(
+          relationalCommentableCodec,
+          "checklist",
+          relationalChecklistsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+            // reciprocal: 'item',
+          },
+        )
+        .addRelation(
+          relationalCommentableCodec,
+          "checklistItem",
+          relationalChecklistItemsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+            // reciprocal: 'item',
+          },
+        )
+
+        .addRelation(unionItemsCodec, "topic", unionTopicsSourceOptions, {
+          localColumns: [`id`] as const,
+          remoteColumns: [`id`] as const,
+          isUnique: true,
+        })
+        .addRelation(unionItemsCodec, "post", unionPostsSource, {
+          localColumns: [`id`] as const,
+          remoteColumns: [`id`] as const,
+          isUnique: true,
+        })
+        .addRelation(unionItemsCodec, "divider", unionDividersSourceOptions, {
+          localColumns: [`id`] as const,
+          remoteColumns: [`id`] as const,
+          isUnique: true,
+        })
+        .addRelation(
+          unionItemsCodec,
+          "checklist",
+          unionChecklistsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+        .addRelation(
+          unionItemsCodec,
+          "checklistItem",
+          unionChecklistItemsSourceOptions,
+          {
+            localColumns: [`id`] as const,
+            remoteColumns: [`id`] as const,
+            isUnique: true,
+          },
+        )
+
         .build();
     },
     [
+      EXPORTABLE,
+      GraphQLEnumType,
+      PgSource,
       TYPES,
+      enumCodec,
       executor,
       listOfCodec,
+      makePgSourceOptions,
       makeRegistryBuilder,
       recordCodec,
       selectAuth,
@@ -606,6 +1602,8 @@ export function makeExampleSchema(
       sqlFromArgDigests,
     ],
   );
+
+  registry.pgSources.singleT.getRelation("author").localColumns;
 
   /*
   registry.pgCodecs.messages.columns.id;
@@ -711,148 +1709,7 @@ export function makeExampleSchema(
     typeof relationalCommentableSource
   >;
 
-  const postColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      post_id: col({ codec: TYPES.int, notNull: true }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      body: col({ codec: TYPES.text, notNull: true }),
-    }),
-    [TYPES, col],
-  );
-
-  const postSourceBuilder = EXPORTABLE(
-    (PgSource, executor, postColumns, recordCodec, selectAuth, sql) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "interfaces_and_unions.posts",
-          identifier: sql`interfaces_and_unions.posts`,
-          columns: postColumns,
-        }),
-        source: sql`interfaces_and_unions.posts`,
-        name: "posts",
-        uniques: [{ columns: ["post_id"], isPrimary: true }],
-      }),
-    [PgSource, executor, postColumns, recordCodec, selectAuth, sql],
-  );
-
-  const commentColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      comment_id: col({ codec: TYPES.int, notNull: true }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      post_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "post", attribute: "id" },
-      }),
-      body: col({ codec: TYPES.text, notNull: true }),
-    }),
-    [TYPES, col],
-  );
-
-  const commentSourceBuilder = EXPORTABLE(
-    (PgSource, commentColumns, executor, recordCodec, selectAuth, sql) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "interfaces_and_unions.comments",
-          identifier: sql`interfaces_and_unions.comments`,
-          columns: commentColumns,
-        }),
-        source: sql`interfaces_and_unions.comments`,
-        name: "comments",
-        uniques: [{ columns: ["comment_id"], isPrimary: true }],
-      }),
-    [PgSource, commentColumns, executor, recordCodec, selectAuth, sql],
-  );
-
-  const itemTypeEnumSource = EXPORTABLE(
-    (PgEnumSource, enumCodec, sql) =>
-      new PgEnumSource({
-        codec: enumCodec({
-          name: `interfaces_and_unions.item_type`,
-          identifier: sql`interfaces_and_unions.item_type`,
-          values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
-        }),
-      }),
-    [PgEnumSource, enumCodec, sql],
-  );
-
-  const enumTablesItemTypeColumns = EXPORTABLE(
-    (TYPES) => ({
-      type: {
-        codec: TYPES.text,
-        notNull: true,
-      },
-      description: {
-        codec: TYPES.text,
-        notNull: false,
-      },
-    }),
-    [TYPES],
-  );
-
-  const enumTableItemTypeSourceBuilder = EXPORTABLE(
-    (
-      PgSource,
-      enumTablesItemTypeColumns,
-      executor,
-      recordCodec,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.enum_table_item_type`,
-          identifier: sql`interfaces_and_unions.enum_table_item_type`,
-          columns: enumTablesItemTypeColumns,
-        }),
-        source: sql`interfaces_and_unions.enum_table_item_type`,
-        name: "enum_table_item_type",
-        uniques: [{ columns: ["type"], isPrimary: true }],
-      }),
-    [
-      PgSource,
-      enumTablesItemTypeColumns,
-      executor,
-      recordCodec,
-      selectAuth,
-      sql,
-    ],
-  );
-
-  const enumTableItemTypeSource = EXPORTABLE(
-    (enumTableItemTypeSourceBuilder) =>
-      enumTableItemTypeSourceBuilder.build({}),
-    [enumTableItemTypeSourceBuilder],
-  );
-
-  const enumTableItemTypeEnumSource = EXPORTABLE(
-    (PgEnumSource, enumCodec, enumTableItemTypeSource, sql) =>
-      new PgEnumSource({
-        codec: enumCodec({
-          name: "text",
-          identifier: sql`text`,
-          values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
-        }),
-        extensions: {
-          tableSource: enumTableItemTypeSource,
-        },
-      }),
-    [PgEnumSource, enumCodec, enumTableItemTypeSource, sql],
-  );
+  ////////////////////////////////////////
 
   const EnumTableItemType = new GraphQLEnumType({
     name: "EnumTableItemType",
@@ -864,1082 +1721,6 @@ export function makeExampleSchema(
       CHECKLIST_ITEM: { value: "CHECKLIST_ITEM" },
     },
   });
-
-  const singleTableItemColumns = EXPORTABLE(
-    (TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      type: col({
-        codec: itemTypeEnumSource.codec,
-        notNull: true,
-      }),
-      type2: col({
-        codec: enumTableItemTypeEnumSource.codec,
-        notNull: true,
-      }),
-
-      parent_id: col({
-        codec: TYPES.int,
-        notNull: false,
-        identicalVia: { relation: "parent", attribute: "id" },
-      }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      position: col({ codec: TYPES.bigint, notNull: true }),
-      created_at: col({ codec: TYPES.timestamptz, notNull: true }),
-      updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
-      is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
-      archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
-
-      title: col({ codec: TYPES.text, notNull: false }),
-      description: col({ codec: TYPES.text, notNull: false }),
-      note: col({ codec: TYPES.text, notNull: false }),
-      color: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
-  );
-  const singleTableItemsSourceBuilder = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      selectAuth,
-      singleTableItemColumns,
-      sql,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.single_table_items`,
-          identifier: sql`interfaces_and_unions.single_table_items`,
-          columns: singleTableItemColumns,
-        }),
-        source: sql`interfaces_and_unions.single_table_items`,
-        name: "single_table_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, selectAuth, singleTableItemColumns, sql],
-  );
-
-  const personSource = EXPORTABLE(
-    (
-      personBookmarksSource,
-      personSourceBuilder,
-      postSourceBuilder,
-      singleTableItemsSourceBuilder,
-    ) =>
-      personSourceBuilder.build({
-        relations: {
-          singleTableItems: {
-            source: singleTableItemsSourceBuilder,
-            isUnique: false,
-            localColumns: ["person_id"],
-            remoteColumns: ["author_id"],
-          },
-          posts: {
-            source: postSourceBuilder,
-            isUnique: false,
-            localColumns: ["person_id"],
-            remoteColumns: ["author_id"],
-          },
-          comments: {
-            source: postSourceBuilder,
-            isUnique: false,
-            localColumns: ["person_id"],
-            remoteColumns: ["author_id"],
-          },
-          personBookmarks: {
-            source: personBookmarksSource,
-            isUnique: false,
-            localColumns: ["person_id"],
-            remoteColumns: ["person_id"],
-          },
-        },
-      }),
-    [
-      personBookmarksSource,
-      personSourceBuilder,
-      postSourceBuilder,
-      singleTableItemsSourceBuilder,
-    ],
-  );
-
-  const postSource = EXPORTABLE(
-    (commentSourceBuilder, personSource, postSourceBuilder) =>
-      postSourceBuilder.build({
-        relations: {
-          author: {
-            source: personSource,
-            isUnique: true,
-            localColumns: ["author_id"],
-            remoteColumns: ["person_id"],
-          },
-          comments: {
-            source: commentSourceBuilder,
-            isUnique: false,
-            localColumns: ["post_id"],
-            remoteColumns: ["post_id"],
-          },
-        },
-      }),
-    [commentSourceBuilder, personSource, postSourceBuilder],
-  );
-
-  const commentSource = EXPORTABLE(
-    (commentSourceBuilder, personSource, postSource) =>
-      commentSourceBuilder.build({
-        relations: {
-          author: {
-            source: personSource,
-            isUnique: true,
-            localColumns: ["author_id"],
-            remoteColumns: ["person_id"],
-          },
-          post: {
-            source: postSource,
-            isUnique: true,
-            localColumns: ["post_id"],
-            remoteColumns: ["post_id"],
-          },
-        },
-      }),
-    [commentSourceBuilder, personSource, postSource],
-  );
-
-  const singleTableItemsSource = EXPORTABLE(
-    (personSource, singleTableItemsSourceBuilder) =>
-      singleTableItemsSourceBuilder.build({
-        relations: {
-          parent: {
-            source: singleTableItemsSourceBuilder,
-            isUnique: true,
-            localColumns: ["parent_id"],
-            remoteColumns: ["id"],
-          },
-          children: {
-            source: singleTableItemsSourceBuilder,
-            isUnique: false,
-            localColumns: ["id"],
-            remoteColumns: ["parent_id"],
-          },
-          author: {
-            source: personSource,
-            isUnique: true,
-            localColumns: ["author_id"],
-            remoteColumns: ["person_id"],
-          },
-        },
-      }),
-    [personSource, singleTableItemsSourceBuilder],
-  );
-
-  const relationalItemColumns = EXPORTABLE(
-    (TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      type: col({
-        codec: itemTypeEnumSource.codec,
-        notNull: true,
-      }),
-      type2: col({
-        codec: enumTableItemTypeEnumSource.codec,
-        notNull: true,
-      }),
-
-      parent_id: col({
-        codec: TYPES.int,
-        notNull: false,
-        identicalVia: { relation: "parent", attribute: "id" },
-      }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      position: col({ codec: TYPES.bigint, notNull: true }),
-      created_at: col({ codec: TYPES.timestamptz, notNull: true }),
-      updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
-      is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
-      archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
-    }),
-    [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
-  );
-
-  const relationalItemsSourceBuilder = EXPORTABLE(
-    (PgSource, executor, recordCodec, relationalItemColumns, selectAuth, sql) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.relational_items`,
-          identifier: sql`interfaces_and_unions.relational_items`,
-          columns: relationalItemColumns,
-        }),
-        source: sql`interfaces_and_unions.relational_items`,
-        name: "relational_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, relationalItemColumns, selectAuth, sql],
-  );
-
-  const relationalCommentableColumns = EXPORTABLE(
-    (TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      type: col({
-        codec: itemTypeEnumSource.codec,
-        notNull: true,
-      }),
-      type2: col({
-        codec: enumTableItemTypeEnumSource.codec,
-        notNull: true,
-      }),
-    }),
-    [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
-  );
-
-  const relationalCommentableSourceBuilder = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      relationalCommentableColumns,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.relational_commentables`,
-          identifier: sql`interfaces_and_unions.relational_commentables`,
-          columns: relationalCommentableColumns,
-        }),
-        source: sql`interfaces_and_unions.relational_commentables`,
-        name: "relational_commentables",
-      }),
-    [
-      PgSource,
-      executor,
-      recordCodec,
-      relationalCommentableColumns,
-      selectAuth,
-      sql,
-    ],
-  );
-
-  const itemColumns = EXPORTABLE(
-    (TYPES, col, enumTableItemTypeEnumSource) => ({
-      id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
-      type: col({ codec: TYPES.text, notNull: true, via: "item" }),
-      type2: col({
-        codec: enumTableItemTypeEnumSource.codec,
-        notNull: true,
-        via: "item",
-      }),
-      parent_id: col({
-        codec: TYPES.int,
-        notNull: false,
-        via: "item",
-      }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        via: "item",
-      }),
-      position: col({ codec: TYPES.bigint, notNull: true, via: "item" }),
-      created_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
-      updated_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
-      is_explicitly_archived: col({
-        codec: TYPES.boolean,
-        notNull: true,
-        via: "item",
-      }),
-      archived_at: col({
-        codec: TYPES.timestamptz,
-        notNull: false,
-        via: "item",
-      }),
-    }),
-    [TYPES, col, enumTableItemTypeEnumSource],
-  );
-
-  const itemRelations = EXPORTABLE(
-    (personSource, relationalItemsSourceBuilder) => ({
-      item: {
-        source: relationalItemsSourceBuilder,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-      },
-      parent: {
-        source: relationalItemsSourceBuilder,
-        localColumns: [`parent_id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-      },
-      author: {
-        source: personSource,
-        localColumns: [`author_id`] as const,
-        remoteColumns: [`person_id`] as const,
-        isUnique: true,
-      },
-    }),
-    [personSource, relationalItemsSourceBuilder],
-  );
-
-  const commentableRelation = EXPORTABLE(
-    (relationalCommentableSourceBuilder) => ({
-      source: relationalCommentableSourceBuilder,
-      localColumns: [`id`] as const,
-      remoteColumns: [`id`] as const,
-      isUnique: true,
-    }),
-    [relationalCommentableSourceBuilder],
-  );
-
-  const relationalTopicsColumns = EXPORTABLE(
-    (TYPES, col, itemColumns) => ({
-      ...itemColumns,
-      title: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col, itemColumns],
-  );
-  const relationalTopicsSourceBuilder = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      relationalTopicsColumns,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.relational_topics`,
-          identifier: sql`interfaces_and_unions.relational_topics`,
-          columns: relationalTopicsColumns,
-        }),
-        source: sql`interfaces_and_unions.relational_topics`,
-        name: "relational_topics",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, relationalTopicsColumns, selectAuth, sql],
-  );
-
-  const relationalPostsColumns = EXPORTABLE(
-    (TYPES, col, itemColumns) => ({
-      ...itemColumns,
-      title: col({ codec: TYPES.text, notNull: false }),
-      description: col({ codec: TYPES.text, notNull: false }),
-      note: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col, itemColumns],
-  );
-  const relationalPostsSourceBuilder = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      relationalPostsColumns,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.relational_posts`,
-          identifier: sql`interfaces_and_unions.relational_posts`,
-          columns: relationalPostsColumns,
-        }),
-        source: sql`interfaces_and_unions.relational_posts`,
-        name: "relational_posts",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, relationalPostsColumns, selectAuth, sql],
-  );
-
-  const relationalDividersColumns = EXPORTABLE(
-    (TYPES, col, itemColumns) => ({
-      ...itemColumns,
-      title: col({ codec: TYPES.text, notNull: false }),
-      color: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col, itemColumns],
-  );
-  const relationalDividersSourceBuilder = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      relationalDividersColumns,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.relational_dividers`,
-          identifier: sql`interfaces_and_unions.relational_dividers`,
-          columns: relationalDividersColumns,
-        }),
-        source: sql`interfaces_and_unions.relational_dividers`,
-        name: "relational_dividers",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [
-      PgSource,
-      executor,
-      recordCodec,
-      relationalDividersColumns,
-      selectAuth,
-      sql,
-    ],
-  );
-
-  const relationalChecklistsColumns = EXPORTABLE(
-    (TYPES, col, itemColumns) => ({
-      ...itemColumns,
-      title: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col, itemColumns],
-  );
-  const relationalChecklistsSourceBuilder = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      relationalChecklistsColumns,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.relational_checklists`,
-          identifier: sql`interfaces_and_unions.relational_checklists`,
-          columns: relationalChecklistsColumns,
-        }),
-        source: sql`interfaces_and_unions.relational_checklists`,
-        name: "relational_checklists",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [
-      PgSource,
-      executor,
-      recordCodec,
-      relationalChecklistsColumns,
-      selectAuth,
-      sql,
-    ],
-  );
-
-  const relationalChecklistItemsColumns = EXPORTABLE(
-    (TYPES, col, itemColumns) => ({
-      ...itemColumns,
-      description: col({ codec: TYPES.text, notNull: true }),
-      note: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col, itemColumns],
-  );
-  const relationalChecklistItemsSourceBuilder = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      relationalChecklistItemsColumns,
-      selectAuth,
-      sql,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.relational_checklist_items`,
-          identifier: sql`interfaces_and_unions.relational_checklist_items`,
-          columns: relationalChecklistItemsColumns,
-        }),
-        source: sql`interfaces_and_unions.relational_checklist_items`,
-        name: "relational_checklist_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [
-      PgSource,
-      executor,
-      recordCodec,
-      relationalChecklistItemsColumns,
-      selectAuth,
-      sql,
-    ],
-  );
-
-  const relationalItemsSource = EXPORTABLE(
-    (
-      personSource,
-      relationalChecklistItemsSourceBuilder,
-      relationalChecklistsSourceBuilder,
-      relationalDividersSourceBuilder,
-      relationalItemsSourceBuilder,
-      relationalPostsSourceBuilder,
-      relationalTopicsSourceBuilder,
-    ) =>
-      relationalItemsSourceBuilder.build({
-        relations: {
-          parent: {
-            source: relationalItemsSourceBuilder,
-            isUnique: true,
-            localColumns: ["parent_id"] as const,
-            remoteColumns: ["id"] as const,
-          },
-          children: {
-            source: relationalItemsSourceBuilder,
-            isUnique: false,
-            localColumns: ["id"] as const,
-            remoteColumns: ["parent_id"] as const,
-          },
-          author: {
-            source: personSource,
-            isUnique: true,
-            localColumns: ["author_id"] as const,
-            remoteColumns: ["person_id"] as const,
-          },
-          topic: {
-            source: relationalTopicsSourceBuilder,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-            // reciprocal: 'item',
-          },
-          post: {
-            source: relationalPostsSourceBuilder,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-            // reciprocal: 'item',
-          },
-          divider: {
-            source: relationalDividersSourceBuilder,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-            // reciprocal: 'item',
-          },
-          checklist: {
-            source: relationalChecklistsSourceBuilder,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-            // reciprocal: 'item',
-          },
-          checklistItem: {
-            source: relationalChecklistItemsSourceBuilder,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-            // reciprocal: 'item',
-          },
-        },
-      }),
-    [
-      personSource,
-      relationalChecklistItemsSourceBuilder,
-      relationalChecklistsSourceBuilder,
-      relationalDividersSourceBuilder,
-      relationalItemsSourceBuilder,
-      relationalPostsSourceBuilder,
-      relationalTopicsSourceBuilder,
-    ],
-  );
-
-  const relationalCommentableSource = EXPORTABLE(
-    (
-      relationalChecklistItemsSourceBuilder,
-      relationalChecklistsSourceBuilder,
-      relationalCommentableSourceBuilder,
-      relationalPostsSourceBuilder,
-    ) =>
-      relationalCommentableSourceBuilder.build({
-        relations: {
-          post: {
-            source: relationalPostsSourceBuilder,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-            // reciprocal: 'item',
-          },
-          checklist: {
-            source: relationalChecklistsSourceBuilder,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-            // reciprocal: 'item',
-          },
-          checklistItem: {
-            source: relationalChecklistItemsSourceBuilder,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-            // reciprocal: 'item',
-          },
-        },
-      }),
-    [
-      relationalChecklistItemsSourceBuilder,
-      relationalChecklistsSourceBuilder,
-      relationalCommentableSourceBuilder,
-      relationalPostsSourceBuilder,
-    ],
-  );
-
-  const relationalTopicsSource = EXPORTABLE(
-    (itemRelations, relationalTopicsSourceBuilder) =>
-      relationalTopicsSourceBuilder.build({
-        relations: itemRelations,
-      }),
-    [itemRelations, relationalTopicsSourceBuilder],
-  );
-  const relationalPostsSource = EXPORTABLE(
-    (commentableRelation, itemRelations, relationalPostsSourceBuilder) =>
-      relationalPostsSourceBuilder.build({
-        relations: {
-          ...itemRelations,
-          commentable: commentableRelation,
-        },
-      }),
-    [commentableRelation, itemRelations, relationalPostsSourceBuilder],
-  );
-  const relationalDividersSource = EXPORTABLE(
-    (itemRelations, relationalDividersSourceBuilder) =>
-      relationalDividersSourceBuilder.build({
-        relations: itemRelations,
-      }),
-    [itemRelations, relationalDividersSourceBuilder],
-  );
-  const relationalChecklistsSource = EXPORTABLE(
-    (commentableRelation, itemRelations, relationalChecklistsSourceBuilder) =>
-      relationalChecklistsSourceBuilder.build({
-        relations: {
-          ...itemRelations,
-          commentable: commentableRelation,
-        },
-      }),
-    [commentableRelation, itemRelations, relationalChecklistsSourceBuilder],
-  );
-  const relationalChecklistItemsSource = EXPORTABLE(
-    (
-      commentableRelation,
-      itemRelations,
-      relationalChecklistItemsSourceBuilder,
-    ) =>
-      relationalChecklistItemsSourceBuilder.build({
-        relations: {
-          ...itemRelations,
-          commentable: commentableRelation,
-        },
-      }),
-    [commentableRelation, itemRelations, relationalChecklistItemsSourceBuilder],
-  );
-
-  ////////////////////////////////////////
-
-  const unionItemsColumns = EXPORTABLE(
-    (TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      type: col({
-        codec: itemTypeEnumSource.codec,
-        notNull: true,
-      }),
-      type2: col({
-        codec: enumTableItemTypeEnumSource.codec,
-        notNull: true,
-      }),
-    }),
-    [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
-  );
-  const unionItemsSourceBuilder = EXPORTABLE(
-    (PgSource, executor, recordCodec, selectAuth, sql, unionItemsColumns) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.union_items`,
-          identifier: sql`interfaces_and_unions.union_items`,
-          columns: unionItemsColumns,
-        }),
-        source: sql`interfaces_and_unions.union_items`,
-        name: "union_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, selectAuth, sql, unionItemsColumns],
-  );
-
-  const unionTopicsColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      title: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col],
-  );
-  const unionTopicsSource = EXPORTABLE(
-    (PgSource, executor, recordCodec, selectAuth, sql, unionTopicsColumns) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.union_topics`,
-          identifier: sql`interfaces_and_unions.union_topics`,
-          columns: unionTopicsColumns,
-        }),
-        source: sql`interfaces_and_unions.union_topics`,
-        name: "union_topics",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, selectAuth, sql, unionTopicsColumns],
-  );
-
-  const unionPostsColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      title: col({ codec: TYPES.text, notNull: false }),
-      description: col({ codec: TYPES.text, notNull: false }),
-      note: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col],
-  );
-  const unionPostsSource = EXPORTABLE(
-    (PgSource, executor, recordCodec, selectAuth, sql, unionPostsColumns) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.union_posts`,
-          identifier: sql`interfaces_and_unions.union_posts`,
-          columns: unionPostsColumns,
-        }),
-        source: sql`interfaces_and_unions.union_posts`,
-        name: "union_posts",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, selectAuth, sql, unionPostsColumns],
-  );
-
-  const unionDividersColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      title: col({ codec: TYPES.text, notNull: false }),
-      color: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col],
-  );
-  const unionDividersSource = EXPORTABLE(
-    (PgSource, executor, recordCodec, selectAuth, sql, unionDividersColumns) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.union_dividers`,
-          identifier: sql`interfaces_and_unions.union_dividers`,
-          columns: unionDividersColumns,
-        }),
-        source: sql`interfaces_and_unions.union_dividers`,
-        name: "union_dividers",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, selectAuth, sql, unionDividersColumns],
-  );
-
-  const unionChecklistsColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      title: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col],
-  );
-  const unionChecklistsSource = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      selectAuth,
-      sql,
-      unionChecklistsColumns,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.union_checklists`,
-          identifier: sql`interfaces_and_unions.union_checklists`,
-          columns: unionChecklistsColumns,
-        }),
-        source: sql`interfaces_and_unions.union_checklists`,
-        name: "union_checklists",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSource, executor, recordCodec, selectAuth, sql, unionChecklistsColumns],
-  );
-
-  const unionChecklistItemsColumns = EXPORTABLE(
-    (TYPES, col) => ({
-      id: col({ codec: TYPES.int, notNull: true }),
-      description: col({ codec: TYPES.text, notNull: true }),
-      note: col({ codec: TYPES.text, notNull: false }),
-    }),
-    [TYPES, col],
-  );
-  const unionChecklistItemsSource = EXPORTABLE(
-    (
-      PgSource,
-      executor,
-      recordCodec,
-      selectAuth,
-      sql,
-      unionChecklistItemsColumns,
-    ) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.union_checklist_items`,
-          identifier: sql`interfaces_and_unions.union_checklist_items`,
-          columns: unionChecklistItemsColumns,
-        }),
-        source: sql`interfaces_and_unions.union_checklist_items`,
-        name: "union_checklist_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [
-      PgSource,
-      executor,
-      recordCodec,
-      selectAuth,
-      sql,
-      unionChecklistItemsColumns,
-    ],
-  );
-
-  const unionEntitySource = EXPORTABLE(
-    (PgSource, executor, recordCodec, selectAuth, sql, unionEntityColumns) =>
-      new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: `interfaces_and_unions.union__entity`,
-          identifier: sql`interfaces_and_unions.union__entity`,
-          columns: unionEntityColumns,
-        }),
-        source: sql`(select null::interfaces_and_unions.union__entity)`,
-        name: "union__entity",
-      }),
-    [PgSource, executor, recordCodec, selectAuth, sql, unionEntityColumns],
-  );
-
-  const entitySearchSource = EXPORTABLE(
-    (TYPES, sql, sqlFromArgDigests, unionEntitySource) =>
-      unionEntitySource.functionSource({
-        source: (...args) =>
-          sql`interfaces_and_unions.search(${sqlFromArgDigests(args)})`,
-        returnsSetof: true,
-        returnsArray: false,
-        name: "entity_search",
-        parameters: [
-          {
-            name: "query",
-            required: true,
-            codec: TYPES.text,
-          },
-        ],
-      }),
-    [TYPES, sql, sqlFromArgDigests, unionEntitySource],
-  );
-
-  const unionItemsSource = EXPORTABLE(
-    (
-      unionChecklistItemsSource,
-      unionChecklistsSource,
-      unionDividersSource,
-      unionItemsSourceBuilder,
-      unionPostsSource,
-      unionTopicsSource,
-    ) =>
-      unionItemsSourceBuilder.build({
-        relations: {
-          topic: {
-            source: unionTopicsSource,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-          },
-          post: {
-            source: unionPostsSource,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-          },
-          divider: {
-            source: unionDividersSource,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-          },
-          checklist: {
-            source: unionChecklistsSource,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-          },
-          checklistItem: {
-            source: unionChecklistItemsSource,
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
-            isUnique: true,
-          },
-        },
-      }),
-    [
-      unionChecklistItemsSource,
-      unionChecklistsSource,
-      unionDividersSource,
-      unionItemsSourceBuilder,
-      unionPostsSource,
-      unionTopicsSource,
-    ],
-  );
-
-  ////////////////////////////////////////
-
-  const awsApplicationsSourceBuilder = EXPORTABLE(
-    (PgSource, TYPES, col, executor, recordCodec, selectAuth, sql) => {
-      return new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "interfaces_and_unions.aws_applications",
-          identifier: sql`interfaces_and_unions.aws_applications`,
-          columns: {
-            id: col({ codec: TYPES.int, notNull: true }),
-            name: col({
-              codec: TYPES.text,
-              notNull: true,
-            }),
-            last_deployed: col({ codec: TYPES.timestamptz, notNull: false }),
-            aws_id: col({ codec: TYPES.text, notNull: false }),
-          },
-        }),
-        source: sql`interfaces_and_unions.aws_applications`,
-        name: "aws_applications",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      });
-    },
-    [PgSource, TYPES, col, executor, recordCodec, selectAuth, sql],
-  );
-
-  const gcpApplicationsSourceBuilder = EXPORTABLE(
-    (PgSource, TYPES, col, executor, recordCodec, selectAuth, sql) => {
-      return new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "interfaces_and_unions.gcp_applications",
-          identifier: sql`interfaces_and_unions.gcp_applications`,
-          columns: {
-            id: col({ codec: TYPES.int, notNull: true }),
-            name: col({
-              codec: TYPES.text,
-              notNull: true,
-            }),
-            last_deployed: col({ codec: TYPES.timestamptz, notNull: false }),
-            gcp_id: col({ codec: TYPES.text, notNull: false }),
-          },
-        }),
-        source: sql`interfaces_and_unions.gcp_applications`,
-        name: "gcp_applications",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      });
-    },
-    [PgSource, TYPES, col, executor, recordCodec, selectAuth, sql],
-  );
-
-  const firstPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
-    (PgSource, TYPES, col, executor, recordCodec, selectAuth, sql) => {
-      return new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "interfaces_and_unions.first_party_vulnerabilities",
-          identifier: sql`interfaces_and_unions.first_party_vulnerabilities`,
-          columns: {
-            id: col({ codec: TYPES.int, notNull: true }),
-            name: col({
-              codec: TYPES.text,
-              notNull: true,
-            }),
-            cvss_score: col({ codec: TYPES.float, notNull: true }),
-            team_name: col({ codec: TYPES.text, notNull: false }),
-          },
-        }),
-        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
-        name: "first_party_vulnerabilities",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      });
-    },
-    [PgSource, TYPES, col, executor, recordCodec, selectAuth, sql],
-  );
-
-  const thirdPartyVulnerabilitiesSourceBuilder = EXPORTABLE(
-    (PgSource, TYPES, col, executor, recordCodec, selectAuth, sql) => {
-      return new PgSource({
-        executor,
-        selectAuth,
-        codec: recordCodec({
-          name: "interfaces_and_unions.third_party_vulnerabilities",
-          identifier: sql`interfaces_and_unions.third_party_vulnerabilities`,
-          columns: {
-            id: col({ codec: TYPES.int, notNull: true }),
-            name: col({
-              codec: TYPES.text,
-              notNull: true,
-            }),
-            cvss_score: col({ codec: TYPES.float, notNull: true }),
-            vendor_name: col({ codec: TYPES.text, notNull: false }),
-          },
-        }),
-        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
-        name: "third_party_vulnerabilities",
-        uniques: [{ columns: ["id"], isPrimary: true }],
-      });
-    },
-    [PgSource, TYPES, col, executor, recordCodec, selectAuth, sql],
-  );
-
-  const firstPartyVulnerabilitiesSource = EXPORTABLE(
-    (firstPartyVulnerabilitiesSourceBuilder) =>
-      firstPartyVulnerabilitiesSourceBuilder.build({}),
-    [firstPartyVulnerabilitiesSourceBuilder],
-  );
-  const thirdPartyVulnerabilitiesSource = EXPORTABLE(
-    (thirdPartyVulnerabilitiesSourceBuilder) =>
-      thirdPartyVulnerabilitiesSourceBuilder.build({}),
-    [thirdPartyVulnerabilitiesSourceBuilder],
-  );
-  const awsApplicationsSource = EXPORTABLE(
-    (awsApplicationsSourceBuilder) => awsApplicationsSourceBuilder.build({}),
-    [awsApplicationsSourceBuilder],
-  );
-  const gcpApplicationsSource = EXPORTABLE(
-    (gcpApplicationsSourceBuilder) => gcpApplicationsSourceBuilder.build({}),
-    [gcpApplicationsSourceBuilder],
-  );
-  awsApplicationsSource;
-  gcpApplicationsSource;
-
-  ////////////////////////////////////////
 
   function attrField<TColumns extends PgTypeColumns>(
     attrName: keyof TColumns,
@@ -3130,17 +2911,10 @@ export function makeExampleSchema(
    */
   const entityUnion = EXPORTABLE(
     (PgSelectSingleStep, entityPolymorphicTypeMap, list, pgPolymorphic) =>
-      <TColumns extends typeof unionEntityColumns>(
+      <TCodec extends typeof unionEntityCodec>(
         $item:
-          | PgSelectSingleStep<TColumns, any, any, any>
-          | PgClassExpressionStep<
-              TColumns,
-              PgTypeCodec<TColumns, any, any>,
-              any,
-              any,
-              any,
-              any
-            >,
+          | PgSelectSingleStep<PgSource<TCodec, any, any, any>>
+          | PgClassExpressionStep<TCodec, PgSource<TCodec, any, any, any>>,
       ) =>
         pgPolymorphic(
           $item,

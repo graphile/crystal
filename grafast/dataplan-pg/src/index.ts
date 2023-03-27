@@ -32,9 +32,6 @@ import {
   PgPolygon,
 } from "./codecUtils/index.js";
 import {
-  PgEnumSource,
-  PgEnumSourceExtensions,
-  PgEnumSourceOptions,
   PgFunctionSourceOptions,
   PgSource,
   PgSourceExtensions,
@@ -203,9 +200,6 @@ export {
   PgEncode,
   PgBaseCodecsObject,
   PgEnumCodecSpec,
-  PgEnumSource,
-  PgEnumSourceExtensions,
-  PgEnumSourceOptions,
   PgEnumTypeCodec,
   PgEnumValue,
   PgExecutor,
@@ -329,7 +323,6 @@ exportAsMany("@dataplan/pg", {
   makeRegistryBuilder,
   makePgSourceOptions,
   TYPES,
-  PgEnumSource,
   PgSource,
   PgExecutor,
   BooleanFilterStep,
