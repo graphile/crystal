@@ -925,11 +925,9 @@ export interface PgRegistryBuilder<
     codec: TCodec,
   ): PgRegistryBuilder<
     TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
-      ? Simplify<
-          TCodecs & {
-            [name in UName]: TCodec;
-          }
-        >
+      ? TCodecs & {
+          [name in UName]: TCodec;
+        }
       : never,
     TSources,
     TRelations
@@ -940,19 +938,15 @@ export interface PgRegistryBuilder<
   ): PgRegistryBuilder<
     TSource extends PgSourceOptions<infer UCodec, any, any, any>
       ? UCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
-        ? Simplify<
-            TCodecs & {
-              [name in UName]: UCodec;
-            }
-          >
+        ? TCodecs & {
+            [name in UName]: UCodec;
+          }
         : never
       : never,
     TSource extends PgSourceOptions<any, any, any, infer UName>
-      ? Simplify<
-          TSources & {
-            [name in UName]: TSource;
-          }
-        >
+      ? TSources & {
+          [name in UName]: TSource;
+        }
       : never,
     TRelations
   >;
@@ -982,13 +976,11 @@ export interface PgRegistryBuilder<
     TCodecs,
     TSources,
     TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
-      ? Simplify<
-          TRelations & {
-            [codecName in UName]: {
-              [relationName in TCodecRelationName]: TCodecRelation;
-            };
-          }
-        >
+      ? TRelations & {
+          [codecName in UName]: {
+            [relationName in TCodecRelationName]: TCodecRelation;
+          };
+        }
       : never
     /*
     TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
