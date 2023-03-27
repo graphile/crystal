@@ -217,8 +217,6 @@ export function makeExampleSchema(
         };
       };
 
-      let builder = makeRegistryBuilder();
-
       const forumCodec = recordCodec({
         name: "forums",
         identifier: sql`app_public.forums`,
@@ -232,7 +230,6 @@ export function makeExampleSchema(
           }),
         },
       });
-      builder = builder.addCodec(forumCodec);
 
       const userCodec = recordCodec({
         name: "users",
@@ -244,7 +241,6 @@ export function makeExampleSchema(
           created_at: col({ notNull: true, codec: TYPES.timestamptz }),
         },
       });
-      builder = builder.addCodec(userCodec);
 
       const messagesCodec = recordCodec({
         name: "messages",
@@ -271,7 +267,6 @@ export function makeExampleSchema(
           }),
         },
       });
-      builder = builder.addCodec(messagesCodec);
 
       const uniqueAuthorCountSourceOptions = makePgSourceOptions({
         executor,
@@ -289,7 +284,6 @@ export function makeExampleSchema(
         ],
         isUnique: true,
       });
-      builder = builder.addSource(uniqueAuthorCountSourceOptions);
 
       const forumNamesArraySourceOptions = makePgSourceOptions({
         executor,
@@ -301,7 +295,6 @@ export function makeExampleSchema(
         parameters: [],
         isUnique: true, // No setof
       });
-      builder = builder.addSource(forumNamesArraySourceOptions);
 
       const forumNamesCasesSourceOptions = makePgSourceOptions({
         executor,
@@ -312,7 +305,6 @@ export function makeExampleSchema(
         name: "forum_names_cases",
         parameters: [],
       });
-      builder = builder.addSource(forumNamesCasesSourceOptions);
 
       const forumsUniqueAuthorCountSourceOptions = makePgSourceOptions({
         executor,
@@ -337,7 +329,6 @@ export function makeExampleSchema(
         ],
         isUnique: true,
       });
-      builder = builder.addSource(forumsUniqueAuthorCountSourceOptions);
 
       const scalarTextSourceOptions = makePgSourceOptions({
         executor,
@@ -346,7 +337,6 @@ export function makeExampleSchema(
         source: sql`(select '')`,
         name: "text",
       });
-      builder = builder.addSource(scalarTextSourceOptions);
 
       const messageSourceOptions = makePgSourceOptions({
         executor,
@@ -356,7 +346,6 @@ export function makeExampleSchema(
         name: "messages",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(messageSourceOptions);
 
       const userSourceOptions = makePgSourceOptions({
         executor,
@@ -369,7 +358,6 @@ export function makeExampleSchema(
           { columns: ["username"] },
         ],
       });
-      builder = builder.addSource(userSourceOptions);
 
       const forumSourceOptions = makePgSourceOptions({
         executor,
@@ -379,7 +367,6 @@ export function makeExampleSchema(
         name: "forums",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(forumSourceOptions);
 
       const usersMostRecentForumSourceOptions = PgSource.functionSourceOptions(
         forumSourceOptions,
@@ -399,7 +386,6 @@ export function makeExampleSchema(
           ],
         },
       );
-      builder = builder.addSource(usersMostRecentForumSourceOptions);
 
       const featuredMessagesSourceOptions = PgSource.functionSourceOptions(
         messageSourceOptions,
@@ -412,7 +398,6 @@ export function makeExampleSchema(
           parameters: [],
         },
       );
-      builder = builder.addSource(featuredMessagesSourceOptions);
 
       const forumsFeaturedMessagesSourceOptions =
         PgSource.functionSourceOptions(messageSourceOptions, {
@@ -431,7 +416,6 @@ export function makeExampleSchema(
             },
           ],
         });
-      builder = builder.addSource(forumsFeaturedMessagesSourceOptions);
 
       const randomUserArraySourceOptions = PgSource.functionSourceOptions(
         userSourceOptions,
@@ -444,7 +428,6 @@ export function makeExampleSchema(
           parameters: [],
         },
       );
-      builder = builder.addSource(randomUserArraySourceOptions);
 
       const randomUserArraySetSourceOptions = PgSource.functionSourceOptions(
         userSourceOptions,
@@ -457,7 +440,6 @@ export function makeExampleSchema(
           parameters: [],
         },
       );
-      builder = builder.addSource(randomUserArraySetSourceOptions);
 
       const forumsMessagesListSetSourceOptions = PgSource.functionSourceOptions(
         messageSourceOptions,
@@ -477,7 +459,6 @@ export function makeExampleSchema(
           },
         },
       );
-      builder = builder.addSource(forumsMessagesListSetSourceOptions);
 
       const unionEntityCodec = recordCodec({
         name: "union__entity",
@@ -488,7 +469,6 @@ export function makeExampleSchema(
           comment_id: col({ codec: TYPES.int, notNull: false }),
         },
       });
-      builder = builder.addCodec(unionEntityCodec);
 
       const personBookmarksCodec = recordCodec({
         name: "person_bookmarks",
@@ -506,7 +486,6 @@ export function makeExampleSchema(
           }),
         },
       });
-      builder = builder.addCodec(personBookmarksCodec);
 
       const personBookmarksSourceOptions = makePgSourceOptions({
         executor,
@@ -516,7 +495,6 @@ export function makeExampleSchema(
         name: "person_bookmarks",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(personBookmarksSourceOptions);
 
       const personCodec = recordCodec({
         name: "interfaces_and_unions.people",
@@ -526,7 +504,6 @@ export function makeExampleSchema(
           username: col({ codec: TYPES.text, notNull: true }),
         },
       });
-      builder = builder.addCodec(personCodec);
 
       const personSourceOptions = makePgSourceOptions({
         executor,
@@ -539,7 +516,6 @@ export function makeExampleSchema(
           { columns: ["username"] },
         ],
       });
-      builder = builder.addSource(personSourceOptions);
 
       const postCodec = recordCodec({
         name: "interfaces_and_unions.posts",
@@ -554,7 +530,6 @@ export function makeExampleSchema(
           body: col({ codec: TYPES.text, notNull: true }),
         },
       });
-      builder = builder.addCodec(postCodec);
 
       const postSourceOptions = makePgSourceOptions({
         executor,
@@ -564,7 +539,6 @@ export function makeExampleSchema(
         name: "posts",
         uniques: [{ columns: ["post_id"], isPrimary: true }],
       });
-      builder = builder.addSource(postSourceOptions);
 
       const commentCodec = recordCodec({
         name: "interfaces_and_unions.comments",
@@ -584,7 +558,6 @@ export function makeExampleSchema(
           body: col({ codec: TYPES.text, notNull: true }),
         },
       });
-      builder = builder.addCodec(commentCodec);
 
       const commentSourceOptions = makePgSourceOptions({
         executor,
@@ -594,14 +567,12 @@ export function makeExampleSchema(
         name: "comments",
         uniques: [{ columns: ["comment_id"], isPrimary: true }],
       });
-      builder = builder.addSource(commentSourceOptions);
 
       const itemTypeEnumCodec = enumCodec({
         name: `interfaces_and_unions.item_type`,
         identifier: sql`interfaces_and_unions.item_type`,
         values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
       });
-      builder = builder.addCodec(itemTypeEnumCodec);
 
       const enumTableItemTypeCodec = recordCodec({
         name: `interfaces_and_unions.enum_table_item_type`,
@@ -617,7 +588,6 @@ export function makeExampleSchema(
           },
         },
       });
-      builder = builder.addCodec(enumTableItemTypeCodec);
 
       const enumTableItemTypeSourceOptions = makePgSourceOptions({
         executor,
@@ -627,14 +597,12 @@ export function makeExampleSchema(
         name: "enum_table_item_type",
         uniques: [{ columns: ["type"], isPrimary: true }],
       });
-      builder = builder.addSource(enumTableItemTypeSourceOptions);
 
       const enumTableItemTypeEnumCodec = enumCodec({
         name: "text",
         identifier: sql`text`,
         values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
       });
-      builder = builder.addCodec(enumTableItemTypeEnumCodec);
 
       const singleTableItemsCodec = recordCodec({
         name: `interfaces_and_unions.single_table_items`,
@@ -675,7 +643,6 @@ export function makeExampleSchema(
           color: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(singleTableItemsCodec);
 
       const singleTableItemsSourceOptions = makePgSourceOptions({
         executor,
@@ -685,7 +652,6 @@ export function makeExampleSchema(
         name: "single_table_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(singleTableItemsSourceOptions);
 
       const relationalItemsCodec = recordCodec({
         name: `interfaces_and_unions.relational_items`,
@@ -721,7 +687,6 @@ export function makeExampleSchema(
           archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
         },
       });
-      builder = builder.addCodec(relationalItemsCodec);
 
       const relationalItemsSourceOptions = makePgSourceOptions({
         executor,
@@ -731,7 +696,6 @@ export function makeExampleSchema(
         name: "relational_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(relationalItemsSourceOptions);
 
       const relationalCommentableCodec = recordCodec({
         name: `interfaces_and_unions.relational_commentables`,
@@ -748,7 +712,6 @@ export function makeExampleSchema(
           }),
         },
       });
-      builder = builder.addCodec(relationalCommentableCodec);
 
       const relationalCommentableSourceOptions = makePgSourceOptions({
         executor,
@@ -757,7 +720,6 @@ export function makeExampleSchema(
         source: sql`interfaces_and_unions.relational_commentables`,
         name: "relational_commentables",
       });
-      builder = builder.addSource(relationalCommentableSourceOptions);
 
       const itemColumns = {
         id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
@@ -808,7 +770,6 @@ export function makeExampleSchema(
           title: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(relationalTopicsCodec);
 
       const relationalTopicsSourceOptions = makePgSourceOptions({
         executor,
@@ -818,7 +779,6 @@ export function makeExampleSchema(
         name: "relational_topics",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(relationalTopicsSourceOptions);
 
       const relationalPostsCodec = recordCodec({
         name: `interfaces_and_unions.relational_posts`,
@@ -830,7 +790,6 @@ export function makeExampleSchema(
           note: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(relationalPostsCodec);
 
       const relationalPostsSourceOptions = makePgSourceOptions({
         executor,
@@ -840,7 +799,6 @@ export function makeExampleSchema(
         name: "relational_posts",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(relationalPostsSourceOptions);
 
       const relationalDividersCodec = recordCodec({
         name: `interfaces_and_unions.relational_dividers`,
@@ -851,7 +809,6 @@ export function makeExampleSchema(
           color: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(relationalDividersCodec);
 
       const relationalDividersSourceOptions = makePgSourceOptions({
         executor,
@@ -861,7 +818,6 @@ export function makeExampleSchema(
         name: "relational_dividers",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(relationalDividersSourceOptions);
 
       const relationalChecklistsCodec = recordCodec({
         name: `interfaces_and_unions.relational_checklists`,
@@ -871,7 +827,6 @@ export function makeExampleSchema(
           title: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(relationalChecklistsCodec);
 
       const relationalChecklistsSourceOptions = makePgSourceOptions({
         executor,
@@ -881,7 +836,6 @@ export function makeExampleSchema(
         name: "relational_checklists",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(relationalChecklistsSourceOptions);
 
       const relationalChecklistItemsCodec = recordCodec({
         name: `interfaces_and_unions.relational_checklist_items`,
@@ -892,7 +846,6 @@ export function makeExampleSchema(
           note: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(relationalChecklistItemsCodec);
 
       const relationalChecklistItemsSourceOptions = makePgSourceOptions({
         executor,
@@ -902,7 +855,6 @@ export function makeExampleSchema(
         name: "relational_checklist_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(relationalChecklistItemsSourceOptions);
 
       ////////////////////////////////////////
 
@@ -921,7 +873,6 @@ export function makeExampleSchema(
           }),
         },
       });
-      builder = builder.addCodec(unionItemsCodec);
 
       const unionItemsSourceOptions = makePgSourceOptions({
         executor,
@@ -931,7 +882,6 @@ export function makeExampleSchema(
         name: "union_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(unionItemsSourceOptions);
 
       const unionTopicsCodec = recordCodec({
         name: `interfaces_and_unions.union_topics`,
@@ -941,7 +891,6 @@ export function makeExampleSchema(
           title: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(unionTopicsCodec);
 
       const unionTopicsSourceOptions = makePgSourceOptions({
         executor,
@@ -951,7 +900,6 @@ export function makeExampleSchema(
         name: "union_topics",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(unionTopicsSourceOptions);
 
       const unionPostsCodec = recordCodec({
         name: `interfaces_and_unions.union_posts`,
@@ -963,7 +911,6 @@ export function makeExampleSchema(
           note: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(unionPostsCodec);
 
       const unionPostsSource = makePgSourceOptions({
         executor,
@@ -973,7 +920,6 @@ export function makeExampleSchema(
         name: "union_posts",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(unionPostsSource);
 
       const unionDividersCodec = recordCodec({
         name: `interfaces_and_unions.union_dividers`,
@@ -984,7 +930,6 @@ export function makeExampleSchema(
           color: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(unionDividersCodec);
 
       const unionDividersSourceOptions = makePgSourceOptions({
         executor,
@@ -994,7 +939,6 @@ export function makeExampleSchema(
         name: "union_dividers",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(unionDividersSourceOptions);
 
       const unionChecklistsCodec = recordCodec({
         name: `interfaces_and_unions.union_checklists`,
@@ -1004,7 +948,6 @@ export function makeExampleSchema(
           title: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(unionChecklistsCodec);
 
       const unionChecklistsSourceOptions = makePgSourceOptions({
         executor,
@@ -1014,7 +957,6 @@ export function makeExampleSchema(
         name: "union_checklists",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(unionChecklistsSourceOptions);
 
       const unionChecklistItemsCodec = recordCodec({
         name: `interfaces_and_unions.union_checklist_items`,
@@ -1025,7 +967,6 @@ export function makeExampleSchema(
           note: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(unionChecklistItemsCodec);
 
       const unionChecklistItemsSourceOptions = makePgSourceOptions({
         executor,
@@ -1035,7 +976,6 @@ export function makeExampleSchema(
         name: "union_checklist_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(unionChecklistItemsSourceOptions);
 
       const unionEntitySourceOptions = makePgSourceOptions({
         executor,
@@ -1044,7 +984,6 @@ export function makeExampleSchema(
         source: sql`(select null::interfaces_and_unions.union__entity)`,
         name: "union__entity",
       });
-      builder = builder.addSource(unionEntitySourceOptions);
 
       const entitySearchSourceOptions = PgSource.functionSourceOptions(
         unionEntitySourceOptions,
@@ -1063,7 +1002,6 @@ export function makeExampleSchema(
           ],
         },
       );
-      builder = builder.addSource(entitySearchSourceOptions);
 
       ////////////////////////////////////////
 
@@ -1083,7 +1021,6 @@ export function makeExampleSchema(
           aws_id: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(awsApplicationsCodec);
 
       const awsApplicationsSourceOptions = makePgSourceOptions({
         executor,
@@ -1093,7 +1030,6 @@ export function makeExampleSchema(
         name: "aws_applications",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(awsApplicationsSourceOptions);
 
       const gcpApplicationsCodec = recordCodec({
         name: "interfaces_and_unions.gcp_applications",
@@ -1111,7 +1047,6 @@ export function makeExampleSchema(
           gcp_id: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(gcpApplicationsCodec);
 
       const gcpApplicationsSourceOptions = makePgSourceOptions({
         executor,
@@ -1121,7 +1056,6 @@ export function makeExampleSchema(
         name: "gcp_applications",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(gcpApplicationsSourceOptions);
 
       const firstPartyVulnerabilitiesCodec = recordCodec({
         name: "interfaces_and_unions.first_party_vulnerabilities",
@@ -1136,7 +1070,6 @@ export function makeExampleSchema(
           team_name: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(firstPartyVulnerabilitiesCodec);
 
       const firstPartyVulnerabilitiesSourceOptions = makePgSourceOptions({
         executor,
@@ -1146,7 +1079,6 @@ export function makeExampleSchema(
         name: "first_party_vulnerabilities",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(firstPartyVulnerabilitiesSourceOptions);
 
       const thirdPartyVulnerabilitiesCodec = recordCodec({
         name: "interfaces_and_unions.third_party_vulnerabilities",
@@ -1161,7 +1093,6 @@ export function makeExampleSchema(
           vendor_name: col({ codec: TYPES.text, notNull: false }),
         },
       });
-      builder = builder.addCodec(thirdPartyVulnerabilitiesCodec);
 
       const thirdPartyVulnerabilitiesSourceOptions = makePgSourceOptions({
         executor,
@@ -1171,9 +1102,76 @@ export function makeExampleSchema(
         name: "third_party_vulnerabilities",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
-      builder = builder.addSource(thirdPartyVulnerabilitiesSourceOptions);
 
-      return builder
+      return makeRegistryBuilder()
+        .addCodec(forumCodec)
+        .addCodec(userCodec)
+        .addCodec(messagesCodec)
+        .addSource(uniqueAuthorCountSourceOptions)
+        .addSource(forumNamesArraySourceOptions)
+        .addSource(forumNamesCasesSourceOptions)
+        .addSource(forumsUniqueAuthorCountSourceOptions)
+        .addSource(scalarTextSourceOptions)
+        .addSource(messageSourceOptions)
+        .addSource(userSourceOptions)
+        .addSource(forumSourceOptions)
+        .addSource(usersMostRecentForumSourceOptions)
+        .addSource(featuredMessagesSourceOptions)
+        .addSource(forumsFeaturedMessagesSourceOptions)
+        .addSource(randomUserArraySourceOptions)
+        .addSource(randomUserArraySetSourceOptions)
+        .addSource(forumsMessagesListSetSourceOptions)
+        .addCodec(unionEntityCodec)
+        .addCodec(personBookmarksCodec)
+        .addSource(personBookmarksSourceOptions)
+        .addCodec(personCodec)
+        .addSource(personSourceOptions)
+        .addCodec(postCodec)
+        .addSource(postSourceOptions)
+        .addCodec(commentCodec)
+        .addSource(commentSourceOptions)
+        .addCodec(itemTypeEnumCodec)
+        .addCodec(enumTableItemTypeCodec)
+        .addSource(enumTableItemTypeSourceOptions)
+        .addCodec(enumTableItemTypeEnumCodec)
+        .addCodec(singleTableItemsCodec)
+        .addSource(singleTableItemsSourceOptions)
+        .addCodec(relationalItemsCodec)
+        .addSource(relationalItemsSourceOptions)
+        .addCodec(relationalCommentableCodec)
+        .addSource(relationalCommentableSourceOptions)
+        .addCodec(relationalTopicsCodec)
+        .addSource(relationalTopicsSourceOptions)
+        .addCodec(relationalPostsCodec)
+        .addSource(relationalPostsSourceOptions)
+        .addCodec(relationalDividersCodec)
+        .addSource(relationalDividersSourceOptions)
+        .addCodec(relationalChecklistsCodec)
+        .addSource(relationalChecklistsSourceOptions)
+        .addCodec(relationalChecklistItemsCodec)
+        .addSource(relationalChecklistItemsSourceOptions)
+        .addCodec(unionItemsCodec)
+        .addSource(unionItemsSourceOptions)
+        .addCodec(unionTopicsCodec)
+        .addSource(unionTopicsSourceOptions)
+        .addCodec(unionPostsCodec)
+        .addSource(unionPostsSource)
+        .addCodec(unionDividersCodec)
+        .addSource(unionDividersSourceOptions)
+        .addCodec(unionChecklistsCodec)
+        .addSource(unionChecklistsSourceOptions)
+        .addCodec(unionChecklistItemsCodec)
+        .addSource(unionChecklistItemsSourceOptions)
+        .addSource(unionEntitySourceOptions)
+        .addSource(entitySearchSourceOptions)
+        .addCodec(awsApplicationsCodec)
+        .addSource(awsApplicationsSourceOptions)
+        .addCodec(gcpApplicationsCodec)
+        .addSource(gcpApplicationsSourceOptions)
+        .addCodec(firstPartyVulnerabilitiesCodec)
+        .addSource(firstPartyVulnerabilitiesSourceOptions)
+        .addCodec(thirdPartyVulnerabilitiesCodec)
+        .addSource(thirdPartyVulnerabilitiesSourceOptions)
         .addRelation(messagesCodec, "author", userSourceOptions, {
           localColumns: [`author_id`],
           remoteColumns: [`id`],
@@ -1583,7 +1581,6 @@ export function makeExampleSchema(
             isUnique: true,
           },
         )
-
         .build();
     },
     [
@@ -1603,7 +1600,7 @@ export function makeExampleSchema(
     ],
   );
 
-  registry.pgSources.singleT.getRelation("author").localColumns;
+  registry.pgSources.single_table_items.getRelation("parent").localColumns;
 
   /*
   registry.pgCodecs.messages.columns.id;
