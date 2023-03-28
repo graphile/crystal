@@ -552,7 +552,7 @@ export class PgSource<
     return chalk.bold.blue(`PgSource(${this.name})`);
   }
 
-  public getRelations(): TRegistry["pgRelations"][TCodec extends PgTypeCodec<
+  public getRelations(): TCodec extends PgTypeCodec<
     infer UName,
     any,
     any,
@@ -561,13 +561,13 @@ export class PgSource<
     any,
     any
   >
-    ? UName
-    : never] {
+    ? TRegistry["pgRelations"][UName]
+    : never {
     return this.registry.pgRelations[this.codec.name] as any;
   }
 
   public getRelation<
-    TRelationName extends keyof TRegistry["pgRelations"][TCodec extends PgTypeCodec<
+    TRelationName extends TCodec extends PgTypeCodec<
       infer UName,
       any,
       any,
@@ -576,13 +576,13 @@ export class PgSource<
       any,
       any
     >
-      ? UName
-      : never],
+      ? keyof TRegistry["pgRelations"][UName]
+      : never,
   >(
     name: TRelationName,
-  ): TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
-    ? TRegistry["pgRelations"][UName][TRelationName]
-    : never {
+  ): (TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+    ? TRegistry["pgRelations"][UName]
+    : never)[TRelationName] {
     return this.getRelations()[name];
   }
 
