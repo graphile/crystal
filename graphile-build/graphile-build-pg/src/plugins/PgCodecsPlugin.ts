@@ -805,33 +805,44 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         return promise;
       },
     },
-    async main(output, info) {
-      if (!output.pgCodecs) {
-        output.pgCodecs = [];
-      }
-      const codecs = new Set<PgTypeCodec<any, any, any, any, any, any, any>>();
+    hooks: {
+      async pgBasics_PgRegistryBuilder_pgCodecs(info, event) {
+        const codecs = new Set<
+          PgTypeCodec<any, any, any, any, any, any, any>
+        >();
 
-      for (const codecByTypeId of info.state.codecByTypeIdByDatabaseName.values()) {
-        for (const codecPromise of codecByTypeId.values()) {
-          const codec = await codecPromise;
-          if (codec) {
-            codecs.add(codec);
+        // If we get errors from the frozen object then clearly we need to
+        // ensure more work has completed before continuing - call other plugin
+        // helpers and wait for their events.
+        for (const codecByTypeId of Object.freeze(
+          info.state.codecByTypeIdByDatabaseName.values(),
+        )) {
+          for (const codecPromise of codecByTypeId.values()) {
+            const codec = await codecPromise;
+            if (codec) {
+              codecs.add(codec);
+            }
           }
         }
-      }
 
-      for (const codecByClassId of info.state.codecByClassIdByDatabaseName.values()) {
-        for (const codecPromise of codecByClassId.values()) {
-          const codec = await codecPromise;
-          if (codec) {
-            codecs.add(codec);
+        for (const codecByClassId of Object.freeze(
+          info.state.codecByClassIdByDatabaseName.values(),
+        )) {
+          for (const codecPromise of codecByClassId.values()) {
+            const codec = await codecPromise;
+            if (codec) {
+              codecs.add(codec);
+            }
           }
         }
-      }
 
-      for (const codec of codecs) {
-        output.pgCodecs.push(codec);
-      }
+        const registryBuilder =
+          await info.helpers.pgBasics.getRegistryBuilder();
+
+        for (const codec of codecs) {
+          registryBuilder.addCodec(codec);
+        }
+      },
     },
   },
 
@@ -879,8 +890,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             }
           }
         }
-        if (build.input.pgCodecs) {
-          for (const codec of build.input.pgCodecs) {
+        if (build.input.pgRegistry.pgCodecs) {
+          for (const codec of Object.values(build.input.pgRegistry.pgCodecs)) {
             walkCodec(codec);
           }
         }

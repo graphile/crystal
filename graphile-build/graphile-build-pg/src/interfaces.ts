@@ -6,6 +6,8 @@ import type {
   PgTypeColumns,
   WithPgClient,
   PgRegistry,
+  PgRegistryAny,
+  PgCodecRelationConfig,
 } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 
@@ -116,14 +118,14 @@ declare global {
   namespace GraphileBuild {
     interface PgRelations {
       [codecName: string]: {
-        [relationName: string]: PgCodecRelation<
+        [relationName: string]: PgCodecRelationConfig<
           PgTypeCodec<any, PgTypeColumns, any, any, undefined, any, undefined>,
           PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
         >;
       };
     }
     interface BuildInput {
-      pgRegistry: PgRegistry<any, any, any>;
+      pgRegistry: PgRegistryAny;
     }
   }
 }

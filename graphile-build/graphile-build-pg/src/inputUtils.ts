@@ -53,13 +53,11 @@ export function getCodecMetaLookupFromInput(
 ): PgTypeCodecMetaLookup {
   const metaLookup: PgTypeCodecMetaLookup = new Map();
   const seenSources = new Set<PgSource<any, any, any, any, any>>();
-  if (input.pgCodecs) {
-    for (const codec of input.pgCodecs) {
-      walkCodec(codec, metaLookup);
-    }
+  for (const codec of Object.values(input.pgRegistry.pgCodecs)) {
+    walkCodec(codec, metaLookup);
   }
-  for (const source of input.pgSources) {
-    walkSource(resolveSource(source), metaLookup, seenSources);
+  for (const source of Object.values(input.pgRegistry.pgSources)) {
+    walkSource(source, metaLookup, seenSources);
   }
   return metaLookup;
 }
@@ -82,11 +80,13 @@ function walkSource(
   if (!metaLookup.has(source.codec)) {
     walkCodec(source.codec, metaLookup);
   }
-  const relations = source.getRelations();
+  const relations = source.getRelations() as {
+    [relationName: string]: PgCodecRelation<any, any>;
+  };
   if (relations) {
     for (const relationshipName in relations) {
       walkSource(
-        resolveSource(relations[relationshipName].source),
+        relations[relationshipName].remoteSource,
         metaLookup,
         seenSources,
       );

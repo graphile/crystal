@@ -96,6 +96,7 @@ import {
   PgCodecRelationConfig,
   PgCodecRelationExtensions,
   PgRegistry,
+  PgRegistryAny,
   PgSourceParameterAny,
 } from "./interfaces.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
@@ -302,6 +303,7 @@ export {
   makePgSourceOptions,
   PgRegistryBuilder,
   PgRegistry,
+  PgRegistryAny,
   PgCodecRelationConfig,
   PgCodecRelationExtensions,
   sqlFromArgDigests,
