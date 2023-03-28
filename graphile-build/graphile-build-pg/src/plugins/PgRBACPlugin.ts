@@ -119,16 +119,17 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           );
         }
       },
-      async pgTables_PgSourceBuilder_options(info, event) {
-        const { pgClass, options, databaseName } = event;
+      async pgTables_PgSourceOptions(info, event) {
+        const { pgClass, sourceOptions, databaseName } = event;
         if (!["r", "v", "m", "f", "p"].includes(pgClass.relkind)) {
           return;
         }
         const db = await info.helpers.pgIntrospection.getDatabase(databaseName);
         const { introspection } = db;
-        options.extensions = options.extensions || Object.create(null);
-        options.extensions!.tags =
-          options.extensions!.tags || Object.create(null);
+        sourceOptions.extensions =
+          sourceOptions.extensions || Object.create(null);
+        sourceOptions.extensions!.tags =
+          sourceOptions.extensions!.tags || Object.create(null);
 
         const introspectionRole = introspection.getCurrentUser();
         if (!introspectionRole) {
@@ -184,7 +185,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           parts.push("-delete");
         }
         if (parts.length > 0) {
-          addBehaviorToTags(options.extensions!.tags!, parts.join(" "));
+          addBehaviorToTags(sourceOptions.extensions!.tags!, parts.join(" "));
         }
       },
     },

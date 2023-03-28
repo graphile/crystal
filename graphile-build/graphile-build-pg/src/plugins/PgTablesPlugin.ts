@@ -47,7 +47,7 @@ declare global {
        */
       _sourceName(
         this: Inflection,
-        source: PgSourceOptions<any, any, any, any>,
+        source: PgSource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -55,7 +55,7 @@ declare global {
        */
       _singularizedSourceName(
         this: Inflection,
-        source: PgSourceOptions<any, any, any, any>,
+        source: PgSource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -209,6 +209,13 @@ declare global {
           pgClass: PgClass;
           sourceOptions: PgSourceOptions<any, any, any>;
         }) => void | Promise<void>
+      >;
+      pgTables_PgSourceOptions_relations: PluginHook<
+        (event: {
+          databaseName: string;
+          pgClass: PgClass;
+          sourceOptions: PgSourceOptions<any, any, any, any>;
+        }) => Promise<void> | void
       >;
       pgTables_PgSourceOptions_relations_post: PluginHook<
         (event: {
@@ -553,7 +560,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           ] of sourceOptionsByPgClass.entries()) {
             const sourceOptions = await sourceOptionsPromise;
             if (sourceOptions) {
-              toProcess.push({ sourceOptions, pgClass, databaseName });
+              const entry = { sourceOptions, pgClass, databaseName };
+              await info.process("pgTables_PgSourceOptions_relations", entry);
+              toProcess.push(entry);
             }
           }
         }

@@ -264,152 +264,180 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           }
         }
       },
-      async pgTables_PgSourceOptions_relations_post(info, event) {
-        const { pgClass, databaseName, sourceOptions } = event;
-        const relations = (
-          await info.helpers.pgBasics.getRegistryBuilder()
-        ).getRegistryConfig().pgRelations[sourceOptions.codec.name] as {
-          [relationName: string]: PgCodecRelationConfig<any, any>;
-        };
-        const poly = (sourceOptions.codec as PgTypeCodecAny).polymorphism;
-        if (poly?.mode === "relational") {
-          // Copy common attributes to implementations
-          for (const spec of Object.values(poly.types)) {
-            const [schemaName, tableName] = parseDatabaseIdentifierFromSmartTag(
-              spec.references,
-              2,
-              pgClass.getNamespace()!.nspname,
-            );
-            const pgRelatedClass =
-              await info.helpers.pgIntrospection.getClassByName(
-                databaseName,
-                schemaName,
-                tableName,
-              );
-            if (!pgRelatedClass) {
-              throw new Error(
-                `Invalid reference to '${spec.references}' - cannot find that table (${schemaName}.${tableName})`,
-              );
-            }
-            const otherCodec = await info.helpers.pgCodecs.getCodecFromClass(
-              databaseName,
-              pgRelatedClass._id,
-            );
-            if (!otherCodec) {
-              continue;
-            }
-            const pk = pgRelatedClass
-              .getConstraints()
-              .find((c) => c.contype === "p");
-            if (!pk) {
-              throw new Error(
-                `Invalid polymorphic relation; ${pgRelatedClass.relname} has no primary key`,
-              );
-            }
-            const remotePk = pgClass
-              .getConstraints()
-              .find((c) => c.contype === "p");
-            if (!remotePk) {
-              throw new Error(
-                `Invalid polymorphic relation; ${pgClass.relname} has no primary key`,
-              );
-            }
-            const pgConstraint = pgRelatedClass
-              .getConstraints()
-              .find(
-                (c) =>
-                  c.contype === "f" &&
-                  c.confrelid === pgClass._id &&
-                  arraysMatch(
-                    c.getForeignAttributes()!,
-                    remotePk.getAttributes()!,
-                  ) &&
-                  arraysMatch(c.getAttributes()!, pk.getAttributes()!),
-              );
-            if (!pgConstraint) {
-              throw new Error(
-                `Invalid polymorphic relation; could not find matching relation between ${pgClass.relname} and ${pgRelatedClass.relname}`,
-              );
-            }
-            const sharedRelationName = info.inflection.sourceRelationName({
-              databaseName,
-              isReferencee: false,
-              isUnique: true,
-              localClass: pgRelatedClass,
-              localColumns: pk.getAttributes()!,
-              foreignClass: pgClass,
-              foreignColumns: remotePk.getAttributes()!,
-              pgConstraint,
-            });
+      async pgBasics_PgRegistry(info, event) {
+        // We're creating 'refs' for the polymorphism. This needs to use the
+        // same relationship names as we will in the GraphQL schema, so we need
+        // to use the final PgRegistry, not hte PgRegistryBuilder.
 
-            for (const [colName, colSpec] of Object.entries(
-              sourceOptions.codec.columns,
-            ) as Array<[string, PgTypeColumn]>) {
-              if (otherCodec.columns[colName]) {
-                otherCodec.columns[colName].identicalVia = sharedRelationName;
-              } else {
-                otherCodec.columns[colName] = {
-                  codec: colSpec.codec,
-                  notNull: colSpec.notNull,
-                  hasDefault: colSpec.hasDefault,
-                  via: sharedRelationName,
-                  restrictedAccess: colSpec.restrictedAccess,
-                  description: colSpec.description,
-                  extensions: { ...colSpec.extensions },
-                };
+        const { registry } = event;
+        for (const source of Object.values(registry.pgSources)) {
+          if (source.parameters || !source.codec.columns) {
+            continue;
+          }
+          if (!source.extensions?.pg) {
+            continue;
+          }
+          const {
+            schemaName: sourceSchemaName,
+            databaseName,
+            name: sourceClassName,
+          } = source.extensions.pg;
+
+          const pgClass = await info.helpers.pgIntrospection.getClassByName(
+            databaseName,
+            sourceSchemaName,
+            sourceClassName,
+          );
+          if (!pgClass) {
+            continue;
+          }
+
+          const relations = (
+            await info.helpers.pgBasics.getRegistryBuilder()
+          ).getRegistryConfig().pgRelations[source.codec.name] as {
+            [relationName: string]: PgCodecRelationConfig<any, any>;
+          };
+          const poly = (source.codec as PgTypeCodecAny).polymorphism;
+          if (poly?.mode === "relational") {
+            // Copy common attributes to implementations
+            for (const spec of Object.values(poly.types)) {
+              const [schemaName, tableName] =
+                parseDatabaseIdentifierFromSmartTag(
+                  spec.references,
+                  2,
+                  sourceSchemaName,
+                );
+              const pgRelatedClass =
+                await info.helpers.pgIntrospection.getClassByName(
+                  databaseName,
+                  schemaName,
+                  tableName,
+                );
+              if (!pgRelatedClass) {
+                throw new Error(
+                  `Invalid reference to '${spec.references}' - cannot find that table (${schemaName}.${tableName})`,
+                );
               }
-            }
-
-            const otherSourceOptions =
-              await info.helpers.pgTables.getSourceOptions(
+              const otherCodec = await info.helpers.pgCodecs.getCodecFromClass(
                 databaseName,
-                pgRelatedClass,
+                pgRelatedClass._id,
               );
+              if (!otherCodec) {
+                continue;
+              }
+              const pk = pgRelatedClass
+                .getConstraints()
+                .find((c) => c.contype === "p");
+              if (!pk) {
+                throw new Error(
+                  `Invalid polymorphic relation; ${pgRelatedClass.relname} has no primary key`,
+                );
+              }
+              const remotePk = pgClass
+                .getConstraints()
+                .find((c) => c.contype === "p");
+              if (!remotePk) {
+                throw new Error(
+                  `Invalid polymorphic relation; ${pgClass.relname} has no primary key`,
+                );
+              }
+              const pgConstraint = pgRelatedClass
+                .getConstraints()
+                .find(
+                  (c) =>
+                    c.contype === "f" &&
+                    c.confrelid === pgClass._id &&
+                    arraysMatch(
+                      c.getForeignAttributes()!,
+                      remotePk.getAttributes()!,
+                    ) &&
+                    arraysMatch(c.getAttributes()!, pk.getAttributes()!),
+                );
+              if (!pgConstraint) {
+                throw new Error(
+                  `Invalid polymorphic relation; could not find matching relation between ${pgClass.relname} and ${pgRelatedClass.relname}`,
+                );
+              }
+              const sharedRelationName = info.inflection.sourceRelationName({
+                databaseName,
+                isReferencee: false,
+                isUnique: true,
+                localClass: pgRelatedClass,
+                localColumns: pk.getAttributes()!,
+                foreignClass: pgClass,
+                foreignColumns: remotePk.getAttributes()!,
+                pgConstraint,
+              });
 
-            for (const [relationName, relationSpec] of Object.entries(
-              relations,
-            )) {
-              const behavior =
-                getBehavior([
-                  relationSpec.remoteSource.codec.extensions,
-                  relationSpec.remoteSource.extensions,
-                  relationSpec.extensions,
-                ]) ?? "";
-              const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
-                {
-                  sourceOptions,
-                  relationName,
-                };
-              const singleRecordFieldName = relationSpec.isReferencee
-                ? info.inflection.singleRelationBackwards(relationDetails)
-                : info.inflection.singleRelation(relationDetails);
-              const connectionFieldName =
-                info.inflection.manyRelationConnection(relationDetails);
-              const listFieldName =
-                info.inflection.manyRelationList(relationDetails);
-              const definition: PgRefDefinition = {
-                singular: relationSpec.isUnique,
-                singleRecordFieldName,
-                listFieldName,
-                connectionFieldName,
-                extensions: {
-                  tags: {
-                    behavior,
-                  },
-                },
-              };
-              const ref: PgCodecRef = {
-                definition,
-                paths: [
-                  [
-                    {
-                      relationName: sharedRelationName,
+              for (const [colName, colSpec] of Object.entries(
+                source.codec.columns,
+              ) as Array<[string, PgTypeColumn]>) {
+                if (otherCodec.columns[colName]) {
+                  otherCodec.columns[colName].identicalVia = sharedRelationName;
+                } else {
+                  otherCodec.columns[colName] = {
+                    codec: colSpec.codec,
+                    notNull: colSpec.notNull,
+                    hasDefault: colSpec.hasDefault,
+                    via: sharedRelationName,
+                    restrictedAccess: colSpec.restrictedAccess,
+                    description: colSpec.description,
+                    extensions: { ...colSpec.extensions },
+                  };
+                }
+              }
+
+              const otherSourceOptions =
+                await info.helpers.pgTables.getSourceOptions(
+                  databaseName,
+                  pgRelatedClass,
+                );
+
+              for (const [relationName, relationSpec] of Object.entries(
+                relations,
+              )) {
+                const behavior =
+                  getBehavior([
+                    relationSpec.remoteSourceOptions.codec.extensions,
+                    relationSpec.remoteSourceOptions.extensions,
+                    relationSpec.extensions,
+                  ]) ?? "";
+                const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
+                  {
+                    source,
+                    relationName,
+                  };
+                const singleRecordFieldName = relationSpec.isReferencee
+                  ? info.inflection.singleRelationBackwards(relationDetails)
+                  : info.inflection.singleRelation(relationDetails);
+                const connectionFieldName =
+                  info.inflection.manyRelationConnection(relationDetails);
+                const listFieldName =
+                  info.inflection.manyRelationList(relationDetails);
+                const definition: PgRefDefinition = {
+                  singular: relationSpec.isUnique,
+                  singleRecordFieldName,
+                  listFieldName,
+                  connectionFieldName,
+                  extensions: {
+                    tags: {
+                      behavior,
                     },
-                    { relationName },
+                  },
+                };
+                const ref: PgCodecRef = {
+                  definition,
+                  paths: [
+                    [
+                      {
+                        relationName: sharedRelationName,
+                      },
+                      { relationName },
+                    ],
                   ],
-                ],
-              };
-              otherSourceOptions!.codec.refs[relationName] = ref;
+                };
+                otherSourceOptions!.codec.refs[relationName] = ref;
+              }
             }
           }
         }

@@ -316,8 +316,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   function plan(
                                     $object: ObjectStep<{
                                       result:
-                                        | PgUpdateStep<any, any, any>
-                                        | PgDeleteStep<any, any, any>;
+                                        | PgUpdateStep<any>
+                                        | PgDeleteStep<any>;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -347,12 +347,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   (handler, lambda, nodeIdCodec) =>
                                     function plan(
                                       $object: ObjectStep<{
-                                        result: PgClassSingleStep<
-                                          any,
-                                          any,
-                                          any,
-                                          any
-                                        >;
+                                        result: PgClassSingleStep<any>;
                                       }>,
                                     ) {
                                       const $record =
@@ -519,7 +514,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgUpdateStep<any, any, any>;
+                                      result: PgUpdateStep<any>;
                                     }>,
                                   ) {
                                     const $record =
@@ -542,10 +537,11 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           }
         };
 
-        const updatableSources = build.input.pgSources.filter((source) =>
+        const allSources = Object.values(build.input.pgRegistry.pgSources);
+        const updatableSources = allSources.filter((source) =>
           isUpdatable(build, source),
         );
-        const deletableSources = build.input.pgSources.filter((source) =>
+        const deletableSources = allSources.filter((source) =>
           isDeletable(build, source),
         );
 
@@ -574,10 +570,11 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const updatableSources = build.input.pgSources.filter((source) =>
+        const allSources = Object.values(build.input.pgRegistry.pgSources);
+        const updatableSources = allSources.filter((source) =>
           isUpdatable(build, source),
         );
-        const deletableSources = build.input.pgSources.filter((source) =>
+        const deletableSources = allSources.filter((source) =>
           isDeletable(build, source),
         );
 
@@ -751,8 +748,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   _: any,
                                   $object: ObjectStep<{
                                     result:
-                                      | PgUpdateStep<any, any, any>
-                                      | PgDeleteStep<any, any, any>;
+                                      | PgUpdateStep<any>
+                                      | PgDeleteStep<any>;
                                   }>,
                                 ) {
                                   return $object;

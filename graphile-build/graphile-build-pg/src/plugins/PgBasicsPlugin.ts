@@ -116,6 +116,11 @@ declare global {
           registryBuilder: PgRegistryBuilder<any, any, any>;
         }) => PromiseOrDirect<void>
       >;
+      pgBasics_PgRegistry: PluginHook<
+        (event: {
+          registry: PgRegistry<any, any, any>;
+        }) => PromiseOrDirect<void>
+      >;
     }
   }
 }
@@ -167,6 +172,9 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             });
             const registry = registryBuilder.build();
             info.state.registry = registry;
+            await info.process("pgBasics_PgRegistry", {
+              registry,
+            });
             return registry;
           })();
         }

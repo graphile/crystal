@@ -310,7 +310,7 @@ export type PgOrderFragmentSpec = {
   /** The expression we're ordering by. */
   fragment: SQL;
   /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
-  codec: PgTypeCodec<string, any, any, any>;
+  codec: PgTypeCodec<string, any, any, any, any, any, any>;
 
   attribute?: never;
   callback?: never;

@@ -23,7 +23,7 @@ declare global {
       // TODO: move this somewhere more shared
       tableEdgeField(
         this: Inflection,
-        codec: PgTypeCodec<any, any, any, any>,
+        codec: PgTypeCodec<any, any, any, any, any, any, any>,
       ): string;
     }
 
@@ -94,11 +94,13 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const sources = build.input.pgSources.filter((source) => {
-          if (source.codec !== pgCodec) return false;
-          if (source.parameters) return false;
-          return true;
-        });
+        const sources = Object.values(build.input.pgRegistry.pgSources).filter(
+          (source) => {
+            if (source.codec !== pgCodec) return false;
+            if (source.parameters) return false;
+            return true;
+          },
+        );
 
         if (sources.length !== 1) {
           return fields;
@@ -190,7 +192,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   ) =>
                     function plan(
                       $mutation: ObjectStep<{
-                        result: PgClassSingleStep<any, any, any, any>;
+                        result: PgClassSingleStep<any>;
                       }>,
                       args: FieldArgs,
                       info: FieldInfo,

@@ -1,7 +1,11 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSelectStep, PgSource, PgSourceParameter } from "@dataplan/pg";
+import type {
+  PgSelectStep,
+  PgSource,
+  PgSourceParameterAny,
+} from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
@@ -13,13 +17,7 @@ declare global {
       computedColumnOrder(
         this: Inflection,
         details: {
-          source: PgSource<
-            any,
-            any,
-            any,
-            readonly PgSourceParameter<any, any>[],
-            any
-          >;
+          source: PgSource<any, any, any, readonly PgSourceParameterAny[], any>;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;
@@ -59,11 +57,14 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           return values;
         }
 
-        const functionSources = build.input.pgSources.filter((source) => {
+        const functionSources = Object.values(
+          build.input.pgRegistry.pgSources,
+        ).filter((source) => {
           if (source.codec.columns) return false;
           if (source.codec.arrayOfCodec) return false;
           if (source.codec.rangeOfCodec) return false;
-          const parameters: PgSourceParameter[] | undefined = source.parameters;
+          const parameters: readonly PgSourceParameterAny[] | undefined =
+            source.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
@@ -81,7 +82,13 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           functionSources.reduce((memo, pgFieldSource) => {
             for (const ascDesc of ["asc" as const, "desc" as const]) {
               const valueName = inflection.computedColumnOrder({
-                source: pgFieldSource,
+                source: pgFieldSource as PgSource<
+                  any,
+                  any,
+                  any,
+                  readonly PgSourceParameterAny[],
+                  any
+                >,
                 variant: ascDesc,
               });
 
@@ -93,7 +100,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                       graphile: {
                         applyPlan: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
-                            (step: PgSelectStep<any, any, any, any>) => {
+                            (step: PgSelectStep<any>) => {
                               if (typeof pgFieldSource.source !== "function") {
                                 throw new Error(
                                   "Invalid computed column source",
@@ -124,8 +131,6 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           }, Object.create(null)),
           `Adding computed column orderable functions to order by for '${pgCodec.name}'`,
         );
-
-        return values;
       },
     },
   },

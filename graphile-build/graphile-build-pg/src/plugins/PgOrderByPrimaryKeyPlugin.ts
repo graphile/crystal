@@ -38,7 +38,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
           return values;
         }
 
-        const sources = build.input.pgSources.filter(
+        const sources = Object.values(build.input.pgRegistry.pgSources).filter(
           (s) => s.codec === pgCodec && !s.parameters,
         );
         if (sources.length < 1) {
@@ -61,7 +61,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 graphile: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
-                      (step: PgSelectStep<any, any, any, any>) => {
+                      (step: PgSelectStep<any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
                           step.orderBy({
@@ -89,7 +89,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 graphile: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
-                      (step: PgSelectStep<any, any, any, any>) => {
+                      (step: PgSelectStep<any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
                           step.orderBy({

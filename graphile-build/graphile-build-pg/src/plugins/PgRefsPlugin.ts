@@ -170,7 +170,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
       async pgTables_PgSourceOptions_relations_post(info, event) {
         const { databaseName, sourceOptions, pgClass } = event;
 
-        const getSourceForTableName = async (targetTableIdentifier: string) => {
+        const getCodecForTableName = async (targetTableIdentifier: string) => {
           const nsp = pgClass.getNamespace();
           if (!nsp) {
             throw new Error(
@@ -192,11 +192,11 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           if (!targetPgClass) {
             return null;
           }
-          const targetSource = await info.helpers.pgCodecs.getCodecFromClass(
+          const targetCodec = await info.helpers.pgCodecs.getCodecFromClass(
             databaseName,
             targetPgClass._id,
           );
-          return targetSource;
+          return targetCodec;
         };
 
         const { tags } = pgClass.getTagsAndDescription();
@@ -294,10 +294,10 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                     maybeRawTargetCols.split(",").map((t) => t.trim())
                   : null;
 
-                const targetSource = await getSourceForTableName(
+                const targetCodec = await getCodecForTableName(
                   targetTableIdentifier,
                 );
-                if (!targetSource) {
+                if (!targetCodec) {
                   console.error(
                     `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a source for. Please be sure to indicate the schema if required.`,
                   );
@@ -305,7 +305,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 }
 
                 relationEntry = relationEntries.find(([, rel]) => {
-                  if (rel.remoteSource.name !== targetSource.name) {
+                  if (rel.remoteSourceOptions.name !== targetCodec.name) {
                     return false;
                   }
                   if (!arraysMatch(rel.localColumns, localColumns)) {
@@ -320,24 +320,24 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 });
               } else {
                 const targetTableIdentifier = part;
-                const targetSource = await getSourceForTableName(
+                const targetCodec = await getCodecForTableName(
                   targetTableIdentifier,
                 );
-                if (!targetSource) {
+                if (!targetCodec) {
                   console.error(
                     `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a source for. Please be sure to indicate the schema if required.`,
                   );
                   continue outerLoop;
                 }
                 relationEntry = relationEntries.find(([, rel]) => {
-                  return rel.remoteSource.name === targetSource.name;
+                  return rel.remoteSourceOptions.name === targetCodec.name;
                 });
               }
               if (relationEntry) {
                 path.push({
                   relationName: relationEntry[0],
                 });
-                const nextSource = relationEntry[1].remoteSource;
+                const nextSource = relationEntry[1].remoteSourceOptions;
                 currentSourceOptions = nextSource;
               } else {
                 console.warn(

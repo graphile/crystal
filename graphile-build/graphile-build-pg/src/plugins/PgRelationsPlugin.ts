@@ -106,7 +106,7 @@ declare global {
           event: {
             pgClass: PgClass;
             databaseName: string;
-            relations: GraphileConfig.PgTablesPluginSourceRelations;
+            sourceOptions: PgSourceOptions<any, any, any>;
           },
           pgConstraint: PgConstraint,
           isReferencee?: boolean,
@@ -321,7 +321,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               );
               return isUnique;
             })();
-        const { databaseName, relations } = event;
+        const { databaseName } = event;
         const localColumns = await Promise.all(
           localColumnNumbers.map((key) =>
             info.helpers.pgIntrospection.getAttribute(
@@ -366,7 +366,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           isUnique,
           isReferencee,
         });
-        const existingRelation = relations[relationName];
+        const registryBuilder =
+          await info.helpers.pgBasics.getRegistryBuilder();
+        const existingRelation =
+          registryBuilder.getRegistryConfig().pgRelations[
+            event.sourceOptions.codec.name
+          ]?.[relationName];
         const { tags: rawTags, description: constraintDescription } =
           pgConstraint.getTagsAndDescription();
         // Clone the tags because we use the same tags on both relations
@@ -428,11 +433,16 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             throw new Error(message);
           }
         }
-        relations[relationName] = newRelation;
+        registryBuilder.addRelation(
+          event.sourceOptions.codec as PgTypeCodecWithColumns,
+          relationName,
+          newRelation.remoteSourceOptions,
+          newRelation,
+        );
       },
     },
     hooks: {
-      async pgTables_PgSourceBuilder_relations(info, event) {
+      async pgTables_PgSourceOptions_relations(info, event) {
         const { pgClass, databaseName } = event;
         const constraints =
           await info.helpers.pgIntrospection.getConstraintsForClass(
