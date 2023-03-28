@@ -5,6 +5,7 @@ import type {
   PgSelectStep,
   PgSource,
   PgSourceParameter,
+  PgSourceParameterAny,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
@@ -43,11 +44,14 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const functionSources = build.input.pgSources.filter((source) => {
+        const functionSources = Object.values(
+          build.input.pgRegistry.pgSources,
+        ).filter((source) => {
           if (source.codec.columns) return false;
           if (source.codec.arrayOfCodec) return false;
           if (source.codec.rangeOfCodec) return false;
-          const parameters: PgSourceParameter[] | undefined = source.parameters;
+          const parameters: readonly PgSourceParameterAny[] | undefined =
+            source.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
@@ -65,7 +69,14 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
 
         return build.extend(
           fields,
-          functionSources.reduce((memo, pgFieldSource) => {
+          functionSources.reduce((memo, rawPgFieldSource) => {
+            const pgFieldSource = rawPgFieldSource as PgSource<
+              any,
+              any,
+              any,
+              readonly PgSourceParameterAny[],
+              any
+            >;
             const fieldName = inflection.computedColumnField({
               source: pgFieldSource,
             });
@@ -93,9 +104,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                     applyPlan: EXPORTABLE(
                       (pgFieldSource, sql) =>
                         function plan(
-                          $condition: PgConditionStep<
-                            PgSelectStep<any, any, any, any>
-                          >,
+                          $condition: PgConditionStep<PgSelectStep<any>>,
                           val,
                         ) {
                           if (typeof pgFieldSource.source !== "function") {
@@ -126,8 +135,6 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           }, Object.create(null)),
           `Adding computed column filterable functions to condition for '${pgCodec.name}'`,
         );
-
-        return fields;
       },
     },
   },

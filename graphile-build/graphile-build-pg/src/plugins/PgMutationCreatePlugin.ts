@@ -76,9 +76,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
           inflection,
           graphql: { GraphQLString, GraphQLNonNull },
         } = build;
-        const insertableSources = build.input.pgSources.filter((source) =>
-          isInsertable(build, source),
-        );
+        const insertableSources = Object.values(
+          build.input.pgRegistry.pgSources,
+        ).filter((source) => isInsertable(build, source));
 
         insertableSources.forEach((source) => {
           build.recoverable(null, () => {
@@ -123,7 +123,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgInsertStep<any, any, any>;
+                                      result: PgInsertStep<any>;
                                     }>,
                                   ) {
                                     const $record =
@@ -197,7 +197,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgInsertStep<any, any, any>;
+                                      result: PgInsertStep<any>;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -235,9 +235,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const insertableSources = build.input.pgSources.filter((source) =>
-          isInsertable(build, source),
-        );
+        const insertableSources = Object.values(
+          build.input.pgRegistry.pgSources,
+        ).filter((source) => isInsertable(build, source));
         return insertableSources.reduce((memo, source) => {
           return build.recoverable(memo, () => {
             const createFieldName = inflection.createField(source);
@@ -264,7 +264,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                             function plan(
                               _: any,
                               $object: ObjectStep<{
-                                result: PgInsertStep<any, any, any>;
+                                result: PgInsertStep<any>;
                               }>,
                             ) {
                               return $object;

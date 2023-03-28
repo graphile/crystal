@@ -126,7 +126,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                                 (column, columnName, sql) =>
                                   function plan(
                                     $condition: PgConditionStep<
-                                      PgSelectStep<any, any, any, any>
+                                      PgSelectStep<any>
                                     >,
                                     val,
                                   ) {
@@ -242,15 +242,15 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ? (
                     _condition,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any, any, any, any>,
+                      PgSelectSingleStep<any>,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any, any, any, any>
+                      PgSelectStep<any>
                     >,
                   ) => {
                     const $select = $connection.getSubplan();
                     return $select.wherePlan();
                   }
-                : (_condition, $select: PgSelectStep<any, any, any, any>) => {
+                : (_condition, $select: PgSelectStep<any>) => {
                     return $select.wherePlan();
                   },
             },

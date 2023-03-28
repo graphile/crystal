@@ -143,12 +143,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   () =>
                     function plan($in) {
-                      const $record = $in as PgSelectSingleStep<
-                        any,
-                        any,
-                        any,
-                        any
-                      >;
+                      const $record = $in as PgSelectSingleStep<any>;
                       return $record.record();
                     },
                   [],

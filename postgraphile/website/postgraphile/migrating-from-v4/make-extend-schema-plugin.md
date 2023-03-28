@@ -190,7 +190,7 @@ function, passing through the `searchText` argument.
 
 ```diff
  module.exports = makeExtendSchemaPlugin((build) => {
-+  const matchUser = build.input.pgSources.find((s) => s.name === "match_user");
++  const matchUser = build.input.pgRegistry.pgSources.match_user;
    return {
      typeDefs: /* GraphQL */ `
        type Query {
@@ -263,9 +263,10 @@ export default makeExtendSchemaPlugin((build) => {
   const { sql } = build;
   /**
    * The 'executor' tells us which database we're talking to.
-   * You can get this from any source via `pgSource.executor`.
+   * You can get this from any source via `pgSource.executor`; here we use the
+   * executor from the 'users' source.
    */
-  const executor = build.input.pgSources[0].executor;
+  const executor = build.input.pgRegistry.pgSources.users.executor;
 
   return {
     typeDefs: /* GraphQL */ `

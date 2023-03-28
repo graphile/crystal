@@ -168,9 +168,9 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                       function plan(
                         _: any,
                         $connection: ConnectionStep<
-                          PgSelectSingleStep<any, any, any, any>,
+                          PgSelectSingleStep<any>,
                           PgSelectParsedCursorStep,
-                          PgSelectStep<any, any, any, any>
+                          PgSelectStep<any>
                         >,
                         val,
                         info: { schema: GraphQLSchema },
@@ -192,7 +192,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                     (applyOrderToPlan, tableOrderByTypeName) =>
                       function plan(
                         _: any,
-                        $select: PgSelectStep<any, any, any, any>,
+                        $select: PgSelectStep<any>,
                         val,
                         info: { schema: GraphQLSchema },
                       ) {
@@ -220,7 +220,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
 export const applyOrderToPlan = EXPORTABLE(
   (SafeError, getEnumValueConfig, inspect) =>
     (
-      $select: PgSelectStep<any, any, any, any>,
+      $select: PgSelectStep<any>,
       $value: InputStep,
       TableOrderByType: GraphQLEnumType,
     ) => {

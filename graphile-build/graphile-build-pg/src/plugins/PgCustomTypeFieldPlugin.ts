@@ -13,6 +13,7 @@ import type {
   PgSelectStep,
   PgSource,
   PgSourceParameter,
+  PgSourceParameterAny,
   PgTypeCodec,
   PgTypedExecutableStep,
   PgUpdateStep,
@@ -268,7 +269,7 @@ declare global {
       [$$rootQuery]: Array<PgSource<any, any, any, any, any>>;
       [$$rootMutation]: Array<PgSource<any, any, any, any, any>>;
       [$$computed]: Map<
-        PgTypeCodec<any, any, any, any, any>,
+        PgTypeCodec<any, any, any, any, any, any, any>,
         Array<PgSource<any, any, any, any, any>>
       >;
     }
@@ -555,22 +556,31 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           // anyway but using the previously declared mutation payload for a
           // different field - this is why we later use this information in the
           // fields hook to determine which fields to add.
-          for (const source of build.input.pgSources) {
+          for (const someSource of Object.values(
+            build.input.pgRegistry.pgSources,
+          )) {
             build.recoverable(null, () => {
               // Add connection type for functions that need it
               const isFunctionSourceRequiringConnection =
-                source.parameters &&
-                !source.isMutation &&
-                !source.codec.arrayOfCodec &&
-                shouldUseCustomConnection(source);
+                someSource.parameters &&
+                !someSource.isMutation &&
+                !someSource.codec.arrayOfCodec &&
+                shouldUseCustomConnection(someSource);
 
               if (isFunctionSourceRequiringConnection) {
+                const source = someSource as PgSource<
+                  any,
+                  any,
+                  any,
+                  readonly PgSourceParameterAny[],
+                  any
+                >;
                 const connectionTypeName = source.codec.columns
                   ? inflection.recordFunctionConnectionType({
-                      source: source,
+                      source,
                     })
                   : inflection.scalarFunctionConnectionType({
-                      source: source,
+                      source,
                     });
                 const edgeTypeName = source.codec.columns
                   ? inflection.recordFunctionEdgeType({ source: source })
@@ -604,36 +614,51 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               // Find non-mutation function sources that don't accept a row type
               // as the first argument
               const isQuerySource =
-                source.parameters &&
+                someSource.parameters &&
                 build.behavior.matches(
-                  getBehavior([source.codec.extensions, source.extensions]),
+                  getBehavior([
+                    someSource.codec.extensions,
+                    someSource.extensions,
+                  ]),
                   "queryField",
-                  defaultProcSourceBehavior(source, options),
+                  defaultProcSourceBehavior(someSource, options),
                 );
               if (isQuerySource) {
                 build.recoverable(null, () => {
-                  build[$$rootQuery].push(source);
+                  build[$$rootQuery].push(someSource);
                 });
               }
 
               // "custom mutation"
               // Find mutation function sources
               const isMutationProcSource =
-                // source.isMutation &&
-                source.parameters &&
+                // someSource.isMutation &&
+                someSource.parameters &&
                 build.behavior.matches(
-                  getBehavior([source.codec.extensions, source.extensions]),
+                  getBehavior([
+                    someSource.codec.extensions,
+                    someSource.extensions,
+                  ]),
                   "mutationField",
-                  defaultProcSourceBehavior(source, options),
+                  defaultProcSourceBehavior(someSource, options),
                 );
               // Add payload type for mutation functions
               if (isMutationProcSource) {
+                const source = someSource as PgSource<
+                  any,
+                  any,
+                  any,
+                  readonly PgSourceParameterAny[],
+                  any
+                >;
                 build.recoverable(null, () => {
                   const inputTypeName = inflection.customMutationInput({
                     source,
                   });
 
-                  const fieldName = inflection.customMutationField({ source });
+                  const fieldName = inflection.customMutationField({
+                    source,
+                  });
                   build.registerInputObjectType(
                     inputTypeName,
                     { isMutationInput: true },
@@ -759,7 +784,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             () =>
                               (
                                 $object: ObjectStep<{
-                                  result: PgClassSingleStep<any, any, any, any>;
+                                  result: PgClassSingleStep<any>;
                                 }>,
                               ) => {
                                 return $object.get("result");
@@ -780,19 +805,22 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               // Find non-mutation function sources that accept a row type of the
               // matching codec as the first argument
               const isComputedSource =
-                source.parameters &&
+                someSource.parameters &&
                 build.behavior.matches(
-                  getBehavior([source.codec.extensions, source.extensions]),
+                  getBehavior([
+                    someSource.codec.extensions,
+                    someSource.extensions,
+                  ]),
                   "typeField",
-                  defaultProcSourceBehavior(source, options),
+                  defaultProcSourceBehavior(someSource, options),
                 );
               if (isComputedSource) {
                 // TODO: should we allow other forms of computed columns here,
                 // e.g. accepting the row id rather than the row itself.
-                const pgCodec = source.parameters?.[0]?.codec;
+                const pgCodec = someSource.parameters?.[0]?.codec;
                 if (pgCodec) {
                   const list = build[$$computed].get(pgCodec) ?? [];
-                  list.push(source);
+                  list.push(someSource);
                   build[$$computed].set(pgCodec, list);
                 }
               }
@@ -845,7 +873,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 isRootMutation || isRootQuery
                   ? source.parameters
                   : source.parameters.slice(1)
-              ) as PgSourceParameter[];
+              ) as PgSourceParameterAny[];
 
               const { makeArgs, makeFieldArgs } = pgGetArgDetailsFromParameters(
                 source,
@@ -1116,7 +1144,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                         $parent,
                                         args,
                                         info,
-                                      ) as PgSelectStep<any, any, any, any>;
+                                      ) as PgSelectStep<any>;
                                     return connection(
                                       $select,
                                       ($item) => $item,

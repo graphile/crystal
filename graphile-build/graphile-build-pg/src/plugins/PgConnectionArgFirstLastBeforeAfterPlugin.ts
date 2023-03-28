@@ -93,9 +93,9 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
-                PgSelectSingleStep<any, any, any, any>,
+                PgSelectSingleStep<any>,
                 PgSelectParsedCursorStep,
-                PgSelectStep<any, any, any, any>
+                PgSelectStep<any>
               >,
               arg,
             ) {
@@ -117,9 +117,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any, any, any, any>,
+                      PgSelectSingleStep<any>,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any, any, any, any>
+                      PgSelectStep<any>
                     >,
                     val,
                   ) {
@@ -143,9 +143,9 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
-                PgSelectSingleStep<any, any, any, any>,
+                PgSelectSingleStep<any>,
                 PgSelectParsedCursorStep,
-                PgSelectStep<any, any, any, any>
+                PgSelectStep<any>
               >,
               val,
             ) {
@@ -167,9 +167,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any, any, any, any>,
+                      PgSelectSingleStep<any>,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any, any, any, any>
+                      PgSelectStep<any>
                     >,
                     val,
                   ) {
@@ -189,9 +189,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any, any, any, any>,
+                      PgSelectSingleStep<any>,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any, any, any, any>
+                      PgSelectStep<any>
                     >,
                     val,
                   ) {

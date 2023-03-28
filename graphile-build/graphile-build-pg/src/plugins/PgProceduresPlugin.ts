@@ -2,7 +2,7 @@
 // Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
-import type {
+import {
   PgFunctionSourceOptions,
   PgSelectArgumentDigest,
   PgSourceExtensions,
@@ -10,6 +10,7 @@ import type {
   PgSourceParameter,
   PgTypeCodec,
   PgTypeColumns,
+  makePgSourceOptions,
 } from "@dataplan/pg";
 import { PgSource, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
@@ -69,10 +70,10 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgProcedures: {
-        getSource(
+        getSourceOptions(
           databaseName: string,
           pgProc: PgProc,
-        ): Promise<PgSource<any, any, any, any, any> | null>;
+        ): Promise<PgSourceOptions<any, any, any, any> | null>;
       };
     }
 
@@ -90,7 +91,7 @@ declare global {
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          options: PgFunctionSourceOptions<any, any, any, any, any>;
+          options: PgFunctionSourceOptions<any, any, any, any>;
         }) => void | Promise<void>
       >;
 
@@ -141,7 +142,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
   gather: {
     namespace: "pgProcedures",
     helpers: {
-      getSource(info, databaseName, pgProc) {
+      async getSourceOptions(info, databaseName, pgProc) {
         let sourceOptionsByPgProc =
           info.state.sourceOptionsByPgProcByDatabase.get(databaseName);
         if (!sourceOptionsByPgProc) {
@@ -151,11 +152,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             sourceOptionsByPgProc,
           );
         }
-        let sourceOptions = sourceOptionsByPgProc.get(pgProc);
-        if (sourceOptions) {
-          return sourceOptions;
+        let sourceOptionsPromise = sourceOptionsByPgProc.get(pgProc);
+        if (sourceOptionsPromise) {
+          return sourceOptionsPromise;
         }
-        sourceOptions = (async () => {
+        sourceOptionsPromise = (async () => {
           const pgConfig = info.resolvedPreset.pgConfigs?.find(
             (db) => db.name === databaseName,
           );
@@ -462,16 +463,16 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               pgType.typrelid!,
             );
             if (!pgClass) return null;
-            const sourceBuilder = await info.helpers.pgTables.getSourceBuilder(
+            const sourceOptions = await info.helpers.pgTables.getSourceOptions(
               databaseName,
               pgClass,
             );
 
             const sourceConfig = await (async () => {
-              if (sourceBuilder) {
-                return sourceBuilder;
+              if (sourceOptions) {
+                return sourceOptions;
               } else {
-                // No sourceBuilder for this; presumably the table is not exposed. Create one for the codec instead.
+                // No sourceOptions for this; presumably the table is not exposed. Create one for the codec instead.
                 const codec = await info.helpers.pgCodecs.getCodecFromClass(
                   databaseName,
                   pgClass._id,
@@ -535,13 +536,23 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             });
 
             return EXPORTABLE(
-              (PgSource, options) => new PgSource(options),
-              [PgSource, options],
+              (makePgSourceOptions, options) => makePgSourceOptions(options),
+              [makePgSourceOptions, options],
             );
           }
-        })();
-        sourceOptionsByPgProc.set(pgProc, source!);
-        return source;
+        })().then((sourceOptions) => {
+          if (sourceOptions) {
+            registryBuilder.addSource(sourceOptions);
+          }
+          return sourceOptions;
+        });
+
+        sourceOptionsByPgProc.set(pgProc, sourceOptionsPromise!);
+
+        const registryBuilder =
+          await info.helpers.pgBasics.getRegistryBuilder();
+
+        return sourceOptionsPromise;
       },
     },
     initialState: () => ({
@@ -604,13 +615,12 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           return;
         }
 
-        helpers.pgProcedures.getSource(databaseName, pgProc);
+        helpers.pgProcedures.getSourceOptions(databaseName, pgProc);
       },
     },
+    // TODO: is this needed?
+    /*
     async main(output, info) {
-      if (!output.pgSources) {
-        output.pgSources = [];
-      }
       for (const [
         databaseName,
         sourceOptionsByPgProc,
@@ -629,5 +639,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         }
       }
     },
+    */
   } as GraphileConfig.PluginGatherConfig<"pgProcedures", State, Cache>,
 };

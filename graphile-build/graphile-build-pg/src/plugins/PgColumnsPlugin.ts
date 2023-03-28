@@ -4,6 +4,7 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type {
+  PgRegistry,
   PgSelectSingleStep,
   PgTypeCodec,
   PgTypeCodecAny,
@@ -89,6 +90,7 @@ function unwrapCodec(
 const getSource = EXPORTABLE(
   (PgSource) =>
     (
+      registry: PgRegistry<any, any, any>,
       baseCodec: PgTypeCodecAny,
       pgSources: PgSource<any, any, any, any, any>[],
       $record: PgSelectSingleStep<any>,
@@ -96,8 +98,14 @@ const getSource = EXPORTABLE(
       const executor = $record.source.executor;
       const source =
         pgSources.find(
-          (potentialSource) => potentialSource.executor === executor,
-        ) ?? PgSource.fromCodec(executor, baseCodec);
+          (potentialSource) =>
+            // These have already been filtered by codec
+            potentialSource.executor === executor,
+        ) ??
+        // TODO: yuck; we should not be building a PgSource on demand. We
+        // should be able to detect this is necessary and add it to the
+        // registry preemptively.
+        new PgSource(registry, PgSource.configFromCodec(executor, baseCodec));
       return source;
     },
   [PgSource],
@@ -117,6 +125,7 @@ function processColumn(
     graphql: { getNullableType, GraphQLNonNull, GraphQLList },
     inflection,
     getGraphQLTypeByPgCodec,
+    input: { pgRegistry: registry },
   } = build;
 
   const {
@@ -183,13 +192,13 @@ function processColumn(
       if (!baseCodec.columns) {
         // Simply get the value
         return EXPORTABLE(
-          (columnName) => ($record: PgSelectSingleStep<any, any, any, any>) => {
+          (columnName) => ($record: PgSelectSingleStep<any>) => {
             return $record.get(columnName);
           },
           [columnName],
         );
       } else {
-        const pgSources = build.input.pgSources.filter(
+        const pgSources = Object.values(registry.pgSources).filter(
           (potentialSource) =>
             potentialSource.codec === baseCodec && !potentialSource.parameters,
         );
@@ -212,10 +221,10 @@ function processColumn(
                 pgSelectSingleFromRecord,
                 pgSources,
               ) =>
-              ($record: PgSelectSingleStep<any, any, any, any>) => {
+              ($record: PgSelectSingleStep<any>) => {
                 const $plan = $record.get(columnName);
                 const $select = pgSelectSingleFromRecord(
-                  getSource(baseCodec, pgSources, $record),
+                  getSource(registry, baseCodec, pgSources, $record),
                   $plan,
                 );
                 if (notNull) {
@@ -249,10 +258,10 @@ function processColumn(
                 pgSelectFromRecords,
                 pgSources,
               ) =>
-              ($record: PgSelectSingleStep<any, any, any, any>) => {
+              ($record: PgSelectSingleStep<any>) => {
                 const $val = $record.get(columnName);
                 const $select = pgSelectFromRecords(
-                  getSource(baseCodec, pgSources, $record),
+                  getSource(registry, baseCodec, pgSources, $record),
                   $val,
                 );
                 $select.setTrusted();

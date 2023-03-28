@@ -871,7 +871,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         }
 
         // Walk all the codecs, add them to build
-        for (const source of build.input.pgSources) {
+        for (const source of Object.values(build.input.pgRegistry.pgSources)) {
           walkCodec(source.codec);
           if (source.parameters) {
             for (const parameter of source.parameters) {
@@ -914,7 +914,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           string,
           PgSource<any, any, any, any, any>
         >();
-        for (const source of build.input.pgSources) {
+        for (const source of Object.values(build.input.pgRegistry.pgSources)) {
           const known = knownSourceByName.get(source.name);
           if (known) {
             console.error({

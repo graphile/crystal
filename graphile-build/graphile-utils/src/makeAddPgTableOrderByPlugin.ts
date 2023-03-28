@@ -6,14 +6,14 @@ type OrderBySpecIdentity =
   | string // Column name
   | Omit<PgOrderSpec, "direction"> // Expression
   | ((
-      $select: PgSelectStep<any, any, any, any>,
+      $select: PgSelectStep<any>,
     ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
       graphile: {
-        applyPlan($select: PgSelectStep<any, any, any, any>): void;
+        applyPlan($select: PgSelectStep<any>): void;
       };
     };
   };
@@ -129,7 +129,7 @@ export function orderByAscDesc(
       ? "FIRST"
       : "LAST";
 
-  type Plan = ($select: PgSelectStep<any, any, any, any>) => void;
+  type Plan = ($select: PgSelectStep<any>) => void;
 
   let spec: PgOrderSpec;
   const ascendingPlan: Plan =
