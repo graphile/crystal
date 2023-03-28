@@ -1,5 +1,5 @@
 import type {
-  PgSourceRelation,
+  PgCodecRelation,
   PgSourceUnique,
   PgTypeCodec,
 } from "@dataplan/pg";
@@ -278,7 +278,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       singleRelation(previous, _options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgSourceRelation<
+        const relation = source.getRelation(relationName) as PgCodecRelation<
           any,
           any
         >;
@@ -311,7 +311,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       singleRelationBackwards(previous, _options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgSourceRelation<
+        const relation = source.getRelation(relationName) as PgCodecRelation<
           any,
           any
         >;
@@ -358,7 +358,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       _manyRelation(previous, _options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgSourceRelation<
+        const relation = source.getRelation(relationName) as PgCodecRelation<
           any,
           any
         >;

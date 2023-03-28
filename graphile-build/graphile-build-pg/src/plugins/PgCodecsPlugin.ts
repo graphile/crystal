@@ -164,7 +164,7 @@ declare global {
 }
 
 declare module "@dataplan/pg" {
-  interface PgSourceRelationExtensions {
+  interface PgCodecRelationExtensions {
     originalName?: string;
   }
 }

@@ -919,7 +919,7 @@ export interface PgRegistryBuilder<
   },
   TRelations extends {
     [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelation<
+      [relationName in string]: PgCodecRelationConfig<
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
         PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
       >;
@@ -1039,7 +1039,7 @@ export function makeRegistry<
   },
   TRelations extends {
     [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelation<
+      [relationName in string]: PgCodecRelationConfig<
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
         PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
       >;
@@ -1076,10 +1076,14 @@ export function makeRegistry<
       if (!relation) {
         continue;
       }
+      const { remoteSourceOptions, ...rest } = relation;
       (registry.pgRelations as any)[codecName][relationName] = {
-        ...relation,
-        source: registry.pgSources[relation.remoteSource.name],
-      } as PgCodecRelation<any, any>;
+        ...rest,
+        remoteSource: registry.pgSources[remoteSourceOptions.name],
+      } as PgCodecRelation<
+        PgTypeCodecWithColumns,
+        PgSource<any, PgTypeCodecWithColumns, any, any, any>
+      >;
     }
   }
 

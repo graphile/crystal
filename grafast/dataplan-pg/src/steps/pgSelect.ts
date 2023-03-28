@@ -860,7 +860,7 @@ export class PgSelectStep<TSource extends PgSource<any, any, any, any, any>>
       relationIdentifier,
     ) as PgCodecRelation<
       PgTypeCodecWithColumns,
-      PgSourceOptions<any, any, any, any>
+      PgSource<any, any, any, any, any>
     >;
     if (!relation) {
       throw new Error(

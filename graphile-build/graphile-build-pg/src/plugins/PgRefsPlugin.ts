@@ -8,6 +8,7 @@ import type {
   PgTypeCodecAny,
   PgTypeCodecExtensions,
   PgTypeCodecWithColumns,
+  PgCodecRelationConfig,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import type { PgClass } from "pg-introspection";
@@ -261,7 +262,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             for (const rawPart of parts) {
               type RelationEntry = [
                 string,
-                PgCodecRelation<
+                PgCodecRelationConfig<
                   PgTypeCodecWithColumns,
                   PgSourceOptions<any, any, any, any>
                 >,

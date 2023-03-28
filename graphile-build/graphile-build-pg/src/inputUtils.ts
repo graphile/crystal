@@ -3,7 +3,7 @@ import "graphile-build";
 import type {
   PgSource,
   PgSourceParameter,
-  PgSourceRelation,
+  PgCodecRelation,
   PgSourceUnique,
   PgTypeCodec,
   PgTypeColumns,

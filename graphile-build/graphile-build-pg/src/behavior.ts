@@ -3,7 +3,7 @@ import "./interfaces.js";
 import type {
   PgSourceExtensions,
   PgSourceRefExtensions,
-  PgSourceRelationExtensions,
+  PgCodecRelationExtensions,
   PgTypeCodecExtensions,
 } from "@dataplan/pg";
 import { isDev } from "grafast";
@@ -23,7 +23,7 @@ export function getBehavior(
   extensions: ArrayOrDirect<
     | Partial<
         | PgSourceExtensions
-        | PgSourceRelationExtensions
+        | PgCodecRelationExtensions
         | PgTypeCodecExtensions
         | PgSourceRefExtensions
       >

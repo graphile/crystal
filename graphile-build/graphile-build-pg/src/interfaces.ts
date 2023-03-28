@@ -29,7 +29,7 @@ export interface PgSourceUniqueTags extends PgSmartTagsDict {
   behavior: string | string[];
 }
 
-export interface PgSourceRelationTags extends PgSmartTagsDict {
+export interface PgCodecRelationTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
 }
@@ -89,8 +89,8 @@ declare module "@dataplan/pg" {
     description?: string;
   }
 
-  interface PgSourceRelationExtensions {
-    tags: Partial<PgSourceRelationTags>;
+  interface PgCodecRelationExtensions {
+    tags: Partial<PgCodecRelationTags>;
     description?: string;
   }
 

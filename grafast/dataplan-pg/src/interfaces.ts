@@ -458,16 +458,9 @@ export interface MakePgConfigOptions
   pubsub?: boolean;
 }
 
-declare global {
-  namespace Grafast {
-    interface PgCodecRelationExtensions {}
-  }
-}
+export interface PgCodecRelationExtensions {}
 
-/**
- * Describes a relation to another source
- */
-export interface PgCodecRelation<
+export interface PgCodecRelationBase<
   TLocalCodec extends PgTypeCodec<
     string,
     PgTypeColumns,
@@ -477,15 +470,10 @@ export interface PgCodecRelation<
     any,
     undefined
   >,
-  TRemoteSource extends PgSourceOptions<any, any, any, any>,
+  TRemoteColumns extends string,
 > {
   /* Where the relationship starts */
   localCodec: TLocalCodec;
-
-  /**
-   * The remote source this relation relates to.
-   */
-  remoteSource: TRemoteSource;
 
   /**
    * The columns locally used in this relationship.
@@ -505,16 +493,7 @@ export interface PgCodecRelation<
   /**
    * The remote columns that are joined against.
    */
-  remoteColumns: TRemoteSource extends PgSourceOptions<
-    infer UCodec,
-    any,
-    any,
-    any
-  >
-    ? UCodec extends PgTypeCodec<any, infer UColumns, any, any, any, any, any>
-      ? readonly (keyof UColumns)[]
-      : never
-    : never;
+  remoteColumns: readonly TRemoteColumns[];
 
   /**
    * If true then there's at most one record this relationship will find.
@@ -531,12 +510,12 @@ export interface PgCodecRelation<
   /**
    * Space for you to add your own metadata.
    */
-  extensions?: Grafast.PgCodecRelationExtensions;
+  extensions?: PgCodecRelationExtensions;
 
   description?: string;
 }
 
-export type PgCodecRelationConfig<
+export interface PgCodecRelationConfig<
   TLocalCodec extends PgTypeCodec<
     string,
     PgTypeColumns,
@@ -546,10 +525,52 @@ export type PgCodecRelationConfig<
     any,
     undefined
   >,
-  TRemoteSource extends PgSourceOptions<any, any, any, any>,
-> = Omit<PgCodecRelation<TLocalCodec, TRemoteSource>, "remoteSource"> & {
+  TRemoteSourceOptions extends PgSourceOptions<any, any, any, any>,
+> extends PgCodecRelationBase<
+    TLocalCodec,
+    TRemoteSourceOptions extends PgSourceOptions<
+      PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+      any,
+      any,
+      any
+    >
+      ? keyof UColumns
+      : never
+  > {
+  remoteSourceOptions: TRemoteSourceOptions;
+}
+
+/**
+ * Describes a relation to another source
+ */
+export interface PgCodecRelation<
+  TLocalCodec extends PgTypeCodec<
+    string,
+    PgTypeColumns,
+    any,
+    any,
+    undefined,
+    any,
+    undefined
+  >,
+  TRemoteSource extends PgSource<any, any, any, any, any>,
+> extends PgCodecRelationBase<
+    TLocalCodec,
+    TRemoteSource extends PgSource<
+      any,
+      PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+      any,
+      any,
+      any
+    >
+      ? keyof UColumns
+      : never
+  > {
+  /**
+   * The remote source this relation relates to.
+   */
   remoteSource: TRemoteSource;
-};
+}
 
 export interface PgRegistryConfig<
   TCodecs extends {
@@ -573,7 +594,7 @@ export interface PgRegistryConfig<
   },
   TRelations extends {
     [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelation<
+      [relationName in string]: PgCodecRelationConfig<
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
         PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
       >;
@@ -613,7 +634,7 @@ export type SourceFromOptions<
   },
   TRelations extends {
     [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelation<
+      [relationName in string]: PgCodecRelationConfig<
         // TCodecs[keyof TCodecs] &
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
         // TSourceOptions[keyof TSourceOptions] &
@@ -665,7 +686,7 @@ export interface PgRegistry<
   },
   TRelations extends {
     [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelation<
+      [relationName in string]: PgCodecRelationConfig<
         // TCodecs[keyof TCodecs] &
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
         // TSourceOptions[keyof TSourceOptions] &
@@ -692,12 +713,12 @@ export interface PgRegistry<
   pgRelations: {
     [codecName in keyof TRelations]: {
       [relationName in keyof TRelations[codecName]]: Expand<
-        TRelations[codecName][relationName] & {
+        Omit<TRelations[codecName][relationName], "remoteSourceOptions"> & {
           remoteSource: SourceFromOptions<
             TCodecs,
             TSourceOptions,
             TRelations,
-            TRelations[codecName][relationName] extends PgCodecRelation<
+            TRelations[codecName][relationName] extends PgCodecRelationConfig<
               any,
               PgSourceOptions<any, any, any, infer USourceName>
             >
@@ -740,7 +761,7 @@ export type PgRegistryAny = PgRegistry<
   },
   {
     [codecName in string]: {
-      [relationName in string]: PgCodecRelation<
+      [relationName in string]: PgCodecRelationConfig<
         PgTypeCodec<any, any, any, any, any, any, any>,
         PgSourceOptions<any, any, any, any>
       >;

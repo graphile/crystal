@@ -8,6 +8,7 @@ import {
   PgTypeCodec,
   PgTypeColumn,
   makePgSourceOptions,
+  PgCodecRelationConfig,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
 import { object } from "grafast";
@@ -170,7 +171,7 @@ declare global {
 declare global {
   namespace GraphileConfig {
     type PgTablesPluginSourceRelations = {
-      [identifier: string]: PgCodecRelation<any, any>;
+      [identifier: string]: PgCodecRelationConfig<any, any>;
     };
 
     interface GatherHelpers {

@@ -7,14 +7,18 @@ import type {
   PgSelectSingleStep,
   PgSource,
   PgSourceOptions,
-  PgSourceRef,
-  PgSourceRefPath,
-  PgSourceRelation,
+  PgCodecRef,
+  PgCodecRefPath,
+  PgCodecRelation,
   PgTypeCodec,
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
+  PgRegistry,
+  PgTypeCodecAny,
+  PgTypeCodecWithColumns,
+  PgCodecRelationConfig,
 } from "@dataplan/pg";
-import { PgSourceBuilder, pgUnionAll } from "@dataplan/pg";
+import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
 import { arraysMatch, connection, list, object } from "grafast";
 import type { PluginHook } from "graphile-config";
@@ -32,7 +36,7 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
-      sourceOptions: PgSourceOptions<any, any, any, any>;
+      source: PgSource<PgRegistry<any, any, any>, any, any, any, any>;
       relationName: string;
     }
 
@@ -82,7 +86,7 @@ declare global {
 }
 
 declare module "@dataplan/pg" {
-  interface PgSourceRelationExtensions {
+  interface PgCodecRelationExtensions {
     /** The (singular) forward relation name */
     fieldName?: string;
     /** The (singular) backward relation name for a FK against a unique combo */
@@ -115,7 +119,7 @@ declare global {
           databaseName: string;
           pgClass: PgClass;
           pgConstraint: PgConstraint;
-          relation: PgSourceRelation<any, any>;
+          relation: PgCodecRelationConfig<any, any>;
         }) => Promise<void> | void
       >;
     }
@@ -174,14 +178,18 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
       singleRelation(options, details) {
         const { source, relationName } = details;
-        const relation: PgSourceRelation<any, any> =
-          source.getRelation(relationName);
+        const relation = source.registry.pgRelations[source.codec.name]?.[
+          relationName
+        ] as PgCodecRelation<
+          PgTypeCodecWithColumns,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        >;
         //const codec = relation.source.codec;
         if (typeof relation.extensions?.tags.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
         // E.g. posts(author_id) references users(id)
-        const remoteType = this.tableType(relation.source.codec);
+        const remoteType = this.tableType(relation.remoteSource.codec);
         const localColumns = relation.localColumns as string[];
         return this.camelCase(
           `${remoteType}-by-${this._joinColumnNames(
@@ -192,8 +200,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       singleRelationBackwards(options, details) {
         const { source, relationName } = details;
-        const relation: PgSourceRelation<any, any> =
-          source.getRelation(relationName);
+        const relation = source.registry.pgRelations[source.codec.name]?.[
+          relationName
+        ] as PgCodecRelation<
+          PgTypeCodecWithColumns,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        >;
         if (
           typeof relation.extensions?.tags.foreignSingleFieldName === "string"
         ) {
@@ -203,39 +215,45 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           return relation.extensions.tags.foreignFieldName;
         }
         // E.g. posts(author_id) references users(id)
-        const remoteType = this.tableType(relation.source.codec);
+        const remoteType = this.tableType(relation.remoteSource.codec);
         const remoteColumns = relation.remoteColumns as string[];
         return this.camelCase(
           `${remoteType}-by-${this._joinColumnNames(
-            relation.source.codec,
+            relation.remoteSource.codec,
             remoteColumns,
           )}`,
         );
       },
       _manyRelation(options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgSourceRelation<
-          any,
-          any
+        const relation = source.registry.pgRelations[source.codec.name]?.[
+          relationName
+        ] as PgCodecRelation<
+          PgTypeCodecWithColumns,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
         }
         // E.g. users(id) references posts(author_id)
-        const remoteType = this.tableType(relation.source.codec);
+        const remoteType = this.tableType(relation.remoteSource.codec);
         const remoteColumns = relation.remoteColumns as string[];
         return this.camelCase(
           `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
-            relation.source.codec,
+            relation.remoteSource.codec,
             remoteColumns,
           )}`,
         );
       },
       manyRelationConnection(options, details) {
         const { source, relationName } = details;
-        const relation: PgSourceRelation<any, any> =
-          source.getRelation(relationName);
+        const relation = source.registry.pgRelations[source.codec.name]?.[
+          relationName
+        ] as PgCodecRelation<
+          PgTypeCodecWithColumns,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        >;
         const override = relation.extensions?.tags.foreignConnectionFieldName;
         if (typeof override === "string") {
           return override;
@@ -244,8 +262,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       manyRelationList(options, details) {
         const { source, relationName } = details;
-        const relation: PgSourceRelation<any, any> =
-          source.getRelation(relationName);
+        const relation = source.registry.pgRelations[source.codec.name]?.[
+          relationName
+        ] as PgCodecRelation<
+          PgTypeCodecWithColumns,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        >;
         const override = relation.extensions?.tags.foreignSimpleFieldName;
         if (typeof override === "string") {
           return override;
@@ -309,6 +331,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             ),
           ),
         );
+        const localCodec = await info.helpers.pgCodecs.getCodecFromClass(
+          databaseName,
+          pgClass._id,
+        );
         const foreignColumns = await Promise.all(
           foreignColumnNumbers.map((key) =>
             info.helpers.pgIntrospection.getAttribute(
@@ -318,11 +344,16 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             ),
           ),
         );
-        const foreignSource = await info.helpers.pgTables.getSourceBuilder(
-          databaseName,
-          foreignClass,
-        );
-        if (!foreignSource || foreignSource.isVirtual) {
+        const foreignSourceOptions =
+          await info.helpers.pgTables.getSourceOptions(
+            databaseName,
+            foreignClass,
+          );
+        if (
+          !localCodec ||
+          !foreignSourceOptions ||
+          foreignSourceOptions.isVirtual
+        ) {
           return;
         }
         const relationName = info.inflection.sourceRelationName({
@@ -345,10 +376,14 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const description = isReferencee
           ? tags.backwardDescription
           : tags.forwardDescription ?? constraintDescription;
-        const newRelation: PgSourceRelation<any, any> = {
+        const newRelation: PgCodecRelationConfig<
+          PgTypeCodecWithColumns,
+          PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+        > = {
+          localCodec,
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
-          source: foreignSource,
+          remoteSourceOptions: foreignSourceOptions,
           isUnique,
           isReferencee,
           description:
@@ -375,7 +410,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               existingRelation.remoteColumns,
               newRelation.remoteColumns,
             ) &&
-            existingRelation.source === newRelation.source;
+            existingRelation.remoteSource === newRelation.remoteSource;
           const message = `Attempted to add a ${
             isReferencee ? "backwards" : "forwards"
           } relation named '${relationName}' to '${pgClass.relname}' for ${
@@ -474,17 +509,16 @@ function makeRelationPlans(
     : null;
 
   const specFromRecord = EXPORTABLE(
-    (localColumns, remoteColumns) =>
-      ($record: PgSelectSingleStep<any, any, any, any>) => {
-        return remoteColumns.reduce((memo, remoteColumnName, i) => {
-          memo[remoteColumnName] = $record.get(localColumns[i] as string);
-          return memo;
-        }, Object.create(null));
-      },
+    (localColumns, remoteColumns) => ($record: PgSelectSingleStep<any>) => {
+      return remoteColumns.reduce((memo, remoteColumnName, i) => {
+        memo[remoteColumnName] = $record.get(localColumns[i] as string);
+        return memo;
+      }, Object.create(null));
+    },
     [localColumns, remoteColumns],
   );
   type MutationPayload = ObjectStep<{
-    result: PgSelectSingleStep<any, any, any, any>;
+    result: PgSelectSingleStep<any>;
   }>;
 
   const singleRecordPlan =
@@ -509,7 +543,7 @@ return function (otherSource) {
         )
       : EXPORTABLE(
           (otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+            function plan($record: PgSelectSingleStep<any>) {
               return otherSource.get(specFromRecord($record));
             },
           [otherSource, specFromRecord],
@@ -536,7 +570,7 @@ return function (otherSource) {
         )
       : EXPORTABLE(
           (otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+            function plan($record: PgSelectSingleStep<any>) {
               return otherSource.find(specFromRecord($record));
             },
           [otherSource, specFromRecord],
@@ -566,7 +600,7 @@ return function (otherSource, connection) {
         )
       : EXPORTABLE(
           (connection, otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep<any, any, any, any>) {
+            function plan($record: PgSelectSingleStep<any>) {
               return connection(otherSource.find(specFromRecord($record)));
             },
           [connection, otherSource, specFromRecord],
@@ -605,18 +639,19 @@ function addRelations(
   const pgPolymorphism =
     "pgPolymorphism" in scope ? scope.pgPolymorphism : undefined;
 
-  const codec = pgTypeSource?.codec ?? pgCodec;
+  const codec = (pgTypeSource?.codec ?? pgCodec) as PgTypeCodecAny;
   // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
   if (!(isPgTableType || isMutationPayload || pgPolymorphism) || !codec) {
     return fields;
   }
+  const allPgSources = Object.values(build.input.pgRegistry.pgSources);
   // TODO: change the default so that we don't do this on
   // isMutationPayload; only do that for V4 compat. (It's redundant vs
   // just using the object type directly)
   const source =
     pgTypeSource ??
-    build.input.pgSources.find((s) => s.codec === codec && !s.parameters) ??
-    build.input.pgSources.find((s) => s.codec === codec && s.isUnique);
+    allPgSources.find((s) => s.codec === codec && !s.parameters) ??
+    allPgSources.find((s) => s.codec === codec && s.isUnique);
   if (!source && !codec.extensions?.refDefinitions) {
     return fields;
   }
@@ -624,25 +659,28 @@ function addRelations(
     return fields;
   }
   const relations: {
-    [identifier: string]: PgSourceRelation<any, any>;
+    [identifier: string]: PgCodecRelation<any, any>;
   } = source?.getRelations();
 
   // Don't use refs on mutation payloads
   const refDefinitionList: Array<{
     refName: string;
     refDefinition: PgRefDefinition;
-    ref?: PgSourceRef;
-    codec?: PgTypeCodec<any, any, any, any>;
+    ref?: PgCodecRef;
+    codec?: PgTypeCodec<any, any, any, any, any, any, any>;
   }> = isMutationPayload
     ? []
-    : source
-    ? Object.entries(source.refs).map(([refName, spec]) => ({
-        refName,
-        refDefinition: spec.definition,
-        ref: spec,
-      }))
+    : source && source.codec.refs
+    ? Object.entries((source.codec as PgTypeCodecAny).refs!).map(
+        ([refName, spec]) => ({
+          refName,
+          refDefinition: spec.definition,
+          ref: spec,
+        }),
+      )
     : Object.entries(
-        codec.extensions?.refDefinitions ??
+        codec.refs ??
+          codec.extensions?.refDefinitions ??
           (Object.create(null) as Record<string, never>),
       ).map(([refName, refDefinition]) => ({
         refName,
@@ -658,7 +696,7 @@ function addRelations(
     isUnique: boolean;
   };
 
-  const resolvePath = (path: PgSourceRefPath) => {
+  const resolvePath = (path: PgCodecRefPath) => {
     if (!source) {
       throw new Error(`Cannot call resolvePath unless there's a source`);
     }
@@ -669,20 +707,17 @@ function addRelations(
       layers: [] as Layer[],
     };
     for (const pathEntry of path) {
-      const relation: PgSourceRelation<any, any> = result.source.getRelation(
-        pathEntry.relationName,
-      );
+      const relation: PgCodecRelation<
+        PgTypeCodecWithColumns,
+        PgSource<any, PgTypeCodecWithColumns, any, any, any>
+      > = result.source.getRelation(pathEntry.relationName);
       const {
         isReferencee,
         localColumns,
         remoteColumns,
-        source: sourceOrBuilder,
+        remoteSource: source,
         isUnique,
       } = relation;
-      const source =
-        sourceOrBuilder instanceof PgSourceBuilder
-          ? sourceOrBuilder.get()
-          : sourceOrBuilder;
       if (isReferencee) {
         result.hasReferencee = true;
       }
@@ -892,7 +927,7 @@ function addRelations(
         // Add forbidden names here
 
         if (ref.paths.length === 1 && ref.paths[0].length === 1) {
-          const relation: PgSourceRelation<any, any> = source.getRelation(
+          const relation: PgCodecRelation<any, any> = source.getRelation(
             ref.paths[0][0].relationName,
           );
           const otherSource =
@@ -1073,7 +1108,7 @@ function addRelations(
             const members: PgUnionAllStepMember<string>[] = [];
             for (const path of paths) {
               const [firstLayer, ...rest] = path.layers;
-              const memberPath: PgSourceRefPath = [];
+              const memberPath: PgCodecRefPath = [];
               let finalSource = firstLayer.source;
               for (const layer of rest) {
                 const { relationName } = layer;
