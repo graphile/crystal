@@ -971,7 +971,7 @@ export interface PgRegistryBuilder<
     TRemoteSource extends PgSourceOptions<any, any, any, any>,
     const TCodecRelation extends Omit<
       PgCodecRelationConfig<TCodec, TRemoteSource>,
-      "localCodec" | "remoteSource"
+      "localCodec" | "remoteSourceOptions"
     >,
   >(
     codec: TCodec,

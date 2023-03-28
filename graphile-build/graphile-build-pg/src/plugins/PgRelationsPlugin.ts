@@ -410,7 +410,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               existingRelation.remoteColumns,
               newRelation.remoteColumns,
             ) &&
-            existingRelation.remoteSource === newRelation.remoteSource;
+            existingRelation.remoteSourceOptions ===
+              newRelation.remoteSourceOptions;
           const message = `Attempted to add a ${
             isReferencee ? "backwards" : "forwards"
           } relation named '${relationName}' to '${pgClass.relname}' for ${
@@ -659,7 +660,10 @@ function addRelations(
     return fields;
   }
   const relations: {
-    [identifier: string]: PgCodecRelation<any, any>;
+    [identifier: string]: PgCodecRelation<
+      PgTypeCodecWithColumns,
+      PgSource<any, PgTypeCodecWithColumns, any, any, any>
+    >;
   } = source?.getRelations();
 
   // Don't use refs on mutation payloads
@@ -731,10 +735,7 @@ function addRelations(
         source,
         isUnique,
       });
-      result.source =
-        relation.source instanceof PgSourceBuilder
-          ? relation.source.get()
-          : relation.source;
+      result.source = relation.remoteSource;
     }
     return result;
   };
@@ -755,7 +756,7 @@ function addRelations(
     connectionFieldName: string;
     description?: string;
     pgSource?: PgSource<any, any, any, any, any>;
-    pgCodec: PgTypeCodec<any, any, any, any> | undefined;
+    pgCodec: PgTypeCodec<any, any, any, any, any, any, any> | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     relatedTypeName: string;
   };
@@ -768,7 +769,7 @@ function addRelations(
       const {
         localColumns,
         remoteColumns,
-        source: otherSourceOrBuilder,
+        remoteSource,
         extensions,
         isReferencee,
       } = relation;
@@ -776,26 +777,22 @@ function addRelations(
         // Don't add backwards relations to mutation payloads
         continue;
       }
-      const otherSource =
-        otherSourceOrBuilder instanceof PgSourceBuilder
-          ? otherSourceOrBuilder.get()
-          : otherSourceOrBuilder;
       // The behavior is the relation behavior PLUS the remote table
       // behavior. But the relation settings win.
       const behavior =
         getBehavior([
-          otherSource.codec.extensions,
-          otherSource.extensions,
+          remoteSource.codec.extensions,
+          remoteSource.extensions,
           extensions,
         ]) ?? "";
-      const otherCodec = otherSource.codec;
+      const otherCodec = remoteSource.codec;
       const typeName = build.inflection.tableType(otherCodec);
       const connectionTypeName =
         build.inflection.tableConnectionType(otherCodec);
 
       const deprecationReason =
         tagToString(relation.extensions?.tags?.deprecated) ??
-        tagToString(relation.source.extensions?.tags?.deprecated);
+        tagToString(relation.remoteSource.extensions?.tags?.deprecated);
 
       const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
         source,
@@ -805,7 +802,7 @@ function addRelations(
       const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
         localColumns as string[],
         remoteColumns as string[],
-        otherSource,
+        remoteSource,
         isMutationPayload ?? false,
       );
       const singleRecordFieldName = relation.isReferencee
@@ -829,8 +826,8 @@ function addRelations(
         listFieldName,
         connectionFieldName,
         description: relation.description,
-        pgSource: otherSource,
-        pgCodec: otherSource.codec,
+        pgSource: remoteSource,
+        pgCodec: remoteSource.codec,
         pgRelationDetails: relationDetails,
         relatedTypeName: build.inflection.tableType(codec),
       };
@@ -927,17 +924,15 @@ function addRelations(
         // Add forbidden names here
 
         if (ref.paths.length === 1 && ref.paths[0].length === 1) {
-          const relation: PgCodecRelation<any, any> = source.getRelation(
-            ref.paths[0][0].relationName,
-          );
-          const otherSource =
-            relation.source instanceof PgSourceBuilder
-              ? relation.source.get()
-              : relation.source;
+          const relation: PgCodecRelation<
+            PgTypeCodecWithColumns,
+            PgSource<any, PgTypeCodecWithColumns, any, any, any>
+          > = source.getRelation(ref.paths[0][0].relationName);
+          const remoteSource = relation.remoteSource;
           return makeRelationPlans(
             relation.localColumns as string[],
             relation.remoteColumns as string[],
-            otherSource,
+            remoteSource,
             isMutationPayload ?? false,
           );
         } else if (!needsPgUnionAll) {
@@ -1006,7 +1001,7 @@ function addRelations(
                 );
                 const specFromRecord = EXPORTABLE(
                   (localColumns, remoteColumns) =>
-                    ($record: PgSelectSingleStep<any, any, any, any>) => {
+                    ($record: PgSelectSingleStep<any>) => {
                       return remoteColumns.reduce(
                         (memo, remoteColumnName, i) => {
                           memo[remoteColumnName] = $record.get(
@@ -1142,10 +1137,10 @@ function addRelations(
                   const $record = isMutationPayload
                     ? (
                         $parent as ObjectStep<{
-                          result: PgSelectSingleStep<any, any, any, any>;
+                          result: PgSelectSingleStep<any>;
                         }>
                       ).get("result")
-                    : ($parent as PgSelectSingleStep<any, any, any, any>);
+                    : ($parent as PgSelectSingleStep<any>);
                   for (let i = 0, l = paths.length; i < l; i++) {
                     const path = paths[i];
                     const firstLayer = path.layers[0];
