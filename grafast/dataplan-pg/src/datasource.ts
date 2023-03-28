@@ -43,6 +43,7 @@ import type {
   PgCodecRelation,
   PgTypeCodecWithColumns,
   PgRegistryConfig,
+  Expand,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
@@ -895,8 +896,6 @@ TInSource
 }
 */
 
-export type Simplify<T> = { [TKey in keyof T]: T[TKey] } & {};
-
 export interface PgRegistryBuilder<
   TCodecs extends {
     [name in string]: PgTypeCodec<
@@ -983,23 +982,26 @@ export interface PgRegistryBuilder<
     TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
       ? TRelations & {
           [codecName in UName]: {
-            [relationName in TCodecRelationName]: TCodecRelation;
+            [relationName in TCodecRelationName]: TCodecRelation & {
+              localCodec: TCodec;
+              remoteSource: TRemoteSource;
+            };
           };
         }
       : never
     /*
     TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
       ? TRelations extends { [codecName in UName]: infer UExist }
-        ? Simplify<
+        ? Expand<
             TRelations & {
-              [codecName in UName]: Simplify<
+              [codecName in UName]: Expand<
                 UExist & {
                   [relationName in TCodecRelationName]: TCodecRelation;
                 }
               >;
             }
           >
-        : Simplify<
+        : Expand<
             TRelations & {
               [codecName in UName]: {
                 [relationName in TCodecRelationName]: TCodecRelation;
@@ -1010,11 +1012,7 @@ export interface PgRegistryBuilder<
 */
   >;
 
-  build(): PgRegistry<
-    Simplify<TCodecs>,
-    Simplify<TSources>,
-    Simplify<TRelations>
-  >;
+  build(): PgRegistry<Expand<TCodecs>, Expand<TSources>, Expand<TRelations>>;
 }
 
 export function makeRegistry<

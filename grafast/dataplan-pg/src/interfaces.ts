@@ -564,6 +564,11 @@ export interface PgRegistryConfig<
   pgRelations: TRelations;
 }
 
+// https://github.com/microsoft/TypeScript/issues/47980#issuecomment-1049304607
+export type Expand<T> = T extends unknown
+  ? { [TKey in keyof T]: T[TKey] }
+  : never;
+
 export type SourceFromOptions<
   TCodecs extends {
     [name in string]: PgTypeCodec<
@@ -664,19 +669,21 @@ export interface PgRegistry<
   };
   pgRelations: {
     [codecName in keyof TRelations]: {
-      [relationName in keyof TRelations[codecName]]: TRelations[codecName][relationName] & {
-        remoteSource: SourceFromOptions<
-          TCodecs,
-          TSourceOptions,
-          TRelations,
-          TRelations[codecName][relationName] extends PgCodecRelation<
-            any,
-            PgSourceOptions<any, any, any, infer USourceName>
-          >
-            ? USourceName
-            : never
-        >;
-      };
+      [relationName in keyof TRelations[codecName]]: Expand<
+        TRelations[codecName][relationName] & {
+          remoteSource: SourceFromOptions<
+            TCodecs,
+            TSourceOptions,
+            TRelations,
+            TRelations[codecName][relationName] extends PgCodecRelation<
+              any,
+              PgSourceOptions<any, any, any, infer USourceName>
+            >
+              ? USourceName
+              : never
+          >;
+        }
+      >;
     };
   };
 }
