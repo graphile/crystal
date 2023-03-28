@@ -5,11 +5,14 @@
  * data sources (hence the "no data gathering" - we skip the gather phase).
  */
 
-import type { PgExecutorContextPlans, WithPgClient } from "@dataplan/pg";
+import {
+  PgExecutorContextPlans,
+  WithPgClient,
+  makePgSourceOptions,
+} from "@dataplan/pg";
+import { makeRegistryBuilder } from "@dataplan/pg";
 import {
   PgExecutor,
-  PgSource,
-  PgSourceBuilder,
   recordCodec,
   sqlFromArgDigests,
   TYPES,
@@ -91,9 +94,16 @@ async function main() {
     },
   ]);
 
-  const usersCodec = EXPORTABLE(
-    (TYPES, recordCodec, sql) =>
-      recordCodec({
+  const registry = EXPORTABLE(
+    (
+      TYPES,
+      executor,
+      makeRegistryBuilder,
+      recordCodec,
+      sql,
+      sqlFromArgDigests,
+    ) => {
+      const usersCodec = recordCodec({
         name: `app_public.users`,
         identifier: sql`app_public.users`,
         columns: {
@@ -124,13 +134,9 @@ async function main() {
             name: "users",
           },
         },
-      }),
-    [TYPES, recordCodec, sql],
-  );
+      });
 
-  const forumsCodec = EXPORTABLE(
-    (TYPES, recordCodec, sql) =>
-      recordCodec({
+      const forumsCodec = recordCodec({
         name: `app_public.forums`,
         identifier: sql`app_public.forums`,
         columns: {
@@ -157,13 +163,9 @@ async function main() {
             name: "forums",
           },
         },
-      }),
-    [TYPES, recordCodec, sql],
-  );
+      });
 
-  const messagesCodec = EXPORTABLE(
-    (TYPES, recordCodec, sql) =>
-      recordCodec({
+      const messagesCodec = recordCodec({
         name: `app_public.messages`,
         identifier: sql`app_public.messages`,
         columns: {
@@ -206,104 +208,34 @@ async function main() {
             name: "messages",
           },
         },
-      }),
-    [TYPES, recordCodec, sql],
-  );
+      });
 
-  const usersSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, usersCodec) =>
-      new PgSourceBuilder({
+      const usersSourceOptions = makePgSourceOptions({
         name: "users",
         executor,
         source: usersCodec.sqlType,
         codec: usersCodec,
         uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSourceBuilder, executor, usersCodec],
-  );
+      });
 
-  const forumsSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, forumsCodec) =>
-      new PgSourceBuilder({
+      const forumsSourceOptions = makePgSourceOptions({
         //name: "main.app_public.forums",
         name: "forums",
         executor,
         source: forumsCodec.sqlType,
         codec: forumsCodec,
         uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSourceBuilder, executor, forumsCodec],
-  );
+      });
 
-  const messagesSourceBuilder = EXPORTABLE(
-    (PgSourceBuilder, executor, messagesCodec) =>
-      new PgSourceBuilder({
+      const messagesSourceOptions = makePgSourceOptions({
         name: "messages",
         executor,
         source: messagesCodec.sqlType,
         codec: messagesCodec,
         uniques: [{ columns: ["id"], isPrimary: true }],
-      }),
-    [PgSourceBuilder, executor, messagesCodec],
-  );
+      });
 
-  const usersSource = EXPORTABLE(
-    (messagesSourceBuilder, usersSourceBuilder) =>
-      usersSourceBuilder.build({
-        relations: {
-          messages: {
-            source: messagesSourceBuilder,
-            isUnique: false,
-            localColumns: ["id"],
-            remoteColumns: ["author_id"],
-          },
-        },
-      }),
-    [messagesSourceBuilder, usersSourceBuilder],
-  );
-  const forumsSource = EXPORTABLE(
-    (forumsSourceBuilder, messagesSourceBuilder) =>
-      forumsSourceBuilder.build({
-        relations: {
-          messages: {
-            source: messagesSourceBuilder,
-            isUnique: false,
-            localColumns: ["id"],
-            remoteColumns: ["forum_id"],
-            extensions: {
-              tags: {
-                behavior: "connection list",
-              },
-            },
-          },
-        },
-      }),
-    [forumsSourceBuilder, messagesSourceBuilder],
-  );
-  const messagesSource = EXPORTABLE(
-    (forumsSource, messagesSourceBuilder, usersSource) =>
-      messagesSourceBuilder.build({
-        relations: {
-          author: {
-            source: usersSource,
-            isUnique: true,
-            localColumns: ["author_id"],
-            remoteColumns: ["id"],
-          },
-          forum: {
-            source: forumsSource,
-            isUnique: true,
-            localColumns: ["forum_id"],
-            remoteColumns: ["id"],
-          },
-        },
-      }),
-    [forumsSource, messagesSourceBuilder, usersSource],
-  );
-
-  const uniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql, sqlFromArgDigests) =>
-      new PgSource({
+      const uniqueAuthorCountSourceOptions = makePgSourceOptions({
         executor,
         codec: TYPES.int,
         source: (...args) =>
@@ -321,13 +253,9 @@ async function main() {
             behavior: "queryField",
           },
         },
-      }),
-    [PgSource, TYPES, executor, sql, sqlFromArgDigests],
-  );
+      });
 
-  const forumsUniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, forumsCodec, sql, sqlFromArgDigests) =>
-      new PgSource({
+      const forumsUniqueAuthorCountSourceOptions = makePgSourceOptions({
         executor,
         codec: TYPES.int,
         isUnique: true,
@@ -356,13 +284,9 @@ async function main() {
             name: "unique_author_count",
           },
         },
-      }),
-    [PgSource, TYPES, executor, forumsCodec, sql, sqlFromArgDigests],
-  );
+      });
 
-  const forumsRandomUser = EXPORTABLE(
-    (PgSource, executor, forumsCodec, sql, sqlFromArgDigests, usersCodec) =>
-      new PgSource({
+      const forumsRandomUserSourceOptions = makePgSourceOptions({
         executor,
         codec: usersCodec,
         isUnique: true,
@@ -383,13 +307,9 @@ async function main() {
             name: "random_user",
           },
         },
-      }),
-    [PgSource, executor, forumsCodec, sql, sqlFromArgDigests, usersCodec],
-  );
+      });
 
-  const forumsFeaturedMessages = EXPORTABLE(
-    (PgSource, executor, forumsCodec, messagesCodec, sql, sqlFromArgDigests) =>
-      new PgSource({
+      const forumsFeaturedMessagesSourceOptions = makePgSourceOptions({
         executor,
         codec: messagesCodec,
         isUnique: false,
@@ -410,21 +330,68 @@ async function main() {
             name: "featured_messages",
           },
         },
-      }),
-    [PgSource, executor, forumsCodec, messagesCodec, sql, sqlFromArgDigests],
+      });
+      return makeRegistryBuilder()
+        .addSource(usersSourceOptions)
+        .addSource(forumsSourceOptions)
+        .addSource(messagesSourceOptions)
+        .addSource(uniqueAuthorCountSourceOptions)
+        .addSource(forumsUniqueAuthorCountSourceOptions)
+        .addSource(forumsRandomUserSourceOptions)
+        .addSource(forumsFeaturedMessagesSourceOptions)
+        .addRelation(
+          usersSourceOptions.codec,
+          "messages",
+          messagesSourceOptions,
+          {
+            isUnique: false,
+            localColumns: ["id"],
+            remoteColumns: ["author_id"],
+          },
+        )
+        .addRelation(
+          forumsSourceOptions.codec,
+          "messages",
+          messagesSourceOptions,
+          {
+            isUnique: false,
+            localColumns: ["id"],
+            remoteColumns: ["forum_id"],
+            extensions: {
+              tags: {
+                behavior: "connection list",
+              },
+            },
+          },
+        )
+        .addRelation(
+          messagesSourceOptions.codec,
+          "author",
+          usersSourceOptions,
+          {
+            isUnique: true,
+            localColumns: ["author_id"],
+            remoteColumns: ["id"],
+          },
+        )
+        .addRelation(
+          messagesSourceOptions.codec,
+          "forum",
+          forumsSourceOptions,
+          {
+            isUnique: true,
+            localColumns: ["forum_id"],
+            remoteColumns: ["id"],
+          },
+        )
+        .build();
+    },
+    [TYPES, executor, makeRegistryBuilder, recordCodec, sql, sqlFromArgDigests],
   );
 
   // We're crafting our own input
   const input: GraphileBuild.BuildInput = {
-    pgSources: [
-      usersSource,
-      forumsSource,
-      messagesSource,
-      uniqueAuthorCountSource,
-      forumsUniqueAuthorCountSource,
-      forumsRandomUser,
-      forumsFeaturedMessages,
-    ],
+    pgRegistry: registry,
   };
   const schema = buildSchema(config, input);
 
