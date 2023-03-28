@@ -3,7 +3,7 @@ import "graphile-build";
 import type {
   PgSource,
   PgSourceOptions,
-  PgSourceRelation,
+  PgCodecRelation,
   PgSourceUnique,
   PgTypeCodec,
   PgTypeColumn,
@@ -17,11 +17,6 @@ import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 import { getBehavior } from "../behavior.js";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
-
-type PgSourceBuilderOptions = Omit<
-  PgSourceOptions<any, any, any, any>,
-  "relations"
->;
 
 declare global {
   namespace GraphileBuild {
@@ -50,7 +45,7 @@ declare global {
        */
       _sourceName(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgSourceOptions<any, any, any, any>,
       ): string;
 
       /**
@@ -58,7 +53,7 @@ declare global {
        */
       _singularizedSourceName(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgSourceOptions<any, any, any, any>,
       ): string;
 
       /**
@@ -95,7 +90,10 @@ declare global {
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _codecName(this: Inflection, codec: PgTypeCodec<any, any, any>): string;
+      _codecName(
+        this: Inflection,
+        codec: PgTypeCodec<any, any, any, any, any, any, any>,
+      ): string;
 
       /**
        * Takes a `_codecName` and singularizes it. This is also a good place to
@@ -110,7 +108,7 @@ declare global {
        */
       _singularizedCodecName(
         this: Inflection,
-        codec: PgTypeCodec<any, any, any>,
+        codec: PgTypeCodec<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -126,17 +124,17 @@ declare global {
        */
       tableType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any>,
+        codec: PgTypeCodec<any, any, any, any, any, any, any>,
       ): string;
 
       tableConnectionType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any>,
+        codec: PgTypeCodec<any, any, any, any, any, any, any>,
       ): string;
 
       tableEdgeType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any>,
+        codec: PgTypeCodec<any, any, any, any, any, any, any>,
       ): string;
 
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
@@ -144,7 +142,7 @@ declare global {
     }
 
     interface ScopeObject {
-      pgCodec?: PgTypeCodec<any, any, any>;
+      pgCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
       // TODO: rename this to isPgClassType?
       isPgTableType?: boolean;
       isPgConnectionRelated?: true;
@@ -152,7 +150,7 @@ declare global {
     interface ScopeObjectFieldsField {
       // TODO: put 'field' into all these names?
       pgSource?: PgSource<any, any, any, any, any>;
-      pgFieldCodec?: PgTypeCodec<any, any, any>;
+      pgFieldCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
@@ -160,7 +158,7 @@ declare global {
     interface ScopeInterfaceFieldsField {
       // TODO: put 'field' into all these names?
       pgSource?: PgSource<any, any, any, any, any>;
-      pgFieldCodec?: PgTypeCodec<any, any, any>;
+      pgFieldCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
@@ -171,7 +169,7 @@ declare global {
 declare global {
   namespace GraphileConfig {
     type PgTablesPluginSourceRelations = {
-      [identifier: string]: PgSourceRelation<any, any>;
+      [identifier: string]: PgCodecRelation<any, any>;
     };
 
     interface GatherHelpers {
@@ -181,7 +179,7 @@ declare global {
           pgClass: PgClass,
         ): Promise<PgSourceOptions<any, any, any, any> | null>;
         getSource(
-          sourceBuilder: PgSourceBuilder<any, any, any>,
+          sourceBuilder: PgSourceOptions<any, any, any>,
         ): Promise<PgSource<any, any, any, any, any> | null>;
       };
     }
@@ -191,7 +189,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceBuilder: PgSourceBuilder<any, any, any>;
+          sourceBuilder: PgSourceOptions<any, any, any>;
           relations: PgTablesPluginSourceRelations;
         }) => Promise<void> | void
       >;
@@ -207,7 +205,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          options: PgSourceBuilderOptions;
+          options: PgSourceOptions<any, any, any>;
         }) => void | Promise<void>
       >;
       pgTables_unique: PluginHook<
@@ -225,14 +223,14 @@ declare global {
 interface State {
   sourceBuilderByPgClassByDatabase: Map<
     string,
-    Map<PgClass, Promise<PgSourceBuilder<any, any, any> | null>>
+    Map<PgClass, Promise<PgSourceOptions<any, any, any> | null>>
   >;
   sourceBySourceBuilder: Map<
-    PgSourceBuilder<any, any, any>,
+    PgSourceOptions<any, any, any>,
     Promise<PgSource<any, any, any, any, any> | null>
   >;
   detailsBySourceBuilder: Map<
-    PgSourceBuilder<any, any, any>,
+    PgSourceOptions<any, any, any>,
     { databaseName: string; pgClass: PgClass }
   >;
 }

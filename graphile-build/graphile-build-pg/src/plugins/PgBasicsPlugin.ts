@@ -3,7 +3,11 @@ import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
 
-import type { PgTypeCodec } from "@dataplan/pg";
+import {
+  PgRegistryBuilder,
+  PgTypeCodec,
+  makeRegistryBuilder,
+} from "@dataplan/pg";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
@@ -74,11 +78,38 @@ declare global {
   }
 }
 
+declare global {
+  namespace GraphileConfig {
+    interface GatherHelpers {
+      pgBasics: {
+        getRegistryBuilder(): PgRegistryBuilder<any, any, any>;
+      };
+    }
+  }
+}
+
+interface Cache {}
+
+interface State {
+  registryBuilder: PgRegistryBuilder<any, any, any>;
+}
+
 export const PgBasicsPlugin: GraphileConfig.Plugin = {
   name: "PgBasicsPlugin",
   description:
     "Basic utilities required by many other graphile-build-pg plugins.",
   version: version,
+
+  gather: <GraphileConfig.PluginGatherConfig<"pgBasics", State, Cache>>{
+    namespace: "pgBasics",
+    initialCache: (): Cache => ({}),
+    initialState: (): State => ({ registryBuilder: makeRegistryBuilder() }),
+    helpers: {
+      getRegistryBuilder(info) {
+        return info.state.registryBuilder;
+      },
+    },
+  },
 
   schema: {
     hooks: {

@@ -1,6 +1,7 @@
 import type {
   PgCodecRelation,
   PgSource,
+  PgSourceOptions,
   PgTypeCodec,
   PgTypeCodecWithColumns,
   PgTypeColumns,
@@ -117,7 +118,7 @@ declare global {
       [codecName: string]: {
         [relationName: string]: PgCodecRelation<
           PgTypeCodec<any, PgTypeColumns, any, any, undefined, any, undefined>,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+          PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
         >;
       };
     }
