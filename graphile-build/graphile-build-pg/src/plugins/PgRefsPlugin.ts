@@ -2,12 +2,13 @@ import type {
   PgRefDefinition,
   PgRefDefinitions,
   PgSource,
-  PgSourceRefPath,
-  PgSourceRelation,
+  PgSourceOptions,
+  PgCodecRefPath,
+  PgCodecRelation,
+  PgTypeCodecAny,
   PgTypeCodecExtensions,
-  PgTypeColumns,
+  PgTypeCodecWithColumns,
 } from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import type { PgClass } from "pg-introspection";
 
@@ -165,13 +166,8 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           };
         }
       },
-      async pgTables_PgSource(info, event) {
-        info.state.sourceEvents.push(event);
-      },
-    },
-    async main(output, info) {
-      for (const event of info.state.sourceEvents) {
-        const { databaseName, source, pgClass } = event;
+      async pgTables_PgSourceOptions_relations_post(info, event) {
+        const { databaseName, sourceOptions, pgClass } = event;
 
         const getSourceForTableName = async (targetTableIdentifier: string) => {
           const nsp = pgClass.getNamespace();
@@ -210,12 +206,13 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           ? [tags.refVia]
           : null;
 
-        const refDefinitions = source.codec.extensions?.refDefinitions;
+        const refDefinitions = (sourceOptions.codec as PgTypeCodecAny)
+          .extensions?.refDefinitions;
         if (!refDefinitions) {
           if (rawRefVias) {
             throw new Error(`@refVia without matching @ref is invalid`);
           }
-          continue;
+          return;
         }
 
         const refVias =
@@ -241,28 +238,36 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           const rawVia = refDefinition.extensions?.via;
           const vias = [...(rawVia ? [rawVia] : []), ...relevantViaStrings];
 
-          const paths: PgSourceRefPath[] = [];
+          const paths: PgCodecRefPath[] = [];
 
           if (vias.length === 0) {
             if (!tags.interface) {
               console.warn(
-                `@ref ${refName} has no valid 'via' on ${source.name}`,
+                `@ref ${refName} has no valid 'via' on ${sourceOptions.name}`,
               );
               continue;
             }
           }
 
+          const registryBuilder =
+            await info.helpers.pgBasics.getRegistryBuilder();
+          const registryConfig = registryBuilder.getRegistryConfig();
+
           outerLoop: for (const via of vias) {
-            const path: PgSourceRefPath = [];
+            const path: PgCodecRefPath = [];
             const parts = via.split(";");
-            let currentSource: PgSource<any, any, any, any, any> = source;
+            let currentSourceOptions: PgSourceOptions<any, any, any, any> =
+              sourceOptions;
             for (const rawPart of parts) {
               type RelationEntry = [
                 string,
-                PgSourceRelation<PgTypeColumns, PgTypeColumns>,
+                PgCodecRelation<
+                  PgTypeCodecWithColumns,
+                  PgSourceOptions<any, any, any, any>
+                >,
               ];
               const relationEntries = Object.entries(
-                currentSource.getRelations(),
+                registryConfig.pgRelations[sourceOptions.codec.name],
               ) as Array<RelationEntry>;
               const part = rawPart.trim();
               // TODO: allow whitespace
@@ -299,7 +304,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 }
 
                 relationEntry = relationEntries.find(([, rel]) => {
-                  if (rel.source.name !== targetSource.name) {
+                  if (rel.remoteSource.name !== targetSource.name) {
                     return false;
                   }
                   if (!arraysMatch(rel.localColumns, localColumns)) {
@@ -324,21 +329,18 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                   continue outerLoop;
                 }
                 relationEntry = relationEntries.find(([, rel]) => {
-                  return rel.source.name === targetSource.name;
+                  return rel.remoteSource.name === targetSource.name;
                 });
               }
               if (relationEntry) {
                 path.push({
                   relationName: relationEntry[0],
                 });
-                const nextSource = relationEntry[1].source;
-                currentSource =
-                  nextSource instanceof PgSourceBuilder
-                    ? nextSource.get()
-                    : nextSource;
+                const nextSource = relationEntry[1].remoteSource;
+                currentSourceOptions = nextSource;
               } else {
                 console.warn(
-                  `Could not find matching relation for '${via}' / ${currentSource.name} -> '${rawPart}'`,
+                  `Could not find matching relation for '${via}' / ${currentSourceOptions.name} -> '${rawPart}'`,
                 );
                 continue outerLoop;
               }
@@ -346,17 +348,17 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             paths.push(path);
           }
 
-          if (source.refs[refName]) {
+          if (sourceOptions.codec.refs[refName]) {
             throw new Error(
-              `@ref ${refName} already registered in ${source.name}`,
+              `@ref ${refName} already registered in ${sourceOptions.codec.name}`,
             );
           }
-          source.refs[refName] = {
+          sourceOptions.codec.refs[refName] = {
             definition: refDefinition,
             paths,
           };
         }
-      }
+      },
     },
   } as GraphileConfig.PluginGatherConfig<"pgRefs", State, Cache>,
 };

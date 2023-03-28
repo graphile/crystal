@@ -4,6 +4,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type { PgTypeColumns } from "./codecs.js";
 import type {
+  PgCodecRefs,
   PgSource,
   PgSourceOptions,
   PgSourceParameter,
@@ -239,6 +240,12 @@ export interface PgTypeCodec<
    * Arbitrary metadata
    */
   extensions?: Partial<PgTypeCodecExtensions>;
+
+  /**
+   * Relations to follow for shortcut references, can be polymorphic, can be
+   * many-to-many.
+   */
+  refs?: PgCodecRefs;
 }
 
 export type PgTypeCodecAny = PgTypeCodec<
@@ -529,6 +536,21 @@ export interface PgCodecRelation<
   description?: string;
 }
 
+export type PgCodecRelationConfig<
+  TLocalCodec extends PgTypeCodec<
+    string,
+    PgTypeColumns,
+    any,
+    any,
+    undefined,
+    any,
+    undefined
+  >,
+  TRemoteSource extends PgSourceOptions<any, any, any, any>,
+> = Omit<PgCodecRelation<TLocalCodec, TRemoteSource>, "remoteSource"> & {
+  remoteSource: TRemoteSource;
+};
+
 export interface PgRegistryConfig<
   TCodecs extends {
     [name in string]: PgTypeCodec<
@@ -725,14 +747,6 @@ export type PgRegistryAny = PgRegistry<
     };
   }
 >;
-
-/*
-  /**
-   * Relations to follow for shortcut references, can be polymorphic, can be many-to-many.
-   * /
-  public refs: PgCodecRefs;
-      refs,
-*/
 
 export type GetPgRegistryCodecs<TRegistry extends PgRegistry<any, any, any>> =
   TRegistry extends PgRegistry<infer UCodecs, any, any> ? UCodecs : never;

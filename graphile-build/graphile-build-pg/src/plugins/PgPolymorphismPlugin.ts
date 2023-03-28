@@ -5,9 +5,11 @@ import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
 import type {
+  PgCodecRelationConfig,
   PgRefDefinition,
-  PgSourceRef,
+  PgCodecRef,
   PgTypeCodec,
+  PgTypeCodecAny,
   PgTypeCodecExtensions,
   PgTypeCodecPolymorphism,
   PgTypeCodecPolymorphismRelational,
@@ -262,9 +264,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           }
         }
       },
-      async pgTables_PgSource(info, event) {
-        const { pgClass, databaseName, source, relations } = event;
-        const poly = source.codec.polymorphism;
+      async pgTables_PgSourceOptions_relations_post(info, event) {
+        const { pgClass, databaseName, sourceOptions } = event;
+        const relations = (
+          await info.helpers.pgBasics.getRegistryBuilder()
+        ).getRegistryConfig().pgRelations[sourceOptions.codec.name] as {
+          [relationName: string]: PgCodecRelationConfig<any, any>;
+        };
+        const poly = (sourceOptions.codec as PgTypeCodecAny).polymorphism;
         if (poly?.mode === "relational") {
           // Copy common attributes to implementations
           for (const spec of Object.values(poly.types)) {
@@ -336,7 +343,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             });
 
             for (const [colName, colSpec] of Object.entries(
-              source.codec.columns,
+              sourceOptions.codec.columns,
             ) as Array<[string, PgTypeColumn]>) {
               if (otherCodec.columns[colName]) {
                 otherCodec.columns[colName].identicalVia = sharedRelationName;
@@ -353,8 +360,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               }
             }
 
-            const otherSourceBuilder =
-              await info.helpers.pgTables.getSourceBuilder(
+            const otherSourceOptions =
+              await info.helpers.pgTables.getSourceOptions(
                 databaseName,
                 pgRelatedClass,
               );
@@ -364,13 +371,13 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             )) {
               const behavior =
                 getBehavior([
-                  relationSpec.source.codec.extensions,
-                  relationSpec.source.extensions,
+                  relationSpec.remoteSource.codec.extensions,
+                  relationSpec.remoteSource.extensions,
                   relationSpec.extensions,
                 ]) ?? "";
               const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
                 {
-                  source,
+                  sourceOptions,
                   relationName,
                 };
               const singleRecordFieldName = relationSpec.isReferencee
@@ -391,7 +398,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                 },
               };
-              const ref: PgSourceRef = {
+              const ref: PgCodecRef = {
                 definition,
                 paths: [
                   [
@@ -402,7 +409,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   ],
                 ],
               };
-              otherSourceBuilder!.refs[relationName] = ref;
+              otherSourceOptions!.codec.refs[relationName] = ref;
             }
           }
         }
@@ -419,7 +426,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         } = build;
         const unionsToRegister = new Map<
           string,
-          PgTypeCodec<any, any, any, any>[]
+          PgTypeCodec<any, any, any, any, any, any, any>[]
         >();
         for (const codec of build.pgCodecMetaLookup.keys()) {
           if (!codec.columns) {

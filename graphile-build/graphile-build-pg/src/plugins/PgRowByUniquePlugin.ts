@@ -64,12 +64,14 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const sources = build.input.pgSources.filter((source) => {
-          if (source.parameters) return false;
-          if (!source.codec.columns) return false;
-          if (!source.uniques || source.uniques.length < 1) return false;
-          return true;
-        });
+        const sources = Object.values(build.input.pgRegistry.pgSources).filter(
+          (source) => {
+            if (source.parameters) return false;
+            if (!source.codec.columns) return false;
+            if (!source.uniques || source.uniques.length < 1) return false;
+            return true;
+          },
+        );
 
         return sources.reduce(
           (outerMemo, source) =>
@@ -95,7 +97,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                   };
                 } = Object.create(null);
                 uniqueKeys.forEach((columnName) => {
-                  const column = source.codec.columns[columnName];
+                  const column = source.codec.columns![columnName];
                   const columnArgName = build.inflection.column({
                     columnName,
                     codec: source.codec,

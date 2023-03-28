@@ -6,6 +6,7 @@ import type {
   PgRefDefinition,
   PgSelectSingleStep,
   PgSource,
+  PgSourceOptions,
   PgSourceRef,
   PgSourceRefPath,
   PgSourceRelation,
@@ -31,7 +32,7 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
-      source: PgSource<any, any, any, any, any>;
+      sourceOptions: PgSourceOptions<any, any, any, any>;
       relationName: string;
     }
 

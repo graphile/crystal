@@ -35,7 +35,9 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdHandler) {
           return _;
         }
-        const tableSources = build.input.pgSources.filter((source) => {
+        const tableSources = Object.values(
+          build.input.pgRegistry.pgSources,
+        ).filter((source) => {
           if (source.codec.isAnonymous) return false;
           if (!source.codec.columns) return false;
           if (source.codec.polymorphism) return false;
@@ -54,7 +56,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         });
 
         const sourcesByCodec = new Map<
-          PgTypeCodec<any, any, any, any>,
+          PgTypeCodec<any, any, any, any, any, any, any>,
           PgSource<any, any, any, any, any>[]
         >();
         for (const source of tableSources) {
@@ -119,7 +121,7 @@ return function (list, constant) {
                 )
               : EXPORTABLE(
                   (constant, identifier, list, pk) =>
-                    ($record: PgSelectSingleStep<any, any, any, any>) => {
+                    ($record: PgSelectSingleStep<any>) => {
                       return list([
                         constant(identifier),
                         ...pk.map((column) => $record.get(column)),

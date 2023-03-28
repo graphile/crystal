@@ -1,11 +1,11 @@
 import type {
   PgCodecRelation,
-  PgSource,
   PgSourceOptions,
   PgTypeCodec,
   PgTypeCodecWithColumns,
   PgTypeColumns,
   WithPgClient,
+  PgRegistry,
 } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 
@@ -123,16 +123,7 @@ declare global {
       };
     }
     interface BuildInput {
-      pgSources: PgSource<any, any, any, any, any>[];
-
-      /**
-       * A non-exhaustive list of codecs, please walk pgSources for more.
-       * Typically useful for the codecs that aren't linked to a source (e.g.
-       * those defining an union or interface)
-       */
-      pgCodecs?: PgTypeCodec<any, any, any, any, any, any, any>[];
-
-      pgRelations?: GraphileBuild.PgRelations;
+      pgRegistry: PgRegistry<any, any, any>;
     }
   }
 }

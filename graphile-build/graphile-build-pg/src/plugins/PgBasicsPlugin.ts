@@ -4,6 +4,7 @@ import "../interfaces.js";
 import "graphile-config";
 
 import {
+  PgRegistry,
   PgRegistryBuilder,
   PgTypeCodec,
   makeRegistryBuilder,
@@ -18,23 +19,25 @@ import {
   makePgTypeCodecMeta,
 } from "../inputUtils.js";
 import { version } from "../version.js";
+import { PromiseOrDirect } from "grafast";
+import { PluginHook } from "graphile-config";
 
 declare global {
   namespace GraphileBuild {
     type HasGraphQLTypeForPgCodec = (
-      codec: PgTypeCodec<any, any, any>,
+      codec: PgTypeCodec<any, any, any, any, any, any, any>,
       situation?: string,
     ) => boolean;
     type GetGraphQLTypeByPgCodec = (
-      codec: PgTypeCodec<any, any, any>,
+      codec: PgTypeCodec<any, any, any, any, any, any, any>,
       situation: string,
     ) => GraphQLType | null;
     type GetGraphQLTypeNameByPgCodec = (
-      codec: PgTypeCodec<any, any, any>,
+      codec: PgTypeCodec<any, any, any, any, any, any, any>,
       situation: string,
     ) => string | null;
     type SetGraphQLTypeForPgCodec = (
-      codec: PgTypeCodec<any, any, any>,
+      codec: PgTypeCodec<any, any, any, any, any, any, any>,
       situations: string | string[],
       typeName: string,
     ) => void;
@@ -82,8 +85,37 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgBasics: {
-        getRegistryBuilder(): PgRegistryBuilder<any, any, any>;
+        getRegistryBuilder(): PromiseOrDirect<PgRegistryBuilder<any, any, any>>;
+        getRegistry(): PromiseOrDirect<PgRegistry<any, any, any>>;
       };
+    }
+
+    interface GatherHooks {
+      pgBasics_PgRegistryBuilder_init: PluginHook<
+        (event: {
+          registryBuilder: PgRegistryBuilder<any, any, any>;
+        }) => PromiseOrDirect<void>
+      >;
+      pgBasics_PgRegistryBuilder_pgCodecs: PluginHook<
+        (event: {
+          registryBuilder: PgRegistryBuilder<any, any, any>;
+        }) => PromiseOrDirect<void>
+      >;
+      pgBasics_PgRegistryBuilder_pgSources: PluginHook<
+        (event: {
+          registryBuilder: PgRegistryBuilder<any, any, any>;
+        }) => PromiseOrDirect<void>
+      >;
+      pgBasics_PgRegistryBuilder_pgRelations: PluginHook<
+        (event: {
+          registryBuilder: PgRegistryBuilder<any, any, any>;
+        }) => PromiseOrDirect<void>
+      >;
+      pgBasics_PgRegistryBuilder_finalize: PluginHook<
+        (event: {
+          registryBuilder: PgRegistryBuilder<any, any, any>;
+        }) => PromiseOrDirect<void>
+      >;
     }
   }
 }
@@ -92,6 +124,7 @@ interface Cache {}
 
 interface State {
   registryBuilder: PgRegistryBuilder<any, any, any>;
+  registry: PromiseOrDirect<PgRegistry<any, any, any>> | null;
 }
 
 export const PgBasicsPlugin: GraphileConfig.Plugin = {
@@ -103,11 +136,45 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
   gather: <GraphileConfig.PluginGatherConfig<"pgBasics", State, Cache>>{
     namespace: "pgBasics",
     initialCache: (): Cache => ({}),
-    initialState: (): State => ({ registryBuilder: makeRegistryBuilder() }),
+    initialState: (): State => ({
+      registryBuilder: makeRegistryBuilder(),
+      registry: null,
+    }),
     helpers: {
       getRegistryBuilder(info) {
-        return info.state.registryBuilder;
+        const { registryBuilder } = info.state;
+        return registryBuilder;
       },
+      async getRegistry(info) {
+        if (!info.state.registry) {
+          info.state.registry = (async () => {
+            const registryBuilder =
+              await info.helpers.pgBasics.getRegistryBuilder();
+            await info.process("pgBasics_PgRegistryBuilder_init", {
+              registryBuilder,
+            });
+            await info.process("pgBasics_PgRegistryBuilder_pgCodecs", {
+              registryBuilder,
+            });
+            await info.process("pgBasics_PgRegistryBuilder_pgSources", {
+              registryBuilder,
+            });
+            await info.process("pgBasics_PgRegistryBuilder_pgRelations", {
+              registryBuilder,
+            });
+            await info.process("pgBasics_PgRegistryBuilder_finalize", {
+              registryBuilder,
+            });
+            const registry = registryBuilder.build();
+            info.state.registry = registry;
+            return registry;
+          })();
+        }
+        return info.state.registry;
+      },
+    },
+    async main(output, info) {
+      output.pgRegistry = await info.helpers.pgBasics.getRegistry();
     },
   },
 

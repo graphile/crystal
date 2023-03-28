@@ -36,7 +36,7 @@ declare global {
       _columnName(
         this: GraphileBuild.Inflection,
         details: {
-          codec: PgTypeCodec<any, any, any, any>;
+          codec: PgTypeCodec<any, any, any, any, any, any, any>;
           columnName: string;
           skipRowId?: boolean;
         },
@@ -48,7 +48,7 @@ declare global {
        */
       _joinColumnNames(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any, any>,
+        codec: PgTypeCodec<any, any, any, any, any, any, any>,
         names: readonly string[],
       ): string;
 
@@ -61,7 +61,7 @@ declare global {
         this: GraphileBuild.Inflection,
         details: {
           columnName: string;
-          codec: PgTypeCodec<any, any, any>;
+          codec: PgTypeCodec<any, any, any, any, any, any, any>;
         },
       ): string;
     }
@@ -78,8 +78,8 @@ declare global {
 }
 
 function unwrapCodec(
-  codec: PgTypeCodec<any, any, any, any>,
-): PgTypeCodec<any, any, any, any> {
+  codec: PgTypeCodec<any, any, any, any, any, any, any>,
+): PgTypeCodec<any, any, any, any, any, any, any> {
   if (codec.arrayOfCodec) {
     return unwrapCodec(codec.arrayOfCodec);
   }

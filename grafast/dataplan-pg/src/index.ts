@@ -93,6 +93,8 @@ import {
   PlanByUniques,
   TuplePlanMap,
   PgCodecRelation,
+  PgRegistry,
+  PgCodecRelationConfig,
 } from "./interfaces.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
 import {
@@ -296,6 +298,8 @@ export {
   makeRegistryBuilder,
   makePgSourceOptions,
   PgRegistryBuilder,
+  PgRegistry,
+  PgCodecRelationConfig,
   sqlFromArgDigests,
   TempTableStep,
   toPg,

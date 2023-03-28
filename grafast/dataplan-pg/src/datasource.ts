@@ -44,6 +44,7 @@ import type {
   PgTypeCodecWithColumns,
   PgRegistryConfig,
   Expand,
+  PgCodecRelationConfig,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
@@ -595,7 +596,7 @@ export class PgSource<
     }
     if (typeof via === "string") {
       // Check
-      const relation = this.getRelation(via);
+      const relation = this.getRelation(via as any);
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
@@ -925,6 +926,7 @@ export interface PgRegistryBuilder<
     };
   },
 > {
+  getRegistryConfig(): PgRegistryConfig<TCodecs, TSources, TRelations>;
   addCodec<const TCodec extends PgTypeCodecAny>(
     codec: TCodec,
   ): PgRegistryBuilder<
@@ -968,7 +970,7 @@ export interface PgRegistryBuilder<
     const TCodecRelationName extends string,
     TRemoteSource extends PgSourceOptions<any, any, any, any>,
     const TCodecRelation extends Omit<
-      PgCodecRelation<TCodec, TRemoteSource>,
+      PgCodecRelationConfig<TCodec, TRemoteSource>,
       "localCodec" | "remoteSource"
     >,
   >(
@@ -1091,6 +1093,9 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     pgRelations: {},
   };
   const builder: PgRegistryBuilder<any, any, any> = {
+    getRegistryConfig() {
+      return registryConfig;
+    },
     addCodec(codec) {
       registryConfig.pgCodecs[codec.name] = codec;
       return builder;
