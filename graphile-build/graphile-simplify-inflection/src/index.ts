@@ -1,7 +1,9 @@
 import type {
   PgCodecRelation,
+  PgSource,
   PgSourceUnique,
   PgTypeCodec,
+  PgTypeCodecWithColumns,
 } from "@dataplan/pg";
 import type {} from "graphile-build";
 import type {} from "graphile-build-pg";
@@ -52,7 +54,7 @@ declare global {
       getBaseNameFromKeys(
         this: GraphileBuild.Inflection,
         detailedKeys: Array<{
-          codec: PgTypeCodec<any, any, any, any>;
+          codec: PgTypeCodec<any, any, any, any, any, any, any>;
           columnName: string;
         }>,
       ): string | null;
@@ -279,8 +281,8 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       singleRelation(previous, _options, details) {
         const { source, relationName } = details;
         const relation = source.getRelation(relationName) as PgCodecRelation<
-          any,
-          any
+          PgTypeCodecWithColumns,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
@@ -295,15 +297,15 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (baseName) {
           return this.camelCase(baseName);
         }
-        const foreignPk = (relation.source.uniques as PgSourceUnique[]).find(
-          (u) => u.isPrimary,
-        );
+        const foreignPk = (
+          relation.remoteSource.uniques as PgSourceUnique[]
+        ).find((u) => u.isPrimary);
         if (
           foreignPk &&
           arraysMatch(foreignPk.columns, relation.remoteColumns)
         ) {
           return this.camelCase(
-            `${this._singularizedCodecName(relation.source.codec)}`,
+            `${this._singularizedCodecName(relation.remoteSource.codec)}`,
           );
         }
         return previous!.call(this, details);
@@ -312,8 +314,8 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       singleRelationBackwards(previous, _options, details) {
         const { source, relationName } = details;
         const relation = source.getRelation(relationName) as PgCodecRelation<
-          any,
-          any
+          PgTypeCodecWithColumns,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         if (
           typeof relation.extensions?.tags?.foreignSingleFieldName === "string"
@@ -325,7 +327,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         }
         const detailedKeys = (relation.remoteColumns as string[]).map(
           (columnName) => ({
-            codec: relation.source.codec,
+            codec: relation.remoteSource.codec,
             columnName,
           }),
         );
@@ -335,13 +337,13 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           if (oppositeBaseName) {
             return this.camelCase(
               `${oppositeBaseName}-${this._singularizedCodecName(
-                relation.source.codec,
+                relation.remoteSource.codec,
               )}`,
             );
           }
           if (this.baseNameMatches(baseName, source.name)) {
             return this.camelCase(
-              `${this._singularizedCodecName(relation.source.codec)}`,
+              `${this._singularizedCodecName(relation.remoteSource.codec)}`,
             );
           }
         }
@@ -350,7 +352,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         );
         if (pk && arraysMatch(pk.columns, relation.localColumns)) {
           return this.camelCase(
-            `${this._singularizedCodecName(relation.source.codec)}`,
+            `${this._singularizedCodecName(relation.remoteSource.codec)}`,
           );
         }
         return previous!.call(this, details);
@@ -359,8 +361,8 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       _manyRelation(previous, _options, details) {
         const { source, relationName } = details;
         const relation = source.getRelation(relationName) as PgCodecRelation<
-          any,
-          any
+          PgTypeCodecWithColumns,
+          PgSource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
@@ -368,7 +370,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         }
         const detailedKeys = (relation.remoteColumns as string[]).map(
           (columnName) => ({
-            codec: relation.source.codec,
+            codec: relation.remoteSource.codec,
             columnName,
           }),
         );
@@ -378,25 +380,25 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           if (oppositeBaseName) {
             return this.camelCase(
               `${oppositeBaseName}-${this.distinctPluralize(
-                this._singularizedCodecName(relation.source.codec),
+                this._singularizedCodecName(relation.remoteSource.codec),
               )}`,
             );
           }
           if (this.baseNameMatches(baseName, source.name)) {
             return this.camelCase(
               `${this.distinctPluralize(
-                this._singularizedCodecName(relation.source.codec),
+                this._singularizedCodecName(relation.remoteSource.codec),
               )}`,
             );
           }
         }
-        const pk = (relation.source.uniques as PgSourceUnique[]).find(
+        const pk = (relation.remoteSource.uniques as PgSourceUnique[]).find(
           (u) => u.isPrimary,
         );
         if (pk && arraysMatch(pk.columns, relation.remoteColumns)) {
           return this.camelCase(
             `${this.distinctPluralize(
-              this._singularizedCodecName(relation.source.codec),
+              this._singularizedCodecName(relation.remoteSource.codec),
             )}`,
           );
         }

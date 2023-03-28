@@ -7,6 +7,7 @@
 
 import {
   PgExecutorContextPlans,
+  PgRegistryAny,
   WithPgClient,
   makePgSourceOptions,
 } from "@dataplan/pg";
@@ -391,7 +392,7 @@ async function main() {
 
   // We're crafting our own input
   const input: GraphileBuild.BuildInput = {
-    pgRegistry: registry,
+    pgRegistry: registry as unknown as PgRegistryAny,
   };
   const schema = buildSchema(config, input);
 
