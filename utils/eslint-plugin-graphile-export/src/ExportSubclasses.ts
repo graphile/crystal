@@ -1,6 +1,6 @@
 import type { ClassDeclaration, Property } from "@babel/types";
 import type { Rule } from "eslint";
-import type { Node as ESTreeNode } from "estree";
+import type { Node as ESTreeNode, PropertyDefinition } from "estree";
 import { basename } from "path";
 
 import { reportProblem } from "./common.js";
@@ -77,7 +77,7 @@ export const ExportSubclasses: Rule.RuleModule = {
         const isGeneric = !!(node as unknown as ClassDeclaration)
           .typeParameters;
         const $$export = node.body.body.find(
-          (def) =>
+          (def): def is PropertyDefinition =>
             def.type === "PropertyDefinition" &&
             def.key.type === "Identifier" &&
             def.key.name === "$$export",
