@@ -22,7 +22,7 @@
     }
   },
   "scripts": {
-    "webpack": "node --loader ts-node/esm node_modules/.bin/webpack-cli",
+    "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\"",
     "watch": "yarn webpack --watch --mode=development",
     "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo && tsc -b && yarn webpack --mode=production"
   },
