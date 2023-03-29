@@ -674,7 +674,7 @@ function addRelations(
       PgTypeCodecWithColumns,
       PgSource<any, PgTypeCodecWithColumns, any, any, any>
     >;
-  } = source?.getRelations();
+  } = source?.getRelations() ?? Object.create(null);
 
   // Don't use refs on mutation payloads
   const refDefinitionList: Array<{
