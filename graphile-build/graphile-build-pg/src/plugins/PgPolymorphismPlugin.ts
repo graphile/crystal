@@ -7,7 +7,6 @@ import "./PgTablesPlugin.js";
 import type {
   PgCodecRef,
   PgCodecRelation,
-  PgCodecRelationConfig,
   PgRefDefinition,
   PgSource,
   PgSourceOptions,
