@@ -477,16 +477,29 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             addBehaviorToTags(tags, "-delete");
           }
 
+          const isVirtual = !["r", "v", "m", "f", "p"].includes(
+            pgClass.relkind,
+          );
+          const extensions = {
+            description,
+            pg: {
+              databaseName,
+              schemaName: pgClass.getNamespace()!.nspname,
+              name: pgClass.relname,
+            },
+            tags: {
+              ...tags,
+            },
+          } as const;
           const options = EXPORTABLE(
             (
               codec,
-              databaseName,
               description,
               executor,
+              extensions,
               identifier,
+              isVirtual,
               name,
-              pgClass,
-              tags,
               uniques,
             ) =>
               ({
@@ -496,30 +509,19 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 source: codec.sqlType,
                 codec,
                 uniques,
-                isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
+                isVirtual,
                 // TODO: consistency: either remove `description` from here or from `extensions` throughout.
                 description,
-                extensions: {
-                  description,
-                  pg: {
-                    databaseName,
-                    schemaName: pgClass.getNamespace()!.nspname,
-                    name: pgClass.relname,
-                  },
-                  tags: {
-                    ...tags,
-                  },
-                },
+                extensions,
               } as const),
             [
               codec,
-              databaseName,
               description,
               executor,
+              extensions,
               identifier,
+              isVirtual,
               name,
-              pgClass,
-              tags,
               uniques,
             ],
           );
