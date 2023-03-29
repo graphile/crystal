@@ -1055,11 +1055,23 @@ export function makeRegistry<
     pgRelations: Object.create(null) as any, //config.pgRelations,
   };
 
-  for (const key of Object.keys(config.pgSources) as (keyof TSourceOptions)[]) {
-    registry.pgSources[key] = new PgSource(
-      registry,
-      config.pgSources[key],
-    ) as any;
+  for (const sourceName of Object.keys(
+    config.pgSources,
+  ) as (keyof TSourceOptions)[]) {
+    const source = new PgSource(registry, config.pgSources[sourceName]) as any;
+
+    // This is the magic that breaks the circular reference: rather than
+    // building PgSource via a factory we tell the system to just retrieve it
+    // from the already build registry.
+    Object.defineProperties(source, {
+      $exporter$args: { value: [registry, sourceName] },
+      $exporter$factory: {
+        value: (registry: PgRegistry<any, any, any>, sourceName: string) =>
+          registry.pgSources[sourceName],
+      },
+    });
+
+    registry.pgSources[sourceName] = source;
   }
 
   for (const codecName of Object.keys(
