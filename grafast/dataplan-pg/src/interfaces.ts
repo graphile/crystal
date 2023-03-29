@@ -587,7 +587,7 @@ export interface PgRegistryConfig<
   TSourceOptions extends {
     [name in string]: PgSourceOptions<
       PgTypeCodecAny,
-      ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+      ReadonlyArray<PgSourceUnique<PgTypeColumns<any>>>,
       readonly PgSourceParameterAny[] | undefined,
       name
     >;

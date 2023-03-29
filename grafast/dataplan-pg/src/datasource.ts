@@ -884,20 +884,6 @@ export class PgSource<
 }
 exportAs("@dataplan/pg", PgSource, "PgSource");
 
-/*
-export function makeRegistry<
-TInCodec,
-TInSource
->(codecs: TCodecs[], sources: TSources[]) {
-  const foo = {
-    withRelation(relation: PgCodecRelation<>):
-  };
-  return foo;
-  return function withRelations(relations: TRelations):  {
-  }
-}
-*/
-
 export interface PgRegistryBuilder<
   TCodecs extends {
     [name in string]: PgTypeCodec<
@@ -927,7 +913,11 @@ export interface PgRegistryBuilder<
     };
   },
 > {
-  getRegistryConfig(): PgRegistryConfig<TCodecs, TSources, TRelations>;
+  getRegistryConfig(): PgRegistryConfig<
+    Expand<TCodecs>,
+    Expand<TSources>,
+    Expand<TRelations>
+  >;
   addCodec<const TCodec extends PgTypeCodecAny>(
     codec: TCodec,
   ): PgRegistryBuilder<
@@ -987,7 +977,7 @@ export interface PgRegistryBuilder<
           [codecName in UName]: {
             [relationName in TCodecRelationName]: TCodecRelation & {
               localCodec: TCodec;
-              remoteSource: TRemoteSource;
+              remoteSourceOptions: TRemoteSource;
             };
           };
         }
@@ -1033,7 +1023,7 @@ export function makeRegistry<
   TSourceOptions extends {
     [name in string]: PgSourceOptions<
       PgTypeCodecAny,
-      ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
+      ReadonlyArray<PgSourceUnique<PgTypeColumns<any>>>,
       readonly PgSourceParameterAny[] | undefined,
       name
     >;
@@ -1050,10 +1040,50 @@ export function makeRegistry<
   config: PgRegistryConfig<TCodecs, TSourceOptions, TRelations>,
 ): PgRegistry<TCodecs, TSourceOptions, TRelations> {
   const registry: PgRegistry<TCodecs, TSourceOptions, TRelations> = {
-    pgCodecs: config.pgCodecs,
+    pgCodecs: Object.create(null) as any,
     pgSources: Object.create(null) as any,
-    pgRelations: Object.create(null) as any, //config.pgRelations,
+    pgRelations: Object.create(null) as any,
   };
+
+  // Tell the system to read the built pgCodecs, pgSources, pgRelations from the registry
+  Object.defineProperties(registry.pgCodecs, {
+    $exporter$args: { value: [registry] },
+    $exporter$factory: {
+      value: (registry: PgRegistry<any, any, any>) => registry.pgCodecs,
+    },
+  });
+  Object.defineProperties(registry.pgSources, {
+    $exporter$args: { value: [registry] },
+    $exporter$factory: {
+      value: (registry: PgRegistry<any, any, any>) => registry.pgSources,
+    },
+  });
+  Object.defineProperties(registry.pgRelations, {
+    $exporter$args: { value: [registry] },
+    $exporter$factory: {
+      value: (registry: PgRegistry<any, any, any>) => registry.pgRelations,
+    },
+  });
+
+  for (const [codecName, codecSpec] of Object.entries(config.pgCodecs)) {
+    if ((codecSpec as any).$exporter$factory) {
+      registry.pgCodecs[codecName as keyof TCodecs] = codecSpec as any;
+    } else {
+      // Custom spec, pin it back to the registry
+      const codec = { ...codecSpec };
+
+      // Tell the system to read the built codec from the registry
+      Object.defineProperties(codec, {
+        $exporter$args: { value: [registry, codecName] },
+        $exporter$factory: {
+          value: (registry: PgRegistry<any, any, any>, codecName: string) =>
+            registry.pgCodecs[codecName],
+        },
+      });
+
+      registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
+    }
+  }
 
   for (const sourceName of Object.keys(
     config.pgSources,
@@ -1081,7 +1111,18 @@ export function makeRegistry<
     if (!relations) {
       continue;
     }
-    registry.pgRelations[codecName] = Object.create(null);
+
+    const builtRelations = Object.create(null);
+
+    // Tell the system to read the built relations from the registry
+    Object.defineProperties(builtRelations, {
+      $exporter$args: { value: [registry, codecName] },
+      $exporter$factory: {
+        value: (registry: PgRegistry<any, any, any>, codecName: string) =>
+          registry.pgRelations[codecName],
+      },
+    });
+
     for (const relationName of Object.keys(
       relations,
     ) as (keyof typeof relations)[]) {
@@ -1090,14 +1131,31 @@ export function makeRegistry<
         continue;
       }
       const { remoteSourceOptions, ...rest } = relation;
-      (registry.pgRelations as any)[codecName][relationName] = {
+
+      const builtRelation = {
         ...rest,
         remoteSource: registry.pgSources[remoteSourceOptions.name],
       } as PgCodecRelation<
         PgTypeCodecWithColumns,
         PgSource<any, PgTypeCodecWithColumns, any, any, any>
       >;
+
+      // Tell the system to read the built relation from the registry
+      Object.defineProperties(builtRelation, {
+        $exporter$args: { value: [registry, codecName, relationName] },
+        $exporter$factory: {
+          value: (
+            registry: PgRegistry<any, any, any>,
+            codecName: string,
+            relationName: string,
+          ) => registry.pgRelations[codecName][relationName],
+        },
+      });
+
+      builtRelations[relationName] = builtRelation;
     }
+
+    registry.pgRelations[codecName] = builtRelations;
   }
 
   return registry;

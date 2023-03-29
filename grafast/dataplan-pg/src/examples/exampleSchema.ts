@@ -66,7 +66,8 @@ import sql from "pg-sql2";
 //import prettier from "prettier";
 import { inspect } from "util";
 
-import type {
+import {
+  makeRegistry,
   PgConditionStep,
   PgExecutorContextPlans,
   PgInsertStep,
@@ -101,7 +102,11 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type { GetPgSourceColumns, PgTypeCodecAny } from "../interfaces";
+import type {
+  GetPgSourceColumns,
+  PgRegistryConfig,
+  PgTypeCodecAny,
+} from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -175,7 +180,7 @@ export function makeExampleSchema(
     [sql],
   );
 
-  const registry = EXPORTABLE(
+  const registryConfig = EXPORTABLE(
     (
       PgSource,
       TYPES,
@@ -1576,7 +1581,7 @@ export function makeExampleSchema(
             isUnique: true,
           },
         )
-        .build();
+        .getRegistryConfig();
     },
     [
       PgSource,
@@ -1591,6 +1596,11 @@ export function makeExampleSchema(
       sql,
       sqlFromArgDigests,
     ],
+  );
+
+  const registry = EXPORTABLE(
+    (makeRegistry, registryConfig) => makeRegistry(registryConfig),
+    [makeRegistry, registryConfig],
   );
 
   /*
