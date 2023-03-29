@@ -17,7 +17,7 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_items__."type2" as "1",
+    __relational_items__."type2"::text as "1",
     __relational_items__."position"::text as "2",
     __relational_posts__."id"::text as "3",
     __relational_posts__."title" as "4",
@@ -46,7 +46,7 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_items__."type2" as "1",
+    __relational_items__."type2"::text as "1",
     __relational_items__."position"::text as "2",
     __relational_checklists__."id"::text as "3",
     __relational_checklists__."title" as "4",
@@ -73,7 +73,7 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_items__."type2" as "1",
+    __relational_items__."type2"::text as "1",
     __relational_items__."position"::text as "2",
     __relational_checklist_items__."id"::text as "3",
     __relational_checklist_items__."description" as "4",

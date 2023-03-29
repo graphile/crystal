@@ -5,7 +5,7 @@ select
       __single_table_items__."type"::text as "0",
       __single_table_items__."parent_id"::text as "1",
       __single_table_items__."id"::text as "2",
-      __single_table_items__."type2" as "3",
+      __single_table_items__."type2"::text as "3",
       __single_table_items__."author_id"::text as "4",
       __single_table_items__."position"::text as "5",
       to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "6",
@@ -37,7 +37,7 @@ from (
 lateral (
   select
     __single_table_items__."type"::text as "0",
-    __single_table_items__."type2" as "1",
+    __single_table_items__."type2"::text as "1",
     __single_table_items__."author_id"::text as "2",
     __single_table_items__."position"::text as "3",
     to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "4",

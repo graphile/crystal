@@ -5,7 +5,7 @@ select
       __relational_items__."type"::text as "0",
       __relational_items__."id"::text as "1",
       __relational_items__."parent_id"::text as "2",
-      __relational_items__."type2" as "3"
+      __relational_items__."type2"::text as "3"
     from interfaces_and_unions.relational_items as __relational_items__
     where
       (
@@ -53,7 +53,7 @@ lateral (
   select
     __relational_items__."type"::text as "0",
     __relational_items__."id"::text as "1",
-    __relational_items__."type2" as "2",
+    __relational_items__."type2"::text as "2",
     __relational_items_identifiers__.idx as "3"
   from interfaces_and_unions.relational_items as __relational_items__
   where

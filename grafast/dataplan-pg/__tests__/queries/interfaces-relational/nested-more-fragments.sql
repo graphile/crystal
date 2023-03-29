@@ -5,7 +5,7 @@ select
       __relational_items__."type"::text as "0",
       __relational_items__."id"::text as "1",
       __relational_items__."parent_id"::text as "2",
-      __relational_items__."type2" as "3",
+      __relational_items__."type2"::text as "3",
       __relational_items__."author_id"::text as "4",
       __relational_items__."position"::text as "5",
       to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "6",
@@ -60,7 +60,7 @@ lateral (
   select
     __relational_items__."type"::text as "0",
     __relational_items__."id"::text as "1",
-    __relational_items__."type2" as "2",
+    __relational_items__."type2"::text as "2",
     __relational_items__."author_id"::text as "3",
     __relational_items__."position"::text as "4",
     to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "5",
