@@ -86,7 +86,7 @@
     "eventemitter3": "^4.0.7",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "iterall": "^1.3.0",
-    "jest": "^28.1.0",
+    "jest": "^28.1.3",
     "license-checker-webpack-plugin": "^0.2.1",
     "lodash": "^4.17.21",
     "mermaid": "^8.14.0",
