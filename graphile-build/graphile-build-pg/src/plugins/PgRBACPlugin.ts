@@ -93,8 +93,8 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           addBehaviorToTags(column.extensions!.tags!, parts.join(" "));
         }
       },
-      async pgProcedures_PgSource(info, event) {
-        const { pgProc, databaseName, source } = event;
+      async pgProcedures_PgSourceOptions(info, event) {
+        const { pgProc, databaseName, sourceOptions } = event;
         const db = await info.helpers.pgIntrospection.getDatabase(databaseName);
         const { introspection } = db;
 
@@ -110,11 +110,12 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           true,
         );
         if (!permissions.execute) {
-          source.extensions = source.extensions || Object.create(null);
-          source.extensions!.tags =
-            source.extensions!.tags || Object.create(null);
+          sourceOptions.extensions =
+            sourceOptions.extensions || Object.create(null);
+          sourceOptions.extensions!.tags =
+            sourceOptions.extensions!.tags || Object.create(null);
           addBehaviorToTags(
-            source.extensions!.tags!,
+            sourceOptions.extensions!.tags!,
             "-queryField -mutationField -typeField -orderBy -filterBy",
           );
         }

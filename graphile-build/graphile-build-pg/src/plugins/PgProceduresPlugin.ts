@@ -78,28 +78,20 @@ declare global {
     }
 
     interface GatherHooks {
-      pgProcedures_PgSource: PluginHook<
+      pgProcedures_functionSourceOptions: PluginHook<
         (event: {
-          source: PgSource<any, any, any, any, any>;
-          pgProc: PgProc;
           databaseName: string;
+          pgProc: PgProc;
+          baseSourceOptions: PgSourceOptions<any, any, any, any>;
+          functionSourceOptions: PgFunctionSourceOptions<any, any, any, any>;
         }) => void | Promise<void>
       >;
 
-      // TODO: should pgProcedures_functionSource_options and pgProcedures_PgSource_options be the same hook?
-      pgProcedures_functionSource_options: PluginHook<
+      pgProcedures_PgSourceOptions: PluginHook<
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          options: PgFunctionSourceOptions<any, any, any, any>;
-        }) => void | Promise<void>
-      >;
-
-      pgProcedures_PgSource_options: PluginHook<
-        (event: {
-          databaseName: string;
-          pgProc: PgProc;
-          options: PgSourceOptions<any, any, any, any>;
+          sourceOptions: PgSourceOptions<any, any, any, any>;
         }) => void | Promise<void>
       >;
     }
@@ -504,16 +496,29 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               description,
             };
 
-            await info.process("pgProcedures_functionSource_options", {
+            await info.process("pgProcedures_functionSourceOptions", {
               databaseName,
               pgProc,
-              options,
+              baseSourceOptions: sourceConfig,
+              functionSourceOptions: options,
             });
 
-            return EXPORTABLE(
+            const finalSourceOptions = EXPORTABLE(
               (options, sourceConfig) =>
                 PgSource.functionSourceOptions(sourceConfig, options),
               [options, sourceConfig],
+            );
+
+            await info.process("pgProcedures_PgSourceOptions", {
+              databaseName,
+              pgProc,
+              sourceOptions: finalSourceOptions,
+            });
+
+            return EXPORTABLE(
+              (makePgSourceOptions, finalSourceOptions) =>
+                makePgSourceOptions(finalSourceOptions),
+              [makePgSourceOptions, finalSourceOptions],
             );
           } else {
             const options: PgSourceOptions<any, any, any, any> = {
@@ -529,10 +534,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               extensions,
               description,
             };
-            await info.process("pgProcedures_PgSource_options", {
+
+            await info.process("pgProcedures_PgSourceOptions", {
               databaseName,
               pgProc,
-              options,
+              sourceOptions: options,
             });
 
             return EXPORTABLE(
@@ -618,27 +624,5 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         helpers.pgProcedures.getSourceOptions(databaseName, pgProc);
       },
     },
-    // TODO: is this needed?
-    /*
-    async main(output, info) {
-      for (const [
-        databaseName,
-        sourceOptionsByPgProc,
-      ] of info.state.sourceOptionsByPgProcByDatabase.entries()) {
-        for (const [pgProc, sourcePromise] of sourceOptionsByPgProc.entries()) {
-          const source = await sourcePromise;
-          if (!source) {
-            continue;
-          }
-          await info.process("pgProcedures_PgSource", {
-            source,
-            pgProc,
-            databaseName,
-          });
-          output.pgSources!.push(source);
-        }
-      }
-    },
-    */
   } as GraphileConfig.PluginGatherConfig<"pgProcedures", State, Cache>,
 };
