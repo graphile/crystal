@@ -184,7 +184,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           PgTypeCodecWithColumns,
           PgSource<any, PgTypeCodecWithColumns, any, any, any>
         >;
-        //const codec = relation.source.codec;
+        //const codec = relation.remoteSource.codec;
         if (typeof relation.extensions?.tags.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }

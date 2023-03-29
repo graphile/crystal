@@ -170,7 +170,7 @@ export async function runTestQuery(
         const document = parse(source);
 
         const operationAST = getOperationAST(document, undefined);
-        const operationType = operationAST.operation;
+        const operationType = operationAST!.operation;
 
         const validationErrors = validate(schema, document);
         if (validationErrors.length > 0) {

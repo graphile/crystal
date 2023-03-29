@@ -596,11 +596,16 @@ export class PgSource<
     }
     if (typeof via === "string") {
       // Check
-      const relation = this.getRelation(via as any);
+      const relation = this.getRelation(
+        via as any,
+      ) as unknown as PgCodecRelation<
+        PgTypeCodecWithColumns,
+        PgSource<any, PgTypeCodecWithColumns, any, any, any>
+      >;
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
-      if (!relation.source.codec.columns[attr]) {
+      if (!relation.remoteSource.codec.columns[attr]) {
         throw new Error(
           `${this} relation '${via}' does not have column '${attr}'`,
         );
@@ -641,29 +646,27 @@ export class PgSource<
     }
     const otherRelation =
       this.registry.pgRelations[otherCodec.name]?.[otherRelationName];
-    const relations = this.getRelations();
-    const reciprocal = (
-      Object.entries(relations) as Array<
-        [
-          relationName: keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
-          relation: GetPgRegistryCodecRelations<
-            TRegistry,
-            TCodec
-          >[keyof GetPgRegistryCodecRelations<TRegistry, TCodec>],
-        ]
+    const relations = this.getRelations() as unknown as Record<
+      string,
+      PgCodecRelation<
+        PgTypeCodecWithColumns,
+        PgSource<any, PgTypeCodecWithColumns, any, any, any>
       >
-    ).find(([_relationName, relation]) => {
-      if (relation.source.codec !== otherCodec) {
-        return false;
-      }
-      if (!arraysMatch(relation.localColumns, otherRelation.remoteColumns)) {
-        return false;
-      }
-      if (!arraysMatch(relation.remoteColumns, otherRelation.localColumns)) {
-        return false;
-      }
-      return true;
-    });
+    >;
+    const reciprocal = Object.entries(relations).find(
+      ([_relationName, relation]) => {
+        if (relation.remoteSource.codec !== otherCodec) {
+          return false;
+        }
+        if (!arraysMatch(relation.localColumns, otherRelation.remoteColumns)) {
+          return false;
+        }
+        if (!arraysMatch(relation.remoteColumns, otherRelation.localColumns)) {
+          return false;
+        }
+        return true;
+      },
+    );
     return (reciprocal as [string, PgCodecRelation<any, any>]) || null;
   }
 
