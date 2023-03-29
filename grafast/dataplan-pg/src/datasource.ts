@@ -1066,39 +1066,32 @@ export function makeRegistry<
   });
 
   function addCodec(
-    codecSpec: PgTypeCodecAny,
+    codec: PgTypeCodecAny,
   ): PgTypeCodec<any, any, any, any, any, any, any> {
-    const codecName = codecSpec.name;
+    const codecName = codec.name;
     if (registry.pgCodecs[codecName]) {
       return registry.pgCodecs[codecName];
-    } else if ((codecSpec as any).$$export) {
-      registry.pgCodecs[codecName as keyof TCodecs] = codecSpec as any;
-      return codecSpec;
+    } else if ((codec as any).$$export || (codec as any).$exporter$factory) {
+      registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
+      return codec;
     } else {
       // Custom spec, pin it back to the registry
-      const codec = {
-        ...codecSpec,
-      };
       registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
 
       if (codec.columns) {
         const prevCols = codec.columns as PgTypeColumns;
-        codec.columns = Object.create(null) as PgTypeColumns;
-        for (const [key, col] of Object.entries(prevCols)) {
-          codec.columns[key] = {
-            ...col,
-            codec: addCodec(col.codec),
-          };
+        for (const col of Object.values(prevCols)) {
+          addCodec(col.codec);
         }
       }
       if (codec.arrayOfCodec) {
-        codec.arrayOfCodec = addCodec(codec.arrayOfCodec);
+        addCodec(codec.arrayOfCodec);
       }
       if (codec.domainOfCodec) {
-        codec.domainOfCodec = addCodec(codec.domainOfCodec);
+        addCodec(codec.domainOfCodec);
       }
       if (codec.rangeOfCodec) {
-        codec.rangeOfCodec = addCodec(codec.rangeOfCodec);
+        addCodec(codec.rangeOfCodec);
       }
 
       // Tell the system to read the built codec from the registry
@@ -1127,7 +1120,7 @@ export function makeRegistry<
   ][]) {
     const sourceConfig = {
       ...rawConfig,
-      codec: registry.pgCodecs[rawConfig.codec.name],
+      codec: addCodec(rawConfig.codec),
       parameters: rawConfig.parameters
         ? (rawConfig.parameters as readonly PgSourceParameterAny[]).map(
             (p) => ({
@@ -1183,7 +1176,7 @@ export function makeRegistry<
 
       const builtRelation = {
         ...rest,
-        localCodec: registry.pgCodecs[localCodec.name],
+        localCodec: addCodec(localCodec),
         remoteSource: registry.pgSources[remoteSourceOptions.name],
       } as PgCodecRelation<
         PgTypeCodecWithColumns,
