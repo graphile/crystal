@@ -1101,7 +1101,23 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return registryConfig;
     },
     addCodec(codec) {
-      registryConfig.pgCodecs[codec.name] = codec;
+      if (!registryConfig.pgCodecs[codec.name]) {
+        registryConfig.pgCodecs[codec.name] = codec;
+        if (codec.arrayOfCodec) {
+          this.addCodec(codec.arrayOfCodec);
+        }
+        if (codec.domainOfCodec) {
+          this.addCodec(codec.domainOfCodec);
+        }
+        if (codec.rangeOfCodec) {
+          this.addCodec(codec.rangeOfCodec);
+        }
+        if (codec.columns) {
+          for (const col of Object.values(codec.columns)) {
+            this.addCodec(col.codec);
+          }
+        }
+      }
       return builder;
     },
     /*
@@ -1113,6 +1129,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     },
     */
     addSource(source) {
+      this.addCodec(source.codec);
       registryConfig.pgSources[source.name] = source;
       return builder;
     },
@@ -1124,15 +1141,28 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return builder;
     },
     */
-    addRelation(localCodec, relationName, remoteSource, relation) {
+    addRelation(localCodec, relationName, remoteSourceOptions, relation) {
+      if (!registryConfig.pgCodecs[localCodec.name]) {
+        throw new Error(
+          `Adding a relation before adding the codec is forbidden.`,
+        );
+      }
+      if (!registryConfig.pgSources[remoteSourceOptions.name]) {
+        throw new Error(
+          `Adding a relation before adding the source is forbidden.`,
+        );
+      }
       if (!registryConfig.pgRelations[localCodec.name]) {
         registryConfig.pgRelations[localCodec.name] = Object.create(null);
       }
       registryConfig.pgRelations[localCodec.name][relationName] = {
         localCodec,
-        remoteSource,
+        remoteSourceOptions,
         ...relation,
-      };
+      } as PgCodecRelationConfig<
+        PgTypeCodecWithColumns,
+        PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+      >;
       return builder;
     },
     build() {
