@@ -1065,12 +1065,41 @@ export function makeRegistry<
     },
   });
 
-  for (const [codecName, codecSpec] of Object.entries(config.pgCodecs)) {
-    if ((codecSpec as any).$exporter$factory) {
+  function addCodec(
+    codecSpec: PgTypeCodecAny,
+  ): PgTypeCodec<any, any, any, any, any, any, any> {
+    const codecName = codecSpec.name;
+    if (registry.pgCodecs[codecName]) {
+      return registry.pgCodecs[codecName];
+    } else if ((codecSpec as any).$$export) {
       registry.pgCodecs[codecName as keyof TCodecs] = codecSpec as any;
+      return codecSpec;
     } else {
       // Custom spec, pin it back to the registry
-      const codec = { ...codecSpec };
+      const codec = {
+        ...codecSpec,
+      };
+      registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
+
+      if (codec.columns) {
+        const prevCols = codec.columns as PgTypeColumns;
+        codec.columns = Object.create(null) as PgTypeColumns;
+        for (const [key, col] of Object.entries(prevCols)) {
+          codec.columns[key] = {
+            ...col,
+            codec: addCodec(col.codec),
+          };
+        }
+      }
+      if (codec.arrayOfCodec) {
+        codec.arrayOfCodec = addCodec(codec.arrayOfCodec);
+      }
+      if (codec.domainOfCodec) {
+        codec.domainOfCodec = addCodec(codec.domainOfCodec);
+      }
+      if (codec.rangeOfCodec) {
+        codec.rangeOfCodec = addCodec(codec.rangeOfCodec);
+      }
 
       // Tell the system to read the built codec from the registry
       Object.defineProperties(codec, {
@@ -1081,14 +1110,34 @@ export function makeRegistry<
         },
       });
 
-      registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
+      return codec;
     }
   }
 
-  for (const sourceName of Object.keys(
-    config.pgSources,
-  ) as (keyof TSourceOptions)[]) {
-    const source = new PgSource(registry, config.pgSources[sourceName]) as any;
+  for (const [codecName, codecSpec] of Object.entries(config.pgCodecs)) {
+    if (codecName !== codecSpec.name) {
+      throw new Error(`Codec added to registry with wrong name`);
+    }
+    addCodec(codecSpec);
+  }
+
+  for (const [sourceName, rawConfig] of Object.entries(config.pgSources) as [
+    keyof TSourceOptions,
+    PgSourceOptions<any, any, any, any>,
+  ][]) {
+    const sourceConfig = {
+      ...rawConfig,
+      codec: registry.pgCodecs[rawConfig.codec.name],
+      parameters: rawConfig.parameters
+        ? (rawConfig.parameters as readonly PgSourceParameterAny[]).map(
+            (p) => ({
+              ...p,
+              codec: addCodec(p.codec),
+            }),
+          )
+        : rawConfig.parameters,
+    };
+    const source = new PgSource(registry, sourceConfig) as any;
 
     // This is the magic that breaks the circular reference: rather than
     // building PgSource via a factory we tell the system to just retrieve it
@@ -1130,10 +1179,11 @@ export function makeRegistry<
       if (!relation) {
         continue;
       }
-      const { remoteSourceOptions, ...rest } = relation;
+      const { localCodec, remoteSourceOptions, ...rest } = relation;
 
       const builtRelation = {
         ...rest,
+        localCodec: registry.pgCodecs[localCodec.name],
         remoteSource: registry.pgSources[remoteSourceOptions.name],
       } as PgCodecRelation<
         PgTypeCodecWithColumns,
