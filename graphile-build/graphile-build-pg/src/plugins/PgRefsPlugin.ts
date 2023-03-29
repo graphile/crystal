@@ -268,7 +268,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 >,
               ];
               const relationEntries = Object.entries(
-                registryConfig.pgRelations[sourceOptions.codec.name],
+                registryConfig.pgRelations[currentSourceOptions.codec.name],
               ) as Array<RelationEntry>;
               const part = rawPart.trim();
               // TODO: allow whitespace
@@ -305,7 +305,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 }
 
                 relationEntry = relationEntries.find(([, rel]) => {
-                  if (rel.remoteSourceOptions.name !== targetCodec.name) {
+                  if (rel.remoteSourceOptions.codec !== targetCodec) {
                     return false;
                   }
                   if (!arraysMatch(rel.localColumns, localColumns)) {

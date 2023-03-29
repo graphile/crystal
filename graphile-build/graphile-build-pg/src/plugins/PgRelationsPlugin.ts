@@ -661,6 +661,8 @@ function addRelations(
     return fields;
   }
   const allPgSources = Object.values(build.input.pgRegistry.pgSources);
+  // TODO: now that refs relate to _codecs_ rather than _sources_ a lot of this
+  // is really hacky. We should tidy it up.
   // TODO: change the default so that we don't do this on
   // isMutationPayload; only do that for V4 compat. (It's redundant vs
   // just using the object type directly)
@@ -694,15 +696,16 @@ function addRelations(
     codec?: PgTypeCodec<any, any, any, any, any, any, any>;
   }> = isMutationPayload
     ? []
-    : source && source.codec.refs
-    ? Object.entries(source.codec.refs).map(([refName, spec]) => ({
-        refName,
-        refDefinition: spec.definition,
-        ref: spec,
-      }))
+    : (source?.codec ?? codec).refs
+    ? Object.entries((source?.codec ?? codec)!.refs!).map(
+        ([refName, spec]) => ({
+          refName,
+          refDefinition: spec.definition,
+          ref: spec,
+        }),
+      )
     : Object.entries(
-        codec.refs ??
-          codec.extensions?.refDefinitions ??
+        codec.extensions?.refDefinitions ??
           (Object.create(null) as Record<string, never>),
       ).map(([refName, refDefinition]) => ({
         refName,
