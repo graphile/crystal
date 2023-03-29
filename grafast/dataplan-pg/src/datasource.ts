@@ -1168,7 +1168,10 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return builder;
     },
     build() {
-      return makeRegistry(registryConfig);
+      return EXPORTABLE(
+        (makeRegistry, registryConfig) => makeRegistry(registryConfig),
+        [makeRegistry, registryConfig],
+      );
     },
   };
   return builder;

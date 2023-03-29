@@ -34,6 +34,7 @@ import {
 import {
   makePgSourceOptions,
   makeRegistryBuilder,
+  makeRegistry,
   PgCodecRef,
   PgCodecRefExtensions,
   PgCodecRefPath,
@@ -185,6 +186,7 @@ export {
   MakePgConfigOptions,
   makePgSourceOptions,
   makeRegistryBuilder,
+  makeRegistry,
   ManyFilterStep,
   ObjectFromPgTypeColumns,
   OrFilterStep,
@@ -331,6 +333,7 @@ exportAsMany("@dataplan/pg", {
   rangeOfCodec,
   recordCodec,
   makeRegistryBuilder,
+  makeRegistry,
   makePgSourceOptions,
   TYPES,
   PgSource,
