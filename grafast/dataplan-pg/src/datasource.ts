@@ -1095,9 +1095,9 @@ export function makeRegistry<
 
 export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
   const registryConfig: PgRegistryConfig<any, any, any> = {
-    pgCodecs: {},
-    pgSources: {},
-    pgRelations: {},
+    pgCodecs: Object.create(null),
+    pgSources: Object.create(null),
+    pgRelations: Object.create(null),
   };
   const builder: PgRegistryBuilder<any, any, any> = {
     getRegistryConfig() {
