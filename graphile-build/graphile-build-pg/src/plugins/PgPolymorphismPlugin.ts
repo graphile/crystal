@@ -6,8 +6,11 @@ import "./PgTablesPlugin.js";
 
 import type {
   PgCodecRef,
+  PgCodecRelation,
   PgCodecRelationConfig,
   PgRefDefinition,
+  PgSource,
+  PgSourceOptions,
   PgTypeCodec,
   PgTypeCodecAny,
   PgTypeCodecExtensions,
@@ -264,13 +267,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           }
         }
       },
-      async pgBasics_PgRegistry(info, event) {
-        // We're creating 'refs' for the polymorphism. This needs to use the
-        // same relationship names as we will in the GraphQL schema, so we need
-        // to use the final PgRegistry, not hte PgRegistryBuilder.
-
-        const { registry } = event;
-        for (const source of Object.values(registry.pgSources)) {
+      async pgBasics_PgRegistryBuilder_finalize(info, event) {
+        const { registryBuilder } = event;
+        const registry = registryBuilder.getRegistryConfig();
+        for (const source of Object.values(
+          registry.pgSources,
+        ) as PgSourceOptions<any, any, any, any>[]) {
           if (source.parameters || !source.codec.columns) {
             continue;
           }
@@ -292,11 +294,6 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const relations = (
-            await info.helpers.pgBasics.getRegistryBuilder()
-          ).getRegistryConfig().pgRelations[source.codec.name] as {
-            [relationName: string]: PgCodecRelationConfig<any, any>;
-          };
           const poly = (source.codec as PgTypeCodecAny).polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
@@ -386,6 +383,119 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   };
                 }
               }
+            }
+          }
+        }
+      },
+
+      async pgBasics_PgRegistry(info, event) {
+        // We're creating 'refs' for the polymorphism. This needs to use the
+        // same relationship names as we will in the GraphQL schema, so we need
+        // to use the final PgRegistry, not the PgRegistryBuilder.
+
+        const { registry } = event;
+        for (const source of Object.values(registry.pgSources) as PgSource<
+          any,
+          any,
+          any,
+          any,
+          any
+        >[]) {
+          if (source.parameters || !source.codec.columns) {
+            continue;
+          }
+          if (!source.extensions?.pg) {
+            continue;
+          }
+          const {
+            schemaName: sourceSchemaName,
+            databaseName,
+            name: sourceClassName,
+          } = source.extensions.pg;
+
+          const pgClass = await info.helpers.pgIntrospection.getClassByName(
+            databaseName,
+            sourceSchemaName,
+            sourceClassName,
+          );
+          if (!pgClass) {
+            continue;
+          }
+
+          const relations = registry.pgRelations[source.codec.name] as {
+            [relationName: string]: PgCodecRelation<any, any>;
+          };
+          const poly = (source.codec as PgTypeCodecAny).polymorphism;
+          if (poly?.mode === "relational") {
+            // Copy common attributes to implementations
+            for (const spec of Object.values(poly.types)) {
+              const [schemaName, tableName] =
+                parseDatabaseIdentifierFromSmartTag(
+                  spec.references,
+                  2,
+                  sourceSchemaName,
+                );
+              const pgRelatedClass =
+                await info.helpers.pgIntrospection.getClassByName(
+                  databaseName,
+                  schemaName,
+                  tableName,
+                );
+              if (!pgRelatedClass) {
+                throw new Error(
+                  `Invalid reference to '${spec.references}' - cannot find that table (${schemaName}.${tableName})`,
+                );
+              }
+              const otherCodec = await info.helpers.pgCodecs.getCodecFromClass(
+                databaseName,
+                pgRelatedClass._id,
+              );
+              if (!otherCodec) {
+                continue;
+              }
+              const pk = pgRelatedClass
+                .getConstraints()
+                .find((c) => c.contype === "p");
+              if (!pk) {
+                throw new Error(
+                  `Invalid polymorphic relation; ${pgRelatedClass.relname} has no primary key`,
+                );
+              }
+              const remotePk = pgClass
+                .getConstraints()
+                .find((c) => c.contype === "p");
+              if (!remotePk) {
+                throw new Error(
+                  `Invalid polymorphic relation; ${pgClass.relname} has no primary key`,
+                );
+              }
+              const pgConstraint = pgRelatedClass
+                .getConstraints()
+                .find(
+                  (c) =>
+                    c.contype === "f" &&
+                    c.confrelid === pgClass._id &&
+                    arraysMatch(
+                      c.getForeignAttributes()!,
+                      remotePk.getAttributes()!,
+                    ) &&
+                    arraysMatch(c.getAttributes()!, pk.getAttributes()!),
+                );
+              if (!pgConstraint) {
+                throw new Error(
+                  `Invalid polymorphic relation; could not find matching relation between ${pgClass.relname} and ${pgRelatedClass.relname}`,
+                );
+              }
+              const sharedRelationName = info.inflection.sourceRelationName({
+                databaseName,
+                isReferencee: false,
+                isUnique: true,
+                localClass: pgRelatedClass,
+                localColumns: pk.getAttributes()!,
+                foreignClass: pgClass,
+                foreignColumns: remotePk.getAttributes()!,
+                pgConstraint,
+              });
 
               const otherSourceOptions =
                 await info.helpers.pgTables.getSourceOptions(
@@ -398,8 +508,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               )) {
                 const behavior =
                   getBehavior([
-                    relationSpec.remoteSourceOptions.codec.extensions,
-                    relationSpec.remoteSourceOptions.extensions,
+                    relationSpec.remoteSource.codec.extensions,
+                    relationSpec.remoteSource.extensions,
                     relationSpec.extensions,
                   ]) ?? "";
                 const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
