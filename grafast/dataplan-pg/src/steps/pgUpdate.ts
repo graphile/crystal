@@ -1,7 +1,8 @@
-import type {
+import {
   GrafastResultsList,
   GrafastValuesList,
   SetterStep,
+  exportAs,
 } from "grafast";
 import { ExecutableStep, isDev, SafeError, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -451,9 +452,4 @@ export function pgUpdate<TSource extends PgSourceAny>(
   return new PgUpdateStep(source, getBy, columns);
 }
 
-Object.defineProperty(pgUpdate, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgUpdate",
-  },
-});
+exportAs("@dataplan/pg", pgUpdate, "pgUpdate");

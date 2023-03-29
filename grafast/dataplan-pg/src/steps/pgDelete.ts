@@ -1,4 +1,4 @@
-import type { GrafastResultsList, GrafastValuesList } from "grafast";
+import { GrafastResultsList, GrafastValuesList, exportAs } from "grafast";
 import { ExecutableStep, isDev, SafeError } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
@@ -375,9 +375,4 @@ export function pgDelete<TSource extends PgSourceAny>(
   return new PgDeleteStep(source, getBy);
 }
 
-Object.defineProperty(pgDelete, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgDelete",
-  },
-});
+exportAs("@dataplan/pg", pgDelete, "pgDelete");

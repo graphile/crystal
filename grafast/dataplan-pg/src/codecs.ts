@@ -1,5 +1,6 @@
 import type { JSONValue } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
+import { exportAs } from "grafast";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";
@@ -34,7 +35,6 @@ import {
   stringifyPoint,
   stringifyPolygon,
 } from "./codecUtils/index.js";
-import { exportAs } from "./exportAs.js";
 import { inspect } from "./inspect.js";
 import type {
   PgDecode,
@@ -444,7 +444,7 @@ export function recordCodec<
     extensions,
   };
 }
-exportAs(recordCodec, "recordCodec");
+exportAs("@dataplan/pg", recordCodec, "recordCodec");
 
 export type PgEnumCodecSpec<TName extends string, TValue extends string> = {
   name: TName;
@@ -478,7 +478,7 @@ export function enumCodec<
     extensions,
   };
 }
-exportAs(enumCodec, "enumCodec");
+exportAs("@dataplan/pg", enumCodec, "enumCodec");
 
 export function isEnumCodec<
   TName extends string,
@@ -654,7 +654,7 @@ export function listOfCodec<
 
   return listCodec;
 }
-exportAs(listOfCodec, "listOfCodec");
+exportAs("@dataplan/pg", listOfCodec, "listOfCodec");
 
 /**
  * Represents a PostgreSQL `DOMAIN` over the given codec
@@ -695,7 +695,7 @@ export function domainOfCodec<
     notNull: Boolean(notNull),
   };
 }
-exportAs(domainOfCodec, "domainOfCodec");
+exportAs("@dataplan/pg", domainOfCodec, "domainOfCodec");
 
 /**
  * @see {@link https://www.postgresql.org/docs/14/rangetypes.html#RANGETYPES-IO}
@@ -855,7 +855,7 @@ export function rangeOfCodec<
     columns: undefined,
   };
 }
-exportAs(rangeOfCodec, "rangeOfCodec");
+exportAs("@dataplan/pg", rangeOfCodec, "rangeOfCodec");
 
 /**
  * Helper type for common casting methods.
@@ -1032,7 +1032,7 @@ export const TYPES = {
     toPg: stringifyHstore,
   }),
 } as const;
-exportAs(TYPES, "TYPES");
+exportAs("@dataplan/pg", TYPES, "TYPES");
 
 type PgBaseCodecs = (typeof TYPES)[keyof typeof TYPES];
 export type PgBaseCodecsObject = {
@@ -1180,8 +1180,8 @@ export function getInnerCodec<
   }
   return codec as any;
 }
-exportAs(getInnerCodec, "getInnerCodec");
+exportAs("@dataplan/pg", getInnerCodec, "getInnerCodec");
 
 for (const key of Object.keys(TYPES)) {
-  exportAs(TYPES[key as keyof typeof TYPES], ["TYPES", key]);
+  exportAs("@dataplan/pg", TYPES[key as keyof typeof TYPES], ["TYPES", key]);
 }

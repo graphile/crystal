@@ -1,8 +1,9 @@
 import chalk from "chalk";
-import type {
+import {
   AccessStep,
   GrafastResultsList,
   GrafastValuesList,
+  exportAs,
 } from "grafast";
 import { access, ExecutableStep } from "grafast";
 
@@ -85,9 +86,4 @@ export function jsonParse<TJSON extends JSONValue>(
   return new JSONParseStep<TJSON>($string);
 }
 
-Object.defineProperty(jsonParse, "$$export", {
-  value: {
-    moduleName: "@dataplan/json",
-    exportName: "jsonParse",
-  },
-});
+exportAs("@dataplan/json", jsonParse, "jsonParse");

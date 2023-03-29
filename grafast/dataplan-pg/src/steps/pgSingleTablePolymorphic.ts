@@ -1,8 +1,9 @@
-import type {
+import {
   GrafastResultsList,
   GrafastValuesList,
   PolymorphicData,
   PolymorphicStep,
+  exportAs,
 } from "grafast";
 import { ExecutableStep, polymorphicWrap } from "grafast";
 import type { GraphQLObjectType } from "graphql";
@@ -76,9 +77,4 @@ export function pgSingleTablePolymorphic<
   return new PgSingleTablePolymorphicStep($typeName, $row);
 }
 
-Object.defineProperty(pgSingleTablePolymorphic, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgSingleTablePolymorphic",
-  },
-});
+exportAs("@dataplan/pg", pgSingleTablePolymorphic, "pgSingleTablePolymorphic");

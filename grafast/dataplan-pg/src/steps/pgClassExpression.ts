@@ -1,5 +1,5 @@
 import type { ExecutionExtra } from "grafast";
-import { UnbatchedExecutableStep } from "grafast";
+import { UnbatchedExecutableStep, exportAs } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -258,11 +258,6 @@ function pgClassExpression<
   };
 }
 
-Object.defineProperty(pgClassExpression, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgClassExpression",
-  },
-});
+exportAs("@dataplan/pg", pgClassExpression, "pgClassExpression");
 
 export { pgClassExpression };

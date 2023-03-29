@@ -1,7 +1,7 @@
 import LRU from "@graphile/lru";
 import chalk from "chalk";
 import debugFactory from "debug";
-import type {
+import {
   Deferred,
   ExecutableStep,
   ExecutionEventEmitter,
@@ -9,6 +9,7 @@ import type {
   GrafastValuesList,
   ObjectStep,
   PromiseOrDirect,
+  exportAs,
 } from "grafast";
 import { defer, isAsyncIterable, isDev } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
@@ -806,6 +807,4 @@ ${duration}
   }
 }
 
-Object.defineProperty(PgExecutor, "$$export", {
-  value: { moduleName: "@dataplan/pg", exportName: "PgExecutor" },
-});
+exportAs("@dataplan/pg", PgExecutor, "PgExecutor");

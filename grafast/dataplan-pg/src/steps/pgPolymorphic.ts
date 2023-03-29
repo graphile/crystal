@@ -1,8 +1,9 @@
-import type {
+import {
   ExecutableStep,
   ExecutionExtra,
   PolymorphicData,
   PolymorphicStep,
+  exportAs,
 } from "grafast";
 import {
   isDev,
@@ -159,9 +160,4 @@ export function pgPolymorphic<
   );
 }
 
-Object.defineProperty(pgPolymorphic, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgPolymorphic",
-  },
-});
+exportAs("@dataplan/pg", pgPolymorphic, "pgPolymorphic");

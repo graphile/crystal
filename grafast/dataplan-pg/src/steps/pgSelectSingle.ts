@@ -1,4 +1,9 @@
-import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
+import {
+  EdgeCapableStep,
+  ExecutableStep,
+  ExecutionExtra,
+  exportAs,
+} from "grafast";
 import { list, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import type { SQL } from "pg-sql2";
@@ -652,16 +657,5 @@ export function pgSelectSingleFromRecord<TSource extends PgSourceAny>(
   ).single() as PgSelectSingleStep<TSource>;
 }
 
-Object.defineProperty(pgSelectFromRecord, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgSelectFromRecord",
-  },
-});
-
-Object.defineProperty(pgSelectSingleFromRecord, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgSelectSingleFromRecord",
-  },
-});
+exportAs("@dataplan/pg", pgSelectFromRecord, "pgSelectFromRecord");
+exportAs("@dataplan/pg", pgSelectSingleFromRecord, "pgSelectSingleFromRecord");

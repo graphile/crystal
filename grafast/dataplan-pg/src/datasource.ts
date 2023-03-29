@@ -11,6 +11,7 @@ import {
   constant,
   ExecutableStep,
   partitionByIndex,
+  exportAs,
 } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -29,7 +30,6 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor.js";
-import { exportAs } from "./exportAs.js";
 import type {
   Expand,
   GetPgCodecColumns,
@@ -882,7 +882,7 @@ export class PgSource<
     }
   }
 }
-exportAs(PgSource, "PgSource");
+exportAs("@dataplan/pg", PgSource, "PgSource");
 
 /*
 export function makeRegistry<
@@ -1174,11 +1174,11 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
   return builder;
 }
 
-exportAs(makeRegistryBuilder, "makeRegistryBuilder");
+exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
 
 export function makePgSourceOptions<
   const TSourceOptions extends PgSourceOptions<any, any, any, any>,
 >(options: TSourceOptions) {
   return options;
 }
-exportAs(makePgSourceOptions, "makePgSourceOptions");
+exportAs("@dataplan/pg", makePgSourceOptions, "makePgSourceOptions");

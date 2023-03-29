@@ -13,7 +13,7 @@ import type { PgTypeCodecAny } from "../interfaces.js";
  */
 export class ToPgStep extends UnbatchedExecutableStep<any> {
   static $$export = {
-    moduleName: "grafast",
+    moduleName: "@dataplan/pg",
     exportName: "ToPgStep",
   };
   isSyncAndSafe = true;

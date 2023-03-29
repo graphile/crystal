@@ -1,8 +1,9 @@
-import type {
+import {
   GrafastResultsList,
   GrafastValuesList,
   SetterCapableStep,
   SetterStep,
+  exportAs,
 } from "grafast";
 import { ExecutableStep, isDev, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -406,9 +407,4 @@ export function pgInsert<TSource extends PgSourceAny>(
   return new PgInsertStep(source, columns);
 }
 
-Object.defineProperty(pgInsert, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgInsert",
-  },
-});
+exportAs("@dataplan/pg", pgInsert, "pgInsert");

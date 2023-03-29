@@ -1,8 +1,9 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
-import type {
+import {
   ConnectionCapableStep,
   ExecutionExtra,
+  exportAs,
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastValuesList,
@@ -2876,13 +2877,7 @@ export function pgSelect<TSource extends PgSource<any, any, any, any, any>>(
 ): PgSelectStep<TSource> {
   return new PgSelectStep(options);
 }
-
-Object.defineProperty(pgSelect, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgSelect",
-  },
-});
+exportAs("@dataplan/pg", pgSelect, "pgSelect");
 
 /**
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
@@ -2904,12 +2899,7 @@ export function pgSelectFromRecords<
   }) as PgSelectStep<TSource>;
 }
 
-Object.defineProperty(pgSelectFromRecords, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgSelectFromRecords",
-  },
-});
+exportAs("@dataplan/pg", pgSelectFromRecords, "pgSelectFromRecords");
 
 export function sqlFromArgDigests(
   digests: readonly PgSelectArgumentDigest[],
