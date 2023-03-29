@@ -477,28 +477,52 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             addBehaviorToTags(tags, "-delete");
           }
 
-          const options = {
-            executor,
-            name,
-            identifier,
-            source: codec.sqlType,
-            codec,
-            uniques,
-            isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
-            // TODO: consistency: either remove `description` from here or from `extensions` throughout.
-            description,
-            extensions: {
+          const options = EXPORTABLE(
+            (
+              codec,
+              databaseName,
               description,
-              pg: {
-                databaseName,
-                schemaName: pgClass.getNamespace()!.nspname,
-                name: pgClass.relname,
-              },
-              tags: {
-                ...tags,
-              },
-            },
-          } as const;
+              executor,
+              identifier,
+              name,
+              pgClass,
+              tags,
+              uniques,
+            ) =>
+              ({
+                executor,
+                name,
+                identifier,
+                source: codec.sqlType,
+                codec,
+                uniques,
+                isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
+                // TODO: consistency: either remove `description` from here or from `extensions` throughout.
+                description,
+                extensions: {
+                  description,
+                  pg: {
+                    databaseName,
+                    schemaName: pgClass.getNamespace()!.nspname,
+                    name: pgClass.relname,
+                  },
+                  tags: {
+                    ...tags,
+                  },
+                },
+              } as const),
+            [
+              codec,
+              databaseName,
+              description,
+              executor,
+              identifier,
+              name,
+              pgClass,
+              tags,
+              uniques,
+            ],
+          );
 
           await info.process("pgTables_PgSourceOptions", {
             databaseName,

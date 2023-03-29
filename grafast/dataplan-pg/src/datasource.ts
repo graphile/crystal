@@ -1182,6 +1182,6 @@ exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
 export function makePgSourceOptions<
   const TSourceOptions extends PgSourceOptions<any, any, any, any>,
 >(options: TSourceOptions) {
-  return options;
+  return { ...options };
 }
 exportAs("@dataplan/pg", makePgSourceOptions, "makePgSourceOptions");
