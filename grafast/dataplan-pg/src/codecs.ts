@@ -1033,6 +1033,9 @@ export const TYPES = {
   }),
 } as const;
 exportAs("@dataplan/pg", TYPES, "TYPES");
+for (const [name, codec] of Object.entries(TYPES)) {
+  exportAs("@dataplan/pg", codec, ["TYPES", name]);
+}
 
 type PgBaseCodecs = (typeof TYPES)[keyof typeof TYPES];
 export type PgBaseCodecsObject = {
