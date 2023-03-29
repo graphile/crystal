@@ -10,8 +10,8 @@ import {
   arraysMatch,
   constant,
   ExecutableStep,
-  partitionByIndex,
   exportAs,
+  partitionByIndex,
 } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";

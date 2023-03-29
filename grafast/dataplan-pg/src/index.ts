@@ -33,8 +33,8 @@ import {
 } from "./codecUtils/index.js";
 import {
   makePgSourceOptions,
-  makeRegistryBuilder,
   makeRegistry,
+  makeRegistryBuilder,
   PgCodecRef,
   PgCodecRefExtensions,
   PgCodecRefPath,
@@ -185,8 +185,8 @@ export {
   listOfCodec,
   MakePgConfigOptions,
   makePgSourceOptions,
-  makeRegistryBuilder,
   makeRegistry,
+  makeRegistryBuilder,
   ManyFilterStep,
   ObjectFromPgTypeColumns,
   OrFilterStep,

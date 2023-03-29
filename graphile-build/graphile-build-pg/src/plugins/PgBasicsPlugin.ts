@@ -17,7 +17,6 @@ import {
   makePgTypeCodecMeta,
 } from "../inputUtils.js";
 import { version } from "../version.js";
-import { EXPORTABLE } from "graphile-export";
 
 declare global {
   namespace GraphileBuild {

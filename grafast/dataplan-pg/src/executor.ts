@@ -1,7 +1,7 @@
 import LRU from "@graphile/lru";
 import chalk from "chalk";
 import debugFactory from "debug";
-import {
+import type {
   Deferred,
   ExecutableStep,
   ExecutionEventEmitter,
@@ -9,9 +9,8 @@ import {
   GrafastValuesList,
   ObjectStep,
   PromiseOrDirect,
-  exportAs,
 } from "grafast";
-import { defer, isAsyncIterable, isDev } from "grafast";
+import { defer, exportAs, isAsyncIterable, isDev } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.js";

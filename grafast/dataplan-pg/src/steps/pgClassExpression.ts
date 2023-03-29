@@ -1,5 +1,5 @@
 import type { ExecutionExtra } from "grafast";
-import { UnbatchedExecutableStep, exportAs } from "grafast";
+import { exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 

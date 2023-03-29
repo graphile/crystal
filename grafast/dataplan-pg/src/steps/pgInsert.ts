@@ -1,11 +1,10 @@
-import {
+import type {
   GrafastResultsList,
   GrafastValuesList,
   SetterCapableStep,
   SetterStep,
-  exportAs,
 } from "grafast";
-import { ExecutableStep, isDev, setter } from "grafast";
+import { ExecutableStep, exportAs, isDev, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 

@@ -1,9 +1,8 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
-import {
+import type {
   ConnectionCapableStep,
   ExecutionExtra,
-  exportAs,
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastValuesList,
@@ -26,6 +25,7 @@ import {
   ConstantStep,
   deepEval,
   ExecutableStep,
+  exportAs,
   first,
   isAsyncIterable,
   isPromiseLike,

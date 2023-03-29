@@ -1,11 +1,10 @@
 import chalk from "chalk";
-import {
+import type {
   AccessStep,
   GrafastResultsList,
   GrafastValuesList,
-  exportAs,
 } from "grafast";
-import { access, ExecutableStep } from "grafast";
+import { access, ExecutableStep, exportAs } from "grafast";
 
 export type JSONValue =
   | string

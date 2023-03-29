@@ -1,11 +1,10 @@
-import {
+import type {
   GrafastResultsList,
   GrafastValuesList,
   PolymorphicData,
   PolymorphicStep,
-  exportAs,
 } from "grafast";
-import { ExecutableStep, polymorphicWrap } from "grafast";
+import { ExecutableStep, exportAs, polymorphicWrap } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 
 import type { PgSource } from "../datasource.js";

@@ -66,8 +66,7 @@ import sql from "pg-sql2";
 //import prettier from "prettier";
 import { inspect } from "util";
 
-import {
-  makeRegistry,
+import type {
   PgConditionStep,
   PgExecutorContextPlans,
   PgInsertStep,
@@ -79,7 +78,11 @@ import {
 } from "../";
 import type { PgSubscriber } from "../adaptors/pg.js";
 import { listOfCodec } from "../codecs.js";
-import { makePgSourceOptions, makeRegistryBuilder } from "../datasource.js";
+import {
+  makePgSourceOptions,
+  makeRegistry,
+  makeRegistryBuilder,
+} from "../datasource.js";
 import {
   BooleanFilterStep,
   ClassFilterStep,
@@ -102,11 +105,7 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type {
-  GetPgSourceColumns,
-  PgRegistryConfig,
-  PgTypeCodecAny,
-} from "../interfaces";
+import type { GetPgSourceColumns, PgTypeCodecAny } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";

@@ -1,6 +1,6 @@
 import type { JSONValue } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
 import { exportAs } from "grafast";
+import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";

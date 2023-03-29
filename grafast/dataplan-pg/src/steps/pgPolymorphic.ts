@@ -1,11 +1,11 @@
-import {
+import type {
   ExecutableStep,
   ExecutionExtra,
   PolymorphicData,
   PolymorphicStep,
-  exportAs,
 } from "grafast";
 import {
+  exportAs,
   isDev,
   polymorphicWrap,
   SafeError,

@@ -1,5 +1,5 @@
-import { GrafastResultsList, GrafastValuesList, exportAs } from "grafast";
-import { ExecutableStep, isDev, SafeError } from "grafast";
+import type { GrafastResultsList, GrafastValuesList } from "grafast";
+import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
