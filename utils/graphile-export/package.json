@@ -61,7 +61,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/babel__generator": "^7.6.3",
+    "@types/babel__generator": "^7.6.4",
     "@types/babel__template": "^7.4.1",
     "@types/jest": "^27.5.1",
     "@types/prettier": "^2",

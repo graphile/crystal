@@ -6238,12 +6238,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/babel__generator@npm:*, @types/babel__generator@npm:^7.6.3":
+"@types/babel__generator@npm:*":
   version: 7.6.3
   resolution: "@types/babel__generator@npm:7.6.3"
   dependencies:
     "@babel/types": "npm:^7.0.0"
   checksum: 8fe150654f050f187085123e1fd4e3394ac3c3ac16b1148dd20ea39a4c43919eef6b2213ff507a825cfb5c0b41459be3cc36373f8a7ded88ede82f85d4ba8d27
+  languageName: node
+  linkType: hard
+
+"@types/babel__generator@npm:^7.6.4":
+  version: 7.6.4
+  resolution: "@types/babel__generator@npm:7.6.4"
+  dependencies:
+    "@babel/types": "npm:^7.0.0"
+  checksum: 2e66f16ed0a281f0dc050a8ef4cc9866b790cef758d8defe7c51cb045f6226d2224379fd18d7a17618619b3c6db863aff29db75eb1110c603822455e5985c27d
   languageName: node
   linkType: hard
 
@@ -14194,7 +14203,7 @@ __metadata:
     "@babel/template": "npm:^7.20.7"
     "@babel/traverse": "npm:^7.21.3"
     "@babel/types": "npm:^7.21.3"
-    "@types/babel__generator": "npm:^7.6.3"
+    "@types/babel__generator": "npm:^7.6.4"
     "@types/babel__template": "npm:^7.4.1"
     "@types/jest": "npm:^27.5.1"
     "@types/node": "npm:^18.15.5"
