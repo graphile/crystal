@@ -436,6 +436,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     ],
                   ],
                 };
+                if (!otherSourceOptions!.codec.refs) {
+                  otherSourceOptions!.codec.refs = Object.create(null) as {};
+                }
                 otherSourceOptions!.codec.refs[relationName] = ref;
               }
             }

@@ -9,6 +9,7 @@ import {
   PgTypeColumn,
   makePgSourceOptions,
   PgCodecRelationConfig,
+  PgTypeCodecAny,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
 import { object } from "grafast";
@@ -179,7 +180,7 @@ declare global {
         getSourceOptions(
           databaseName: string,
           pgClass: PgClass,
-        ): Promise<PgSourceOptions<any, any, any, any> | null>;
+        ): Promise<PgSourceOptions<PgTypeCodecAny, any, any, any> | null>;
         /*
         getSource(
           sourceOptions: PgSourceOptions<any, any, any>,
@@ -221,7 +222,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceOptions: PgSourceOptions<any, any, any, any>;
+          sourceOptions: PgSourceOptions<PgTypeCodecAny, any, any, any>;
         }) => Promise<void> | void
       >;
     }

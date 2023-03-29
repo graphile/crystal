@@ -349,6 +349,9 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             paths.push(path);
           }
 
+          if (!sourceOptions.codec.refs) {
+            sourceOptions.codec.refs = Object.create(null) as {};
+          }
           if (sourceOptions.codec.refs[refName]) {
             throw new Error(
               `@ref ${refName} already registered in ${sourceOptions.codec.name}`,

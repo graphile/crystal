@@ -388,7 +388,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           localCodec,
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
-          remoteSourceOptions: foreignSourceOptions,
+          remoteSourceOptions: foreignSourceOptions as PgSourceOptions<
+            any,
+            any,
+            any,
+            any
+          >,
           isUnique,
           isReferencee,
           description:
@@ -659,10 +664,15 @@ function addRelations(
   // TODO: change the default so that we don't do this on
   // isMutationPayload; only do that for V4 compat. (It's redundant vs
   // just using the object type directly)
-  const source =
-    pgTypeSource ??
+  const source = (pgTypeSource ??
     allPgSources.find((s) => s.codec === codec && !s.parameters) ??
-    allPgSources.find((s) => s.codec === codec && s.isUnique);
+    allPgSources.find((s) => s.codec === codec && s.isUnique)) as PgSource<
+    any,
+    PgTypeCodecAny,
+    any,
+    any,
+    any
+  >;
   if (!source && !codec.extensions?.refDefinitions) {
     return fields;
   }
@@ -685,13 +695,11 @@ function addRelations(
   }> = isMutationPayload
     ? []
     : source && source.codec.refs
-    ? Object.entries((source.codec as PgTypeCodecAny).refs!).map(
-        ([refName, spec]) => ({
-          refName,
-          refDefinition: spec.definition,
-          ref: spec,
-        }),
-      )
+    ? Object.entries(source.codec.refs).map(([refName, spec]) => ({
+        refName,
+        refDefinition: spec.definition,
+        ref: spec,
+      }))
     : Object.entries(
         codec.refs ??
           codec.extensions?.refDefinitions ??
@@ -852,7 +860,7 @@ function addRelations(
     ref,
   } of refDefinitionList) {
     let hasReferencee;
-    let sharedCodec: PgTypeCodec<any, any, any, any> | undefined = undefined;
+    let sharedCodec: PgTypeCodecAny | undefined = undefined;
     let sharedSource: PgSource<any, any, any, any, any> | undefined = undefined;
     let behavior;
     let typeName;
