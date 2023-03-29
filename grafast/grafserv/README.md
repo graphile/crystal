@@ -131,7 +131,7 @@ serv.addTo(server).catch((e) => {
 });
 
 // Start the Node server
-server.listen(preset.grafserv.port ?? 5678);
+server.listen(preset.grafserv?.port ?? 5678);
 ```
 
 ### Express V4
@@ -164,7 +164,7 @@ serv.addTo(app, server).catch((e) => {
 });
 
 // Start the Express server
-server.listen(preset.grafserv.port ?? 5678);
+server.listen(preset.grafserv?.port ?? 5678);
 ```
 
 ### Koa V2
@@ -197,7 +197,7 @@ serv.addTo(app, server).catch((e) => {
 });
 
 // Start the Koa server
-server.listen(preset.grafserv.port ?? 5678);
+server.listen(preset.grafserv?.port ?? 5678);
 ```
 
 ### Fastify V4
@@ -226,7 +226,7 @@ serv.addTo(app).catch((e) => {
 });
 
 // Start the Fastify server
-app.listen({ port: preset.grafserv.port ?? 5678 }, (err, address) => {
+app.listen({ port: preset.grafserv?.port ?? 5678 }, (err, address) => {
   if (err) throw err;
   console.log(`Server is now listening on ${address}`);
 });
