@@ -907,6 +907,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         >();
         for (const codec of build.allPgCodecs) {
           const known = knownCodecByName.get(codec.name);
+          if (known === codec) {
+            throw new Error(
+              `The codec '${codec.name}' was added to build.allPgCodecs twice; this is a bug.`,
+            );
+          }
           if (known) {
             console.error({
               error: `Two different codecs were created with the same name:`,
@@ -914,7 +919,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               second: codec,
             });
             throw new Error(
-              "Two different codecs were created with the same name; please ensure all codec names are unique. If you are creating codecs from multiple realms, consider prefixing the codec names with the realm name.",
+              `Two different codecs were created with the same name '${codec.name}'; please ensure all codec names are unique. If you are creating codecs from multiple realms, consider prefixing the codec names with the realm name.`,
             );
           } else {
             knownCodecByName.set(codec.name, codec);
