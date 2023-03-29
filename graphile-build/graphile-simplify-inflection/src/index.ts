@@ -9,6 +9,11 @@ import type {} from "graphile-build";
 import type {} from "graphile-build-pg";
 import type { GraphileConfig } from "graphile-config";
 
+type PgCodecRelationAny = PgCodecRelation<
+  PgTypeCodecWithColumns,
+  PgSource<any, PgTypeCodecWithColumns, any, any, any>
+>;
+
 /**
  * Returns true if array1 and array2 have the same length, and every pair of
  * values within them pass the `comparator` check (which defaults to `===`).
@@ -280,10 +285,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       singleRelation(previous, _options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgCodecRelation<
-          PgTypeCodecWithColumns,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
-        >;
+        const relation = source.getRelation(relationName) as PgCodecRelationAny;
         if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
@@ -313,10 +315,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       singleRelationBackwards(previous, _options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgCodecRelation<
-          PgTypeCodecWithColumns,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
-        >;
+        const relation = source.getRelation(relationName) as PgCodecRelationAny;
         if (
           typeof relation.extensions?.tags?.foreignSingleFieldName === "string"
         ) {
@@ -360,10 +359,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       _manyRelation(previous, _options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgCodecRelation<
-          PgTypeCodecWithColumns,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
-        >;
+        const relation = source.getRelation(relationName) as PgCodecRelationAny;
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
@@ -407,10 +403,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       manyRelationConnection(previous, _options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName);
+        const relation = source.getRelation(relationName) as PgCodecRelationAny;
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
-          relation.source.extensions?.tags?.listSuffix;
+          relation.remoteSource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );
@@ -418,10 +414,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       manyRelationList(previous, _options, details) {
         const { source, relationName } = details;
-        const relation = source.getRelation(relationName);
+        const relation = source.getRelation(relationName) as PgCodecRelationAny;
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
-          relation.source.extensions?.tags?.listSuffix;
+          relation.remoteSource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );
