@@ -5,9 +5,7 @@ import { EXPORTABLE } from "./exportable.js";
 type OrderBySpecIdentity =
   | string // Column name
   | Omit<PgOrderSpec, "direction"> // Expression
-  | ((
-      $select: PgSelectStep<any>,
-    ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+  | (($select: PgSelectStep<any>) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {

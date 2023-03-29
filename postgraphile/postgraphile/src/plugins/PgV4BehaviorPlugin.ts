@@ -1,11 +1,7 @@
 import "graphile-config";
 import "graphile-build-pg";
 
-import type {
-  PgSource,
-  PgSourceOptions,
-  PgSourceParameter,
-} from "@dataplan/pg";
+import type { PgSourceOptions, PgSourceParameter } from "@dataplan/pg";
 import type { PgProc } from "pg-introspection";
 import { inspect } from "util";
 
@@ -18,7 +14,7 @@ declare global {
 }
 
 const v4ComputedColumnChecks = (
-  s: PgSourceOptions<any, any, any, any>,
+  _s: PgSourceOptions<any, any, any, any>,
   pgProc: PgProc,
 ): boolean => {
   const args = pgProc.getArguments();

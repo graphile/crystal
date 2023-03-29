@@ -220,6 +220,7 @@ function processColumn(
                 notNull,
                 pgSelectSingleFromRecord,
                 pgSources,
+                registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $plan = $record.get(columnName);
@@ -240,6 +241,7 @@ function processColumn(
               notNull,
               pgSelectSingleFromRecord,
               pgSources,
+              registry,
             ],
           );
         } else {
@@ -257,6 +259,7 @@ function processColumn(
                 getSource,
                 pgSelectFromRecords,
                 pgSources,
+                registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $val = $record.get(columnName);
@@ -267,7 +270,14 @@ function processColumn(
                 $select.setTrusted();
                 return $select;
               },
-            [baseCodec, columnName, getSource, pgSelectFromRecords, pgSources],
+            [
+              baseCodec,
+              columnName,
+              getSource,
+              pgSelectFromRecords,
+              pgSources,
+              registry,
+            ],
           );
         }
       }

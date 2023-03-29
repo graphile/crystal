@@ -1,13 +1,6 @@
 import "graphile-build";
 
-import type {
-  PgSource,
-  PgSourceParameter,
-  PgCodecRelation,
-  PgSourceUnique,
-  PgTypeCodec,
-  PgTypeColumns,
-} from "@dataplan/pg";
+import type { PgCodecRelation, PgSource, PgTypeCodec } from "@dataplan/pg";
 
 /**
  * Metadata for a specific PgTypeCodec

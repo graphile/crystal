@@ -5,14 +5,14 @@
  * data sources (hence the "no data gathering" - we skip the gather phase).
  */
 
-import {
+import type {
   PgExecutorContextPlans,
   PgRegistryAny,
   WithPgClient,
-  makePgSourceOptions,
 } from "@dataplan/pg";
-import { makeRegistryBuilder } from "@dataplan/pg";
 import {
+  makePgSourceOptions,
+  makeRegistryBuilder,
   PgExecutor,
   recordCodec,
   sqlFromArgDigests,
@@ -99,6 +99,7 @@ async function main() {
     (
       TYPES,
       executor,
+      makePgSourceOptions,
       makeRegistryBuilder,
       recordCodec,
       sql,
@@ -387,7 +388,15 @@ async function main() {
         )
         .build();
     },
-    [TYPES, executor, makeRegistryBuilder, recordCodec, sql, sqlFromArgDigests],
+    [
+      TYPES,
+      executor,
+      makePgSourceOptions,
+      makeRegistryBuilder,
+      recordCodec,
+      sql,
+      sqlFromArgDigests,
+    ],
   );
 
   // We're crafting our own input

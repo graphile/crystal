@@ -42,15 +42,10 @@ import sql, { arraysMatch } from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
-import type {
-  PgSource,
-  PgSourceOptions,
-  PgSourceUnique,
-} from "../datasource.js";
+import type { PgSource, PgSourceUnique } from "../datasource.js";
 import type {
   GetPgSourceCodec,
   GetPgSourceColumns,
-  GetPgSourceRegistry,
   GetPgSourceRelations,
   PgCodecRelation,
   PgGroupSpec,

@@ -10,7 +10,6 @@ import type { PgSource } from "../datasource.js";
 import type {
   GetPgSourceCodec,
   GetPgSourceColumns,
-  GetPgSourceRelations,
   PgCodecRelation,
   PgRegistryAny,
   PgSourceAny,

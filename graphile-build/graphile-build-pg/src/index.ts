@@ -1,6 +1,6 @@
 export {
-  PgSmartTagsDict,
   PgCodecRelationTags,
+  PgSmartTagsDict,
   PgSourceTags,
   PgTypeCodecTags,
   PgTypeColumnTags,

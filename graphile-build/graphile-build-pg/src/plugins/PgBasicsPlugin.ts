@@ -3,12 +3,10 @@ import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
 
-import {
-  PgRegistry,
-  PgRegistryBuilder,
-  PgTypeCodec,
-  makeRegistryBuilder,
-} from "@dataplan/pg";
+import type { PgRegistry, PgRegistryBuilder, PgTypeCodec } from "@dataplan/pg";
+import { makeRegistryBuilder } from "@dataplan/pg";
+import type { PromiseOrDirect } from "grafast";
+import type { PluginHook } from "graphile-config";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
@@ -19,8 +17,6 @@ import {
   makePgTypeCodecMeta,
 } from "../inputUtils.js";
 import { version } from "../version.js";
-import { PromiseOrDirect } from "grafast";
-import { PluginHook } from "graphile-config";
 
 declare global {
   namespace GraphileBuild {

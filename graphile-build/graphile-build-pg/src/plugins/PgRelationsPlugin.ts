@@ -3,20 +3,20 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgRefDefinition,
-  PgSelectSingleStep,
-  PgSource,
-  PgSourceOptions,
   PgCodecRef,
   PgCodecRefPath,
   PgCodecRelation,
-  PgTypeCodec,
-  PgUnionAllStepConfigAttributes,
-  PgUnionAllStepMember,
+  PgCodecRelationConfig,
+  PgRefDefinition,
   PgRegistry,
+  PgSelectSingleStep,
+  PgSource,
+  PgSourceOptions,
+  PgTypeCodec,
   PgTypeCodecAny,
   PgTypeCodecWithColumns,
-  PgCodecRelationConfig,
+  PgUnionAllStepConfigAttributes,
+  PgUnionAllStepMember,
 } from "@dataplan/pg";
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";

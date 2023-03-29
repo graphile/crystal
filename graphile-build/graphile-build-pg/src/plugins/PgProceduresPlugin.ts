@@ -2,7 +2,7 @@
 // Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
-import {
+import type {
   PgFunctionSourceOptions,
   PgSelectArgumentDigest,
   PgSourceExtensions,
@@ -10,9 +10,13 @@ import {
   PgSourceParameter,
   PgTypeCodec,
   PgTypeColumns,
-  makePgSourceOptions,
 } from "@dataplan/pg";
-import { PgSource, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
+import {
+  makePgSourceOptions,
+  PgSource,
+  recordCodec,
+  sqlFromArgDigests,
+} from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgProc } from "pg-introspection";
@@ -504,9 +508,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             });
 
             const finalSourceOptions = EXPORTABLE(
-              (options, sourceConfig) =>
+              (PgSource, options, sourceConfig) =>
                 PgSource.functionSourceOptions(sourceConfig, options),
-              [options, sourceConfig],
+              [PgSource, options, sourceConfig],
             );
 
             await info.process("pgProcedures_PgSourceOptions", {
@@ -516,9 +520,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             });
 
             return EXPORTABLE(
-              (makePgSourceOptions, finalSourceOptions) =>
+              (finalSourceOptions, makePgSourceOptions) =>
                 makePgSourceOptions(finalSourceOptions),
-              [makePgSourceOptions, finalSourceOptions],
+              [finalSourceOptions, makePgSourceOptions],
             );
           } else {
             const options: PgSourceOptions<any, any, any, any> = {

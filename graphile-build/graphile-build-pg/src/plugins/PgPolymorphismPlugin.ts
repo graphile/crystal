@@ -5,9 +5,9 @@ import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
 import type {
+  PgCodecRef,
   PgCodecRelationConfig,
   PgRefDefinition,
-  PgCodecRef,
   PgTypeCodec,
   PgTypeCodecAny,
   PgTypeCodecExtensions,
@@ -437,7 +437,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   ],
                 };
                 if (!otherSourceOptions!.codec.refs) {
-                  otherSourceOptions!.codec.refs = Object.create(null) as {};
+                  otherSourceOptions!.codec.refs = Object.create(
+                    null,
+                  ) as Record<string, any>;
                 }
                 otherSourceOptions!.codec.refs[relationName] = ref;
               }

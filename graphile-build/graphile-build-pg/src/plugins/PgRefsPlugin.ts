@@ -1,14 +1,13 @@
 import type {
+  PgCodecRefPath,
+  PgCodecRelationConfig,
   PgRefDefinition,
   PgRefDefinitions,
   PgSource,
   PgSourceOptions,
-  PgCodecRefPath,
-  PgCodecRelation,
   PgTypeCodecAny,
   PgTypeCodecExtensions,
   PgTypeCodecWithColumns,
-  PgCodecRelationConfig,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import type { PgClass } from "pg-introspection";
@@ -350,7 +349,10 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           }
 
           if (!sourceOptions.codec.refs) {
-            sourceOptions.codec.refs = Object.create(null) as {};
+            sourceOptions.codec.refs = Object.create(null) as Record<
+              string,
+              any
+            >;
           }
           if (sourceOptions.codec.refs[refName]) {
             throw new Error(

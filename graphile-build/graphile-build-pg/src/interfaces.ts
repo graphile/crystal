@@ -1,13 +1,11 @@
 import type {
-  PgCodecRelation,
+  PgCodecRelationConfig,
+  PgRegistryAny,
   PgSourceOptions,
   PgTypeCodec,
   PgTypeCodecWithColumns,
   PgTypeColumns,
   WithPgClient,
-  PgRegistry,
-  PgRegistryAny,
-  PgCodecRelationConfig,
 } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 

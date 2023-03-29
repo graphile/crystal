@@ -68,7 +68,6 @@ import { inspect } from "util";
 
 import type {
   PgConditionStep,
-  PgEnumTypeCodec,
   PgExecutorContextPlans,
   PgInsertStep,
   PgSelectStep,
@@ -77,11 +76,9 @@ import type {
   PgTypeColumnVia,
   WithPgClient,
 } from "../";
-import { makePgSourceOptions } from "../";
-import { makeRegistryBuilder } from "../";
 import type { PgSubscriber } from "../adaptors/pg.js";
-import type { PgTypeColumns } from "../codecs.js";
 import { listOfCodec } from "../codecs.js";
+import { makePgSourceOptions, makeRegistryBuilder } from "../datasource.js";
 import {
   BooleanFilterStep,
   ClassFilterStep,
@@ -104,8 +101,7 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type { PgTypeCodecAny } from "../interfaces";
-import type { GetPgSourceColumns } from "../interfaces";
+import type { GetPgSourceColumns, PgTypeCodecAny } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -181,8 +177,6 @@ export function makeExampleSchema(
 
   const registry = EXPORTABLE(
     (
-      EXPORTABLE,
-      GraphQLEnumType,
       PgSource,
       TYPES,
       enumCodec,
@@ -1585,8 +1579,6 @@ export function makeExampleSchema(
         .build();
     },
     [
-      EXPORTABLE,
-      GraphQLEnumType,
       PgSource,
       TYPES,
       enumCodec,

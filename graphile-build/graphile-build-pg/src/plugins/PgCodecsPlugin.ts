@@ -807,6 +807,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
     },
     hooks: {
       async pgBasics_PgRegistryBuilder_pgCodecs(info, event) {
+        const { registryBuilder } = event;
         const codecs = new Set<
           PgTypeCodec<any, any, any, any, any, any, any>
         >();
@@ -835,9 +836,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             }
           }
         }
-
-        const registryBuilder =
-          await info.helpers.pgBasics.getRegistryBuilder();
 
         for (const codec of codecs) {
           registryBuilder.addCodec(codec);

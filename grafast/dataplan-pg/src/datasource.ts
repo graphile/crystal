@@ -31,20 +31,18 @@ import type {
 } from "./executor.js";
 import { exportAs } from "./exportAs.js";
 import type {
+  Expand,
   GetPgCodecColumns,
-  GetPgRegistryCodecs,
-  GetPgRegistryCodecRelations,
+  PgCodecRelation,
+  PgCodecRelationConfig,
   PgRefDefinition,
   PgRegistry,
+  PgRegistryConfig,
+  PgSourceParameterAny,
   PgTypeCodec,
   PgTypeCodecAny,
-  PlanByUniques,
-  PgSourceParameterAny,
-  PgCodecRelation,
   PgTypeCodecWithColumns,
-  PgRegistryConfig,
-  Expand,
-  PgCodecRelationConfig,
+  PlanByUniques,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
@@ -1093,6 +1091,7 @@ export function makeRegistry<
   return registry;
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
   const registryConfig: PgRegistryConfig<any, any, any> = {
     pgCodecs: Object.create(null),

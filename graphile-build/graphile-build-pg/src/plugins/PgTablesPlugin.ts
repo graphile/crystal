@@ -1,17 +1,15 @@
 import "graphile-build";
 
-import {
+import type {
+  PgCodecRelationConfig,
   PgSource,
   PgSourceOptions,
-  PgCodecRelation,
   PgSourceUnique,
   PgTypeCodec,
-  PgTypeColumn,
-  makePgSourceOptions,
-  PgCodecRelationConfig,
   PgTypeCodecAny,
+  PgTypeColumn,
 } from "@dataplan/pg";
-import { assertPgClassSingleStep } from "@dataplan/pg";
+import { assertPgClassSingleStep, makePgSourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
@@ -509,8 +507,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           });
 
           const sourceOptions = EXPORTABLE(
-            () => makePgSourceOptions(options),
-            [],
+            (makePgSourceOptions, options) => makePgSourceOptions(options),
+            [makePgSourceOptions, options],
           );
 
           const registryBuilder =
@@ -545,7 +543,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
       // `pgIntrospection_class` above is called before
       // `pgBasics_PgRegistryBuilder_pgRelations` below.
 
-      async pgBasics_PgRegistryBuilder_pgRelations(info, event) {
+      async pgBasics_PgRegistryBuilder_pgRelations(info, _event) {
         const toProcess: Array<{
           sourceOptions: PgSourceOptions<any, any, any, any>;
           pgClass: PgClass;

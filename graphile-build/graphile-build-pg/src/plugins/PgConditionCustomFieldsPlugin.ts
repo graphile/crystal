@@ -4,7 +4,6 @@ import type {
   PgConditionStep,
   PgSelectStep,
   PgSource,
-  PgSourceParameter,
   PgSourceParameterAny,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
