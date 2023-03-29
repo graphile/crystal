@@ -17,6 +17,7 @@ import {
   access,
   constant,
   ExecutableStep,
+  exportAs,
   first,
   isPromiseLike,
   lambda,
@@ -1847,3 +1848,4 @@ export function pgUnionAll<
 ): PgUnionAllStep<TAttributes, TTypeNames> {
   return new PgUnionAllStep(spec);
 }
+exportAs("@dataplan/pg", pgUnionAll, "pgUnionAll");

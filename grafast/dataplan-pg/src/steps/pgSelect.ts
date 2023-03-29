@@ -2915,6 +2915,7 @@ export function sqlFromArgDigests(
     ? sql.indent(sql.join(args, ",\n"))
     : sql.join(args, ", ");
 }
+exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 export function digestsFromArgumentSpecs(
   $placeholderable: {
@@ -2954,6 +2955,7 @@ export function digestsFromArgumentSpecs(
   }
   return { digests, argIndex };
 }
+exportAs("@dataplan/pg", digestsFromArgumentSpecs, "digestsFromArgumentSpecs");
 
 export function getFragmentAndCodecFromOrder(
   alias: SQL,
