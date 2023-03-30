@@ -33,16 +33,16 @@ import type {
 import type {
   Expand,
   GetPgCodecColumns,
+  PgCodec,
+  PgCodecAny,
   PgCodecRelation,
   PgCodecRelationConfig,
+  PgCodecWithColumns,
   PgRefDefinition,
   PgRegistry,
   PgRegistryAny,
   PgRegistryConfig,
   PgResourceParameterAny,
-  PgCodec,
-  PgCodecAny,
-  PgCodecWithColumns,
   PlanByUniques,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";

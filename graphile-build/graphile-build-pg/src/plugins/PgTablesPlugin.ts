@@ -1,12 +1,12 @@
 import "graphile-build";
 
 import type {
+  PgCodec,
+  PgCodecAny,
   PgCodecRelationConfig,
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
-  PgCodec,
-  PgCodecAny,
   PgTypeColumn,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
@@ -592,7 +592,10 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           }
         }
         for (const entry of toProcess) {
-          await info.process("pgTables_PgResourceOptions_relations_post", entry);
+          await info.process(
+            "pgTables_PgResourceOptions_relations_post",
+            entry,
+          );
         }
       },
     },

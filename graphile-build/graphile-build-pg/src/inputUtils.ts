@@ -1,6 +1,6 @@
 import "graphile-build";
 
-import type { PgCodecRelation, PgResource, PgCodec } from "@dataplan/pg";
+import type { PgCodec, PgCodecRelation, PgResource } from "@dataplan/pg";
 
 /**
  * Metadata for a specific PgCodec
@@ -18,17 +18,12 @@ export interface PgCodecMeta {
 /**
  * A map from PgCodec to its associated metadata.
  */
-export type PgCodecMetaLookup = Map<
-  PgCodec<any, any, any>,
-  PgCodecMeta
->;
+export type PgCodecMetaLookup = Map<PgCodec<any, any, any>, PgCodecMeta>;
 
 /**
  * Creates an empty meta object for the given codec.
  */
-export function makePgCodecMeta(
-  _codec: PgCodec<any, any, any>,
-): PgCodecMeta {
+export function makePgCodecMeta(_codec: PgCodec<any, any, any>): PgCodecMeta {
   return {
     typeNameBySituation: Object.create(null),
   };

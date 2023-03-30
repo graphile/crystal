@@ -36,10 +36,10 @@ import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type { PgExecutor } from "../executor.js";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
-  PgOrderFragmentSpec,
-  PgOrderSpec,
   PgCodec,
   PgCodecAny,
+  PgOrderFragmentSpec,
+  PgOrderSpec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";

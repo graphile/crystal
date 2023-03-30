@@ -1,9 +1,9 @@
 import type {
+  PgCodec,
   PgCodecRelationConfig,
+  PgCodecWithColumns,
   PgRegistryAny,
   PgResourceOptions,
-  PgCodec,
-  PgCodecWithColumns,
   PgTypeColumns,
   WithPgClient,
 } from "@dataplan/pg";

@@ -2,10 +2,10 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  PgCodec,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
-  PgCodec,
 } from "@dataplan/pg";
 import type {
   ConnectionStep,

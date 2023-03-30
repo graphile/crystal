@@ -48,13 +48,13 @@ import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
   GetPgResourceRelations,
+  PgCodec,
+  PgCodecAny,
   PgCodecRelation,
+  PgCodecWithColumns,
   PgGroupSpec,
   PgOrderSpec,
   PgResourceAny,
-  PgCodec,
-  PgCodecAny,
-  PgCodecWithColumns,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -2889,15 +2889,7 @@ export function pgSelectFromRecords<
 >(
   source: TSource,
   records: PgClassExpressionStep<
-    PgCodec<
-      any,
-      undefined,
-      any,
-      any,
-      GetPgResourceCodec<TSource>,
-      any,
-      any
-    >,
+    PgCodec<any, undefined, any, any, GetPgResourceCodec<TSource>, any, any>,
     TSource
   >,
 ): PgSelectStep<TSource> {
@@ -2929,10 +2921,7 @@ exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 export function digestsFromArgumentSpecs(
   $placeholderable: {
-    placeholder(
-      step: ExecutableStep,
-      codec: PgCodec<any, any, any, any>,
-    ): SQL;
+    placeholder(step: ExecutableStep, codec: PgCodec<any, any, any, any>): SQL;
   },
   specs: PgSelectArgumentSpec[],
   digests: PgSelectArgumentDigest[] = [],

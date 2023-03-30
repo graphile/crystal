@@ -30,10 +30,7 @@ export class TempTableStep<
     this.alias = sql.identifier(Symbol(`${source.name}_filter`));
   }
 
-  placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgCodec<any, any, any>,
-  ): SQL {
+  placeholder($step: ExecutableStep<any>, codec: PgCodec<any, any, any>): SQL {
     return this.$parent.placeholder($step, codec);
   }
 

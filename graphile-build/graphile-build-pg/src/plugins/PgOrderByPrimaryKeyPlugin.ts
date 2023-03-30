@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSelectStep, PgResourceUnique } from "@dataplan/pg";
+import type { PgResourceUnique, PgSelectStep } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../version.js";

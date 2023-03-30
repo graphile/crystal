@@ -3,7 +3,7 @@ import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
 
-import type { PgRegistry, PgRegistryBuilder, PgCodec } from "@dataplan/pg";
+import type { PgCodec, PgRegistry, PgRegistryBuilder } from "@dataplan/pg";
 import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 import type { PluginHook } from "graphile-config";
@@ -12,10 +12,7 @@ import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
 import type { PgCodecMetaLookup } from "../inputUtils.js";
-import {
-  getCodecMetaLookupFromInput,
-  makePgCodecMeta,
-} from "../inputUtils.js";
+import { getCodecMetaLookupFromInput, makePgCodecMeta } from "../inputUtils.js";
 import { version } from "../version.js";
 
 declare global {

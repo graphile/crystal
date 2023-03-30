@@ -2,8 +2,8 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgResourceUnique,
   PgCodec,
+  PgResourceUnique,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";

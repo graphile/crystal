@@ -7,14 +7,14 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
+  PgCodec,
   PgDeleteStep,
   PgInsertStep,
-  PgSelectArgumentSpec,
-  PgSelectStep,
   PgResource,
   PgResourceParameter,
   PgResourceParameterAny,
-  PgCodec,
+  PgSelectArgumentSpec,
+  PgSelectStep,
   PgTypedExecutableStep,
   PgUpdateStep,
 } from "@dataplan/pg";
@@ -211,7 +211,13 @@ function defaultProcSourceBehavior(
   const { simpleCollections } = options;
   const behavior = [];
   const firstParameter = (
-    s as PgResource<any, any, any, readonly PgResourceParameter<any, any>[], any>
+    s as PgResource<
+      any,
+      any,
+      any,
+      readonly PgResourceParameter<any, any>[],
+      any
+    >
   ).parameters[0];
   if (
     !s.isMutation &&

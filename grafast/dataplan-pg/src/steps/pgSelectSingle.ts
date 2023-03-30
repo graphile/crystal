@@ -15,11 +15,11 @@ import type { PgResource } from "../datasource.js";
 import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
+  PgCodec,
+  PgCodecAny,
   PgCodecRelation,
   PgRegistryAny,
   PgResourceAny,
-  PgCodec,
-  PgCodecAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";

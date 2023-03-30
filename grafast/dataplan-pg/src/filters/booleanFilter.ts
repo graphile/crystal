@@ -2,7 +2,7 @@ import type { ExecutableStep } from "grafast";
 import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
 
-import type { PgConditionLikeStep, PgCodec } from "../interfaces.js";
+import type { PgCodec, PgConditionLikeStep } from "../interfaces.js";
 
 export class BooleanFilterStep extends ModifierStep<PgConditionLikeStep> {
   static $$export = {

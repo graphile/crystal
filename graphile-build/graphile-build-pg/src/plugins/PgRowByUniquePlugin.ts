@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PgResource, PgResourceUnique, PgCodec } from "@dataplan/pg";
+import type { PgCodec, PgResource, PgResourceUnique } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import te, { isSafeObjectPropertyName } from "tamedevil";

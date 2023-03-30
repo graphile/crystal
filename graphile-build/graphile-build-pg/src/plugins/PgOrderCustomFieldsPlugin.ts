@@ -2,9 +2,9 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgSelectStep,
   PgResource,
   PgResourceParameterAny,
+  PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
@@ -17,7 +17,13 @@ declare global {
       computedColumnOrder(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, readonly PgResourceParameterAny[], any>;
+          source: PgResource<
+            any,
+            any,
+            any,
+            readonly PgResourceParameterAny[],
+            any
+          >;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;

@@ -14,8 +14,8 @@ import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
   GetPgResourceUniques,
-  PgResourceAny,
   PgCodecAny,
+  PgResourceAny,
   PlanByUniques,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";

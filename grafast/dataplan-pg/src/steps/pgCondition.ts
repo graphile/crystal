@@ -21,10 +21,7 @@ export interface PgConditionStepExtensions {}
 
 export interface PgConditionCapableParentStep extends BaseStep {
   alias: SQL;
-  placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgCodec<any, any, any>,
-  ): SQL;
+  placeholder($step: ExecutableStep<any>, codec: PgCodec<any, any, any>): SQL;
   where(condition: PgWhereConditionSpec<any>): void;
   having?(condition: PgHavingConditionSpec<any>): void;
 }

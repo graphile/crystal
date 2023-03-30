@@ -37,14 +37,14 @@ import {
 } from "./codecUtils/index.js";
 import { inspect } from "./inspect.js";
 import type {
-  PgDecode,
-  PgEncode,
-  PgEnumTypeCodec,
-  PgEnumValue,
   PgCodec,
   PgCodecAny,
   PgCodecExtensions,
   PgCodecPolymorphism,
+  PgDecode,
+  PgEncode,
+  PgEnumTypeCodec,
+  PgEnumValue,
 } from "./interfaces.js";
 
 // PERF: `identity` can be shortcut
@@ -500,15 +500,7 @@ type CodecWithListCodec<
       : never}[]`,
     undefined,
     string,
-    TCodec extends PgCodec<
-      any,
-      any,
-      any,
-      infer UFromJs,
-      undefined,
-      any,
-      any
-    >
+    TCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
       ? UFromJs[]
       : any[],
     TCodec,
@@ -543,15 +535,7 @@ export function listOfCodec<
     : never}[]`,
   undefined, // Array has no columns
   string,
-  TInnerCodec extends PgCodec<
-    any,
-    any,
-    any,
-    infer UFromJs,
-    undefined,
-    any,
-    any
-  >
+  TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
     ? UFromJs[]
     : any[],
   TInnerCodec,
@@ -568,15 +552,7 @@ export function listOfCodec<
   }
 
   const listCodec: PgCodec<
-    `${TInnerCodec extends PgCodec<
-      infer UName,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any
-    >
+    `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? UName
       : never}[]`,
     undefined, // Array has no columns
@@ -703,15 +679,7 @@ exportAs("@dataplan/pg", domainOfCodec, "domainOfCodec");
  * @internal
  */
 function escapeRangeValue<
-  TInnerCodec extends PgCodec<
-    any,
-    undefined,
-    any,
-    any,
-    undefined,
-    any,
-    any
-  >,
+  TInnerCodec extends PgCodec<any, undefined, any, any, undefined, any, any>,
 >(value: null | any, innerCodec: TInnerCodec): string {
   if (value == null) {
     return "";

@@ -5,11 +5,6 @@ import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
 import type {
-  PgCodecRef,
-  PgCodecRelation,
-  PgRefDefinition,
-  PgResource,
-  PgResourceOptions,
   PgCodec,
   PgCodecAny,
   PgCodecExtensions,
@@ -19,6 +14,11 @@ import type {
   PgCodecPolymorphismSingle,
   PgCodecPolymorphismSingleTypeColumnSpec,
   PgCodecPolymorphismSingleTypeSpec,
+  PgCodecRef,
+  PgCodecRelation,
+  PgRefDefinition,
+  PgResource,
+  PgResourceOptions,
   PgTypeColumn,
 } from "@dataplan/pg";
 import { arraysMatch, ExecutableStep } from "grafast";
@@ -56,9 +56,7 @@ declare global {
       pgPolymorphicSingleTableType?: {
         typeIdentifier: string;
         name: string;
-        columns: ReadonlyArray<
-          PgCodecPolymorphismSingleTypeColumnSpec<any>
-        >;
+        columns: ReadonlyArray<PgCodecPolymorphismSingleTypeColumnSpec<any>>;
       };
       pgPolymorphicRelationalType?: {
         typeIdentifier: string;

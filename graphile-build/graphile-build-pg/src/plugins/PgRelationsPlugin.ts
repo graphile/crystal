@@ -3,18 +3,18 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  PgCodec,
+  PgCodecAny,
   PgCodecRef,
   PgCodecRefPath,
   PgCodecRelation,
   PgCodecRelationConfig,
+  PgCodecWithColumns,
   PgRefDefinition,
   PgRegistry,
-  PgSelectSingleStep,
   PgResource,
   PgResourceOptions,
-  PgCodec,
-  PgCodecAny,
-  PgCodecWithColumns,
+  PgSelectSingleStep,
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
 } from "@dataplan/pg";

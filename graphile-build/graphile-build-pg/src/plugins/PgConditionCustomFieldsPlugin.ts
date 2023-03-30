@@ -2,9 +2,9 @@ import "graphile-config";
 
 import type {
   PgConditionStep,
-  PgSelectStep,
   PgResource,
   PgResourceParameterAny,
+  PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 

@@ -1,11 +1,11 @@
 import "graphile-build";
 
 import type {
+  PgCodec,
+  PgCodecExtensions,
   PgEnumTypeCodec,
   PgRecordTypeCodecSpec,
   PgResource,
-  PgCodec,
-  PgCodecExtensions,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
@@ -811,9 +811,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
     hooks: {
       async pgBasics_PgRegistryBuilder_pgCodecs(info, event) {
         const { registryBuilder } = event;
-        const codecs = new Set<
-          PgCodec<any, any, any, any, any, any, any>
-        >();
+        const codecs = new Set<PgCodec<any, any, any, any, any, any, any>>();
 
         // If we get errors from the frozen object then clearly we need to
         // ensure more work has completed before continuing - call other plugin

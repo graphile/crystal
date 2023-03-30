@@ -1,8 +1,8 @@
 export {
   PgCodecRelationTags,
-  PgSmartTagsDict,
-  PgResourceTags,
   PgCodecTags,
+  PgResourceTags,
+  PgSmartTagsDict,
   PgTypeColumnTags,
 } from "./interfaces.js";
 export {

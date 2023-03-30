@@ -13,8 +13,8 @@ import { inspect } from "../inspect.js";
 import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
-  PgResourceAny,
   PgCodecAny,
+  PgResourceAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";

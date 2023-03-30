@@ -1,9 +1,9 @@
 import type {
+  PgCodec,
   PgCodecRelation,
+  PgCodecWithColumns,
   PgResource,
   PgResourceUnique,
-  PgCodec,
-  PgCodecWithColumns,
 } from "@dataplan/pg";
 import type {} from "graphile-build";
 import type {} from "graphile-build-pg";

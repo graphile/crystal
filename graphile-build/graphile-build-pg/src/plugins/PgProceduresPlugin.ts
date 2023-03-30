@@ -3,12 +3,12 @@
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import type {
+  PgCodec,
   PgFunctionSourceOptions,
-  PgSelectArgumentDigest,
   PgResourceExtensions,
   PgResourceOptions,
   PgResourceParameter,
-  PgCodec,
+  PgSelectArgumentDigest,
   PgTypeColumns,
 } from "@dataplan/pg";
 import {
@@ -27,10 +27,22 @@ import { version } from "../version.js";
 
 // TODO: these should be used, surely?
 interface _ComputedColumnDetails {
-  source: PgResource<any, any, any, readonly PgResourceParameter<any, any>[], any>;
+  source: PgResource<
+    any,
+    any,
+    any,
+    readonly PgResourceParameter<any, any>[],
+    any
+  >;
 }
 interface _ArgumentDetails {
-  source: PgResource<any, any, any, readonly PgResourceParameter<any, any>[], any>;
+  source: PgResource<
+    any,
+    any,
+    any,
+    readonly PgResourceParameter<any, any>[],
+    any
+  >;
   param: PgResourceParameter<any, any>;
   index: number;
 }
@@ -546,7 +558,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             });
 
             return EXPORTABLE(
-              (makePgResourceOptions, options) => makePgResourceOptions(options),
+              (makePgResourceOptions, options) =>
+                makePgResourceOptions(options),
               [makePgResourceOptions, options],
             );
           }

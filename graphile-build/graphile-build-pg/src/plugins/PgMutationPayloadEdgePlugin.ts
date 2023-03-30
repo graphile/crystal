@@ -3,8 +3,8 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
-  PgResourceUnique,
   PgCodec,
+  PgResourceUnique,
 } from "@dataplan/pg";
 import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";

@@ -67,11 +67,11 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import type {
+  PgCodec,
   PgConditionStep,
   PgExecutorContextPlans,
   PgInsertStep,
   PgSelectStep,
-  PgCodec,
   PgTypeColumn,
   PgTypeColumnVia,
   WithPgClient,
@@ -95,11 +95,11 @@ import {
   PgExecutor,
   pgInsert,
   pgPolymorphic,
+  PgResource,
   pgSelect,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
   pgSingleTablePolymorphic,
-  PgResource,
   pgUpdate,
   PgUpdateStep,
   recordCodec,
@@ -4727,15 +4727,7 @@ export function makeExampleSchema(
 
   type PgRecord<TDataSource extends PgResource<any, any, any, any, any>> =
     PgClassExpressionStep<
-      PgCodec<
-        any,
-        GetPgResourceColumns<TDataSource>,
-        any,
-        any,
-        any,
-        any,
-        any
-      >,
+      PgCodec<any, GetPgResourceColumns<TDataSource>, any, any, any, any, any>,
       TDataSource
     >;
 

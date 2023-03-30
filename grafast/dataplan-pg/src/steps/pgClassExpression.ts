@@ -8,8 +8,8 @@ import type { PgResource } from "../datasource.js";
 import type {
   GetPgCodecColumns,
   PgClassSingleStep,
-  PgResourceAny,
   PgCodecAny,
+  PgResourceAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgDeleteStep } from "./pgDelete.js";

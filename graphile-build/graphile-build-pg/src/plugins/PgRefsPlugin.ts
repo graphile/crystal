@@ -1,13 +1,13 @@
 import type {
+  PgCodecAny,
+  PgCodecExtensions,
   PgCodecRefPath,
   PgCodecRelationConfig,
+  PgCodecWithColumns,
   PgRefDefinition,
   PgRefDefinitions,
   PgResource,
   PgResourceOptions,
-  PgCodecAny,
-  PgCodecExtensions,
-  PgCodecWithColumns,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import type { PgClass } from "pg-introspection";
@@ -206,8 +206,8 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           ? [tags.refVia]
           : null;
 
-        const refDefinitions = (sourceOptions.codec as PgCodecAny)
-          .extensions?.refDefinitions;
+        const refDefinitions = (sourceOptions.codec as PgCodecAny).extensions
+          ?.refDefinitions;
         if (!refDefinitions) {
           if (rawRefVias) {
             throw new Error(`@refVia without matching @ref is invalid`);

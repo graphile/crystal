@@ -2,10 +2,10 @@ import "graphile-build";
 import "graphile-config";
 
 import type {
-  PgSelectSingleStep,
+  PgCodec,
   PgResource,
   PgResourceUnique,
-  PgCodec,
+  PgSelectSingleStep,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";

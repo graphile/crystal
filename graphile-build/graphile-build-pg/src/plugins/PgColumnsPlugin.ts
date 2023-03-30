@@ -5,17 +5,17 @@ import "graphile-config";
 
 import type {
   PgClassExpressionStep,
-  PgRegistry,
-  PgSelectSingleStep,
   PgCodec,
   PgCodecAny,
+  PgRegistry,
+  PgSelectSingleStep,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
 import {
+  PgResource,
   pgSelectFromRecords,
   pgSelectSingleFromRecord,
-  PgResource,
 } from "@dataplan/pg";
 import type { GraphileFieldConfig, SetterStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
