@@ -10,7 +10,7 @@ import type { PgConditionCapableParentStep } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 
 export class TempTableStep<
-    TDataSource extends PgResource<any, any, any, any, any>,
+    TResource extends PgResource<any, any, any, any, any>,
   >
   extends BaseStep
   implements PgConditionCapableParentStep
@@ -24,7 +24,7 @@ export class TempTableStep<
   public readonly conditions: SQL[] = [];
   constructor(
     public readonly $parent: ClassFilterStep,
-    public readonly source: TDataSource,
+    public readonly source: TResource,
   ) {
     super();
     this.alias = sql.identifier(Symbol(`${source.name}_filter`));

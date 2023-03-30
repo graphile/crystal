@@ -62,14 +62,14 @@ const CHEAP_COLUMN_TYPES = new Set([
  * telling the PgSelectStep to select the relevant expressions.
  */
 export class PgSelectSingleStep<
-    TSource extends PgResource<any, any, any, any, any>,
+    TResource extends PgResource<any, any, any, any, any>,
   >
   extends UnbatchedExecutableStep<
     unknown[] /* What we return will be a tuple based on the values selected */
   >
   implements
     PgTypedExecutableStep<
-      TSource extends PgResource<any, infer UCodec, any, any, any>
+      TResource extends PgResource<any, infer UCodec, any, any, any>
         ? UCodec
         : never
     >,
@@ -81,24 +81,24 @@ export class PgSelectSingleStep<
   };
   isSyncAndSafe = true;
 
-  public readonly pgCodec: GetPgResourceCodec<TSource>;
+  public readonly pgCodec: GetPgResourceCodec<TResource>;
   public readonly itemStepId: number;
   public readonly mode: PgSelectMode;
   private classStepId: number;
   private nullCheckId: number | null = null;
-  public readonly source: TSource;
+  public readonly source: TResource;
   private _coalesceToEmptyObject = false;
   private typeStepIndexList: number[] | null = null;
 
   constructor(
-    $class: PgSelectStep<TSource>,
+    $class: PgSelectStep<TResource>,
     $item: ExecutableStep<unknown[]>,
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
     this.itemStepId = this.addDependency($item);
     this.source = $class.source;
-    this.pgCodec = this.source.codec as GetPgResourceCodec<TSource>;
+    this.pgCodec = this.source.codec as GetPgResourceCodec<TResource>;
     this.mode = $class.mode;
     this.classStepId = $class.id;
   }
@@ -111,7 +111,7 @@ export class PgSelectSingleStep<
     return this.source.name;
   }
 
-  public getClassStep(): PgSelectStep<TSource> {
+  public getClassStep(): PgSelectStep<TResource> {
     if (this.isOptimized) {
       throw new Error(`Cannot ${this}.getClassStep() after we're optimized.`);
     }
@@ -134,7 +134,10 @@ export class PgSelectSingleStep<
    *
    * @internal
    */
-  getSelfNamed(): PgClassExpressionStep<GetPgResourceCodec<TSource>, TSource> {
+  getSelfNamed(): PgClassExpressionStep<
+    GetPgResourceCodec<TResource>,
+    TResource
+  > {
     if (this.mode === "aggregate") {
       throw new Error("Invalid call to getSelfNamed on aggregate plan");
     }
@@ -146,13 +149,16 @@ export class PgSelectSingleStep<
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof GetPgResourceColumns<TSource>>(
+  get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TSource>[TAttr] extends PgTypeColumn<infer UCodec, any>
+    GetPgResourceColumns<TResource>[TAttr] extends PgTypeColumn<
+      infer UCodec,
+      any
+    >
       ? UCodec
       : never,
-    TSource
+    TResource
   > {
     if (this.mode === "aggregate") {
       throw new Error("Invalid call to .get() on aggregate plan");
@@ -232,7 +238,7 @@ export class PgSelectSingleStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression<any, TSource>(
+    const sqlExpr = pgClassExpression<any, TResource>(
       this,
       attr === ""
         ? this.source.codec
@@ -262,8 +268,8 @@ export class PgSelectSingleStep<
   public select<TExpressionCodec extends PgCodecAny>(
     fragment: SQL,
     codec: TExpressionCodec,
-  ): PgClassExpressionStep<TExpressionCodec, TSource> {
-    const sqlExpr = pgClassExpression<TExpressionCodec, TSource>(this, codec);
+  ): PgClassExpressionStep<TExpressionCodec, TResource> {
+    const sqlExpr = pgClassExpression<TExpressionCodec, TResource>(this, codec);
     return sqlExpr`${fragment}`;
   }
 
@@ -292,7 +298,7 @@ export class PgSelectSingleStep<
   }
 
   private existingSingleRelation<
-    TRelationName extends TSource extends PgResource<
+    TRelationName extends TResource extends PgResource<
       any,
       PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
@@ -304,7 +310,7 @@ export class PgSelectSingleStep<
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    TSource extends PgResource<
+    TResource extends PgResource<
       any,
       PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
@@ -335,7 +341,7 @@ export class PgSelectSingleStep<
   }
 
   public singleRelation<
-    TRelationName extends TSource extends PgResource<
+    TRelationName extends TResource extends PgResource<
       any,
       PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
@@ -347,7 +353,7 @@ export class PgSelectSingleStep<
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    TSource extends PgResource<
+    TResource extends PgResource<
       any,
       PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
@@ -389,10 +395,10 @@ export class PgSelectSingleStep<
   }
 
   public manyRelation<
-    TRelationName extends keyof TSource["registry"]["pgRelations"][TSource["codec"]["name"]],
+    TRelationName extends keyof TResource["registry"]["pgRelations"][TResource["codec"]["name"]],
   >(
     relationIdentifier: TRelationName,
-  ): TSource["registry"]["pgRelations"][TSource["codec"]["name"]][TRelationName] {
+  ): TResource["registry"]["pgRelations"][TResource["codec"]["name"]][TRelationName] {
     const relation: PgCodecRelation<any, any> =
       this.source.getRelation(relationIdentifier);
     if (!relation) {
@@ -410,10 +416,13 @@ export class PgSelectSingleStep<
     ) as any;
   }
 
-  public record(): PgClassExpressionStep<GetPgResourceCodec<TSource>, TSource> {
-    return pgClassExpression<GetPgResourceCodec<TSource>, TSource>(
+  public record(): PgClassExpressionStep<
+    GetPgResourceCodec<TResource>,
+    TResource
+  > {
+    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
-      this.source.codec as GetPgResourceCodec<TSource>,
+      this.source.codec as GetPgResourceCodec<TResource>,
     )`${this.getClassStep().alias}`;
   }
 
@@ -423,8 +432,8 @@ export class PgSelectSingleStep<
   expression<TExpressionCodec extends PgCodecAny>(
     expression: SQL,
     codec: TExpressionCodec,
-  ): PgClassExpressionStep<TExpressionCodec, TSource> {
-    return pgClassExpression<TExpressionCodec, TSource>(
+  ): PgClassExpressionStep<TExpressionCodec, TResource> {
+    return pgClassExpression<TExpressionCodec, TResource>(
       this,
       codec,
     )`${expression}`;
@@ -471,7 +480,9 @@ export class PgSelectSingleStep<
     return this;
   }
 
-  deduplicate(peers: PgSelectSingleStep<any>[]): PgSelectSingleStep<TSource>[] {
+  deduplicate(
+    peers: PgSelectSingleStep<any>[],
+  ): PgSelectSingleStep<TResource>[] {
     // We've been careful to not store anything locally so we shouldn't
     // need to move anything across to the peer.
     return peers.filter((peer) => {
@@ -595,7 +606,7 @@ export class PgSelectSingleStep<
 
   unbatchedExecute(
     extra: ExecutionExtra,
-    result: ObjectFromPgTypeColumns<GetPgResourceColumns<TSource>>,
+    result: ObjectFromPgTypeColumns<GetPgResourceColumns<TResource>>,
   ): unknown[] {
     if (result == null) {
       return this._coalesceToEmptyObject ? Object.create(null) : null;
@@ -622,7 +633,7 @@ export class PgSelectSingleStep<
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
 export function pgSelectFromRecord<
-  TSource extends PgResource<
+  TResource extends PgResource<
     any,
     PgCodec<any, any, any, any, any, any, any>,
     any,
@@ -630,10 +641,10 @@ export function pgSelectFromRecord<
     PgRegistryAny
   >,
 >(
-  source: TSource,
-  $record: PgClassExpressionStep<GetPgResourceCodec<TSource>, TSource>,
-): PgSelectStep<TSource> {
-  return new PgSelectStep<TSource>({
+  source: TResource,
+  $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
+): PgSelectStep<TResource> {
+  return new PgSelectStep<TResource>({
     source,
     identifiers: [],
     from: (record) => sql`(select (${record.placeholder}).*)`,
@@ -646,15 +657,15 @@ export function pgSelectFromRecord<
  * Given a plan that represents a single record (via
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
-export function pgSelectSingleFromRecord<TSource extends PgResourceAny>(
-  source: TSource,
-  $record: PgClassExpressionStep<GetPgResourceCodec<TSource>, TSource>,
-): PgSelectSingleStep<TSource> {
+export function pgSelectSingleFromRecord<TResource extends PgResourceAny>(
+  source: TResource,
+  $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
+): PgSelectSingleStep<TResource> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
   return pgSelectFromRecord(
     source,
     $record,
-  ).single() as PgSelectSingleStep<TSource>;
+  ).single() as PgSelectSingleStep<TResource>;
 }
 
 exportAs("@dataplan/pg", pgSelectFromRecord, "pgSelectFromRecord");
