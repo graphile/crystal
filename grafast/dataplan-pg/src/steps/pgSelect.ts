@@ -387,7 +387,7 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
   private identifierMatches: readonly SQL[];
 
   /**
-   * If the source is a function, this is the names of the arguments to pass
+   * If the resource is a function, this is the names of the arguments to pass
    */
   private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
@@ -887,7 +887,6 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
     }
     this.joins.push({
       type: "left",
-      // TODO: `resource.source` is confusing, rename one of these!
       source: remoteResource.source,
       alias,
       conditions: localColumns.map(

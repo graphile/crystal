@@ -231,12 +231,12 @@ export class PgUnionAllSingleStep
         `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
-    const source = this.spec.resourceByTypeName[objectType.name];
-    if (!source) {
+    const resource = this.spec.resourceByTypeName[objectType.name];
+    if (!resource) {
       // This type isn't handled; so it should never occur
       return constant(null);
     }
-    const pk = (source.uniques as PgResourceUnique[] | undefined)?.find(
+    const pk = (resource.uniques as PgResourceUnique[] | undefined)?.find(
       (u) => u.isPrimary === true,
     );
     if (!pk) {
@@ -250,7 +250,7 @@ export class PgUnionAllSingleStep
       const col = pk.columns[i];
       spec[col] = access($parsed, [i]);
     }
-    return source.get(spec);
+    return resource.get(spec);
   }
 
   /**

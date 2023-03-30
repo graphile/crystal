@@ -550,21 +550,21 @@ const plans = {
           members: [
             {
               typeName: "Person",
-              source: personResource,
+              resource: personResource,
               match: {
                 id: $favourite.get("liked_person_id"),
               },
             },
             {
               typeName: "Post",
-              source: postResource,
+              resource: postResource,
               match: {
                 id: $favourite.get("liked_post_id"),
               },
             },
             {
               typeName: "Comment",
-              source: commentResource,
+              resource: commentResource,
               match: {
                 id: $favourite.get("liked_comment_id"),
               },
