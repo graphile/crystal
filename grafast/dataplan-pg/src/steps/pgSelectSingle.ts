@@ -18,8 +18,8 @@ import type {
   PgCodecRelation,
   PgRegistryAny,
   PgResourceAny,
-  PgTypeCodec,
-  PgTypeCodecAny,
+  PgCodec,
+  PgCodecAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -259,7 +259,7 @@ export class PgSelectSingleStep<
     return colPlan as any;
   }
 
-  public select<TExpressionCodec extends PgTypeCodecAny>(
+  public select<TExpressionCodec extends PgCodecAny>(
     fragment: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, TSource> {
@@ -280,11 +280,11 @@ export class PgSelectSingleStep<
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
     $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
+    codec: PgCodec<any, any, any>,
   ): SQL;
   public placeholder(
     $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
-    overrideCodec?: PgTypeCodec<any, any, any>,
+    overrideCodec?: PgCodec<any, any, any>,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
@@ -294,7 +294,7 @@ export class PgSelectSingleStep<
   private existingSingleRelation<
     TRelationName extends TSource extends PgResource<
       any,
-      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
+      PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
       infer URegistry
@@ -306,7 +306,7 @@ export class PgSelectSingleStep<
   ): PgSelectSingleStep<
     TSource extends PgResource<
       any,
-      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
+      PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
       infer URegistry
@@ -337,7 +337,7 @@ export class PgSelectSingleStep<
   public singleRelation<
     TRelationName extends TSource extends PgResource<
       any,
-      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
+      PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
       infer URegistry
@@ -349,7 +349,7 @@ export class PgSelectSingleStep<
   ): PgSelectSingleStep<
     TSource extends PgResource<
       any,
-      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
+      PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
       infer URegistry
@@ -420,7 +420,7 @@ export class PgSelectSingleStep<
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<TExpressionCodec extends PgTypeCodecAny>(
+  expression<TExpressionCodec extends PgCodecAny>(
     expression: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, TSource> {
@@ -489,7 +489,7 @@ export class PgSelectSingleStep<
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
-    const poly = (this.source.codec as PgTypeCodecAny).polymorphism;
+    const poly = (this.source.codec as PgCodecAny).polymorphism;
     if (poly?.mode === "single") {
       return this;
     } else if (poly?.mode === "relational") {
@@ -511,7 +511,7 @@ export class PgSelectSingleStep<
   private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = (this.source.codec as PgTypeCodecAny).polymorphism;
+    const poly = (this.source.codec as PgCodecAny).polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       const $class = this.getClassStep();
       this.typeStepIndexList = poly.typeColumns.map((col) => {
@@ -624,7 +624,7 @@ export class PgSelectSingleStep<
 export function pgSelectFromRecord<
   TSource extends PgResource<
     any,
-    PgTypeCodec<any, any, any, any, any, any, any>,
+    PgCodec<any, any, any, any, any, any, any>,
     any,
     any,
     PgRegistryAny

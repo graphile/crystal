@@ -5,7 +5,7 @@ import type {
   PgSelectSingleStep,
   PgResource,
   PgResourceUnique,
-  PgTypeCodec,
+  PgCodec,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";
@@ -56,7 +56,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         });
 
         const sourcesByCodec = new Map<
-          PgTypeCodec<any, any, any, any, any, any, any>,
+          PgCodec<any, any, any, any, any, any, any>,
           PgResource<any, any, any, any, any>[]
         >();
         for (const source of tableSources) {

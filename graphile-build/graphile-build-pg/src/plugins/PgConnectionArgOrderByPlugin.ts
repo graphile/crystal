@@ -5,7 +5,7 @@ import type {
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
-  PgTypeCodec,
+  PgCodec,
 } from "@dataplan/pg";
 import type {
   ConnectionStep,
@@ -26,7 +26,7 @@ declare global {
       orderByType(this: Inflection, typeName: string): string;
     }
     interface ScopeEnum {
-      pgCodec?: PgTypeCodec<any, any, any, any>;
+      pgCodec?: PgCodec<any, any, any, any>;
       isPgRowSortEnum?: boolean;
     }
   }

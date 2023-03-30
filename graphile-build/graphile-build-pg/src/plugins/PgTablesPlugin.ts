@@ -5,8 +5,8 @@ import type {
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
-  PgTypeCodec,
-  PgTypeCodecAny,
+  PgCodec,
+  PgCodecAny,
   PgTypeColumn,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
@@ -82,7 +82,7 @@ declare global {
       ): string;
 
       /**
-       * A PgTypeCodec may represent any of a wide range of PostgreSQL types;
+       * A PgCodec may represent any of a wide range of PostgreSQL types;
        * this inflector gives a name to this codec, it's primarily used when
        * naming _types_ in the GraphQL schema (as opposed to `_sourceName`
        * which typically names _fields_).
@@ -93,7 +93,7 @@ declare global {
        */
       _codecName(
         this: Inflection,
-        codec: PgTypeCodec<any, any, any, any, any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -109,7 +109,7 @@ declare global {
        */
       _singularizedCodecName(
         this: Inflection,
-        codec: PgTypeCodec<any, any, any, any, any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -121,21 +121,21 @@ declare global {
       /**
        * The name of the GraphQL Object Type that's generated to represent a
        * specific table (more specifically a PostgreSQL "pg_class" which is
-       * represented as a certain PgTypeCodec)
+       * represented as a certain PgCodec)
        */
       tableType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any, any, any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       tableConnectionType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any, any, any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       tableEdgeType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any, any, any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
@@ -143,7 +143,7 @@ declare global {
     }
 
     interface ScopeObject {
-      pgCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
+      pgCodec?: PgCodec<any, any, any, any, any, any, any>;
       // TODO: rename this to isPgClassType?
       isPgTableType?: boolean;
       isPgConnectionRelated?: true;
@@ -151,7 +151,7 @@ declare global {
     interface ScopeObjectFieldsField {
       // TODO: put 'field' into all these names?
       pgSource?: PgResource<any, any, any, any, any>;
-      pgFieldCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
+      pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
@@ -159,7 +159,7 @@ declare global {
     interface ScopeInterfaceFieldsField {
       // TODO: put 'field' into all these names?
       pgSource?: PgResource<any, any, any, any, any>;
-      pgFieldCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
+      pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
@@ -178,7 +178,7 @@ declare global {
         getSourceOptions(
           databaseName: string,
           pgClass: PgClass,
-        ): Promise<PgResourceOptions<PgTypeCodecAny, any, any, any> | null>;
+        ): Promise<PgResourceOptions<PgCodecAny, any, any, any> | null>;
         /*
         getSource(
           sourceOptions: PgResourceOptions<any, any, any>,
@@ -220,7 +220,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceOptions: PgResourceOptions<PgTypeCodecAny, any, any, any>;
+          sourceOptions: PgResourceOptions<PgCodecAny, any, any, any>;
         }) => Promise<void> | void
       >;
     }

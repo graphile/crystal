@@ -11,7 +11,7 @@ import type {
   GetPgResourceColumns,
   GetPgResourceUniques,
   PgResourceAny,
-  PgTypeCodecAny,
+  PgCodecAny,
   PlanByUniques,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -74,7 +74,7 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
   private getBys: Array<{
     name: keyof GetPgResourceColumns<TSource>;
     depId: number;
-    pgCodec: PgTypeCodecAny;
+    pgCodec: PgCodecAny;
   }> = [];
 
   /**

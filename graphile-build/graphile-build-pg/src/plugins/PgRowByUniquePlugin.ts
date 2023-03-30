@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PgResource, PgResourceUnique, PgTypeCodec } from "@dataplan/pg";
+import type { PgResource, PgResourceUnique, PgCodec } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import te, { isSafeObjectPropertyName } from "tamedevil";
@@ -93,7 +93,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                 const detailsByColumnName: {
                   [columnName: string]: {
                     graphqlName: string;
-                    codec: PgTypeCodec<any, any, any, any>;
+                    codec: PgCodec<any, any, any, any>;
                   };
                 } = Object.create(null);
                 uniqueKeys.forEach((columnName) => {

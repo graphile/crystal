@@ -4,7 +4,7 @@ import type {
   PgCodecRelationExtensions,
   PgResourceExtensions,
   PgResourceRefExtensions,
-  PgTypeCodecExtensions,
+  PgCodecExtensions,
 } from "@dataplan/pg";
 import { isDev } from "grafast";
 import { inspect } from "util";
@@ -24,7 +24,7 @@ export function getBehavior(
     | Partial<
         | PgResourceExtensions
         | PgCodecRelationExtensions
-        | PgTypeCodecExtensions
+        | PgCodecExtensions
         | PgResourceRefExtensions
       >
     | undefined

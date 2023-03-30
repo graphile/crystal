@@ -4,8 +4,8 @@ import type {
   PgEnumTypeCodec,
   PgRecordTypeCodecSpec,
   PgResource,
-  PgTypeCodec,
-  PgTypeCodecExtensions,
+  PgCodec,
+  PgCodecExtensions,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
@@ -30,11 +30,11 @@ import { version } from "../version.js";
 interface State {
   codecByTypeIdByDatabaseName: Map<
     string,
-    Map<string, Promise<PgTypeCodec<any, any, any, any, any, any, any> | null>>
+    Map<string, Promise<PgCodec<any, any, any, any, any, any, any> | null>>
   >;
   codecByClassIdByDatabaseName: Map<
     string,
-    Map<string, Promise<PgTypeCodec<any, any, any, any, any, any, any> | null>>
+    Map<string, Promise<PgCodec<any, any, any, any, any, any, any> | null>>
   >;
 }
 
@@ -50,7 +50,7 @@ declare global {
 
       scalarCodecTypeName(
         this: Inflection,
-        codec: PgTypeCodec<string, undefined, any, any, undefined, any, any>,
+        codec: PgCodec<string, undefined, any, any, undefined, any, any>,
       ): string;
       enumType(this: Inflection, codec: PgEnumTypeCodec<string, any>): string;
       enumValue(
@@ -59,17 +59,17 @@ declare global {
         codec: PgEnumTypeCodec<string, any>,
       ): string;
       rangeBoundType(input: {
-        codec: PgTypeCodec<string, undefined, any, any, undefined, any, any>;
+        codec: PgCodec<string, undefined, any, any, undefined, any, any>;
         underlyingTypeName: string;
       }): string;
       rangeType(input: {
-        codec: PgTypeCodec<string, undefined, any, any, undefined, any, any>;
+        codec: PgCodec<string, undefined, any, any, undefined, any, any>;
         underlyingTypeName: string;
       }): string;
     }
 
     interface Build {
-      allPgCodecs: Set<PgTypeCodec<any, any, any, any, any, any, any>>;
+      allPgCodecs: Set<PgCodec<any, any, any, any, any, any, any>>;
     }
 
     interface ScopeObject {
@@ -80,7 +80,7 @@ declare global {
     interface ScopeInputObject {
       isPgRangeInputType?: boolean;
       isPgRangeBoundInputType?: boolean;
-      pgCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
+      pgCodec?: PgCodec<any, any, any, any, any, any, any>;
     }
   }
 
@@ -90,19 +90,19 @@ declare global {
         getCodecFromClass(
           databaseName: string,
           pgClassId: string,
-        ): Promise<PgTypeCodec<any, any, any, any, any, any, any> | null>;
+        ): Promise<PgCodec<any, any, any, any, any, any, any> | null>;
         getCodecFromType(
           databaseName: string,
           pgTypeId: string,
           pgTypeModifier?: string | number | null,
-        ): Promise<PgTypeCodec<any, any, any, any, any, any, any> | null>;
+        ): Promise<PgCodec<any, any, any, any, any, any, any> | null>;
       };
     }
     interface GatherHooks {
-      pgCodecs_PgTypeCodec: PluginHook<
+      pgCodecs_PgCodec: PluginHook<
         (event: {
           databaseName: string;
-          pgCodec: PgTypeCodec<any, any, any, any, any, any, any>;
+          pgCodec: PgCodec<any, any, any, any, any, any, any>;
           pgClass?: PgClass;
           pgType: PgType;
         }) => Promise<void> | void
@@ -137,7 +137,7 @@ declare global {
         (event: {
           databaseName: string;
           pgType: PgType;
-          innerCodec: PgTypeCodec<any, any, any, any, any, any, any>;
+          innerCodec: PgCodec<any, any, any, any, any, any, any>;
           extensions: any;
         }) => Promise<void> | void
       >;
@@ -146,7 +146,7 @@ declare global {
         (event: {
           databaseName: string;
           pgType: PgType;
-          innerCodec: PgTypeCodec<any, any, any, any, any, any, any>;
+          innerCodec: PgCodec<any, any, any, any, any, any, any>;
           extensions: any;
         }) => Promise<void> | void
       >;
@@ -155,7 +155,7 @@ declare global {
         (event: {
           databaseName: string;
           pgType: PgType;
-          innerCodec: PgTypeCodec<any, any, any, any, any, any, any>;
+          innerCodec: PgCodec<any, any, any, any, any, any, any>;
           extensions: any;
         }) => Promise<void> | void
       >;
@@ -412,7 +412,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             typeTagsAndDescription.description ??
             classTagsAndDescription.description;
 
-          const extensions: PgTypeCodecExtensions = {
+          const extensions: PgCodecExtensions = {
             oid: pgClass.reltype,
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             pg: {
@@ -442,7 +442,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             (recordCodec, spec) => recordCodec(spec),
             [recordCodec, spec],
           );
-          info.process("pgCodecs_PgTypeCodec", {
+          info.process("pgCodecs_PgCodec", {
             pgCodec: codec,
             pgType: pgClass.getType()!,
             pgClass,
@@ -608,7 +608,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               const typeName = type.typname;
               if (!innerCodec) {
                 console.warn(
-                  `PgTypeCodec could not build codec for '${namespaceName}.${typeName}', we don't know how to process the subtype`,
+                  `PgCodec could not build codec for '${namespaceName}.${typeName}', we don't know how to process the subtype`,
                 );
                 return null;
               }
@@ -619,7 +619,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
               const { tags, description } = type.getTagsAndDescription();
 
-              const extensions: PgTypeCodecExtensions = {
+              const extensions: PgCodecExtensions = {
                 oid: type._id,
                 pg: {
                   databaseName,
@@ -685,7 +685,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               const typeName = type.typname;
               if (innerCodec) {
                 const { tags, description } = type.getTagsAndDescription();
-                const extensions: PgTypeCodecExtensions = {
+                const extensions: PgCodecExtensions = {
                   oid: type._id,
                   pg: {
                     databaseName,
@@ -756,7 +756,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 if (innerCodec) {
                   const typeDelim = innerType.typdelim!;
                   const { tags, description } = type.getTagsAndDescription();
-                  const extensions: PgTypeCodecExtensions = {
+                  const extensions: PgCodecExtensions = {
                     oid: type._id,
                     pg: {
                       databaseName,
@@ -780,7 +780,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 }
               }
               console.warn(
-                `Could not build PgTypeCodec for '${namespaceName}.${type.typname}' due to issue with getting codec for underlying type`,
+                `Could not build PgCodec for '${namespaceName}.${type.typname}' due to issue with getting codec for underlying type`,
               );
               return null;
             }
@@ -794,8 +794,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           })();
           if (codec) {
             // Be careful not to call this for class codecs!
-            info.process("pgCodecs_PgTypeCodec", {
-              pgCodec: codec as PgTypeCodec<any, any, any, any, any, any, any>,
+            info.process("pgCodecs_PgCodec", {
+              pgCodec: codec as PgCodec<any, any, any, any, any, any, any>,
               pgType: type,
               databaseName,
             });
@@ -812,7 +812,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
       async pgBasics_PgRegistryBuilder_pgCodecs(info, event) {
         const { registryBuilder } = event;
         const codecs = new Set<
-          PgTypeCodec<any, any, any, any, any, any, any>
+          PgCodec<any, any, any, any, any, any, any>
         >();
 
         // If we get errors from the frozen object then clearly we need to
@@ -851,10 +851,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
     hooks: {
       build(build) {
         build.allPgCodecs = new Set<
-          PgTypeCodec<any, any, any, any, any, any, any>
+          PgCodec<any, any, any, any, any, any, any>
         >();
         function walkCodec(
-          codec: PgTypeCodec<any, any, any, any, any, any, any>,
+          codec: PgCodec<any, any, any, any, any, any, any>,
         ): void {
           if (build.allPgCodecs!.has(codec)) {
             return;
@@ -903,7 +903,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         // Ensure all sources are uniquely named
         const knownCodecByName = new Map<
           string,
-          PgTypeCodec<any, any, any, any, any, any, any>
+          PgCodec<any, any, any, any, any, any, any>
         >();
         for (const codec of build.allPgCodecs) {
           const known = knownCodecByName.get(codec.name);
@@ -1077,8 +1077,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           // Now walk over all the codecs and ensure that each on has an associated type
           function prepareTypeForCodec(
-            codec: PgTypeCodec<any, any, any, any, any, any, any>,
-            visited: Set<PgTypeCodec<any, any, any, any, any, any, any>>,
+            codec: PgCodec<any, any, any, any, any, any, any>,
+            visited: Set<PgCodec<any, any, any, any, any, any, any>>,
           ): void {
             if (visited.has(codec)) {
               return;
@@ -1388,7 +1388,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     }
                     default: {
                       console.warn(
-                        `PgTypeCodec output type '${codec.name}' not understood, we don't know how to copy a '${underlyingOutputMeta.Constructor?.name}'`,
+                        `PgCodec output type '${codec.name}' not understood, we don't know how to copy a '${underlyingOutputMeta.Constructor?.name}'`,
                       );
                       return;
                     }
@@ -1420,7 +1420,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     }
                     default: {
                       console.warn(
-                        `PgTypeCodec input type '${codec.name}' not understood, we don't know how to copy a '${underlyingInputMeta.Constructor?.name}'`,
+                        `PgCodec input type '${codec.name}' not understood, we don't know how to copy a '${underlyingInputMeta.Constructor?.name}'`,
                       );
                       return;
                     }
@@ -1438,12 +1438,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               // We have no idea what this is or how to handle it.
               // TODO: add some default handling, like "behavesLike = TYPES.string"?
               console.warn(
-                `PgTypeCodec '${codec.name}' not understood, please set 'domainOfCodec' to indicate the underlying behaviour the type should have when exposed to GraphQL`,
+                `PgCodec '${codec.name}' not understood, please set 'domainOfCodec' to indicate the underlying behaviour the type should have when exposed to GraphQL`,
               );
             }
           }
 
-          const visited: Set<PgTypeCodec<any, any, any, any, any, any, any>> =
+          const visited: Set<PgCodec<any, any, any, any, any, any, any>> =
             new Set();
           for (const codec of build.allPgCodecs) {
             prepareTypeForCodec(codec, visited);

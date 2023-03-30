@@ -14,7 +14,7 @@ import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
   PgResourceAny,
-  PgTypeCodecAny,
+  PgCodecAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -86,7 +86,7 @@ export class PgInsertStep<TSource extends PgResourceAny>
     name: keyof GetPgResourceColumns<TSource>;
     depId: number;
     // TODO: this shouldn't be needed, we can look it up in the codec?
-    pgCodec: PgTypeCodecAny;
+    pgCodec: PgCodecAny;
   }> = [];
 
   /**

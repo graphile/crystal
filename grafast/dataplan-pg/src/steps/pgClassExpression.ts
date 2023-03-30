@@ -9,7 +9,7 @@ import type {
   GetPgCodecColumns,
   PgClassSingleStep,
   PgResourceAny,
-  PgTypeCodecAny,
+  PgCodecAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgDeleteStep } from "./pgDelete.js";
@@ -30,7 +30,7 @@ import { PgUpdateStep } from "./pgUpdate.js";
  * of another layer of plan.
  */
 export class PgClassExpressionStep<
-    TExpressionCodec extends PgTypeCodecAny,
+    TExpressionCodec extends PgCodecAny,
     TSource extends PgResource<any, any, any, any, any>,
   >
   extends UnbatchedExecutableStep<any>
@@ -244,7 +244,7 @@ export class PgClassExpressionStep<
  * that will be selected.
  */
 function pgClassExpression<
-  TExpressionCodec extends PgTypeCodecAny,
+  TExpressionCodec extends PgCodecAny,
   TSource extends PgResourceAny,
 >(
   table: PgClassSingleStep<TSource> | PgUnionAllSingleStep,

@@ -38,8 +38,8 @@ import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
   PgOrderFragmentSpec,
   PgOrderSpec,
-  PgTypeCodec,
-  PgTypeCodecAny,
+  PgCodec,
+  PgCodecAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -116,12 +116,12 @@ type PgUnionAllStepSelect<TAttributes extends string> =
   | {
       type: "attribute";
       attribute: TAttributes;
-      codec: PgTypeCodec<any, any, any, any>;
+      codec: PgCodec<any, any, any, any>;
     }
   | {
       type: "expression";
       expression: SQL;
-      codec: PgTypeCodec<any, any, any, any>;
+      codec: PgCodec<any, any, any, any>;
     }
   | {
       type: "outerExpression";
@@ -134,7 +134,7 @@ export interface PgUnionAllSourceSpec {
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
   [attributeName in TAttributes]: {
-    codec: PgTypeCodec<any, any, any>;
+    codec: PgCodec<any, any, any>;
   };
 };
 
@@ -149,7 +149,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
         }
       | {
           step: ExecutableStep;
-          codec: PgTypeCodec<any, any, any, any>;
+          codec: PgCodec<any, any, any, any>;
         };
   };
   path?: PgCodecRefPath;
@@ -179,7 +179,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
 
 interface QueryValue {
   dependencyIndex: number;
-  codec: PgTypeCodec<any, any, any>;
+  codec: PgCodec<any, any, any>;
 }
 
 /**
@@ -194,7 +194,7 @@ interface QueryValue {
  */
 type PgUnionAllPlaceholder = {
   dependencyIndex: number;
-  codec: PgTypeCodec<any, any, any, any>;
+  codec: PgCodec<any, any, any, any>;
   symbol: symbol;
 };
 
@@ -293,7 +293,7 @@ export class PgUnionAllSingleStep
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<TExpressionCodec extends PgTypeCodecAny>(
+  expression<TExpressionCodec extends PgCodecAny>(
     expression: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -310,7 +310,7 @@ export class PgUnionAllSingleStep
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
-  public select<TExpressionCodec extends PgTypeCodecAny>(
+  public select<TExpressionCodec extends PgCodecAny>(
     fragment: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -789,7 +789,7 @@ on (${sql.indent(
 
   selectExpression(
     expression: SQL,
-    codec: PgTypeCodec<any, any, any, any>,
+    codec: PgCodec<any, any, any, any>,
   ): number {
     const existingIndex = this.selects.findIndex(
       (s) =>
@@ -970,11 +970,11 @@ on (${sql.indent(
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
     $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
+    codec: PgCodec<any, any, any>,
   ): SQL;
   public placeholder(
     $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
-    overrideCodec?: PgTypeCodec<any, any, any>,
+    overrideCodec?: PgCodec<any, any, any>,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -1076,7 +1076,7 @@ on (${sql.indent(
         );
         identifierPlaceholders[i] = this.placeholder(
           toPg(access($parsedCursorPlan, [i + 1]), codec),
-          codec as PgTypeCodec<any, any, any, any, any, any, any>,
+          codec as PgCodec<any, any, any, any, any, any, any>,
         );
       }
     }
@@ -1466,7 +1466,7 @@ and ${condition(i + 1)}`}
         const midSelects: SQL[] = [];
         const innerSelects = this.selects
           .map((s, selectIndex) => {
-            const r = ((): [SQL, PgTypeCodec<any, any, any, any>] | null => {
+            const r = ((): [SQL, PgCodec<any, any, any, any>] | null => {
               switch (s.type) {
                 case "attribute": {
                   if (!this.spec.attributes) {
@@ -1515,7 +1515,7 @@ and ${condition(i + 1)}`}
                   );
                   return [
                     frag,
-                    codec as PgTypeCodec<any, any, any, any, any, any, any>,
+                    codec as PgCodec<any, any, any, any, any, any, any>,
                   ];
                 }
                 default: {

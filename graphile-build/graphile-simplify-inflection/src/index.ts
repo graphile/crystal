@@ -2,16 +2,16 @@ import type {
   PgCodecRelation,
   PgResource,
   PgResourceUnique,
-  PgTypeCodec,
-  PgTypeCodecWithColumns,
+  PgCodec,
+  PgCodecWithColumns,
 } from "@dataplan/pg";
 import type {} from "graphile-build";
 import type {} from "graphile-build-pg";
 import type { GraphileConfig } from "graphile-config";
 
 type PgCodecRelationAny = PgCodecRelation<
-  PgTypeCodecWithColumns,
-  PgResource<any, PgTypeCodecWithColumns, any, any, any>
+  PgCodecWithColumns,
+  PgResource<any, PgCodecWithColumns, any, any, any>
 >;
 
 /**
@@ -59,7 +59,7 @@ declare global {
       getBaseNameFromKeys(
         this: GraphileBuild.Inflection,
         detailedKeys: Array<{
-          codec: PgTypeCodec<any, any, any, any, any, any, any>;
+          codec: PgCodec<any, any, any, any, any, any, any>;
           columnName: string;
         }>,
       ): string | null;

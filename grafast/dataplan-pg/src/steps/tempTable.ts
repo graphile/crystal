@@ -5,7 +5,7 @@ import { sql } from "pg-sql2";
 
 import type { PgResource } from "../datasource.js";
 import type { ClassFilterStep } from "../filters/classFilter.js";
-import type { PgTypeCodec } from "../interfaces.js";
+import type { PgCodec } from "../interfaces.js";
 import type { PgConditionCapableParentStep } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 
@@ -32,7 +32,7 @@ export class TempTableStep<
 
   placeholder(
     $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
+    codec: PgCodec<any, any, any>,
   ): SQL {
     return this.$parent.placeholder($step, codec);
   }

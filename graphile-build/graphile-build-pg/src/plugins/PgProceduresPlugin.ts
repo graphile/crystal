@@ -8,7 +8,7 @@ import type {
   PgResourceExtensions,
   PgResourceOptions,
   PgResourceParameter,
-  PgTypeCodec,
+  PgCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
 import {
@@ -210,7 +210,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             pgProc,
           });
           const identifier = `${databaseName}.${namespace.nspname}.${pgProc.proname}(...)`;
-          const makeCodecFromReturn = async (): Promise<PgTypeCodec<
+          const makeCodecFromReturn = async (): Promise<PgCodec<
             any,
             any,
             any,
@@ -219,7 +219,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             any,
             any
           > | null> => {
-            // We're building a PgTypeCodec to represent specifically the
+            // We're building a PgCodec to represent specifically the
             // return type of this function.
 
             const numberOfArguments = allArgTypes.length ?? 0;

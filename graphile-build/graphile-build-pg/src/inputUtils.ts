@@ -1,14 +1,14 @@
 import "graphile-build";
 
-import type { PgCodecRelation, PgResource, PgTypeCodec } from "@dataplan/pg";
+import type { PgCodecRelation, PgResource, PgCodec } from "@dataplan/pg";
 
 /**
- * Metadata for a specific PgTypeCodec
+ * Metadata for a specific PgCodec
  */
-export interface PgTypeCodecMeta {
+export interface PgCodecMeta {
   /**
    * Given a `situation` such as 'input', 'output', 'patch', etc. returns the
-   * name of the GraphQL type to use for this PgTypeCodec.
+   * name of the GraphQL type to use for this PgCodec.
    */
   typeNameBySituation: {
     [situation: string]: string;
@@ -16,19 +16,19 @@ export interface PgTypeCodecMeta {
 }
 
 /**
- * A map from PgTypeCodec to its associated metadata.
+ * A map from PgCodec to its associated metadata.
  */
-export type PgTypeCodecMetaLookup = Map<
-  PgTypeCodec<any, any, any>,
-  PgTypeCodecMeta
+export type PgCodecMetaLookup = Map<
+  PgCodec<any, any, any>,
+  PgCodecMeta
 >;
 
 /**
  * Creates an empty meta object for the given codec.
  */
-export function makePgTypeCodecMeta(
-  _codec: PgTypeCodec<any, any, any>,
-): PgTypeCodecMeta {
+export function makePgCodecMeta(
+  _codec: PgCodec<any, any, any>,
+): PgCodecMeta {
   return {
     typeNameBySituation: Object.create(null),
   };
@@ -43,8 +43,8 @@ export function makePgTypeCodecMeta(
  */
 export function getCodecMetaLookupFromInput(
   input: GraphileBuild.BuildInput,
-): PgTypeCodecMetaLookup {
-  const metaLookup: PgTypeCodecMetaLookup = new Map();
+): PgCodecMetaLookup {
+  const metaLookup: PgCodecMetaLookup = new Map();
   const seenSources = new Set<PgResource<any, any, any, any, any>>();
   for (const codec of Object.values(input.pgRegistry.pgCodecs)) {
     walkCodec(codec, metaLookup);
@@ -63,7 +63,7 @@ export function getCodecMetaLookupFromInput(
  */
 function walkSource(
   source: PgResource<any, any, any, any, any>,
-  metaLookup: PgTypeCodecMetaLookup,
+  metaLookup: PgCodecMetaLookup,
   seenSources: Set<PgResource<any, any, any, any, any>>,
 ): void {
   if (seenSources.has(source)) {
@@ -94,13 +94,13 @@ function walkSource(
  * @internal
  */
 function walkCodec(
-  codec: PgTypeCodec<any, any, any>,
-  metaLookup: PgTypeCodecMetaLookup,
+  codec: PgCodec<any, any, any>,
+  metaLookup: PgCodecMetaLookup,
 ): void {
   if (metaLookup.has(codec)) {
     return;
   }
-  metaLookup.set(codec, makePgTypeCodecMeta(codec));
+  metaLookup.set(codec, makePgCodecMeta(codec));
   if (codec.columns) {
     for (const columnName in codec.columns) {
       walkCodec(codec.columns[columnName].codec, metaLookup);

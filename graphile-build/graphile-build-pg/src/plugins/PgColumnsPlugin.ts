@@ -7,8 +7,8 @@ import type {
   PgClassExpressionStep,
   PgRegistry,
   PgSelectSingleStep,
-  PgTypeCodec,
-  PgTypeCodecAny,
+  PgCodec,
+  PgCodecAny,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
@@ -28,7 +28,7 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       /**
-       * Given a columnName on a PgTypeCodec's columns, should return the field
+       * Given a columnName on a PgCodec's columns, should return the field
        * name to use to represent this column (both for input and output).
        *
        * @remarks The method beginning with `_` implies it's not ment to
@@ -38,7 +38,7 @@ declare global {
       _columnName(
         this: GraphileBuild.Inflection,
         details: {
-          codec: PgTypeCodec<any, any, any, any, any, any, any>;
+          codec: PgCodec<any, any, any, any, any, any, any>;
           columnName: string;
           skipRowId?: boolean;
         },
@@ -50,7 +50,7 @@ declare global {
        */
       _joinColumnNames(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any, any, any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
         names: readonly string[],
       ): string;
 
@@ -63,7 +63,7 @@ declare global {
         this: GraphileBuild.Inflection,
         details: {
           columnName: string;
-          codec: PgTypeCodec<any, any, any, any, any, any, any>;
+          codec: PgCodec<any, any, any, any, any, any, any>;
         },
       ): string;
     }
@@ -80,8 +80,8 @@ declare global {
 }
 
 function unwrapCodec(
-  codec: PgTypeCodec<any, any, any, any, any, any, any>,
-): PgTypeCodec<any, any, any, any, any, any, any> {
+  codec: PgCodec<any, any, any, any, any, any, any>,
+): PgCodec<any, any, any, any, any, any, any> {
   if (codec.arrayOfCodec) {
     return unwrapCodec(codec.arrayOfCodec);
   }
@@ -92,7 +92,7 @@ const getSource = EXPORTABLE(
   (PgResource) =>
     (
       registry: PgRegistry<any, any, any>,
-      baseCodec: PgTypeCodecAny,
+      baseCodec: PgCodecAny,
       pgSources: PgResource<any, any, any, any, any>[],
       $record: PgSelectSingleStep<any>,
     ) => {
@@ -142,7 +142,7 @@ function processColumn(
   const isInterface = context.type === "GraphQLInterfaceType";
 
   const column = pgCodec.columns[columnName] as PgTypeColumn<
-    PgTypeCodec<any, any, any, any, any, any>
+    PgCodec<any, any, any, any, any, any>
   >;
 
   const behavior = getBehavior([pgCodec.extensions, column.extensions]);
@@ -166,7 +166,7 @@ function processColumn(
     : baseType;
   if (!arrayOrNotType) {
     console.warn(
-      `Couldn't find a 'output' variant for PgTypeCodec ${
+      `Couldn't find a 'output' variant for PgCodec ${
         pgCodec.name
       }'s '${columnName}' column (${column.codec.name}; array=${!!column.codec
         .arrayOfCodec}, domain=${!!column.codec.domainOfCodec}, enum=${!!(
@@ -267,7 +267,7 @@ function processColumn(
               ) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $val = $record.get(columnName) as PgClassExpressionStep<
-                  PgTypeCodec<any, undefined, any, any, any, any, any>,
+                  PgCodec<any, undefined, any, any, any, any, any>,
                   any
                 >;
                 const $select = pgSelectFromRecords(
@@ -302,7 +302,7 @@ function processColumn(
         fieldSpec,
       ),
     },
-    `Adding '${columnName}' column field to PgTypeCodec '${pgCodec.name}'`,
+    `Adding '${columnName}' column field to PgCodec '${pgCodec.name}'`,
   );
 }
 
@@ -476,7 +476,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
               });
               if (memo[fieldName]) {
                 throw new Error(
-                  `Two columns produce the same GraphQL field name '${fieldName}' on input PgTypeCodec '${pgCodec.name}'; one of them is '${columnName}'`,
+                  `Two columns produce the same GraphQL field name '${fieldName}' on input PgCodec '${pgCodec.name}'; one of them is '${columnName}'`,
                 );
               }
               const columnType = build.getGraphQLTypeByPgCodec(

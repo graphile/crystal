@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PgSelectSingleStep, PgTypeCodec } from "@dataplan/pg";
+import type { PgSelectSingleStep, PgCodec } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 import { sign as signJwt } from "jsonwebtoken";
 
@@ -28,7 +28,7 @@ declare global {
 
     interface ScopeScalar {
       isPgJwtType?: boolean;
-      pgCodec?: PgTypeCodec<any, any, any, any>;
+      pgCodec?: PgCodec<any, any, any, any>;
     }
   }
 }
@@ -56,7 +56,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
     namespace: "pgJWT",
     helpers: {},
     hooks: {
-      pgCodecs_PgTypeCodec(info, { pgCodec, pgType }) {
+      pgCodecs_PgCodec(info, { pgCodec, pgType }) {
         if (
           info.options.pgJwtType?.[1] === pgType.typname &&
           info.options.pgJwtType?.[0] === pgType.getNamespace()!.nspname

@@ -10,15 +10,15 @@ import type {
   PgRefDefinition,
   PgResource,
   PgResourceOptions,
-  PgTypeCodec,
-  PgTypeCodecAny,
-  PgTypeCodecExtensions,
-  PgTypeCodecPolymorphism,
-  PgTypeCodecPolymorphismRelational,
-  PgTypeCodecPolymorphismRelationalTypeSpec,
-  PgTypeCodecPolymorphismSingle,
-  PgTypeCodecPolymorphismSingleTypeColumnSpec,
-  PgTypeCodecPolymorphismSingleTypeSpec,
+  PgCodec,
+  PgCodecAny,
+  PgCodecExtensions,
+  PgCodecPolymorphism,
+  PgCodecPolymorphismRelational,
+  PgCodecPolymorphismRelationalTypeSpec,
+  PgCodecPolymorphismSingle,
+  PgCodecPolymorphismSingleTypeColumnSpec,
+  PgCodecPolymorphismSingleTypeSpec,
   PgTypeColumn,
 } from "@dataplan/pg";
 import { arraysMatch, ExecutableStep } from "grafast";
@@ -47,17 +47,17 @@ declare global {
   }
   namespace GraphileBuild {
     interface ScopeInterface {
-      pgCodec?: PgTypeCodec<any, any, any, any>;
+      pgCodec?: PgCodec<any, any, any, any>;
       isPgPolymorphicTableType?: boolean;
-      pgPolymorphism?: PgTypeCodecPolymorphism<string>;
+      pgPolymorphism?: PgCodecPolymorphism<string>;
     }
     interface ScopeObject {
-      pgPolymorphism?: PgTypeCodecPolymorphism<string>;
+      pgPolymorphism?: PgCodecPolymorphism<string>;
       pgPolymorphicSingleTableType?: {
         typeIdentifier: string;
         name: string;
         columns: ReadonlyArray<
-          PgTypeCodecPolymorphismSingleTypeColumnSpec<any>
+          PgCodecPolymorphismSingleTypeColumnSpec<any>
         >;
       };
       pgPolymorphicRelationalType?: {
@@ -70,7 +70,7 @@ declare global {
 
 function parseColumn(
   colSpec: string,
-): PgTypeCodecPolymorphismSingleTypeColumnSpec<any> {
+): PgCodecPolymorphismSingleTypeColumnSpec<any> {
   let spec = colSpec;
   let isNotNull = false;
   if (spec.endsWith("!")) {
@@ -96,7 +96,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     hooks: {
       async pgCodecs_recordType_spec(info, event) {
         const { pgClass, spec, databaseName } = event;
-        const extensions: PgTypeCodecExtensions =
+        const extensions: PgCodecExtensions =
           spec.extensions ?? Object.create(null);
         if (!spec.extensions) {
           spec.extensions = extensions;
@@ -135,7 +135,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 .filter((a) => a.attnum >= 1)
                 .map((a) => a.attname);
 
-              const types: PgTypeCodecPolymorphismSingle<any>["types"] =
+              const types: PgCodecPolymorphismSingle<any>["types"] =
                 Object.create(null);
               const specificColumns = new Set<string>();
               for (const typeTag of typeTags) {
@@ -182,7 +182,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 ? rawTypeTags.map((t) => String(t))
                 : [String(rawTypeTags)];
 
-              const types: PgTypeCodecPolymorphismRelational<any>["types"] =
+              const types: PgCodecPolymorphismRelational<any>["types"] =
                 Object.create(null);
               for (const typeTag of typeTags) {
                 const {
@@ -293,7 +293,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const poly = (source.codec as PgTypeCodecAny).polymorphism;
+          const poly = (source.codec as PgCodecAny).polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
@@ -424,7 +424,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           const relations = registry.pgRelations[source.codec.name] as {
             [relationName: string]: PgCodecRelation<any, any>;
           };
-          const poly = (source.codec as PgTypeCodecAny).polymorphism;
+          const poly = (source.codec as PgCodecAny).polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
@@ -568,7 +568,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         } = build;
         const unionsToRegister = new Map<
           string,
-          PgTypeCodec<any, any, any, any, any, any, any>[]
+          PgCodec<any, any, any, any, any, any, any>[]
         >();
         for (const codec of build.pgCodecMetaLookup.keys()) {
           if (!codec.columns) {
@@ -650,8 +650,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   [
                     string,
                     (
-                      | PgTypeCodecPolymorphismSingleTypeSpec<string>
-                      | PgTypeCodecPolymorphismRelationalTypeSpec
+                      | PgCodecPolymorphismSingleTypeSpec<string>
+                      | PgCodecPolymorphismRelationalTypeSpec
                     ),
                   ]
                 >) {
@@ -667,7 +667,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           typeIdentifier,
                           name: spec.name,
                           columns: (
-                            spec as PgTypeCodecPolymorphismSingleTypeSpec<string>
+                            spec as PgCodecPolymorphismSingleTypeSpec<string>
                           ).columns,
                         },
                       },

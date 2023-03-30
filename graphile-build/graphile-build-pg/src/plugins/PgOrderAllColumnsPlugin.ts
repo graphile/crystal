@@ -3,7 +3,7 @@ import "graphile-config";
 
 import type {
   PgResourceUnique,
-  PgTypeCodec,
+  PgCodec,
   PgTypeColumn,
   PgTypeColumns,
 } from "@dataplan/pg";
@@ -21,7 +21,7 @@ declare global {
       orderByColumnEnum(
         this: Inflection,
         details: {
-          codec: PgTypeCodec<any, any, any, any>;
+          codec: PgCodec<any, any, any, any>;
           columnName: string;
           column: PgTypeColumn;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";

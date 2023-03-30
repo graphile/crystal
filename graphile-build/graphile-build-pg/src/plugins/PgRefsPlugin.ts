@@ -5,9 +5,9 @@ import type {
   PgRefDefinitions,
   PgResource,
   PgResourceOptions,
-  PgTypeCodecAny,
-  PgTypeCodecExtensions,
-  PgTypeCodecWithColumns,
+  PgCodecAny,
+  PgCodecExtensions,
+  PgCodecWithColumns,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import type { PgClass } from "pg-introspection";
@@ -44,7 +44,7 @@ declare global {
 
 declare module "@dataplan/pg" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface PgTypeCodecExtensions {
+  interface PgCodecExtensions {
     /**
      * References between codecs (cannot be implemented directly, but sources
      * may implement them).
@@ -105,7 +105,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
     helpers: {},
     initialState: () => ({ sourceEvents: [] }),
     hooks: {
-      async pgCodecs_PgTypeCodec(info, event) {
+      async pgCodecs_PgCodec(info, event) {
         const { pgCodec, pgClass } = event;
         if (!pgClass) {
           return;
@@ -124,7 +124,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
         }
 
         const refs = rawRefs.map((ref) => parseSmartTagsOptsString(ref, 1));
-        const extensions: Partial<PgTypeCodecExtensions> =
+        const extensions: Partial<PgCodecExtensions> =
           pgCodec.extensions ?? Object.create(null);
         pgCodec.extensions = extensions;
         const refDefinitions: PgRefDefinitions =
@@ -206,7 +206,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           ? [tags.refVia]
           : null;
 
-        const refDefinitions = (sourceOptions.codec as PgTypeCodecAny)
+        const refDefinitions = (sourceOptions.codec as PgCodecAny)
           .extensions?.refDefinitions;
         if (!refDefinitions) {
           if (rawRefVias) {
@@ -262,7 +262,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
               type RelationEntry = [
                 string,
                 PgCodecRelationConfig<
-                  PgTypeCodecWithColumns,
+                  PgCodecWithColumns,
                   PgResourceOptions<any, any, any, any>
                 >,
               ];

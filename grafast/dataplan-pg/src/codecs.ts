@@ -41,10 +41,10 @@ import type {
   PgEncode,
   PgEnumTypeCodec,
   PgEnumValue,
-  PgTypeCodec,
-  PgTypeCodecAny,
-  PgTypeCodecExtensions,
-  PgTypeCodecPolymorphism,
+  PgCodec,
+  PgCodecAny,
+  PgCodecExtensions,
+  PgCodecPolymorphism,
 } from "./interfaces.js";
 
 // PERF: `identity` can be shortcut
@@ -56,7 +56,7 @@ export type PgTypeColumnVia = string | PgTypeColumnViaExplicit;
 export interface PgTypeColumnExtensions {}
 
 export interface PgTypeColumn<
-  TCodec extends PgTypeCodecAny = PgTypeCodecAny,
+  TCodec extends PgCodecAny = PgCodecAny,
   TNotNull extends boolean = boolean,
 > {
   /**
@@ -130,19 +130,19 @@ export interface PgTypeColumn<
 export type PgTypeColumns<
   TCodecMap extends {
     [columnName in string]: PgTypeColumn<
-      PgTypeCodec<string, any, any, any, any, any, any>,
+      PgCodec<string, any, any, any, any, any, any>,
       boolean
     >;
   } = {
     [columnName in string]: PgTypeColumn<
-      PgTypeCodec<string, any, any, any, any, any, any>,
+      PgCodec<string, any, any, any, any, any, any>,
       boolean
     >;
   },
 > = TCodecMap;
 
 /**
- * Returns a PgTypeCodec for the given builtin Postgres scalar type, optionally
+ * Returns a PgCodec for the given builtin Postgres scalar type, optionally
  * pass the following config:
  *
  * - castFromPg: how to wrap the SQL fragment that represents this type so that
@@ -162,7 +162,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
   oid: string | undefined,
   type: TName,
   options?: Cast<TFromJavaScript, TFromPostgres>,
-) => PgTypeCodec<
+) => PgCodec<
   TName,
   undefined,
   TFromPostgres,
@@ -357,7 +357,7 @@ export type ObjectFromPgTypeColumns<TColumns extends PgTypeColumns> = {
     infer UCodec,
     infer UNonNull
   >
-    ? UCodec extends PgTypeCodec<string, any, any, infer UFromJs, any, any, any>
+    ? UCodec extends PgCodec<string, any, any, infer UFromJs, any, any, any>
       ? UNonNull extends true
         ? UFromJs
         : UFromJs | null
@@ -396,13 +396,13 @@ export type PgRecordTypeCodecSpec<
   name: TName;
   identifier: SQL;
   columns: TColumns;
-  polymorphism?: PgTypeCodecPolymorphism<any>;
-  extensions?: Partial<PgTypeCodecExtensions>;
+  polymorphism?: PgCodecPolymorphism<any>;
+  extensions?: Partial<PgCodecExtensions>;
   isAnonymous?: boolean;
 };
 
 /**
- * Returns a PgTypeCodec that represents a composite type (a type with
+ * Returns a PgCodec that represents a composite type (a type with
  * attributes).
  *
  * name - the name of this type
@@ -416,7 +416,7 @@ export function recordCodec<
   const TColumns extends PgTypeColumns,
 >(
   config: PgRecordTypeCodecSpec<TName, TColumns>,
-): PgTypeCodec<
+): PgCodec<
   TName,
   TColumns,
   string,
@@ -450,11 +450,11 @@ export type PgEnumCodecSpec<TName extends string, TValue extends string> = {
   name: TName;
   identifier: SQL;
   values: Array<PgEnumValue<TValue> | TValue>;
-  extensions?: Partial<PgTypeCodecExtensions>;
+  extensions?: Partial<PgCodecExtensions>;
 };
 
 /**
- * Returns a PgTypeCodec that represents a Postgres enum type.
+ * Returns a PgCodec that represents a Postgres enum type.
  *
  * - name - the name of the enum
  * - identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
@@ -484,7 +484,7 @@ export function isEnumCodec<
   TName extends string,
   TValue extends string = string,
 >(
-  t: PgTypeCodec<TName, any, any, any, any, any, any>,
+  t: PgCodec<TName, any, any, any, any, any, any>,
 ): t is PgEnumTypeCodec<TName, TValue> {
   return "values" in t;
 }
@@ -492,15 +492,15 @@ export function isEnumCodec<
 const $$listCodec = Symbol("listCodec");
 
 type CodecWithListCodec<
-  TCodec extends PgTypeCodec<any, any, any, any, any, any, any>,
+  TCodec extends PgCodec<any, any, any, any, any, any, any>,
 > = TCodec & {
-  [$$listCodec]?: PgTypeCodec<
-    `${TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+  [$$listCodec]?: PgCodec<
+    `${TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? UName
       : never}[]`,
     undefined,
     string,
-    TCodec extends PgTypeCodec<
+    TCodec extends PgCodec<
       any,
       any,
       any,
@@ -518,7 +518,7 @@ type CodecWithListCodec<
 };
 
 /**
- * Given a PgTypeCodec, this returns a new PgTypeCodec that represents a list
+ * Given a PgCodec, this returns a new PgCodec that represents a list
  * of the former.
  *
  * List codecs CANNOT BE NESTED - Postgres array types don't have defined
@@ -531,19 +531,19 @@ type CodecWithListCodec<
  * @param identifier - a pg-sql2 fragment that represents the name of this type
  */
 export function listOfCodec<
-  TInnerCodec extends PgTypeCodec<string, any, any, any, undefined, any, any>,
+  TInnerCodec extends PgCodec<string, any, any, any, undefined, any, any>,
 >(
   listedCodec: TInnerCodec,
-  extensions?: Partial<PgTypeCodecExtensions>,
+  extensions?: Partial<PgCodecExtensions>,
   typeDelim = `,`,
   identifier: SQL = sql`${listedCodec.sqlType}[]`,
-): PgTypeCodec<
-  `${TInnerCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+): PgCodec<
+  `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
     ? UName
     : never}[]`,
   undefined, // Array has no columns
   string,
-  TInnerCodec extends PgTypeCodec<
+  TInnerCodec extends PgCodec<
     any,
     any,
     any,
@@ -567,8 +567,8 @@ export function listOfCodec<
     return innerCodec[$$listCodec];
   }
 
-  const listCodec: PgTypeCodec<
-    `${TInnerCodec extends PgTypeCodec<
+  const listCodec: PgCodec<
+    `${TInnerCodec extends PgCodec<
       infer UName,
       any,
       any,
@@ -581,7 +581,7 @@ export function listOfCodec<
       : never}[]`,
     undefined, // Array has no columns
     string,
-    TInnerCodec extends PgTypeCodec<
+    TInnerCodec extends PgCodec<
       any,
       any,
       any,
@@ -595,7 +595,7 @@ export function listOfCodec<
     TInnerCodec
   > = {
     name: `${
-      innerCodec.name as TInnerCodec extends PgTypeCodec<
+      innerCodec.name as TInnerCodec extends PgCodec<
         infer UName,
         any,
         any,
@@ -665,19 +665,19 @@ exportAs("@dataplan/pg", listOfCodec, "listOfCodec");
  * @param config - extra details about this domain
  */
 export function domainOfCodec<
-  TInnerCodec extends PgTypeCodec<any, any, any, any, any, any>,
+  TInnerCodec extends PgCodec<any, any, any, any, any, any>,
 >(
   innerCodec: TInnerCodec,
   name: string,
   identifier: SQL,
   config: {
-    extensions?: Partial<PgTypeCodecExtensions>;
+    extensions?: Partial<PgCodecExtensions>;
     notNull?: boolean | null;
   } = {},
-): PgTypeCodec<
-  TInnerCodec extends PgTypeCodec<infer U, any, any, any, any, any> ? U : any,
-  TInnerCodec extends PgTypeCodec<any, infer U, any, any, any, any> ? U : any,
-  TInnerCodec extends PgTypeCodec<any, any, infer U, any, any, any> ? U : any,
+): PgCodec<
+  TInnerCodec extends PgCodec<infer U, any, any, any, any, any> ? U : any,
+  TInnerCodec extends PgCodec<any, infer U, any, any, any, any> ? U : any,
+  TInnerCodec extends PgCodec<any, any, infer U, any, any, any> ? U : any,
   undefined,
   TInnerCodec,
   undefined
@@ -703,7 +703,7 @@ exportAs("@dataplan/pg", domainOfCodec, "domainOfCodec");
  * @internal
  */
 function escapeRangeValue<
-  TInnerCodec extends PgTypeCodec<
+  TInnerCodec extends PgCodec<
     any,
     undefined,
     any,
@@ -727,16 +727,16 @@ interface PgRange<T> {
 }
 
 /**
- * Returns a PgTypeCodec that represents a range of the given inner PgTypeCodec
+ * Returns a PgCodec that represents a range of the given inner PgCodec
  * type.
  *
- * @param innerCodec - the PgTypeCodec that represents the bounds of this range
+ * @param innerCodec - the PgCodec that represents the bounds of this range
  * @param name - the name of the range
  * @param identifier - a pg-sql2 fragment that represents the name of this type
  * @param config - extra details about this range
  */
 export function rangeOfCodec<
-  TInnerCodec extends PgTypeCodec<
+  TInnerCodec extends PgCodec<
     any,
     undefined,
     any,
@@ -750,8 +750,8 @@ export function rangeOfCodec<
   innerCodec: TInnerCodec,
   name: TName,
   identifier: SQL,
-  config: { extensions?: Partial<PgTypeCodecExtensions> } = {},
-): PgTypeCodec<
+  config: { extensions?: Partial<PgCodecExtensions> } = {},
+): PgCodec<
   TName,
   undefined,
   string,
@@ -1044,7 +1044,7 @@ export type PgBaseCodecsObject = {
 
 /**
  * For supported builtin type names ('void', 'bool', etc) that will be found in
- * the `pg_catalog` table this will return a PgTypeCodec.
+ * the `pg_catalog` table this will return a PgCodec.
  */
 export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
   switch (pgCatalogTypeName) {
@@ -1159,10 +1159,10 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
 }
 
 export function getInnerCodec<
-  TCodec extends PgTypeCodec<any, any, any, any, any, any>,
+  TCodec extends PgCodec<any, any, any, any, any, any>,
 >(
   codec: TCodec,
-): TCodec extends PgTypeCodec<
+): TCodec extends PgCodec<
   any,
   any,
   any,

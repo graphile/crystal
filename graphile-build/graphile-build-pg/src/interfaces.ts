@@ -2,8 +2,8 @@ import type {
   PgCodecRelationConfig,
   PgRegistryAny,
   PgResourceOptions,
-  PgTypeCodec,
-  PgTypeCodecWithColumns,
+  PgCodec,
+  PgCodecWithColumns,
   PgTypeColumns,
   WithPgClient,
 } from "@dataplan/pg";
@@ -45,7 +45,7 @@ export interface PgTypeColumnTags extends PgSmartTagsDict {
   notNull: true;
 }
 
-export interface PgTypeCodecTags extends PgSmartTagsDict {
+export interface PgCodecTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
   implements: string | string[];
@@ -104,10 +104,10 @@ declare module "@dataplan/pg" {
     description?: string;
   }
 
-  interface PgTypeCodecExtensions {
+  interface PgCodecExtensions {
     /** If false but the codec has columns then it's probably a composite type */
     isTableLike?: boolean;
-    tags: Partial<PgTypeCodecTags>;
+    tags: Partial<PgCodecTags>;
     description?: string;
   }
 }
@@ -117,8 +117,8 @@ declare global {
     interface PgRelations {
       [codecName: string]: {
         [relationName: string]: PgCodecRelationConfig<
-          PgTypeCodec<any, PgTypeColumns, any, any, undefined, any, undefined>,
-          PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
+          PgCodec<any, PgTypeColumns, any, any, undefined, any, undefined>,
+          PgResourceOptions<PgCodecWithColumns, any, any, any>
         >;
       };
     }

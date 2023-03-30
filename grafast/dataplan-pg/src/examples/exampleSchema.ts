@@ -71,7 +71,7 @@ import type {
   PgExecutorContextPlans,
   PgInsertStep,
   PgSelectStep,
-  PgTypeCodec,
+  PgCodec,
   PgTypeColumn,
   PgTypeColumnVia,
   WithPgClient,
@@ -105,7 +105,7 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type { GetPgResourceColumns, PgTypeCodecAny } from "../interfaces";
+import type { GetPgResourceColumns, PgCodecAny } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -195,7 +195,7 @@ export function makeExampleSchema(
     ) => {
       const col = <
         TOptions extends {
-          codec: PgTypeCodecAny;
+          codec: PgCodecAny;
           notNull?: boolean;
           expression?: PgTypeColumn<any>["expression"];
           // TODO: we could make TypeScript understand the relations on the object
@@ -1614,7 +1614,7 @@ export function makeExampleSchema(
   >;
 
   type BBB = typeof registry.pgSources.messages.codec;
-  type Baz = BBB extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+  type Baz = BBB extends PgCodec<infer UName, any, any, any, any, any, any>
     ? typeof registry extends PgRegistry<any, any, infer URelations>
       ? URelations[UName]
       : never
@@ -1764,7 +1764,7 @@ export function makeExampleSchema(
     TMyDataSource extends PgResource<any, any, any, any, any>,
     TAttrName extends TMyDataSource extends PgResource<
       any,
-      PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+      PgCodec<any, infer UColumns, any, any, any, any, any>,
       any,
       any,
       any
@@ -1788,7 +1788,7 @@ export function makeExampleSchema(
     TMyDataSource extends PgResource<any, any, any, any, any>,
     TRelationName extends TMyDataSource extends PgResource<
       any,
-      PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
+      PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
       any
@@ -2926,7 +2926,7 @@ export function makeExampleSchema(
       personSource,
       postSource,
     ): PgPolymorphicTypeMap<
-      PgSelectSingleStep<any> | PgClassExpressionStep<PgTypeCodecAny, any>,
+      PgSelectSingleStep<any> | PgClassExpressionStep<PgCodecAny, any>,
       readonly number[],
       ListStep<readonly ExecutableStep<any>[]>
     > => ({
@@ -3147,7 +3147,7 @@ export function makeExampleSchema(
       PgSelectSingleStep<
         PgResource<
           any,
-          PgTypeCodec<
+          PgCodec<
             any,
             typeof singleTableItemsSource.codec.columns,
             any,
@@ -3293,7 +3293,7 @@ export function makeExampleSchema(
         PgSelectSingleStep<
           PgResource<
             any,
-            PgTypeCodec<any, TColumns, any, any, any, any, any>,
+            PgCodec<any, TColumns, any, any, any, any, any>,
             any,
             any,
             any
@@ -4727,7 +4727,7 @@ export function makeExampleSchema(
 
   type PgRecord<TDataSource extends PgResource<any, any, any, any, any>> =
     PgClassExpressionStep<
-      PgTypeCodec<
+      PgCodec<
         any,
         GetPgResourceColumns<TDataSource>,
         any,

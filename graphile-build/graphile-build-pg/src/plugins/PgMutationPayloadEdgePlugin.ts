@@ -4,7 +4,7 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgResourceUnique,
-  PgTypeCodec,
+  PgCodec,
 } from "@dataplan/pg";
 import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
@@ -23,7 +23,7 @@ declare global {
       // TODO: move this somewhere more shared
       tableEdgeField(
         this: Inflection,
-        codec: PgTypeCodec<any, any, any, any, any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
     }
 

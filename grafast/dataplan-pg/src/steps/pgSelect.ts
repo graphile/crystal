@@ -52,9 +52,9 @@ import type {
   PgGroupSpec,
   PgOrderSpec,
   PgResourceAny,
-  PgTypeCodec,
-  PgTypeCodecAny,
-  PgTypeCodecWithColumns,
+  PgCodec,
+  PgCodecAny,
+  PgCodecWithColumns,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -163,26 +163,26 @@ type PgSelectPlanJoin =
  */
 type PgSelectPlaceholder = {
   dependencyIndex: number;
-  codec: PgTypeCodecAny;
+  codec: PgCodecAny;
   symbol: symbol;
 };
 
 export type PgSelectIdentifierSpec =
   | {
       step: ExecutableStep<any>;
-      codec: PgTypeCodec<any, any, any>;
+      codec: PgCodec<any, any, any>;
       matches: (alias: SQL) => SQL;
     }
   | {
       step: PgTypedExecutableStep<any>;
-      codec?: PgTypeCodec<any, any, any>;
+      codec?: PgCodec<any, any, any>;
       matches: (alias: SQL) => SQL;
     };
 
 export type PgSelectArgumentSpec =
   | {
       step: ExecutableStep<any>;
-      pgCodec: PgTypeCodec<any, any, any, any>;
+      pgCodec: PgCodec<any, any, any, any>;
       name?: string;
     }
   | {
@@ -198,7 +198,7 @@ export interface PgSelectArgumentDigest {
 
 interface QueryValue {
   dependencyIndex: number;
-  codec: PgTypeCodecAny;
+  codec: PgCodecAny;
 }
 
 function assertSensible(step: ExecutableStep): void {
@@ -803,11 +803,11 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
     return this.isUnique;
   }
 
-  public placeholder($step: PgTypedExecutableStep<PgTypeCodecAny>): SQL;
-  public placeholder($step: ExecutableStep<any>, codec: PgTypeCodecAny): SQL;
+  public placeholder($step: PgTypedExecutableStep<PgCodecAny>): SQL;
+  public placeholder($step: ExecutableStep<any>, codec: PgCodecAny): SQL;
   public placeholder(
-    $step: ExecutableStep<any> | PgTypedExecutableStep<PgTypeCodecAny>,
-    overrideCodec?: PgTypeCodecAny,
+    $step: ExecutableStep<any> | PgTypedExecutableStep<PgCodecAny>,
+    overrideCodec?: PgCodecAny,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -855,7 +855,7 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
     const relation = this.source.getRelation(
       relationIdentifier,
     ) as PgCodecRelation<
-      PgTypeCodecWithColumns,
+      PgCodecWithColumns,
       PgResource<any, any, any, any, any>
     >;
     if (!relation) {
@@ -2767,7 +2767,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     options?: PgSelectSinglePlanOptions,
   ): TSource extends PgResource<
     any,
-    PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+    PgCodec<any, infer UColumns, any, any, any, any, any>,
     any,
     any,
     any
@@ -2775,7 +2775,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     ? UColumns extends PgTypeColumns
       ? PgSelectSingleStep<TSource>
       : PgClassExpressionStep<
-          PgTypeCodec<string, undefined, any, any, any, any, any>,
+          PgCodec<string, undefined, any, any, any, any, any>,
           TSource
         >
     : never {
@@ -2801,7 +2801,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     itemPlan: ExecutableStep,
   ): TSource extends PgResource<
     any,
-    PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
+    PgCodec<any, infer UColumns, any, any, any, any, any>,
     any,
     any,
     any
@@ -2809,7 +2809,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     ? UColumns extends PgTypeColumns
       ? PgSelectSingleStep<TSource>
       : PgClassExpressionStep<
-          PgTypeCodec<string, undefined, any, any, any, any, any>,
+          PgCodec<string, undefined, any, any, any, any, any>,
           TSource
         >
     : never {
@@ -2889,7 +2889,7 @@ export function pgSelectFromRecords<
 >(
   source: TSource,
   records: PgClassExpressionStep<
-    PgTypeCodec<
+    PgCodec<
       any,
       undefined,
       any,
@@ -2931,7 +2931,7 @@ export function digestsFromArgumentSpecs(
   $placeholderable: {
     placeholder(
       step: ExecutableStep,
-      codec: PgTypeCodec<any, any, any, any>,
+      codec: PgCodec<any, any, any, any>,
     ): SQL;
   },
   specs: PgSelectArgumentSpec[],
@@ -2970,8 +2970,8 @@ exportAs("@dataplan/pg", digestsFromArgumentSpecs, "digestsFromArgumentSpecs");
 export function getFragmentAndCodecFromOrder(
   alias: SQL,
   order: PgOrderSpec,
-  codec: PgTypeCodecAny,
-): [SQL, PgTypeCodecAny] {
+  codec: PgCodecAny,
+): [SQL, PgCodecAny] {
   if (order.attribute != null) {
     const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
     const colCodec = codec.columns![order.attribute].codec;

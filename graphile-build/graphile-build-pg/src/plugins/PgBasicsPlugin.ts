@@ -3,7 +3,7 @@ import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
 
-import type { PgRegistry, PgRegistryBuilder, PgTypeCodec } from "@dataplan/pg";
+import type { PgRegistry, PgRegistryBuilder, PgCodec } from "@dataplan/pg";
 import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 import type { PluginHook } from "graphile-config";
@@ -11,29 +11,29 @@ import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
-import type { PgTypeCodecMetaLookup } from "../inputUtils.js";
+import type { PgCodecMetaLookup } from "../inputUtils.js";
 import {
   getCodecMetaLookupFromInput,
-  makePgTypeCodecMeta,
+  makePgCodecMeta,
 } from "../inputUtils.js";
 import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
     type HasGraphQLTypeForPgCodec = (
-      codec: PgTypeCodec<any, any, any, any, any, any, any>,
+      codec: PgCodec<any, any, any, any, any, any, any>,
       situation?: string,
     ) => boolean;
     type GetGraphQLTypeByPgCodec = (
-      codec: PgTypeCodec<any, any, any, any, any, any, any>,
+      codec: PgCodec<any, any, any, any, any, any, any>,
       situation: string,
     ) => GraphQLType | null;
     type GetGraphQLTypeNameByPgCodec = (
-      codec: PgTypeCodec<any, any, any, any, any, any, any>,
+      codec: PgCodec<any, any, any, any, any, any, any>,
       situation: string,
     ) => string | null;
     type SetGraphQLTypeForPgCodec = (
-      codec: PgTypeCodec<any, any, any, any, any, any, any>,
+      codec: PgCodec<any, any, any, any, any, any, any>,
       situations: string | string[],
       typeName: string,
     ) => void;
@@ -45,7 +45,7 @@ declare global {
        *
        * @internal
        */
-      pgCodecMetaLookup: PgTypeCodecMetaLookup;
+      pgCodecMetaLookup: PgCodecMetaLookup;
 
       /**
        * Do we already have a GraphQL type to use for the given codec in the
@@ -247,7 +247,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
 
             let meta = pgCodecMetaLookup.get(codec);
             if (!meta) {
-              meta = makePgTypeCodecMeta(codec);
+              meta = makePgCodecMeta(codec);
               pgCodecMetaLookup.set(codec, meta);
             }
 

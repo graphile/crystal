@@ -14,7 +14,7 @@ import type {
   PgResource,
   PgResourceParameter,
   PgResourceParameterAny,
-  PgTypeCodec,
+  PgCodec,
   PgTypedExecutableStep,
   PgUpdateStep,
 } from "@dataplan/pg";
@@ -75,7 +75,7 @@ declare global {
         argDetails: Array<{
           graphqlArgName: string;
           postgresArgName: string | null;
-          pgCodec: PgTypeCodec<any, any, any, any>;
+          pgCodec: PgCodec<any, any, any, any>;
           inputType: GraphQLInputType;
           required: boolean;
         }>;
@@ -83,7 +83,7 @@ declare global {
           $placeholderable: {
             placeholder(
               $step: ExecutableStep,
-              codec: PgTypeCodec<any, any, any, any>,
+              codec: PgCodec<any, any, any, any>,
             ): SQL;
           };
           source: PgResource<any, any, any, any, any>;
@@ -269,7 +269,7 @@ declare global {
       [$$rootQuery]: Array<PgResource<any, any, any, any, any>>;
       [$$rootMutation]: Array<PgResource<any, any, any, any, any>>;
       [$$computed]: Map<
-        PgTypeCodec<any, any, any, any, any, any, any>,
+        PgCodec<any, any, any, any, any, any, any>,
         Array<PgResource<any, any, any, any, any>>
       >;
     }
@@ -1231,7 +1231,7 @@ function getFunctionSourceReturnGraphQLType(
   build: GraphileBuild.Build,
   source: PgResource<any, any, any, any, any>,
 ): GraphQLOutputType | null {
-  const sourceInnerCodec: PgTypeCodec<any, any, any, any, undefined, any, any> =
+  const sourceInnerCodec: PgCodec<any, any, any, any, undefined, any, any> =
     source.codec.arrayOfCodec ?? source.codec;
   if (!sourceInnerCodec) {
     return null;

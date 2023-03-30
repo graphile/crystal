@@ -40,9 +40,9 @@ import type {
   PgRegistryAny,
   PgRegistryConfig,
   PgResourceParameterAny,
-  PgTypeCodec,
-  PgTypeCodecAny,
-  PgTypeCodecWithColumns,
+  PgCodec,
+  PgCodecAny,
+  PgCodecWithColumns,
   PlanByUniques,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
@@ -96,7 +96,7 @@ export interface PgResourceParameterExtensions {
  */
 export interface PgResourceParameter<
   TName extends string | null,
-  TCodec extends PgTypeCodecAny,
+  TCodec extends PgCodecAny,
 > {
   /**
    * Name of the parameter, if null then we must use positional rather than
@@ -161,7 +161,7 @@ export interface PgCodecRefs {
  * Configuration options for your PgResource
  */
 export interface PgResourceOptions<
-  TCodec extends PgTypeCodecAny,
+  TCodec extends PgCodecAny,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
   TName extends string = string,
@@ -215,7 +215,7 @@ export interface PgResourceOptions<
 }
 
 export interface PgFunctionSourceOptions<
-  TCodec extends PgTypeCodecAny,
+  TCodec extends PgCodecAny,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TNewParameters extends readonly PgResourceParameterAny[],
   TNewName extends string,
@@ -239,7 +239,7 @@ const $$codecSource = Symbol("codecSource");
 const $$codecCounter = Symbol("codecCounter");
 
 // TODO: is this needed any more, now that we've moved codecs to owning relations?
-type CodecWithSource<TCodec extends PgTypeCodecAny> = TCodec & {
+type CodecWithSource<TCodec extends PgCodecAny> = TCodec & {
   [$$codecSource]?: Map<any, any>;
   [$$codecCounter]?: number;
 };
@@ -250,7 +250,7 @@ type CodecWithSource<TCodec extends PgTypeCodecAny> = TCodec & {
  */
 export class PgResource<
   TName extends string,
-  TCodec extends PgTypeCodecAny,
+  TCodec extends PgCodecAny,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
   TRegistry extends PgRegistry<any, any, any> = PgRegistryAny,
@@ -297,7 +297,7 @@ export class PgResource<
   public extensions: Partial<PgResourceExtensions> | undefined;
 
   // TODO: delete me?
-  static configFromCodec<TCodec extends PgTypeCodecAny>(
+  static configFromCodec<TCodec extends PgCodecAny>(
     executor: PgExecutor,
     baseCodec: TCodec,
   ): PgResourceOptions<
@@ -418,7 +418,7 @@ export class PgResource<
    * type/relations/etc.
    */
   static alternativeSourceOptions<
-    TCodec extends PgTypeCodecAny,
+    TCodec extends PgCodecAny,
     const TNewUniques extends ReadonlyArray<
       PgResourceUnique<GetPgCodecColumns<TCodec>>
     >,
@@ -455,7 +455,7 @@ export class PgResource<
    * type/relations/etc but pull their rows from functions.
    */
   static functionSourceOptions<
-    TCodec extends PgTypeCodecAny,
+    TCodec extends PgCodecAny,
     const TNewParameters extends readonly PgResourceParameterAny[],
     const TNewUniques extends ReadonlyArray<
       PgResourceUnique<GetPgCodecColumns<TCodec>>
@@ -557,7 +557,7 @@ export class PgResource<
     return chalk.bold.blue(`PgResource(${this.name})`);
   }
 
-  public getRelations(): TCodec extends PgTypeCodec<
+  public getRelations(): TCodec extends PgCodec<
     infer UName,
     any,
     any,
@@ -572,7 +572,7 @@ export class PgResource<
   }
 
   public getRelation<
-    TRelationName extends TCodec extends PgTypeCodec<
+    TRelationName extends TCodec extends PgCodec<
       infer UName,
       any,
       any,
@@ -585,7 +585,7 @@ export class PgResource<
       : never,
   >(
     name: TRelationName,
-  ): (TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+  ): (TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
     ? TRegistry["pgRelations"][UName]
     : never)[TRelationName] {
     return this.getRelations()[name];
@@ -603,8 +603,8 @@ export class PgResource<
       const relation = this.getRelation(
         via as any,
       ) as unknown as PgCodecRelation<
-        PgTypeCodecWithColumns,
-        PgResource<any, PgTypeCodecWithColumns, any, any, any>
+        PgCodecWithColumns,
+        PgResource<any, PgCodecWithColumns, any, any, any>
       >;
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
@@ -622,7 +622,7 @@ export class PgResource<
 
   public getReciprocal<
     TOtherCodec extends TRegistry["pgCodecs"][keyof TRegistry["pgCodecs"]],
-    TOtherRelationName extends keyof TRegistry["pgRelations"][TOtherCodec extends PgTypeCodec<
+    TOtherRelationName extends keyof TRegistry["pgRelations"][TOtherCodec extends PgCodec<
       infer UCodecName,
       any,
       any,
@@ -653,8 +653,8 @@ export class PgResource<
     const relations = this.getRelations() as unknown as Record<
       string,
       PgCodecRelation<
-        PgTypeCodecWithColumns,
-        PgResource<any, PgTypeCodecWithColumns, any, any, any>
+        PgCodecWithColumns,
+        PgResource<any, PgCodecWithColumns, any, any, any>
       >
     >;
     const reciprocal = Object.entries(relations).find(
@@ -857,7 +857,7 @@ export class PgResource<
    * Returns an SQL fragment that evaluates to `'true'` (string) if the row is
    * non-null and `'false'` or `null` otherwise.
    *
-   * @see {@link PgTypeCodec.notNullExpression}
+   * @see {@link PgCodec.notNullExpression}
    */
   public getNullCheckExpression(alias: SQL): SQL | null {
     if (this.codec.notNullExpression) {
@@ -892,7 +892,7 @@ exportAs("@dataplan/pg", PgResource, "PgResource");
 
 export interface PgRegistryBuilder<
   TCodecs extends {
-    [name in string]: PgTypeCodec<
+    [name in string]: PgCodec<
       name,
       PgTypeColumns | undefined,
       any,
@@ -904,7 +904,7 @@ export interface PgRegistryBuilder<
   },
   TSources extends {
     [name in string]: PgResourceOptions<
-      PgTypeCodecAny,
+      PgCodecAny,
       ReadonlyArray<PgResourceUnique<PgTypeColumns>>,
       readonly PgResourceParameterAny[] | undefined,
       name
@@ -913,8 +913,8 @@ export interface PgRegistryBuilder<
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
-        PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
-        PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
+        PgCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgResourceOptions<PgCodecWithColumns, any, any, any>
       >;
     };
   },
@@ -924,10 +924,10 @@ export interface PgRegistryBuilder<
     Expand<TSources>,
     Expand<TRelations>
   >;
-  addCodec<const TCodec extends PgTypeCodecAny>(
+  addCodec<const TCodec extends PgCodecAny>(
     codec: TCodec,
   ): PgRegistryBuilder<
-    TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+    TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? TCodecs & {
           [name in UName]: TCodec;
         }
@@ -940,7 +940,7 @@ export interface PgRegistryBuilder<
     source: TSource,
   ): PgRegistryBuilder<
     TSource extends PgResourceOptions<infer UCodec, any, any, any>
-      ? UCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+      ? UCodec extends PgCodec<infer UName, any, any, any, any, any, any>
         ? TCodecs & {
             [name in UName]: UCodec;
           }
@@ -955,7 +955,7 @@ export interface PgRegistryBuilder<
   >;
 
   addRelation<
-    TCodec extends PgTypeCodec<
+    TCodec extends PgCodec<
       string,
       PgTypeColumns,
       any,
@@ -978,7 +978,7 @@ export interface PgRegistryBuilder<
   ): PgRegistryBuilder<
     TCodecs,
     TSources,
-    TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+    TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? TRelations & {
           [codecName in UName]: {
             [relationName in TCodecRelationName]: TCodecRelation & {
@@ -989,7 +989,7 @@ export interface PgRegistryBuilder<
         }
       : never
     /*
-    TCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
+    TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? TRelations extends { [codecName in UName]: infer UExist }
         ? Expand<
             TRelations & {
@@ -1016,7 +1016,7 @@ export interface PgRegistryBuilder<
 
 export function makeRegistry<
   TCodecs extends {
-    [name in string]: PgTypeCodec<
+    [name in string]: PgCodec<
       name,
       PgTypeColumns | undefined,
       any,
@@ -1028,7 +1028,7 @@ export function makeRegistry<
   },
   TSourceOptions extends {
     [name in string]: PgResourceOptions<
-      PgTypeCodecAny,
+      PgCodecAny,
       ReadonlyArray<PgResourceUnique<PgTypeColumns<any>>>,
       readonly PgResourceParameterAny[] | undefined,
       name
@@ -1037,8 +1037,8 @@ export function makeRegistry<
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
-        PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
-        PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
+        PgCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgResourceOptions<PgCodecWithColumns, any, any, any>
       >;
     };
   },
@@ -1072,8 +1072,8 @@ export function makeRegistry<
   });
 
   function addCodec(
-    codec: PgTypeCodecAny,
-  ): PgTypeCodec<any, any, any, any, any, any, any> {
+    codec: PgCodecAny,
+  ): PgCodec<any, any, any, any, any, any, any> {
     const codecName = codec.name;
     if (registry.pgCodecs[codecName]) {
       return registry.pgCodecs[codecName];
@@ -1185,8 +1185,8 @@ export function makeRegistry<
         localCodec: addCodec(localCodec),
         remoteSource: registry.pgSources[remoteSourceOptions.name],
       } as PgCodecRelation<
-        PgTypeCodecWithColumns,
-        PgResource<any, PgTypeCodecWithColumns, any, any, any>
+        PgCodecWithColumns,
+        PgResource<any, PgCodecWithColumns, any, any, any>
       >;
 
       // Tell the system to read the built relation from the registry
@@ -1281,8 +1281,8 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
         remoteSourceOptions,
         ...relation,
       } as PgCodecRelationConfig<
-        PgTypeCodecWithColumns,
-        PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
+        PgCodecWithColumns,
+        PgResourceOptions<PgCodecWithColumns, any, any, any>
       >;
       return builder;
     },
