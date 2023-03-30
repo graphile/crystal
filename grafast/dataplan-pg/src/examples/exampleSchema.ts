@@ -367,9 +367,8 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const usersMostRecentForumSourceOptions = PgResource.functionSourceOptions(
-        forumSourceOptions,
-        {
+      const usersMostRecentForumSourceOptions =
+        PgResource.functionSourceOptions(forumSourceOptions, {
           name: "users_most_recent_forum",
           source: (...args) =>
             sql`app_public.users_most_recent_forum(${sqlFromArgDigests(args)})`,
@@ -383,8 +382,7 @@ export function makeExampleSchema(
               notNull: true,
             },
           ],
-        },
-      );
+        });
 
       const featuredMessagesSourceOptions = PgResource.functionSourceOptions(
         messageSourceOptions,
@@ -440,9 +438,8 @@ export function makeExampleSchema(
         },
       );
 
-      const forumsMessagesListSetSourceOptions = PgResource.functionSourceOptions(
-        messageSourceOptions,
-        {
+      const forumsMessagesListSetSourceOptions =
+        PgResource.functionSourceOptions(messageSourceOptions, {
           name: "forums_messages_list_set",
           source: (...args) =>
             sql`app_public.forums_messages_list_set(${sqlFromArgDigests(
@@ -456,8 +453,7 @@ export function makeExampleSchema(
               name: "messagesListSet",
             },
           },
-        },
-      );
+        });
 
       const unionEntityCodec = recordCodec({
         name: "union__entity",
