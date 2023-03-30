@@ -128,16 +128,6 @@ type PgUnionAllStepSelect<TAttributes extends string> =
       expression: SQL;
     };
 
-export interface PgUnionAllResourceSpec {
-  resource: PgResource<
-    any,
-    any,
-    ReadonlyArray<PgResourceUnique<any>>,
-    any,
-    any
-  >;
-}
-
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
   [attributeName in TAttributes]: {
     codec: PgCodec<any, any, any>;
