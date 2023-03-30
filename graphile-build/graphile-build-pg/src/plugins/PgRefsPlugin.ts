@@ -167,7 +167,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
         }
       },
       async pgTables_PgResourceOptions_relations_post(info, event) {
-        const { databaseName, sourceOptions, pgClass } = event;
+        const { databaseName, resourceOptions, pgClass } = event;
 
         const getCodecForTableName = async (targetTableIdentifier: string) => {
           const nsp = pgClass.getNamespace();
@@ -206,7 +206,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           ? [tags.refVia]
           : null;
 
-        const refDefinitions = (sourceOptions.codec as PgCodecAny).extensions
+        const refDefinitions = (resourceOptions.codec as PgCodecAny).extensions
           ?.refDefinitions;
         if (!refDefinitions) {
           if (rawRefVias) {
@@ -243,7 +243,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           if (vias.length === 0) {
             if (!tags.interface) {
               console.warn(
-                `@ref ${refName} has no valid 'via' on ${sourceOptions.name}`,
+                `@ref ${refName} has no valid 'via' on ${resourceOptions.name}`,
               );
               continue;
             }
@@ -256,8 +256,8 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           outerLoop: for (const via of vias) {
             const path: PgCodecRefPath = [];
             const parts = via.split(";");
-            let currentSourceOptions: PgResourceOptions<any, any, any, any> =
-              sourceOptions;
+            let currentResourceOptions: PgResourceOptions<any, any, any, any> =
+              resourceOptions;
             for (const rawPart of parts) {
               type RelationEntry = [
                 string,
@@ -267,7 +267,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 >,
               ];
               const relationEntries = Object.entries(
-                registryConfig.pgRelations[currentSourceOptions.codec.name],
+                registryConfig.pgRelations[currentResourceOptions.codec.name],
               ) as Array<RelationEntry>;
               const part = rawPart.trim();
               // TODO: allow whitespace
@@ -337,10 +337,10 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                   relationName: relationEntry[0],
                 });
                 const nextSource = relationEntry[1].remoteResourceOptions;
-                currentSourceOptions = nextSource;
+                currentResourceOptions = nextSource;
               } else {
                 console.warn(
-                  `Could not find matching relation for '${via}' / ${currentSourceOptions.name} -> '${rawPart}'`,
+                  `Could not find matching relation for '${via}' / ${currentResourceOptions.name} -> '${rawPart}'`,
                 );
                 continue outerLoop;
               }
@@ -348,18 +348,18 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             paths.push(path);
           }
 
-          if (!sourceOptions.codec.refs) {
-            sourceOptions.codec.refs = Object.create(null) as Record<
+          if (!resourceOptions.codec.refs) {
+            resourceOptions.codec.refs = Object.create(null) as Record<
               string,
               any
             >;
           }
-          if (sourceOptions.codec.refs[refName]) {
+          if (resourceOptions.codec.refs[refName]) {
             throw new Error(
-              `@ref ${refName} already registered in ${sourceOptions.codec.name}`,
+              `@ref ${refName} already registered in ${resourceOptions.codec.name}`,
             );
           }
-          sourceOptions.codec.refs[refName] = {
+          resourceOptions.codec.refs[refName] = {
             definition: refDefinition,
             paths,
           };

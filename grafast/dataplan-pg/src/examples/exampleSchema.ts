@@ -267,7 +267,7 @@ export function makeExampleSchema(
         },
       });
 
-      const uniqueAuthorCountSourceOptions = makePgResourceOptions({
+      const uniqueAuthorCountResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: TYPES.int,
@@ -284,7 +284,7 @@ export function makeExampleSchema(
         isUnique: true,
       });
 
-      const forumNamesArraySourceOptions = makePgResourceOptions({
+      const forumNamesArrayResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: listOfCodec(TYPES.text),
@@ -295,7 +295,7 @@ export function makeExampleSchema(
         isUnique: true, // No setof
       });
 
-      const forumNamesCasesSourceOptions = makePgResourceOptions({
+      const forumNamesCasesResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: listOfCodec(TYPES.text),
@@ -305,7 +305,7 @@ export function makeExampleSchema(
         parameters: [],
       });
 
-      const forumsUniqueAuthorCountSourceOptions = makePgResourceOptions({
+      const forumsUniqueAuthorCountResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: TYPES.int,
@@ -329,7 +329,7 @@ export function makeExampleSchema(
         isUnique: true,
       });
 
-      const scalarTextSourceOptions = makePgResourceOptions({
+      const scalarTextResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: TYPES.text,
@@ -337,7 +337,7 @@ export function makeExampleSchema(
         name: "text",
       });
 
-      const messageSourceOptions = makePgResourceOptions({
+      const messageResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: messagesCodec,
@@ -346,7 +346,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const userSourceOptions = makePgResourceOptions({
+      const userResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: userCodec,
@@ -358,7 +358,7 @@ export function makeExampleSchema(
         ],
       });
 
-      const forumSourceOptions = makePgResourceOptions({
+      const forumResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: forumCodec,
@@ -367,8 +367,8 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const usersMostRecentForumSourceOptions =
-        PgResource.functionSourceOptions(forumSourceOptions, {
+      const usersMostRecentForumResourceOptions =
+        PgResource.functionResourceOptions(forumResourceOptions, {
           name: "users_most_recent_forum",
           source: (...args) =>
             sql`app_public.users_most_recent_forum(${sqlFromArgDigests(args)})`,
@@ -377,15 +377,15 @@ export function makeExampleSchema(
           parameters: [
             {
               name: "u",
-              codec: userSourceOptions.codec,
+              codec: userResourceOptions.codec,
               required: true,
               notNull: true,
             },
           ],
         });
 
-      const featuredMessagesSourceOptions = PgResource.functionSourceOptions(
-        messageSourceOptions,
+      const featuredMessagesResourceOptions = PgResource.functionResourceOptions(
+        messageResourceOptions,
         {
           name: "featured_messages",
           source: (...args) =>
@@ -396,8 +396,8 @@ export function makeExampleSchema(
         },
       );
 
-      const forumsFeaturedMessagesSourceOptions =
-        PgResource.functionSourceOptions(messageSourceOptions, {
+      const forumsFeaturedMessagesResourceOptions =
+        PgResource.functionResourceOptions(messageResourceOptions, {
           name: "forums_featured_messages",
           source: (...args) =>
             sql`app_public.forums_featured_messages(${sqlFromArgDigests(
@@ -414,8 +414,8 @@ export function makeExampleSchema(
           ],
         });
 
-      const randomUserArraySourceOptions = PgResource.functionSourceOptions(
-        userSourceOptions,
+      const randomUserArrayResourceOptions = PgResource.functionResourceOptions(
+        userResourceOptions,
         {
           name: "random_user_array",
           source: (...args) =>
@@ -426,8 +426,8 @@ export function makeExampleSchema(
         },
       );
 
-      const randomUserArraySetSourceOptions = PgResource.functionSourceOptions(
-        userSourceOptions,
+      const randomUserArraySetResourceOptions = PgResource.functionResourceOptions(
+        userResourceOptions,
         {
           name: "random_user_array_set",
           source: (...args) =>
@@ -438,8 +438,8 @@ export function makeExampleSchema(
         },
       );
 
-      const forumsMessagesListSetSourceOptions =
-        PgResource.functionSourceOptions(messageSourceOptions, {
+      const forumsMessagesListSetResourceOptions =
+        PgResource.functionResourceOptions(messageResourceOptions, {
           name: "forums_messages_list_set",
           source: (...args) =>
             sql`app_public.forums_messages_list_set(${sqlFromArgDigests(
@@ -482,7 +482,7 @@ export function makeExampleSchema(
         },
       });
 
-      const personBookmarksSourceOptions = makePgResourceOptions({
+      const personBookmarksResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: personBookmarksCodec,
@@ -500,7 +500,7 @@ export function makeExampleSchema(
         },
       });
 
-      const personSourceOptions = makePgResourceOptions({
+      const personResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: personCodec,
@@ -526,7 +526,7 @@ export function makeExampleSchema(
         },
       });
 
-      const postSourceOptions = makePgResourceOptions({
+      const postResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: postCodec,
@@ -554,7 +554,7 @@ export function makeExampleSchema(
         },
       });
 
-      const commentSourceOptions = makePgResourceOptions({
+      const commentResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: commentCodec,
@@ -584,7 +584,7 @@ export function makeExampleSchema(
         },
       });
 
-      const enumTableItemTypeSourceOptions = makePgResourceOptions({
+      const enumTableItemTypeResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: enumTableItemTypeCodec,
@@ -639,7 +639,7 @@ export function makeExampleSchema(
         },
       });
 
-      const singleTableItemsSourceOptions = makePgResourceOptions({
+      const singleTableItemsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: singleTableItemsCodec,
@@ -683,7 +683,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalItemsSourceOptions = makePgResourceOptions({
+      const relationalItemsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: relationalItemsCodec,
@@ -708,7 +708,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalCommentableSourceOptions = makePgResourceOptions({
+      const relationalCommentableResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: relationalCommentableCodec,
@@ -766,7 +766,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalTopicsSourceOptions = makePgResourceOptions({
+      const relationalTopicsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: relationalTopicsCodec,
@@ -786,7 +786,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalPostsSourceOptions = makePgResourceOptions({
+      const relationalPostsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: relationalPostsCodec,
@@ -805,7 +805,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalDividersSourceOptions = makePgResourceOptions({
+      const relationalDividersResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: relationalDividersCodec,
@@ -823,7 +823,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalChecklistsSourceOptions = makePgResourceOptions({
+      const relationalChecklistsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: relationalChecklistsCodec,
@@ -842,7 +842,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalChecklistItemsSourceOptions = makePgResourceOptions({
+      const relationalChecklistItemsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: relationalChecklistItemsCodec,
@@ -869,7 +869,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionItemsSourceOptions = makePgResourceOptions({
+      const unionItemsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: unionItemsCodec,
@@ -887,7 +887,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionTopicsSourceOptions = makePgResourceOptions({
+      const unionTopicsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: unionTopicsCodec,
@@ -926,7 +926,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionDividersSourceOptions = makePgResourceOptions({
+      const unionDividersResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: unionDividersCodec,
@@ -944,7 +944,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionChecklistsSourceOptions = makePgResourceOptions({
+      const unionChecklistsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: unionChecklistsCodec,
@@ -963,7 +963,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionChecklistItemsSourceOptions = makePgResourceOptions({
+      const unionChecklistItemsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: unionChecklistItemsCodec,
@@ -972,7 +972,7 @@ export function makeExampleSchema(
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const unionEntitySourceOptions = makePgResourceOptions({
+      const unionEntityResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: unionEntityCodec,
@@ -980,8 +980,8 @@ export function makeExampleSchema(
         name: "union__entity",
       });
 
-      const entitySearchSourceOptions = PgResource.functionSourceOptions(
-        unionEntitySourceOptions,
+      const entitySearchResourceOptions = PgResource.functionResourceOptions(
+        unionEntityResourceOptions,
         {
           source: (...args) =>
             sql`interfaces_and_unions.search(${sqlFromArgDigests(args)})`,
@@ -1017,7 +1017,7 @@ export function makeExampleSchema(
         },
       });
 
-      const awsApplicationsSourceOptions = makePgResourceOptions({
+      const awsApplicationsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: awsApplicationsCodec,
@@ -1043,7 +1043,7 @@ export function makeExampleSchema(
         },
       });
 
-      const gcpApplicationsSourceOptions = makePgResourceOptions({
+      const gcpApplicationsResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: gcpApplicationsCodec,
@@ -1066,7 +1066,7 @@ export function makeExampleSchema(
         },
       });
 
-      const firstPartyVulnerabilitiesSourceOptions = makePgResourceOptions({
+      const firstPartyVulnerabilitiesResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: firstPartyVulnerabilitiesCodec,
@@ -1089,7 +1089,7 @@ export function makeExampleSchema(
         },
       });
 
-      const thirdPartyVulnerabilitiesSourceOptions = makePgResourceOptions({
+      const thirdPartyVulnerabilitiesResourceOptions = makePgResourceOptions({
         executor,
         selectAuth,
         codec: thirdPartyVulnerabilitiesCodec,
@@ -1102,85 +1102,85 @@ export function makeExampleSchema(
         .addCodec(forumCodec)
         .addCodec(userCodec)
         .addCodec(messagesCodec)
-        .addSource(uniqueAuthorCountSourceOptions)
-        .addSource(forumNamesArraySourceOptions)
-        .addSource(forumNamesCasesSourceOptions)
-        .addSource(forumsUniqueAuthorCountSourceOptions)
-        .addSource(scalarTextSourceOptions)
-        .addSource(messageSourceOptions)
-        .addSource(userSourceOptions)
-        .addSource(forumSourceOptions)
-        .addSource(usersMostRecentForumSourceOptions)
-        .addSource(featuredMessagesSourceOptions)
-        .addSource(forumsFeaturedMessagesSourceOptions)
-        .addSource(randomUserArraySourceOptions)
-        .addSource(randomUserArraySetSourceOptions)
-        .addSource(forumsMessagesListSetSourceOptions)
+        .addSource(uniqueAuthorCountResourceOptions)
+        .addSource(forumNamesArrayResourceOptions)
+        .addSource(forumNamesCasesResourceOptions)
+        .addSource(forumsUniqueAuthorCountResourceOptions)
+        .addSource(scalarTextResourceOptions)
+        .addSource(messageResourceOptions)
+        .addSource(userResourceOptions)
+        .addSource(forumResourceOptions)
+        .addSource(usersMostRecentForumResourceOptions)
+        .addSource(featuredMessagesResourceOptions)
+        .addSource(forumsFeaturedMessagesResourceOptions)
+        .addSource(randomUserArrayResourceOptions)
+        .addSource(randomUserArraySetResourceOptions)
+        .addSource(forumsMessagesListSetResourceOptions)
         .addCodec(unionEntityCodec)
         .addCodec(personBookmarksCodec)
-        .addSource(personBookmarksSourceOptions)
+        .addSource(personBookmarksResourceOptions)
         .addCodec(personCodec)
-        .addSource(personSourceOptions)
+        .addSource(personResourceOptions)
         .addCodec(postCodec)
-        .addSource(postSourceOptions)
+        .addSource(postResourceOptions)
         .addCodec(commentCodec)
-        .addSource(commentSourceOptions)
+        .addSource(commentResourceOptions)
         .addCodec(itemTypeEnumCodec)
         .addCodec(enumTableItemTypeCodec)
-        .addSource(enumTableItemTypeSourceOptions)
+        .addSource(enumTableItemTypeResourceOptions)
         .addCodec(enumTableItemTypeEnumCodec)
         .addCodec(singleTableItemsCodec)
-        .addSource(singleTableItemsSourceOptions)
+        .addSource(singleTableItemsResourceOptions)
         .addCodec(relationalItemsCodec)
-        .addSource(relationalItemsSourceOptions)
+        .addSource(relationalItemsResourceOptions)
         .addCodec(relationalCommentableCodec)
-        .addSource(relationalCommentableSourceOptions)
+        .addSource(relationalCommentableResourceOptions)
         .addCodec(relationalTopicsCodec)
-        .addSource(relationalTopicsSourceOptions)
+        .addSource(relationalTopicsResourceOptions)
         .addCodec(relationalPostsCodec)
-        .addSource(relationalPostsSourceOptions)
+        .addSource(relationalPostsResourceOptions)
         .addCodec(relationalDividersCodec)
-        .addSource(relationalDividersSourceOptions)
+        .addSource(relationalDividersResourceOptions)
         .addCodec(relationalChecklistsCodec)
-        .addSource(relationalChecklistsSourceOptions)
+        .addSource(relationalChecklistsResourceOptions)
         .addCodec(relationalChecklistItemsCodec)
-        .addSource(relationalChecklistItemsSourceOptions)
+        .addSource(relationalChecklistItemsResourceOptions)
         .addCodec(unionItemsCodec)
-        .addSource(unionItemsSourceOptions)
+        .addSource(unionItemsResourceOptions)
         .addCodec(unionTopicsCodec)
-        .addSource(unionTopicsSourceOptions)
+        .addSource(unionTopicsResourceOptions)
         .addCodec(unionPostsCodec)
         .addSource(unionPostsSource)
         .addCodec(unionDividersCodec)
-        .addSource(unionDividersSourceOptions)
+        .addSource(unionDividersResourceOptions)
         .addCodec(unionChecklistsCodec)
-        .addSource(unionChecklistsSourceOptions)
+        .addSource(unionChecklistsResourceOptions)
         .addCodec(unionChecklistItemsCodec)
-        .addSource(unionChecklistItemsSourceOptions)
-        .addSource(unionEntitySourceOptions)
-        .addSource(entitySearchSourceOptions)
+        .addSource(unionChecklistItemsResourceOptions)
+        .addSource(unionEntityResourceOptions)
+        .addSource(entitySearchResourceOptions)
         .addCodec(awsApplicationsCodec)
-        .addSource(awsApplicationsSourceOptions)
+        .addSource(awsApplicationsResourceOptions)
         .addCodec(gcpApplicationsCodec)
-        .addSource(gcpApplicationsSourceOptions)
+        .addSource(gcpApplicationsResourceOptions)
         .addCodec(firstPartyVulnerabilitiesCodec)
-        .addSource(firstPartyVulnerabilitiesSourceOptions)
+        .addSource(firstPartyVulnerabilitiesResourceOptions)
         .addCodec(thirdPartyVulnerabilitiesCodec)
-        .addSource(thirdPartyVulnerabilitiesSourceOptions)
-        .addRelation(messagesCodec, "author", userSourceOptions, {
+        .addSource(thirdPartyVulnerabilitiesResourceOptions)
+        .addRelation(messagesCodec, "author", userResourceOptions, {
           localColumns: [`author_id`],
           remoteColumns: [`id`],
           isUnique: true,
         })
-        .addRelation(messagesCodec, "forum", forumSourceOptions, {
+        .addRelation(messagesCodec, "forum", forumResourceOptions, {
           localColumns: ["forum_id"],
           remoteColumns: ["id"],
           isUnique: true,
         })
         .addRelation(
-          personBookmarksSourceOptions.codec,
+          personBookmarksResourceOptions.codec,
           "person",
-          personSourceOptions,
+          personResourceOptions,
           {
             isUnique: true,
             localColumns: ["person_id"],
@@ -1190,19 +1190,19 @@ export function makeExampleSchema(
         .addRelation(
           personCodec,
           "singleTableItems",
-          singleTableItemsSourceOptions,
+          singleTableItemsResourceOptions,
           {
             isUnique: false,
             localColumns: ["person_id"],
             remoteColumns: ["author_id"],
           },
         )
-        .addRelation(personCodec, "posts", postSourceOptions, {
+        .addRelation(personCodec, "posts", postResourceOptions, {
           isUnique: false,
           localColumns: ["person_id"],
           remoteColumns: ["author_id"],
         })
-        .addRelation(personCodec, "comments", postSourceOptions, {
+        .addRelation(personCodec, "comments", postResourceOptions, {
           isUnique: false,
           localColumns: ["person_id"],
           remoteColumns: ["author_id"],
@@ -1210,29 +1210,29 @@ export function makeExampleSchema(
         .addRelation(
           personCodec,
           "personBookmarks",
-          personBookmarksSourceOptions,
+          personBookmarksResourceOptions,
           {
             isUnique: false,
             localColumns: ["person_id"],
             remoteColumns: ["person_id"],
           },
         )
-        .addRelation(postCodec, "author", personSourceOptions, {
+        .addRelation(postCodec, "author", personResourceOptions, {
           isUnique: true,
           localColumns: ["author_id"],
           remoteColumns: ["person_id"],
         })
-        .addRelation(postCodec, "comments", commentSourceOptions, {
+        .addRelation(postCodec, "comments", commentResourceOptions, {
           isUnique: false,
           localColumns: ["post_id"],
           remoteColumns: ["post_id"],
         })
-        .addRelation(commentCodec, "author", personSourceOptions, {
+        .addRelation(commentCodec, "author", personResourceOptions, {
           isUnique: true,
           localColumns: ["author_id"],
           remoteColumns: ["person_id"],
         })
-        .addRelation(commentCodec, "post", postSourceOptions, {
+        .addRelation(commentCodec, "post", postResourceOptions, {
           isUnique: true,
           localColumns: ["post_id"],
           remoteColumns: ["post_id"],
@@ -1240,7 +1240,7 @@ export function makeExampleSchema(
         .addRelation(
           singleTableItemsCodec,
           "parent",
-          singleTableItemsSourceOptions,
+          singleTableItemsResourceOptions,
           {
             isUnique: true,
             localColumns: ["parent_id"],
@@ -1250,14 +1250,14 @@ export function makeExampleSchema(
         .addRelation(
           singleTableItemsCodec,
           "children",
-          singleTableItemsSourceOptions,
+          singleTableItemsResourceOptions,
           {
             isUnique: false,
             localColumns: ["id"],
             remoteColumns: ["parent_id"],
           },
         )
-        .addRelation(singleTableItemsCodec, "author", personSourceOptions, {
+        .addRelation(singleTableItemsCodec, "author", personResourceOptions, {
           isUnique: true,
           localColumns: ["author_id"],
           remoteColumns: ["person_id"],
@@ -1266,7 +1266,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalTopicsCodec,
           "item",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1276,14 +1276,14 @@ export function makeExampleSchema(
         .addRelation(
           relationalTopicsCodec,
           "parent",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`parent_id`] as const,
             remoteColumns: [`id`] as const,
             isUnique: true,
           },
         )
-        .addRelation(relationalTopicsCodec, "author", personSourceOptions, {
+        .addRelation(relationalTopicsCodec, "author", personResourceOptions, {
           localColumns: [`author_id`] as const,
           remoteColumns: [`person_id`] as const,
           isUnique: true,
@@ -1292,7 +1292,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalPostsCodec,
           "item",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1302,14 +1302,14 @@ export function makeExampleSchema(
         .addRelation(
           relationalPostsCodec,
           "parent",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`parent_id`] as const,
             remoteColumns: [`id`] as const,
             isUnique: true,
           },
         )
-        .addRelation(relationalPostsCodec, "author", personSourceOptions, {
+        .addRelation(relationalPostsCodec, "author", personResourceOptions, {
           localColumns: [`author_id`] as const,
           remoteColumns: [`person_id`] as const,
           isUnique: true,
@@ -1317,7 +1317,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalPostsCodec,
           "commentable",
-          relationalCommentableSourceOptions,
+          relationalCommentableResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1328,7 +1328,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalDividersCodec,
           "item",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1338,14 +1338,14 @@ export function makeExampleSchema(
         .addRelation(
           relationalDividersCodec,
           "parent",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`parent_id`] as const,
             remoteColumns: [`id`] as const,
             isUnique: true,
           },
         )
-        .addRelation(relationalDividersCodec, "author", personSourceOptions, {
+        .addRelation(relationalDividersCodec, "author", personResourceOptions, {
           localColumns: [`author_id`] as const,
           remoteColumns: [`person_id`] as const,
           isUnique: true,
@@ -1353,7 +1353,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalChecklistsCodec,
           "item",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1363,14 +1363,14 @@ export function makeExampleSchema(
         .addRelation(
           relationalChecklistsCodec,
           "parent",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`parent_id`] as const,
             remoteColumns: [`id`] as const,
             isUnique: true,
           },
         )
-        .addRelation(relationalChecklistsCodec, "author", personSourceOptions, {
+        .addRelation(relationalChecklistsCodec, "author", personResourceOptions, {
           localColumns: [`author_id`] as const,
           remoteColumns: [`person_id`] as const,
           isUnique: true,
@@ -1378,7 +1378,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalChecklistsCodec,
           "commentable",
-          relationalCommentableSourceOptions,
+          relationalCommentableResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1388,7 +1388,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalChecklistItemsCodec,
           "item",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1398,7 +1398,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalChecklistItemsCodec,
           "parent",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             localColumns: [`parent_id`] as const,
             remoteColumns: [`id`] as const,
@@ -1408,7 +1408,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalChecklistItemsCodec,
           "author",
-          personSourceOptions,
+          personResourceOptions,
           {
             localColumns: [`author_id`] as const,
             remoteColumns: [`person_id`] as const,
@@ -1418,7 +1418,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalChecklistItemsCodec,
           "commentable",
-          relationalCommentableSourceOptions,
+          relationalCommentableResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1429,7 +1429,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalItemsCodec,
           "parent",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             isUnique: true,
             localColumns: ["parent_id"] as const,
@@ -1439,14 +1439,14 @@ export function makeExampleSchema(
         .addRelation(
           relationalItemsCodec,
           "children",
-          relationalItemsSourceOptions,
+          relationalItemsResourceOptions,
           {
             isUnique: false,
             localColumns: ["id"] as const,
             remoteColumns: ["parent_id"] as const,
           },
         )
-        .addRelation(relationalItemsCodec, "author", personSourceOptions, {
+        .addRelation(relationalItemsCodec, "author", personResourceOptions, {
           isUnique: true,
           localColumns: ["author_id"] as const,
           remoteColumns: ["person_id"] as const,
@@ -1454,7 +1454,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalItemsCodec,
           "topic",
-          relationalTopicsSourceOptions,
+          relationalTopicsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1465,7 +1465,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalItemsCodec,
           "post",
-          relationalPostsSourceOptions,
+          relationalPostsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1476,7 +1476,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalItemsCodec,
           "divider",
-          relationalDividersSourceOptions,
+          relationalDividersResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1487,7 +1487,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalItemsCodec,
           "checklist",
-          relationalChecklistsSourceOptions,
+          relationalChecklistsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1498,7 +1498,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalItemsCodec,
           "checklistItem",
-          relationalChecklistItemsSourceOptions,
+          relationalChecklistItemsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1510,7 +1510,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalCommentableCodec,
           "post",
-          relationalPostsSourceOptions,
+          relationalPostsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1521,7 +1521,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalCommentableCodec,
           "checklist",
-          relationalChecklistsSourceOptions,
+          relationalChecklistsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1532,7 +1532,7 @@ export function makeExampleSchema(
         .addRelation(
           relationalCommentableCodec,
           "checklistItem",
-          relationalChecklistItemsSourceOptions,
+          relationalChecklistItemsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1541,7 +1541,7 @@ export function makeExampleSchema(
           },
         )
 
-        .addRelation(unionItemsCodec, "topic", unionTopicsSourceOptions, {
+        .addRelation(unionItemsCodec, "topic", unionTopicsResourceOptions, {
           localColumns: [`id`] as const,
           remoteColumns: [`id`] as const,
           isUnique: true,
@@ -1551,7 +1551,7 @@ export function makeExampleSchema(
           remoteColumns: [`id`] as const,
           isUnique: true,
         })
-        .addRelation(unionItemsCodec, "divider", unionDividersSourceOptions, {
+        .addRelation(unionItemsCodec, "divider", unionDividersResourceOptions, {
           localColumns: [`id`] as const,
           remoteColumns: [`id`] as const,
           isUnique: true,
@@ -1559,7 +1559,7 @@ export function makeExampleSchema(
         .addRelation(
           unionItemsCodec,
           "checklist",
-          unionChecklistsSourceOptions,
+          unionChecklistsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,
@@ -1569,7 +1569,7 @@ export function makeExampleSchema(
         .addRelation(
           unionItemsCodec,
           "checklistItem",
-          unionChecklistItemsSourceOptions,
+          unionChecklistItemsResourceOptions,
           {
             localColumns: [`id`] as const,
             remoteColumns: [`id`] as const,

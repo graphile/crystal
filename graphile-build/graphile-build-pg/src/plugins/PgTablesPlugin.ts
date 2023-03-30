@@ -175,13 +175,13 @@ declare global {
 
     interface GatherHelpers {
       pgTables: {
-        getSourceOptions(
+        getResourceOptions(
           databaseName: string,
           pgClass: PgClass,
         ): Promise<PgResourceOptions<PgCodecAny, any, any, any> | null>;
         /*
         getSource(
-          sourceOptions: PgResourceOptions<any, any, any>,
+          resourceOptions: PgResourceOptions<any, any, any>,
         ): Promise<PgResource<any, any, any, any, any> | null>;
         */
       };
@@ -206,21 +206,21 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceOptions: PgResourceOptions<any, any, any>;
+          resourceOptions: PgResourceOptions<any, any, any>;
         }) => void | Promise<void>
       >;
       pgTables_PgResourceOptions_relations: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceOptions: PgResourceOptions<any, any, any, any>;
+          resourceOptions: PgResourceOptions<any, any, any, any>;
         }) => Promise<void> | void
       >;
       pgTables_PgResourceOptions_relations_post: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceOptions: PgResourceOptions<PgCodecAny, any, any, any>;
+          resourceOptions: PgResourceOptions<PgCodecAny, any, any, any>;
         }) => Promise<void> | void
       >;
     }
@@ -228,15 +228,15 @@ declare global {
 }
 
 interface State {
-  sourceOptionsByPgClassByDatabase: Map<
+  resourceOptionsByPgClassByDatabase: Map<
     string,
     Map<PgClass, Promise<PgResourceOptions<any, any, any> | null>>
   >;
-  sourceBySourceOptions: Map<
+  sourceByResourceOptions: Map<
     PgResourceOptions<any, any, any>,
     Promise<PgResource<any, any, any, any, any> | null>
   >;
-  detailsBySourceOptions: Map<
+  detailsByResourceOptions: Map<
     PgResourceOptions<any, any, any>,
     { databaseName: string; pgClass: PgClass }
   >;
@@ -333,21 +333,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   gather: {
     namespace: "pgTables",
     helpers: {
-      getSourceOptions(info, databaseName, pgClass) {
-        let sourceOptionsByPgClass =
-          info.state.sourceOptionsByPgClassByDatabase.get(databaseName);
-        if (!sourceOptionsByPgClass) {
-          sourceOptionsByPgClass = new Map();
-          info.state.sourceOptionsByPgClassByDatabase.set(
+      getResourceOptions(info, databaseName, pgClass) {
+        let resourceOptionsByPgClass =
+          info.state.resourceOptionsByPgClassByDatabase.get(databaseName);
+        if (!resourceOptionsByPgClass) {
+          resourceOptionsByPgClass = new Map();
+          info.state.resourceOptionsByPgClassByDatabase.set(
             databaseName,
-            sourceOptionsByPgClass,
+            resourceOptionsByPgClass,
           );
         }
-        let sourceOptions = sourceOptionsByPgClass.get(pgClass);
-        if (sourceOptions) {
-          return sourceOptions;
+        let resourceOptions = resourceOptionsByPgClass.get(pgClass);
+        if (resourceOptions) {
+          return resourceOptions;
         }
-        sourceOptions = (async () => {
+        resourceOptions = (async () => {
           const pgConfig = info.resolvedPreset.pgConfigs?.find(
             (db) => db.name === databaseName,
           );
@@ -529,40 +529,40 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           await info.process("pgTables_PgResourceOptions", {
             databaseName,
             pgClass,
-            sourceOptions: options,
+            resourceOptions: options,
           });
 
-          const sourceOptions = EXPORTABLE(
+          const resourceOptions = EXPORTABLE(
             (makePgResourceOptions, options) => makePgResourceOptions(options),
             [makePgResourceOptions, options],
           );
 
           const registryBuilder =
             await info.helpers.pgBasics.getRegistryBuilder();
-          if (!sourceOptions.isVirtual) {
-            registryBuilder.addSource(sourceOptions);
+          if (!resourceOptions.isVirtual) {
+            registryBuilder.addSource(resourceOptions);
           }
 
-          info.state.detailsBySourceOptions.set(sourceOptions, {
+          info.state.detailsByResourceOptions.set(resourceOptions, {
             databaseName,
             pgClass,
           });
 
-          return sourceOptions;
+          return resourceOptions;
         })();
-        sourceOptionsByPgClass.set(pgClass, sourceOptions);
-        return sourceOptions;
+        resourceOptionsByPgClass.set(pgClass, resourceOptions);
+        return resourceOptions;
       },
     },
     initialState: () => ({
-      sourceOptionsByPgClassByDatabase: new Map(),
-      sourceBySourceOptions: new Map(),
-      detailsBySourceOptions: new Map(),
+      resourceOptionsByPgClassByDatabase: new Map(),
+      sourceByResourceOptions: new Map(),
+      detailsByResourceOptions: new Map(),
     }),
     hooks: {
       async pgIntrospection_class({ helpers }, event) {
         const { entity: pgClass, databaseName } = event;
-        helpers.pgTables.getSourceOptions(databaseName, pgClass);
+        helpers.pgTables.getResourceOptions(databaseName, pgClass);
       },
 
       // TODO: Ensure introspection has occurred, to ensure that
@@ -571,21 +571,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
       async pgBasics_PgRegistryBuilder_pgRelations(info, _event) {
         const toProcess: Array<{
-          sourceOptions: PgResourceOptions<any, any, any, any>;
+          resourceOptions: PgResourceOptions<any, any, any, any>;
           pgClass: PgClass;
           databaseName: string;
         }> = [];
         for (const [
           databaseName,
-          sourceOptionsByPgClass,
-        ] of info.state.sourceOptionsByPgClassByDatabase.entries()) {
+          resourceOptionsByPgClass,
+        ] of info.state.resourceOptionsByPgClassByDatabase.entries()) {
           for (const [
             pgClass,
-            sourceOptionsPromise,
-          ] of sourceOptionsByPgClass.entries()) {
-            const sourceOptions = await sourceOptionsPromise;
-            if (sourceOptions) {
-              const entry = { sourceOptions, pgClass, databaseName };
+            resourceOptionsPromise,
+          ] of resourceOptionsByPgClass.entries()) {
+            const resourceOptions = await resourceOptionsPromise;
+            if (resourceOptions) {
+              const entry = { resourceOptions, pgClass, databaseName };
               await info.process("pgTables_PgResourceOptions_relations", entry);
               toProcess.push(entry);
             }

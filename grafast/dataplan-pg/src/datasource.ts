@@ -214,7 +214,7 @@ export interface PgResourceOptions<
   isVirtual?: boolean;
 }
 
-export interface PgFunctionSourceOptions<
+export interface PgFunctionResourceOptions<
   TCodec extends PgCodecAny,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TNewParameters extends readonly PgResourceParameterAny[],
@@ -417,7 +417,7 @@ export class PgResource<
    * multiple datasources that all represent the same underlying table
    * type/relations/etc.
    */
-  static alternativeSourceOptions<
+  static alternativeResourceOptions<
     TCodec extends PgCodecAny,
     const TNewUniques extends ReadonlyArray<
       PgResourceUnique<GetPgCodecColumns<TCodec>>
@@ -454,7 +454,7 @@ export class PgResource<
    * datasources that all represent the same underlying table
    * type/relations/etc but pull their rows from functions.
    */
-  static functionSourceOptions<
+  static functionResourceOptions<
     TCodec extends PgCodecAny,
     const TNewParameters extends readonly PgResourceParameterAny[],
     const TNewUniques extends ReadonlyArray<
@@ -463,7 +463,7 @@ export class PgResource<
     const TNewName extends string,
   >(
     baseOptions: PgResourceOptions<TCodec, any, any, any>,
-    overrideOptions: PgFunctionSourceOptions<
+    overrideOptions: PgFunctionResourceOptions<
       TCodec,
       TNewUniques,
       TNewParameters,
@@ -1026,7 +1026,7 @@ export function makeRegistry<
       any
     >;
   },
-  TSourceOptions extends {
+  TResourceOptions extends {
     [name in string]: PgResourceOptions<
       PgCodecAny,
       ReadonlyArray<PgResourceUnique<PgTypeColumns<any>>>,
@@ -1043,9 +1043,9 @@ export function makeRegistry<
     };
   },
 >(
-  config: PgRegistryConfig<TCodecs, TSourceOptions, TRelations>,
-): PgRegistry<TCodecs, TSourceOptions, TRelations> {
-  const registry: PgRegistry<TCodecs, TSourceOptions, TRelations> = {
+  config: PgRegistryConfig<TCodecs, TResourceOptions, TRelations>,
+): PgRegistry<TCodecs, TResourceOptions, TRelations> {
+  const registry: PgRegistry<TCodecs, TResourceOptions, TRelations> = {
     pgCodecs: Object.create(null) as any,
     pgResources: Object.create(null) as any,
     pgRelations: Object.create(null) as any,
@@ -1121,7 +1121,7 @@ export function makeRegistry<
   }
 
   for (const [sourceName, rawConfig] of Object.entries(config.pgResources) as [
-    keyof TSourceOptions,
+    keyof TResourceOptions,
     PgResourceOptions<any, any, any, any>,
   ][]) {
     const sourceConfig = {
@@ -1299,8 +1299,8 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
 exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
 
 export function makePgResourceOptions<
-  const TSourceOptions extends PgResourceOptions<any, any, any, any>,
->(options: TSourceOptions) {
+  const TResourceOptions extends PgResourceOptions<any, any, any, any>,
+>(options: TResourceOptions) {
   return { ...options };
 }
 exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");

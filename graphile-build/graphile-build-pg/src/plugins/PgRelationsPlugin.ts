@@ -106,7 +106,7 @@ declare global {
           event: {
             pgClass: PgClass;
             databaseName: string;
-            sourceOptions: PgResourceOptions<any, any, any>;
+            resourceOptions: PgResourceOptions<any, any, any>;
           },
           pgConstraint: PgConstraint,
           isReferencee?: boolean,
@@ -344,15 +344,15 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             ),
           ),
         );
-        const foreignSourceOptions =
-          await info.helpers.pgTables.getSourceOptions(
+        const foreignResourceOptions =
+          await info.helpers.pgTables.getResourceOptions(
             databaseName,
             foreignClass,
           );
         if (
           !localCodec ||
-          !foreignSourceOptions ||
-          foreignSourceOptions.isVirtual
+          !foreignResourceOptions ||
+          foreignResourceOptions.isVirtual
         ) {
           return;
         }
@@ -370,7 +370,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           await info.helpers.pgBasics.getRegistryBuilder();
         const existingRelation =
           registryBuilder.getRegistryConfig().pgRelations[
-            event.sourceOptions.codec.name
+            event.resourceOptions.codec.name
           ]?.[relationName];
         const { tags: rawTags, description: constraintDescription } =
           pgConstraint.getTagsAndDescription();
@@ -388,7 +388,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           localCodec,
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
-          remoteResourceOptions: foreignSourceOptions as PgResourceOptions<
+          remoteResourceOptions: foreignResourceOptions as PgResourceOptions<
             any,
             any,
             any,
@@ -439,7 +439,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           }
         }
         registryBuilder.addRelation(
-          event.sourceOptions.codec as PgCodecWithColumns,
+          event.resourceOptions.codec as PgCodecWithColumns,
           relationName,
           newRelation.remoteResourceOptions,
           newRelation,

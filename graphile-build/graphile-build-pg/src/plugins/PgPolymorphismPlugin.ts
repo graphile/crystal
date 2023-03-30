@@ -494,8 +494,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 pgConstraint,
               });
 
-              const otherSourceOptions =
-                await info.helpers.pgTables.getSourceOptions(
+              const otherResourceOptions =
+                await info.helpers.pgTables.getResourceOptions(
                   databaseName,
                   pgRelatedClass,
                 );
@@ -543,12 +543,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     ],
                   ],
                 };
-                if (!otherSourceOptions!.codec.refs) {
-                  otherSourceOptions!.codec.refs = Object.create(
+                if (!otherResourceOptions!.codec.refs) {
+                  otherResourceOptions!.codec.refs = Object.create(
                     null,
                   ) as Record<string, any>;
                 }
-                otherSourceOptions!.codec.refs[relationName] = ref;
+                otherResourceOptions!.codec.refs[relationName] = ref;
               }
             }
           }

@@ -4,7 +4,7 @@
 
 import type {
   PgCodec,
-  PgFunctionSourceOptions,
+  PgFunctionResourceOptions,
   PgResourceExtensions,
   PgResourceOptions,
   PgResourceParameter,
@@ -86,7 +86,7 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgProcedures: {
-        getSourceOptions(
+        getResourceOptions(
           databaseName: string,
           pgProc: PgProc,
         ): Promise<PgResourceOptions<any, any, any, any> | null>;
@@ -94,12 +94,12 @@ declare global {
     }
 
     interface GatherHooks {
-      pgProcedures_functionSourceOptions: PluginHook<
+      pgProcedures_functionResourceOptions: PluginHook<
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          baseSourceOptions: PgResourceOptions<any, any, any, any>;
-          functionSourceOptions: PgFunctionSourceOptions<any, any, any, any>;
+          baseResourceOptions: PgResourceOptions<any, any, any, any>;
+          functionResourceOptions: PgFunctionResourceOptions<any, any, any, any>;
         }) => void | Promise<void>
       >;
 
@@ -107,7 +107,7 @@ declare global {
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          sourceOptions: PgResourceOptions<any, any, any, any>;
+          resourceOptions: PgResourceOptions<any, any, any, any>;
         }) => void | Promise<void>
       >;
     }
@@ -115,7 +115,7 @@ declare global {
 }
 
 interface State {
-  sourceOptionsByPgProcByDatabase: Map<
+  resourceOptionsByPgProcByDatabase: Map<
     string,
     Map<PgProc, Promise<PgResourceOptions<any, any, any, any> | null>>
   >;
@@ -150,21 +150,21 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
   gather: {
     namespace: "pgProcedures",
     helpers: {
-      async getSourceOptions(info, databaseName, pgProc) {
-        let sourceOptionsByPgProc =
-          info.state.sourceOptionsByPgProcByDatabase.get(databaseName);
-        if (!sourceOptionsByPgProc) {
-          sourceOptionsByPgProc = new Map();
-          info.state.sourceOptionsByPgProcByDatabase.set(
+      async getResourceOptions(info, databaseName, pgProc) {
+        let resourceOptionsByPgProc =
+          info.state.resourceOptionsByPgProcByDatabase.get(databaseName);
+        if (!resourceOptionsByPgProc) {
+          resourceOptionsByPgProc = new Map();
+          info.state.resourceOptionsByPgProcByDatabase.set(
             databaseName,
-            sourceOptionsByPgProc,
+            resourceOptionsByPgProc,
           );
         }
-        let sourceOptionsPromise = sourceOptionsByPgProc.get(pgProc);
-        if (sourceOptionsPromise) {
-          return sourceOptionsPromise;
+        let resourceOptionsPromise = resourceOptionsByPgProc.get(pgProc);
+        if (resourceOptionsPromise) {
+          return resourceOptionsPromise;
         }
-        sourceOptionsPromise = (async () => {
+        resourceOptionsPromise = (async () => {
           const pgConfig = info.resolvedPreset.pgConfigs?.find(
             (db) => db.name === databaseName,
           );
@@ -471,16 +471,16 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               pgType.typrelid!,
             );
             if (!pgClass) return null;
-            const sourceOptions = await info.helpers.pgTables.getSourceOptions(
+            const resourceOptions = await info.helpers.pgTables.getResourceOptions(
               databaseName,
               pgClass,
             );
 
             const sourceConfig = await (async () => {
-              if (sourceOptions) {
-                return sourceOptions;
+              if (resourceOptions) {
+                return resourceOptions;
               } else {
-                // No sourceOptions for this; presumably the table is not exposed. Create one for the codec instead.
+                // No resourceOptions for this; presumably the table is not exposed. Create one for the codec instead.
                 const codec = await info.helpers.pgCodecs.getCodecFromClass(
                   databaseName,
                   pgClass._id,
@@ -500,7 +500,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               return null;
             }
 
-            const options: PgFunctionSourceOptions<any, any, any, any> = {
+            const options: PgFunctionResourceOptions<any, any, any, any> = {
               name,
               identifier,
               source: sourceCallback,
@@ -512,29 +512,29 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               description,
             };
 
-            await info.process("pgProcedures_functionSourceOptions", {
+            await info.process("pgProcedures_functionResourceOptions", {
               databaseName,
               pgProc,
-              baseSourceOptions: sourceConfig,
-              functionSourceOptions: options,
+              baseResourceOptions: sourceConfig,
+              functionResourceOptions: options,
             });
 
-            const finalSourceOptions = EXPORTABLE(
+            const finalResourceOptions = EXPORTABLE(
               (PgResource, options, sourceConfig) =>
-                PgResource.functionSourceOptions(sourceConfig, options),
+                PgResource.functionResourceOptions(sourceConfig, options),
               [PgResource, options, sourceConfig],
             );
 
             await info.process("pgProcedures_PgResourceOptions", {
               databaseName,
               pgProc,
-              sourceOptions: finalSourceOptions,
+              resourceOptions: finalResourceOptions,
             });
 
             return EXPORTABLE(
-              (finalSourceOptions, makePgResourceOptions) =>
-                makePgResourceOptions(finalSourceOptions),
-              [finalSourceOptions, makePgResourceOptions],
+              (finalResourceOptions, makePgResourceOptions) =>
+                makePgResourceOptions(finalResourceOptions),
+              [finalResourceOptions, makePgResourceOptions],
             );
           } else {
             const options: PgResourceOptions<any, any, any, any> = {
@@ -554,7 +554,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             await info.process("pgProcedures_PgResourceOptions", {
               databaseName,
               pgProc,
-              sourceOptions: options,
+              resourceOptions: options,
             });
 
             return EXPORTABLE(
@@ -563,23 +563,23 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [makePgResourceOptions, options],
             );
           }
-        })().then((sourceOptions) => {
-          if (sourceOptions) {
-            registryBuilder.addSource(sourceOptions);
+        })().then((resourceOptions) => {
+          if (resourceOptions) {
+            registryBuilder.addSource(resourceOptions);
           }
-          return sourceOptions;
+          return resourceOptions;
         });
 
-        sourceOptionsByPgProc.set(pgProc, sourceOptionsPromise!);
+        resourceOptionsByPgProc.set(pgProc, resourceOptionsPromise!);
 
         const registryBuilder =
           await info.helpers.pgBasics.getRegistryBuilder();
 
-        return sourceOptionsPromise;
+        return resourceOptionsPromise;
       },
     },
     initialState: () => ({
-      sourceOptionsByPgProcByDatabase: new Map(),
+      resourceOptionsByPgProcByDatabase: new Map(),
     }),
     hooks: {
       async pgIntrospection_proc({ helpers, resolvedPreset }, event) {
@@ -638,7 +638,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           return;
         }
 
-        helpers.pgProcedures.getSourceOptions(databaseName, pgProc);
+        helpers.pgProcedures.getResourceOptions(databaseName, pgProc);
       },
     },
   } as GraphileConfig.PluginGatherConfig<"pgProcedures", State, Cache>,

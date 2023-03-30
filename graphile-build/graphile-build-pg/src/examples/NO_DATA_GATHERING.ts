@@ -212,7 +212,7 @@ async function main() {
         },
       });
 
-      const usersSourceOptions = makePgResourceOptions({
+      const usersResourceOptions = makePgResourceOptions({
         name: "users",
         executor,
         source: usersCodec.sqlType,
@@ -220,7 +220,7 @@ async function main() {
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const forumsSourceOptions = makePgResourceOptions({
+      const forumsResourceOptions = makePgResourceOptions({
         //name: "main.app_public.forums",
         name: "forums",
         executor,
@@ -229,7 +229,7 @@ async function main() {
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const messagesSourceOptions = makePgResourceOptions({
+      const messagesResourceOptions = makePgResourceOptions({
         name: "messages",
         executor,
         source: messagesCodec.sqlType,
@@ -237,7 +237,7 @@ async function main() {
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const uniqueAuthorCountSourceOptions = makePgResourceOptions({
+      const uniqueAuthorCountResourceOptions = makePgResourceOptions({
         executor,
         codec: TYPES.int,
         source: (...args) =>
@@ -257,7 +257,7 @@ async function main() {
         },
       });
 
-      const forumsUniqueAuthorCountSourceOptions = makePgResourceOptions({
+      const forumsUniqueAuthorCountResourceOptions = makePgResourceOptions({
         executor,
         codec: TYPES.int,
         isUnique: true,
@@ -288,7 +288,7 @@ async function main() {
         },
       });
 
-      const forumsRandomUserSourceOptions = makePgResourceOptions({
+      const forumsRandomUserResourceOptions = makePgResourceOptions({
         executor,
         codec: usersCodec,
         isUnique: true,
@@ -311,7 +311,7 @@ async function main() {
         },
       });
 
-      const forumsFeaturedMessagesSourceOptions = makePgResourceOptions({
+      const forumsFeaturedMessagesResourceOptions = makePgResourceOptions({
         executor,
         codec: messagesCodec,
         isUnique: false,
@@ -334,17 +334,17 @@ async function main() {
         },
       });
       return makeRegistryBuilder()
-        .addSource(usersSourceOptions)
-        .addSource(forumsSourceOptions)
-        .addSource(messagesSourceOptions)
-        .addSource(uniqueAuthorCountSourceOptions)
-        .addSource(forumsUniqueAuthorCountSourceOptions)
-        .addSource(forumsRandomUserSourceOptions)
-        .addSource(forumsFeaturedMessagesSourceOptions)
+        .addSource(usersResourceOptions)
+        .addSource(forumsResourceOptions)
+        .addSource(messagesResourceOptions)
+        .addSource(uniqueAuthorCountResourceOptions)
+        .addSource(forumsUniqueAuthorCountResourceOptions)
+        .addSource(forumsRandomUserResourceOptions)
+        .addSource(forumsFeaturedMessagesResourceOptions)
         .addRelation(
-          usersSourceOptions.codec,
+          usersResourceOptions.codec,
           "messages",
-          messagesSourceOptions,
+          messagesResourceOptions,
           {
             isUnique: false,
             localColumns: ["id"],
@@ -352,9 +352,9 @@ async function main() {
           },
         )
         .addRelation(
-          forumsSourceOptions.codec,
+          forumsResourceOptions.codec,
           "messages",
-          messagesSourceOptions,
+          messagesResourceOptions,
           {
             isUnique: false,
             localColumns: ["id"],
@@ -367,9 +367,9 @@ async function main() {
           },
         )
         .addRelation(
-          messagesSourceOptions.codec,
+          messagesResourceOptions.codec,
           "author",
-          usersSourceOptions,
+          usersResourceOptions,
           {
             isUnique: true,
             localColumns: ["author_id"],
@@ -377,9 +377,9 @@ async function main() {
           },
         )
         .addRelation(
-          messagesSourceOptions.codec,
+          messagesResourceOptions.codec,
           "forum",
-          forumsSourceOptions,
+          forumsResourceOptions,
           {
             isUnique: true,
             localColumns: ["forum_id"],

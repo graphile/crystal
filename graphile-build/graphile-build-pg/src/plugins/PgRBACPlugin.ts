@@ -94,7 +94,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         }
       },
       async pgProcedures_PgResourceOptions(info, event) {
-        const { pgProc, databaseName, sourceOptions } = event;
+        const { pgProc, databaseName, resourceOptions } = event;
         const db = await info.helpers.pgIntrospection.getDatabase(databaseName);
         const { introspection } = db;
 
@@ -110,27 +110,27 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           true,
         );
         if (!permissions.execute) {
-          sourceOptions.extensions =
-            sourceOptions.extensions || Object.create(null);
-          sourceOptions.extensions!.tags =
-            sourceOptions.extensions!.tags || Object.create(null);
+          resourceOptions.extensions =
+            resourceOptions.extensions || Object.create(null);
+          resourceOptions.extensions!.tags =
+            resourceOptions.extensions!.tags || Object.create(null);
           addBehaviorToTags(
-            sourceOptions.extensions!.tags!,
+            resourceOptions.extensions!.tags!,
             "-queryField -mutationField -typeField -orderBy -filterBy",
           );
         }
       },
       async pgTables_PgResourceOptions(info, event) {
-        const { pgClass, sourceOptions, databaseName } = event;
+        const { pgClass, resourceOptions, databaseName } = event;
         if (!["r", "v", "m", "f", "p"].includes(pgClass.relkind)) {
           return;
         }
         const db = await info.helpers.pgIntrospection.getDatabase(databaseName);
         const { introspection } = db;
-        sourceOptions.extensions =
-          sourceOptions.extensions || Object.create(null);
-        sourceOptions.extensions!.tags =
-          sourceOptions.extensions!.tags || Object.create(null);
+        resourceOptions.extensions =
+          resourceOptions.extensions || Object.create(null);
+        resourceOptions.extensions!.tags =
+          resourceOptions.extensions!.tags || Object.create(null);
 
         const introspectionRole = introspection.getCurrentUser();
         if (!introspectionRole) {
@@ -186,7 +186,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           parts.push("-delete");
         }
         if (parts.length > 0) {
-          addBehaviorToTags(sourceOptions.extensions!.tags!, parts.join(" "));
+          addBehaviorToTags(resourceOptions.extensions!.tags!, parts.join(" "));
         }
       },
     },

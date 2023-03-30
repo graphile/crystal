@@ -42,7 +42,7 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
   gather: {
     hooks: {
       pgProcedures_PgResourceOptions(info, event) {
-        const { sourceOptions: s } = event;
+        const { resourceOptions: s } = event;
         // Apply default behavior
         const behavior = [];
         const firstParameter = (
