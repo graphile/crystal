@@ -97,7 +97,7 @@ export class PgSelectSingleStep<
   ) {
     super();
     this.itemStepId = this.addDependency($item);
-    this.source = $class.source;
+    this.source = $class.resource;
     this.pgCodec = this.source.codec as GetPgResourceCodec<TResource>;
     this.mode = $class.mode;
     this.classStepId = $class.id;
@@ -453,7 +453,7 @@ export class PgSelectSingleStep<
             const [frag, codec] = getFragmentAndCodecFromOrder(
               this.getClassStep().alias,
               o,
-              this.getClassStep().source.codec,
+              this.getClassStep().resource.codec,
             );
             return this.expression(frag, codec);
           })
@@ -645,7 +645,7 @@ export function pgSelectFromRecord<
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({
-    source,
+    resource: source,
     identifiers: [],
     from: (record) => sql`(select (${record.placeholder}).*)`,
     args: [{ step: $record, pgCodec: source.codec }],

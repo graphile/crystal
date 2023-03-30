@@ -224,7 +224,7 @@ export interface PgSelectOptions<
    * from, what it's called, etc. Many of these details can be overridden
    * below.
    */
-  source: TResource;
+  resource: TResource;
 
   /**
    * The identifiers to limit the results down to just the row(s) you care
@@ -238,7 +238,7 @@ export interface PgSelectOptions<
   identifiers: Array<PgSelectIdentifierSpec>;
 
   /**
-   * If your `from` (or source.source if omitted) is a function, the arguments
+   * If your `from` (or resource.source if omitted) is a function, the arguments
    * to pass to the function.
    */
   args?: Array<PgSelectArgumentSpec>;
@@ -246,8 +246,8 @@ export interface PgSelectOptions<
   /**
    * If you want to build the data in a custom way (e.g. calling a function,
    * selecting from a view, building a complex query, etc) then you can
-   * override the `source.source` here with your own from code. Defaults to
-   * `source.source`.
+   * override the `resource.source` here with your own from code. Defaults to
+   * `resource.source`.
    */
   from?: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
 
@@ -299,7 +299,7 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
     | ((...args: Array<PgSelectArgumentDigest>) => SQL);
 
   /**
-   * This defaults to the name of the source but you can override it. Aids
+   * This defaults to the name of the resource but you can override it. Aids
    * in debugging.
    */
   private readonly name: string;
@@ -320,9 +320,9 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
   public readonly alias: SQL;
 
   /**
-   * The data source from which we are selecting: table, view, etc
+   * The resource from which we are selecting: table, view, etc
    */
-  public readonly source: TResource;
+  public readonly resource: TResource;
 
   // JOIN
 
@@ -405,8 +405,8 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
   private placeholderValues: Map<symbol, SQL>;
 
   /**
-   * If true, we don't need to add any of the security checks from the data
-   * source; otherwise we must do so. Default false.
+   * If true, we don't need to add any of the security checks from the
+   * resource; otherwise we must do so. Default false.
    */
   private isTrusted: boolean;
 
@@ -501,7 +501,7 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
     const [
       cloneFrom,
       {
-        source,
+        resource,
         identifiers,
         args: inArgs,
         from: inFrom = null,
@@ -514,7 +514,7 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
         ? [
             optionsOrCloneFrom,
             {
-              source: optionsOrCloneFrom.source,
+              resource: optionsOrCloneFrom.resource,
               identifiers: null,
               from: optionsOrCloneFrom.from,
               args: null,
@@ -528,7 +528,7 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
     const cloneFromMatchingMode =
       cloneFrom?.mode === this.mode ? cloneFrom : null;
 
-    this.source = source;
+    this.resource = resource;
     if (cloneFrom) {
       // Prevent any changes to our original to help avoid programming
       // errors.
@@ -559,9 +559,9 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
 
     this.contextId = cloneFrom
       ? cloneFrom.contextId
-      : this.addDependency(this.source.executor.context());
+      : this.addDependency(this.resource.executor.context());
 
-    this.name = customName ?? source.name;
+    this.name = customName ?? resource.name;
     this.queryValuesSymbol = cloneFrom
       ? cloneFrom.queryValuesSymbol
       : Symbol(this.name + "_identifier_values");
@@ -570,14 +570,14 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
       ? new Map(cloneFrom._symbolSubstitutes)
       : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
-    this.from = inFrom ?? source.source;
+    this.from = inFrom ?? resource.source;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.placeholderValues = cloneFrom
       ? new Map(cloneFrom.placeholderValues)
       : new Map();
     this.joinAsLateral =
       (cloneFrom ? cloneFrom.joinAsLateral : inJoinAsLateral) ??
-      !!this.source.parameters;
+      !!this.resource.parameters;
     if (cloneFrom) {
       this.queryValues = [...cloneFrom.queryValues]; // References indexes cloned above
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
@@ -852,7 +852,7 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
   public singleRelation<
     TRelationName extends keyof GetPgResourceRelations<TResource> & string,
   >(relationIdentifier: TRelationName): SQL {
-    const relation = this.source.getRelation(
+    const relation = this.resource.getRelation(
       relationIdentifier,
     ) as PgCodecRelation<
       PgCodecWithColumns,
@@ -860,14 +860,14 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
     >;
     if (!relation) {
       throw new Error(
-        `${this.source} does not have a relation named '${String(
+        `${this.resource} does not have a relation named '${String(
           relationIdentifier,
         )}'`,
       );
     }
     if (!relation.isUnique) {
       throw new Error(
-        `${this.source} relation '${String(
+        `${this.resource} relation '${String(
           relationIdentifier,
         )}' is not unique so cannot be used with singleRelation`,
       );
@@ -887,7 +887,7 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
     }
     this.joins.push({
       type: "left",
-      // TODO: `source.source` is confusing, rename one of these!
+      // TODO: `resource.source` is confusing, rename one of these!
       source: remoteResource.source,
       alias,
       conditions: localColumns.map(
@@ -942,7 +942,9 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
     if (this.nullCheckIndex !== undefined) {
       return this.nullCheckIndex;
     }
-    const nullCheckExpression = this.source.getNullCheckExpression(this.alias);
+    const nullCheckExpression = this.resource.getNullCheckExpression(
+      this.alias,
+    );
     if (nullCheckExpression) {
       this.nullCheckIndex = this.selectAndReturnIndex(nullCheckExpression);
     } else {
@@ -1132,7 +1134,7 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
       const [orderFragment, orderCodec] = getFragmentAndCodecFromOrder(
         this.alias,
         order,
-        this.source.codec,
+        this.resource.codec,
       );
       const sqlValue = this.placeholder(
         toPg(access($parsedCursorPlan, [i + 1]), orderCodec),
@@ -1237,7 +1239,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults;
 
-    const executionResult = await this.source.executeWithCache(
+    const executionResult = await this.resource.executeWithCache(
       values[this.contextId].map((context, i) => {
         return {
           // The context is how we'd handle different connections with different claims
@@ -1324,7 +1326,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
     const initialFetchResult = text
       ? (
-          await this.source.executeWithoutCache(
+          await this.resource.executeWithoutCache(
             values[this.contextId].map((context, i) => {
               return {
                 // The context is how we'd handle different connections with different claims
@@ -1350,7 +1352,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       : null;
 
     const streams = (
-      await this.source.executeStream(
+      await this.resource.executeStream(
         values[this.contextId].map((context, i) => {
           return {
             // The context is how we'd handle different connections with different claims
@@ -1485,7 +1487,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   private buildFrom() {
     return {
       sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}${
-        this.source.codec.columns ? sql.blank : sql`(v)`
+        this.resource.codec.columns ? sql.blank : sql`(v)`
       }`,
     };
   }
@@ -1572,7 +1574,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           const [frag] = getFragmentAndCodecFromOrder(
             this.alias,
             o,
-            this.source.codec,
+            this.resource.codec,
           );
           return sql.compile(frag, {
             placeholderValues: this.placeholderValues,
@@ -1635,7 +1637,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
                 const [frag] = getFragmentAndCodecFromOrder(
                   this.alias,
                   o,
-                  this.source.codec,
+                  this.resource.codec,
                 );
                 return sql`${frag} ${
                   o.direction === "ASC" ? sql`asc` : sql`desc`
@@ -1837,7 +1839,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     extraSelectIndexes: number[];
   } {
     if (!this.isTrusted) {
-      this.source.applyAuthorizationChecksToPlan(this);
+      this.resource.applyAuthorizationChecksToPlan(this);
     }
 
     const reverse = this.shouldReverseOrder();
@@ -2175,7 +2177,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       // at this stage.
 
       // Check FROM matches
-      if (p.source !== this.source) {
+      if (p.resource !== this.resource) {
         return false;
       }
 
@@ -2623,7 +2625,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
                 type: "left",
                 source: this.fromExpression(),
                 alias: this.alias,
-                columnNames: this.source.codec.columns ? sql.blank : sql`(v)`,
+                columnNames: this.resource.codec.columns ? sql.blank : sql`(v)`,
                 conditions,
                 lateral: this.joinAsLateral,
               },
@@ -2757,7 +2759,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
   /**
    * If this plan may only return one record, you can use `.single()` to return
    * a plan that resolves to either that record (in the case of composite
-   * types) or the underlying scalar (in the case of a source whose codec has
+   * types) or the underlying scalar (in the case of a resource whose codec has
    * no columns).
    *
    * Beware: if you call this and the database might actually return more than
@@ -2780,7 +2782,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
         >
     : never {
     const $single = this.singleAsRecord(options);
-    const isScalar = !this.source.codec.columns;
+    const isScalar = !this.resource.codec.columns;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
@@ -2814,7 +2816,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
         >
     : never {
     const $single = new PgSelectSingleStep(this, itemPlan);
-    const isScalar = !this.source.codec.columns;
+    const isScalar = !this.resource.codec.columns;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
@@ -2858,14 +2860,14 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function ensureOrderIsUnique(step: PgSelectStep<any>) {
-  const unique = (step.source.uniques as PgResourceUnique[])[0];
+  const unique = (step.resource.uniques as PgResourceUnique[])[0];
   if (unique) {
     const ordersIsUnique = step.orderIsUnique();
     if (!ordersIsUnique) {
       unique.columns.forEach((c) => {
         step.orderBy({
           fragment: sql`${step.alias}.${sql.identifier(c as string)}`,
-          codec: step.source.codec.columns![c].codec,
+          codec: step.resource.codec.columns![c].codec,
           direction: "ASC",
         });
       });
@@ -2887,17 +2889,17 @@ exportAs("@dataplan/pg", pgSelect, "pgSelect");
 export function pgSelectFromRecords<
   TResource extends PgResource<any, any, any, any, any>,
 >(
-  source: TResource,
+  resource: TResource,
   records: PgClassExpressionStep<
     PgCodec<any, undefined, any, any, GetPgResourceCodec<TResource>, any, any>,
     TResource
   >,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({
-    source,
+    resource,
     identifiers: [],
     from: (records) => sql`unnest(${records.placeholder})`,
-    args: [{ step: records, pgCodec: listOfCodec(source.codec) }],
+    args: [{ step: records, pgCodec: listOfCodec(resource.codec) }],
   }) as PgSelectStep<TResource>;
 }
 

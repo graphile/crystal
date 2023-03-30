@@ -2665,7 +2665,7 @@ export function makeExampleSchema(
           ) =>
             function plan($forum) {
               const $user = pgSelect({
-                source: userResource,
+                resource: userResource,
                 identifiers: [],
                 args: [
                   {
@@ -3356,7 +3356,7 @@ export function makeExampleSchema(
           (pgSelect, scalarTextResource, sql, sqlFromArgDigests) =>
             function plan($entity) {
               return pgSelect({
-                source: scalarTextResource,
+                resource: scalarTextResource,
                 identifiers: [],
                 args: [
                   {
@@ -4016,7 +4016,7 @@ export function makeExampleSchema(
           (pgSelect, scalarTextResource, sql) =>
             function plan(_$root) {
               const $plan = pgSelect({
-                source: scalarTextResource,
+                resource: scalarTextResource,
                 identifiers: [],
                 from: sql`app_public.forum_names()`,
                 name: "forum_names",
@@ -4072,7 +4072,7 @@ export function makeExampleSchema(
           (each, lambda, pgSelect, scalarTextResource, sql) =>
             function plan(_$root) {
               const $names = pgSelect({
-                source: scalarTextResource,
+                resource: scalarTextResource,
                 identifiers: [],
                 from: sql`app_public.forum_names()`,
                 name: "forum_names",
@@ -4092,7 +4092,7 @@ export function makeExampleSchema(
           (deoptimizeIfAppropriate, pgSelect, sql, userResource) =>
             function plan() {
               const $users = pgSelect({
-                source: userResource,
+                resource: userResource,
                 identifiers: [],
                 from: sql`app_public.random_user()`,
                 name: "random_user",
@@ -4136,7 +4136,7 @@ export function makeExampleSchema(
           (deoptimizeIfAppropriate, featuredMessagesResource, pgSelect) =>
             function plan() {
               const $messages = pgSelect({
-                source: featuredMessagesResource,
+                resource: featuredMessagesResource,
                 identifiers: [],
               });
               deoptimizeIfAppropriate($messages);
@@ -5043,7 +5043,7 @@ export function makeExampleSchema(
               let $post: PgSelectStep<typeof relationalPostsResource>;
               for (let i = 0; i < 3; i++) {
                 $post = pgSelect({
-                  source: relationalPostsResource,
+                  resource: relationalPostsResource,
                   identifiers: [],
                   from: (authorId, title) =>
                     sql`interfaces_and_unions.insert_post(${authorId.placeholder}, ${title.placeholder})`,

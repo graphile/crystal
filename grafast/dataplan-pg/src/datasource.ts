@@ -82,7 +82,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
 export interface PgResourceUniqueExtensions {}
 
 /**
- * Space for extra metadata about this source
+ * Space for extra metadata about this resource
  */
 export interface PgResourceExtensions {}
 
@@ -91,7 +91,7 @@ export interface PgResourceParameterExtensions {
 }
 
 /**
- * If this is a functional (rather than static) source, this describes one of
+ * If this is a functional (rather than static) resource, this describes one of
  * the parameters it accepts.
  */
 export interface PgResourceParameter<
@@ -130,7 +130,7 @@ export interface PgResourceUnique<
    */
   columns: ReadonlyArray<keyof TColumns & string>;
   /**
-   * If this is true, this represents the "primary key" of the source.
+   * If this is true, this represents the "primary key" of the resource.
    */
   isPrimary?: boolean;
   /**
@@ -167,11 +167,11 @@ export interface PgResourceOptions<
   TName extends string = string,
 > {
   /**
-   * The associated codec for thsi source
+   * The associated codec for this resource
    */
   codec: TCodec;
   /**
-   * The PgExecutor to use when servicing this source; different executors can
+   * The PgExecutor to use when servicing this resource; different executors can
    * have different caching rules. A plan that uses one executor cannot be
    * inlined into a plan for a different executor.
    */
@@ -192,7 +192,7 @@ export interface PgResourceOptions<
   parameters?: TParameters;
   description?: string;
   /**
-   * Set true if this source will only return at most one record - this is
+   * Set true if this resource will only return at most one record - this is
    * generally only useful for PostgreSQL function sources, in which case you
    * should set it false if the function `returns setof` and true otherwise.
    */
@@ -245,7 +245,7 @@ type CodecWithSource<TCodec extends PgCodecAny> = TCodec & {
 };
 
 /**
- * PgResource represents any source of SELECT-able data in Postgres: tables,
+ * PgResource represents any resource of SELECT-able data in Postgres: tables,
  * views, functions, etc.
  */
 export class PgResource<
@@ -268,7 +268,7 @@ export class PgResource<
 
   // TODO: make a public interface for this information
   /**
-   * If present, implies that the source represents a `setof composite[]` (i.e.
+   * If present, implies that the resource represents a `setof composite[]` (i.e.
    * an array of arrays) - and thus is not appropriate to use for GraphQL
    * Cursor Connections.
    *
@@ -324,10 +324,10 @@ export class PgResource<
 
     // "From Codec"
     const name = `frmcdc_${codec.name}_${counter}`;
-    const source = EXPORTABLE(
+    const resource = EXPORTABLE(
       (codec, executor, name, sql) => ({
         executor,
-        source: sql`(select 1/0 /* codec-only source; should not select directly */)`,
+        source: sql`(select 1/0 /* codec-only resource; should not select directly */)`,
         codec,
         name,
         identifier: name,
@@ -335,15 +335,15 @@ export class PgResource<
       [codec, executor, name, sql],
     );
 
-    codec[$$codecSource].set(executor, source);
+    codec[$$codecSource].set(executor, resource);
 
-    return source;
+    return resource;
   }
 
   /**
    * @param source - the SQL for the `FROM` clause (without any
    * aliasing). If this is a subquery don't forget to wrap it in parens.
-   * @param name - a nickname for this data source. Doesn't need to be unique
+   * @param name - a nickname for this resource. Doesn't need to be unique
    * (but should be). Used for making the SQL query and debug messages easier
    * to understand.
    */
@@ -394,13 +394,13 @@ export class PgResource<
     }
     if (this.parameters != null && !sourceIsFunction) {
       throw new Error(
-        `Resource ${this} is invalid - parameters can only be specified when the source is a function.`,
+        `Resource ${this} is invalid - parameters can only be specified when the resource is a function.`,
       );
     }
 
     if (this.codec.arrayOfCodec?.columns) {
       throw new Error(
-        `Resource ${this} is invalid - creating a source that returns an array of a composite type is forbidden; please \`unnest\` the array.`,
+        `Resource ${this} is invalid - creating a resource that returns an array of a composite type is forbidden; please \`unnest\` the array.`,
       );
     }
 
@@ -776,7 +776,7 @@ export class PgResource<
             : sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
-    return pgSelect({ source: this, identifiers }) as PgSelectStep<this>;
+    return pgSelect({ resource: this, identifiers }) as PgSelectStep<this>;
   }
 
   execute(
@@ -784,7 +784,7 @@ export class PgResource<
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
   ): ExecutableStep<unknown> {
     const $select = pgSelect({
-      source: this,
+      resource: this,
       identifiers: [],
       args,
       mode,
@@ -942,7 +942,7 @@ export interface PgRegistryBuilder<
   >;
 
   addResource<const TResource extends PgResourceOptions<any, any, any, any>>(
-    source: TResource,
+    resource: TResource,
   ): PgRegistryBuilder<
     TResource extends PgResourceOptions<infer UCodec, any, any, any>
       ? UCodec extends PgCodec<infer UName, any, any, any, any, any, any>
@@ -1141,12 +1141,12 @@ export function makeRegistry<
           )
         : rawConfig.parameters,
     };
-    const source = new PgResource(registry, sourceConfig) as any;
+    const resource = new PgResource(registry, sourceConfig) as any;
 
     // This is the magic that breaks the circular reference: rather than
     // building PgResource via a factory we tell the system to just retrieve it
     // from the already build registry.
-    Object.defineProperties(source, {
+    Object.defineProperties(resource, {
       $exporter$args: { value: [registry, sourceName] },
       $exporter$factory: {
         value: (registry: PgRegistry<any, any, any>, sourceName: string) =>
@@ -1154,7 +1154,7 @@ export function makeRegistry<
       },
     });
 
-    registry.pgResources[sourceName] = source;
+    registry.pgResources[sourceName] = resource;
   }
 
   for (const codecName of Object.keys(
@@ -1254,15 +1254,15 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return builder;
     },
     */
-    addResource(source) {
-      this.addCodec(source.codec);
-      registryConfig.pgResources[source.name] = source;
+    addResource(resource) {
+      this.addCodec(resource.codec);
+      registryConfig.pgResources[resource.name] = resource;
       return builder;
     },
     /*
     addResources(sources) {
-      for (const source of sources) {
-        registryConfig.pgResources[source.name] = source;
+      for (const resource of sources) {
+        registryConfig.pgResources[resource.name] = resource;
       }
       return builder;
     },
@@ -1275,7 +1275,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       }
       if (!registryConfig.pgResources[remoteResourceOptions.name]) {
         throw new Error(
-          `Adding a relation before adding the source is forbidden.`,
+          `Adding a relation before adding the resource is forbidden.`,
         );
       }
       if (!registryConfig.pgRelations[localCodec.name]) {
