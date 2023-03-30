@@ -389,24 +389,24 @@ export class PgResource<
     const sourceIsFunction = typeof this.source === "function";
     if (this.parameters == null && sourceIsFunction) {
       throw new Error(
-        `Source ${this} is invalid - it's a function but without a parameters array. If the function accepts no parameters please pass an empty array.`,
+        `Resource ${this} is invalid - it's a function but without a parameters array. If the function accepts no parameters please pass an empty array.`,
       );
     }
     if (this.parameters != null && !sourceIsFunction) {
       throw new Error(
-        `Source ${this} is invalid - parameters can only be specified when the source is a function.`,
+        `Resource ${this} is invalid - parameters can only be specified when the source is a function.`,
       );
     }
 
     if (this.codec.arrayOfCodec?.columns) {
       throw new Error(
-        `Source ${this} is invalid - creating a source that returns an array of a composite type is forbidden; please \`unnest\` the array.`,
+        `Resource ${this} is invalid - creating a source that returns an array of a composite type is forbidden; please \`unnest\` the array.`,
       );
     }
 
     if (this.isUnique && this.sqlPartitionByIndex) {
       throw new Error(
-        `Source ${this} is invalid - cannot be unique and also partitionable`,
+        `Resource ${this} is invalid - cannot be unique and also partitionable`,
       );
     }
   }
@@ -902,7 +902,7 @@ export interface PgRegistryBuilder<
       any
     >;
   },
-  TSources extends {
+  TResources extends {
     [name in string]: PgResourceOptions<
       PgCodecAny,
       ReadonlyArray<PgResourceUnique<PgTypeColumns>>,
@@ -921,7 +921,7 @@ export interface PgRegistryBuilder<
 > {
   getRegistryConfig(): PgRegistryConfig<
     Expand<TCodecs>,
-    Expand<TSources>,
+    Expand<TResources>,
     Expand<TRelations>
   >;
   addCodec<const TCodec extends PgCodecAny>(
@@ -932,7 +932,7 @@ export interface PgRegistryBuilder<
           [name in UName]: TCodec;
         }
       : never,
-    TSources,
+    TResources,
     TRelations
   >;
 
@@ -947,7 +947,7 @@ export interface PgRegistryBuilder<
         : never
       : never,
     TResource extends PgResourceOptions<any, any, any, infer UName>
-      ? TSources & {
+      ? TResources & {
           [name in UName]: TResource;
         }
       : never,
@@ -977,7 +977,7 @@ export interface PgRegistryBuilder<
     relation: TCodecRelation,
   ): PgRegistryBuilder<
     TCodecs,
-    TSources,
+    TResources,
     TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? TRelations & {
           [codecName in UName]: {
@@ -1011,7 +1011,7 @@ export interface PgRegistryBuilder<
 */
   >;
 
-  build(): PgRegistry<Expand<TCodecs>, Expand<TSources>, Expand<TRelations>>;
+  build(): PgRegistry<Expand<TCodecs>, Expand<TResources>, Expand<TRelations>>;
 }
 
 export function makeRegistry<
@@ -1255,7 +1255,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return builder;
     },
     /*
-    addSources(sources) {
+    addResources(sources) {
       for (const source of sources) {
         registryConfig.pgResources[source.name] = source;
       }
