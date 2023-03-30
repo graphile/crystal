@@ -222,8 +222,8 @@ function processColumn(
                 columnName,
                 getSource,
                 notNull,
-                pgSelectSingleFromRecord,
                 pgResources,
+                pgSelectSingleFromRecord,
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
@@ -243,8 +243,8 @@ function processColumn(
               columnName,
               getSource,
               notNull,
-              pgSelectSingleFromRecord,
               pgResources,
+              pgSelectSingleFromRecord,
               registry,
             ],
           );
@@ -261,8 +261,8 @@ function processColumn(
                 baseCodec,
                 columnName,
                 getSource,
-                pgSelectFromRecords,
                 pgResources,
+                pgSelectFromRecords,
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
@@ -281,8 +281,8 @@ function processColumn(
               baseCodec,
               columnName,
               getSource,
-              pgSelectFromRecords,
               pgResources,
+              pgSelectFromRecords,
               registry,
             ],
           );

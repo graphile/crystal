@@ -1154,8 +1154,8 @@ function addRelations(
                   members,
                   paths,
                   pgUnionAll,
-                  single,
                   resourceByTypeName,
+                  single,
                 ) =>
                 ($parent: ExecutableStep<any>) => {
                   const $record = isMutationPayload
@@ -1200,8 +1200,8 @@ function addRelations(
                 members,
                 paths,
                 pgUnionAll,
-                single,
                 resourceByTypeName,
+                single,
               ],
             );
           };

@@ -38,9 +38,9 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
           return values;
         }
 
-        const sources = Object.values(build.input.pgRegistry.pgResources).filter(
-          (s) => s.codec === pgCodec && !s.parameters,
-        );
+        const sources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ).filter((s) => s.codec === pgCodec && !s.parameters);
         if (sources.length < 1) {
           return values;
         }

@@ -6,11 +6,9 @@ import type {
   PgCodecWithColumns,
   PgRefDefinition,
   PgRefDefinitions,
-  PgResource,
   PgResourceOptions,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
-import type { PgClass } from "pg-introspection";
 
 import {
   parseDatabaseIdentifierFromSmartTag,
