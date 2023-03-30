@@ -4,7 +4,7 @@ import type {
   PgCodecWithColumns,
   PgRegistryAny,
   PgResourceOptions,
-  PgTypeColumns,
+  PgCodecAttributes,
   WithPgClient,
 } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
@@ -39,7 +39,7 @@ export interface PgResourceRefTags extends PgSmartTagsDict {
   deprecated: string | string[];
 }
 
-export interface PgTypeColumnTags extends PgSmartTagsDict {
+export interface PgCodecAttributeTags extends PgSmartTagsDict {
   name: string;
   behavior: string | string[];
   notNull: true;
@@ -99,8 +99,8 @@ declare module "@dataplan/pg" {
     description?: string;
   }
 
-  interface PgTypeColumnExtensions {
-    tags: Partial<PgTypeColumnTags>;
+  interface PgCodecAttributeExtensions {
+    tags: Partial<PgCodecAttributeTags>;
     description?: string;
   }
 
@@ -117,7 +117,7 @@ declare global {
     interface PgRelations {
       [codecName: string]: {
         [relationName: string]: PgCodecRelationConfig<
-          PgCodec<any, PgTypeColumns, any, any, undefined, any, undefined>,
+          PgCodec<any, PgCodecAttributes, any, any, undefined, any, undefined>,
           PgResourceOptions<PgCodecWithColumns, any, any, any>
         >;
       };

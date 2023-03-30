@@ -5,7 +5,7 @@ import type {
   PgDeleteStep,
   PgResource,
   PgResourceUnique,
-  PgTypeColumn,
+  PgCodecAttribute,
   PgUpdateStep,
 } from "@dataplan/pg";
 import { pgDelete, pgUpdate } from "@dataplan/pg";
@@ -490,7 +490,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               (memo, columnName) => {
                                 const column = resource.codec.columns[
                                   columnName
-                                ] as PgTypeColumn;
+                                ] as PgCodecAttribute;
                                 memo[
                                   inflection.column({
                                     columnName,

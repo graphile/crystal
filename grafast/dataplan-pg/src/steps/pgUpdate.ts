@@ -7,7 +7,7 @@ import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgTypeColumn } from "../codecs.js";
+import type { PgCodecAttribute } from "../codecs.js";
 import type { PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
@@ -217,12 +217,12 @@ export class PgUpdateStep<
   get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr] extends PgTypeColumn<infer UCodec>
+    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<infer UCodec>
       ? UCodec
       : never,
     TResource
   > {
-    const resourceColumn: PgTypeColumn =
+    const resourceColumn: PgCodecAttribute =
       this.resource.codec.columns![attr as string];
     if (!resourceColumn) {
       throw new Error(

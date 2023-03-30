@@ -41,7 +41,7 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
-import type { PgTypeColumns } from "../codecs.js";
+import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type {
@@ -2773,7 +2773,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     any,
     any
   >
-    ? UColumns extends PgTypeColumns
+    ? UColumns extends PgCodecAttributes
       ? PgSelectSingleStep<TResource>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
@@ -2807,7 +2807,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     any,
     any
   >
-    ? UColumns extends PgTypeColumns
+    ? UColumns extends PgCodecAttributes
       ? PgSelectSingleStep<TResource>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,

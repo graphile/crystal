@@ -8,7 +8,7 @@ import { ExecutableStep, exportAs, isDev, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgTypeColumn } from "../codecs.js";
+import type { PgCodecAttribute } from "../codecs.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceCodec,
@@ -185,7 +185,7 @@ export class PgInsertStep<TResource extends PgResourceAny>
   get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr] extends PgTypeColumn<infer UCodec>
+    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<infer UCodec>
       ? UCodec
       : never,
     TResource
@@ -193,7 +193,7 @@ export class PgInsertStep<TResource extends PgResourceAny>
     if (!this.resource.codec.columns) {
       throw new Error(`Cannot call .get() when there's no columns.`);
     }
-    const resourceColumn: PgTypeColumn =
+    const resourceColumn: PgCodecAttribute =
       this.resource.codec.columns[attr as string];
     if (!resourceColumn) {
       throw new Error(
@@ -399,7 +399,7 @@ export function pgInsert<TResource extends PgResourceAny>(
   columns?: {
     [key in keyof GetPgResourceColumns<TResource>]?:
       | PgTypedExecutableStep<
-          GetPgResourceColumns<TResource>[key] extends PgTypeColumn<
+          GetPgResourceColumns<TResource>[key] extends PgCodecAttribute<
             infer UCodec,
             any
           >

@@ -2,7 +2,7 @@ import type { ExecutableStep, GrafastSubscriber, ModifierStep } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgAdaptorOptions } from "./adaptors/pg.js";
-import type { PgTypeColumns } from "./codecs.js";
+import type { PgCodecAttributes } from "./codecs.js";
 import type {
   PgCodecRefs,
   PgResource,
@@ -123,7 +123,7 @@ export type PgCodecPolymorphism<TColumnName extends string> =
  */
 export interface PgCodec<
   TName extends string,
-  TColumns extends PgTypeColumns | undefined,
+  TColumns extends PgCodecAttributes | undefined,
   TFromPostgres,
   TFromJavaScript = TFromPostgres,
   TArrayItemCodec extends
@@ -248,22 +248,22 @@ export interface PgCodec<
 
 export type PgCodecAny = PgCodec<
   string,
-  PgTypeColumns | undefined,
+  PgCodecAttributes | undefined,
   any,
   any,
-  | PgCodec<string, PgTypeColumns | undefined, any, any, undefined, any, any>
+  | PgCodec<string, PgCodecAttributes | undefined, any, any, undefined, any, any>
   | undefined,
-  | PgCodec<string, PgTypeColumns | undefined, any, any, any, any, any>
+  | PgCodec<string, PgCodecAttributes | undefined, any, any, any, any, any>
   | undefined,
   PgCodec<string, undefined, any, any, any, any, any> | undefined
 >;
 export type PgCodecWithColumns = PgCodec<
   string,
-  PgTypeColumns,
+  PgCodecAttributes,
   any,
   any,
   undefined,
-  | PgCodec<string, PgTypeColumns | undefined, any, any, any, any, any>
+  | PgCodec<string, PgCodecAttributes | undefined, any, any, any, any, any>
   | undefined,
   undefined
 >;
@@ -360,9 +360,9 @@ export type TuplePlanMap<
  * to.
  */
 export type PlanByUniques<
-  TColumns extends PgTypeColumns,
+  TColumns extends PgCodecAttributes,
   TUniqueColumns extends ReadonlyArray<PgResourceUnique<TColumns>>,
-> = TColumns extends PgTypeColumns
+> = TColumns extends PgCodecAttributes
   ? TuplePlanMap<TColumns, TUniqueColumns[number]["columns"] & string[]>[number]
   : undefined;
 
@@ -453,7 +453,7 @@ export interface PgCodecRelationExtensions {}
 export interface PgCodecRelationBase<
   TLocalCodec extends PgCodec<
     string,
-    PgTypeColumns,
+    PgCodecAttributes,
     any,
     any,
     undefined,
@@ -508,7 +508,7 @@ export interface PgCodecRelationBase<
 export interface PgCodecRelationConfig<
   TLocalCodec extends PgCodec<
     string,
-    PgTypeColumns,
+    PgCodecAttributes,
     any,
     any,
     undefined,
@@ -536,7 +536,7 @@ export interface PgCodecRelationConfig<
 export interface PgCodecRelation<
   TLocalCodec extends PgCodec<
     string,
-    PgTypeColumns,
+    PgCodecAttributes,
     any,
     any,
     undefined,
@@ -566,7 +566,7 @@ export interface PgRegistryConfig<
   TCodecs extends {
     [name in string]: PgCodec<
       name,
-      PgTypeColumns | undefined,
+      PgCodecAttributes | undefined,
       any,
       any,
       any,
@@ -577,7 +577,7 @@ export interface PgRegistryConfig<
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
       PgCodecAny,
-      ReadonlyArray<PgResourceUnique<PgTypeColumns<any>>>,
+      ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
       readonly PgResourceParameterAny[] | undefined,
       name
     >;
@@ -585,7 +585,7 @@ export interface PgRegistryConfig<
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
-        PgCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
         PgResourceOptions<PgCodecWithColumns, any, any, any>
       >;
     };
@@ -606,7 +606,7 @@ export type ResourceFromOptions<
   TCodecs extends {
     [name in string]: PgCodec<
       name,
-      PgTypeColumns | undefined,
+      PgCodecAttributes | undefined,
       any,
       any,
       any,
@@ -617,7 +617,7 @@ export type ResourceFromOptions<
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
       PgCodecAny, // TCodecs[keyof TCodecs],
-      ReadonlyArray<PgResourceUnique<PgTypeColumns>>,
+      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameterAny[] | undefined,
       name
     >;
@@ -626,7 +626,7 @@ export type ResourceFromOptions<
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         // TCodecs[keyof TCodecs] &
-        PgCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
         // TResourceOptions[keyof TResourceOptions] &
         PgResourceOptions<
           // TCodecs[keyof TCodecs] &
@@ -658,7 +658,7 @@ export interface PgRegistry<
   TCodecs extends {
     [name in string]: PgCodec<
       name,
-      PgTypeColumns | undefined,
+      PgCodecAttributes | undefined,
       any,
       any,
       any,
@@ -669,7 +669,7 @@ export interface PgRegistry<
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
       PgCodecAny, // TCodecs[keyof TCodecs],
-      ReadonlyArray<PgResourceUnique<PgTypeColumns>>,
+      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameterAny[] | undefined,
       name
     >;
@@ -678,7 +678,7 @@ export interface PgRegistry<
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         // TCodecs[keyof TCodecs] &
-        PgCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
         // TResourceOptions[keyof TResourceOptions] &
         PgResourceOptions<
           // TCodecs[keyof TCodecs] &
@@ -729,7 +729,7 @@ export type PgResourceParameterAny = PgResourceParameter<
 export type PgResourceAny = PgResource<
   string & any,
   PgCodecAny & any,
-  ReadonlyArray<PgResourceUnique<PgTypeColumns>> & any,
+  ReadonlyArray<PgResourceUnique<PgCodecAttributes>> & any,
   readonly PgResourceParameterAny[] | undefined,
   PgRegistry<any, any, any>
 >;
@@ -738,7 +738,7 @@ export type PgRegistryAny = PgRegistry<
   {
     [name in string]: PgCodec<
       name,
-      PgTypeColumns | undefined,
+      PgCodecAttributes | undefined,
       any,
       any,
       any,

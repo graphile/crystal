@@ -9,7 +9,7 @@ import type {
   PgResourceOptions,
   PgResourceParameter,
   PgSelectArgumentDigest,
-  PgTypeColumns,
+  PgCodecAttributes,
 } from "@dataplan/pg";
 import {
   makePgResourceOptions,
@@ -76,7 +76,7 @@ declare global {
 }
 
 declare module "@dataplan/pg" {
-  interface PgTypeColumnExtensions {
+  interface PgCodecAttributeExtensions {
     argIndex?: number;
     argName?: string;
   }
@@ -240,7 +240,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             // return type of this function.
 
             const numberOfArguments = allArgTypes.length ?? 0;
-            const columns: PgTypeColumns = Object.create(null);
+            const columns: PgCodecAttributes = Object.create(null);
             for (let i = 0, l = numberOfArguments; i < l; i++) {
               const argType = allArgTypes[i];
               const trueArgName = pgProc.proargnames?.[i];

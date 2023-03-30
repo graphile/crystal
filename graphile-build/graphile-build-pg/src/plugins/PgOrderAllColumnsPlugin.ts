@@ -4,8 +4,8 @@ import "graphile-config";
 import type {
   PgCodec,
   PgResourceUnique,
-  PgTypeColumn,
-  PgTypeColumns,
+  PgCodecAttribute,
+  PgCodecAttributes,
 } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
@@ -23,7 +23,7 @@ declare global {
         details: {
           codec: PgCodec<any, any, any, any>;
           columnName: string;
-          column: PgTypeColumn;
+          column: PgCodecAttribute;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;
@@ -62,7 +62,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
         ) {
           return values;
         }
-        const columns = pgCodec.columns as PgTypeColumns;
+        const columns = pgCodec.columns as PgCodecAttributes;
         const sources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((s) => s.codec === pgCodec && !s.parameters);

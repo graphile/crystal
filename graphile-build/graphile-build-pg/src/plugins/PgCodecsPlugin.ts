@@ -6,8 +6,8 @@ import type {
   PgEnumTypeCodec,
   PgRecordTypeCodecSpec,
   PgResource,
-  PgTypeColumn,
-  PgTypeColumns,
+  PgCodecAttribute,
+  PgCodecAttributes,
 } from "@dataplan/pg";
 import {
   domainOfCodec,
@@ -113,7 +113,7 @@ declare global {
           databaseName: string;
           pgClass: PgClass;
           pgAttribute: PgAttribute;
-          column: PgTypeColumn<any>;
+          column: PgCodecAttribute<any>;
         }) => Promise<void> | void
       >;
 
@@ -327,7 +327,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             );
           }
 
-          const columns: PgTypeColumns = Object.create(null);
+          const columns: PgCodecAttributes = Object.create(null);
           const allAttributes =
             await info.helpers.pgIntrospection.getAttributesForClass(
               databaseName,
@@ -865,7 +865,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           if (codec.columns) {
             for (const columnName in codec.columns) {
-              const columnCodec = (codec.columns as PgTypeColumns)[columnName]
+              const columnCodec = (codec.columns as PgCodecAttributes)[columnName]
                 .codec;
               walkCodec(columnCodec);
             }
@@ -1098,7 +1098,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             // Process all the columns (if any), then exit.
             if (codec.columns) {
               for (const columnName in codec.columns) {
-                const columnCodec = (codec.columns as PgTypeColumns)[columnName]
+                const columnCodec = (codec.columns as PgCodecAttributes)[columnName]
                   .codec;
                 prepareTypeForCodec(columnCodec, visited);
               }

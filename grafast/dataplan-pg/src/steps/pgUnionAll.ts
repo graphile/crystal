@@ -30,7 +30,7 @@ import type { GraphQLObjectType } from "graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import { sql } from "pg-sql2";
 
-import type { PgTypeColumns } from "../codecs.js";
+import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type { PgExecutor } from "../executor.js";
@@ -1095,7 +1095,7 @@ on (${sql.indent(
       }
       const max = orderCount - 1 + pk.columns.length;
       const pkPlaceholder = identifierPlaceholders[orderCount - 1];
-      const pkColumns = finalResource.codec.columns as PgTypeColumns;
+      const pkColumns = finalResource.codec.columns as PgCodecAttributes;
       const condition = (i = 0): SQL => {
         const order = digest.orders[i];
         const [orderFragment, sqlValue, direction] = (() => {

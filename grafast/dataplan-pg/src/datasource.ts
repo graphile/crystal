@@ -17,9 +17,9 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
-  PgTypeColumns,
-  PgTypeColumnVia,
-  PgTypeColumnViaExplicit,
+  PgCodecAttributes,
+  PgCodecAttributeVia,
+  PgCodecAttributeViaExplicit,
 } from "./codecs.js";
 import { TYPES } from "./codecs.js";
 import type {
@@ -123,7 +123,7 @@ export interface PgResourceParameter<
  * Description of a unique constraint on a PgResource.
  */
 export interface PgResourceUnique<
-  TColumns extends PgTypeColumns = PgTypeColumns,
+  TColumns extends PgCodecAttributes = PgCodecAttributes,
 > {
   /**
    * The columns that are unique
@@ -592,9 +592,9 @@ export class PgResource<
   }
 
   public resolveVia(
-    via: PgTypeColumnVia,
+    via: PgCodecAttributeVia,
     attr: string,
-  ): PgTypeColumnViaExplicit {
+  ): PgCodecAttributeViaExplicit {
     if (!via) {
       throw new Error("No via to resolve");
     }
@@ -678,7 +678,7 @@ export class PgResource<
     spec: PlanByUniques<GetPgCodecColumns<TCodec>, TUniques>,
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
-  ): GetPgCodecColumns<TCodec> extends PgTypeColumns
+  ): GetPgCodecColumns<TCodec> extends PgCodecAttributes
     ? PgSelectSingleStep<
         PgResource<TName, TCodec, TUniques, TParameters, TRegistry>
       >
@@ -899,7 +899,7 @@ export interface PgRegistryBuilder<
   TCodecs extends {
     [name in string]: PgCodec<
       name,
-      PgTypeColumns | undefined,
+      PgCodecAttributes | undefined,
       any,
       any,
       any,
@@ -910,7 +910,7 @@ export interface PgRegistryBuilder<
   TResources extends {
     [name in string]: PgResourceOptions<
       PgCodecAny,
-      ReadonlyArray<PgResourceUnique<PgTypeColumns>>,
+      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameterAny[] | undefined,
       name
     >;
@@ -918,7 +918,7 @@ export interface PgRegistryBuilder<
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
-        PgCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
         PgResourceOptions<PgCodecWithColumns, any, any, any>
       >;
     };
@@ -962,7 +962,7 @@ export interface PgRegistryBuilder<
   addRelation<
     TCodec extends PgCodec<
       string,
-      PgTypeColumns,
+      PgCodecAttributes,
       any,
       any,
       undefined,
@@ -1023,7 +1023,7 @@ export function makeRegistry<
   TCodecs extends {
     [name in string]: PgCodec<
       name,
-      PgTypeColumns | undefined,
+      PgCodecAttributes | undefined,
       any,
       any,
       any,
@@ -1034,7 +1034,7 @@ export function makeRegistry<
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
       PgCodecAny,
-      ReadonlyArray<PgResourceUnique<PgTypeColumns<any>>>,
+      ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
       readonly PgResourceParameterAny[] | undefined,
       name
     >;
@@ -1042,7 +1042,7 @@ export function makeRegistry<
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
-        PgCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
+        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
         PgResourceOptions<PgCodecWithColumns, any, any, any>
       >;
     };
@@ -1090,7 +1090,7 @@ export function makeRegistry<
       registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
 
       if (codec.columns) {
-        const prevCols = codec.columns as PgTypeColumns;
+        const prevCols = codec.columns as PgCodecAttributes;
         for (const col of Object.values(prevCols)) {
           addCodec(col.codec);
         }

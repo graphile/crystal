@@ -50,12 +50,12 @@ import type {
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
 
-export type PgTypeColumnViaExplicit = { relation: string; attribute: string };
-export type PgTypeColumnVia = string | PgTypeColumnViaExplicit;
+export type PgCodecAttributeViaExplicit = { relation: string; attribute: string };
+export type PgCodecAttributeVia = string | PgCodecAttributeViaExplicit;
 
-export interface PgTypeColumnExtensions {}
+export interface PgCodecAttributeExtensions {}
 
-export interface PgTypeColumn<
+export interface PgCodecAttribute<
   TCodec extends PgCodecAny = PgCodecAny,
   TNotNull extends boolean = boolean,
 > {
@@ -85,7 +85,7 @@ export interface PgTypeColumn<
    * If this column actually exists on a relation rather than locally, the name
    * of the (unique) relation this column belongs to.
    */
-  via?: PgTypeColumnVia;
+  via?: PgCodecAttributeVia;
 
   /**
    * If the column exists identically on a relation and locally (e.g.
@@ -110,7 +110,7 @@ export interface PgTypeColumn<
    * these are all plural relationships. So identicalVia is generally one-way
    * (except in 1-to-1 relationships).
    */
-  identicalVia?: PgTypeColumnVia;
+  identicalVia?: PgCodecAttributeVia;
   // TODO: can identicalVia be plural? Is that useful? Maybe a column that has
   // multiple foreign key references?
 
@@ -124,17 +124,17 @@ export interface PgTypeColumn<
 
   description?: string;
 
-  extensions?: Partial<PgTypeColumnExtensions>;
+  extensions?: Partial<PgCodecAttributeExtensions>;
 }
 
-export type PgTypeColumns<
+export type PgCodecAttributes<
   TCodecMap extends {
-    [columnName in string]: PgTypeColumn<
+    [columnName in string]: PgCodecAttribute<
       PgCodec<string, any, any, any, any, any, any>,
       boolean
     >;
   } = {
-    [columnName in string]: PgTypeColumn<
+    [columnName in string]: PgCodecAttribute<
       PgCodec<string, any, any, any, any, any, any>,
       boolean
     >;
@@ -320,7 +320,7 @@ function recordStringToTuple(value: string): Array<string | null> {
   return tuple;
 }
 
-function realColumnDefs<TColumns extends PgTypeColumns>(
+function realColumnDefs<TColumns extends PgCodecAttributes>(
   columns: TColumns,
 ): Array<[string, TColumns[keyof TColumns]]> {
   const columnDefs = Object.entries(columns) as Array<
@@ -338,9 +338,9 @@ function realColumnDefs<TColumns extends PgTypeColumns>(
  *
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
-function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
+function makeRecordToSQLRawValue<TColumns extends PgCodecAttributes>(
   columns: TColumns,
-): PgEncode<ObjectFromPgTypeColumns<TColumns>> {
+): PgEncode<ObjectFromPgCodecAttributes<TColumns>> {
   const columnDefs = realColumnDefs(columns);
   return (value) => {
     const values = columnDefs.map(([columnName, spec]) => {
@@ -352,8 +352,8 @@ function makeRecordToSQLRawValue<TColumns extends PgTypeColumns>(
   };
 }
 
-export type ObjectFromPgTypeColumns<TColumns extends PgTypeColumns> = {
-  [columnName in keyof TColumns]: TColumns[columnName] extends PgTypeColumn<
+export type ObjectFromPgCodecAttributes<TColumns extends PgCodecAttributes> = {
+  [columnName in keyof TColumns]: TColumns[columnName] extends PgCodecAttribute<
     infer UCodec,
     infer UNonNull
   >
@@ -372,9 +372,9 @@ export type ObjectFromPgTypeColumns<TColumns extends PgTypeColumns> = {
  *
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
-function makeSQLValueToRecord<TColumns extends PgTypeColumns>(
+function makeSQLValueToRecord<TColumns extends PgCodecAttributes>(
   columns: TColumns,
-): (value: string) => ObjectFromPgTypeColumns<TColumns> {
+): (value: string) => ObjectFromPgCodecAttributes<TColumns> {
   const columnDefs = realColumnDefs(columns);
   const columnCount = columnDefs.length;
   return (value) => {
@@ -391,7 +391,7 @@ function makeSQLValueToRecord<TColumns extends PgTypeColumns>(
 
 export type PgRecordTypeCodecSpec<
   TName extends string,
-  TColumns extends PgTypeColumns,
+  TColumns extends PgCodecAttributes,
 > = {
   name: TName;
   identifier: SQL;
@@ -413,14 +413,14 @@ export type PgRecordTypeCodecSpec<
  */
 export function recordCodec<
   const TName extends string,
-  const TColumns extends PgTypeColumns,
+  const TColumns extends PgCodecAttributes,
 >(
   config: PgRecordTypeCodecSpec<TName, TColumns>,
 ): PgCodec<
   TName,
   TColumns,
   string,
-  ObjectFromPgTypeColumns<TColumns>,
+  ObjectFromPgCodecAttributes<TColumns>,
   undefined,
   undefined,
   undefined

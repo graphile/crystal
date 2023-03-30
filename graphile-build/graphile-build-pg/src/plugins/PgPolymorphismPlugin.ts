@@ -19,7 +19,7 @@ import type {
   PgRefDefinition,
   PgResource,
   PgResourceOptions,
-  PgTypeColumn,
+  PgCodecAttribute,
 } from "@dataplan/pg";
 import { arraysMatch, ExecutableStep } from "grafast";
 import type {
@@ -365,7 +365,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
 
               for (const [colName, colSpec] of Object.entries(
                 resource.codec.columns,
-              ) as Array<[string, PgTypeColumn]>) {
+              ) as Array<[string, PgCodecAttribute]>) {
                 if (otherCodec.columns[colName]) {
                   otherCodec.columns[colName].identicalVia = sharedRelationName;
                 } else {

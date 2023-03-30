@@ -9,7 +9,7 @@ import type { GraphQLObjectType } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { ObjectFromPgTypeColumns, PgTypeColumn } from "../codecs.js";
+import type { ObjectFromPgCodecAttributes, PgCodecAttribute } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgResource } from "../datasource.js";
 import type {
@@ -152,7 +152,7 @@ export class PgSelectSingleStep<
   get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr] extends PgTypeColumn<
+    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<
       infer UCodec,
       any
     >
@@ -173,7 +173,7 @@ export class PgSelectSingleStep<
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
-    const resourceColumn: PgTypeColumn | undefined =
+    const resourceColumn: PgCodecAttribute | undefined =
       this.resource.codec.columns?.[attr as string];
     if (!resourceColumn && attr !== "") {
       throw new Error(
@@ -208,7 +208,7 @@ export class PgSelectSingleStep<
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       const matchingColumn = (
         Object.entries($fromPlan.resource.codec.columns!) as Array<
-          [string, PgTypeColumn]
+          [string, PgCodecAttribute]
         >
       ).find(([name, col]) => {
         if (col.identicalVia) {
@@ -519,7 +519,7 @@ export class PgSelectSingleStep<
     }
   }
 
-  private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
+  private nonNullColumn: { column: PgCodecAttribute; attr: string } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
     const poly = (this.resource.codec as PgCodecAny).polymorphism;
@@ -606,7 +606,7 @@ export class PgSelectSingleStep<
 
   unbatchedExecute(
     extra: ExecutionExtra,
-    result: ObjectFromPgTypeColumns<GetPgResourceColumns<TResource>>,
+    result: ObjectFromPgCodecAttributes<GetPgResourceColumns<TResource>>,
   ): unknown[] {
     if (result == null) {
       return this._coalesceToEmptyObject ? Object.create(null) : null;

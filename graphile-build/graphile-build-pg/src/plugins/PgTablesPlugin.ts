@@ -7,7 +7,7 @@ import type {
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
-  PgTypeColumn,
+  PgCodecAttribute,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
@@ -152,7 +152,7 @@ declare global {
       // TODO: put 'field' into all these names?
       pgResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgColumn?: PgTypeColumn<any>;
+      pgColumn?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -160,7 +160,7 @@ declare global {
       // TODO: put 'field' into all these names?
       pgResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgColumn?: PgTypeColumn<any>;
+      pgColumn?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }

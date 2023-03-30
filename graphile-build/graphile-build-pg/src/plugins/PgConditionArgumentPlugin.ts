@@ -6,7 +6,7 @@ import type {
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
-  PgTypeColumns,
+  PgCodecAttributes,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
@@ -76,7 +76,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ),
                 fields: (context) => {
                   const { fieldWithHooks } = context;
-                  const columns: PgTypeColumns = codec.columns;
+                  const columns: PgCodecAttributes = codec.columns;
                   // TODO: move this to a separate plugin
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {

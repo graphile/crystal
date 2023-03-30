@@ -3,7 +3,7 @@ import { exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgTypeColumn } from "../codecs.js";
+import type { PgCodecAttribute } from "../codecs.js";
 import type { PgResource } from "../datasource.js";
 import type {
   GetPgCodecColumns,
@@ -132,7 +132,7 @@ export class PgClassExpressionStep<
   public get<TAttr extends keyof GetPgCodecColumns<TExpressionCodec>>(
     attributeName: TAttr,
   ): PgClassExpressionStep<
-    GetPgCodecColumns<TExpressionCodec>[TAttr] extends PgTypeColumn<
+    GetPgCodecColumns<TExpressionCodec>[TAttr] extends PgCodecAttribute<
       infer UCodec,
       any
     >

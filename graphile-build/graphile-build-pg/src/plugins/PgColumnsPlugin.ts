@@ -9,8 +9,8 @@ import type {
   PgCodecAny,
   PgRegistry,
   PgSelectSingleStep,
-  PgTypeColumn,
-  PgTypeColumns,
+  PgCodecAttribute,
+  PgCodecAttributes,
 } from "@dataplan/pg";
 import {
   PgResource,
@@ -74,7 +74,7 @@ declare global {
       isPgBaseInput?: boolean;
       isPgRowType?: boolean;
       isPgCompoundType?: boolean;
-      pgColumn?: PgTypeColumn;
+      pgColumn?: PgCodecAttribute;
     }
   }
 }
@@ -142,7 +142,7 @@ function processColumn(
 
   const isInterface = context.type === "GraphQLInterfaceType";
 
-  const column = pgCodec.columns[columnName] as PgTypeColumn<
+  const column = pgCodec.columns[columnName] as PgCodecAttribute<
     PgCodec<any, any, any, any, any, any>
   >;
 
@@ -450,7 +450,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        return Object.entries(pgCodec.columns as PgTypeColumns).reduce(
+        return Object.entries(pgCodec.columns as PgCodecAttributes).reduce(
           (memo, [columnName, column]) =>
             build.recoverable(memo, () => {
               const behavior = getBehavior([

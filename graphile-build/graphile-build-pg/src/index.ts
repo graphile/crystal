@@ -3,7 +3,7 @@ export {
   PgCodecTags,
   PgResourceTags,
   PgSmartTagsDict,
-  PgTypeColumnTags,
+  PgCodecAttributeTags,
 } from "./interfaces.js";
 export {
   getWithPgClientFromPgConfig,

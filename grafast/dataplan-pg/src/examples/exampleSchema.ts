@@ -72,8 +72,8 @@ import type {
   PgExecutorContextPlans,
   PgInsertStep,
   PgSelectStep,
-  PgTypeColumn,
-  PgTypeColumnVia,
+  PgCodecAttribute,
+  PgCodecAttributeVia,
   WithPgClient,
 } from "../";
 import type { PgSubscriber } from "../adaptors/pg.js";
@@ -197,15 +197,15 @@ export function makeExampleSchema(
         TOptions extends {
           codec: PgCodecAny;
           notNull?: boolean;
-          expression?: PgTypeColumn<any>["expression"];
+          expression?: PgCodecAttribute<any>["expression"];
           // TODO: we could make TypeScript understand the relations on the object
           // rather than just being string.
-          via?: PgTypeColumnVia;
-          identicalVia?: PgTypeColumnVia;
+          via?: PgCodecAttributeVia;
+          identicalVia?: PgCodecAttributeVia;
         },
       >(
         options: TOptions,
-      ): PgTypeColumn<TOptions extends { codec: infer U } ? U : never> => {
+      ): PgCodecAttribute<TOptions extends { codec: infer U } ? U : never> => {
         const { notNull, codec, expression, via, identicalVia } = options;
         return {
           codec: codec as TOptions extends { codec: infer U } ? U : never,
