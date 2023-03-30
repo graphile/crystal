@@ -335,7 +335,7 @@ export class PgUnionAllSingleStep
 
 interface MemberDigest<TTypeNames extends string> {
   member: PgUnionAllStepMember<TTypeNames>;
-  finalSource: PgResource<
+  finalResource: PgResource<
     any,
     any,
     ReadonlyArray<PgResourceUnique<any>>,
@@ -691,7 +691,7 @@ on (${sql.indent(
 
         this.memberDigests.push({
           member,
-          finalSource: currentSource,
+          finalResource: currentSource,
           symbol: currentSymbol,
           alias: currentAlias,
           conditions,
@@ -1073,7 +1073,7 @@ on (${sql.indent(
         // the signature of `getFragmentAndCodecFromOrder` to pass all the
         // codecs (and maybe even attribute mapping), or... I dunno... fix it
         // some other way.
-        const mutualCodec = this.memberDigests[0].finalSource.codec;
+        const mutualCodec = this.memberDigests[0].finalResource.codec;
         const [, codec] = getFragmentAndCodecFromOrder(
           this.alias,
           order,
@@ -1087,14 +1087,14 @@ on (${sql.indent(
     }
 
     for (const digest of this.memberDigests) {
-      const { finalSource } = digest;
-      const pk = finalSource.uniques?.find((u) => u.isPrimary === true);
+      const { finalResource } = digest;
+      const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
       if (!pk) {
         throw new Error("No primary key; this should have been caught earlier");
       }
       const max = orderCount - 1 + pk.columns.length;
       const pkPlaceholder = identifierPlaceholders[orderCount - 1];
-      const pkColumns = finalSource.codec.columns as PgTypeColumns;
+      const pkColumns = finalResource.codec.columns as PgTypeColumns;
       const condition = (i = 0): SQL => {
         const order = digest.orders[i];
         const [orderFragment, sqlValue, direction] = (() => {
@@ -1120,7 +1120,7 @@ on (${sql.indent(
             const [frag] = getFragmentAndCodecFromOrder(
               this.alias,
               order,
-              digest.finalSource.codec,
+              digest.finalResource.codec,
             );
             return [frag, identifierPlaceholders[i], order.direction];
           }
@@ -1407,7 +1407,7 @@ and ${condition(i + 1)}`}
     // the signature of `getFragmentAndCodecFromOrder` to pass all the
     // codecs (and maybe even attribute mapping), or... I dunno... fix it
     // some other way.
-    const mutualCodec = this.memberDigests[0].finalSource.codec;
+    const mutualCodec = this.memberDigests[0].finalResource.codec;
 
     hash.update(
       JSON.stringify(
@@ -1448,7 +1448,7 @@ and ${condition(i + 1)}`}
     const reverse = normalMode ? this.shouldReverseOrder() : null;
 
     // HACK: THIS IS UNSAFE. See "HACK: this is bad" comments.
-    const mutualCodec = this.memberDigests[0].finalSource.codec;
+    const mutualCodec = this.memberDigests[0].finalResource.codec;
 
     const makeQuery = () => {
       const tables: SQL[] = [];
@@ -1459,7 +1459,7 @@ and ${condition(i + 1)}`}
           alias: tableAlias,
           conditions,
           orders,
-          finalSource,
+          finalResource: finalSource,
         } = digest;
 
         const pk = finalSource.uniques?.find((u) => u.isPrimary === true);
@@ -1516,7 +1516,7 @@ and ${condition(i + 1)}`}
                   const [frag, codec] = getFragmentAndCodecFromOrder(
                     this.alias,
                     orderSpec,
-                    digest.finalSource.codec,
+                    digest.finalResource.codec,
                   );
                   return [
                     frag,
