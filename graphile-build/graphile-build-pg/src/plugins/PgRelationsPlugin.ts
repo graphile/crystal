@@ -723,7 +723,7 @@ function addRelations(
 
   const resolvePath = (path: PgCodecRefPath) => {
     if (!resource) {
-      throw new Error(`Cannot call resolvePath unless there's a source`);
+      throw new Error(`Cannot call resolvePath unless there's a resource`);
     }
     const result = {
       resource,
@@ -756,7 +756,7 @@ function addRelations(
         resource,
         isUnique,
       });
-      result.resource = relation.remoteResource as any;
+      result.resource = relation.remoteResource;
     }
     return result;
   };
@@ -934,7 +934,7 @@ function addRelations(
 
       // const isUnique = paths.every((p) => p.isUnique);
 
-      // TODO: shouldn't the ref behavior override the source behavior?
+      // TODO: shouldn't the ref behavior override the resource behavior?
       behavior = hasExactlyOneSource
         ? getBehavior([
             firstSource.codec.extensions,
@@ -1072,7 +1072,7 @@ function addRelations(
             );
             functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
             */
-                // ENHANCEMENT: we could rename this to be the singular of the source name or something
+                // ENHANCEMENT: we could rename this to be the singular of the resource name or something
                 const $entry = te`$entry`;
                 const specString = makeSpecString(
                   $entry,
