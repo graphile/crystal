@@ -94,21 +94,21 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const sources = Object.values(build.input.pgRegistry.pgResources).filter(
-          (source) => {
-            if (source.codec !== pgCodec) return false;
-            if (source.parameters) return false;
-            return true;
-          },
-        );
+        const resources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ).filter((resource) => {
+          if (resource.codec !== pgCodec) return false;
+          if (resource.parameters) return false;
+          return true;
+        });
 
-        if (sources.length !== 1) {
+        if (resources.length !== 1) {
           return fields;
         }
 
-        const source = sources[0];
+        const resource = resources[0];
 
-        const pk = (source.uniques as PgResourceUnique[])?.find(
+        const pk = (resource.uniques as PgResourceUnique[])?.find(
           (u) => u.isPrimary,
         );
         if (!pk) {
@@ -132,13 +132,13 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
         const TableEdgeType = getTypeByName(
-          inflection.tableEdgeType(source.codec),
+          inflection.tableEdgeType(resource.codec),
         ) as GraphQLObjectType | undefined;
         if (!TableEdgeType) {
           return fields;
         }
 
-        const fieldName = inflection.tableEdgeField(source.codec);
+        const fieldName = inflection.tableEdgeField(resource.codec);
         const primaryKeyAsc = inflection.builtin("PRIMARY_KEY_ASC");
         const defaultValueEnum =
           TableOrderByType.getValues().find((v) => v.name === primaryKeyAsc) ||
@@ -175,7 +175,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   },
                 },
                 deprecationReason: tagToString(
-                  source.extensions?.tags?.deprecated,
+                  resource.extensions?.tags?.deprecated,
                 ),
                 // TODO: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
@@ -187,7 +187,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     constant,
                     pgSelectFromRecord,
                     pkColumns,
-                    source,
+                    resource,
                     tableOrderByTypeName,
                   ) =>
                     function plan(
@@ -205,7 +205,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       const $select = (() => {
                         if ($result instanceof PgDeleteStep) {
                           return pgSelectFromRecord(
-                            $result.source,
+                            $result.resource,
                             $result.record(),
                           );
                         } else {
@@ -213,7 +213,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                             memo[columnName] = $result.get(columnName);
                             return memo;
                           }, Object.create(null));
-                          return source.find(spec);
+                          return resource.find(spec);
                         }
                       })();
 
@@ -239,7 +239,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     constant,
                     pgSelectFromRecord,
                     pkColumns,
-                    source,
+                    resource,
                     tableOrderByTypeName,
                   ],
                 ),

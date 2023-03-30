@@ -96,8 +96,8 @@ const getSource = EXPORTABLE(
       pgResources: PgResource<any, any, any, any, any>[],
       $record: PgSelectSingleStep<any>,
     ) => {
-      const executor = $record.source.executor;
-      const source =
+      const executor = $record.resource.executor;
+      const resource =
         pgResources.find(
           (potentialSource) =>
             // These have already been filtered by codec
@@ -110,7 +110,7 @@ const getSource = EXPORTABLE(
           registry,
           PgResource.configFromCodec(executor, baseCodec),
         );
-      return source;
+      return resource;
     },
   [PgResource],
 );

@@ -39,7 +39,7 @@ interface PgInsertPlanFinalizeResults {
 }
 
 /**
- * Inserts a row into source with the given specified column values.
+ * Inserts a row into resource with the given specified column values.
  */
 export class PgInsertStep<TResource extends PgResourceAny>
   extends ExecutableStep<
@@ -62,10 +62,10 @@ export class PgInsertStep<TResource extends PgResourceAny>
    * Tells us what we're dealing with - data type, columns, where to insert it,
    * what it's called, etc.
    */
-  public readonly source: TResource;
+  public readonly resource: TResource;
 
   /**
-   * This defaults to the name of the source but you can override it. Aids
+   * This defaults to the name of the resource but you can override it. Aids
    * in debugging.
    */
   private readonly name: string;
@@ -111,17 +111,17 @@ export class PgInsertStep<TResource extends PgResourceAny>
   private selects: Array<SQL> = [];
 
   constructor(
-    source: TResource,
+    resource: TResource,
     columns?: {
       [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep<any>; // PgTypedExecutableStep<TColumns[key]["codec"]> |
     },
   ) {
     super();
-    this.source = source;
-    this.name = source.name;
+    this.resource = resource;
+    this.name = resource.name;
     this.symbol = Symbol(this.name);
     this.alias = sql.identifier(this.symbol);
-    this.contextId = this.addDependency(this.source.executor.context());
+    this.contextId = this.addDependency(this.resource.executor.context());
     if (columns) {
       Object.entries(columns).forEach(([key, value]) => {
         if (value) {
@@ -149,11 +149,13 @@ export class PgInsertStep<TResource extends PgResourceAny>
       }
     }
     const column = (
-      this.source.codec.columns as NonNullable<GetPgResourceColumns<TResource>>
+      this.resource.codec.columns as NonNullable<
+        GetPgResourceColumns<TResource>
+      >
     )?.[name];
     if (!column) {
       throw new Error(
-        `Column ${String(name)} not found in ${this.source.codec}`,
+        `Column ${String(name)} not found in ${this.resource.codec}`,
       );
     }
     const { codec: pgCodec } = column;
@@ -188,14 +190,14 @@ export class PgInsertStep<TResource extends PgResourceAny>
       : never,
     TResource
   > {
-    if (!this.source.codec.columns) {
+    if (!this.resource.codec.columns) {
       throw new Error(`Cannot call .get() when there's no columns.`);
     }
     const dataSourceColumn: PgTypeColumn =
-      this.source.codec.columns[attr as string];
+      this.resource.codec.columns[attr as string];
     if (!dataSourceColumn) {
       throw new Error(
-        `${this.source} does not define an attribute named '${String(attr)}'`,
+        `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
@@ -227,7 +229,7 @@ export class PgInsertStep<TResource extends PgResourceAny>
   > {
     return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
-      this.source.codec as GetPgResourceCodec<TResource>,
+      this.resource.codec as GetPgResourceCodec<TResource>,
     )`${this.alias}`;
   }
 
@@ -293,7 +295,7 @@ export class PgInsertStep<TResource extends PgResourceAny>
             }
           })
         : rawSqlValues;
-      const { rows } = await this.source.executeMutation({
+      const { rows } = await this.resource.executeMutation({
         context: value[this.contextId],
         text,
         values: sqlValues,
@@ -305,12 +307,12 @@ export class PgInsertStep<TResource extends PgResourceAny>
   public finalize(): void {
     if (!this.isFinalized) {
       this.locked = true;
-      const sourceSource = this.source.source;
+      const sourceSource = this.resource.source;
       if (!sql.isSQL(sourceSource)) {
         throw new Error(
           `Error in ${this}: can only insert into sources defined as SQL, however ${
-            this.source
-          } has ${inspect(this.source.source)}`,
+            this.resource
+          } has ${inspect(this.resource.source)}`,
         );
       }
       const table = sql`${sourceSource} as ${this.alias}`;
@@ -390,10 +392,10 @@ export class PgInsertStep<TResource extends PgResourceAny>
 }
 
 /**
- * Inserts a row into source with the given specified column values.
+ * Inserts a row into resource with the given specified column values.
  */
 export function pgInsert<TResource extends PgResourceAny>(
-  source: TResource,
+  resource: TResource,
   columns?: {
     [key in keyof GetPgResourceColumns<TResource>]?:
       | PgTypedExecutableStep<
@@ -407,7 +409,7 @@ export function pgInsert<TResource extends PgResourceAny>(
       | ExecutableStep<any>;
   },
 ): PgInsertStep<TResource> {
-  return new PgInsertStep(source, columns);
+  return new PgInsertStep(resource, columns);
 }
 
 exportAs("@dataplan/pg", pgInsert, "pgInsert");

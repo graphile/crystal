@@ -86,7 +86,7 @@ export class PgSelectSingleStep<
   public readonly mode: PgSelectMode;
   private classStepId: number;
   private nullCheckId: number | null = null;
-  public readonly source: TResource;
+  public readonly resource: TResource;
   private _coalesceToEmptyObject = false;
   private typeStepIndexList: number[] | null = null;
 
@@ -97,8 +97,8 @@ export class PgSelectSingleStep<
   ) {
     super();
     this.itemStepId = this.addDependency($item);
-    this.source = $class.resource;
-    this.pgCodec = this.source.codec as GetPgResourceCodec<TResource>;
+    this.resource = $class.resource;
+    this.pgCodec = this.resource.codec as GetPgResourceCodec<TResource>;
     this.mode = $class.mode;
     this.classStepId = $class.id;
   }
@@ -108,7 +108,7 @@ export class PgSelectSingleStep<
   }
 
   public toStringMeta(): string {
-    return this.source.name;
+    return this.resource.name;
   }
 
   public getClassStep(): PgSelectStep<TResource> {
@@ -163,9 +163,9 @@ export class PgSelectSingleStep<
     if (this.mode === "aggregate") {
       throw new Error("Invalid call to .get() on aggregate plan");
     }
-    if (!this.source.codec.columns && attr !== "") {
+    if (!this.resource.codec.columns && attr !== "") {
       throw new Error(
-        `Cannot call ${this}.get() when the source codec (${this.source.codec.name}) has no columns to get.`,
+        `Cannot call ${this}.get() when the resource codec (${this.resource.codec.name}) has no columns to get.`,
       );
     }
     const classPlan = this.getClassStep();
@@ -174,15 +174,15 @@ export class PgSelectSingleStep<
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
     const dataSourceColumn: PgTypeColumn | undefined =
-      this.source.codec.columns?.[attr as string];
+      this.resource.codec.columns?.[attr as string];
     if (!dataSourceColumn && attr !== "") {
       throw new Error(
-        `${this.source} does not define an attribute named '${String(attr)}'`,
+        `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
     if (dataSourceColumn?.via) {
-      const { relation, attribute } = this.source.resolveVia(
+      const { relation, attribute } = this.resource.resolveVia(
         dataSourceColumn.via,
         attr as string,
       );
@@ -190,7 +190,7 @@ export class PgSelectSingleStep<
     }
 
     if (dataSourceColumn?.identicalVia) {
-      const { relation, attribute } = this.source.resolveVia(
+      const { relation, attribute } = this.resource.resolveVia(
         dataSourceColumn.identicalVia,
         attr as string,
       );
@@ -207,12 +207,12 @@ export class PgSelectSingleStep<
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       const matchingColumn = (
-        Object.entries($fromPlan.source.codec.columns!) as Array<
+        Object.entries($fromPlan.resource.codec.columns!) as Array<
           [string, PgTypeColumn]
         >
       ).find(([name, col]) => {
         if (col.identicalVia) {
-          const { relation, attribute } = $fromPlan.source.resolveVia(
+          const { relation, attribute } = $fromPlan.resource.resolveVia(
             col.identicalVia,
             name,
           );
@@ -241,8 +241,8 @@ export class PgSelectSingleStep<
     const sqlExpr = pgClassExpression<any, TResource>(
       this,
       attr === ""
-        ? this.source.codec
-        : this.source.codec.columns![attr as string].codec,
+        ? this.resource.codec
+        : this.resource.codec.columns![attr as string].codec,
     );
     const colPlan = dataSourceColumn
       ? dataSourceColumn.expression
@@ -323,8 +323,8 @@ export class PgSelectSingleStep<
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       // check to see if we already came via this relationship
-      const reciprocal = this.source.getReciprocal(
-        $fromPlan.source.codec,
+      const reciprocal = this.resource.getReciprocal(
+        $fromPlan.resource.codec,
         fromRelationName,
       );
       if (reciprocal) {
@@ -367,13 +367,13 @@ export class PgSelectSingleStep<
     if ($existingPlan) {
       return $existingPlan;
     }
-    const relation: PgCodecRelation<any, any> = this.source.getRelation(
+    const relation: PgCodecRelation<any, any> = this.resource.getRelation(
       relationIdentifier as string,
     );
     if (!relation || !relation.isUnique) {
       throw new Error(
         `${String(relationIdentifier)} is not a unique relation on ${
-          this.source
+          this.resource
         }`,
       );
     }
@@ -400,10 +400,10 @@ export class PgSelectSingleStep<
     relationIdentifier: TRelationName,
   ): TResource["registry"]["pgRelations"][TResource["codec"]["name"]][TRelationName] {
     const relation: PgCodecRelation<any, any> =
-      this.source.getRelation(relationIdentifier);
+      this.resource.getRelation(relationIdentifier);
     if (!relation) {
       throw new Error(
-        `${String(relationIdentifier)} is not a relation on ${this.source}`,
+        `${String(relationIdentifier)} is not a relation on ${this.resource}`,
       );
     }
     const { remoteResource, remoteColumns, localColumns } = relation;
@@ -422,7 +422,7 @@ export class PgSelectSingleStep<
   > {
     return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
-      this.source.codec as GetPgResourceCodec<TResource>,
+      this.resource.codec as GetPgResourceCodec<TResource>,
     )`${this.getClassStep().alias}`;
   }
 
@@ -486,7 +486,7 @@ export class PgSelectSingleStep<
     // We've been careful to not store anything locally so we shouldn't
     // need to move anything across to the peer.
     return peers.filter((peer) => {
-      if (peer.source !== this.source) {
+      if (peer.resource !== this.resource) {
         return false;
       }
       if (peer.getClassStep() !== this.getClassStep()) {
@@ -500,7 +500,7 @@ export class PgSelectSingleStep<
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
-    const poly = (this.source.codec as PgCodecAny).polymorphism;
+    const poly = (this.resource.codec as PgCodecAny).polymorphism;
     if (poly?.mode === "single") {
       return this;
     } else if (poly?.mode === "relational") {
@@ -522,11 +522,11 @@ export class PgSelectSingleStep<
   private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = (this.source.codec as PgCodecAny).polymorphism;
+    const poly = (this.resource.codec as PgCodecAny).polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       const $class = this.getClassStep();
       this.typeStepIndexList = poly.typeColumns.map((col) => {
-        const attr = this.source.codec.columns![col];
+        const attr = this.resource.codec.columns![col];
         const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
 
         return $class.selectAndReturnIndex(
@@ -539,7 +539,7 @@ export class PgSelectSingleStep<
       this.typeStepIndexList = null;
     }
 
-    const columns = this.source.codec.columns;
+    const columns = this.resource.codec.columns;
     if (columns && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
       // non-null column, but failing that we invoke the codec's
@@ -586,7 +586,7 @@ export class PgSelectSingleStep<
   }
 
   finalize() {
-    const poly = this.source.codec.polymorphism;
+    const poly = this.resource.codec.polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       this.handlePolymorphism = (val) => {
         if (val == null) return val;
@@ -641,14 +641,14 @@ export function pgSelectFromRecord<
     PgRegistryAny
   >,
 >(
-  source: TResource,
+  resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({
-    resource: source,
+    resource: resource,
     identifiers: [],
     from: (record) => sql`(select (${record.placeholder}).*)`,
-    args: [{ step: $record, pgCodec: source.codec }],
+    args: [{ step: $record, pgCodec: resource.codec }],
     joinAsLateral: true,
   });
 }
@@ -658,12 +658,12 @@ export function pgSelectFromRecord<
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
 export function pgSelectSingleFromRecord<TResource extends PgResourceAny>(
-  source: TResource,
+  resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
 ): PgSelectSingleStep<TResource> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
   return pgSelectFromRecord(
-    source,
+    resource,
     $record,
   ).single() as PgSelectSingleStep<TResource>;
 }

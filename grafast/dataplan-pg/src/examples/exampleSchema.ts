@@ -2212,7 +2212,7 @@ export function makeExampleSchema(
               $value.evalIs("INHERIT") &&
               // INHERIT only works if the parent has an archived_at column.
               $parent instanceof PgSelectSingleStep &&
-              !!$parent.source.codec.columns.archived_at
+              !!$parent.resource.codec.columns.archived_at
             ) {
               $messages.where(
                 sql`(${

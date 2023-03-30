@@ -55,10 +55,10 @@ export class PgUpdateStep<
    * Tells us what we're dealing with - data type, columns, where to update it,
    * what it's called, etc.
    */
-  public readonly source: TResource;
+  public readonly resource: TResource;
 
   /**
-   * This defaults to the name of the source but you can override it. Aids
+   * This defaults to the name of the resource but you can override it. Aids
    * in debugging.
    */
   private readonly name: string;
@@ -112,7 +112,7 @@ export class PgUpdateStep<
   private selects: Array<SQL> = [];
 
   constructor(
-    source: TResource,
+    resource: TResource,
     getBy: PlanByUniques<
       GetPgResourceColumns<TResource>,
       GetPgResourceUniques<TResource>
@@ -122,27 +122,27 @@ export class PgUpdateStep<
     },
   ) {
     super();
-    this.source = source;
-    this.name = source.name;
+    this.resource = resource;
+    this.name = resource.name;
     this.symbol = Symbol(this.name);
     this.alias = sql.identifier(this.symbol);
-    this.contextId = this.addDependency(this.source.executor.context());
+    this.contextId = this.addDependency(this.resource.executor.context());
 
     const keys: ReadonlyArray<keyof GetPgResourceColumns<TResource>> = getBy
       ? (Object.keys(getBy) as Array<keyof GetPgResourceColumns<TResource>>)
       : [];
 
     if (
-      !(this.source.uniques as PgResourceUnique[]).some((uniq) =>
+      !(this.resource.uniques as PgResourceUnique[]).some((uniq) =>
         uniq.columns.every((key) => keys.includes(key as any)),
       )
     ) {
       throw new Error(
         `Attempted to build 'PgUpdateStep' with a non-unique getBy keys ('${keys.join(
           "', '",
-        )}') - please ensure your 'getBy' spec uniquely identifiers a row (source = ${
-          this.source
-        }; supported uniques = ${inspect(this.source.uniques)}).`,
+        )}') - please ensure your 'getBy' spec uniquely identifiers a row (resource = ${
+          this.resource
+        }; supported uniques = ${inspect(this.resource.uniques)}).`,
       );
     }
 
@@ -159,7 +159,7 @@ export class PgUpdateStep<
       const value = (getBy as any)![name as any];
       const depId = this.addDependency(value);
       const column = (
-        this.source.codec.columns as GetPgResourceColumns<TResource>
+        this.resource.codec.columns as GetPgResourceColumns<TResource>
       )[name];
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
@@ -192,7 +192,7 @@ export class PgUpdateStep<
       }
     }
     const { codec: pgCodec } = (
-      this.source.codec.columns as GetPgResourceColumns<TResource>
+      this.resource.codec.columns as GetPgResourceColumns<TResource>
     )[name];
     const depId = this.addDependency(value);
     this.columns.push({ name, depId, pgCodec });
@@ -223,10 +223,10 @@ export class PgUpdateStep<
     TResource
   > {
     const dataSourceColumn: PgTypeColumn =
-      this.source.codec.columns![attr as string];
+      this.resource.codec.columns![attr as string];
     if (!dataSourceColumn) {
       throw new Error(
-        `${this.source} does not define an attribute named '${String(attr)}'`,
+        `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
@@ -258,7 +258,7 @@ export class PgUpdateStep<
   > {
     return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
-      this.source.codec as GetPgResourceCodec<TResource>,
+      this.resource.codec as GetPgResourceCodec<TResource>,
     )`${this.alias}`;
   }
 
@@ -323,7 +323,7 @@ export class PgUpdateStep<
             }
           })
         : rawSqlValues;
-      const { rows, rowCount } = await this.source.executeMutation({
+      const { rows, rowCount } = await this.resource.executeMutation({
         context,
         text,
         values: sqlValues,
@@ -335,12 +335,12 @@ export class PgUpdateStep<
   public finalize(): void {
     if (!this.isFinalized) {
       this.locked = true;
-      const sourceSource = this.source.source;
+      const sourceSource = this.resource.source;
       if (!sql.isSQL(sourceSource)) {
         throw new Error(
           `Error in ${this}: can only update into sources defined as SQL, however ${
-            this.source
-          } has ${inspect(this.source.source)}`,
+            this.resource
+          } has ${inspect(this.resource.source)}`,
         );
       }
       const table = sql`${sourceSource} as ${this.alias}`;
@@ -442,7 +442,7 @@ export class PgUpdateStep<
  * Update a single row identified by the 'getBy' argument.
  */
 export function pgUpdate<TResource extends PgResourceAny>(
-  source: TResource,
+  resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceColumns<TResource>,
     GetPgResourceUniques<TResource>
@@ -451,7 +451,7 @@ export function pgUpdate<TResource extends PgResourceAny>(
     [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep<any>; // | PgTypedExecutableStep<TColumns[key]["codec"]>
   },
 ): PgUpdateStep<TResource> {
-  return new PgUpdateStep(source, getBy, columns);
+  return new PgUpdateStep(resource, getBy, columns);
 }
 
 exportAs("@dataplan/pg", pgUpdate, "pgUpdate");

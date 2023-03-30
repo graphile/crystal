@@ -51,10 +51,10 @@ export class PgDeleteStep<
    * Tells us what we're dealing with - data type, columns, where to delete it
    * from, what it's called, etc.
    */
-  public readonly source: TResource;
+  public readonly resource: TResource;
 
   /**
-   * This defaults to the name of the source but you can override it. Aids
+   * This defaults to the name of the resource but you can override it. Aids
    * in debugging.
    */
   private readonly name: string;
@@ -101,34 +101,34 @@ export class PgDeleteStep<
   private selects: Array<SQL> = [];
 
   constructor(
-    source: TResource,
+    resource: TResource,
     getBy: PlanByUniques<
       GetPgResourceColumns<TResource>,
       GetPgResourceUniques<TResource>
     >,
   ) {
     super();
-    this.source = source;
-    this.name = source.name;
+    this.resource = resource;
+    this.name = resource.name;
     this.symbol = Symbol(this.name);
     this.alias = sql.identifier(this.symbol);
-    this.contextId = this.addDependency(this.source.executor.context());
+    this.contextId = this.addDependency(this.resource.executor.context());
 
     const keys: ReadonlyArray<keyof GetPgResourceColumns<TResource>> = getBy
       ? (Object.keys(getBy) as Array<keyof GetPgResourceColumns<TResource>>)
       : [];
 
     if (
-      !(this.source.uniques as PgResourceUnique[]).some((uniq) =>
+      !(this.resource.uniques as PgResourceUnique[]).some((uniq) =>
         uniq.columns.every((key) => keys.includes(key as any)),
       )
     ) {
       throw new Error(
         `Attempted to build 'PgDeleteStep' with a non-unique getBy keys ('${keys.join(
           "', '",
-        )}') - please ensure your 'getBy' spec uniquely identifiers a row (source = ${
-          this.source
-        }; supported uniques = ${inspect(this.source.uniques)}).`,
+        )}') - please ensure your 'getBy' spec uniquely identifiers a row (resource = ${
+          this.resource
+        }; supported uniques = ${inspect(this.resource.uniques)}).`,
       );
     }
 
@@ -145,7 +145,7 @@ export class PgDeleteStep<
       const value = (getBy as any)![name as any];
       const depId = this.addDependency(value);
       const column = (
-        this.source.codec.columns as GetPgResourceColumns<TResource>
+        this.resource.codec.columns as GetPgResourceColumns<TResource>
       )[name];
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
@@ -168,10 +168,10 @@ export class PgDeleteStep<
     TResource
   > {
     const dataSourceColumn: PgTypeColumn =
-      this.source.codec.columns![attr as string];
+      this.resource.codec.columns![attr as string];
     if (!dataSourceColumn) {
       throw new Error(
-        `${this.source} does not define an attribute named '${String(attr)}'`,
+        `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
@@ -203,7 +203,7 @@ export class PgDeleteStep<
   > {
     return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
-      this.source.codec as GetPgResourceCodec<TResource>,
+      this.resource.codec as GetPgResourceCodec<TResource>,
     )`${this.alias}`;
   }
 
@@ -268,7 +268,7 @@ export class PgDeleteStep<
             }
           })
         : rawSqlValues;
-      const { rows, rowCount } = await this.source.executeMutation({
+      const { rows, rowCount } = await this.resource.executeMutation({
         context,
         text,
         values: sqlValues,
@@ -278,7 +278,7 @@ export class PgDeleteStep<
         (rowCount === 0
           ? Promise.reject(
               new Error(
-                `No values were deleted in collection '${this.source.name}' because no values you can delete were found matching these criteria.`,
+                `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
               ),
             )
           : Object.create(null))
@@ -289,12 +289,12 @@ export class PgDeleteStep<
   public finalize(): void {
     if (!this.isFinalized) {
       this.locked = true;
-      const sourceSource = this.source.source;
+      const sourceSource = this.resource.source;
       if (!sql.isSQL(sourceSource)) {
         throw new Error(
           `Error in ${this}: can only delete into sources defined as SQL, however ${
-            this.source
-          } has ${inspect(this.source.source)}`,
+            this.resource
+          } has ${inspect(this.resource.source)}`,
         );
       }
       const table = sql`${sourceSource} as ${this.alias}`;
@@ -369,16 +369,16 @@ export class PgDeleteStep<
 }
 
 /**
- * Delete a row in `source` identified by the `getBy` unique condition.
+ * Delete a row in `resource` identified by the `getBy` unique condition.
  */
 export function pgDelete<TResource extends PgResourceAny>(
-  source: TResource,
+  resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceColumns<TResource>,
     GetPgResourceUniques<TResource>
   >,
 ): PgDeleteStep<TResource> {
-  return new PgDeleteStep(source, getBy);
+  return new PgDeleteStep(resource, getBy);
 }
 
 exportAs("@dataplan/pg", pgDelete, "pgDelete");

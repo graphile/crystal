@@ -943,7 +943,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           );
                         const $row = canUseExpressionDirectly
                           ? $in
-                          : pgSelectSingleFromRecord($in.source, $in.record());
+                          : pgSelectSingleFromRecord(
+                              $in.resource,
+                              $in.record(),
+                            );
                         const selectArgs: PgSelectArgumentSpec[] = [
                           { step: $row.record() },
                           ...extraSelectArgs,
