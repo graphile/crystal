@@ -740,7 +740,7 @@ function addRelations(
         isReferencee,
         localColumns,
         remoteColumns,
-        remoteResource,
+        remoteResource: resource,
         isUnique,
       } = relation;
       if (isReferencee) {
@@ -756,7 +756,7 @@ function addRelations(
         resource,
         isUnique,
       });
-      result.resource = remoteResource;
+      result.resource = relation.remoteResource as any;
     }
     return result;
   };
