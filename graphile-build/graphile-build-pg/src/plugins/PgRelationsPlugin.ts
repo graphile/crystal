@@ -36,7 +36,7 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
-      source: PgResource<PgRegistry<any, any, any>, any, any, any, any>;
+      source: PgResource<any, any, any, any, PgRegistry<any, any, any>>;
       relationName: string;
     }
 
@@ -864,7 +864,8 @@ function addRelations(
   } of refDefinitionList) {
     let hasReferencee;
     let sharedCodec: PgTypeCodecAny | undefined = undefined;
-    let sharedSource: PgResource<any, any, any, any, any> | undefined = undefined;
+    let sharedSource: PgResource<any, any, any, any, any> | undefined =
+      undefined;
     let behavior;
     let typeName;
     let singleRecordPlan;

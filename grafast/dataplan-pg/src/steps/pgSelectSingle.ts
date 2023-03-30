@@ -293,11 +293,11 @@ export class PgSelectSingleStep<
 
   private existingSingleRelation<
     TRelationName extends TSource extends PgResource<
-      infer URegistry,
+      any,
       PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
-      any
+      infer URegistry
     >
       ? keyof URegistry["pgRelations"][UCodecName]
       : never,
@@ -305,11 +305,11 @@ export class PgSelectSingleStep<
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
     TSource extends PgResource<
-      infer URegistry,
+      any,
       PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
-      any
+      infer URegistry
     >
       ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteSource"]
       : never
@@ -336,11 +336,11 @@ export class PgSelectSingleStep<
 
   public singleRelation<
     TRelationName extends TSource extends PgResource<
-      infer URegistry,
+      any,
       PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
-      any
+      infer URegistry
     >
       ? keyof URegistry["pgRelations"][UCodecName]
       : never,
@@ -348,11 +348,11 @@ export class PgSelectSingleStep<
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
     TSource extends PgResource<
-      infer URegistry,
+      any,
       PgTypeCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
       any,
-      any
+      infer URegistry
     >
       ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteSource"]
       : never
@@ -623,11 +623,11 @@ export class PgSelectSingleStep<
  */
 export function pgSelectFromRecord<
   TSource extends PgResource<
-    PgRegistryAny,
+    any,
     PgTypeCodec<any, any, any, any, any, any, any>,
     any,
     any,
-    any
+    PgRegistryAny
   >,
 >(
   source: TSource,

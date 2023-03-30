@@ -656,11 +656,11 @@ export type SourceFromOptions<
   infer UName
 >
   ? PgResource<
-      PgRegistry<TCodecs, TSourceOptions, TRelations>,
+      UName,
       UCodec,
       UUniques,
       UParameters,
-      UName
+      PgRegistry<TCodecs, TSourceOptions, TRelations>
     >
   : never;
 
@@ -737,11 +737,11 @@ export type PgResourceParameterAny = PgResourceParameter<
 >;
 
 export type PgResourceAny = PgResource<
-  PgRegistry<any, any, any>,
+  string & any,
   PgTypeCodecAny & any,
   ReadonlyArray<PgResourceUnique<PgTypeColumns>> & any,
   readonly PgResourceParameterAny[] | undefined,
-  string & any
+  PgRegistry<any, any, any>
 >;
 
 export type PgRegistryAny = PgRegistry<

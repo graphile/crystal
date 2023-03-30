@@ -37,6 +37,7 @@ import type {
   PgCodecRelationConfig,
   PgRefDefinition,
   PgRegistry,
+  PgRegistryAny,
   PgRegistryConfig,
   PgResourceParameterAny,
   PgTypeCodec,
@@ -248,11 +249,11 @@ type CodecWithSource<TCodec extends PgTypeCodecAny> = TCodec & {
  * views, functions, etc.
  */
 export class PgResource<
-  TRegistry extends PgRegistry<any, any, any>,
+  TName extends string,
   TCodec extends PgTypeCodecAny,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
-  TName extends string = string,
+  TRegistry extends PgRegistry<any, any, any> = PgRegistryAny,
 > {
   public readonly registry: TRegistry;
   public readonly codec: TCodec;
@@ -262,7 +263,7 @@ export class PgResource<
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
   private selectAuth?: (
-    $step: PgSelectStep<PgResource<TRegistry, TCodec, any, any, any>>,
+    $step: PgSelectStep<PgResource<any, TCodec, any, any, TRegistry>>,
   ) => void;
 
   // TODO: make a public interface for this information
@@ -808,7 +809,7 @@ export class PgResource<
     if (this.selectAuth) {
       this.selectAuth(
         $step as unknown as PgSelectStep<
-          PgResource<TRegistry, TCodec, any, any, any>
+          PgResource<any, TCodec, any, any, TRegistry>
         >,
       );
     }
