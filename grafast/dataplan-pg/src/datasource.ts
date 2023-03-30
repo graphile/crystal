@@ -193,7 +193,7 @@ export interface PgResourceOptions<
   description?: string;
   /**
    * Set true if this resource will only return at most one record - this is
-   * generally only useful for PostgreSQL function sources, in which case you
+   * generally only useful for PostgreSQL function resources, in which case you
    * should set it false if the function `returns setof` and true otherwise.
    */
   isUnique?: boolean;
@@ -208,8 +208,8 @@ export interface PgResourceOptions<
   isList?: boolean;
 
   /**
-   * "Virtual" sources cannot be selected from/inserted to/etc, they're
-   * normally used to generate other sources that are _not_ virtual.
+   * "Virtual" resources cannot be selected from/inserted to/etc, they're
+   * normally used to generate other resources that are _not_ virtual.
    */
   isVirtual?: boolean;
 }
@@ -289,8 +289,8 @@ export class PgResource<
   public readonly isList: boolean;
 
   /**
-   * "Virtual" sources cannot be selected from/inserted to/etc, they're
-   * normally used to generate other sources that are _not_ virtual.
+   * "Virtual" resources cannot be selected from/inserted to/etc, they're
+   * normally used to generate other resources that are _not_ virtual.
    */
   public readonly isVirtual: boolean;
 
@@ -645,7 +645,7 @@ export class PgResource<
     | null {
     if (this.parameters) {
       throw new Error(
-        ".getReciprocal() cannot be used with functional sources; please use .execute()",
+        ".getReciprocal() cannot be used with functional resources; please use .execute()",
       );
     }
     const otherRelation =
@@ -688,7 +688,7 @@ export class PgResource<
       > {
     if (this.parameters) {
       throw new Error(
-        ".get() cannot be used with functional sources; please use .execute()",
+        ".get() cannot be used with functional resources; please use .execute()",
       );
     }
     if (!spec) {
@@ -723,7 +723,7 @@ export class PgResource<
   ): PgSelectStep<this> {
     if (this.parameters) {
       throw new Error(
-        ".get() cannot be used with functional sources; please use .execute()",
+        ".get() cannot be used with functional resources; please use .execute()",
       );
     }
     if (!this.codec.columns) {
@@ -823,7 +823,7 @@ export class PgResource<
   }
 
   /**
-   * @deprecated Please use `.executor.context()` instead - all sources for the
+   * @deprecated Please use `.executor.context()` instead - all resources for the
    * same executor must use the same context to allow for SQL inlining, unions,
    * etc.
    */
@@ -1125,10 +1125,9 @@ export function makeRegistry<
     addCodec(codecSpec);
   }
 
-  for (const [sourceName, rawConfig] of Object.entries(config.pgResources) as [
-    keyof TResourceOptions,
-    PgResourceOptions<any, any, any, any>,
-  ][]) {
+  for (const [resourceName, rawConfig] of Object.entries(
+    config.pgResources,
+  ) as [keyof TResourceOptions, PgResourceOptions<any, any, any, any>][]) {
     const resourceConfig = {
       ...rawConfig,
       codec: addCodec(rawConfig.codec),
@@ -1147,14 +1146,14 @@ export function makeRegistry<
     // building PgResource via a factory we tell the system to just retrieve it
     // from the already build registry.
     Object.defineProperties(resource, {
-      $exporter$args: { value: [registry, sourceName] },
+      $exporter$args: { value: [registry, resourceName] },
       $exporter$factory: {
-        value: (registry: PgRegistry<any, any, any>, sourceName: string) =>
-          registry.pgResources[sourceName],
+        value: (registry: PgRegistry<any, any, any>, resourceName: string) =>
+          registry.pgResources[resourceName],
       },
     });
 
-    registry.pgResources[sourceName] = resource;
+    registry.pgResources[resourceName] = resource;
   }
 
   for (const codecName of Object.keys(

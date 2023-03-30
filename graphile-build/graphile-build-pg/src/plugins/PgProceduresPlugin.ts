@@ -130,7 +130,7 @@ interface Cache {}
 export const PgProceduresPlugin: GraphileConfig.Plugin = {
   name: "PgProceduresPlugin",
   description:
-    "Generates @dataplan/pg sources for the PostgreSQL functions/procedures it finds",
+    "Generates @dataplan/pg resources for the PostgreSQL functions/procedures it finds",
   version: version,
 
   inflection: {
@@ -482,7 +482,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 pgClass,
               );
 
-            const sourceConfig = await (async () => {
+            const resourceConfig = await (async () => {
               if (resourceOptions) {
                 return resourceOptions;
               } else {
@@ -502,7 +502,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               }
             })();
 
-            if (!sourceConfig) {
+            if (!resourceConfig) {
               return null;
             }
 
@@ -521,14 +521,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             await info.process("pgProcedures_functionResourceOptions", {
               databaseName,
               pgProc,
-              baseResourceOptions: sourceConfig,
+              baseResourceOptions: resourceConfig,
               functionResourceOptions: options,
             });
 
             const finalResourceOptions = EXPORTABLE(
-              (PgResource, options, sourceConfig) =>
-                PgResource.functionResourceOptions(sourceConfig, options),
-              [PgResource, options, sourceConfig],
+              (PgResource, options, resourceConfig) =>
+                PgResource.functionResourceOptions(resourceConfig, options),
+              [PgResource, options, resourceConfig],
             );
 
             await info.process("pgProcedures_PgResourceOptions", {

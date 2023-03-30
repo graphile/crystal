@@ -55,28 +55,28 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           );
         });
 
-        const sourcesByCodec = new Map<
+        const resourcesByCodec = new Map<
           PgCodec<any, any, any, any, any, any, any>,
           PgResource<any, any, any, any, any>[]
         >();
         for (const resource of tableResources) {
-          let list = sourcesByCodec.get(resource.codec);
+          let list = resourcesByCodec.get(resource.codec);
           if (!list) {
             list = [];
-            sourcesByCodec.set(resource.codec, list);
+            resourcesByCodec.set(resource.codec, list);
           }
           list.push(resource);
         }
 
-        for (const [codec, sources] of sourcesByCodec.entries()) {
+        for (const [codec, resources] of resourcesByCodec.entries()) {
           const tableTypeName = build.inflection.tableType(codec);
-          if (sources.length !== 1) {
+          if (resources.length !== 1) {
             console.warn(
-              `Found multiple table sources for codec '${codec.name}'; we don't currently support that but we _could_ - get in touch if you need this.`,
+              `Found multiple table resources for codec '${codec.name}'; we don't currently support that but we _could_ - get in touch if you need this.`,
             );
             continue;
           }
-          const pgResource = sources[0];
+          const pgResource = resources[0];
           const primaryKey = (pgResource.uniques as PgResourceUnique[]).find(
             (u) => u.isPrimary === true,
           );
@@ -96,7 +96,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             isSafeObjectPropertyName(identifier) &&
             pk.every((columnName) => isSafeObjectPropertyName(columnName));
 
-          const firstSource = sources.find((s) => !s.parameters);
+          const firstSource = resources.find((s) => !s.parameters);
 
           build.registerNodeIdHandler({
             typeName: tableTypeName,

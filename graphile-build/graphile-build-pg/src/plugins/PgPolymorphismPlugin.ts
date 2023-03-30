@@ -267,31 +267,31 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
       async pgBasics_PgRegistryBuilder_finalize(info, event) {
         const { registryBuilder } = event;
         const registry = registryBuilder.getRegistryConfig();
-        for (const source of Object.values(
+        for (const resource of Object.values(
           registry.pgResources,
         ) as PgResourceOptions<any, any, any, any>[]) {
-          if (source.parameters || !source.codec.columns) {
+          if (resource.parameters || !resource.codec.columns) {
             continue;
           }
-          if (!source.extensions?.pg) {
+          if (!resource.extensions?.pg) {
             continue;
           }
           const {
-            schemaName: sourceSchemaName,
+            schemaName: resourceSchemaName,
             databaseName,
-            name: sourceClassName,
-          } = source.extensions.pg;
+            name: resourceClassName,
+          } = resource.extensions.pg;
 
           const pgClass = await info.helpers.pgIntrospection.getClassByName(
             databaseName,
-            sourceSchemaName,
-            sourceClassName,
+            resourceSchemaName,
+            resourceClassName,
           );
           if (!pgClass) {
             continue;
           }
 
-          const poly = (source.codec as PgCodecAny).polymorphism;
+          const poly = (resource.codec as PgCodecAny).polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
@@ -299,7 +299,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 parseDatabaseIdentifierFromSmartTag(
                   spec.references,
                   2,
-                  sourceSchemaName,
+                  resourceSchemaName,
                 );
               const pgRelatedClass =
                 await info.helpers.pgIntrospection.getClassByName(
@@ -364,7 +364,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               });
 
               for (const [colName, colSpec] of Object.entries(
-                source.codec.columns,
+                resource.codec.columns,
               ) as Array<[string, PgTypeColumn]>) {
                 if (otherCodec.columns[colName]) {
                   otherCodec.columns[colName].identicalVia = sharedRelationName;
@@ -401,15 +401,15 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             continue;
           }
           const {
-            schemaName: sourceSchemaName,
+            schemaName: resourceSchemaName,
             databaseName,
-            name: sourceClassName,
+            name: resourceClassName,
           } = resource.extensions.pg;
 
           const pgClass = await info.helpers.pgIntrospection.getClassByName(
             databaseName,
-            sourceSchemaName,
-            sourceClassName,
+            resourceSchemaName,
+            resourceClassName,
           );
           if (!pgClass) {
             continue;
@@ -426,7 +426,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 parseDatabaseIdentifierFromSmartTag(
                   spec.references,
                   2,
-                  sourceSchemaName,
+                  resourceSchemaName,
                 );
               const pgRelatedClass =
                 await info.helpers.pgIntrospection.getClassByName(

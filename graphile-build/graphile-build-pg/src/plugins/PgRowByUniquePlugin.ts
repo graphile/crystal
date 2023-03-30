@@ -29,7 +29,7 @@ declare global {
 export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
   name: "PgRowByUniquePlugin",
   description:
-    "Adds accessors for rows by their unique constraints (technically the @dataplan/pg data sources' 'uniques' property)",
+    "Adds accessors for rows by their unique constraints (technically the @dataplan/pg resources' 'uniques' property)",
   version: version,
 
   inflection: {
@@ -40,7 +40,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
         }
         const uniqueKeys = unique.columns;
         return this.camelCase(
-          // TODO: should this use the _source_ rather than the _codec_ in case the same codec is used across multiple sources?
+          // TODO: should this use the _resource_ rather than the _codec_ in case the same codec is used across multiple resources?
           `${this.tableType(resource.codec)}-by-${this._joinColumnNames(
             resource.codec,
             uniqueKeys,
@@ -64,16 +64,16 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const sources = Object.values(
+        const resources = Object.values(
           build.input.pgRegistry.pgResources,
-        ).filter((source) => {
-          if (source.parameters) return false;
-          if (!source.codec.columns) return false;
-          if (!source.uniques || source.uniques.length < 1) return false;
+        ).filter((resource) => {
+          if (resource.parameters) return false;
+          if (!resource.codec.columns) return false;
+          if (!resource.uniques || resource.uniques.length < 1) return false;
           return true;
         });
 
-        return sources.reduce(
+        return resources.reduce(
           (outerMemo, resource) =>
             build.recoverable(outerMemo, () =>
               (resource.uniques as PgResourceUnique[]).reduce(

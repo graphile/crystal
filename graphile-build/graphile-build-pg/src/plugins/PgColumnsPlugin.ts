@@ -193,7 +193,7 @@ function processColumn(
   };
   if (!isInterface) {
     const makePlan = () => {
-      // See if there's a source to pull record types from (e.g. for relations/etc)
+      // See if there's a resource to pull record types from (e.g. for relations/etc)
       if (!baseCodec.columns) {
         // Simply get the value
         return EXPORTABLE(
@@ -210,7 +210,7 @@ function processColumn(
         // TODO: this is pretty horrible in the export; we should fix that.
         if (!column.codec.arrayOfCodec) {
           const notNull = column.notNull || column.codec.notNull;
-          // Single record from source
+          // Single record from resource
           /*
            * TODO: if we refactor `PgSelectSingleStep` we can probably
            * optimise this to do inline selection and still join against

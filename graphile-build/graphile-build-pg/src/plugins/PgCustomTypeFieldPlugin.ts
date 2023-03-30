@@ -1258,15 +1258,15 @@ function getFunctionSourceReturnGraphQLType(
   build: GraphileBuild.Build,
   resource: PgResource<any, any, any, any, any>,
 ): GraphQLOutputType | null {
-  const sourceInnerCodec: PgCodec<any, any, any, any, undefined, any, any> =
+  const resourceInnerCodec: PgCodec<any, any, any, any, undefined, any, any> =
     resource.codec.arrayOfCodec ?? resource.codec;
-  if (!sourceInnerCodec) {
+  if (!resourceInnerCodec) {
     return null;
   }
-  const isVoid = sourceInnerCodec === TYPES.void;
+  const isVoid = resourceInnerCodec === TYPES.void;
   const innerType = isVoid
     ? null
-    : (build.getGraphQLTypeByPgCodec(sourceInnerCodec, "output") as
+    : (build.getGraphQLTypeByPgCodec(resourceInnerCodec, "output") as
         | GraphQLOutputType
         | undefined);
   if (!innerType && !isVoid) {

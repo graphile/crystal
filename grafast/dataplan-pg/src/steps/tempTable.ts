@@ -24,10 +24,10 @@ export class TempTableStep<
   public readonly conditions: SQL[] = [];
   constructor(
     public readonly $parent: ClassFilterStep,
-    public readonly source: TResource,
+    public readonly resource: TResource,
   ) {
     super();
-    this.alias = sql.identifier(Symbol(`${source.name}_filter`));
+    this.alias = sql.identifier(Symbol(`${resource.name}_filter`));
   }
 
   placeholder($step: ExecutableStep<any>, codec: PgCodec<any, any, any>): SQL {
@@ -42,7 +42,7 @@ export class TempTableStep<
   }
 
   fromExpression() {
-    const source = this.source.source;
+    const source = this.resource.source;
     if (typeof source === "function") {
       throw new Error("TempTableStep doesn't support function sources yet.");
     } else {
