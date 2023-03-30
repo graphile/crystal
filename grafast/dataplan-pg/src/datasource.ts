@@ -965,15 +965,15 @@ export interface PgRegistryBuilder<
       undefined
     >,
     const TCodecRelationName extends string,
-    TRemoteSource extends PgResourceOptions<any, any, any, any>,
+    TRemoteResource extends PgResourceOptions<any, any, any, any>,
     const TCodecRelation extends Omit<
-      PgCodecRelationConfig<TCodec, TRemoteSource>,
+      PgCodecRelationConfig<TCodec, TRemoteResource>,
       "localCodec" | "remoteResourceOptions"
     >,
   >(
     codec: TCodec,
     relationName: TCodecRelationName,
-    remoteResource: TRemoteSource,
+    remoteResource: TRemoteResource,
     relation: TCodecRelation,
   ): PgRegistryBuilder<
     TCodecs,
@@ -983,7 +983,7 @@ export interface PgRegistryBuilder<
           [codecName in UName]: {
             [relationName in TCodecRelationName]: TCodecRelation & {
               localCodec: TCodec;
-              remoteResourceOptions: TRemoteSource;
+              remoteResourceOptions: TRemoteResource;
             };
           };
         }

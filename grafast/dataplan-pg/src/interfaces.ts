@@ -515,10 +515,10 @@ export interface PgCodecRelationConfig<
     any,
     undefined
   >,
-  TRemoteSourceOptions extends PgResourceOptions<any, any, any, any>,
+  TRemoteResourceOptions extends PgResourceOptions<any, any, any, any>,
 > extends PgCodecRelationBase<
     TLocalCodec,
-    TRemoteSourceOptions extends PgResourceOptions<
+    TRemoteResourceOptions extends PgResourceOptions<
       PgCodec<any, infer UColumns, any, any, any, any, any>,
       any,
       any,
@@ -527,7 +527,7 @@ export interface PgCodecRelationConfig<
       ? keyof UColumns
       : never
   > {
-  remoteResourceOptions: TRemoteSourceOptions;
+  remoteResourceOptions: TRemoteResourceOptions;
 }
 
 /**
@@ -543,10 +543,10 @@ export interface PgCodecRelation<
     any,
     undefined
   >,
-  TRemoteSource extends PgResource<any, any, any, any, any>,
+  TRemoteResource extends PgResource<any, any, any, any, any>,
 > extends PgCodecRelationBase<
     TLocalCodec,
-    TRemoteSource extends PgResource<
+    TRemoteResource extends PgResource<
       any,
       PgCodec<any, infer UColumns, any, any, any, any, any>,
       any,
@@ -559,7 +559,7 @@ export interface PgCodecRelation<
   /**
    * The remote source this relation relates to.
    */
-  remoteResource: TRemoteSource;
+  remoteResource: TRemoteResource;
 }
 
 export interface PgRegistryConfig<
