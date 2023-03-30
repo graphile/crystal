@@ -540,7 +540,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           const registryBuilder =
             await info.helpers.pgBasics.getRegistryBuilder();
           if (!resourceOptions.isVirtual) {
-            registryBuilder.addSource(resourceOptions);
+            registryBuilder.addResource(resourceOptions);
           }
 
           info.state.detailsByResourceOptions.set(resourceOptions, {

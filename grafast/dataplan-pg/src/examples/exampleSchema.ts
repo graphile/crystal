@@ -384,17 +384,15 @@ export function makeExampleSchema(
           ],
         });
 
-      const featuredMessagesResourceOptions = PgResource.functionResourceOptions(
-        messageResourceOptions,
-        {
+      const featuredMessagesResourceOptions =
+        PgResource.functionResourceOptions(messageResourceOptions, {
           name: "featured_messages",
           source: (...args) =>
             sql`app_public.featured_messages(${sqlFromArgDigests(args)})`,
           returnsSetof: true,
           returnsArray: false,
           parameters: [],
-        },
-      );
+        });
 
       const forumsFeaturedMessagesResourceOptions =
         PgResource.functionResourceOptions(messageResourceOptions, {
@@ -426,17 +424,15 @@ export function makeExampleSchema(
         },
       );
 
-      const randomUserArraySetResourceOptions = PgResource.functionResourceOptions(
-        userResourceOptions,
-        {
+      const randomUserArraySetResourceOptions =
+        PgResource.functionResourceOptions(userResourceOptions, {
           name: "random_user_array_set",
           source: (...args) =>
             sql`app_public.random_user_array_set(${sqlFromArgDigests(args)})`,
           returnsSetof: true,
           returnsArray: true,
           parameters: [],
-        },
-      );
+        });
 
       const forumsMessagesListSetResourceOptions =
         PgResource.functionResourceOptions(messageResourceOptions, {
@@ -907,7 +903,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionPostsSource = makePgResourceOptions({
+      const unionPostsResource = makePgResourceOptions({
         executor,
         selectAuth,
         codec: unionPostsCodec,
@@ -1102,71 +1098,71 @@ export function makeExampleSchema(
         .addCodec(forumCodec)
         .addCodec(userCodec)
         .addCodec(messagesCodec)
-        .addSource(uniqueAuthorCountResourceOptions)
-        .addSource(forumNamesArrayResourceOptions)
-        .addSource(forumNamesCasesResourceOptions)
-        .addSource(forumsUniqueAuthorCountResourceOptions)
-        .addSource(scalarTextResourceOptions)
-        .addSource(messageResourceOptions)
-        .addSource(userResourceOptions)
-        .addSource(forumResourceOptions)
-        .addSource(usersMostRecentForumResourceOptions)
-        .addSource(featuredMessagesResourceOptions)
-        .addSource(forumsFeaturedMessagesResourceOptions)
-        .addSource(randomUserArrayResourceOptions)
-        .addSource(randomUserArraySetResourceOptions)
-        .addSource(forumsMessagesListSetResourceOptions)
+        .addResource(uniqueAuthorCountResourceOptions)
+        .addResource(forumNamesArrayResourceOptions)
+        .addResource(forumNamesCasesResourceOptions)
+        .addResource(forumsUniqueAuthorCountResourceOptions)
+        .addResource(scalarTextResourceOptions)
+        .addResource(messageResourceOptions)
+        .addResource(userResourceOptions)
+        .addResource(forumResourceOptions)
+        .addResource(usersMostRecentForumResourceOptions)
+        .addResource(featuredMessagesResourceOptions)
+        .addResource(forumsFeaturedMessagesResourceOptions)
+        .addResource(randomUserArrayResourceOptions)
+        .addResource(randomUserArraySetResourceOptions)
+        .addResource(forumsMessagesListSetResourceOptions)
         .addCodec(unionEntityCodec)
         .addCodec(personBookmarksCodec)
-        .addSource(personBookmarksResourceOptions)
+        .addResource(personBookmarksResourceOptions)
         .addCodec(personCodec)
-        .addSource(personResourceOptions)
+        .addResource(personResourceOptions)
         .addCodec(postCodec)
-        .addSource(postResourceOptions)
+        .addResource(postResourceOptions)
         .addCodec(commentCodec)
-        .addSource(commentResourceOptions)
+        .addResource(commentResourceOptions)
         .addCodec(itemTypeEnumCodec)
         .addCodec(enumTableItemTypeCodec)
-        .addSource(enumTableItemTypeResourceOptions)
+        .addResource(enumTableItemTypeResourceOptions)
         .addCodec(enumTableItemTypeEnumCodec)
         .addCodec(singleTableItemsCodec)
-        .addSource(singleTableItemsResourceOptions)
+        .addResource(singleTableItemsResourceOptions)
         .addCodec(relationalItemsCodec)
-        .addSource(relationalItemsResourceOptions)
+        .addResource(relationalItemsResourceOptions)
         .addCodec(relationalCommentableCodec)
-        .addSource(relationalCommentableResourceOptions)
+        .addResource(relationalCommentableResourceOptions)
         .addCodec(relationalTopicsCodec)
-        .addSource(relationalTopicsResourceOptions)
+        .addResource(relationalTopicsResourceOptions)
         .addCodec(relationalPostsCodec)
-        .addSource(relationalPostsResourceOptions)
+        .addResource(relationalPostsResourceOptions)
         .addCodec(relationalDividersCodec)
-        .addSource(relationalDividersResourceOptions)
+        .addResource(relationalDividersResourceOptions)
         .addCodec(relationalChecklistsCodec)
-        .addSource(relationalChecklistsResourceOptions)
+        .addResource(relationalChecklistsResourceOptions)
         .addCodec(relationalChecklistItemsCodec)
-        .addSource(relationalChecklistItemsResourceOptions)
+        .addResource(relationalChecklistItemsResourceOptions)
         .addCodec(unionItemsCodec)
-        .addSource(unionItemsResourceOptions)
+        .addResource(unionItemsResourceOptions)
         .addCodec(unionTopicsCodec)
-        .addSource(unionTopicsResourceOptions)
+        .addResource(unionTopicsResourceOptions)
         .addCodec(unionPostsCodec)
-        .addSource(unionPostsSource)
+        .addResource(unionPostsResource)
         .addCodec(unionDividersCodec)
-        .addSource(unionDividersResourceOptions)
+        .addResource(unionDividersResourceOptions)
         .addCodec(unionChecklistsCodec)
-        .addSource(unionChecklistsResourceOptions)
+        .addResource(unionChecklistsResourceOptions)
         .addCodec(unionChecklistItemsCodec)
-        .addSource(unionChecklistItemsResourceOptions)
-        .addSource(unionEntityResourceOptions)
-        .addSource(entitySearchResourceOptions)
+        .addResource(unionChecklistItemsResourceOptions)
+        .addResource(unionEntityResourceOptions)
+        .addResource(entitySearchResourceOptions)
         .addCodec(awsApplicationsCodec)
-        .addSource(awsApplicationsResourceOptions)
+        .addResource(awsApplicationsResourceOptions)
         .addCodec(gcpApplicationsCodec)
-        .addSource(gcpApplicationsResourceOptions)
+        .addResource(gcpApplicationsResourceOptions)
         .addCodec(firstPartyVulnerabilitiesCodec)
-        .addSource(firstPartyVulnerabilitiesResourceOptions)
+        .addResource(firstPartyVulnerabilitiesResourceOptions)
         .addCodec(thirdPartyVulnerabilitiesCodec)
-        .addSource(thirdPartyVulnerabilitiesResourceOptions)
+        .addResource(thirdPartyVulnerabilitiesResourceOptions)
         .addRelation(messagesCodec, "author", userResourceOptions, {
           localColumns: [`author_id`],
           remoteColumns: [`id`],
@@ -1370,11 +1366,16 @@ export function makeExampleSchema(
             isUnique: true,
           },
         )
-        .addRelation(relationalChecklistsCodec, "author", personResourceOptions, {
-          localColumns: [`author_id`] as const,
-          remoteColumns: [`person_id`] as const,
-          isUnique: true,
-        })
+        .addRelation(
+          relationalChecklistsCodec,
+          "author",
+          personResourceOptions,
+          {
+            localColumns: [`author_id`] as const,
+            remoteColumns: [`person_id`] as const,
+            isUnique: true,
+          },
+        )
         .addRelation(
           relationalChecklistsCodec,
           "commentable",
@@ -1546,7 +1547,7 @@ export function makeExampleSchema(
           remoteColumns: [`id`] as const,
           isUnique: true,
         })
-        .addRelation(unionItemsCodec, "post", unionPostsSource, {
+        .addRelation(unionItemsCodec, "post", unionPostsResource, {
           localColumns: [`id`] as const,
           remoteColumns: [`id`] as const,
           isUnique: true,
@@ -1652,13 +1653,13 @@ export function makeExampleSchema(
       },
     [__ListTransformStep, options],
   );
-  type PgConnectionPlanFromSource<
-    TSource extends PgResource<any, any, any, any, any>,
+  type PgConnectionPlanFromResource<
+    TResource extends PgResource<any, any, any, any, any>,
   > = ConnectionStep<
-    PgSelectSingleStep<TSource>,
+    PgSelectSingleStep<TResource>,
     PgSelectParsedCursorStep,
-    PgSelectStep<TSource>,
-    PgSelectSingleStep<TSource>
+    PgSelectStep<TResource>,
+    PgSelectSingleStep<TResource>
   >;
 
   const {
@@ -1667,84 +1668,90 @@ export function makeExampleSchema(
       relational_items: relationalItemsCodec,
     },
     pgResources: {
-      messages: messageSource,
-      users: userSource,
-      forums: forumSource,
-      people: personSource,
-      person_bookmarks: personBookmarksSource,
-      posts: postSource,
-      comments: commentSource,
-      single_table_items: singleTableItemsSource,
-      relational_items: relationalItemsSource,
-      relational_topics: relationalTopicsSource,
-      relational_posts: relationalPostsSource,
-      relational_dividers: relationalDividersSource,
-      relational_checklists: relationalChecklistsSource,
-      relational_checklist_items: relationalChecklistItemsSource,
-      union_items: unionItemsSource,
-      union_topics: unionTopicsSource,
-      union_posts: unionPostsSource,
-      union_dividers: unionDividersSource,
-      union_checklists: unionChecklistsSource,
-      union_checklist_items: unionChecklistItemsSource,
-      relational_commentables: relationalCommentableSource,
-      users_most_recent_forum: usersMostRecentForumSource,
-      forums_unique_author_count: forumsUniqueAuthorCountSource,
-      forums_featured_messages: forumsFeaturedMessagesSource,
-      forums_messages_list_set: forumsMessagesListSetSource,
-      text: scalarTextSource,
-      unique_author_count: uniqueAuthorCountSource,
-      forum_names_array: forumNamesArraySource,
-      forum_names_cases: forumNamesCasesSource,
-      random_user_array: randomUserArraySource,
-      random_user_array_set: randomUserArraySetSource,
-      featured_messages: featuredMessagesSource,
-      entity_search: entitySearchSource,
-      first_party_vulnerabilities: firstPartyVulnerabilitiesSource,
-      third_party_vulnerabilities: thirdPartyVulnerabilitiesSource,
+      messages: messageResource,
+      users: userResource,
+      forums: forumResource,
+      people: personResource,
+      person_bookmarks: personBookmarksResource,
+      posts: postResource,
+      comments: commentResource,
+      single_table_items: singleTableItemsResource,
+      relational_items: relationalItemsResource,
+      relational_topics: relationalTopicsResource,
+      relational_posts: relationalPostsResource,
+      relational_dividers: relationalDividersResource,
+      relational_checklists: relationalChecklistsResource,
+      relational_checklist_items: relationalChecklistItemsResource,
+      union_items: unionItemsResource,
+      union_topics: unionTopicsResource,
+      union_posts: unionPostsResource,
+      union_dividers: unionDividersResource,
+      union_checklists: unionChecklistsResource,
+      union_checklist_items: unionChecklistItemsResource,
+      relational_commentables: relationalCommentableResource,
+      users_most_recent_forum: usersMostRecentForumResource,
+      forums_unique_author_count: forumsUniqueAuthorCountResource,
+      forums_featured_messages: forumsFeaturedMessagesResource,
+      forums_messages_list_set: forumsMessagesListSetResource,
+      text: scalarTextResource,
+      unique_author_count: uniqueAuthorCountResource,
+      forum_names_array: forumNamesArrayResource,
+      forum_names_cases: forumNamesCasesResource,
+      random_user_array: randomUserArrayResource,
+      random_user_array_set: randomUserArraySetResource,
+      featured_messages: featuredMessagesResource,
+      entity_search: entitySearchResource,
+      first_party_vulnerabilities: firstPartyVulnerabilitiesResource,
+      third_party_vulnerabilities: thirdPartyVulnerabilitiesResource,
     },
   } = registry;
 
-  // type MessagesStep = PgSelectStep<typeof messageSource>;
-  type MessageConnectionStep = PgConnectionPlanFromSource<typeof messageSource>;
-  type MessageStep = PgSelectSingleStep<typeof messageSource>;
-  // type UsersStep = PgSelectStep<typeof userSource>;
-  type UserStep = PgSelectSingleStep<typeof userSource>;
-  // type ForumsStep = PgSelectStep<typeof forumSource>;
-  type ForumStep = PgSelectSingleStep<typeof forumSource>;
-  type PersonStep = PgSelectSingleStep<typeof personSource>;
-  type PersonBookmarkStep = PgSelectSingleStep<typeof personBookmarksSource>;
-  type PostStep = PgSelectSingleStep<typeof postSource>;
-  type CommentStep = PgSelectSingleStep<typeof commentSource>;
-  type SingleTableItemsStep = PgSelectStep<typeof singleTableItemsSource>;
-  type SingleTableItemStep = PgSelectSingleStep<typeof singleTableItemsSource>;
-  type RelationalItemsStep = PgSelectStep<typeof relationalItemsSource>;
-  type RelationalItemStep = PgSelectSingleStep<typeof relationalItemsSource>;
-  type RelationalTopicStep = PgSelectSingleStep<typeof relationalTopicsSource>;
-  type RelationalPostStep = PgSelectSingleStep<typeof relationalPostsSource>;
+  // type MessagesStep = PgSelectStep<typeof messageResource>;
+  type MessageConnectionStep = PgConnectionPlanFromResource<
+    typeof messageResource
+  >;
+  type MessageStep = PgSelectSingleStep<typeof messageResource>;
+  // type UsersStep = PgSelectStep<typeof userResource>;
+  type UserStep = PgSelectSingleStep<typeof userResource>;
+  // type ForumsStep = PgSelectStep<typeof forumResource>;
+  type ForumStep = PgSelectSingleStep<typeof forumResource>;
+  type PersonStep = PgSelectSingleStep<typeof personResource>;
+  type PersonBookmarkStep = PgSelectSingleStep<typeof personBookmarksResource>;
+  type PostStep = PgSelectSingleStep<typeof postResource>;
+  type CommentStep = PgSelectSingleStep<typeof commentResource>;
+  type SingleTableItemsStep = PgSelectStep<typeof singleTableItemsResource>;
+  type SingleTableItemStep = PgSelectSingleStep<
+    typeof singleTableItemsResource
+  >;
+  type RelationalItemsStep = PgSelectStep<typeof relationalItemsResource>;
+  type RelationalItemStep = PgSelectSingleStep<typeof relationalItemsResource>;
+  type RelationalTopicStep = PgSelectSingleStep<
+    typeof relationalTopicsResource
+  >;
+  type RelationalPostStep = PgSelectSingleStep<typeof relationalPostsResource>;
   type RelationalDividerStep = PgSelectSingleStep<
-    typeof relationalDividersSource
+    typeof relationalDividersResource
   >;
   type RelationalChecklistStep = PgSelectSingleStep<
-    typeof relationalChecklistsSource
+    typeof relationalChecklistsResource
   >;
   type RelationalChecklistItemStep = PgSelectSingleStep<
-    typeof relationalChecklistItemsSource
+    typeof relationalChecklistItemsResource
   >;
-  type UnionItemsStep = PgSelectStep<typeof unionItemsSource>;
-  type UnionItemStep = PgSelectSingleStep<typeof unionItemsSource>;
-  type UnionTopicStep = PgSelectSingleStep<typeof unionTopicsSource>;
-  type UnionPostStep = PgSelectSingleStep<typeof unionPostsSource>;
-  type UnionDividerStep = PgSelectSingleStep<typeof unionDividersSource>;
-  type UnionChecklistStep = PgSelectSingleStep<typeof unionChecklistsSource>;
+  type UnionItemsStep = PgSelectStep<typeof unionItemsResource>;
+  type UnionItemStep = PgSelectSingleStep<typeof unionItemsResource>;
+  type UnionTopicStep = PgSelectSingleStep<typeof unionTopicsResource>;
+  type UnionPostStep = PgSelectSingleStep<typeof unionPostsResource>;
+  type UnionDividerStep = PgSelectSingleStep<typeof unionDividersResource>;
+  type UnionChecklistStep = PgSelectSingleStep<typeof unionChecklistsResource>;
   type UnionChecklistItemStep = PgSelectSingleStep<
-    typeof unionChecklistItemsSource
+    typeof unionChecklistItemsResource
   >;
   type RelationalCommentablesStep = PgSelectStep<
-    typeof relationalCommentableSource
+    typeof relationalCommentableResource
   >;
   type RelationalCommentableStep = PgSelectSingleStep<
-    typeof relationalCommentableSource
+    typeof relationalCommentableResource
   >;
 
   ////////////////////////////////////////
@@ -1761,8 +1768,8 @@ export function makeExampleSchema(
   });
 
   function attrField<
-    TMyDataSource extends PgResource<any, any, any, any, any>,
-    TAttrName extends TMyDataSource extends PgResource<
+    TMyResource extends PgResource<any, any, any, any, any>,
+    TAttrName extends TMyResource extends PgResource<
       any,
       PgCodec<any, infer UColumns, any, any, any, any, any>,
       any,
@@ -1776,7 +1783,7 @@ export function makeExampleSchema(
       type,
       plan: EXPORTABLE(
         (attrName) =>
-          function plan($entity: PgSelectSingleStep<TMyDataSource>) {
+          function plan($entity: PgSelectSingleStep<TMyResource>) {
             return $entity.get(attrName);
           },
         [attrName],
@@ -1785,8 +1792,8 @@ export function makeExampleSchema(
   }
 
   function singleRelationField<
-    TMyDataSource extends PgResource<any, any, any, any, any>,
-    TRelationName extends TMyDataSource extends PgResource<
+    TMyResource extends PgResource<any, any, any, any, any>,
+    TRelationName extends TMyResource extends PgResource<
       any,
       PgCodec<infer UCodecName, any, any, any, any, any, any>,
       any,
@@ -1801,7 +1808,7 @@ export function makeExampleSchema(
       type,
       plan: EXPORTABLE(
         (deoptimizeIfAppropriate, relation) =>
-          function plan($entity: PgSelectSingleStep<TMyDataSource>) {
+          function plan($entity: PgSelectSingleStep<TMyResource>) {
             const $plan = $entity.singleRelation(relation);
             deoptimizeIfAppropriate($plan);
             return $plan;
@@ -1902,14 +1909,15 @@ export function makeExampleSchema(
       mostRecentForum: {
         type: Forum,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, usersMostRecentForumSource) => ($user) => {
-            const $forum = usersMostRecentForumSource.execute([
-              { step: $user.record() },
-            ]) as PgSelectStep<typeof forumSource>;
-            deoptimizeIfAppropriate($forum);
-            return $forum;
-          },
-          [deoptimizeIfAppropriate, usersMostRecentForumSource],
+          (deoptimizeIfAppropriate, usersMostRecentForumResource) =>
+            ($user) => {
+              const $forum = usersMostRecentForumResource.execute([
+                { step: $user.record() },
+              ]) as PgSelectStep<typeof forumResource>;
+              deoptimizeIfAppropriate($forum);
+              return $forum;
+            },
+          [deoptimizeIfAppropriate, usersMostRecentForumResource],
         ),
       },
 
@@ -1967,7 +1975,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              (TYPES, sql) => (step: PgSelectStep<typeof messageSource>) => {
+              (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 step.orderBy({
                   codec: TYPES.text,
                   fragment: sql`${step.alias}.body`,
@@ -1983,7 +1991,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              (TYPES, sql) => (step: PgSelectStep<typeof messageSource>) => {
+              (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 step.orderBy({
                   codec: TYPES.text,
                   fragment: sql`${step.alias}.body`,
@@ -1999,7 +2007,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              (TYPES, sql) => (step: PgSelectStep<typeof messageSource>) => {
+              (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 const authorAlias = step.singleRelation("author");
                 step.orderBy({
                   codec: TYPES.text,
@@ -2016,7 +2024,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              (TYPES, sql) => (step: PgSelectStep<typeof messageSource>) => {
+              (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 const authorAlias = step.singleRelation("author");
                 step.orderBy({
                   codec: TYPES.text,
@@ -2361,7 +2369,7 @@ export function makeExampleSchema(
 
   const ForumToManyMessageFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    ManyFilterStep<typeof messageSource>
+    ManyFilterStep<typeof messageResource>
   >()({
     name: "ForumToManyMessageFilter",
     fields: {
@@ -2370,7 +2378,7 @@ export function makeExampleSchema(
         applyPlan: EXPORTABLE(
           () =>
             function plan(
-              $manyFilter: ManyFilterStep<typeof messageSource>,
+              $manyFilter: ManyFilterStep<typeof messageResource>,
               arg,
             ) {
               const $value = arg.getRaw();
@@ -2394,20 +2402,20 @@ export function makeExampleSchema(
       messages: {
         type: ForumToManyMessageFilter,
         applyPlan: EXPORTABLE(
-          (ManyFilterStep, messageSource) =>
+          (ManyFilterStep, messageResource) =>
             function plan($condition, arg) {
               const $value = arg.getRaw();
               if (!$value.evalIs(null)) {
                 const plan = new ManyFilterStep(
                   $condition,
-                  messageSource,
+                  messageResource,
                   ["id"],
                   ["forum_id"],
                 );
                 arg.apply(plan);
               }
             },
-          [ManyFilterStep, messageSource],
+          [ManyFilterStep, messageResource],
         ),
       },
     },
@@ -2464,7 +2472,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum: ForumStep,
-                  $messages: PgSelectStep<typeof messageSource>,
+                  $messages: PgSelectStep<typeof messageResource>,
                   arg,
                 ) {
                   $messages.setFirst(arg.getRaw());
@@ -2479,7 +2487,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum: ForumStep,
-                  $messages: PgSelectStep<typeof messageSource>,
+                  $messages: PgSelectStep<typeof messageResource>,
                 ) {
                   return $messages.wherePlan();
                 },
@@ -2492,7 +2500,7 @@ export function makeExampleSchema(
               (ClassFilterStep) =>
                 function plan(
                   _$forum: ForumStep,
-                  $messages: PgSelectStep<typeof messageSource>,
+                  $messages: PgSelectStep<typeof messageResource>,
                 ) {
                   return new ClassFilterStep(
                     $messages.wherePlan(),
@@ -2503,14 +2511,14 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedArg<
-            PgSelectStep<typeof messageSource>
+            PgSelectStep<typeof messageResource>
           >(($messages) => $messages),
         },
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, messageSource) =>
+          (deoptimizeIfAppropriate, messageResource) =>
             function plan($forum) {
               const $forumId = $forum.get("id");
-              const $messages = messageSource.find({ forum_id: $forumId });
+              const $messages = messageResource.find({ forum_id: $forumId });
               deoptimizeIfAppropriate($messages);
               $messages.setTrusted();
               // $messages.leftJoin(...);
@@ -2520,7 +2528,7 @@ export function makeExampleSchema(
               // $messages.orderBy(...);
               return $messages;
             },
-          [deoptimizeIfAppropriate, messageSource],
+          [deoptimizeIfAppropriate, messageResource],
         ),
       },
       messagesConnection: {
@@ -2532,7 +2540,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum: ForumStep,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setFirst(arg.getRaw());
@@ -2547,7 +2557,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
@@ -2562,7 +2574,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                 ) {
                   const $messages = $connection.getSubplan();
                   return $messages.wherePlan();
@@ -2576,7 +2590,9 @@ export function makeExampleSchema(
               (ClassFilterStep) =>
                 function plan(
                   _$forum,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                 ) {
                   const $messages = $connection.getSubplan();
                   return new ClassFilterStep(
@@ -2588,13 +2604,13 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedArg<
-            PgConnectionPlanFromSource<typeof messageSource>
+            PgConnectionPlanFromResource<typeof messageResource>
           >(($connection) => $connection.getSubplan()),
         },
         plan: EXPORTABLE(
-          (connection, deoptimizeIfAppropriate, messageSource) =>
+          (connection, deoptimizeIfAppropriate, messageResource) =>
             function plan($forum) {
-              const $messages = messageSource.find({
+              const $messages = messageResource.find({
                 forum_id: $forum.get("id"),
               });
               $messages.setTrusted();
@@ -2609,7 +2625,7 @@ export function makeExampleSchema(
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
               return $connectionPlan;
             },
-          [connection, deoptimizeIfAppropriate, messageSource],
+          [connection, deoptimizeIfAppropriate, messageResource],
         ),
       },
       uniqueAuthorCount: {
@@ -2620,10 +2636,10 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (TYPES, forumsUniqueAuthorCountSource) =>
+          (TYPES, forumsUniqueAuthorCountResource) =>
             function plan($forum, args) {
               const $featured = args.get("featured");
-              return forumsUniqueAuthorCountSource.execute([
+              return forumsUniqueAuthorCountResource.execute([
                 {
                   step: $forum.record(),
                 },
@@ -2633,7 +2649,7 @@ export function makeExampleSchema(
                 },
               ]);
             },
-          [TYPES, forumsUniqueAuthorCountSource],
+          [TYPES, forumsUniqueAuthorCountResource],
         ),
       },
 
@@ -2645,11 +2661,11 @@ export function makeExampleSchema(
             pgSelect,
             sql,
             sqlFromArgDigests,
-            userSource,
+            userResource,
           ) =>
             function plan($forum) {
               const $user = pgSelect({
-                source: userSource,
+                source: userResource,
                 identifiers: [],
                 args: [
                   {
@@ -2670,7 +2686,7 @@ export function makeExampleSchema(
             pgSelect,
             sql,
             sqlFromArgDigests,
-            userSource,
+            userResource,
           ],
         ),
       },
@@ -2678,9 +2694,9 @@ export function makeExampleSchema(
       featuredMessages: {
         type: new GraphQLList(Message),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, forumsFeaturedMessagesSource) =>
+          (deoptimizeIfAppropriate, forumsFeaturedMessagesResource) =>
             function plan($forum) {
-              const $messages = forumsFeaturedMessagesSource.execute([
+              const $messages = forumsFeaturedMessagesResource.execute([
                 {
                   step: $forum.record(),
                 },
@@ -2688,24 +2704,25 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate($messages);
               return $messages;
             },
-          [deoptimizeIfAppropriate, forumsFeaturedMessagesSource],
+          [deoptimizeIfAppropriate, forumsFeaturedMessagesResource],
         ),
       },
 
       messagesListSet: {
         type: new GraphQLList(new GraphQLList(Message)),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, forumsMessagesListSetSource) =>
+          (deoptimizeIfAppropriate, forumsMessagesListSetResource) =>
             function plan($forum) {
-              const $partitionedMessages = forumsMessagesListSetSource.execute([
-                {
-                  step: $forum.record(),
-                },
-              ]);
+              const $partitionedMessages =
+                forumsMessagesListSetResource.execute([
+                  {
+                    step: $forum.record(),
+                  },
+                ]);
               deoptimizeIfAppropriate($partitionedMessages);
               return $partitionedMessages;
             },
-          [deoptimizeIfAppropriate, forumsMessagesListSetSource],
+          [deoptimizeIfAppropriate, forumsMessagesListSetResource],
         ),
       },
 
@@ -2719,14 +2736,14 @@ export function makeExampleSchema(
             groupBy,
             lambda,
             list,
-            messageSource,
+            messageResource,
           ) =>
             function plan($forum) {
               // This is a deliberately convoluted plan to ensure that multiple
               // filter plans work well together.
 
               // Load _all_ the messages from the DB.
-              const $messages = messageSource.find();
+              const $messages = messageResource.find();
               deoptimizeIfAppropriate($messages);
 
               // Filter messages to those _not_ in this forum
@@ -2762,7 +2779,7 @@ export function makeExampleSchema(
             groupBy,
             lambda,
             list,
-            messageSource,
+            messageResource,
           ],
         ),
       },
@@ -2922,9 +2939,9 @@ export function makeExampleSchema(
 
   const entityPolymorphicTypeMap = EXPORTABLE(
     (
-      commentSource,
-      personSource,
-      postSource,
+      commentResource,
+      personResource,
+      postResource,
     ): PgPolymorphicTypeMap<
       PgSelectSingleStep<any> | PgClassExpressionStep<PgCodecAny, any>,
       readonly number[],
@@ -2932,18 +2949,18 @@ export function makeExampleSchema(
     > => ({
       Person: {
         match: (v) => v[0] != null,
-        plan: ($list) => personSource.get({ person_id: $list.at(0) }),
+        plan: ($list) => personResource.get({ person_id: $list.at(0) }),
       },
       Post: {
         match: (v) => v[1] != null,
-        plan: ($list) => postSource.get({ post_id: $list.at(1) }),
+        plan: ($list) => postResource.get({ post_id: $list.at(1) }),
       },
       Comment: {
         match: (v) => v[2] != null,
-        plan: ($list) => commentSource.get({ comment_id: $list.at(2) }),
+        plan: ($list) => commentResource.get({ comment_id: $list.at(2) }),
       },
     }),
-    [commentSource, personSource, postSource],
+    [commentResource, personResource, postResource],
   );
 
   /**
@@ -2953,7 +2970,7 @@ export function makeExampleSchema(
    * included in the union).
    *
    * i.e. if `$item.get('person_id')` is set, then it's a Person and we should
-   * grab that person from the `personSource`. If `post_id` is set it's a Post,
+   * grab that person from the `personResource`. If `post_id` is set it's a Post,
    * and so on.
    */
   const entityUnion = EXPORTABLE(
@@ -3018,12 +3035,12 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate,
               each,
               singleTableItemInterface,
-              singleTableItemsSource,
+              singleTableItemsResource,
             ) =>
               function plan($person) {
                 const $personId = $person.get("person_id");
                 const $items: SingleTableItemsStep =
-                  singleTableItemsSource.find({
+                  singleTableItemsResource.find({
                     author_id: $personId,
                   });
                 deoptimizeIfAppropriate($items);
@@ -3033,7 +3050,7 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate,
               each,
               singleTableItemInterface,
-              singleTableItemsSource,
+              singleTableItemsResource,
             ],
           ),
         },
@@ -3045,13 +3062,14 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate,
               each,
               relationalItemInterface,
-              relationalItemsSource,
+              relationalItemsResource,
             ) =>
               function plan($person) {
                 const $personId = $person.get("person_id");
-                const $items: RelationalItemsStep = relationalItemsSource.find({
-                  author_id: $personId,
-                });
+                const $items: RelationalItemsStep =
+                  relationalItemsResource.find({
+                    author_id: $personId,
+                  });
                 deoptimizeIfAppropriate($items);
                 return each($items, ($item) => relationalItemInterface($item));
               },
@@ -3059,7 +3077,7 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate,
               each,
               relationalItemInterface,
-              relationalItemsSource,
+              relationalItemsResource,
             ],
           ),
         },
@@ -3149,7 +3167,7 @@ export function makeExampleSchema(
           any,
           PgCodec<
             any,
-            typeof singleTableItemsSource.codec.columns,
+            typeof singleTableItemsResource.codec.columns,
             any,
             any,
             any,
@@ -3312,7 +3330,7 @@ export function makeExampleSchema(
     interfaces: [RelationalItem],
     fields: () => ({
       ...commonRelationalItemFields<
-        typeof relationalTopicsSource.codec.columns
+        typeof relationalTopicsResource.codec.columns
       >(),
       title: attrField("title", GraphQLString),
     }),
@@ -3326,7 +3344,7 @@ export function makeExampleSchema(
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields<
-        typeof relationalPostsSource.codec.columns
+        typeof relationalPostsResource.codec.columns
       >(),
       title: attrField("title", GraphQLString),
       description: attrField("description", GraphQLString),
@@ -3335,10 +3353,10 @@ export function makeExampleSchema(
       titleLower: {
         type: GraphQLString,
         plan: EXPORTABLE(
-          (pgSelect, scalarTextSource, sql, sqlFromArgDigests) =>
+          (pgSelect, scalarTextResource, sql, sqlFromArgDigests) =>
             function plan($entity) {
               return pgSelect({
-                source: scalarTextSource,
+                source: scalarTextResource,
                 identifiers: [],
                 args: [
                   {
@@ -3352,7 +3370,7 @@ export function makeExampleSchema(
                 name: "relational_posts_title_lower",
               }).single();
             },
-          [pgSelect, scalarTextSource, sql, sqlFromArgDigests],
+          [pgSelect, scalarTextResource, sql, sqlFromArgDigests],
         ),
       },
     }),
@@ -3366,7 +3384,7 @@ export function makeExampleSchema(
     interfaces: [RelationalItem],
     fields: () => ({
       ...commonRelationalItemFields<
-        typeof relationalDividersSource.codec.columns
+        typeof relationalDividersResource.codec.columns
       >(),
       title: attrField("title", GraphQLString),
       color: attrField("color", GraphQLString),
@@ -3381,7 +3399,7 @@ export function makeExampleSchema(
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields<
-        typeof relationalChecklistsSource.codec.columns
+        typeof relationalChecklistsResource.codec.columns
       >(),
       title: attrField("title", GraphQLString),
     }),
@@ -3395,7 +3413,7 @@ export function makeExampleSchema(
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields<
-        typeof relationalChecklistItemsSource.codec.columns
+        typeof relationalChecklistItemsResource.codec.columns
       >(),
       description: attrField("description", GraphQLString),
       note: attrField("note", GraphQLString),
@@ -3708,13 +3726,13 @@ export function makeExampleSchema(
       forums: {
         type: new GraphQLList(Forum),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, forumSource) =>
+          (deoptimizeIfAppropriate, forumResource) =>
             function plan(_$root) {
-              const $forums = forumSource.find();
+              const $forums = forumResource.find();
               deoptimizeIfAppropriate($forums);
               return $forums;
             },
-          [deoptimizeIfAppropriate, forumSource],
+          [deoptimizeIfAppropriate, forumResource],
         ),
         args: {
           first: {
@@ -3723,7 +3741,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: __ValueStep<BaseGraphQLRootValue>,
-                  $forums: PgSelectStep<typeof forumSource>,
+                  $forums: PgSelectStep<typeof forumResource>,
                   arg,
                 ) {
                   $forums.setFirst(arg.getRaw());
@@ -3733,7 +3751,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedArg<
-            PgSelectStep<typeof forumSource>
+            PgSelectStep<typeof forumResource>
           >(($forums) => $forums),
           condition: {
             type: ForumCondition,
@@ -3741,7 +3759,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $forums: PgSelectStep<typeof forumSource>,
+                  $forums: PgSelectStep<typeof forumResource>,
                 ) {
                   return $forums.wherePlan();
                 },
@@ -3754,7 +3772,7 @@ export function makeExampleSchema(
               (ClassFilterStep) =>
                 function plan(
                   _$root,
-                  $forums: PgSelectStep<typeof forumSource>,
+                  $forums: PgSelectStep<typeof forumResource>,
                 ) {
                   return new ClassFilterStep(
                     $forums.wherePlan(),
@@ -3769,13 +3787,13 @@ export function makeExampleSchema(
       forum: {
         type: Forum,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, forumSource) =>
+          (deoptimizeIfAppropriate, forumResource) =>
             function plan(_$root, args) {
-              const $forum = forumSource.get({ id: args.get("id") });
+              const $forum = forumResource.get({ id: args.get("id") });
               deoptimizeIfAppropriate($forum);
               return $forum;
             },
-          [deoptimizeIfAppropriate, forumSource],
+          [deoptimizeIfAppropriate, forumResource],
         ),
         args: {
           id: {
@@ -3786,13 +3804,13 @@ export function makeExampleSchema(
       message: {
         type: Message,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, messageSource) =>
+          (deoptimizeIfAppropriate, messageResource) =>
             function plan(_$root, args) {
-              const $message = messageSource.get({ id: args.get("id") });
+              const $message = messageResource.get({ id: args.get("id") });
               deoptimizeIfAppropriate($message);
               return $message;
             },
-          [deoptimizeIfAppropriate, messageSource],
+          [deoptimizeIfAppropriate, messageResource],
         ),
         args: {
           id: {
@@ -3809,7 +3827,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: any,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                 ) {
                   const $messages = $connection.getSubplan();
                   return $messages.wherePlan();
@@ -3823,7 +3843,9 @@ export function makeExampleSchema(
               (ClassFilterStep) =>
                 function plan(
                   _$root: any,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                 ) {
                   const $messages = $connection.getSubplan();
                   return new ClassFilterStep(
@@ -3835,7 +3857,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedArg<
-            PgConnectionPlanFromSource<typeof messageSource>
+            PgConnectionPlanFromResource<typeof messageResource>
           >(($connection) => $connection.getSubplan()),
           first: {
             type: GraphQLInt,
@@ -3843,7 +3865,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: any,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   val,
                 ) {
                   $connection.setFirst(val.getRaw());
@@ -3858,7 +3882,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
@@ -3873,7 +3899,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setAfter(arg.getRaw());
@@ -3888,7 +3916,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setBefore(arg.getRaw());
@@ -3903,7 +3933,9 @@ export function makeExampleSchema(
               (GraphQLError, MessagesOrderBy, getEnumValueConfig, inspect) =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -3935,9 +3967,9 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (connection, deoptimizeIfAppropriate, messageSource) =>
+          (connection, deoptimizeIfAppropriate, messageResource) =>
             function plan() {
-              const $messages = messageSource.find();
+              const $messages = messageResource.find();
               deoptimizeIfAppropriate($messages);
               // $messages.leftJoin(...);
               // $messages.innerJoin(...);
@@ -3949,7 +3981,7 @@ export function makeExampleSchema(
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
               return $connectionPlan;
             },
-          [connection, deoptimizeIfAppropriate, messageSource],
+          [connection, deoptimizeIfAppropriate, messageResource],
         ),
       },
 
@@ -3961,10 +3993,10 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (TYPES, deoptimizeIfAppropriate, uniqueAuthorCountSource) =>
+          (TYPES, deoptimizeIfAppropriate, uniqueAuthorCountResource) =>
             function plan(_$root, args) {
               const $featured = args.get("featured");
-              const $plan = uniqueAuthorCountSource.execute([
+              const $plan = uniqueAuthorCountResource.execute([
                 {
                   step: $featured,
                   pgCodec: TYPES.boolean,
@@ -3974,47 +4006,47 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate($plan);
               return $plan;
             },
-          [TYPES, deoptimizeIfAppropriate, uniqueAuthorCountSource],
+          [TYPES, deoptimizeIfAppropriate, uniqueAuthorCountResource],
         ),
       },
 
       forumNames: {
         type: new GraphQLList(GraphQLString),
         plan: EXPORTABLE(
-          (pgSelect, scalarTextSource, sql) =>
+          (pgSelect, scalarTextResource, sql) =>
             function plan(_$root) {
               const $plan = pgSelect({
-                source: scalarTextSource,
+                source: scalarTextResource,
                 identifiers: [],
                 from: sql`app_public.forum_names()`,
                 name: "forum_names",
               });
               return $plan;
             },
-          [pgSelect, scalarTextSource, sql],
+          [pgSelect, scalarTextResource, sql],
         ),
       },
 
       forumNamesArray: {
         type: new GraphQLList(GraphQLString),
         plan: EXPORTABLE(
-          (forumNamesArraySource) =>
+          (forumNamesArrayResource) =>
             function plan(_$root) {
-              return forumNamesArraySource.execute();
+              return forumNamesArrayResource.execute();
             },
-          [forumNamesArraySource],
+          [forumNamesArrayResource],
         ),
       },
 
       forumNamesCasesList: {
         type: new GraphQLList(new GraphQLList(GraphQLString)),
         plan: EXPORTABLE(
-          (forumNamesCasesSource) =>
+          (forumNamesCasesResource) =>
             function plan(_$root) {
-              const $plan = forumNamesCasesSource.execute();
+              const $plan = forumNamesCasesResource.execute();
               return $plan;
             },
-          [forumNamesCasesSource],
+          [forumNamesCasesResource],
         ),
       },
 
@@ -4023,12 +4055,12 @@ export function makeExampleSchema(
       forumNamesCasesConnection: {
         type: new GraphQLList(GraphQLString),
         plan: EXPORTABLE(
-          (forumNamesArraySource, connection) =>
+          (forumNamesArrayResource, connection) =>
             function plan(_$root) {
-              const $plan = forumNamesArraySource.execute();
+              const $plan = forumNamesArrayResource.execute();
               return connection($plan);
             },
-          [forumNamesArraySource, connection],
+          [forumNamesArrayResource, connection],
         ),
       },
       */
@@ -4037,10 +4069,10 @@ export function makeExampleSchema(
         type: new GraphQLList(GraphQLString),
         description: "Like forumNames, only we convert them all to upper case",
         plan: EXPORTABLE(
-          (each, lambda, pgSelect, scalarTextSource, sql) =>
+          (each, lambda, pgSelect, scalarTextResource, sql) =>
             function plan(_$root) {
               const $names = pgSelect({
-                source: scalarTextSource,
+                source: scalarTextResource,
                 identifiers: [],
                 from: sql`app_public.forum_names()`,
                 name: "forum_names",
@@ -4050,17 +4082,17 @@ export function makeExampleSchema(
                 lambda($name, (name) => name.toUpperCase(), true),
               );
             },
-          [each, lambda, pgSelect, scalarTextSource, sql],
+          [each, lambda, pgSelect, scalarTextResource, sql],
         ),
       },
 
       randomUser: {
         type: User,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, pgSelect, sql, userSource) =>
+          (deoptimizeIfAppropriate, pgSelect, sql, userResource) =>
             function plan() {
               const $users = pgSelect({
-                source: userSource,
+                source: userResource,
                 identifiers: [],
                 from: sql`app_public.random_user()`,
                 name: "random_user",
@@ -4068,62 +4100,62 @@ export function makeExampleSchema(
               deoptimizeIfAppropriate($users);
               return $users.single();
             },
-          [deoptimizeIfAppropriate, pgSelect, sql, userSource],
+          [deoptimizeIfAppropriate, pgSelect, sql, userResource],
         ),
       },
 
       randomUserArray: {
         type: new GraphQLList(User),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, randomUserArraySource) =>
+          (deoptimizeIfAppropriate, randomUserArrayResource) =>
             function plan() {
-              const $select = randomUserArraySource.execute();
+              const $select = randomUserArrayResource.execute();
               deoptimizeIfAppropriate($select);
               return $select;
             },
-          [deoptimizeIfAppropriate, randomUserArraySource],
+          [deoptimizeIfAppropriate, randomUserArrayResource],
         ),
       },
 
       randomUserArraySet: {
         type: new GraphQLList(new GraphQLList(User)),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, randomUserArraySetSource) =>
+          (deoptimizeIfAppropriate, randomUserArraySetResource) =>
             function plan() {
-              const $selectPartitioned = randomUserArraySetSource.execute();
+              const $selectPartitioned = randomUserArraySetResource.execute();
               deoptimizeIfAppropriate($selectPartitioned);
               return $selectPartitioned;
             },
-          [deoptimizeIfAppropriate, randomUserArraySetSource],
+          [deoptimizeIfAppropriate, randomUserArraySetResource],
         ),
       },
 
       featuredMessages: {
         type: new GraphQLList(Message),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, featuredMessagesSource, pgSelect) =>
+          (deoptimizeIfAppropriate, featuredMessagesResource, pgSelect) =>
             function plan() {
               const $messages = pgSelect({
-                source: featuredMessagesSource,
+                source: featuredMessagesResource,
                 identifiers: [],
               });
               deoptimizeIfAppropriate($messages);
               return $messages;
             },
-          [deoptimizeIfAppropriate, featuredMessagesSource, pgSelect],
+          [deoptimizeIfAppropriate, featuredMessagesResource, pgSelect],
         ),
       },
 
       people: {
         type: new GraphQLList(Person),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, personSource) =>
+          (deoptimizeIfAppropriate, personResource) =>
             function plan() {
-              const $people = personSource.find();
+              const $people = personResource.find();
               deoptimizeIfAppropriate($people);
               return $people;
             },
-          [deoptimizeIfAppropriate, personSource],
+          [deoptimizeIfAppropriate, personResource],
         ),
       },
 
@@ -4135,14 +4167,14 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (singleTableItemInterface, singleTableItemsSource) =>
+          (singleTableItemInterface, singleTableItemsResource) =>
             function plan(_$root, args) {
-              const $item: SingleTableItemStep = singleTableItemsSource.get({
+              const $item: SingleTableItemStep = singleTableItemsResource.get({
                 id: args.get("id"),
               });
               return singleTableItemInterface($item);
             },
-          [singleTableItemInterface, singleTableItemsSource],
+          [singleTableItemInterface, singleTableItemsResource],
         ),
       },
 
@@ -4154,15 +4186,15 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (constant, singleTableItemsSource) =>
+          (constant, singleTableItemsResource) =>
             function plan(_$root, args) {
-              const $item: SingleTableItemStep = singleTableItemsSource.get({
+              const $item: SingleTableItemStep = singleTableItemsResource.get({
                 id: args.get("id"),
                 type: constant("TOPIC"),
               });
               return $item;
             },
-          [constant, singleTableItemsSource],
+          [constant, singleTableItemsResource],
         ),
       },
 
@@ -4174,14 +4206,14 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (relationalItemInterface, relationalItemsSource) =>
+          (relationalItemInterface, relationalItemsResource) =>
             function plan(_$root, args) {
-              const $item: RelationalItemStep = relationalItemsSource.get({
+              const $item: RelationalItemStep = relationalItemsResource.get({
                 id: args.get("id"),
               });
               return relationalItemInterface($item);
             },
-          [relationalItemInterface, relationalItemsSource],
+          [relationalItemInterface, relationalItemsResource],
         ),
       },
 
@@ -4193,13 +4225,13 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (relationalTopicsSource) =>
+          (relationalTopicsResource) =>
             function plan(_$root, args) {
-              return relationalTopicsSource.get({
+              return relationalTopicsResource.get({
                 id: args.get("id"),
               });
             },
-          [relationalTopicsSource],
+          [relationalTopicsResource],
         ),
       },
 
@@ -4229,12 +4261,12 @@ export function makeExampleSchema(
             TYPES,
             each,
             relationalCommentableInterface,
-            relationalCommentableSource,
+            relationalCommentableResource,
             sql,
           ) =>
             function plan() {
               const $commentables: RelationalCommentablesStep =
-                relationalCommentableSource.find();
+                relationalCommentableResource.find();
               $commentables.orderBy({
                 codec: TYPES.int,
                 fragment: sql`${$commentables.alias}.id`,
@@ -4248,7 +4280,7 @@ export function makeExampleSchema(
             TYPES,
             each,
             relationalCommentableInterface,
-            relationalCommentableSource,
+            relationalCommentableResource,
             sql,
           ],
         ),
@@ -4262,14 +4294,14 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (unionItemUnion, unionItemsSource) =>
+          (unionItemUnion, unionItemsResource) =>
             function plan(_$root, args) {
-              const $item: UnionItemStep = unionItemsSource.get({
+              const $item: UnionItemStep = unionItemsResource.get({
                 id: args.get("id"),
               });
               return unionItemUnion($item);
             },
-          [unionItemUnion, unionItemsSource],
+          [unionItemUnion, unionItemsResource],
         ),
       },
 
@@ -4281,22 +4313,22 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (unionTopicsSource) =>
+          (unionTopicsResource) =>
             function plan(_$root, args) {
-              return unionTopicsSource.get({
+              return unionTopicsResource.get({
                 id: args.get("id"),
               });
             },
-          [unionTopicsSource],
+          [unionTopicsResource],
         ),
       },
 
       allUnionItemsList: {
         type: new GraphQLList(new GraphQLNonNull(UnionItem)),
         plan: EXPORTABLE(
-          (TYPES, each, sql, unionItemUnion, unionItemsSource) =>
+          (TYPES, each, sql, unionItemUnion, unionItemsResource) =>
             function plan() {
-              const $items: UnionItemsStep = unionItemsSource.find();
+              const $items: UnionItemsStep = unionItemsResource.find();
               $items.orderBy({
                 codec: TYPES.int,
                 fragment: sql`${$items.alias}.id`,
@@ -4304,7 +4336,7 @@ export function makeExampleSchema(
               });
               return each($items, ($item) => unionItemUnion($item));
             },
-          [TYPES, each, sql, unionItemUnion, unionItemsSource],
+          [TYPES, each, sql, unionItemUnion, unionItemsResource],
         ),
       },
 
@@ -4320,11 +4352,11 @@ export function makeExampleSchema(
             TYPES,
             deoptimizeIfAppropriate,
             each,
-            entitySearchSource,
+            entitySearchResource,
             entityUnion,
           ) =>
             function plan(_$root, args) {
-              const $step = entitySearchSource.execute([
+              const $step = entitySearchResource.execute([
                 {
                   step: args.get("query"),
                   pgCodec: TYPES.text,
@@ -4338,7 +4370,7 @@ export function makeExampleSchema(
             TYPES,
             deoptimizeIfAppropriate,
             each,
-            entitySearchSource,
+            entitySearchResource,
             entityUnion,
           ],
         ),
@@ -4352,11 +4384,11 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (personSource) =>
+          (personResource) =>
             function plan(_$root, args) {
-              return personSource.get({ person_id: args.get("personId") });
+              return personResource.get({ person_id: args.get("personId") });
             },
-          [personSource],
+          [personResource],
         ),
       },
 
@@ -4451,10 +4483,10 @@ export function makeExampleSchema(
           (
             TYPES,
             constant,
-            firstPartyVulnerabilitiesSource,
+            firstPartyVulnerabilitiesResource,
             pgUnionAll,
             sql,
-            thirdPartyVulnerabilitiesSource,
+            thirdPartyVulnerabilitiesResource,
           ) =>
             function plan(_, fieldArgs) {
               const $first = fieldArgs.getRaw("first");
@@ -4467,8 +4499,8 @@ export function makeExampleSchema(
                   },
                 },
                 sourceByTypeName: {
-                  FirstPartyVulnerability: firstPartyVulnerabilitiesSource,
-                  ThirdPartyVulnerability: thirdPartyVulnerabilitiesSource,
+                  FirstPartyVulnerability: firstPartyVulnerabilitiesResource,
+                  ThirdPartyVulnerability: thirdPartyVulnerabilitiesResource,
                 },
               });
               $vulnerabilities.orderBy({
@@ -4491,10 +4523,10 @@ export function makeExampleSchema(
           [
             TYPES,
             constant,
-            firstPartyVulnerabilitiesSource,
+            firstPartyVulnerabilitiesResource,
             pgUnionAll,
             sql,
-            thirdPartyVulnerabilitiesSource,
+            thirdPartyVulnerabilitiesResource,
           ],
         ),
       },
@@ -4521,7 +4553,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: any,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   val,
                 ) {
                   $connection.setFirst(val.getRaw());
@@ -4536,7 +4570,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
@@ -4551,7 +4587,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setOffset(arg.getRaw());
@@ -4566,7 +4604,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setAfter(arg.getRaw());
@@ -4581,7 +4621,9 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   $connection.setBefore(arg.getRaw());
@@ -4601,7 +4643,9 @@ export function makeExampleSchema(
               ) =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
+                  $connection: PgConnectionPlanFromResource<
+                    typeof messageResource
+                  >,
                   arg,
                 ) {
                   const $collection = $connection.getSubplan();
@@ -4642,9 +4686,9 @@ export function makeExampleSchema(
           (
             TYPES,
             connection,
-            firstPartyVulnerabilitiesSource,
+            firstPartyVulnerabilitiesResource,
             pgUnionAll,
-            thirdPartyVulnerabilitiesSource,
+            thirdPartyVulnerabilitiesResource,
           ) =>
             function plan() {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
@@ -4655,8 +4699,8 @@ export function makeExampleSchema(
                   },
                 },
                 sourceByTypeName: {
-                  FirstPartyVulnerability: firstPartyVulnerabilitiesSource,
-                  ThirdPartyVulnerability: thirdPartyVulnerabilitiesSource,
+                  FirstPartyVulnerability: firstPartyVulnerabilitiesResource,
+                  ThirdPartyVulnerability: thirdPartyVulnerabilitiesResource,
                 },
               });
               return connection($vulnerabilities);
@@ -4664,9 +4708,9 @@ export function makeExampleSchema(
           [
             TYPES,
             connection,
-            firstPartyVulnerabilitiesSource,
+            firstPartyVulnerabilitiesResource,
             pgUnionAll,
-            thirdPartyVulnerabilitiesSource,
+            thirdPartyVulnerabilitiesResource,
           ],
         ),
       },
@@ -4725,26 +4769,26 @@ export function makeExampleSchema(
     },
   });
 
-  type PgRecord<TDataSource extends PgResource<any, any, any, any, any>> =
+  type PgRecord<TResource extends PgResource<any, any, any, any, any>> =
     PgClassExpressionStep<
-      PgCodec<any, GetPgResourceColumns<TDataSource>, any, any, any, any, any>,
-      TDataSource
+      PgCodec<any, GetPgResourceColumns<TResource>, any, any, any, any, any>,
+      TResource
     >;
 
   const CreateRelationalPostPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgRecord<typeof relationalPostsSource>
+    PgRecord<typeof relationalPostsResource>
   >(PgClassExpressionStep)({
     name: "CreateRelationalPostPayload",
     fields: {
       post: {
         type: RelationalPost,
         plan: EXPORTABLE(
-          (relationalPostsSource) =>
+          (relationalPostsResource) =>
             function plan($post) {
-              return relationalPostsSource.get({ id: $post.get("id") });
+              return relationalPostsResource.get({ id: $post.get("id") });
             },
-          [relationalPostsSource],
+          [relationalPostsResource],
         ),
       },
       id: {
@@ -4772,18 +4816,18 @@ export function makeExampleSchema(
 
   const UpdateRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgUpdateStep<typeof relationalPostsSource>
+    PgUpdateStep<typeof relationalPostsResource>
   >(PgUpdateStep)({
     name: "UpdateRelationalPostByIdPayload",
     fields: {
       post: {
         type: RelationalPost,
         plan: EXPORTABLE(
-          (relationalPostsSource) =>
+          (relationalPostsResource) =>
             function plan($post) {
-              return relationalPostsSource.get({ id: $post.get("id") });
+              return relationalPostsResource.get({ id: $post.get("id") });
             },
-          [relationalPostsSource],
+          [relationalPostsResource],
         ),
       },
       id: {
@@ -4811,7 +4855,7 @@ export function makeExampleSchema(
 
   const DeleteRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgDeleteStep<typeof relationalPostsSource>
+    PgDeleteStep<typeof relationalPostsResource>
   >(PgDeleteStep)({
     name: "DeleteRelationalPostByIdPayload",
     fields: {
@@ -4820,14 +4864,14 @@ export function makeExampleSchema(
       post: {
         type: RelationalPost,
         plan: EXPORTABLE(
-          (pgSelectSingleFromRecord, relationalPostsSource) =>
+          (pgSelectSingleFromRecord, relationalPostsResource) =>
             function plan($post) {
               return pgSelectSingleFromRecord(
-                relationalPostsSource,
+                relationalPostsResource,
                 $post.record(),
               );
             },
-          [pgSelectSingleFromRecord, relationalPostsSource],
+          [pgSelectSingleFromRecord, relationalPostsResource],
         ),
       },
 
@@ -4896,19 +4940,24 @@ export function makeExampleSchema(
         },
         type: CreateRelationalPostPayload,
         plan: EXPORTABLE(
-          (constant, pgInsert, relationalItemsSource, relationalPostsSource) =>
+          (
+            constant,
+            pgInsert,
+            relationalItemsResource,
+            relationalPostsResource,
+          ) =>
             function plan(_$root, args) {
-              const $item = pgInsert(relationalItemsSource, {
+              const $item = pgInsert(relationalItemsResource, {
                 type: constant`POST`,
                 author_id: constant(2),
               });
               const $itemId = $item.get("id");
               // TODO: make this TypeScript stuff automatic
-              const $post = pgInsert(relationalPostsSource, {
+              const $post = pgInsert(relationalPostsResource, {
                 id: $itemId,
               });
               for (const key of ["title", "description", "note"] as Array<
-                keyof typeof relationalPostsSource.codec.columns
+                keyof typeof relationalPostsResource.codec.columns
               >) {
                 const $value = args.getRaw(["input", key]);
                 if (!$value.evalIs(undefined)) {
@@ -4930,7 +4979,12 @@ export function makeExampleSchema(
               // `PgClassExpressionStep`
               return $post.record();
             },
-          [constant, pgInsert, relationalItemsSource, relationalPostsSource],
+          [
+            constant,
+            pgInsert,
+            relationalItemsResource,
+            relationalPostsResource,
+          ],
         ),
       },
 
@@ -4939,19 +4993,24 @@ export function makeExampleSchema(
           "This silly mutation is specifically to ensure that mutation plans are not tree-shaken - we never want to throw away mutation side effects.",
         type: CreateRelationalPostPayload,
         plan: EXPORTABLE(
-          (constant, pgInsert, relationalItemsSource, relationalPostsSource) =>
+          (
+            constant,
+            pgInsert,
+            relationalItemsResource,
+            relationalPostsResource,
+          ) =>
             function plan() {
               // Only the _last_ post plan is returned; there's no dependency on
               // the first two posts, and yet they should not be tree-shaken
               // because they're mutations.
-              let $post: PgInsertStep<typeof relationalPostsSource>;
+              let $post: PgInsertStep<typeof relationalPostsResource>;
               for (let i = 0; i < 3; i++) {
-                const $item = pgInsert(relationalItemsSource, {
+                const $item = pgInsert(relationalItemsResource, {
                   type: constant`POST`,
                   author_id: constant(2),
                 });
                 const $itemId = $item.get("id");
-                $post = pgInsert(relationalPostsSource, {
+                $post = pgInsert(relationalPostsResource, {
                   id: $itemId,
                   title: constant(`Post #${i + 1}`),
                   description: constant(`Desc ${i + 1}`),
@@ -4962,7 +5021,12 @@ export function makeExampleSchema(
               // See NOTE in createRelationalPost plan.
               return $post!.record();
             },
-          [constant, pgInsert, relationalItemsSource, relationalPostsSource],
+          [
+            constant,
+            pgInsert,
+            relationalItemsResource,
+            relationalPostsResource,
+          ],
         ),
       },
 
@@ -4971,15 +5035,15 @@ export function makeExampleSchema(
           "This silly mutation is specifically to ensure that mutation plans are not tree-shaken even if they use plans that are normally side-effect free - we never want to throw away mutation side effects.",
         type: CreateRelationalPostPayload,
         plan: EXPORTABLE(
-          (TYPES, constant, pgSelect, relationalPostsSource, sql) =>
+          (TYPES, constant, pgSelect, relationalPostsResource, sql) =>
             function plan() {
               // Only the _last_ post plan is returned; there's no dependency on
               // the first two posts, and yet they should not be tree-shaken
               // because they're mutations.
-              let $post: PgSelectStep<typeof relationalPostsSource>;
+              let $post: PgSelectStep<typeof relationalPostsResource>;
               for (let i = 0; i < 3; i++) {
                 $post = pgSelect({
-                  source: relationalPostsSource,
+                  source: relationalPostsResource,
                   identifiers: [],
                   from: (authorId, title) =>
                     sql`interfaces_and_unions.insert_post(${authorId.placeholder}, ${title.placeholder})`,
@@ -5000,7 +5064,7 @@ export function makeExampleSchema(
               // See NOTE in createRelationalPost plan.
               return $post!.single().record();
             },
-          [TYPES, constant, pgSelect, relationalPostsSource, sql],
+          [TYPES, constant, pgSelect, relationalPostsResource, sql],
         ),
       },
 
@@ -5012,13 +5076,13 @@ export function makeExampleSchema(
         },
         type: UpdateRelationalPostByIdPayload,
         plan: EXPORTABLE(
-          (pgUpdate, relationalPostsSource) =>
+          (pgUpdate, relationalPostsResource) =>
             function plan(_$root, args) {
-              const $post = pgUpdate(relationalPostsSource, {
+              const $post = pgUpdate(relationalPostsResource, {
                 id: args.get(["input", "id"]),
               });
               for (const key of ["title", "description", "note"] as Array<
-                keyof typeof relationalPostsSource.codec.columns
+                keyof typeof relationalPostsResource.codec.columns
               >) {
                 const $rawValue = args.getRaw(["input", "patch", key]);
                 const $value = args.get(["input", "patch", key]);
@@ -5030,7 +5094,7 @@ export function makeExampleSchema(
               }
               return $post;
             },
-          [pgUpdate, relationalPostsSource],
+          [pgUpdate, relationalPostsResource],
         ),
       },
 
@@ -5042,14 +5106,14 @@ export function makeExampleSchema(
         },
         type: DeleteRelationalPostByIdPayload,
         plan: EXPORTABLE(
-          (pgDelete, relationalPostsSource) =>
+          (pgDelete, relationalPostsResource) =>
             function plan(_$root, args) {
-              const $post = pgDelete(relationalPostsSource, {
+              const $post = pgDelete(relationalPostsResource, {
                 id: args.get(["input", "id"]),
               });
               return $post;
             },
-          [pgDelete, relationalPostsSource],
+          [pgDelete, relationalPostsResource],
         ),
       },
 
@@ -5063,14 +5127,14 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (
             object,
-            relationalPostsSource,
+            relationalPostsResource,
             sleep,
             sql,
             withPgClientTransaction,
           ) =>
             function plan(_$root, args) {
               const $transactionResult = withPgClientTransaction(
-                relationalPostsSource.executor,
+                relationalPostsResource.executor,
                 object({
                   a: args.get(["input", "a"]) as ExecutableStep<
                     number | null | undefined
@@ -5113,7 +5177,13 @@ export function makeExampleSchema(
               );
               return $transactionResult;
             },
-          [object, relationalPostsSource, sleep, sql, withPgClientTransaction],
+          [
+            object,
+            relationalPostsResource,
+            sleep,
+            sql,
+            withPgClientTransaction,
+          ],
         ),
       },
     },
@@ -5142,11 +5212,11 @@ export function makeExampleSchema(
       message: {
         type: Message,
         plan: EXPORTABLE(
-          (messageSource) =>
+          (messageResource) =>
             function plan($event) {
-              return messageSource.get({ id: $event.get("id") });
+              return messageResource.get({ id: $event.get("id") });
             },
-          [messageSource],
+          [messageResource],
         ),
       },
     },
@@ -5219,9 +5289,9 @@ export function makeExampleSchema(
     extensions: {
       graphileExporter: {
         deps: [
-          relationalDividersSource,
-          relationalChecklistsSource,
-          relationalChecklistItemsSource,
+          relationalDividersResource,
+          relationalChecklistsResource,
+          relationalChecklistItemsResource,
         ],
       },
     },

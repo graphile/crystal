@@ -36,9 +36,9 @@ interface PgDeletePlanFinalizeResults {
 /**
  * Deletes a row in the database, can return columns from the deleted row.
  */
-export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
-  unknown[]
-> {
+export class PgDeleteStep<
+  TResource extends PgResourceAny,
+> extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgDeleteStep",
@@ -51,7 +51,7 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
    * Tells us what we're dealing with - data type, columns, where to delete it
    * from, what it's called, etc.
    */
-  public readonly source: TSource;
+  public readonly source: TResource;
 
   /**
    * This defaults to the name of the source but you can override it. Aids
@@ -72,7 +72,7 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
    * The columns and their dependency ids for us to find the record by.
    */
   private getBys: Array<{
-    name: keyof GetPgResourceColumns<TSource>;
+    name: keyof GetPgResourceColumns<TResource>;
     depId: number;
     pgCodec: PgCodecAny;
   }> = [];
@@ -101,10 +101,10 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
   private selects: Array<SQL> = [];
 
   constructor(
-    source: TSource,
+    source: TResource,
     getBy: PlanByUniques<
-      GetPgResourceColumns<TSource>,
-      GetPgResourceUniques<TSource>
+      GetPgResourceColumns<TResource>,
+      GetPgResourceUniques<TResource>
     >,
   ) {
     super();
@@ -114,8 +114,8 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.source.executor.context());
 
-    const keys: ReadonlyArray<keyof GetPgResourceColumns<TSource>> = getBy
-      ? (Object.keys(getBy) as Array<keyof GetPgResourceColumns<TSource>>)
+    const keys: ReadonlyArray<keyof GetPgResourceColumns<TResource>> = getBy
+      ? (Object.keys(getBy) as Array<keyof GetPgResourceColumns<TResource>>)
       : [];
 
     if (
@@ -145,7 +145,7 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
       const value = (getBy as any)![name as any];
       const depId = this.addDependency(value);
       const column = (
-        this.source.codec.columns as GetPgResourceColumns<TSource>
+        this.source.codec.columns as GetPgResourceColumns<TResource>
       )[name];
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
@@ -156,13 +156,16 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * deleteed row.
    */
-  get<TAttr extends keyof GetPgResourceColumns<TSource>>(
+  get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TSource>[TAttr] extends PgTypeColumn<infer UCodec, any>
+    GetPgResourceColumns<TResource>[TAttr] extends PgTypeColumn<
+      infer UCodec,
+      any
+    >
       ? UCodec
       : never,
-    TSource
+    TResource
   > {
     const dataSourceColumn: PgTypeColumn =
       this.source.codec.columns![attr as string];
@@ -194,10 +197,13 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
     return colPlan as any;
   }
 
-  public record(): PgClassExpressionStep<GetPgResourceCodec<TSource>, TSource> {
-    return pgClassExpression<GetPgResourceCodec<TSource>, TSource>(
+  public record(): PgClassExpressionStep<
+    GetPgResourceCodec<TResource>,
+    TResource
+  > {
+    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
-      this.source.codec as GetPgResourceCodec<TSource>,
+      this.source.codec as GetPgResourceCodec<TResource>,
     )`${this.alias}`;
   }
 
@@ -365,13 +371,13 @@ export class PgDeleteStep<TSource extends PgResourceAny> extends ExecutableStep<
 /**
  * Delete a row in `source` identified by the `getBy` unique condition.
  */
-export function pgDelete<TSource extends PgResourceAny>(
-  source: TSource,
+export function pgDelete<TResource extends PgResourceAny>(
+  source: TResource,
   getBy: PlanByUniques<
-    GetPgResourceColumns<TSource>,
-    GetPgResourceUniques<TSource>
+    GetPgResourceColumns<TResource>,
+    GetPgResourceUniques<TResource>
   >,
-): PgDeleteStep<TSource> {
+): PgDeleteStep<TResource> {
   return new PgDeleteStep(source, getBy);
 }
 

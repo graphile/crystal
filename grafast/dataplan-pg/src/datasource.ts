@@ -936,19 +936,19 @@ export interface PgRegistryBuilder<
     TRelations
   >;
 
-  addSource<const TSource extends PgResourceOptions<any, any, any, any>>(
-    source: TSource,
+  addResource<const TResource extends PgResourceOptions<any, any, any, any>>(
+    source: TResource,
   ): PgRegistryBuilder<
-    TSource extends PgResourceOptions<infer UCodec, any, any, any>
+    TResource extends PgResourceOptions<infer UCodec, any, any, any>
       ? UCodec extends PgCodec<infer UName, any, any, any, any, any, any>
         ? TCodecs & {
             [name in UName]: UCodec;
           }
         : never
       : never,
-    TSource extends PgResourceOptions<any, any, any, infer UName>
+    TResource extends PgResourceOptions<any, any, any, infer UName>
       ? TSources & {
-          [name in UName]: TSource;
+          [name in UName]: TResource;
         }
       : never,
     TRelations
@@ -1249,7 +1249,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return builder;
     },
     */
-    addSource(source) {
+    addResource(source) {
       this.addCodec(source.codec);
       registryConfig.pgResources[source.name] = source;
       return builder;

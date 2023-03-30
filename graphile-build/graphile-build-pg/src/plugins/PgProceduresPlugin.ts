@@ -565,7 +565,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           }
         })().then((resourceOptions) => {
           if (resourceOptions) {
-            registryBuilder.addSource(resourceOptions);
+            registryBuilder.addResource(resourceOptions);
           }
           return resourceOptions;
         });

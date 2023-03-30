@@ -41,13 +41,13 @@ interface PgInsertPlanFinalizeResults {
 /**
  * Inserts a row into source with the given specified column values.
  */
-export class PgInsertStep<TSource extends PgResourceAny>
+export class PgInsertStep<TResource extends PgResourceAny>
   extends ExecutableStep<
     unknown[] // tuple depending on what's selected
   >
   implements
     SetterCapableStep<{
-      [key in keyof GetPgResourceColumns<TSource> & string]: ExecutableStep;
+      [key in keyof GetPgResourceColumns<TResource> & string]: ExecutableStep;
     }>
 {
   static $$export = {
@@ -62,7 +62,7 @@ export class PgInsertStep<TSource extends PgResourceAny>
    * Tells us what we're dealing with - data type, columns, where to insert it,
    * what it's called, etc.
    */
-  public readonly source: TSource;
+  public readonly source: TResource;
 
   /**
    * This defaults to the name of the source but you can override it. Aids
@@ -83,7 +83,7 @@ export class PgInsertStep<TSource extends PgResourceAny>
    * The columns and their dependency ids for us to insert.
    */
   private columns: Array<{
-    name: keyof GetPgResourceColumns<TSource>;
+    name: keyof GetPgResourceColumns<TResource>;
     depId: number;
     // TODO: this shouldn't be needed, we can look it up in the codec?
     pgCodec: PgCodecAny;
@@ -111,9 +111,9 @@ export class PgInsertStep<TSource extends PgResourceAny>
   private selects: Array<SQL> = [];
 
   constructor(
-    source: TSource,
+    source: TResource,
     columns?: {
-      [key in keyof GetPgResourceColumns<TSource>]?: ExecutableStep<any>; // PgTypedExecutableStep<TColumns[key]["codec"]> |
+      [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep<any>; // PgTypedExecutableStep<TColumns[key]["codec"]> |
     },
   ) {
     super();
@@ -126,7 +126,7 @@ export class PgInsertStep<TSource extends PgResourceAny>
       Object.entries(columns).forEach(([key, value]) => {
         if (value) {
           this.set(
-            key as keyof GetPgResourceColumns<TSource>,
+            key as keyof GetPgResourceColumns<TResource>,
             value as ExecutableStep<any>,
           );
         }
@@ -134,7 +134,7 @@ export class PgInsertStep<TSource extends PgResourceAny>
     }
   }
 
-  set<TKey extends keyof GetPgResourceColumns<TSource>>(
+  set<TKey extends keyof GetPgResourceColumns<TResource>>(
     name: TKey,
     value: ExecutableStep<any>, // | PgTypedExecutableStep<TColumns[TKey]["codec"]>
   ): void {
@@ -149,7 +149,7 @@ export class PgInsertStep<TSource extends PgResourceAny>
       }
     }
     const column = (
-      this.source.codec.columns as NonNullable<GetPgResourceColumns<TSource>>
+      this.source.codec.columns as NonNullable<GetPgResourceColumns<TResource>>
     )?.[name];
     if (!column) {
       throw new Error(
@@ -163,7 +163,7 @@ export class PgInsertStep<TSource extends PgResourceAny>
 
   setPlan(): SetterStep<
     {
-      [key in keyof GetPgResourceColumns<TSource> &
+      [key in keyof GetPgResourceColumns<TResource> &
         string]: ExecutableStep<any>;
     },
     this
@@ -180,13 +180,13 @@ export class PgInsertStep<TSource extends PgResourceAny>
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * inserted row.
    */
-  get<TAttr extends keyof GetPgResourceColumns<TSource>>(
+  get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TSource>[TAttr] extends PgTypeColumn<infer UCodec>
+    GetPgResourceColumns<TResource>[TAttr] extends PgTypeColumn<infer UCodec>
       ? UCodec
       : never,
-    TSource
+    TResource
   > {
     if (!this.source.codec.columns) {
       throw new Error(`Cannot call .get() when there's no columns.`);
@@ -221,10 +221,13 @@ export class PgInsertStep<TSource extends PgResourceAny>
     return colPlan as any;
   }
 
-  public record(): PgClassExpressionStep<GetPgResourceCodec<TSource>, TSource> {
-    return pgClassExpression<GetPgResourceCodec<TSource>, TSource>(
+  public record(): PgClassExpressionStep<
+    GetPgResourceCodec<TResource>,
+    TResource
+  > {
+    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
-      this.source.codec as GetPgResourceCodec<TSource>,
+      this.source.codec as GetPgResourceCodec<TResource>,
     )`${this.alias}`;
   }
 
@@ -389,12 +392,12 @@ export class PgInsertStep<TSource extends PgResourceAny>
 /**
  * Inserts a row into source with the given specified column values.
  */
-export function pgInsert<TSource extends PgResourceAny>(
-  source: TSource,
+export function pgInsert<TResource extends PgResourceAny>(
+  source: TResource,
   columns?: {
-    [key in keyof GetPgResourceColumns<TSource>]?:
+    [key in keyof GetPgResourceColumns<TResource>]?:
       | PgTypedExecutableStep<
-          GetPgResourceColumns<TSource>[key] extends PgTypeColumn<
+          GetPgResourceColumns<TResource>[key] extends PgTypeColumn<
             infer UCodec,
             any
           >
@@ -403,7 +406,7 @@ export function pgInsert<TSource extends PgResourceAny>(
         >
       | ExecutableStep<any>;
   },
-): PgInsertStep<TSource> {
+): PgInsertStep<TResource> {
   return new PgInsertStep(source, columns);
 }
 

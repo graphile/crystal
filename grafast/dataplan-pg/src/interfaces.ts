@@ -21,12 +21,12 @@ import type { PgUpdateStep } from "./steps/pgUpdate.js";
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
 export type PgClassSingleStep<
-  TSource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any>,
 > =
-  | PgSelectSingleStep<TSource>
-  | PgInsertStep<TSource>
-  | PgUpdateStep<TSource>
-  | PgDeleteStep<TSource>;
+  | PgSelectSingleStep<TResource>
+  | PgInsertStep<TResource>
+  | PgUpdateStep<TResource>
+  | PgDeleteStep<TResource>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
@@ -773,17 +773,17 @@ export type GetPgRegistryCodecRelations<
 export type GetPgCodecColumns<TCodec extends PgCodecAny> =
   TCodec extends PgCodecWithColumns ? TCodec["columns"] : never;
 
-export type GetPgResourceRegistry<TSource extends PgResourceAny> =
-  TSource["registry"];
+export type GetPgResourceRegistry<TResource extends PgResourceAny> =
+  TResource["registry"];
 
-export type GetPgResourceCodec<TSource extends PgResourceAny> =
-  TSource["codec"];
+export type GetPgResourceCodec<TResource extends PgResourceAny> =
+  TResource["codec"];
 
-export type GetPgResourceColumns<TSource extends PgResourceAny> =
-  GetPgCodecColumns<TSource["codec"]>;
+export type GetPgResourceColumns<TResource extends PgResourceAny> =
+  GetPgCodecColumns<TResource["codec"]>;
 
-export type GetPgResourceRelations<TSource extends PgResourceAny> =
-  TSource["registry"]["pgRelations"][TSource["codec"]["name"]];
+export type GetPgResourceRelations<TResource extends PgResourceAny> =
+  TResource["registry"]["pgRelations"][TResource["codec"]["name"]];
 
-export type GetPgResourceUniques<TSource extends PgResourceAny> =
-  TSource["uniques"];
+export type GetPgResourceUniques<TResource extends PgResourceAny> =
+  TResource["uniques"];

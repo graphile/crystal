@@ -31,7 +31,7 @@ import { PgUpdateStep } from "./pgUpdate.js";
  */
 export class PgClassExpressionStep<
     TExpressionCodec extends PgCodecAny,
-    TSource extends PgResource<any, any, any, any, any>,
+    TResource extends PgResource<any, any, any, any, any>,
   >
   extends UnbatchedExecutableStep<any>
   implements PgTypedExecutableStep<TExpressionCodec>
@@ -63,7 +63,7 @@ export class PgClassExpressionStep<
   private needsPolymorphicUnwrap: boolean;
 
   constructor(
-    $table: PgClassSingleStep<TSource> | PgUnionAllSingleStep,
+    $table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
@@ -138,7 +138,7 @@ export class PgClassExpressionStep<
     >
       ? UCodec
       : never,
-    TSource
+    TResource
   > {
     const columns = this.pgCodec.columns;
     if (!columns) {
@@ -178,7 +178,7 @@ export class PgClassExpressionStep<
     )}` as any;
   }
 
-  public getParentStep(): PgClassSingleStep<TSource> | PgUnionAllSingleStep {
+  public getParentStep(): PgClassSingleStep<TResource> | PgUnionAllSingleStep {
     const step = this.getDep(this.tableId);
     if (
       !(step instanceof PgSelectSingleStep) &&
@@ -218,7 +218,7 @@ export class PgClassExpressionStep<
 
   public deduplicate(
     peers: Array<PgClassExpressionStep<any, any>>,
-  ): PgClassExpressionStep<TExpressionCodec, TSource>[] {
+  ): PgClassExpressionStep<TExpressionCodec, TResource>[] {
     const parentPlan = this.getParentStep();
     const classPlan =
       parentPlan instanceof PgSelectSingleStep
@@ -245,14 +245,14 @@ export class PgClassExpressionStep<
  */
 function pgClassExpression<
   TExpressionCodec extends PgCodecAny,
-  TSource extends PgResourceAny,
+  TResource extends PgResourceAny,
 >(
-  table: PgClassSingleStep<TSource> | PgUnionAllSingleStep,
+  table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
   codec: TExpressionCodec,
 ): (
   strings: TemplateStringsArray,
   ...dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL>
-) => PgClassExpressionStep<TExpressionCodec, TSource> {
+) => PgClassExpressionStep<TExpressionCodec, TResource> {
   return (strings, ...dependencies) => {
     return new PgClassExpressionStep(table, codec, strings, dependencies);
   };

@@ -18,7 +18,7 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
  * that represents a row from this table.
  */
 export class PgSingleTablePolymorphicStep<
-    TSource extends PgResource<any, any, any, any, any>,
+    TResource extends PgResource<any, any, any, any, any>,
   >
   extends ExecutableStep<unknown>
   implements PolymorphicStep
@@ -34,7 +34,7 @@ export class PgSingleTablePolymorphicStep<
 
   constructor(
     $typeName: ExecutableStep<string | null>,
-    $row: PgSelectSingleStep<TSource>,
+    $row: PgSelectSingleStep<TResource>,
   ) {
     super();
     this.typeStepId = this.addDependency($typeName);
@@ -47,7 +47,7 @@ export class PgSingleTablePolymorphicStep<
 
   deduplicate(
     peers: PgSingleTablePolymorphicStep<any>[],
-  ): PgSingleTablePolymorphicStep<TSource>[] {
+  ): PgSingleTablePolymorphicStep<TResource>[] {
     return peers;
   }
 
@@ -68,11 +68,11 @@ export class PgSingleTablePolymorphicStep<
 }
 
 export function pgSingleTablePolymorphic<
-  TSource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any>,
 >(
   $typeName: ExecutableStep<string | null>,
-  $row: PgSelectSingleStep<TSource>,
-): PgSingleTablePolymorphicStep<TSource> {
+  $row: PgSelectSingleStep<TResource>,
+): PgSingleTablePolymorphicStep<TResource> {
   return new PgSingleTablePolymorphicStep($typeName, $row);
 }
 

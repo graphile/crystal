@@ -217,14 +217,14 @@ function assertSensible(step: ExecutableStep): void {
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
 export interface PgSelectOptions<
-  TSource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any>,
 > {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
    * below.
    */
-  source: TSource;
+  source: TResource;
 
   /**
    * The identifiers to limit the results down to just the row(s) you care
@@ -275,14 +275,14 @@ export interface PgSelectOptions<
  * don't allow `UNION`/`INTERSECT`/`EXCEPT`/`FOR UPDATE`/etc at this time,
  * purely because it hasn't been sufficiently considered.
  */
-export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
+export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
   extends ExecutableStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
   implements
     StreamableStep<unknown[]>,
     ConnectionCapableStep<
-      PgSelectSingleStep<TSource>,
+      PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
     >
 {
@@ -322,11 +322,11 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
   /**
    * The data source from which we are selecting: table, view, etc
    */
-  public readonly source: TSource;
+  public readonly source: TResource;
 
   // JOIN
 
-  private relationJoins: Map<keyof GetPgResourceRelations<TSource>, SQL>;
+  private relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
   private joins: Array<PgSelectPlanJoin>;
 
   // WHERE
@@ -491,10 +491,10 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
 
   private locker: PgLocker<this> = new PgLocker(this);
 
-  constructor(options: PgSelectOptions<TSource>);
-  constructor(cloneFrom: PgSelectStep<TSource>, mode?: PgSelectMode);
+  constructor(options: PgSelectOptions<TResource>);
+  constructor(cloneFrom: PgSelectStep<TResource>, mode?: PgSelectMode);
   constructor(
-    optionsOrCloneFrom: PgSelectStep<TSource> | PgSelectOptions<TSource>,
+    optionsOrCloneFrom: PgSelectStep<TResource> | PgSelectOptions<TResource>,
     overrideMode?: PgSelectMode,
   ) {
     super();
@@ -850,7 +850,7 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
    * SELECT, WHERE and ORDER BY.
    */
   public singleRelation<
-    TRelationName extends keyof GetPgResourceRelations<TSource> & string,
+    TRelationName extends keyof GetPgResourceRelations<TResource> & string,
   >(relationIdentifier: TRelationName): SQL {
     const relation = this.source.getRelation(
       relationIdentifier,
@@ -956,14 +956,14 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
    * connections/etc (e.g. copying `where` conditions but adding more, or
    * pagination, or grouping, aggregates, etc)
    */
-  clone(mode?: PgSelectMode): PgSelectStep<TSource> {
+  clone(mode?: PgSelectMode): PgSelectStep<TResource> {
     return new PgSelectStep(this, mode);
   }
 
   connectionClone(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgSelectMode,
-  ): PgSelectStep<TSource> {
+  ): PgSelectStep<TResource> {
     const $plan = this.clone(mode);
     // In case any errors are raised
     $plan.addDependency($connection);
@@ -972,7 +972,7 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
 
   where(
     condition: PgWhereConditionSpec<
-      keyof GetPgResourceColumns<TSource> & string
+      keyof GetPgResourceColumns<TResource> & string
     >,
   ): void {
     if (this.locker.locked) {
@@ -1037,7 +1037,7 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
 
   having(
     condition: PgHavingConditionSpec<
-      keyof GetPgResourceColumns<TSource> & string
+      keyof GetPgResourceColumns<TResource> & string
     >,
   ): void {
     if (this.locker.locked) {
@@ -2159,9 +2159,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     super.finalize();
   }
 
-  deduplicate(peers: PgSelectStep<any>[]): PgSelectStep<TSource>[] {
+  deduplicate(peers: PgSelectStep<any>[]): PgSelectStep<TResource>[] {
     this.locker.lockAllParameters();
-    return peers.filter(($p): $p is PgSelectStep<TSource> => {
+    return peers.filter(($p): $p is PgSelectStep<TResource> => {
       if ($p === this) {
         return true;
       }
@@ -2327,7 +2327,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     });
   }
 
-  public deduplicatedWith(replacement: PgSelectStep<TSource>): void {
+  public deduplicatedWith(replacement: PgSelectStep<TResource>): void {
     if (
       typeof this.symbol === "symbol" &&
       typeof replacement.symbol === "symbol"
@@ -2746,7 +2746,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
    */
   singleAsRecord(
     options?: PgSelectSinglePlanOptions,
-  ): PgSelectSingleStep<TSource> {
+  ): PgSelectSingleStep<TResource> {
     this.setUnique(true);
     // TODO: should this be on a clone plan? I don't currently think so since
     // PgSelectSingleStep does not allow for `.where` divergence (since it
@@ -2765,7 +2765,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
    */
   single(
     options?: PgSelectSinglePlanOptions,
-  ): TSource extends PgResource<
+  ): TResource extends PgResource<
     any,
     PgCodec<any, infer UColumns, any, any, any, any, any>,
     any,
@@ -2773,10 +2773,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     any
   >
     ? UColumns extends PgTypeColumns
-      ? PgSelectSingleStep<TSource>
+      ? PgSelectSingleStep<TResource>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
-          TSource
+          TResource
         >
     : never {
     const $single = this.singleAsRecord(options);
@@ -2799,7 +2799,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
    */
   listItem(
     itemPlan: ExecutableStep,
-  ): TSource extends PgResource<
+  ): TResource extends PgResource<
     any,
     PgCodec<any, infer UColumns, any, any, any, any, any>,
     any,
@@ -2807,10 +2807,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     any
   >
     ? UColumns extends PgTypeColumns
-      ? PgSelectSingleStep<TSource>
+      ? PgSelectSingleStep<TResource>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
-          TSource
+          TResource
         >
     : never {
     const $single = new PgSelectSingleStep(this, itemPlan);
@@ -2874,9 +2874,9 @@ function ensureOrderIsUnique(step: PgSelectStep<any>) {
   }
 }
 
-export function pgSelect<TSource extends PgResource<any, any, any, any, any>>(
-  options: PgSelectOptions<TSource>,
-): PgSelectStep<TSource> {
+export function pgSelect<TResource extends PgResource<any, any, any, any, any>>(
+  options: PgSelectOptions<TResource>,
+): PgSelectStep<TResource> {
   return new PgSelectStep(options);
 }
 exportAs("@dataplan/pg", pgSelect, "pgSelect");
@@ -2885,20 +2885,20 @@ exportAs("@dataplan/pg", pgSelect, "pgSelect");
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
  */
 export function pgSelectFromRecords<
-  TSource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any>,
 >(
-  source: TSource,
+  source: TResource,
   records: PgClassExpressionStep<
-    PgCodec<any, undefined, any, any, GetPgResourceCodec<TSource>, any, any>,
-    TSource
+    PgCodec<any, undefined, any, any, GetPgResourceCodec<TResource>, any, any>,
+    TResource
   >,
-): PgSelectStep<TSource> {
-  return new PgSelectStep<TSource>({
+): PgSelectStep<TResource> {
+  return new PgSelectStep<TResource>({
     source,
     identifiers: [],
     from: (records) => sql`unnest(${records.placeholder})`,
     args: [{ step: records, pgCodec: listOfCodec(source.codec) }],
-  }) as PgSelectStep<TSource>;
+  }) as PgSelectStep<TResource>;
 }
 
 exportAs("@dataplan/pg", pgSelectFromRecords, "pgSelectFromRecords");

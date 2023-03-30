@@ -334,13 +334,13 @@ async function main() {
         },
       });
       return makeRegistryBuilder()
-        .addSource(usersResourceOptions)
-        .addSource(forumsResourceOptions)
-        .addSource(messagesResourceOptions)
-        .addSource(uniqueAuthorCountResourceOptions)
-        .addSource(forumsUniqueAuthorCountResourceOptions)
-        .addSource(forumsRandomUserResourceOptions)
-        .addSource(forumsFeaturedMessagesResourceOptions)
+        .addResource(usersResourceOptions)
+        .addResource(forumsResourceOptions)
+        .addResource(messagesResourceOptions)
+        .addResource(uniqueAuthorCountResourceOptions)
+        .addResource(forumsUniqueAuthorCountResourceOptions)
+        .addResource(forumsRandomUserResourceOptions)
+        .addResource(forumsFeaturedMessagesResourceOptions)
         .addRelation(
           usersResourceOptions.codec,
           "messages",
