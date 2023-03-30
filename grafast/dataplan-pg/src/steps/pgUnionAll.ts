@@ -171,7 +171,7 @@ export interface PgUnionAllStepConfig<
   TAttributes extends string,
   TTypeNames extends string,
 > {
-  sourceByTypeName: {
+  resourceByTypeName: {
     [typeName in TTypeNames]: PgResource<any, any, any, any, any>;
   };
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
@@ -241,7 +241,7 @@ export class PgUnionAllSingleStep
         `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
-    const source = this.spec.sourceByTypeName[objectType.name];
+    const source = this.spec.resourceByTypeName[objectType.name];
     if (!source) {
       // This type isn't handled; so it should never occur
       return constant(null);
@@ -603,16 +603,16 @@ export class PgUnionAllStep<
       const members =
         spec.members ??
         (
-          Object.entries(spec.sourceByTypeName) as Array<
+          Object.entries(spec.resourceByTypeName) as Array<
             [
               typeName: TTypeNames,
               resource: PgResource<any, any, any, any, any>,
             ]
           >
         ).map(
-          ([typeName, source]): PgUnionAllStepMember<TTypeNames> => ({
+          ([typeName, resource]): PgUnionAllStepMember<TTypeNames> => ({
             typeName,
-            resource: source,
+            resource,
           }),
         );
 

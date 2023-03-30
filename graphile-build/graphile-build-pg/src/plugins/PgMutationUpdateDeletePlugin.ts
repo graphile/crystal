@@ -195,7 +195,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         return this.upperCamelCase(`${this.updateNodeField(details)}-input`);
       },
 
-      deletedNodeId(options, { resource: resource }) {
+      deletedNodeId(options, { resource }) {
         return this.camelCase(
           `deleted-${this._singularizedResourceName(
             resource,
@@ -203,7 +203,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         );
       },
 
-      deleteNodeField(options, { resource: resource, unique: _unique }) {
+      deleteNodeField(options, { resource, unique: _unique }) {
         return this.camelCase(
           `delete-${this._singularizedResourceName(resource)}`,
         );
@@ -212,7 +212,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         return this.upperCamelCase(`${this.deleteNodeField(details)}-input`);
       },
 
-      updateByKeysField(options, { resource: resource, unique }) {
+      updateByKeysField(options, { resource, unique }) {
         return this.camelCase(
           `update-${this._singularizedResourceName(
             resource,
@@ -223,7 +223,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         return this.upperCamelCase(`${this.updateByKeysField(details)}-input`);
       },
 
-      deleteByKeysField(options, { resource: resource, unique }) {
+      deleteByKeysField(options, { resource, unique }) {
         return this.camelCase(
           `delete-${this._singularizedResourceName(
             resource,
@@ -257,8 +257,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
           const payloadTypeName =
             mode === "source:update"
-              ? inflection.updatePayloadType({ resource: resource })
-              : inflection.deletePayloadType({ resource: resource });
+              ? inflection.updatePayloadType({ resource })
+              : inflection.deletePayloadType({ resource });
 
           // Payload type is shared independent of the keys used
           build.registerObjectType(
@@ -285,7 +285,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   const deletedNodeIdFieldName =
                     build.getNodeIdHandler !== undefined
                       ? inflection.deletedNodeId({
-                          resource: resource,
+                          resource,
                         })
                       : null;
                   const TableType = build.getGraphQLTypeByPgCodec(
@@ -597,8 +597,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           for (const resource of resources) {
             const payloadTypeName =
               mode === "source:update"
-                ? inflection.updatePayloadType({ resource: resource })
-                : inflection.deletePayloadType({ resource: resource });
+                ? inflection.updatePayloadType({ resource })
+                : inflection.deletePayloadType({ resource });
             const primaryUnique = resource.uniques.find(
               (u: PgResourceUnique) => u.isPrimary,
             );

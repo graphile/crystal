@@ -391,24 +391,20 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         // to use the final PgRegistry, not the PgRegistryBuilder.
 
         const { registry } = event;
-        for (const source of Object.values(registry.pgResources) as PgResource<
-          any,
-          any,
-          any,
-          any,
-          any
-        >[]) {
-          if (source.parameters || !source.codec.columns) {
+        for (const resource of Object.values(
+          registry.pgResources,
+        ) as PgResource<any, any, any, any, any>[]) {
+          if (resource.parameters || !resource.codec.columns) {
             continue;
           }
-          if (!source.extensions?.pg) {
+          if (!resource.extensions?.pg) {
             continue;
           }
           const {
             schemaName: sourceSchemaName,
             databaseName,
             name: sourceClassName,
-          } = source.extensions.pg;
+          } = resource.extensions.pg;
 
           const pgClass = await info.helpers.pgIntrospection.getClassByName(
             databaseName,
@@ -419,10 +415,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const relations = registry.pgRelations[source.codec.name] as {
+          const relations = registry.pgRelations[resource.codec.name] as {
             [relationName: string]: PgCodecRelation<any, any>;
           };
-          const poly = (source.codec as PgCodecAny).polymorphism;
+          const poly = (resource.codec as PgCodecAny).polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
@@ -511,7 +507,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   ]) ?? "";
                 const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
                   {
-                    resource: source,
+                    resource,
                     relationName,
                   };
                 const singleRecordFieldName = relationSpec.isReferencee

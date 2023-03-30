@@ -726,7 +726,7 @@ function addRelations(
       throw new Error(`Cannot call resolvePath unless there's a source`);
     }
     const result = {
-      resource: resource,
+      resource,
       hasReferencee: false,
       isUnique: true,
       layers: [] as Layer[],
@@ -816,7 +816,7 @@ function addRelations(
         tagToString(relation.remoteResource.extensions?.tags?.deprecated);
 
       const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
-        resource: resource,
+        resource,
         relationName,
       };
 
@@ -1000,20 +1000,15 @@ function addRelations(
             let isStillSingular = true;
             for (let i = 0, l = path.layers.length; i < l; i++) {
               const layer = path.layers[i];
-              const {
-                localColumns,
-                remoteColumns,
-                resource: source,
-                isUnique,
-              } = layer;
+              const { localColumns, remoteColumns, resource, isUnique } = layer;
               const clean =
                 localColumns.every(isSafeObjectPropertyName) &&
                 remoteColumns.every(isSafeObjectPropertyName);
               const sourceName = idents.makeSafeIdentifier(
-                `${source.name}Source`,
+                `${resource.name}Source`,
               );
               prefixLines.push(
-                te`const ${te.identifier(sourceName)} = ${te.ref(source)};`,
+                te`const ${te.identifier(sourceName)} = ${te.ref(resource)};`,
               );
               if (isStillSingular) {
                 if (!isUnique) {
@@ -1023,8 +1018,8 @@ function addRelations(
                   idents.makeSafeIdentifier(
                     `$${
                       isUnique
-                        ? build.inflection.singularize(source.name)
-                        : build.inflection.pluralize(source.name)
+                        ? build.inflection.singularize(resource.name)
+                        : build.inflection.pluralize(resource.name)
                     }`,
                   ),
                 );
@@ -1060,7 +1055,7 @@ function addRelations(
               } else {
                 const newIdentifier = te.identifier(
                   idents.makeSafeIdentifier(
-                    `$${build.inflection.pluralize(source.name)}`,
+                    `$${build.inflection.pluralize(resource.name)}`,
                   ),
                 );
                 /*
@@ -1126,28 +1121,28 @@ function addRelations(
             const isConnection = mode === "connection";
             const attributes: PgUnionAllStepConfigAttributes<string> =
               unionAttributes ?? {};
-            const sourceByTypeName: {
+            const resourceByTypeName: {
               [typeName: string]: PgResource<any, any, any, any, any>;
             } = Object.create(null);
             const members: PgUnionAllStepMember<string>[] = [];
             for (const path of paths) {
               const [firstLayer, ...rest] = path.layers;
               const memberPath: PgCodecRefPath = [];
-              let finalSource = firstLayer.resource;
+              let finalResource = firstLayer.resource;
               for (const layer of rest) {
                 const { relationName } = layer;
                 memberPath!.push({ relationName });
-                finalSource = layer.resource;
+                finalResource = layer.resource;
               }
-              const typeName = build.inflection.tableType(finalSource.codec);
+              const typeName = build.inflection.tableType(finalResource.codec);
               const member: PgUnionAllStepMember<string> = {
                 resource: firstLayer.resource,
                 typeName,
                 path: memberPath,
               };
               members.push(member);
-              if (!sourceByTypeName[typeName]) {
-                sourceByTypeName[typeName] = finalSource;
+              if (!resourceByTypeName[typeName]) {
+                resourceByTypeName[typeName] = finalResource;
               }
             }
             return EXPORTABLE(
@@ -1160,7 +1155,7 @@ function addRelations(
                   paths,
                   pgUnionAll,
                   single,
-                  sourceByTypeName,
+                  resourceByTypeName,
                 ) =>
                 ($parent: ExecutableStep<any>) => {
                   const $record = isMutationPayload
@@ -1186,7 +1181,7 @@ function addRelations(
                   }
                   const $list = pgUnionAll({
                     attributes,
-                    sourceByTypeName,
+                    resourceByTypeName,
                     members,
                   });
                   if (isConnection) {
@@ -1206,7 +1201,7 @@ function addRelations(
                 paths,
                 pgUnionAll,
                 single,
-                sourceByTypeName,
+                resourceByTypeName,
               ],
             );
           };

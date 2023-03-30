@@ -16,7 +16,7 @@ declare global {
     interface Inflection {
       /**
        * The field name for a Cursor Connection field that returns all rows
-       * from the given source.
+       * from the given resource.
        */
       allRowsConnection(
         this: Inflection,
@@ -25,7 +25,7 @@ declare global {
 
       /**
        * The field name for a List field that returns all rows from the given
-       * source.
+       * resource.
        */
       allRowsList(
         this: Inflection,
@@ -43,17 +43,17 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      allRowsConnection(options, source) {
+      allRowsConnection(options, resource) {
         return this.connectionField(
           this.camelCase(
-            `all-${this.pluralize(this._singularizedResourceName(source))}`,
+            `all-${this.pluralize(this._singularizedResourceName(resource))}`,
           ),
         );
       },
-      allRowsList(options, source) {
+      allRowsList(options, resource) {
         return this.listField(
           this.camelCase(
-            `all-${this.pluralize(this._singularizedResourceName(source))}`,
+            `all-${this.pluralize(this._singularizedResourceName(resource))}`,
           ),
         );
       },
@@ -70,26 +70,26 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
         if (!context.scope.isRootQuery) {
           return fields;
         }
-        for (const source of Object.values(
+        for (const resource of Object.values(
           build.input.pgRegistry.pgResources,
         )) {
-          if (source.parameters) {
+          if (resource.parameters) {
             // Skip functions
             continue;
           }
-          if (!source.find || source.isVirtual) {
+          if (!resource.find || resource.isVirtual) {
             continue;
           }
           const type = build.getTypeByName(
-            build.inflection.tableType(source.codec),
+            build.inflection.tableType(resource.codec),
           );
           if (!type) {
             continue;
           }
 
           const behavior = getBehavior([
-            source.codec.extensions,
-            source.extensions,
+            resource.codec.extensions,
+            resource.extensions,
           ]);
           const defaultBehavior = "connection -list";
 
@@ -100,7 +100,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
               defaultBehavior,
             )
           ) {
-            const fieldName = build.inflection.allRowsList(source);
+            const fieldName = build.inflection.allRowsList(resource);
             fields = build.extend(
               fields,
               {
@@ -109,29 +109,29 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     fieldName,
                     fieldBehaviorScope: `query:source:list`,
                     isPgFieldSimpleCollection: true,
-                    pgResource: source,
+                    pgResource: resource,
                   },
                   () => ({
                     type: new GraphQLList(
                       new GraphQLNonNull(type),
                     ) as GraphQLOutputType,
                     description: `Reads a set of \`${build.inflection.tableType(
-                      source.codec,
+                      resource.codec,
                     )}\`.`,
                     deprecationReason: tagToString(
-                      source.extensions?.tags?.deprecated,
+                      resource.extensions?.tags?.deprecated,
                     ),
                     plan: EXPORTABLE(
-                      (source) =>
+                      (resource) =>
                         function plan() {
-                          return source.find();
+                          return resource.find();
                         },
-                      [source],
+                      [resource],
                     ),
                   }),
                 ),
               },
-              `Adding 'all rows' list field for PgResource ${source}`,
+              `Adding 'all rows' list field for PgResource ${resource}`,
             );
           }
 
@@ -142,9 +142,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
               defaultBehavior,
             )
           ) {
-            const fieldName = build.inflection.allRowsConnection(source);
+            const fieldName = build.inflection.allRowsConnection(resource);
             const connectionType = build.getTypeByName(
-              build.inflection.tableConnectionType(source.codec),
+              build.inflection.tableConnectionType(resource.codec),
             ) as GraphQLObjectType | undefined;
             if (connectionType) {
               fields = build.extend(
@@ -155,27 +155,27 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                       fieldName,
                       fieldBehaviorScope: `query:source:connection`,
                       isPgFieldConnection: true,
-                      pgResource: source,
+                      pgResource: resource,
                     },
                     () => ({
                       type: connectionType,
                       description: `Reads and enables pagination through a set of \`${build.inflection.tableType(
-                        source.codec,
+                        resource.codec,
                       )}\`.`,
                       deprecationReason: tagToString(
-                        source.extensions?.tags?.deprecated,
+                        resource.extensions?.tags?.deprecated,
                       ),
                       plan: EXPORTABLE(
-                        (connection, source) =>
+                        (connection, resource) =>
                           function plan() {
-                            return connection(source.find());
+                            return connection(resource.find());
                           },
-                        [connection, source],
+                        [connection, resource],
                       ),
                     }),
                   ),
                 },
-                `Adding 'all rows' connection field for PgResource ${source}`,
+                `Adding 'all rows' connection field for PgResource ${resource}`,
               );
             }
           }

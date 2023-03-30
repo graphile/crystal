@@ -4498,7 +4498,7 @@ export function makeExampleSchema(
                     codec: TYPES.float,
                   },
                 },
-                sourceByTypeName: {
+                resourceByTypeName: {
                   FirstPartyVulnerability: firstPartyVulnerabilitiesResource,
                   ThirdPartyVulnerability: thirdPartyVulnerabilitiesResource,
                 },
@@ -4698,7 +4698,7 @@ export function makeExampleSchema(
                     codec: TYPES.float,
                   },
                 },
-                sourceByTypeName: {
+                resourceByTypeName: {
                   FirstPartyVulnerability: firstPartyVulnerabilitiesResource,
                   ThirdPartyVulnerability: thirdPartyVulnerabilitiesResource,
                 },
