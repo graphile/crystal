@@ -178,7 +178,7 @@ export interface PgResourceOptions<
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
   selectAuth?: (
-    $step: PgSelectStep<PgResource<any, TCodec, any, any, any>>,
+    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
   ) => void;
 
   name: TName;
@@ -229,7 +229,7 @@ export interface PgFunctionSourceOptions<
   extensions?: PgResourceExtensions;
   isMutation?: boolean;
   selectAuth?: (
-    $step: PgSelectStep<PgResource<any, TCodec, any, any, any>>,
+    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
   ) => void;
   description?: string;
 }
@@ -299,7 +299,12 @@ export class PgResource<
   static configFromCodec<TCodec extends PgTypeCodecAny>(
     executor: PgExecutor,
     baseCodec: TCodec,
-  ): PgResourceOptions<TCodec, never[]> {
+  ): PgResourceOptions<
+    TCodec,
+    ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+    undefined,
+    string
+  > {
     const codec: CodecWithSource<typeof baseCodec> = baseCodec;
     if (!codec[$$codecSource]) {
       codec[$$codecSource] = new Map();

@@ -770,44 +770,30 @@ export type PgRegistryAny = PgRegistry<
 >;
 
 export type GetPgRegistryCodecs<TRegistry extends PgRegistry<any, any, any>> =
-  TRegistry extends PgRegistry<infer UCodecs, any, any> ? UCodecs : never;
+  TRegistry["pgCodecs"];
 
 export type GetPgRegistrySources<TRegistry extends PgRegistry<any, any, any>> =
-  TRegistry extends PgRegistry<any, infer USources, any> ? USources : never;
+  TRegistry["pgSources"];
 
 export type GetPgRegistryCodecRelations<
   TRegistry extends PgRegistry<any, any, any>,
-  TCodec extends GetPgRegistryCodecs<TRegistry>[keyof GetPgRegistryCodecs<TRegistry>],
-> = TRegistry extends PgRegistry<any, any, infer URelations>
-  ? TCodec extends PgTypeCodec<infer UCodecName, any, any, any, any, any, any>
-    ? URelations[UCodecName]
-    : never
-  : never;
+  TCodec extends PgTypeCodec<any, any, any, any, any, any, any>,
+> = TRegistry["pgRelations"][TCodec["name"]];
 
 export type GetPgCodecColumns<TCodec extends PgTypeCodecAny> =
-  TCodec extends PgTypeCodec<string, infer UColumns, any, any, any, any, any>
-    ? UColumns extends PgTypeColumns
-      ? UColumns
-      : never
-    : never;
+  TCodec extends PgTypeCodecWithColumns ? TCodec["columns"] : never;
 
 export type GetPgResourceRegistry<TSource extends PgResourceAny> =
-  TSource extends PgResource<infer URegistry, any, any, any, any>
-    ? URegistry
-    : never;
+  TSource["registry"];
 
 export type GetPgResourceCodec<TSource extends PgResourceAny> =
-  TSource extends PgResource<any, infer UCodec, any, any, any> ? UCodec : never;
+  TSource["codec"];
 
 export type GetPgResourceColumns<TSource extends PgResourceAny> =
-  GetPgCodecColumns<GetPgResourceCodec<TSource>>;
+  GetPgCodecColumns<TSource["codec"]>;
 
 export type GetPgResourceRelations<TSource extends PgResourceAny> =
-  TSource extends PgResource<infer URegistry, infer UCodec, any, any, any>
-    ? GetPgRegistryCodecRelations<URegistry, UCodec>
-    : never;
+  TSource["registry"]["pgRelations"][TSource["codec"]["name"]];
 
 export type GetPgResourceUniques<TSource extends PgResourceAny> =
-  TSource extends PgResource<any, any, infer UUniques, any, any>
-    ? UUniques
-    : never;
+  TSource["uniques"];

@@ -4,6 +4,7 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type {
+  PgClassExpressionStep,
   PgRegistry,
   PgSelectSingleStep,
   PgTypeCodec,
@@ -105,7 +106,10 @@ const getSource = EXPORTABLE(
         // TODO: yuck; we should not be building a PgResource on demand. We
         // should be able to detect this is necessary and add it to the
         // registry preemptively.
-        new PgResource(registry, PgResource.configFromCodec(executor, baseCodec));
+        new PgResource(
+          registry,
+          PgResource.configFromCodec(executor, baseCodec),
+        );
       return source;
     },
   [PgResource],
@@ -262,7 +266,10 @@ function processColumn(
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
-                const $val = $record.get(columnName);
+                const $val = $record.get(columnName) as PgClassExpressionStep<
+                  PgTypeCodec<any, undefined, any, any, any, any, any>,
+                  any
+                >;
                 const $select = pgSelectFromRecords(
                   getSource(registry, baseCodec, pgSources, $record),
                   $val,
