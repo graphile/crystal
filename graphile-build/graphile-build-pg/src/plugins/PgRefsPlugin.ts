@@ -65,7 +65,7 @@ interface State {
   sourceEvents: Array<{
     databaseName: string;
     pgClass: PgClass;
-    source: PgResource<any, any, any, undefined, any>;
+    resource: PgResource<any, any, any, undefined, any>;
     relations: GraphileConfig.PgTablesPluginSourceRelations;
   }>;
 }

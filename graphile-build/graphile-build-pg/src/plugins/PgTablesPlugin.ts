@@ -46,7 +46,7 @@ declare global {
        */
       _sourceName(
         this: Inflection,
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -54,7 +54,7 @@ declare global {
        */
       _singularizedResourceName(
         this: Inflection,
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -150,7 +150,7 @@ declare global {
     }
     interface ScopeObjectFieldsField {
       // TODO: put 'field' into all these names?
-      pgSource?: PgResource<any, any, any, any, any>;
+      pgResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
@@ -158,7 +158,7 @@ declare global {
     }
     interface ScopeInterfaceFieldsField {
       // TODO: put 'field' into all these names?
-      pgSource?: PgResource<any, any, any, any, any>;
+      pgResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;

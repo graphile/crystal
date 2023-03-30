@@ -27,7 +27,7 @@ import { version } from "../version.js";
 
 // TODO: these should be used, surely?
 interface _ComputedColumnDetails {
-  source: PgResource<
+  resource: PgResource<
     any,
     any,
     any,
@@ -36,7 +36,7 @@ interface _ComputedColumnDetails {
   >;
 }
 interface _ArgumentDetails {
-  source: PgResource<
+  resource: PgResource<
     any,
     any,
     any,
@@ -99,7 +99,12 @@ declare global {
           databaseName: string;
           pgProc: PgProc;
           baseResourceOptions: PgResourceOptions<any, any, any, any>;
-          functionResourceOptions: PgFunctionResourceOptions<any, any, any, any>;
+          functionResourceOptions: PgFunctionResourceOptions<
+            any,
+            any,
+            any,
+            any
+          >;
         }) => void | Promise<void>
       >;
 
@@ -471,10 +476,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               pgType.typrelid!,
             );
             if (!pgClass) return null;
-            const resourceOptions = await info.helpers.pgTables.getResourceOptions(
-              databaseName,
-              pgClass,
-            );
+            const resourceOptions =
+              await info.helpers.pgTables.getResourceOptions(
+                databaseName,
+                pgClass,
+              );
 
             const sourceConfig = await (async () => {
               if (resourceOptions) {

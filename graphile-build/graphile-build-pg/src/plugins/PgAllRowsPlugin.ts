@@ -20,7 +20,7 @@ declare global {
        */
       allRowsConnection(
         this: Inflection,
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -29,7 +29,7 @@ declare global {
        */
       allRowsList(
         this: Inflection,
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
     }
   }
@@ -70,7 +70,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
         if (!context.scope.isRootQuery) {
           return fields;
         }
-        for (const source of Object.values(build.input.pgRegistry.pgResources)) {
+        for (const source of Object.values(
+          build.input.pgRegistry.pgResources,
+        )) {
           if (source.parameters) {
             // Skip functions
             continue;
@@ -107,7 +109,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     fieldName,
                     fieldBehaviorScope: `query:source:list`,
                     isPgFieldSimpleCollection: true,
-                    pgSource: source,
+                    pgResource: source,
                   },
                   () => ({
                     type: new GraphQLList(
@@ -153,7 +155,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                       fieldName,
                       fieldBehaviorScope: `query:source:connection`,
                       isPgFieldConnection: true,
-                      pgSource: source,
+                      pgResource: source,
                     },
                     () => ({
                       type: connectionType,

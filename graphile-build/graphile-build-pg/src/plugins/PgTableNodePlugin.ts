@@ -76,8 +76,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             );
             continue;
           }
-          const pgSource = sources[0];
-          const primaryKey = (pgSource.uniques as PgResourceUnique[]).find(
+          const pgResource = sources[0];
+          const primaryKey = (pgResource.uniques as PgResourceUnique[]).find(
             (u) => u.isPrimary === true,
           );
           if (!primaryKey) {
@@ -88,8 +88,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           const identifier =
             // Yes, this behaviour in V4 was ridiculous. Alas.
             build.options.pgV4UseTableNameForNodeIdentifier &&
-            pgSource.extensions?.pg?.name
-              ? build.inflection.pluralize(pgSource.extensions.pg.name)
+            pgResource.extensions?.pg?.name
+              ? build.inflection.pluralize(pgResource.extensions.pg.name)
               : tableTypeName;
 
           const clean =
@@ -157,8 +157,8 @@ return function (access) {
                   [access, pk],
                 ),
             get: EXPORTABLE(
-              (pgSource) => (spec: any) => pgSource.get(spec),
-              [pgSource],
+              (pgResource) => (spec: any) => pgResource.get(spec),
+              [pgResource],
             ),
             match: EXPORTABLE(
               (identifier) => (obj) => {

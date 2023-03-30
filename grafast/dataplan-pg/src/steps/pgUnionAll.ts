@@ -128,8 +128,14 @@ type PgUnionAllStepSelect<TAttributes extends string> =
       expression: SQL;
     };
 
-export interface PgUnionAllSourceSpec {
-  source: PgResource<any, any, ReadonlyArray<PgResourceUnique<any>>, any, any>;
+export interface PgUnionAllResourceSpec {
+  resource: PgResource<
+    any,
+    any,
+    ReadonlyArray<PgResourceUnique<any>>,
+    any,
+    any
+  >;
 }
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
@@ -140,7 +146,13 @@ export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
 
 export interface PgUnionAllStepMember<TTypeNames extends string> {
   typeName: TTypeNames;
-  source: PgResource<any, any, ReadonlyArray<PgResourceUnique<any>>, any, any>;
+  resource: PgResource<
+    any,
+    any,
+    ReadonlyArray<PgResourceUnique<any>>,
+    any,
+    any
+  >;
   match?: {
     [sourceColumnName: string]:
       | {
@@ -592,12 +604,15 @@ export class PgUnionAllStep<
         spec.members ??
         (
           Object.entries(spec.sourceByTypeName) as Array<
-            [typeName: TTypeNames, source: PgResource<any, any, any, any, any>]
+            [
+              typeName: TTypeNames,
+              resource: PgResource<any, any, any, any, any>,
+            ]
           >
         ).map(
           ([typeName, source]): PgUnionAllStepMember<TTypeNames> => ({
             typeName,
-            source,
+            resource: source,
           }),
         );
 
@@ -615,13 +630,13 @@ export class PgUnionAllStep<
       this.memberDigests = [];
       for (const member of members) {
         if (!this.executor) {
-          this.executor = member.source.executor;
+          this.executor = member.resource.executor;
           this.contextId = this.addDependency(this.executor.context());
         }
         const { path = [] } = member;
         const conditions: SQL[] = [];
 
-        let currentSource = member.source;
+        let currentSource = member.resource;
         let currentSymbol = Symbol(currentSource.name);
         let currentAlias = sql.identifier(currentSymbol);
         if (this.executor !== currentSource.executor) {

@@ -16,19 +16,19 @@ declare global {
     interface Inflection {
       createField(
         this: Inflection,
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
       createInputType(
         this: Inflection,
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
       createPayloadType(
         this: Inflection,
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
       tableFieldName(
         this: Inflection,
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
     }
   }
@@ -36,13 +36,16 @@ declare global {
 
 const isInsertable = (
   build: GraphileBuild.Build,
-  source: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any>,
 ) => {
-  if (source.parameters) return false;
-  if (!source.codec.columns) return false;
-  if (source.codec.polymorphism) return false;
-  if (source.codec.isAnonymous) return false;
-  const behavior = getBehavior([source.codec.extensions, source.extensions]);
+  if (resource.parameters) return false;
+  if (!resource.codec.columns) return false;
+  if (resource.codec.polymorphism) return false;
+  if (resource.codec.isAnonymous) return false;
+  const behavior = getBehavior([
+    resource.codec.extensions,
+    resource.extensions,
+  ]);
   return build.behavior.matches(behavior, "source:insert", "insert") === true;
 };
 

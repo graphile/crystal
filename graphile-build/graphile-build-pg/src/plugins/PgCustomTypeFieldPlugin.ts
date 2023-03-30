@@ -62,7 +62,7 @@ declare global {
   namespace GraphileBuild {
     interface Build {
       pgGetArgDetailsFromParameters(
-        source: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
         parameters?: readonly PgResourceParameter<any, any>[],
       ): {
         makeFieldArgs(): {
@@ -86,7 +86,7 @@ declare global {
               codec: PgCodec<any, any, any, any>,
             ): SQL;
           };
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           fieldArgs: FieldArgs;
           path?: string[];
           initialArgs?: SQL[];
@@ -95,7 +95,7 @@ declare global {
     }
 
     interface InflectionCustomFieldProcedureDetails {
-      source: PgResource<
+      resource: PgResource<
         any,
         any,
         any,
@@ -104,7 +104,7 @@ declare global {
       >;
     }
     interface InflectionCustomFieldArgumentDetails {
-      source: PgResource<
+      resource: PgResource<
         any,
         any,
         any,
@@ -115,7 +115,7 @@ declare global {
       index: number;
     }
     interface InflectionCustomFieldMutationResult {
-      source: PgResource<
+      resource: PgResource<
         any,
         any,
         any,
@@ -195,11 +195,11 @@ declare global {
 }
 
 function shouldUseCustomConnection(
-  pgSource: PgResource<any, any, any, any, any>,
+  pgResource: PgResource<any, any, any, any, any>,
 ): boolean {
-  const { codec } = pgSource;
+  const { codec } = pgResource;
   // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
-  const setOrArray = !pgSource.isUnique || !!codec.arrayOfCodec;
+  const setOrArray = !pgResource.isUnique || !!codec.arrayOfCodec;
   const scalarOrAnonymous = !codec.columns || !!codec.isAnonymous;
   return setOrArray && scalarOrAnonymous;
 }
@@ -291,7 +291,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   inflection: {
     add: {
       _functionName(options, details) {
-        return details.source.extensions?.tags?.name ?? details.source.name;
+        return details.resource.extensions?.tags?.name ?? details.resource.name;
       },
       customMutationField(options, details) {
         return this.camelCase(this._functionName(details));
@@ -312,13 +312,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         return this.listField(this.camelCase(this.customQueryField(details)));
       },
       computedColumnField(options, details) {
-        const explicitName = details.source.extensions?.tags?.fieldName;
+        const explicitName = details.resource.extensions?.tags?.fieldName;
         if (typeof explicitName === "string") {
           return explicitName;
         }
-        const name = details.source.name;
+        const name = details.resource.name;
         const codecName =
-          details.source.parameters[0].codec.extensions?.pg?.name;
+          details.resource.parameters[0].codec.extensions?.pg?.name;
         const legacyPrefix = codecName + "_";
         if (name.startsWith(legacyPrefix)) {
           return this.camelCase(name.slice(legacyPrefix.length));
@@ -376,7 +376,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             const argDetails = parameters.map((param, index) => {
               const argName = build.inflection.argument({
                 param,
-                source,
+                resource: source,
                 index,
               });
               const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
@@ -518,7 +518,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               makeFieldArgs,
               makeExpression({
                 $placeholderable,
-                source,
+                resource: source,
                 fieldArgs,
                 path = [],
                 initialArgs = [],
@@ -583,14 +583,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 >;
                 const connectionTypeName = source.codec.columns
                   ? inflection.recordFunctionConnectionType({
-                      source,
+                      resource: source,
                     })
                   : inflection.scalarFunctionConnectionType({
-                      source,
+                      resource: source,
                     });
                 const edgeTypeName = source.codec.columns
-                  ? inflection.recordFunctionEdgeType({ source: source })
-                  : inflection.scalarFunctionEdgeType({ source: source });
+                  ? inflection.recordFunctionEdgeType({ resource: source })
+                  : inflection.scalarFunctionEdgeType({ resource: source });
                 const typeName = source.codec.columns
                   ? inflection.tableType(source.codec)
                   : build.getGraphQLTypeNameByPgCodec(source.codec, "output");
@@ -659,11 +659,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 >;
                 build.recoverable(null, () => {
                   const inputTypeName = inflection.customMutationInput({
-                    source,
+                    resource: source,
                   });
 
                   const fieldName = inflection.customMutationField({
-                    source,
+                    resource: source,
                   });
                   build.registerInputObjectType(
                     inputTypeName,
@@ -710,7 +710,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   ////////////////////////////////////////
 
                   const payloadTypeName = inflection.customMutationPayload({
-                    source,
+                    resource: source,
                   });
 
                   const isVoid = source.codec === TYPES.void;
@@ -724,7 +724,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     isVoid || !returnGraphQLTypeName
                       ? null
                       : inflection.functionMutationResultFieldName({
-                          source,
+                          resource: source,
                           returnGraphQLTypeName,
                         });
 
@@ -990,13 +990,15 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
               if (isRootMutation) {
                 // mutation type
-                const fieldName = inflection.customMutationField({ source });
+                const fieldName = inflection.customMutationField({
+                  resource: source,
+                });
                 const payloadTypeName = inflection.customMutationPayload({
-                  source,
+                  resource: source,
                 });
                 const payloadType = build.getTypeByName(payloadTypeName);
                 const inputTypeName = inflection.customMutationInput({
-                  source,
+                  resource: source,
                 });
                 const inputType = build.getTypeByName(inputTypeName);
                 if (!(payloadType instanceof GraphQLObjectType)) {
@@ -1038,8 +1040,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 }
 
                 const fieldName = isRootQuery
-                  ? inflection.customQueryField({ source })
-                  : inflection.computedColumnField({ source });
+                  ? inflection.customQueryField({ resource: source })
+                  : inflection.computedColumnField({ resource: source });
                 memo[fieldName] = fieldWithHooks(
                   {
                     fieldName,
@@ -1094,14 +1096,22 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   )
                 ) {
                   const fieldName = isRootQuery
-                    ? inflection.customQueryConnectionField({ source })
-                    : inflection.computedColumnConnectionField({ source });
+                    ? inflection.customQueryConnectionField({
+                        resource: source,
+                      })
+                    : inflection.computedColumnConnectionField({
+                        resource: source,
+                      });
 
                   const namedType = build.graphql.getNamedType(type!);
                   const connectionTypeName = shouldUseCustomConnection(source)
                     ? source.codec.columns
-                      ? inflection.recordFunctionConnectionType({ source })
-                      : inflection.scalarFunctionConnectionType({ source })
+                      ? inflection.recordFunctionConnectionType({
+                          resource: source,
+                        })
+                      : inflection.scalarFunctionConnectionType({
+                          resource: source,
+                        })
                     : source.codec.columns
                     ? inflection.tableConnectionType(source.codec)
                     : namedType
@@ -1122,7 +1132,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               fieldName,
                               fieldBehaviorScope: connectionFieldBehaviorScope,
                               isPgFieldConnection: true,
-                              pgSource: source,
+                              pgResource: source,
                             },
                             {
                               description:
@@ -1180,11 +1190,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 ) {
                   const fieldName = isRootQuery
                     ? source.isList
-                      ? inflection.customQueryField({ source })
-                      : inflection.customQueryListField({ source })
+                      ? inflection.customQueryField({ resource: source })
+                      : inflection.customQueryListField({ resource: source })
                     : source.isList
-                    ? inflection.computedColumnField({ source })
-                    : inflection.computedColumnListField({ source });
+                    ? inflection.computedColumnField({ resource: source })
+                    : inflection.computedColumnListField({ resource: source });
                   memo = build.recoverable(memo, () =>
                     build.extend(
                       memo,
@@ -1196,7 +1206,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             isPgFieldSimpleCollection: source.isList
                               ? false // No pagination if it returns an array - just return it.
                               : true,
-                            pgSource: source,
+                            pgResource: source,
                           },
                           {
                             description: source.description,
@@ -1235,10 +1245,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
 function getFunctionSourceReturnGraphQLType(
   build: GraphileBuild.Build,
-  source: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any>,
 ): GraphQLOutputType | null {
   const sourceInnerCodec: PgCodec<any, any, any, any, undefined, any, any> =
-    source.codec.arrayOfCodec ?? source.codec;
+    resource.codec.arrayOfCodec ?? resource.codec;
   if (!sourceInnerCodec) {
     return null;
   }
@@ -1250,7 +1260,7 @@ function getFunctionSourceReturnGraphQLType(
         | undefined);
   if (!innerType && !isVoid) {
     console.warn(
-      `Failed to find a suitable type for codec '${source.codec.name}'; not adding function field`,
+      `Failed to find a suitable type for codec '${resource.codec.name}'; not adding function field`,
     );
     return null;
   } else if (!innerType) {
@@ -1259,7 +1269,7 @@ function getFunctionSourceReturnGraphQLType(
 
   // TODO: nullability
   const type =
-    innerType && source.codec.arrayOfCodec
+    innerType && resource.codec.arrayOfCodec
       ? new build.graphql.GraphQLList(innerType)
       : innerType;
   return type;

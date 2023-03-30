@@ -16,7 +16,7 @@ declare global {
         this: Inflection,
         details: {
           unique: PgResourceUnique;
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
         },
       ): string;
     }
@@ -34,7 +34,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      rowByUnique(options, { unique, source }) {
+      rowByUnique(options, { unique, resource: source }) {
         if (typeof unique.extensions?.tags?.fieldName === "string") {
           return unique.extensions?.tags?.fieldName;
         }
@@ -64,14 +64,14 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const sources = Object.values(build.input.pgRegistry.pgResources).filter(
-          (source) => {
-            if (source.parameters) return false;
-            if (!source.codec.columns) return false;
-            if (!source.uniques || source.uniques.length < 1) return false;
-            return true;
-          },
-        );
+        const sources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ).filter((source) => {
+          if (source.parameters) return false;
+          if (!source.codec.columns) return false;
+          if (!source.uniques || source.uniques.length < 1) return false;
+          return true;
+        });
 
         return sources.reduce(
           (outerMemo, source) =>
@@ -80,7 +80,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                 const uniqueKeys = unique.columns as string[];
                 const fieldName = build.inflection.rowByUnique({
                   unique,
-                  source,
+                  resource: source,
                 });
 
                 const type = build.getTypeByName(

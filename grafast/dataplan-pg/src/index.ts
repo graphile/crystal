@@ -148,7 +148,7 @@ import {
 import {
   pgUnionAll,
   PgUnionAllSingleStep,
-  PgUnionAllSourceSpec,
+  PgUnionAllResourceSpec,
   PgUnionAllStep,
   PgUnionAllStepCondition,
   PgUnionAllStepConfig,
@@ -293,7 +293,7 @@ export {
   PgTypedExecutableStep,
   pgUnionAll,
   PgUnionAllSingleStep,
-  PgUnionAllSourceSpec,
+  PgUnionAllResourceSpec,
   PgUnionAllStep,
   PgUnionAllStepCondition,
   PgUnionAllStepConfig,

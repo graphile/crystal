@@ -227,10 +227,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       singularize: fixChangePlural,
 
       // Fix a naming bug
-      deletedNodeId(_prev, preset, { source }) {
+      deletedNodeId(_prev, preset, { resource }) {
         return this.camelCase(
           `deleted-${this.singularize(
-            this.tableType(source.codec),
+            this.tableType(resource.codec),
           )}-${this.nodeIdFieldName()}`,
         );
       },
@@ -252,46 +252,50 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           : baseName + "List";
       },
 
-      allRowsConnection(previous, options, source) {
-        const listSuffix = source.extensions?.tags?.listSuffix;
+      allRowsConnection(previous, options, resource) {
+        const listSuffix = resource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () => {
           if (options.schema?.pgSimplifyAllRows) {
             return this.connectionField(
               this.camelCase(
                 `${this.distinctPluralize(
-                  this._singularizedResourceName(source),
+                  this._singularizedResourceName(resource),
                 )}`,
               ),
             );
           } else {
-            return previous!.call(this, source);
+            return previous!.call(this, resource);
           }
         });
       },
-      allRowsList(previous, options, source) {
-        const listSuffix = source.extensions?.tags?.listSuffix;
+      allRowsList(previous, options, resource) {
+        const listSuffix = resource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () => {
           if (options.schema?.pgSimplifyAllRows) {
             return this.listField(
               this.camelCase(
-                this.distinctPluralize(this._singularizedResourceName(source)),
+                this.distinctPluralize(
+                  this._singularizedResourceName(resource),
+                ),
               ),
             );
           } else {
-            return previous!.call(this, source);
+            return previous!.call(this, resource);
           }
         });
       },
 
       singleRelation(previous, _options, details) {
-        const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgCodecRelationAny;
+        const { resource, relationName } = details;
+        const relation = resource.getRelation(
+          relationName,
+        ) as PgCodecRelationAny;
         if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
         const detailedKeys = (relation.localColumns as string[]).map(
           (columnName) => ({
-            codec: source.codec,
+            codec: resource.codec,
             columnName,
           }),
         );
@@ -314,8 +318,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       singleRelationBackwards(previous, _options, details) {
-        const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgCodecRelationAny;
+        const { resource, relationName } = details;
+        const relation = resource.getRelation(
+          relationName,
+        ) as PgCodecRelationAny;
         if (
           typeof relation.extensions?.tags?.foreignSingleFieldName === "string"
         ) {
@@ -340,13 +346,13 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               )}`,
             );
           }
-          if (this.baseNameMatches(baseName, source.name)) {
+          if (this.baseNameMatches(baseName, resource.name)) {
             return this.camelCase(
               `${this._singularizedCodecName(relation.remoteResource.codec)}`,
             );
           }
         }
-        const pk = (source.uniques as PgResourceUnique[]).find(
+        const pk = (resource.uniques as PgResourceUnique[]).find(
           (u) => u.isPrimary,
         );
         if (pk && arraysMatch(pk.columns, relation.localColumns)) {
@@ -358,8 +364,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       _manyRelation(previous, _options, details) {
-        const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgCodecRelationAny;
+        const { resource, relationName } = details;
+        const relation = resource.getRelation(
+          relationName,
+        ) as PgCodecRelationAny;
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
@@ -380,7 +388,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               )}`,
             );
           }
-          if (this.baseNameMatches(baseName, source.name)) {
+          if (this.baseNameMatches(baseName, resource.name)) {
             return this.camelCase(
               `${this.distinctPluralize(
                 this._singularizedCodecName(relation.remoteResource.codec),
@@ -402,8 +410,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       manyRelationConnection(previous, _options, details) {
-        const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgCodecRelationAny;
+        const { resource, relationName } = details;
+        const relation = resource.getRelation(
+          relationName,
+        ) as PgCodecRelationAny;
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
           relation.remoteResource.extensions?.tags?.listSuffix;
@@ -413,8 +423,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       manyRelationList(previous, _options, details) {
-        const { source, relationName } = details;
-        const relation = source.getRelation(relationName) as PgCodecRelationAny;
+        const { resource, relationName } = details;
+        const relation = resource.getRelation(
+          relationName,
+        ) as PgCodecRelationAny;
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
           relation.remoteResource.extensions?.tags?.listSuffix;
@@ -423,25 +435,25 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         );
       },
       customQueryConnectionField(previous, _options, details) {
-        const listSuffix = details.source.extensions?.tags?.listSuffix;
+        const listSuffix = details.resource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );
       },
       customQueryListField(previous, _options, details) {
-        const listSuffix = details.source.extensions?.tags?.listSuffix;
+        const listSuffix = details.resource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );
       },
       computedColumnConnectionField(previous, _options, details) {
-        const listSuffix = details.source.extensions?.tags?.listSuffix;
+        const listSuffix = details.resource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );
       },
       computedColumnListField(previous, _options, details) {
-        const listSuffix = details.source.extensions?.tags?.listSuffix;
+        const listSuffix = details.resource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );
@@ -455,47 +467,47 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         }
       },
       rowByUnique(previous, options, details) {
-        const { unique, source } = details;
+        const { unique, resource } = details;
         if (typeof unique.extensions?.tags?.fieldName === "string") {
           return unique.extensions?.tags?.fieldName;
         }
         if (options.schema?.pgShortPk && unique.isPrimary) {
           // Primary key, shorten!
-          return this.camelCase(this._singularizedCodecName(source.codec));
+          return this.camelCase(this._singularizedCodecName(resource.codec));
         } else {
           return previous!.call(this, details);
         }
       },
 
       updateByKeysField(previous, options, details) {
-        const { source, unique } = details;
+        const { resource, unique } = details;
         if (typeof unique.extensions?.tags.updateFieldName === "string") {
           return unique.extensions.tags.updateFieldName;
         }
         if (options.schema?.pgShortPk && unique.isPrimary) {
           return this.camelCase(
-            `update-${this._singularizedCodecName(source.codec)}`,
+            `update-${this._singularizedCodecName(resource.codec)}`,
           );
         } else {
           return previous!.call(this, details);
         }
       },
       deleteByKeysField(previous, options, details) {
-        const { source, unique } = details;
+        const { resource, unique } = details;
         if (typeof unique.extensions?.tags.deleteFieldName === "string") {
           return unique.extensions.tags.deleteFieldName;
         }
         if (options.schema?.pgShortPk && unique.isPrimary) {
           // Primary key, shorten!
           return this.camelCase(
-            `delete-${this._singularizedCodecName(source.codec)}`,
+            `delete-${this._singularizedCodecName(resource.codec)}`,
           );
         } else {
           return previous!.call(this, details);
         }
       },
       updateByKeysInputType(previous, options, details) {
-        const { source, unique } = details;
+        const { resource, unique } = details;
         if (unique.extensions?.tags.updateFieldName) {
           return this.upperCamelCase(
             `${unique.extensions.tags.updateFieldName}-input`,
@@ -504,14 +516,14 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (options.schema?.pgShortPk && unique.isPrimary) {
           // Primary key, shorten!
           return this.upperCamelCase(
-            `update-${this._singularizedCodecName(source.codec)}-input`,
+            `update-${this._singularizedCodecName(resource.codec)}-input`,
           );
         } else {
           return previous!.call(this, details);
         }
       },
       deleteByKeysInputType(previous, options, details) {
-        const { source, unique } = details;
+        const { resource, unique } = details;
         if (unique.extensions?.tags.deleteFieldName) {
           return this.upperCamelCase(
             `${unique.extensions.tags.deleteFieldName}-input`,
@@ -520,7 +532,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (options.schema?.pgShortPk && unique.isPrimary) {
           // Primary key, shorten!
           return this.upperCamelCase(
-            `delete-${this._singularizedCodecName(source.codec)}-input`,
+            `delete-${this._singularizedCodecName(resource.codec)}-input`,
           );
         } else {
           return previous!.call(this, details);
@@ -530,7 +542,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (options.schema?.pgShortPk) {
           return this.camelCase(
             `update-${this._singularizedCodecName(
-              details.source.codec,
+              details.resource.codec,
             )}-by-${this.nodeIdFieldName()}`,
           );
         } else {
@@ -541,7 +553,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (options.schema?.pgShortPk) {
           return this.camelCase(
             `delete-${this._singularizedCodecName(
-              details.source.codec,
+              details.resource.codec,
             )}-by-${this.nodeIdFieldName()}`,
           );
         } else {
@@ -552,7 +564,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (options.schema?.pgShortPk) {
           return this.upperCamelCase(
             `update-${this._singularizedCodecName(
-              details.source.codec,
+              details.resource.codec,
             )}-by-${this.nodeIdFieldName()}-input`,
           );
         } else {
@@ -563,7 +575,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (options.schema?.pgShortPk) {
           return this.upperCamelCase(
             `delete-${this._singularizedCodecName(
-              details.source.codec,
+              details.resource.codec,
             )}-by-${this.nodeIdFieldName()}-input`,
           );
         } else {

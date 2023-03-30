@@ -59,7 +59,7 @@ function commonFn(
     fieldName,
     isPgFieldConnection,
     isPgFieldSimpleCollection,
-    pgSource,
+    pgResource,
     pgFieldCodec,
   } = scope;
 
@@ -67,11 +67,11 @@ function commonFn(
     return args;
   }
 
-  const codec = pgFieldCodec ?? pgSource?.codec;
-  const isSuitableSource = pgSource && !pgSource.isUnique;
+  const codec = pgFieldCodec ?? pgResource?.codec;
+  const isSuitableSource = pgResource && !pgResource.isUnique;
   const isSuitableCodec =
     codec &&
-    (isSuitableSource || (!pgSource && codec?.polymorphism?.mode === "union"));
+    (isSuitableSource || (!pgResource && codec?.polymorphism?.mode === "union"));
 
   if (!isSuitableCodec) {
     return args;

@@ -109,7 +109,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           fieldName,
           isPgFieldConnection,
           isPgFieldSimpleCollection,
-          pgSource,
+          pgResource,
           pgFieldCodec,
         } = scope;
 
@@ -117,13 +117,13 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           return args;
         }
 
-        const codec = pgFieldCodec ?? pgSource?.codec;
+        const codec = pgFieldCodec ?? pgResource?.codec;
         const isSuitableSource =
-          pgSource && pgSource.codec.columns && !pgSource.isUnique;
+          pgResource && pgResource.codec.columns && !pgResource.isUnique;
         const isSuitableCodec =
           codec &&
           (isSuitableSource ||
-            (!pgSource && codec?.polymorphism?.mode === "union")) &&
+            (!pgResource && codec?.polymorphism?.mode === "union")) &&
           codec.columns;
 
         if (!isSuitableCodec) {
@@ -132,13 +132,13 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
         const behavior = getBehavior([
           scope,
           codec?.extensions,
-          pgSource?.extensions,
+          pgResource?.extensions,
         ]);
         if (
           !build.behavior.matches(
             behavior,
             "order",
-            pgSource?.parameters ? "" : "order",
+            pgResource?.parameters ? "" : "order",
           )
         ) {
           return args;

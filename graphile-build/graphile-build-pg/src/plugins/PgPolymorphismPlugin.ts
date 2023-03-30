@@ -511,7 +511,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   ]) ?? "";
                 const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
                   {
-                    source,
+                    resource: source,
                     relationName,
                   };
                 const singleRecordFieldName = relationSpec.isReferencee

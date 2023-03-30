@@ -263,7 +263,7 @@ export class PgResource<
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
   private selectAuth?: (
-    $step: PgSelectStep<PgResource<any, TCodec, any, any, TRegistry>>,
+    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
   ) => void;
 
   // TODO: make a public interface for this information
@@ -679,8 +679,13 @@ export class PgResource<
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
   ): GetPgCodecColumns<TCodec> extends PgTypeColumns
-    ? PgSelectSingleStep<this>
-    : PgClassExpressionStep<TCodec, this> {
+    ? PgSelectSingleStep<
+        PgResource<TName, TCodec, TUniques, TParameters, TRegistry>
+      >
+    : PgClassExpressionStep<
+        TCodec,
+        PgResource<TName, TCodec, TUniques, TParameters, TRegistry>
+      > {
     if (this.parameters) {
       throw new Error(
         ".get() cannot be used with functional sources; please use .execute()",

@@ -184,20 +184,20 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
           fieldBehaviorScope,
           isPgFieldConnection,
           isPgFieldSimpleCollection,
-          pgSource,
+          pgResource,
           pgFieldCodec,
         } = scope;
 
         const shouldAddCondition =
           isPgFieldConnection || isPgFieldSimpleCollection;
 
-        const codec = pgFieldCodec ?? pgSource?.codec;
+        const codec = pgFieldCodec ?? pgResource?.codec;
         const isSuitableSource =
-          pgSource && pgSource.codec.columns && !pgSource.isUnique;
+          pgResource && pgResource.codec.columns && !pgResource.isUnique;
         const isSuitableCodec =
           codec &&
           (isSuitableSource ||
-            (!pgSource && codec?.polymorphism?.mode === "union")) &&
+            (!pgResource && codec?.polymorphism?.mode === "union")) &&
           codec.columns;
 
         if (!shouldAddCondition || !isSuitableCodec) {
@@ -207,13 +207,13 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         const behavior = getBehavior([
           scope,
           codec?.extensions,
-          pgSource?.extensions,
+          pgResource?.extensions,
         ]);
         if (
           !build.behavior.matches(
             behavior,
             fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
-            pgSource?.parameters ? "" : "filter",
+            pgResource?.parameters ? "" : "filter",
           )
         ) {
           return args;

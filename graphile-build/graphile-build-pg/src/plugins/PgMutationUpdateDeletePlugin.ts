@@ -45,35 +45,35 @@ declare global {
       isPgDeleteInputType?: boolean;
       isPgDeleteByKeysInputType?: boolean;
       isPgDeleteNodeInputType?: boolean;
-      pgSource?: PgResource<any, any, any, any, any>;
-      pgSourceUnique?: PgResourceUnique;
+      pgResource?: PgResource<any, any, any, any, any>;
+      pgResourceUnique?: PgResourceUnique;
     }
 
     interface Inflection {
       updatePayloadType(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
         },
       ): string;
       deletePayloadType(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
         },
       ): string;
 
       updateNodeField(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
       updateNodeInputType(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
@@ -81,21 +81,21 @@ declare global {
       deletedNodeId(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
         },
       ): string;
 
       deleteNodeField(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
       deleteNodeInputType(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
@@ -103,14 +103,14 @@ declare global {
       updateByKeysField(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
       updateByKeysInputType(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
@@ -118,14 +118,14 @@ declare global {
       deleteByKeysField(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
       deleteByKeysInputType(
         this: Inflection,
         details: {
-          source: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
@@ -137,27 +137,33 @@ declare global {
 
 const isUpdatable = (
   build: GraphileBuild.Build,
-  source: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any>,
 ) => {
-  if (source.parameters) return false;
-  if (!source.codec.columns) return false;
-  if (source.codec.polymorphism) return false;
-  if (source.codec.isAnonymous) return false;
-  if (!source.uniques || source.uniques.length < 1) return false;
-  const behavior = getBehavior([source.codec.extensions, source.extensions]);
+  if (resource.parameters) return false;
+  if (!resource.codec.columns) return false;
+  if (resource.codec.polymorphism) return false;
+  if (resource.codec.isAnonymous) return false;
+  if (!resource.uniques || resource.uniques.length < 1) return false;
+  const behavior = getBehavior([
+    resource.codec.extensions,
+    resource.extensions,
+  ]);
   return !!build.behavior.matches(behavior, "source:update", "update");
 };
 
 const isDeletable = (
   build: GraphileBuild.Build,
-  source: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any>,
 ) => {
-  if (source.parameters) return false;
-  if (!source.codec.columns) return false;
-  if (source.codec.polymorphism) return false;
-  if (source.codec.isAnonymous) return false;
-  if (!source.uniques || source.uniques.length < 1) return false;
-  const behavior = getBehavior([source.codec.extensions, source.extensions]);
+  if (resource.parameters) return false;
+  if (!resource.codec.columns) return false;
+  if (resource.codec.polymorphism) return false;
+  if (resource.codec.isAnonymous) return false;
+  if (!resource.uniques || resource.uniques.length < 1) return false;
+  const behavior = getBehavior([
+    resource.codec.extensions,
+    resource.extensions,
+  ]);
   return !!build.behavior.matches(behavior, "source:delete", "delete");
 };
 
@@ -169,55 +175,59 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      updatePayloadType(options, { source }) {
+      updatePayloadType(options, { resource }) {
         return this.upperCamelCase(
-          `update-${this._singularizedResourceName(source)}-payload`,
+          `update-${this._singularizedResourceName(resource)}-payload`,
         );
       },
-      deletePayloadType(options, { source }) {
+      deletePayloadType(options, { resource }) {
         return this.upperCamelCase(
-          `delete-${this._singularizedResourceName(source)}-payload`,
+          `delete-${this._singularizedResourceName(resource)}-payload`,
         );
       },
 
-      updateNodeField(options, { source, unique: _unique }) {
-        return this.camelCase(`update-${this._singularizedResourceName(source)}`);
+      updateNodeField(options, { resource, unique: _unique }) {
+        return this.camelCase(
+          `update-${this._singularizedResourceName(resource)}`,
+        );
       },
       updateNodeInputType(options, details) {
         return this.upperCamelCase(`${this.updateNodeField(details)}-input`);
       },
 
-      deletedNodeId(options, { source }) {
+      deletedNodeId(options, { resource: resource }) {
         return this.camelCase(
           `deleted-${this._singularizedResourceName(
-            source,
+            resource,
           )}-${this.nodeIdFieldName()}`,
         );
       },
 
-      deleteNodeField(options, { source, unique: _unique }) {
-        return this.camelCase(`delete-${this._singularizedResourceName(source)}`);
+      deleteNodeField(options, { resource: resource, unique: _unique }) {
+        return this.camelCase(
+          `delete-${this._singularizedResourceName(resource)}`,
+        );
       },
       deleteNodeInputType(options, details) {
         return this.upperCamelCase(`${this.deleteNodeField(details)}-input`);
       },
 
-      updateByKeysField(options, { source, unique }) {
+      updateByKeysField(options, { resource: resource, unique }) {
         return this.camelCase(
           `update-${this._singularizedResourceName(
-            source,
-          )}-by-${this._joinColumnNames(source.codec, unique.columns)}`,
+            resource,
+          )}-by-${this._joinColumnNames(resource.codec, unique.columns)}`,
         );
       },
       updateByKeysInputType(options, details) {
         return this.upperCamelCase(`${this.updateByKeysField(details)}-input`);
       },
 
-      deleteByKeysField(options, { source, unique }) {
+      deleteByKeysField(options, { resource: resource, unique }) {
         return this.camelCase(
           `delete-${this._singularizedResourceName(
-            source,
-          )}-by-${this._joinColumnNames(source.codec, unique.columns)}`,
+            resource,
+          )}-by-${this._joinColumnNames(resource.codec, unique.columns)}`,
         );
       },
       deleteByKeysInputType(options, details) {
@@ -239,16 +249,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         } = build;
 
         const process = (
-          source: PgResource<any, any, any, any, any>,
+          resource: PgResource<any, any, any, any, any>,
           mode: "source:update" | "source:delete",
         ) => {
           const modeText = mode === "source:update" ? "update" : "delete";
-          const tableTypeName = inflection.tableType(source.codec);
+          const tableTypeName = inflection.tableType(resource.codec);
 
           const payloadTypeName =
             mode === "source:update"
-              ? inflection.updatePayloadType({ source })
-              : inflection.deletePayloadType({ source });
+              ? inflection.updatePayloadType({ resource: resource })
+              : inflection.deletePayloadType({ resource: resource });
 
           // Payload type is shared independent of the keys used
           build.registerObjectType(
@@ -257,7 +267,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               isMutationPayload: true,
               isPgUpdatePayloadType: mode === "source:update",
               isPgDeletePayloadType: mode === "source:delete",
-              pgTypeSource: source,
+              pgTypeSource: resource,
             },
             ObjectStep,
             () => {
@@ -267,19 +277,19 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   "type",
                 ),
                 fields: ({ fieldWithHooks }) => {
-                  const tableName = inflection.tableFieldName(source);
+                  const tableName = inflection.tableFieldName(resource);
                   const behavior = getBehavior([
-                    source.codec.extensions,
-                    source.extensions,
+                    resource.codec.extensions,
+                    resource.extensions,
                   ]);
                   const deletedNodeIdFieldName =
                     build.getNodeIdHandler !== undefined
                       ? inflection.deletedNodeId({
-                          source,
+                          resource: resource,
                         })
                       : null;
                   const TableType = build.getGraphQLTypeByPgCodec(
-                    source.codec,
+                    resource.codec,
                     "output",
                   ) as GraphQLObjectType | undefined;
                   const handler =
@@ -369,17 +379,17 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                 },
               };
             },
-            `Creating ${mode} payload for ${source} from PgMutationUpdateDeletePlugin`,
+            `Creating ${mode} payload for ${resource} from PgMutationUpdateDeletePlugin`,
           );
 
-          const primaryUnique = source.uniques.find(
+          const primaryUnique = resource.uniques.find(
             (u: PgResourceUnique) => u.isPrimary,
           );
           const specs = [
             ...(primaryUnique && build.getNodeIdCodec !== undefined
               ? [{ unique: primaryUnique, uniqueMode: "node" }]
               : []),
-            ...source.uniques.map((unique: PgResourceUnique) => ({
+            ...resource.uniques.map((unique: PgResourceUnique) => ({
               unique,
               uniqueMode: "keys",
             })),
@@ -387,7 +397,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           for (const spec of specs) {
             const { uniqueMode, unique } = spec;
             const details = {
-              source,
+              resource,
               unique,
             };
             if (uniqueMode === "node" && !build.getNodeIdHandler) {
@@ -395,7 +405,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
             }
             build.recoverable(null, () => {
               const tablePatchName = build.getGraphQLTypeNameByPgCodec(
-                source.codec,
+                resource.codec,
                 "patch",
               );
               if (!tablePatchName && mode === "source:update") {
@@ -433,8 +443,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     mode === "source:delete" && uniqueMode === "keys",
                   isPgDeleteNodeInputType:
                     mode === "source:delete" && uniqueMode === "node",
-                  pgSource: source,
-                  pgSourceUnique: unique,
+                  pgResource: resource,
+                  pgResourceUnique: unique,
                   isMutationInput: true,
                 },
                 () => {
@@ -478,13 +488,13 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             }
                           : (unique.columns as string[]).reduce(
                               (memo, columnName) => {
-                                const column = source.codec.columns[
+                                const column = resource.codec.columns[
                                   columnName
                                 ] as PgTypeColumn;
                                 memo[
                                   inflection.column({
                                     columnName,
-                                    codec: source.codec,
+                                    codec: resource.codec,
                                   })
                                 ] = {
                                   description: column.description,
@@ -503,7 +513,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                       mode === "source:update"
                         ? {
                             [inflection.patchField(
-                              inflection.tableFieldName(source),
+                              inflection.tableFieldName(resource),
                             )]: {
                               description: build.wrapDescription(
                                 `An object where the defined keys will be set on the \`${tableTypeName}\` being ${modeText}d.`,
@@ -531,26 +541,26 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                 },
                 `Creating ${mode} input by ${uniqueMode} for ${unique.columns.join(
                   ",",
-                )} of ${source} from PgMutationUpdateDeletePlugin`,
+                )} of ${resource} from PgMutationUpdateDeletePlugin`,
               );
             });
           }
         };
 
-        const allSources = Object.values(build.input.pgRegistry.pgResources);
-        const updatableSources = allSources.filter((source) =>
-          isUpdatable(build, source),
+        const allResources = Object.values(build.input.pgRegistry.pgResources);
+        const updatableResources = allResources.filter((resource) =>
+          isUpdatable(build, resource),
         );
-        const deletableSources = allSources.filter((source) =>
-          isDeletable(build, source),
+        const deletableResources = allResources.filter((resource) =>
+          isDeletable(build, resource),
         );
 
-        updatableSources.forEach((source) => {
-          process(source, "source:update");
+        updatableResources.forEach((resource) => {
+          process(resource, "source:update");
         });
 
-        deletableSources.forEach((source) => {
-          process(source, "source:delete");
+        deletableResources.forEach((resource) => {
+          process(resource, "source:delete");
         });
 
         return _;
@@ -571,25 +581,25 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         }
 
         const allSources = Object.values(build.input.pgRegistry.pgResources);
-        const updatableSources = allSources.filter((source) =>
-          isUpdatable(build, source),
+        const updatableSources = allSources.filter((resource) =>
+          isUpdatable(build, resource),
         );
-        const deletableSources = allSources.filter((source) =>
-          isDeletable(build, source),
+        const deletableSources = allSources.filter((resource) =>
+          isDeletable(build, resource),
         );
 
         const process = (
           fields: GraphQLFieldConfigMap<any, any>,
-          sources: PgResource<any, any, any, any, any>[],
+          resources: PgResource<any, any, any, any, any>[],
           mode: "source:update" | "source:delete",
         ) => {
           const modeShort = mode === "source:update" ? "update" : "delete";
-          for (const source of sources) {
+          for (const resource of resources) {
             const payloadTypeName =
               mode === "source:update"
-                ? inflection.updatePayloadType({ source })
-                : inflection.deletePayloadType({ source });
-            const primaryUnique = source.uniques.find(
+                ? inflection.updatePayloadType({ resource: resource })
+                : inflection.deletePayloadType({ resource: resource });
+            const primaryUnique = resource.uniques.find(
               (u: PgResourceUnique) => u.isPrimary,
             );
             const constraintMode = `constraint:${mode}`;
@@ -597,15 +607,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               ...(primaryUnique && !!build.getNodeIdHandler
                 ? [{ unique: primaryUnique, uniqueMode: "node" }]
                 : []),
-              ...source.uniques.map((unique: PgResourceUnique) => ({
+              ...resource.uniques.map((unique: PgResourceUnique) => ({
                 unique,
                 uniqueMode: "keys",
               })),
             ].filter((spec) => {
               const unique = spec.unique as PgResourceUnique;
               const behavior = getBehavior([
-                source.codec.extensions,
-                source.extensions,
+                resource.codec.extensions,
+                resource.extensions,
                 unique.extensions,
               ]);
               return !!build.behavior.matches(
@@ -617,7 +627,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
             for (const spec of specs) {
               const { uniqueMode, unique } = spec;
               const details = {
-                source,
+                resource,
                 unique,
               };
               fields = build.recoverable(fields, () => {
@@ -654,7 +664,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     columnName,
                     inflection.column({
                       columnName,
-                      codec: source.codec,
+                      codec: resource.codec,
                     }),
                   ],
                 );
@@ -691,7 +701,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     )} }`
                   : null;
 
-                const tableTypeName = inflection.tableType(source.codec);
+                const tableTypeName = inflection.tableType(resource.codec);
                 const handler = build.getNodeIdHandler
                   ? build.getNodeIdHandler(tableTypeName)
                   : null;
@@ -761,13 +771,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         type: payloadType,
                         description: `${
                           mode === "source:update" ? "Updates" : "Deletes"
-                        } a single \`${inflection.tableType(source.codec)}\` ${
+                        } a single \`${inflection.tableType(
+                          resource.codec,
+                        )}\` ${
                           uniqueMode === "keys"
                             ? "using a unique key"
                             : "using its globally unique id"
                         }${mode === "source:update" ? " and a patch" : ""}.`,
                         deprecationReason: tagToString(
-                          source.extensions?.tags?.deprecated,
+                          resource.extensions?.tags?.deprecated,
                         ),
                         plan:
                           mode === "source:update"
@@ -775,66 +787,66 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                                 EXPORTABLE(
                                   te.run`\
-return function(object, pgUpdate, source) {
+return function(object, pgUpdate, resource) {
 return (_$root, args) => {
-  const plan = object({ result: pgUpdate(source, ${specFromArgsString}) });
+  const plan = object({ result: pgUpdate(resource, ${specFromArgsString}) });
   args.apply(plan);
   return plan;
 }
 }` as any,
-                                  [object, pgUpdate, source],
+                                  [object, pgUpdate, resource],
                                 )
                               : (EXPORTABLE(
-                                  (object, pgUpdate, source, specFromArgs) =>
+                                  (object, pgUpdate, resource, specFromArgs) =>
                                     function plan(
                                       _$root: ExecutableStep,
                                       args: FieldArgs,
                                     ) {
                                       const plan = object({
                                         result: pgUpdate(
-                                          source,
+                                          resource,
                                           specFromArgs(args),
                                         ),
                                       });
                                       args.apply(plan);
                                       return plan;
                                     },
-                                  [object, pgUpdate, source, specFromArgs],
+                                  [object, pgUpdate, resource, specFromArgs],
                                 ) as any)
                             : specFromArgsString
                             ? // eslint-disable-next-line graphile-export/exhaustive-deps
                               EXPORTABLE(
                                 te.run`\
-return function (object, pgDelete, source) {
+return function (object, pgDelete, resource) {
 return (_$root, args) => {
-  const plan = object({ result: pgDelete(source, ${specFromArgsString}) });
+  const plan = object({ result: pgDelete(resource, ${specFromArgsString}) });
   args.apply(plan);
   return plan;
 }
 }` as any,
-                                [object, pgDelete, source],
+                                [object, pgDelete, resource],
                               )
                             : (EXPORTABLE(
-                                (object, pgDelete, source, specFromArgs) =>
+                                (object, pgDelete, resource, specFromArgs) =>
                                   function plan(
                                     _$root: ExecutableStep,
                                     args: FieldArgs,
                                   ) {
                                     const plan = object({
                                       result: pgDelete(
-                                        source,
+                                        resource,
                                         specFromArgs(args),
                                       ),
                                     });
                                     args.apply(plan);
                                     return plan;
                                   },
-                                [object, pgDelete, source, specFromArgs],
+                                [object, pgDelete, resource, specFromArgs],
                               ) as any),
                       },
                     ),
                   },
-                  `Adding ${mode} mutation for ${source}`,
+                  `Adding ${mode} mutation for ${resource}`,
                 );
               });
             }

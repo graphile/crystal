@@ -45,19 +45,19 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
 
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
-        ).filter((source) => {
-          if (source.codec.columns) return false;
-          if (source.codec.arrayOfCodec) return false;
-          if (source.codec.rangeOfCodec) return false;
+        ).filter((resource) => {
+          if (resource.codec.columns) return false;
+          if (resource.codec.arrayOfCodec) return false;
+          if (resource.codec.rangeOfCodec) return false;
           const parameters: readonly PgResourceParameterAny[] | undefined =
-            source.parameters;
+            resource.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
-          if (!source.isUnique) return false;
+          if (!resource.isUnique) return false;
           const behavior = getBehavior([
-            source.codec.extensions,
-            source.extensions,
+            resource.codec.extensions,
+            resource.extensions,
           ]);
           return build.behavior.matches(
             behavior,
@@ -77,7 +77,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
               any
             >;
             const fieldName = inflection.computedColumnField({
-              source: pgFieldSource,
+              resource: pgFieldSource,
             });
             const type = build.getGraphQLTypeByPgCodec(
               pgFieldSource.codec,

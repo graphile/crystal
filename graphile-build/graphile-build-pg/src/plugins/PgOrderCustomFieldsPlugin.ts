@@ -17,7 +17,7 @@ declare global {
       computedColumnOrder(
         this: Inflection,
         details: {
-          source: PgResource<
+          resource: PgResource<
             any,
             any,
             any,
@@ -40,8 +40,8 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      computedColumnOrder(options, { source, variant }) {
-        const computedColumnName = this.computedColumnField({ source });
+      computedColumnOrder(options, { resource, variant }) {
+        const computedColumnName = this.computedColumnField({ resource });
         return this.constantCase(`${computedColumnName}-${variant}`);
       },
     },
@@ -65,19 +65,19 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
 
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
-        ).filter((source) => {
-          if (source.codec.columns) return false;
-          if (source.codec.arrayOfCodec) return false;
-          if (source.codec.rangeOfCodec) return false;
+        ).filter((resource) => {
+          if (resource.codec.columns) return false;
+          if (resource.codec.arrayOfCodec) return false;
+          if (resource.codec.rangeOfCodec) return false;
           const parameters: readonly PgResourceParameterAny[] | undefined =
-            source.parameters;
+            resource.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
-          if (!source.isUnique) return false;
+          if (!resource.isUnique) return false;
           const behavior = getBehavior([
-            source.codec.extensions,
-            source.extensions,
+            resource.codec.extensions,
+            resource.extensions,
           ]);
           // TODO: should this be `proc:orderBy`? If so, should we make it so `getBehavior` accepts a prefix to prepend, so `"orderBy"` in a smart tag on a proc becomes `proc:orderBy`?
           return !!build.behavior.matches(behavior, "orderBy", "-orderBy");
@@ -88,7 +88,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           functionSources.reduce((memo, pgFieldSource) => {
             for (const ascDesc of ["asc" as const, "desc" as const]) {
               const valueName = inflection.computedColumnOrder({
-                source: pgFieldSource as PgResource<
+                resource: pgFieldSource as PgResource<
                   any,
                   any,
                   any,
