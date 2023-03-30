@@ -251,7 +251,15 @@ export type PgCodecAny = PgCodec<
   PgCodecAttributes | undefined,
   any,
   any,
-  | PgCodec<string, PgCodecAttributes | undefined, any, any, undefined, any, any>
+  | PgCodec<
+      string,
+      PgCodecAttributes | undefined,
+      any,
+      any,
+      undefined,
+      any,
+      any
+    >
   | undefined,
   | PgCodec<string, PgCodecAttributes | undefined, any, any, any, any, any>
   | undefined,

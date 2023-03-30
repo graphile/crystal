@@ -2,11 +2,11 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  PgCodecAttributes,
   PgConditionStep,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
-  PgCodecAttributes,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";

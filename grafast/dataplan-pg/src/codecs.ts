@@ -50,7 +50,10 @@ import type {
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
 
-export type PgCodecAttributeViaExplicit = { relation: string; attribute: string };
+export type PgCodecAttributeViaExplicit = {
+  relation: string;
+  attribute: string;
+};
 export type PgCodecAttributeVia = string | PgCodecAttributeViaExplicit;
 
 export interface PgCodecAttributeExtensions {}

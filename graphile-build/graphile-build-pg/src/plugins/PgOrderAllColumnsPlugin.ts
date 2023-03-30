@@ -3,9 +3,9 @@ import "graphile-config";
 
 import type {
   PgCodec,
-  PgResourceUnique,
   PgCodecAttribute,
   PgCodecAttributes,
+  PgResourceUnique,
 } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";

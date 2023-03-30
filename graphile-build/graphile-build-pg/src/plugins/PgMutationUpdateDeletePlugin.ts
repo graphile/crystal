@@ -2,10 +2,10 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
+  PgCodecAttribute,
   PgDeleteStep,
   PgResource,
   PgResourceUnique,
-  PgCodecAttribute,
   PgUpdateStep,
 } from "@dataplan/pg";
 import { pgDelete, pgUpdate } from "@dataplan/pg";

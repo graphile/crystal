@@ -1,10 +1,10 @@
 import type {
   PgCodec,
+  PgCodecAttributes,
   PgCodecRelationConfig,
   PgCodecWithColumns,
   PgRegistryAny,
   PgResourceOptions,
-  PgCodecAttributes,
   WithPgClient,
 } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";

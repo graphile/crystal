@@ -4,12 +4,12 @@
 
 import type {
   PgCodec,
+  PgCodecAttributes,
   PgFunctionResourceOptions,
   PgResourceExtensions,
   PgResourceOptions,
   PgResourceParameter,
   PgSelectArgumentDigest,
-  PgCodecAttributes,
 } from "@dataplan/pg";
 import {
   makePgResourceOptions,

@@ -68,12 +68,12 @@ import { inspect } from "util";
 
 import type {
   PgCodec,
+  PgCodecAttribute,
+  PgCodecAttributeVia,
   PgConditionStep,
   PgExecutorContextPlans,
   PgInsertStep,
   PgSelectStep,
-  PgCodecAttribute,
-  PgCodecAttributeVia,
   WithPgClient,
 } from "../";
 import type { PgSubscriber } from "../adaptors/pg.js";

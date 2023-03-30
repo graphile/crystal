@@ -1,9 +1,9 @@
 export {
+  PgCodecAttributeTags,
   PgCodecRelationTags,
   PgCodecTags,
   PgResourceTags,
   PgSmartTagsDict,
-  PgCodecAttributeTags,
 } from "./interfaces.js";
 export {
   getWithPgClientFromPgConfig,

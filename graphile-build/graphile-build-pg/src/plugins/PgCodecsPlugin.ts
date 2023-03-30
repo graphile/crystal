@@ -2,12 +2,12 @@ import "graphile-build";
 
 import type {
   PgCodec,
+  PgCodecAttribute,
+  PgCodecAttributes,
   PgCodecExtensions,
   PgEnumTypeCodec,
   PgRecordTypeCodecSpec,
   PgResource,
-  PgCodecAttribute,
-  PgCodecAttributes,
 } from "@dataplan/pg";
 import {
   domainOfCodec,
@@ -865,8 +865,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           if (codec.columns) {
             for (const columnName in codec.columns) {
-              const columnCodec = (codec.columns as PgCodecAttributes)[columnName]
-                .codec;
+              const columnCodec = (codec.columns as PgCodecAttributes)[
+                columnName
+              ].codec;
               walkCodec(columnCodec);
             }
           }
@@ -1098,8 +1099,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             // Process all the columns (if any), then exit.
             if (codec.columns) {
               for (const columnName in codec.columns) {
-                const columnCodec = (codec.columns as PgCodecAttributes)[columnName]
-                  .codec;
+                const columnCodec = (codec.columns as PgCodecAttributes)[
+                  columnName
+                ].codec;
                 prepareTypeForCodec(columnCodec, visited);
               }
 

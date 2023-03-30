@@ -7,10 +7,10 @@ import type {
   PgClassExpressionStep,
   PgCodec,
   PgCodecAny,
-  PgRegistry,
-  PgSelectSingleStep,
   PgCodecAttribute,
   PgCodecAttributes,
+  PgRegistry,
+  PgSelectSingleStep,
 } from "@dataplan/pg";
 import {
   PgResource,

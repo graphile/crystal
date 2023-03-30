@@ -3,11 +3,11 @@ import "graphile-build";
 import type {
   PgCodec,
   PgCodecAny,
+  PgCodecAttribute,
   PgCodecRelationConfig,
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
-  PgCodecAttribute,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";

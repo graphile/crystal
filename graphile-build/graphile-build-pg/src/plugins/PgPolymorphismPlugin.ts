@@ -7,6 +7,7 @@ import "./PgTablesPlugin.js";
 import type {
   PgCodec,
   PgCodecAny,
+  PgCodecAttribute,
   PgCodecExtensions,
   PgCodecPolymorphism,
   PgCodecPolymorphismRelational,
@@ -19,7 +20,6 @@ import type {
   PgRefDefinition,
   PgResource,
   PgResourceOptions,
-  PgCodecAttribute,
 } from "@dataplan/pg";
 import { arraysMatch, ExecutableStep } from "grafast";
 import type {

@@ -217,7 +217,9 @@ export class PgUpdateStep<
   get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<infer UCodec>
+    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<
+      infer UCodec
+    >
       ? UCodec
       : never,
     TResource
