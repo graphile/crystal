@@ -1,7 +1,7 @@
 import type {
   PgCodecRelationConfig,
   PgRegistryAny,
-  PgSourceOptions,
+  PgResourceOptions,
   PgTypeCodec,
   PgTypeCodecWithColumns,
   PgTypeColumns,
@@ -9,7 +9,7 @@ import type {
 } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 
-export interface PgSourceTags extends PgSmartTagsDict {
+export interface PgResourceTags extends PgSmartTagsDict {
   name: string;
 
   /** For a computed column function/etc, what field name should we use? */
@@ -23,7 +23,7 @@ export interface PgSourceTags extends PgSmartTagsDict {
   deprecated: string | string[];
 }
 
-export interface PgSourceUniqueTags extends PgSmartTagsDict {
+export interface PgResourceUniqueTags extends PgSmartTagsDict {
   /** The field name for the root-level accessor for a row by this unique constraint */
   fieldName: string;
   behavior: string | string[];
@@ -34,7 +34,7 @@ export interface PgCodecRelationTags extends PgSmartTagsDict {
   deprecated: string | string[];
 }
 
-export interface PgSourceRefTags extends PgSmartTagsDict {
+export interface PgResourceRefTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
 }
@@ -72,8 +72,8 @@ export interface PgAdaptor<
  * extensions so we can easily use them with TypeScript.
  */
 declare module "@dataplan/pg" {
-  interface PgSourceExtensions {
-    tags: Partial<PgSourceTags>;
+  interface PgResourceExtensions {
+    tags: Partial<PgResourceTags>;
     description?: string;
     singleOutputParameterName?: string;
     /** For v4 compatibility, what's the name of the actual table. */
@@ -84,8 +84,8 @@ declare module "@dataplan/pg" {
     };
   }
 
-  interface PgSourceUniqueExtensions {
-    tags: Partial<PgSourceUniqueTags>;
+  interface PgResourceUniqueExtensions {
+    tags: Partial<PgResourceUniqueTags>;
     description?: string;
   }
 
@@ -94,8 +94,8 @@ declare module "@dataplan/pg" {
     description?: string;
   }
 
-  interface PgSourceRefExtensions {
-    tags: Partial<PgSourceRefTags>;
+  interface PgResourceRefExtensions {
+    tags: Partial<PgResourceRefTags>;
     description?: string;
   }
 
@@ -118,7 +118,7 @@ declare global {
       [codecName: string]: {
         [relationName: string]: PgCodecRelationConfig<
           PgTypeCodec<any, PgTypeColumns, any, any, undefined, any, undefined>,
-          PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+          PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
         >;
       };
     }

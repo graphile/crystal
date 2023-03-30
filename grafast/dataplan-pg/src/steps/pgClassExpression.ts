@@ -4,11 +4,11 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgTypeColumn } from "../codecs.js";
-import type { PgSource } from "../datasource.js";
+import type { PgResource } from "../datasource.js";
 import type {
   GetPgCodecColumns,
   PgClassSingleStep,
-  PgSourceAny,
+  PgResourceAny,
   PgTypeCodecAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
@@ -31,7 +31,7 @@ import { PgUpdateStep } from "./pgUpdate.js";
  */
 export class PgClassExpressionStep<
     TExpressionCodec extends PgTypeCodecAny,
-    TSource extends PgSource<any, any, any, any, any>,
+    TSource extends PgResource<any, any, any, any, any>,
   >
   extends UnbatchedExecutableStep<any>
   implements PgTypedExecutableStep<TExpressionCodec>
@@ -245,7 +245,7 @@ export class PgClassExpressionStep<
  */
 function pgClassExpression<
   TExpressionCodec extends PgTypeCodecAny,
-  TSource extends PgSourceAny,
+  TSource extends PgResourceAny,
 >(
   table: PgClassSingleStep<TSource> | PgUnionAllSingleStep,
   codec: TExpressionCodec,

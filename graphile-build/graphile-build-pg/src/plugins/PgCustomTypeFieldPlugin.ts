@@ -11,9 +11,9 @@ import type {
   PgInsertStep,
   PgSelectArgumentSpec,
   PgSelectStep,
-  PgSource,
-  PgSourceParameter,
-  PgSourceParameterAny,
+  PgResource,
+  PgResourceParameter,
+  PgResourceParameterAny,
   PgTypeCodec,
   PgTypedExecutableStep,
   PgUpdateStep,
@@ -62,8 +62,8 @@ declare global {
   namespace GraphileBuild {
     interface Build {
       pgGetArgDetailsFromParameters(
-        source: PgSource<any, any, any, any, any>,
-        parameters?: readonly PgSourceParameter<any, any>[],
+        source: PgResource<any, any, any, any, any>,
+        parameters?: readonly PgResourceParameter<any, any>[],
       ): {
         makeFieldArgs(): {
           [graphqlArgName: string]: {
@@ -86,7 +86,7 @@ declare global {
               codec: PgTypeCodec<any, any, any, any>,
             ): SQL;
           };
-          source: PgSource<any, any, any, any, any>;
+          source: PgResource<any, any, any, any, any>;
           fieldArgs: FieldArgs;
           path?: string[];
           initialArgs?: SQL[];
@@ -95,31 +95,31 @@ declare global {
     }
 
     interface InflectionCustomFieldProcedureDetails {
-      source: PgSource<
+      source: PgResource<
         any,
         any,
         any,
-        readonly PgSourceParameter<any, any>[],
+        readonly PgResourceParameter<any, any>[],
         any
       >;
     }
     interface InflectionCustomFieldArgumentDetails {
-      source: PgSource<
+      source: PgResource<
         any,
         any,
         any,
-        readonly PgSourceParameter<any, any>[],
+        readonly PgResourceParameter<any, any>[],
         any
       >;
-      param: PgSourceParameter<any, any>;
+      param: PgResourceParameter<any, any>;
       index: number;
     }
     interface InflectionCustomFieldMutationResult {
-      source: PgSource<
+      source: PgResource<
         any,
         any,
         any,
-        readonly PgSourceParameter<any, any>[],
+        readonly PgResourceParameter<any, any>[],
         any
       >;
       returnGraphQLTypeName: string;
@@ -195,7 +195,7 @@ declare global {
 }
 
 function shouldUseCustomConnection(
-  pgSource: PgSource<any, any, any, any, any>,
+  pgSource: PgResource<any, any, any, any, any>,
 ): boolean {
   const { codec } = pgSource;
   // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
@@ -205,13 +205,13 @@ function shouldUseCustomConnection(
 }
 
 function defaultProcSourceBehavior(
-  s: PgSource<any, any, any, any, any>,
+  s: PgResource<any, any, any, any, any>,
   options: GraphileBuild.SchemaOptions,
 ): string {
   const { simpleCollections } = options;
   const behavior = [];
   const firstParameter = (
-    s as PgSource<any, any, any, readonly PgSourceParameter<any, any>[], any>
+    s as PgResource<any, any, any, readonly PgResourceParameter<any, any>[], any>
   ).parameters[0];
   if (
     !s.isMutation &&
@@ -266,11 +266,11 @@ function hasRecord(
 declare global {
   namespace GraphileBuild {
     interface Build {
-      [$$rootQuery]: Array<PgSource<any, any, any, any, any>>;
-      [$$rootMutation]: Array<PgSource<any, any, any, any, any>>;
+      [$$rootQuery]: Array<PgResource<any, any, any, any, any>>;
+      [$$rootMutation]: Array<PgResource<any, any, any, any, any>>;
       [$$computed]: Map<
         PgTypeCodec<any, any, any, any, any, any, any>,
-        Array<PgSource<any, any, any, any, any>>
+        Array<PgResource<any, any, any, any, any>>
       >;
     }
   }
@@ -568,11 +568,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 shouldUseCustomConnection(someSource);
 
               if (isFunctionSourceRequiringConnection) {
-                const source = someSource as PgSource<
+                const source = someSource as PgResource<
                   any,
                   any,
                   any,
-                  readonly PgSourceParameterAny[],
+                  readonly PgResourceParameterAny[],
                   any
                 >;
                 const connectionTypeName = source.codec.columns
@@ -644,11 +644,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 );
               // Add payload type for mutation functions
               if (isMutationProcSource) {
-                const source = someSource as PgSource<
+                const source = someSource as PgResource<
                   any,
                   any,
                   any,
-                  readonly PgSourceParameterAny[],
+                  readonly PgResourceParameterAny[],
                   any
                 >;
                 build.recoverable(null, () => {
@@ -873,7 +873,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 isRootMutation || isRootQuery
                   ? source.parameters
                   : source.parameters.slice(1)
-              ) as PgSourceParameterAny[];
+              ) as PgResourceParameterAny[];
 
               const { makeArgs, makeFieldArgs } = pgGetArgDetailsFromParameters(
                 source,
@@ -1229,7 +1229,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
 function getFunctionSourceReturnGraphQLType(
   build: GraphileBuild.Build,
-  source: PgSource<any, any, any, any, any>,
+  source: PgResource<any, any, any, any, any>,
 ): GraphQLOutputType | null {
   const sourceInnerCodec: PgTypeCodec<any, any, any, any, undefined, any, any> =
     source.codec.arrayOfCodec ?? source.codec;

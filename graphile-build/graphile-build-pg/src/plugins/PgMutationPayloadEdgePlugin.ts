@@ -3,7 +3,7 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
-  PgSourceUnique,
+  PgResourceUnique,
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
@@ -108,7 +108,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
 
         const source = sources[0];
 
-        const pk = (source.uniques as PgSourceUnique[])?.find(
+        const pk = (source.uniques as PgResourceUnique[])?.find(
           (u) => u.isPrimary,
         );
         if (!pk) {

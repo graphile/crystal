@@ -7,7 +7,7 @@ import type {
 import { ExecutableStep, exportAs, polymorphicWrap } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 
-import type { PgSource } from "../datasource.js";
+import type { PgResource } from "../datasource.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
 /**
@@ -18,7 +18,7 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
  * that represents a row from this table.
  */
 export class PgSingleTablePolymorphicStep<
-    TSource extends PgSource<any, any, any, any, any>,
+    TSource extends PgResource<any, any, any, any, any>,
   >
   extends ExecutableStep<unknown>
   implements PolymorphicStep
@@ -68,7 +68,7 @@ export class PgSingleTablePolymorphicStep<
 }
 
 export function pgSingleTablePolymorphic<
-  TSource extends PgSource<any, any, any, any, any>,
+  TSource extends PgResource<any, any, any, any, any>,
 >(
   $typeName: ExecutableStep<string | null>,
   $row: PgSelectSingleStep<TSource>,

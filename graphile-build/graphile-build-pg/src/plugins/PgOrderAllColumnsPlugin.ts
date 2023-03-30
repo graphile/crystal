@@ -2,7 +2,7 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgSourceUnique,
+  PgResourceUnique,
   PgTypeCodec,
   PgTypeColumn,
   PgTypeColumns,
@@ -66,7 +66,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
         const sources = Object.values(build.input.pgRegistry.pgSources).filter(
           (s) => s.codec === pgCodec && !s.parameters,
         );
-        const uniques = sources.flatMap((s) => s.uniques as PgSourceUnique[]);
+        const uniques = sources.flatMap((s) => s.uniques as PgResourceUnique[]);
         return extend(
           values,
           Object.entries(columns).reduce((memo, [columnName, column]) => {

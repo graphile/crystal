@@ -8,8 +8,8 @@ import type {
   PgCodecRef,
   PgCodecRelation,
   PgRefDefinition,
-  PgSource,
-  PgSourceOptions,
+  PgResource,
+  PgResourceOptions,
   PgTypeCodec,
   PgTypeCodecAny,
   PgTypeCodecExtensions,
@@ -271,7 +271,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         const registry = registryBuilder.getRegistryConfig();
         for (const source of Object.values(
           registry.pgSources,
-        ) as PgSourceOptions<any, any, any, any>[]) {
+        ) as PgResourceOptions<any, any, any, any>[]) {
           if (source.parameters || !source.codec.columns) {
             continue;
           }
@@ -393,7 +393,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         // to use the final PgRegistry, not the PgRegistryBuilder.
 
         const { registry } = event;
-        for (const source of Object.values(registry.pgSources) as PgSource<
+        for (const source of Object.values(registry.pgSources) as PgResource<
           any,
           any,
           any,

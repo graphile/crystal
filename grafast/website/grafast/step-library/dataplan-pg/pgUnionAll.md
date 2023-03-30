@@ -33,7 +33,7 @@ The `pgUnionAll` function accepts one argument - the `PgUnionAllStepConfig`.
 This configuration object has the following entries:
 
 - `sourceByTypeName` - (required) a map from GraphQL type name to the relevant
-  `PgSource` from which matching records can be fetched.
+  `PgResource` from which matching records can be fetched.
 - `members` - (optional) a list of details of the sources and relationship
   paths to combine in the `union all` statement; each entry in `members` will
   become another `union all`'d `select` statement. If unspecified, we'll generate

@@ -93,7 +93,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           addBehaviorToTags(column.extensions!.tags!, parts.join(" "));
         }
       },
-      async pgProcedures_PgSourceOptions(info, event) {
+      async pgProcedures_PgResourceOptions(info, event) {
         const { pgProc, databaseName, sourceOptions } = event;
         const db = await info.helpers.pgIntrospection.getDatabase(databaseName);
         const { introspection } = db;
@@ -120,7 +120,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           );
         }
       },
-      async pgTables_PgSourceOptions(info, event) {
+      async pgTables_PgResourceOptions(info, event) {
         const { pgClass, sourceOptions, databaseName } = event;
         if (!["r", "v", "m", "f", "p"].includes(pgClass.relkind)) {
           return;

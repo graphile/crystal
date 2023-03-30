@@ -9,8 +9,8 @@ interface CommonOptions {
 }
 
 const KNOWN_IMPORTS: Array<[string, string]> = [
-  ["@dataplan/pg", "PgSource"],
-  ["@dataplan/pg", "PgSourceBuilder"],
+  ["@dataplan/pg", "PgResource"],
+  ["@dataplan/pg", "PgResourceBuilder"],
   ["@dataplan/pg", "PgExecutor"],
   ["@dataplan/pg", "recordCodec"],
 ];

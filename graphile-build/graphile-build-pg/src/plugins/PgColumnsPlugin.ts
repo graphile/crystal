@@ -14,7 +14,7 @@ import type {
 import {
   pgSelectFromRecords,
   pgSelectSingleFromRecord,
-  PgSource,
+  PgResource,
 } from "@dataplan/pg";
 import type { GraphileFieldConfig, SetterStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
@@ -88,11 +88,11 @@ function unwrapCodec(
 }
 
 const getSource = EXPORTABLE(
-  (PgSource) =>
+  (PgResource) =>
     (
       registry: PgRegistry<any, any, any>,
       baseCodec: PgTypeCodecAny,
-      pgSources: PgSource<any, any, any, any, any>[],
+      pgSources: PgResource<any, any, any, any, any>[],
       $record: PgSelectSingleStep<any>,
     ) => {
       const executor = $record.source.executor;
@@ -102,13 +102,13 @@ const getSource = EXPORTABLE(
             // These have already been filtered by codec
             potentialSource.executor === executor,
         ) ??
-        // TODO: yuck; we should not be building a PgSource on demand. We
+        // TODO: yuck; we should not be building a PgResource on demand. We
         // should be able to detect this is necessary and add it to the
         // registry preemptively.
-        new PgSource(registry, PgSource.configFromCodec(executor, baseCodec));
+        new PgResource(registry, PgResource.configFromCodec(executor, baseCodec));
       return source;
     },
-  [PgSource],
+  [PgResource],
 );
 
 function processColumn(

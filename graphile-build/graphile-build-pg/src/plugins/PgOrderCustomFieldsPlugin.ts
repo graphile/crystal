@@ -3,8 +3,8 @@ import "graphile-config";
 
 import type {
   PgSelectStep,
-  PgSource,
-  PgSourceParameterAny,
+  PgResource,
+  PgResourceParameterAny,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
@@ -17,7 +17,7 @@ declare global {
       computedColumnOrder(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, readonly PgSourceParameterAny[], any>;
+          source: PgResource<any, any, any, readonly PgResourceParameterAny[], any>;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;
@@ -63,7 +63,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           if (source.codec.columns) return false;
           if (source.codec.arrayOfCodec) return false;
           if (source.codec.rangeOfCodec) return false;
-          const parameters: readonly PgSourceParameterAny[] | undefined =
+          const parameters: readonly PgResourceParameterAny[] | undefined =
             source.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
@@ -82,11 +82,11 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           functionSources.reduce((memo, pgFieldSource) => {
             for (const ascDesc of ["asc" as const, "desc" as const]) {
               const valueName = inflection.computedColumnOrder({
-                source: pgFieldSource as PgSource<
+                source: pgFieldSource as PgResource<
                   any,
                   any,
                   any,
-                  readonly PgSourceParameterAny[],
+                  readonly PgResourceParameterAny[],
                   any
                 >,
                 variant: ascDesc,

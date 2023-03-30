@@ -1,7 +1,7 @@
 import type {
   PgCodecRelation,
-  PgSource,
-  PgSourceUnique,
+  PgResource,
+  PgResourceUnique,
   PgTypeCodec,
   PgTypeCodecWithColumns,
 } from "@dataplan/pg";
@@ -11,7 +11,7 @@ import type { GraphileConfig } from "graphile-config";
 
 type PgCodecRelationAny = PgCodecRelation<
   PgTypeCodecWithColumns,
-  PgSource<any, PgTypeCodecWithColumns, any, any, any>
+  PgResource<any, PgTypeCodecWithColumns, any, any, any>
 >;
 
 /**
@@ -300,7 +300,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           return this.camelCase(baseName);
         }
         const foreignPk = (
-          relation.remoteSource.uniques as PgSourceUnique[]
+          relation.remoteSource.uniques as PgResourceUnique[]
         ).find((u) => u.isPrimary);
         if (
           foreignPk &&
@@ -346,7 +346,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             );
           }
         }
-        const pk = (source.uniques as PgSourceUnique[]).find(
+        const pk = (source.uniques as PgResourceUnique[]).find(
           (u) => u.isPrimary,
         );
         if (pk && arraysMatch(pk.columns, relation.localColumns)) {
@@ -388,7 +388,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             );
           }
         }
-        const pk = (relation.remoteSource.uniques as PgSourceUnique[]).find(
+        const pk = (relation.remoteSource.uniques as PgResourceUnique[]).find(
           (u) => u.isPrimary,
         );
         if (pk && arraysMatch(pk.columns, relation.remoteColumns)) {

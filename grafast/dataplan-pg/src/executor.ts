@@ -117,7 +117,7 @@ export type PgExecutorSubscribeOptions = {
 
 /**
  * Represents a PostgreSQL database connection, can be used for issuing queries
- * to the database. Used by PgSource but also directly by things like
+ * to the database. Used by PgResource but also directly by things like
  * PgSimpleFunctionCallStep. Was once PgDataSource itself. Multiple PgExecutors
  * can exist in the same schema. PgExecutor is also responsible for things like
  * caching.

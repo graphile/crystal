@@ -2,14 +2,14 @@ import "graphile-build";
 
 import type {
   PgCodecRelationConfig,
-  PgSource,
-  PgSourceOptions,
-  PgSourceUnique,
+  PgResource,
+  PgResourceOptions,
+  PgResourceUnique,
   PgTypeCodec,
   PgTypeCodecAny,
   PgTypeColumn,
 } from "@dataplan/pg";
-import { assertPgClassSingleStep, makePgSourceOptions } from "@dataplan/pg";
+import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
@@ -31,7 +31,7 @@ declare global {
 
     interface Inflection {
       /**
-       * A PgSource represents a single way of getting a number of values of
+       * A PgResource represents a single way of getting a number of values of
        * `source.codec` type. It doesn't necessarily represent a table directly
        * (although it can) - e.g. it might be a function that returns records
        * from a table, or it could be a "sub-selection" of a table, e.g.
@@ -46,7 +46,7 @@ declare global {
        */
       _sourceName(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgResource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -54,7 +54,7 @@ declare global {
        */
       _singularizedSourceName(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgResource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -71,7 +71,7 @@ declare global {
       ): string;
 
       /**
-       * The name of the PgSource for a table/class
+       * The name of the PgResource for a table/class
        */
       tableSourceName(
         this: Inflection,
@@ -150,7 +150,7 @@ declare global {
     }
     interface ScopeObjectFieldsField {
       // TODO: put 'field' into all these names?
-      pgSource?: PgSource<any, any, any, any, any>;
+      pgSource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
@@ -158,7 +158,7 @@ declare global {
     }
     interface ScopeInterfaceFieldsField {
       // TODO: put 'field' into all these names?
-      pgSource?: PgSource<any, any, any, any, any>;
+      pgSource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgTypeCodec<any, any, any, any, any, any, any>;
       pgColumn?: PgTypeColumn<any>;
       isPgFieldConnection?: boolean;
@@ -178,49 +178,49 @@ declare global {
         getSourceOptions(
           databaseName: string,
           pgClass: PgClass,
-        ): Promise<PgSourceOptions<PgTypeCodecAny, any, any, any> | null>;
+        ): Promise<PgResourceOptions<PgTypeCodecAny, any, any, any> | null>;
         /*
         getSource(
-          sourceOptions: PgSourceOptions<any, any, any>,
-        ): Promise<PgSource<any, any, any, any, any> | null>;
+          sourceOptions: PgResourceOptions<any, any, any>,
+        ): Promise<PgResource<any, any, any, any, any> | null>;
         */
       };
     }
 
     interface GatherHooks {
       /**
-       * Determines the uniques to include in a PgSourceOptions when it is built
+       * Determines the uniques to include in a PgResourceOptions when it is built
        */
       pgTables_unique: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
           pgConstraint: PgConstraint;
-          unique: PgSourceUnique;
+          unique: PgResourceUnique;
         }) => void | Promise<void>
       >;
       /**
-       * Passed the PgSourceOptions before it's added to the PgRegistryBuilder.
+       * Passed the PgResourceOptions before it's added to the PgRegistryBuilder.
        */
-      pgTables_PgSourceOptions: PluginHook<
+      pgTables_PgResourceOptions: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceOptions: PgSourceOptions<any, any, any>;
+          sourceOptions: PgResourceOptions<any, any, any>;
         }) => void | Promise<void>
       >;
-      pgTables_PgSourceOptions_relations: PluginHook<
+      pgTables_PgResourceOptions_relations: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceOptions: PgSourceOptions<any, any, any, any>;
+          sourceOptions: PgResourceOptions<any, any, any, any>;
         }) => Promise<void> | void
       >;
-      pgTables_PgSourceOptions_relations_post: PluginHook<
+      pgTables_PgResourceOptions_relations_post: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          sourceOptions: PgSourceOptions<PgTypeCodecAny, any, any, any>;
+          sourceOptions: PgResourceOptions<PgTypeCodecAny, any, any, any>;
         }) => Promise<void> | void
       >;
     }
@@ -230,14 +230,14 @@ declare global {
 interface State {
   sourceOptionsByPgClassByDatabase: Map<
     string,
-    Map<PgClass, Promise<PgSourceOptions<any, any, any> | null>>
+    Map<PgClass, Promise<PgResourceOptions<any, any, any> | null>>
   >;
   sourceBySourceOptions: Map<
-    PgSourceOptions<any, any, any>,
-    Promise<PgSource<any, any, any, any, any> | null>
+    PgResourceOptions<any, any, any>,
+    Promise<PgResource<any, any, any, any, any> | null>
   >;
   detailsBySourceOptions: Map<
-    PgSourceOptions<any, any, any>,
+    PgResourceOptions<any, any, any>,
     { databaseName: string; pgClass: PgClass }
   >;
 }
@@ -433,7 +433,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             uniqueColumnOnlyConstraints.map(async (pgConstraint) => {
               const { tags, description } =
                 pgConstraint.getTagsAndDescription();
-              const unique: PgSourceUnique = {
+              const unique: PgResourceUnique = {
                 isPrimary: pgConstraint.contype === "p",
                 columns: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
@@ -526,15 +526,15 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             ],
           );
 
-          await info.process("pgTables_PgSourceOptions", {
+          await info.process("pgTables_PgResourceOptions", {
             databaseName,
             pgClass,
             sourceOptions: options,
           });
 
           const sourceOptions = EXPORTABLE(
-            (makePgSourceOptions, options) => makePgSourceOptions(options),
-            [makePgSourceOptions, options],
+            (makePgResourceOptions, options) => makePgResourceOptions(options),
+            [makePgResourceOptions, options],
           );
 
           const registryBuilder =
@@ -571,7 +571,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
       async pgBasics_PgRegistryBuilder_pgRelations(info, _event) {
         const toProcess: Array<{
-          sourceOptions: PgSourceOptions<any, any, any, any>;
+          sourceOptions: PgResourceOptions<any, any, any, any>;
           pgClass: PgClass;
           databaseName: string;
         }> = [];
@@ -586,13 +586,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             const sourceOptions = await sourceOptionsPromise;
             if (sourceOptions) {
               const entry = { sourceOptions, pgClass, databaseName };
-              await info.process("pgTables_PgSourceOptions_relations", entry);
+              await info.process("pgTables_PgResourceOptions_relations", entry);
               toProcess.push(entry);
             }
           }
         }
         for (const entry of toProcess) {
-          await info.process("pgTables_PgSourceOptions_relations_post", entry);
+          await info.process("pgTables_PgResourceOptions_relations_post", entry);
         }
       },
     },

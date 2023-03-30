@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PgInsertStep, PgSource } from "@dataplan/pg";
+import type { PgInsertStep, PgResource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
 import { constant, ExecutableStep, object } from "grafast";
@@ -16,19 +16,19 @@ declare global {
     interface Inflection {
       createField(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgResource<any, any, any, any, any>,
       ): string;
       createInputType(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgResource<any, any, any, any, any>,
       ): string;
       createPayloadType(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgResource<any, any, any, any, any>,
       ): string;
       tableFieldName(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgResource<any, any, any, any, any>,
       ): string;
     }
   }
@@ -36,7 +36,7 @@ declare global {
 
 const isInsertable = (
   build: GraphileBuild.Build,
-  source: PgSource<any, any, any, any, any>,
+  source: PgResource<any, any, any, any, any>,
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;

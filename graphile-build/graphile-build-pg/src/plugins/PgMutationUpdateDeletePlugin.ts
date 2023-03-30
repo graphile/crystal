@@ -3,8 +3,8 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgDeleteStep,
-  PgSource,
-  PgSourceUnique,
+  PgResource,
+  PgResourceUnique,
   PgTypeColumn,
   PgUpdateStep,
 } from "@dataplan/pg";
@@ -31,7 +31,7 @@ declare global {
     interface ScopeObject {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;
-      pgTypeSource?: PgSource<any, any, any, any, any>;
+      pgTypeSource?: PgResource<any, any, any, any, any>;
     }
 
     interface ScopeObjectFieldsField {
@@ -45,88 +45,88 @@ declare global {
       isPgDeleteInputType?: boolean;
       isPgDeleteByKeysInputType?: boolean;
       isPgDeleteNodeInputType?: boolean;
-      pgSource?: PgSource<any, any, any, any, any>;
-      pgSourceUnique?: PgSourceUnique;
+      pgSource?: PgResource<any, any, any, any, any>;
+      pgSourceUnique?: PgResourceUnique;
     }
 
     interface Inflection {
       updatePayloadType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
+          source: PgResource<any, any, any, any, any>;
         },
       ): string;
       deletePayloadType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
+          source: PgResource<any, any, any, any, any>;
         },
       ): string;
 
       updateNodeField(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
-          unique: PgSourceUnique;
+          source: PgResource<any, any, any, any, any>;
+          unique: PgResourceUnique;
         },
       ): string;
       updateNodeInputType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
-          unique: PgSourceUnique;
+          source: PgResource<any, any, any, any, any>;
+          unique: PgResourceUnique;
         },
       ): string;
 
       deletedNodeId(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
+          source: PgResource<any, any, any, any, any>;
         },
       ): string;
 
       deleteNodeField(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
-          unique: PgSourceUnique;
+          source: PgResource<any, any, any, any, any>;
+          unique: PgResourceUnique;
         },
       ): string;
       deleteNodeInputType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
-          unique: PgSourceUnique;
+          source: PgResource<any, any, any, any, any>;
+          unique: PgResourceUnique;
         },
       ): string;
 
       updateByKeysField(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
-          unique: PgSourceUnique;
+          source: PgResource<any, any, any, any, any>;
+          unique: PgResourceUnique;
         },
       ): string;
       updateByKeysInputType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
-          unique: PgSourceUnique;
+          source: PgResource<any, any, any, any, any>;
+          unique: PgResourceUnique;
         },
       ): string;
 
       deleteByKeysField(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
-          unique: PgSourceUnique;
+          source: PgResource<any, any, any, any, any>;
+          unique: PgResourceUnique;
         },
       ): string;
       deleteByKeysInputType(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, any, any>;
-          unique: PgSourceUnique;
+          source: PgResource<any, any, any, any, any>;
+          unique: PgResourceUnique;
         },
       ): string;
 
@@ -137,7 +137,7 @@ declare global {
 
 const isUpdatable = (
   build: GraphileBuild.Build,
-  source: PgSource<any, any, any, any, any>,
+  source: PgResource<any, any, any, any, any>,
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
@@ -150,7 +150,7 @@ const isUpdatable = (
 
 const isDeletable = (
   build: GraphileBuild.Build,
-  source: PgSource<any, any, any, any, any>,
+  source: PgResource<any, any, any, any, any>,
 ) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
@@ -239,7 +239,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         } = build;
 
         const process = (
-          source: PgSource<any, any, any, any, any>,
+          source: PgResource<any, any, any, any, any>,
           mode: "source:update" | "source:delete",
         ) => {
           const modeText = mode === "source:update" ? "update" : "delete";
@@ -373,13 +373,13 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           );
 
           const primaryUnique = source.uniques.find(
-            (u: PgSourceUnique) => u.isPrimary,
+            (u: PgResourceUnique) => u.isPrimary,
           );
           const specs = [
             ...(primaryUnique && build.getNodeIdCodec !== undefined
               ? [{ unique: primaryUnique, uniqueMode: "node" }]
               : []),
-            ...source.uniques.map((unique: PgSourceUnique) => ({
+            ...source.uniques.map((unique: PgResourceUnique) => ({
               unique,
               uniqueMode: "keys",
             })),
@@ -580,7 +580,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
         const process = (
           fields: GraphQLFieldConfigMap<any, any>,
-          sources: PgSource<any, any, any, any, any>[],
+          sources: PgResource<any, any, any, any, any>[],
           mode: "source:update" | "source:delete",
         ) => {
           const modeShort = mode === "source:update" ? "update" : "delete";
@@ -590,19 +590,19 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                 ? inflection.updatePayloadType({ source })
                 : inflection.deletePayloadType({ source });
             const primaryUnique = source.uniques.find(
-              (u: PgSourceUnique) => u.isPrimary,
+              (u: PgResourceUnique) => u.isPrimary,
             );
             const constraintMode = `constraint:${mode}`;
             const specs = [
               ...(primaryUnique && !!build.getNodeIdHandler
                 ? [{ unique: primaryUnique, uniqueMode: "node" }]
                 : []),
-              ...source.uniques.map((unique: PgSourceUnique) => ({
+              ...source.uniques.map((unique: PgResourceUnique) => ({
                 unique,
                 uniqueMode: "keys",
               })),
             ].filter((spec) => {
-              const unique = spec.unique as PgSourceUnique;
+              const unique = spec.unique as PgResourceUnique;
               const behavior = getBehavior([
                 source.codec.extensions,
                 source.extensions,

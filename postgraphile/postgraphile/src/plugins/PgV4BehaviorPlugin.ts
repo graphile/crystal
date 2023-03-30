@@ -1,7 +1,7 @@
 import "graphile-config";
 import "graphile-build-pg";
 
-import type { PgSourceOptions, PgSourceParameter } from "@dataplan/pg";
+import type { PgResourceOptions, PgResourceParameter } from "@dataplan/pg";
 import type { PgProc } from "pg-introspection";
 import { inspect } from "util";
 
@@ -14,7 +14,7 @@ declare global {
 }
 
 const v4ComputedColumnChecks = (
-  _s: PgSourceOptions<any, any, any, any>,
+  _s: PgResourceOptions<any, any, any, any>,
   pgProc: PgProc,
 ): boolean => {
   const args = pgProc.getArguments();
@@ -41,15 +41,15 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
 
   gather: {
     hooks: {
-      pgProcedures_PgSourceOptions(info, event) {
+      pgProcedures_PgResourceOptions(info, event) {
         const { sourceOptions: s } = event;
         // Apply default behavior
         const behavior = [];
         const firstParameter = (
-          s as PgSourceOptions<
+          s as PgResourceOptions<
             any,
             any,
-            readonly PgSourceParameter<any, any>[],
+            readonly PgResourceParameter<any, any>[],
             any
           >
         ).parameters![0];

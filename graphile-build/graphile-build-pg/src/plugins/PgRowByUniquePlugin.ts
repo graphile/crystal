@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
+import type { PgResource, PgResourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import te, { isSafeObjectPropertyName } from "tamedevil";
@@ -15,8 +15,8 @@ declare global {
       rowByUnique(
         this: Inflection,
         details: {
-          unique: PgSourceUnique;
-          source: PgSource<any, any, any, any, any>;
+          unique: PgResourceUnique;
+          source: PgResource<any, any, any, any, any>;
         },
       ): string;
     }
@@ -76,7 +76,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
         return sources.reduce(
           (outerMemo, source) =>
             build.recoverable(outerMemo, () =>
-              (source.uniques as PgSourceUnique[]).reduce((memo, unique) => {
+              (source.uniques as PgResourceUnique[]).reduce((memo, unique) => {
                 const uniqueKeys = unique.columns as string[];
                 const fieldName = build.inflection.rowByUnique({
                   unique,

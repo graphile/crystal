@@ -38,7 +38,7 @@ import type {
   PgRefDefinition,
   PgRegistry,
   PgRegistryConfig,
-  PgSourceParameterAny,
+  PgResourceParameterAny,
   PgTypeCodec,
   PgTypeCodecAny,
   PgTypeCodecWithColumns,
@@ -78,14 +78,14 @@ export function EXPORTABLE<T, TScope extends any[]>(
 /**
  * Extra metadata you can attach to a unique constraint.
  */
-export interface PgSourceUniqueExtensions {}
+export interface PgResourceUniqueExtensions {}
 
 /**
  * Space for extra metadata about this source
  */
-export interface PgSourceExtensions {}
+export interface PgResourceExtensions {}
 
-export interface PgSourceParameterExtensions {
+export interface PgResourceParameterExtensions {
   variant?: string;
 }
 
@@ -93,7 +93,7 @@ export interface PgSourceParameterExtensions {
  * If this is a functional (rather than static) source, this describes one of
  * the parameters it accepts.
  */
-export interface PgSourceParameter<
+export interface PgResourceParameter<
   TName extends string | null,
   TCodec extends PgTypeCodecAny,
 > {
@@ -115,13 +115,13 @@ export interface PgSourceParameter<
    * null.
    */
   notNull?: boolean;
-  extensions?: PgSourceParameterExtensions;
+  extensions?: PgResourceParameterExtensions;
 }
 
 /**
- * Description of a unique constraint on a PgSource.
+ * Description of a unique constraint on a PgResource.
  */
-export interface PgSourceUnique<
+export interface PgResourceUnique<
   TColumns extends PgTypeColumns = PgTypeColumns,
 > {
   /**
@@ -135,7 +135,7 @@ export interface PgSourceUnique<
   /**
    * Space for you to add your own metadata
    */
-  extensions?: PgSourceUniqueExtensions;
+  extensions?: PgResourceUniqueExtensions;
 }
 
 export interface PgCodecRefPathEntry {
@@ -157,12 +157,12 @@ export interface PgCodecRefs {
 }
 
 /**
- * Configuration options for your PgSource
+ * Configuration options for your PgResource
  */
-export interface PgSourceOptions<
+export interface PgResourceOptions<
   TCodec extends PgTypeCodecAny,
-  TUniques extends ReadonlyArray<PgSourceUnique<GetPgCodecColumns<TCodec>>>,
-  TParameters extends readonly PgSourceParameterAny[] | undefined = undefined,
+  TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
   TName extends string = string,
 > {
   /**
@@ -178,16 +178,16 @@ export interface PgSourceOptions<
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
   selectAuth?: (
-    $step: PgSelectStep<PgSource<any, TCodec, any, any, any>>,
+    $step: PgSelectStep<PgResource<any, TCodec, any, any, any>>,
   ) => void;
 
   name: TName;
   identifier?: string;
-  source: TParameters extends readonly PgSourceParameterAny[]
+  source: TParameters extends readonly PgResourceParameterAny[]
     ? (...args: PgSelectArgumentDigest[]) => SQL
     : SQL;
   uniques?: TUniques;
-  extensions?: PgSourceExtensions;
+  extensions?: PgResourceExtensions;
   parameters?: TParameters;
   description?: string;
   /**
@@ -215,8 +215,8 @@ export interface PgSourceOptions<
 
 export interface PgFunctionSourceOptions<
   TCodec extends PgTypeCodecAny,
-  TUniques extends ReadonlyArray<PgSourceUnique<GetPgCodecColumns<TCodec>>>,
-  TNewParameters extends readonly PgSourceParameterAny[],
+  TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TNewParameters extends readonly PgResourceParameterAny[],
   TNewName extends string,
 > {
   name: TNewName;
@@ -226,10 +226,10 @@ export interface PgFunctionSourceOptions<
   returnsSetof: boolean;
   returnsArray: boolean;
   uniques?: TUniques;
-  extensions?: PgSourceExtensions;
+  extensions?: PgResourceExtensions;
   isMutation?: boolean;
   selectAuth?: (
-    $step: PgSelectStep<PgSource<any, TCodec, any, any, any>>,
+    $step: PgSelectStep<PgResource<any, TCodec, any, any, any>>,
   ) => void;
   description?: string;
 }
@@ -244,14 +244,14 @@ type CodecWithSource<TCodec extends PgTypeCodecAny> = TCodec & {
 };
 
 /**
- * PgSource represents any source of SELECT-able data in Postgres: tables,
+ * PgResource represents any source of SELECT-able data in Postgres: tables,
  * views, functions, etc.
  */
-export class PgSource<
+export class PgResource<
   TRegistry extends PgRegistry<any, any, any>,
   TCodec extends PgTypeCodecAny,
-  TUniques extends ReadonlyArray<PgSourceUnique<GetPgCodecColumns<TCodec>>>,
-  TParameters extends readonly PgSourceParameterAny[] | undefined = undefined,
+  TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
   TName extends string = string,
 > {
   public readonly registry: TRegistry;
@@ -262,7 +262,7 @@ export class PgSource<
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
   private selectAuth?: (
-    $step: PgSelectStep<PgSource<TRegistry, TCodec, any, any, any>>,
+    $step: PgSelectStep<PgResource<TRegistry, TCodec, any, any, any>>,
   ) => void;
 
   // TODO: make a public interface for this information
@@ -293,13 +293,13 @@ export class PgSource<
    */
   public readonly isVirtual: boolean;
 
-  public extensions: Partial<PgSourceExtensions> | undefined;
+  public extensions: Partial<PgResourceExtensions> | undefined;
 
   // TODO: delete me?
   static configFromCodec<TCodec extends PgTypeCodecAny>(
     executor: PgExecutor,
     baseCodec: TCodec,
-  ): PgSourceOptions<TCodec, never[]> {
+  ): PgResourceOptions<TCodec, never[]> {
     const codec: CodecWithSource<typeof baseCodec> = baseCodec;
     if (!codec[$$codecSource]) {
       codec[$$codecSource] = new Map();
@@ -343,7 +343,7 @@ export class PgSource<
    */
   constructor(
     registry: TRegistry,
-    options: PgSourceOptions<TCodec, TUniques, TParameters, TName>,
+    options: PgResourceOptions<TCodec, TUniques, TParameters, TName>,
   ) {
     const {
       codec,
@@ -414,19 +414,19 @@ export class PgSource<
   static alternativeSourceOptions<
     TCodec extends PgTypeCodecAny,
     const TNewUniques extends ReadonlyArray<
-      PgSourceUnique<GetPgCodecColumns<TCodec>>
+      PgResourceUnique<GetPgCodecColumns<TCodec>>
     >,
     const TNewName extends string,
   >(
-    baseOptions: PgSourceOptions<TCodec, any, undefined, any>,
+    baseOptions: PgResourceOptions<TCodec, any, undefined, any>,
     overrideOptions: {
       name: TNewName;
       identifier?: string;
       source: SQL;
       uniques?: TNewUniques;
-      extensions?: PgSourceExtensions;
+      extensions?: PgResourceExtensions;
     },
-  ): PgSourceOptions<TCodec, TNewUniques, undefined, TNewName> {
+  ): PgResourceOptions<TCodec, TNewUniques, undefined, TNewName> {
     const { name, identifier, source, uniques, extensions } = overrideOptions;
     const { codec, executor, selectAuth } = baseOptions;
     return {
@@ -450,20 +450,20 @@ export class PgSource<
    */
   static functionSourceOptions<
     TCodec extends PgTypeCodecAny,
-    const TNewParameters extends readonly PgSourceParameterAny[],
+    const TNewParameters extends readonly PgResourceParameterAny[],
     const TNewUniques extends ReadonlyArray<
-      PgSourceUnique<GetPgCodecColumns<TCodec>>
+      PgResourceUnique<GetPgCodecColumns<TCodec>>
     >,
     const TNewName extends string,
   >(
-    baseOptions: PgSourceOptions<TCodec, any, any, any>,
+    baseOptions: PgResourceOptions<TCodec, any, any, any>,
     overrideOptions: PgFunctionSourceOptions<
       TCodec,
       TNewUniques,
       TNewParameters,
       TNewName
     >,
-  ): PgSourceOptions<TCodec, TNewUniques, TNewParameters, TNewName> {
+  ): PgResourceOptions<TCodec, TNewUniques, TNewParameters, TNewName> {
     const { codec, executor, selectAuth } = baseOptions;
     const {
       name,
@@ -548,7 +548,7 @@ export class PgSource<
   }
 
   public toString(): string {
-    return chalk.bold.blue(`PgSource(${this.name})`);
+    return chalk.bold.blue(`PgResource(${this.name})`);
   }
 
   public getRelations(): TCodec extends PgTypeCodec<
@@ -598,7 +598,7 @@ export class PgSource<
         via as any,
       ) as unknown as PgCodecRelation<
         PgTypeCodecWithColumns,
-        PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        PgResource<any, PgTypeCodecWithColumns, any, any, any>
       >;
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
@@ -648,7 +648,7 @@ export class PgSource<
       string,
       PgCodecRelation<
         PgTypeCodecWithColumns,
-        PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        PgResource<any, PgTypeCodecWithColumns, any, any, any>
       >
     >;
     const reciprocal = Object.entries(relations).find(
@@ -803,7 +803,7 @@ export class PgSource<
     if (this.selectAuth) {
       this.selectAuth(
         $step as unknown as PgSelectStep<
-          PgSource<TRegistry, TCodec, any, any, any>
+          PgResource<TRegistry, TCodec, any, any, any>
         >,
       );
     }
@@ -882,7 +882,7 @@ export class PgSource<
     }
   }
 }
-exportAs("@dataplan/pg", PgSource, "PgSource");
+exportAs("@dataplan/pg", PgResource, "PgResource");
 
 export interface PgRegistryBuilder<
   TCodecs extends {
@@ -897,10 +897,10 @@ export interface PgRegistryBuilder<
     >;
   },
   TSources extends {
-    [name in string]: PgSourceOptions<
+    [name in string]: PgResourceOptions<
       PgTypeCodecAny,
-      ReadonlyArray<PgSourceUnique<PgTypeColumns>>,
-      readonly PgSourceParameterAny[] | undefined,
+      ReadonlyArray<PgResourceUnique<PgTypeColumns>>,
+      readonly PgResourceParameterAny[] | undefined,
       name
     >;
   },
@@ -908,7 +908,7 @@ export interface PgRegistryBuilder<
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
-        PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+        PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
       >;
     };
   },
@@ -930,17 +930,17 @@ export interface PgRegistryBuilder<
     TRelations
   >;
 
-  addSource<const TSource extends PgSourceOptions<any, any, any, any>>(
+  addSource<const TSource extends PgResourceOptions<any, any, any, any>>(
     source: TSource,
   ): PgRegistryBuilder<
-    TSource extends PgSourceOptions<infer UCodec, any, any, any>
+    TSource extends PgResourceOptions<infer UCodec, any, any, any>
       ? UCodec extends PgTypeCodec<infer UName, any, any, any, any, any, any>
         ? TCodecs & {
             [name in UName]: UCodec;
           }
         : never
       : never,
-    TSource extends PgSourceOptions<any, any, any, infer UName>
+    TSource extends PgResourceOptions<any, any, any, infer UName>
       ? TSources & {
           [name in UName]: TSource;
         }
@@ -959,7 +959,7 @@ export interface PgRegistryBuilder<
       undefined
     >,
     const TCodecRelationName extends string,
-    TRemoteSource extends PgSourceOptions<any, any, any, any>,
+    TRemoteSource extends PgResourceOptions<any, any, any, any>,
     const TCodecRelation extends Omit<
       PgCodecRelationConfig<TCodec, TRemoteSource>,
       "localCodec" | "remoteSourceOptions"
@@ -1021,10 +1021,10 @@ export function makeRegistry<
     >;
   },
   TSourceOptions extends {
-    [name in string]: PgSourceOptions<
+    [name in string]: PgResourceOptions<
       PgTypeCodecAny,
-      ReadonlyArray<PgSourceUnique<PgTypeColumns<any>>>,
-      readonly PgSourceParameterAny[] | undefined,
+      ReadonlyArray<PgResourceUnique<PgTypeColumns<any>>>,
+      readonly PgResourceParameterAny[] | undefined,
       name
     >;
   },
@@ -1032,7 +1032,7 @@ export function makeRegistry<
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         PgTypeCodec<string, PgTypeColumns, any, any, undefined, any, undefined>,
-        PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+        PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
       >;
     };
   },
@@ -1116,13 +1116,13 @@ export function makeRegistry<
 
   for (const [sourceName, rawConfig] of Object.entries(config.pgSources) as [
     keyof TSourceOptions,
-    PgSourceOptions<any, any, any, any>,
+    PgResourceOptions<any, any, any, any>,
   ][]) {
     const sourceConfig = {
       ...rawConfig,
       codec: addCodec(rawConfig.codec),
       parameters: rawConfig.parameters
-        ? (rawConfig.parameters as readonly PgSourceParameterAny[]).map(
+        ? (rawConfig.parameters as readonly PgResourceParameterAny[]).map(
             (p) => ({
               ...p,
               codec: addCodec(p.codec),
@@ -1130,10 +1130,10 @@ export function makeRegistry<
           )
         : rawConfig.parameters,
     };
-    const source = new PgSource(registry, sourceConfig) as any;
+    const source = new PgResource(registry, sourceConfig) as any;
 
     // This is the magic that breaks the circular reference: rather than
-    // building PgSource via a factory we tell the system to just retrieve it
+    // building PgResource via a factory we tell the system to just retrieve it
     // from the already build registry.
     Object.defineProperties(source, {
       $exporter$args: { value: [registry, sourceName] },
@@ -1180,7 +1180,7 @@ export function makeRegistry<
         remoteSource: registry.pgSources[remoteSourceOptions.name],
       } as PgCodecRelation<
         PgTypeCodecWithColumns,
-        PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        PgResource<any, PgTypeCodecWithColumns, any, any, any>
       >;
 
       // Tell the system to read the built relation from the registry
@@ -1276,7 +1276,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
         ...relation,
       } as PgCodecRelationConfig<
         PgTypeCodecWithColumns,
-        PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+        PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
       >;
       return builder;
     },
@@ -1292,9 +1292,9 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
 
 exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
 
-export function makePgSourceOptions<
-  const TSourceOptions extends PgSourceOptions<any, any, any, any>,
+export function makePgResourceOptions<
+  const TSourceOptions extends PgResourceOptions<any, any, any, any>,
 >(options: TSourceOptions) {
   return { ...options };
 }
-exportAs("@dataplan/pg", makePgSourceOptions, "makePgSourceOptions");
+exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");

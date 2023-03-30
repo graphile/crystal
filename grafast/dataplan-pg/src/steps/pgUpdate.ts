@@ -8,13 +8,13 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgTypeColumn } from "../codecs.js";
-import type { PgSourceUnique } from "../index.js";
+import type { PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
-  GetPgSourceCodec,
-  GetPgSourceColumns,
-  GetPgSourceUniques,
-  PgSourceAny,
+  GetPgResourceCodec,
+  GetPgResourceColumns,
+  GetPgResourceUniques,
+  PgResourceAny,
   PgTypeCodecAny,
   PlanByUniques,
 } from "../interfaces.js";
@@ -40,7 +40,7 @@ interface PgUpdatePlanFinalizeResults {
 /**
  * Update a single row identified by the 'getBy' argument.
  */
-export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
+export class PgUpdateStep<TSource extends PgResourceAny> extends ExecutableStep<
   unknown[]
 > {
   static $$export = {
@@ -76,7 +76,7 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
    * The columns and their dependency ids for us to find the record by.
    */
   private getBys: Array<{
-    name: keyof GetPgSourceColumns<TSource>;
+    name: keyof GetPgResourceColumns<TSource>;
     depId: number;
     pgCodec: PgTypeCodecAny;
   }> = [];
@@ -85,7 +85,7 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
    * The columns and their dependency ids for us to update.
    */
   private columns: Array<{
-    name: keyof GetPgSourceColumns<TSource>;
+    name: keyof GetPgResourceColumns<TSource>;
     depId: number;
     pgCodec: PgTypeCodecAny;
   }> = [];
@@ -114,11 +114,11 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
   constructor(
     source: TSource,
     getBy: PlanByUniques<
-      GetPgSourceColumns<TSource>,
-      GetPgSourceUniques<TSource>
+      GetPgResourceColumns<TSource>,
+      GetPgResourceUniques<TSource>
     >,
     columns?: {
-      [key in keyof GetPgSourceColumns<TSource>]?: ExecutableStep<any>; // | PgTypedExecutableStep<TColumns[key]["codec"]>
+      [key in keyof GetPgResourceColumns<TSource>]?: ExecutableStep<any>; // | PgTypedExecutableStep<TColumns[key]["codec"]>
     },
   ) {
     super();
@@ -128,12 +128,12 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.source.executor.context());
 
-    const keys: ReadonlyArray<keyof GetPgSourceColumns<TSource>> = getBy
-      ? (Object.keys(getBy) as Array<keyof GetPgSourceColumns<TSource>>)
+    const keys: ReadonlyArray<keyof GetPgResourceColumns<TSource>> = getBy
+      ? (Object.keys(getBy) as Array<keyof GetPgResourceColumns<TSource>>)
       : [];
 
     if (
-      !(this.source.uniques as PgSourceUnique[]).some((uniq) =>
+      !(this.source.uniques as PgResourceUnique[]).some((uniq) =>
         uniq.columns.every((key) => keys.includes(key as any)),
       )
     ) {
@@ -158,9 +158,9 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
       }
       const value = (getBy as any)![name as any];
       const depId = this.addDependency(value);
-      const column = (this.source.codec.columns as GetPgSourceColumns<TSource>)[
-        name
-      ];
+      const column = (
+        this.source.codec.columns as GetPgResourceColumns<TSource>
+      )[name];
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
@@ -169,7 +169,7 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
       Object.entries(columns).forEach(([key, value]) => {
         if (value) {
           this.set(
-            key as keyof GetPgSourceColumns<TSource>,
+            key as keyof GetPgResourceColumns<TSource>,
             value as ExecutableStep<any>,
           );
         }
@@ -177,7 +177,7 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
     }
   }
 
-  set<TKey extends keyof GetPgSourceColumns<TSource>>(
+  set<TKey extends keyof GetPgResourceColumns<TSource>>(
     name: TKey,
     value: ExecutableStep<any>, // | PgTypedExecutableStep<TColumns[TKey]["codec"]>
   ): void {
@@ -192,14 +192,14 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
       }
     }
     const { codec: pgCodec } = (
-      this.source.codec.columns as GetPgSourceColumns<TSource>
+      this.source.codec.columns as GetPgResourceColumns<TSource>
     )[name];
     const depId = this.addDependency(value);
     this.columns.push({ name, depId, pgCodec });
   }
 
   setPlan(): SetterStep<
-    { [key in keyof GetPgSourceColumns<TSource> & string]: ExecutableStep },
+    { [key in keyof GetPgResourceColumns<TSource> & string]: ExecutableStep },
     this
   > {
     if (this.locked) {
@@ -214,10 +214,10 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * updateed row.
    */
-  get<TAttr extends keyof GetPgSourceColumns<TSource>>(
+  get<TAttr extends keyof GetPgResourceColumns<TSource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgSourceColumns<TSource>[TAttr] extends PgTypeColumn<infer UCodec>
+    GetPgResourceColumns<TSource>[TAttr] extends PgTypeColumn<infer UCodec>
       ? UCodec
       : never,
     TSource
@@ -252,10 +252,10 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
     return colPlan as any;
   }
 
-  public record(): PgClassExpressionStep<GetPgSourceCodec<TSource>, TSource> {
-    return pgClassExpression<GetPgSourceCodec<TSource>, TSource>(
+  public record(): PgClassExpressionStep<GetPgResourceCodec<TSource>, TSource> {
+    return pgClassExpression<GetPgResourceCodec<TSource>, TSource>(
       this,
-      this.source.codec as GetPgSourceCodec<TSource>,
+      this.source.codec as GetPgResourceCodec<TSource>,
     )`${this.alias}`;
   }
 
@@ -438,14 +438,14 @@ export class PgUpdateStep<TSource extends PgSourceAny> extends ExecutableStep<
 /**
  * Update a single row identified by the 'getBy' argument.
  */
-export function pgUpdate<TSource extends PgSourceAny>(
+export function pgUpdate<TSource extends PgResourceAny>(
   source: TSource,
   getBy: PlanByUniques<
-    GetPgSourceColumns<TSource>,
-    GetPgSourceUniques<TSource>
+    GetPgResourceColumns<TSource>,
+    GetPgResourceUniques<TSource>
   >,
   columns?: {
-    [key in keyof GetPgSourceColumns<TSource>]?: ExecutableStep<any>; // | PgTypedExecutableStep<TColumns[key]["codec"]>
+    [key in keyof GetPgResourceColumns<TSource>]?: ExecutableStep<any>; // | PgTypedExecutableStep<TColumns[key]["codec"]>
   },
 ): PgUpdateStep<TSource> {
   return new PgUpdateStep(source, getBy, columns);

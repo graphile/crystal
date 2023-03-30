@@ -10,8 +10,8 @@ import type {
   PgRefDefinition,
   PgRegistry,
   PgSelectSingleStep,
-  PgSource,
-  PgSourceOptions,
+  PgResource,
+  PgResourceOptions,
   PgTypeCodec,
   PgTypeCodecAny,
   PgTypeCodecWithColumns,
@@ -36,7 +36,7 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
-      source: PgSource<PgRegistry<any, any, any>, any, any, any, any>;
+      source: PgResource<PgRegistry<any, any, any>, any, any, any, any>;
       relationName: string;
     }
 
@@ -106,7 +106,7 @@ declare global {
           event: {
             pgClass: PgClass;
             databaseName: string;
-            sourceOptions: PgSourceOptions<any, any, any>;
+            sourceOptions: PgResourceOptions<any, any, any>;
           },
           pgConstraint: PgConstraint,
           isReferencee?: boolean,
@@ -182,7 +182,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           relationName
         ] as PgCodecRelation<
           PgTypeCodecWithColumns,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+          PgResource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         //const codec = relation.remoteSource.codec;
         if (typeof relation.extensions?.tags.fieldName === "string") {
@@ -204,7 +204,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           relationName
         ] as PgCodecRelation<
           PgTypeCodecWithColumns,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+          PgResource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         if (
           typeof relation.extensions?.tags.foreignSingleFieldName === "string"
@@ -230,7 +230,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           relationName
         ] as PgCodecRelation<
           PgTypeCodecWithColumns,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+          PgResource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
@@ -252,7 +252,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           relationName
         ] as PgCodecRelation<
           PgTypeCodecWithColumns,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+          PgResource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         const override = relation.extensions?.tags.foreignConnectionFieldName;
         if (typeof override === "string") {
@@ -266,7 +266,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           relationName
         ] as PgCodecRelation<
           PgTypeCodecWithColumns,
-          PgSource<any, PgTypeCodecWithColumns, any, any, any>
+          PgResource<any, PgTypeCodecWithColumns, any, any, any>
         >;
         const override = relation.extensions?.tags.foreignSimpleFieldName;
         if (typeof override === "string") {
@@ -383,12 +383,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           : tags.forwardDescription ?? constraintDescription;
         const newRelation: PgCodecRelationConfig<
           PgTypeCodecWithColumns,
-          PgSourceOptions<PgTypeCodecWithColumns, any, any, any>
+          PgResourceOptions<PgTypeCodecWithColumns, any, any, any>
         > = {
           localCodec,
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
-          remoteSourceOptions: foreignSourceOptions as PgSourceOptions<
+          remoteSourceOptions: foreignSourceOptions as PgResourceOptions<
             any,
             any,
             any,
@@ -447,7 +447,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
     },
     hooks: {
-      async pgTables_PgSourceOptions_relations(info, event) {
+      async pgTables_PgResourceOptions_relations(info, event) {
         const { pgClass, databaseName } = event;
         const constraints =
           await info.helpers.pgIntrospection.getConstraintsForClass(
@@ -502,7 +502,7 @@ function makeSpecString(
 function makeRelationPlans(
   localColumns: readonly string[],
   remoteColumns: readonly string[],
-  otherSource: PgSource<any, any, any, any, any>,
+  otherSource: PgResource<any, any, any, any, any>,
   isMutationPayload: boolean,
 ) {
   const recordOrResult = isMutationPayload
@@ -660,15 +660,15 @@ function addRelations(
   if (!(isPgTableType || isMutationPayload || pgPolymorphism) || !codec) {
     return fields;
   }
-  const allPgSources = Object.values(build.input.pgRegistry.pgSources);
+  const allPgResources = Object.values(build.input.pgRegistry.pgSources);
   // TODO: now that refs relate to _codecs_ rather than _sources_ a lot of this
   // is really hacky. We should tidy it up.
   // TODO: change the default so that we don't do this on
   // isMutationPayload; only do that for V4 compat. (It's redundant vs
   // just using the object type directly)
   const source = (pgTypeSource ??
-    allPgSources.find((s) => s.codec === codec && !s.parameters) ??
-    allPgSources.find((s) => s.codec === codec && s.isUnique)) as PgSource<
+    allPgResources.find((s) => s.codec === codec && !s.parameters) ??
+    allPgResources.find((s) => s.codec === codec && s.isUnique)) as PgResource<
     any,
     PgTypeCodecAny,
     any,
@@ -684,7 +684,7 @@ function addRelations(
   const relations: {
     [identifier: string]: PgCodecRelation<
       PgTypeCodecWithColumns,
-      PgSource<any, PgTypeCodecWithColumns, any, any, any>
+      PgResource<any, PgTypeCodecWithColumns, any, any, any>
     >;
   } = source?.getRelations() ?? Object.create(null);
 
@@ -716,7 +716,7 @@ function addRelations(
   type Layer = {
     relationName: string;
     localColumns: string[];
-    source: PgSource<any, any, any, any, any>;
+    source: PgResource<any, any, any, any, any>;
     remoteColumns: string[];
     isUnique: boolean;
   };
@@ -734,7 +734,7 @@ function addRelations(
     for (const pathEntry of path) {
       const relation: PgCodecRelation<
         PgTypeCodecWithColumns,
-        PgSource<any, PgTypeCodecWithColumns, any, any, any>
+        PgResource<any, PgTypeCodecWithColumns, any, any, any>
       > = result.source.getRelation(pathEntry.relationName);
       const {
         isReferencee,
@@ -776,7 +776,7 @@ function addRelations(
     listFieldName: string;
     connectionFieldName: string;
     description?: string;
-    pgSource?: PgSource<any, any, any, any, any>;
+    pgSource?: PgResource<any, any, any, any, any>;
     pgCodec: PgTypeCodec<any, any, any, any, any, any, any> | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     relatedTypeName: string;
@@ -864,7 +864,7 @@ function addRelations(
   } of refDefinitionList) {
     let hasReferencee;
     let sharedCodec: PgTypeCodecAny | undefined = undefined;
-    let sharedSource: PgSource<any, any, any, any, any> | undefined = undefined;
+    let sharedSource: PgResource<any, any, any, any, any> | undefined = undefined;
     let behavior;
     let typeName;
     let singleRecordPlan;
@@ -947,7 +947,7 @@ function addRelations(
         if (ref.paths.length === 1 && ref.paths[0].length === 1) {
           const relation: PgCodecRelation<
             PgTypeCodecWithColumns,
-            PgSource<any, PgTypeCodecWithColumns, any, any, any>
+            PgResource<any, PgTypeCodecWithColumns, any, any, any>
           > = source.getRelation(ref.paths[0][0].relationName);
           const remoteSource = relation.remoteSource;
           return makeRelationPlans(
@@ -1119,7 +1119,7 @@ function addRelations(
             const attributes: PgUnionAllStepConfigAttributes<string> =
               unionAttributes ?? {};
             const sourceByTypeName: {
-              [typeName: string]: PgSource<any, any, any, any, any>;
+              [typeName: string]: PgResource<any, any, any, any, any>;
             } = Object.create(null);
             const members: PgUnionAllStepMember<string>[] = [];
             for (const path of paths) {

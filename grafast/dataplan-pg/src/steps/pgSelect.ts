@@ -43,15 +43,15 @@ import sql, { arraysMatch } from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
-import type { PgSource, PgSourceUnique } from "../datasource.js";
+import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type {
-  GetPgSourceCodec,
-  GetPgSourceColumns,
-  GetPgSourceRelations,
+  GetPgResourceCodec,
+  GetPgResourceColumns,
+  GetPgResourceRelations,
   PgCodecRelation,
   PgGroupSpec,
   PgOrderSpec,
-  PgSourceAny,
+  PgResourceAny,
   PgTypeCodec,
   PgTypeCodecAny,
   PgTypeCodecWithColumns,
@@ -217,7 +217,7 @@ function assertSensible(step: ExecutableStep): void {
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
 export interface PgSelectOptions<
-  TSource extends PgSource<any, any, any, any, any>,
+  TSource extends PgResource<any, any, any, any, any>,
 > {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
@@ -275,7 +275,7 @@ export interface PgSelectOptions<
  * don't allow `UNION`/`INTERSECT`/`EXCEPT`/`FOR UPDATE`/etc at this time,
  * purely because it hasn't been sufficiently considered.
  */
-export class PgSelectStep<TSource extends PgSource<any, any, any, any, any>>
+export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
   extends ExecutableStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
@@ -326,7 +326,7 @@ export class PgSelectStep<TSource extends PgSource<any, any, any, any, any>>
 
   // JOIN
 
-  private relationJoins: Map<keyof GetPgSourceRelations<TSource>, SQL>;
+  private relationJoins: Map<keyof GetPgResourceRelations<TSource>, SQL>;
   private joins: Array<PgSelectPlanJoin>;
 
   // WHERE
@@ -850,13 +850,13 @@ export class PgSelectStep<TSource extends PgSource<any, any, any, any, any>>
    * SELECT, WHERE and ORDER BY.
    */
   public singleRelation<
-    TRelationName extends keyof GetPgSourceRelations<TSource> & string,
+    TRelationName extends keyof GetPgResourceRelations<TSource> & string,
   >(relationIdentifier: TRelationName): SQL {
     const relation = this.source.getRelation(
       relationIdentifier,
     ) as PgCodecRelation<
       PgTypeCodecWithColumns,
-      PgSource<any, any, any, any, any>
+      PgResource<any, any, any, any, any>
     >;
     if (!relation) {
       throw new Error(
@@ -971,7 +971,9 @@ export class PgSelectStep<TSource extends PgSource<any, any, any, any, any>>
   }
 
   where(
-    condition: PgWhereConditionSpec<keyof GetPgSourceColumns<TSource> & string>,
+    condition: PgWhereConditionSpec<
+      keyof GetPgResourceColumns<TSource> & string
+    >,
   ): void {
     if (this.locker.locked) {
       throw new Error(
@@ -1035,7 +1037,7 @@ export class PgSelectStep<TSource extends PgSource<any, any, any, any, any>>
 
   having(
     condition: PgHavingConditionSpec<
-      keyof GetPgSourceColumns<TSource> & string
+      keyof GetPgResourceColumns<TSource> & string
     >,
   ): void {
     if (this.locker.locked) {
@@ -2163,7 +2165,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       if ($p === this) {
         return true;
       }
-      const p = $p as PgSelectStep<PgSourceAny>;
+      const p = $p as PgSelectStep<PgResourceAny>;
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
       // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
@@ -2342,7 +2344,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     }
   }
 
-  private mergeSelectsWith<TOtherStep extends PgSelectStep<PgSourceAny>>(
+  private mergeSelectsWith<TOtherStep extends PgSelectStep<PgResourceAny>>(
     otherPlan: TOtherStep,
   ): {
     [desiredIndex: string]: string;
@@ -2366,7 +2368,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     return actualKeyByDesiredKey;
   }
 
-  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<PgSourceAny>>(
+  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<PgResourceAny>>(
     otherPlan: TOtherStep,
   ): void {
     for (const placeholder of this.placeholders) {
@@ -2444,7 +2446,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       !this.isNullFetch()
     ) {
       // Inline ourself into our parent if we can.
-      let t: PgSelectStep<PgSourceAny> | null | undefined = undefined;
+      let t: PgSelectStep<PgResourceAny> | null | undefined = undefined;
       let p: ExecutableStep<any> | undefined = undefined;
       for (
         let dependencyIndex = 0, l = this.dependencies.length;
@@ -2763,7 +2765,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
    */
   single(
     options?: PgSelectSinglePlanOptions,
-  ): TSource extends PgSource<
+  ): TSource extends PgResource<
     any,
     PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
     any,
@@ -2797,7 +2799,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
    */
   listItem(
     itemPlan: ExecutableStep,
-  ): TSource extends PgSource<
+  ): TSource extends PgResource<
     any,
     PgTypeCodec<any, infer UColumns, any, any, any, any, any>,
     any,
@@ -2856,7 +2858,7 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function ensureOrderIsUnique(step: PgSelectStep<any>) {
-  const unique = (step.source.uniques as PgSourceUnique[])[0];
+  const unique = (step.source.uniques as PgResourceUnique[])[0];
   if (unique) {
     const ordersIsUnique = step.orderIsUnique();
     if (!ordersIsUnique) {
@@ -2872,7 +2874,7 @@ function ensureOrderIsUnique(step: PgSelectStep<any>) {
   }
 }
 
-export function pgSelect<TSource extends PgSource<any, any, any, any, any>>(
+export function pgSelect<TSource extends PgResource<any, any, any, any, any>>(
   options: PgSelectOptions<TSource>,
 ): PgSelectStep<TSource> {
   return new PgSelectStep(options);
@@ -2883,11 +2885,19 @@ exportAs("@dataplan/pg", pgSelect, "pgSelect");
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
  */
 export function pgSelectFromRecords<
-  TSource extends PgSource<any, any, any, any, any>,
+  TSource extends PgResource<any, any, any, any, any>,
 >(
   source: TSource,
   records: PgClassExpressionStep<
-    PgTypeCodec<any, undefined, any, any, GetPgSourceCodec<TSource>, any, any>,
+    PgTypeCodec<
+      any,
+      undefined,
+      any,
+      any,
+      GetPgResourceCodec<TSource>,
+      any,
+      any
+    >,
     TSource
   >,
 ): PgSelectStep<TSource> {

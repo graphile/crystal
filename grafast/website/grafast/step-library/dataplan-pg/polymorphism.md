@@ -329,7 +329,7 @@ create table checklist_items (
 
 :::info
 
-When building the `PgSource` for these tables, the subtables should have
+When building the `PgResource` for these tables, the subtables should have
 entries in `columns` for all of the shared columns, with `via: "item"`
 (replacing `"item"` with the name of the relation that needs to be traversed to
 access the central table) to indicate that those columns come via the 'item'

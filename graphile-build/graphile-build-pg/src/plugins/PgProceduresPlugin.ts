@@ -5,15 +5,15 @@
 import type {
   PgFunctionSourceOptions,
   PgSelectArgumentDigest,
-  PgSourceExtensions,
-  PgSourceOptions,
-  PgSourceParameter,
+  PgResourceExtensions,
+  PgResourceOptions,
+  PgResourceParameter,
   PgTypeCodec,
   PgTypeColumns,
 } from "@dataplan/pg";
 import {
-  makePgSourceOptions,
-  PgSource,
+  makePgResourceOptions,
+  PgResource,
   recordCodec,
   sqlFromArgDigests,
 } from "@dataplan/pg";
@@ -27,11 +27,11 @@ import { version } from "../version.js";
 
 // TODO: these should be used, surely?
 interface _ComputedColumnDetails {
-  source: PgSource<any, any, any, readonly PgSourceParameter<any, any>[], any>;
+  source: PgResource<any, any, any, readonly PgResourceParameter<any, any>[], any>;
 }
 interface _ArgumentDetails {
-  source: PgSource<any, any, any, readonly PgSourceParameter<any, any>[], any>;
-  param: PgSourceParameter<any, any>;
+  source: PgResource<any, any, any, readonly PgResourceParameter<any, any>[], any>;
+  param: PgResourceParameter<any, any>;
   index: number;
 }
 
@@ -77,7 +77,7 @@ declare global {
         getSourceOptions(
           databaseName: string,
           pgProc: PgProc,
-        ): Promise<PgSourceOptions<any, any, any, any> | null>;
+        ): Promise<PgResourceOptions<any, any, any, any> | null>;
       };
     }
 
@@ -86,16 +86,16 @@ declare global {
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          baseSourceOptions: PgSourceOptions<any, any, any, any>;
+          baseSourceOptions: PgResourceOptions<any, any, any, any>;
           functionSourceOptions: PgFunctionSourceOptions<any, any, any, any>;
         }) => void | Promise<void>
       >;
 
-      pgProcedures_PgSourceOptions: PluginHook<
+      pgProcedures_PgResourceOptions: PluginHook<
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          sourceOptions: PgSourceOptions<any, any, any, any>;
+          sourceOptions: PgResourceOptions<any, any, any, any>;
         }) => void | Promise<void>
       >;
     }
@@ -105,7 +105,7 @@ declare global {
 interface State {
   sourceOptionsByPgProcByDatabase: Map<
     string,
-    Map<PgProc, Promise<PgSourceOptions<any, any, any, any> | null>>
+    Map<PgProc, Promise<PgResourceOptions<any, any, any, any> | null>>
   >;
 }
 interface Cache {}
@@ -315,7 +315,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
           // TODO: this isn't a sufficiently unique name, it does not allow for overloaded functions
 
-          const parameters: PgSourceParameter<any, any>[] = [];
+          const parameters: PgResourceParameter<any, any>[] = [];
 
           // const processedFirstInputArg = false;
 
@@ -414,7 +414,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           addBehaviorToTags(tags, "-filter -order", true);
 
-          const extensions: PgSourceExtensions = {
+          const extensions: PgResourceExtensions = {
             tags,
             description,
           };
@@ -480,7 +480,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   info.helpers.pgIntrospection.getExecutorForDatabase(
                     databaseName,
                   );
-                return PgSource.configFromCodec(executor, codec);
+                return PgResource.configFromCodec(executor, codec);
               }
             })();
 
@@ -508,24 +508,24 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             });
 
             const finalSourceOptions = EXPORTABLE(
-              (PgSource, options, sourceConfig) =>
-                PgSource.functionSourceOptions(sourceConfig, options),
-              [PgSource, options, sourceConfig],
+              (PgResource, options, sourceConfig) =>
+                PgResource.functionSourceOptions(sourceConfig, options),
+              [PgResource, options, sourceConfig],
             );
 
-            await info.process("pgProcedures_PgSourceOptions", {
+            await info.process("pgProcedures_PgResourceOptions", {
               databaseName,
               pgProc,
               sourceOptions: finalSourceOptions,
             });
 
             return EXPORTABLE(
-              (finalSourceOptions, makePgSourceOptions) =>
-                makePgSourceOptions(finalSourceOptions),
-              [finalSourceOptions, makePgSourceOptions],
+              (finalSourceOptions, makePgResourceOptions) =>
+                makePgResourceOptions(finalSourceOptions),
+              [finalSourceOptions, makePgResourceOptions],
             );
           } else {
-            const options: PgSourceOptions<any, any, any, any> = {
+            const options: PgResourceOptions<any, any, any, any> = {
               executor,
               name,
               identifier,
@@ -539,15 +539,15 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               description,
             };
 
-            await info.process("pgProcedures_PgSourceOptions", {
+            await info.process("pgProcedures_PgResourceOptions", {
               databaseName,
               pgProc,
               sourceOptions: options,
             });
 
             return EXPORTABLE(
-              (makePgSourceOptions, options) => makePgSourceOptions(options),
-              [makePgSourceOptions, options],
+              (makePgResourceOptions, options) => makePgResourceOptions(options),
+              [makePgResourceOptions, options],
             );
           }
         })().then((sourceOptions) => {

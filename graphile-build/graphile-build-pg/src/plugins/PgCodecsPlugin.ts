@@ -3,7 +3,7 @@ import "graphile-build";
 import type {
   PgEnumTypeCodec,
   PgRecordTypeCodecSpec,
-  PgSource,
+  PgResource,
   PgTypeCodec,
   PgTypeCodecExtensions,
   PgTypeColumn,
@@ -929,7 +929,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         // Now ensure all codecs are uniquely named
         const knownSourceByName = new Map<
           string,
-          PgSource<any, any, any, any, any>
+          PgResource<any, any, any, any, any>
         >();
         for (const source of Object.values(build.input.pgRegistry.pgSources)) {
           const known = knownSourceByName.get(source.name);

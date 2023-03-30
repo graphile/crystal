@@ -2,7 +2,7 @@ import "graphile-build";
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSource } from "@dataplan/pg";
+import type { PgResource } from "@dataplan/pg";
 import { connection } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
@@ -20,7 +20,7 @@ declare global {
        */
       allRowsConnection(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgResource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -29,7 +29,7 @@ declare global {
        */
       allRowsList(
         this: Inflection,
-        source: PgSource<any, any, any, any, any>,
+        source: PgResource<any, any, any, any, any>,
       ): string;
     }
   }
@@ -129,7 +129,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                   }),
                 ),
               },
-              `Adding 'all rows' list field for PgSource ${source}`,
+              `Adding 'all rows' list field for PgResource ${source}`,
             );
           }
 
@@ -173,7 +173,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     }),
                   ),
                 },
-                `Adding 'all rows' connection field for PgSource ${source}`,
+                `Adding 'all rows' connection field for PgResource ${source}`,
               );
             }
           }

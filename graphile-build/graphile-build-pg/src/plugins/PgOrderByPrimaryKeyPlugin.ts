@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSelectStep, PgSourceUnique } from "@dataplan/pg";
+import type { PgSelectStep, PgResourceUnique } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../version.js";
@@ -45,7 +45,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
           return values;
         }
 
-        const primaryKey = (sources[0].uniques as PgSourceUnique[]).find(
+        const primaryKey = (sources[0].uniques as PgResourceUnique[]).find(
           (source) => source.isPrimary,
         );
         if (!primaryKey) {

@@ -11,7 +11,7 @@ import type {
   WithPgClient,
 } from "@dataplan/pg";
 import {
-  makePgSourceOptions,
+  makePgResourceOptions,
   makeRegistryBuilder,
   PgExecutor,
   recordCodec,
@@ -99,7 +99,7 @@ async function main() {
     (
       TYPES,
       executor,
-      makePgSourceOptions,
+      makePgResourceOptions,
       makeRegistryBuilder,
       recordCodec,
       sql,
@@ -212,7 +212,7 @@ async function main() {
         },
       });
 
-      const usersSourceOptions = makePgSourceOptions({
+      const usersSourceOptions = makePgResourceOptions({
         name: "users",
         executor,
         source: usersCodec.sqlType,
@@ -220,7 +220,7 @@ async function main() {
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const forumsSourceOptions = makePgSourceOptions({
+      const forumsSourceOptions = makePgResourceOptions({
         //name: "main.app_public.forums",
         name: "forums",
         executor,
@@ -229,7 +229,7 @@ async function main() {
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const messagesSourceOptions = makePgSourceOptions({
+      const messagesSourceOptions = makePgResourceOptions({
         name: "messages",
         executor,
         source: messagesCodec.sqlType,
@@ -237,7 +237,7 @@ async function main() {
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
 
-      const uniqueAuthorCountSourceOptions = makePgSourceOptions({
+      const uniqueAuthorCountSourceOptions = makePgResourceOptions({
         executor,
         codec: TYPES.int,
         source: (...args) =>
@@ -257,7 +257,7 @@ async function main() {
         },
       });
 
-      const forumsUniqueAuthorCountSourceOptions = makePgSourceOptions({
+      const forumsUniqueAuthorCountSourceOptions = makePgResourceOptions({
         executor,
         codec: TYPES.int,
         isUnique: true,
@@ -288,7 +288,7 @@ async function main() {
         },
       });
 
-      const forumsRandomUserSourceOptions = makePgSourceOptions({
+      const forumsRandomUserSourceOptions = makePgResourceOptions({
         executor,
         codec: usersCodec,
         isUnique: true,
@@ -311,7 +311,7 @@ async function main() {
         },
       });
 
-      const forumsFeaturedMessagesSourceOptions = makePgSourceOptions({
+      const forumsFeaturedMessagesSourceOptions = makePgResourceOptions({
         executor,
         codec: messagesCodec,
         isUnique: false,
@@ -391,7 +391,7 @@ async function main() {
     [
       TYPES,
       executor,
-      makePgSourceOptions,
+      makePgResourceOptions,
       makeRegistryBuilder,
       recordCodec,
       sql,

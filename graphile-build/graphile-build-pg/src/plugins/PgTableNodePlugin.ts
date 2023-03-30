@@ -3,8 +3,8 @@ import "graphile-config";
 
 import type {
   PgSelectSingleStep,
-  PgSource,
-  PgSourceUnique,
+  PgResource,
+  PgResourceUnique,
   PgTypeCodec,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
@@ -57,7 +57,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
         const sourcesByCodec = new Map<
           PgTypeCodec<any, any, any, any, any, any, any>,
-          PgSource<any, any, any, any, any>[]
+          PgResource<any, any, any, any, any>[]
         >();
         for (const source of tableSources) {
           let list = sourcesByCodec.get(source.codec);
@@ -77,7 +77,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             continue;
           }
           const pgSource = sources[0];
-          const primaryKey = (pgSource.uniques as PgSourceUnique[]).find(
+          const primaryKey = (pgSource.uniques as PgResourceUnique[]).find(
             (u) => u.isPrimary === true,
           );
           if (!primaryKey) {

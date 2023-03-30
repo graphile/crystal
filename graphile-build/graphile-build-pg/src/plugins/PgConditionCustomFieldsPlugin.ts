@@ -3,8 +3,8 @@ import "graphile-config";
 import type {
   PgConditionStep,
   PgSelectStep,
-  PgSource,
-  PgSourceParameterAny,
+  PgResource,
+  PgResourceParameterAny,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
@@ -15,7 +15,7 @@ declare global {
   namespace GraphileBuild {
     interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;
-      pgFieldSource?: PgSource<any, any, any, any, any>;
+      pgFieldSource?: PgResource<any, any, any, any, any>;
     }
   }
 }
@@ -49,7 +49,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           if (source.codec.columns) return false;
           if (source.codec.arrayOfCodec) return false;
           if (source.codec.rangeOfCodec) return false;
-          const parameters: readonly PgSourceParameterAny[] | undefined =
+          const parameters: readonly PgResourceParameterAny[] | undefined =
             source.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
@@ -69,11 +69,11 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         return build.extend(
           fields,
           functionSources.reduce((memo, rawPgFieldSource) => {
-            const pgFieldSource = rawPgFieldSource as PgSource<
+            const pgFieldSource = rawPgFieldSource as PgResource<
               any,
               any,
               any,
-              readonly PgSourceParameterAny[],
+              readonly PgResourceParameterAny[],
               any
             >;
             const fieldName = inflection.computedColumnField({

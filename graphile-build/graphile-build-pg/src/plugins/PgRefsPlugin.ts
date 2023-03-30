@@ -3,8 +3,8 @@ import type {
   PgCodecRelationConfig,
   PgRefDefinition,
   PgRefDefinitions,
-  PgSource,
-  PgSourceOptions,
+  PgResource,
+  PgResourceOptions,
   PgTypeCodecAny,
   PgTypeCodecExtensions,
   PgTypeCodecWithColumns,
@@ -65,7 +65,7 @@ interface State {
   sourceEvents: Array<{
     databaseName: string;
     pgClass: PgClass;
-    source: PgSource<any, any, any, undefined, any>;
+    source: PgResource<any, any, any, undefined, any>;
     relations: GraphileConfig.PgTablesPluginSourceRelations;
   }>;
 }
@@ -166,7 +166,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           };
         }
       },
-      async pgTables_PgSourceOptions_relations_post(info, event) {
+      async pgTables_PgResourceOptions_relations_post(info, event) {
         const { databaseName, sourceOptions, pgClass } = event;
 
         const getCodecForTableName = async (targetTableIdentifier: string) => {
@@ -256,14 +256,14 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           outerLoop: for (const via of vias) {
             const path: PgCodecRefPath = [];
             const parts = via.split(";");
-            let currentSourceOptions: PgSourceOptions<any, any, any, any> =
+            let currentSourceOptions: PgResourceOptions<any, any, any, any> =
               sourceOptions;
             for (const rawPart of parts) {
               type RelationEntry = [
                 string,
                 PgCodecRelationConfig<
                   PgTypeCodecWithColumns,
-                  PgSourceOptions<any, any, any, any>
+                  PgResourceOptions<any, any, any, any>
                 >,
               ];
               const relationEntries = Object.entries(

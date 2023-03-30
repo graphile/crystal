@@ -3,14 +3,14 @@ import { BaseStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
-import type { PgSource } from "../datasource.js";
+import type { PgResource } from "../datasource.js";
 import type { ClassFilterStep } from "../filters/classFilter.js";
 import type { PgTypeCodec } from "../interfaces.js";
 import type { PgConditionCapableParentStep } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 
 export class TempTableStep<
-    TDataSource extends PgSource<any, any, any, any, any>,
+    TDataSource extends PgResource<any, any, any, any, any>,
   >
   extends BaseStep
   implements PgConditionCapableParentStep

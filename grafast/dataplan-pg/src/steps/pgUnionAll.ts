@@ -32,7 +32,7 @@ import { sql } from "pg-sql2";
 
 import type { PgTypeColumns } from "../codecs.js";
 import { TYPES } from "../codecs.js";
-import type { PgSource, PgSourceUnique } from "../datasource.js";
+import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type { PgExecutor } from "../executor.js";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
@@ -129,7 +129,7 @@ type PgUnionAllStepSelect<TAttributes extends string> =
     };
 
 export interface PgUnionAllSourceSpec {
-  source: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+  source: PgResource<any, any, ReadonlyArray<PgResourceUnique<any>>, any, any>;
 }
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
@@ -140,7 +140,7 @@ export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
 
 export interface PgUnionAllStepMember<TTypeNames extends string> {
   typeName: TTypeNames;
-  source: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+  source: PgResource<any, any, ReadonlyArray<PgResourceUnique<any>>, any, any>;
   match?: {
     [sourceColumnName: string]:
       | {
@@ -160,7 +160,7 @@ export interface PgUnionAllStepConfig<
   TTypeNames extends string,
 > {
   sourceByTypeName: {
-    [typeName in TTypeNames]: PgSource<any, any, any, any, any>;
+    [typeName in TTypeNames]: PgResource<any, any, any, any, any>;
   };
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
@@ -234,7 +234,7 @@ export class PgUnionAllSingleStep
       // This type isn't handled; so it should never occur
       return constant(null);
     }
-    const pk = (source.uniques as PgSourceUnique[] | undefined)?.find(
+    const pk = (source.uniques as PgResourceUnique[] | undefined)?.find(
       (u) => u.isPrimary === true,
     );
     if (!pk) {
@@ -333,7 +333,13 @@ export class PgUnionAllSingleStep
 
 interface MemberDigest<TTypeNames extends string> {
   member: PgUnionAllStepMember<TTypeNames>;
-  finalSource: PgSource<any, any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+  finalSource: PgResource<
+    any,
+    any,
+    ReadonlyArray<PgResourceUnique<any>>,
+    any,
+    any
+  >;
   sqlSource: SQL;
   symbol: symbol;
   alias: SQL;
@@ -586,7 +592,7 @@ export class PgUnionAllStep<
         spec.members ??
         (
           Object.entries(spec.sourceByTypeName) as Array<
-            [typeName: TTypeNames, source: PgSource<any, any, any, any, any>]
+            [typeName: TTypeNames, source: PgResource<any, any, any, any, any>]
           >
         ).map(
           ([typeName, source]): PgUnionAllStepMember<TTypeNames> => ({

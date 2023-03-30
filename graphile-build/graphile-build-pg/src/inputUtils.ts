@@ -1,6 +1,6 @@
 import "graphile-build";
 
-import type { PgCodecRelation, PgSource, PgTypeCodec } from "@dataplan/pg";
+import type { PgCodecRelation, PgResource, PgTypeCodec } from "@dataplan/pg";
 
 /**
  * Metadata for a specific PgTypeCodec
@@ -45,7 +45,7 @@ export function getCodecMetaLookupFromInput(
   input: GraphileBuild.BuildInput,
 ): PgTypeCodecMetaLookup {
   const metaLookup: PgTypeCodecMetaLookup = new Map();
-  const seenSources = new Set<PgSource<any, any, any, any, any>>();
+  const seenSources = new Set<PgResource<any, any, any, any, any>>();
   for (const codec of Object.values(input.pgRegistry.pgCodecs)) {
     walkCodec(codec, metaLookup);
   }
@@ -62,9 +62,9 @@ export function getCodecMetaLookupFromInput(
  * @internal
  */
 function walkSource(
-  source: PgSource<any, any, any, any, any>,
+  source: PgResource<any, any, any, any, any>,
   metaLookup: PgTypeCodecMetaLookup,
-  seenSources: Set<PgSource<any, any, any, any, any>>,
+  seenSources: Set<PgResource<any, any, any, any, any>>,
 ): void {
   if (seenSources.has(source)) {
     return;
