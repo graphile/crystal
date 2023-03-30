@@ -173,25 +173,25 @@ export class PgSelectSingleStep<
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
-    const dataSourceColumn: PgTypeColumn | undefined =
+    const resourceColumn: PgTypeColumn | undefined =
       this.resource.codec.columns?.[attr as string];
-    if (!dataSourceColumn && attr !== "") {
+    if (!resourceColumn && attr !== "") {
       throw new Error(
         `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
-    if (dataSourceColumn?.via) {
+    if (resourceColumn?.via) {
       const { relation, attribute } = this.resource.resolveVia(
-        dataSourceColumn.via,
+        resourceColumn.via,
         attr as string,
       );
       return this.singleRelation(relation as any).get(attribute) as any;
     }
 
-    if (dataSourceColumn?.identicalVia) {
+    if (resourceColumn?.identicalVia) {
       const { relation, attribute } = this.resource.resolveVia(
-        dataSourceColumn.identicalVia,
+        resourceColumn.identicalVia,
         attr as string,
       );
 
@@ -244,9 +244,9 @@ export class PgSelectSingleStep<
         ? this.resource.codec
         : this.resource.codec.columns![attr as string].codec,
     );
-    const colPlan = dataSourceColumn
-      ? dataSourceColumn.expression
-        ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
+    const colPlan = resourceColumn
+      ? resourceColumn.expression
+        ? sqlExpr`${sql.parens(resourceColumn.expression(classPlan.alias))}`
         : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
       : sqlExpr`${classPlan.alias}.v`; /* single column */
 
@@ -254,12 +254,12 @@ export class PgSelectSingleStep<
       this.nonNullColumn == null &&
       typeof attr === "string" &&
       attr.length > 0 &&
-      dataSourceColumn &&
-      !dataSourceColumn.expression &&
-      dataSourceColumn.notNull
+      resourceColumn &&
+      !resourceColumn.expression &&
+      resourceColumn.notNull
     ) {
       // We know the row is null iff this attribute is null
-      this.nonNullColumn = { column: dataSourceColumn, attr };
+      this.nonNullColumn = { column: resourceColumn, attr };
     }
 
     return colPlan as any;

@@ -222,15 +222,15 @@ export class PgUpdateStep<
       : never,
     TResource
   > {
-    const dataSourceColumn: PgTypeColumn =
+    const resourceColumn: PgTypeColumn =
       this.resource.codec.columns![attr as string];
-    if (!dataSourceColumn) {
+    if (!resourceColumn) {
       throw new Error(
         `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
-    if (dataSourceColumn?.via) {
+    if (resourceColumn?.via) {
       throw new Error(`Cannot select a 'via' column from PgUpdateStep`);
     }
 
@@ -245,9 +245,9 @@ export class PgUpdateStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression(this, dataSourceColumn.codec);
-    const colPlan = dataSourceColumn.expression
-      ? sqlExpr`${sql.parens(dataSourceColumn.expression(this.alias))}`
+    const sqlExpr = pgClassExpression(this, resourceColumn.codec);
+    const colPlan = resourceColumn.expression
+      ? sqlExpr`${sql.parens(resourceColumn.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
     return colPlan as any;
   }
@@ -335,15 +335,15 @@ export class PgUpdateStep<
   public finalize(): void {
     if (!this.isFinalized) {
       this.locked = true;
-      const sourceSource = this.resource.source;
-      if (!sql.isSQL(sourceSource)) {
+      const resourceSource = this.resource.source;
+      if (!sql.isSQL(resourceSource)) {
         throw new Error(
           `Error in ${this}: can only update into sources defined as SQL, however ${
             this.resource
           } has ${inspect(this.resource.source)}`,
         );
       }
-      const table = sql`${sourceSource} as ${this.alias}`;
+      const table = sql`${resourceSource} as ${this.alias}`;
 
       const fragmentsWithAliases = this.selects.map(
         (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
