@@ -46,14 +46,14 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
       allRowsConnection(options, source) {
         return this.connectionField(
           this.camelCase(
-            `all-${this.pluralize(this._singularizedSourceName(source))}`,
+            `all-${this.pluralize(this._singularizedResourceName(source))}`,
           ),
         );
       },
       allRowsList(options, source) {
         return this.listField(
           this.camelCase(
-            `all-${this.pluralize(this._singularizedSourceName(source))}`,
+            `all-${this.pluralize(this._singularizedResourceName(source))}`,
           ),
         );
       },
@@ -70,7 +70,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
         if (!context.scope.isRootQuery) {
           return fields;
         }
-        for (const source of Object.values(build.input.pgRegistry.pgSources)) {
+        for (const source of Object.values(build.input.pgRegistry.pgResources)) {
           if (source.parameters) {
             // Skip functions
             continue;

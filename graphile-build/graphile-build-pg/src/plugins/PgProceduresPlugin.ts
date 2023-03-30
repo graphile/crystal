@@ -50,7 +50,7 @@ interface _ArgumentDetails {
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      functionSourceName(
+      functionResourceName(
         this: Inflection,
         details: {
           databaseName: string;
@@ -130,7 +130,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      functionSourceName(options, { databaseName, pgProc }) {
+      functionResourceName(options, { databaseName, pgProc }) {
         const { tags } = pgProc.getTagsAndDescription();
         if (typeof tags.name === "string") {
           return tags.name;
@@ -141,7 +141,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
       },
       functionRecordReturnCodecName(options, details) {
         return this.upperCamelCase(
-          this.functionSourceName(details) + "-record",
+          this.functionResourceName(details) + "-record",
         );
       },
     },
@@ -217,7 +217,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          const name = info.inflection.functionSourceName({
+          const name = info.inflection.functionResourceName({
             databaseName,
             pgProc,
           });

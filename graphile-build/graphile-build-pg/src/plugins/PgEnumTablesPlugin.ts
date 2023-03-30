@@ -78,9 +78,9 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           if (typeof classTags.enumName === "string") {
             return classTags.enumName;
           }
-          return this.tableSourceName({ databaseName, pgClass });
+          return this.tableResourceName({ databaseName, pgClass });
         } else {
-          const tableName = this.tableSourceName({ databaseName, pgClass });
+          const tableName = this.tableResourceName({ databaseName, pgClass });
           const pgAttribute = pgClass
             .getAttributes()!
             .find((att) => att.attnum === pgConstraint.conkey![0])!;

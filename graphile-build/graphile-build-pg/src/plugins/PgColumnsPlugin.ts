@@ -93,12 +93,12 @@ const getSource = EXPORTABLE(
     (
       registry: PgRegistry<any, any, any>,
       baseCodec: PgCodecAny,
-      pgSources: PgResource<any, any, any, any, any>[],
+      pgResources: PgResource<any, any, any, any, any>[],
       $record: PgSelectSingleStep<any>,
     ) => {
       const executor = $record.source.executor;
       const source =
-        pgSources.find(
+        pgResources.find(
           (potentialSource) =>
             // These have already been filtered by codec
             potentialSource.executor === executor,
@@ -202,7 +202,7 @@ function processColumn(
           [columnName],
         );
       } else {
-        const pgSources = Object.values(registry.pgSources).filter(
+        const pgResources = Object.values(registry.pgResources).filter(
           (potentialSource) =>
             potentialSource.codec === baseCodec && !potentialSource.parameters,
         );
@@ -223,13 +223,13 @@ function processColumn(
                 getSource,
                 notNull,
                 pgSelectSingleFromRecord,
-                pgSources,
+                pgResources,
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $plan = $record.get(columnName);
                 const $select = pgSelectSingleFromRecord(
-                  getSource(registry, baseCodec, pgSources, $record),
+                  getSource(registry, baseCodec, pgResources, $record),
                   $plan,
                 );
                 if (notNull) {
@@ -244,7 +244,7 @@ function processColumn(
               getSource,
               notNull,
               pgSelectSingleFromRecord,
-              pgSources,
+              pgResources,
               registry,
             ],
           );
@@ -262,7 +262,7 @@ function processColumn(
                 columnName,
                 getSource,
                 pgSelectFromRecords,
-                pgSources,
+                pgResources,
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
@@ -271,7 +271,7 @@ function processColumn(
                   any
                 >;
                 const $select = pgSelectFromRecords(
-                  getSource(registry, baseCodec, pgSources, $record),
+                  getSource(registry, baseCodec, pgResources, $record),
                   $val,
                 );
                 $select.setTrusted();
@@ -282,7 +282,7 @@ function processColumn(
               columnName,
               getSource,
               pgSelectFromRecords,
-              pgSources,
+              pgResources,
               registry,
             ],
           );

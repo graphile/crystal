@@ -527,7 +527,7 @@ export interface PgCodecRelationConfig<
       ? keyof UColumns
       : never
   > {
-  remoteSourceOptions: TRemoteSourceOptions;
+  remoteResourceOptions: TRemoteSourceOptions;
 }
 
 /**
@@ -559,7 +559,7 @@ export interface PgCodecRelation<
   /**
    * The remote source this relation relates to.
    */
-  remoteSource: TRemoteSource;
+  remoteResource: TRemoteSource;
 }
 
 export interface PgRegistryConfig<
@@ -593,7 +593,7 @@ export interface PgRegistryConfig<
 > {
   pgCodecs: TCodecs;
   // TODO: Rename to pgSourceOptions?
-  pgSources: TSourceOptions;
+  pgResources: TSourceOptions;
   pgRelations: TRelations;
 }
 
@@ -638,8 +638,8 @@ export type SourceFromOptions<
       >;
     };
   },
-  TSourceName extends keyof TSourceOptions,
-> = TSourceOptions[TSourceName] extends PgResourceOptions<
+  TResourceName extends keyof TSourceOptions,
+> = TSourceOptions[TResourceName] extends PgResourceOptions<
   infer UCodec,
   infer UUniques,
   infer UParameters,
@@ -692,7 +692,7 @@ export interface PgRegistry<
   },
 > {
   pgCodecs: TCodecs;
-  pgSources: {
+  pgResources: {
     [name in keyof TSourceOptions]: SourceFromOptions<
       TCodecs,
       TSourceOptions,
@@ -703,16 +703,16 @@ export interface PgRegistry<
   pgRelations: {
     [codecName in keyof TRelations]: {
       [relationName in keyof TRelations[codecName]]: Expand<
-        Omit<TRelations[codecName][relationName], "remoteSourceOptions"> & {
-          remoteSource: SourceFromOptions<
+        Omit<TRelations[codecName][relationName], "remoteResourceOptions"> & {
+          remoteResource: SourceFromOptions<
             TCodecs,
             TSourceOptions,
             TRelations,
             TRelations[codecName][relationName] extends PgCodecRelationConfig<
               any,
-              PgResourceOptions<any, any, any, infer USourceName>
+              PgResourceOptions<any, any, any, infer UResourceName>
             >
-              ? USourceName
+              ? UResourceName
               : never
           >;
         }
@@ -763,7 +763,7 @@ export type GetPgRegistryCodecs<TRegistry extends PgRegistry<any, any, any>> =
   TRegistry["pgCodecs"];
 
 export type GetPgRegistrySources<TRegistry extends PgRegistry<any, any, any>> =
-  TRegistry["pgSources"];
+  TRegistry["pgResources"];
 
 export type GetPgRegistryCodecRelations<
   TRegistry extends PgRegistry<any, any, any>,

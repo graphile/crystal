@@ -304,7 +304,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 }
 
                 relationEntry = relationEntries.find(([, rel]) => {
-                  if (rel.remoteSourceOptions.codec !== targetCodec) {
+                  if (rel.remoteResourceOptions.codec !== targetCodec) {
                     return false;
                   }
                   if (!arraysMatch(rel.localColumns, localColumns)) {
@@ -329,14 +329,14 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                   continue outerLoop;
                 }
                 relationEntry = relationEntries.find(([, rel]) => {
-                  return rel.remoteSourceOptions.name === targetCodec.name;
+                  return rel.remoteResourceOptions.name === targetCodec.name;
                 });
               }
               if (relationEntry) {
                 path.push({
                   relationName: relationEntry[0],
                 });
-                const nextSource = relationEntry[1].remoteSourceOptions;
+                const nextSource = relationEntry[1].remoteResourceOptions;
                 currentSourceOptions = nextSource;
               } else {
                 console.warn(

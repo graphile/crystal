@@ -1601,8 +1601,8 @@ export function makeExampleSchema(
   /*
   registry.pgCodecs.messages.columns.id;
   registry.pgCodecs.forums.columns;
-  registry.pgSources.messages.getRelations();
-  registry.pgSources.messages.getRelation("author").localColumns;
+  registry.pgResources.messages.getRelations();
+  registry.pgResources.messages.getRelation("author").localColumns;
   registry.pgRelations.messages.author.localColumns;
 
   type Bar = GetPgRegistryCodecs<typeof registry>[keyof GetPgRegistryCodecs<
@@ -1610,10 +1610,10 @@ export function makeExampleSchema(
   >];
   type Foo = GetPgRegistryCodecRelations<
     typeof registry,
-    typeof registry.pgSources.messages.codec
+    typeof registry.pgResources.messages.codec
   >;
 
-  type BBB = typeof registry.pgSources.messages.codec;
+  type BBB = typeof registry.pgResources.messages.codec;
   type Baz = BBB extends PgCodec<infer UName, any, any, any, any, any, any>
     ? typeof registry extends PgRegistry<any, any, infer URelations>
       ? URelations[UName]
@@ -1666,7 +1666,7 @@ export function makeExampleSchema(
       union__entity: unionEntityCodec,
       relational_items: relationalItemsCodec,
     },
-    pgSources: {
+    pgResources: {
       messages: messageSource,
       users: userSource,
       forums: forumSource,

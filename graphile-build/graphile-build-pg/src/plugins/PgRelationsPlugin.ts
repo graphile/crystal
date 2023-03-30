@@ -159,7 +159,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         if (isReferencee && typeof tags.foreignFieldName === "string") {
           return tags.foreignFieldName;
         }
-        const remoteName = this.tableSourceName({
+        const remoteName = this.tableResourceName({
           databaseName,
           pgClass: foreignClass,
         });
@@ -184,12 +184,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           PgCodecWithColumns,
           PgResource<any, PgCodecWithColumns, any, any, any>
         >;
-        //const codec = relation.remoteSource.codec;
+        //const codec = relation.remoteResource.codec;
         if (typeof relation.extensions?.tags.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
         // E.g. posts(author_id) references users(id)
-        const remoteType = this.tableType(relation.remoteSource.codec);
+        const remoteType = this.tableType(relation.remoteResource.codec);
         const localColumns = relation.localColumns as string[];
         return this.camelCase(
           `${remoteType}-by-${this._joinColumnNames(
@@ -215,11 +215,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           return relation.extensions.tags.foreignFieldName;
         }
         // E.g. posts(author_id) references users(id)
-        const remoteType = this.tableType(relation.remoteSource.codec);
+        const remoteType = this.tableType(relation.remoteResource.codec);
         const remoteColumns = relation.remoteColumns as string[];
         return this.camelCase(
           `${remoteType}-by-${this._joinColumnNames(
-            relation.remoteSource.codec,
+            relation.remoteResource.codec,
             remoteColumns,
           )}`,
         );
@@ -237,11 +237,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           return baseOverride;
         }
         // E.g. users(id) references posts(author_id)
-        const remoteType = this.tableType(relation.remoteSource.codec);
+        const remoteType = this.tableType(relation.remoteResource.codec);
         const remoteColumns = relation.remoteColumns as string[];
         return this.camelCase(
           `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
-            relation.remoteSource.codec,
+            relation.remoteResource.codec,
             remoteColumns,
           )}`,
         );
@@ -388,7 +388,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           localCodec,
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
-          remoteSourceOptions: foreignSourceOptions as PgResourceOptions<
+          remoteResourceOptions: foreignSourceOptions as PgResourceOptions<
             any,
             any,
             any,
@@ -420,8 +420,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               existingRelation.remoteColumns,
               newRelation.remoteColumns,
             ) &&
-            existingRelation.remoteSourceOptions ===
-              newRelation.remoteSourceOptions;
+            existingRelation.remoteResourceOptions ===
+              newRelation.remoteResourceOptions;
           const message = `Attempted to add a ${
             isReferencee ? "backwards" : "forwards"
           } relation named '${relationName}' to '${pgClass.relname}' for ${
@@ -441,7 +441,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         registryBuilder.addRelation(
           event.sourceOptions.codec as PgCodecWithColumns,
           relationName,
-          newRelation.remoteSourceOptions,
+          newRelation.remoteResourceOptions,
           newRelation,
         );
       },
@@ -660,7 +660,7 @@ function addRelations(
   if (!(isPgTableType || isMutationPayload || pgPolymorphism) || !codec) {
     return fields;
   }
-  const allPgResources = Object.values(build.input.pgRegistry.pgSources);
+  const allPgResources = Object.values(build.input.pgRegistry.pgResources);
   // TODO: now that refs relate to _codecs_ rather than _sources_ a lot of this
   // is really hacky. We should tidy it up.
   // TODO: change the default so that we don't do this on
@@ -740,7 +740,7 @@ function addRelations(
         isReferencee,
         localColumns,
         remoteColumns,
-        remoteSource: source,
+        remoteResource: source,
         isUnique,
       } = relation;
       if (isReferencee) {
@@ -756,7 +756,7 @@ function addRelations(
         source,
         isUnique,
       });
-      result.source = relation.remoteSource;
+      result.source = relation.remoteResource;
     }
     return result;
   };
@@ -790,7 +790,7 @@ function addRelations(
       const {
         localColumns,
         remoteColumns,
-        remoteSource,
+        remoteResource,
         extensions,
         isReferencee,
       } = relation;
@@ -802,18 +802,18 @@ function addRelations(
       // behavior. But the relation settings win.
       const behavior =
         getBehavior([
-          remoteSource.codec.extensions,
-          remoteSource.extensions,
+          remoteResource.codec.extensions,
+          remoteResource.extensions,
           extensions,
         ]) ?? "";
-      const otherCodec = remoteSource.codec;
+      const otherCodec = remoteResource.codec;
       const typeName = build.inflection.tableType(otherCodec);
       const connectionTypeName =
         build.inflection.tableConnectionType(otherCodec);
 
       const deprecationReason =
         tagToString(relation.extensions?.tags?.deprecated) ??
-        tagToString(relation.remoteSource.extensions?.tags?.deprecated);
+        tagToString(relation.remoteResource.extensions?.tags?.deprecated);
 
       const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
         source,
@@ -823,7 +823,7 @@ function addRelations(
       const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
         localColumns as string[],
         remoteColumns as string[],
-        remoteSource,
+        remoteResource,
         isMutationPayload ?? false,
       );
       const singleRecordFieldName = relation.isReferencee
@@ -847,8 +847,8 @@ function addRelations(
         listFieldName,
         connectionFieldName,
         description: relation.description,
-        pgSource: remoteSource,
-        pgCodec: remoteSource.codec,
+        pgSource: remoteResource,
+        pgCodec: remoteResource.codec,
         pgRelationDetails: relationDetails,
         relatedTypeName: build.inflection.tableType(codec),
       };
@@ -950,11 +950,11 @@ function addRelations(
             PgCodecWithColumns,
             PgResource<any, PgCodecWithColumns, any, any, any>
           > = source.getRelation(ref.paths[0][0].relationName);
-          const remoteSource = relation.remoteSource;
+          const remoteResource = relation.remoteResource;
           return makeRelationPlans(
             relation.localColumns as string[],
             relation.remoteColumns as string[],
-            remoteSource,
+            remoteResource,
             isMutationPayload ?? false,
           );
         } else if (!needsPgUnionAll) {

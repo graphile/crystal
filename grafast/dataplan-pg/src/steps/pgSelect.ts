@@ -872,7 +872,7 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
         )}' is not unique so cannot be used with singleRelation`,
       );
     }
-    const { remoteSource, localColumns, remoteColumns } = relation;
+    const { remoteResource, localColumns, remoteColumns } = relation;
 
     // Join to this relation if we haven't already
     const cachedAlias = this.relationJoins.get(relationIdentifier);
@@ -880,7 +880,7 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
       return cachedAlias;
     }
     const alias = sql.identifier(Symbol(relationIdentifier as string));
-    if (typeof remoteSource.source === "function") {
+    if (typeof remoteResource.source === "function") {
       throw new Error(
         "Callback sources not currently supported via singleRelation",
       );
@@ -888,7 +888,7 @@ export class PgSelectStep<TSource extends PgResource<any, any, any, any, any>>
     this.joins.push({
       type: "left",
       // TODO: `source.source` is confusing, rename one of these!
-      source: remoteSource.source,
+      source: remoteResource.source,
       alias,
       conditions: localColumns.map(
         (col, i) =>

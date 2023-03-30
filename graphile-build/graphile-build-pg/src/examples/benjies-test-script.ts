@@ -95,7 +95,7 @@ pool.on("error", (e) => {
   console.log("Sources:");
   console.log(
     "  " +
-      input.pgRegistry.pgSources
+      input.pgRegistry.pgResources
         .map(
           (s) => grafastPrint((s as any).name),
           // + ` => ${(s as any).extensions?.tags?.name}`,

@@ -77,7 +77,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
           graphql: { GraphQLString, GraphQLNonNull },
         } = build;
         const insertableSources = Object.values(
-          build.input.pgRegistry.pgSources,
+          build.input.pgRegistry.pgResources,
         ).filter((source) => isInsertable(build, source));
 
         insertableSources.forEach((source) => {
@@ -236,7 +236,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
         }
 
         const insertableSources = Object.values(
-          build.input.pgRegistry.pgSources,
+          build.input.pgRegistry.pgResources,
         ).filter((source) => isInsertable(build, source));
         return insertableSources.reduce((memo, source) => {
           return build.recoverable(memo, () => {

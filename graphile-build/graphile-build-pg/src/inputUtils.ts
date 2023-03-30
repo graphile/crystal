@@ -30,7 +30,7 @@ export function makePgCodecMeta(_codec: PgCodec<any, any, any>): PgCodecMeta {
 }
 
 /**
- * Given the input object, this function walks through all the pgSources and
+ * Given the input object, this function walks through all the pgResources and
  * all their codecs and relations and extracts the full set of reachable
  * codecs.
  *
@@ -40,12 +40,12 @@ export function getCodecMetaLookupFromInput(
   input: GraphileBuild.BuildInput,
 ): PgCodecMetaLookup {
   const metaLookup: PgCodecMetaLookup = new Map();
-  const seenSources = new Set<PgResource<any, any, any, any, any>>();
+  const seenResources = new Set<PgResource<any, any, any, any, any>>();
   for (const codec of Object.values(input.pgRegistry.pgCodecs)) {
     walkCodec(codec, metaLookup);
   }
-  for (const source of Object.values(input.pgRegistry.pgSources)) {
-    walkSource(source, metaLookup, seenSources);
+  for (const source of Object.values(input.pgRegistry.pgResources)) {
+    walkResource(source, metaLookup, seenResources);
   }
   return metaLookup;
 }
@@ -56,27 +56,27 @@ export function getCodecMetaLookupFromInput(
  *
  * @internal
  */
-function walkSource(
-  source: PgResource<any, any, any, any, any>,
+function walkResource(
+  resource: PgResource<any, any, any, any, any>,
   metaLookup: PgCodecMetaLookup,
-  seenSources: Set<PgResource<any, any, any, any, any>>,
+  seenResources: Set<PgResource<any, any, any, any, any>>,
 ): void {
-  if (seenSources.has(source)) {
+  if (seenResources.has(resource)) {
     return;
   }
-  seenSources.add(source);
-  if (!metaLookup.has(source.codec)) {
-    walkCodec(source.codec, metaLookup);
+  seenResources.add(resource);
+  if (!metaLookup.has(resource.codec)) {
+    walkCodec(resource.codec, metaLookup);
   }
-  const relations = source.getRelations() as {
+  const relations = resource.getRelations() as {
     [relationName: string]: PgCodecRelation<any, any>;
   };
   if (relations) {
     for (const relationshipName in relations) {
-      walkSource(
-        relations[relationshipName].remoteSource,
+      walkResource(
+        relations[relationshipName].remoteResource,
         metaLookup,
-        seenSources,
+        seenResources,
       );
     }
   }

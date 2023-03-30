@@ -226,9 +226,9 @@ const OrderByMemberNamePlugin = makeAddPgTableOrderByPlugin(
   (build) => {
     const {
       sql,
-      input: { pgSources },
+      input: { pgResources },
     } = build;
-    const usersSource = pgSources.find((s) => s.name === "users");
+    const usersSource = pgResources.find((s) => s.name === "users");
     if (!usersSource) throw new Error(`Couldn't find users source`);
     const sqlIdentifier = sql.identifier(Symbol("member"));
     return orderByAscDesc(

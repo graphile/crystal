@@ -52,7 +52,7 @@ declare global {
       /**
        * Takes a `_sourceName` and singularizes it.
        */
-      _singularizedSourceName(
+      _singularizedResourceName(
         this: Inflection,
         source: PgResource<any, any, any, any, any>,
       ): string;
@@ -73,7 +73,7 @@ declare global {
       /**
        * The name of the PgResource for a table/class
        */
-      tableSourceName(
+      tableResourceName(
         this: Inflection,
         details: {
           databaseName: string;
@@ -266,7 +266,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         return `${databasePrefix}${schemaPrefix}`;
       },
 
-      tableSourceName(options, { pgClass, databaseName }) {
+      tableResourceName(options, { pgClass, databaseName }) {
         const typeTags = pgClass.getType()!.getTags();
         const classTags = pgClass.getTags();
         if (typeof typeTags?.name === "string") {
@@ -303,7 +303,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         );
       },
 
-      _singularizedSourceName(options, source) {
+      _singularizedResourceName(options, source) {
         return this.dontEndInInputOrPatch(
           this.singularize(this._sourceName(source)),
         );
@@ -455,7 +455,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
           const executor =
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
-          const name = info.inflection.tableSourceName({
+          const name = info.inflection.tableResourceName({
             databaseName,
             pgClass,
           });

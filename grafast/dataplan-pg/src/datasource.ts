@@ -609,7 +609,7 @@ export class PgResource<
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
-      if (!relation.remoteSource.codec.columns[attr]) {
+      if (!relation.remoteResource.codec.columns[attr]) {
         throw new Error(
           `${this} relation '${via}' does not have column '${attr}'`,
         );
@@ -659,7 +659,7 @@ export class PgResource<
     >;
     const reciprocal = Object.entries(relations).find(
       ([_relationName, relation]) => {
-        if (relation.remoteSource.codec !== otherCodec) {
+        if (relation.remoteResource.codec !== otherCodec) {
           return false;
         }
         if (!arraysMatch(relation.localColumns, otherRelation.remoteColumns)) {
@@ -968,12 +968,12 @@ export interface PgRegistryBuilder<
     TRemoteSource extends PgResourceOptions<any, any, any, any>,
     const TCodecRelation extends Omit<
       PgCodecRelationConfig<TCodec, TRemoteSource>,
-      "localCodec" | "remoteSourceOptions"
+      "localCodec" | "remoteResourceOptions"
     >,
   >(
     codec: TCodec,
     relationName: TCodecRelationName,
-    remoteSource: TRemoteSource,
+    remoteResource: TRemoteSource,
     relation: TCodecRelation,
   ): PgRegistryBuilder<
     TCodecs,
@@ -983,7 +983,7 @@ export interface PgRegistryBuilder<
           [codecName in UName]: {
             [relationName in TCodecRelationName]: TCodecRelation & {
               localCodec: TCodec;
-              remoteSourceOptions: TRemoteSource;
+              remoteResourceOptions: TRemoteSource;
             };
           };
         }
@@ -1047,21 +1047,21 @@ export function makeRegistry<
 ): PgRegistry<TCodecs, TSourceOptions, TRelations> {
   const registry: PgRegistry<TCodecs, TSourceOptions, TRelations> = {
     pgCodecs: Object.create(null) as any,
-    pgSources: Object.create(null) as any,
+    pgResources: Object.create(null) as any,
     pgRelations: Object.create(null) as any,
   };
 
-  // Tell the system to read the built pgCodecs, pgSources, pgRelations from the registry
+  // Tell the system to read the built pgCodecs, pgResources, pgRelations from the registry
   Object.defineProperties(registry.pgCodecs, {
     $exporter$args: { value: [registry] },
     $exporter$factory: {
       value: (registry: PgRegistry<any, any, any>) => registry.pgCodecs,
     },
   });
-  Object.defineProperties(registry.pgSources, {
+  Object.defineProperties(registry.pgResources, {
     $exporter$args: { value: [registry] },
     $exporter$factory: {
-      value: (registry: PgRegistry<any, any, any>) => registry.pgSources,
+      value: (registry: PgRegistry<any, any, any>) => registry.pgResources,
     },
   });
   Object.defineProperties(registry.pgRelations, {
@@ -1120,7 +1120,7 @@ export function makeRegistry<
     addCodec(codecSpec);
   }
 
-  for (const [sourceName, rawConfig] of Object.entries(config.pgSources) as [
+  for (const [sourceName, rawConfig] of Object.entries(config.pgResources) as [
     keyof TSourceOptions,
     PgResourceOptions<any, any, any, any>,
   ][]) {
@@ -1145,11 +1145,11 @@ export function makeRegistry<
       $exporter$args: { value: [registry, sourceName] },
       $exporter$factory: {
         value: (registry: PgRegistry<any, any, any>, sourceName: string) =>
-          registry.pgSources[sourceName],
+          registry.pgResources[sourceName],
       },
     });
 
-    registry.pgSources[sourceName] = source;
+    registry.pgResources[sourceName] = source;
   }
 
   for (const codecName of Object.keys(
@@ -1178,12 +1178,12 @@ export function makeRegistry<
       if (!relation) {
         continue;
       }
-      const { localCodec, remoteSourceOptions, ...rest } = relation;
+      const { localCodec, remoteResourceOptions, ...rest } = relation;
 
       const builtRelation = {
         ...rest,
         localCodec: addCodec(localCodec),
-        remoteSource: registry.pgSources[remoteSourceOptions.name],
+        remoteResource: registry.pgResources[remoteResourceOptions.name],
       } as PgCodecRelation<
         PgCodecWithColumns,
         PgResource<any, PgCodecWithColumns, any, any, any>
@@ -1214,7 +1214,7 @@ export function makeRegistry<
 export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
   const registryConfig: PgRegistryConfig<any, any, any> = {
     pgCodecs: Object.create(null),
-    pgSources: Object.create(null),
+    pgResources: Object.create(null),
     pgRelations: Object.create(null),
   };
   const builder: PgRegistryBuilder<any, any, any> = {
@@ -1251,24 +1251,24 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     */
     addSource(source) {
       this.addCodec(source.codec);
-      registryConfig.pgSources[source.name] = source;
+      registryConfig.pgResources[source.name] = source;
       return builder;
     },
     /*
     addSources(sources) {
       for (const source of sources) {
-        registryConfig.pgSources[source.name] = source;
+        registryConfig.pgResources[source.name] = source;
       }
       return builder;
     },
     */
-    addRelation(localCodec, relationName, remoteSourceOptions, relation) {
+    addRelation(localCodec, relationName, remoteResourceOptions, relation) {
       if (!registryConfig.pgCodecs[localCodec.name]) {
         throw new Error(
           `Adding a relation before adding the codec is forbidden.`,
         );
       }
-      if (!registryConfig.pgSources[remoteSourceOptions.name]) {
+      if (!registryConfig.pgResources[remoteResourceOptions.name]) {
         throw new Error(
           `Adding a relation before adding the source is forbidden.`,
         );
@@ -1278,7 +1278,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       }
       registryConfig.pgRelations[localCodec.name][relationName] = {
         localCodec,
-        remoteSourceOptions,
+        remoteResourceOptions,
         ...relation,
       } as PgCodecRelationConfig<
         PgCodecWithColumns,

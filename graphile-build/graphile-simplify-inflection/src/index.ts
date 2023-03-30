@@ -259,7 +259,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             return this.connectionField(
               this.camelCase(
                 `${this.distinctPluralize(
-                  this._singularizedSourceName(source),
+                  this._singularizedResourceName(source),
                 )}`,
               ),
             );
@@ -274,7 +274,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           if (options.schema?.pgSimplifyAllRows) {
             return this.listField(
               this.camelCase(
-                this.distinctPluralize(this._singularizedSourceName(source)),
+                this.distinctPluralize(this._singularizedResourceName(source)),
               ),
             );
           } else {
@@ -300,14 +300,14 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           return this.camelCase(baseName);
         }
         const foreignPk = (
-          relation.remoteSource.uniques as PgResourceUnique[]
+          relation.remoteResource.uniques as PgResourceUnique[]
         ).find((u) => u.isPrimary);
         if (
           foreignPk &&
           arraysMatch(foreignPk.columns, relation.remoteColumns)
         ) {
           return this.camelCase(
-            `${this._singularizedCodecName(relation.remoteSource.codec)}`,
+            `${this._singularizedCodecName(relation.remoteResource.codec)}`,
           );
         }
         return previous!.call(this, details);
@@ -326,7 +326,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         }
         const detailedKeys = (relation.remoteColumns as string[]).map(
           (columnName) => ({
-            codec: relation.remoteSource.codec,
+            codec: relation.remoteResource.codec,
             columnName,
           }),
         );
@@ -336,13 +336,13 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           if (oppositeBaseName) {
             return this.camelCase(
               `${oppositeBaseName}-${this._singularizedCodecName(
-                relation.remoteSource.codec,
+                relation.remoteResource.codec,
               )}`,
             );
           }
           if (this.baseNameMatches(baseName, source.name)) {
             return this.camelCase(
-              `${this._singularizedCodecName(relation.remoteSource.codec)}`,
+              `${this._singularizedCodecName(relation.remoteResource.codec)}`,
             );
           }
         }
@@ -351,7 +351,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         );
         if (pk && arraysMatch(pk.columns, relation.localColumns)) {
           return this.camelCase(
-            `${this._singularizedCodecName(relation.remoteSource.codec)}`,
+            `${this._singularizedCodecName(relation.remoteResource.codec)}`,
           );
         }
         return previous!.call(this, details);
@@ -366,7 +366,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         }
         const detailedKeys = (relation.remoteColumns as string[]).map(
           (columnName) => ({
-            codec: relation.remoteSource.codec,
+            codec: relation.remoteResource.codec,
             columnName,
           }),
         );
@@ -376,25 +376,25 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           if (oppositeBaseName) {
             return this.camelCase(
               `${oppositeBaseName}-${this.distinctPluralize(
-                this._singularizedCodecName(relation.remoteSource.codec),
+                this._singularizedCodecName(relation.remoteResource.codec),
               )}`,
             );
           }
           if (this.baseNameMatches(baseName, source.name)) {
             return this.camelCase(
               `${this.distinctPluralize(
-                this._singularizedCodecName(relation.remoteSource.codec),
+                this._singularizedCodecName(relation.remoteResource.codec),
               )}`,
             );
           }
         }
-        const pk = (relation.remoteSource.uniques as PgResourceUnique[]).find(
+        const pk = (relation.remoteResource.uniques as PgResourceUnique[]).find(
           (u) => u.isPrimary,
         );
         if (pk && arraysMatch(pk.columns, relation.remoteColumns)) {
           return this.camelCase(
             `${this.distinctPluralize(
-              this._singularizedCodecName(relation.remoteSource.codec),
+              this._singularizedCodecName(relation.remoteResource.codec),
             )}`,
           );
         }
@@ -406,7 +406,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         const relation = source.getRelation(relationName) as PgCodecRelationAny;
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
-          relation.remoteSource.extensions?.tags?.listSuffix;
+          relation.remoteResource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );
@@ -417,7 +417,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         const relation = source.getRelation(relationName) as PgCodecRelationAny;
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
-          relation.remoteSource.extensions?.tags?.listSuffix;
+          relation.remoteResource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );

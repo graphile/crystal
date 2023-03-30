@@ -563,7 +563,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           // different field - this is why we later use this information in the
           // fields hook to determine which fields to add.
           for (const someSource of Object.values(
-            build.input.pgRegistry.pgSources,
+            build.input.pgRegistry.pgResources,
           )) {
             build.recoverable(null, () => {
               // Add connection type for functions that need it

@@ -36,7 +36,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           return _;
         }
         const tableSources = Object.values(
-          build.input.pgRegistry.pgSources,
+          build.input.pgRegistry.pgResources,
         ).filter((source) => {
           if (source.codec.isAnonymous) return false;
           if (!source.codec.columns) return false;

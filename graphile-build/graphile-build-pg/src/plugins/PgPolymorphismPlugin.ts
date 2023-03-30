@@ -268,7 +268,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         const { registryBuilder } = event;
         const registry = registryBuilder.getRegistryConfig();
         for (const source of Object.values(
-          registry.pgSources,
+          registry.pgResources,
         ) as PgResourceOptions<any, any, any, any>[]) {
           if (source.parameters || !source.codec.columns) {
             continue;
@@ -391,7 +391,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         // to use the final PgRegistry, not the PgRegistryBuilder.
 
         const { registry } = event;
-        for (const source of Object.values(registry.pgSources) as PgResource<
+        for (const source of Object.values(registry.pgResources) as PgResource<
           any,
           any,
           any,
@@ -505,8 +505,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               )) {
                 const behavior =
                   getBehavior([
-                    relationSpec.remoteSource.codec.extensions,
-                    relationSpec.remoteSource.extensions,
+                    relationSpec.remoteResource.codec.extensions,
+                    relationSpec.remoteResource.extensions,
                     relationSpec.extensions,
                   ]) ?? "";
                 const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =

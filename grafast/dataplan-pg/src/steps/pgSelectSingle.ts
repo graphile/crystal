@@ -311,7 +311,7 @@ export class PgSelectSingleStep<
       any,
       infer URegistry
     >
-      ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteSource"]
+      ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteResource"]
       : never
   > | null {
     if (this.options.fromRelation) {
@@ -354,7 +354,7 @@ export class PgSelectSingleStep<
       any,
       infer URegistry
     >
-      ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteSource"]
+      ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteResource"]
       : never
   > {
     const $existingPlan = this.existingSingleRelation(relationIdentifier);
@@ -371,7 +371,7 @@ export class PgSelectSingleStep<
         }`,
       );
     }
-    const { remoteSource, remoteColumns, localColumns } = relation;
+    const { remoteResource, remoteColumns, localColumns } = relation;
 
     const options: PgSelectSinglePlanOptions = {
       fromRelation: [
@@ -379,7 +379,7 @@ export class PgSelectSingleStep<
         relationIdentifier as string,
       ],
     };
-    return remoteSource.get(
+    return remoteResource.get(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
         memo[remoteColumn] = this.get(localColumns[columnIndex]);
         return memo;
@@ -400,9 +400,9 @@ export class PgSelectSingleStep<
         `${String(relationIdentifier)} is not a relation on ${this.source}`,
       );
     }
-    const { remoteSource, remoteColumns, localColumns } = relation;
+    const { remoteResource, remoteColumns, localColumns } = relation;
 
-    return remoteSource.find(
+    return remoteResource.find(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
         memo[remoteColumn] = this.get(localColumns[columnIndex]);
         return memo;

@@ -94,7 +94,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const sources = Object.values(build.input.pgRegistry.pgSources).filter(
+        const sources = Object.values(build.input.pgRegistry.pgResources).filter(
           (source) => {
             if (source.codec !== pgCodec) return false;
             if (source.parameters) return false;

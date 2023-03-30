@@ -64,7 +64,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
         }
 
         const functionSources = Object.values(
-          build.input.pgRegistry.pgSources,
+          build.input.pgRegistry.pgResources,
         ).filter((source) => {
           if (source.codec.columns) return false;
           if (source.codec.arrayOfCodec) return false;

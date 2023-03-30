@@ -651,7 +651,7 @@ export class PgUnionAllStep<
           const relation: PgCodecRelation<any, any> = currentSource.getRelation(
             pathEntry.relationName,
           );
-          const nextSource = relation.remoteSource;
+          const nextSource = relation.remoteResource;
           const nextSymbol = Symbol(nextSource.name);
           const nextAlias = sql.identifier(nextSymbol);
 

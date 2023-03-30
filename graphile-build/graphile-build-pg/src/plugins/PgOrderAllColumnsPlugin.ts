@@ -63,7 +63,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
           return values;
         }
         const columns = pgCodec.columns as PgTypeColumns;
-        const sources = Object.values(build.input.pgRegistry.pgSources).filter(
+        const sources = Object.values(build.input.pgRegistry.pgResources).filter(
           (s) => s.codec === pgCodec && !s.parameters,
         );
         const uniques = sources.flatMap((s) => s.uniques as PgResourceUnique[]);

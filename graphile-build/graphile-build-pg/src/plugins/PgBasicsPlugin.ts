@@ -94,7 +94,7 @@ declare global {
           registryBuilder: PgRegistryBuilder<any, any, any>;
         }) => PromiseOrDirect<void>
       >;
-      pgBasics_PgRegistryBuilder_pgSources: PluginHook<
+      pgBasics_PgRegistryBuilder_pgResources: PluginHook<
         (event: {
           registryBuilder: PgRegistryBuilder<any, any, any>;
         }) => PromiseOrDirect<void>
@@ -154,7 +154,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             await info.process("pgBasics_PgRegistryBuilder_pgCodecs", {
               registryBuilder,
             });
-            await info.process("pgBasics_PgRegistryBuilder_pgSources", {
+            await info.process("pgBasics_PgRegistryBuilder_pgResources", {
               registryBuilder,
             });
             await info.process("pgBasics_PgRegistryBuilder_pgRelations", {
