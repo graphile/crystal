@@ -61,14 +61,7 @@ declare module "@dataplan/pg" {
   }
 }
 
-interface State {
-  sourceEvents: Array<{
-    databaseName: string;
-    pgClass: PgClass;
-    resource: PgResource<any, any, any, undefined, any>;
-    relations: GraphileConfig.PgTablesPluginSourceRelations;
-  }>;
-}
+interface State {}
 interface Cache {}
 
 export const PgRefsPlugin: GraphileConfig.Plugin = {
@@ -103,7 +96,6 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
   gather: {
     namespace: "pgRefs",
     helpers: {},
-    initialState: () => ({ sourceEvents: [] }),
     hooks: {
       async pgCodecs_PgCodec(info, event) {
         const { pgCodec, pgClass } = event;
