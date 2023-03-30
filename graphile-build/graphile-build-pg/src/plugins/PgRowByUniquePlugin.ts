@@ -128,8 +128,8 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                       // eslint-disable-next-line graphile-export/exhaustive-deps
                       EXPORTABLE(
                         te.run`\
-return function (source) {
-  return (_$root, args) => source.get({ ${te.join(
+return function (resource) {
+  return (_$root, args) => resource.get({ ${te.join(
     columnNames.map(
       (columnName) =>
         te`${te.dangerousKey(columnName)}: args.get(${te.lit(
@@ -142,7 +142,7 @@ return function (source) {
                         [resource],
                       )
                     : EXPORTABLE(
-                        (detailsByColumnName, source) =>
+                        (detailsByColumnName, resource) =>
                           function plan(_$root: any, args: FieldArgs) {
                             const spec = Object.create(null);
                             for (const columnName in detailsByColumnName) {
@@ -150,7 +150,7 @@ return function (source) {
                                 detailsByColumnName[columnName].graphqlName,
                               );
                             }
-                            return source.get(spec);
+                            return resource.get(spec);
                           },
                         [detailsByColumnName, resource],
                       );

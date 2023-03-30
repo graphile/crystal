@@ -144,7 +144,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
     any
   >;
   match?: {
-    [sourceColumnName: string]:
+    [resourceColumnName: string]:
       | {
           step: PgTypedExecutableStep<any>;
           codec?: never;
@@ -353,7 +353,7 @@ export type PgUnionAllMode = "normal" | "aggregate";
 
 /**
  * Represents a `UNION ALL` statement, which can have multiple table-like
- * sources, but must return a consistent data shape.
+ * resources, but must return a consistent data shape.
  */
 export class PgUnionAllStep<
     TAttributes extends string,
@@ -589,7 +589,7 @@ export class PgUnionAllStep<
       }
       this.spec = spec;
       // If the user doesn't specify members, we'll just build membership based
-      // on the provided sources.
+      // on the provided resources.
       const members =
         spec.members ??
         (
@@ -656,20 +656,20 @@ export class PgUnionAllStep<
           const relation: PgCodecRelation<any, any> = currentSource.getRelation(
             pathEntry.relationName,
           );
-          const nextSource = relation.remoteResource;
-          const nextSymbol = Symbol(nextSource.name);
+          const nextResource = relation.remoteResource;
+          const nextSymbol = Symbol(nextResource.name);
           const nextAlias = sql.identifier(nextSymbol);
 
-          if (this.executor !== nextSource.executor) {
+          if (this.executor !== nextResource.executor) {
             throw new Error(
               `${this}: all sources must currently come from same executor`,
             );
           }
-          if (!sql.isSQL(nextSource.source)) {
+          if (!sql.isSQL(nextResource.source)) {
             throw new Error(`${this}: parameterized sources not yet supported`);
           }
 
-          const nextSqlSource: SQL = nextSource.source;
+          const nextSqlSource: SQL = nextResource.source;
           sqlSource = sql`${sqlSource}
 inner join ${nextSqlSource} as ${nextAlias}
 on (${sql.indent(
@@ -684,7 +684,7 @@ on (${sql.indent(
             ),
           )})`;
 
-          currentSource = nextSource;
+          currentSource = nextResource;
           currentSymbol = nextSymbol;
           currentAlias = nextAlias;
         }

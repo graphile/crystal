@@ -35,18 +35,18 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdHandler) {
           return _;
         }
-        const tableSources = Object.values(
+        const tableResources = Object.values(
           build.input.pgRegistry.pgResources,
-        ).filter((source) => {
-          if (source.codec.isAnonymous) return false;
-          if (!source.codec.columns) return false;
-          if (source.codec.polymorphism) return false;
-          if (source.parameters) return false;
-          if (!source.uniques) return false;
-          if (!source.uniques[0]) return false;
+        ).filter((resource) => {
+          if (resource.codec.isAnonymous) return false;
+          if (!resource.codec.columns) return false;
+          if (resource.codec.polymorphism) return false;
+          if (resource.parameters) return false;
+          if (!resource.uniques) return false;
+          if (!resource.uniques[0]) return false;
           const behavior = getBehavior([
-            source.codec.extensions,
-            source.extensions,
+            resource.codec.extensions,
+            resource.extensions,
           ]);
           // Needs the 'select' and 'node' behaviours for compatibility
           return (
@@ -59,13 +59,13 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           PgCodec<any, any, any, any, any, any, any>,
           PgResource<any, any, any, any, any>[]
         >();
-        for (const source of tableSources) {
-          let list = sourcesByCodec.get(source.codec);
+        for (const resource of tableResources) {
+          let list = sourcesByCodec.get(resource.codec);
           if (!list) {
             list = [];
-            sourcesByCodec.set(source.codec, list);
+            sourcesByCodec.set(resource.codec, list);
           }
-          list.push(source);
+          list.push(resource);
         }
 
         for (const [codec, sources] of sourcesByCodec.entries()) {

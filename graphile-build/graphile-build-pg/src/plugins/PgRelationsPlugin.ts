@@ -48,7 +48,7 @@ declare global {
       behavior?: string;
     }
     interface Inflection {
-      sourceRelationName(
+      resourceRelationName(
         this: Inflection,
         details: {
           databaseName: string;
@@ -139,7 +139,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      sourceRelationName(
+      resourceRelationName(
         options,
         {
           databaseName,
@@ -356,7 +356,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         ) {
           return;
         }
-        const relationName = info.inflection.sourceRelationName({
+        const relationName = info.inflection.resourceRelationName({
           databaseName,
           pgConstraint,
           localClass: pgClass,
@@ -649,7 +649,8 @@ function addRelations(
   const { pgCodec } = scope;
   const isPgTableType =
     "isPgTableType" in scope ? scope.isPgTableType : undefined;
-  const pgTypeResource = "pgTypeResource" in scope ? scope.pgTypeResource : undefined;
+  const pgTypeResource =
+    "pgTypeResource" in scope ? scope.pgTypeResource : undefined;
   const isMutationPayload =
     "isMutationPayload" in scope ? scope.isMutationPayload : undefined;
   const pgPolymorphism =

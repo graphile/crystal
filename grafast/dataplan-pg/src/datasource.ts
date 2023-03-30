@@ -1129,7 +1129,7 @@ export function makeRegistry<
     keyof TResourceOptions,
     PgResourceOptions<any, any, any, any>,
   ][]) {
-    const sourceConfig = {
+    const resourceConfig = {
       ...rawConfig,
       codec: addCodec(rawConfig.codec),
       parameters: rawConfig.parameters
@@ -1141,7 +1141,7 @@ export function makeRegistry<
           )
         : rawConfig.parameters,
     };
-    const resource = new PgResource(registry, sourceConfig) as any;
+    const resource = new PgResource(registry, resourceConfig) as any;
 
     // This is the magic that breaks the circular reference: rather than
     // building PgResource via a factory we tell the system to just retrieve it
@@ -1260,8 +1260,8 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return builder;
     },
     /*
-    addResources(sources) {
-      for (const resource of sources) {
+    addResources(resources) {
+      for (const resource of resources) {
         registryConfig.pgResources[resource.name] = resource;
       }
       return builder;

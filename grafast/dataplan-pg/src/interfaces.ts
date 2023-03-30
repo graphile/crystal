@@ -602,7 +602,7 @@ export type Expand<T> = T extends unknown
   ? { [TKey in keyof T]: T[TKey] }
   : never;
 
-export type SourceFromOptions<
+export type ResourceFromOptions<
   TCodecs extends {
     [name in string]: PgCodec<
       name,
@@ -693,7 +693,7 @@ export interface PgRegistry<
 > {
   pgCodecs: TCodecs;
   pgResources: {
-    [name in keyof TResourceOptions]: SourceFromOptions<
+    [name in keyof TResourceOptions]: ResourceFromOptions<
       TCodecs,
       TResourceOptions,
       TRelations,
@@ -704,7 +704,7 @@ export interface PgRegistry<
     [codecName in keyof TRelations]: {
       [relationName in keyof TRelations[codecName]]: Expand<
         Omit<TRelations[codecName][relationName], "remoteResourceOptions"> & {
-          remoteResource: SourceFromOptions<
+          remoteResource: ResourceFromOptions<
             TCodecs,
             TResourceOptions,
             TRelations,

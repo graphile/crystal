@@ -232,7 +232,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 types[typeValue] = {
                   name: info.inflection.tableType(codec!),
                   references,
-                  relationName: info.inflection.sourceRelationName({
+                  relationName: info.inflection.resourceRelationName({
                     databaseName,
                     isReferencee: true,
                     isUnique: true,
@@ -352,7 +352,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   `Invalid polymorphic relation; could not find matching relation between ${pgClass.relname} and ${pgRelatedClass.relname}`,
                 );
               }
-              const sharedRelationName = info.inflection.sourceRelationName({
+              const sharedRelationName = info.inflection.resourceRelationName({
                 databaseName,
                 isReferencee: false,
                 isUnique: true,
@@ -479,7 +479,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   `Invalid polymorphic relation; could not find matching relation between ${pgClass.relname} and ${pgRelatedClass.relname}`,
                 );
               }
-              const sharedRelationName = info.inflection.sourceRelationName({
+              const sharedRelationName = info.inflection.resourceRelationName({
                 databaseName,
                 isReferencee: false,
                 isUnique: true,

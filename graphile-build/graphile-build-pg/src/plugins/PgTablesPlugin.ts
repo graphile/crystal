@@ -232,7 +232,7 @@ interface State {
     string,
     Map<PgClass, Promise<PgResourceOptions<any, any, any> | null>>
   >;
-  sourceByResourceOptions: Map<
+  resourceByResourceOptions: Map<
     PgResourceOptions<any, any, any>,
     Promise<PgResource<any, any, any, any, any> | null>
   >;
@@ -556,7 +556,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     },
     initialState: () => ({
       resourceOptionsByPgClassByDatabase: new Map(),
-      sourceByResourceOptions: new Map(),
+      resourceByResourceOptions: new Map(),
       detailsByResourceOptions: new Map(),
     }),
     hooks: {
