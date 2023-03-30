@@ -88,7 +88,8 @@ function unwrapCodec(
   return codec;
 }
 
-const getSource = EXPORTABLE(
+// TODO: get rid of this! Determine the resources at build time
+const getResource = EXPORTABLE(
   (PgResource) =>
     (
       registry: PgRegistry<any, any, any>,
@@ -220,16 +221,16 @@ function processColumn(
             (
                 baseCodec,
                 columnName,
-                getSource,
+                getResource,
                 notNull,
-                pgResources,
                 pgSelectSingleFromRecord,
+                pgResources,
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $plan = $record.get(columnName);
                 const $select = pgSelectSingleFromRecord(
-                  getSource(registry, baseCodec, pgResources, $record),
+                  getResource(registry, baseCodec, pgResources, $record),
                   $plan,
                 );
                 if (notNull) {
@@ -241,15 +242,15 @@ function processColumn(
             [
               baseCodec,
               columnName,
-              getSource,
+              getResource,
               notNull,
-              pgResources,
               pgSelectSingleFromRecord,
+              pgResources,
               registry,
             ],
           );
         } else {
-          // Many records from source
+          // Many records from resource
           /*
            * TODO: if we refactor `PgSelectSingleStep` we can probably
            * optimise this to do inline selection and still join against
@@ -260,9 +261,9 @@ function processColumn(
             (
                 baseCodec,
                 columnName,
-                getSource,
-                pgResources,
+                getResource,
                 pgSelectFromRecords,
+                pgResources,
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
@@ -271,7 +272,7 @@ function processColumn(
                   any
                 >;
                 const $select = pgSelectFromRecords(
-                  getSource(registry, baseCodec, pgResources, $record),
+                  getResource(registry, baseCodec, pgResources, $record),
                   $val,
                 );
                 $select.setTrusted();
@@ -280,9 +281,9 @@ function processColumn(
             [
               baseCodec,
               columnName,
-              getSource,
-              pgResources,
+              getResource,
               pgSelectFromRecords,
+              pgResources,
               registry,
             ],
           );

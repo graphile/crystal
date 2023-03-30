@@ -531,7 +531,7 @@ export interface PgCodecRelationConfig<
 }
 
 /**
- * Describes a relation to another source
+ * Describes a relation from a codec to a resource
  */
 export interface PgCodecRelation<
   TLocalCodec extends PgCodec<

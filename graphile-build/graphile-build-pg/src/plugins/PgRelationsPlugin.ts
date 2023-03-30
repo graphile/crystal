@@ -1005,11 +1005,11 @@ function addRelations(
               const clean =
                 localColumns.every(isSafeObjectPropertyName) &&
                 remoteColumns.every(isSafeObjectPropertyName);
-              const sourceName = idents.makeSafeIdentifier(
+              const resourceName = idents.makeSafeIdentifier(
                 `${resource.name}Source`,
               );
               prefixLines.push(
-                te`const ${te.identifier(sourceName)} = ${te.ref(resource)};`,
+                te`const ${te.identifier(resourceName)} = ${te.ref(resource)};`,
               );
               if (isStillSingular) {
                 if (!isUnique) {
@@ -1048,9 +1048,9 @@ function addRelations(
                     )
                   : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
                 functionLines.push(
-                  te`  const ${newIdentifier} = ${te.identifier(sourceName)}.${
-                    isUnique ? te`get` : te`find`
-                  }(${specString});`,
+                  te`  const ${newIdentifier} = ${te.identifier(
+                    resourceName,
+                  )}.${isUnique ? te`get` : te`find`}(${specString});`,
                 );
                 previousIdentifier = newIdentifier;
               } else {
@@ -1082,7 +1082,7 @@ function addRelations(
                 );
                 functionLines.push(
                   te`  const ${newIdentifier} = each(${previousIdentifier}, (${$entry}) => ${te.identifier(
-                    sourceName,
+                    resourceName,
                   )}.get(${specString}));`,
                 );
                 previousIdentifier = newIdentifier;

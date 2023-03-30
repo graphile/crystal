@@ -44,7 +44,7 @@ declare global {
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _sourceName(
+      _resourceName(
         this: Inflection,
         resource: PgResource<any, any, any, any, any>,
       ): string;
@@ -297,15 +297,15 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         );
       },
 
-      _sourceName(options, source) {
+      _resourceName(options, resource) {
         return this.coerceToGraphQLName(
-          source.extensions?.tags?.name ?? source.name,
+          resource.extensions?.tags?.name ?? resource.name,
         );
       },
 
       _singularizedResourceName(options, source) {
         return this.dontEndInInputOrPatch(
-          this.singularize(this._sourceName(source)),
+          this.singularize(this._resourceName(source)),
         );
       },
 

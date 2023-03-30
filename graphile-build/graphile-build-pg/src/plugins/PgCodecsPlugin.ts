@@ -927,25 +927,25 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         }
 
         // Now ensure all codecs are uniquely named
-        const knownSourceByName = new Map<
+        const knownResourceByName = new Map<
           string,
           PgResource<any, any, any, any, any>
         >();
-        for (const source of Object.values(
+        for (const resource of Object.values(
           build.input.pgRegistry.pgResources,
         )) {
-          const known = knownSourceByName.get(source.name);
+          const known = knownResourceByName.get(resource.name);
           if (known) {
             console.error({
-              error: `Two different sources were created with the same name:`,
+              error: `Two different resources were created with the same name:`,
               first: known,
-              second: source,
+              second: resource,
             });
             throw new Error(
-              "Two different sources were created with the same name; please ensure all source names are unique. If you are creating sources from multiple realms, consider prefixing the source names with the realm name.",
+              "Two different resources were created with the same name; please ensure all source names are unique. If you are creating resources from multiple realms, consider prefixing the source names with the realm name.",
             );
           } else {
-            knownSourceByName.set(source.name, source);
+            knownResourceByName.set(resource.name, resource);
           }
         }
 
