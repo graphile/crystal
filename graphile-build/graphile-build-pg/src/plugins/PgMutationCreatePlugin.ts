@@ -57,17 +57,17 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      createField(options, source) {
-        return this.camelCase(`create-${this.tableType(source.codec)}`);
+      createField(options, resource) {
+        return this.camelCase(`create-${this.tableType(resource.codec)}`);
       },
-      createInputType(options, source) {
-        return this.upperCamelCase(`${this.createField(source)}-input`);
+      createInputType(options, resource) {
+        return this.upperCamelCase(`${this.createField(resource)}-input`);
       },
-      createPayloadType(options, source) {
-        return this.upperCamelCase(`${this.createField(source)}-payload`);
+      createPayloadType(options, resource) {
+        return this.upperCamelCase(`${this.createField(resource)}-payload`);
       },
-      tableFieldName(options, source) {
-        return this.camelCase(`${this.tableType(source.codec)}`);
+      tableFieldName(options, resource) {
+        return this.camelCase(`${this.tableType(resource.codec)}`);
       },
     },
   },
@@ -79,15 +79,15 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
           inflection,
           graphql: { GraphQLString, GraphQLNonNull },
         } = build;
-        const insertableSources = Object.values(
+        const insertableResources = Object.values(
           build.input.pgRegistry.pgResources,
-        ).filter((source) => isInsertable(build, source));
+        ).filter((resource) => isInsertable(build, resource));
 
-        insertableSources.forEach((source) => {
+        insertableResources.forEach((resource) => {
           build.recoverable(null, () => {
-            const tableTypeName = inflection.tableType(source.codec);
-            const inputTypeName = inflection.createInputType(source);
-            const tableFieldName = inflection.tableFieldName(source);
+            const tableTypeName = inflection.tableType(resource.codec);
+            const inputTypeName = inflection.createInputType(resource);
+            const tableFieldName = inflection.tableFieldName(resource);
             build.registerInputObjectType(
               inputTypeName,
               { isMutationInput: true },
@@ -95,7 +95,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                 description: `All input for the create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {
                   const TableInput = build.getGraphQLTypeByPgCodec(
-                    source.codec,
+                    resource.codec,
                     "input",
                   );
                   return {
@@ -142,27 +142,27 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                   };
                 },
               }),
-              `PgMutationCreatePlugin input for ${source.name}`,
+              `PgMutationCreatePlugin input for ${resource.name}`,
             );
 
-            const payloadTypeName = inflection.createPayloadType(source);
+            const payloadTypeName = inflection.createPayloadType(resource);
             const behavior = getBehavior([
-              source.codec.extensions,
-              source.extensions,
+              resource.codec.extensions,
+              resource.extensions,
             ]);
             build.registerObjectType(
               payloadTypeName,
               {
                 isMutationPayload: true,
                 // TODO: isPgCreatePayloadType: true,
-                pgTypeResource: source,
+                pgTypeResource: resource,
               },
               ExecutableStep as any,
               () => ({
                 description: `The output of our create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {
                   const TableType = build.getGraphQLTypeByPgCodec(
-                    source.codec,
+                    resource.codec,
                     "output",
                   ) as GraphQLOutputType | undefined;
                   return {
@@ -208,7 +208,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 [],
                               ),
                               deprecationReason: tagToString(
-                                source.extensions?.tags?.deprecated,
+                                resource.extensions?.tags?.deprecated,
                               ),
                             },
                           ),
@@ -217,7 +217,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                   };
                 },
               }),
-              `PgMutationCreatePlugin payload for ${source.name}`,
+              `PgMutationCreatePlugin payload for ${resource.name}`,
             );
           });
         });
@@ -240,14 +240,14 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
 
         const insertableSources = Object.values(
           build.input.pgRegistry.pgResources,
-        ).filter((source) => isInsertable(build, source));
-        return insertableSources.reduce((memo, source) => {
+        ).filter((resource) => isInsertable(build, resource));
+        return insertableSources.reduce((memo, resource) => {
           return build.recoverable(memo, () => {
-            const createFieldName = inflection.createField(source);
-            const payloadTypeName = inflection.createPayloadType(source);
+            const createFieldName = inflection.createField(resource);
+            const payloadTypeName = inflection.createPayloadType(resource);
             const payloadType = build.getOutputTypeByName(payloadTypeName);
             const mutationInputType = build.getInputTypeByName(
-              inflection.createInputType(source),
+              inflection.createInputType(resource),
             );
 
             return build.extend(
@@ -278,26 +278,26 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     },
                     type: payloadType,
                     description: `Creates a single \`${inflection.tableType(
-                      source.codec,
+                      resource.codec,
                     )}\`.`,
                     deprecationReason: tagToString(
-                      source.extensions?.tags?.deprecated,
+                      resource.extensions?.tags?.deprecated,
                     ),
                     plan: EXPORTABLE(
-                      (object, pgInsert, source) =>
+                      (object, pgInsert, resource) =>
                         function plan(_: any, args: FieldArgs) {
                           const plan = object({
-                            result: pgInsert(source, Object.create(null)),
+                            result: pgInsert(resource, Object.create(null)),
                           });
                           args.apply(plan);
                           return plan;
                         },
-                      [object, pgInsert, source],
+                      [object, pgInsert, resource],
                     ),
                   },
                 ),
               },
-              `Adding create mutation for ${source.name}`,
+              `Adding create mutation for ${resource.name}`,
             );
           });
         }, fields);

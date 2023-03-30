@@ -768,7 +768,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         );
                         if (!baseType || !resultFieldName) {
                           console.warn(
-                            `Procedure source ${resource} has a return type, but we couldn't build it; skipping output field`,
+                            `Procedure resource ${resource} has a return type, but we couldn't build it; skipping output field`,
                           );
                           return {};
                         }
@@ -893,18 +893,18 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               > = isRootQuery
                 ? // Not computed
                   EXPORTABLE(
-                    (makeArgs, source) => ($root, args, _info) => {
+                    (makeArgs, resource) => ($root, args, _info) => {
                       const selectArgs = makeArgs(args);
-                      return source.execute(selectArgs);
+                      return resource.execute(selectArgs);
                     },
                     [makeArgs, resource],
                   )
                 : isRootMutation
                 ? // Mutation uses 'args.input' rather than 'args'
                   EXPORTABLE(
-                    (makeArgs, object, source) => ($root, args, _info) => {
+                    (makeArgs, object, resource) => ($root, args, _info) => {
                       const selectArgs = makeArgs(args, ["input"]);
-                      const $result = source.execute(selectArgs, "mutation");
+                      const $result = resource.execute(selectArgs, "mutation");
                       return object({
                         result: $result,
                       });
@@ -919,7 +919,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         makeArgs,
                         pgClassExpression,
                         pgSelectSingleFromRecord,
-                        source,
+                        resource,
                         stepAMayDependOnStepB,
                       ) =>
                       ($in, args, _info) => {
@@ -952,9 +952,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           ...extraSelectArgs,
                         ];
                         if (
-                          source.isUnique &&
-                          !source.codec.columns &&
-                          typeof source.source === "function"
+                          resource.isUnique &&
+                          !resource.codec.columns &&
+                          typeof resource.source === "function"
                         ) {
                           // This is a scalar computed column, let's inline the expression
                           const placeholders = selectArgs.map((arg, i) => {
@@ -970,15 +970,15 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           });
                           return pgClassExpression(
                             $row,
-                            source.codec,
-                          )`${source.source(
+                            resource.codec,
+                          )`${resource.source(
                             ...placeholders.map((placeholder) => ({
                               placeholder,
                             })),
                           )}`;
                         }
                         // TODO: or here, if scalar add select to `$row`?
-                        return source.execute(selectArgs);
+                        return resource.execute(selectArgs);
                       },
                     [
                       PgSelectSingleStep,
@@ -1080,9 +1080,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   return memo;
                 }
 
-                // isUnique is false => this is a 'setof' source.
+                // isUnique is false => this is a 'setof' resource.
 
-                // If the source still has an array type, then it's a 'setof
+                // If the resource still has an array type, then it's a 'setof
                 // foo[]' which __MUST NOT USE__ GraphQL connections; see:
                 // https://relay.dev/graphql/connections.htm#sec-Node
                 const canUseConnection =
@@ -1184,7 +1184,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             },
                           ),
                         },
-                        `Adding field '${fieldName}' to '${SelfName}' from function source '${resource.name}'`,
+                        `Adding field '${fieldName}' to '${SelfName}' from function resource '${resource.name}'`,
                       ),
                     );
                   }
@@ -1240,7 +1240,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           },
                         ),
                       },
-                      `Adding list field '${fieldName}' to ${SelfName} from function source '${resource.name}'`,
+                      `Adding list field '${fieldName}' to ${SelfName} from function resource '${resource.name}'`,
                     ),
                   );
                 }

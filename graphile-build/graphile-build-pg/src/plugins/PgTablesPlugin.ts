@@ -32,11 +32,11 @@ declare global {
     interface Inflection {
       /**
        * A PgResource represents a single way of getting a number of values of
-       * `source.codec` type. It doesn't necessarily represent a table directly
+       * `resource.codec` type. It doesn't necessarily represent a table directly
        * (although it can) - e.g. it might be a function that returns records
        * from a table, or it could be a "sub-selection" of a table, e.g.
        * "admin_users" might be "users where admin is true".  This inflector
-       * gives a name to this source, it's primarily used when naming _fields_
+       * gives a name to this resource, it's primarily used when naming _fields_
        * in the GraphQL schema (as opposed to `_codecName` which typically
        * names _types_.
        *
@@ -303,9 +303,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         );
       },
 
-      _singularizedResourceName(options, source) {
+      _singularizedResourceName(options, resource) {
         return this.dontEndInInputOrPatch(
-          this.singularize(this._resourceName(source)),
+          this.singularize(this._resourceName(resource)),
         );
       },
 

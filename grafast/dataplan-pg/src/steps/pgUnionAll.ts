@@ -626,16 +626,16 @@ export class PgUnionAllStep<
         const { path = [] } = member;
         const conditions: SQL[] = [];
 
-        let currentSource = member.resource;
-        let currentSymbol = Symbol(currentSource.name);
+        let currentResource = member.resource;
+        let currentSymbol = Symbol(currentResource.name);
         let currentAlias = sql.identifier(currentSymbol);
-        if (this.executor !== currentSource.executor) {
+        if (this.executor !== currentResource.executor) {
           throw new Error(
-            `${this}: all sources must currently come from same executor`,
+            `${this}: all resources must currently come from same executor`,
           );
         }
-        if (!sql.isSQL(currentSource.source)) {
-          throw new Error(`${this}: parameterized sources not yet supported`);
+        if (!sql.isSQL(currentResource.source)) {
+          throw new Error(`${this}: parameterized resources not yet supported`);
         }
 
         if (member.match) {
@@ -650,23 +650,24 @@ export class PgUnionAllStep<
           }
         }
 
-        let sqlSource = sql`${currentSource.source} as ${currentAlias}`;
+        let sqlSource = sql`${currentResource.source} as ${currentAlias}`;
 
         for (const pathEntry of path) {
-          const relation: PgCodecRelation<any, any> = currentSource.getRelation(
-            pathEntry.relationName,
-          );
+          const relation: PgCodecRelation<any, any> =
+            currentResource.getRelation(pathEntry.relationName);
           const nextResource = relation.remoteResource;
           const nextSymbol = Symbol(nextResource.name);
           const nextAlias = sql.identifier(nextSymbol);
 
           if (this.executor !== nextResource.executor) {
             throw new Error(
-              `${this}: all sources must currently come from same executor`,
+              `${this}: all resources must currently come from same executor`,
             );
           }
           if (!sql.isSQL(nextResource.source)) {
-            throw new Error(`${this}: parameterized sources not yet supported`);
+            throw new Error(
+              `${this}: parameterized resources not yet supported`,
+            );
           }
 
           const nextSqlSource: SQL = nextResource.source;
@@ -684,14 +685,14 @@ on (${sql.indent(
             ),
           )})`;
 
-          currentSource = nextResource;
+          currentResource = nextResource;
           currentSymbol = nextSymbol;
           currentAlias = nextAlias;
         }
 
         this.memberDigests.push({
           member,
-          finalResource: currentSource,
+          finalResource: currentResource,
           symbol: currentSymbol,
           alias: currentAlias,
           conditions,
@@ -1465,7 +1466,7 @@ and ${condition(i + 1)}`}
         const pk = finalSource.uniques?.find((u) => u.isPrimary === true);
         if (!pk) {
           throw new Error(
-            `No PK for ${digest.member.typeName} source in ${this}`,
+            `No PK for ${digest.member.typeName} resource in ${this}`,
           );
         }
         const midSelects: SQL[] = [];

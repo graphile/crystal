@@ -38,15 +38,15 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
           return values;
         }
 
-        const sources = Object.values(
+        const resources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((s) => s.codec === pgCodec && !s.parameters);
-        if (sources.length < 1) {
+        if (resources.length < 1) {
           return values;
         }
 
-        const primaryKey = (sources[0].uniques as PgResourceUnique[]).find(
-          (source) => source.isPrimary,
+        const primaryKey = (resources[0].uniques as PgResourceUnique[]).find(
+          (resource) => resource.isPrimary,
         );
         if (!primaryKey) {
           return values;

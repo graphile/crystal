@@ -557,7 +557,7 @@ export interface PgCodecRelation<
       : never
   > {
   /**
-   * The remote source this relation relates to.
+   * The remote resource this relation relates to.
    */
   remoteResource: TRemoteResource;
 }

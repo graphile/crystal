@@ -1006,7 +1006,7 @@ function addRelations(
                 localColumns.every(isSafeObjectPropertyName) &&
                 remoteColumns.every(isSafeObjectPropertyName);
               const resourceName = idents.makeSafeIdentifier(
-                `${resource.name}Source`,
+                `${resource.name}Resource`,
               );
               prefixLines.push(
                 te`const ${te.identifier(resourceName)} = ${te.ref(resource)};`,
