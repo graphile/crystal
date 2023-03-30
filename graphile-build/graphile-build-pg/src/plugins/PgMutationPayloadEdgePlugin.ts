@@ -58,12 +58,12 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           options: { simpleCollections },
         } = build;
         const {
-          scope: { isMutationPayload, pgTypeSource, pgCodec: _pgCodec },
+          scope: { isMutationPayload, pgTypeResource, pgCodec: _pgCodec },
           fieldWithHooks,
           Self,
         } = context;
 
-        const pgCodec = pgTypeSource?.codec ?? _pgCodec;
+        const pgCodec = pgTypeResource?.codec ?? _pgCodec;
 
         if (
           !isMutationPayload ||
@@ -74,7 +74,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        if (pgTypeSource?.parameters && !pgTypeSource.isUnique) {
+        if (pgTypeResource?.parameters && !pgTypeResource.isUnique) {
           return fields;
         }
 

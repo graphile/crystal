@@ -31,7 +31,7 @@ declare global {
     interface ScopeObject {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;
-      pgTypeSource?: PgResource<any, any, any, any, any>;
+      pgTypeResource?: PgResource<any, any, any, any, any>;
     }
 
     interface ScopeObjectFieldsField {
@@ -267,7 +267,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               isMutationPayload: true,
               isPgUpdatePayloadType: mode === "source:update",
               isPgDeletePayloadType: mode === "source:delete",
-              pgTypeSource: resource,
+              pgTypeResource: resource,
             },
             ObjectStep,
             () => {

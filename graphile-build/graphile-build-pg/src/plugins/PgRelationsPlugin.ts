@@ -649,13 +649,13 @@ function addRelations(
   const { pgCodec } = scope;
   const isPgTableType =
     "isPgTableType" in scope ? scope.isPgTableType : undefined;
-  const pgTypeSource = "pgTypeSource" in scope ? scope.pgTypeSource : undefined;
+  const pgTypeResource = "pgTypeResource" in scope ? scope.pgTypeResource : undefined;
   const isMutationPayload =
     "isMutationPayload" in scope ? scope.isMutationPayload : undefined;
   const pgPolymorphism =
     "pgPolymorphism" in scope ? scope.pgPolymorphism : undefined;
 
-  const codec = (pgTypeSource?.codec ?? pgCodec) as PgCodecAny;
+  const codec = (pgTypeResource?.codec ?? pgCodec) as PgCodecAny;
   // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
   if (!(isPgTableType || isMutationPayload || pgPolymorphism) || !codec) {
     return fields;
@@ -666,7 +666,7 @@ function addRelations(
   // TODO: change the default so that we don't do this on
   // isMutationPayload; only do that for V4 compat. (It's redundant vs
   // just using the object type directly)
-  const resource = (pgTypeSource ??
+  const resource = (pgTypeResource ??
     allPgResources.find((s) => s.codec === codec && !s.parameters) ??
     allPgResources.find((s) => s.codec === codec && s.isUnique)) as PgResource<
     any,

@@ -733,7 +733,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     {
                       isMutationPayload: true,
                       pgCodec: resource.codec,
-                      pgTypeSource: resource,
+                      pgTypeResource: resource,
                     },
                     ObjectStep,
                     () => ({
