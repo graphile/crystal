@@ -702,6 +702,7 @@ interface PgRange<T> {
  * @param config - extra details about this range
  */
 export function rangeOfCodec<
+  TName extends string,
   TInnerCodec extends PgCodec<
     any,
     undefined,
@@ -711,7 +712,6 @@ export function rangeOfCodec<
     any,
     undefined
   >,
-  TName extends string,
 >(
   innerCodec: TInnerCodec,
   name: TName,
