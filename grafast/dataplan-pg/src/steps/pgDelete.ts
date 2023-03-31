@@ -159,12 +159,7 @@ export class PgDeleteStep<
   get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<
-      infer UCodec,
-      any
-    >
-      ? UCodec
-      : never,
+    GetPgResourceColumns<TResource>[TAttr]["codec"],
     TResource
   > {
     const resourceColumn: PgCodecAttribute =

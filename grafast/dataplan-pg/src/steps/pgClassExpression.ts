@@ -131,12 +131,7 @@ export class PgClassExpressionStep<
   public get<TAttr extends keyof GetPgCodecColumns<TExpressionCodec>>(
     attributeName: TAttr,
   ): PgClassExpressionStep<
-    GetPgCodecColumns<TExpressionCodec>[TAttr] extends PgCodecAttribute<
-      infer UCodec,
-      any
-    >
-      ? UCodec
-      : never,
+    GetPgCodecColumns<TExpressionCodec>[TAttr]["codec"],
     TResource
   > {
     const columns = this.pgCodec.columns;
@@ -243,7 +238,7 @@ export class PgClassExpressionStep<
  * that will be selected.
  */
 function pgClassExpression<
-  TExpressionCodec extends PgCodec<any, any, any, any, any, any, any>,
+  TExpressionCodec extends PgCodec,
   TResource extends PgResource<any, any, any, any, any>,
 >(
   table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
