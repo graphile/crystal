@@ -69,6 +69,7 @@ import { inspect } from "util";
 import type {
   GetPgResourceRelations,
   PgCodecAttribute,
+  PgCodecAttributes,
   PgCodecAttributeVia,
   PgCodecWithColumns,
   PgConditionStep,
@@ -3216,11 +3217,7 @@ export function makeExampleSchema(
   });
 
   const commonRelationalItemFields = <
-    TColumns extends {
-      [key in string]: key extends keyof typeof relationalItemsCodec.columns
-        ? (typeof relationalItemsCodec.columns)[key]
-        : any;
-    },
+    TStep extends PgSelectSingleStep<any>,
   >() =>
     ({
       id: attrField("id", GraphQLInt),
@@ -3245,15 +3242,7 @@ export function makeExampleSchema(
       isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
       archivedAt: attrField("archived_at", GraphQLString),
     } satisfies {
-      [fieldName: string]: GraphileFieldConfig<
-        any,
-        any,
-        PgSelectSingleStep<
-          PgResource<any, PgCodecWithColumns<TColumns>, any, any, any>
-        >,
-        any,
-        any
-      >;
+      [fieldName: string]: GraphileFieldConfig<any, any, TStep, any, any>;
     });
 
   const RelationalTopic = newObjectTypeBuilder<
@@ -3263,9 +3252,7 @@ export function makeExampleSchema(
     name: "RelationalTopic",
     interfaces: [RelationalItem],
     fields: () => ({
-      ...commonRelationalItemFields<
-        typeof relationalTopicsResource.codec.columns
-      >(),
+      ...commonRelationalItemFields(),
       title: attrField("title", GraphQLString),
     }),
   });
@@ -3277,9 +3264,7 @@ export function makeExampleSchema(
     name: "RelationalPost",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields<
-        typeof relationalPostsResource.codec.columns
-      >(),
+      ...commonRelationalItemFields(),
       title: attrField("title", GraphQLString),
       description: attrField("description", GraphQLString),
       note: attrField("note", GraphQLString),
@@ -3317,9 +3302,7 @@ export function makeExampleSchema(
     name: "RelationalDivider",
     interfaces: [RelationalItem],
     fields: () => ({
-      ...commonRelationalItemFields<
-        typeof relationalDividersResource.codec.columns
-      >(),
+      ...commonRelationalItemFields(),
       title: attrField("title", GraphQLString),
       color: attrField("color", GraphQLString),
     }),
@@ -3332,9 +3315,7 @@ export function makeExampleSchema(
     name: "RelationalChecklist",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields<
-        typeof relationalChecklistsResource.codec.columns
-      >(),
+      ...commonRelationalItemFields(),
       title: attrField("title", GraphQLString),
     }),
   });
@@ -3346,9 +3327,7 @@ export function makeExampleSchema(
     name: "RelationalChecklistItem",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields<
-        typeof relationalChecklistItemsResource.codec.columns
-      >(),
+      ...commonRelationalItemFields(),
       description: attrField("description", GraphQLString),
       note: attrField("note", GraphQLString),
     }),
