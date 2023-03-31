@@ -177,10 +177,10 @@ declare global {
         getResourceOptions(
           databaseName: string,
           pgClass: PgClass,
-        ): Promise<PgResourceOptions<PgCodec, any, any, any> | null>;
+        ): Promise<PgResourceOptions<any, PgCodec, any, any> | null>;
         /*
         getSource(
-          resourceOptions: PgResourceOptions<any, any, any>,
+          resourceOptions: PgResourceOptions<any, any, any, any>,
         ): Promise<PgResource<any, any, any, any, any> | null>;
         */
       };
@@ -205,7 +205,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          resourceOptions: PgResourceOptions<any, any, any>;
+          resourceOptions: PgResourceOptions<any, any, any, any>;
         }) => void | Promise<void>
       >;
       pgTables_PgResourceOptions_relations: PluginHook<
@@ -219,7 +219,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          resourceOptions: PgResourceOptions<PgCodec, any, any, any>;
+          resourceOptions: PgResourceOptions<any, PgCodec, any, any>;
         }) => Promise<void> | void
       >;
     }
@@ -229,14 +229,14 @@ declare global {
 interface State {
   resourceOptionsByPgClassByDatabase: Map<
     string,
-    Map<PgClass, Promise<PgResourceOptions<any, any, any> | null>>
+    Map<PgClass, Promise<PgResourceOptions<any, any, any, any> | null>>
   >;
   resourceByResourceOptions: Map<
-    PgResourceOptions<any, any, any>,
+    PgResourceOptions<any, any, any, any>,
     Promise<PgResource<any, any, any, any, any> | null>
   >;
   detailsByResourceOptions: Map<
-    PgResourceOptions<any, any, any>,
+    PgResourceOptions<any, any, any, any>,
     { databaseName: string; pgClass: PgClass }
   >;
 }

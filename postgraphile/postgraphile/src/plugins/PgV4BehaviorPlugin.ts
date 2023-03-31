@@ -49,8 +49,8 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
           s as PgResourceOptions<
             any,
             any,
-            readonly PgResourceParameter<any, any>[],
-            any
+            any,
+            readonly PgResourceParameter<any, any>[]
           >
         ).parameters![0];
         if (s.isMutation && s.parameters) {

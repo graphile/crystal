@@ -522,8 +522,8 @@ export interface PgCodecRelationConfig<
 > extends PgCodecRelationBase<
     TLocalCodec,
     TRemoteResourceOptions extends PgResourceOptions<
-      PgCodec<any, infer UColumns, any, any, any, any, any>,
       any,
+      PgCodec<any, infer UColumns, any, any, any, any, any>,
       any,
       any
     >
@@ -579,17 +579,17 @@ export interface PgRegistryConfig<
   },
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
+      name,
       PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
-      readonly PgResourceParameter[] | undefined,
-      name
+      readonly PgResourceParameter[] | undefined
     >;
   },
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        PgResourceOptions<PgCodecWithColumns, any, any, any>
+        PgResourceOptions<any, PgCodecWithColumns, any, any>
       >;
     };
   },
@@ -619,10 +619,10 @@ export type ResourceFromOptions<
   },
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
+      name,
       PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined,
-      name
+      readonly PgResourceParameter[] | undefined
     >;
   },
   TRelations extends {
@@ -632,9 +632,9 @@ export type ResourceFromOptions<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
         // TResourceOptions[keyof TResourceOptions] &
         PgResourceOptions<
+          any,
           // TCodecs[keyof TCodecs] &
           PgCodecWithColumns,
-          any,
           any,
           any
         >
@@ -643,10 +643,10 @@ export type ResourceFromOptions<
   },
   TResourceName extends keyof TResourceOptions,
 > = TResourceOptions[TResourceName] extends PgResourceOptions<
+  infer UName,
   infer UCodec,
   infer UUniques,
-  infer UParameters,
-  infer UName
+  infer UParameters
 >
   ? PgResource<
       UName,
@@ -681,17 +681,17 @@ export interface PgRegistry<
   },
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
+      name,
       PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined,
-      name
+      readonly PgResourceParameter[] | undefined
     >;
   } = {
     [name in string]: PgResourceOptions<
+      name,
       PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined,
-      name
+      readonly PgResourceParameter[] | undefined
     >;
   },
   TRelations extends {
@@ -701,9 +701,9 @@ export interface PgRegistry<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
         // TResourceOptions[keyof TResourceOptions] &
         PgResourceOptions<
+          any,
           // TCodecs[keyof TCodecs] &
           PgCodecWithColumns,
-          any,
           any,
           any
         >
@@ -716,9 +716,9 @@ export interface PgRegistry<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
         // TResourceOptions[keyof TResourceOptions] &
         PgResourceOptions<
+          any,
           // TCodecs[keyof TCodecs] &
           PgCodecWithColumns,
-          any,
           any,
           any
         >
@@ -745,7 +745,7 @@ export interface PgRegistry<
             TRelations,
             TRelations[codecName][relationName] extends PgCodecRelationConfig<
               any,
-              PgResourceOptions<any, any, any, infer UResourceName>
+              PgResourceOptions<infer UResourceName, any, any, any>
             >
               ? UResourceName
               : never

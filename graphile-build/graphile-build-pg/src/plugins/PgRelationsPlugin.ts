@@ -106,7 +106,7 @@ declare global {
           event: {
             pgClass: PgClass;
             databaseName: string;
-            resourceOptions: PgResourceOptions<any, any, any>;
+            resourceOptions: PgResourceOptions<any, any, any, any>;
           },
           pgConstraint: PgConstraint,
           isReferencee?: boolean,
@@ -380,7 +380,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           : tags.forwardDescription ?? constraintDescription;
         const newRelation: PgCodecRelationConfig<
           PgCodecWithColumns,
-          PgResourceOptions<PgCodecWithColumns, any, any, any>
+          PgResourceOptions<any, PgCodecWithColumns, any, any>
         > = {
           localCodec,
           localColumns: localColumns.map((c) => c!.attname),

@@ -118,7 +118,7 @@ declare global {
       [codecName: string]: {
         [relationName: string]: PgCodecRelationConfig<
           PgCodec<any, PgCodecAttributes, any, any, undefined, any, undefined>,
-          PgResourceOptions<PgCodecWithColumns, any, any, any>
+          PgResourceOptions<any, PgCodecWithColumns, any, any>
         >;
       };
     }

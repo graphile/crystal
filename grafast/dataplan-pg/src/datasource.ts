@@ -159,10 +159,14 @@ export interface PgCodecRefs {
  * Configuration options for your PgResource
  */
 export interface PgResourceOptions<
-  TCodec extends PgCodec,
-  TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
-  TParameters extends readonly PgResourceParameter[] | undefined = undefined,
   TName extends string = string,
+  TCodec extends PgCodec = PgCodec,
+  TUniques extends ReadonlyArray<
+    PgResourceUnique<GetPgCodecColumns<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TParameters extends readonly PgResourceParameter[] | undefined =
+    | readonly PgResourceParameter[]
+    | undefined,
 > {
   /**
    * The associated codec for this resource
@@ -301,10 +305,10 @@ export class PgResource<
     executor: PgExecutor,
     baseCodec: TCodec,
   ): PgResourceOptions<
+    string,
     TCodec,
     ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
-    undefined,
-    string
+    undefined
   > {
     const codec: CodecWithSource<typeof baseCodec> = baseCodec;
     if (!codec[$$codecSource]) {
@@ -349,7 +353,7 @@ export class PgResource<
    */
   constructor(
     registry: TRegistry,
-    options: PgResourceOptions<TCodec, TUniques, TParameters, TName>,
+    options: PgResourceOptions<TName, TCodec, TUniques, TParameters>,
   ) {
     const {
       codec,
@@ -424,7 +428,7 @@ export class PgResource<
     >,
     const TNewName extends string,
   >(
-    baseOptions: PgResourceOptions<TCodec, any, undefined, any>,
+    baseOptions: PgResourceOptions<any, TCodec, any, undefined>,
     overrideOptions: {
       name: TNewName;
       identifier?: string;
@@ -432,7 +436,7 @@ export class PgResource<
       uniques?: TNewUniques;
       extensions?: PgResourceExtensions;
     },
-  ): PgResourceOptions<TCodec, TNewUniques, undefined, TNewName> {
+  ): PgResourceOptions<TNewName, TCodec, TNewUniques, undefined> {
     const { name, identifier, source, uniques, extensions } = overrideOptions;
     const { codec, executor, selectAuth } = baseOptions;
     return {
@@ -462,14 +466,14 @@ export class PgResource<
     >,
     const TNewName extends string,
   >(
-    baseOptions: PgResourceOptions<TCodec, any, any, any>,
+    baseOptions: PgResourceOptions<any, TCodec, any, any>,
     overrideOptions: PgFunctionResourceOptions<
       TCodec,
       TNewUniques,
       TNewParameters,
       TNewName
     >,
-  ): PgResourceOptions<TCodec, TNewUniques, TNewParameters, TNewName> {
+  ): PgResourceOptions<TNewName, TCodec, TNewUniques, TNewParameters> {
     const { codec, executor, selectAuth } = baseOptions;
     const {
       name,
@@ -904,17 +908,17 @@ export interface PgRegistryBuilder<
   },
   TResources extends {
     [name in string]: PgResourceOptions<
+      name,
       PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined,
-      name
+      readonly PgResourceParameter[] | undefined
     >;
   },
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        PgResourceOptions<PgCodecWithColumns, any, any, any>
+        PgResourceOptions<any, PgCodecWithColumns, any, any>
       >;
     };
   },
@@ -939,14 +943,14 @@ export interface PgRegistryBuilder<
   addResource<const TResource extends PgResourceOptions<any, any, any, any>>(
     resource: TResource,
   ): PgRegistryBuilder<
-    TResource extends PgResourceOptions<infer UCodec, any, any, any>
+    TResource extends PgResourceOptions<any, infer UCodec, any, any>
       ? UCodec extends PgCodec<infer UName, any, any, any, any, any, any>
         ? TCodecs & {
             [name in UName]: UCodec;
           }
         : never
       : never,
-    TResource extends PgResourceOptions<any, any, any, infer UName>
+    TResource extends PgResourceOptions<infer UName, any, any, any>
       ? TResources & {
           [name in UName]: TResource;
         }
@@ -1028,17 +1032,17 @@ export function makeRegistry<
   },
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
+      name,
       PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
-      readonly PgResourceParameter[] | undefined,
-      name
+      readonly PgResourceParameter[] | undefined
     >;
   },
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        PgResourceOptions<PgCodecWithColumns, any, any, any>
+        PgResourceOptions<any, PgCodecWithColumns, any, any>
       >;
     };
   },
@@ -1329,7 +1333,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
         ...relation,
       } as PgCodecRelationConfig<
         PgCodecWithColumns,
-        PgResourceOptions<PgCodecWithColumns, any, any, any>
+        PgResourceOptions<any, PgCodecWithColumns, any, any>
       >;
       return builder;
     },
