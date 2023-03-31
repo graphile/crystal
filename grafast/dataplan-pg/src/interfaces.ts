@@ -122,19 +122,25 @@ export type PgCodecPolymorphism<TColumnName extends string> =
  * about the type, for example any of the attributes it has.
  */
 export interface PgCodec<
-  TName extends string,
-  TColumns extends PgCodecAttributes | undefined,
-  TFromPostgres,
+  TName extends string = string,
+  TColumns extends PgCodecAttributes | undefined =
+    | PgCodecAttributes
+    | undefined,
+  TFromPostgres = any,
   TFromJavaScript = TFromPostgres,
   TArrayItemCodec extends
     | PgCodec<string, any, any, any, undefined, any, any>
-    | undefined = undefined,
+    | undefined =
+    | PgCodec<string, any, any, any, undefined, any, any>
+    | undefined,
   TDomainItemCodec extends
     | PgCodec<string, any, any, any, any, any, any>
-    | undefined = undefined,
+    | undefined = PgCodec<string, any, any, any, any, any, any> | undefined,
   TRangeItemCodec extends
     | PgCodec<string, undefined, any, any, undefined, any, undefined>
-    | undefined = undefined,
+    | undefined =
+    | PgCodec<string, undefined, any, any, undefined, any, undefined>
+    | undefined,
 > {
   /**
    * Unique name to identify this codec.
@@ -285,7 +291,15 @@ export type PgEnumValue<TValue extends string = string> = {
  * A PgCodec specifically for enums
  */
 export interface PgEnumCodec<TName extends string, TValue extends string>
-  extends PgCodec<TName, undefined, string, TValue> {
+  extends PgCodec<
+    TName,
+    undefined,
+    string,
+    TValue,
+    undefined,
+    undefined,
+    undefined
+  > {
   values: PgEnumValue<TValue>[];
 }
 

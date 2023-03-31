@@ -565,7 +565,9 @@ export function listOfCodec<
     >
       ? UFromJs[]
       : any[],
-    TInnerCodec
+    TInnerCodec,
+    undefined,
+    undefined
   > = {
     name: `${
       innerCodec.name as TInnerCodec extends PgCodec<
