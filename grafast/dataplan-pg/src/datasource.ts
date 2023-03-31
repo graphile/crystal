@@ -39,7 +39,6 @@ import type {
   PgCodecWithColumns,
   PgRefDefinition,
   PgRegistry,
-  PgRegistryAny,
   PgRegistryConfig,
   PlanByUniques,
 } from "./interfaces.js";
@@ -217,10 +216,10 @@ export interface PgResourceOptions<
 }
 
 export interface PgFunctionResourceOptions<
+  TNewName extends string,
   TCodec extends PgCodec,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TNewParameters extends readonly PgResourceParameter[],
-  TNewName extends string,
 > {
   name: TNewName;
   identifier?: string;
@@ -470,10 +469,10 @@ export class PgResource<
   >(
     baseOptions: PgResourceOptions<any, TCodec, any, any>,
     overrideOptions: PgFunctionResourceOptions<
+      TNewName,
       TCodec,
       TNewUniques,
-      TNewParameters,
-      TNewName
+      TNewParameters
     >,
   ): PgResourceOptions<TNewName, TCodec, TNewUniques, TNewParameters> {
     const { codec, executor, selectAuth } = baseOptions;
