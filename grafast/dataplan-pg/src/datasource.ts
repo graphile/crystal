@@ -906,33 +906,19 @@ export interface PgRegistryBuilder<
   addResource<const TResource extends PgResourceOptions<any, any, any, any>>(
     resource: TResource,
   ): PgRegistryBuilder<
-    TResource extends PgResourceOptions<any, infer UCodec, any, any>
-      ? UCodec extends PgCodec<infer UName, any, any, any, any, any, any>
-        ? TCodecs & {
-            [name in UName]: UCodec;
-          }
-        : never
-      : never,
-    TResource extends PgResourceOptions<infer UName, any, any, any>
-      ? TResources & {
-          [name in UName]: TResource;
-        }
-      : never,
+    TCodecs & {
+      [name in TResource["codec"]["name"]]: TResource["codec"];
+    },
+    TResources & {
+      [name in TResource["name"]]: TResource;
+    },
     TRelations
   >;
 
   addRelation<
-    TCodec extends PgCodec<
-      string,
-      PgCodecAttributes,
-      any,
-      any,
-      undefined,
-      any,
-      undefined
-    >,
+    TCodec extends PgCodec,
     const TCodecRelationName extends string,
-    TRemoteResource extends PgResourceOptions<any, any, any, any>,
+    const TRemoteResource extends PgResourceOptions<any, any, any, any>,
     const TCodecRelation extends Omit<
       PgCodecRelationConfig<TCodec, TRemoteResource>,
       "localCodec" | "remoteResourceOptions"
@@ -945,37 +931,14 @@ export interface PgRegistryBuilder<
   ): PgRegistryBuilder<
     TCodecs,
     TResources,
-    TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
-      ? TRelations & {
-          [codecName in UName]: {
-            [relationName in TCodecRelationName]: TCodecRelation & {
-              localCodec: TCodec;
-              remoteResourceOptions: TRemoteResource;
-            };
-          };
-        }
-      : never
-    /*
-    TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
-      ? TRelations extends { [codecName in UName]: infer UExist }
-        ? Expand<
-            TRelations & {
-              [codecName in UName]: Expand<
-                UExist & {
-                  [relationName in TCodecRelationName]: TCodecRelation;
-                }
-              >;
-            }
-          >
-        : Expand<
-            TRelations & {
-              [codecName in UName]: {
-                [relationName in TCodecRelationName]: TCodecRelation;
-              };
-            }
-          >
-      : never
-*/
+    TRelations & {
+      [codecName in TCodec["name"]]: {
+        [relationName in TCodecRelationName]: TCodecRelation & {
+          localCodec: TCodec;
+          remoteResourceOptions: TRemoteResource;
+        };
+      };
+    }
   >;
 
   build(): PgRegistry<Expand<TCodecs>, Expand<TResources>, Expand<TRelations>>;
