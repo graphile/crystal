@@ -286,16 +286,16 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       singleRelation(previous, _options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.getRelation(
-          relationName,
-        ) as PgCodecRelationAny;
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name][
+          relationName
+        ] as PgCodecRelationAny;
         if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
         const detailedKeys = (relation.localColumns as string[]).map(
           (columnName) => ({
-            codec: resource.codec,
+            codec,
             columnName,
           }),
         );
@@ -318,10 +318,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       singleRelationBackwards(previous, _options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.getRelation(
-          relationName,
-        ) as PgCodecRelationAny;
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name][
+          relationName
+        ] as PgCodecRelationAny;
         if (
           typeof relation.extensions?.tags?.foreignSingleFieldName === "string"
         ) {
@@ -346,15 +346,23 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               )}`,
             );
           }
-          if (this.baseNameMatches(baseName, resource.name)) {
+          if (this.baseNameMatches(baseName, codec.name)) {
             return this.camelCase(
               `${this._singularizedCodecName(relation.remoteResource.codec)}`,
             );
           }
         }
-        const pk = (resource.uniques as PgResourceUnique[]).find(
-          (u) => u.isPrimary,
+        const possibleResources = Object.values(registry.pgResources).filter(
+          (resource) => resource.codec === codec && !resource.parameters,
         );
+        if (possibleResources.length > 1) {
+          throw new Error(
+            `singleRelationBackwards inflector check failed: multiple table-like resources for codec '${codec.name}', so we cannot determine the primary key - please override this inflector for this table.`,
+          );
+        }
+        const uniques = (possibleResources[0]?.uniques ??
+          []) as PgResourceUnique[];
+        const pk = uniques.find((u) => u.isPrimary);
         if (pk && arraysMatch(pk.columns, relation.localColumns)) {
           return this.camelCase(
             `${this._singularizedCodecName(relation.remoteResource.codec)}`,
@@ -364,10 +372,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       _manyRelation(previous, _options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.getRelation(
-          relationName,
-        ) as PgCodecRelationAny;
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name][
+          relationName
+        ] as PgCodecRelationAny;
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
@@ -388,7 +396,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               )}`,
             );
           }
-          if (this.baseNameMatches(baseName, resource.name)) {
+          if (this.baseNameMatches(baseName, codec.name)) {
             return this.camelCase(
               `${this.distinctPluralize(
                 this._singularizedCodecName(relation.remoteResource.codec),
@@ -410,10 +418,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       manyRelationConnection(previous, _options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.getRelation(
-          relationName,
-        ) as PgCodecRelationAny;
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name][
+          relationName
+        ] as PgCodecRelationAny;
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
           relation.remoteResource.extensions?.tags?.listSuffix;
@@ -423,10 +431,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       manyRelationList(previous, _options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.getRelation(
-          relationName,
-        ) as PgCodecRelationAny;
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name][
+          relationName
+        ] as PgCodecRelationAny;
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
           relation.remoteResource.extensions?.tags?.listSuffix;

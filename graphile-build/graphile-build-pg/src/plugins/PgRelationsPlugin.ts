@@ -36,7 +36,8 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
-      resource: PgResource<any, any, any, any, PgRegistry<any, any, any>>;
+      registry: PgRegistry<any, any, any>;
+      codec: PgCodecAny;
       relationName: string;
     }
 
@@ -177,8 +178,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
 
       singleRelation(options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.registry.pgRelations[resource.codec.name]?.[
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name]?.[
           relationName
         ] as PgCodecRelation<
           PgCodecWithColumns,
@@ -192,15 +193,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const remoteType = this.tableType(relation.remoteResource.codec);
         const localColumns = relation.localColumns as string[];
         return this.camelCase(
-          `${remoteType}-by-${this._joinColumnNames(
-            resource.codec,
-            localColumns,
-          )}`,
+          `${remoteType}-by-${this._joinColumnNames(codec, localColumns)}`,
         );
       },
       singleRelationBackwards(options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.registry.pgRelations[resource.codec.name]?.[
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name]?.[
           relationName
         ] as PgCodecRelation<
           PgCodecWithColumns,
@@ -225,8 +223,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         );
       },
       _manyRelation(options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.registry.pgRelations[resource.codec.name]?.[
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name]?.[
           relationName
         ] as PgCodecRelation<
           PgCodecWithColumns,
@@ -247,8 +245,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         );
       },
       manyRelationConnection(options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.registry.pgRelations[resource.codec.name]?.[
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name]?.[
           relationName
         ] as PgCodecRelation<
           PgCodecWithColumns,
@@ -261,8 +259,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         return this.connectionField(this._manyRelation(details));
       },
       manyRelationList(options, details) {
-        const { resource, relationName } = details;
-        const relation = resource.registry.pgRelations[resource.codec.name]?.[
+        const { registry, codec, relationName } = details;
+        const relation = registry.pgRelations[codec.name]?.[
           relationName
         ] as PgCodecRelation<
           PgCodecWithColumns,
@@ -817,7 +815,8 @@ function addRelations(
         tagToString(relation.remoteResource.extensions?.tags?.deprecated);
 
       const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
-        resource,
+        registry: resource.registry,
+        codec: resource.codec,
         relationName,
       };
 

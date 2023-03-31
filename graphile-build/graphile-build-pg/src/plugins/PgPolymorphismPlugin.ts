@@ -507,7 +507,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   ]) ?? "";
                 const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
                   {
-                    resource,
+                    registry: resource.registry,
+                    codec: resource.codec,
                     relationName,
                   };
                 const singleRecordFieldName = relationSpec.isReferencee
