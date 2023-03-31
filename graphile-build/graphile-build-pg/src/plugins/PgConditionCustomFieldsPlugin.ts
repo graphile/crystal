@@ -3,7 +3,7 @@ import "graphile-config";
 import type {
   PgConditionStep,
   PgResource,
-  PgResourceParameterAny,
+  PgResourceParameter,
   PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
@@ -49,7 +49,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           if (resource.codec.columns) return false;
           if (resource.codec.arrayOfCodec) return false;
           if (resource.codec.rangeOfCodec) return false;
-          const parameters: readonly PgResourceParameterAny[] | undefined =
+          const parameters: readonly PgResourceParameter[] | undefined =
             resource.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
@@ -73,7 +73,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
               any,
               any,
               any,
-              readonly PgResourceParameterAny[],
+              readonly PgResourceParameter[],
               any
             >;
             const fieldName = inflection.computedColumnField({

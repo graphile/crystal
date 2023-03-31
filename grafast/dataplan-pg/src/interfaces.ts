@@ -581,7 +581,7 @@ export interface PgRegistryConfig<
     [name in string]: PgResourceOptions<
       PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
-      readonly PgResourceParameterAny[] | undefined,
+      readonly PgResourceParameter[] | undefined,
       name
     >;
   },
@@ -621,7 +621,7 @@ export type ResourceFromOptions<
     [name in string]: PgResourceOptions<
       PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameterAny[] | undefined,
+      readonly PgResourceParameter[] | undefined,
       name
     >;
   },
@@ -683,14 +683,14 @@ export interface PgRegistry<
     [name in string]: PgResourceOptions<
       PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameterAny[] | undefined,
+      readonly PgResourceParameter[] | undefined,
       name
     >;
   } = {
     [name in string]: PgResourceOptions<
       PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameterAny[] | undefined,
+      readonly PgResourceParameter[] | undefined,
       name
     >;
   },
@@ -756,16 +756,11 @@ export interface PgRegistry<
   };
 }
 
-export type PgResourceParameterAny = PgResourceParameter<
-  string | null,
-  PgCodec
->;
-
 export type PgResourceAny = PgResource<
   string,
   PgCodec,
   ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-  readonly PgResourceParameterAny[] | undefined,
+  readonly PgResourceParameter[] | undefined,
   PgRegistry<any, any, any>
 >;
 

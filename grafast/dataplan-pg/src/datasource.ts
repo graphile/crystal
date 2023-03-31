@@ -41,7 +41,6 @@ import type {
   PgRegistry,
   PgRegistryAny,
   PgRegistryConfig,
-  PgResourceParameterAny,
   PlanByUniques,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
@@ -94,8 +93,8 @@ export interface PgResourceParameterExtensions {
  * the parameters it accepts.
  */
 export interface PgResourceParameter<
-  TName extends string | null,
-  TCodec extends PgCodec,
+  TName extends string | null = string | null,
+  TCodec extends PgCodec = PgCodec,
 > {
   /**
    * Name of the parameter, if null then we must use positional rather than
@@ -162,7 +161,7 @@ export interface PgCodecRefs {
 export interface PgResourceOptions<
   TCodec extends PgCodec,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
-  TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
+  TParameters extends readonly PgResourceParameter[] | undefined = undefined,
   TName extends string = string,
 > {
   /**
@@ -183,7 +182,7 @@ export interface PgResourceOptions<
 
   name: TName;
   identifier?: string;
-  source: TParameters extends readonly PgResourceParameterAny[]
+  source: TParameters extends readonly PgResourceParameter[]
     ? (...args: PgSelectArgumentDigest[]) => SQL
     : SQL;
   uniques?: TUniques;
@@ -216,7 +215,7 @@ export interface PgResourceOptions<
 export interface PgFunctionResourceOptions<
   TCodec extends PgCodec,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
-  TNewParameters extends readonly PgResourceParameterAny[],
+  TNewParameters extends readonly PgResourceParameter[],
   TNewName extends string,
 > {
   name: TNewName;
@@ -253,7 +252,7 @@ export class PgResource<
   TUniques extends ReadonlyArray<
     PgResourceUnique<GetPgCodecColumns<TCodec>>
   > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
-  TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
+  TParameters extends readonly PgResourceParameter[] | undefined = undefined,
   TRegistry extends PgRegistry<any, any, any> = PgRegistryAny,
 > {
   public readonly registry: TRegistry;
@@ -457,7 +456,7 @@ export class PgResource<
    */
   static functionResourceOptions<
     TCodec extends PgCodec,
-    const TNewParameters extends readonly PgResourceParameterAny[],
+    const TNewParameters extends readonly PgResourceParameter[],
     const TNewUniques extends ReadonlyArray<
       PgResourceUnique<GetPgCodecColumns<TCodec>>
     >,
@@ -907,7 +906,7 @@ export interface PgRegistryBuilder<
     [name in string]: PgResourceOptions<
       PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameterAny[] | undefined,
+      readonly PgResourceParameter[] | undefined,
       name
     >;
   },
@@ -1031,7 +1030,7 @@ export function makeRegistry<
     [name in string]: PgResourceOptions<
       PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
-      readonly PgResourceParameterAny[] | undefined,
+      readonly PgResourceParameter[] | undefined,
       name
     >;
   },
@@ -1128,12 +1127,10 @@ export function makeRegistry<
       ...rawConfig,
       codec: addCodec(rawConfig.codec),
       parameters: rawConfig.parameters
-        ? (rawConfig.parameters as readonly PgResourceParameterAny[]).map(
-            (p) => ({
-              ...p,
-              codec: addCodec(p.codec),
-            }),
-          )
+        ? (rawConfig.parameters as readonly PgResourceParameter[]).map((p) => ({
+            ...p,
+            codec: addCodec(p.codec),
+          }))
         : rawConfig.parameters,
     };
     const resource = new PgResource(registry, resourceConfig) as any;

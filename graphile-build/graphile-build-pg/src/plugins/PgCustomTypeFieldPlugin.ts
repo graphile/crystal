@@ -12,7 +12,6 @@ import type {
   PgInsertStep,
   PgResource,
   PgResourceParameter,
-  PgResourceParameterAny,
   PgSelectArgumentSpec,
   PgSelectStep,
   PgTypedExecutableStep,
@@ -578,7 +577,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   any,
                   any,
                   any,
-                  readonly PgResourceParameterAny[],
+                  readonly PgResourceParameter[],
                   any
                 >;
                 const connectionTypeName = resource.codec.columns
@@ -654,7 +653,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   any,
                   any,
                   any,
-                  readonly PgResourceParameterAny[],
+                  readonly PgResourceParameter[],
                   any
                 >;
                 build.recoverable(null, () => {
@@ -879,7 +878,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 isRootMutation || isRootQuery
                   ? resource.parameters
                   : resource.parameters.slice(1)
-              ) as PgResourceParameterAny[];
+              ) as PgResourceParameter[];
 
               const { makeArgs, makeFieldArgs } = pgGetArgDetailsFromParameters(
                 resource,
