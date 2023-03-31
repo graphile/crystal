@@ -19,6 +19,7 @@ import type {
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
+import { PgResource } from "../index.js";
 
 const EMPTY_MAP = new Map<never, never>();
 
@@ -41,7 +42,7 @@ interface PgInsertPlanFinalizeResults {
 /**
  * Inserts a row into resource with the given specified column values.
  */
-export class PgInsertStep<TResource extends PgResourceAny>
+export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
   extends ExecutableStep<
     unknown[] // tuple depending on what's selected
   >
@@ -396,7 +397,7 @@ export class PgInsertStep<TResource extends PgResourceAny>
 /**
  * Inserts a row into resource with the given specified column values.
  */
-export function pgInsert<TResource extends PgResourceAny>(
+export function pgInsert<TResource extends PgResource<any, any, any, any, any>>(
   resource: TResource,
   columns?: {
     [key in keyof GetPgResourceColumns<TResource>]?:

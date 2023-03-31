@@ -735,9 +735,9 @@ export type PgResourceParameterAny = PgResourceParameter<
 >;
 
 export type PgResourceAny = PgResource<
-  string & any,
-  PgCodecAny & any,
-  ReadonlyArray<PgResourceUnique<PgCodecAttributes>> & any,
+  string,
+  PgCodecAny,
+  ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
   readonly PgResourceParameterAny[] | undefined,
   PgRegistry<any, any, any>
 >;

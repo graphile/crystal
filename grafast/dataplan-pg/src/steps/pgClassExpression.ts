@@ -8,6 +8,7 @@ import type { PgResource } from "../datasource.js";
 import type {
   GetPgCodecColumns,
   PgClassSingleStep,
+  PgCodec,
   PgCodecAny,
   PgResourceAny,
   PgTypedExecutableStep,
@@ -244,8 +245,8 @@ export class PgClassExpressionStep<
  * that will be selected.
  */
 function pgClassExpression<
-  TExpressionCodec extends PgCodecAny,
-  TResource extends PgResourceAny,
+  TExpressionCodec extends PgCodec<any, any, any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any>,
 >(
   table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
   codec: TExpressionCodec,

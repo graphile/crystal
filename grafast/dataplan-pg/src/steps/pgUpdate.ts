@@ -8,7 +8,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
-import type { PgResourceUnique } from "../index.js";
+import type { PgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceCodec,
@@ -41,7 +41,7 @@ interface PgUpdatePlanFinalizeResults {
  * Update a single row identified by the 'getBy' argument.
  */
 export class PgUpdateStep<
-  TResource extends PgResourceAny,
+  TResource extends PgResource<any, any, any, any, any>,
 > extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
