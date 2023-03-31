@@ -1128,8 +1128,6 @@ export function makeRegistry<
       builtRelations[relationName] = builtRelation;
     }
 
-    //
-
     registry.pgRelations[codecName] = builtRelations;
   }
 
@@ -1192,10 +1190,12 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     pgResources: Object.create(null),
     pgRelations: Object.create(null),
   };
+
   const builder: PgRegistryBuilder<any, any, any> = {
     getRegistryConfig() {
       return registryConfig;
     },
+
     addCodec(codec) {
       if (!registryConfig.pgCodecs[codec.name]) {
         registryConfig.pgCodecs[codec.name] = codec;
@@ -1216,27 +1216,13 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       }
       return builder;
     },
-    /*
-    addCodecs(codecs) {
-      for (const codec of codecs) {
-        registryConfig.pgCodecs[codec.name] = codec;
-      }
-      return builder;
-    },
-    */
+
     addResource(resource) {
       this.addCodec(resource.codec);
       registryConfig.pgResources[resource.name] = resource;
       return builder;
     },
-    /*
-    addResources(resources) {
-      for (const resource of resources) {
-        registryConfig.pgResources[resource.name] = resource;
-      }
-      return builder;
-    },
-    */
+
     addRelation(localCodec, relationName, remoteResourceOptions, relation) {
       if (!registryConfig.pgCodecs[localCodec.name]) {
         throw new Error(
@@ -1261,6 +1247,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       >;
       return builder;
     },
+
     build() {
       return EXPORTABLE(
         (makeRegistry, registryConfig) => makeRegistry(registryConfig),
@@ -1278,4 +1265,5 @@ export function makePgResourceOptions<
 >(options: TResourceOptions) {
   return { ...options };
 }
+
 exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
