@@ -34,6 +34,7 @@ import type {
   Expand,
   GetPgCodecColumns,
   GetPgRegistryCodecRelations,
+  GetPgRegistryCodecs,
   PgCodec,
   PgCodecRelation,
   PgCodecRelationConfig,
@@ -602,26 +603,21 @@ export class PgResource<
   }
 
   public getReciprocal<
-    TOtherCodec extends TRegistry["pgCodecs"][keyof TRegistry["pgCodecs"]],
-    TOtherRelationName extends keyof TRegistry["pgRelations"][TOtherCodec extends PgCodec<
-      infer UCodecName,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any
-    >
-      ? UCodecName
-      : never],
+    TOtherCodec extends GetPgRegistryCodecs<TRegistry>,
+    TOtherRelationName extends keyof GetPgRegistryCodecRelations<
+      TRegistry,
+      TOtherCodec
+    >,
   >(
     otherCodec: TOtherCodec,
     otherRelationName: TOtherRelationName,
   ):
     | [
-        // TODO: tighten these types up
-        relationName: string,
-        relation: PgCodecRelation<any, any>,
+        relationName: keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
+        relation: GetPgRegistryCodecRelations<
+          TRegistry,
+          TCodec
+        >[keyof GetPgRegistryCodecRelations<TRegistry, TCodec>],
       ]
     | null {
     if (this.parameters) {
@@ -649,7 +645,7 @@ export class PgResource<
         return true;
       },
     );
-    return (reciprocal as [string, PgCodecRelation<any, any>]) || null;
+    return (reciprocal as [any, any]) || null;
   }
 
   public get(
