@@ -269,9 +269,7 @@ export class PgResource<
   public readonly identifier: string;
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
-  private selectAuth?: (
-    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
-  ) => void;
+  private selectAuth?: ($step: PgSelectStep<this>) => void;
 
   // TODO: make a public interface for this information
   /**
@@ -390,7 +388,9 @@ export class PgResource<
     this.isMutation = !!isMutation;
     this.isList = !!isList;
     this.isVirtual = isVirtual ?? false;
-    this.selectAuth = selectAuth;
+    this.selectAuth = selectAuth as
+      | (($step: PgSelectStep<this>) => void)
+      | undefined;
 
     // parameters is null iff source is not a function
     const sourceIsFunction = typeof this.source === "function";
@@ -629,7 +629,7 @@ export class PgResource<
       this.registry.pgRelations[otherCodec.name]?.[otherRelationName];
     const relations = this.getRelations() as unknown as Record<
       string,
-      PgCodecRelation<PgCodecWithColumns, PgResource>
+      PgCodecRelation
     >;
     const reciprocal = Object.entries(relations).find(
       ([_relationName, relation]) => {
@@ -745,7 +745,7 @@ export class PgResource<
             : sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
-    return pgSelect({ resource: this, identifiers }) as PgSelectStep<this>;
+    return pgSelect({ resource: this, identifiers });
   }
 
   execute(
@@ -781,11 +781,7 @@ export class PgResource<
 
   public applyAuthorizationChecksToPlan($step: PgSelectStep<this>): void {
     if (this.selectAuth) {
-      this.selectAuth(
-        $step as unknown as PgSelectStep<
-          PgResource<any, TCodec, any, any, TRegistry>
-        >,
-      );
+      this.selectAuth($step);
     }
     // e.g. $step.where(sql`user_id = ${me}`);
     return;
