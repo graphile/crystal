@@ -5,7 +5,7 @@ import type {
   PgCodecAttribute,
   PgCodecAttributes,
   PgCodecExtensions,
-  PgEnumTypeCodec,
+  PgEnumCodec,
   PgRecordTypeCodecSpec,
   PgResource,
 } from "@dataplan/pg";
@@ -52,11 +52,11 @@ declare global {
         this: Inflection,
         codec: PgCodec<string, undefined, any, any, undefined, any, any>,
       ): string;
-      enumType(this: Inflection, codec: PgEnumTypeCodec<string, any>): string;
+      enumType(this: Inflection, codec: PgEnumCodec<string, any>): string;
       enumValue(
         this: Inflection,
         value: string,
-        codec: PgEnumTypeCodec<string, any>,
+        codec: PgEnumCodec<string, any>,
       ): string;
       rangeBoundType(input: {
         codec: PgCodec<string, undefined, any, any, undefined, any, any>;

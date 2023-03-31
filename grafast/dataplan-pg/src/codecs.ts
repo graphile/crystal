@@ -43,7 +43,7 @@ import type {
   PgCodecPolymorphism,
   PgDecode,
   PgEncode,
-  PgEnumTypeCodec,
+  PgEnumCodec,
   PgEnumValue,
 } from "./interfaces.js";
 
@@ -467,7 +467,7 @@ export type PgEnumCodecSpec<TName extends string, TValue extends string> = {
 export function enumCodec<
   const TName extends string,
   const TValue extends string,
->(config: PgEnumCodecSpec<TName, TValue>): PgEnumTypeCodec<TName, TValue> {
+>(config: PgEnumCodecSpec<TName, TValue>): PgEnumCodec<TName, TValue> {
   const { name, identifier, values, extensions } = config;
   return {
     name,
@@ -488,7 +488,7 @@ export function isEnumCodec<
   TValue extends string = string,
 >(
   t: PgCodec<TName, any, any, any, any, any, any>,
-): t is PgEnumTypeCodec<TName, TValue> {
+): t is PgEnumCodec<TName, TValue> {
   return "values" in t;
 }
 
