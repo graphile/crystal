@@ -269,7 +269,9 @@ export class PgResource<
   public readonly identifier: string;
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
-  private selectAuth?: ($step: PgSelectStep<this>) => void;
+  private selectAuth?: (
+    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
+  ) => void;
 
   // TODO: make a public interface for this information
   /**
@@ -388,10 +390,7 @@ export class PgResource<
     this.isMutation = !!isMutation;
     this.isList = !!isList;
     this.isVirtual = isVirtual ?? false;
-    this.selectAuth = selectAuth as
-      | (($step: PgSelectStep<this>) => void)
-      | undefined;
-
+    this.selectAuth = selectAuth;
     // parameters is null iff source is not a function
     const sourceIsFunction = typeof this.source === "function";
     if (this.parameters == null && sourceIsFunction) {
@@ -781,7 +780,7 @@ export class PgResource<
 
   public applyAuthorizationChecksToPlan($step: PgSelectStep<this>): void {
     if (this.selectAuth) {
-      this.selectAuth($step);
+      this.selectAuth($step as any);
     }
     // e.g. $step.where(sql`user_id = ${me}`);
     return;
@@ -897,11 +896,9 @@ export interface PgRegistryBuilder<
   addCodec<const TCodec extends PgCodec>(
     codec: TCodec,
   ): PgRegistryBuilder<
-    TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
-      ? TCodecs & {
-          [name in UName]: TCodec;
-        }
-      : never,
+    TCodecs & {
+      [name in TCodec["name"]]: TCodec;
+    },
     TResources,
     TRelations
   >;
