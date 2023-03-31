@@ -9,17 +9,16 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
+import type { PgResource } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
   PgCodec,
-  PgResourceAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import { PgResource } from "../index.js";
 
 const EMPTY_MAP = new Map<never, never>();
 

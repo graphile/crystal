@@ -9,7 +9,6 @@ import type {
   GetPgCodecColumns,
   PgClassSingleStep,
   PgCodec,
-  PgResourceAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgDeleteStep } from "./pgDelete.js";
