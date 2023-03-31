@@ -256,8 +256,10 @@ export class PgResource<
   TUniques extends ReadonlyArray<
     PgResourceUnique<GetPgCodecColumns<TCodec>>
   > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
-  TParameters extends readonly PgResourceParameter[] | undefined = undefined,
-  TRegistry extends PgRegistry<any, any, any> = PgRegistryAny,
+  TParameters extends readonly PgResourceParameter[] | undefined =
+    | readonly PgResourceParameter[]
+    | undefined,
+  TRegistry extends PgRegistry<any, any, any> = PgRegistry<any, any, any>,
 > {
   public readonly registry: TRegistry;
   public readonly codec: TCodec;

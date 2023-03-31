@@ -13,7 +13,10 @@ export type WithPgClientStepCallback<TData, TResult> = (
  * from `$data` (which can be `constant(null)` if you don't need it). Typically
  * useful for running custom transactions.
  */
-export class WithPgClientStep<TData, TResult> extends ExecutableStep<TResult> {
+export class WithPgClientStep<
+  TData = any,
+  TResult = any,
+> extends ExecutableStep<TResult> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "WithPgClientStep",

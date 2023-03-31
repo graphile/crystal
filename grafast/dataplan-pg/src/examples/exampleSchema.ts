@@ -2193,7 +2193,7 @@ export function makeExampleSchema(
 
   function makeIncludeArchivedArg<TFieldStep>(
     getClassStep: ($fieldPlan: TFieldStep) => PgSelectStep<any>,
-  ): GraphileArgumentConfig<any, any, any, any, any, any> {
+  ): GraphileArgumentConfig {
     return {
       type: IncludeArchived,
       applyPlan: EXPORTABLE(
@@ -3685,7 +3685,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep<any, any>) => {
+              () => (step: PgUnionAllStep) => {
                 step.orderBy({
                   attribute: "cvss_score",
                   direction: "ASC",
@@ -3700,7 +3700,7 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep<any, any>) => {
+              () => (step: PgUnionAllStep) => {
                 step.orderBy({
                   attribute: "cvss_score",
                   direction: "DESC",
@@ -4241,11 +4241,7 @@ export function makeExampleSchema(
             type: GraphQLInt,
             applyPlan: EXPORTABLE(
               () =>
-                function plan(
-                  _$root: any,
-                  $each: __ListTransformStep<any, any, any, any>,
-                  val,
-                ) {
+                function plan(_$root: any, $each: __ListTransformStep, val) {
                   const $commentables =
                     $each.getListStep() as RelationalCommentablesStep;
                   $commentables.setFirst(val.getRaw());
@@ -4908,7 +4904,7 @@ export function makeExampleSchema(
 
   const MultipleActionsPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    WithPgClientStep<any, any>
+    WithPgClientStep
   >(WithPgClientStep)({
     name: "MultipleActionsPayload",
     fields: {

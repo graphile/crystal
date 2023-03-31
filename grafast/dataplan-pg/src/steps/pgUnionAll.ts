@@ -355,8 +355,8 @@ export type PgUnionAllMode = "normal" | "aggregate";
  * resources, but must return a consistent data shape.
  */
 export class PgUnionAllStep<
-    TAttributes extends string,
-    TTypeNames extends string,
+    TAttributes extends string = string,
+    TTypeNames extends string = string,
   >
   extends ExecutableStep
   implements

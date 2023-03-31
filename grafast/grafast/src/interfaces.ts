@@ -591,14 +591,16 @@ export type GraphileFieldConfigArgumentMap<
  * Basically GraphQLArgumentConfig but allowing for a plan.
  */
 export type GraphileArgumentConfig<
-  TInputType extends GraphQLInputType,
-  _TContext extends Grafast.Context,
-  _TParentStep extends ExecutableStep<any> | null,
-  TFieldStep extends ExecutableStep<any>,
+  TInputType extends GraphQLInputType = GraphQLInputType,
+  _TContext extends Grafast.Context = Grafast.Context,
+  _TParentStep extends ExecutableStep<any> | null = ExecutableStep<any> | null,
+  TFieldStep extends ExecutableStep<any> = ExecutableStep<any>,
   _TArgumentStep extends TFieldStep extends ExecutableStep<any>
     ? ModifierStep<TFieldStep> | null
+    : null = TFieldStep extends ExecutableStep<any>
+    ? ModifierStep<TFieldStep> | null
     : null,
-  _TInput extends InputTypeFor<TInputType>,
+  _TInput extends InputTypeFor<TInputType> = InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
   inputPlan?: ArgumentInputPlanResolver<any>;

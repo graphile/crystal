@@ -62,10 +62,12 @@ export interface ListTransformOptions<
  * functions that uses this under the hood such as `filter()`.
  */
 export class __ListTransformStep<
-  TListStep extends ExecutableStep<readonly any[]>,
-  TDepsStep extends ExecutableStep,
-  TMemo,
-  TItemStep extends ExecutableStep | undefined = undefined,
+  TListStep extends ExecutableStep<readonly any[]> = ExecutableStep<
+    readonly any[]
+  >,
+  TDepsStep extends ExecutableStep = ExecutableStep,
+  TMemo = any,
+  TItemStep extends ExecutableStep | undefined = ExecutableStep | undefined,
 > extends ExecutableStep<TMemo> {
   static $$export = {
     moduleName: "grafast",
