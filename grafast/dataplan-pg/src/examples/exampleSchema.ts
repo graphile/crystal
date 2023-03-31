@@ -1637,10 +1637,7 @@ export function makeExampleSchema(
   >;
 
   const {
-    pgCodecs: {
-      union__entity: unionEntityCodec,
-      relational_items: relationalItemsCodec,
-    },
+    pgCodecs: { union__entity: unionEntityCodec },
     pgResources: {
       messages: messageResource,
       users: userResource,
