@@ -1205,10 +1205,60 @@ export function makeRegistry<
       builtRelations[relationName] = builtRelation;
     }
 
+    //
+
     registry.pgRelations[codecName] = builtRelations;
   }
 
+  validateRelations(registry);
+
   return registry;
+}
+
+function validateRelations(registry: PgRegistry<any, any, any>): void {
+  // PERF: skip this if not isDev?
+
+  const reg = registry as PgRegistry;
+
+  for (const codec of Object.values(reg.pgCodecs)) {
+    // Check that all the `via` and `identicalVia` match actual relations.
+    const relationKeys = Object.keys(reg.pgRelations[codec.name] ?? {});
+    if (codec.columns) {
+      Object.entries(codec.columns).forEach(([columnName, col]) => {
+        const { via, identicalVia } = col;
+        if (via) {
+          if (typeof via === "string") {
+            if (!relationKeys.includes(via)) {
+              throw new Error(
+                `${codec.name} claims column '${columnName}' is via relation '${via}', but there is no such relation.`,
+              );
+            }
+          } else {
+            if (!relationKeys.includes(via.relation)) {
+              throw new Error(
+                `${codec.name} claims column '${columnName}' is via relation '${via.relation}', but there is no such relation.`,
+              );
+            }
+          }
+        }
+        if (identicalVia) {
+          if (typeof identicalVia === "string") {
+            if (!relationKeys.includes(identicalVia)) {
+              throw new Error(
+                `${codec.name} claims column '${columnName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
+              );
+            }
+          } else {
+            if (!relationKeys.includes(identicalVia.relation)) {
+              throw new Error(
+                `${codec.name} claims column '${columnName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
+              );
+            }
+          }
+        }
+      });
+    }
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
