@@ -18,6 +18,7 @@ import type { PgResource } from "../datasource.js";
 import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
+  GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
   PgRegistryAny,
@@ -300,27 +301,11 @@ export class PgSelectSingleStep<
   }
 
   private existingSingleRelation<
-    TRelationName extends TResource extends PgResource<
-      any,
-      PgCodec<infer UCodecName, any, any, any, any, any, any>,
-      any,
-      any,
-      infer URegistry
-    >
-      ? keyof URegistry["pgRelations"][UCodecName]
-      : never,
+    TRelationName extends keyof GetPgResourceRelations<TResource>,
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    TResource extends PgResource<
-      any,
-      PgCodec<infer UCodecName, any, any, any, any, any, any>,
-      any,
-      any,
-      infer URegistry
-    >
-      ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteResource"]
-      : never
+    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > | null {
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
@@ -343,27 +328,11 @@ export class PgSelectSingleStep<
   }
 
   public singleRelation<
-    TRelationName extends TResource extends PgResource<
-      any,
-      PgCodec<infer UCodecName, any, any, any, any, any, any>,
-      any,
-      any,
-      infer URegistry
-    >
-      ? keyof URegistry["pgRelations"][UCodecName]
-      : never,
+    TRelationName extends keyof GetPgResourceRelations<TResource>,
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    TResource extends PgResource<
-      any,
-      PgCodec<infer UCodecName, any, any, any, any, any, any>,
-      any,
-      any,
-      infer URegistry
-    >
-      ? URegistry["pgRelations"][UCodecName][TRelationName]["remoteResource"]
-      : never
+    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > {
     const $existingPlan = this.existingSingleRelation(relationIdentifier);
     if ($existingPlan) {

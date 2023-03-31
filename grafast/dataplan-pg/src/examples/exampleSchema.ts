@@ -67,6 +67,7 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import type {
+  GetPgResourceRelations,
   PgCodecAttribute,
   PgCodecAttributeVia,
   PgConditionStep,
@@ -1598,33 +1599,6 @@ export function makeExampleSchema(
     [makeRegistry, registryConfig],
   );
 
-  /*
-  registry.pgCodecs.messages.columns.id;
-  registry.pgCodecs.forums.columns;
-  registry.pgResources.messages.getRelations();
-  registry.pgResources.messages.getRelation("author").localColumns;
-  registry.pgRelations.messages.author.localColumns;
-
-  type Bar = GetPgRegistryCodecs<typeof registry>[keyof GetPgRegistryCodecs<
-    typeof registry
-  >];
-  type Foo = GetPgRegistryCodecRelations<
-    typeof registry,
-    typeof registry.pgResources.messages.codec
-  >;
-
-  type BBB = typeof registry.pgResources.messages.codec;
-  type Baz = BBB extends PgCodec<infer UName, any, any, any, any, any, any>
-    ? typeof registry extends PgRegistry<any, any, infer URelations>
-      ? URelations[UName]
-      : never
-    : never;
-  type CCC = typeof registry extends PgRegistry<any, any, infer URelations>
-    ? URelations
-    : never;
-  type DDD = typeof registry.pgRelations
-*/
-
   const deoptimizeIfAppropriate = EXPORTABLE(
     (__ListTransformStep, options) =>
       <
@@ -1705,14 +1679,11 @@ export function makeExampleSchema(
     },
   } = registry;
 
-  // type MessagesStep = PgSelectStep<typeof messageResource>;
   type MessageConnectionStep = PgConnectionPlanFromResource<
     typeof messageResource
   >;
   type MessageStep = PgSelectSingleStep<typeof messageResource>;
-  // type UsersStep = PgSelectStep<typeof userResource>;
   type UserStep = PgSelectSingleStep<typeof userResource>;
-  // type ForumsStep = PgSelectStep<typeof forumResource>;
   type ForumStep = PgSelectSingleStep<typeof forumResource>;
   type PersonStep = PgSelectSingleStep<typeof personResource>;
   type PersonBookmarkStep = PgSelectSingleStep<typeof personBookmarksResource>;
@@ -1768,15 +1739,7 @@ export function makeExampleSchema(
 
   function attrField<
     TMyResource extends PgResource<any, any, any, any, any>,
-    TAttrName extends TMyResource extends PgResource<
-      any,
-      PgCodec<any, infer UColumns, any, any, any, any, any>,
-      any,
-      any,
-      any
-    >
-      ? keyof UColumns
-      : never,
+    TAttrName extends keyof GetPgResourceColumns<TMyResource>,
   >(attrName: TAttrName, type: GraphQLOutputType) {
     return {
       type,
@@ -1792,16 +1755,7 @@ export function makeExampleSchema(
 
   function singleRelationField<
     TMyResource extends PgResource<any, any, any, any, any>,
-    TRelationName extends TMyResource extends PgResource<
-      any,
-      PgCodec<infer UCodecName, any, any, any, any, any, any>,
-      any,
-      any,
-      any
-    >
-      ? keyof (typeof registry.pgRelations)[UCodecName &
-          keyof typeof registry.pgRelations]
-      : never,
+    TRelationName extends keyof GetPgResourceRelations<TMyResource>,
   >(relation: TRelationName, type: GraphQLOutputType) {
     return {
       type,
