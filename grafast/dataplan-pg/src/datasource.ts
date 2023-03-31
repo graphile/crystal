@@ -33,6 +33,7 @@ import type {
 import type {
   Expand,
   GetPgCodecColumns,
+  GetPgRegistryCodecRelations,
   PgCodec,
   PgCodecRelation,
   PgCodecRelationConfig,
@@ -562,37 +563,15 @@ export class PgResource<
     return chalk.bold.blue(`PgResource(${this.name})`);
   }
 
-  public getRelations(): TCodec extends PgCodec<
-    infer UName,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >
-    ? TRegistry["pgRelations"][UName]
-    : never {
+  public getRelations(): GetPgRegistryCodecRelations<TRegistry, TCodec> {
     return this.registry.pgRelations[this.codec.name] as any;
   }
 
   public getRelation<
-    TRelationName extends TCodec extends PgCodec<
-      infer UName,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any
-    >
-      ? keyof TRegistry["pgRelations"][UName]
-      : never,
+    TRelationName extends keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
   >(
     name: TRelationName,
-  ): (TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
-    ? TRegistry["pgRelations"][UName]
-    : never)[TRelationName] {
+  ): GetPgRegistryCodecRelations<TRegistry, TCodec>[TRelationName] {
     return this.getRelations()[name];
   }
 
