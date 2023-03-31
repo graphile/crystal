@@ -69,9 +69,7 @@ import { inspect } from "util";
 import type {
   GetPgResourceRelations,
   PgCodecAttribute,
-  PgCodecAttributes,
   PgCodecAttributeVia,
-  PgCodecWithColumns,
   PgConditionStep,
   PgExecutorContextPlans,
   PgInsertStep,
@@ -1628,7 +1626,8 @@ export function makeExampleSchema(
       },
     [__ListTransformStep, options],
   );
-  type PgConnectionPlanFromResource<
+
+  type ResourceConnectionPlan<
     TResource extends PgResource<any, any, any, any, any>,
   > = ConnectionStep<
     PgSelectSingleStep<TResource>,
@@ -1681,9 +1680,7 @@ export function makeExampleSchema(
     },
   } = registry;
 
-  type MessageConnectionStep = PgConnectionPlanFromResource<
-    typeof messageResource
-  >;
+  type MessageConnectionStep = ResourceConnectionPlan<typeof messageResource>;
   type MessageStep = PgSelectSingleStep<typeof messageResource>;
   type UserStep = PgSelectSingleStep<typeof userResource>;
   type ForumStep = PgSelectSingleStep<typeof forumResource>;
@@ -2495,9 +2492,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum: ForumStep,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setFirst(arg.getRaw());
@@ -2512,9 +2507,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
@@ -2529,9 +2522,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                 ) {
                   const $messages = $connection.getSubplan();
                   return $messages.wherePlan();
@@ -2545,9 +2536,7 @@ export function makeExampleSchema(
               (ClassFilterStep) =>
                 function plan(
                   _$forum,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                 ) {
                   const $messages = $connection.getSubplan();
                   return new ClassFilterStep(
@@ -2559,7 +2548,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedArg<
-            PgConnectionPlanFromResource<typeof messageResource>
+            ResourceConnectionPlan<typeof messageResource>
           >(($connection) => $connection.getSubplan()),
         },
         plan: EXPORTABLE(
@@ -3740,9 +3729,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: any,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                 ) {
                   const $messages = $connection.getSubplan();
                   return $messages.wherePlan();
@@ -3756,9 +3743,7 @@ export function makeExampleSchema(
               (ClassFilterStep) =>
                 function plan(
                   _$root: any,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                 ) {
                   const $messages = $connection.getSubplan();
                   return new ClassFilterStep(
@@ -3770,7 +3755,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedArg<
-            PgConnectionPlanFromResource<typeof messageResource>
+            ResourceConnectionPlan<typeof messageResource>
           >(($connection) => $connection.getSubplan()),
           first: {
             type: GraphQLInt,
@@ -3778,9 +3763,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: any,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   val,
                 ) {
                   $connection.setFirst(val.getRaw());
@@ -3795,9 +3778,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
@@ -3812,9 +3793,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setAfter(arg.getRaw());
@@ -3829,9 +3808,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setBefore(arg.getRaw());
@@ -3846,9 +3823,7 @@ export function makeExampleSchema(
               (GraphQLError, MessagesOrderBy, getEnumValueConfig, inspect) =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -4462,9 +4437,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root: any,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   val,
                 ) {
                   $connection.setFirst(val.getRaw());
@@ -4479,9 +4452,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
@@ -4496,9 +4467,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setOffset(arg.getRaw());
@@ -4513,9 +4482,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setAfter(arg.getRaw());
@@ -4530,9 +4497,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   $connection.setBefore(arg.getRaw());
@@ -4552,9 +4517,7 @@ export function makeExampleSchema(
               ) =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlanFromResource<
-                    typeof messageResource
-                  >,
+                  $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   const $collection = $connection.getSubplan();
