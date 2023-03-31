@@ -249,9 +249,11 @@ type CodecWithSource<TCodec extends PgCodecAny> = TCodec & {
  * views, functions, etc.
  */
 export class PgResource<
-  TName extends string,
-  TCodec extends PgCodecAny,
-  TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TName extends string = string,
+  TCodec extends PgCodecAny = PgCodecAny,
+  TUniques extends ReadonlyArray<
+    PgResourceUnique<GetPgCodecColumns<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
   TRegistry extends PgRegistry<any, any, any> = PgRegistryAny,
 > {
