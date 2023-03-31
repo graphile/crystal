@@ -1004,11 +1004,6 @@ for (const [name, codec] of Object.entries(TYPES)) {
   exportAs("@dataplan/pg", codec, ["TYPES", name]);
 }
 
-type PgBaseCodecs = (typeof TYPES)[keyof typeof TYPES];
-export type PgBaseCodecsObject = {
-  [codecName in PgBaseCodecs as PgBaseCodecs["name"]]: PgBaseCodecs;
-};
-
 /**
  * For supported builtin type names ('void', 'bool', etc) that will be found in
  * the `pg_catalog` table this will return a PgCodec.
@@ -1151,7 +1146,3 @@ export function getInnerCodec<
   return codec as any;
 }
 exportAs("@dataplan/pg", getInnerCodec, "getInnerCodec");
-
-for (const key of Object.keys(TYPES)) {
-  exportAs("@dataplan/pg", TYPES[key as keyof typeof TYPES], ["TYPES", key]);
-}
