@@ -1214,6 +1214,7 @@ export function makeRegistry<
 
   return registry;
 }
+exportAs("@dataplan/pg", makeRegistry, "makeRegistry");
 
 function validateRelations(registry: PgRegistry<any, any, any>): void {
   // PERF: skip this if not isDev?
