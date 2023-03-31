@@ -47,7 +47,9 @@ export type PgConditionStepMode =
   | "NOT"
   | PgConditionStepResolvedMode;
 
-export class PgConditionStep<TParentStep extends PgConditionCapableParentStep>
+export class PgConditionStep<
+    TParentStep extends PgConditionCapableParentStep = PgConditionCapableParentStep,
+  >
   extends ModifierStep<TParentStep>
   implements PgConditionCapableParentStep
 {
