@@ -252,16 +252,9 @@ export interface PgCodec<
   refs?: PgCodecRefs;
 }
 
-export type PgCodecWithColumns = PgCodec<
-  string,
-  PgCodecAttributes,
-  any,
-  any,
-  undefined,
-  | PgCodec<string, PgCodecAttributes | undefined, any, any, any, any, any>
-  | undefined,
-  undefined
->;
+export type PgCodecWithColumns<
+  TColumns extends PgCodecAttributes = PgCodecAttributes,
+> = PgCodec<any, TColumns, any, any, undefined, any, undefined>;
 
 export type PgEnumValue<TValue extends string = string> = {
   value: TValue;

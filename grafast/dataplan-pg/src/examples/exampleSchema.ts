@@ -70,6 +70,7 @@ import type {
   GetPgResourceRelations,
   PgCodecAttribute,
   PgCodecAttributeVia,
+  PgCodecWithColumns,
   PgConditionStep,
   PgExecutorContextPlans,
   PgInsertStep,
@@ -3116,21 +3117,7 @@ export function makeExampleSchema(
       any,
       any,
       PgSelectSingleStep<
-        PgResource<
-          any,
-          PgCodec<
-            any,
-            typeof singleTableItemsResource.codec.columns,
-            any,
-            any,
-            any,
-            any,
-            any
-          >,
-          any,
-          any,
-          any
-        >
+        PgResource<any, typeof singleTableItemsResource.codec, any, any, any>
       >,
       any,
       any
@@ -3262,13 +3249,7 @@ export function makeExampleSchema(
         any,
         any,
         PgSelectSingleStep<
-          PgResource<
-            any,
-            PgCodec<any, TColumns, any, any, any, any, any>,
-            any,
-            any,
-            any
-          >
+          PgResource<any, PgCodecWithColumns<TColumns>, any, any, any>
         >,
         any,
         any
