@@ -778,20 +778,26 @@ export type GetPgRegistryCodecRelations<
   TCodec extends PgCodec<any, any, any, any, any, any, any>,
 > = TRegistry["pgRelations"][TCodec["name"]];
 
-export type GetPgCodecColumns<TCodec extends PgCodecAny> =
-  TCodec extends PgCodecWithColumns ? TCodec["columns"] : never;
+export type GetPgCodecColumns<
+  TCodec extends PgCodec<any, any, any, any, any, any, any>,
+> = TCodec extends PgCodecWithColumns ? TCodec["columns"] : never;
 
-export type GetPgResourceRegistry<TResource extends PgResourceAny> =
-  TResource["registry"];
+export type GetPgResourceRegistry<
+  TResource extends PgResource<any, any, any, any, any>,
+> = TResource["registry"];
 
-export type GetPgResourceCodec<TResource extends PgResourceAny> =
-  TResource["codec"];
+export type GetPgResourceCodec<
+  TResource extends PgResource<any, any, any, any, any>,
+> = TResource["codec"];
 
-export type GetPgResourceColumns<TResource extends PgResourceAny> =
-  GetPgCodecColumns<TResource["codec"]>;
+export type GetPgResourceColumns<
+  TResource extends PgResource<any, any, any, any, any>,
+> = GetPgCodecColumns<TResource["codec"]>;
 
-export type GetPgResourceRelations<TResource extends PgResourceAny> =
-  TResource["registry"]["pgRelations"][TResource["codec"]["name"]];
+export type GetPgResourceRelations<
+  TResource extends PgResource<any, any, any, any, any>,
+> = TResource["registry"]["pgRelations"][TResource["codec"]["name"]];
 
-export type GetPgResourceUniques<TResource extends PgResourceAny> =
-  TResource["uniques"];
+export type GetPgResourceUniques<
+  TResource extends PgResource<any, any, any, any, any>,
+> = TResource["uniques"];
