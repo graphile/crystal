@@ -638,17 +638,18 @@ exportAs("@dataplan/pg", listOfCodec, "listOfCodec");
  * @param config - extra details about this domain
  */
 export function domainOfCodec<
+  TName extends string,
   TInnerCodec extends PgCodec<any, any, any, any, any, any>,
 >(
   innerCodec: TInnerCodec,
-  name: string,
+  name: TName,
   identifier: SQL,
   config: {
     extensions?: Partial<PgCodecExtensions>;
     notNull?: boolean | null;
   } = {},
 ): PgCodec<
-  TInnerCodec extends PgCodec<infer U, any, any, any, any, any> ? U : any,
+  TName,
   TInnerCodec extends PgCodec<any, infer U, any, any, any, any> ? U : any,
   TInnerCodec extends PgCodec<any, any, infer U, any, any, any> ? U : any,
   undefined,
