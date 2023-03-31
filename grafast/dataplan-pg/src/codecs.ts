@@ -354,9 +354,9 @@ export type ObjectFromPgCodecAttributes<TColumns extends PgCodecAttributes> = {
     infer UCodec,
     infer UNonNull
   >
-    ? UCodec extends PgCodec<string, any, any, infer UFromJs, any, any, any>
+    ? UCodec extends PgCodec<any, any, any, infer UFromJs, any, any, any>
       ? UNonNull extends true
-        ? UFromJs
+        ? Exclude<UFromJs, null | undefined>
         : UFromJs | null
       : never
     : never;
