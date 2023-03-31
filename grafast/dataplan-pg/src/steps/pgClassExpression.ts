@@ -9,7 +9,6 @@ import type {
   GetPgCodecColumns,
   PgClassSingleStep,
   PgCodec,
-  PgCodecAny,
   PgResourceAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
@@ -31,7 +30,7 @@ import { PgUpdateStep } from "./pgUpdate.js";
  * of another layer of plan.
  */
 export class PgClassExpressionStep<
-    TExpressionCodec extends PgCodecAny,
+    TExpressionCodec extends PgCodec,
     TResource extends PgResource<any, any, any, any, any>,
   >
   extends UnbatchedExecutableStep<any>

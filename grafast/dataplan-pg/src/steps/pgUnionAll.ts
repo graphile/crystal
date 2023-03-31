@@ -37,7 +37,6 @@ import type { PgExecutor } from "../executor.js";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
   PgCodec,
-  PgCodecAny,
   PgOrderFragmentSpec,
   PgOrderSpec,
   PgTypedExecutableStep,
@@ -116,12 +115,12 @@ type PgUnionAllStepSelect<TAttributes extends string> =
   | {
       type: "attribute";
       attribute: TAttributes;
-      codec: PgCodecAny;
+      codec: PgCodec;
     }
   | {
       type: "expression";
       expression: SQL;
-      codec: PgCodecAny;
+      codec: PgCodec;
     }
   | {
       type: "outerExpression";
@@ -130,7 +129,7 @@ type PgUnionAllStepSelect<TAttributes extends string> =
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
   [attributeName in TAttributes]: {
-    codec: PgCodecAny;
+    codec: PgCodec;
   };
 };
 
@@ -151,7 +150,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
         }
       | {
           step: ExecutableStep;
-          codec: PgCodecAny;
+          codec: PgCodec;
         };
   };
   path?: PgCodecRefPath;
@@ -295,7 +294,7 @@ export class PgUnionAllSingleStep
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<TExpressionCodec extends PgCodecAny>(
+  expression<TExpressionCodec extends PgCodec>(
     expression: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -312,7 +311,7 @@ export class PgUnionAllSingleStep
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
-  public select<TExpressionCodec extends PgCodecAny>(
+  public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -974,10 +973,10 @@ on (${sql.indent(
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep<any>, codec: PgCodecAny): SQL;
+  public placeholder($step: ExecutableStep<any>, codec: PgCodec): SQL;
   public placeholder(
     $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
-    overrideCodec?: PgCodecAny,
+    overrideCodec?: PgCodec,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -1469,7 +1468,7 @@ and ${condition(i + 1)}`}
         const midSelects: SQL[] = [];
         const innerSelects = this.selects
           .map((s, selectIndex) => {
-            const r = ((): [SQL, PgCodecAny] | null => {
+            const r = ((): [SQL, PgCodec] | null => {
               switch (s.type) {
                 case "attribute": {
                   if (!this.spec.attributes) {

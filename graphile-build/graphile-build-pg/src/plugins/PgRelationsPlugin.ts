@@ -4,7 +4,6 @@ import "graphile-config";
 
 import type {
   PgCodec,
-  PgCodecAny,
   PgCodecRef,
   PgCodecRefPath,
   PgCodecRelation,
@@ -37,7 +36,7 @@ declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
       registry: PgRegistry<any, any, any>;
-      codec: PgCodecAny;
+      codec: PgCodec;
       relationName: string;
     }
 
@@ -654,7 +653,7 @@ function addRelations(
   const pgPolymorphism =
     "pgPolymorphism" in scope ? scope.pgPolymorphism : undefined;
 
-  const codec = (pgTypeResource?.codec ?? pgCodec) as PgCodecAny;
+  const codec = (pgTypeResource?.codec ?? pgCodec) as PgCodec;
   // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
   if (!(isPgTableType || isMutationPayload || pgPolymorphism) || !codec) {
     return fields;
@@ -669,7 +668,7 @@ function addRelations(
     allPgResources.find((s) => s.codec === codec && !s.parameters) ??
     allPgResources.find((s) => s.codec === codec && s.isUnique)) as PgResource<
     any,
-    PgCodecAny,
+    PgCodec,
     any,
     any,
     any
@@ -863,7 +862,7 @@ function addRelations(
     ref,
   } of refDefinitionList) {
     let hasReferencee;
-    let sharedCodec: PgCodecAny | undefined = undefined;
+    let sharedCodec: PgCodec | undefined = undefined;
     let sharedSource: PgResource<any, any, any, any, any> | undefined =
       undefined;
     let behavior;

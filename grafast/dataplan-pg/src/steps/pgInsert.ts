@@ -13,7 +13,7 @@ import { inspect } from "../inspect.js";
 import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
-  PgCodecAny,
+  PgCodec,
   PgResourceAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
@@ -87,7 +87,7 @@ export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
     name: keyof GetPgResourceColumns<TResource>;
     depId: number;
     // TODO: this shouldn't be needed, we can look it up in the codec?
-    pgCodec: PgCodecAny;
+    pgCodec: PgCodec;
   }> = [];
 
   /**

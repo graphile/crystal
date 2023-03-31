@@ -67,7 +67,6 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import type {
-  PgCodec,
   PgCodecAttribute,
   PgCodecAttributeVia,
   PgConditionStep,
@@ -105,7 +104,7 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type { GetPgResourceColumns, PgCodecAny } from "../interfaces";
+import type { GetPgResourceColumns, PgCodec } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -195,7 +194,7 @@ export function makeExampleSchema(
     ) => {
       const col = <
         TOptions extends {
-          codec: PgCodecAny;
+          codec: PgCodec;
           notNull?: boolean;
           expression?: PgCodecAttribute<any>["expression"];
           // TODO: we could make TypeScript understand the relations on the object
@@ -2943,7 +2942,7 @@ export function makeExampleSchema(
       personResource,
       postResource,
     ): PgPolymorphicTypeMap<
-      PgSelectSingleStep<any> | PgClassExpressionStep<PgCodecAny, any>,
+      PgSelectSingleStep<any> | PgClassExpressionStep<PgCodec, any>,
       readonly number[],
       ListStep<readonly ExecutableStep<any>[]>
     > => ({

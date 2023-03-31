@@ -1,5 +1,5 @@
 import type {
-  PgCodecAny,
+  PgCodec,
   PgCodecExtensions,
   PgCodecRefPath,
   PgCodecRelationConfig,
@@ -196,7 +196,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           ? [tags.refVia]
           : null;
 
-        const refDefinitions = (resourceOptions.codec as PgCodecAny).extensions
+        const refDefinitions = (resourceOptions.codec as PgCodec).extensions
           ?.refDefinitions;
         if (!refDefinitions) {
           if (rawRefVias) {

@@ -19,7 +19,6 @@ import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
   PgCodec,
-  PgCodecAny,
   PgCodecRelation,
   PgRegistryAny,
   PgResourceAny,
@@ -268,7 +267,7 @@ export class PgSelectSingleStep<
     return colPlan as any;
   }
 
-  public select<TExpressionCodec extends PgCodecAny>(
+  public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
@@ -432,7 +431,7 @@ export class PgSelectSingleStep<
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<TExpressionCodec extends PgCodecAny>(
+  expression<TExpressionCodec extends PgCodec>(
     expression: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
@@ -503,7 +502,7 @@ export class PgSelectSingleStep<
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
-    const poly = (this.resource.codec as PgCodecAny).polymorphism;
+    const poly = (this.resource.codec as PgCodec).polymorphism;
     if (poly?.mode === "single") {
       return this;
     } else if (poly?.mode === "relational") {
@@ -526,7 +525,7 @@ export class PgSelectSingleStep<
     null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = (this.resource.codec as PgCodecAny).polymorphism;
+    const poly = (this.resource.codec as PgCodec).polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       const $class = this.getClassStep();
       this.typeStepIndexList = poly.typeColumns.map((col) => {

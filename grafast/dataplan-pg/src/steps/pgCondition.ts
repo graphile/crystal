@@ -4,7 +4,7 @@ import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
 import { TYPES } from "../index.js";
-import type { PgCodecAny } from "../interfaces.js";
+import type { PgCodec } from "../interfaces.js";
 
 export type PgWhereConditionSpec<TAttribute extends string> =
   | SQL
@@ -21,7 +21,7 @@ export interface PgConditionStepExtensions {}
 
 export interface PgConditionCapableParentStep extends BaseStep {
   alias: SQL;
-  placeholder($step: ExecutableStep<any>, codec: PgCodecAny): SQL;
+  placeholder($step: ExecutableStep<any>, codec: PgCodec): SQL;
   where(condition: PgWhereConditionSpec<any>): void;
   having?(condition: PgHavingConditionSpec<any>): void;
 }
@@ -131,7 +131,7 @@ export class PgConditionStep<TParentStep extends PgConditionCapableParentStep>
     this.havingConditions.push(condition);
   }
 
-  placeholder($step: ExecutableStep<any>, codec: PgCodecAny): SQL {
+  placeholder($step: ExecutableStep<any>, codec: PgCodec): SQL {
     return this.$parent.placeholder($step, codec);
   }
 

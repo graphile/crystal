@@ -6,7 +6,6 @@ import "./PgTablesPlugin.js";
 
 import type {
   PgCodec,
-  PgCodecAny,
   PgCodecAttribute,
   PgCodecExtensions,
   PgCodecPolymorphism,
@@ -291,7 +290,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const poly = (resource.codec as PgCodecAny).polymorphism;
+          const poly = (resource.codec as PgCodec).polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
@@ -418,7 +417,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           const relations = registry.pgRelations[resource.codec.name] as {
             [relationName: string]: PgCodecRelation<any, any>;
           };
-          const poly = (resource.codec as PgCodecAny).polymorphism;
+          const poly = (resource.codec as PgCodec).polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {

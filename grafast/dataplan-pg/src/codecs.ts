@@ -38,7 +38,6 @@ import {
 import { inspect } from "./inspect.js";
 import type {
   PgCodec,
-  PgCodecAny,
   PgCodecExtensions,
   PgCodecPolymorphism,
   PgDecode,
@@ -59,7 +58,7 @@ export type PgCodecAttributeVia = string | PgCodecAttributeViaExplicit;
 export interface PgCodecAttributeExtensions {}
 
 export interface PgCodecAttribute<
-  TCodec extends PgCodecAny = PgCodecAny,
+  TCodec extends PgCodec = PgCodec,
   TNotNull extends boolean = boolean,
 > {
   /**

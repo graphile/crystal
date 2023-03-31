@@ -49,7 +49,6 @@ import type {
   GetPgResourceColumns,
   GetPgResourceRelations,
   PgCodec,
-  PgCodecAny,
   PgCodecRelation,
   PgCodecWithColumns,
   PgGroupSpec,
@@ -163,19 +162,19 @@ type PgSelectPlanJoin =
  */
 type PgSelectPlaceholder = {
   dependencyIndex: number;
-  codec: PgCodecAny;
+  codec: PgCodec;
   symbol: symbol;
 };
 
 export type PgSelectIdentifierSpec =
   | {
       step: ExecutableStep<any>;
-      codec: PgCodecAny;
+      codec: PgCodec;
       matches: (alias: SQL) => SQL;
     }
   | {
       step: PgTypedExecutableStep<any>;
-      codec?: PgCodecAny;
+      codec?: PgCodec;
       matches: (alias: SQL) => SQL;
     };
 
@@ -198,7 +197,7 @@ export interface PgSelectArgumentDigest {
 
 interface QueryValue {
   dependencyIndex: number;
-  codec: PgCodecAny;
+  codec: PgCodec;
 }
 
 function assertSensible(step: ExecutableStep): void {
@@ -803,11 +802,11 @@ export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
     return this.isUnique;
   }
 
-  public placeholder($step: PgTypedExecutableStep<PgCodecAny>): SQL;
-  public placeholder($step: ExecutableStep<any>, codec: PgCodecAny): SQL;
+  public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
+  public placeholder($step: ExecutableStep<any>, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep<any> | PgTypedExecutableStep<PgCodecAny>,
-    overrideCodec?: PgCodecAny,
+    $step: ExecutableStep<any> | PgTypedExecutableStep<PgCodec>,
+    overrideCodec?: PgCodec,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -2960,8 +2959,8 @@ exportAs("@dataplan/pg", digestsFromArgumentSpecs, "digestsFromArgumentSpecs");
 export function getFragmentAndCodecFromOrder(
   alias: SQL,
   order: PgOrderSpec,
-  codec: PgCodecAny,
-): [SQL, PgCodecAny] {
+  codec: PgCodec,
+): [SQL, PgCodec] {
   if (order.attribute != null) {
     const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
     const colCodec = codec.columns![order.attribute].codec;

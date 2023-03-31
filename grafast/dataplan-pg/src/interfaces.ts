@@ -252,25 +252,6 @@ export interface PgCodec<
   refs?: PgCodecRefs;
 }
 
-export type PgCodecAny = PgCodec<
-  string,
-  PgCodecAttributes | undefined,
-  any,
-  any,
-  | PgCodec<
-      string,
-      PgCodecAttributes | undefined,
-      any,
-      any,
-      undefined,
-      any,
-      any
-    >
-  | undefined,
-  | PgCodec<string, PgCodecAttributes | undefined, any, any, any, any, any>
-  | undefined,
-  PgCodec<string, undefined, any, any, any, any, any> | undefined
->;
 export type PgCodecWithColumns = PgCodec<
   string,
   PgCodecAttributes,
@@ -307,7 +288,7 @@ export interface PgEnumCodec<TName extends string, TValue extends string>
  * A PgTypedExecutableStep has a 'pgCodec' property which means we don't need
  * to also state the pgCodec to use, this can be an added convenience.
  */
-export interface PgTypedExecutableStep<TCodec extends PgCodecAny>
+export interface PgTypedExecutableStep<TCodec extends PgCodec>
   extends ExecutableStep<any> {
   pgCodec: TCodec;
 }
@@ -334,8 +315,8 @@ export type PgOrderAttributeSpec = {
   /** An optional expression to wrap this column with, and the type that expression returns */
   callback?: (
     attributeExpression: SQL,
-    attributeCodec: PgCodecAny,
-  ) => [SQL, PgCodecAny];
+    attributeCodec: PgCodec,
+  ) => [SQL, PgCodec];
 
   fragment?: never;
   codec?: never;
@@ -598,7 +579,7 @@ export interface PgRegistryConfig<
   },
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
-      PgCodecAny,
+      PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
       readonly PgResourceParameterAny[] | undefined,
       name
@@ -638,7 +619,7 @@ export type ResourceFromOptions<
   },
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
-      PgCodecAny, // TCodecs[keyof TCodecs],
+      PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameterAny[] | undefined,
       name
@@ -700,14 +681,14 @@ export interface PgRegistry<
   },
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
-      PgCodecAny, // TCodecs[keyof TCodecs],
+      PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameterAny[] | undefined,
       name
     >;
   } = {
     [name in string]: PgResourceOptions<
-      PgCodecAny, // TCodecs[keyof TCodecs],
+      PgCodec, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameterAny[] | undefined,
       name
@@ -777,12 +758,12 @@ export interface PgRegistry<
 
 export type PgResourceParameterAny = PgResourceParameter<
   string | null,
-  PgCodecAny
+  PgCodec
 >;
 
 export type PgResourceAny = PgResource<
   string,
-  PgCodecAny,
+  PgCodec,
   ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
   readonly PgResourceParameterAny[] | undefined,
   PgRegistry<any, any, any>

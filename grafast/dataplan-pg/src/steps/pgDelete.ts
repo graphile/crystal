@@ -10,7 +10,7 @@ import type {
   GetPgResourceCodec,
   GetPgResourceColumns,
   GetPgResourceUniques,
-  PgCodecAny,
+  PgCodec,
   PgResourceAny,
   PlanByUniques,
 } from "../interfaces.js";
@@ -74,7 +74,7 @@ export class PgDeleteStep<
   private getBys: Array<{
     name: keyof GetPgResourceColumns<TResource>;
     depId: number;
-    pgCodec: PgCodecAny;
+    pgCodec: PgCodec;
   }> = [];
 
   /**

@@ -2,7 +2,6 @@ import "graphile-build";
 
 import type {
   PgCodec,
-  PgCodecAny,
   PgCodecAttribute,
   PgCodecRelationConfig,
   PgResource,
@@ -178,7 +177,7 @@ declare global {
         getResourceOptions(
           databaseName: string,
           pgClass: PgClass,
-        ): Promise<PgResourceOptions<PgCodecAny, any, any, any> | null>;
+        ): Promise<PgResourceOptions<PgCodec, any, any, any> | null>;
         /*
         getSource(
           resourceOptions: PgResourceOptions<any, any, any>,
@@ -220,7 +219,7 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          resourceOptions: PgResourceOptions<PgCodecAny, any, any, any>;
+          resourceOptions: PgResourceOptions<PgCodec, any, any, any>;
         }) => Promise<void> | void
       >;
     }

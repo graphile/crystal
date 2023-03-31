@@ -34,7 +34,6 @@ import type {
   Expand,
   GetPgCodecColumns,
   PgCodec,
-  PgCodecAny,
   PgCodecRelation,
   PgCodecRelationConfig,
   PgCodecWithColumns,
@@ -96,7 +95,7 @@ export interface PgResourceParameterExtensions {
  */
 export interface PgResourceParameter<
   TName extends string | null,
-  TCodec extends PgCodecAny,
+  TCodec extends PgCodec,
 > {
   /**
    * Name of the parameter, if null then we must use positional rather than
@@ -161,7 +160,7 @@ export interface PgCodecRefs {
  * Configuration options for your PgResource
  */
 export interface PgResourceOptions<
-  TCodec extends PgCodecAny,
+  TCodec extends PgCodec,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TParameters extends readonly PgResourceParameterAny[] | undefined = undefined,
   TName extends string = string,
@@ -215,7 +214,7 @@ export interface PgResourceOptions<
 }
 
 export interface PgFunctionResourceOptions<
-  TCodec extends PgCodecAny,
+  TCodec extends PgCodec,
   TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
   TNewParameters extends readonly PgResourceParameterAny[],
   TNewName extends string,
@@ -239,7 +238,7 @@ const $$codecSource = Symbol("codecSource");
 const $$codecCounter = Symbol("codecCounter");
 
 // TODO: is this needed any more, now that we've moved codecs to owning relations?
-type CodecWithSource<TCodec extends PgCodecAny> = TCodec & {
+type CodecWithSource<TCodec extends PgCodec> = TCodec & {
   [$$codecSource]?: Map<any, any>;
   [$$codecCounter]?: number;
 };
@@ -250,7 +249,7 @@ type CodecWithSource<TCodec extends PgCodecAny> = TCodec & {
  */
 export class PgResource<
   TName extends string = string,
-  TCodec extends PgCodecAny = PgCodecAny,
+  TCodec extends PgCodec = PgCodec,
   TUniques extends ReadonlyArray<
     PgResourceUnique<GetPgCodecColumns<TCodec>>
   > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
@@ -299,7 +298,7 @@ export class PgResource<
   public extensions: Partial<PgResourceExtensions> | undefined;
 
   // TODO: delete me?
-  static configFromCodec<TCodec extends PgCodecAny>(
+  static configFromCodec<TCodec extends PgCodec>(
     executor: PgExecutor,
     baseCodec: TCodec,
   ): PgResourceOptions<
@@ -420,7 +419,7 @@ export class PgResource<
    * type/relations/etc.
    */
   static alternativeResourceOptions<
-    TCodec extends PgCodecAny,
+    TCodec extends PgCodec,
     const TNewUniques extends ReadonlyArray<
       PgResourceUnique<GetPgCodecColumns<TCodec>>
     >,
@@ -457,7 +456,7 @@ export class PgResource<
    * type/relations/etc but pull their rows from functions.
    */
   static functionResourceOptions<
-    TCodec extends PgCodecAny,
+    TCodec extends PgCodec,
     const TNewParameters extends readonly PgResourceParameterAny[],
     const TNewUniques extends ReadonlyArray<
       PgResourceUnique<GetPgCodecColumns<TCodec>>
@@ -906,7 +905,7 @@ export interface PgRegistryBuilder<
   },
   TResources extends {
     [name in string]: PgResourceOptions<
-      PgCodecAny,
+      PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameterAny[] | undefined,
       name
@@ -926,7 +925,7 @@ export interface PgRegistryBuilder<
     Expand<TResources>,
     Expand<TRelations>
   >;
-  addCodec<const TCodec extends PgCodecAny>(
+  addCodec<const TCodec extends PgCodec>(
     codec: TCodec,
   ): PgRegistryBuilder<
     TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
@@ -1030,7 +1029,7 @@ export function makeRegistry<
   },
   TResourceOptions extends {
     [name in string]: PgResourceOptions<
-      PgCodecAny,
+      PgCodec,
       ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
       readonly PgResourceParameterAny[] | undefined,
       name
@@ -1074,7 +1073,7 @@ export function makeRegistry<
   });
 
   function addCodec(
-    codec: PgCodecAny,
+    codec: PgCodec,
   ): PgCodec<any, any, any, any, any, any, any> {
     const codecName = codec.name;
     if (registry.pgCodecs[codecName]) {

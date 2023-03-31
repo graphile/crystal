@@ -6,7 +6,6 @@ import "graphile-config";
 import type {
   PgClassExpressionStep,
   PgCodec,
-  PgCodecAny,
   PgCodecAttribute,
   PgCodecAttributes,
   PgRegistry,
@@ -93,7 +92,7 @@ const getResource = EXPORTABLE(
   (PgResource) =>
     (
       registry: PgRegistry<any, any, any>,
-      baseCodec: PgCodecAny,
+      baseCodec: PgCodec,
       pgResources: PgResource<any, any, any, any, any>[],
       $record: PgSelectSingleStep<any>,
     ) => {
