@@ -320,8 +320,8 @@ export type PgOrderAttributeSpec = {
   /** An optional expression to wrap this column with, and the type that expression returns */
   callback?: (
     attributeExpression: SQL,
-    attributeCodec: PgCodec<string, any, any, any>,
-  ) => [SQL, PgCodec<string, any, any, any>];
+    attributeCodec: PgCodecAny,
+  ) => [SQL, PgCodecAny];
 
   fragment?: never;
   codec?: never;

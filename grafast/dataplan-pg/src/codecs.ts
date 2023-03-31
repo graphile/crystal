@@ -132,15 +132,9 @@ export interface PgCodecAttribute<
 
 export type PgCodecAttributes<
   TCodecMap extends {
-    [columnName in string]: PgCodecAttribute<
-      PgCodec<string, any, any, any, any, any, any>,
-      boolean
-    >;
+    [columnName in string]: PgCodecAttribute<PgCodecAny, boolean>;
   } = {
-    [columnName in string]: PgCodecAttribute<
-      PgCodec<string, any, any, any, any, any, any>,
-      boolean
-    >;
+    [columnName in string]: PgCodecAttribute<PgCodecAny, boolean>;
   },
 > = TCodecMap;
 

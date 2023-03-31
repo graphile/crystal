@@ -116,12 +116,12 @@ type PgUnionAllStepSelect<TAttributes extends string> =
   | {
       type: "attribute";
       attribute: TAttributes;
-      codec: PgCodec<any, any, any, any>;
+      codec: PgCodecAny;
     }
   | {
       type: "expression";
       expression: SQL;
-      codec: PgCodec<any, any, any, any>;
+      codec: PgCodecAny;
     }
   | {
       type: "outerExpression";
@@ -130,7 +130,7 @@ type PgUnionAllStepSelect<TAttributes extends string> =
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
   [attributeName in TAttributes]: {
-    codec: PgCodec<any, any, any>;
+    codec: PgCodecAny;
   };
 };
 
@@ -151,7 +151,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
         }
       | {
           step: ExecutableStep;
-          codec: PgCodec<any, any, any, any>;
+          codec: PgCodecAny;
         };
   };
   path?: PgCodecRefPath;
@@ -974,13 +974,10 @@ on (${sql.indent(
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgCodec<any, any, any>,
-  ): SQL;
+  public placeholder($step: ExecutableStep<any>, codec: PgCodecAny): SQL;
   public placeholder(
     $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
-    overrideCodec?: PgCodec<any, any, any>,
+    overrideCodec?: PgCodecAny,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -1472,7 +1469,7 @@ and ${condition(i + 1)}`}
         const midSelects: SQL[] = [];
         const innerSelects = this.selects
           .map((s, selectIndex) => {
-            const r = ((): [SQL, PgCodec<any, any, any, any>] | null => {
+            const r = ((): [SQL, PgCodecAny] | null => {
               switch (s.type) {
                 case "attribute": {
                   if (!this.spec.attributes) {

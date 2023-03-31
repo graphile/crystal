@@ -170,12 +170,12 @@ type PgSelectPlaceholder = {
 export type PgSelectIdentifierSpec =
   | {
       step: ExecutableStep<any>;
-      codec: PgCodec<any, any, any>;
+      codec: PgCodecAny;
       matches: (alias: SQL) => SQL;
     }
   | {
       step: PgTypedExecutableStep<any>;
-      codec?: PgCodec<any, any, any>;
+      codec?: PgCodecAny;
       matches: (alias: SQL) => SQL;
     };
 
