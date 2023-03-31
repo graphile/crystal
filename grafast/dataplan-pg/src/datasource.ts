@@ -1001,9 +1001,7 @@ export function makeRegistry<
     },
   });
 
-  function addCodec(
-    codec: PgCodec,
-  ): PgCodec<any, any, any, any, any, any, any> {
+  function addCodec(codec: PgCodec): PgCodec {
     const codecName = codec.name;
     if (registry.pgCodecs[codecName]) {
       return registry.pgCodecs[codecName];
