@@ -454,16 +454,8 @@ export interface MakePgConfigOptions
 export interface PgCodecRelationExtensions {}
 
 export interface PgCodecRelationBase<
-  TLocalCodec extends PgCodec<
-    string,
-    PgCodecAttributes,
-    any,
-    any,
-    undefined,
-    any,
-    undefined
-  >,
-  TRemoteColumns extends string,
+  TLocalCodec extends PgCodec = PgCodec,
+  TRemoteColumns extends string = string,
 > {
   /* Where the relationship starts */
   localCodec: TLocalCodec;
@@ -509,16 +501,13 @@ export interface PgCodecRelationBase<
 }
 
 export interface PgCodecRelationConfig<
-  TLocalCodec extends PgCodec<
-    string,
-    PgCodecAttributes,
+  TLocalCodec extends PgCodec = PgCodec,
+  TRemoteResourceOptions extends PgResourceOptions<
     any,
     any,
-    undefined,
     any,
-    undefined
-  >,
-  TRemoteResourceOptions extends PgResourceOptions<any, any, any, any>,
+    any
+  > = PgResourceOptions<any, any, any, any>,
 > extends PgCodecRelationBase<
     TLocalCodec,
     TRemoteResourceOptions extends PgResourceOptions<
@@ -537,16 +526,8 @@ export interface PgCodecRelationConfig<
  * Describes a relation from a codec to a resource
  */
 export interface PgCodecRelation<
-  TLocalCodec extends PgCodec<
-    string,
-    PgCodecAttributes,
-    any,
-    any,
-    undefined,
-    any,
-    undefined
-  >,
-  TRemoteResource extends PgResource<any, any, any, any, any>,
+  TLocalCodec extends PgCodec = PgCodec,
+  TRemoteResource extends PgResource = PgResource,
 > extends PgCodecRelationBase<
     TLocalCodec,
     TRemoteResource extends PgResource<

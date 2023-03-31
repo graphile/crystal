@@ -584,16 +584,13 @@ export class PgResource<
     }
     if (typeof via === "string") {
       // Check
-      const relation = this.getRelation(
-        via as any,
-      ) as unknown as PgCodecRelation<
-        PgCodecWithColumns,
-        PgResource<any, PgCodecWithColumns, any, any, any>
-      >;
+      const relation = this.getRelation(via) as unknown as
+        | PgCodecRelation
+        | undefined;
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
-      if (!relation.remoteResource.codec.columns[attr]) {
+      if (!relation.remoteResource.codec.columns![attr]) {
         throw new Error(
           `${this} relation '${via}' does not have column '${attr}'`,
         );
@@ -636,10 +633,7 @@ export class PgResource<
       this.registry.pgRelations[otherCodec.name]?.[otherRelationName];
     const relations = this.getRelations() as unknown as Record<
       string,
-      PgCodecRelation<
-        PgCodecWithColumns,
-        PgResource<any, PgCodecWithColumns, any, any, any>
-      >
+      PgCodecRelation<PgCodecWithColumns, PgResource>
     >;
     const reciprocal = Object.entries(relations).find(
       ([_relationName, relation]) => {
@@ -1155,20 +1149,19 @@ export function makeRegistry<
     for (const relationName of Object.keys(
       relations,
     ) as (keyof typeof relations)[]) {
-      const relation = relations![relationName];
-      if (!relation) {
+      const relationConfig = relations![
+        relationName
+      ] as unknown as PgCodecRelationConfig;
+      if (!relationConfig) {
         continue;
       }
-      const { localCodec, remoteResourceOptions, ...rest } = relation;
+      const { localCodec, remoteResourceOptions, ...rest } = relationConfig;
 
       const builtRelation = {
-        ...rest,
+        ...(rest as any),
         localCodec: addCodec(localCodec),
         remoteResource: registry.pgResources[remoteResourceOptions.name],
-      } as PgCodecRelation<
-        PgCodecWithColumns,
-        PgResource<any, PgCodecWithColumns, any, any, any>
-      >;
+      } as PgCodecRelation;
 
       // Tell the system to read the built relation from the registry
       Object.defineProperties(builtRelation, {
