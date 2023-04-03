@@ -8,6 +8,7 @@ import type {
   PgCodec,
   PgCodecAttribute,
   PgCodecAttributes,
+  PgCodecWithColumns,
   PgRegistry,
   PgSelectSingleStep,
 } from "@dataplan/pg";
@@ -37,7 +38,7 @@ declare global {
       _columnName(
         this: GraphileBuild.Inflection,
         details: {
-          codec: PgCodec<any, any, any, any, any, any, any>;
+          codec: PgCodecWithColumns;
           columnName: string;
           skipRowId?: boolean;
         },

@@ -5,6 +5,7 @@ import type {
   PgCodec,
   PgCodecAttribute,
   PgCodecAttributes,
+  PgCodecWithColumns,
   PgResourceUnique,
 } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
@@ -21,7 +22,7 @@ declare global {
       orderByColumnEnum(
         this: Inflection,
         details: {
-          codec: PgCodec<any, any, any, any>;
+          codec: PgCodecWithColumns;
           columnName: string;
           column: PgCodecAttribute;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
@@ -51,18 +52,19 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
       GraphQLEnumType_values(values, build, context) {
         const { extend, inflection, options } = build;
         const {
-          scope: { isPgRowSortEnum, pgCodec },
+          scope: { isPgRowSortEnum, pgCodec: rawPgCodec },
         } = context;
         const { orderByNullsLast } = options;
         if (
           !isPgRowSortEnum ||
-          !pgCodec ||
-          !pgCodec.columns ||
-          pgCodec.isAnonymous
+          !rawPgCodec ||
+          !rawPgCodec.columns ||
+          rawPgCodec.isAnonymous
         ) {
           return values;
         }
-        const columns = pgCodec.columns as PgCodecAttributes;
+        const pgCodec = rawPgCodec as PgCodecWithColumns;
+        const columns = pgCodec.columns;
         const sources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((s) => s.codec === pgCodec && !s.parameters);
