@@ -22,10 +22,7 @@ export class BooleanFilterStep extends ModifierStep<PgConditionLikeStep> {
     this.alias = $classFilterPlan.alias;
   }
 
-  placeholder(
-    $step: ExecutableStep,
-    codec: PgCodec<any, any, any, any>,
-  ): SQL {
+  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
     return this.$parent.placeholder($step, codec);
   }
 
