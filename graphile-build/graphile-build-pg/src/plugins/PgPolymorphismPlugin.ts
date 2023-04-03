@@ -263,7 +263,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           }
         }
       },
-      async pgBasics_PgRegistryBuilder_finalize(info, event) {
+      async pgRegistry_PgRegistryBuilder_finalize(info, event) {
         const { registryBuilder } = event;
         const registry = registryBuilder.getRegistryConfig();
         for (const resource of Object.values(
@@ -384,7 +384,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         }
       },
 
-      async pgBasics_PgRegistry(info, event) {
+      async pgRegistry_PgRegistry(info, event) {
         // We're creating 'refs' for the polymorphism. This needs to use the
         // same relationship names as we will in the GraphQL schema, so we need
         // to use the final PgRegistry, not the PgRegistryBuilder.

@@ -27,6 +27,7 @@ import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.j
 import { PgPolymorphismPlugin } from "./plugins/PgPolymorphismPlugin.js";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
 import { PgRefsPlugin } from "./plugins/PgRefsPlugin.js";
+import { PgRegistryPlugin } from "./plugins/PgRegistryPlugin.js";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
 import { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionResourcesPlugin.js";
 import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
@@ -70,5 +71,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgEnumTablesPlugin,
     PgPolymorphismPlugin,
     PgRBACPlugin,
+    PgRegistryPlugin,
   ],
 };

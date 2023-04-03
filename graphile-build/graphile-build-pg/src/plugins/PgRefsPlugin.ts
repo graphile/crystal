@@ -240,7 +240,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           }
 
           const registryBuilder =
-            await info.helpers.pgBasics.getRegistryBuilder();
+            await info.helpers.pgRegistry.getRegistryBuilder();
           const registryConfig = registryBuilder.getRegistryConfig();
 
           outerLoop: for (const via of vias) {

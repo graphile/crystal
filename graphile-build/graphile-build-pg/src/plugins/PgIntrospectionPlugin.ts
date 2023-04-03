@@ -355,10 +355,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     "Introspects PostgreSQL databases and makes the results available to other plugins",
   version: version,
 
-  // Run before PgBasicsPlugin because we want all the introspection to be
-  // triggered/announced before the pgBasics registryBuilder is built.
-  // TODO: consider moving registryBuilder to its own plugin.
-  before: ["PgBasicsPlugin"],
+  // Run before PgRegistryPlugin because we want all the introspection to be
+  // triggered/announced before the registryBuilder is built.
+  before: ["PgRegistryPlugin"],
 
   // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
   gather: <GraphileConfig.PluginGatherConfig<"pgIntrospection", State, Cache>>{
@@ -715,7 +714,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     },
 
     hooks: {
-      async pgBasics_PgRegistryBuilder_init(info, _event) {
+      async pgRegistry_PgRegistryBuilder_init(info, _event) {
         await info.helpers.pgIntrospection.getIntrospection();
       },
     },

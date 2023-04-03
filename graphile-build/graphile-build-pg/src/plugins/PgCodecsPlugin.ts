@@ -812,7 +812,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
       },
     },
     hooks: {
-      async pgBasics_PgRegistryBuilder_pgCodecs(info, event) {
+      async pgRegistry_PgRegistryBuilder_pgCodecs(info, event) {
         const { registryBuilder } = event;
         const codecs = new Set<PgCodec>();
 

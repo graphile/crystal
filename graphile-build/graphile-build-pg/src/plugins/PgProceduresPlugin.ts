@@ -579,7 +579,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         resourceOptionsByPgProc.set(pgProc, resourceOptionsPromise!);
 
         const registryBuilder =
-          await info.helpers.pgBasics.getRegistryBuilder();
+          await info.helpers.pgRegistry.getRegistryBuilder();
 
         return resourceOptionsPromise;
       },

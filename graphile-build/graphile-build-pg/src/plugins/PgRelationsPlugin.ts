@@ -364,7 +364,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           isReferencee,
         });
         const registryBuilder =
-          await info.helpers.pgBasics.getRegistryBuilder();
+          await info.helpers.pgRegistry.getRegistryBuilder();
         const existingRelation =
           registryBuilder.getRegistryConfig().pgRelations[
             event.resourceOptions.codec.name

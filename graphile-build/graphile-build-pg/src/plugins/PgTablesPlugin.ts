@@ -537,7 +537,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           );
 
           const registryBuilder =
-            await info.helpers.pgBasics.getRegistryBuilder();
+            await info.helpers.pgRegistry.getRegistryBuilder();
           if (!resourceOptions.isVirtual) {
             registryBuilder.addResource(resourceOptions);
           }
@@ -566,9 +566,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
       // TODO: Ensure introspection has occurred, to ensure that
       // `pgIntrospection_class` above is called before
-      // `pgBasics_PgRegistryBuilder_pgRelations` below.
+      // `pgRegistry_PgRegistryBuilder_pgRelations` below.
 
-      async pgBasics_PgRegistryBuilder_pgRelations(info, _event) {
+      async pgRegistry_PgRegistryBuilder_pgRelations(info, _event) {
         const toProcess: Array<{
           resourceOptions: PgResourceOptions<any, any, any, any>;
           pgClass: PgClass;

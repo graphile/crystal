@@ -34,6 +34,7 @@ export { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.j
 export { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
 export { PgRBACPlugin } from "./plugins/PgRBACPlugin.js";
 export { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
+export { PgRegistryPlugin } from "./plugins/PgRegistryPlugin.js";
 export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
 export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
