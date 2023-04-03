@@ -65,7 +65,7 @@ const CHEAP_COLUMN_TYPES = new Set([
  * telling the PgSelectStep to select the relevant expressions.
  */
 export class PgSelectSingleStep<
-    TResource extends PgResource<any, any, any, any, any>,
+    TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
   extends UnbatchedExecutableStep<
     unknown[] /* What we return will be a tuple based on the values selected */
@@ -610,7 +610,7 @@ export function pgSelectFromRecord<
     any,
     any,
     PgRegistryAny
-  >,
+  > = PgResource,
 >(
   resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
@@ -629,7 +629,7 @@ export function pgSelectFromRecord<
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
 export function pgSelectSingleFromRecord<
-  TResource extends PgResource<any, any, any, any>,
+  TResource extends PgResource<any, any, any, any> = PgResource,
 >(
   resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,

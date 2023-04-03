@@ -216,7 +216,7 @@ function assertSensible(step: ExecutableStep): void {
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
 export interface PgSelectOptions<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
 > {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
@@ -274,7 +274,9 @@ export interface PgSelectOptions<
  * don't allow `UNION`/`INTERSECT`/`EXCEPT`/`FOR UPDATE`/etc at this time,
  * purely because it hasn't been sufficiently considered.
  */
-export class PgSelectStep<TResource extends PgResource<any, any, any, any, any>>
+export class PgSelectStep<
+    TResource extends PgResource<any, any, any, any, any> = PgResource,
+  >
   extends ExecutableStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
@@ -2874,9 +2876,9 @@ function ensureOrderIsUnique(step: PgSelectStep<any>) {
   }
 }
 
-export function pgSelect<TResource extends PgResource<any, any, any, any, any>>(
-  options: PgSelectOptions<TResource>,
-): PgSelectStep<TResource> {
+export function pgSelect<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+>(options: PgSelectOptions<TResource>): PgSelectStep<TResource> {
   return new PgSelectStep(options);
 }
 exportAs("@dataplan/pg", pgSelect, "pgSelect");
@@ -2885,7 +2887,7 @@ exportAs("@dataplan/pg", pgSelect, "pgSelect");
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
  */
 export function pgSelectFromRecords<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
 >(
   resource: TResource,
   records: PgClassExpressionStep<

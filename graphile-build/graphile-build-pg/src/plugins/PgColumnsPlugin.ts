@@ -94,7 +94,7 @@ const getResource = EXPORTABLE(
       registry: PgRegistry<any, any, any>,
       baseCodec: PgCodec,
       pgResources: PgResource<any, any, any, any, any>[],
-      $record: PgSelectSingleStep<any>,
+      $record: PgSelectSingleStep,
     ) => {
       const executor = $record.resource.executor;
       const resource =
@@ -196,7 +196,7 @@ function processColumn(
       if (!baseCodec.columns) {
         // Simply get the value
         return EXPORTABLE(
-          (columnName) => ($record: PgSelectSingleStep<any>) => {
+          (columnName) => ($record: PgSelectSingleStep) => {
             return $record.get(columnName);
           },
           [columnName],

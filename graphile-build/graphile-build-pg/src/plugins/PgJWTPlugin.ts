@@ -28,7 +28,7 @@ declare global {
 
     interface ScopeScalar {
       isPgJwtType?: boolean;
-      pgCodec?: PgCodec<any, any, any, any>;
+      pgCodec?: PgCodec;
     }
   }
 }
@@ -148,7 +148,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   () =>
                     function plan($in) {
-                      const $record = $in as PgSelectSingleStep<any>;
+                      const $record = $in as PgSelectSingleStep;
                       return $record.record();
                     },
                   [],

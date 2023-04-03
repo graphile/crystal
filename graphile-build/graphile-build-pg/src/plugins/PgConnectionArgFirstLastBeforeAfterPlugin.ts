@@ -94,9 +94,9 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
-                PgSelectSingleStep<any>,
+                PgSelectSingleStep,
                 PgSelectParsedCursorStep,
-                PgSelectStep<any>
+                PgSelectStep
               >,
               arg,
             ) {
@@ -118,9 +118,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any>,
+                      PgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any>
+                      PgSelectStep
                     >,
                     val,
                   ) {
@@ -144,9 +144,9 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
-                PgSelectSingleStep<any>,
+                PgSelectSingleStep,
                 PgSelectParsedCursorStep,
-                PgSelectStep<any>
+                PgSelectStep
               >,
               val,
             ) {
@@ -168,9 +168,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any>,
+                      PgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any>
+                      PgSelectStep
                     >,
                     val,
                   ) {
@@ -190,9 +190,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any>,
+                      PgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any>
+                      PgSelectStep
                     >,
                     val,
                   ) {

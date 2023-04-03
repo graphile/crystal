@@ -1153,14 +1153,12 @@ function addRelations(
                   resourceByTypeName,
                   single,
                 ) =>
-                ($parent: ExecutableStep<any>) => {
+                ($parent: ExecutableStep) => {
                   const $record = isMutationPayload
                     ? (
-                        $parent as ObjectStep<{
-                          result: PgSelectSingleStep<any>;
-                        }>
+                        $parent as ObjectStep<{ result: PgSelectSingleStep }>
                       ).get("result")
-                    : ($parent as PgSelectSingleStep<any>);
+                    : ($parent as PgSelectSingleStep);
                   for (let i = 0, l = paths.length; i < l; i++) {
                     const path = paths[i];
                     const firstLayer = path.layers[0];

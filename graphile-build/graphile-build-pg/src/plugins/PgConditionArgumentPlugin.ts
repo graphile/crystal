@@ -243,15 +243,15 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ? (
                     _condition,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any>,
+                      PgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any>
+                      PgSelectStep
                     >,
                   ) => {
                     const $select = $connection.getSubplan();
                     return $select.wherePlan();
                   }
-                : (_condition, $select: PgSelectStep<any>) => {
+                : (_condition, $select: PgSelectStep) => {
                     return $select.wherePlan();
                   },
             },

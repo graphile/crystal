@@ -1141,7 +1141,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                         $parent,
                                         args,
                                         info,
-                                      ) as PgSelectStep<any>;
+                                      ) as PgSelectStep;
                                     return connection(
                                       $select,
                                       ($item) => $item,

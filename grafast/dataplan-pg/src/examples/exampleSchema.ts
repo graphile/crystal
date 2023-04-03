@@ -1636,7 +1636,7 @@ export function makeExampleSchema(
           const innerPlan =
             step instanceof __ListTransformStep
               ? step.getListStep()
-              : (step as PgSelectStep<any> | PgSelectSingleStep<any>);
+              : (step as PgSelectStep | PgSelectSingleStep);
           if ("getClassStep" in innerPlan) {
             innerPlan.getClassStep().setInliningForbidden();
           } else if ("setInliningForbidden" in innerPlan) {
@@ -4264,7 +4264,7 @@ export function makeExampleSchema(
                   pgCodec: TYPES.text,
                   name: "query",
                 },
-              ]) as PgSelectStep<any>;
+              ]) as PgSelectStep;
               deoptimizeIfAppropriate($step);
               return each($step, ($item) => entityUnion($item as any));
             },
