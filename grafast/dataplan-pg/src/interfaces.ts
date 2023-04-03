@@ -266,6 +266,18 @@ export type PgCodecAnyScalar = PgCodec<
   any
 >;
 
+export type PgCodecList<
+  TInnerCodec extends PgCodec<
+    string,
+    any,
+    any,
+    any,
+    undefined,
+    any,
+    any
+  > = PgCodec<string, any, any, any, undefined, any, any>,
+> = PgCodec<string, undefined, any, any, TInnerCodec, undefined, undefined>;
+
 export type PgEnumValue<TValue extends string = string> = {
   value: TValue;
   description?: string;

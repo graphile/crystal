@@ -6,8 +6,10 @@ import "graphile-config";
 import type {
   PgClassExpressionStep,
   PgCodec,
+  PgCodecAnyScalar,
   PgCodecAttribute,
   PgCodecAttributes,
+  PgCodecList,
   PgCodecWithColumns,
   PgRegistry,
   PgSelectSingleStep,
@@ -79,9 +81,7 @@ declare global {
   }
 }
 
-function unwrapCodec(
-  codec: PgCodec<any, any, any, any, any, any, any>,
-): PgCodec<any, any, any, any, any, any, any> {
+function unwrapCodec(codec: PgCodec): PgCodec {
   if (codec.arrayOfCodec) {
     return unwrapCodec(codec.arrayOfCodec);
   }
@@ -104,6 +104,7 @@ const getResource = EXPORTABLE(
             // These have already been filtered by codec
             potentialSource.executor === executor,
         ) ??
+        // HACK: yuck yuck yuck
         // TODO: yuck; we should not be building a PgResource on demand. We
         // should be able to detect this is necessary and add it to the
         // registry preemptively.
@@ -143,9 +144,7 @@ function processColumn(
 
   const isInterface = context.type === "GraphQLInterfaceType";
 
-  const column = pgCodec.columns[columnName] as PgCodecAttribute<
-    PgCodec<any, any, any, any, any, any>
-  >;
+  const column = pgCodec.columns[columnName];
 
   const behavior = getBehavior([pgCodec.extensions, column.extensions]);
   if (!build.behavior.matches(behavior, "attribute:select", "select")) {
@@ -269,7 +268,7 @@ function processColumn(
               ) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $val = $record.get(columnName) as PgClassExpressionStep<
-                  PgCodec<any, undefined, any, any, any, any, any>,
+                  PgCodecList,
                   any
                 >;
                 const $select = pgSelectFromRecords(
