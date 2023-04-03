@@ -96,10 +96,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                 deprecationReason: handler.deprecationReason,
                 plan: EXPORTABLE(
                   (codec, handler, lambda, nodeIdFieldName, specForHandler) =>
-                    function plan(
-                      _$parent: ExecutableStep,
-                      args: FieldArgs,
-                    ) {
+                    function plan(_$parent: ExecutableStep, args: FieldArgs) {
                       const $decoded = lambda(
                         args.get(nodeIdFieldName),
                         specForHandler(handler, codec),

@@ -12,8 +12,11 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 // const debugObjectPlan = debugFactory("grafast:ObjectStep");
 // const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
-type DataFromStep<TStep extends ExecutableStep> =
-  TStep extends ExecutableStep<infer TData> ? TData : never;
+type DataFromStep<TStep extends ExecutableStep> = TStep extends ExecutableStep<
+  infer TData
+>
+  ? TData
+  : never;
 
 type DataFromPlans<TPlans extends { [key: string]: ExecutableStep }> = {
   [key in keyof TPlans]: DataFromStep<TPlans[key]>;
