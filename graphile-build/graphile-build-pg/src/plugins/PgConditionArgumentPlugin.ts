@@ -76,7 +76,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ),
                 fields: (context) => {
                   const { fieldWithHooks } = context;
-                  const columns: PgCodecAttributes = codec.columns;
+                  const columns = codec.columns as PgCodecAttributes;
                   // TODO: move this to a separate plugin
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {

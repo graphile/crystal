@@ -18,12 +18,12 @@ export interface PgCodecMeta {
 /**
  * A map from PgCodec to its associated metadata.
  */
-export type PgCodecMetaLookup = Map<PgCodec<any, any, any>, PgCodecMeta>;
+export type PgCodecMetaLookup = Map<PgCodec, PgCodecMeta>;
 
 /**
  * Creates an empty meta object for the given codec.
  */
-export function makePgCodecMeta(_codec: PgCodec<any, any, any>): PgCodecMeta {
+export function makePgCodecMeta(_codec: PgCodec): PgCodecMeta {
   return {
     typeNameBySituation: Object.create(null),
   };
@@ -88,10 +88,7 @@ function walkResource(
  *
  * @internal
  */
-function walkCodec(
-  codec: PgCodec<any, any, any>,
-  metaLookup: PgCodecMetaLookup,
-): void {
+function walkCodec(codec: PgCodec, metaLookup: PgCodecMetaLookup): void {
   if (metaLookup.has(codec)) {
     return;
   }

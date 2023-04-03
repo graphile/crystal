@@ -85,6 +85,11 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
         if (!jwtCodec) {
           return _;
         }
+        if (!jwtCodec.columns) {
+          throw new Error(
+            `JWT codec '${jwtCodec.name}' found, but it does not appear to have any attributes. Please check your configuration, the JWT type should be a composite type.`,
+          );
+        }
 
         const jwtTypeName = build.inflection.tableType(jwtCodec);
         const columnNames = Object.keys(jwtCodec.columns);
