@@ -180,7 +180,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
 
 interface QueryValue {
   dependencyIndex: number;
-  codec: PgCodec<any, any, any>;
+  codec: PgCodec;
 }
 
 /**
@@ -195,7 +195,7 @@ interface QueryValue {
  */
 type PgUnionAllPlaceholder = {
   dependencyIndex: number;
-  codec: PgCodec<any, any, any, any>;
+  codec: PgCodec;
   symbol: symbol;
 };
 
@@ -792,10 +792,7 @@ on (${sql.indent(
     return index;
   }
 
-  selectExpression(
-    expression: SQL,
-    codec: PgCodec<any, any, any, any>,
-  ): number {
+  selectExpression(expression: SQL, codec: PgCodec): number {
     const existingIndex = this.selects.findIndex(
       (s) =>
         s.type === "expression" && sql.isEquivalent(s.expression, expression),
@@ -1078,7 +1075,7 @@ on (${sql.indent(
         );
         identifierPlaceholders[i] = this.placeholder(
           toPg(access($parsedCursorPlan, [i + 1]), codec),
-          codec as PgCodec<any, any, any, any, any, any, any>,
+          codec as PgCodec,
         );
       }
     }
@@ -1515,10 +1512,7 @@ and ${condition(i + 1)}`}
                     orderSpec,
                     digest.finalResource.codec,
                   );
-                  return [
-                    frag,
-                    codec as PgCodec<any, any, any, any, any, any, any>,
-                  ];
+                  return [frag, codec as PgCodec];
                 }
                 default: {
                   const never: never = s;
