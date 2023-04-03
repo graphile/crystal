@@ -4,6 +4,8 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgCodec,
+  PgCodecWithColumns,
+  PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
 import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
@@ -21,10 +23,7 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       // TODO: move this somewhere more shared
-      tableEdgeField(
-        this: Inflection,
-        codec: PgCodec<any, any, any, any, any, any, any>,
-      ): string;
+      tableEdgeField(this: Inflection, codec: PgCodecWithColumns): string;
     }
 
     interface ScopeObjectFieldsField {
@@ -106,7 +105,13 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const resource = resources[0];
+        const resource = resources[0] as PgResource<
+          any,
+          PgCodecWithColumns,
+          any,
+          any,
+          any
+        >;
 
         const pk = (resource.uniques as PgResourceUnique[])?.find(
           (u) => u.isPrimary,
