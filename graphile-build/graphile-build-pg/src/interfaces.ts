@@ -35,7 +35,7 @@ export interface PgCodecRelationTags extends PgSmartTagsDict {
   deprecated: string | string[];
 }
 
-export interface PgResourceRefTags extends PgSmartTagsDict {
+export interface PgCodecRefTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
 }
@@ -95,8 +95,8 @@ declare module "@dataplan/pg" {
     description?: string;
   }
 
-  interface PgResourceRefExtensions {
-    tags: Partial<PgResourceRefTags>;
+  interface PgCodecRefExtensions {
+    tags: Partial<PgCodecRefTags>;
     description?: string;
   }
 
