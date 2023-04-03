@@ -2921,7 +2921,7 @@ exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 export function digestsFromArgumentSpecs(
   $placeholderable: {
-    placeholder(step: ExecutableStep, codec: PgCodec<any, any, any, any>): SQL;
+    placeholder(step: ExecutableStep, codec: PgCodec): SQL;
   },
   specs: PgSelectArgumentSpec[],
   digests: PgSelectArgumentDigest[] = [],

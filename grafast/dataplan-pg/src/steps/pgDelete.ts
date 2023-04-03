@@ -11,7 +11,6 @@ import type {
   GetPgResourceColumns,
   GetPgResourceUniques,
   PgCodec,
-  PgResourceAny,
   PlanByUniques,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -366,7 +365,7 @@ export class PgDeleteStep<
 /**
  * Delete a row in `resource` identified by the `getBy` unique condition.
  */
-export function pgDelete<TResource extends PgResourceAny>(
+export function pgDelete<TResource extends PgResource<any, any, any, any>>(
   resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceColumns<TResource>,

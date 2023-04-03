@@ -15,7 +15,6 @@ import type {
   GetPgResourceColumns,
   GetPgResourceUniques,
   PgCodec,
-  PgResourceAny,
   PlanByUniques,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -443,7 +442,7 @@ export class PgUpdateStep<
 /**
  * Update a single row identified by the 'getBy' argument.
  */
-export function pgUpdate<TResource extends PgResourceAny>(
+export function pgUpdate<TResource extends PgResource<any, any, any, any>>(
   resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceColumns<TResource>,

@@ -1599,6 +1599,23 @@ export function makeExampleSchema(
     [makeRegistry, registryConfig],
   );
 
+  {
+    /*
+     * This block includes a rudimentary TypeScript types test - we get a
+     * person by id, follow the relationship to their posts, grab one of these,
+     * then grab its id. This id should be an int4, we want to ensure that it's
+     * assignable to 'int4' and NOT assignable to 'text' (i.e. not `string` or
+     * `any`).
+     */
+    const $person = registry.pgResources.people.get({ person_id: constant(1) });
+    const $posts = $person.manyRelation("posts");
+    const $post = $posts.single();
+    const $id = $post.get("post_id");
+    const _testGood: "int4" = $id.pgCodec.name;
+    // @ts-expect-error
+    const _testBad: "text" = $id.pgCodec.name;
+  }
+
   const deoptimizeIfAppropriate = EXPORTABLE(
     (__ListTransformStep, options) =>
       <

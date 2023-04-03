@@ -287,13 +287,10 @@ export class PgSelectSingleStep<
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgCodec<any, any, any>,
-  ): SQL;
-  public placeholder(
-    $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
-    overrideCodec?: PgCodec<any, any, any>,
+    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
@@ -366,10 +363,12 @@ export class PgSelectSingleStep<
   }
 
   public manyRelation<
-    TRelationName extends keyof TResource["registry"]["pgRelations"][TResource["codec"]["name"]],
+    TRelationName extends keyof GetPgResourceRelations<TResource>,
   >(
     relationIdentifier: TRelationName,
-  ): TResource["registry"]["pgRelations"][TResource["codec"]["name"]][TRelationName] {
+  ): PgSelectStep<
+    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
+  > {
     const relation: PgCodecRelation<any, any> =
       this.resource.getRelation(relationIdentifier);
     if (!relation) {
@@ -379,7 +378,7 @@ export class PgSelectSingleStep<
     }
     const { remoteResource, remoteColumns, localColumns } = relation;
 
-    return remoteResource.find(
+    return (remoteResource as PgResource).find(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
         memo[remoteColumn] = this.get(localColumns[columnIndex]);
         return memo;
@@ -629,7 +628,9 @@ export function pgSelectFromRecord<
  * Given a plan that represents a single record (via
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
-export function pgSelectSingleFromRecord<TResource extends PgResourceAny>(
+export function pgSelectSingleFromRecord<
+  TResource extends PgResource<any, any, any, any>,
+>(
   resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
 ): PgSelectSingleStep<TResource> {

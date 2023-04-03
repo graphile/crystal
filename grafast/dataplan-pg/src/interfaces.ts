@@ -561,58 +561,6 @@ export type Expand<T> = T extends unknown
   ? { [TKey in keyof T]: T[TKey] }
   : never;
 
-export type ResourceFromOptions<
-  TCodecs extends {
-    [name in string]: PgCodec<
-      name,
-      PgCodecAttributes | undefined,
-      any,
-      any,
-      any,
-      any,
-      any
-    >;
-  },
-  TResourceOptions extends {
-    [name in string]: PgResourceOptions<
-      name,
-      PgCodec, // TCodecs[keyof TCodecs],
-      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined
-    >;
-  },
-  TRelations extends {
-    [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelationConfig<
-        // TCodecs[keyof TCodecs] &
-        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        // TResourceOptions[keyof TResourceOptions] &
-        PgResourceOptions<
-          any,
-          // TCodecs[keyof TCodecs] &
-          PgCodecWithColumns,
-          any,
-          any
-        >
-      >;
-    };
-  },
-  TResourceName extends keyof TResourceOptions,
-> = TResourceOptions[TResourceName] extends PgResourceOptions<
-  infer UName,
-  infer UCodec,
-  infer UUniques,
-  infer UParameters
->
-  ? PgResource<
-      UName,
-      UCodec,
-      UUniques,
-      UParameters,
-      PgRegistry<TCodecs, TResourceOptions, TRelations>
-    >
-  : never;
-
 export interface PgRegistry<
   TCodecs extends {
     [name in string]: PgCodec<
@@ -684,28 +632,41 @@ export interface PgRegistry<
 > {
   pgCodecs: TCodecs;
   pgResources: {
-    [name in keyof TResourceOptions]: ResourceFromOptions<
-      TCodecs,
-      TResourceOptions,
-      TRelations,
-      name
-    >;
+    [name in keyof TResourceOptions]: TResourceOptions[name] extends PgResourceOptions<
+      infer UName,
+      infer UCodec,
+      infer UUniques,
+      infer UParameters
+    >
+      ? PgResource<
+          UName,
+          UCodec,
+          UUniques,
+          UParameters,
+          PgRegistry<TCodecs, TResourceOptions, TRelations>
+        >
+      : never;
   };
   pgRelations: {
     [codecName in keyof TRelations]: {
       [relationName in keyof TRelations[codecName]]: Expand<
         Omit<TRelations[codecName][relationName], "remoteResourceOptions"> & {
-          remoteResource: ResourceFromOptions<
-            TCodecs,
-            TResourceOptions,
-            TRelations,
-            TRelations[codecName][relationName] extends PgCodecRelationConfig<
-              any,
-              PgResourceOptions<infer UResourceName, any, any, any>
-            >
-              ? UResourceName
-              : never
-          >;
+          remoteResource: TRelations[codecName][relationName] extends {
+            remoteResourceOptions: PgResourceOptions<
+              infer UName,
+              infer UCodec,
+              infer UUniques,
+              infer UParameters
+            >;
+          }
+            ? PgResource<
+                UName,
+                UCodec,
+                UUniques,
+                UParameters,
+                PgRegistry<TCodecs, TResourceOptions, TRelations>
+              >
+            : never;
         }
       >;
     };
