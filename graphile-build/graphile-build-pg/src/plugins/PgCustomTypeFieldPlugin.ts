@@ -758,7 +758,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             () =>
                               (
                                 $object: ObjectStep<{
-                                  result: PgClassSingleStep<any>;
+                                  result: PgClassSingleStep;
                                 }>,
                               ) => {
                                 return $object.get("result");

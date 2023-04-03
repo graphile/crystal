@@ -355,7 +355,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   (handler, lambda, nodeIdCodec) =>
                                     function plan(
                                       $object: ObjectStep<{
-                                        result: PgClassSingleStep<any>;
+                                        result: PgClassSingleStep;
                                       }>,
                                     ) {
                                       const $record =

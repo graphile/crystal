@@ -666,7 +666,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         },
                       },
                       // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
-                      ExecutableStep, // PgClassSingleStep<any, any, any, any>
+                      ExecutableStep, // PgClassSingleStep
                       () => ({
                         description: codec.extensions?.description,
                         interfaces: [

@@ -21,7 +21,7 @@ import type { PgUpdateStep } from "./steps/pgUpdate.js";
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
 export type PgClassSingleStep<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
 > =
   | PgSelectSingleStep<TResource>
   | PgInsertStep<TResource>

@@ -197,7 +197,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   ) =>
                     function plan(
                       $mutation: ObjectStep<{
-                        result: PgClassSingleStep<any>;
+                        result: PgClassSingleStep;
                       }>,
                       args: FieldArgs,
                       info: FieldInfo,
