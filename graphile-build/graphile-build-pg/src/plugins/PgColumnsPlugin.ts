@@ -63,7 +63,7 @@ declare global {
         this: GraphileBuild.Inflection,
         details: {
           columnName: string;
-          codec: PgCodec<any, any, any, any, any, any, any>;
+          codec: PgCodecWithColumns;
         },
       ): string;
     }
@@ -134,11 +134,12 @@ function processColumn(
   } = build;
 
   const {
-    scope: { pgCodec },
+    scope: { pgCodec: rawPgCodec },
   } = context;
-  if (!pgCodec) {
+  if (!rawPgCodec || !rawPgCodec.columns) {
     return;
   }
+  const pgCodec = rawPgCodec as PgCodecWithColumns;
 
   const isInterface = context.type === "GraphQLInterfaceType";
 
@@ -437,18 +438,19 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
             isPgCompoundType,
             isPgPatch,
             isPgBaseInput,
-            pgCodec,
+            pgCodec: rawPgCodec,
           },
           fieldWithHooks,
         } = context;
         if (
           !(isPgRowType || isPgCompoundType) ||
-          !pgCodec ||
-          !pgCodec.columns ||
-          pgCodec.isAnonymous
+          !rawPgCodec ||
+          !rawPgCodec.columns ||
+          rawPgCodec.isAnonymous
         ) {
           return fields;
         }
+        const pgCodec = rawPgCodec as PgCodecWithColumns;
 
         return Object.entries(pgCodec.columns as PgCodecAttributes).reduce(
           (memo, [columnName, column]) =>

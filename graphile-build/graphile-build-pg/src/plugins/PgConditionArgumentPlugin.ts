@@ -3,6 +3,7 @@ import "graphile-config";
 
 import type {
   PgCodecAttributes,
+  PgCodecWithColumns,
   PgConditionStep,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
@@ -46,12 +47,13 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_, build) {
         const { inflection, sql } = build;
-        for (const codec of build.pgCodecMetaLookup.keys()) {
+        for (const rawCodec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
             // Ignore scalar codecs
-            if (!codec.columns || codec.isAnonymous) {
+            if (!rawCodec.columns || rawCodec.isAnonymous) {
               return;
             }
+            const codec = rawCodec as PgCodecWithColumns;
 
             const behavior = getBehavior(codec.extensions);
             // TODO: do we want this filter here? E.g. we might want to enable a bulk delete mutation without allowing any selects?

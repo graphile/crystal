@@ -1,6 +1,11 @@
 import "graphile-config";
 
-import type { PgCodec, PgResource, PgResourceUnique } from "@dataplan/pg";
+import type {
+  PgCodec,
+  PgCodecWithColumns,
+  PgResource,
+  PgResourceUnique,
+} from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import te, { isSafeObjectPropertyName } from "tamedevil";
@@ -74,10 +79,17 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
         });
 
         return resources.reduce(
-          (outerMemo, resource) =>
+          (outerMemo, rawResource) =>
             build.recoverable(outerMemo, () =>
-              (resource.uniques as PgResourceUnique[]).reduce(
+              (rawResource.uniques as PgResourceUnique[]).reduce(
                 (memo, unique) => {
+                  const resource = rawResource as PgResource<
+                    any,
+                    PgCodecWithColumns,
+                    any,
+                    any,
+                    any
+                  >;
                   const uniqueKeys = unique.columns as string[];
                   const fieldName = build.inflection.rowByUnique({
                     unique,
