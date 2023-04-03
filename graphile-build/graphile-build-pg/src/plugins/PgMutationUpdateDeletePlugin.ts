@@ -3,6 +3,7 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgCodecAttribute,
+  PgCodecWithColumns,
   PgDeleteStep,
   PgResource,
   PgResourceUnique,
@@ -249,7 +250,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         } = build;
 
         const process = (
-          resource: PgResource<any, any, any, any, any>,
+          resource: PgResource<any, PgCodecWithColumns, any, any, any>,
           mode: "source:update" | "source:delete",
         ) => {
           const modeText = mode === "source:update" ? "update" : "delete";
@@ -486,9 +487,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             }
                           : (unique.columns as string[]).reduce(
                               (memo, columnName) => {
-                                const column = resource.codec.columns[
-                                  columnName
-                                ] as PgCodecAttribute;
+                                const column =
+                                  resource.codec.columns[columnName];
                                 memo[
                                   inflection.column({
                                     columnName,
@@ -545,12 +545,20 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           }
         };
 
-        const allResources = Object.values(build.input.pgRegistry.pgResources);
-        const updatableResources = allResources.filter((resource) =>
-          isUpdatable(build, resource),
+        const allResources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ) as PgResource<any, any, any, any, any>[];
+        const updatableResources = allResources.filter(
+          (
+            resource,
+          ): resource is PgResource<any, PgCodecWithColumns, any, any, any> =>
+            isUpdatable(build, resource),
         );
-        const deletableResources = allResources.filter((resource) =>
-          isDeletable(build, resource),
+        const deletableResources = allResources.filter(
+          (
+            resource,
+          ): resource is PgResource<any, PgCodecWithColumns, any, any, any> =>
+            isDeletable(build, resource),
         );
 
         updatableResources.forEach((resource) => {

@@ -3,7 +3,6 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
-  PgCodec,
   PgCodecWithColumns,
   PgResource,
   PgResourceUnique,
