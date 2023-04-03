@@ -26,7 +26,7 @@ declare global {
       orderByType(this: Inflection, typeName: string): string;
     }
     interface ScopeEnum {
-      pgCodec?: PgCodec<any, any, any, any>;
+      pgCodec?: PgCodec;
       isPgRowSortEnum?: boolean;
     }
   }

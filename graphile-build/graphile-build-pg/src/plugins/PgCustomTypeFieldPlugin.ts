@@ -62,7 +62,7 @@ declare global {
     interface Build {
       pgGetArgDetailsFromParameters(
         resource: PgResource<any, any, any, any, any>,
-        parameters?: readonly PgResourceParameter<any, any>[],
+        parameters?: readonly PgResourceParameter[],
       ): {
         makeFieldArgs(): {
           [graphqlArgName: string]: {
@@ -74,16 +74,13 @@ declare global {
         argDetails: Array<{
           graphqlArgName: string;
           postgresArgName: string | null;
-          pgCodec: PgCodec<any, any, any, any>;
+          pgCodec: PgCodec;
           inputType: GraphQLInputType;
           required: boolean;
         }>;
         makeExpression(opts: {
           $placeholderable: {
-            placeholder(
-              $step: ExecutableStep,
-              codec: PgCodec<any, any, any, any>,
-            ): SQL;
+            placeholder($step: ExecutableStep, codec: PgCodec): SQL;
           };
           resource: PgResource<any, any, any, any, any>;
           fieldArgs: FieldArgs;
@@ -94,33 +91,15 @@ declare global {
     }
 
     interface InflectionCustomFieldProcedureDetails {
-      resource: PgResource<
-        any,
-        any,
-        any,
-        readonly PgResourceParameter<any, any>[],
-        any
-      >;
+      resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
     }
     interface InflectionCustomFieldArgumentDetails {
-      resource: PgResource<
-        any,
-        any,
-        any,
-        readonly PgResourceParameter<any, any>[],
-        any
-      >;
-      param: PgResourceParameter<any, any>;
+      resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
+      param: PgResourceParameter;
       index: number;
     }
     interface InflectionCustomFieldMutationResult {
-      resource: PgResource<
-        any,
-        any,
-        any,
-        readonly PgResourceParameter<any, any>[],
-        any
-      >;
+      resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
       returnGraphQLTypeName: string;
     }
 
@@ -210,13 +189,7 @@ function defaultProcSourceBehavior(
   const { simpleCollections } = options;
   const behavior = [];
   const firstParameter = (
-    s as PgResource<
-      any,
-      any,
-      any,
-      readonly PgResourceParameter<any, any>[],
-      any
-    >
+    s as PgResource<any, any, any, readonly PgResourceParameter[], any>
   ).parameters[0];
   if (
     !s.isMutation &&
