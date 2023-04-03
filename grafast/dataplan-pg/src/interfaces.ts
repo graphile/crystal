@@ -76,7 +76,9 @@ export interface PgCodecPolymorphismSingleTypeColumnSpec<
   rename?: string;
 }
 
-export interface PgCodecPolymorphismSingleTypeSpec<TColumnName extends string> {
+export interface PgCodecPolymorphismSingleTypeSpec<
+  TColumnName extends string = string,
+> {
   name: string;
   // TODO: make this optional?
   columns: Array<PgCodecPolymorphismSingleTypeColumnSpec<TColumnName>>;

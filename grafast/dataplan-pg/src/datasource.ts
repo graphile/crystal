@@ -218,10 +218,12 @@ export interface PgResourceOptions<
 }
 
 export interface PgFunctionResourceOptions<
-  TNewName extends string,
-  TCodec extends PgCodec,
-  TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
-  TNewParameters extends readonly PgResourceParameter[],
+  TNewName extends string = string,
+  TCodec extends PgCodec = PgCodec,
+  TUniques extends ReadonlyArray<
+    PgResourceUnique<GetPgCodecColumns<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TNewParameters extends readonly PgResourceParameter[] = readonly PgResourceParameter[],
 > {
   name: TNewName;
   identifier?: string;

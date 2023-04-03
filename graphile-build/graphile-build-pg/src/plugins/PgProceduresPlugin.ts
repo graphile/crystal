@@ -27,23 +27,11 @@ import { version } from "../version.js";
 
 // TODO: these should be used, surely?
 interface _ComputedColumnDetails {
-  resource: PgResource<
-    any,
-    any,
-    any,
-    readonly PgResourceParameter<any, any>[],
-    any
-  >;
+  resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
 }
 interface _ArgumentDetails {
-  resource: PgResource<
-    any,
-    any,
-    any,
-    readonly PgResourceParameter<any, any>[],
-    any
-  >;
-  param: PgResourceParameter<any, any>;
+  resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
+  param: PgResourceParameter;
   index: number;
 }
 
@@ -89,7 +77,7 @@ declare global {
         getResourceOptions(
           databaseName: string,
           pgProc: PgProc,
-        ): Promise<PgResourceOptions<any, any, any, any> | null>;
+        ): Promise<PgResourceOptions | null>;
       };
     }
 
@@ -98,13 +86,8 @@ declare global {
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          baseResourceOptions: PgResourceOptions<any, any, any, any>;
-          functionResourceOptions: PgFunctionResourceOptions<
-            any,
-            any,
-            any,
-            any
-          >;
+          baseResourceOptions: PgResourceOptions;
+          functionResourceOptions: PgFunctionResourceOptions;
         }) => void | Promise<void>
       >;
 
@@ -112,7 +95,7 @@ declare global {
         (event: {
           databaseName: string;
           pgProc: PgProc;
-          resourceOptions: PgResourceOptions<any, any, any, any>;
+          resourceOptions: PgResourceOptions;
         }) => void | Promise<void>
       >;
     }
@@ -122,7 +105,7 @@ declare global {
 interface State {
   resourceOptionsByPgProcByDatabase: Map<
     string,
-    Map<PgProc, Promise<PgResourceOptions<any, any, any, any> | null>>
+    Map<PgProc, Promise<PgResourceOptions | null>>
   >;
 }
 interface Cache {}
@@ -227,15 +210,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             pgProc,
           });
           const identifier = `${databaseName}.${namespace.nspname}.${pgProc.proname}(...)`;
-          const makeCodecFromReturn = async (): Promise<PgCodec<
-            any,
-            any,
-            any,
-            any,
-            any,
-            any,
-            any
-          > | null> => {
+          const makeCodecFromReturn = async (): Promise<PgCodec | null> => {
             // We're building a PgCodec to represent specifically the
             // return type of this function.
 
@@ -332,7 +307,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
           // TODO: this isn't a sufficiently unique name, it does not allow for overloaded functions
 
-          const parameters: PgResourceParameter<any, any>[] = [];
+          const parameters: PgResourceParameter[] = [];
 
           // const processedFirstInputArg = false;
 
@@ -506,7 +481,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               return null;
             }
 
-            const options: PgFunctionResourceOptions<any, any, any, any> = {
+            const options: PgFunctionResourceOptions = {
               name,
               identifier,
               source: sourceCallback,
@@ -543,7 +518,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [finalResourceOptions, makePgResourceOptions],
             );
           } else {
-            const options: PgResourceOptions<any, any, any, any> = {
+            const options: PgResourceOptions = {
               executor,
               name,
               identifier,

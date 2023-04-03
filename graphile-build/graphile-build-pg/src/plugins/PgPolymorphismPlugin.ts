@@ -16,7 +16,9 @@ import type {
   PgCodecPolymorphismSingleTypeSpec,
   PgCodecRef,
   PgCodecRelation,
+  PgCodecWithColumns,
   PgRefDefinition,
+  PgRegistry,
   PgResource,
   PgResourceOptions,
 } from "@dataplan/pg";
@@ -263,10 +265,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
       },
       async pgRegistry_PgRegistryBuilder_finalize(info, event) {
         const { registryBuilder } = event;
-        const registry = registryBuilder.getRegistryConfig();
+        const registryConfig = registryBuilder.getRegistryConfig();
         for (const resource of Object.values(
-          registry.pgResources,
-        ) as PgResourceOptions<any, any, any, any>[]) {
+          registryConfig.pgResources,
+        ) as PgResourceOptions[]) {
           if (resource.parameters || !resource.codec.columns) {
             continue;
           }
@@ -362,7 +364,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
 
               for (const [colName, colSpec] of Object.entries(
                 resource.codec.columns,
-              ) as Array<[string, PgCodecAttribute]>) {
+              )) {
                 if (otherCodec.columns[colName]) {
                   otherCodec.columns[colName].identicalVia = sharedRelationName;
                 } else {
@@ -388,12 +390,17 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         // to use the final PgRegistry, not the PgRegistryBuilder.
 
         const { registry } = event;
-        for (const resource of Object.values(
-          registry.pgResources,
-        ) as PgResource<any, any, any, any, any>[]) {
-          if (resource.parameters || !resource.codec.columns) {
+        for (const rawResource of Object.values(registry.pgResources)) {
+          if (rawResource.parameters || !rawResource.codec.columns) {
             continue;
           }
+          const resource = rawResource as PgResource<
+            string,
+            PgCodecWithColumns,
+            any,
+            undefined,
+            PgRegistry
+          >;
           if (!resource.extensions?.pg) {
             continue;
           }
@@ -558,10 +565,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
           setGraphQLTypeForPgCodec,
         } = build;
-        const unionsToRegister = new Map<
-          string,
-          PgCodec<any, any, any, any, any, any, any>[]
-        >();
+        const unionsToRegister = new Map<string, PgCodec[]>();
         for (const codec of build.pgCodecMetaLookup.keys()) {
           if (!codec.columns) {
             // Only apply to codecs that define columns
@@ -642,7 +646,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   [
                     string,
                     (
-                      | PgCodecPolymorphismSingleTypeSpec<string>
+                      | PgCodecPolymorphismSingleTypeSpec
                       | PgCodecPolymorphismRelationalTypeSpec
                     ),
                   ]
@@ -658,9 +662,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         pgPolymorphicSingleTableType: {
                           typeIdentifier,
                           name: spec.name,
-                          columns: (
-                            spec as PgCodecPolymorphismSingleTypeSpec<string>
-                          ).columns,
+                          columns: (spec as PgCodecPolymorphismSingleTypeSpec)
+                            .columns,
                         },
                       },
                       // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep

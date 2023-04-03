@@ -246,15 +246,11 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           outerLoop: for (const via of vias) {
             const path: PgCodecRefPath = [];
             const parts = via.split(";");
-            let currentResourceOptions: PgResourceOptions<any, any, any, any> =
-              resourceOptions;
+            let currentResourceOptions: PgResourceOptions = resourceOptions;
             for (const rawPart of parts) {
               type RelationEntry = [
                 string,
-                PgCodecRelationConfig<
-                  PgCodecWithColumns,
-                  PgResourceOptions<any, any, any, any>
-                >,
+                PgCodecRelationConfig<PgCodecWithColumns, PgResourceOptions>,
               ];
               const relationEntries = Object.entries(
                 registryConfig.pgRelations[currentResourceOptions.codec.name],
