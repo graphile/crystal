@@ -3,7 +3,7 @@ import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 
 export class ListStep<
-  const TPlanTuple extends readonly ExecutableStep<any>[],
+  const TPlanTuple extends readonly ExecutableStep[],
 > extends UnbatchedExecutableStep<UnwrapPlanTuple<TPlanTuple>> {
   static $$export = {
     moduleName: "grafast",
@@ -89,7 +89,7 @@ export class ListStep<
  * Takes a list of plans and turns it into a single plan that represents the
  * list of their values.
  */
-export function list<const TPlanTuple extends readonly ExecutableStep<any>[]>(
+export function list<const TPlanTuple extends readonly ExecutableStep[]>(
   list: TPlanTuple,
 ): ListStep<TPlanTuple> {
   return new ListStep<TPlanTuple>(list);

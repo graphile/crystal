@@ -73,8 +73,8 @@ export default function makeNewBuild(
       specGenerator: any;
       origin: string | null | undefined;
       Step?:
-        | ((step: ExecutableStep<any>) => asserts step is ExecutableStep<any>)
-        | { new (...args: any[]): ExecutableStep<any> }
+        | ((step: ExecutableStep) => asserts step is ExecutableStep)
+        | { new (...args: any[]): ExecutableStep }
         | null;
     };
   } = Object.create(null);
@@ -88,8 +88,8 @@ export default function makeNewBuild(
     typeName: string,
     scope: GraphileBuild.SomeScope,
     Step:
-      | ((step: ExecutableStep<any>) => asserts step is ExecutableStep<any>)
-      | { new (...args: any[]): ExecutableStep<any> }
+      | ((step: ExecutableStep) => asserts step is ExecutableStep)
+      | { new (...args: any[]): ExecutableStep }
       | null,
     specGenerator: () => any,
     origin: string | null | undefined,

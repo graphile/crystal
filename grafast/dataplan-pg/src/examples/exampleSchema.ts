@@ -1628,7 +1628,7 @@ export function makeExampleSchema(
           | PgSelectSingleStep<any>
           | PgClassExpressionStep<any, any>
           | __ListTransformStep<PgSelectStep<any>, any, any, any>
-          | ExecutableStep<any>,
+          | ExecutableStep,
       >(
         step: TStep,
       ): TStep => {
@@ -2169,7 +2169,7 @@ export function makeExampleSchema(
       type: IncludeArchived,
       applyPlan: EXPORTABLE(
         (PgSelectSingleStep, TYPES, getClassStep, sql) =>
-          function plan($parent: ExecutableStep<any>, $field: TFieldStep, val) {
+          function plan($parent: ExecutableStep, $field: TFieldStep, val) {
             const $messages = getClassStep($field);
             const $value = val.getRaw() as
               | __InputStaticLeafStep
@@ -2907,7 +2907,7 @@ export function makeExampleSchema(
     ): PgPolymorphicTypeMap<
       PgSelectSingleStep<any> | PgClassExpressionStep<PgCodec, any>,
       readonly number[],
-      ListStep<readonly ExecutableStep<any>[]>
+      ListStep<readonly ExecutableStep[]>
     > => ({
       Person: {
         match: (v) => v[0] != null,

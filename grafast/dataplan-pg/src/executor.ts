@@ -141,7 +141,7 @@ export class PgExecutor<TSettings = any> {
     return chalk.bold.blue(`PgExecutor(${this.name})`);
   }
 
-  // public context(): ExecutableStep<any>
+  // public context(): ExecutableStep
   public context(): ObjectStep<PgExecutorContextPlans<TSettings>> {
     return this.contextCallback();
   }

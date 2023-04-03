@@ -425,7 +425,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       )[expressionSymbol];
       if (expressionDetails) {
         // @ts-ignore
-        const $parent: ExecutableStep<any> = $root.getDep(0);
+        const $parent: ExecutableStep = $root.getDep(0);
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
           this,
           $parent,

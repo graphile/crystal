@@ -306,7 +306,7 @@ export interface PgEnumCodec<
  * to also state the pgCodec to use, this can be an added convenience.
  */
 export interface PgTypedExecutableStep<TCodec extends PgCodec>
-  extends ExecutableStep<any> {
+  extends ExecutableStep {
   pgCodec: TCodec;
 }
 

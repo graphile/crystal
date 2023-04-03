@@ -168,7 +168,7 @@ type PgSelectPlaceholder = {
 
 export type PgSelectIdentifierSpec =
   | {
-      step: ExecutableStep<any>;
+      step: ExecutableStep;
       codec: PgCodec;
       matches: (alias: SQL) => SQL;
     }
@@ -180,7 +180,7 @@ export type PgSelectIdentifierSpec =
 
 export type PgSelectArgumentSpec =
   | {
-      step: ExecutableStep<any>;
+      step: ExecutableStep;
       pgCodec: PgCodec<any, any, any, any>;
       name?: string;
     }
@@ -805,9 +805,9 @@ export class PgSelectStep<
   }
 
   public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
-  public placeholder($step: ExecutableStep<any>, codec: PgCodec): SQL;
+  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep<any> | PgTypedExecutableStep<PgCodec>,
+    $step: ExecutableStep | PgTypedExecutableStep<PgCodec>,
     overrideCodec?: PgCodec,
   ): SQL {
     if (this.locker.locked) {
@@ -2449,7 +2449,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     ) {
       // Inline ourself into our parent if we can.
       let t: PgSelectStep<PgResourceAny> | null | undefined = undefined;
-      let p: ExecutableStep<any> | undefined = undefined;
+      let p: ExecutableStep | undefined = undefined;
       for (
         let dependencyIndex = 0, l = this.dependencies.length;
         dependencyIndex < l;

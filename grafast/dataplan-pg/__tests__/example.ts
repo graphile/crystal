@@ -48,7 +48,7 @@ const schema = makeExampleSchema();
   +--------------------------------------------------------------------------+*/
 
 /*
-class ConnectionStep<TSubplan extends ExecutableStep<any>> extends ExecutableStep<Opaque<any>> {
+class ConnectionStep<TSubplan extends ExecutableStep> extends ExecutableStep<Opaque<any>> {
   constructor(public readonly subplan: TSubplan) {
     super();
   }

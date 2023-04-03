@@ -10,7 +10,7 @@ import { PgUpdateStep } from "./steps/pgUpdate.js";
 export function assertPgClassSingleStep<
   TResource extends PgResource<any, any, any, any, any>,
 >(
-  step: ExecutableStep<any> | PgClassSingleStep<TResource>,
+  step: ExecutableStep | PgClassSingleStep<TResource>,
 ): asserts step is PgClassSingleStep<TResource> {
   if (
     !(

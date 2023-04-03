@@ -44,7 +44,7 @@ export interface ListTransformOptions<
     TMemo,
     TDepsStep extends ExecutableStep<infer U> ? U : never
   >;
-  listItem?(itemPlan: ExecutableStep<any>): TItemStep;
+  listItem?(itemPlan: ExecutableStep): TItemStep;
   finalizeCallback?(data: TMemo): TMemo;
   meta?: string;
   optimize?: (

@@ -614,7 +614,7 @@ ${te.join(
         throw new SafeError("Failed to setup subscription");
       }
       const stepOptions: StepOptions = {
-        stream: isStreamableStep(subscribeStep as ExecutableStep<any>)
+        stream: isStreamableStep(subscribeStep as ExecutableStep)
           ? { initialCount: 0 }
           : null,
       };
@@ -712,7 +712,7 @@ ${te.join(
         },
       );
       const stepOptions: StepOptions = {
-        stream: isStreamableStep(subscribeStep as ExecutableStep<any>)
+        stream: isStreamableStep(subscribeStep as ExecutableStep)
           ? { initialCount: 0 }
           : null,
       };
@@ -1605,7 +1605,7 @@ ${te.join(
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
     deduplicate = true,
-  ): { haltTree: boolean; step: ExecutableStep<any> } {
+  ): { haltTree: boolean; step: ExecutableStep } {
     // The step may have been de-duped whilst sibling steps were planned
     // PERF: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
@@ -1661,7 +1661,7 @@ ${te.join(
         stream:
           !haltTree &&
           streamDirective &&
-          isStreamableStep(step as ExecutableStep<any>)
+          isStreamableStep(step as ExecutableStep)
             ? {
                 initialCount:
                   Number(
@@ -1856,7 +1856,7 @@ ${te.join(
     actionDescription: string,
     fromStepId: number,
     order: "dependents-first" | "dependencies-first",
-    callback: (plan: ExecutableStep<any>) => ExecutableStep<any>,
+    callback: (plan: ExecutableStep) => ExecutableStep,
   ): void {
     if (fromStepId === this.stepTracker.stepCount) {
       // Nothing to do since there are no plans to process
@@ -2997,7 +2997,7 @@ ${te.join(
 }
 
 function makeDefaultPlan(fieldName: string) {
-  return ($step: ExecutableStep<any>) => access($step, [fieldName]);
+  return ($step: ExecutableStep) => access($step, [fieldName]);
 }
 function isMaybeAPeer(
   step: ExecutableStep,

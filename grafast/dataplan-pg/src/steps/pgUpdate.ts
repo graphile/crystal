@@ -117,7 +117,7 @@ export class PgUpdateStep<
       GetPgResourceUniques<TResource>
     >,
     columns?: {
-      [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep<any>; // | PgTypedExecutableStep<TColumns[key]["codec"]>
+      [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TColumns[key]["codec"]>
     },
   ) {
     super();
@@ -169,7 +169,7 @@ export class PgUpdateStep<
         if (value) {
           this.set(
             key as keyof GetPgResourceColumns<TResource>,
-            value as ExecutableStep<any>,
+            value as ExecutableStep,
           );
         }
       });
@@ -178,7 +178,7 @@ export class PgUpdateStep<
 
   set<TKey extends keyof GetPgResourceColumns<TResource>>(
     name: TKey,
-    value: ExecutableStep<any>, // | PgTypedExecutableStep<TColumns[TKey]["codec"]>
+    value: ExecutableStep, // | PgTypedExecutableStep<TColumns[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -445,7 +445,7 @@ export function pgUpdate<TResource extends PgResource<any, any, any, any>>(
     GetPgResourceUniques<TResource>
   >,
   columns?: {
-    [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep<any>; // | PgTypedExecutableStep<TColumns[key]["codec"]>
+    [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TColumns[key]["codec"]>
   },
 ): PgUpdateStep<TResource> {
   return new PgUpdateStep(resource, getBy, columns);

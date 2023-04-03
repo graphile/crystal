@@ -115,7 +115,7 @@ export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
     columns?: {
       [key in keyof GetPgResourceColumns<TResource>]?:
         | PgTypedExecutableStep<GetPgResourceColumns<TResource>[key]["codec"]>
-        | ExecutableStep<any>;
+        | ExecutableStep;
     },
   ) {
     super();
@@ -129,7 +129,7 @@ export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
         if (value) {
           this.set(
             key as keyof GetPgResourceColumns<TResource>,
-            value as ExecutableStep<any>,
+            value as ExecutableStep,
           );
         }
       });
@@ -138,7 +138,7 @@ export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
 
   set<TKey extends keyof GetPgResourceColumns<TResource>>(
     name: TKey,
-    value: ExecutableStep<any>, // | PgTypedExecutableStep<TColumns[TKey]["codec"]>
+    value: ExecutableStep, // | PgTypedExecutableStep<TColumns[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -166,7 +166,7 @@ export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
   setPlan(): SetterStep<
     {
       [key in keyof GetPgResourceColumns<TResource> &
-        string]: ExecutableStep<any>;
+        string]: ExecutableStep;
     },
     this
   > {
@@ -401,7 +401,7 @@ export function pgInsert<TResource extends PgResource<any, any, any, any, any>>(
   columns?: {
     [key in keyof GetPgResourceColumns<TResource>]?:
       | PgTypedExecutableStep<GetPgResourceColumns<TResource>[key]["codec"]>
-      | ExecutableStep<any>;
+      | ExecutableStep;
   },
 ): PgInsertStep<TResource> {
   return new PgInsertStep(resource, columns);

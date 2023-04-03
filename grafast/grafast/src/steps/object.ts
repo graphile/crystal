@@ -12,18 +12,18 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 // const debugObjectPlan = debugFactory("grafast:ObjectStep");
 // const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
-type DataFromStep<TStep extends ExecutableStep<any>> =
+type DataFromStep<TStep extends ExecutableStep> =
   TStep extends ExecutableStep<infer TData> ? TData : never;
 
-type DataFromPlans<TPlans extends { [key: string]: ExecutableStep<any> }> = {
+type DataFromPlans<TPlans extends { [key: string]: ExecutableStep }> = {
   [key in keyof TPlans]: DataFromStep<TPlans[key]>;
 };
-type Results<TPlans extends { [key: string]: ExecutableStep<any> }> = Array<
+type Results<TPlans extends { [key: string]: ExecutableStep }> = Array<
   [Array<DataFromPlans<TPlans>[keyof TPlans]>, DataFromPlans<TPlans>]
 >;
 
 export interface ObjectPlanMeta<
-  TPlans extends { [key: string]: ExecutableStep<any> },
+  TPlans extends { [key: string]: ExecutableStep },
 > {
   results: Results<TPlans>;
 }
@@ -33,8 +33,8 @@ export interface ObjectPlanMeta<
  * the results of the associated plans.
  */
 export class ObjectStep<
-    TPlans extends { [key: string]: ExecutableStep<any> } = {
-      [key: string]: ExecutableStep<any>;
+    TPlans extends { [key: string]: ExecutableStep } = {
+      [key: string]: ExecutableStep;
     },
   >
   extends UnbatchedExecutableStep<DataFromPlans<TPlans>>
@@ -235,7 +235,7 @@ ${inner}
  * A plan that represents an object using the keys given and the values being
  * the results of the associated plans.
  */
-export function object<TPlans extends { [key: string]: ExecutableStep<any> }>(
+export function object<TPlans extends { [key: string]: ExecutableStep }>(
   obj: TPlans,
 ): ObjectStep<TPlans> {
   return new ObjectStep<TPlans>(obj);

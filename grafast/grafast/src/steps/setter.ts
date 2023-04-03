@@ -3,7 +3,7 @@ import { ModifierStep } from "../step.js";
 
 export interface SetterCapableStep<
   TPlans extends {
-    [key: string]: ExecutableStep<any>;
+    [key: string]: ExecutableStep;
   },
 > extends BaseStep {
   set<TKey extends keyof TPlans>(key: TKey, value: TPlans[TKey]): void;
@@ -11,9 +11,9 @@ export interface SetterCapableStep<
 
 export class SetterStep<
   TPlans extends {
-    [key: string]: ExecutableStep<any>;
+    [key: string]: ExecutableStep;
   } = {
-    [key: string]: ExecutableStep<any>;
+    [key: string]: ExecutableStep;
   },
   TParentStep extends SetterCapableStep<TPlans> = SetterCapableStep<TPlans>,
 > extends ModifierStep<TParentStep> {
@@ -41,9 +41,9 @@ export class SetterStep<
 
 export function setter<
   TPlans extends {
-    [key: string]: ExecutableStep<any>;
+    [key: string]: ExecutableStep;
   } = {
-    [key: string]: ExecutableStep<any>;
+    [key: string]: ExecutableStep;
   },
   TParentStep extends SetterCapableStep<TPlans> = SetterCapableStep<TPlans>,
 >($parent: TParentStep) {

@@ -54,7 +54,7 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
  * callback. Note: if you need to pass more than one value, pass a `ListStep`
  * as the `$plan` argument.
  */
-function lambda<const TIn extends readonly ExecutableStep<any>[], TOut>(
+function lambda<const TIn extends readonly ExecutableStep[], TOut>(
   plans: TIn,
   fn: (value: UnwrapPlanTuple<TIn>) => PromiseOrDirect<TOut>,
   isSyncAndSafe?: boolean,

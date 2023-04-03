@@ -211,7 +211,7 @@ export class PgUnionAllSingleStep
   private typeKey: number | null;
   private pkKey: number | null;
   private readonly spec: PgUnionAllStepConfig<string, string>;
-  constructor($parent: PgUnionAllStep<any, any>, $item: ExecutableStep<any>) {
+  constructor($parent: PgUnionAllStep<any, any>, $item: ExecutableStep) {
     super();
     this.addDependency($item);
     this.spec = $parent.spec;
@@ -224,7 +224,7 @@ export class PgUnionAllSingleStep
     }
   }
 
-  planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep<any> {
+  planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep {
     if (this.pkKey === null || this.typeKey === null) {
       throw new Error(
         `${this} not polymorphic because parent isn't in normal mode`,
@@ -970,9 +970,9 @@ on (${sql.indent(
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep<any>, codec: PgCodec): SQL;
+  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
+    $step: ExecutableStep | PgTypedExecutableStep<any>,
     overrideCodec?: PgCodec,
   ): SQL {
     if (this.locker.locked) {

@@ -97,7 +97,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (codec, handler, lambda, nodeIdFieldName, specForHandler) =>
                     function plan(
-                      _$parent: ExecutableStep<any>,
+                      _$parent: ExecutableStep,
                       args: FieldArgs,
                     ) {
                       const $decoded = lambda(

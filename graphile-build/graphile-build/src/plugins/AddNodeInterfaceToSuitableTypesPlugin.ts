@@ -82,7 +82,7 @@ export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
               type: new GraphQLNonNull(GraphQLID),
               plan: EXPORTABLE(
                 (handler, lambda, nodeIdCodecs) =>
-                  ($parent: ExecutableStep<any>) => {
+                  ($parent: ExecutableStep) => {
                     const specifier = handler.plan($parent);
                     return lambda(
                       specifier,

@@ -28,7 +28,7 @@ export interface PgPolymorphicTypeMap<
 > {
   [typeName: string]: {
     match(specifier: TTypeSpecifier): boolean;
-    plan($specifier: TTypeSpecifierStep, $item: TItemStep): ExecutableStep<any>;
+    plan($specifier: TTypeSpecifierStep, $item: TItemStep): ExecutableStep;
   };
 }
 

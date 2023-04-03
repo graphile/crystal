@@ -32,7 +32,7 @@ import { object } from "./steps/object.js";
 
 export function withFieldArgsForArguments<
   T extends ExecutableStep,
-  TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TParentStep extends ExecutableStep = ExecutableStep,
 >(
   operationPlan: OperationPlan,
   parentPlan: TParentStep,

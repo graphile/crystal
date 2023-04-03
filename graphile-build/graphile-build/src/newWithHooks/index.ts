@@ -56,8 +56,8 @@ export type NewWithHooksFunction = <
   spec: SpecForType<TType>,
   scope: ScopeForType<TType>,
   Step?:
-    | ((step: ExecutableStep<any>) => asserts step is ExecutableStep<any>)
-    | { new (...args: any[]): ExecutableStep<any> }
+    | ((step: ExecutableStep) => asserts step is ExecutableStep)
+    | { new (...args: any[]): ExecutableStep }
     | null,
 ) => TType;
 
@@ -178,7 +178,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
                 TContext extends Grafast.Context,
-                TParentStep extends ExecutableStep<any>,
+                TParentStep extends ExecutableStep,
                 TFieldStep extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
               >(

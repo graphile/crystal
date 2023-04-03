@@ -26,7 +26,7 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
     return $dep.toString();
   }
   // Publicly expose this
-  public addDependency(step: ExecutableStep<any>): number {
+  public addDependency(step: ExecutableStep): number {
     return super.addDependency(step);
   }
   execute(values: [GrafastValuesList<T>]): GrafastResultsList<T> {
