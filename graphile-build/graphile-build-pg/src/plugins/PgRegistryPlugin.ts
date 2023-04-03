@@ -1,3 +1,4 @@
+/* eslint-disable graphile-export/export-instances */
 import type { PgRegistry, PgRegistryBuilder } from "@dataplan/pg";
 import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";

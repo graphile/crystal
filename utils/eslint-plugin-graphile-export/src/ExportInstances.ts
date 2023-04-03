@@ -12,8 +12,6 @@ const KNOWN_IMPORTS: Array<[string, string]> = [
   ["@dataplan/pg", "PgResource"],
   ["@dataplan/pg", "PgExecutor"],
   ["@dataplan/pg", "recordCodec"],
-  ["@dataplan/pg", "listOfCodec"],
-  ["@dataplan/pg", "rangeOfCodec"],
   ["@dataplan/pg", "makeRegistry"],
   ["@dataplan/pg", "makeRegistryBuilder"],
 ];
