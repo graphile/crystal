@@ -382,7 +382,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           PgCodecWithColumns,
           PgResourceOptions<any, PgCodecWithColumns, any, any>
         > = {
-          localCodec,
+          localCodec: localCodec as PgCodecWithColumns,
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
           remoteResourceOptions: foreignResourceOptions as PgResourceOptions<

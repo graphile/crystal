@@ -315,7 +315,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 databaseName,
                 pgRelatedClass._id,
               );
-              if (!otherCodec) {
+              if (!otherCodec || !otherCodec.columns) {
                 continue;
               }
               const pk = pgRelatedClass

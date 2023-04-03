@@ -256,6 +256,16 @@ export type PgCodecWithColumns<
   TColumns extends PgCodecAttributes = PgCodecAttributes,
 > = PgCodec<any, TColumns, any, any, undefined, any, undefined>;
 
+export type PgCodecAnyScalar = PgCodec<
+  string,
+  undefined,
+  any,
+  any,
+  undefined,
+  any,
+  any
+>;
+
 export type PgEnumValue<TValue extends string = string> = {
   value: TValue;
   description?: string;
