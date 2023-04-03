@@ -50,7 +50,7 @@ declare global {
        */
       _joinColumnNames(
         this: GraphileBuild.Inflection,
-        codec: PgCodec<any, any, any, any, any, any, any>,
+        codec: PgCodecWithColumns,
         names: readonly string[],
       ): string;
 

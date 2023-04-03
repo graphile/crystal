@@ -36,7 +36,7 @@ declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
       registry: PgRegistry<any, any, any>;
-      codec: PgCodec;
+      codec: PgCodecWithColumns;
       relationName: string;
     }
 
@@ -668,7 +668,7 @@ function addRelations(
     allPgResources.find((s) => s.codec === codec && !s.parameters) ??
     allPgResources.find((s) => s.codec === codec && s.isUnique)) as PgResource<
     any,
-    PgCodec,
+    PgCodecWithColumns,
     any,
     any,
     any
@@ -680,10 +680,7 @@ function addRelations(
     return fields;
   }
   const relations: {
-    [identifier: string]: PgCodecRelation<
-      PgCodecWithColumns,
-      PgResource<any, PgCodecWithColumns, any, any, any>
-    >;
+    [identifier: string]: PgCodecRelation;
   } = resource?.getRelations() ?? Object.create(null);
 
   // Don't use refs on mutation payloads

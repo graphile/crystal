@@ -511,8 +511,14 @@ export interface PgCodecRelationConfig<
  * Describes a relation from a codec to a resource
  */
 export interface PgCodecRelation<
-  TLocalCodec extends PgCodec = PgCodec,
-  TRemoteResource extends PgResource = PgResource,
+  TLocalCodec extends PgCodecWithColumns = PgCodecWithColumns,
+  TRemoteResource extends PgResource<
+    any,
+    PgCodecWithColumns,
+    any,
+    any,
+    any
+  > = PgResource<any, PgCodecWithColumns, any, any, any>,
 > extends PgCodecRelationBase<
     TLocalCodec,
     TRemoteResource extends PgResource<
