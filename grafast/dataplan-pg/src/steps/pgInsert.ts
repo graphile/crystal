@@ -113,7 +113,9 @@ export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
   constructor(
     resource: TResource,
     columns?: {
-      [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep<any>; // PgTypedExecutableStep<TColumns[key]["codec"]> |
+      [key in keyof GetPgResourceColumns<TResource>]?:
+        | PgTypedExecutableStep<GetPgResourceColumns<TResource>[key]["codec"]>
+        | ExecutableStep<any>;
     },
   ) {
     super();
@@ -398,14 +400,7 @@ export function pgInsert<TResource extends PgResource<any, any, any, any, any>>(
   resource: TResource,
   columns?: {
     [key in keyof GetPgResourceColumns<TResource>]?:
-      | PgTypedExecutableStep<
-          GetPgResourceColumns<TResource>[key] extends PgCodecAttribute<
-            infer UCodec,
-            any
-          >
-            ? UCodec
-            : never
-        >
+      | PgTypedExecutableStep<GetPgResourceColumns<TResource>[key]["codec"]>
       | ExecutableStep<any>;
   },
 ): PgInsertStep<TResource> {
