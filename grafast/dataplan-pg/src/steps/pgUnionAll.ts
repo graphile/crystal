@@ -1453,10 +1453,10 @@ and ${condition(i + 1)}`}
           alias: tableAlias,
           conditions,
           orders,
-          finalResource: finalSource,
+          finalResource,
         } = digest;
 
-        const pk = finalSource.uniques?.find((u) => u.isPrimary === true);
+        const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
         if (!pk) {
           throw new Error(
             `No PK for ${digest.member.typeName} resource in ${this}`,
@@ -1512,7 +1512,7 @@ and ${condition(i + 1)}`}
                     orderSpec,
                     digest.finalResource.codec,
                   );
-                  return [frag, codec as PgCodec];
+                  return [frag, codec];
                 }
                 default: {
                   const never: never = s;
@@ -1548,7 +1548,7 @@ ${sql.indent`${
           const [frag] = getFragmentAndCodecFromOrder(
             tableAlias,
             orderSpec,
-            finalSource.codec,
+            finalResource.codec,
           );
           return sql`${frag} ${
             Number(orderSpec.direction === "DESC") ^ Number(reverse)
