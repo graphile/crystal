@@ -150,7 +150,9 @@ return function (resource) {
                                 detailsByColumnName[columnName].graphqlName,
                               );
                             }
-                            return resource.get(spec);
+                            return (
+                              resource as PgResource<any, any, any, any, any>
+                            ).get(spec);
                           },
                         [detailsByColumnName, resource],
                       );

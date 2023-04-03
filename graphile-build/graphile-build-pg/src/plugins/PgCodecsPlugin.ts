@@ -893,7 +893,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           }
         }
         if (build.input.pgRegistry.pgCodecs) {
-          for (const codec of Object.values(build.input.pgRegistry.pgCodecs)) {
+          for (const codec of Object.values(
+            build.input.pgRegistry.pgCodecs,
+          ) as PgCodec[]) {
             walkCodec(codec);
           }
         }

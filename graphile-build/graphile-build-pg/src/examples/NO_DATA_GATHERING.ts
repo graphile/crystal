@@ -95,7 +95,7 @@ async function main() {
     },
   ]);
 
-  const registry = EXPORTABLE(
+  const pgRegistry = EXPORTABLE(
     (
       TYPES,
       executor,
@@ -400,9 +400,7 @@ async function main() {
   );
 
   // We're crafting our own input
-  const input: GraphileBuild.BuildInput = {
-    pgRegistry: registry as unknown as PgRegistryAny,
-  };
+  const input: GraphileBuild.BuildInput = { pgRegistry };
   const schema = buildSchema(config, input);
 
   // Output our schema

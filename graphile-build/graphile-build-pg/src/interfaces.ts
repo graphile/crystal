@@ -3,6 +3,7 @@ import type {
   PgCodecAttributes,
   PgCodecRelationConfig,
   PgCodecWithColumns,
+  PgRegistry,
   PgRegistryAny,
   PgResourceOptions,
   WithPgClient,
@@ -123,7 +124,7 @@ declare global {
       };
     }
     interface BuildInput {
-      pgRegistry: PgRegistryAny;
+      pgRegistry: PgRegistry<any, any, any>;
     }
   }
 }
