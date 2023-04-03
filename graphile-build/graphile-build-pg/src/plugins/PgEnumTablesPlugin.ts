@@ -1,4 +1,4 @@
-import type { PgCodec, PgEnumValue } from "@dataplan/pg";
+import type { PgCodec, PgEnumCodec, PgEnumValue } from "@dataplan/pg";
 import { enumCodec } from "@dataplan/pg";
 import type {
   Introspection,
@@ -44,8 +44,8 @@ declare global {
 }
 
 interface State {
-  codecByPgConstraint: Map<PgConstraint, PgCodec<any, any, any, any>>;
-  codecByPgAttribute: Map<PgAttribute, PgCodec<any, any, any, any>>;
+  codecByPgConstraint: Map<PgConstraint, PgEnumCodec>;
+  codecByPgAttribute: Map<PgAttribute, PgEnumCodec>;
 }
 interface Cache {}
 

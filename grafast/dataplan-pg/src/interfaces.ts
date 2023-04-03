@@ -286,8 +286,10 @@ export type PgEnumValue<TValue extends string = string> = {
 /**
  * A PgCodec specifically for enums
  */
-export interface PgEnumCodec<TName extends string, TValue extends string>
-  extends PgCodec<
+export interface PgEnumCodec<
+  TName extends string = string,
+  TValue extends string = string,
+> extends PgCodec<
     TName,
     undefined,
     string,
