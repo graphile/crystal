@@ -3,7 +3,6 @@ import { exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgCodecAttribute } from "../codecs.js";
 import type { PgResource } from "../datasource.js";
 import type {
   GetPgCodecColumns,

@@ -5,11 +5,7 @@
  * data sources (hence the "no data gathering" - we skip the gather phase).
  */
 
-import type {
-  PgExecutorContextPlans,
-  PgRegistryAny,
-  WithPgClient,
-} from "@dataplan/pg";
+import type { PgExecutorContextPlans, WithPgClient } from "@dataplan/pg";
 import {
   makePgResourceOptions,
   makeRegistryBuilder,

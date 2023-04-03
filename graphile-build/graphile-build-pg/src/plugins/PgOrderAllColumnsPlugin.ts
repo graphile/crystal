@@ -2,9 +2,7 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgCodec,
   PgCodecAttribute,
-  PgCodecAttributes,
   PgCodecWithColumns,
   PgResourceUnique,
 } from "@dataplan/pg";

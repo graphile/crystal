@@ -2,9 +2,9 @@ import "./interfaces.js";
 
 import type {
   PgCodecExtensions,
+  PgCodecRefExtensions,
   PgCodecRelationExtensions,
   PgResourceExtensions,
-  PgCodecRefExtensions,
 } from "@dataplan/pg";
 import { isDev } from "grafast";
 import { inspect } from "util";

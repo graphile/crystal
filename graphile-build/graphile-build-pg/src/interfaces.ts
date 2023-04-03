@@ -4,7 +4,6 @@ import type {
   PgCodecRelationConfig,
   PgCodecWithColumns,
   PgRegistry,
-  PgRegistryAny,
   PgResourceOptions,
   WithPgClient,
 } from "@dataplan/pg";

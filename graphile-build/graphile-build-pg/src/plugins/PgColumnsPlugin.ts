@@ -6,7 +6,6 @@ import "graphile-config";
 import type {
   PgClassExpressionStep,
   PgCodec,
-  PgCodecAnyScalar,
   PgCodecAttribute,
   PgCodecAttributes,
   PgCodecList,
