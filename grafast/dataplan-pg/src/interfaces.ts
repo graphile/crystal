@@ -69,7 +69,7 @@ export interface PgCodecExtensions {
 }
 
 export interface PgCodecPolymorphismSingleTypeColumnSpec<
-  TColumnName extends string,
+  TColumnName extends string = string,
 > {
   column: TColumnName;
   isNotNull?: boolean;
@@ -81,7 +81,9 @@ export interface PgCodecPolymorphismSingleTypeSpec<TColumnName extends string> {
   // TODO: make this optional?
   columns: Array<PgCodecPolymorphismSingleTypeColumnSpec<TColumnName>>;
 }
-export interface PgCodecPolymorphismSingle<TColumnName extends string> {
+export interface PgCodecPolymorphismSingle<
+  TColumnName extends string = string,
+> {
   mode: "single";
   typeColumns: readonly TColumnName[];
   // TODO: make this optional?
@@ -99,7 +101,9 @@ export interface PgCodecPolymorphismRelationalTypeSpec {
   relationName: string;
   // Currently assumes it's joined via PK, but we might expand that in future
 }
-export interface PgCodecPolymorphismRelational<TColumnName extends string> {
+export interface PgCodecPolymorphismRelational<
+  TColumnName extends string = string,
+> {
   mode: "relational";
   typeColumns: readonly TColumnName[];
   types: {

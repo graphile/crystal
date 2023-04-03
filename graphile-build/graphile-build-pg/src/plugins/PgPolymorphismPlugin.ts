@@ -46,7 +46,7 @@ declare global {
   }
   namespace GraphileBuild {
     interface ScopeInterface {
-      pgCodec?: PgCodec<any, any, any, any>;
+      pgCodec?: PgCodec<any, any, any, any, any, any, any>;
       isPgPolymorphicTableType?: boolean;
       pgPolymorphism?: PgCodecPolymorphism<string>;
     }
@@ -55,7 +55,7 @@ declare global {
       pgPolymorphicSingleTableType?: {
         typeIdentifier: string;
         name: string;
-        columns: ReadonlyArray<PgCodecPolymorphismSingleTypeColumnSpec<any>>;
+        columns: ReadonlyArray<PgCodecPolymorphismSingleTypeColumnSpec>;
       };
       pgPolymorphicRelationalType?: {
         typeIdentifier: string;
@@ -65,9 +65,7 @@ declare global {
   }
 }
 
-function parseColumn(
-  colSpec: string,
-): PgCodecPolymorphismSingleTypeColumnSpec<any> {
+function parseColumn(colSpec: string): PgCodecPolymorphismSingleTypeColumnSpec {
   let spec = colSpec;
   let isNotNull = false;
   if (spec.endsWith("!")) {
@@ -132,7 +130,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 .filter((a) => a.attnum >= 1)
                 .map((a) => a.attname);
 
-              const types: PgCodecPolymorphismSingle<any>["types"] =
+              const types: PgCodecPolymorphismSingle["types"] =
                 Object.create(null);
               const specificColumns = new Set<string>();
               for (const typeTag of typeTags) {
@@ -179,7 +177,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 ? rawTypeTags.map((t) => String(t))
                 : [String(rawTypeTags)];
 
-              const types: PgCodecPolymorphismRelational<any>["types"] =
+              const types: PgCodecPolymorphismRelational["types"] =
                 Object.create(null);
               for (const typeTag of typeTags) {
                 const {

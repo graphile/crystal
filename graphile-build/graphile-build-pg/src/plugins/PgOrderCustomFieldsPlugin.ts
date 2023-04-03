@@ -106,7 +106,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                       graphile: {
                         applyPlan: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
-                            (step: PgSelectStep<any>) => {
+                            (step: PgSelectStep) => {
                               if (typeof pgFieldSource.source !== "function") {
                                 throw new Error(
                                   "Invalid computed column source",
