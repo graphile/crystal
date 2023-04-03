@@ -897,9 +897,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           }
         }
 
-        // TODO: find a better word than 'realm'... or at least define it
-        // somewhere.
-
         // Ensure all sources are uniquely named
         const knownCodecByName = new Map<string, PgCodec>();
         for (const codec of build.allPgCodecs) {
@@ -916,7 +913,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               second: codec,
             });
             throw new Error(
-              `Two different codecs were created with the same name '${codec.name}'; please ensure all codec names are unique. If you are creating codecs from multiple realms, consider prefixing the codec names with the realm name.`,
+              `Two different codecs were created with the same name '${codec.name}'; please ensure all codec names are unique. If you are creating codecs from multiple data sources, consider prefixing the codec names with the data source's name.`,
             );
           } else {
             knownCodecByName.set(codec.name, codec);
@@ -939,7 +936,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               second: resource,
             });
             throw new Error(
-              "Two different resources were created with the same name; please ensure all source names are unique. If you are creating resources from multiple realms, consider prefixing the source names with the realm name.",
+              "Two different resources were created with the same name; please ensure all source names are unique. If you are creating resources from multiple data sources, consider prefixing the source names with the data source's name.",
             );
           } else {
             knownResourceByName.set(resource.name, resource);
