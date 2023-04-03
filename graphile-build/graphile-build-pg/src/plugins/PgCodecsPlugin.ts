@@ -816,9 +816,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         // If we get errors from the frozen object then clearly we need to
         // ensure more work has completed before continuing - call other plugin
         // helpers and wait for their events.
-        for (const codecByTypeId of Object.freeze(
-          info.state.codecByTypeIdByDatabaseName.values(),
-        )) {
+        for (const codecByTypeId of info.state.codecByTypeIdByDatabaseName.values()) {
           for (const codecPromise of codecByTypeId.values()) {
             const codec = await codecPromise;
             if (codec) {
