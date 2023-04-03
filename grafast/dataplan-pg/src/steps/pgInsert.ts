@@ -149,9 +149,7 @@ export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
       }
     }
     const column = (
-      this.resource.codec.columns as NonNullable<
-        GetPgResourceColumns<TResource>
-      >
+      this.resource.codec.columns as GetPgResourceColumns<TResource>
     )?.[name];
     if (!column) {
       throw new Error(
