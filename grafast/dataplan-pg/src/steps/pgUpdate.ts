@@ -40,7 +40,7 @@ interface PgUpdatePlanFinalizeResults {
  * Update a single row identified by the 'getBy' argument.
  */
 export class PgUpdateStep<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
 > extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",

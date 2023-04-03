@@ -2876,9 +2876,9 @@ function ensureOrderIsUnique(step: PgSelectStep<any>) {
   }
 }
 
-export function pgSelect<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
->(options: PgSelectOptions<TResource>): PgSelectStep<TResource> {
+export function pgSelect<TResource extends PgResource<any, any, any, any, any>>(
+  options: PgSelectOptions<TResource>,
+): PgSelectStep<TResource> {
   return new PgSelectStep(options);
 }
 exportAs("@dataplan/pg", pgSelect, "pgSelect");
@@ -2887,7 +2887,7 @@ exportAs("@dataplan/pg", pgSelect, "pgSelect");
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
  */
 export function pgSelectFromRecords<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any>,
 >(
   resource: TResource,
   records: PgClassExpressionStep<

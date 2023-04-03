@@ -610,7 +610,7 @@ export function pgSelectFromRecord<
     any,
     any,
     PgRegistryAny
-  > = PgResource,
+  >,
 >(
   resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
@@ -629,7 +629,7 @@ export function pgSelectFromRecord<
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
 export function pgSelectSingleFromRecord<
-  TResource extends PgResource<any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any>,
 >(
   resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,

@@ -325,9 +325,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result:
-                                        | PgUpdateStep<any>
-                                        | PgDeleteStep<any>;
+                                      result: PgUpdateStep | PgDeleteStep;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -524,7 +522,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgUpdateStep<any>;
+                                      result: PgUpdateStep;
                                     }>,
                                   ) {
                                     const $record =
@@ -757,9 +755,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 function plan(
                                   _: any,
                                   $object: ObjectStep<{
-                                    result:
-                                      | PgUpdateStep<any>
-                                      | PgDeleteStep<any>;
+                                    result: PgUpdateStep | PgDeleteStep;
                                   }>,
                                 ) {
                                   return $object;

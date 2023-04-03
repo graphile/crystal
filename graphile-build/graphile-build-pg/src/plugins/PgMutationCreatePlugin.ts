@@ -126,7 +126,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgInsertStep<any>;
+                                      result: PgInsertStep;
                                     }>,
                                   ) {
                                     const $record =
@@ -200,7 +200,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgInsertStep<any>;
+                                      result: PgInsertStep;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -267,7 +267,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                             function plan(
                               _: any,
                               $object: ObjectStep<{
-                                result: PgInsertStep<any>;
+                                result: PgInsertStep;
                               }>,
                             ) {
                               return $object;

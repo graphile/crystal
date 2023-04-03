@@ -41,7 +41,9 @@ interface PgInsertPlanFinalizeResults {
 /**
  * Inserts a row into resource with the given specified column values.
  */
-export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
+export class PgInsertStep<
+    TResource extends PgResource<any, any, any, any, any> = PgResource,
+  >
   extends ExecutableStep<
     unknown[] // tuple depending on what's selected
   >
@@ -165,8 +167,7 @@ export class PgInsertStep<TResource extends PgResource<any, any, any, any, any>>
 
   setPlan(): SetterStep<
     {
-      [key in keyof GetPgResourceColumns<TResource> &
-        string]: ExecutableStep;
+      [key in keyof GetPgResourceColumns<TResource> & string]: ExecutableStep;
     },
     this
   > {

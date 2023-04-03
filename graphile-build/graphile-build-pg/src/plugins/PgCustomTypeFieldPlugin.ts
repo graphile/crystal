@@ -233,11 +233,7 @@ function defaultProcSourceBehavior(
 
 function hasRecord(
   $row: ExecutableStep,
-): $row is
-  | PgSelectSingleStep<any>
-  | PgInsertStep<any>
-  | PgUpdateStep<any>
-  | PgDeleteStep<any> {
+): $row is PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep {
   return "record" in $row && typeof ($row as any).record === "function";
 }
 
