@@ -364,10 +364,7 @@ export type PlanByUniques<
 
 export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
   alias: SQL;
-  placeholder(
-    $step: ExecutableStep,
-    codec: PgCodec<string, any, any, any, any>,
-  ): SQL;
+  placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   where(condition: SQL): void;
   having(condition: SQL): void;
 };
@@ -456,17 +453,7 @@ export interface PgCodecRelationBase<
   /**
    * The columns locally used in this relationship.
    */
-  localColumns: TLocalCodec extends PgCodec<
-    any,
-    infer UColumns,
-    any,
-    any,
-    any,
-    any,
-    any
-  >
-    ? readonly (keyof UColumns)[]
-    : never;
+  localColumns: readonly (keyof TLocalCodec["columns"])[];
 
   /**
    * The remote columns that are joined against.
@@ -495,12 +482,7 @@ export interface PgCodecRelationBase<
 
 export interface PgCodecRelationConfig<
   TLocalCodec extends PgCodec = PgCodec,
-  TRemoteResourceOptions extends PgResourceOptions<
-    any,
-    any,
-    any,
-    any
-  > = PgResourceOptions<any, any, any, any>,
+  TRemoteResourceOptions extends PgResourceOptions = PgResourceOptions,
 > extends PgCodecRelationBase<
     TLocalCodec,
     TRemoteResourceOptions extends PgResourceOptions<
