@@ -6,7 +6,6 @@ import "./PgTablesPlugin.js";
 
 import type {
   PgCodec,
-  PgCodecAttribute,
   PgCodecExtensions,
   PgCodecPolymorphism,
   PgCodecPolymorphismRelational,
