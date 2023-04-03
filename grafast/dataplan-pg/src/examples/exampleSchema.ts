@@ -1599,13 +1599,17 @@ export function makeExampleSchema(
     [makeRegistry, registryConfig],
   );
 
-  {
+  if (Math.random() > 2) {
     /*
      * This block includes a rudimentary TypeScript types test - we get a
      * person by id, follow the relationship to their posts, grab one of these,
      * then grab its id. This id should be an int4, we want to ensure that it's
      * assignable to 'int4' and NOT assignable to 'text' (i.e. not `string` or
      * `any`).
+     *
+     * NOTE: this code would throw errors if you actually try and run it
+     * because it's not being ran as part of a Grafast planning context - hence
+     * the `if`.
      */
     const $person = registry.pgResources.people.get({ person_id: constant(1) });
     const $posts = $person.manyRelation("posts");
