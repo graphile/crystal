@@ -489,7 +489,7 @@ function makeRelationPlans(
     : null;
 
   const specFromRecord = EXPORTABLE(
-    (localColumns, remoteColumns) => ($record: PgSelectSingleStep<any>) => {
+    (localColumns, remoteColumns) => ($record: PgSelectSingleStep) => {
       return remoteColumns.reduce((memo, remoteColumnName, i) => {
         memo[remoteColumnName] = $record.get(localColumns[i] as string);
         return memo;
@@ -498,7 +498,7 @@ function makeRelationPlans(
     [localColumns, remoteColumns],
   );
   type MutationPayload = ObjectStep<{
-    result: PgSelectSingleStep<any>;
+    result: PgSelectSingleStep;
   }>;
 
   const singleRecordPlan =
@@ -523,7 +523,7 @@ return function (otherSource) {
         )
       : EXPORTABLE(
           (otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep<any>) {
+            function plan($record: PgSelectSingleStep) {
               return otherSource.get(specFromRecord($record));
             },
           [otherSource, specFromRecord],
@@ -550,7 +550,7 @@ return function (otherSource) {
         )
       : EXPORTABLE(
           (otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep<any>) {
+            function plan($record: PgSelectSingleStep) {
               return otherSource.find(specFromRecord($record));
             },
           [otherSource, specFromRecord],
@@ -580,7 +580,7 @@ return function (otherSource, connection) {
         )
       : EXPORTABLE(
           (connection, otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep<any>) {
+            function plan($record: PgSelectSingleStep) {
               return connection(otherSource.find(specFromRecord($record)));
             },
           [connection, otherSource, specFromRecord],
@@ -784,7 +784,7 @@ function addRelations(
       const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
         localColumns as string[],
         remoteColumns as string[],
-        remoteResource,
+        remoteResource as PgResource,
         isMutationPayload ?? false,
       );
       const singleRecordFieldName = relation.isReferencee
@@ -985,7 +985,7 @@ function addRelations(
                 );
                 const specFromRecord = EXPORTABLE(
                   (localColumns, remoteColumns) =>
-                    ($record: PgSelectSingleStep<any>) => {
+                    ($record: PgSelectSingleStep) => {
                       return remoteColumns.reduce(
                         (memo, remoteColumnName, i) => {
                           memo[remoteColumnName] = $record.get(
