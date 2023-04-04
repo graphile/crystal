@@ -319,7 +319,10 @@ export class PgUnionAllSingleStep
     return sqlExpr`${fragment}`;
   }
 
-  execute(values: [GrafastValuesList<any>]): GrafastResultsList<any> {
+  execute(
+    _count: number,
+    values: [GrafastValuesList<any>],
+  ): GrafastResultsList<any> {
     if (this.typeKey !== null) {
       const typeKey = this.typeKey;
       return values[0].map((v) => {
@@ -1773,6 +1776,7 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
 
   // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
   async execute(
+    _count: number,
     values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
   ): Promise<GrafastValuesList<any>> {

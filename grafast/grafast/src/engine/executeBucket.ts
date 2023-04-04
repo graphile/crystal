@@ -79,7 +79,6 @@ export function executeBucket(
   const {
     size,
     store,
-    noDepsList,
     layerPlan: { phases, children: childLayerPlans },
   } = bucket;
 
@@ -499,9 +498,9 @@ export function executeBucket(
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     if (step._stepOptions.stream && isStreamableStep(step)) {
-      return step.stream(dependencies, extra, step._stepOptions.stream);
+      return step.stream(size, dependencies, extra, step._stepOptions.stream);
     } else {
-      return step.execute(dependencies, extra);
+      return step.execute(size, dependencies, extra);
     }
   }
 
@@ -567,12 +566,7 @@ export function executeBucket(
 
     // Trim the side-effect dependencies back out again
     const dependencies = sideEffectPlanIdsWithErrors
-      ? dependenciesIncludingSideEffects.slice(
-          0,
-          // There must always be at least one dependency! This serves the same
-          // purpose as bucket.noDepsList
-          Math.max(1, step.dependencies.length),
-        )
+      ? dependenciesIncludingSideEffects.slice(0, step.dependencies.length)
       : dependenciesIncludingSideEffects;
 
     if (needsNoExecution) {
@@ -632,8 +626,6 @@ export function executeBucket(
             }
           }
         }
-      } else {
-        dependencies.push(noDepsList);
       }
       const isSelectiveStep =
         step.polymorphicPaths.size !== step.layerPlan.polymorphicPaths.size;
@@ -786,7 +778,6 @@ export function newBucket(
     polymorphicPathList: spec.polymorphicPathList,
 
     isComplete: false,
-    noDepsList: arrayOfLength(spec.size, undefined),
     children: Object.create(null),
   };
 }

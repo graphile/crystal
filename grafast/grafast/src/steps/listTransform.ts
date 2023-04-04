@@ -196,6 +196,7 @@ export class __ListTransformStep<
   }
 
   async execute(
+    _count: number,
     values: [GrafastValuesList<any[] | null | undefined | GrafastError>],
     extra: ExecutionExtra,
   ): Promise<GrafastResultsList<TMemo>> {

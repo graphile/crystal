@@ -70,7 +70,10 @@ export class MapStep extends UnbatchedExecutableStep {
     );
   }
 
-  execute(values: GrafastValuesList<any[]>): GrafastResultsList<any> {
+  execute(
+    _count: number,
+    values: GrafastValuesList<any[]>,
+  ): GrafastResultsList<any> {
     return values[0].map(this.mapper);
   }
 

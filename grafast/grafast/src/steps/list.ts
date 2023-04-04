@@ -23,40 +23,10 @@ export class ListStep<
     return this.dependencies.map(($dep) => $dep.id).join(",");
   }
 
-  // Could be used to reduce the number of unique values returned
-  tupleToTuple(
-    results: Array<UnwrapPlanTuple<TPlanTuple>>,
-    tuple: UnwrapPlanTuple<TPlanTuple>,
-  ): UnwrapPlanTuple<TPlanTuple> {
-    const tupleLength = tuple.length;
-    // Note: `outerloop` is a JavaScript "label". They are not very common.
-    // First look for an existing match:
-    outerloop: for (let i = 0, l = results.length; i < l; i++) {
-      const existingTuple = results[i];
-      // Shortcut for identical tuples (unlikely).
-      if (existingTuple === tuple) {
-        return existingTuple;
-      }
-      // Slow loop over each value in the tuples; this is not expected to be a
-      // particularly big loop, typically only 2-5 keys.
-      for (let j = 0; j < tupleLength; j++) {
-        if (existingTuple[j] !== tuple[j]) {
-          // This isn't a match; try the next record in the outer loop
-          continue outerloop;
-        }
-      }
-      return existingTuple;
-    }
-
-    // That failed; store this tuple so the same tuple values result in the exact same array.
-    results.push(tuple);
-    return tuple;
-  }
-
   execute(
+    count: number,
     values: any[][], //Array<UnwrapPlanTuple<TPlanTuple>>,
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
-    const count = values[0].length;
     const result: any[] = [];
     for (let i = 0; i < count; i++) {
       result[i] = values.map((list) => list[i]);

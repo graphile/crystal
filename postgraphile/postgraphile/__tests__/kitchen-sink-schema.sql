@@ -369,6 +369,14 @@ create function c.int_set_mutation(x int, y int, z int) returns setof integer as
 create function c.no_args_query() returns int as $$ select 2 $$ language sql stable;
 create function c.no_args_mutation() returns int as $$ select 2 $$ language sql;
 create function a.return_void_mutation() returns void as $$ begin return; end; $$ language plpgsql;
+create function b.list_bde_mutation(b text[], d text, e text) returns uuid[] as $$
+begin
+  if d <> '' and b <> '{}' then
+    raise exception 'Must provide only one of d or b' using errcode='INVLD';
+  end if;
+  return ARRAY[]::uuid[];
+end;
+$$ language plpgsql volatile;
 
 create function c.person_first_name(person c.person) returns text as $$ select split_part(person.person_full_name, ' ', 1) $$ language sql stable;
 comment on function c.person_first_name(c.person) is E'@sortable';

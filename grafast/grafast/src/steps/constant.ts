@@ -16,8 +16,8 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     super();
   }
 
-  execute(values: [[undefined]]): GrafastResultsList<TData> {
-    return arrayOfLength(values[0].length, this.data);
+  execute(count: number): GrafastResultsList<TData> {
+    return arrayOfLength(count, this.data);
   }
 
   eval() {

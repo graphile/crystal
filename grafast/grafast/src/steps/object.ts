@@ -198,11 +198,11 @@ ${inner}
   }
 
   execute(
+    count: number,
     values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
     extra: ExecutionExtra,
   ): Array<DataFromPlans<TPlans>> {
-    const count = values[0].length;
-    const result = [];
+    const result: Array<DataFromPlans<TPlans>> = [];
     for (let i = 0; i < count; i++) {
       result[i] = this.unbatchedExecute!(extra, ...values.map((v) => v[i]));
     }

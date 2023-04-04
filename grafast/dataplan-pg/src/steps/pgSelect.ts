@@ -1222,6 +1222,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
+    count: number,
     values: Array<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
   ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
@@ -1229,7 +1230,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
     if (this.isNullFetch()) {
-      return arrayOfLength(values[0].length, []);
+      return arrayOfLength(count, Object.freeze([]));
     }
     const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults;
@@ -1296,6 +1297,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * Like `execute`, but stream the results via async iterables.
    */
   async stream(
+    _count: number,
     values: ReadonlyArray<GrafastValuesList<any>>,
     { eventEmitter }: ExecutionExtra,
   ): Promise<GrafastResultStreamList<unknown[]>> {

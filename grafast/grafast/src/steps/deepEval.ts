@@ -80,6 +80,7 @@ export class DeepEvalStep extends ExecutableStep {
   }
 
   async execute(
+    _count: number,
     values: [GrafastValuesList<any[] | null | undefined | GrafastError>],
     extra: ExecutionExtra,
   ): Promise<GrafastResultsList<any[]>> {

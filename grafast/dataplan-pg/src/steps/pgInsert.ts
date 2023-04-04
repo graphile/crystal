@@ -1,6 +1,7 @@
 import type {
   GrafastResultsList,
   GrafastValuesList,
+  PromiseOrDirect,
   SetterCapableStep,
   SetterStep,
 } from "grafast";
@@ -271,6 +272,7 @@ export class PgInsertStep<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
+    count: number,
     values: Array<GrafastValuesList<any>>,
   ): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
@@ -282,7 +284,8 @@ export class PgInsertStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    return values[0].map(async (_, i) => {
+    const result: Array<PromiseOrDirect<any>> = [];
+    for (let i = 0; i < count; i++) {
       const value = values.map((v) => v[i]);
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
@@ -298,13 +301,14 @@ export class PgInsertStep<
             }
           })
         : rawSqlValues;
-      const { rows } = await this.resource.executeMutation({
+      const promise = this.resource.executeMutation({
         context: value[this.contextId],
         text,
         values: sqlValues,
       });
-      return rows[0] ?? {};
-    });
+      result[i] = promise.then(({ rows }) => rows[0] ?? Object.create(null));
+    }
+    return result;
   }
 
   public finalize(): void {

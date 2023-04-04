@@ -74,7 +74,10 @@ export class __TrackedObjectStep<
     this.path = path;
   }
 
-  execute(values: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
+  execute(
+    _count: number,
+    values: [GrafastValuesList<TData>],
+  ): GrafastResultsList<TData> {
     // We have only one dependency, return the value of that.
     return values[0];
   }

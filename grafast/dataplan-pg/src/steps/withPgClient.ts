@@ -36,6 +36,11 @@ export class WithPgClientStep<
    */
   private contextId: number;
 
+  /**
+   * The id for the data plan.
+   */
+  private dataId: number;
+
   constructor(
     executor: PgExecutor,
     $data: ExecutableStep<TData>,
@@ -44,17 +49,20 @@ export class WithPgClientStep<
     super();
     this.executor = executor;
     this.contextId = this.addDependency(this.executor.context());
-    this.addDependency($data);
+    this.dataId = this.addDependency($data);
   }
 
   execute(
+    _count: number,
     values: [
       GrafastValuesList<{ pgSettings: any; withPgClient: WithPgClient }>,
       GrafastValuesList<TData>,
     ],
   ): GrafastResultsList<TResult> {
-    return values[0].map(async ({ pgSettings, withPgClient }, i) => {
-      const data = values[1][i];
+    const contexts = values[this.contextId as 0];
+    const datas = values[this.dataId as 1];
+    return contexts.map(async ({ pgSettings, withPgClient }, i) => {
+      const data = datas[i];
       return withPgClient(pgSettings, (client) => this.callback(client, data));
     });
   }

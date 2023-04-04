@@ -3,6 +3,7 @@ import type {
   AccessStep,
   GrafastResultsList,
   GrafastValuesList,
+  PromiseOrDirect,
 } from "grafast";
 import { access, ExecutableStep, exportAs } from "grafast";
 
@@ -52,18 +53,24 @@ export class JSONParseStep<
     return access(this, [index]);
   }
 
-  execute(values: [GrafastValuesList<string>]): GrafastResultsList<TJSON> {
-    return values[0].map((v) => {
+  execute(
+    count: number,
+    values: [GrafastValuesList<string>],
+  ): GrafastResultsList<TJSON> {
+    const result: Array<PromiseOrDirect<TJSON>> = []; // new Array(count);
+    const list = values[0];
+    for (let i = 0; i < count; i++) {
+      const v = list[i];
       if (typeof v === "string") {
         try {
-          return JSON.parse(v);
+          result[i] = JSON.parse(v);
         } catch (e) {
-          return Promise.reject(e);
+          result[i] = Promise.reject(e);
         }
       } else if (v == null) {
-        return null;
+        result[i] = null as any;
       } else {
-        return Promise.reject(
+        result[i] = Promise.reject(
           new Error(
             `JSONParseStep: expected string to parse, but received ${
               Array.isArray(v) ? "array" : typeof v
@@ -71,7 +78,8 @@ export class JSONParseStep<
           ),
         );
       }
-    }) as GrafastResultsList<TJSON>;
+    }
+    return result;
   }
 }
 

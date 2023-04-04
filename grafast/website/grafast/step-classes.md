@@ -90,29 +90,34 @@ You may override this to add additional data to the `toString` method.
 Execute is the one method that your step class must define, and it has very
 strict rules.
 
-The first argument to the execute method will be the values tuple. This tuple
-contains a list of all the batched values for each of your dependencies. The
-value in each of these lists at the same index relate to each other, therefore
-each of these lists will have the exact same length. Your execute method must
-return a list (or a promise to a list) with this exact same length, and each
-entry in this result list must correspond with the input values at the same
-index in the values tuple.
+The first argument to the execute method, `count`, indicates how many values
+will be fed into your execute function, and the length of the list that it must
+return.
 
-If the step has no dependencies then it will be passed a tuple containing a list
-of N arbitrary values (probably `null` or `undefined`, the actual value is
-unimportant and should be ignored), and it must return a list that contains this
-same number of values. Thus it is always safe to map over the first entry in the
+The second argument to the execute method, `values`, will be a tuple that
+contains a list of all the batched values for each of your dependencies. The
+length of each of these lists will be `count`. The value in each of these lists
+at the same index relate to each other. Your execute method must return a list
+(or a promise to a list) with this exact same length, and each entry in this
+result list must correspond with the input values at the same index in the
 values tuple.
+
+:::danger
+
+If the step has no dependencies then the `values` tuple will contain no
+entries, so you _must_ use `count` to determine how many results to return.
+
+:::
 
 :::info
 
-You might wonder why the input to execute is a tuple of lists, rather than what
+You might wonder why the `values` input is a tuple of lists, rather than what
 it obviously represents which is a list of tuples. The reason comes down to
-efficiency, by using a tuple of lists, Grafast only needs to build one new array
-(the tuple), and into that array it can insert the results from previous execute
-methods unmodified. Were it to provide a list of tuples instead then it would
-need to build N+1 new arrays, where N was the number of values being processed,
-which can easily be in the thousands.
+efficiency, by using a tuple of lists, Grafast only needs to build one new
+array (the tuple), and into that array it can insert the results from previous
+execute methods unmodified. Were it to provide a list of tuples instead then it
+would need to build N+1 new arrays, where N was the number of values being
+processed, which can easily be in the thousands.
 
 :::
 
@@ -120,7 +125,7 @@ In the [getting started][] guide the `AddStep` step class should add two numbers
 together. It's execute method looked like this:
 
 ```ts
-  execute([allA, allB]) {
+  execute(count, [allA, allB]) {
     return allA.map((a, i) => {
       return a + allB[i];
     );
@@ -149,7 +154,7 @@ don't use promises for any of the other values.
 
 _This method is optional._
 
-TODO: document stream. (It's like execute, except it returns an async iterator.)
+TODO: document stream. (It's like execute, except it returns a list of async iterators.)
 
 ### deduplicate
 

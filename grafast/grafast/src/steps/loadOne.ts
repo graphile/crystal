@@ -111,6 +111,7 @@ export class LoadOneStep<
     this.metaKey = `LoadOneStep|${loadId}|${this.loadOptionsKey}`;
   }
   execute(
+    count: number,
     [specs]: [GrafastValuesList<TSpec>],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
@@ -124,7 +125,7 @@ export class LoadOneStep<
     const batch = new Map<TSpec, number[]>();
 
     const results: Array<PromiseOrDirect<TData> | null> = [];
-    for (let i = 0, l = specs.length; i < l; i++) {
+    for (let i = 0; i < count; i++) {
       const spec = specs[i];
       if (cache.has(spec)) {
         results.push(cache.get(spec)!);

@@ -1,10 +1,6 @@
 import * as assert from "../assert.js";
 import type { InputStep } from "../input.js";
-import type {
-  ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
-} from "../interfaces.js";
+import type { ExecutionExtra, GrafastResultsList } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
@@ -298,11 +294,9 @@ export class ConnectionStep<
   }
   */
 
-  public execute(
-    values: Array<GrafastValuesList<any>>,
-  ): GrafastResultsList<Record<string, never>> {
+  public execute(count: number): GrafastResultsList<Record<string, never>> {
     // Fake execution; data actually comes from the child plans
-    return arrayOfLength(values[0].length, EMPTY_OBJECT);
+    return arrayOfLength(count, EMPTY_OBJECT);
   }
 
   public unbatchedExecute() {
