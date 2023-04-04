@@ -104,7 +104,7 @@ export const stringScalarSpec = Object.freeze({
     [Kind, SafeError],
   ),
   extensions: {
-    graphile: {
+    grafast: {
       idempotent: true,
     },
   },
@@ -197,7 +197,7 @@ export const stringTypeSpec = (
         [GraphQLError, Kind],
       ),
   extensions: {
-    graphile: {
+    grafast: {
       idempotent: !coerce || (coerce as any)[$$idempotent] ? true : false,
     },
   },

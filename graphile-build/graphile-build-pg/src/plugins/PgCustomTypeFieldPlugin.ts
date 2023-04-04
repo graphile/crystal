@@ -31,7 +31,7 @@ import type {
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
-  GraphileFieldConfig,
+  GrafastFieldConfig,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -725,7 +725,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           },
                         }) as Record<
                           string,
-                          GraphileFieldConfig<any, any, any, any, any>
+                          GrafastFieldConfig<any, any, any, any, any>
                         >;
                         if (isVoid) {
                           return fields;

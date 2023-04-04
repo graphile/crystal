@@ -212,7 +212,7 @@ function outputBucket(
     );
     if (!c) {
       throw new Error(
-        `GraphileInternalError<8bbf56c1-8e2a-4ee9-b5fc-724fd0ee222b>: could not find relevant bucket for output plan`,
+        `GrafastInternalError<8bbf56c1-8e2a-4ee9-b5fc-724fd0ee222b>: could not find relevant bucket for output plan`,
       );
     }
     [childBucket, childBucketIndex] = c;
@@ -554,7 +554,7 @@ function newIterator<T = any>(
       if (done) {
         // TODO: should
         console.warn(
-          "GraphileWarning<85e02385-d3d2-48a1-b791-b4cf87817899>: value pushed into iterable after done; ignoring",
+          "GrafastWarning<85e02385-d3d2-48a1-b791-b4cf87817899>: value pushed into iterable after done; ignoring",
         );
         return;
       }
@@ -656,7 +656,7 @@ async function processStream(
       const parent = directLayerPlanChild.parentLayerPlan;
       if (!parent) {
         throw new Error(
-          `GraphileInternalError<f6179ee1-ace2-429c-8f30-8fe6cd53ed03>: Invalid heirarchy - could not find direct layerPlan child of ${spec.bucket.layerPlan}`,
+          `GrafastInternalError<f6179ee1-ace2-429c-8f30-8fe6cd53ed03>: Invalid heirarchy - could not find direct layerPlan child of ${spec.bucket.layerPlan}`,
         );
       }
       directLayerPlanChild = parent;
@@ -681,7 +681,7 @@ async function processStream(
         const list = spec.bucket.store.get(copyPlanId);
         if (!list) {
           throw new Error(
-            `GraphileInternalError<2db7b749-399f-486b-bd12-7ca337b937e4>: ${spec.bucket.layerPlan} doesn't seem to include ${copyPlanId} (required by ${directLayerPlanChild} via ${spec.outputPlan})`,
+            `GrafastInternalError<2db7b749-399f-486b-bd12-7ca337b937e4>: ${spec.bucket.layerPlan} doesn't seem to include ${copyPlanId} (required by ${directLayerPlanChild} via ${spec.outputPlan})`,
           );
         }
         // PERF: optimize away these .get calls
@@ -694,7 +694,7 @@ async function processStream(
     assert.strictEqual(
       bucketIndex,
       size,
-      "GraphileInternalError<7c8deab0-8dfa-40f2-b625-97026f8fedcc>: expected bucket size does not match",
+      "GrafastInternalError<7c8deab0-8dfa-40f2-b625-97026f8fedcc>: expected bucket size does not match",
     );
 
     // const childBucket = newBucket(directLayerPlanChild, noDepsList, store);
@@ -765,7 +765,7 @@ async function processStream(
     timeout = null;
     assert.ok(
       queue,
-      "GraphileInternalError<bcf5cef8-2c60-419e-b942-14fd34b8caa7>: processQueue called with no queue",
+      "GrafastInternalError<bcf5cef8-2c60-419e-b942-14fd34b8caa7>: processQueue called with no queue",
     );
 
     // This is guaranteed to have at least one entry in it
@@ -850,7 +850,7 @@ function processSingleDeferred(
   assert.strictEqual(
     bucketIndex,
     size,
-    "GraphileInternalError<4e88c671-f65b-42a6-8756-61247b188093>: expected bucket size does not match",
+    "GrafastInternalError<4e88c671-f65b-42a6-8756-61247b188093>: expected bucket size does not match",
   );
 
   // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);

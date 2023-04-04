@@ -345,7 +345,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       if (!this.layerPlan.ancestry.includes(step.layerPlan)) {
         throw new Error(
           //console.error(
-          // This is not a GraphileInternalError
+          // This is not a GrafastInternalError
           `Attempted to add '${step}' (${step.layerPlan}) as a dependency of '${this}' (${this.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
         );
       }

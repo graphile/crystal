@@ -240,7 +240,7 @@ export class StepTracker {
       const outputPlansBy$existing = this.outputPlansByRootStep.get($existing);
       if (!outputPlansBy$existing) {
         throw new Error(
-          `GraphileInternalError<f39690fc-f565-40d9-a781-e68a3bf5e84a>: ${outputPlan}.rootStep (${$existing}) isn't in 'outputPlansByRootStep'`,
+          `GrafastInternalError<f39690fc-f565-40d9-a781-e68a3bf5e84a>: ${outputPlan}.rootStep (${$existing}) isn't in 'outputPlansByRootStep'`,
         );
       }
       outputPlansBy$existing.delete(outputPlan);
@@ -272,7 +272,7 @@ export class StepTracker {
       const layerPlansBy$existing = this.layerPlansByRootStep.get($existing);
       if (!layerPlansBy$existing) {
         throw new Error(
-          `GraphileInternalError<7b5b7fe6-d403-48bd-a75f-1c9557b9a030>: ${layerPlan}.rootStep (${$existing}) isn't in 'layerPlansByRootStep'`,
+          `GrafastInternalError<7b5b7fe6-d403-48bd-a75f-1c9557b9a030>: ${layerPlan}.rootStep (${$existing}) isn't in 'layerPlansByRootStep'`,
         );
       }
       layerPlansBy$existing.delete(layerPlan);

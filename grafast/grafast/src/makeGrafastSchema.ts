@@ -147,7 +147,7 @@ export function makeGrafastSchema(details: {
       const fields = type.getFields();
       for (const [fieldName, fieldSpec] of Object.entries(objSpec)) {
         if (fieldName === "__Step") {
-          (type.extensions as any).graphile = { Step: fieldSpec };
+          (type.extensions as any).grafast = { Step: fieldSpec };
           continue;
         }
 
@@ -161,16 +161,14 @@ export function makeGrafastSchema(details: {
 
         if (typeof fieldSpec === "function") {
           // it's a plan
-          (field.extensions as any).graphile = {
+          (field.extensions as any).grafast = {
             plan: fieldSpec,
           };
         } else {
           // it's a spec
-          const graphileExtensions: GraphQLFieldExtensions<
-            any,
-            any
-          >["graphile"] = Object.create(null);
-          (field.extensions as any).graphile = graphileExtensions;
+          const grafastExtensions: GraphQLFieldExtensions<any, any>["grafast"] =
+            Object.create(null);
+          (field.extensions as any).grafast = grafastExtensions;
           if (fieldSpec.resolve) {
             field.resolve = fieldSpec.resolve;
           }
@@ -178,10 +176,10 @@ export function makeGrafastSchema(details: {
             field.subscribe = fieldSpec.subscribe;
           }
           if (fieldSpec.plan) {
-            graphileExtensions!.plan = fieldSpec.plan;
+            grafastExtensions!.plan = fieldSpec.plan;
           }
           if (fieldSpec.subscribePlan) {
-            graphileExtensions!.subscribePlan = fieldSpec.subscribePlan;
+            grafastExtensions!.subscribePlan = fieldSpec.subscribePlan;
           }
 
           if (typeof fieldSpec.args === "object" && fieldSpec.args != null) {
@@ -194,7 +192,7 @@ export function makeGrafastSchema(details: {
                 continue;
               }
               if (typeof argSpec === "function") {
-                (arg.extensions as any).graphile = {
+                (arg.extensions as any).grafast = {
                   plan: argSpec,
                 };
               } else {
@@ -225,7 +223,7 @@ export function makeGrafastSchema(details: {
           continue;
         }
         if (typeof fieldSpec === "function") {
-          (field.extensions as any).graphile = { plan: fieldSpec };
+          (field.extensions as any).grafast = { plan: fieldSpec };
         } else {
           throw new Error(
             `Expected function input object type '${typeName}' field '${fieldName}', but an invalid value was received`,
@@ -255,7 +253,7 @@ export function makeGrafastSchema(details: {
         type.parseLiteral = scalarSpec.parseLiteral;
       }
       if (scalarSpec.plan) {
-        (type.extensions as any).graphile = { plan: scalarSpec.plan };
+        (type.extensions as any).grafast = { plan: scalarSpec.plan };
       }
     } else if (isEnumType(type)) {
       if (typeof spec !== "object" || !spec) {
@@ -272,13 +270,13 @@ export function makeGrafastSchema(details: {
         }
         if (typeof enumValueSpec === "function") {
           // It's a plan
-          (enumValue.extensions as any).graphile = {
+          (enumValue.extensions as any).grafast = {
             plan: enumValueSpec,
           };
         } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
           // It's a full spec
           if (enumValueSpec.plan) {
-            (enumValue.extensions as any).graphile = {
+            (enumValue.extensions as any).grafast = {
               plan: enumValueSpec.plan,
             };
           }

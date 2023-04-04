@@ -580,7 +580,7 @@ ${duration}
 
         if (batchIndexesByIdentifiersJSON.size <= 0) {
           throw new Error(
-            "GraphileInternalError<98699a62-cd44-4372-8e92-d730b116a51d>: empty batch doesn't make sense in this context.",
+            "GrafastInternalError<98699a62-cd44-4372-8e92-d730b116a51d>: empty batch doesn't make sense in this context.",
           );
         }
 
@@ -718,7 +718,7 @@ ${duration}
             const batchIndexes = batchIndexesByValueIndex[valueIndex];
             if (!batchIndexes) {
               throw new Error(
-                `GraphileInternalError<8f513ceb-a3dc-4ec7-9ca1-0f0d4576a22d>: could not determine the identifier JSON for value index '${valueIndex}'`,
+                `GrafastInternalError<8f513ceb-a3dc-4ec7-9ca1-0f0d4576a22d>: could not determine the identifier JSON for value index '${valueIndex}'`,
               );
             }
             for (let i = 0, l = batchIndexes.length; i < l; i++) {

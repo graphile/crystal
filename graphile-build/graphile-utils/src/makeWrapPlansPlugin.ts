@@ -2,7 +2,7 @@ import type {
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
-  GraphileFieldConfig,
+  GrafastFieldConfig,
 } from "grafast";
 import { access, ExecutableStep } from "grafast";
 import { inspect } from "util";
@@ -38,7 +38,7 @@ export type PlanWrapperRulesGenerator = (
 export type PlanWrapperFilter<T> = (
   context: GraphileBuild.ContextObjectFieldsField,
   build: GraphileBuild.Build,
-  field: GraphileFieldConfig<any, any, any, any, any>,
+  field: GrafastFieldConfig<any, any, any, any, any>,
 ) => T | null;
 
 export type PlanWrapperFilterRule<T> = (

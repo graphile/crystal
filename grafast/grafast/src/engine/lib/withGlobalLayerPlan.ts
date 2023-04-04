@@ -37,7 +37,7 @@ export function currentPolymorphicPaths(): ReadonlySet<string> {
   const pp = globalData?.polymorphicPaths;
   if (!pp) {
     throw new Error(
-      "GraphileInternalError<b0b05743-8b21-42c6-9b53-925013d88bd1>: currentPolymorphicPaths called out of turn; must only called within a withGlobalLayerPlan callback",
+      "GrafastInternalError<b0b05743-8b21-42c6-9b53-925013d88bd1>: currentPolymorphicPaths called out of turn; must only called within a withGlobalLayerPlan callback",
     );
   }
   return pp;

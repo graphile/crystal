@@ -1,4 +1,4 @@
-import type { GraphileArgumentConfig, GraphileFieldConfig } from "grafast";
+import type { GrafastArgumentConfig, GrafastFieldConfig } from "grafast";
 import type {} from "graphile-build";
 import type * as AllGraphQL from "graphql";
 import type { GraphQLInputType, GraphQLOutputType, GraphQLType } from "graphql";
@@ -124,7 +124,7 @@ export function makeChangeNullabilityPlugin(
   let pendingMatches = new Set<string>();
 
   function objectOrInterfaceFieldCallback<
-    T extends GraphileFieldConfig<any, any, any, any, any>,
+    T extends GrafastFieldConfig<any, any, any, any, any>,
   >(
     field: T,
     build: GraphileBuild.Build,
@@ -158,7 +158,7 @@ export function makeChangeNullabilityPlugin(
   }
 
   function objectOrInterfaceArgsArgCallback<
-    T extends GraphileArgumentConfig<any, any, any, any, any, any>,
+    T extends GrafastArgumentConfig<any, any, any, any, any, any>,
   >(
     arg: T,
     build: GraphileBuild.Build,

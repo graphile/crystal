@@ -64,7 +64,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
           {
             [inflection.builtin("PRIMARY_KEY_ASC")]: {
               extensions: {
-                graphile: {
+                grafast: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
                       (step: PgSelectStep) => {
@@ -92,7 +92,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
             },
             [inflection.builtin("PRIMARY_KEY_DESC")]: {
               extensions: {
-                graphile: {
+                grafast: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
                       (step: PgSelectStep) => {

@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { GraphileArgumentConfig } from "grafast";
+import type { GrafastArgumentConfig } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
@@ -14,10 +14,10 @@ import type {
  */
 function rmEmptyTypeDescription<
   T extends
-    | GraphileBuild.GraphileObjectTypeConfig<any, any>
-    | GraphileBuild.GraphileInputObjectTypeConfig
-    | GraphileBuild.GraphileUnionTypeConfig<any, any>
-    | GraphileBuild.GraphileInterfaceTypeConfig<any, any>
+    | GraphileBuild.GrafastObjectTypeConfig<any, any>
+    | GraphileBuild.GrafastInputObjectTypeConfig
+    | GraphileBuild.GrafastUnionTypeConfig<any, any>
+    | GraphileBuild.GrafastInterfaceTypeConfig<any, any>
     | GraphQLEnumTypeConfig,
 >(type: T): T {
   // TODO: should we trim before comparison?
@@ -47,7 +47,7 @@ function rmEmptyFieldDescription<
  * descriptions is u.g.l.y.
  */
 function rmEmptyArgDescriptions<
-  T extends GraphileArgumentConfig<any, any, any, any, any, any>,
+  T extends GrafastArgumentConfig<any, any, any, any, any, any>,
 >(arg: T): T {
   if (arg.description === "") {
     arg.description = null;

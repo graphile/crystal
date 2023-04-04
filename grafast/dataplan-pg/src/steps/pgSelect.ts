@@ -89,7 +89,7 @@ function parseCursor(cursor: string | null) {
     // This throw should never happen, so we can still be isSyncAndSafe.
     // If it does throw, the entire lambda will throw, which is allowed.
     throw new Error(
-      "GraphileInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
+      "GrafastInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
     );
   }
   try {
@@ -2086,7 +2086,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
             });
           if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
             throw new Error(
-              `GraphileInternalError<3760b02e-dfd0-4924-bf62-2e0ef9399605>: expected identifier indexes to match`,
+              `GrafastInternalError<3760b02e-dfd0-4924-bf62-2e0ef9399605>: expected identifier indexes to match`,
             );
           }
           const identifierIndex = initialFetchIdentifierIndex;
@@ -2348,7 +2348,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
   } {
     if (otherPlan.mode !== this.mode) {
       throw new Error(
-        "GraphileInternalError<d12a3d95-4f7b-41d9-8cb4-a97bd169d128>: attempted to merge selects with a PgSelectStep in a different mode",
+        "GrafastInternalError<d12a3d95-4f7b-41d9-8cb4-a97bd169d128>: attempted to merge selects with a PgSelectStep in a different mode",
       );
     }
     const actualKeyByDesiredKey = Object.create(null);

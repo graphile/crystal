@@ -273,17 +273,17 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       if (isDev) {
         if (typeof key !== "string") {
           throw new Error(
-            `GraphileInternalError<7334ec50-23dc-442a-8ffa-19664c9eb79f>: Key must be provided in ${this.type.mode} OutputPlan mode`,
+            `GrafastInternalError<7334ec50-23dc-442a-8ffa-19664c9eb79f>: Key must be provided in ${this.type.mode} OutputPlan mode`,
           );
         }
         if (type == null) {
           throw new Error(
-            `GraphileInternalError<638cebef-4ec6-49f4-b681-2f390fb1c0fc>: Type must be provided in ${this.type.mode} OutputPlan mode.`,
+            `GrafastInternalError<638cebef-4ec6-49f4-b681-2f390fb1c0fc>: Type must be provided in ${this.type.mode} OutputPlan mode.`,
           );
         }
         if (!isObjectType(type)) {
           throw new Error(
-            `GraphileInternalError<eaa87576-1d50-49be-990a-345a9b57b998>: Type must provided in ${this.type.mode} OutputPlan mode must be an object type, instead saw '${type}'.`,
+            `GrafastInternalError<eaa87576-1d50-49be-990a-345a9b57b998>: Type must provided in ${this.type.mode} OutputPlan mode must be an object type, instead saw '${type}'.`,
           );
         }
         assert.ok(
@@ -292,7 +292,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         );
         if (this.keys[key]) {
           throw new Error(
-            `GraphileInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set for key '${key}'`,
+            `GrafastInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set for key '${key}'`,
           );
         }
       }
@@ -307,13 +307,13 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       if (isDev) {
         if (key != null) {
           throw new Error(
-            `GraphileInternalError<7de67325-a02f-4619-b118-61bb2d84f33b>: Key must not be provided in ${this.type.mode} OutputPlan mode`,
+            `GrafastInternalError<7de67325-a02f-4619-b118-61bb2d84f33b>: Key must not be provided in ${this.type.mode} OutputPlan mode`,
           );
         }
         assert.ok(type == null, "Array should not specify type");
         if (this.child) {
           throw new Error(
-            `GraphileInternalError<07059d9d-a47d-441f-b834-683cca1d856a>: child already set`,
+            `GrafastInternalError<07059d9d-a47d-441f-b834-683cca1d856a>: child already set`,
           );
         }
       }
@@ -322,34 +322,34 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         this.childIsNonNull = child.isNonNull;
       } else {
         throw new Error(
-          `GraphileInternalError<7525c854-9145-4c6d-8d60-79c14f040519>: Array child must be an outputPlan`,
+          `GrafastInternalError<7525c854-9145-4c6d-8d60-79c14f040519>: Array child must be an outputPlan`,
         );
       }
     } else if (this.type.mode === "polymorphic") {
       if (isDev) {
         assert.ok(
           type && this.type.typeNames.includes(type.name),
-          "GraphileInternalError<566a34ac-1138-4dbf-943e-f704819431dd>: polymorphic output plan can only addChild for a matching type",
+          "GrafastInternalError<566a34ac-1138-4dbf-943e-f704819431dd>: polymorphic output plan can only addChild for a matching type",
         );
         assert.strictEqual(
           key,
           null,
-          "GraphileInternalError<4346ebda-a02d-4489-b767-7a6d621a73c7>: addChild for polymorphic OutputPlan should not specify a key",
+          "GrafastInternalError<4346ebda-a02d-4489-b767-7a6d621a73c7>: addChild for polymorphic OutputPlan should not specify a key",
         );
         assert.ok(
           child.type === "outputPlan",
-          "GraphileInternalError<b29285da-fb07-4943-9038-708edc785041>: polymorphic OutputPlan child must be an outputPlan",
+          "GrafastInternalError<b29285da-fb07-4943-9038-708edc785041>: polymorphic OutputPlan child must be an outputPlan",
         );
         assert.ok(
           child.outputPlan.type.mode === "object",
-          "GraphileInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
+          "GrafastInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
         );
       }
       this.childByTypeName[type!.name] = (child as OutputPlanKeyValueOutputPlan)
         .outputPlan as OutputPlan<OutputPlanTypeObject>;
     } else {
       throw new Error(
-        `GraphileInternalError<5667df5f-30b7-48d3-be3f-a0065ed9c05c>: Doesn't make sense to set a child in mode '${this.type.mode}'`,
+        `GrafastInternalError<5667df5f-30b7-48d3-be3f-a0065ed9c05c>: Doesn't make sense to set a child in mode '${this.type.mode}'`,
       );
     }
   }
@@ -362,7 +362,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         this.child.getLayerPlans(layerPlans);
       } else {
         throw new Error(
-          "GraphileInternalError<4013e05f-b8ed-41ea-a869-204232d02763>: how could the child be in the same layer?",
+          "GrafastInternalError<4013e05f-b8ed-41ea-a869-204232d02763>: how could the child be in the same layer?",
         );
       }
     }
@@ -484,7 +484,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       case "array": {
         if (!this.child) {
           throw new Error(
-            "GraphileInternalError<48fabdc8-ce84-45ec-ac20-35a2af9098e0>: No child output plan for list bucket?",
+            "GrafastInternalError<48fabdc8-ce84-45ec-ac20-35a2af9098e0>: No child output plan for list bucket?",
           );
         }
         const childIsNonNull = this.childIsNonNull;
@@ -493,7 +493,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           const parent = directLayerPlanChild.parentLayerPlan;
           if (!parent) {
             throw new Error(
-              `GraphileInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${this}`,
+              `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${this}`,
             );
           }
           directLayerPlanChild = parent;
@@ -562,7 +562,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       default: {
         const never: never = this.type;
         throw new Error(
-          `GraphileInternalError<e88531b2-d9af-4d3a-8cd5-e9f034324341>: Could not build executor for OutputPlan with type ${inspect(
+          `GrafastInternalError<e88531b2-d9af-4d3a-8cd5-e9f034324341>: Could not build executor for OutputPlan with type ${inspect(
             never,
           )}}`,
         );
@@ -612,7 +612,7 @@ export function nonNullError(
   if (!parentTypeName || !fieldName) {
     return new GraphQLError(
       // TODO: rename. Also this shouldn't happen?
-      `GraphileInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
+      `GrafastInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
       node,
       null,
       null,
@@ -655,7 +655,7 @@ export function getChildBucketAndIndex(
     (outputPlan != null && outputPlan.type.mode === "array")
   ) {
     throw new Error(
-      "GraphileInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
+      "GrafastInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
     );
   }
   if (outputPlan && childOutputPlan.layerPlan === bucket.layerPlan) {
@@ -695,7 +695,7 @@ export function getChildBucketAndIndex(
     if (arrayIndex == null || i !== l - 1) {
       if (Array.isArray(out)) {
         throw new Error(
-          "GraphileInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
+          "GrafastInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
         );
       }
       currentBucket = child.bucket;
@@ -703,14 +703,14 @@ export function getChildBucketAndIndex(
     } else {
       if (!Array.isArray(out)) {
         throw new Error(
-          `GraphileInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
+          `GrafastInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
             out,
           )}`,
         );
       }
       if (!(out.length > arrayIndex)) {
         throw new Error(
-          `GraphileInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
+          `GrafastInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
         );
       }
       currentBucket = child.bucket;
@@ -932,7 +932,7 @@ ${
   if (!${te.ref(isPolymorphicData, "isPolymorphicData")}(bucketRootValue)) {
     throw ${te.ref(coerceError, "coerceError")}(
       new Error(
-        "GraphileInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
+        "GrafastInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
       ),
       this.locationDetails,
       mutablePath.slice(1),
@@ -948,11 +948,11 @@ ${
       ? te`{
     ${te.ref(assert, "assert")}.ok(
       typeName,
-      "GraphileInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
+      "GrafastInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
     );
     ${te.ref(assert, "assert")}.ok(
       childOutputPlan,
-      \`GraphileInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
+      \`GrafastInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
     );
   }`
       : te``
@@ -971,7 +971,7 @@ ${
       bucketIndex,
     );
     if (!c) {
-      throw new Error("GraphileInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket");
+      throw new Error("GrafastInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket");
     }
     const [childBucket, childBucketIndex] = c;
     return childOutputPlan.${
@@ -1327,7 +1327,7 @@ ${makeExecuteChildPlanCode(
         default: {
           const never: never = fieldType;
           throw new Error(
-            `GraphileInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+            `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
           );
         }
       }

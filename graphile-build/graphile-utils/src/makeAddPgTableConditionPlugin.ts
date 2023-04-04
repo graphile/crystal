@@ -1,5 +1,5 @@
 import type { PgConditionStep, PgSelectStep } from "@dataplan/pg";
-import type { FieldArgs, GraphileInputFieldConfig } from "grafast";
+import type { FieldArgs, GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
 import { EXPORTABLE } from "./exportable.js";
@@ -9,7 +9,7 @@ export function makeAddPgTableConditionPlugin(
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
     build: GraphileBuild.Build,
-  ) => GraphileInputFieldConfig<any, any, any, any, any>,
+  ) => GrafastInputFieldConfig<any, any, any, any, any>,
   conditionGenerator?: (
     value: FieldArgs,
     helpers: {
@@ -67,7 +67,7 @@ export function makeAddPgTableConditionPlugin(
           const conditionFieldSpec = conditionFieldSpecGenerator(build);
           if (
             conditionFieldSpec.applyPlan ||
-            conditionFieldSpec.extensions?.graphile?.applyPlan
+            conditionFieldSpec.extensions?.grafast?.applyPlan
           ) {
             if (conditionGenerator) {
               throw new Error(

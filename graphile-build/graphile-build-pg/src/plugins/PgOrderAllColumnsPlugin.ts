@@ -129,7 +129,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
               {
                 [ascFieldName]: {
                   extensions: {
-                    graphile: {
+                    grafast: {
                       applyPlan: EXPORTABLE(
                         (
                             PgSelectStep,
@@ -186,7 +186,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
               {
                 [descFieldName]: {
                   extensions: {
-                    graphile: {
+                    grafast: {
                       applyPlan: EXPORTABLE(
                         (
                             PgSelectStep,
