@@ -1,0 +1,14 @@
+mutation M {
+  answer0: listBdeMutation(input: { d: "bar", b: [], e: "q0" }) {
+    uuids
+  }
+  answer1: listBdeMutation(input: { d: "", b: ["option-1"], e: "q1" }) {
+    uuids
+  }
+  answer2: listBdeMutation(input: { d: "foo", b: [], e: "q2" }) {
+    uuids
+  }
+  answer3: listBdeMutation(input: { d: "", b: ["option-2"], e: "q3" }) {
+    uuids
+  }
+}
