@@ -55,10 +55,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           );
         });
 
-        const resourcesByCodec = new Map<
-          PgCodec<any, any, any, any, any, any, any>,
-          PgResource<any, any, any, any, any>[]
-        >();
+        const resourcesByCodec = new Map<PgCodec, PgResource[]>();
         for (const resource of tableResources) {
           let list = resourcesByCodec.get(resource.codec);
           if (!list) {
@@ -121,7 +118,7 @@ return function (list, constant) {
                 )
               : EXPORTABLE(
                   (constant, identifier, list, pk) =>
-                    ($record: PgSelectSingleStep<any>) => {
+                    ($record: PgSelectSingleStep) => {
                       return list([
                         constant(identifier),
                         ...pk.map((column) => $record.get(column)),
