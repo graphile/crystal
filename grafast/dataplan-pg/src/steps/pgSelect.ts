@@ -1230,7 +1230,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
     if (this.isNullFetch()) {
-      return arrayOfLength(count, []);
+      return arrayOfLength(count, Object.freeze([]));
     }
     const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults;

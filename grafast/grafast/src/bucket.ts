@@ -54,12 +54,6 @@ export interface Bucket {
   size: number;
 
   /**
-   * An array of the same size as the bucket to feed to plans that have no
-   * dependencies so they output the right number of results.
-   */
-  noDepsList: readonly undefined[];
-
-  /**
    * The polymorphic path through which each of the entries (respectively) has
    * travelled. This influences the steps that will be executed using the
    * related inputs.

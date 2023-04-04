@@ -1,5 +1,5 @@
 import { inspect } from "../inspect.js";
-import type { GrafastResultsList, GrafastValuesList } from "../interfaces.js";
+import type { GrafastResultsList } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 

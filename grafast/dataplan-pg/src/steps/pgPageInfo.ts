@@ -1,7 +1,6 @@
 import type {
   ExecutableStep,
   GrafastResultsList,
-  GrafastValuesList,
   PageInfoCapableStep,
 } from "grafast";
 import {
