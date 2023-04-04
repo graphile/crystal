@@ -149,8 +149,6 @@ export interface GrafastScalarTypeExtensions {
   idempotent?: boolean;
 }
 
-// TODO: change 'graphile' to 'grafast'
-
 /*
  * We register certain things (plans, etc) into the GraphQL "extensions"
  * property on the various GraphQL configs (type, field, argument, etc); this
