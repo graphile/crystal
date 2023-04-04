@@ -294,6 +294,7 @@ export class PgUpdateStep<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
+    _count: number,
     values: Array<GrafastValuesList<any>>,
   ): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {

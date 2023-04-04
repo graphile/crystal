@@ -3,6 +3,7 @@ import type {
   GrafastValuesList,
   PolymorphicData,
   PolymorphicStep,
+  PromiseOrDirect,
 } from "grafast";
 import { ExecutableStep, exportAs, polymorphicWrap } from "grafast";
 import type { GraphQLObjectType } from "graphql";
@@ -58,12 +59,21 @@ export class PgSingleTablePolymorphicStep<
   }
 
   execute(
+    count: number,
     values: Array<GrafastValuesList<any>>,
   ): GrafastResultsList<PolymorphicData<
     string,
     ReadonlyArray<unknown[]>
   > | null> {
-    return values[this.typeStepId].map((v) => (v ? polymorphicWrap(v) : null));
+    const result: Array<
+      PromiseOrDirect<PolymorphicData<string, ReadonlyArray<unknown[]>> | null>
+    > = [];
+    const list = values[this.typeStepId];
+    for (let i = 0; i < count; i++) {
+      const v = list[i];
+      result[i] = v ? polymorphicWrap(v) : null;
+    }
+    return result;
   }
 }
 

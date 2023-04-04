@@ -65,12 +65,17 @@ export class ListenStep<
   }
 
   stream(
+    count: number,
     values: readonly [
       GrafastValuesList<GrafastSubscriber<TTopics>>,
       GrafastValuesList<TTopic>,
     ],
   ): GrafastResultStreamList<TTopics[TTopic]> {
-    return values[this.pubsubDep as 0].map((pubsub, i) => {
+    const pubsubs = values[this.pubsubDep as 0];
+    const topics = values[this.topicDep as 1];
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      const pubsub = pubsubs[i];
       if (!pubsub) {
         throw new SafeError(
           "Subscription not supported",
@@ -83,9 +88,10 @@ export class ListenStep<
             : {},
         );
       }
-      const topic = values[this.topicDep as 1][i];
-      return pubsub.subscribe(topic);
-    });
+      const topic = topics[i];
+      result[i] = pubsub.subscribe(topic);
+    }
+    return result;
   }
 }
 

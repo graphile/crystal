@@ -38,6 +38,7 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
   }
 
   execute(
+    _count: number,
     values: [GrafastValuesList<string | null>],
   ): GrafastResultsList<undefined> {
     return values[0].map((decoded) => {

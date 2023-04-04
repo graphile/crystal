@@ -41,7 +41,10 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
     this.addDependency(plan);
   }
 
-  execute(values: [GrafastValuesList<TData[]>]): GrafastResultsList<TData[]> {
+  execute(
+    _count: number,
+    values: [GrafastValuesList<TData[]>],
+  ): GrafastResultsList<TData[]> {
     return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
   }
 

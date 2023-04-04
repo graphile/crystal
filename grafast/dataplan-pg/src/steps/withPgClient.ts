@@ -48,6 +48,7 @@ export class WithPgClientStep<
   }
 
   execute(
+    _count: number,
     values: [
       GrafastValuesList<{ pgSettings: any; withPgClient: WithPgClient }>,
       GrafastValuesList<TData>,

@@ -88,7 +88,10 @@ export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
     // can replace ourself with our dependency:
     return this.getDep(0);
   }
-  execute([records]: [GrafastValuesList<TData>]): GrafastResultsList<TData> {
+  execute(
+    _count: number,
+    [records]: [GrafastValuesList<TData>],
+  ): GrafastResultsList<TData> {
     return records;
   }
 }
@@ -163,7 +166,9 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
     }
     this.metaKey = `LoadManyStep|${loadId}|${this.loadOptionsKey}`;
   }
+
   execute(
+    count: number,
     [specs]: [GrafastValuesList<TSpec>],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<ReadonlyArray<TData>>> {
@@ -177,7 +182,7 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
     const batch = new Map<TSpec, number[]>();
 
     const results: Array<PromiseOrDirect<readonly TData[]> | null> = [];
-    for (let i = 0, l = specs.length; i < l; i++) {
+    for (let i = 0; i < count; i++) {
       const spec = specs[i];
       if (cache.has(spec)) {
         results.push(cache.get(spec)!);

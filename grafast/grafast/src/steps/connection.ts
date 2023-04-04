@@ -298,11 +298,9 @@ export class ConnectionStep<
   }
   */
 
-  public execute(
-    values: Array<GrafastValuesList<any>>,
-  ): GrafastResultsList<Record<string, never>> {
+  public execute(count: number): GrafastResultsList<Record<string, never>> {
     // Fake execution; data actually comes from the child plans
-    return arrayOfLength(values[0].length, EMPTY_OBJECT);
+    return arrayOfLength(count, EMPTY_OBJECT);
   }
 
   public unbatchedExecute() {

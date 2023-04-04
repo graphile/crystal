@@ -438,10 +438,12 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * memoizing results) so that you can expand your usage of meta in future.
    */
   /* abstract */ execute(
+    count: number,
     values: ReadonlyArray<GrafastValuesList<any>>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
     // ESLint/TS: ignore not used.
+    count;
     values;
     extra;
     throw new Error(`${this} has not implemented an 'execute' method`);
@@ -489,14 +491,13 @@ ${te.indent(inFrag)}
         }
       };
       this.execute = te.run`
-return function execute(values, extra) {
+return function execute(count, values, extra) {
   const [
 ${te.join(
   depIndexes.map((i) => te`    ${te.identifier(`list${i}`)},\n`),
   "",
 )}\
   ] = values;
-  const count = list0.length;
   const results = [];
   for (let i = 0; i < count; i++) {
 ${tryOrNot(te`\
@@ -514,13 +515,13 @@ ${tryOrNot(te`\
   }
 
   execute(
+    count: number,
     values: ReadonlyArray<GrafastValuesList<any>>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
     console.warn(
       `${this} didn't call 'super.finalize()' in the finalize method.`,
     );
-    const count = values[0].length;
     const results = [];
     for (let i = 0; i < count; i++) {
       try {
@@ -595,6 +596,7 @@ export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
    * rather than a list of results.
    */
   stream(
+    count: number,
     values: ReadonlyArray<GrafastValuesList<any>>,
     extra: ExecutionExtra,
     streamOptions: {

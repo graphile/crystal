@@ -499,9 +499,9 @@ export function executeBucket(
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     if (step._stepOptions.stream && isStreamableStep(step)) {
-      return step.stream(dependencies, extra, step._stepOptions.stream);
+      return step.stream(size, dependencies, extra, step._stepOptions.stream);
     } else {
-      return step.execute(dependencies, extra);
+      return step.execute(size, dependencies, extra);
     }
   }
 

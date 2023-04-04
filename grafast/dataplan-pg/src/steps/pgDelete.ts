@@ -1,4 +1,8 @@
-import type { GrafastResultsList, GrafastValuesList } from "grafast";
+import type {
+  GrafastResultsList,
+  GrafastValuesList,
+  PromiseOrDirect,
+} from "grafast";
 import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
@@ -236,6 +240,7 @@ export class PgDeleteStep<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
+    count: number,
     values: Array<GrafastValuesList<any>>,
   ): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
@@ -247,7 +252,10 @@ export class PgDeleteStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    return values[this.contextId].map(async (context, i) => {
+    const result: Array<PromiseOrDirect<any>> = [];
+    const list = values[this.contextId];
+    for (let i = 0; i < count; i++) {
+      const context = list[i];
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -262,22 +270,24 @@ export class PgDeleteStep<
             }
           })
         : rawSqlValues;
-      const { rows, rowCount } = await this.resource.executeMutation({
+      const promise = this.resource.executeMutation({
         context,
         text,
         values: sqlValues,
       });
-      return (
-        rows[0] ??
-        (rowCount === 0
-          ? Promise.reject(
-              new Error(
-                `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
-              ),
-            )
-          : Object.create(null))
+      result[i] = promise.then(
+        ({ rows, rowCount }) =>
+          rows[0] ??
+          (rowCount === 0
+            ? Promise.reject(
+                new Error(
+                  `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
+                ),
+              )
+            : Object.create(null)),
       );
-    });
+    }
+    return result;
   }
 
   public finalize(): void {

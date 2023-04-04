@@ -154,7 +154,7 @@ class AddStep extends ExecutableStep {
     this.addDependency($b);
   }
 
-  execute([allA, allB]) {
+  execute(count, [allA, allB]) {
     // allA and allB are guaranteed to have the same length. We have to return
     // a list with the same length as allA and allB, so in this case we can
     // simply map:

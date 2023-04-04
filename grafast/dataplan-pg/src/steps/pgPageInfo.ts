@@ -175,10 +175,8 @@ export class PgPageInfoStep<
     return new PgSelectSingleStep($rows, last($rows)).cursor();
   }
 
-  execute(
-    values: GrafastValuesList<ReadonlyArray<any>>,
-  ): GrafastResultsList<object> {
-    return new Array(values[0].length).fill(EMPTY_OBJECT);
+  execute(count: number): GrafastResultsList<object> {
+    return new Array(count).fill(EMPTY_OBJECT);
   }
 
   unbatchedExecute() {

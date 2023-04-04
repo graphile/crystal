@@ -120,7 +120,7 @@ In the [getting started][] guide the `AddStep` step class should add two numbers
 together. It's execute method looked like this:
 
 ```ts
-  execute([allA, allB]) {
+  execute(count, [allA, allB]) {
     return allA.map((a, i) => {
       return a + allB[i];
     );
