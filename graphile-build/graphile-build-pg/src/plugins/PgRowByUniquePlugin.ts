@@ -106,7 +106,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                   const detailsByColumnName: {
                     [columnName: string]: {
                       graphqlName: string;
-                      codec: PgCodec<any, any, any, any>;
+                      codec: PgCodec;
                     };
                   } = Object.create(null);
                   uniqueKeys.forEach((columnName) => {
@@ -162,9 +162,7 @@ return function (resource) {
                                 detailsByColumnName[columnName].graphqlName,
                               );
                             }
-                            return (
-                              resource as PgResource<any, any, any, any, any>
-                            ).get(spec);
+                            return resource.get(spec);
                           },
                         [detailsByColumnName, resource],
                       );
