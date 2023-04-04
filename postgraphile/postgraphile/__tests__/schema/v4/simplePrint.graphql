@@ -974,9 +974,7 @@ type Query implements Node {
   queryTextArray: [String]
   returnTableWithoutGrants: CompoundKey
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
-  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
-  tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of `CompoundType`."""
   compoundTypeSetQuery(
@@ -999,8 +997,10 @@ type Query implements Node {
     after: Cursor
   ): CompoundTypesConnection
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
+  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
+  tableQuery(id: Int): Post
   funcOutComplex(a: Int, b: String): FuncOutComplexRecord
 
   """
@@ -4009,12 +4009,6 @@ input FloatRangeBoundInput {
   inclusive: Boolean!
 }
 
-type QueryOutputTwoRowsRecord {
-  txt: String
-  leftArm: LeftArm
-  post: Post
-}
-
 type FuncOutOutCompoundTypeRecord {
   o1: Int
   o2: CompoundType
@@ -4044,6 +4038,12 @@ type CompoundTypesEdge {
 
   """The `CompoundType` at the end of the edge."""
   node: CompoundType
+}
+
+type QueryOutputTwoRowsRecord {
+  txt: String
+  leftArm: LeftArm
+  post: Post
 }
 
 type FuncOutComplexRecord {
@@ -4284,6 +4284,12 @@ type Mutation {
     """
     input: MutationTextArrayInput!
   ): MutationTextArrayPayload
+  listBdeMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ListBdeMutationInput!
+  ): ListBdeMutationPayload
   issue756Mutation(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4338,18 +4344,6 @@ type Mutation {
     """
     input: MutationOutOutCompoundTypeInput!
   ): MutationOutOutCompoundTypePayload
-  tableMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: TableMutationInput!
-  ): TableMutationPayload
-  postWithSuffix(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: PostWithSuffixInput!
-  ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
   compoundTypeMutation(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4374,6 +4368,18 @@ type Mutation {
     """
     input: CompoundTypeArrayMutationInput!
   ): CompoundTypeArrayMutationPayload
+  tableMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: TableMutationInput!
+  ): TableMutationPayload
+  postWithSuffix(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PostWithSuffixInput!
+  ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
   postMany(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -6056,6 +6062,33 @@ input MutationTextArrayInput {
   clientMutationId: String
 }
 
+"""The output of our `listBdeMutation` mutation."""
+type ListBdeMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  uuids: [UUID]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `listBdeMutation` mutation."""
+input ListBdeMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  b: [String]
+  d: String
+  e: String
+}
+
 """The output of our `issue756Mutation` mutation."""
 type Issue756MutationPayload {
   """
@@ -6337,85 +6370,6 @@ input MutationOutOutCompoundTypeInput {
   i1: Int
 }
 
-"""The output of our `tableMutation` mutation."""
-type TableMutationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  post: Post
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Post`. May be used by Relay 1."""
-  postEdge(
-    """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostsEdge
-
-  """Reads a single `Person` that is related to this `Post`."""
-  personByAuthorId: Person
-}
-
-"""All input for the `tableMutation` mutation."""
-input TableMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int
-}
-
-"""The output of our `postWithSuffix` mutation."""
-type PostWithSuffixPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  post: Post
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Post`. May be used by Relay 1."""
-  postEdge(
-    """The method to use when ordering `Post`."""
-    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostsEdge
-
-  """Reads a single `Person` that is related to this `Post`."""
-  personByAuthorId: Person
-}
-
-"""All input for the `postWithSuffix` mutation."""
-input PostWithSuffixInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  post: PostInput
-  suffix: String
-}
-
-"""An input for mutations affecting `Post`"""
-input PostInput {
-  id: Int
-  headline: String!
-  body: String
-  authorId: Int
-  enums: [AnEnum]
-  comptypes: [ComptypeInput]
-}
-
 """The output of our `compoundTypeMutation` mutation."""
 type CompoundTypeMutationPayload {
   """
@@ -6514,6 +6468,85 @@ input CompoundTypeArrayMutationInput {
   """
   clientMutationId: String
   object: CompoundTypeInput
+}
+
+"""The output of our `tableMutation` mutation."""
+type TableMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  post: Post
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """Reads a single `Person` that is related to this `Post`."""
+  personByAuthorId: Person
+}
+
+"""All input for the `tableMutation` mutation."""
+input TableMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int
+}
+
+"""The output of our `postWithSuffix` mutation."""
+type PostWithSuffixPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  post: Post
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Post`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering `Post`."""
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """Reads a single `Person` that is related to this `Post`."""
+  personByAuthorId: Person
+}
+
+"""All input for the `postWithSuffix` mutation."""
+input PostWithSuffixInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  post: PostInput
+  suffix: String
+}
+
+"""An input for mutations affecting `Post`"""
+input PostInput {
+  id: Int
+  headline: String!
+  body: String
+  authorId: Int
+  enums: [AnEnum]
+  comptypes: [ComptypeInput]
 }
 
 """The output of our `postMany` mutation."""
