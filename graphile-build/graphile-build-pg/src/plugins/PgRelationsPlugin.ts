@@ -178,9 +178,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
       singleRelation(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         //const codec = relation.remoteResource.codec;
         if (typeof relation.extensions?.tags.fieldName === "string") {
           return relation.extensions.tags.fieldName;
@@ -194,9 +192,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       singleRelationBackwards(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         if (
           typeof relation.extensions?.tags.foreignSingleFieldName === "string"
         ) {
@@ -217,9 +213,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       _manyRelation(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
@@ -236,9 +230,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       manyRelationConnection(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         const override = relation.extensions?.tags.foreignConnectionFieldName;
         if (typeof override === "string") {
           return override;
@@ -247,9 +239,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       manyRelationList(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         const override = relation.extensions?.tags.foreignSimpleFieldName;
         if (typeof override === "string") {
           return override;
@@ -656,9 +646,8 @@ function addRelations(
   if (resource && resource.parameters && !resource.isUnique) {
     return fields;
   }
-  const relations: {
-    [identifier: string]: PgCodecRelation;
-  } = resource?.getRelations() ?? Object.create(null);
+  const relations: Record<string, PgCodecRelation> =
+    resource?.getRelations() ?? Object.create(null);
 
   // Don't use refs on mutation payloads
   const refDefinitionList: Array<{
@@ -704,10 +693,9 @@ function addRelations(
       layers: [] as Layer[],
     };
     for (const pathEntry of path) {
-      const relation: PgCodecRelation<
-        PgCodecWithColumns,
-        PgResource<any, PgCodecWithColumns, any, any, any>
-      > = result.resource.getRelation(pathEntry.relationName);
+      const relation = result.resource.getRelation(
+        pathEntry.relationName,
+      ) as PgCodecRelation;
       const {
         isReferencee,
         localColumns,
@@ -921,10 +909,9 @@ function addRelations(
         // Add forbidden names here
 
         if (ref.paths.length === 1 && ref.paths[0].length === 1) {
-          const relation: PgCodecRelation<
-            PgCodecWithColumns,
-            PgResource<any, PgCodecWithColumns, any, any, any>
-          > = resource.getRelation(ref.paths[0][0].relationName);
+          const relation: PgCodecRelation = resource.getRelation(
+            ref.paths[0][0].relationName,
+          );
           const remoteResource = relation.remoteResource;
           return makeRelationPlans(
             relation.localColumns as string[],

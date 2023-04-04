@@ -287,9 +287,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       singleRelation(previous, _options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
@@ -319,9 +317,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       singleRelationBackwards(previous, _options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         if (
           typeof relation.extensions?.tags?.foreignSingleFieldName === "string"
         ) {
@@ -373,9 +369,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       _manyRelation(previous, _options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
@@ -419,9 +413,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       manyRelationConnection(previous, _options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
           relation.remoteResource.extensions?.tags?.listSuffix;
@@ -432,9 +424,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       manyRelationList(previous, _options, details) {
         const { registry, codec, relationName } = details;
-        const relation = (
-          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
-        )?.[relationName];
+        const relation = registry.pgRelations[codec.name]?.[relationName];
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
           relation.remoteResource.extensions?.tags?.listSuffix;
