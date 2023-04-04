@@ -1,12 +1,4 @@
-import type {
-  PgCodec,
-  PgCodecAttributes,
-  PgCodecRelationConfig,
-  PgCodecWithColumns,
-  PgRegistry,
-  PgResourceOptions,
-  WithPgClient,
-} from "@dataplan/pg";
+import type { PgRegistry, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 
 export interface PgResourceTags extends PgSmartTagsDict {
