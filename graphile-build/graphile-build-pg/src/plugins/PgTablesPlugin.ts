@@ -667,7 +667,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   description: `An input for mutations affecting \`${tableTypeName}\``,
                   extensions: {
-                    graphile: {
+                    grafast: {
                       inputPlan() {
                         return object(Object.create(null));
                       },
@@ -696,7 +696,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
                   extensions: {
-                    graphile: {
+                    grafast: {
                       inputPlan() {
                         return object(Object.create(null));
                       },
@@ -721,7 +721,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   description: `An input representation of \`${tableTypeName}\` with nullable fields.`,
                   extensions: {
-                    graphile: {
+                    grafast: {
                       inputPlan() {
                         return object(Object.create(null));
                       },

@@ -103,7 +103,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                 {
                   [valueName]: {
                     extensions: {
-                      graphile: {
+                      grafast: {
                         applyPlan: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
                             (step: PgSelectStep) => {

@@ -213,7 +213,7 @@ export class __ListTransformStep<
     const itemStepId = this.opPlan.dangerouslyGetStep(this.itemStepId).id;
     if (itemStepId == null) {
       throw new Error(
-        "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
+        "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
       );
     }
     store.set(itemStepId, []);
@@ -223,7 +223,7 @@ export class __ListTransformStep<
       store.set(planId, []);
       if (!bucket.store.has(planId)) {
         throw new Error(
-          `GraphileInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.layerPlan.operationPlan.dangerouslyGetStep(
+          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.layerPlan.operationPlan.dangerouslyGetStep(
             planId,
           )}) listed in copyStepIds but not available in parent bucket for ${this}`,
         );
@@ -287,7 +287,7 @@ export class __ListTransformStep<
         assert.strictEqual(
           list.length,
           values.length,
-          "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __ListTransformStep",
+          "GrafastInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __ListTransformStep",
         );
       }
       const initialState = this.initialState();

@@ -6,7 +6,7 @@ import type {
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
-import type { ConnectionStep, GraphileFieldConfigArgumentMap } from "grafast";
+import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../version.js";
@@ -42,7 +42,7 @@ export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
   };
 
 function commonFn(
-  args: GraphileFieldConfigArgumentMap<any, any, any, any>,
+  args: GrafastFieldConfigArgumentMap<any, any, any, any>,
   build: GraphileBuild.Build,
   context:
     | GraphileBuild.ContextObjectFieldsFieldArgs
@@ -203,7 +203,7 @@ function commonFn(
             },
           }
         : null),
-    } as GraphileFieldConfigArgumentMap<any, any, any, any>,
+    } as GrafastFieldConfigArgumentMap<any, any, any, any>,
     isPgFieldConnection
       ? `Adding connection pagination args to field '${fieldName}' of '${Self.name}'`
       : `Adding simple collection args to field '${fieldName}' of '${Self.name}'`,

@@ -441,7 +441,7 @@ export function executeBucket(
           .then(null, (e) => {
             // THIS SHOULD NEVER HAPPEN!
             console.error(
-              `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: this error should never occur! Please file an issue against grafast. Details: ${e}`,
+              `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: this error should never occur! Please file an issue against grafast. Details: ${e}`,
             );
 
             bucket.hasErrors = true;
@@ -456,7 +456,7 @@ export function executeBucket(
               const storeEntry = bucket.store.get(finishedStep.id)!;
               storeEntry[dataIndex] = newGrafastError(
                 new Error(
-                  `GraphileInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
+                  `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
                 ),
                 finishedStep.id,
               );
@@ -533,7 +533,7 @@ export function executeBucket(
           isDev && DEBUG_POLYMORPHISM
             ? newGrafastError(
                 new Error(
-                  `GraphileInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: step ${
+                  `GrafastInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: step ${
                     step.id
                   } (polymorphicPaths ${[
                     ...step.polymorphicPaths,
@@ -712,13 +712,13 @@ export function executeBucket(
         case "root": {
           throw new Error(
             // *confused emoji*
-            "GraphileInternalError<05fb7069-81b5-43f7-ae71-f62547d2c2b7>: root cannot be not the root (...)",
+            "GrafastInternalError<05fb7069-81b5-43f7-ae71-f62547d2c2b7>: root cannot be not the root (...)",
           );
         }
         default: {
           const never: never = childLayerPlan.reason;
           throw new Error(
-            `GraphileInternalError<c6984a96-050e-4d40-ab18-a8c5dc7e239b>: unhandled reason '${inspect(
+            `GrafastInternalError<c6984a96-050e-4d40-ab18-a8c5dc7e239b>: unhandled reason '${inspect(
               never,
             )}'`,
           );
@@ -749,7 +749,7 @@ export function newBucket(
     // Some validations
     if (!(spec.size > 0)) {
       throw new Error(
-        "GraphileInternalError<eb5c962d-c748-4759-95e3-52c50c873593>: No need to create an empty bucket!",
+        "GrafastInternalError<eb5c962d-c748-4759-95e3-52c50c873593>: No need to create an empty bucket!",
       );
     }
     assert.strictEqual(

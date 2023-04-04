@@ -9,7 +9,7 @@ import type {
 } from "@dataplan/pg";
 import type {
   ConnectionStep,
-  GraphileFieldConfigArgumentMap,
+  GrafastFieldConfigArgumentMap,
   InputStep,
 } from "grafast";
 import { getEnumValueConfig, SafeError } from "grafast";
@@ -76,7 +76,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
               values: {
                 [inflection.builtin("NATURAL")]: {
                   extensions: {
-                    graphile: {
+                    grafast: {
                       // NATURAL means to not change the sort order
                       applyPlan: EXPORTABLE(() => () => {}, []),
                     },
@@ -209,7 +209,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                     [applyOrderToPlan, tableOrderByTypeName],
                   ),
             },
-          } as GraphileFieldConfigArgumentMap<any, any, any, any>,
+          } as GrafastFieldConfigArgumentMap<any, any, any, any>,
           `Adding 'orderBy' argument to field '${fieldName}' of '${Self.name}'`,
         );
       },
@@ -230,7 +230,7 @@ export const applyOrderToPlan = EXPORTABLE(
       }
       val.forEach((order) => {
         const config = getEnumValueConfig(TableOrderByType, order);
-        const plan = config?.extensions?.graphile?.applyPlan;
+        const plan = config?.extensions?.grafast?.applyPlan;
         if (typeof plan !== "function") {
           console.error(
             `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(

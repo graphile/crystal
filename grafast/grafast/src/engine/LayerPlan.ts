@@ -501,12 +501,12 @@ ${te.join(
         const itemStepId = this.rootStep?.id;
         assert.ok(
           itemStepId != null,
-          "GraphileInternalError<f8136364-46c7-4886-b2ae-51319826f97d>: nullableStepStore layer plan has no rootStepId",
+          "GrafastInternalError<f8136364-46c7-4886-b2ae-51319826f97d>: nullableStepStore layer plan has no rootStepId",
         );
         const nullableStepStore = parentBucket.store.get(itemStepId);
         if (!nullableStepStore) {
           throw new Error(
-            `GraphileInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
+            `GrafastInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
               itemStepId,
             )}) in store for ${parentBucket.layerPlan}`,
           );
@@ -573,7 +573,7 @@ ${te.join(
         const listStepStore = parentBucket.store.get(listStepId);
         if (!listStepStore) {
           throw new Error(
-            `GraphileInternalError<314865b0-f7e8-4e81-b966-56e5a0de562e>: could not find entry '${listStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
+            `GrafastInternalError<314865b0-f7e8-4e81-b966-56e5a0de562e>: could not find entry '${listStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
               listStepId,
             )}) in store for layerPlan ${parentBucket.layerPlan}`,
           );
@@ -582,7 +582,7 @@ ${te.join(
         const itemStepId = this.rootStep?.id;
         if (itemStepId == null) {
           throw new Error(
-            "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
+            "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
           );
         }
         store.set(itemStepId, []);
@@ -638,7 +638,7 @@ ${te.join(
         const polymorphicPlanStore = parentBucket.store.get(polymorphicPlanId);
         if (!polymorphicPlanStore) {
           throw new Error(
-            `GraphileInternalError<af1417c6-752b-466e-af7e-cfc35724c3bc>: Entry for '${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
+            `GrafastInternalError<af1417c6-752b-466e-af7e-cfc35724c3bc>: Entry for '${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
               polymorphicPlanId,
             )}' not found in bucket for '${parentBucket.layerPlan}'`,
           );
@@ -652,7 +652,7 @@ ${te.join(
           store.set(planId, []);
           if (!parentBucket.store.has(planId)) {
             throw new Error(
-              `GraphileInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
+              `GrafastInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
                 planId,
               )}, but bucket for ${
                 parentBucket.layerPlan
@@ -706,13 +706,13 @@ ${te.join(
       case "root": {
         throw new Error(
           // *confused emoji*
-          "GraphileInternalError<05fb7069-81b5-43f7-ae71-f62547d2c2b7>: root cannot be not the root (...)",
+          "GrafastInternalError<05fb7069-81b5-43f7-ae71-f62547d2c2b7>: root cannot be not the root (...)",
         );
       }
       default: {
         const never: never = this.reason;
         throw new Error(
-          `GraphileInternalError<8162e6c2-3d66-4d67-ba03-5310a4f9a6d4>: unhandled reason '${inspect(
+          `GrafastInternalError<8162e6c2-3d66-4d67-ba03-5310a4f9a6d4>: unhandled reason '${inspect(
             never,
           )}'`,
         );

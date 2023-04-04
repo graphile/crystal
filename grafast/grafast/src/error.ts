@@ -31,7 +31,7 @@ export class _GrafastError extends Error implements GrafastError {
   constructor(originalError: Error, planId: number | null) {
     if (originalError instanceof _GrafastError) {
       throw new Error(
-        "GraphileInternalError<62505509-8b21-4ef7-80f5-d0f99873174b>: attempted to wrap a GrafastError with a GrafastError.",
+        "GrafastInternalError<62505509-8b21-4ef7-80f5-d0f99873174b>: attempted to wrap a GrafastError with a GrafastError.",
       );
     }
     const message = originalError?.message;

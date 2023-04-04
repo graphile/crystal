@@ -411,7 +411,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
           function registerGeometry(
             typeName: string,
             description: string,
-            fieldGen: () => GraphileBuild.GraphileFieldConfigMap<any, any>,
+            fieldGen: () => GraphileBuild.GrafastFieldConfigMap<any, any>,
             inputFieldGen: () => GraphQLInputFieldConfigMap,
           ): void {
             build.registerObjectType(

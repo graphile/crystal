@@ -81,7 +81,7 @@ export function fieldSelectionsForType(
       default: {
         const never: never = selection;
         throw new Error(
-          `GraphileInternalError<10b01e35-cf2b-4f48-9c66-486cdef00323>: cannot process selection '${inspect(
+          `GrafastInternalError<10b01e35-cf2b-4f48-9c66-486cdef00323>: cannot process selection '${inspect(
             never,
           )}'`,
         );

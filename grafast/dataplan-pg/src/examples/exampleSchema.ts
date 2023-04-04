@@ -20,8 +20,8 @@ import type {
   AccessStep,
   BaseGraphQLRootValue,
   GrafastSubscriber,
-  GraphileArgumentConfig,
-  GraphileFieldConfig,
+  GrafastArgumentConfig,
+  GrafastFieldConfig,
   ListStep,
 } from "grafast";
 import {
@@ -40,7 +40,7 @@ import {
   lambda,
   list,
   listen,
-  newGraphileFieldConfigBuilder,
+  newGrafastFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
@@ -1943,7 +1943,7 @@ export function makeExampleSchema(
     values: {
       BODY_ASC: {
         extensions: {
-          graphile: {
+          grafast: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 step.orderBy({
@@ -1959,7 +1959,7 @@ export function makeExampleSchema(
       },
       BODY_DESC: {
         extensions: {
-          graphile: {
+          grafast: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 step.orderBy({
@@ -1975,7 +1975,7 @@ export function makeExampleSchema(
       },
       AUTHOR_USERNAME_ASC: {
         extensions: {
-          graphile: {
+          grafast: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 const authorAlias = step.singleRelation("author");
@@ -1992,7 +1992,7 @@ export function makeExampleSchema(
       },
       AUTHOR_USERNAME_DESC: {
         extensions: {
-          graphile: {
+          grafast: {
             applyPlan: EXPORTABLE(
               (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 const authorAlias = step.singleRelation("author");
@@ -2103,7 +2103,7 @@ export function makeExampleSchema(
           [],
         ),
       },
-      nodes: newGraphileFieldConfigBuilder<
+      nodes: newGrafastFieldConfigBuilder<
         OurGraphQLContext,
         MessageConnectionStep
       >()({
@@ -2116,7 +2116,7 @@ export function makeExampleSchema(
           [],
         ),
       }),
-      pageInfo: newGraphileFieldConfigBuilder<
+      pageInfo: newGrafastFieldConfigBuilder<
         OurGraphQLContext,
         MessageConnectionStep
       >()({
@@ -2164,7 +2164,7 @@ export function makeExampleSchema(
 
   function makeIncludeArchivedArg<TFieldStep>(
     getClassStep: ($fieldPlan: TFieldStep) => PgSelectStep<any>,
-  ): GraphileArgumentConfig {
+  ): GrafastArgumentConfig {
     return {
       type: IncludeArchived,
       applyPlan: EXPORTABLE(
@@ -3121,7 +3121,7 @@ export function makeExampleSchema(
     isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
     archivedAt: attrField("archived_at", GraphQLString),
   } satisfies {
-    [fieldName: string]: GraphileFieldConfig<
+    [fieldName: string]: GrafastFieldConfig<
       any,
       any,
       PgSelectSingleStep<
@@ -3249,7 +3249,7 @@ export function makeExampleSchema(
       isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
       archivedAt: attrField("archived_at", GraphQLString),
     } satisfies {
-      [fieldName: string]: GraphileFieldConfig<any, any, TStep, any, any>;
+      [fieldName: string]: GrafastFieldConfig<any, any, TStep, any, any>;
     });
 
   const RelationalTopic = newObjectTypeBuilder<
@@ -3574,7 +3574,7 @@ export function makeExampleSchema(
           [],
         ),
       },
-      pageInfo: newGraphileFieldConfigBuilder<
+      pageInfo: newGrafastFieldConfigBuilder<
         OurGraphQLContext,
         VulnerabilityConnectionStep
       >()({
@@ -3604,7 +3604,7 @@ export function makeExampleSchema(
     values: {
       CVSS_SCORE_ASC: {
         extensions: {
-          graphile: {
+          grafast: {
             applyPlan: EXPORTABLE(
               () => (step: PgUnionAllStep) => {
                 step.orderBy({
@@ -3619,7 +3619,7 @@ export function makeExampleSchema(
       },
       CVSS_SCORE_DESC: {
         extensions: {
-          graphile: {
+          grafast: {
             applyPlan: EXPORTABLE(
               () => (step: PgUnionAllStep) => {
                 step.orderBy({
@@ -3853,7 +3853,7 @@ export function makeExampleSchema(
                   }
                   val.forEach((order) => {
                     const config = getEnumValueConfig(MessagesOrderBy, order);
-                    const plan = config?.extensions?.graphile?.applyPlan;
+                    const plan = config?.extensions?.grafast?.applyPlan;
                     if (typeof plan !== "function") {
                       console.error(
                         `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
@@ -4548,7 +4548,7 @@ export function makeExampleSchema(
                       VulnerabilitiesOrderBy,
                       order,
                     );
-                    const plan = config?.extensions?.graphile?.applyPlan;
+                    const plan = config?.extensions?.grafast?.applyPlan;
                     if (typeof plan !== "function") {
                       console.error(
                         `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(

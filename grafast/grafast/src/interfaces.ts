@@ -29,7 +29,7 @@ import type {
   __InputStaticLeafStep,
   __TrackedObjectStep,
 } from "./steps/index.js";
-import type { GraphileInputObjectType, GraphileObjectType } from "./utils.js";
+import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
@@ -158,35 +158,35 @@ export interface GrafastScalarTypeExtensions {
  */
 declare module "graphql" {
   interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
-    graphile?: GrafastFieldExtensions;
+    grafast?: GrafastFieldExtensions;
   }
 
   interface GraphQLArgumentExtensions {
-    graphile?: GrafastArgumentExtensions;
+    grafast?: GrafastArgumentExtensions;
   }
 
   interface GraphQLInputObjectTypeExtensions {
-    graphile?: GrafastInputObjectTypeExtensions;
+    grafast?: GrafastInputObjectTypeExtensions;
   }
 
   interface GraphQLInputFieldExtensions {
-    graphile?: GrafastInputFieldExtensions;
+    grafast?: GrafastInputFieldExtensions;
   }
 
   interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
-    graphile?: GrafastObjectTypeExtensions;
+    grafast?: GrafastObjectTypeExtensions;
   }
 
   interface GraphQLEnumTypeExtensions {
-    graphile?: GrafastEnumTypeExtensions;
+    grafast?: GrafastEnumTypeExtensions;
   }
 
   interface GraphQLEnumValueExtensions {
-    graphile?: GrafastEnumValueExtensions;
+    grafast?: GrafastEnumValueExtensions;
   }
 
   interface GraphQLScalarTypeExtensions {
-    graphile?: GrafastScalarTypeExtensions;
+    grafast?: GrafastScalarTypeExtensions;
   }
 }
 
@@ -301,7 +301,7 @@ export interface FieldInfo {
  * process the data and feed that into the actual resolver functions
  * (preferably using the default resolver function?).
  *
- * They are stored onto `<field>.extensions.graphile.plan`
+ * They are stored onto `<field>.extensions.grafast.plan`
  *
  * @returns a plan for this field.
  *
@@ -449,7 +449,7 @@ export type EnumValueApplyPlanResolver<
 // TypeScript gets upset if we go too deep, so we try and cover the most common
 // use cases and fall back to `any`
 type OutputPlanForNamedType<TType extends GraphQLType> =
-  TType extends GraphileObjectType<any, infer TStep, any>
+  TType extends GrafastObjectType<any, infer TStep, any>
     ? TStep
     : ExecutableStep;
 
@@ -470,7 +470,7 @@ export type OutputPlanForType<TType extends GraphQLOutputType> =
 // TypeScript gets upset if we go too deep, so we try and cover the most common
 // use cases and fall back to `any`
 type InputPlanForNamedType<TType extends GraphQLType> =
-  TType extends GraphileInputObjectType<any, infer U, any>
+  TType extends GrafastInputObjectType<any, infer U, any>
     ? U
     : ModifierStep<any>;
 type InputPlanForType<TType extends GraphQLInputType> =
@@ -550,7 +550,7 @@ type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
  */
-export type GraphileFieldConfig<
+export type GrafastFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends Grafast.Context,
   TParentStep extends ExecutableStep | null,
@@ -560,7 +560,7 @@ export type GraphileFieldConfig<
   type: TType;
   plan?: FieldPlanResolver<TArgs, TParentStep, TFieldStep>;
   subscribePlan?: FieldPlanResolver<TArgs, TParentStep, TFieldStep>;
-  args?: GraphileFieldConfigArgumentMap<
+  args?: GrafastFieldConfigArgumentMap<
     TType,
     TContext,
     TParentStep,
@@ -571,13 +571,13 @@ export type GraphileFieldConfig<
 /**
  * Basically GraphQLFieldConfigArgumentMap but allowing for args to have plans.
  */
-export type GraphileFieldConfigArgumentMap<
+export type GrafastFieldConfigArgumentMap<
   _TType extends GraphQLOutputType,
   TContext extends Grafast.Context,
   TParentStep extends ExecutableStep | null,
   TFieldStep extends ExecutableStep, // TODO: should be OutputPlanForType<_TType>, but that results in everything thinking it should be a ListStep
 > = {
-  [argName: string]: GraphileArgumentConfig<
+  [argName: string]: GrafastArgumentConfig<
     any,
     TContext,
     TParentStep,
@@ -590,7 +590,7 @@ export type GraphileFieldConfigArgumentMap<
 /**
  * Basically GraphQLArgumentConfig but allowing for a plan.
  */
-export type GraphileArgumentConfig<
+export type GrafastArgumentConfig<
   TInputType extends GraphQLInputType = GraphQLInputType,
   _TContext extends Grafast.Context = Grafast.Context,
   _TParentStep extends ExecutableStep | null = ExecutableStep | null,
@@ -610,7 +610,7 @@ export type GraphileArgumentConfig<
 /**
  * Basically GraphQLInputFieldConfig but allowing for the field to have a plan.
  */
-export type GraphileInputFieldConfig<
+export type GrafastInputFieldConfig<
   TInputType extends GraphQLInputType,
   _TContext extends Grafast.Context,
   _TParentStep extends ModifierStep<any>,

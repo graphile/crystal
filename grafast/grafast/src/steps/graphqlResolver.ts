@@ -213,7 +213,7 @@ export class GraphQLItemHandler
     } else {
       if (!isAbstractType(nullableType)) {
         throw new Error(
-          `GraphileInternalError<0a293e88-0f38-43f6-9179-f3ef9a720872>: Expected nullableType to be a list or abstract type, instead found ${nullableType}`,
+          `GrafastInternalError<0a293e88-0f38-43f6-9179-f3ef9a720872>: Expected nullableType to be a list or abstract type, instead found ${nullableType}`,
         );
       }
       this.abstractType = nullableType;
@@ -227,7 +227,7 @@ export class GraphQLItemHandler
   listItem($item: __ItemStep<any>) {
     if (!this.nullableInnerType) {
       throw new Error(
-        `GraphileInternalError<83f3533a-db8e-4eb9-9251-2a165ae6147b>: did not expect ${this}.listItem() to be called since it wasn't handling a list type`,
+        `GrafastInternalError<83f3533a-db8e-4eb9-9251-2a165ae6147b>: did not expect ${this}.listItem() to be called since it wasn't handling a list type`,
       );
     }
     return graphqlItemHandler($item, this.nullableInnerType);
@@ -245,7 +245,7 @@ export class GraphQLItemHandler
     const abstractType = this.abstractType;
     if (!abstractType) {
       throw new Error(
-        "GraphileInternalError<5ea0892a-e9f6-479c-9b0b-2b09e46eecb6>: No abstract type? How can this be?",
+        "GrafastInternalError<5ea0892a-e9f6-479c-9b0b-2b09e46eecb6>: No abstract type? How can this be?",
       );
     }
     if (abstractType.resolveType) {
@@ -332,7 +332,7 @@ export class GraphQLItemHandler
       });
     } else {
       throw new Error(
-        `GraphileInternalError<6a3ed701-6b53-41e6-9a64-fbea57c76ae7>: has to be abstract or list`,
+        `GrafastInternalError<6a3ed701-6b53-41e6-9a64-fbea57c76ae7>: has to be abstract or list`,
       );
     }
   }

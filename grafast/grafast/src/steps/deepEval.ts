@@ -97,7 +97,7 @@ export class DeepEvalStep extends ExecutableStep {
     const itemStepId = this.opPlan.dangerouslyGetStep(this.itemStepId).id;
     if (itemStepId == null) {
       throw new Error(
-        "GraphileInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
+        "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
       );
     }
     store.set(itemStepId, []);
@@ -107,7 +107,7 @@ export class DeepEvalStep extends ExecutableStep {
       store.set(planId, []);
       if (!bucket.store.has(planId)) {
         throw new Error(
-          `GraphileInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.layerPlan.operationPlan.dangerouslyGetStep(
+          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.layerPlan.operationPlan.dangerouslyGetStep(
             planId,
           )}) listed in copyStepIds but not available in parent bucket for ${this}`,
         );
@@ -177,7 +177,7 @@ export class DeepEvalStep extends ExecutableStep {
         assert.strictEqual(
           list.length,
           values.length,
-          "GraphileInternalError<43cb302e-673b-4881-8c4c-f2d00fe5a3d7>: The list and values length must match for a DeepEvalStep",
+          "GrafastInternalError<43cb302e-673b-4881-8c4c-f2d00fe5a3d7>: The list and values length must match for a DeepEvalStep",
         );
       }
       return values;

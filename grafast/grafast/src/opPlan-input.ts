@@ -185,7 +185,7 @@ function withFieldArgsForArgumentsOrInputObject<
           if (!parentType) {
             const arg = argOrField as GraphQLArgument;
             if ($toStep) {
-              const argResolver = arg.extensions.graphile?.applyPlan;
+              const argResolver = arg.extensions.grafast?.applyPlan;
               if (argResolver && notUndefined($value)) {
                 return argResolver(parentPlan, $toStep, fieldArgs, {
                   schema,
@@ -195,7 +195,7 @@ function withFieldArgsForArgumentsOrInputObject<
                 return $toStep;
               }
             } else {
-              const argResolver = arg.extensions.graphile?.inputPlan;
+              const argResolver = arg.extensions.grafast?.inputPlan;
               if (argResolver) {
                 return argResolver(parentPlan, fieldArgs, {
                   schema,
@@ -208,7 +208,7 @@ function withFieldArgsForArgumentsOrInputObject<
           } else {
             const field = argOrField as GraphQLInputField;
             if ($toStep) {
-              const fieldResolver = field.extensions.graphile?.applyPlan;
+              const fieldResolver = field.extensions.grafast?.applyPlan;
               if (fieldResolver && notUndefined($value)) {
                 return fieldResolver($toStep, fieldArgs, {
                   schema,
@@ -218,7 +218,7 @@ function withFieldArgsForArgumentsOrInputObject<
                 return $toStep;
               }
             } else {
-              const fieldResolver = field.extensions.graphile?.inputPlan;
+              const fieldResolver = field.extensions.grafast?.inputPlan;
               if (fieldResolver) {
                 return fieldResolver(fieldArgs, {
                   schema,
@@ -260,7 +260,7 @@ function withFieldArgsForArgumentsOrInputObject<
     } else if (isListType(currentType)) {
       if (!("evalLength" in $value)) {
         throw new Error(
-          `GraphileInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedObjectStep (i.e. to have 'evalLength')`,
+          `GrafastInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedObjectStep (i.e. to have 'evalLength')`,
         );
       }
       const l = $value.evalLength();
@@ -275,7 +275,7 @@ function withFieldArgsForArgumentsOrInputObject<
       return list(entries);
     } else if (isInputObjectType(currentType)) {
       const typeResolver =
-        currentType.extensions.graphile?.inputPlan ||
+        currentType.extensions.grafast?.inputPlan ||
         defaultInputObjectTypeInputPlanResolver;
       return withFieldArgsForArgumentsOrInputObject(
         operationPlan,
@@ -290,7 +290,7 @@ function withFieldArgsForArgumentsOrInputObject<
           }),
       );
     } else if (isScalarType(currentType)) {
-      const scalarResolver = currentType.extensions.graphile?.inputPlan;
+      const scalarResolver = currentType.extensions.grafast?.inputPlan;
       if (scalarResolver) {
         return scalarResolver($value, { schema, type: currentType });
       } else {
@@ -298,7 +298,7 @@ function withFieldArgsForArgumentsOrInputObject<
       }
     } else if (isEnumType(currentType)) {
       /*
-      const enumResolver = currentType.extensions.graphile?.inputPlan;
+      const enumResolver = currentType.extensions.grafast?.inputPlan;
       if (enumResolver) {
         return enumResolver($value, { schema, type: currentType });
       } else {
@@ -323,7 +323,7 @@ function withFieldArgsForArgumentsOrInputObject<
     } else if (isListType(currentType)) {
       if (!("evalLength" in $value)) {
         throw new Error(
-          `GraphileInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedObjectStep (i.e. to have 'evalLength')`,
+          `GrafastInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedObjectStep (i.e. to have 'evalLength')`,
         );
       }
       const l = $value.evalLength();
@@ -343,12 +343,12 @@ function withFieldArgsForArgumentsOrInputObject<
       const fields = currentType.getFields();
       for (const fieldName in fields) {
         const field = fields[fieldName];
-        const resolver = field.extensions.graphile?.applyPlan;
+        const resolver = field.extensions.grafast?.applyPlan;
         if (resolver) {
           const fieldType = field.type;
           if (!("get" in $value)) {
             throw new Error(
-              `GraphileInternalError<b68a1d2a-9315-40cc-a91b-2eca1724b752>: unexpected '${$value}'`,
+              `GrafastInternalError<b68a1d2a-9315-40cc-a91b-2eca1724b752>: unexpected '${$value}'`,
             );
           }
           const $field = $value.get(fieldName);
@@ -384,7 +384,7 @@ function withFieldArgsForArgumentsOrInputObject<
       // PERF: only do this if this enum type has values that have side effects
       const value = $value.eval();
       const enumValue = currentType.getValues().find((v) => v.value === value);
-      const enumResolver = enumValue?.extensions.graphile?.applyPlan;
+      const enumResolver = enumValue?.extensions.grafast?.applyPlan;
       if (enumResolver) {
         const $toStep = toStepOrCallback;
         if (!($toStep instanceof BaseStep)) {
@@ -520,7 +520,7 @@ function withFieldArgsForArgumentsOrInputObject<
             const inputObjectType = getNullableType(field.type);
             if (!isInputObjectType(inputObjectType)) {
               throw new Error(
-                `GraphileInternalError<1ac45a76-a21e-4f25-841c-59c73ddcf70c>: How could this not be an input object type given we have a path that uses it?!`,
+                `GrafastInternalError<1ac45a76-a21e-4f25-841c-59c73ddcf70c>: How could this not be an input object type given we have a path that uses it?!`,
               );
             }
             process(inputObjectType.getFields(), newPath);

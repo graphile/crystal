@@ -18,7 +18,7 @@ import {
   pgSelectFromRecords,
   pgSelectSingleFromRecord,
 } from "@dataplan/pg";
-import type { GraphileFieldConfig, SetterStep } from "grafast";
+import type { GrafastFieldConfig, SetterStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "graphql";
 
@@ -186,7 +186,7 @@ function processColumn(
     );
     return;
   }
-  const fieldSpec: GraphileFieldConfig<any, any, any, any, any> = {
+  const fieldSpec: GrafastFieldConfig<any, any, any, any, any> = {
     description: column.description,
     type: type as GraphQLOutputType,
   };

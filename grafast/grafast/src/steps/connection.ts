@@ -345,7 +345,7 @@ export class EdgeStep<
     assert.strictEqual(
       itemDepId,
       0,
-      "GraphileInternalError<89cc75cd-ccaf-4b7e-873f-a629c36d55f7>: item must be first dependency",
+      "GrafastInternalError<89cc75cd-ccaf-4b7e-873f-a629c36d55f7>: item must be first dependency",
     );
     if (!skipCursor) {
       const $cursor =
@@ -360,7 +360,7 @@ export class EdgeStep<
       assert.strictEqual(
         this.cursorDepId,
         1,
-        "GraphileInternalError<46e4b5ca-0c11-4737-973d-0edd0be060c9>: cursor must be second dependency",
+        "GrafastInternalError<46e4b5ca-0c11-4737-973d-0edd0be060c9>: cursor must be second dependency",
       );
     } else {
       this.cursorDepId = null;

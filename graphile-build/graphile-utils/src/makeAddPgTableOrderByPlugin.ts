@@ -10,7 +10,7 @@ type OrderBySpecIdentity =
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
-      graphile: {
+      grafast: {
         applyPlan($select: PgSelectStep): void;
       };
     };
@@ -226,14 +226,14 @@ export function orderByAscDesc(
   const orders: MakeAddPgTableOrderByPluginOrders = {
     [`${baseName}_ASC`]: {
       extensions: {
-        graphile: {
+        grafast: {
           applyPlan: ascendingPlan,
         },
       },
     },
     [`${baseName}_DESC`]: {
       extensions: {
-        graphile: {
+        grafast: {
           applyPlan: descendingPlan,
         },
       },
