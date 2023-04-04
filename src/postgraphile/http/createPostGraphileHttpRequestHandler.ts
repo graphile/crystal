@@ -222,11 +222,6 @@ export default function createPostGraphileHttpRequestHandler(
 
   const origGraphiqlHtml = pluginHook('postgraphile:graphiql:html', baseGraphiqlHtml, { options });
 
-  if (pgDefaultRole && typeof pgSettings === 'function') {
-    throw new Error(
-      'pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req).',
-    );
-  }
   if (
     pgDefaultRole &&
     pgSettings &&
