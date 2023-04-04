@@ -22,7 +22,6 @@ import type {
   PgCodec,
   PgCodecRelation,
   PgRegistryAny,
-  PgResourceAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -38,7 +37,7 @@ import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 export interface PgSelectSinglePlanOptions {
-  fromRelation?: [PgSelectSingleStep<PgResourceAny>, string];
+  fromRelation?: [PgSelectSingleStep<PgResource>, string];
 }
 
 // Types that only take a few bytes so adding them to the selection would be

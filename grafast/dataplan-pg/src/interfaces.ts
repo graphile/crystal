@@ -710,14 +710,6 @@ export interface PgRegistry<
   };
 }
 
-export type PgResourceAny = PgResource<
-  string,
-  PgCodec,
-  ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-  readonly PgResourceParameter[] | undefined,
-  PgRegistry<any, any, any>
->;
-
 export type PgRegistryAny = PgRegistry<
   {
     [name in string]: PgCodec<

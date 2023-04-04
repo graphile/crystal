@@ -50,10 +50,8 @@ import type {
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
-  PgCodecWithColumns,
   PgGroupSpec,
   PgOrderSpec,
-  PgResourceAny,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -2164,7 +2162,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       if ($p === this) {
         return true;
       }
-      const p = $p as PgSelectStep<PgResourceAny>;
+      const p = $p as PgSelectStep<PgResource>;
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
       // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
@@ -2343,7 +2341,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     }
   }
 
-  private mergeSelectsWith<TOtherStep extends PgSelectStep<PgResourceAny>>(
+  private mergeSelectsWith<TOtherStep extends PgSelectStep<PgResource>>(
     otherPlan: TOtherStep,
   ): {
     [desiredIndex: string]: string;
@@ -2367,7 +2365,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
     return actualKeyByDesiredKey;
   }
 
-  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<PgResourceAny>>(
+  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<PgResource>>(
     otherPlan: TOtherStep,
   ): void {
     for (const placeholder of this.placeholders) {
@@ -2445,7 +2443,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       !this.isNullFetch()
     ) {
       // Inline ourself into our parent if we can.
-      let t: PgSelectStep<PgResourceAny> | null | undefined = undefined;
+      let t: PgSelectStep<PgResource> | null | undefined = undefined;
       let p: ExecutableStep | undefined = undefined;
       for (
         let dependencyIndex = 0, l = this.dependencies.length;

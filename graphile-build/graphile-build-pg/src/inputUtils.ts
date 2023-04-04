@@ -40,7 +40,7 @@ export function getCodecMetaLookupFromInput(
   input: GraphileBuild.BuildInput,
 ): PgCodecMetaLookup {
   const metaLookup: PgCodecMetaLookup = new Map();
-  const seenResources = new Set<PgResource<any, any, any, any, any>>();
+  const seenResources = new Set<PgResource>();
   for (const codec of Object.values(input.pgRegistry.pgCodecs) as PgCodec[]) {
     walkCodec(codec, metaLookup);
   }
@@ -57,9 +57,9 @@ export function getCodecMetaLookupFromInput(
  * @internal
  */
 function walkResource(
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource,
   metaLookup: PgCodecMetaLookup,
-  seenResources: Set<PgResource<any, any, any, any, any>>,
+  seenResources: Set<PgResource>,
 ): void {
   if (seenResources.has(resource)) {
     return;
