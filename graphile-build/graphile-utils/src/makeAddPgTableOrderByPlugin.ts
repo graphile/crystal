@@ -5,13 +5,13 @@ import { EXPORTABLE } from "./exportable.js";
 type OrderBySpecIdentity =
   | string // Column name
   | Omit<PgOrderSpec, "direction"> // Expression
-  | (($select: PgSelectStep<any>) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+  | (($select: PgSelectStep) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
       graphile: {
-        applyPlan($select: PgSelectStep<any>): void;
+        applyPlan($select: PgSelectStep): void;
       };
     };
   };
@@ -127,7 +127,7 @@ export function orderByAscDesc(
       ? "FIRST"
       : "LAST";
 
-  type Plan = ($select: PgSelectStep<any>) => void;
+  type Plan = ($select: PgSelectStep) => void;
 
   let spec: PgOrderSpec;
   const ascendingPlan: Plan =
