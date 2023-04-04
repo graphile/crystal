@@ -3,7 +3,6 @@ import "graphile-build";
 import type {
   PgCodec,
   PgCodecAttribute,
-  PgCodecRelationConfig,
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
@@ -168,21 +167,12 @@ declare global {
 
 declare global {
   namespace GraphileConfig {
-    type PgTablesPluginSourceRelations = {
-      [identifier: string]: PgCodecRelationConfig<any, any>;
-    };
-
     interface GatherHelpers {
       pgTables: {
         getResourceOptions(
           databaseName: string,
           pgClass: PgClass,
-        ): Promise<PgResourceOptions<any, PgCodec, any, any> | null>;
-        /*
-        getSource(
-          resourceOptions: PgResourceOptions<any, any, any, any>,
-        ): Promise<PgResource<any, any, any, any, any> | null>;
-        */
+        ): Promise<PgResourceOptions | null>;
       };
     }
 
@@ -205,21 +195,21 @@ declare global {
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          resourceOptions: PgResourceOptions<any, any, any, any>;
+          resourceOptions: PgResourceOptions;
         }) => void | Promise<void>
       >;
       pgTables_PgResourceOptions_relations: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          resourceOptions: PgResourceOptions<any, any, any, any>;
+          resourceOptions: PgResourceOptions;
         }) => Promise<void> | void
       >;
       pgTables_PgResourceOptions_relations_post: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
-          resourceOptions: PgResourceOptions<any, PgCodec, any, any>;
+          resourceOptions: PgResourceOptions;
         }) => Promise<void> | void
       >;
     }
@@ -229,14 +219,11 @@ declare global {
 interface State {
   resourceOptionsByPgClassByDatabase: Map<
     string,
-    Map<PgClass, Promise<PgResourceOptions<any, any, any, any> | null>>
+    Map<PgClass, Promise<PgResourceOptions | null>>
   >;
-  resourceByResourceOptions: Map<
-    PgResourceOptions<any, any, any, any>,
-    Promise<PgResource<any, any, any, any, any> | null>
-  >;
+  resourceByResourceOptions: Map<PgResourceOptions, Promise<PgResource | null>>;
   detailsByResourceOptions: Map<
-    PgResourceOptions<any, any, any, any>,
+    PgResourceOptions,
     { databaseName: string; pgClass: PgClass }
   >;
 }
@@ -570,7 +557,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
       async pgRegistry_PgRegistryBuilder_pgRelations(info, _event) {
         const toProcess: Array<{
-          resourceOptions: PgResourceOptions<any, any, any, any>;
+          resourceOptions: PgResourceOptions;
           pgClass: PgClass;
           databaseName: string;
         }> = [];
