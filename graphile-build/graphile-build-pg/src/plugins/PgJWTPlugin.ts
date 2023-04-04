@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PgSelectSingleStep, PgTypeCodec } from "@dataplan/pg";
+import type { PgCodec, PgSelectSingleStep } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 import { sign as signJwt } from "jsonwebtoken";
 
@@ -28,7 +28,7 @@ declare global {
 
     interface ScopeScalar {
       isPgJwtType?: boolean;
-      pgCodec?: PgTypeCodec<any, any, any, any>;
+      pgCodec?: PgCodec;
     }
   }
 }
@@ -56,7 +56,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
     namespace: "pgJWT",
     helpers: {},
     hooks: {
-      pgCodecs_PgTypeCodec(info, { pgCodec, pgType }) {
+      pgCodecs_PgCodec(info, { pgCodec, pgType }) {
         if (
           info.options.pgJwtType?.[1] === pgType.typname &&
           info.options.pgJwtType?.[0] === pgType.getNamespace()!.nspname
@@ -84,6 +84,11 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
 
         if (!jwtCodec) {
           return _;
+        }
+        if (!jwtCodec.columns) {
+          throw new Error(
+            `JWT codec '${jwtCodec.name}' found, but it does not appear to have any attributes. Please check your configuration, the JWT type should be a composite type.`,
+          );
         }
 
         const jwtTypeName = build.inflection.tableType(jwtCodec);
@@ -143,12 +148,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   () =>
                     function plan($in) {
-                      const $record = $in as PgSelectSingleStep<
-                        any,
-                        any,
-                        any,
-                        any
-                      >;
+                      const $record = $in as PgSelectSingleStep;
                       return $record.record();
                     },
                   [],

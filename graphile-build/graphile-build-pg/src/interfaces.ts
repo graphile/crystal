@@ -1,7 +1,7 @@
-import type { WithPgClient } from "@dataplan/pg";
+import type { PgRegistry, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 
-export interface PgSourceTags extends PgSmartTagsDict {
+export interface PgResourceTags extends PgSmartTagsDict {
   name: string;
 
   /** For a computed column function/etc, what field name should we use? */
@@ -15,29 +15,29 @@ export interface PgSourceTags extends PgSmartTagsDict {
   deprecated: string | string[];
 }
 
-export interface PgSourceUniqueTags extends PgSmartTagsDict {
+export interface PgResourceUniqueTags extends PgSmartTagsDict {
   /** The field name for the root-level accessor for a row by this unique constraint */
   fieldName: string;
   behavior: string | string[];
 }
 
-export interface PgSourceRelationTags extends PgSmartTagsDict {
+export interface PgCodecRelationTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
 }
 
-export interface PgSourceRefTags extends PgSmartTagsDict {
+export interface PgCodecRefTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
 }
 
-export interface PgTypeColumnTags extends PgSmartTagsDict {
+export interface PgCodecAttributeTags extends PgSmartTagsDict {
   name: string;
   behavior: string | string[];
   notNull: true;
 }
 
-export interface PgTypeCodecTags extends PgSmartTagsDict {
+export interface PgCodecTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
   implements: string | string[];
@@ -64,8 +64,8 @@ export interface PgAdaptor<
  * extensions so we can easily use them with TypeScript.
  */
 declare module "@dataplan/pg" {
-  interface PgSourceExtensions {
-    tags: Partial<PgSourceTags>;
+  interface PgResourceExtensions {
+    tags: Partial<PgResourceTags>;
     description?: string;
     singleOutputParameterName?: string;
     /** For v4 compatibility, what's the name of the actual table. */
@@ -76,30 +76,38 @@ declare module "@dataplan/pg" {
     };
   }
 
-  interface PgSourceUniqueExtensions {
-    tags: Partial<PgSourceUniqueTags>;
+  interface PgResourceUniqueExtensions {
+    tags: Partial<PgResourceUniqueTags>;
     description?: string;
   }
 
-  interface PgSourceRelationExtensions {
-    tags: Partial<PgSourceRelationTags>;
+  interface PgCodecRelationExtensions {
+    tags: Partial<PgCodecRelationTags>;
     description?: string;
   }
 
-  interface PgSourceRefExtensions {
-    tags: Partial<PgSourceRefTags>;
+  interface PgCodecRefExtensions {
+    tags: Partial<PgCodecRefTags>;
     description?: string;
   }
 
-  interface PgTypeColumnExtensions {
-    tags: Partial<PgTypeColumnTags>;
+  interface PgCodecAttributeExtensions {
+    tags: Partial<PgCodecAttributeTags>;
     description?: string;
   }
 
-  interface PgTypeCodecExtensions {
+  interface PgCodecExtensions {
     /** If false but the codec has columns then it's probably a composite type */
     isTableLike?: boolean;
-    tags: Partial<PgTypeCodecTags>;
+    tags: Partial<PgCodecTags>;
     description?: string;
+  }
+}
+
+declare global {
+  namespace GraphileBuild {
+    interface BuildInput {
+      pgRegistry: PgRegistry<any, any, any>;
+    }
   }
 }

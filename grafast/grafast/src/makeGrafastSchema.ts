@@ -53,7 +53,7 @@ export type FieldPlans =
  * The plans/config for each field of a GraphQL object type.
  */
 export type ObjectPlans = {
-  __Step?: { new (...args: any[]): ExecutableStep<any> };
+  __Step?: { new (...args: any[]): ExecutableStep };
 } & {
   [fieldName: string]: FieldPlans;
 };

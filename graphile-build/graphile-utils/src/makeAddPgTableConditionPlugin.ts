@@ -13,7 +13,7 @@ export function makeAddPgTableConditionPlugin(
   conditionGenerator?: (
     value: FieldArgs,
     helpers: {
-      $condition: PgConditionStep<PgSelectStep<any, any, any, any>>;
+      $condition: PgConditionStep<PgSelectStep>;
       sql: typeof sql;
       sqlTableAlias: SQL;
       build: GraphileBuild.Build;
@@ -85,7 +85,7 @@ export function makeAddPgTableConditionPlugin(
             conditionFieldSpec.applyPlan = EXPORTABLE(
               (build, conditionGenerator, sql) =>
                 function applyPlan(
-                  $condition: PgConditionStep<PgSelectStep<any, any, any, any>>,
+                  $condition: PgConditionStep<PgSelectStep>,
                   val,
                 ) {
                   const expression = conditionGenerator!(val, {

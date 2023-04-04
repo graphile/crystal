@@ -4,15 +4,10 @@ import type {
   PolymorphicData,
   PolymorphicStep,
 } from "grafast";
-import { ExecutableStep, polymorphicWrap } from "grafast";
+import { ExecutableStep, exportAs, polymorphicWrap } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 
-import type { ObjectFromPgTypeColumns, PgTypeColumns } from "../codecs.js";
-import type {
-  PgSourceParameter,
-  PgSourceRelation,
-  PgSourceUnique,
-} from "../datasource.js";
+import type { PgResource } from "../datasource.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
 /**
@@ -23,16 +18,7 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
  * that represents a row from this table.
  */
 export class PgSingleTablePolymorphicStep<
-    TColumns extends PgTypeColumns | undefined,
-    TUniques extends ReadonlyArray<
-      PgSourceUnique<Exclude<TColumns, undefined>>
-    >,
-    TRelations extends {
-      [identifier: string]: TColumns extends PgTypeColumns
-        ? PgSourceRelation<TColumns, any>
-        : never;
-    },
-    TParameters extends PgSourceParameter[] | undefined = undefined,
+    TResource extends PgResource<any, any, any, any, any>,
   >
   extends ExecutableStep<unknown>
   implements PolymorphicStep
@@ -48,7 +34,7 @@ export class PgSingleTablePolymorphicStep<
 
   constructor(
     $typeName: ExecutableStep<string | null>,
-    $row: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
+    $row: PgSelectSingleStep<TResource>,
   ) {
     super();
     this.typeStepId = this.addDependency($typeName);
@@ -60,13 +46,8 @@ export class PgSingleTablePolymorphicStep<
   }
 
   deduplicate(
-    peers: PgSingleTablePolymorphicStep<any, any, any, any>[],
-  ): PgSingleTablePolymorphicStep<
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  >[] {
+    peers: PgSingleTablePolymorphicStep<any>[],
+  ): PgSingleTablePolymorphicStep<TResource>[] {
     return peers;
   }
 
@@ -80,33 +61,19 @@ export class PgSingleTablePolymorphicStep<
     values: Array<GrafastValuesList<any>>,
   ): GrafastResultsList<PolymorphicData<
     string,
-    ReadonlyArray<
-      TColumns extends PgTypeColumns ? ObjectFromPgTypeColumns<TColumns> : never
-    >
+    ReadonlyArray<unknown[]>
   > | null> {
     return values[this.typeStepId].map((v) => (v ? polymorphicWrap(v) : null));
   }
 }
 
 export function pgSingleTablePolymorphic<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
+  TResource extends PgResource<any, any, any, any, any>,
 >(
   $typeName: ExecutableStep<string | null>,
-  $row: PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>,
-): PgSingleTablePolymorphicStep<TColumns, TUniques, TRelations, TParameters> {
+  $row: PgSelectSingleStep<TResource>,
+): PgSingleTablePolymorphicStep<TResource> {
   return new PgSingleTablePolymorphicStep($typeName, $row);
 }
 
-Object.defineProperty(pgSingleTablePolymorphic, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgSingleTablePolymorphic",
-  },
-});
+exportAs("@dataplan/pg", pgSingleTablePolymorphic, "pgSingleTablePolymorphic");

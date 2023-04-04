@@ -3,8 +3,9 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
-  PgSourceUnique,
-  PgTypeCodec,
+  PgCodecWithColumns,
+  PgResource,
+  PgResourceUnique,
 } from "@dataplan/pg";
 import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
@@ -21,10 +22,7 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       // TODO: move this somewhere more shared
-      tableEdgeField(
-        this: Inflection,
-        codec: PgTypeCodec<any, any, any, any>,
-      ): string;
+      tableEdgeField(this: Inflection, codec: PgCodecWithColumns): string;
     }
 
     interface ScopeObjectFieldsField {
@@ -58,12 +56,12 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           options: { simpleCollections },
         } = build;
         const {
-          scope: { isMutationPayload, pgTypeSource, pgCodec: _pgCodec },
+          scope: { isMutationPayload, pgTypeResource, pgCodec: _pgCodec },
           fieldWithHooks,
           Self,
         } = context;
 
-        const pgCodec = pgTypeSource?.codec ?? _pgCodec;
+        const pgCodec = pgTypeResource?.codec ?? _pgCodec;
 
         if (
           !isMutationPayload ||
@@ -74,7 +72,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        if (pgTypeSource?.parameters && !pgTypeSource.isUnique) {
+        if (pgTypeResource?.parameters && !pgTypeResource.isUnique) {
           return fields;
         }
 
@@ -94,19 +92,27 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const sources = build.input.pgSources.filter((source) => {
-          if (source.codec !== pgCodec) return false;
-          if (source.parameters) return false;
+        const resources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ).filter((resource) => {
+          if (resource.codec !== pgCodec) return false;
+          if (resource.parameters) return false;
           return true;
         });
 
-        if (sources.length !== 1) {
+        if (resources.length !== 1) {
           return fields;
         }
 
-        const source = sources[0];
+        const resource = resources[0] as PgResource<
+          any,
+          PgCodecWithColumns,
+          any,
+          any,
+          any
+        >;
 
-        const pk = (source.uniques as PgSourceUnique[])?.find(
+        const pk = (resource.uniques as PgResourceUnique[])?.find(
           (u) => u.isPrimary,
         );
         if (!pk) {
@@ -130,13 +136,13 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
         const TableEdgeType = getTypeByName(
-          inflection.tableEdgeType(source.codec),
+          inflection.tableEdgeType(resource.codec),
         ) as GraphQLObjectType | undefined;
         if (!TableEdgeType) {
           return fields;
         }
 
-        const fieldName = inflection.tableEdgeField(source.codec);
+        const fieldName = inflection.tableEdgeField(resource.codec);
         const primaryKeyAsc = inflection.builtin("PRIMARY_KEY_ASC");
         const defaultValueEnum =
           TableOrderByType.getValues().find((v) => v.name === primaryKeyAsc) ||
@@ -173,7 +179,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   },
                 },
                 deprecationReason: tagToString(
-                  source.extensions?.tags?.deprecated,
+                  resource.extensions?.tags?.deprecated,
                 ),
                 // TODO: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
@@ -185,12 +191,12 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     constant,
                     pgSelectFromRecord,
                     pkColumns,
-                    source,
+                    resource,
                     tableOrderByTypeName,
                   ) =>
                     function plan(
                       $mutation: ObjectStep<{
-                        result: PgClassSingleStep<any, any, any, any>;
+                        result: PgClassSingleStep;
                       }>,
                       args: FieldArgs,
                       info: FieldInfo,
@@ -203,7 +209,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       const $select = (() => {
                         if ($result instanceof PgDeleteStep) {
                           return pgSelectFromRecord(
-                            $result.source,
+                            $result.resource,
                             $result.record(),
                           );
                         } else {
@@ -211,7 +217,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                             memo[columnName] = $result.get(columnName);
                             return memo;
                           }, Object.create(null));
-                          return source.find(spec);
+                          return resource.find(spec);
                         }
                       })();
 
@@ -237,7 +243,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     constant,
                     pgSelectFromRecord,
                     pkColumns,
-                    source,
+                    resource,
                     tableOrderByTypeName,
                   ],
                 ),

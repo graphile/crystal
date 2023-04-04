@@ -125,7 +125,7 @@ export interface GrafastInputFieldExtensions {
 
 export interface GrafastObjectTypeExtensions {
   Step?:
-    | ((step: ExecutableStep<any>) => asserts step is ExecutableStep<any>)
+    | ((step: ExecutableStep) => asserts step is ExecutableStep)
     | { new (...args: any[]): ExecutableStep; displayName?: string };
 }
 
@@ -311,8 +311,8 @@ export interface FieldInfo {
  */
 export type FieldPlanResolver<
   _TArgs extends BaseGraphQLArguments,
-  TParentStep extends ExecutableStep<any> | null,
-  TResultStep extends ExecutableStep<any>,
+  TParentStep extends ExecutableStep | null,
+  TResultStep extends ExecutableStep,
 > = (
   $parentPlan: TParentStep,
   args: FieldArgs,
@@ -327,7 +327,7 @@ export type FieldPlanResolver<
  * resolver must return either a ModifierStep or null.
  */
 export type InputObjectFieldInputPlanResolver<
-  TResultStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TResultStep extends ExecutableStep = ExecutableStep,
 > = (
   input: FieldArgs,
   info: {
@@ -337,13 +337,13 @@ export type InputObjectFieldInputPlanResolver<
 ) => TResultStep;
 
 export type InputObjectFieldApplyPlanResolver<
-  TFieldStep extends ExecutableStep<any> | ModifierStep<any> =
-    | ExecutableStep<any>
+  TFieldStep extends ExecutableStep | ModifierStep<any> =
+    | ExecutableStep
     | ModifierStep<any>,
   TResultStep extends ModifierStep<
-    ExecutableStep<any> | ModifierStep<any>
+    ExecutableStep | ModifierStep<any>
   > | null | void = ModifierStep<
-    ExecutableStep<any> | ModifierStep<any>
+    ExecutableStep | ModifierStep<any>
   > | null | void,
 > = (
   $fieldPlan: TFieldStep,
@@ -371,8 +371,8 @@ export type InputObjectTypeInputPlanResolver = (
  * argument. The resolver must return either a ModifierStep or null.
  */
 export type ArgumentInputPlanResolver<
-  TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
-  TResultStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TParentStep extends ExecutableStep = ExecutableStep,
+  TResultStep extends ExecutableStep = ExecutableStep,
 > = (
   $parentPlan: TParentStep,
   input: FieldArgs,
@@ -383,9 +383,9 @@ export type ArgumentInputPlanResolver<
 ) => TResultStep;
 
 export type ArgumentApplyPlanResolver<
-  TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
-  TFieldStep extends ExecutableStep<any> | ModifierStep<any> =
-    | ExecutableStep<any>
+  TParentStep extends ExecutableStep = ExecutableStep,
+  TFieldStep extends ExecutableStep | ModifierStep<any> =
+    | ExecutableStep
     | ModifierStep<any>,
   TResultStep extends
     | ExecutableStep
@@ -411,8 +411,8 @@ export type ArgumentApplyPlanResolver<
  * return an executable plan.
  */
 export type ScalarPlanResolver<
-  TParentStep extends ExecutableStep<any> = ExecutableStep<any>,
-  TResultStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TParentStep extends ExecutableStep = ExecutableStep,
+  TResultStep extends ExecutableStep = ExecutableStep,
 > = ($parentPlan: TParentStep, info: { schema: GraphQLSchema }) => TResultStep;
 
 /**
@@ -420,7 +420,7 @@ export type ScalarPlanResolver<
  * return an executable plan.
  */
 export type ScalarInputPlanResolver<
-  TResultStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TResultStep extends ExecutableStep = ExecutableStep,
 > = (
   $inputValue: InputStep,
   /*
@@ -451,7 +451,7 @@ export type EnumValueApplyPlanResolver<
 type OutputPlanForNamedType<TType extends GraphQLType> =
   TType extends GraphileObjectType<any, infer TStep, any>
     ? TStep
-    : ExecutableStep<any>;
+    : ExecutableStep;
 
 // TODO: this is completely wrong now; ListCapableStep is no longer required to be supported for lists.
 export type OutputPlanForType<TType extends GraphQLOutputType> =
@@ -553,8 +553,8 @@ type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
 export type GraphileFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep<any> | null,
-  TFieldStep extends ExecutableStep<any>, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
+  TParentStep extends ExecutableStep | null,
+  TFieldStep extends ExecutableStep, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
@@ -574,8 +574,8 @@ export type GraphileFieldConfig<
 export type GraphileFieldConfigArgumentMap<
   _TType extends GraphQLOutputType,
   TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep<any> | null,
-  TFieldStep extends ExecutableStep<any>, // TODO: should be OutputPlanForType<_TType>, but that results in everything thinking it should be a ListStep
+  TParentStep extends ExecutableStep | null,
+  TFieldStep extends ExecutableStep, // TODO: should be OutputPlanForType<_TType>, but that results in everything thinking it should be a ListStep
 > = {
   [argName: string]: GraphileArgumentConfig<
     any,
@@ -591,14 +591,16 @@ export type GraphileFieldConfigArgumentMap<
  * Basically GraphQLArgumentConfig but allowing for a plan.
  */
 export type GraphileArgumentConfig<
-  TInputType extends GraphQLInputType,
-  _TContext extends Grafast.Context,
-  _TParentStep extends ExecutableStep<any> | null,
-  TFieldStep extends ExecutableStep<any>,
-  _TArgumentStep extends TFieldStep extends ExecutableStep<any>
+  TInputType extends GraphQLInputType = GraphQLInputType,
+  _TContext extends Grafast.Context = Grafast.Context,
+  _TParentStep extends ExecutableStep | null = ExecutableStep | null,
+  TFieldStep extends ExecutableStep = ExecutableStep,
+  _TArgumentStep extends TFieldStep extends ExecutableStep
+    ? ModifierStep<TFieldStep> | null
+    : null = TFieldStep extends ExecutableStep
     ? ModifierStep<TFieldStep> | null
     : null,
-  _TInput extends InputTypeFor<TInputType>,
+  _TInput extends InputTypeFor<TInputType> = InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
   inputPlan?: ArgumentInputPlanResolver<any>;
@@ -684,7 +686,7 @@ export type NodeIdHandler<
     [key: string]: NodeIdCodec<any>;
   },
   TCodecName extends keyof TCodecs = keyof TCodecs,
-  TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TNodeStep extends ExecutableStep = ExecutableStep,
   TSpec = any,
 > = {
   /**
@@ -817,8 +819,9 @@ export interface JSONObject {
 }
 export interface JSONArray extends Array<JSONValue> {}
 
-export type UnwrapPlanTuple<
-  /* const */ TIn extends readonly ExecutableStep<any>[],
-> = {
-  [Index in keyof TIn]: TIn[Index] extends ExecutableStep<infer U> ? U : never;
-} & { length: number };
+export type UnwrapPlanTuple</* const */ TIn extends readonly ExecutableStep[]> =
+  {
+    [Index in keyof TIn]: TIn[Index] extends ExecutableStep<infer U>
+      ? U
+      : never;
+  } & { length: number };

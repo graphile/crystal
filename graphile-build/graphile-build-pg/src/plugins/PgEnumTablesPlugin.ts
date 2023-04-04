@@ -1,4 +1,4 @@
-import type { PgEnumValue, PgTypeCodec } from "@dataplan/pg";
+import type { PgEnumCodec, PgEnumValue } from "@dataplan/pg";
 import { enumCodec } from "@dataplan/pg";
 import type {
   Introspection,
@@ -44,8 +44,8 @@ declare global {
 }
 
 interface State {
-  codecByPgConstraint: Map<PgConstraint, PgTypeCodec<any, any, any, any>>;
-  codecByPgAttribute: Map<PgAttribute, PgTypeCodec<any, any, any, any>>;
+  codecByPgConstraint: Map<PgConstraint, PgEnumCodec>;
+  codecByPgAttribute: Map<PgAttribute, PgEnumCodec>;
 }
 interface Cache {}
 
@@ -78,9 +78,9 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           if (typeof classTags.enumName === "string") {
             return classTags.enumName;
           }
-          return this.tableSourceName({ databaseName, pgClass });
+          return this.tableResourceName({ databaseName, pgClass });
         } else {
-          const tableName = this.tableSourceName({ databaseName, pgClass });
+          const tableName = this.tableResourceName({ databaseName, pgClass });
           const pgAttribute = pgClass
             .getAttributes()!
             .find((att) => att.attnum === pgConstraint.conkey![0])!;

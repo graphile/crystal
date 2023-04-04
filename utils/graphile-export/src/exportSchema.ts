@@ -958,12 +958,33 @@ function _convertToAST(
       "Attempted to export GraphQLSchema directly from `_convertToAST`; this is currently unsupported.",
     );
   } else if (typeof thing === "object" && thing != null) {
-    return t.objectExpression(
+    const prototype = Object.getPrototypeOf(thing);
+    if (prototype !== null && prototype !== Object.prototype) {
+      throw new Error(
+        `Attempting to export an instance of a class; you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
+      );
+    }
+    const obj = t.objectExpression(
       Object.entries(thing).map(([key, value]) => {
         const tKey = identifierOrLiteral(key);
         return t.objectProperty(tKey, handleSubvalue(value, tKey, key));
       }),
     );
+    if (prototype === null) {
+      return t.callExpression(
+        t.memberExpression(t.identifier("Object"), t.identifier("assign")),
+        [
+          t.callExpression(
+            t.memberExpression(t.identifier("Object"), t.identifier("create")),
+            [t.nullLiteral()],
+          ),
+          // TODO: this is unsafe if obj has any forbidden keys
+          obj,
+        ],
+      );
+    } else {
+      return obj;
+    }
   } else {
     throw new Error(
       `_convertToAST: did not understand item (${inspect(

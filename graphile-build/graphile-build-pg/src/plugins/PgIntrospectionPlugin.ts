@@ -67,12 +67,7 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgIntrospection: {
-        getIntrospection(): Promise<
-          Array<{
-            introspection: Introspection;
-            pgConfig: GraphileConfig.PgDatabaseConfiguration;
-          }>
-        >;
+        getIntrospection(): PromiseOrDirect<IntrospectionResults>;
         getDatabase(databaseName: string): Promise<{
           introspection: Introspection;
           pgConfig: GraphileConfig.PgDatabaseConfiguration;
@@ -286,7 +281,7 @@ interface Cache {
 }
 
 interface State {
-  introspectionResultsPromise: null | Promise<IntrospectionResults>;
+  introspectionResultsPromise: null | PromiseOrDirect<IntrospectionResults>;
   executors: {
     [key: string]: PgExecutor;
   };
@@ -359,6 +354,11 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
   description:
     "Introspects PostgreSQL databases and makes the results available to other plugins",
   version: version,
+
+  // Run before PgRegistryPlugin because we want all the introspection to be
+  // triggered/announced before the registryBuilder is built.
+  before: ["PgRegistryPlugin"],
+
   // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
   gather: <GraphileConfig.PluginGatherConfig<"pgIntrospection", State, Cache>>{
     namespace: "pgIntrospection",
@@ -534,91 +534,170 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           return info.state.introspectionResultsPromise;
         }
 
-        info.state.introspectionResultsPromise = (async () => {
-          if (info.cache.introspectionResultsPromise) {
-            return info.cache.introspectionResultsPromise;
-          }
-          if (!info.resolvedPreset.pgConfigs) {
-            return [];
-          }
-          const seenNames = new Map<string, number>();
-          const seenPgSettingsKeys = new Map<string, number>();
-          const seenWithPgClientKeys = new Map<string, number>();
-          // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
-          const introspectionPromise = Promise.all(
-            info.resolvedPreset.pgConfigs.map(async (pgConfig, i) => {
-              // Validate there's no conflicts between pgConfigs
-              const { name, pgSettingsKey, withPgClientKey } = pgConfig;
-              if (!name) {
-                throw new Error(`pgConfigs[${i}] has no name`);
-              }
-              if (!withPgClientKey) {
-                throw new Error(`pgConfigs[${i}] has no withPgClientKey`);
-              }
-              {
-                const existingIndex = seenNames.get(name);
-                if (existingIndex != null) {
-                  throw new Error(
-                    `pgConfigs[${i}] has the same name as pgConfigs[${existingIndex}] (${JSON.stringify(
-                      name,
-                    )})`,
-                  );
+        info.state.introspectionResultsPromise =
+          info.cache.introspectionResultsPromise ??
+          (async () => {
+            if (info.cache.introspectionResultsPromise) {
+              return info.cache.introspectionResultsPromise;
+            }
+            if (!info.resolvedPreset.pgConfigs) {
+              return [];
+            }
+            const seenNames = new Map<string, number>();
+            const seenPgSettingsKeys = new Map<string, number>();
+            const seenWithPgClientKeys = new Map<string, number>();
+            // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
+            const introspectionPromise = Promise.all(
+              info.resolvedPreset.pgConfigs.map(async (pgConfig, i) => {
+                // Validate there's no conflicts between pgConfigs
+                const { name, pgSettingsKey, withPgClientKey } = pgConfig;
+                if (!name) {
+                  throw new Error(`pgConfigs[${i}] has no name`);
                 }
-                seenNames.set(name, i);
-              }
-              {
-                const existingIndex = seenWithPgClientKeys.get(withPgClientKey);
-                if (existingIndex != null) {
-                  throw new Error(
-                    `pgConfigs[${i}] has the same withPgClientKey as pgConfigs[${existingIndex}] (${JSON.stringify(
-                      withPgClientKey,
-                    )})`,
-                  );
+                if (!withPgClientKey) {
+                  throw new Error(`pgConfigs[${i}] has no withPgClientKey`);
                 }
-                seenWithPgClientKeys.set(withPgClientKey, i);
-              }
-              if (pgSettingsKey) {
-                const existingIndex = seenPgSettingsKeys.get(pgSettingsKey);
-                if (existingIndex != null) {
-                  throw new Error(
-                    `pgConfigs[${i}] has the same pgSettingsKey as pgConfigs[${existingIndex}] (${JSON.stringify(
-                      pgSettingsKey,
-                    )})`,
-                  );
+                {
+                  const existingIndex = seenNames.get(name);
+                  if (existingIndex != null) {
+                    throw new Error(
+                      `pgConfigs[${i}] has the same name as pgConfigs[${existingIndex}] (${JSON.stringify(
+                        name,
+                      )})`,
+                    );
+                  }
+                  seenNames.set(name, i);
                 }
-                seenPgSettingsKeys.set(pgSettingsKey, i);
-              }
+                {
+                  const existingIndex =
+                    seenWithPgClientKeys.get(withPgClientKey);
+                  if (existingIndex != null) {
+                    throw new Error(
+                      `pgConfigs[${i}] has the same withPgClientKey as pgConfigs[${existingIndex}] (${JSON.stringify(
+                        withPgClientKey,
+                      )})`,
+                    );
+                  }
+                  seenWithPgClientKeys.set(withPgClientKey, i);
+                }
+                if (pgSettingsKey) {
+                  const existingIndex = seenPgSettingsKeys.get(pgSettingsKey);
+                  if (existingIndex != null) {
+                    throw new Error(
+                      `pgConfigs[${i}] has the same pgSettingsKey as pgConfigs[${existingIndex}] (${JSON.stringify(
+                        pgSettingsKey,
+                      )})`,
+                    );
+                  }
+                  seenPgSettingsKeys.set(pgSettingsKey, i);
+                }
 
-              // Do the introspection
-              const introspectionQuery = makeIntrospectionQuery();
-              const {
-                rows: [row],
-              } = await withPgClientFromPgConfig(
-                pgConfig,
-                pgConfig.pgSettingsForIntrospection ?? null,
-                (client) =>
-                  client.query<{ introspection: string }>({
-                    text: introspectionQuery,
-                  }),
-              );
-              if (!row) {
-                throw new Error("Introspection failed");
-              }
-              const introspection = parseIntrospectionResults(
-                row.introspection,
-              );
-              return { pgConfig, introspection };
-            }),
-          );
-          info.cache.introspectionResultsPromise = introspectionPromise;
+                // Do the introspection
+                const introspectionQuery = makeIntrospectionQuery();
+                const {
+                  rows: [row],
+                } = await withPgClientFromPgConfig(
+                  pgConfig,
+                  pgConfig.pgSettingsForIntrospection ?? null,
+                  (client) =>
+                    client.query<{ introspection: string }>({
+                      text: introspectionQuery,
+                    }),
+                );
+                if (!row) {
+                  throw new Error("Introspection failed");
+                }
+                const introspection = parseIntrospectionResults(
+                  row.introspection,
+                );
+                return { pgConfig, introspection };
+              }),
+            );
 
-          // Don't cache errors
-          introspectionPromise.then(null, () => {
-            info.cache.introspectionResultsPromise = null;
-          });
+            info.cache.introspectionResultsPromise = introspectionPromise;
+            // Don't cache errors
+            introspectionPromise.then(null, () => {
+              info.cache.introspectionResultsPromise = null;
+            });
 
-          return introspectionPromise;
-        })();
+            const introspections = await introspectionPromise;
+
+            // Store the resolved state, so access during announcements doesn't cause the system to hang
+            info.state.introspectionResultsPromise = introspections;
+
+            // Announce it
+            await Promise.all(
+              introspections.map(async (result) => {
+                const { introspection, pgConfig } = result;
+
+                const {
+                  namespaces,
+                  classes,
+                  attributes,
+                  constraints,
+                  procs,
+                  roles,
+                  auth_members,
+                  types,
+                  enums,
+                  extensions,
+                  indexes,
+                  languages,
+                  ranges,
+                  depends,
+                  descriptions,
+                } = introspection;
+
+                function announce<
+                  TEvent extends keyof GraphileConfig.GatherHooks,
+                >(
+                  eventName: TEvent,
+                  entities: GraphileConfig.GatherHooks[TEvent] extends PluginHook<
+                    infer U
+                  >
+                    ? Parameters<U>[0] extends {
+                        entity: infer V;
+                        databaseName: string;
+                      }
+                      ? V[]
+                      : never
+                    : never,
+                ) {
+                  const promises: Promise<any>[] = [];
+                  for (const entity of entities) {
+                    promises.push(
+                      (info.process as any)(eventName, {
+                        entity: entity,
+                        databaseName: pgConfig.name,
+                      }),
+                    );
+                  }
+                  return Promise.all(promises);
+                }
+                await info.process("pgIntrospection_introspection", {
+                  introspection,
+                  databaseName: pgConfig.name,
+                });
+                await announce("pgIntrospection_namespace", namespaces);
+                await announce("pgIntrospection_class", classes);
+                await announce("pgIntrospection_attribute", attributes);
+                await announce("pgIntrospection_constraint", constraints);
+                await announce("pgIntrospection_proc", procs);
+                await announce("pgIntrospection_role", roles);
+                await announce("pgIntrospection_auth_member", auth_members);
+                await announce("pgIntrospection_type", types);
+                await announce("pgIntrospection_enum", enums);
+                await announce("pgIntrospection_extension", extensions);
+                await announce("pgIntrospection_index", indexes);
+                await announce("pgIntrospection_language", languages);
+                await announce("pgIntrospection_range", ranges);
+                await announce("pgIntrospection_depend", depends);
+                await announce("pgIntrospection_description", descriptions);
+              }),
+            );
+
+            return introspections;
+          })();
 
         return info.state.introspectionResultsPromise;
       },
@@ -631,6 +710,12 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           );
         }
         return match;
+      },
+    },
+
+    hooks: {
+      async pgRegistry_PgRegistryBuilder_init(info, _event) {
+        await info.helpers.pgIntrospection.getIntrospection();
       },
     },
 
@@ -710,78 +795,6 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           }
         }
       };
-    },
-
-    async main(_output, info) {
-      const introspections =
-        await info.helpers.pgIntrospection.getIntrospection();
-      await Promise.all(
-        introspections.map(async (result) => {
-          const { introspection, pgConfig } = result;
-
-          const {
-            namespaces,
-            classes,
-            attributes,
-            constraints,
-            procs,
-            roles,
-            auth_members,
-            types,
-            enums,
-            extensions,
-            indexes,
-            languages,
-            ranges,
-            depends,
-            descriptions,
-          } = introspection;
-
-          function announce<TEvent extends keyof GraphileConfig.GatherHooks>(
-            eventName: TEvent,
-            entities: GraphileConfig.GatherHooks[TEvent] extends PluginHook<
-              infer U
-            >
-              ? Parameters<U>[0] extends {
-                  entity: infer V;
-                  databaseName: string;
-                }
-                ? V[]
-                : never
-              : never,
-          ) {
-            const promises: Promise<any>[] = [];
-            for (const entity of entities) {
-              promises.push(
-                (info.process as any)(eventName, {
-                  entity: entity,
-                  databaseName: pgConfig.name,
-                }),
-              );
-            }
-            return Promise.all(promises);
-          }
-          await info.process("pgIntrospection_introspection", {
-            introspection,
-            databaseName: pgConfig.name,
-          });
-          await announce("pgIntrospection_namespace", namespaces);
-          await announce("pgIntrospection_class", classes);
-          await announce("pgIntrospection_attribute", attributes);
-          await announce("pgIntrospection_constraint", constraints);
-          await announce("pgIntrospection_proc", procs);
-          await announce("pgIntrospection_role", roles);
-          await announce("pgIntrospection_auth_member", auth_members);
-          await announce("pgIntrospection_type", types);
-          await announce("pgIntrospection_enum", enums);
-          await announce("pgIntrospection_extension", extensions);
-          await announce("pgIntrospection_index", indexes);
-          await announce("pgIntrospection_language", languages);
-          await announce("pgIntrospection_range", ranges);
-          await announce("pgIntrospection_depend", depends);
-          await announce("pgIntrospection_description", descriptions);
-        }),
-      );
     },
   },
 };

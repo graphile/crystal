@@ -37,7 +37,7 @@ const eachCallbackForListPlan = (
  */
 export function each<
   TListStep extends ExecutableStep<readonly any[]>,
-  TResultItemStep extends ExecutableStep<any>,
+  TResultItemStep extends ExecutableStep,
 >(
   listPlan: TListStep,
   mapper: (

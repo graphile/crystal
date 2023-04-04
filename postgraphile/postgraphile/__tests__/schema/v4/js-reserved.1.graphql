@@ -30,6 +30,23 @@ type Building implements Node {
     """The method to use when ordering `Machine`."""
     orderBy: [MachinesOrderBy!] = [PRIMARY_KEY_ASC]
   ): MachinesConnection!
+
+  """Reads and enables pagination through a set of `Machine`."""
+  machinesByConstructorList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MachineCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachinesOrderBy!]
+  ): [Machine!]!
   name: String
 
   """
@@ -65,6 +82,23 @@ type Building implements Node {
     """The method to use when ordering `RelationalItem`."""
     orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByConstructorList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!]
+  ): [RelationalItem!]!
 }
 
 """
@@ -2573,6 +2607,23 @@ type Query implements Node {
     orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BuildingsConnection
 
+  """Reads a set of `Building`."""
+  allBuildingsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BuildingCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!]
+  ): [Building!]
+
   """Reads and enables pagination through a set of `Constructor`."""
   allConstructors(
     """Read all values in the set after (below) this cursor."""
@@ -2601,6 +2652,23 @@ type Query implements Node {
     """The method to use when ordering `Constructor`."""
     orderBy: [ConstructorsOrderBy!] = [PRIMARY_KEY_ASC]
   ): ConstructorsConnection
+
+  """Reads a set of `Constructor`."""
+  allConstructorsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ConstructorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Constructor`."""
+    orderBy: [ConstructorsOrderBy!]
+  ): [Constructor!]
 
   """Reads and enables pagination through a set of `Crop`."""
   allCrops(
@@ -2631,6 +2699,23 @@ type Query implements Node {
     orderBy: [CropsOrderBy!] = [PRIMARY_KEY_ASC]
   ): CropsConnection
 
+  """Reads a set of `Crop`."""
+  allCropsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CropCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Crop`."""
+    orderBy: [CropsOrderBy!]
+  ): [Crop!]
+
   """Reads and enables pagination through a set of `Machine`."""
   allMachines(
     """Read all values in the set after (below) this cursor."""
@@ -2659,6 +2744,23 @@ type Query implements Node {
     """The method to use when ordering `Machine`."""
     orderBy: [MachinesOrderBy!] = [PRIMARY_KEY_ASC]
   ): MachinesConnection
+
+  """Reads a set of `Machine`."""
+  allMachinesList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MachineCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachinesOrderBy!]
+  ): [Machine!]
 
   """Reads and enables pagination through a set of `Material`."""
   allMaterials(
@@ -2689,6 +2791,23 @@ type Query implements Node {
     orderBy: [MaterialsOrderBy!] = [PRIMARY_KEY_ASC]
   ): MaterialsConnection
 
+  """Reads a set of `Material`."""
+  allMaterialsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MaterialCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Material`."""
+    orderBy: [MaterialsOrderBy!]
+  ): [Material!]
+
   """Reads and enables pagination through a set of `Null`."""
   allNulls(
     """Read all values in the set after (below) this cursor."""
@@ -2717,6 +2836,23 @@ type Query implements Node {
     """The method to use when ordering `Null`."""
     orderBy: [NullsOrderBy!] = [PRIMARY_KEY_ASC]
   ): NullsConnection
+
+  """Reads a set of `Null`."""
+  allNullsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: NullCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Null`."""
+    orderBy: [NullsOrderBy!]
+  ): [Null!]
 
   """Reads and enables pagination through a set of `Project`."""
   allProjects(
@@ -2747,6 +2883,23 @@ type Query implements Node {
     orderBy: [ProjectsOrderBy!] = [PRIMARY_KEY_ASC]
   ): ProjectsConnection
 
+  """Reads a set of `Project`."""
+  allProjectsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProjectCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Project`."""
+    orderBy: [ProjectsOrderBy!]
+  ): [Project!]
+
   """Reads and enables pagination through a set of `_Proto__`."""
   allProtoS(
     """Read all values in the set after (below) this cursor."""
@@ -2775,6 +2928,23 @@ type Query implements Node {
     """The method to use when ordering `_Proto__`."""
     orderBy: [_ProtoSOrderBy!] = [PRIMARY_KEY_ASC]
   ): _Proto__SConnection
+
+  """Reads a set of `_Proto__`."""
+  allProtoSList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: _ProtoCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `_Proto__`."""
+    orderBy: [_ProtoSOrderBy!]
+  ): [_Proto__!]
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   allRelationalItems(
@@ -2805,6 +2975,23 @@ type Query implements Node {
     orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection
 
+  """Reads a set of `RelationalItem`."""
+  allRelationalItemsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!]
+  ): [RelationalItem!]
+
   """Reads and enables pagination through a set of `RelationalStatus`."""
   allRelationalStatuses(
     """Read all values in the set after (below) this cursor."""
@@ -2833,6 +3020,23 @@ type Query implements Node {
     """The method to use when ordering `RelationalStatus`."""
     orderBy: [RelationalStatusesOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalStatusesConnection
+
+  """Reads a set of `RelationalStatus`."""
+  allRelationalStatusesList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalStatusCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `RelationalStatus`."""
+    orderBy: [RelationalStatusesOrderBy!]
+  ): [RelationalStatus!]
 
   """Reads and enables pagination through a set of `RelationalTopic`."""
   allRelationalTopics(
@@ -2863,6 +3067,23 @@ type Query implements Node {
     orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalTopicsConnection
 
+  """Reads a set of `RelationalTopic`."""
+  allRelationalTopicsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalTopicCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!]
+  ): [RelationalTopic!]
+
   """Reads and enables pagination through a set of `Reserved`."""
   allReserveds(
     """Read all values in the set after (below) this cursor."""
@@ -2892,6 +3113,23 @@ type Query implements Node {
     orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
   ): ReservedsConnection
 
+  """Reads a set of `Reserved`."""
+  allReservedsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ReservedCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Reserved`."""
+    orderBy: [ReservedsOrderBy!]
+  ): [Reserved!]
+
   """Reads and enables pagination through a set of `Yield`."""
   allYields(
     """Read all values in the set after (below) this cursor."""
@@ -2920,6 +3158,23 @@ type Query implements Node {
     """The method to use when ordering `Yield`."""
     orderBy: [YieldsOrderBy!] = [PRIMARY_KEY_ASC]
   ): YieldsConnection
+
+  """Reads a set of `Yield`."""
+  allYieldsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: YieldCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Yield`."""
+    orderBy: [YieldsOrderBy!]
+  ): [Yield!]
   await(_proto__: Int, constructor: Int, hasOwnProperty: Int, yield: Int): Int
 
   """Reads a single `Building` using its globally unique `ID`."""

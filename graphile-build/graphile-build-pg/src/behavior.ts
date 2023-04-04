@@ -1,10 +1,10 @@
 import "./interfaces.js";
 
 import type {
-  PgSourceExtensions,
-  PgSourceRefExtensions,
-  PgSourceRelationExtensions,
-  PgTypeCodecExtensions,
+  PgCodecExtensions,
+  PgCodecRefExtensions,
+  PgCodecRelationExtensions,
+  PgResourceExtensions,
 } from "@dataplan/pg";
 import { isDev } from "grafast";
 import { inspect } from "util";
@@ -22,10 +22,10 @@ type ArrayOrDirect<T> = Array<T> | T;
 export function getBehavior(
   extensions: ArrayOrDirect<
     | Partial<
-        | PgSourceExtensions
-        | PgSourceRelationExtensions
-        | PgTypeCodecExtensions
-        | PgSourceRefExtensions
+        | PgResourceExtensions
+        | PgCodecRelationExtensions
+        | PgCodecExtensions
+        | PgCodecRefExtensions
       >
     | undefined
   >,

@@ -86,7 +86,7 @@ export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
       graphile: {
-        applyPlan($select: PgSelectStep<any, any, any, any>): void;
+        applyPlan($select: PgSelectStep): void;
       };
     };
   };
@@ -95,9 +95,7 @@ export interface MakeAddPgTableOrderByPluginOrders {
 type OrderBySpecIdentity =
   | string // Column name
   | Omit<PgOrderSpec, "direction"> // Expression
-  | ((
-      $select: PgSelectStep<any, any, any, any>,
-    ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+  | (($select: PgSelectStep) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export function orderByAscDesc(
   baseName: string,
@@ -228,9 +226,11 @@ const OrderByMemberNamePlugin = makeAddPgTableOrderByPlugin(
   (build) => {
     const {
       sql,
-      input: { pgSources },
+      input: {
+        pgRegistry: { pgResources },
+      },
     } = build;
-    const usersSource = pgSources.find((s) => s.name === "users");
+    const usersSource = pgResources.find((s) => s.name === "users");
     if (!usersSource) throw new Error(`Couldn't find users source`);
     const sqlIdentifier = sql.identifier(Symbol("member"));
     return orderByAscDesc(

@@ -1,3 +1,5 @@
+import { arraysMatch } from "./utils.js";
+
 /**
  * Marks that `thing` is exported from the `grafast` module as
  * `exportName` so that `graphile-export` can convert references to `thing`
@@ -5,14 +7,44 @@
  *
  * @internal
  */
-export function exportAs<T>(
+export function exportAs<T extends object>(
   moduleName: string,
   thing: T,
-  exportName: string,
+  exportName: string | string[],
 ): T {
-  Object.defineProperty(thing, "$$export", {
-    value: { moduleName, exportName },
-  });
+  if (!("$$export" in thing)) {
+    Object.defineProperty(thing, "$$export", {
+      value: { moduleName, exportName },
+    });
+  } else {
+    const e = thing.$$export as {
+      moduleName: string;
+      exportName: string | string[];
+    };
+    if (e.moduleName !== moduleName) {
+      throw new Error(
+        `Attempted to export ${thing} as '${moduleName}.${exportName}', but it's already exported as '${e.moduleName}.${e.exportName}' (module name mismatch)`,
+      );
+    }
+    if (typeof e.exportName === "string" || exportName === "string") {
+      if (e.exportName !== exportName) {
+        throw new Error(
+          `Attempted to export ${thing} as '${moduleName}.${exportName}', but it's already exported as '${e.moduleName}.${e.exportName}' (export name mismatch)`,
+        );
+      }
+    } else {
+      // Must be arrays
+      if (
+        !Array.isArray(e.exportName) ||
+        !Array.isArray(exportName) ||
+        !arraysMatch(e.exportName, exportName)
+      ) {
+        throw new Error(
+          `Attempted to export ${thing} as '${moduleName}.${exportName}', but it's already exported as '${e.moduleName}.${e.exportName}' (export name path mismatch)`,
+        );
+      }
+    }
+  }
   return thing;
 }
 
@@ -31,8 +63,7 @@ export function exportAsMany(
     const value = all[key];
     if (
       (typeof value === "object" || typeof value === "function") &&
-      value !== null &&
-      !("$$export" in value)
+      value !== null
     ) {
       exportAs(moduleName, all[key], key);
     }

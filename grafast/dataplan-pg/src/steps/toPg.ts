@@ -1,7 +1,7 @@
 import type { ExecutableStep, ExecutionExtra } from "grafast";
 import { UnbatchedExecutableStep } from "grafast";
 
-import type { PgTypeCodec } from "../interfaces.js";
+import type { PgCodec } from "../interfaces.js";
 
 /**
  * Converts the given value to the representation suitable for feeding into the
@@ -13,14 +13,11 @@ import type { PgTypeCodec } from "../interfaces.js";
  */
 export class ToPgStep extends UnbatchedExecutableStep<any> {
   static $$export = {
-    moduleName: "grafast",
+    moduleName: "@dataplan/pg",
     exportName: "ToPgStep",
   };
   isSyncAndSafe = true;
-  constructor(
-    $value: ExecutableStep<any>,
-    private codec: PgTypeCodec<any, any, any>,
-  ) {
+  constructor($value: ExecutableStep, private codec: PgCodec) {
     super();
     this.addDependency($value);
   }
@@ -39,9 +36,6 @@ export class ToPgStep extends UnbatchedExecutableStep<any> {
  *
  * @internal
  */
-export function toPg(
-  $value: ExecutableStep<any>,
-  codec: PgTypeCodec<any, any, any>,
-) {
+export function toPg($value: ExecutableStep, codec: PgCodec) {
   return new ToPgStep($value, codec);
 }

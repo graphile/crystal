@@ -1,23 +1,29 @@
 import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
-import { list, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
+import {
+  exportAs,
+  list,
+  polymorphicWrap,
+  UnbatchedExecutableStep,
+} from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
-  ObjectFromPgTypeColumns,
-  PgTypeColumn,
-  PgTypeColumns,
+  ObjectFromPgCodecAttributes,
+  PgCodecAttribute,
 } from "../codecs.js";
 import { TYPES } from "../codecs.js";
+import type { PgResource } from "../datasource.js";
 import type {
-  PgSource,
-  PgSourceParameter,
-  PgSourceRelation,
-  PgSourceUnique,
-} from "../datasource.js";
-import { PgSourceBuilder } from "../datasource.js";
-import type { PgTypeCodec, PgTypedExecutableStep } from "../interfaces.js";
+  GetPgResourceCodec,
+  GetPgResourceColumns,
+  GetPgResourceRelations,
+  PgCodec,
+  PgCodecRelation,
+  PgRegistry,
+  PgTypedExecutableStep,
+} from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
@@ -31,7 +37,7 @@ import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 export interface PgSelectSinglePlanOptions {
-  fromRelation?: [PgSelectSingleStep<any, any, any, any>, string];
+  fromRelation?: [PgSelectSingleStep<PgResource>, string];
 }
 
 // Types that only take a few bytes so adding them to the selection would be
@@ -58,24 +64,17 @@ const CHEAP_COLUMN_TYPES = new Set([
  * telling the PgSelectStep to select the relevant expressions.
  */
 export class PgSelectSingleStep<
-    TColumns extends PgTypeColumns | undefined,
-    TUniques extends ReadonlyArray<
-      PgSourceUnique<Exclude<TColumns, undefined>>
-    >,
-    TRelations extends {
-      [identifier: string]: TColumns extends PgTypeColumns
-        ? PgSourceRelation<TColumns, any>
-        : never;
-    },
-    TParameters extends PgSourceParameter[] | undefined = undefined,
+    TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
   extends UnbatchedExecutableStep<
-    TColumns extends PgTypeColumns
-      ? ObjectFromPgTypeColumns<TColumns> | null
-      : unknown
+    unknown[] /* What we return will be a tuple based on the values selected */
   >
   implements
-    PgTypedExecutableStep<PgTypeCodec<TColumns, any, any>>,
+    PgTypedExecutableStep<
+      TResource extends PgResource<any, infer UCodec, any, any, any>
+        ? UCodec
+        : never
+    >,
     EdgeCapableStep<any>
 {
   static $$export = {
@@ -84,28 +83,24 @@ export class PgSelectSingleStep<
   };
   isSyncAndSafe = true;
 
-  public readonly pgCodec: PgTypeCodec<TColumns, any, any>;
+  public readonly pgCodec: GetPgResourceCodec<TResource>;
   public readonly itemStepId: number;
   public readonly mode: PgSelectMode;
   private classStepId: number;
   private nullCheckId: number | null = null;
-  public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
+  public readonly resource: TResource;
   private _coalesceToEmptyObject = false;
   private typeStepIndexList: number[] | null = null;
 
   constructor(
-    $class: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
-    $item: ExecutableStep<
-      TColumns extends PgTypeColumns
-        ? ObjectFromPgTypeColumns<TColumns>
-        : unknown
-    >,
+    $class: PgSelectStep<TResource>,
+    $item: ExecutableStep<unknown[]>,
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
     this.itemStepId = this.addDependency($item);
-    this.source = $class.source;
-    this.pgCodec = this.source.codec;
+    this.resource = $class.resource;
+    this.pgCodec = this.resource.codec as GetPgResourceCodec<TResource>;
     this.mode = $class.mode;
     this.classStepId = $class.id;
   }
@@ -115,15 +110,10 @@ export class PgSelectSingleStep<
   }
 
   public toStringMeta(): string {
-    return this.source.name;
+    return this.resource.name;
   }
 
-  public getClassStep(): PgSelectStep<
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  > {
+  public getClassStep(): PgSelectStep<TResource> {
     if (this.isOptimized) {
       throw new Error(`Cannot ${this}.getClassStep() after we're optimized.`);
     }
@@ -136,9 +126,7 @@ export class PgSelectSingleStep<
     return plan;
   }
 
-  private getItemStep(): ExecutableStep<
-    TColumns extends PgTypeColumns ? ObjectFromPgTypeColumns<TColumns> : unknown
-  > {
+  private getItemStep(): ExecutableStep<unknown[]> {
     const plan = this.getDep(this.itemStepId);
     return plan;
   }
@@ -149,12 +137,8 @@ export class PgSelectSingleStep<
    * @internal
    */
   getSelfNamed(): PgClassExpressionStep<
-    any,
-    any,
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
+    GetPgResourceCodec<TResource>,
+    TResource
   > {
     if (this.mode === "aggregate") {
       throw new Error("Invalid call to getSelfNamed on aggregate plan");
@@ -167,22 +151,23 @@ export class PgSelectSingleStep<
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof TColumns>(
+  get<TAttr extends keyof GetPgResourceColumns<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    any,
-    any,
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
+    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<
+      infer UCodec,
+      any
+    >
+      ? UCodec
+      : never,
+    TResource
   > {
     if (this.mode === "aggregate") {
       throw new Error("Invalid call to .get() on aggregate plan");
     }
-    if (!this.source.codec.columns && attr !== "") {
+    if (!this.resource.codec.columns && attr !== "") {
       throw new Error(
-        `Cannot call ${this}.get() when the source codec (${this.source.codec.name}) has no columns to get.`,
+        `Cannot call ${this}.get() when the resource codec (${this.resource.codec.name}) has no columns to get.`,
       );
     }
     const classPlan = this.getClassStep();
@@ -190,29 +175,29 @@ export class PgSelectSingleStep<
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
-    const dataSourceColumn: PgTypeColumn | undefined =
-      this.source.codec.columns?.[attr as string];
-    if (!dataSourceColumn && attr !== "") {
+    const resourceColumn: PgCodecAttribute | undefined =
+      this.resource.codec.columns?.[attr as string];
+    if (!resourceColumn && attr !== "") {
       throw new Error(
-        `${this.source} does not define an attribute named '${String(attr)}'`,
+        `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
-    if (dataSourceColumn?.via) {
-      const { relation, attribute } = this.source.resolveVia(
-        dataSourceColumn.via,
+    if (resourceColumn?.via) {
+      const { relation, attribute } = this.resource.resolveVia(
+        resourceColumn.via,
         attr as string,
       );
-      return this.singleRelation(relation).get(attribute) as any;
+      return this.singleRelation(relation as any).get(attribute) as any;
     }
 
-    if (dataSourceColumn?.identicalVia) {
-      const { relation, attribute } = this.source.resolveVia(
-        dataSourceColumn.identicalVia,
+    if (resourceColumn?.identicalVia) {
+      const { relation, attribute } = this.resource.resolveVia(
+        resourceColumn.identicalVia,
         attr as string,
       );
 
-      const $existingPlan = this.existingSingleRelation(relation);
+      const $existingPlan = this.existingSingleRelation(relation as any);
       if ($existingPlan) {
         // Relation exists already; load it from there for efficiency
         return $existingPlan.get(attribute) as any;
@@ -224,12 +209,12 @@ export class PgSelectSingleStep<
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       const matchingColumn = (
-        Object.entries($fromPlan.source.codec.columns) as Array<
-          [string, PgTypeColumn]
+        Object.entries($fromPlan.resource.codec.columns!) as Array<
+          [string, PgCodecAttribute]
         >
       ).find(([name, col]) => {
         if (col.identicalVia) {
-          const { relation, attribute } = $fromPlan.source.resolveVia(
+          const { relation, attribute } = $fromPlan.resource.resolveVia(
             col.identicalVia,
             name,
           );
@@ -240,7 +225,7 @@ export class PgSelectSingleStep<
         return false;
       });
       if (matchingColumn) {
-        return $fromPlan.get(matchingColumn[0]);
+        return $fromPlan.get(matchingColumn[0]) as any;
       }
     }
 
@@ -255,22 +240,15 @@ export class PgSelectSingleStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression<
-      any,
-      any,
-      TColumns,
-      TUniques,
-      TRelations,
-      TParameters
-    >(
+    const sqlExpr = pgClassExpression<any, TResource>(
       this,
       attr === ""
-        ? this.source.codec
-        : this.source.codec.columns![attr as string].codec,
+        ? this.resource.codec
+        : this.resource.codec.columns![attr as string].codec,
     );
-    const colPlan = dataSourceColumn
-      ? dataSourceColumn.expression
-        ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
+    const colPlan = resourceColumn
+      ? resourceColumn.expression
+        ? sqlExpr`${sql.parens(resourceColumn.expression(classPlan.alias))}`
         : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
       : sqlExpr`${classPlan.alias}.v`; /* single column */
 
@@ -278,39 +256,22 @@ export class PgSelectSingleStep<
       this.nonNullColumn == null &&
       typeof attr === "string" &&
       attr.length > 0 &&
-      dataSourceColumn &&
-      !dataSourceColumn.expression &&
-      dataSourceColumn.notNull
+      resourceColumn &&
+      !resourceColumn.expression &&
+      resourceColumn.notNull
     ) {
       // We know the row is null iff this attribute is null
-      this.nonNullColumn = { column: dataSourceColumn, attr };
+      this.nonNullColumn = { column: resourceColumn, attr };
     }
 
     return colPlan as any;
   }
 
-  public select<
-    TExpressionColumns extends PgTypeColumns | undefined,
-    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  >(
+  public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
-  ): PgClassExpressionStep<
-    TExpressionColumns,
-    TExpressionCodec,
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  > {
-    const sqlExpr = pgClassExpression<
-      TExpressionColumns,
-      TExpressionCodec,
-      TColumns,
-      TUniques,
-      TRelations,
-      TParameters
-    >(this, codec);
+  ): PgClassExpressionStep<TExpressionCodec, TResource> {
+    const sqlExpr = pgClassExpression<TExpressionCodec, TResource>(this, codec);
     return sqlExpr`${fragment}`;
   }
 
@@ -325,42 +286,36 @@ export class PgSelectSingleStep<
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
-  ): SQL;
-  public placeholder(
-    $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
-    overrideCodec?: PgTypeCodec<any, any, any>,
+    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
       : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
   }
 
-  private existingSingleRelation<TRelationName extends keyof TRelations>(
+  private existingSingleRelation<
+    TRelationName extends keyof GetPgResourceRelations<TResource>,
+  >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    TRelations[TRelationName]["source"]["TColumns"] extends PgTypeColumns
-      ? TRelations[TRelationName]["source"]["TColumns"]
-      : any,
-    TRelations[TRelationName]["source"]["TUniques"],
-    TRelations[TRelationName]["source"]["TRelations"],
-    TRelations[TRelationName]["source"]["TParameters"]
+    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > | null {
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       // check to see if we already came via this relationship
-      const reciprocal = this.source.getReciprocal(
-        $fromPlan.source,
+      const reciprocal = this.resource.getReciprocal(
+        $fromPlan.resource.codec,
         fromRelationName,
       );
       if (reciprocal) {
-        const reciprocalRelationName = reciprocal[0] as string;
+        const reciprocalRelationName = reciprocal[0];
         if (reciprocalRelationName === relationIdentifier) {
-          const reciprocalRelation: PgSourceRelation<any, any> = reciprocal[1];
+          const reciprocalRelation = reciprocal[1];
           if (reciprocalRelation.isUnique) {
-            return $fromPlan;
+            return $fromPlan as PgSelectSingleStep<any>;
           }
         }
       }
@@ -368,134 +323,90 @@ export class PgSelectSingleStep<
     return null;
   }
 
-  public singleRelation<TRelationName extends keyof TRelations>(
+  public singleRelation<
+    TRelationName extends keyof GetPgResourceRelations<TResource>,
+  >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    any,
-    any,
-    any,
-    any
-    // TODO: fix the return type
-    /*
-    TRelations[TRelationName]["source"]["TColumns"] extends PgTypeColumns
-      ? TRelations[TRelationName]["source"]["TColumns"]
-      : any,
-    TRelations[TRelationName]["source"]["TUniques"],
-    TRelations[TRelationName]["source"]["TRelations"],
-    TRelations[TRelationName]["source"]["TParameters"]
-  */
+    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > {
     const $existingPlan = this.existingSingleRelation(relationIdentifier);
     if ($existingPlan) {
       return $existingPlan;
     }
-    const relation = this.source.getRelation(relationIdentifier);
+    const relation = this.resource.getRelation(
+      relationIdentifier,
+    ) as PgCodecRelation;
     if (!relation || !relation.isUnique) {
       throw new Error(
         `${String(relationIdentifier)} is not a unique relation on ${
-          this.source
+          this.resource
         }`,
       );
     }
-    const rawRelationSource = relation.source;
-    const relationSource =
-      rawRelationSource instanceof PgSourceBuilder
-        ? rawRelationSource.get()
-        : rawRelationSource;
-    const remoteColumns = relation.remoteColumns;
-    const localColumns = relation.localColumns;
+    const { remoteResource, remoteColumns, localColumns } = relation;
 
     const options: PgSelectSinglePlanOptions = {
-      fromRelation: [this, relationIdentifier as string],
+      fromRelation: [
+        this as PgSelectSingleStep<any>,
+        relationIdentifier as string,
+      ],
     };
-    return relationSource.get(
+    return remoteResource.get(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
-        memo[remoteColumn] = this.get(
-          localColumns[columnIndex] as keyof TColumns,
-        );
+        memo[remoteColumn] = this.get(localColumns[columnIndex]);
         return memo;
       }, Object.create(null)),
       options,
-    ) as PgSelectSingleStep<any, any, any, any>;
+    ) as PgSelectSingleStep<any>;
   }
 
-  public manyRelation<TRelationName extends keyof TRelations>(
+  public manyRelation<
+    TRelationName extends keyof GetPgResourceRelations<TResource>,
+  >(
     relationIdentifier: TRelationName,
   ): PgSelectStep<
-    TRelations[TRelationName]["source"]["TColumns"] extends PgTypeColumns
-      ? TRelations[TRelationName]["source"]["TColumns"]
-      : any,
-    TRelations[TRelationName]["source"]["TUniques"],
-    TRelations[TRelationName]["source"]["TRelations"],
-    TRelations[TRelationName]["source"]["TParameters"]
+    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > {
-    const relation = this.source.getRelation(relationIdentifier);
+    const relation = this.resource.getRelation(
+      relationIdentifier,
+    ) as PgCodecRelation;
     if (!relation) {
       throw new Error(
-        `${String(relationIdentifier)} is not a relation on ${this.source}`,
+        `${String(relationIdentifier)} is not a relation on ${this.resource}`,
       );
     }
-    const rawRelationSource = relation.source;
-    const relationSource =
-      rawRelationSource instanceof PgSourceBuilder
-        ? rawRelationSource.get()
-        : rawRelationSource;
-    const remoteColumns = relation.remoteColumns;
-    const localColumns = relation.localColumns;
+    const { remoteResource, remoteColumns, localColumns } = relation;
 
-    return relationSource.find(
+    return (remoteResource as PgResource).find(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
-        memo[remoteColumn] = this.get(
-          localColumns[columnIndex] as keyof TColumns,
-        );
+        memo[remoteColumn] = this.get(localColumns[columnIndex]);
         return memo;
       }, Object.create(null)),
-    );
+    ) as any;
   }
 
-  record(): PgClassExpressionStep<
-    TColumns,
-    PgTypeCodec<TColumns, any, any>,
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
+  public record(): PgClassExpressionStep<
+    GetPgResourceCodec<TResource>,
+    TResource
   > {
-    return pgClassExpression<
-      TColumns,
-      PgTypeCodec<TColumns, any, any>,
-      TColumns,
-      TUniques,
-      TRelations,
-      TParameters
-    >(this, this.source.codec)`${this.getClassStep().alias}`;
+    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
+      this,
+      this.resource.codec as GetPgResourceCodec<TResource>,
+    )`${this.getClassStep().alias}`;
   }
 
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<
-    TExpressionColumns extends PgTypeColumns | undefined,
-    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  >(
+  expression<TExpressionCodec extends PgCodec>(
     expression: SQL,
     codec: TExpressionCodec,
-  ): PgClassExpressionStep<
-    TExpressionColumns,
-    TExpressionCodec,
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  > {
-    return pgClassExpression<
-      TExpressionColumns,
-      TExpressionCodec,
-      TColumns,
-      TUniques,
-      TRelations,
-      TParameters
-    >(this, codec)`${expression}`;
+  ): PgClassExpressionStep<TExpressionCodec, TResource> {
+    return pgClassExpression<TExpressionCodec, TResource>(
+      this,
+      codec,
+    )`${expression}`;
   }
 
   /**
@@ -512,7 +423,7 @@ export class PgSelectSingleStep<
             const [frag, codec] = getFragmentAndCodecFromOrder(
               this.getClassStep().alias,
               o,
-              this.getClassStep().source.codec,
+              this.getClassStep().resource.codec,
             );
             return this.expression(frag, codec);
           })
@@ -540,12 +451,12 @@ export class PgSelectSingleStep<
   }
 
   deduplicate(
-    peers: PgSelectSingleStep<any, any, any, any>[],
-  ): PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>[] {
+    peers: PgSelectSingleStep<any>[],
+  ): PgSelectSingleStep<TResource>[] {
     // We've been careful to not store anything locally so we shouldn't
     // need to move anything across to the peer.
     return peers.filter((peer) => {
-      if (peer.source !== this.source) {
+      if (peer.resource !== this.resource) {
         return false;
       }
       if (peer.getClassStep() !== this.getClassStep()) {
@@ -559,13 +470,13 @@ export class PgSelectSingleStep<
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
-    const poly = this.source.codec.polymorphism;
+    const poly = (this.resource.codec as PgCodec).polymorphism;
     if (poly?.mode === "single") {
       return this;
     } else if (poly?.mode === "relational") {
       for (const spec of Object.values(poly.types)) {
         if (spec.name === type.name) {
-          return this.singleRelation(spec.relationName);
+          return this.singleRelation(spec.relationName as any);
         }
       }
       throw new Error(
@@ -578,14 +489,15 @@ export class PgSelectSingleStep<
     }
   }
 
-  private nonNullColumn: { column: PgTypeColumn; attr: string } | null = null;
+  private nonNullColumn: { column: PgCodecAttribute; attr: string } | null =
+    null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = this.source.codec.polymorphism;
+    const poly = (this.resource.codec as PgCodec).polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       const $class = this.getClassStep();
       this.typeStepIndexList = poly.typeColumns.map((col) => {
-        const attr = this.source.codec.columns![col];
+        const attr = this.resource.codec.columns![col];
         const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
 
         return $class.selectAndReturnIndex(
@@ -598,7 +510,7 @@ export class PgSelectSingleStep<
       this.typeStepIndexList = null;
     }
 
-    const columns = this.source.codec.columns;
+    const columns = this.resource.codec.columns;
     if (columns && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
       // non-null column, but failing that we invoke the codec's
@@ -645,7 +557,7 @@ export class PgSelectSingleStep<
   }
 
   finalize() {
-    const poly = this.source.codec.polymorphism;
+    const poly = this.resource.codec.polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       this.handlePolymorphism = (val) => {
         if (val == null) return val;
@@ -665,12 +577,8 @@ export class PgSelectSingleStep<
 
   unbatchedExecute(
     extra: ExecutionExtra,
-    result: TColumns extends PgTypeColumns
-      ? ObjectFromPgTypeColumns<TColumns>
-      : never,
-  ): TColumns extends PgTypeColumns
-    ? ObjectFromPgTypeColumns<TColumns> | null
-    : unknown {
+    result: ObjectFromPgCodecAttributes<GetPgResourceColumns<TResource>>,
+  ): unknown[] {
     if (result == null) {
       return this._coalesceToEmptyObject ? Object.create(null) : null;
     } else if (this.nullCheckAttributeIndex != null) {
@@ -696,32 +604,24 @@ export class PgSelectSingleStep<
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
 export function pgSelectFromRecord<
-  TColumns extends PgTypeColumns,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
->(
-  source: PgSource<TColumns, TUniques, TRelations, TParameters>,
-  $record: PgClassExpressionStep<
-    TColumns,
-    PgTypeCodec<TColumns, any, any>,
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
+  TResource extends PgResource<
+    any,
+    PgCodec<any, any, any, any, any, any, any>,
+    any,
+    any,
+    PgRegistry
   >,
-): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
-  return new PgSelectStep<TColumns, TUniques, TRelations, TParameters>({
-    source,
+>(
+  resource: TResource,
+  $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
+): PgSelectStep<TResource> {
+  return new PgSelectStep<TResource>({
+    resource: resource,
     identifiers: [],
     from: (record) => sql`(select (${record.placeholder}).*)`,
-    args: [{ step: $record, pgCodec: source.codec }],
+    args: [{ step: $record, pgCodec: resource.codec }],
     joinAsLateral: true,
-  }) as PgSelectStep<TColumns, TUniques, TRelations, TParameters>;
+  });
 }
 
 /**
@@ -729,44 +629,17 @@ export function pgSelectFromRecord<
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
 export function pgSelectSingleFromRecord<
-  TColumns extends PgTypeColumns,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
+  TResource extends PgResource<any, any, any, any>,
 >(
-  source: PgSource<TColumns, TUniques, TRelations, TParameters>,
-  record: PgClassExpressionStep<
-    TColumns,
-    PgTypeCodec<TColumns, any, any>,
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  >,
-): PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters> {
+  resource: TResource,
+  $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
+): PgSelectSingleStep<TResource> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
-  return pgSelectFromRecord(source, record).single() as PgSelectSingleStep<
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  >;
+  return pgSelectFromRecord(
+    resource,
+    $record,
+  ).single() as PgSelectSingleStep<TResource>;
 }
 
-Object.defineProperty(pgSelectFromRecord, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgSelectFromRecord",
-  },
-});
-
-Object.defineProperty(pgSelectSingleFromRecord, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgSelectSingleFromRecord",
-  },
-});
+exportAs("@dataplan/pg", pgSelectFromRecord, "pgSelectFromRecord");
+exportAs("@dataplan/pg", pgSelectSingleFromRecord, "pgSelectSingleFromRecord");

@@ -457,33 +457,39 @@ export function resolvePermissions(
   role: PgRoles,
   includeNoInherit = false,
 ): ResolvedPermissions {
+  const expandedRoles = expandRoles(introspection, [role], includeNoInherit);
+  const isSuperuser = expandedRoles.some((role) => role.rolsuper);
   // Just as in life, you start with nothing...
   const permissions: ResolvedPermissions = {
-    select: false,
-    selectGrant: false,
-    update: false,
-    updateGrant: false,
-    insert: false,
-    insertGrant: false,
-    delete: false,
-    deleteGrant: false,
-    truncate: false,
-    truncateGrant: false,
-    references: false,
-    referencesGrant: false,
-    trigger: false,
-    triggerGrant: false,
-    execute: false,
-    executeGrant: false,
-    usage: false,
-    usageGrant: false,
-    create: false,
-    createGrant: false,
-    connect: false,
-    connectGrant: false,
-    temporary: false,
-    temporaryGrant: false,
+    select: isSuperuser,
+    selectGrant: isSuperuser,
+    update: isSuperuser,
+    updateGrant: isSuperuser,
+    insert: isSuperuser,
+    insertGrant: isSuperuser,
+    delete: isSuperuser,
+    deleteGrant: isSuperuser,
+    truncate: isSuperuser,
+    truncateGrant: isSuperuser,
+    references: isSuperuser,
+    referencesGrant: isSuperuser,
+    trigger: isSuperuser,
+    triggerGrant: isSuperuser,
+    execute: isSuperuser,
+    executeGrant: isSuperuser,
+    usage: isSuperuser,
+    usageGrant: isSuperuser,
+    create: isSuperuser,
+    createGrant: isSuperuser,
+    connect: isSuperuser,
+    connectGrant: isSuperuser,
+    temporary: isSuperuser,
+    temporaryGrant: isSuperuser,
   };
+
+  if (isSuperuser) {
+    return permissions;
+  }
 
   for (const acl of acls) {
     const appliesToRole = aclContainsRole(

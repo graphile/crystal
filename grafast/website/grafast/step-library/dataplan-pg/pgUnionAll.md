@@ -32,12 +32,12 @@ have to be polymorphic!) and supports both limit/offset and cursor pagination.
 The `pgUnionAll` function accepts one argument - the `PgUnionAllStepConfig`.
 This configuration object has the following entries:
 
-- `sourceByTypeName` - (required) a map from GraphQL type name to the relevant
-  `PgSource` from which matching records can be fetched.
+- `resourceByTypeName` - (required) a map from GraphQL type name to the relevant
+  `PgResource` from which matching records can be fetched.
 - `members` - (optional) a list of details of the sources and relationship
   paths to combine in the `union all` statement; each entry in `members` will
   become another `union all`'d `select` statement. If unspecified, we'll generate
-  members for you based on `sourceByTypeName`.
+  members for you based on `resourceByTypeName`.
   - TODO: document subkeys of members
 - `attributes` - (optional) an object defining the available common attributes
   (if any) as a map from the attribute name to a specification object
@@ -105,14 +105,10 @@ pagination.
 
 ```ts
 const $vulnerabilities = pgUnionAll({
-  executor: firstPartyVulnerabilitiesSource.executor,
-  sourceByTypeName: {
-    FirstPartyVulnerability: {
-      source: firstPartyVulnerabilitiesSource,
-    },
-    ThirdPartyVulnerability: {
-      source: thirdPartyVulnerabilitiesSource,
-    },
+  executor: firstPartyVulnerabilitiesResource.executor,
+  resourceByTypeName: {
+    FirstPartyVulnerability: firstPartyVulnerabilitiesResource,
+    ThirdPartyVulnerability: thirdPartyVulnerabilitiesResource,
   },
   attributes: {
     cvss_score: {

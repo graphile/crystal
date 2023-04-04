@@ -38,10 +38,10 @@ TODO: the documentation for this is terrible. Sorry.
 
 ```ts
 export function connection<
-  TItemStep extends ExecutableStep<any>,
-  TCursorStep extends ExecutableStep<any>,
+  TItemStep extends ExecutableStep,
+  TCursorStep extends ExecutableStep,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TNodeStep extends ExecutableStep = ExecutableStep,
 >(
   $collection: TStep,
   itemPlan?: ($item: TItemStep) => TNodeStep,

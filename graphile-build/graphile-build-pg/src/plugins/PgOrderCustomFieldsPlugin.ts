@@ -1,7 +1,11 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSelectStep, PgSource, PgSourceParameter } from "@dataplan/pg";
+import type {
+  PgResource,
+  PgResourceParameter,
+  PgSelectStep,
+} from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
 import { getBehavior } from "../behavior.js";
@@ -13,7 +17,13 @@ declare global {
       computedColumnOrder(
         this: Inflection,
         details: {
-          source: PgSource<any, any, any, PgSourceParameter[]>;
+          resource: PgResource<
+            any,
+            any,
+            any,
+            readonly PgResourceParameter[],
+            any
+          >;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;
@@ -30,8 +40,8 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      computedColumnOrder(options, { source, variant }) {
-        const computedColumnName = this.computedColumnField({ source });
+      computedColumnOrder(options, { resource, variant }) {
+        const computedColumnName = this.computedColumnField({ resource });
         return this.constantCase(`${computedColumnName}-${variant}`);
       },
     },
@@ -53,18 +63,21 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           return values;
         }
 
-        const functionSources = build.input.pgSources.filter((source) => {
-          if (source.codec.columns) return false;
-          if (source.codec.arrayOfCodec) return false;
-          if (source.codec.rangeOfCodec) return false;
-          const parameters: PgSourceParameter[] | undefined = source.parameters;
+        const functionSources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ).filter((resource) => {
+          if (resource.codec.columns) return false;
+          if (resource.codec.arrayOfCodec) return false;
+          if (resource.codec.rangeOfCodec) return false;
+          const parameters: readonly PgResourceParameter[] | undefined =
+            resource.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
-          if (!source.isUnique) return false;
+          if (!resource.isUnique) return false;
           const behavior = getBehavior([
-            source.codec.extensions,
-            source.extensions,
+            resource.codec.extensions,
+            resource.extensions,
           ]);
           // TODO: should this be `proc:orderBy`? If so, should we make it so `getBehavior` accepts a prefix to prepend, so `"orderBy"` in a smart tag on a proc becomes `proc:orderBy`?
           return !!build.behavior.matches(behavior, "orderBy", "-orderBy");
@@ -75,7 +88,13 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           functionSources.reduce((memo, pgFieldSource) => {
             for (const ascDesc of ["asc" as const, "desc" as const]) {
               const valueName = inflection.computedColumnOrder({
-                source: pgFieldSource,
+                resource: pgFieldSource as PgResource<
+                  any,
+                  any,
+                  any,
+                  readonly PgResourceParameter[],
+                  any
+                >,
                 variant: ascDesc,
               });
 
@@ -87,7 +106,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                       graphile: {
                         applyPlan: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
-                            (step: PgSelectStep<any, any, any, any>) => {
+                            (step: PgSelectStep) => {
                               if (typeof pgFieldSource.source !== "function") {
                                 throw new Error(
                                   "Invalid computed column source",
@@ -118,8 +137,6 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           }, Object.create(null)),
           `Adding computed column orderable functions to order by for '${pgCodec.name}'`,
         );
-
-        return values;
       },
     },
   },

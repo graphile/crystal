@@ -1,22 +1,14 @@
 import "graphile-build";
 
-import type {
-  PgSource,
-  PgSourceParameter,
-  PgSourceRelation,
-  PgSourceUnique,
-  PgTypeCodec,
-  PgTypeColumns,
-} from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
+import type { PgCodec, PgCodecRelation, PgResource } from "@dataplan/pg";
 
 /**
- * Metadata for a specific PgTypeCodec
+ * Metadata for a specific PgCodec
  */
-export interface PgTypeCodecMeta {
+export interface PgCodecMeta {
   /**
    * Given a `situation` such as 'input', 'output', 'patch', etc. returns the
-   * name of the GraphQL type to use for this PgTypeCodec.
+   * name of the GraphQL type to use for this PgCodec.
    */
   typeNameBySituation: {
     [situation: string]: string;
@@ -24,26 +16,21 @@ export interface PgTypeCodecMeta {
 }
 
 /**
- * A map from PgTypeCodec to its associated metadata.
+ * A map from PgCodec to its associated metadata.
  */
-export type PgTypeCodecMetaLookup = Map<
-  PgTypeCodec<any, any, any>,
-  PgTypeCodecMeta
->;
+export type PgCodecMetaLookup = Map<PgCodec, PgCodecMeta>;
 
 /**
  * Creates an empty meta object for the given codec.
  */
-export function makePgTypeCodecMeta(
-  _codec: PgTypeCodec<any, any, any>,
-): PgTypeCodecMeta {
+export function makePgCodecMeta(_codec: PgCodec): PgCodecMeta {
   return {
     typeNameBySituation: Object.create(null),
   };
 }
 
 /**
- * Given the input object, this function walks through all the pgSources and
+ * Given the input object, this function walks through all the pgResources and
  * all their codecs and relations and extracts the full set of reachable
  * codecs.
  *
@@ -51,16 +38,14 @@ export function makePgTypeCodecMeta(
  */
 export function getCodecMetaLookupFromInput(
   input: GraphileBuild.BuildInput,
-): PgTypeCodecMetaLookup {
-  const metaLookup: PgTypeCodecMetaLookup = new Map();
-  const seenSources = new Set<PgSource<any, any, any, any>>();
-  if (input.pgCodecs) {
-    for (const codec of input.pgCodecs) {
-      walkCodec(codec, metaLookup);
-    }
+): PgCodecMetaLookup {
+  const metaLookup: PgCodecMetaLookup = new Map();
+  const seenResources = new Set<PgResource>();
+  for (const codec of Object.values(input.pgRegistry.pgCodecs) as PgCodec[]) {
+    walkCodec(codec, metaLookup);
   }
-  for (const source of input.pgSources) {
-    walkSource(resolveSource(source), metaLookup, seenSources);
+  for (const source of Object.values(input.pgRegistry.pgResources)) {
+    walkResource(source, metaLookup, seenResources);
   }
   return metaLookup;
 }
@@ -71,25 +56,25 @@ export function getCodecMetaLookupFromInput(
  *
  * @internal
  */
-function walkSource(
-  source: PgSource<any, any, any, any>,
-  metaLookup: PgTypeCodecMetaLookup,
-  seenSources: Set<PgSource<any, any, any, any>>,
+function walkResource(
+  resource: PgResource,
+  metaLookup: PgCodecMetaLookup,
+  seenResources: Set<PgResource>,
 ): void {
-  if (seenSources.has(source)) {
+  if (seenResources.has(resource)) {
     return;
   }
-  seenSources.add(source);
-  if (!metaLookup.has(source.codec)) {
-    walkCodec(source.codec, metaLookup);
+  seenResources.add(resource);
+  if (!metaLookup.has(resource.codec)) {
+    walkCodec(resource.codec, metaLookup);
   }
-  const relations = source.getRelations();
+  const relations = resource.getRelations() as Record<string, PgCodecRelation>;
   if (relations) {
     for (const relationshipName in relations) {
-      walkSource(
-        resolveSource(relations[relationshipName].source),
+      walkResource(
+        relations[relationshipName].remoteResource,
         metaLookup,
-        seenSources,
+        seenResources,
       );
     }
   }
@@ -101,14 +86,11 @@ function walkSource(
  *
  * @internal
  */
-function walkCodec(
-  codec: PgTypeCodec<any, any, any>,
-  metaLookup: PgTypeCodecMetaLookup,
-): void {
+function walkCodec(codec: PgCodec, metaLookup: PgCodecMetaLookup): void {
   if (metaLookup.has(codec)) {
     return;
   }
-  metaLookup.set(codec, makePgTypeCodecMeta(codec));
+  metaLookup.set(codec, makePgCodecMeta(codec));
   if (codec.columns) {
     for (const columnName in codec.columns) {
       walkCodec(codec.columns[columnName].codec, metaLookup);
@@ -123,25 +105,4 @@ function walkCodec(
   if (codec.rangeOfCodec) {
     walkCodec(codec.rangeOfCodec, metaLookup);
   }
-}
-
-/**
- * Where a source might be a PgSource or a PgSourceBuilder, this ensures we
- * return a PgSource.
- */
-function resolveSource<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
->(
-  source:
-    | PgSource<TColumns, TUniques, TRelations, TParameters>
-    | PgSourceBuilder<TColumns, TUniques, TParameters>,
-): PgSource<TColumns, TUniques, TRelations, TParameters> {
-  return source instanceof PgSourceBuilder ? source.get() : source;
 }

@@ -17,6 +17,7 @@ import {
   access,
   constant,
   ExecutableStep,
+  exportAs,
   first,
   isPromiseLike,
   lambda,
@@ -29,21 +30,15 @@ import type { GraphQLObjectType } from "graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import { sql } from "pg-sql2";
 
-import type { PgTypeColumns } from "../codecs.js";
+import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
-import type {
-  PgSource,
-  PgSourceRefPath,
-  PgSourceRelation,
-  PgSourceUnique,
-} from "../datasource.js";
-import { PgSourceBuilder } from "../datasource.js";
+import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type { PgExecutor } from "../executor.js";
-import type { PgGroupSpec } from "../index.js";
+import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
+  PgCodec,
   PgOrderFragmentSpec,
   PgOrderSpec,
-  PgTypeCodec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -120,56 +115,53 @@ type PgUnionAllStepSelect<TAttributes extends string> =
   | {
       type: "attribute";
       attribute: TAttributes;
-      codec: PgTypeCodec<any, any, any, any>;
+      codec: PgCodec;
     }
   | {
       type: "expression";
       expression: SQL;
-      codec: PgTypeCodec<any, any, any, any>;
+      codec: PgCodec;
     }
   | {
       type: "outerExpression";
       expression: SQL;
     };
 
-export interface PgUnionAllSourceSpec {
-  source: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
-}
-
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
   [attributeName in TAttributes]: {
-    codec: PgTypeCodec<any, any, any>;
+    codec: PgCodec;
   };
 };
 
 export interface PgUnionAllStepMember<TTypeNames extends string> {
   typeName: TTypeNames;
-  source: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+  resource: PgResource<
+    any,
+    any,
+    ReadonlyArray<PgResourceUnique<any>>,
+    any,
+    any
+  >;
   match?: {
-    [sourceColumnName: string]:
+    [resourceColumnName: string]:
       | {
           step: PgTypedExecutableStep<any>;
           codec?: never;
         }
       | {
           step: ExecutableStep;
-          codec: PgTypeCodec<any, any, any, any>;
+          codec: PgCodec;
         };
   };
-  path?: PgSourceRefPath;
+  path?: PgCodecRefPath;
 }
 
 export interface PgUnionAllStepConfig<
   TAttributes extends string,
   TTypeNames extends string,
 > {
-  sourceByTypeName: {
-    [typeName in TTypeNames]: PgSource<
-      any,
-      ReadonlyArray<PgSourceUnique<any>>,
-      any,
-      any
-    >;
+  resourceByTypeName: {
+    [typeName in TTypeNames]: PgResource<any, any, any, any, any>;
   };
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
@@ -188,7 +180,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
 
 interface QueryValue {
   dependencyIndex: number;
-  codec: PgTypeCodec<any, any, any>;
+  codec: PgCodec;
 }
 
 /**
@@ -203,7 +195,7 @@ interface QueryValue {
  */
 type PgUnionAllPlaceholder = {
   dependencyIndex: number;
-  codec: PgTypeCodec<any, any, any, any>;
+  codec: PgCodec;
   symbol: symbol;
 };
 
@@ -219,7 +211,7 @@ export class PgUnionAllSingleStep
   private typeKey: number | null;
   private pkKey: number | null;
   private readonly spec: PgUnionAllStepConfig<string, string>;
-  constructor($parent: PgUnionAllStep<any, any>, $item: ExecutableStep<any>) {
+  constructor($parent: PgUnionAllStep<any, any>, $item: ExecutableStep) {
     super();
     this.addDependency($item);
     this.spec = $parent.spec;
@@ -232,18 +224,20 @@ export class PgUnionAllSingleStep
     }
   }
 
-  planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep<any> {
+  planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep {
     if (this.pkKey === null || this.typeKey === null) {
       throw new Error(
         `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
-    const source = this.spec.sourceByTypeName[objectType.name];
-    if (!source) {
+    const resource = this.spec.resourceByTypeName[objectType.name];
+    if (!resource) {
       // This type isn't handled; so it should never occur
       return constant(null);
     }
-    const pk = source.uniques?.find((u) => u.isPrimary === true);
+    const pk = (resource.uniques as PgResourceUnique[] | undefined)?.find(
+      (u) => u.isPrimary === true,
+    );
     if (!pk) {
       throw new Error(
         `No PK found for ${objectType.name}; this should have been caught earlier?!`,
@@ -255,7 +249,7 @@ export class PgUnionAllSingleStep
       const col = pk.columns[i];
       spec[col] = access($parsed, [i]);
     }
-    return source.get(spec);
+    return resource.get(spec);
   }
 
   /**
@@ -300,28 +294,11 @@ export class PgUnionAllSingleStep
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<
-    TExpressionColumns extends PgTypeColumns | undefined,
-    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  >(
+  expression<TExpressionCodec extends PgCodec>(
     expression: SQL,
     codec: TExpressionCodec,
-  ): PgClassExpressionStep<
-    TExpressionColumns,
-    TExpressionCodec,
-    any,
-    any,
-    any,
-    any
-  > {
-    return pgClassExpression<
-      TExpressionColumns,
-      TExpressionCodec,
-      any,
-      any,
-      any,
-      any
-    >(this, codec)`${expression}`;
+  ): PgClassExpressionStep<TExpressionCodec, any> {
+    return pgClassExpression<TExpressionCodec, any>(this, codec)`${expression}`;
   }
 
   /**
@@ -334,28 +311,11 @@ export class PgUnionAllSingleStep
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
-  public select<
-    TExpressionColumns extends PgTypeColumns | undefined,
-    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  >(
+  public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
-  ): PgClassExpressionStep<
-    TExpressionColumns,
-    TExpressionCodec,
-    any,
-    any,
-    any,
-    any
-  > {
-    const sqlExpr = pgClassExpression<
-      TExpressionColumns,
-      TExpressionCodec,
-      any,
-      any,
-      any,
-      any
-    >(this, codec);
+  ): PgClassExpressionStep<TExpressionCodec, any> {
+    const sqlExpr = pgClassExpression<TExpressionCodec, any>(this, codec);
     return sqlExpr`${fragment}`;
   }
 
@@ -374,7 +334,13 @@ export class PgUnionAllSingleStep
 
 interface MemberDigest<TTypeNames extends string> {
   member: PgUnionAllStepMember<TTypeNames>;
-  finalSource: PgSource<any, ReadonlyArray<PgSourceUnique<any>>, any, any>;
+  finalResource: PgResource<
+    any,
+    any,
+    ReadonlyArray<PgResourceUnique<any>>,
+    any,
+    any
+  >;
   sqlSource: SQL;
   symbol: symbol;
   alias: SQL;
@@ -386,18 +352,15 @@ export type PgUnionAllMode = "normal" | "aggregate";
 
 /**
  * Represents a `UNION ALL` statement, which can have multiple table-like
- * sources, but must return a consistent data shape.
+ * resources, but must return a consistent data shape.
  */
 export class PgUnionAllStep<
-    TAttributes extends string,
-    TTypeNames extends string,
+    TAttributes extends string = string,
+    TTypeNames extends string = string,
   >
   extends ExecutableStep
   implements
-    ConnectionCapableStep<
-      PgSelectSingleStep<any, any, any, any>,
-      PgSelectParsedCursorStep
-    >
+    ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -625,17 +588,20 @@ export class PgUnionAllStep<
       }
       this.spec = spec;
       // If the user doesn't specify members, we'll just build membership based
-      // on the provided sources.
+      // on the provided resources.
       const members =
         spec.members ??
         (
-          Object.entries(spec.sourceByTypeName) as Array<
-            [typeName: TTypeNames, source: PgSource<any, any, any, any>]
+          Object.entries(spec.resourceByTypeName) as Array<
+            [
+              typeName: TTypeNames,
+              resource: PgResource<any, any, any, any, any>,
+            ]
           >
         ).map(
-          ([typeName, source]): PgUnionAllStepMember<TTypeNames> => ({
+          ([typeName, resource]): PgUnionAllStepMember<TTypeNames> => ({
             typeName,
-            source,
+            resource,
           }),
         );
 
@@ -653,22 +619,22 @@ export class PgUnionAllStep<
       this.memberDigests = [];
       for (const member of members) {
         if (!this.executor) {
-          this.executor = member.source.executor;
+          this.executor = member.resource.executor;
           this.contextId = this.addDependency(this.executor.context());
         }
         const { path = [] } = member;
         const conditions: SQL[] = [];
 
-        let currentSource = member.source;
-        let currentSymbol = Symbol(currentSource.name);
+        let currentResource = member.resource;
+        let currentSymbol = Symbol(currentResource.name);
         let currentAlias = sql.identifier(currentSymbol);
-        if (this.executor !== currentSource.executor) {
+        if (this.executor !== currentResource.executor) {
           throw new Error(
-            `${this}: all sources must currently come from same executor`,
+            `${this}: all resources must currently come from same executor`,
           );
         }
-        if (!sql.isSQL(currentSource.source)) {
-          throw new Error(`${this}: parameterized sources not yet supported`);
+        if (!sql.isSQL(currentResource.source)) {
+          throw new Error(`${this}: parameterized resources not yet supported`);
         }
 
         if (member.match) {
@@ -683,28 +649,28 @@ export class PgUnionAllStep<
           }
         }
 
-        let sqlSource = sql`${currentSource.source} as ${currentAlias}`;
+        let sqlSource = sql`${currentResource.source} as ${currentAlias}`;
 
         for (const pathEntry of path) {
-          const relation: PgSourceRelation<any, any> =
-            currentSource.getRelation(pathEntry.relationName);
-          const nextSource =
-            relation.source instanceof PgSourceBuilder
-              ? relation.source.get()
-              : relation.source;
-          const nextSymbol = Symbol(nextSource.name);
+          const relation = currentResource.getRelation(
+            pathEntry.relationName,
+          ) as PgCodecRelation;
+          const nextResource = relation.remoteResource;
+          const nextSymbol = Symbol(nextResource.name);
           const nextAlias = sql.identifier(nextSymbol);
 
-          if (this.executor !== nextSource.executor) {
+          if (this.executor !== nextResource.executor) {
             throw new Error(
-              `${this}: all sources must currently come from same executor`,
+              `${this}: all resources must currently come from same executor`,
             );
           }
-          if (!sql.isSQL(nextSource.source)) {
-            throw new Error(`${this}: parameterized sources not yet supported`);
+          if (!sql.isSQL(nextResource.source)) {
+            throw new Error(
+              `${this}: parameterized resources not yet supported`,
+            );
           }
 
-          const nextSqlSource: SQL = nextSource.source;
+          const nextSqlSource: SQL = nextResource.source;
           sqlSource = sql`${sqlSource}
 inner join ${nextSqlSource} as ${nextAlias}
 on (${sql.indent(
@@ -719,14 +685,14 @@ on (${sql.indent(
             ),
           )})`;
 
-          currentSource = nextSource;
+          currentResource = nextResource;
           currentSymbol = nextSymbol;
           currentAlias = nextAlias;
         }
 
         this.memberDigests.push({
           member,
-          finalSource: currentSource,
+          finalResource: currentResource,
           symbol: currentSymbol,
           alias: currentAlias,
           conditions,
@@ -827,10 +793,7 @@ on (${sql.indent(
     return index;
   }
 
-  selectExpression(
-    expression: SQL,
-    codec: PgTypeCodec<any, any, any, any>,
-  ): number {
+  selectExpression(expression: SQL, codec: PgCodec): number {
     const existingIndex = this.selects.findIndex(
       (s) =>
         s.type === "expression" && sql.isEquivalent(s.expression, expression),
@@ -1008,13 +971,10 @@ on (${sql.indent(
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
-  ): SQL;
-  public placeholder(
-    $step: ExecutableStep<any> | PgTypedExecutableStep<any>,
-    overrideCodec?: PgTypeCodec<any, any, any>,
+    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    overrideCodec?: PgCodec,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -1108,7 +1068,7 @@ on (${sql.indent(
         // the signature of `getFragmentAndCodecFromOrder` to pass all the
         // codecs (and maybe even attribute mapping), or... I dunno... fix it
         // some other way.
-        const mutualCodec = this.memberDigests[0].finalSource.codec;
+        const mutualCodec = this.memberDigests[0].finalResource.codec;
         const [, codec] = getFragmentAndCodecFromOrder(
           this.alias,
           order,
@@ -1116,20 +1076,20 @@ on (${sql.indent(
         );
         identifierPlaceholders[i] = this.placeholder(
           toPg(access($parsedCursorPlan, [i + 1]), codec),
-          codec,
+          codec as PgCodec,
         );
       }
     }
 
     for (const digest of this.memberDigests) {
-      const { finalSource } = digest;
-      const pk = finalSource.uniques?.find((u) => u.isPrimary === true);
+      const { finalResource } = digest;
+      const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
       if (!pk) {
         throw new Error("No primary key; this should have been caught earlier");
       }
       const max = orderCount - 1 + pk.columns.length;
       const pkPlaceholder = identifierPlaceholders[orderCount - 1];
-      const pkColumns = finalSource.codec.columns as PgTypeColumns;
+      const pkColumns = finalResource.codec.columns as PgCodecAttributes;
       const condition = (i = 0): SQL => {
         const order = digest.orders[i];
         const [orderFragment, sqlValue, direction] = (() => {
@@ -1155,7 +1115,7 @@ on (${sql.indent(
             const [frag] = getFragmentAndCodecFromOrder(
               this.alias,
               order,
-              digest.finalSource.codec,
+              digest.finalResource.codec,
             );
             return [frag, identifierPlaceholders[i], order.direction];
           }
@@ -1442,7 +1402,7 @@ and ${condition(i + 1)}`}
     // the signature of `getFragmentAndCodecFromOrder` to pass all the
     // codecs (and maybe even attribute mapping), or... I dunno... fix it
     // some other way.
-    const mutualCodec = this.memberDigests[0].finalSource.codec;
+    const mutualCodec = this.memberDigests[0].finalResource.codec;
 
     hash.update(
       JSON.stringify(
@@ -1483,7 +1443,7 @@ and ${condition(i + 1)}`}
     const reverse = normalMode ? this.shouldReverseOrder() : null;
 
     // HACK: THIS IS UNSAFE. See "HACK: this is bad" comments.
-    const mutualCodec = this.memberDigests[0].finalSource.codec;
+    const mutualCodec = this.memberDigests[0].finalResource.codec;
 
     const makeQuery = () => {
       const tables: SQL[] = [];
@@ -1494,19 +1454,19 @@ and ${condition(i + 1)}`}
           alias: tableAlias,
           conditions,
           orders,
-          finalSource,
+          finalResource,
         } = digest;
 
-        const pk = finalSource.uniques?.find((u) => u.isPrimary === true);
+        const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
         if (!pk) {
           throw new Error(
-            `No PK for ${digest.member.typeName} source in ${this}`,
+            `No PK for ${digest.member.typeName} resource in ${this}`,
           );
         }
         const midSelects: SQL[] = [];
         const innerSelects = this.selects
           .map((s, selectIndex) => {
-            const r = ((): [SQL, PgTypeCodec<any, any, any, any>] | null => {
+            const r = ((): [SQL, PgCodec] | null => {
               switch (s.type) {
                 case "attribute": {
                   if (!this.spec.attributes) {
@@ -1551,7 +1511,7 @@ and ${condition(i + 1)}`}
                   const [frag, codec] = getFragmentAndCodecFromOrder(
                     this.alias,
                     orderSpec,
-                    digest.finalSource.codec,
+                    digest.finalResource.codec,
                   );
                   return [frag, codec];
                 }
@@ -1589,7 +1549,7 @@ ${sql.indent`${
           const [frag] = getFragmentAndCodecFromOrder(
             tableAlias,
             orderSpec,
-            finalSource.codec,
+            finalResource.codec,
           );
           return sql`${frag} ${
             Number(orderSpec.direction === "DESC") ^ Number(reverse)
@@ -1891,3 +1851,4 @@ export function pgUnionAll<
 ): PgUnionAllStep<TAttributes, TTypeNames> {
   return new PgUnionAllStep(spec);
 }
+exportAs("@dataplan/pg", pgUnionAll, "pgUnionAll");

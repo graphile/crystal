@@ -1,14 +1,13 @@
 import "graphile-build";
 
 import type {
-  PgSource,
-  PgSourceOptions,
-  PgSourceRelation,
-  PgSourceUnique,
-  PgTypeCodec,
-  PgTypeColumn,
+  PgCodec,
+  PgCodecAttribute,
+  PgResource,
+  PgResourceOptions,
+  PgResourceUnique,
 } from "@dataplan/pg";
-import { assertPgClassSingleStep, PgSourceBuilder } from "@dataplan/pg";
+import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
@@ -17,11 +16,6 @@ import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 import { getBehavior } from "../behavior.js";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
-
-type PgSourceBuilderOptions = Omit<
-  PgSourceOptions<any, any, any, any>,
-  "relations"
->;
 
 declare global {
   namespace GraphileBuild {
@@ -33,18 +27,14 @@ declare global {
       pgForbidSetofFunctionsToReturnNull?: boolean;
     }
 
-    interface BuildInput {
-      pgSources: PgSource<any, any, any, any>[];
-    }
-
     interface Inflection {
       /**
-       * A PgSource represents a single way of getting a number of values of
-       * `source.codec` type. It doesn't necessarily represent a table directly
+       * A PgResource represents a single way of getting a number of values of
+       * `resource.codec` type. It doesn't necessarily represent a table directly
        * (although it can) - e.g. it might be a function that returns records
        * from a table, or it could be a "sub-selection" of a table, e.g.
        * "admin_users" might be "users where admin is true".  This inflector
-       * gives a name to this source, it's primarily used when naming _fields_
+       * gives a name to this resource, it's primarily used when naming _fields_
        * in the GraphQL schema (as opposed to `_codecName` which typically
        * names _types_.
        *
@@ -52,17 +42,17 @@ declare global {
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _sourceName(
+      _resourceName(
         this: Inflection,
-        source: PgSource<any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
 
       /**
        * Takes a `_sourceName` and singularizes it.
        */
-      _singularizedSourceName(
+      _singularizedResourceName(
         this: Inflection,
-        source: PgSource<any, any, any, any>,
+        resource: PgResource<any, any, any, any, any>,
       ): string;
 
       /**
@@ -79,9 +69,9 @@ declare global {
       ): string;
 
       /**
-       * The name of the PgSource for a table/class
+       * The name of the PgResource for a table/class
        */
-      tableSourceName(
+      tableResourceName(
         this: Inflection,
         details: {
           databaseName: string;
@@ -90,7 +80,7 @@ declare global {
       ): string;
 
       /**
-       * A PgTypeCodec may represent any of a wide range of PostgreSQL types;
+       * A PgCodec may represent any of a wide range of PostgreSQL types;
        * this inflector gives a name to this codec, it's primarily used when
        * naming _types_ in the GraphQL schema (as opposed to `_sourceName`
        * which typically names _fields_).
@@ -99,7 +89,10 @@ declare global {
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _codecName(this: Inflection, codec: PgTypeCodec<any, any, any>): string;
+      _codecName(
+        this: Inflection,
+        codec: PgCodec<any, any, any, any, any, any, any>,
+      ): string;
 
       /**
        * Takes a `_codecName` and singularizes it. This is also a good place to
@@ -114,7 +107,7 @@ declare global {
        */
       _singularizedCodecName(
         this: Inflection,
-        codec: PgTypeCodec<any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -126,21 +119,21 @@ declare global {
       /**
        * The name of the GraphQL Object Type that's generated to represent a
        * specific table (more specifically a PostgreSQL "pg_class" which is
-       * represented as a certain PgTypeCodec)
+       * represented as a certain PgCodec)
        */
       tableType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       tableConnectionType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       tableEdgeType(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any>,
+        codec: PgCodec<any, any, any, any, any, any, any>,
       ): string;
 
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
@@ -148,24 +141,24 @@ declare global {
     }
 
     interface ScopeObject {
-      pgCodec?: PgTypeCodec<any, any, any>;
+      pgCodec?: PgCodec<any, any, any, any, any, any, any>;
       // TODO: rename this to isPgClassType?
       isPgTableType?: boolean;
       isPgConnectionRelated?: true;
     }
     interface ScopeObjectFieldsField {
       // TODO: put 'field' into all these names?
-      pgSource?: PgSource<any, any, any, any>;
-      pgFieldCodec?: PgTypeCodec<any, any, any>;
-      pgColumn?: PgTypeColumn<any>;
+      pgResource?: PgResource<any, any, any, any, any>;
+      pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
+      pgColumn?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
     interface ScopeInterfaceFieldsField {
       // TODO: put 'field' into all these names?
-      pgSource?: PgSource<any, any, any, any>;
-      pgFieldCodec?: PgTypeCodec<any, any, any>;
-      pgColumn?: PgTypeColumn<any>;
+      pgResource?: PgResource<any, any, any, any, any>;
+      pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
+      pgColumn?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -174,69 +167,63 @@ declare global {
 
 declare global {
   namespace GraphileConfig {
-    type PgTablesPluginSourceRelations = {
-      [identifier: string]: PgSourceRelation<any, any>;
-    };
-
     interface GatherHelpers {
       pgTables: {
-        getSourceBuilder(
+        getResourceOptions(
           databaseName: string,
           pgClass: PgClass,
-        ): Promise<PgSourceBuilder<any, any, any> | null>;
-        getSource(
-          sourceBuilder: PgSourceBuilder<any, any, any>,
-        ): Promise<PgSource<any, any, any, any> | null>;
+        ): Promise<PgResourceOptions | null>;
       };
     }
 
     interface GatherHooks {
-      pgTables_PgSourceBuilder_relations: PluginHook<
-        (event: {
-          databaseName: string;
-          pgClass: PgClass;
-          sourceBuilder: PgSourceBuilder<any, any, any>;
-          relations: PgTablesPluginSourceRelations;
-        }) => Promise<void> | void
-      >;
-      pgTables_PgSource: PluginHook<
-        (event: {
-          databaseName: string;
-          pgClass: PgClass;
-          source: PgSource<any, any, any>;
-          relations: PgTablesPluginSourceRelations;
-        }) => Promise<void> | void
-      >;
-      pgTables_PgSourceBuilder_options: PluginHook<
-        (event: {
-          databaseName: string;
-          pgClass: PgClass;
-          options: PgSourceBuilderOptions;
-        }) => void | Promise<void>
-      >;
+      /**
+       * Determines the uniques to include in a PgResourceOptions when it is built
+       */
       pgTables_unique: PluginHook<
         (event: {
           databaseName: string;
           pgClass: PgClass;
           pgConstraint: PgConstraint;
-          unique: PgSourceUnique;
+          unique: PgResourceUnique;
         }) => void | Promise<void>
+      >;
+      /**
+       * Passed the PgResourceOptions before it's added to the PgRegistryBuilder.
+       */
+      pgTables_PgResourceOptions: PluginHook<
+        (event: {
+          databaseName: string;
+          pgClass: PgClass;
+          resourceOptions: PgResourceOptions;
+        }) => void | Promise<void>
+      >;
+      pgTables_PgResourceOptions_relations: PluginHook<
+        (event: {
+          databaseName: string;
+          pgClass: PgClass;
+          resourceOptions: PgResourceOptions;
+        }) => Promise<void> | void
+      >;
+      pgTables_PgResourceOptions_relations_post: PluginHook<
+        (event: {
+          databaseName: string;
+          pgClass: PgClass;
+          resourceOptions: PgResourceOptions;
+        }) => Promise<void> | void
       >;
     }
   }
 }
 
 interface State {
-  sourceBuilderByPgClassByDatabase: Map<
+  resourceOptionsByPgClassByDatabase: Map<
     string,
-    Map<PgClass, Promise<PgSourceBuilder<any, any, any> | null>>
+    Map<PgClass, Promise<PgResourceOptions | null>>
   >;
-  sourceBySourceBuilder: Map<
-    PgSourceBuilder<any, any, any>,
-    Promise<PgSource<any, any, any, any> | null>
-  >;
-  detailsBySourceBuilder: Map<
-    PgSourceBuilder<any, any, any>,
+  resourceByResourceOptions: Map<PgResourceOptions, Promise<PgResource | null>>;
+  detailsByResourceOptions: Map<
+    PgResourceOptions,
     { databaseName: string; pgClass: PgClass }
   >;
 }
@@ -265,7 +252,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         return `${databasePrefix}${schemaPrefix}`;
       },
 
-      tableSourceName(options, { pgClass, databaseName }) {
+      tableResourceName(options, { pgClass, databaseName }) {
         const typeTags = pgClass.getType()!.getTags();
         const classTags = pgClass.getTags();
         if (typeof typeTags?.name === "string") {
@@ -296,15 +283,15 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         );
       },
 
-      _sourceName(options, source) {
+      _resourceName(options, resource) {
         return this.coerceToGraphQLName(
-          source.extensions?.tags?.name ?? source.name,
+          resource.extensions?.tags?.name ?? resource.name,
         );
       },
 
-      _singularizedSourceName(options, source) {
+      _singularizedResourceName(options, resource) {
         return this.dontEndInInputOrPatch(
-          this.singularize(this._sourceName(source)),
+          this.singularize(this._resourceName(resource)),
         );
       },
 
@@ -332,46 +319,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   gather: {
     namespace: "pgTables",
     helpers: {
-      getSource(info, sourceBuilder) {
-        let source = info.state.sourceBySourceBuilder.get(sourceBuilder);
-        if (source) {
-          return source;
-        }
-        source = (async () => {
-          const relations: GraphileConfig.PgTablesPluginSourceRelations =
-            Object.create(null);
-          const { pgClass, databaseName } =
-            info.state.detailsBySourceBuilder.get(sourceBuilder)!;
-          await info.process("pgTables_PgSourceBuilder_relations", {
-            sourceBuilder,
-            pgClass,
-            relations,
+      getResourceOptions(info, databaseName, pgClass) {
+        let resourceOptionsByPgClass =
+          info.state.resourceOptionsByPgClassByDatabase.get(databaseName);
+        if (!resourceOptionsByPgClass) {
+          resourceOptionsByPgClass = new Map();
+          info.state.resourceOptionsByPgClassByDatabase.set(
             databaseName,
-          });
-          const source = EXPORTABLE(
-            (relations, sourceBuilder) => sourceBuilder.build({ relations }),
-            [relations, sourceBuilder],
-          );
-          return source;
-        })();
-        info.state.sourceBySourceBuilder.set(sourceBuilder, source);
-        return source;
-      },
-      getSourceBuilder(info, databaseName, pgClass) {
-        let sourceBuilderByPgClass =
-          info.state.sourceBuilderByPgClassByDatabase.get(databaseName);
-        if (!sourceBuilderByPgClass) {
-          sourceBuilderByPgClass = new Map();
-          info.state.sourceBuilderByPgClassByDatabase.set(
-            databaseName,
-            sourceBuilderByPgClass,
+            resourceOptionsByPgClass,
           );
         }
-        let sourceBuilder = sourceBuilderByPgClass.get(pgClass);
-        if (sourceBuilder) {
-          return sourceBuilder;
+        let resourceOptions = resourceOptionsByPgClass.get(pgClass);
+        if (resourceOptions) {
+          return resourceOptions;
         }
-        sourceBuilder = (async () => {
+        resourceOptions = (async () => {
           const pgConfig = info.resolvedPreset.pgConfigs?.find(
             (db) => db.name === databaseName,
           );
@@ -457,7 +419,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             uniqueColumnOnlyConstraints.map(async (pgConstraint) => {
               const { tags, description } =
                 pgConstraint.getTagsAndDescription();
-              const unique: PgSourceUnique = {
+              const unique: PgResourceUnique = {
                 isPrimary: pgConstraint.contype === "p",
                 columns: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
@@ -479,7 +441,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
           const executor =
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
-          const name = info.inflection.tableSourceName({
+          const name = info.inflection.tableResourceName({
             databaseName,
             pgClass,
           });
@@ -501,99 +463,127 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             addBehaviorToTags(tags, "-delete");
           }
 
-          const options: PgSourceBuilderOptions = {
-            executor,
-            name,
-            identifier,
-            source: codec.sqlType,
-            codec,
-            uniques,
-            isVirtual: !["r", "v", "m", "f", "p"].includes(pgClass.relkind),
-            // TODO: consistency: either remove `description` from here or from `extensions` throughout.
-            description,
-            extensions: {
-              description,
-              pg: {
-                databaseName,
-                schemaName: pgClass.getNamespace()!.nspname,
-                name: pgClass.relname,
-              },
-              tags: {
-                ...tags,
-              },
-            },
-          };
-
-          await info.process("pgTables_PgSourceBuilder_options", {
-            databaseName,
-            pgClass,
-            options,
-          });
-
-          const sourceBuilder = EXPORTABLE(
-            (PgSourceBuilder, options) => new PgSourceBuilder(options),
-            [PgSourceBuilder, options],
+          const isVirtual = !["r", "v", "m", "f", "p"].includes(
+            pgClass.relkind,
           );
-          info.state.detailsBySourceBuilder.set(sourceBuilder, {
+          const extensions = {
+            description,
+            pg: {
+              databaseName,
+              schemaName: pgClass.getNamespace()!.nspname,
+              name: pgClass.relname,
+            },
+            tags: {
+              ...tags,
+            },
+          } as const;
+          const options = EXPORTABLE(
+            (
+              codec,
+              description,
+              executor,
+              extensions,
+              identifier,
+              isVirtual,
+              name,
+              uniques,
+            ) =>
+              ({
+                executor,
+                name,
+                identifier,
+                source: codec.sqlType,
+                codec,
+                uniques,
+                isVirtual,
+                // TODO: consistency: either remove `description` from here or from `extensions` throughout.
+                description,
+                extensions,
+              } as const),
+            [
+              codec,
+              description,
+              executor,
+              extensions,
+              identifier,
+              isVirtual,
+              name,
+              uniques,
+            ],
+          );
+
+          await info.process("pgTables_PgResourceOptions", {
+            databaseName,
+            pgClass,
+            resourceOptions: options,
+          });
+
+          const resourceOptions = EXPORTABLE(
+            (makePgResourceOptions, options) => makePgResourceOptions(options),
+            [makePgResourceOptions, options],
+          );
+
+          const registryBuilder =
+            await info.helpers.pgRegistry.getRegistryBuilder();
+          if (!resourceOptions.isVirtual) {
+            registryBuilder.addResource(resourceOptions);
+          }
+
+          info.state.detailsByResourceOptions.set(resourceOptions, {
             databaseName,
             pgClass,
           });
 
-          return sourceBuilder;
+          return resourceOptions;
         })();
-        sourceBuilderByPgClass.set(pgClass, sourceBuilder);
-        return sourceBuilder;
+        resourceOptionsByPgClass.set(pgClass, resourceOptions);
+        return resourceOptions;
       },
     },
     initialState: () => ({
-      sourceBuilderByPgClassByDatabase: new Map(),
-      sourceBySourceBuilder: new Map(),
-      detailsBySourceBuilder: new Map(),
+      resourceOptionsByPgClassByDatabase: new Map(),
+      resourceByResourceOptions: new Map(),
+      detailsByResourceOptions: new Map(),
     }),
     hooks: {
       async pgIntrospection_class({ helpers }, event) {
         const { entity: pgClass, databaseName } = event;
-        helpers.pgTables.getSourceBuilder(databaseName, pgClass);
+        helpers.pgTables.getResourceOptions(databaseName, pgClass);
       },
-    },
 
-    async main(output, info) {
-      if (!output.pgSources) {
-        output.pgSources = [];
-      }
-      const toProcess: Array<{
-        source: PgSource<any, any, any, any>;
-        pgClass: PgClass;
-        databaseName: string;
-      }> = [];
-      for (const [
-        databaseName,
-        sourceBuilderByPgClass,
-      ] of info.state.sourceBuilderByPgClassByDatabase.entries()) {
+      // TODO: Ensure introspection has occurred, to ensure that
+      // `pgIntrospection_class` above is called before
+      // `pgRegistry_PgRegistryBuilder_pgRelations` below.
+
+      async pgRegistry_PgRegistryBuilder_pgRelations(info, _event) {
+        const toProcess: Array<{
+          resourceOptions: PgResourceOptions;
+          pgClass: PgClass;
+          databaseName: string;
+        }> = [];
         for (const [
-          pgClass,
-          sourceBuilderPromise,
-        ] of sourceBuilderByPgClass.entries()) {
-          const sourceBuilder = await sourceBuilderPromise;
-          if (!sourceBuilder) {
-            continue;
-          }
-          const source = await info.helpers.pgTables.getSource(sourceBuilder);
-          if (source && !source.isVirtual) {
-            output.pgSources!.push(source);
-          }
-          if (source) {
-            toProcess.push({ source, pgClass, databaseName });
+          databaseName,
+          resourceOptionsByPgClass,
+        ] of info.state.resourceOptionsByPgClassByDatabase.entries()) {
+          for (const [
+            pgClass,
+            resourceOptionsPromise,
+          ] of resourceOptionsByPgClass.entries()) {
+            const resourceOptions = await resourceOptionsPromise;
+            if (resourceOptions) {
+              const entry = { resourceOptions, pgClass, databaseName };
+              await info.process("pgTables_PgResourceOptions_relations", entry);
+              toProcess.push(entry);
+            }
           }
         }
-      }
-
-      for (const entry of toProcess) {
-        await info.process("pgTables_PgSource", {
-          ...entry,
-          relations: entry.source.getRelations(),
-        });
-      }
+        for (const entry of toProcess) {
+          await info.process(
+            "pgTables_PgResourceOptions_relations_post",
+            entry,
+          );
+        }
+      },
     },
   } as GraphileConfig.PluginGatherConfig<"pgTables", State, Cache>,
 

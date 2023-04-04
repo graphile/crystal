@@ -4,15 +4,19 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type {
+  PgClassExpressionStep,
+  PgCodec,
+  PgCodecAttribute,
+  PgCodecAttributes,
+  PgCodecList,
+  PgCodecWithColumns,
+  PgRegistry,
   PgSelectSingleStep,
-  PgTypeCodec,
-  PgTypeColumn,
-  PgTypeColumns,
 } from "@dataplan/pg";
 import {
+  PgResource,
   pgSelectFromRecords,
   pgSelectSingleFromRecord,
-  PgSource,
 } from "@dataplan/pg";
 import type { GraphileFieldConfig, SetterStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
@@ -25,7 +29,7 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       /**
-       * Given a columnName on a PgTypeCodec's columns, should return the field
+       * Given a columnName on a PgCodec's columns, should return the field
        * name to use to represent this column (both for input and output).
        *
        * @remarks The method beginning with `_` implies it's not ment to
@@ -35,7 +39,7 @@ declare global {
       _columnName(
         this: GraphileBuild.Inflection,
         details: {
-          codec: PgTypeCodec<any, any, any, any>;
+          codec: PgCodecWithColumns;
           columnName: string;
           skipRowId?: boolean;
         },
@@ -47,7 +51,7 @@ declare global {
        */
       _joinColumnNames(
         this: GraphileBuild.Inflection,
-        codec: PgTypeCodec<any, any, any, any>,
+        codec: PgCodecWithColumns,
         names: readonly string[],
       ): string;
 
@@ -60,7 +64,7 @@ declare global {
         this: GraphileBuild.Inflection,
         details: {
           columnName: string;
-          codec: PgTypeCodec<any, any, any>;
+          codec: PgCodecWithColumns;
         },
       ): string;
     }
@@ -71,35 +75,45 @@ declare global {
       isPgBaseInput?: boolean;
       isPgRowType?: boolean;
       isPgCompoundType?: boolean;
-      pgColumn?: PgTypeColumn;
+      pgColumn?: PgCodecAttribute;
     }
   }
 }
 
-function unwrapCodec(
-  codec: PgTypeCodec<any, any, any, any>,
-): PgTypeCodec<any, any, any, any> {
+function unwrapCodec(codec: PgCodec): PgCodec {
   if (codec.arrayOfCodec) {
     return unwrapCodec(codec.arrayOfCodec);
   }
   return codec;
 }
 
-const getSource = EXPORTABLE(
-  (PgSource) =>
+// TODO: get rid of this! Determine the resources at build time
+const getResource = EXPORTABLE(
+  (PgResource) =>
     (
-      baseCodec: PgTypeCodec<any, any, any, any>,
-      pgSources: PgSource<any, any, any, any>[],
-      $record: PgSelectSingleStep<any, any, any, any>,
+      registry: PgRegistry<any, any, any>,
+      baseCodec: PgCodec,
+      pgResources: PgResource<any, any, any, any, any>[],
+      $record: PgSelectSingleStep,
     ) => {
-      const executor = $record.source.executor;
-      const source =
-        pgSources.find(
-          (potentialSource) => potentialSource.executor === executor,
-        ) ?? PgSource.fromCodec(executor, baseCodec);
-      return source;
+      const executor = $record.resource.executor;
+      const resource =
+        pgResources.find(
+          (potentialSource) =>
+            // These have already been filtered by codec
+            potentialSource.executor === executor,
+        ) ??
+        // HACK: yuck yuck yuck
+        // TODO: yuck; we should not be building a PgResource on demand. We
+        // should be able to detect this is necessary and add it to the
+        // registry preemptively.
+        new PgResource(
+          registry,
+          PgResource.configFromCodec(executor, baseCodec),
+        );
+      return resource;
     },
-  [PgSource],
+  [PgResource],
 );
 
 function processColumn(
@@ -116,20 +130,20 @@ function processColumn(
     graphql: { getNullableType, GraphQLNonNull, GraphQLList },
     inflection,
     getGraphQLTypeByPgCodec,
+    input: { pgRegistry: registry },
   } = build;
 
   const {
-    scope: { pgCodec },
+    scope: { pgCodec: rawPgCodec },
   } = context;
-  if (!pgCodec) {
+  if (!rawPgCodec || !rawPgCodec.columns) {
     return;
   }
+  const pgCodec = rawPgCodec as PgCodecWithColumns;
 
   const isInterface = context.type === "GraphQLInterfaceType";
 
-  const column = pgCodec.columns[columnName] as PgTypeColumn<
-    PgTypeCodec<any, any, any, any, any, any>
-  >;
+  const column = pgCodec.columns[columnName];
 
   const behavior = getBehavior([pgCodec.extensions, column.extensions]);
   if (!build.behavior.matches(behavior, "attribute:select", "select")) {
@@ -152,7 +166,7 @@ function processColumn(
     : baseType;
   if (!arrayOrNotType) {
     console.warn(
-      `Couldn't find a 'output' variant for PgTypeCodec ${
+      `Couldn't find a 'output' variant for PgCodec ${
         pgCodec.name
       }'s '${columnName}' column (${column.codec.name}; array=${!!column.codec
         .arrayOfCodec}, domain=${!!column.codec.domainOfCodec}, enum=${!!(
@@ -178,24 +192,24 @@ function processColumn(
   };
   if (!isInterface) {
     const makePlan = () => {
-      // See if there's a source to pull record types from (e.g. for relations/etc)
+      // See if there's a resource to pull record types from (e.g. for relations/etc)
       if (!baseCodec.columns) {
         // Simply get the value
         return EXPORTABLE(
-          (columnName) => ($record: PgSelectSingleStep<any, any, any, any>) => {
+          (columnName) => ($record: PgSelectSingleStep) => {
             return $record.get(columnName);
           },
           [columnName],
         );
       } else {
-        const pgSources = build.input.pgSources.filter(
+        const pgResources = Object.values(registry.pgResources).filter(
           (potentialSource) =>
             potentialSource.codec === baseCodec && !potentialSource.parameters,
         );
         // TODO: this is pretty horrible in the export; we should fix that.
         if (!column.codec.arrayOfCodec) {
           const notNull = column.notNull || column.codec.notNull;
-          // Single record from source
+          // Single record from resource
           /*
            * TODO: if we refactor `PgSelectSingleStep` we can probably
            * optimise this to do inline selection and still join against
@@ -206,15 +220,16 @@ function processColumn(
             (
                 baseCodec,
                 columnName,
-                getSource,
+                getResource,
                 notNull,
+                pgResources,
                 pgSelectSingleFromRecord,
-                pgSources,
+                registry,
               ) =>
-              ($record: PgSelectSingleStep<any, any, any, any>) => {
+              ($record: PgSelectSingleStep<any>) => {
                 const $plan = $record.get(columnName);
                 const $select = pgSelectSingleFromRecord(
-                  getSource(baseCodec, pgSources, $record),
+                  getResource(registry, baseCodec, pgResources, $record),
                   $plan,
                 );
                 if (notNull) {
@@ -226,14 +241,15 @@ function processColumn(
             [
               baseCodec,
               columnName,
-              getSource,
+              getResource,
               notNull,
+              pgResources,
               pgSelectSingleFromRecord,
-              pgSources,
+              registry,
             ],
           );
         } else {
-          // Many records from source
+          // Many records from resource
           /*
            * TODO: if we refactor `PgSelectSingleStep` we can probably
            * optimise this to do inline selection and still join against
@@ -244,20 +260,31 @@ function processColumn(
             (
                 baseCodec,
                 columnName,
-                getSource,
+                getResource,
+                pgResources,
                 pgSelectFromRecords,
-                pgSources,
+                registry,
               ) =>
-              ($record: PgSelectSingleStep<any, any, any, any>) => {
-                const $val = $record.get(columnName);
+              ($record: PgSelectSingleStep<any>) => {
+                const $val = $record.get(columnName) as PgClassExpressionStep<
+                  PgCodecList,
+                  any
+                >;
                 const $select = pgSelectFromRecords(
-                  getSource(baseCodec, pgSources, $record),
+                  getResource(registry, baseCodec, pgResources, $record),
                   $val,
                 );
                 $select.setTrusted();
                 return $select;
               },
-            [baseCodec, columnName, getSource, pgSelectFromRecords, pgSources],
+            [
+              baseCodec,
+              columnName,
+              getResource,
+              pgResources,
+              pgSelectFromRecords,
+              registry,
+            ],
           );
         }
       }
@@ -275,7 +302,7 @@ function processColumn(
         fieldSpec,
       ),
     },
-    `Adding '${columnName}' column field to PgTypeCodec '${pgCodec.name}'`,
+    `Adding '${columnName}' column field to PgCodec '${pgCodec.name}'`,
   );
 }
 
@@ -409,20 +436,21 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
             isPgCompoundType,
             isPgPatch,
             isPgBaseInput,
-            pgCodec,
+            pgCodec: rawPgCodec,
           },
           fieldWithHooks,
         } = context;
         if (
           !(isPgRowType || isPgCompoundType) ||
-          !pgCodec ||
-          !pgCodec.columns ||
-          pgCodec.isAnonymous
+          !rawPgCodec ||
+          !rawPgCodec.columns ||
+          rawPgCodec.isAnonymous
         ) {
           return fields;
         }
+        const pgCodec = rawPgCodec as PgCodecWithColumns;
 
-        return Object.entries(pgCodec.columns as PgTypeColumns).reduce(
+        return Object.entries(pgCodec.columns as PgCodecAttributes).reduce(
           (memo, [columnName, column]) =>
             build.recoverable(memo, () => {
               const behavior = getBehavior([
@@ -449,7 +477,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
               });
               if (memo[fieldName]) {
                 throw new Error(
-                  `Two columns produce the same GraphQL field name '${fieldName}' on input PgTypeCodec '${pgCodec.name}'; one of them is '${columnName}'`,
+                  `Two columns produce the same GraphQL field name '${fieldName}' on input PgCodec '${pgCodec.name}'; one of them is '${columnName}'`,
                 );
               }
               const columnType = build.getGraphQLTypeByPgCodec(

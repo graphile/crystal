@@ -2,7 +2,7 @@ import "./thereCanBeOnlyOne.js";
 
 import debugFactory from "debug";
 
-import { exportAsMany } from "./exportAs.js";
+import { exportAs, exportAsMany } from "./exportAs.js";
 import { grafastPrint } from "./grafastPrint.js";
 import {
   EnumPlans,
@@ -255,6 +255,7 @@ export {
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  exportAs,
   exportAsMany,
   FieldArgs,
   FieldInfo,
@@ -396,6 +397,7 @@ export {
 };
 
 exportAsMany("grafast", {
+  exportAs,
   exportAsMany,
   grafastPrint,
   makeGrafastSchema,

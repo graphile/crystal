@@ -2,7 +2,7 @@ import type { ExecutableStep } from "grafast";
 import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
 
-import type { PgConditionLikeStep, PgTypeCodec } from "../interfaces.js";
+import type { PgCodec, PgConditionLikeStep } from "../interfaces.js";
 
 export class BooleanFilterStep extends ModifierStep<PgConditionLikeStep> {
   static $$export = {
@@ -22,10 +22,7 @@ export class BooleanFilterStep extends ModifierStep<PgConditionLikeStep> {
     this.alias = $classFilterPlan.alias;
   }
 
-  placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any, any>,
-  ): SQL {
+  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
     return this.$parent.placeholder($step, codec);
   }
 

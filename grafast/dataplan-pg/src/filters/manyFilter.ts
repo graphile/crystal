@@ -1,22 +1,22 @@
 import { ModifierStep } from "grafast";
 import sql from "pg-sql2";
 
-import type { PgSource } from "../datasource.js";
+import type { PgResource } from "../datasource.js";
 import { TempTableStep } from "../steps/tempTable.js";
 import { ClassFilterStep } from "./classFilter.js";
 
 export class ManyFilterStep<
-  TChildDataSource extends PgSource<any, any, any, any>,
+  TChildResource extends PgResource<any, any, any, any, any>,
 > extends ModifierStep<ClassFilterStep> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "ManyFilterStep",
   };
 
-  public $some: TempTableStep<TChildDataSource> | null = null;
+  public $some: TempTableStep<TChildResource> | null = null;
   constructor(
     $parentFilterPlan: ClassFilterStep,
-    public childDataSource: TChildDataSource,
+    public childDataSource: TChildResource,
     private myAttrs: string[],
     private theirAttrs: string[],
   ) {

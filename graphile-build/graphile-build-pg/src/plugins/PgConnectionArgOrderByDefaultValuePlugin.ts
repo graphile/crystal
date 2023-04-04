@@ -15,7 +15,7 @@ export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
       GraphQLObjectType_fields_field_args_arg(arg, build, context) {
         const { extend, getTypeByName, inflection } = build;
         const {
-          scope: { fieldName, isPgFieldConnection, pgSource, argName },
+          scope: { fieldName, isPgFieldConnection, pgResource, argName },
           Self,
         } = context;
 
@@ -25,14 +25,14 @@ export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
 
         if (
           !isPgFieldConnection ||
-          !pgSource ||
-          !pgSource.codec.columns ||
-          pgSource.parameters
+          !pgResource ||
+          !pgResource.codec.columns ||
+          pgResource.parameters
         ) {
           return arg;
         }
 
-        const tableTypeName = inflection.tableType(pgSource.codec);
+        const tableTypeName = inflection.tableType(pgResource.codec);
         const TableOrderByType = getTypeByName(
           inflection.orderByType(tableTypeName),
         ) as GraphQLEnumType;

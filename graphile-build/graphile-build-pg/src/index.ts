@@ -1,9 +1,9 @@
 export {
+  PgCodecAttributeTags,
+  PgCodecRelationTags,
+  PgCodecTags,
+  PgResourceTags,
   PgSmartTagsDict,
-  PgSourceRelationTags,
-  PgSourceTags,
-  PgTypeCodecTags,
-  PgTypeColumnTags,
 } from "./interfaces.js";
 export {
   getWithPgClientFromPgConfig,
@@ -33,6 +33,7 @@ export { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.j
 export { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
 export { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
 export { PgRBACPlugin } from "./plugins/PgRBACPlugin.js";
+export { PgRegistryPlugin } from "./plugins/PgRegistryPlugin.js";
 export { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
 export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
 export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";

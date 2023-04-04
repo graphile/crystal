@@ -4,7 +4,7 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
 } from "grafast";
-import { access, ExecutableStep } from "grafast";
+import { access, ExecutableStep, exportAs } from "grafast";
 
 export type JSONValue =
   | string
@@ -85,9 +85,4 @@ export function jsonParse<TJSON extends JSONValue>(
   return new JSONParseStep<TJSON>($string);
 }
 
-Object.defineProperty(jsonParse, "$$export", {
-  value: {
-    moduleName: "@dataplan/json",
-    exportName: "jsonParse",
-  },
-});
+exportAs("@dataplan/json", jsonParse, "jsonParse");

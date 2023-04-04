@@ -10,7 +10,7 @@ import type {
   ObjectStep,
   PromiseOrDirect,
 } from "grafast";
-import { defer, isAsyncIterable, isDev } from "grafast";
+import { defer, exportAs, isAsyncIterable, isDev } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.js";
@@ -117,7 +117,7 @@ export type PgExecutorSubscribeOptions = {
 
 /**
  * Represents a PostgreSQL database connection, can be used for issuing queries
- * to the database. Used by PgSource but also directly by things like
+ * to the database. Used by PgResource but also directly by things like
  * PgSimpleFunctionCallStep. Was once PgDataSource itself. Multiple PgExecutors
  * can exist in the same schema. PgExecutor is also responsible for things like
  * caching.
@@ -141,7 +141,7 @@ export class PgExecutor<TSettings = any> {
     return chalk.bold.blue(`PgExecutor(${this.name})`);
   }
 
-  // public context(): ExecutableStep<any>
+  // public context(): ExecutableStep
   public context(): ObjectStep<PgExecutorContextPlans<TSettings>> {
     return this.contextCallback();
   }
@@ -806,6 +806,4 @@ ${duration}
   }
 }
 
-Object.defineProperty(PgExecutor, "$$export", {
-  value: { moduleName: "@dataplan/pg", exportName: "PgExecutor" },
-});
+exportAs("@dataplan/pg", PgExecutor, "PgExecutor");

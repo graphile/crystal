@@ -325,7 +325,7 @@ export function arraysMatch<T>(
 
 export type ObjectTypeFields<
   TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep<any>,
+  TParentStep extends ExecutableStep,
 > = {
   [key: string]: GraphileFieldConfig<
     GraphQLOutputType,
@@ -338,7 +338,7 @@ export type ObjectTypeFields<
 
 export type ObjectTypeSpec<
   TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep<any>,
+  TParentStep extends ExecutableStep,
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 > = Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
   fields: TFields | (() => TFields);
@@ -349,12 +349,12 @@ export type ObjectTypeSpec<
  */
 export function objectSpec<
   TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep<any>,
+  TParentStep extends ExecutableStep,
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 >(
   spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
   Step:
-    | ((step: ExecutableStep<any>) => asserts step is ExecutableStep<any>)
+    | ((step: ExecutableStep) => asserts step is ExecutableStep)
     | { new (...args: any[]): TParentStep }
     | null,
 ): GraphQLObjectTypeConfig<any, TContext> {
@@ -389,7 +389,7 @@ export function objectSpec<
 
 export type GraphileObjectType<
   TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep<any>,
+  TParentStep extends ExecutableStep,
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 > = GraphQLObjectType<
   TParentStep extends ExecutableStep<infer U> ? U : never,
@@ -401,7 +401,7 @@ export type GraphileObjectType<
  */
 export function newObjectTypeBuilder<
   TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep<any>,
+  TParentStep extends ExecutableStep,
 >(Step: {
   new (...args: any[]): TParentStep;
 }): <TFields extends ObjectTypeFields<TContext, TParentStep>>(
@@ -420,8 +420,8 @@ export function newObjectTypeBuilder<
  */
 export function objectFieldSpec<
   TContext extends Grafast.Context,
-  TSource extends ExecutableStep<any>,
-  TResult extends ExecutableStep<any> = ExecutableStep<any>,
+  TSource extends ExecutableStep,
+  TResult extends ExecutableStep = ExecutableStep,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
   graphileSpec: GraphileFieldConfig<
@@ -485,7 +485,7 @@ export function objectFieldSpec<
  */
 export function newGraphileFieldConfigBuilder<
   TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep<any>,
+  TParentStep extends ExecutableStep,
 >(): <
   TType extends GraphQLOutputType,
   TFieldStep extends OutputPlanForType<TType>,

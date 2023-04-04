@@ -2,9 +2,9 @@ import "graphile-config";
 
 import type {
   PgConditionStep,
+  PgResource,
+  PgResourceParameter,
   PgSelectStep,
-  PgSource,
-  PgSourceParameter,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
@@ -15,7 +15,7 @@ declare global {
   namespace GraphileBuild {
     interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;
-      pgFieldSource?: PgSource<any, any, any, any>;
+      pgFieldSource?: PgResource<any, any, any, any, any>;
     }
   }
 }
@@ -43,18 +43,21 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const functionSources = build.input.pgSources.filter((source) => {
-          if (source.codec.columns) return false;
-          if (source.codec.arrayOfCodec) return false;
-          if (source.codec.rangeOfCodec) return false;
-          const parameters: PgSourceParameter[] | undefined = source.parameters;
+        const functionSources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ).filter((resource) => {
+          if (resource.codec.columns) return false;
+          if (resource.codec.arrayOfCodec) return false;
+          if (resource.codec.rangeOfCodec) return false;
+          const parameters: readonly PgResourceParameter[] | undefined =
+            resource.parameters;
           if (!parameters || parameters.length < 1) return false;
           if (parameters.some((p, i) => i > 0 && p.required)) return false;
           if (parameters[0].codec !== pgCodec) return false;
-          if (!source.isUnique) return false;
+          if (!resource.isUnique) return false;
           const behavior = getBehavior([
-            source.codec.extensions,
-            source.extensions,
+            resource.codec.extensions,
+            resource.extensions,
           ]);
           return build.behavior.matches(
             behavior,
@@ -65,9 +68,16 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
 
         return build.extend(
           fields,
-          functionSources.reduce((memo, pgFieldSource) => {
+          functionSources.reduce((memo, rawPgFieldSource) => {
+            const pgFieldSource = rawPgFieldSource as PgResource<
+              any,
+              any,
+              any,
+              readonly PgResourceParameter[],
+              any
+            >;
             const fieldName = inflection.computedColumnField({
-              source: pgFieldSource,
+              resource: pgFieldSource,
             });
             const type = build.getGraphQLTypeByPgCodec(
               pgFieldSource.codec,
@@ -93,9 +103,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                     applyPlan: EXPORTABLE(
                       (pgFieldSource, sql) =>
                         function plan(
-                          $condition: PgConditionStep<
-                            PgSelectStep<any, any, any, any>
-                          >,
+                          $condition: PgConditionStep<PgSelectStep<any>>,
                           val,
                         ) {
                           if (typeof pgFieldSource.source !== "function") {
@@ -126,8 +134,6 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           }, Object.create(null)),
           `Adding computed column filterable functions to condition for '${pgCodec.name}'`,
         );
-
-        return fields;
       },
     },
   },

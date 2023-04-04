@@ -56,7 +56,7 @@
   "devDependencies": {
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
-    "jest": "^28.1.0",
+    "jest": "^28.1.3",
     "jest-serializer-graphql-schema": "workspace:^",
     "nodemon": "^2.0.15",
     "postgraphile": "workspace:^",

@@ -571,8 +571,8 @@ export function isUnbatchedExecutableStep<TData = any>(
 }
 
 export type ObjectLikeStep<
-  TData extends { [key: string]: ExecutableStep<any> } = {
-    [key: string]: ExecutableStep<any>;
+  TData extends { [key: string]: ExecutableStep } = {
+    [key: string]: ExecutableStep;
   },
 > = ExecutableStep<{
   [key in keyof TData]: TData[key] extends ExecutableStep<infer U> ? U : never;
@@ -581,8 +581,8 @@ export type ObjectLikeStep<
 };
 
 export function isObjectLikeStep<
-  TData extends { [key: string]: ExecutableStep<any> } = {
-    [key: string]: ExecutableStep<any>;
+  TData extends { [key: string]: ExecutableStep } = {
+    [key: string]: ExecutableStep;
   },
 >(plan: ExecutableStep): plan is ObjectLikeStep<TData> {
   return "get" in plan && typeof (plan as any).get === "function";

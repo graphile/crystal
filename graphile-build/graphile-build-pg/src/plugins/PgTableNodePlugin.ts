@@ -2,10 +2,10 @@ import "graphile-build";
 import "graphile-config";
 
 import type {
+  PgCodec,
+  PgResource,
+  PgResourceUnique,
   PgSelectSingleStep,
-  PgSource,
-  PgSourceUnique,
-  PgTypeCodec,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";
@@ -35,16 +35,18 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdHandler) {
           return _;
         }
-        const tableSources = build.input.pgSources.filter((source) => {
-          if (source.codec.isAnonymous) return false;
-          if (!source.codec.columns) return false;
-          if (source.codec.polymorphism) return false;
-          if (source.parameters) return false;
-          if (!source.uniques) return false;
-          if (!source.uniques[0]) return false;
+        const tableResources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ).filter((resource) => {
+          if (resource.codec.isAnonymous) return false;
+          if (!resource.codec.columns) return false;
+          if (resource.codec.polymorphism) return false;
+          if (resource.parameters) return false;
+          if (!resource.uniques) return false;
+          if (!resource.uniques[0]) return false;
           const behavior = getBehavior([
-            source.codec.extensions,
-            source.extensions,
+            resource.codec.extensions,
+            resource.extensions,
           ]);
           // Needs the 'select' and 'node' behaviours for compatibility
           return (
@@ -53,29 +55,26 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           );
         });
 
-        const sourcesByCodec = new Map<
-          PgTypeCodec<any, any, any, any>,
-          PgSource<any, any, any, any>[]
-        >();
-        for (const source of tableSources) {
-          let list = sourcesByCodec.get(source.codec);
+        const resourcesByCodec = new Map<PgCodec, PgResource[]>();
+        for (const resource of tableResources) {
+          let list = resourcesByCodec.get(resource.codec);
           if (!list) {
             list = [];
-            sourcesByCodec.set(source.codec, list);
+            resourcesByCodec.set(resource.codec, list);
           }
-          list.push(source);
+          list.push(resource);
         }
 
-        for (const [codec, sources] of sourcesByCodec.entries()) {
+        for (const [codec, resources] of resourcesByCodec.entries()) {
           const tableTypeName = build.inflection.tableType(codec);
-          if (sources.length !== 1) {
+          if (resources.length !== 1) {
             console.warn(
-              `Found multiple table sources for codec '${codec.name}'; we don't currently support that but we _could_ - get in touch if you need this.`,
+              `Found multiple table resources for codec '${codec.name}'; we don't currently support that but we _could_ - get in touch if you need this.`,
             );
             continue;
           }
-          const pgSource = sources[0];
-          const primaryKey = (pgSource.uniques as PgSourceUnique[]).find(
+          const pgResource = resources[0];
+          const primaryKey = (pgResource.uniques as PgResourceUnique[]).find(
             (u) => u.isPrimary === true,
           );
           if (!primaryKey) {
@@ -86,15 +85,15 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           const identifier =
             // Yes, this behaviour in V4 was ridiculous. Alas.
             build.options.pgV4UseTableNameForNodeIdentifier &&
-            pgSource.extensions?.pg?.name
-              ? build.inflection.pluralize(pgSource.extensions.pg.name)
+            pgResource.extensions?.pg?.name
+              ? build.inflection.pluralize(pgResource.extensions.pg.name)
               : tableTypeName;
 
           const clean =
             isSafeObjectPropertyName(identifier) &&
             pk.every((columnName) => isSafeObjectPropertyName(columnName));
 
-          const firstSource = sources.find((s) => !s.parameters);
+          const firstSource = resources.find((s) => !s.parameters);
 
           build.registerNodeIdHandler({
             typeName: tableTypeName,
@@ -119,7 +118,7 @@ return function (list, constant) {
                 )
               : EXPORTABLE(
                   (constant, identifier, list, pk) =>
-                    ($record: PgSelectSingleStep<any, any, any, any>) => {
+                    ($record: PgSelectSingleStep) => {
                       return list([
                         constant(identifier),
                         ...pk.map((column) => $record.get(column)),
@@ -155,8 +154,8 @@ return function (access) {
                   [access, pk],
                 ),
             get: EXPORTABLE(
-              (pgSource) => (spec: any) => pgSource.get(spec),
-              [pgSource],
+              (pgResource) => (spec: any) => pgResource.get(spec),
+              [pgResource],
             ),
             match: EXPORTABLE(
               (identifier) => (obj) => {

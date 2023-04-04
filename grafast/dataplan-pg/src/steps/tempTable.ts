@@ -3,13 +3,15 @@ import { BaseStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
-import type { PgSource } from "../datasource.js";
+import type { PgResource } from "../datasource.js";
 import type { ClassFilterStep } from "../filters/classFilter.js";
-import type { PgTypeCodec } from "../interfaces.js";
+import type { PgCodec } from "../interfaces.js";
 import type { PgConditionCapableParentStep } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 
-export class TempTableStep<TDataSource extends PgSource<any, any, any, any>>
+export class TempTableStep<
+    TResource extends PgResource<any, any, any, any, any>,
+  >
   extends BaseStep
   implements PgConditionCapableParentStep
 {
@@ -22,16 +24,13 @@ export class TempTableStep<TDataSource extends PgSource<any, any, any, any>>
   public readonly conditions: SQL[] = [];
   constructor(
     public readonly $parent: ClassFilterStep,
-    public readonly source: TDataSource,
+    public readonly resource: TResource,
   ) {
     super();
-    this.alias = sql.identifier(Symbol(`${source.name}_filter`));
+    this.alias = sql.identifier(Symbol(`${resource.name}_filter`));
   }
 
-  placeholder(
-    $step: ExecutableStep<any>,
-    codec: PgTypeCodec<any, any, any>,
-  ): SQL {
+  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
     return this.$parent.placeholder($step, codec);
   }
 
@@ -43,7 +42,7 @@ export class TempTableStep<TDataSource extends PgSource<any, any, any, any>>
   }
 
   fromExpression() {
-    const source = this.source.source;
+    const source = this.resource.source;
     if (typeof source === "function") {
       throw new Error("TempTableStep doesn't support function sources yet.");
     } else {

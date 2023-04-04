@@ -80,7 +80,7 @@
     "fastify": "^4.12.0",
     "grafast": "workspace:^",
     "graphql-http": "^1.16.0",
-    "jest": "^28.1.0",
+    "jest": "^28.1.3",
     "jest-serializer-graphql-schema": "workspace:^",
     "koa": "^2.14.1",
     "koa-bodyparser": "^4.3.0",

@@ -112,7 +112,7 @@ const userHandler = {
   // Given a spec (the result of `getSpec` above), return a step that resolves
   // to the entity (if found).
   get(spec: any) {
-    return pgSource.get(spec);
+    return pgResource.get(spec);
   },
 };
 

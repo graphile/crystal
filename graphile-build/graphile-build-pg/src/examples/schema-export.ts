@@ -36,7 +36,7 @@ async function main() {
   /** The result of the gather phase, ready to feed into 'buildSchema' */
   const input = await gather(config, shared);
 
-  // NOTE: at this point `input.pgSources` contains all your
+  // NOTE: at this point `input.pgRegistry.pgResources` contains all your
   // Postgres sources (tables, views, functions, etc).
 
   // ---------------------------------------------------------------------------

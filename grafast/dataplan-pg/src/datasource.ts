@@ -10,15 +10,16 @@ import {
   arraysMatch,
   constant,
   ExecutableStep,
+  exportAs,
   partitionByIndex,
 } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
-  PgTypeColumns,
-  PgTypeColumnVia,
-  PgTypeColumnViaExplicit,
+  PgCodecAttributes,
+  PgCodecAttributeVia,
+  PgCodecAttributeViaExplicit,
 } from "./codecs.js";
 import { TYPES } from "./codecs.js";
 import type {
@@ -29,11 +30,18 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor.js";
-import { exportAs } from "./exportAs.js";
 import type {
-  PgEnumTypeCodec,
+  Expand,
+  GetPgCodecColumns,
+  GetPgRegistryCodecRelations,
+  GetPgRegistryCodecs,
+  PgCodec,
+  PgCodecRelation,
+  PgCodecRelationConfig,
+  PgCodecWithColumns,
   PgRefDefinition,
-  PgTypeCodec,
+  PgRegistry,
+  PgRegistryConfig,
   PlanByUniques,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
@@ -68,81 +76,36 @@ export function EXPORTABLE<T, TScope extends any[]>(
 }
 
 /**
- * Extra metadata you can attach to a source relation.
- */
-export interface PgSourceRelationExtensions {}
-/**
  * Extra metadata you can attach to a unique constraint.
  */
-export interface PgSourceUniqueExtensions {}
+export interface PgResourceUniqueExtensions {}
 
 /**
- * Describes a relation to another source
+ * Space for extra metadata about this resource
  */
-export interface PgSourceRelation<
-  TLocalColumns extends PgTypeColumns,
-  TRemoteColumns extends PgTypeColumns,
-> {
-  /**
-   * The remote source this relation relates to.
-   */
-  source:
-    | PgSourceBuilder<TRemoteColumns, any, any>
-    | PgSource<TRemoteColumns, any, any, any>;
+export interface PgResourceExtensions {}
 
-  /**
-   * The columns locally used in this relationship.
-   */
-  localColumns: readonly (keyof TLocalColumns)[];
-
-  /**
-   * The remote columns that are joined against.
-   */
-  remoteColumns: ReadonlyArray<keyof TRemoteColumns>;
-
-  /**
-   * If true then there's at most one record this relationship will find.
-   */
-  isUnique: boolean;
-
-  /**
-   * If true then this is a reverse lookup (where our local columns are
-   * referenced by the remote tables remote columns, rather than the other way
-   * around), so multiple rows may be found (unless isUnique is true).
-   */
-  isReferencee?: boolean;
-
-  /**
-   * Space for you to add your own metadata.
-   */
-  extensions?: PgSourceRelationExtensions;
-
-  description?: string;
-}
-
-/**
- * Space for extra metadata about this source
- */
-export interface PgSourceExtensions {}
-
-export interface PgSourceParameterExtensions {
+export interface PgResourceParameterExtensions {
   variant?: string;
 }
 
 /**
- * If this is a functional (rather than static) source, this describes one of
+ * If this is a functional (rather than static) resource, this describes one of
  * the parameters it accepts.
  */
-export interface PgSourceParameter {
+export interface PgResourceParameter<
+  TName extends string | null = string | null,
+  TCodec extends PgCodec = PgCodec,
+> {
   /**
    * Name of the parameter, if null then we must use positional rather than
    * named arguments
    */
-  name: string | null;
+  name: TName;
   /**
    * The type of this parameter
    */
-  codec: PgTypeCodec<any, any, any>;
+  codec: TCodec;
   /**
    * If true, then this parameter must be supplied, otherwise it's optional.
    */
@@ -152,88 +115,88 @@ export interface PgSourceParameter {
    * null.
    */
   notNull?: boolean;
-  extensions?: PgSourceParameterExtensions;
+  extensions?: PgResourceParameterExtensions;
 }
 
 /**
- * Description of a unique constraint on a PgSource.
+ * Description of a unique constraint on a PgResource.
  */
-export interface PgSourceUnique<
-  TColumns extends PgTypeColumns = PgTypeColumns,
+export interface PgResourceUnique<
+  TColumns extends PgCodecAttributes = PgCodecAttributes,
 > {
   /**
    * The columns that are unique
    */
   columns: ReadonlyArray<keyof TColumns & string>;
   /**
-   * If this is true, this represents the "primary key" of the source.
+   * If this is true, this represents the "primary key" of the resource.
    */
   isPrimary?: boolean;
   /**
    * Space for you to add your own metadata
    */
-  extensions?: PgSourceUniqueExtensions;
+  extensions?: PgResourceUniqueExtensions;
 }
 
-export interface PgSourceRefPathEntry {
+export interface PgCodecRefPathEntry {
   relationName: string;
   // Could add conditions here
 }
 
-export type PgSourceRefPath = PgSourceRefPathEntry[];
-export interface PgSourceRefExtensions {}
+export type PgCodecRefPath = PgCodecRefPathEntry[];
+export interface PgCodecRefExtensions {}
 
-export interface PgSourceRef {
+export interface PgCodecRef {
   definition: PgRefDefinition;
-  paths: Array<PgSourceRefPath>;
-  extensions?: PgSourceRefExtensions;
+  paths: Array<PgCodecRefPath>;
+  extensions?: PgCodecRefExtensions;
 }
 
-export interface PgSourceRefs {
-  [refName: string]: PgSourceRef;
+export interface PgCodecRefs {
+  [refName: string]: PgCodecRef;
 }
 
 /**
- * Configuration options for your PgSource
+ * Configuration options for your PgResource
  */
-export interface PgSourceOptions<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
+export interface PgResourceOptions<
+  TName extends string = string,
+  TCodec extends PgCodec = PgCodec,
+  TUniques extends ReadonlyArray<
+    PgResourceUnique<GetPgCodecColumns<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TParameters extends readonly PgResourceParameter[] | undefined =
+    | readonly PgResourceParameter[]
+    | undefined,
 > {
   /**
-   * The associated codec for thsi source
+   * The associated codec for this resource
    */
-  codec: PgTypeCodec<TColumns, any, any, any>;
+  codec: TCodec;
   /**
-   * The PgExecutor to use when servicing this source; different executors can
+   * The PgExecutor to use when servicing this resource; different executors can
    * have different caching rules. A plan that uses one executor cannot be
    * inlined into a plan for a different executor.
    */
   executor: PgExecutor;
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
-  selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
+  selectAuth?: (
+    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
+  ) => void;
 
-  name: string;
+  name: TName;
   identifier?: string;
-  source: TParameters extends PgSourceParameter[]
+  source: TParameters extends readonly PgResourceParameter[]
     ? (...args: PgSelectArgumentDigest[]) => SQL
     : SQL;
   uniques?: TUniques;
-  relations?: TRelations | (() => TRelations);
-  refs?: PgSourceRefs;
-  extensions?: PgSourceExtensions;
+  extensions?: PgResourceExtensions;
   parameters?: TParameters;
   description?: string;
   /**
-   * Set true if this source will only return at most one record - this is
-   * generally only useful for PostgreSQL function sources, in which case you
+   * Set true if this resource will only return at most one record - this is
+   * generally only useful for PostgreSQL function resources, in which case you
    * should set it false if the function `returns setof` and true otherwise.
    */
   isUnique?: boolean;
@@ -248,182 +211,73 @@ export interface PgSourceOptions<
   isList?: boolean;
 
   /**
-   * "Virtual" sources cannot be selected from/inserted to/etc, they're
-   * normally used to generate other sources that are _not_ virtual.
+   * "Virtual" resources cannot be selected from/inserted to/etc, they're
+   * normally used to generate other resources that are _not_ virtual.
    */
   isVirtual?: boolean;
 }
 
-export interface PgFunctionSourceOptions<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TNewParameters extends PgSourceParameter[],
+export interface PgFunctionResourceOptions<
+  TNewName extends string = string,
+  TCodec extends PgCodec = PgCodec,
+  TUniques extends ReadonlyArray<
+    PgResourceUnique<GetPgCodecColumns<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TNewParameters extends readonly PgResourceParameter[] = readonly PgResourceParameter[],
 > {
-  name: string;
+  name: TNewName;
   identifier?: string;
   source: (...args: PgSelectArgumentDigest[]) => SQL;
   parameters: TNewParameters;
   returnsSetof: boolean;
   returnsArray: boolean;
   uniques?: TUniques;
-  extensions?: PgSourceExtensions;
+  extensions?: PgResourceExtensions;
   isMutation?: boolean;
-  selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
+  selectAuth?: (
+    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
+  ) => void;
   description?: string;
 }
-// FIXME: is there a better way? Maybe relations should be separate from sources, then PgSourceBuilder wouldn't be needed? See: https://github.com/benjie/postgraphile-private/issues/117
-/**
- * This class hacks around TypeScript inference issues by allowing us to define
- * the relations at a later step to avoid circular references.
- */
-export class PgSourceBuilder<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TParameters extends PgSourceParameter[] | undefined = undefined,
-> {
-  /** TypeScript hack, avoid. @internal */
-  TColumns!: TColumns;
-  /** TypeScript hack, avoid. @internal */
-  TUniques!: TUniques;
-  /** TypeScript hack, avoid. @internal */
-  TRelations!: never;
-  /** TypeScript hack, avoid. @internal */
-  TParameters!: TParameters;
-
-  private built: PgSource<TColumns, TUniques, any, TParameters> | null = null;
-  public codec: PgTypeCodec<TColumns, any, any>;
-  public uniques: TUniques | undefined;
-  public readonly extensions: Partial<PgSourceExtensions> | undefined;
-  public readonly name: string;
-  public readonly isVirtual: boolean;
-  public readonly refs: PgSourceRefs;
-  constructor(
-    private options: Omit<
-      PgSourceOptions<TColumns, TUniques, any, TParameters>,
-      "relations"
-    >,
-  ) {
-    this.codec = options.codec;
-    this.uniques = options.uniques;
-    this.extensions = options.extensions;
-    this.name = options.name;
-    options.isVirtual = options.isVirtual ?? false;
-    this.isVirtual = options.isVirtual;
-    options.refs = options.refs ?? Object.create(null);
-    this.refs = options.refs!;
-  }
-
-  public toString(): string {
-    return chalk.bold.blueBright(`PgSourceBuilder(${this.options.name})`);
-  }
-
-  build<
-    TRelations extends {
-      [identifier: string]: TColumns extends PgTypeColumns
-        ? PgSourceRelation<TColumns, any>
-        : never;
-    },
-  >({
-    relations,
-  }: {
-    relations?: TRelations;
-  }): PgSource<TColumns, TUniques, TRelations, TParameters> {
-    if (this.built) {
-      throw new Error("This builder has already been built!");
-    }
-    this.built = new PgSource({
-      ...this.options,
-      ...(relations
-        ? {
-            relations: () => {
-              // Replace the PgSourceBuilders with PgSources
-              return Object.keys(relations).reduce((memo, key) => {
-                const spec = relations[key];
-                if (spec.source instanceof PgSourceBuilder) {
-                  const { source: sourceBuilder, ...rest } = spec;
-                  const source = sourceBuilder.get();
-                  memo[key] = {
-                    source,
-                    ...rest,
-                  };
-                } else {
-                  memo[key] = spec;
-                }
-                return memo;
-              }, Object.create(null));
-            },
-          }
-        : null),
-    });
-    return this.built;
-  }
-
-  get(): PgSource<TColumns, TUniques, any, TParameters> {
-    if (!this.built) {
-      throw new Error(
-        `This builder (${this.options.name}) has not been built!`,
-      );
-    }
-    return this.built;
-  }
-}
-exportAs(PgSourceBuilder, "PgSourceBuilder");
 
 const $$codecSource = Symbol("codecSource");
 const $$codecCounter = Symbol("codecCounter");
 
-type CodecWithSource<TCodec extends PgTypeCodec<any, any, any, any>> =
-  TCodec & {
-    [$$codecSource]?: Map<any, any>;
-    [$$codecCounter]?: number;
-  };
+// TODO: is this needed any more, now that we've moved codecs to owning relations?
+type CodecWithSource<TCodec extends PgCodec> = TCodec & {
+  [$$codecSource]?: Map<any, any>;
+  [$$codecCounter]?: number;
+};
 
 /**
- * PgSource represents any source of SELECT-able data in Postgres: tables,
+ * PgResource represents any resource of SELECT-able data in Postgres: tables,
  * views, functions, etc.
  */
-export class PgSource<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
+export class PgResource<
+  TName extends string = string,
+  TCodec extends PgCodec = PgCodec,
+  TUniques extends ReadonlyArray<
+    PgResourceUnique<GetPgCodecColumns<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+  TParameters extends readonly PgResourceParameter[] | undefined =
+    | readonly PgResourceParameter[]
+    | undefined,
+  TRegistry extends PgRegistry<any, any, any> = PgRegistry<any, any, any>,
 > {
-  /** TypeScript hack, avoid. @internal */
-  TColumns!: TColumns;
-  /** TypeScript hack, avoid. @internal */
-  TUniques!: TUniques;
-  /** TypeScript hack, avoid. @internal */
-  TRelations!: TRelations;
-  /** TypeScript hack, avoid. @internal */
-  TParameters!: TParameters;
-
-  public readonly codec: PgTypeCodec<TColumns, any, any, any>;
+  public readonly registry: TRegistry;
+  public readonly codec: TCodec;
   public readonly executor: PgExecutor;
-  public readonly name: string;
+  public readonly name: TName;
   public readonly identifier: string;
   public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
-  private readonly _options: PgSourceOptions<
-    TColumns,
-    TUniques,
-    TRelations,
-    TParameters
-  >;
-  private relationsThunk: (() => TRelations) | null;
-  private _relations: TRelations | null = null;
-  /**
-   * Relations to follow for shortcut references, can be polymorphic, can be many-to-many.
-   */
-  public refs: PgSourceRefs;
-  private selectAuth?: ($step: PgSelectStep<any, any, any, any>) => void;
+  private selectAuth?: (
+    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
+  ) => void;
 
   // TODO: make a public interface for this information
   /**
-   * If present, implies that the source represents a `setof composite[]` (i.e.
+   * If present, implies that the resource represents a `setof composite[]` (i.e.
    * an array of arrays) - and thus is not appropriate to use for GraphQL
    * Cursor Connections.
    *
@@ -444,17 +298,23 @@ export class PgSource<
   public readonly isList: boolean;
 
   /**
-   * "Virtual" sources cannot be selected from/inserted to/etc, they're
-   * normally used to generate other sources that are _not_ virtual.
+   * "Virtual" resources cannot be selected from/inserted to/etc, they're
+   * normally used to generate other resources that are _not_ virtual.
    */
   public readonly isVirtual: boolean;
 
-  public extensions: Partial<PgSourceExtensions> | undefined;
+  public extensions: Partial<PgResourceExtensions> | undefined;
 
-  static fromCodec<TColumns extends PgTypeColumns>(
+  // TODO: delete me?
+  static configFromCodec<TCodec extends PgCodec>(
     executor: PgExecutor,
-    baseCodec: PgTypeCodec<TColumns, any, any>,
-  ): PgSource<TColumns, any, any, undefined> {
+    baseCodec: TCodec,
+  ): PgResourceOptions<
+    string,
+    TCodec,
+    ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+    undefined
+  > {
     const codec: CodecWithSource<typeof baseCodec> = baseCodec;
     if (!codec[$$codecSource]) {
       codec[$$codecSource] = new Map();
@@ -473,32 +333,32 @@ export class PgSource<
 
     // "From Codec"
     const name = `frmcdc_${codec.name}_${counter}`;
-    const source = EXPORTABLE(
-      (PgSource, codec, executor, name, sql) =>
-        new PgSource({
-          executor,
-          source: sql`(select 1/0 /* codec-only source; should not select directly */)`,
-          codec,
-          name,
-          identifier: name,
-        }),
-      [PgSource, codec, executor, name, sql],
+    const resource = EXPORTABLE(
+      (codec, executor, name, sql) => ({
+        executor,
+        source: sql`(select 1/0 /* codec-only resource; should not select directly */)`,
+        codec,
+        name,
+        identifier: name,
+      }),
+      [codec, executor, name, sql],
     );
 
-    codec[$$codecSource].set(executor, source);
+    codec[$$codecSource].set(executor, resource);
 
-    return source;
+    return resource;
   }
 
   /**
    * @param source - the SQL for the `FROM` clause (without any
    * aliasing). If this is a subquery don't forget to wrap it in parens.
-   * @param name - a nickname for this data source. Doesn't need to be unique
+   * @param name - a nickname for this resource. Doesn't need to be unique
    * (but should be). Used for making the SQL query and debug messages easier
    * to understand.
    */
   constructor(
-    options: PgSourceOptions<TColumns, TUniques, TRelations, TParameters>,
+    registry: TRegistry,
+    options: PgResourceOptions<TName, TCodec, TUniques, TParameters>,
   ) {
     const {
       codec,
@@ -507,8 +367,6 @@ export class PgSource<
       identifier,
       source,
       uniques,
-      relations,
-      refs,
       extensions,
       parameters,
       description,
@@ -519,21 +377,14 @@ export class PgSource<
       isList,
       isVirtual,
     } = options;
-    this._options = options;
+    this.registry = registry;
     this.extensions = extensions;
     this.codec = codec;
     this.executor = executor;
     this.name = name;
     this.identifier = identifier ?? name;
     this.source = source;
-    this.uniques =
-      uniques ?? ([] as TUniques extends never[] ? TUniques : never);
-    this.relationsThunk = typeof relations === "function" ? relations : null;
-    if (typeof relations !== "function") {
-      this._relations = relations || ({} as TRelations);
-      this.validateRelations();
-    }
-    this.refs = refs ?? Object.create(null);
+    this.uniques = uniques ?? ([] as never);
     this.parameters = parameters as TParameters;
     this.description = description;
     this.isUnique = !!isUnique;
@@ -542,29 +393,28 @@ export class PgSource<
     this.isList = !!isList;
     this.isVirtual = isVirtual ?? false;
     this.selectAuth = selectAuth;
-
     // parameters is null iff source is not a function
     const sourceIsFunction = typeof this.source === "function";
     if (this.parameters == null && sourceIsFunction) {
       throw new Error(
-        `Source ${this} is invalid - it's a function but without a parameters array. If the function accepts no parameters please pass an empty array.`,
+        `Resource ${this} is invalid - it's a function but without a parameters array. If the function accepts no parameters please pass an empty array.`,
       );
     }
     if (this.parameters != null && !sourceIsFunction) {
       throw new Error(
-        `Source ${this} is invalid - parameters can only be specified when the source is a function.`,
+        `Resource ${this} is invalid - parameters can only be specified when the resource is a function.`,
       );
     }
 
     if (this.codec.arrayOfCodec?.columns) {
       throw new Error(
-        `Source ${this} is invalid - creating a source that returns an array of a composite type is forbidden; please \`unnest\` the array.`,
+        `Resource ${this} is invalid - creating a resource that returns an array of a composite type is forbidden; please \`unnest\` the array.`,
       );
     }
 
     if (this.isUnique && this.sqlPartitionByIndex) {
       throw new Error(
-        `Source ${this} is invalid - cannot be unique and also partitionable`,
+        `Resource ${this} is invalid - cannot be unique and also partitionable`,
       );
     }
   }
@@ -575,32 +425,35 @@ export class PgSource<
    * multiple datasources that all represent the same underlying table
    * type/relations/etc.
    */
-  public alternativeSource<
-    TUniques extends ReadonlyArray<
-      PgSourceUnique<Exclude<TColumns, undefined>>
+  static alternativeResourceOptions<
+    TCodec extends PgCodec,
+    const TNewUniques extends ReadonlyArray<
+      PgResourceUnique<GetPgCodecColumns<TCodec>>
     >,
-  >(overrideOptions: {
-    name: string;
-    identifier?: string;
-    source: SQL;
-    uniques?: TUniques;
-    extensions?: PgSourceExtensions;
-  }): PgSource<TColumns, TUniques, TRelations, undefined> {
+    const TNewName extends string,
+  >(
+    baseOptions: PgResourceOptions<any, TCodec, any, undefined>,
+    overrideOptions: {
+      name: TNewName;
+      identifier?: string;
+      source: SQL;
+      uniques?: TNewUniques;
+      extensions?: PgResourceExtensions;
+    },
+  ): PgResourceOptions<TNewName, TCodec, TNewUniques, undefined> {
     const { name, identifier, source, uniques, extensions } = overrideOptions;
-    const { codec, executor, relations, refs, selectAuth } = this._options;
-    return new PgSource({
+    const { codec, executor, selectAuth } = baseOptions;
+    return {
       codec,
       executor,
       name,
       identifier,
-      source: source as any,
+      source,
       uniques,
-      relations,
-      refs,
       parameters: undefined,
       extensions,
       selectAuth,
-    });
+    };
   }
 
   /**
@@ -609,18 +462,23 @@ export class PgSource<
    * datasources that all represent the same underlying table
    * type/relations/etc but pull their rows from functions.
    */
-  public functionSource<
-    TUniques extends ReadonlyArray<
-      PgSourceUnique<Exclude<TColumns, undefined>>
+  static functionResourceOptions<
+    TCodec extends PgCodec,
+    const TNewParameters extends readonly PgResourceParameter[],
+    const TNewUniques extends ReadonlyArray<
+      PgResourceUnique<GetPgCodecColumns<TCodec>>
     >,
-    TNewParameters extends PgSourceParameter[],
+    const TNewName extends string,
   >(
-    overrideOptions: PgFunctionSourceOptions<
-      TColumns,
-      TUniques,
+    baseOptions: PgResourceOptions<any, TCodec, any, any>,
+    overrideOptions: PgFunctionResourceOptions<
+      TNewName,
+      TCodec,
+      TNewUniques,
       TNewParameters
     >,
-  ) {
+  ): PgResourceOptions<TNewName, TCodec, TNewUniques, TNewParameters> {
+    const { codec, executor, selectAuth } = baseOptions;
     const {
       name,
       identifier,
@@ -634,25 +492,22 @@ export class PgSource<
       selectAuth: overrideSelectAuth,
       description,
     } = overrideOptions;
-    const { codec, executor, relations, refs, selectAuth } = this._options;
     if (!returnsArray) {
       // This is the easy case
-      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+      return {
         codec,
         executor,
         name,
         identifier,
         source: fnSource as any,
         uniques,
-        relations,
-        refs,
         parameters,
         extensions,
         isUnique: !returnsSetof,
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
         description,
-      });
+      };
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
       const source = EXPORTABLE(
@@ -661,15 +516,13 @@ export class PgSource<
             sql`unnest(${fnSource(...args)})`,
         [fnSource, sql],
       );
-      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+      return {
         codec,
         executor,
         name,
         identifier,
         source: source as any,
         uniques,
-        relations,
-        refs,
         parameters,
         extensions,
         isUnique: false, // set now, not unique
@@ -677,7 +530,7 @@ export class PgSource<
         selectAuth: overrideSelectAuth ?? selectAuth,
         isList: true,
         description,
-      });
+      };
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
       const sqlTmp = sql.identifier(Symbol(`${name}_tmp`));
@@ -690,15 +543,13 @@ export class PgSource<
             )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`,
         [fnSource, sql, sqlPartitionByIndex, sqlTmp],
       );
-      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+      return {
         codec,
         executor,
         name,
         identifier,
         source: source as any,
         uniques,
-        relations,
-        refs,
         parameters,
         extensions,
         isUnique: false, // set now, not unique
@@ -706,92 +557,42 @@ export class PgSource<
         isMutation: Boolean(isMutation),
         selectAuth: overrideSelectAuth ?? selectAuth,
         description,
-      });
+      };
     }
   }
 
   public toString(): string {
-    return chalk.bold.blue(`PgSource(${this.name})`);
+    return chalk.bold.blue(`PgResource(${this.name})`);
   }
 
-  private validateRelations(): void {
-    // PERF: skip this if not isDev?
-
-    if (!this._relations) {
-      return;
-    }
-
-    // Check that all the `via` and `identicalVia` match actual relations.
-    const relationKeys = Object.keys(this._relations);
-    if (this.codec.columns) {
-      Object.entries(this.codec.columns).forEach(([columnName, col]) => {
-        const { via, identicalVia } = col;
-        if (via) {
-          if (typeof via === "string") {
-            if (!relationKeys.includes(via)) {
-              throw new Error(
-                `${this} claims column '${columnName}' is via relation '${via}', but there is no such relation.`,
-              );
-            }
-          } else {
-            if (!relationKeys.includes(via.relation)) {
-              throw new Error(
-                `${this} claims column '${columnName}' is via relation '${via.relation}', but there is no such relation.`,
-              );
-            }
-          }
-        }
-        if (identicalVia) {
-          if (typeof identicalVia === "string") {
-            if (!relationKeys.includes(identicalVia)) {
-              throw new Error(
-                `${this} claims column '${columnName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
-              );
-            }
-          } else {
-            if (!relationKeys.includes(identicalVia.relation)) {
-              throw new Error(
-                `${this} claims column '${columnName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
-              );
-            }
-          }
-        }
-      });
-    }
+  public getRelations(): GetPgRegistryCodecRelations<TRegistry, TCodec> {
+    return this.registry.pgRelations[this.codec.name] as any;
   }
 
-  public getRelations(): TRelations {
-    if (typeof this.relationsThunk === "function") {
-      this._relations = this.relationsThunk();
-      this.relationsThunk = null;
-      this.validateRelations();
-    }
-    if (!this._relations) {
-      throw new Error("PgSource relations must not be null");
-    }
-    return this._relations;
-  }
-
-  public getRelation<TRelationName extends keyof TRelations>(
+  public getRelation<
+    TRelationName extends keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
+  >(
     name: TRelationName,
-  ): TRelations[TRelationName] {
+  ): GetPgRegistryCodecRelations<TRegistry, TCodec>[TRelationName] {
     return this.getRelations()[name];
   }
 
   public resolveVia(
-    via: PgTypeColumnVia,
+    via: PgCodecAttributeVia,
     attr: string,
-  ): PgTypeColumnViaExplicit {
+  ): PgCodecAttributeViaExplicit {
     if (!via) {
       throw new Error("No via to resolve");
     }
     if (typeof via === "string") {
       // Check
-      const relation = this.getRelation(via);
+      const relation = this.getRelation(via) as unknown as
+        | PgCodecRelation
+        | undefined;
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
-      if (!relation.source.codec.columns[attr]) {
+      if (!relation.remoteResource.codec.columns![attr]) {
         throw new Error(
           `${this} relation '${via}' does not have column '${attr}'`,
         );
@@ -803,62 +604,68 @@ export class PgSource<
   }
 
   public getReciprocal<
-    TOtherDataSource extends PgSource<any, any, any, any>,
-    TOtherRelationName extends Parameters<TOtherDataSource["getRelation"]>[0],
+    TOtherCodec extends GetPgRegistryCodecs<TRegistry>,
+    TOtherRelationName extends keyof GetPgRegistryCodecRelations<
+      TRegistry,
+      TOtherCodec
+    >,
   >(
-    otherDataSource: TOtherDataSource,
+    otherCodec: TOtherCodec,
     otherRelationName: TOtherRelationName,
-  ): [keyof TRelations, TRelations[keyof TRelations]] | null {
+  ):
+    | [
+        relationName: keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
+        relation: GetPgRegistryCodecRelations<
+          TRegistry,
+          TCodec
+        >[keyof GetPgRegistryCodecRelations<TRegistry, TCodec>],
+      ]
+    | null {
     if (this.parameters) {
       throw new Error(
-        ".getReciprocal() cannot be used with functional sources; please use .execute()",
+        ".getReciprocal() cannot be used with functional resources; please use .execute()",
       );
     }
-    const otherRelation = otherDataSource.getRelation(otherRelationName);
-    const relations = this.getRelations();
-    const reciprocal = (
-      Object.entries(relations) as Array<
-        [keyof TRelations, TRelations[keyof TRelations]]
-      >
-    ).find(([_relationName, relation]) => {
-      if (relation.source !== otherDataSource) {
-        return false;
-      }
-      if (!arraysMatch(relation.localColumns, otherRelation.remoteColumns)) {
-        return false;
-      }
-      if (!arraysMatch(relation.remoteColumns, otherRelation.localColumns)) {
-        return false;
-      }
-      return true;
-    });
-    return reciprocal || null;
+    const otherRelation =
+      this.registry.pgRelations[otherCodec.name]?.[otherRelationName];
+    const relations = this.getRelations() as unknown as Record<
+      string,
+      PgCodecRelation
+    >;
+    const reciprocal = Object.entries(relations).find(
+      ([_relationName, relation]) => {
+        if (relation.remoteResource.codec !== otherCodec) {
+          return false;
+        }
+        if (!arraysMatch(relation.localColumns, otherRelation.remoteColumns)) {
+          return false;
+        }
+        if (!arraysMatch(relation.remoteColumns, otherRelation.localColumns)) {
+          return false;
+        }
+        return true;
+      },
+    );
+    return (reciprocal as [any, any]) || null;
   }
 
   public get(
-    spec: PlanByUniques<TColumns, TUniques>,
+    spec: PlanByUniques<GetPgCodecColumns<TCodec>, TUniques>,
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
-  ): TColumns extends PgTypeColumns
-    ? PgSelectSingleStep<TColumns, TUniques, TRelations, TParameters>
-    : PgClassExpressionStep<
-        undefined,
-        PgTypeCodec<undefined, any, any>,
-        TColumns,
-        TUniques,
-        TRelations,
-        TParameters
-      > {
+  ): GetPgCodecColumns<TCodec> extends PgCodecAttributes
+    ? PgSelectSingleStep<this>
+    : PgClassExpressionStep<TCodec, this> {
     if (this.parameters) {
       throw new Error(
-        ".get() cannot be used with functional sources; please use .execute()",
+        ".get() cannot be used with functional resources; please use .execute()",
       );
     }
     if (!spec) {
       throw new Error(`Cannot ${this}.get without a valid spec`);
     }
     const keys = Object.keys(spec) as ReadonlyArray<string> as ReadonlyArray<
-      keyof TColumns
+      keyof GetPgCodecColumns<TCodec>
     >;
     if (
       !this.uniques.some((uniq) =>
@@ -873,23 +680,28 @@ export class PgSource<
         )}). Did you mean to call .find() instead?`,
       );
     }
-    return this.find(spec).single(_internalOptionsDoNotPass);
+    return this.find(spec).single(_internalOptionsDoNotPass) as any;
   }
 
   public find(
     spec: {
-      [key in keyof TColumns]?: ExecutableStep | string | number;
+      [key in keyof GetPgCodecColumns<TCodec>]?:
+        | ExecutableStep
+        | string
+        | number;
     } = Object.create(null),
-  ): PgSelectStep<TColumns, TUniques, TRelations, TParameters> {
+  ): PgSelectStep<this> {
     if (this.parameters) {
       throw new Error(
-        ".get() cannot be used with functional sources; please use .execute()",
+        ".get() cannot be used with functional resources; please use .execute()",
       );
     }
     if (!this.codec.columns) {
       throw new Error("Cannot call find if there's no columns");
     }
-    const columns = this.codec.columns as NonNullable<TColumns>;
+    const columns = this.codec.columns as NonNullable<
+      GetPgCodecColumns<TCodec>
+    >;
     const keys = Object.keys(spec); /* as Array<keyof typeof columns>*/
     const invalidKeys = keys.filter((key) => columns[key] == null);
     if (invalidKeys.length > 0) {
@@ -914,7 +726,7 @@ export class PgSource<
         );
       }
       const { codec } = column;
-      const stepOrConstant = spec[key as keyof TColumns];
+      const stepOrConstant = spec[key];
       if (stepOrConstant == undefined) {
         throw new Error(
           `Attempted to call ${this}.find({${keys.join(
@@ -934,15 +746,15 @@ export class PgSource<
             : sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
-    return pgSelect({ source: this, identifiers });
+    return pgSelect({ resource: this, identifiers });
   }
 
   execute(
     args: Array<PgSelectArgumentSpec> = [],
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
-  ) {
+  ): ExecutableStep<unknown> {
     const $select = pgSelect({
-      source: this,
+      resource: this,
       identifiers: [],
       args,
       mode,
@@ -956,7 +768,7 @@ export class PgSource<
       return partitionByIndex(
         $select,
         ($row) =>
-          ($row as PgSelectSingleStep<any, any, any, any>).select(
+          ($row as PgSelectSingleStep<any>).select(
             sqlPartitionByIndex,
             TYPES.int,
           ),
@@ -968,18 +780,16 @@ export class PgSource<
     }
   }
 
-  public applyAuthorizationChecksToPlan(
-    $step: PgSelectStep<TColumns, TUniques, TRelations, TParameters>,
-  ): void {
+  public applyAuthorizationChecksToPlan($step: PgSelectStep<this>): void {
     if (this.selectAuth) {
-      this.selectAuth($step);
+      this.selectAuth($step as any);
     }
     // e.g. $step.where(sql`user_id = ${me}`);
     return;
   }
 
   /**
-   * @deprecated Please use `.executor.context()` instead - all sources for the
+   * @deprecated Please use `.executor.context()` instead - all resources for the
    * same executor must use the same context to allow for SQL inlining, unions,
    * etc.
    */
@@ -1018,7 +828,7 @@ export class PgSource<
    * Returns an SQL fragment that evaluates to `'true'` (string) if the row is
    * non-null and `'false'` or `null` otherwise.
    *
-   * @see {@link PgTypeCodec.notNullExpression}
+   * @see {@link PgCodec.notNullExpression}
    */
   public getNullCheckExpression(alias: SQL): SQL | null {
     if (this.codec.notNullExpression) {
@@ -1049,40 +859,413 @@ export class PgSource<
     }
   }
 }
-exportAs(PgSource, "PgSource");
+exportAs("@dataplan/pg", PgResource, "PgResource");
 
-export interface PgEnumSourceExtensions {}
+export interface PgRegistryBuilder<
+  TCodecs extends {
+    [name in string]: PgCodec<
+      name,
+      PgCodecAttributes | undefined,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  },
+  TResources extends {
+    [name in string]: PgResourceOptions<
+      name,
+      PgCodec,
+      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
+      readonly PgResourceParameter[] | undefined
+    >;
+  },
+  TRelations extends {
+    [codecName in keyof TCodecs]?: {
+      [relationName in string]: PgCodecRelationConfig<
+        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
+        PgResourceOptions<any, PgCodecWithColumns, any, any>
+      >;
+    };
+  },
+> {
+  getRegistryConfig(): PgRegistryConfig<
+    Expand<TCodecs>,
+    Expand<TResources>,
+    Expand<TRelations>
+  >;
+  addCodec<const TCodec extends PgCodec>(
+    codec: TCodec,
+  ): PgRegistryBuilder<
+    TCodecs & {
+      [name in TCodec["name"]]: TCodec;
+    },
+    TResources,
+    TRelations
+  >;
 
-export interface PgEnumSourceOptions<TValue extends string> {
-  codec: PgEnumTypeCodec<TValue>;
-  extensions?: PgEnumSourceExtensions;
+  addResource<const TResource extends PgResourceOptions<any, any, any, any>>(
+    resource: TResource,
+  ): PgRegistryBuilder<
+    TCodecs & {
+      [name in TResource["codec"]["name"]]: TResource["codec"];
+    },
+    TResources & {
+      [name in TResource["name"]]: TResource;
+    },
+    TRelations
+  >;
+
+  addRelation<
+    TCodec extends PgCodec,
+    const TCodecRelationName extends string,
+    const TRemoteResource extends PgResourceOptions<any, any, any, any>,
+    const TCodecRelation extends Omit<
+      PgCodecRelationConfig<TCodec, TRemoteResource>,
+      "localCodec" | "remoteResourceOptions"
+    >,
+  >(
+    codec: TCodec,
+    relationName: TCodecRelationName,
+    remoteResource: TRemoteResource,
+    relation: TCodecRelation,
+  ): PgRegistryBuilder<
+    TCodecs,
+    TResources,
+    TRelations & {
+      [codecName in TCodec["name"]]: {
+        [relationName in TCodecRelationName]: TCodecRelation & {
+          localCodec: TCodec;
+          remoteResourceOptions: TRemoteResource;
+        };
+      };
+    }
+  >;
+
+  build(): PgRegistry<Expand<TCodecs>, Expand<TResources>, Expand<TRelations>>;
 }
 
-// TODO: is this the best way of solving the problem of enums vs sources?
-export class PgEnumSource<TValue extends string> {
-  public readonly codec: PgEnumTypeCodec<TValue>;
-  public readonly extensions: PgEnumSourceExtensions | undefined;
-  constructor(options: PgEnumSourceOptions<TValue>) {
-    this.codec = options.codec;
-    this.extensions = options.extensions || {};
+export function makeRegistry<
+  TCodecs extends {
+    [name in string]: PgCodec<
+      name,
+      PgCodecAttributes | undefined,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  },
+  TResourceOptions extends {
+    [name in string]: PgResourceOptions<
+      name,
+      PgCodec,
+      ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
+      readonly PgResourceParameter[] | undefined
+    >;
+  },
+  TRelations extends {
+    [codecName in keyof TCodecs]?: {
+      [relationName in string]: PgCodecRelationConfig<
+        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
+        PgResourceOptions<any, PgCodecWithColumns, any, any>
+      >;
+    };
+  },
+>(
+  config: PgRegistryConfig<TCodecs, TResourceOptions, TRelations>,
+): PgRegistry<TCodecs, TResourceOptions, TRelations> {
+  const registry: PgRegistry<TCodecs, TResourceOptions, TRelations> = {
+    pgCodecs: Object.create(null) as any,
+    pgResources: Object.create(null) as any,
+    pgRelations: Object.create(null) as any,
+  };
+
+  // Tell the system to read the built pgCodecs, pgResources, pgRelations from the registry
+  Object.defineProperties(registry.pgCodecs, {
+    $exporter$args: { value: [registry] },
+    $exporter$factory: {
+      value: (registry: PgRegistry<any, any, any>) => registry.pgCodecs,
+    },
+  });
+  Object.defineProperties(registry.pgResources, {
+    $exporter$args: { value: [registry] },
+    $exporter$factory: {
+      value: (registry: PgRegistry<any, any, any>) => registry.pgResources,
+    },
+  });
+  Object.defineProperties(registry.pgRelations, {
+    $exporter$args: { value: [registry] },
+    $exporter$factory: {
+      value: (registry: PgRegistry<any, any, any>) => registry.pgRelations,
+    },
+  });
+
+  function addCodec(codec: PgCodec): PgCodec {
+    const codecName = codec.name;
+    if (registry.pgCodecs[codecName]) {
+      return registry.pgCodecs[codecName];
+    } else if ((codec as any).$$export || (codec as any).$exporter$factory) {
+      registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
+      return codec;
+    } else {
+      // Custom spec, pin it back to the registry
+      registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
+
+      if (codec.columns) {
+        const prevCols = codec.columns as PgCodecAttributes;
+        for (const col of Object.values(prevCols)) {
+          addCodec(col.codec);
+        }
+      }
+      if (codec.arrayOfCodec) {
+        addCodec(codec.arrayOfCodec);
+      }
+      if (codec.domainOfCodec) {
+        addCodec(codec.domainOfCodec);
+      }
+      if (codec.rangeOfCodec) {
+        addCodec(codec.rangeOfCodec);
+      }
+
+      // Tell the system to read the built codec from the registry
+      Object.defineProperties(codec, {
+        $exporter$args: { value: [registry, codecName] },
+        $exporter$factory: {
+          value: (registry: PgRegistry<any, any, any>, codecName: string) =>
+            registry.pgCodecs[codecName],
+        },
+      });
+
+      return codec;
+    }
+  }
+
+  for (const [codecName, codecSpec] of Object.entries(config.pgCodecs)) {
+    if (codecName !== codecSpec.name) {
+      throw new Error(`Codec added to registry with wrong name`);
+    }
+    addCodec(codecSpec);
+  }
+
+  for (const [resourceName, rawConfig] of Object.entries(
+    config.pgResources,
+  ) as [keyof TResourceOptions, PgResourceOptions<any, any, any, any>][]) {
+    const resourceConfig = {
+      ...rawConfig,
+      codec: addCodec(rawConfig.codec),
+      parameters: rawConfig.parameters
+        ? (rawConfig.parameters as readonly PgResourceParameter[]).map((p) => ({
+            ...p,
+            codec: addCodec(p.codec),
+          }))
+        : rawConfig.parameters,
+    };
+    const resource = new PgResource(registry, resourceConfig) as any;
+
+    // This is the magic that breaks the circular reference: rather than
+    // building PgResource via a factory we tell the system to just retrieve it
+    // from the already build registry.
+    Object.defineProperties(resource, {
+      $exporter$args: { value: [registry, resourceName] },
+      $exporter$factory: {
+        value: (registry: PgRegistry<any, any, any>, resourceName: string) =>
+          registry.pgResources[resourceName],
+      },
+    });
+
+    registry.pgResources[resourceName] = resource;
+  }
+
+  for (const codecName of Object.keys(
+    config.pgRelations,
+  ) as (keyof typeof config.pgRelations)[]) {
+    const relations = config.pgRelations[codecName];
+    if (!relations) {
+      continue;
+    }
+
+    const builtRelations = Object.create(null);
+
+    // Tell the system to read the built relations from the registry
+    Object.defineProperties(builtRelations, {
+      $exporter$args: { value: [registry, codecName] },
+      $exporter$factory: {
+        value: (registry: PgRegistry<any, any, any>, codecName: string) =>
+          registry.pgRelations[codecName],
+      },
+    });
+
+    for (const relationName of Object.keys(
+      relations,
+    ) as (keyof typeof relations)[]) {
+      const relationConfig = relations![
+        relationName
+      ] as unknown as PgCodecRelationConfig;
+      if (!relationConfig) {
+        continue;
+      }
+      const { localCodec, remoteResourceOptions, ...rest } = relationConfig;
+
+      const builtRelation = {
+        ...(rest as any),
+        localCodec: addCodec(localCodec),
+        remoteResource: registry.pgResources[remoteResourceOptions.name],
+      } as PgCodecRelation;
+
+      // Tell the system to read the built relation from the registry
+      Object.defineProperties(builtRelation, {
+        $exporter$args: { value: [registry, codecName, relationName] },
+        $exporter$factory: {
+          value: (
+            registry: PgRegistry<any, any, any>,
+            codecName: string,
+            relationName: string,
+          ) => registry.pgRelations[codecName][relationName],
+        },
+      });
+
+      builtRelations[relationName] = builtRelation;
+    }
+
+    registry.pgRelations[codecName] = builtRelations;
+  }
+
+  validateRelations(registry);
+
+  return registry;
+}
+exportAs("@dataplan/pg", makeRegistry, "makeRegistry");
+
+function validateRelations(registry: PgRegistry<any, any, any>): void {
+  // PERF: skip this if not isDev?
+
+  const reg = registry as PgRegistry;
+
+  for (const codec of Object.values(reg.pgCodecs)) {
+    // Check that all the `via` and `identicalVia` match actual relations.
+    const relationKeys = Object.keys(reg.pgRelations[codec.name] ?? {});
+    if (codec.columns) {
+      Object.entries(codec.columns).forEach(([columnName, col]) => {
+        const { via, identicalVia } = col;
+        if (via) {
+          if (typeof via === "string") {
+            if (!relationKeys.includes(via)) {
+              throw new Error(
+                `${codec.name} claims column '${columnName}' is via relation '${via}', but there is no such relation.`,
+              );
+            }
+          } else {
+            if (!relationKeys.includes(via.relation)) {
+              throw new Error(
+                `${codec.name} claims column '${columnName}' is via relation '${via.relation}', but there is no such relation.`,
+              );
+            }
+          }
+        }
+        if (identicalVia) {
+          if (typeof identicalVia === "string") {
+            if (!relationKeys.includes(identicalVia)) {
+              throw new Error(
+                `${codec.name} claims column '${columnName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
+              );
+            }
+          } else {
+            if (!relationKeys.includes(identicalVia.relation)) {
+              throw new Error(
+                `${codec.name} claims column '${columnName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
+              );
+            }
+          }
+        }
+      });
+    }
   }
 }
-exportAs(PgEnumSource, "PgEnumSource");
 
-export function resolveSource<
-  TColumns extends PgTypeColumns | undefined,
-  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgTypeColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-  TParameters extends PgSourceParameter[] | undefined = undefined,
->(
-  s:
-    | PgSourceBuilder<TColumns, TUniques, TParameters>
-    | PgSource<TColumns, TUniques, TRelations, TParameters>,
-): PgSource<TColumns, TUniques, TRelations, TParameters> {
-  return s instanceof PgSourceBuilder ? s.get() : s;
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
+  const registryConfig: PgRegistryConfig<any, any, any> = {
+    pgCodecs: Object.create(null),
+    pgResources: Object.create(null),
+    pgRelations: Object.create(null),
+  };
+
+  const builder: PgRegistryBuilder<any, any, any> = {
+    getRegistryConfig() {
+      return registryConfig;
+    },
+
+    addCodec(codec) {
+      if (!registryConfig.pgCodecs[codec.name]) {
+        registryConfig.pgCodecs[codec.name] = codec;
+        if (codec.arrayOfCodec) {
+          this.addCodec(codec.arrayOfCodec);
+        }
+        if (codec.domainOfCodec) {
+          this.addCodec(codec.domainOfCodec);
+        }
+        if (codec.rangeOfCodec) {
+          this.addCodec(codec.rangeOfCodec);
+        }
+        if (codec.columns) {
+          for (const col of Object.values(codec.columns)) {
+            this.addCodec(col.codec);
+          }
+        }
+      }
+      return builder;
+    },
+
+    addResource(resource) {
+      this.addCodec(resource.codec);
+      registryConfig.pgResources[resource.name] = resource;
+      return builder;
+    },
+
+    addRelation(localCodec, relationName, remoteResourceOptions, relation) {
+      if (!registryConfig.pgCodecs[localCodec.name]) {
+        throw new Error(
+          `Adding a relation before adding the codec is forbidden.`,
+        );
+      }
+      if (!registryConfig.pgResources[remoteResourceOptions.name]) {
+        throw new Error(
+          `Adding a relation before adding the resource is forbidden.`,
+        );
+      }
+      if (!registryConfig.pgRelations[localCodec.name]) {
+        registryConfig.pgRelations[localCodec.name] = Object.create(null);
+      }
+      registryConfig.pgRelations[localCodec.name][relationName] = {
+        localCodec,
+        remoteResourceOptions,
+        ...relation,
+      } as PgCodecRelationConfig<
+        PgCodecWithColumns,
+        PgResourceOptions<any, PgCodecWithColumns, any, any>
+      >;
+      return builder;
+    },
+
+    build() {
+      return EXPORTABLE(
+        (makeRegistry, registryConfig) => makeRegistry(registryConfig),
+        [makeRegistry, registryConfig],
+      );
+    },
+  };
+  return builder;
 }
-exportAs(resolveSource, "resolveSource");
+
+exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
+
+export function makePgResourceOptions<
+  const TResourceOptions extends PgResourceOptions<any, any, any, any>,
+>(options: TResourceOptions) {
+  return { ...options };
+}
+
+exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");

@@ -152,7 +152,7 @@ must have the `polymorphic` configuration option set to `mode: "single"` for it
 to work. Something like:
 
 ```ts
-itemSource.codec.polymorphic = {
+itemResource.codec.polymorphic = {
   mode: "single",
   typeColumns: ["type"],
   types: {
@@ -329,7 +329,7 @@ create table checklist_items (
 
 :::info
 
-When building the `PgSource` for these tables, the subtables should have
+When building the `PgResource` for these tables, the subtables should have
 entries in `columns` for all of the shared columns, with `via: "item"`
 (replacing `"item"` with the name of the relation that needs to be traversed to
 access the central table) to indicate that those columns come via the 'item'
@@ -352,7 +352,7 @@ must have the `polymorphic` configuration option set to `mode: "relational"`
 for it to work. Something like:
 
 ```ts
-itemSource.codec.polymorphic = {
+itemResource.codec.polymorphic = {
   mode: "relational",
   typeColumns: ["type"],
   types: {
@@ -461,15 +461,15 @@ we've modelled the specifier as a tuple):
 const entityTypeMap = {
   Person: {
     match: (specifier) => specifier[0] != null,
-    plan: ($specifier) => personSource.get({ person_id: $specifier.at(0) }),
+    plan: ($specifier) => personResource.get({ person_id: $specifier.at(0) }),
   },
   Post: {
     match: (specifier) => specifier[1] != null,
-    plan: ($specifier) => postSource.get({ post_id: $specifier.at(1) }),
+    plan: ($specifier) => postResource.get({ post_id: $specifier.at(1) }),
   },
   Comment: {
     match: (specifier) => specifier[2] != null,
-    plan: ($specifier) => commentSource.get({ comment_id: $specifier.at(2) }),
+    plan: ($specifier) => commentResource.get({ comment_id: $specifier.at(2) }),
   },
 };
 
@@ -536,35 +536,35 @@ We can plan this using a `pgUnionAll`:
 const plans = {
   Person: {
     favourites($person) {
-      const $favourites = personFavouritesSource.find({
+      const $favourites = personFavouritesResource.find({
         person_id: $person.get("id"),
       });
       return each($favourites, ($favourite) => {
         const $list = pgUnionAll({
           attributes: {},
-          sourceByTypeName: {
-            Person: personSource,
-            Post: postSource,
-            Comment: pommentSource,
+          resourceByTypeName: {
+            Person: personResource,
+            Post: postResource,
+            Comment: pommentResource,
           },
           members: [
             {
               typeName: "Person",
-              source: personSource,
+              resource: personResource,
               match: {
                 id: $favourite.get("liked_person_id"),
               },
             },
             {
               typeName: "Post",
-              source: postSource,
+              resource: postResource,
               match: {
                 id: $favourite.get("liked_post_id"),
               },
             },
             {
               typeName: "Comment",
-              source: commentSource,
+              resource: commentResource,
               match: {
                 id: $favourite.get("liked_comment_id"),
               },
@@ -588,22 +588,22 @@ Planning for this could be very similar to the composite type union above:
 const personFavouriteEntityTypeMap = {
   Person: {
     match: (specifier) => specifier[0] != null,
-    plan: ($specifier) => personSource.get({ person_id: $specifier.at(0) }),
+    plan: ($specifier) => personResource.get({ person_id: $specifier.at(0) }),
   },
   Post: {
     match: (specifier) => specifier[1] != null,
-    plan: ($specifier) => postSource.get({ post_id: $specifier.at(1) }),
+    plan: ($specifier) => postResource.get({ post_id: $specifier.at(1) }),
   },
   Comment: {
     match: (specifier) => specifier[2] != null,
-    plan: ($specifier) => commentSource.get({ comment_id: $specifier.at(2) }),
+    plan: ($specifier) => commentResource.get({ comment_id: $specifier.at(2) }),
   },
 };
 
 const plans = {
   Person: {
     favourites($person) {
-      const $favourites = personFavouritesSource.find({
+      const $favourites = personFavouritesResource.find({
         person_id: $person.get("id"),
       });
       return each($favourites, ($favourite) => {
@@ -636,9 +636,9 @@ const plans = {
   Query: {
     allPeopleAndOrganizations() {
       const $list = pgUnionAll({
-        sourceByTypeName: {
-          Person: personSource,
-          Organization: organizationSource,
+        resourceByTypeName: {
+          Person: personResource,
+          Organization: organizationResource,
         },
       });
       return $list;

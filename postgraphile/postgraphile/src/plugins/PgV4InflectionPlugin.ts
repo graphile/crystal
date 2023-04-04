@@ -43,13 +43,13 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         return previous!.call(this, details);
       },
       functionMutationResultFieldName(previous, options, details) {
-        const { source, returnGraphQLTypeName } = details;
-        if (source.extensions?.tags?.resultFieldName) {
-          return source.extensions.tags.resultFieldName;
+        const { resource, returnGraphQLTypeName } = details;
+        if (resource.extensions?.tags?.resultFieldName) {
+          return resource.extensions.tags.resultFieldName;
         }
         let name;
-        if (source.extensions?.singleOutputParameterName) {
-          name = this.camelCase(source.extensions.singleOutputParameterName);
+        if (resource.extensions?.singleOutputParameterName) {
+          name = this.camelCase(resource.extensions.singleOutputParameterName);
         } else if (returnGraphQLTypeName === "Int") {
           name = "integer";
         } else if (returnGraphQLTypeName === "Float") {
@@ -58,20 +58,20 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
           name = "boolean";
         } else if (returnGraphQLTypeName === "String") {
           name = "string";
-        } else if (source.codec.isAnonymous) {
+        } else if (resource.codec.isAnonymous) {
           // returns a record type
           name = "result";
         } else {
           name = this.camelCase(returnGraphQLTypeName);
         }
-        const plural = !source.isUnique || !!source.codec.arrayOfCodec;
+        const plural = !resource.isUnique || !!resource.codec.arrayOfCodec;
         return plural ? this.pluralize(name) : name;
       },
-      deletedNodeId(previous, options, { source }) {
+      deletedNodeId(previous, options, { resource }) {
         // Silly V4 behavior
         return this.camelCase(
           `deleted-${this.singularize(
-            source.extensions?.pg?.name ?? this._sourceName(source),
+            resource.extensions?.pg?.name ?? this._resourceName(resource),
           )}-id`,
         );
       },

@@ -1,7 +1,11 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgSelectStep, PgSourceUnique } from "@dataplan/pg";
+import type {
+  PgCodecWithColumns,
+  PgResourceUnique,
+  PgSelectStep,
+} from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-export";
 
 import { version } from "../version.js";
@@ -25,28 +29,30 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
       GraphQLEnumType_values(values, build, context) {
         const { extend, inflection, sql, options } = build;
         const {
-          scope: { isPgRowSortEnum, pgCodec },
+          scope: { isPgRowSortEnum, pgCodec: rawPgCodec },
         } = context;
         const { orderByNullsLast } = options;
 
         if (
           !isPgRowSortEnum ||
-          !pgCodec ||
-          !pgCodec.columns ||
-          pgCodec.isAnonymous
+          !rawPgCodec ||
+          !rawPgCodec.columns ||
+          rawPgCodec.isAnonymous
         ) {
           return values;
         }
 
-        const sources = build.input.pgSources.filter(
-          (s) => s.codec === pgCodec && !s.parameters,
-        );
-        if (sources.length < 1) {
+        const pgCodec = rawPgCodec as PgCodecWithColumns;
+
+        const resources = Object.values(
+          build.input.pgRegistry.pgResources,
+        ).filter((s) => s.codec === pgCodec && !s.parameters);
+        if (resources.length < 1) {
           return values;
         }
 
-        const primaryKey = (sources[0].uniques as PgSourceUnique[]).find(
-          (source) => source.isPrimary,
+        const primaryKey = (resources[0].uniques as PgResourceUnique[]).find(
+          (resource) => resource.isPrimary,
         );
         if (!primaryKey) {
           return values;
@@ -61,7 +67,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 graphile: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
-                      (step: PgSelectStep<any, any, any, any>) => {
+                      (step: PgSelectStep) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
                           step.orderBy({
@@ -89,7 +95,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 graphile: {
                   applyPlan: EXPORTABLE(
                     (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
-                      (step: PgSelectStep<any, any, any, any>) => {
+                      (step: PgSelectStep) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
                           step.orderBy({

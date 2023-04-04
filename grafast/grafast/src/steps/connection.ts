@@ -18,7 +18,7 @@ type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
  * Describes what a plan needs to implement in order to be suitable for
  * supplying what the `PageInfo` type requires.
  */
-export interface PageInfoCapableStep extends ExecutableStep<any> {
+export interface PageInfoCapableStep extends ExecutableStep {
   hasNextPage(): ExecutableStep<boolean>;
   hasPreviousPage(): ExecutableStep<boolean>;
   startCursor(): ExecutableStep<string | null>;
@@ -30,8 +30,8 @@ export interface PageInfoCapableStep extends ExecutableStep<any> {
  * supplying what a ConnectionStep requires.
  */
 export interface ConnectionCapableStep<
-  TItemStep extends ExecutableStep<any>,
-  TCursorStep extends ExecutableStep<any>,
+  TItemStep extends ExecutableStep,
+  TCursorStep extends ExecutableStep,
 > extends ExecutableStep<
     ReadonlyArray<TItemStep extends ExecutableStep<infer U> ? U : any>
   > {
@@ -68,10 +68,10 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
  * indepdenent of data source.
  */
 export class ConnectionStep<
-  TItemStep extends ExecutableStep<any>,
-  TCursorStep extends ExecutableStep<any>,
+  TItemStep extends ExecutableStep,
+  TCursorStep extends ExecutableStep,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TNodeStep extends ExecutableStep = ExecutableStep,
 > extends UnbatchedExecutableStep<unknown> {
   static $$export = {
     moduleName: "grafast",
@@ -310,17 +310,17 @@ export class ConnectionStep<
   }
 }
 
-export interface EdgeCapableStep<TNodeStep extends ExecutableStep<any>>
-  extends ExecutableStep<any> {
+export interface EdgeCapableStep<TNodeStep extends ExecutableStep>
+  extends ExecutableStep {
   node(): TNodeStep;
   cursor(): ExecutableStep<string | null>;
 }
 
 export class EdgeStep<
-    TItemStep extends ExecutableStep<any>,
-    TCursorStep extends ExecutableStep<any>,
+    TItemStep extends ExecutableStep,
+    TCursorStep extends ExecutableStep,
     TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-    TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
+    TNodeStep extends ExecutableStep = ExecutableStep,
   >
   extends UnbatchedExecutableStep
   implements EdgeCapableStep<TNodeStep>
@@ -423,10 +423,10 @@ export class EdgeStep<
  * cursor connections.
  */
 export function connection<
-  TItemStep extends ExecutableStep<any>,
-  TCursorStep extends ExecutableStep<any>,
+  TItemStep extends ExecutableStep,
+  TCursorStep extends ExecutableStep,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TNodeStep extends ExecutableStep<any> = ExecutableStep<any>,
+  TNodeStep extends ExecutableStep = ExecutableStep,
 >(
   step: TStep,
   itemPlan?: ($item: TItemStep) => TNodeStep,

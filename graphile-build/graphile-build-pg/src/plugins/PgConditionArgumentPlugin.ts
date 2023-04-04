@@ -2,11 +2,11 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  PgCodecWithColumns,
   PgConditionStep,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
-  PgTypeColumns,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
@@ -46,12 +46,13 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_, build) {
         const { inflection, sql } = build;
-        for (const codec of build.pgCodecMetaLookup.keys()) {
+        for (const rawCodec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
             // Ignore scalar codecs
-            if (!codec.columns || codec.isAnonymous) {
+            if (!rawCodec.columns || rawCodec.isAnonymous) {
               return;
             }
+            const codec = rawCodec as PgCodecWithColumns;
 
             const behavior = getBehavior(codec.extensions);
             // TODO: do we want this filter here? E.g. we might want to enable a bulk delete mutation without allowing any selects?
@@ -76,7 +77,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ),
                 fields: (context) => {
                   const { fieldWithHooks } = context;
-                  const columns: PgTypeColumns = codec.columns;
+                  const columns = codec.columns;
                   // TODO: move this to a separate plugin
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {
@@ -126,7 +127,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                                 (column, columnName, sql) =>
                                   function plan(
                                     $condition: PgConditionStep<
-                                      PgSelectStep<any, any, any, any>
+                                      PgSelectStep<any>
                                     >,
                                     val,
                                   ) {
@@ -184,20 +185,20 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
           fieldBehaviorScope,
           isPgFieldConnection,
           isPgFieldSimpleCollection,
-          pgSource,
+          pgResource,
           pgFieldCodec,
         } = scope;
 
         const shouldAddCondition =
           isPgFieldConnection || isPgFieldSimpleCollection;
 
-        const codec = pgFieldCodec ?? pgSource?.codec;
+        const codec = pgFieldCodec ?? pgResource?.codec;
         const isSuitableSource =
-          pgSource && pgSource.codec.columns && !pgSource.isUnique;
+          pgResource && pgResource.codec.columns && !pgResource.isUnique;
         const isSuitableCodec =
           codec &&
           (isSuitableSource ||
-            (!pgSource && codec?.polymorphism?.mode === "union")) &&
+            (!pgResource && codec?.polymorphism?.mode === "union")) &&
           codec.columns;
 
         if (!shouldAddCondition || !isSuitableCodec) {
@@ -207,13 +208,13 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         const behavior = getBehavior([
           scope,
           codec?.extensions,
-          pgSource?.extensions,
+          pgResource?.extensions,
         ]);
         if (
           !build.behavior.matches(
             behavior,
             fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
-            pgSource?.parameters ? "" : "filter",
+            pgResource?.parameters ? "" : "filter",
           )
         ) {
           return args;
@@ -242,15 +243,15 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ? (
                     _condition,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep<any, any, any, any>,
+                      PgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep<any, any, any, any>
+                      PgSelectStep
                     >,
                   ) => {
                     const $select = $connection.getSubplan();
                     return $select.wherePlan();
                   }
-                : (_condition, $select: PgSelectStep<any, any, any, any>) => {
+                : (_condition, $select: PgSelectStep) => {
                     return $select.wherePlan();
                   },
             },

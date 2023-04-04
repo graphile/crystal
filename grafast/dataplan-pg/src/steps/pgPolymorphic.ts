@@ -5,6 +5,7 @@ import type {
   PolymorphicStep,
 } from "grafast";
 import {
+  exportAs,
   isDev,
   polymorphicWrap,
   SafeError,
@@ -21,15 +22,13 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
  * determine which one is correct, and how to handle it if it matches.
  */
 export interface PgPolymorphicTypeMap<
-  TItemStep extends
-    | PgSelectSingleStep<any, any, any, any>
-    | PgClassExpressionStep<any, any, any, any, any, any>,
+  TItemStep extends PgSelectSingleStep<any> | PgClassExpressionStep<any, any>,
   TTypeSpecifier,
   TTypeSpecifierStep extends ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
 > {
   [typeName: string]: {
     match(specifier: TTypeSpecifier): boolean;
-    plan($specifier: TTypeSpecifierStep, $item: TItemStep): ExecutableStep<any>;
+    plan($specifier: TTypeSpecifierStep, $item: TItemStep): ExecutableStep;
   };
 }
 
@@ -40,9 +39,7 @@ export interface PgPolymorphicTypeMap<
  * handle it.
  */
 export class PgPolymorphicStep<
-    TItemStep extends
-      | PgSelectSingleStep<any, any, any, any>
-      | PgClassExpressionStep<any, any, any, any, any, any>,
+    TItemStep extends PgSelectSingleStep<any> | PgClassExpressionStep<any, any>,
     TTypeSpecifier,
     TTypeSpecifierStep extends ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
   >
@@ -144,9 +141,7 @@ export class PgPolymorphicStep<
  * handle it.
  */
 export function pgPolymorphic<
-  TItemStep extends
-    | PgSelectSingleStep<any, any, any, any>
-    | PgClassExpressionStep<any, any, any, any, any, any>,
+  TItemStep extends PgSelectSingleStep<any> | PgClassExpressionStep<any, any>,
   TTypeSpecifier = any,
   TTypeSpecifierStep extends ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
 >(
@@ -165,9 +160,4 @@ export function pgPolymorphic<
   );
 }
 
-Object.defineProperty(pgPolymorphic, "$$export", {
-  value: {
-    moduleName: "@dataplan/pg",
-    exportName: "pgPolymorphic",
-  },
-});
+exportAs("@dataplan/pg", pgPolymorphic, "pgPolymorphic");

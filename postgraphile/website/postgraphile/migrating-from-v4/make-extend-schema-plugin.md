@@ -184,13 +184,13 @@ versus to use as the result of the field is exactly the same, so no more
 confusion.
 
 Here's an example of porting an example from the Version 4 documentation to
-Version 5. First we find the `pgSource` that represents the `match_user`
+Version 5. First we find the `pgResource` that represents the `match_user`
 function then we add a plan for the `Query.matchingUser` field that executes the
 function, passing through the `searchText` argument.
 
 ```diff
  module.exports = makeExtendSchemaPlugin((build) => {
-+  const matchUser = build.input.pgSources.find((s) => s.name === "match_user");
++  const matchUser = build.input.pgRegistry.pgResources.match_user;
    return {
      typeDefs: /* GraphQL */ `
        type Query {
@@ -263,9 +263,10 @@ export default makeExtendSchemaPlugin((build) => {
   const { sql } = build;
   /**
    * The 'executor' tells us which database we're talking to.
-   * You can get this from any source via `pgSource.executor`.
+   * You can get this from any source via `pgResource.executor`; here we use the
+   * executor from the 'users' source.
    */
-  const executor = build.input.pgSources[0].executor;
+  const executor = build.input.pgRegistry.pgResources.users.executor;
 
   return {
     typeDefs: /* GraphQL */ `

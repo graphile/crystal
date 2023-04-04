@@ -1,7 +1,7 @@
 import "graphile-config";
 import "graphile-build-pg";
 
-import type { PgSource, PgSourceParameter } from "@dataplan/pg";
+import type { PgResourceOptions } from "@dataplan/pg";
 import type { PgProc } from "pg-introspection";
 import { inspect } from "util";
 
@@ -14,7 +14,7 @@ declare global {
 }
 
 const v4ComputedColumnChecks = (
-  s: PgSource<any, any, any, any>,
+  _s: PgResourceOptions,
   pgProc: PgProc,
 ): boolean => {
   const args = pgProc.getArguments();
@@ -41,13 +41,11 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
 
   gather: {
     hooks: {
-      pgProcedures_PgSource(info, event) {
-        const { source: s } = event;
+      pgProcedures_PgResourceOptions(info, event) {
+        const { resourceOptions: s } = event;
         // Apply default behavior
         const behavior = [];
-        const firstParameter = (
-          s as PgSource<any, any, any, PgSourceParameter[]>
-        ).parameters[0];
+        const firstParameter = s.parameters![0];
         if (s.isMutation && s.parameters) {
           behavior.push("-queryField mutationField -typeField");
         } else if (

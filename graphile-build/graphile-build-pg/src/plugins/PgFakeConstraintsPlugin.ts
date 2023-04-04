@@ -56,7 +56,7 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
     hooks: {
       // We detect "fake" foreign key constraints during the "introspection"
       // phase (which runs first) because we need it to already be established
-      // for _all_ classes by the time pgTables_PgSourceBuilder_relations is
+      // for _all_ classes by the time pgTables_PgResourceOptions_relations is
       // called (otherwise we may get race conditions and relations only being
       // defined in one direction).
       async pgIntrospection_introspection(info, event) {

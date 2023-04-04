@@ -154,7 +154,7 @@ declare global {
 
     /** Our take on GraphQLFieldConfigMap that allows for plans */
     type GraphileFieldConfigMap<
-      TParentStep extends ExecutableStep<any> | null,
+      TParentStep extends ExecutableStep | null,
       TContext extends Grafast.Context,
     > = {
       [fieldName: string]: GraphileFieldConfig<
@@ -168,7 +168,7 @@ declare global {
 
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
     interface GraphileObjectTypeConfig<
-      TParentStep extends ExecutableStep<any> | null,
+      TParentStep extends ExecutableStep | null,
       TContext extends Grafast.Context,
     > extends Omit<
         GraphQLObjectTypeConfig<unknown, TContext>,
@@ -309,12 +309,12 @@ declare global {
        * scope so that other plugins may hook it; it can also be helpful to
        * indicate where a conflict has occurred.
        */
-      registerObjectType<TStep extends ExecutableStep<any> | null>(
+      registerObjectType<TStep extends ExecutableStep | null>(
         typeName: string,
         scope: ScopeObject,
-        Step: TStep extends ExecutableStep<any>
+        Step: TStep extends ExecutableStep
           ?
-              | ((step: ExecutableStep<any>) => asserts step is TStep)
+              | ((step: ExecutableStep) => asserts step is TStep)
               | { new (...args: any[]): TStep }
           : null,
         specGenerator: () => Omit<GraphileObjectTypeConfig<TStep, any>, "name">,
@@ -374,7 +374,7 @@ declare global {
         Constructor: { new (spec: any): GraphQLNamedType };
         scope: GraphileBuild.SomeScope;
         origin: string | null | undefined;
-        Step?: { new (...args: any[]): ExecutableStep<any> } | null;
+        Step?: { new (...args: any[]): ExecutableStep } | null;
       } | null;
 
       /**
@@ -725,7 +725,7 @@ declare global {
     type FieldWithHooksFunction = <
       TType extends GraphQLOutputType,
       TContext extends Grafast.Context,
-      TParentStep extends ExecutableStep<any>,
+      TParentStep extends ExecutableStep,
       TFieldStep extends OutputPlanForType<TType>,
       TArgs extends BaseGraphQLArguments,
     >(

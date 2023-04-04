@@ -9,10 +9,11 @@ interface CommonOptions {
 }
 
 const KNOWN_IMPORTS: Array<[string, string]> = [
-  ["@dataplan/pg", "PgSource"],
-  ["@dataplan/pg", "PgSourceBuilder"],
+  ["@dataplan/pg", "PgResource"],
   ["@dataplan/pg", "PgExecutor"],
   ["@dataplan/pg", "recordCodec"],
+  ["@dataplan/pg", "makeRegistry"],
+  ["@dataplan/pg", "makeRegistryBuilder"],
 ];
 
 export const ExportInstances: Rule.RuleModule = {
