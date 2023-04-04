@@ -27,9 +27,14 @@ export class ListStep<
     values: any[][], //Array<UnwrapPlanTuple<TPlanTuple>>,
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
     const count = values[0].length;
+    const dl = this.dependencies.length;
     const result: any[] = [];
     for (let i = 0; i < count; i++) {
-      result[i] = values.map((list) => list[i]);
+      const arr = [];
+      for (let j = 0; j < dl; j++) {
+        arr.push(values[j][i]);
+      }
+      result[i] = arr;
     }
     return result;
   }
