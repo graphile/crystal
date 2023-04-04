@@ -654,7 +654,7 @@ function addRelations(
     refName: string;
     refDefinition: PgRefDefinition;
     ref?: PgCodecRef;
-    codec?: PgCodec<any, any, any, any, any, any, any>;
+    codec?: PgCodec;
   }> = isMutationPayload
     ? []
     : (resource?.codec ?? codec).refs
@@ -677,7 +677,7 @@ function addRelations(
   type Layer = {
     relationName: string;
     localColumns: string[];
-    resource: PgResource<any, any, any, any, any>;
+    resource: PgResource;
     remoteColumns: string[];
     isUnique: boolean;
   };
@@ -736,8 +736,8 @@ function addRelations(
     listFieldName: string;
     connectionFieldName: string;
     description?: string;
-    pgResource?: PgResource<any, any, any, any, any>;
-    pgCodec: PgCodec<any, any, any, any, any, any, any> | undefined;
+    pgResource?: PgResource;
+    pgCodec: PgCodec | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     relatedTypeName: string;
   };
@@ -825,8 +825,7 @@ function addRelations(
   } of refDefinitionList) {
     let hasReferencee;
     let sharedCodec: PgCodec | undefined = undefined;
-    let sharedSource: PgResource<any, any, any, any, any> | undefined =
-      undefined;
+    let sharedSource: PgResource | undefined = undefined;
     let behavior;
     let typeName;
     let singleRecordPlan;
@@ -916,7 +915,7 @@ function addRelations(
           return makeRelationPlans(
             relation.localColumns as string[],
             relation.remoteColumns as string[],
-            remoteResource,
+            remoteResource as PgResource,
             isMutationPayload ?? false,
           );
         } else if (!needsPgUnionAll) {
@@ -1081,9 +1080,8 @@ function addRelations(
             const isConnection = mode === "connection";
             const attributes: PgUnionAllStepConfigAttributes<string> =
               unionAttributes ?? {};
-            const resourceByTypeName: {
-              [typeName: string]: PgResource<any, any, any, any, any>;
-            } = Object.create(null);
+            const resourceByTypeName: Record<string, PgResource> =
+              Object.create(null);
             const members: PgUnionAllStepMember<string>[] = [];
             for (const path of paths) {
               const [firstLayer, ...rest] = path.layers;
