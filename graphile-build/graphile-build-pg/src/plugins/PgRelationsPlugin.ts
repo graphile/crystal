@@ -466,7 +466,7 @@ function makeSpecString(
 function makeRelationPlans(
   localColumns: readonly string[],
   remoteColumns: readonly string[],
-  otherSource: PgResource<any, any, any, any, any>,
+  otherSource: PgResource,
   isMutationPayload: boolean,
 ) {
   const recordOrResult = isMutationPayload

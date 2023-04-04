@@ -628,7 +628,7 @@ export interface PgRegistry<
     string,
     PgResourceOptions<
       string,
-      PgCodec, // TCodecs[keyof TCodecs],
+      PgCodecWithColumns, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameter[] | undefined
     >
@@ -756,7 +756,11 @@ export type GetPgRegistryCodecRelations<
 
 export type GetPgCodecColumns<
   TCodec extends PgCodec<any, any, any, any, any, any, any>,
-> = TCodec extends PgCodecWithColumns ? TCodec["columns"] : never;
+> = TCodec extends PgCodec<any, infer UColumns, any, any, any, any, any>
+  ? UColumns extends undefined
+    ? never
+    : UColumns
+  : PgCodecAttributes;
 
 export type GetPgResourceRegistry<
   TResource extends PgResource<any, any, any, any, any>,
