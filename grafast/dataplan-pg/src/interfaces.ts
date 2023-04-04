@@ -710,31 +710,6 @@ export interface PgRegistry<
   };
 }
 
-export type PgRegistryAny = PgRegistry<
-  {
-    [name in string]: PgCodec<
-      name,
-      PgCodecAttributes | undefined,
-      any,
-      any,
-      any,
-      any,
-      any
-    >;
-  },
-  {
-    [name in string]: PgResourceOptions<any, any, any, any>;
-  },
-  {
-    [codecName in string]: {
-      [relationName in string]: PgCodecRelationConfig<
-        PgCodec<any, any, any, any, any, any, any>,
-        PgResourceOptions<any, any, any, any>
-      >;
-    };
-  }
->;
-
 export type GetPgRegistryCodecs<TRegistry extends PgRegistry<any, any, any>> =
   TRegistry["pgCodecs"];
 

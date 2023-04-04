@@ -21,7 +21,7 @@ import type {
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
-  PgRegistryAny,
+  PgRegistry,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -609,7 +609,7 @@ export function pgSelectFromRecord<
     PgCodec<any, any, any, any, any, any, any>,
     any,
     any,
-    PgRegistryAny
+    PgRegistry
   >,
 >(
   resource: TResource,
