@@ -786,7 +786,7 @@ export function newBucket(
     polymorphicPathList: spec.polymorphicPathList,
 
     isComplete: false,
-    noDepsList: arrayOfLength(spec.size, undefined),
+    noDepsList: Object.freeze(arrayOfLength(spec.size, undefined)),
     children: Object.create(null),
   };
 }
