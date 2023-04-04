@@ -511,8 +511,13 @@ export interface PgCodecRelationBase<
 }
 
 export interface PgCodecRelationConfig<
-  TLocalCodec extends PgCodec = PgCodec,
-  TRemoteResourceOptions extends PgResourceOptions = PgResourceOptions,
+  TLocalCodec extends PgCodec = PgCodecWithColumns,
+  TRemoteResourceOptions extends PgResourceOptions = PgResourceOptions<
+    any,
+    PgCodecWithColumns,
+    any,
+    any
+  >,
 > extends PgCodecRelationBase<
     TLocalCodec,
     TRemoteResourceOptions extends PgResourceOptions<

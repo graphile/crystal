@@ -35,7 +35,7 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
-      registry: PgRegistry<any, any, any>;
+      registry: PgRegistry;
       codec: PgCodecWithColumns;
       relationName: string;
     }
@@ -106,7 +106,7 @@ declare global {
           event: {
             pgClass: PgClass;
             databaseName: string;
-            resourceOptions: PgResourceOptions<any, any, any, any>;
+            resourceOptions: PgResourceOptions;
           },
           pgConstraint: PgConstraint,
           isReferencee?: boolean,
@@ -119,7 +119,7 @@ declare global {
           databaseName: string;
           pgClass: PgClass;
           pgConstraint: PgConstraint;
-          relation: PgCodecRelationConfig<any, any>;
+          relation: PgCodecRelationConfig;
         }) => Promise<void> | void
       >;
     }
@@ -178,12 +178,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
       singleRelation(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = registry.pgRelations[codec.name]?.[
-          relationName
-        ] as PgCodecRelation<
-          PgCodecWithColumns,
-          PgResource<any, PgCodecWithColumns, any, any, any>
-        >;
+        const relation = (
+          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
+        )?.[relationName];
         //const codec = relation.remoteResource.codec;
         if (typeof relation.extensions?.tags.fieldName === "string") {
           return relation.extensions.tags.fieldName;
@@ -197,12 +194,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       singleRelationBackwards(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = registry.pgRelations[codec.name]?.[
-          relationName
-        ] as PgCodecRelation<
-          PgCodecWithColumns,
-          PgResource<any, PgCodecWithColumns, any, any, any>
-        >;
+        const relation = (
+          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
+        )?.[relationName];
         if (
           typeof relation.extensions?.tags.foreignSingleFieldName === "string"
         ) {
@@ -223,12 +217,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       _manyRelation(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = registry.pgRelations[codec.name]?.[
-          relationName
-        ] as PgCodecRelation<
-          PgCodecWithColumns,
-          PgResource<any, PgCodecWithColumns, any, any, any>
-        >;
+        const relation = (
+          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
+        )?.[relationName];
         const baseOverride = relation.extensions?.tags.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
@@ -245,12 +236,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       manyRelationConnection(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = registry.pgRelations[codec.name]?.[
-          relationName
-        ] as PgCodecRelation<
-          PgCodecWithColumns,
-          PgResource<any, PgCodecWithColumns, any, any, any>
-        >;
+        const relation = (
+          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
+        )?.[relationName];
         const override = relation.extensions?.tags.foreignConnectionFieldName;
         if (typeof override === "string") {
           return override;
@@ -259,12 +247,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       },
       manyRelationList(options, details) {
         const { registry, codec, relationName } = details;
-        const relation = registry.pgRelations[codec.name]?.[
-          relationName
-        ] as PgCodecRelation<
-          PgCodecWithColumns,
-          PgResource<any, PgCodecWithColumns, any, any, any>
-        >;
+        const relation = (
+          registry.pgRelations[codec.name] as Record<string, PgCodecRelation>
+        )?.[relationName];
         const override = relation.extensions?.tags.foreignSimpleFieldName;
         if (typeof override === "string") {
           return override;
@@ -342,10 +327,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           ),
         );
         const foreignResourceOptions =
-          await info.helpers.pgTables.getResourceOptions(
+          (await info.helpers.pgTables.getResourceOptions(
             databaseName,
             foreignClass,
-          );
+          )) as PgResourceOptions<any, PgCodecWithColumns, any, any>;
         if (
           !localCodec ||
           !foreignResourceOptions ||
@@ -378,19 +363,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const description = isReferencee
           ? tags.backwardDescription
           : tags.forwardDescription ?? constraintDescription;
-        const newRelation: PgCodecRelationConfig<
-          PgCodecWithColumns,
-          PgResourceOptions<any, PgCodecWithColumns, any, any>
-        > = {
+        const newRelation: PgCodecRelationConfig = {
           localCodec: localCodec as PgCodecWithColumns,
           localColumns: localColumns.map((c) => c!.attname),
           remoteColumns: foreignColumns.map((c) => c!.attname),
-          remoteResourceOptions: foreignResourceOptions as PgResourceOptions<
-            any,
-            any,
-            any,
-            any
-          >,
+          remoteResourceOptions: foreignResourceOptions,
           isUnique,
           isReferencee,
           description:
