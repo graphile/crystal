@@ -114,14 +114,6 @@ declare module "@dataplan/pg" {
 
 declare global {
   namespace GraphileBuild {
-    interface PgRelations {
-      [codecName: string]: {
-        [relationName: string]: PgCodecRelationConfig<
-          PgCodec<any, PgCodecAttributes, any, any, undefined, any, undefined>,
-          PgResourceOptions<any, PgCodecWithColumns, any, any>
-        >;
-      };
-    }
     interface BuildInput {
       pgRegistry: PgRegistry<any, any, any>;
     }
