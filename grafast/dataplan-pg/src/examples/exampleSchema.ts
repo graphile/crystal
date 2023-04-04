@@ -19,9 +19,9 @@ import type {
   __TrackedObjectStep,
   AccessStep,
   BaseGraphQLRootValue,
-  GrafastSubscriber,
   GrafastArgumentConfig,
   GrafastFieldConfig,
+  GrafastSubscriber,
   ListStep,
 } from "grafast";
 import {

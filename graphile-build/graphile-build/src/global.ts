@@ -325,10 +325,7 @@ declare global {
       registerInterfaceType: (
         typeName: string,
         scope: ScopeInterface,
-        specGenerator: () => Omit<
-          GrafastInterfaceTypeConfig<any, any>,
-          "name"
-        >,
+        specGenerator: () => Omit<GrafastInterfaceTypeConfig<any, any>, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for unions */

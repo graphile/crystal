@@ -559,9 +559,11 @@ export function newInputObjectTypeBuilder<
   spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
 ) => GrafastInputObjectType<TContext, TParentStep, TFields> {
   return (spec) =>
-    new GraphQLInputObjectType(
-      inputObjectSpec(spec),
-    ) as GrafastInputObjectType<TContext, TParentStep, any>;
+    new GraphQLInputObjectType(inputObjectSpec(spec)) as GrafastInputObjectType<
+      TContext,
+      TParentStep,
+      any
+    >;
 }
 
 /**

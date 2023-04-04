@@ -166,10 +166,8 @@ export function makeGrafastSchema(details: {
           };
         } else {
           // it's a spec
-          const grafastExtensions: GraphQLFieldExtensions<
-            any,
-            any
-          >["grafast"] = Object.create(null);
+          const grafastExtensions: GraphQLFieldExtensions<any, any>["grafast"] =
+            Object.create(null);
           (field.extensions as any).grafast = grafastExtensions;
           if (fieldSpec.resolve) {
             field.resolve = fieldSpec.resolve;
