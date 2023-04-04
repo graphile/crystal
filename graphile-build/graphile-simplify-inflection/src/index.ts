@@ -1,18 +1,7 @@
-import type {
-  PgCodec,
-  PgCodecRelation,
-  PgCodecWithColumns,
-  PgResource,
-  PgResourceUnique,
-} from "@dataplan/pg";
+import type { PgCodec, PgResourceUnique } from "@dataplan/pg";
 import type {} from "graphile-build";
 import type {} from "graphile-build-pg";
 import type { GraphileConfig } from "graphile-config";
-
-type PgCodecRelationAny = PgCodecRelation<
-  PgCodecWithColumns,
-  PgResource<any, PgCodecWithColumns, any, any, any>
->;
 
 /**
  * Returns true if array1 and array2 have the same length, and every pair of

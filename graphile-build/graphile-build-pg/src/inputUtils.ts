@@ -68,9 +68,7 @@ function walkResource(
   if (!metaLookup.has(resource.codec)) {
     walkCodec(resource.codec, metaLookup);
   }
-  const relations = resource.getRelations() as {
-    [relationName: string]: PgCodecRelation<any, any>;
-  };
+  const relations = resource.getRelations() as Record<string, PgCodecRelation>;
   if (relations) {
     for (const relationshipName in relations) {
       walkResource(

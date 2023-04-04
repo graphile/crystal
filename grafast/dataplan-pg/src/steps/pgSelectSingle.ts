@@ -335,9 +335,9 @@ export class PgSelectSingleStep<
     if ($existingPlan) {
       return $existingPlan;
     }
-    const relation: PgCodecRelation<any, any> = this.resource.getRelation(
-      relationIdentifier as string,
-    );
+    const relation = this.resource.getRelation(
+      relationIdentifier,
+    ) as PgCodecRelation;
     if (!relation || !relation.isUnique) {
       throw new Error(
         `${String(relationIdentifier)} is not a unique relation on ${
@@ -369,8 +369,9 @@ export class PgSelectSingleStep<
   ): PgSelectStep<
     GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > {
-    const relation: PgCodecRelation<any, any> =
-      this.resource.getRelation(relationIdentifier);
+    const relation = this.resource.getRelation(
+      relationIdentifier,
+    ) as PgCodecRelation;
     if (!relation) {
       throw new Error(
         `${String(relationIdentifier)} is not a relation on ${this.resource}`,

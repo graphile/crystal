@@ -418,9 +418,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const relations = registry.pgRelations[resource.codec.name] as {
-            [relationName: string]: PgCodecRelation<any, any>;
-          };
+          const relations = registry.pgRelations[resource.codec.name] as Record<
+            string,
+            PgCodecRelation
+          >;
           const poly = (resource.codec as PgCodec).polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations

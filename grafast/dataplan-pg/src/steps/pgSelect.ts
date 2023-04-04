@@ -855,10 +855,7 @@ export class PgSelectStep<
   >(relationIdentifier: TRelationName): SQL {
     const relation = this.resource.getRelation(
       relationIdentifier,
-    ) as PgCodecRelation<
-      PgCodecWithColumns,
-      PgResource<any, any, any, any, any>
-    >;
+    ) as PgCodecRelation;
     if (!relation) {
       throw new Error(
         `${this.resource} does not have a relation named '${String(
