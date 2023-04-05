@@ -3,5 +3,5 @@
 "postgraphile": patch
 ---
 
-PgV4NoIgnoreIndexesPlugin is renamed, moved to graphile-build-pg, and is enabled
-by default
+PgV4NoIgnoreIndexesPlugin is now PgIndexBehaviorsPlugin, moved to
+graphile-build-pg, and is enabled by default

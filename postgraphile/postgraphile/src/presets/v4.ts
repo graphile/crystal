@@ -197,7 +197,7 @@ export const makeV4Preset = (
         : []),
       ...(options.skipPlugins ? options.skipPlugins.map((p) => p.name) : []),
       ...(options.ignoreRBAC !== false ? ["PgRBACPlugin"] : []),
-      ...(options.ignoreIndexes === false ? [] : ["PgNoIgnoreIndexesPlugin"]),
+      ...(options.ignoreIndexes === false ? [] : ["PgIndexBehaviorsPlugin"]),
     ],
     schema: {
       ...otherGraphileBuildOptions,
