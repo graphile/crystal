@@ -6,6 +6,7 @@ import type { ExplainHelpers } from "../hooks/useExplain.js";
 import type { ExplainResults } from "../hooks/useFetcher.js";
 import { Copy } from "./Copy.js";
 import { Mermaid } from "./Mermaid.js";
+import { FormatSQL } from "./FormatSQL.js";
 
 export const Explain: FC<{
   explain: boolean;
@@ -89,25 +90,7 @@ export const ExplainMain: FC<{
               </>
             ) : null}
             <h4>Executed SQL query:</h4>
-            <pre
-              className="explain-sql"
-              style={{ fontSize: "0.75rem", whiteSpace: "pre-wrap" }}
-            >
-              {selectedResult.query.split("\n").map((line, i) => (
-                <>
-                  <code
-                    style={{
-                      display: "block",
-                      marginLeft: "1.8rem",
-                      textIndent: "-1.8rem",
-                    }}
-                    key={i}
-                  >
-                    {line}
-                  </code>
-                </>
-              ))}
-            </pre>
+            <FormatSQL sql={selectedResult.query} />
           </div>
         );
       }
