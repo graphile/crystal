@@ -50,11 +50,11 @@ from "a"."query_interval_set"() as __query_interval_set__(v);
 
 select
   __post__."id"::text as "0",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
     from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-  ) _) as "1"
+  ) s) as "1"
 from "a"."post" as __post__
 order by __post__."id" asc
 limit 1;

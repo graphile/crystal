@@ -619,13 +619,13 @@ lateral (
   select
     __post__."id"::text as "0",
     __post__."headline" as "1",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
         __frmcdc_comptype_1__."is_optimised"::text as "1",
         (not (__frmcdc_comptype_1__ is null))::text as "2"
       from unnest(__post__."comptypes") as __frmcdc_comptype_1__
-    ) _) as "2",
+    ) s) as "2",
     __person__."person_full_name" as "3",
     __post_identifiers__.idx as "4"
   from "a"."post" as __post__

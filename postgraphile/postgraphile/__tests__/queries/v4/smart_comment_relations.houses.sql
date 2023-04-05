@@ -26,7 +26,7 @@ lateral (
 
 select
   __streets__."id"::text as "0",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __buildings__."id"::text as "0",
       __buildings__."name" as "1"
@@ -35,10 +35,10 @@ select
       __streets__."name"::"text" = __buildings__."name"
     )
     order by __buildings__."id" asc
-  ) _) as "1",
+  ) s) as "1",
   __streets__."name" as "2",
   __streets_2."id"::text as "3",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __buildings_2."id"::text as "0",
       __buildings_2."name" as "1"
@@ -47,12 +47,12 @@ select
       __streets_2."name"::"text" = __buildings_2."name"
     )
     order by __buildings_2."id" asc
-  ) _) as "4",
+  ) s) as "4",
   __streets_2."name" as "5",
   __street_property__."str_id"::text as "6",
   __properties__."id"::text as "7",
   __streets_3."id"::text as "8",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __buildings_3."id"::text as "0",
       __buildings_3."name" as "1"
@@ -61,7 +61,7 @@ select
       __streets_3."name"::"text" = __buildings_3."name"
     )
     order by __buildings_3."id" asc
-  ) _) as "9",
+  ) s) as "9",
   __streets_3."name" as "10",
   __properties__."street_id"::text as "11",
   __properties__."name_or_number" as "12",
@@ -70,7 +70,7 @@ select
   __houses__."street_id"::text as "15",
   __properties_2."id"::text as "16",
   __streets_4."id"::text as "17",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __buildings_4."id"::text as "0",
       __buildings_4."name" as "1"
@@ -79,7 +79,7 @@ select
       __streets_4."name"::"text" = __buildings_4."name"
     )
     order by __buildings_4."id" asc
-  ) _) as "18",
+  ) s) as "18",
   __streets_4."name" as "19",
   __properties_2."street_id"::text as "20",
   __properties_2."name_or_number" as "21",
@@ -89,7 +89,7 @@ select
   __houses__."street_name" as "25",
   __buildings_5."id"::text as "26",
   __streets_5."id"::text as "27",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __buildings_6."id"::text as "0",
       __buildings_6."name" as "1"
@@ -98,14 +98,14 @@ select
       __streets_5."name"::"text" = __buildings_6."name"
     )
     order by __buildings_6."id" asc
-  ) _) as "28",
+  ) s) as "28",
   __streets_5."name" as "29",
   __buildings_5."name" as "30",
   __buildings_5."floors"::text as "31",
   __buildings_5."is_primary"::text as "32",
   __properties_3."id"::text as "33",
   __streets_6."id"::text as "34",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __buildings_7."id"::text as "0",
       __buildings_7."name" as "1"
@@ -114,7 +114,7 @@ select
       __streets_6."name"::"text" = __buildings_7."name"
     )
     order by __buildings_7."id" asc
-  ) _) as "35",
+  ) s) as "35",
   __streets_6."name" as "36",
   __properties_3."street_id"::text as "37",
   __properties_3."name_or_number" as "38",

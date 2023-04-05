@@ -49,7 +49,7 @@ lateral (
     __frmcdc_compound_type_1__."b" as "2",
     __frmcdc_compound_type_1__."c"::text as "3",
     (not (__frmcdc_compound_type_1__ is null))::text as "4",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __post__."id"::text as "0"
       from "a"."post" as __post__
@@ -57,7 +57,7 @@ lateral (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "5",
+    ) s) as "5",
     __person__."id"::text as "6",
     __person__."person_full_name" as "7",
     (not (__func_out_complex__ is null))::text as "8",
@@ -140,7 +140,7 @@ lateral (
     __frmcdc_compound_type_1__."b" as "4",
     __frmcdc_compound_type_1__."c"::text as "5",
     (not (__frmcdc_compound_type_1__ is null))::text as "6",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __post__."id"::text as "0"
       from "a"."post" as __post__
@@ -148,7 +148,7 @@ lateral (
         __person_2."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "7",
+    ) s) as "7",
     __person_2."id"::text as "8",
     __person_2."person_full_name" as "9",
     (not (__person_computed_complex__ is null))::text as "10",
@@ -313,7 +313,7 @@ lateral (
     __frmcdc_compound_type_1__."b" as "2",
     __frmcdc_compound_type_1__."c"::text as "3",
     (not (__frmcdc_compound_type_1__ is null))::text as "4",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __post__."id"::text as "0"
       from "a"."post" as __post__
@@ -321,7 +321,7 @@ lateral (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "5",
+    ) s) as "5",
     __person__."id"::text as "6",
     __person__."person_full_name" as "7",
     (not (__func_out_complex_setof__ is null))::text as "8",

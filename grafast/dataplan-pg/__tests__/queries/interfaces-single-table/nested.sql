@@ -1,6 +1,6 @@
 select
   __people__."username" as "0",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __single_table_items__."type"::text as "0",
       __single_table_items__."parent_id"::text as "1",
@@ -14,7 +14,7 @@ select
         true /* authorization checks */
       )
     order by __single_table_items__."id" asc
-  ) _) as "1"
+  ) s) as "1"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */

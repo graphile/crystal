@@ -1,6 +1,6 @@
 select
   __forums__."name" as "0",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __messages__."body" as "0",
       __messages__."author_id" as "1",
@@ -13,7 +13,7 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-  ) _) as "1"
+  ) s) as "1"
 from app_public.forums as __forums__
 where
   (

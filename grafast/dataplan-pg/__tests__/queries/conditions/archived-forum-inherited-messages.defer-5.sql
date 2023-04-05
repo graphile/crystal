@@ -1,6 +1,6 @@
 select
   __forums__."name" as "0",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __messages__."body" as "0",
       __users__."username" as "1",
@@ -20,8 +20,8 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-  ) _) as "1",
-  (select json_agg(_) from (
+  ) s) as "1",
+  (select json_agg(s) from (
     select
       (count(*))::text as "0"
     from app_public.messages as __messages__
@@ -31,7 +31,7 @@ select
       ) and (
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
-  ) _) as "2"
+  ) s) as "2"
 from app_public.forums as __forums__
 where
   (

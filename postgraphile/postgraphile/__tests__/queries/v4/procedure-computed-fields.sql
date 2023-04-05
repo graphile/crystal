@@ -72,12 +72,12 @@ lateral (
     __post_2."id"::text as "2",
     __post_3::text as "3",
     __post_3."id"::text as "4",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
         (row_number() over (partition by 1))::text as "1"
       from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-    ) _) as "5",
+    ) s) as "5",
     "a"."post_headline_trimmed"(__post__) as "6",
     "a"."post_headline_trimmed"(
       __post__,
@@ -119,21 +119,21 @@ lateral (
 
 select
   __person__."person_full_name" as "0",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __person_friends__."person_full_name" as "0",
-      (select json_agg(_) from (
+      (select json_agg(s) from (
         select
           __person_friends_2."person_full_name" as "0",
           "c"."person_first_name"(__person_friends_2) as "1",
           __person_friends_2."id"::text as "2"
         from "c"."person_friends"(__person_friends__) as __person_friends_2
         limit 1
-      ) _) as "1",
+      ) s) as "1",
       "c"."person_first_name"(__person_friends__) as "2",
       __person_friends__."id"::text as "3"
     from "c"."person_friends"(__person__) as __person_friends__
-  ) _) as "1",
+  ) s) as "1",
   __person_first_post__."id"::text as "2",
   __person_first_post__."headline" as "3",
   "c"."person_first_name"(__person__) as "4"
