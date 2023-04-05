@@ -1,7 +1,7 @@
 import { addBehaviorToTags } from "graphile-build-pg";
 
-export const PgV4NoIgnoreIndexesPlugin: GraphileConfig.Plugin = {
-  name: "PgV4NoIgnoreIndexesPlugin",
+export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
+  name: "PgIndexBehaviorsPlugin",
   version: "0.0.0",
 
   gather: {

@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 mutation M {
   answer0: listBdeMutation(input: { d: "bar", b: [], e: "q0" }) {
     uuids

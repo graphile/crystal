@@ -16,6 +16,7 @@ import { PgContextPlugin } from "./plugins/PgContextPlugin.js";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
 import { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.js";
 import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
+import { PgIndexBehaviorsPlugin } from "./plugins/PgIndexBehaviorsPlugin.js";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
@@ -71,6 +72,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgEnumTablesPlugin,
     PgPolymorphismPlugin,
     PgRBACPlugin,
+    PgIndexBehaviorsPlugin,
     PgRegistryPlugin,
   ],
 };

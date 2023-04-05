@@ -5,15 +5,9 @@ import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
-import { PgV4NoIgnoreIndexesPlugin } from "../plugins/PgV4NoIgnoreIndexesPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 
-export {
-  PgV4BehaviorPlugin,
-  PgV4InflectionPlugin,
-  PgV4NoIgnoreIndexesPlugin,
-  PgV4SmartTagsPlugin,
-};
+export { PgV4BehaviorPlugin, PgV4InflectionPlugin, PgV4SmartTagsPlugin };
 
 type PromiseOrDirect<T> = T | Promise<T>;
 type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
@@ -194,7 +188,6 @@ export const makeV4Preset = (
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
       PgV4BehaviorPlugin,
-      ...(options.ignoreIndexes === false ? [PgV4NoIgnoreIndexesPlugin] : []),
       makeV4Plugin(options),
       ...(options.appendPlugins ? options.appendPlugins : []),
     ].filter(isNotNullish),
@@ -204,6 +197,7 @@ export const makeV4Preset = (
         : []),
       ...(options.skipPlugins ? options.skipPlugins.map((p) => p.name) : []),
       ...(options.ignoreRBAC !== false ? ["PgRBACPlugin"] : []),
+      ...(options.ignoreIndexes === false ? [] : ["PgIndexBehaviorsPlugin"]),
     ],
     schema: {
       ...otherGraphileBuildOptions,
