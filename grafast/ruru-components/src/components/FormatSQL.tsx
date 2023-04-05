@@ -1,6 +1,7 @@
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 
 export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
+  const [highlitIndex, setHighlitIndex] = useState(null);
   const formattedSQL = useMemo(() => {
     const lines = sql.split("\n");
     const elements: JSX.Element[] = [];
@@ -23,7 +24,16 @@ export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
         if (f) {
           parts.push(f);
         } else {
-          const sub = <Highlight n={identifierCount++}>{full}</Highlight>;
+          const index = identifierCount++;
+          const sub = (
+            <Highlight
+              n={index}
+              highlit={index === highlitIndex}
+              setHighlitIndex={setHighlitIndex}
+            >
+              {full}
+            </Highlight>
+          );
           knownIdentifiers.set(full, sub);
           parts.push(sub);
         }
@@ -51,7 +61,7 @@ export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
       );
     }
     return elements;
-  }, [sql]);
+  }, [sql, highlitIndex]);
   return (
     <pre
       className="explain-sql"
@@ -69,7 +79,33 @@ const COLORS = [
   "rgb(255, 0, 247)",
 ];
 
-const Highlight: FC<{ n: number; children: string }> = ({ n, children }) => {
+const Highlight: FC<{
+  n: number;
+  highlit: boolean;
+  setHighlitIndex: any;
+  children: string;
+}> = ({ n, highlit, setHighlitIndex, children }) => {
   const color = COLORS[n % COLORS.length];
-  return <strong style={{ color }}>{children}</strong>;
+  const style = highlit
+    ? {
+        color,
+        backgroundColor:
+          "hsla(var(--color-primary),var(--alpha-background-medium))",
+      }
+    : { color };
+  const onMouseEnter = useCallback(() => {
+    setHighlitIndex(n);
+  }, [setHighlitIndex, n]);
+  const onMouseLeave = useCallback(() => {
+    setHighlitIndex(null);
+  }, [setHighlitIndex]);
+  return (
+    <strong
+      style={style}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {children}
+    </strong>
+  );
 };
