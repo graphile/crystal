@@ -89,6 +89,8 @@ const Highlight: FC<{
   const style = highlit
     ? {
         color,
+        borderRadius: "3px",
+        fontWeight: "900",
         backgroundColor:
           "hsla(var(--color-primary),var(--alpha-background-medium))",
       }
