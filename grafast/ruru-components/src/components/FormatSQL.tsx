@@ -74,12 +74,17 @@ export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
 };
 
 const COLORS = [
-  "#f16f41",
-  "#56941e",
-  "#1ab6e5",
-  "#e51ade",
-  "#d11b32",
-  "#d9cb26",
+  "#00bfff",
+  "#ffa500",
+  "#7fff00",
+  "#ff1493",
+  "#808000",
+  "#dda0dd",
+  "#ff0000",
+  "#4169e1",
+  "#3cb371",
+  "#a52a2a",
+  "#ff00ff",
 ];
 
 const Highlight: FC<{
