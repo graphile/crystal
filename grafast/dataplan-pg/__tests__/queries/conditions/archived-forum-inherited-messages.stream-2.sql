@@ -1,6 +1,6 @@
 select
   __forums__."name" as "0",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       (count(*))::text as "0"
     from app_public.messages as __messages__
@@ -10,7 +10,7 @@ select
       ) and (
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
-  ) _) as "1",
+  ) s) as "1",
   __forums__."id" as "2",
   to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "3"
 from app_public.forums as __forums__

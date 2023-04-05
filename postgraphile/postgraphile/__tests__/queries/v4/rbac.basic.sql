@@ -148,7 +148,7 @@ from (
 ) as __person_identifiers__,
 lateral (
   select
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __post__."id"::text as "0",
         __post__."headline" as "1",
@@ -159,7 +159,7 @@ lateral (
         __person__."id"::"int4" = __post__."author_id"
       )
       order by __post__."id" asc
-    ) _) as "0",
+    ) s) as "0",
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from "c"."person" as __person__

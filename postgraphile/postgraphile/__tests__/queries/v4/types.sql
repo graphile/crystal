@@ -650,7 +650,7 @@ lateral (
     __person_type_function__."regdictionary"::text as "94",
     __person_type_function__."text_array_domain"::text as "95",
     __person_type_function__."int8_array_domain"::text as "96",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __post_3."id"::text as "0",
         __post_3."headline" as "1",
@@ -778,8 +778,8 @@ lateral (
       on TRUE
       left outer join lateral (select (__frmcdc_nested_compound_type_1_4."b").*) as __frmcdc_compound_type_1_12
       on TRUE
-    ) _) as "97",
-    (select json_agg(_) from (
+    ) s) as "97",
+    (select json_agg(s) from (
       select
         __post_5."id"::text as "0",
         __post_5."headline" as "1",
@@ -984,12 +984,12 @@ lateral (
       on TRUE
       left outer join lateral (select (__frmcdc_nested_compound_type_1_8."b").*) as __frmcdc_compound_type_1_24
       on TRUE
-    ) _) as "98",
-    (select json_agg(_) from (
+    ) s) as "98",
+    (select json_agg(s) from (
       select
         (count(*))::text as "0"
       from "c"."person_type_function_connection"(__person__) as __person_type_function_connection__
-    ) _) as "99",
+    ) s) as "99",
     __person__."id"::text as "100",
     __person_identifiers__.idx as "101"
   from "c"."person" as __person__
@@ -1138,7 +1138,7 @@ lateral (
     __types__."regdictionary"::text as "94",
     __types__."text_array_domain"::text as "95",
     __types__."int8_array_domain"::text as "96",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __post_3."id"::text as "0",
         __post_3."headline" as "1",
@@ -1346,15 +1346,15 @@ lateral (
         __post_7."id"::"int2" = __types_2."smallint"
       )
       order by __types_2."id" asc
-    ) _) as "97",
-    (select json_agg(_) from (
+    ) s) as "97",
+    (select json_agg(s) from (
       select
         (count(*))::text as "0"
       from "b"."types" as __types_2
       where (
         __post_7."id"::"int2" = __types_2."smallint"
       )
-    ) _) as "98",
+    ) s) as "98",
     __post_7."id"::text as "99",
     __post_7."headline" as "100",
     __post_identifiers__.idx as "101"

@@ -31,7 +31,7 @@ from (
 ) as __building_identifiers__,
 lateral (
   select
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __machine__."id"::text as "0",
         __machine__."constructor" as "1",
@@ -41,7 +41,7 @@ lateral (
         __building__."constructor"::"text" = __machine__."constructor"
       )
       order by __machine__."id" asc
-    ) _) as "0",
+    ) s) as "0",
     __building__."name" as "1",
     __building__."id"::text as "2",
     __building_identifiers__.idx as "3"

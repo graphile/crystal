@@ -7,7 +7,7 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __person_bookmarks__."id"::text as "0",
         __people__."username" as "1",
@@ -25,7 +25,7 @@ lateral (
           true /* authorization checks */
         )
       order by __person_bookmarks__."id" asc
-    ) _) as "0",
+    ) s) as "0",
     __people_2."person_id"::text as "1",
     __people_2."username" as "2",
     __people_identifiers__.idx as "3"

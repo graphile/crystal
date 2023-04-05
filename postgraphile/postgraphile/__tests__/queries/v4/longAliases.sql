@@ -9,16 +9,16 @@ lateral (
   select
     __person__."id"::text as "0",
     __person__."email" as "1",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         (count(*))::text as "0"
       from "c"."person_friends"(__person__) as __person_friends__
-    ) _) as "2",
-    (select json_agg(_) from (
+    ) s) as "2",
+    (select json_agg(s) from (
       select
         (count(*))::text as "0"
       from "c"."person_friends"(__person__) as __person_friends__
-    ) _) as "3",
+    ) s) as "3",
     __person_identifiers__.idx as "4"
   from "c"."person" as __person__
   where (

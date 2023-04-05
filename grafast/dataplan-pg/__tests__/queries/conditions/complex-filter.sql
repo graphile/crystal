@@ -9,7 +9,7 @@ from (
 lateral (
   select
     __forums__."name" as "0",
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select
         __messages__."body" as "0",
         __messages__."featured"::text as "1"
@@ -23,7 +23,7 @@ lateral (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
       order by __messages__."id" asc
-    ) _) as "1",
+    ) s) as "1",
     __forums_identifiers__.idx as "2"
   from app_public.forums as __forums__
   where

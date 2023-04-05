@@ -10,19 +10,19 @@ select
   __person_2."id"::text as "8",
   __person_2."person_full_name" as "9",
   "c"."person_first_name"(__person_2) as "10",
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __person_friends__."id"::text as "0",
       __person_friends__."person_full_name" as "1",
       "c"."person_first_name"(__person_friends__) as "2",
       (row_number() over (partition by 1))::text as "3"
     from "c"."person_friends"(__person__) as __person_friends__
-  ) _) as "11",
-  (select json_agg(_) from (
+  ) s) as "11",
+  (select json_agg(s) from (
     select
       (count(*))::text as "0"
     from "c"."person_friends"(__person__) as __person_friends__
-  ) _) as "12",
+  ) s) as "12",
   "c"."person_first_name"(__person__) as "13"
 from "a"."post" as __post__
 left outer join "c"."person" as __person__

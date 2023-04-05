@@ -1,5 +1,5 @@
 select
-  (select json_agg(_) from (
+  (select json_agg(s) from (
     select
       __forums_messages_list_set__."body" as "0",
       __forums_messages_list_set__."featured"::text as "1",
@@ -9,7 +9,7 @@ select
     where (
       true /* authorization checks */
     )
-  ) _) as "0",
+  ) s) as "0",
   __forums__."id" as "1"
 from app_public.forums as __forums__
 where

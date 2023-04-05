@@ -7,7 +7,7 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    (select json_agg(_) from (
+    (select json_agg(s) from (
       select /* NOTHING?! */
       from app_public.messages as __messages__
       where
@@ -20,8 +20,8 @@ lateral (
         )
       order by __messages__."id" asc
       limit 6
-    ) _) as "0",
-    (select json_agg(_) from (
+    ) s) as "0",
+    (select json_agg(s) from (
       select
         (count(*))::text as "0"
       from app_public.messages as __messages__
@@ -33,7 +33,7 @@ lateral (
         ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
-    ) _) as "1",
+    ) s) as "1",
     __forums__."id" as "2",
     __forums_identifiers__.idx as "3"
   from app_public.forums as __forums__
