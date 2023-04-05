@@ -232,7 +232,7 @@ Other changes:
 - In some circumstances the location where a `null` is returned or an error is
   thrown may differ slightly between V4 and V5; this will still respect the
   GraphQL schema though, of course.
-- What was `--no-ignore-indexes` and is now `PgV4NoIgnoreIndexesPlugin` now
+- What was `--no-ignore-indexes` and is now `PgNoIgnoreIndexesPlugin` now
   only removes the backwards relation when a relation is unindexed, since the
   forwards (to one) relation is always indexed
 

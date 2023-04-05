@@ -21,6 +21,7 @@ import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 import { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
+import { PgNoIgnoreIndexesPlugin } from "./plugins/PgNoIgnoreIndexesPlugin.js";
 import { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin.js";
 import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
@@ -71,6 +72,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgEnumTablesPlugin,
     PgPolymorphismPlugin,
     PgRBACPlugin,
+    PgNoIgnoreIndexesPlugin,
     PgRegistryPlugin,
   ],
 };
