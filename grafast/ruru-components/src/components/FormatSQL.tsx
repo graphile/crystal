@@ -1,11 +1,12 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import type { FC } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
   const [highlitIndex, setHighlitIndex] = useState(null);
   const formattedSQL = useMemo(() => {
     const lines = sql.split("\n");
     const elements: JSX.Element[] = [];
-    let knownIdentifiers = new Map<string, JSX.Element>();
+    const knownIdentifiers = new Map<string, JSX.Element>();
     let identifierCount = 0;
     const makeParts = (line: string) => {
       const parts: JSX.Element[] = [];
