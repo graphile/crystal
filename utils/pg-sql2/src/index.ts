@@ -510,11 +510,26 @@ export function compile(
   }
   const text = isDev ? print(sql).replace(/\n\s*\n/g, "\n") : print(sql);
 
-  return {
-    text,
-    values,
-    symbolToIdentifier,
-  };
+  return Object.create(null, {
+    text: {
+      value: text,
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    },
+    values: {
+      value: values,
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    },
+    symbolToIdentifier: {
+      value: symbolToIdentifier,
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    },
+  });
 }
 
 // LRU not necessary
