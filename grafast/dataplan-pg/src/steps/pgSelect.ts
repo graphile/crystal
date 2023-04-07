@@ -477,6 +477,7 @@ export class PgSelectStep<
 
     // For prepared queries
     name?: string;
+    nameForSingle?: string;
   } | null = null;
 
   // --------------------
@@ -1231,6 +1232,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       identifierIndex,
       shouldReverseOrder,
       name,
+      nameForSingle,
     } = this.finalizeResults;
 
     const executionResult = await this.resource.executeWithCache(
@@ -1253,6 +1255,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         rawSqlValues,
         identifierIndex,
         name,
+        nameForSingle,
         eventEmitter,
         useTransaction: this.mode === "mutation",
       },
@@ -2194,6 +2197,7 @@ ${lateralText};`;
           identifierIndex,
           shouldReverseOrder: this.shouldReverseOrder(),
           name: hash(text),
+          nameForSingle: textForSingle ? hash(textForSingle) : undefined,
         };
       }
     }

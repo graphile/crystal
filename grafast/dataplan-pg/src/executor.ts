@@ -107,6 +107,7 @@ export type PgExecutorOptions = {
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
   name?: string;
+  nameForSingle?: string;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
 };
@@ -466,7 +467,7 @@ ${duration}
                   : common.text;
               const name =
                 singleMode && common.textForSingle
-                  ? "s_" + common.name
+                  ? common.nameForSingle
                   : common.name;
 
               const sqlValues =

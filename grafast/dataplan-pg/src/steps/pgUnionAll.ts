@@ -452,6 +452,7 @@ export class PgUnionAllStep<
   private finalizeResults: {
     // The SQL query text
     text: string;
+    textForSingle?: string;
 
     // The values to feed into the query
     rawSqlValues: SQLRawValue[];
@@ -473,6 +474,7 @@ export class PgUnionAllStep<
 
     // For prepared queries
     name?: string;
+    nameForSingle?: string;
   } | null = null;
 
   private limitAndOffsetSQL: SQL | null = null;
@@ -1787,12 +1789,16 @@ ${lateralText};`;
 
     // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
 
+    const textForSingle = undefined;
+
     this.finalizeResults = {
       text,
+      textForSingle,
       rawSqlValues,
       identifierIndex,
       shouldReverseOrder,
       name: hash(text),
+      nameForSingle: textForSingle ? hash(textForSingle) : undefined,
     };
 
     super.finalize();
