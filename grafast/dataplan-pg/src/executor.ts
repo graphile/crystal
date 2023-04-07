@@ -31,6 +31,12 @@ const debug = debugFactory("datasource:pg:PgExecutor");
 const debugVerbose = debug.extend("verbose");
 const debugExplain = debug.extend("explain");
 
+type PublishFunction = (
+  text: string,
+  name: string | undefined,
+  explain: string | undefined,
+) => void;
+
 type ExecuteFunction = <TData>(
   text: string,
   values: ReadonlyArray<SQLRawValue>,
@@ -152,6 +158,7 @@ export class PgExecutor<TSettings = any> {
     text: string,
     values: ReadonlyArray<SQLRawValue>,
     name?: string,
+    publish?: PublishFunction,
   ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
@@ -165,6 +172,28 @@ export class PgExecutor<TSettings = any> {
       });
     } catch (e) {
       error = e;
+    }
+    // TODO: this should be based on the headers of the incoming request
+    const shouldExplain = debugExplain.enabled;
+    const explainAnalyzeSafe = shouldExplain && /^\s*select/i.test(text);
+    let explain: string | undefined = undefined;
+    if (shouldExplain) {
+      const explainResult = await client.query<{ 0: string }>({
+        text: `EXPLAIN (${
+          explainAnalyzeSafe ? "ANALYZE, " : ""
+        }COSTS, VERBOSE, BUFFERS, SETTINGS) ${text}`,
+        values: values as SQLRawValue[],
+        arrayMode: true,
+      });
+      const firstResult = explainResult.rows[0];
+      const key = firstResult ? (Object.keys(firstResult)[0] as "0") : "0";
+      explain =
+        explainResult.rows.length === 1 &&
+        typeof firstResult[key] === "object" &&
+        firstResult[key] !== null
+          ? // Support for 'FORMAT JSON'
+            JSON.stringify(firstResult[key], null, 2)
+          : explainResult.rows.map((r) => r[key]).join("\n");
     }
     if (debugVerbose.enabled || debugExplain.enabled) {
       const end = process.hrtime.bigint();
@@ -188,7 +217,7 @@ export class PgExecutor<TSettings = any> {
               .join("\n  ") +
             "\n]"
           : inspect(queryResult?.rows, { colors: true, depth: 6 });
-      (debugVerbose.enabled ? debugVerbose : debugExplain)(
+      (debugExplain.enabled ? debugExplain : debugVerbose)(
         `\
 
 
@@ -214,29 +243,22 @@ ${duration}
 %s
 
 
+# EXPLAIN
+%s
+
+
 `,
         LOOK_DOWN,
         formatSQLForDebugging(text, error),
         values,
         error ? error : rowResults,
         LOOK_UP,
+        explain ??
+          `(Use 'DEBUG="datasource:pg:PgExecutor:explain"' to enable explain)`,
       );
-
-      if (debugExplain.enabled && /^\s*select/i.test(text)) {
-        const explainResult = await client.query<{ 0: string }>({
-          text: `EXPLAIN ANALYZE ${text}`,
-          values: values as SQLRawValue[],
-          arrayMode: true,
-        });
-        debugExplain(
-          `\
-# EXPLAIN:%s`,
-          "\n" +
-            explainResult.rows
-              .map((r) => r[(Object.keys(r) as ["0"])[0]])
-              .join("\n"),
-        );
-      }
+    }
+    if (publish) {
+      publish(text, name, explain);
     }
     if (error) {
       throw error;
@@ -253,12 +275,13 @@ ${duration}
     text: string,
     values: ReadonlyArray<SQLRawValue>,
     name?: string,
+    publish?: PublishFunction,
   ) {
     // PERF: we could probably make this more efficient by grouping the
     // deferreds further, DataLoader-style, and running one SQL query for
     // everything.
     return await context.withPgClient(context.pgSettings, (client) =>
-      this._executeWithClient<TData>(client, text, values, name),
+      this._executeWithClient<TData>(client, text, values, name, publish),
     );
   }
 
@@ -308,16 +331,20 @@ ${duration}
   ): Promise<{
     values: GrafastValuesList<ReadonlyArray<TOutput>>;
   }> {
-    const { text, rawSqlValues, identifierIndex, name, eventEmitter } = common;
+    const { rawSqlValues, identifierIndex, eventEmitter } = common;
 
-    eventEmitter?.emit("explainOperation", {
-      operation: {
-        type: "sql",
-        title: `SQL query${name ? ` '${name.slice(0, 7)}...'` : ""}`,
-        query: text,
-        explain: undefined, // TODO: add explain output
-      },
-    });
+    const publishExecute: PublishFunction | undefined = eventEmitter
+      ? (text, name, explain) => {
+          eventEmitter.emit("explainOperation", {
+            operation: {
+              type: "sql",
+              title: `SQL query${name ? ` '${name.slice(0, 7)}...'` : ""}`,
+              query: text,
+              explain,
+            },
+          });
+        }
+      : undefined;
 
     const valuesCount = values.length;
     const results: Array<Deferred<Array<TOutput>> | undefined> = [];
@@ -372,7 +399,9 @@ ${duration}
             }
           }
 
-          const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
+          const textAndValues = `${common.text}\n${JSON.stringify(
+            rawSqlValues,
+          )}`;
           let cacheForQuery = cacheForContext.get(textAndValues);
           if (!cacheForQuery) {
             cacheForQuery = new Map();
@@ -435,6 +464,10 @@ ${duration}
                 singleMode && common.textForSingle
                   ? common.textForSingle
                   : common.text;
+              const name =
+                singleMode && common.textForSingle
+                  ? "s_" + common.name
+                  : common.name;
 
               const sqlValues =
                 identifierIndex == null
@@ -456,7 +489,13 @@ ${duration}
                     text,
                     values: sqlValues,
                   })
-                : await this._execute<TOutput>(context, text, sqlValues, name);
+                : await this._execute<TOutput>(
+                    context,
+                    text,
+                    sqlValues,
+                    name,
+                    publishExecute,
+                  );
               const { rows } = queryResult;
               const groups: { [valueIndex: number]: any[] } =
                 Object.create(null);
