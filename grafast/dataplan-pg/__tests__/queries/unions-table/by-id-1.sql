@@ -1,10 +1,5 @@
 select __union_items_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __union_items_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __union_items_identifiers__,
 lateral (
   select
     __union_items__."type"::text as "0",
@@ -21,12 +16,7 @@ lateral (
 ) as __union_items_result__;
 
 select __union_topics_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __union_topics_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __union_topics_identifiers__,
 lateral (
   select
     __union_topics__."id"::text as "0",

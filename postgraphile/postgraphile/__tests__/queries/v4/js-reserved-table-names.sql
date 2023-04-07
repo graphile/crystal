@@ -6,12 +6,7 @@ from "js_reserved"."constructor" as __constructor__
 order by __constructor__."id" asc;
 
 select __constructor_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __constructor_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __constructor_identifiers__,
 lateral (
   select
     __constructor__."name" as "0",
@@ -25,12 +20,7 @@ lateral (
 ) as __constructor_result__;
 
 select __constructor_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __constructor_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __constructor_identifiers__,
 lateral (
   select
     __constructor__."export" as "0",
@@ -45,12 +35,7 @@ lateral (
 ) as __constructor_result__;
 
 select __constructor_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __constructor_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __constructor_identifiers__,
 lateral (
   select
     __constructor__."export" as "0",
@@ -71,12 +56,7 @@ from "js_reserved"."yield" as __yield__
 order by __yield__."id" asc;
 
 select __yield_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __yield_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __yield_identifiers__,
 lateral (
   select
     __yield__."crop" as "0",
@@ -90,12 +70,7 @@ lateral (
 ) as __yield_result__;
 
 select __yield_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __yield_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __yield_identifiers__,
 lateral (
   select
     __yield__."crop" as "0",
@@ -117,12 +92,7 @@ from "js_reserved"."__proto__" as __proto__
 order by __proto__."id" asc;
 
 select __proto_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __proto_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __proto_identifiers__,
 lateral (
   select
     __proto__."brand" as "0",
@@ -137,12 +107,7 @@ lateral (
 ) as __proto_result__;
 
 select __proto_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __proto_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __proto_identifiers__,
 lateral (
   select
     __proto__."brand" as "0",
@@ -163,12 +128,7 @@ from "js_reserved"."null" as __null__
 order by __null__."id" asc;
 
 select __null_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __null_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __null_identifiers__,
 lateral (
   select
     __null__."hasOwnProperty" as "0",
@@ -182,12 +142,7 @@ lateral (
 ) as __null_result__;
 
 select __null_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __null_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __null_identifiers__,
 lateral (
   select
     __null__."break" as "0",
@@ -201,12 +156,7 @@ lateral (
 ) as __null_result__;
 
 select __null_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __null_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __null_identifiers__,
 lateral (
   select
     __null__."break" as "0",

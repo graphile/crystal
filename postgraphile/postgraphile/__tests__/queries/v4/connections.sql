@@ -76,12 +76,7 @@ from "b"."updatable_view" as __updatable_view__
 order by __updatable_view__."constant" asc, __updatable_view__."x" asc;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -96,12 +91,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
@@ -113,12 +103,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -134,12 +119,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."headline" as "0",
@@ -155,12 +135,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
@@ -185,12 +160,7 @@ limit 4
 offset 1;
 
 select __edge_case_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __edge_case_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __edge_case_identifiers__,
 lateral (
   select
     __edge_case__."row_id"::text as "0",
@@ -236,12 +206,7 @@ select
 from "a"."post" as __post__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"inet" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"inet" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -260,12 +225,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"inet" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"inet" as "id0") as __person_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
@@ -288,12 +248,7 @@ order by __post__."id" asc
 limit 2;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"cidr" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"cidr" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -312,12 +267,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"cidr" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"cidr" as "id0") as __person_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
@@ -329,12 +279,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"macaddr" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"macaddr" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -353,12 +298,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"macaddr" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"macaddr" as "id0") as __person_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
@@ -377,12 +317,7 @@ from "c"."null_test_record" as __null_test_record__
 order by __null_test_record__."id" asc;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -401,12 +336,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -425,12 +355,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -450,12 +375,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -475,12 +395,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",

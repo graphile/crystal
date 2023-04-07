@@ -1,10 +1,5 @@
 select __type_function_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __type_function_mutation_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __type_function_mutation_identifiers__,
 lateral (
   select
     __type_function_mutation__."id"::text as "0",
@@ -65,12 +60,7 @@ lateral (
 ) as __type_function_mutation_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -86,12 +76,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -121,12 +106,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -142,12 +122,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -177,12 +152,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -196,12 +166,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -271,12 +236,7 @@ select
 from unnest("b"."type_function_list_mutation"()) as __type_function_list_mutation__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -292,12 +252,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -327,12 +282,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -348,12 +298,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -383,12 +328,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -402,12 +342,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -477,12 +412,7 @@ select
 from "b"."type_function_connection_mutation"() as __type_function_connection_mutation__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -498,12 +428,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -533,12 +458,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -554,12 +474,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -589,12 +504,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -608,12 +518,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -682,12 +587,7 @@ update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int
   __types__."int8_array_domain"::text as "44";
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -703,12 +603,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -738,12 +633,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -759,12 +649,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -794,12 +679,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -813,12 +693,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -887,12 +762,7 @@ insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal"
   __types__."int8_array_domain"::text as "44";
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -908,12 +778,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -943,12 +808,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -964,12 +824,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -999,12 +854,7 @@ lateral (
 ) as __frmcdc_nested_compound_type_1_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",

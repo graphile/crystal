@@ -1,10 +1,5 @@
 select __machine_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __machine_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __machine_identifiers__,
 lateral (
   select
     __building__."id"::text as "0",
@@ -23,12 +18,7 @@ lateral (
 ) as __machine_result__;
 
 select __building_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __building_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __building_identifiers__,
 lateral (
   select
     (select json_agg(s) from (
@@ -60,12 +50,7 @@ from "js_reserved"."relational_items" as __relational_items__
 order by __relational_items__."id" asc;
 
 select __relational_topics_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __relational_topics_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_topics_identifiers__,
 lateral (
   select
     __relational_topics__."title" as "0",
@@ -78,12 +63,7 @@ lateral (
 ) as __relational_topics_result__;
 
 select __relational_status_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __relational_status_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_status_identifiers__,
 lateral (
   select
     __relational_status__."note" as "0",

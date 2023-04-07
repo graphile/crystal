@@ -6,13 +6,7 @@ order by __people__."person_id" asc
 limit 4;
 
 select __union_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     to_char(__union__."0", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
@@ -81,12 +75,7 @@ lateral (
 ) as __union_result__;
 
 select __aws_applications_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __aws_applications_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __aws_applications_identifiers__,
 lateral (
   select
     __aws_applications__."id"::text as "0",
@@ -101,12 +90,7 @@ lateral (
 ) as __aws_applications_result__;
 
 select __gcp_applications_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __gcp_applications_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __gcp_applications_identifiers__,
 lateral (
   select
     __gcp_applications__."id"::text as "0",

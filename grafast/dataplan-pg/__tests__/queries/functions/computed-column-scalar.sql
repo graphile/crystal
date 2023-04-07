@@ -1,13 +1,5 @@
 select __forums_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"uuid" as "id0",
-    (ids.value->>1)::"bool" as "id1",
-    (ids.value->>2)::"bool" as "id2",
-    (ids.value->>3)::"bool" as "id3"
-  from json_array_elements($1::json) with ordinality as ids
-) as __forums_identifiers__,
+from (select 0 as idx, $1::"uuid" as "id0", $2::"bool" as "id1", $3::"bool" as "id2", $4::"bool" as "id3") as __forums_identifiers__,
 lateral (
   select
     __forums_unique_author_count__.v::text as "0",

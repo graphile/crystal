@@ -1,10 +1,5 @@
 select __letter_descriptions_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __letter_descriptions_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __letter_descriptions_identifiers__,
 lateral (
   select
     __letter_descriptions__."id"::text as "0",
@@ -20,12 +15,7 @@ lateral (
 ) as __letter_descriptions_result__;
 
 select __letter_descriptions_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __letter_descriptions_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __letter_descriptions_identifiers__,
 lateral (
   select
     __letter_descriptions__."id"::text as "0",
@@ -65,12 +55,7 @@ from "enum_tables"."letter_descriptions" as __letter_descriptions__
 order by __letter_descriptions__."letter_via_view" desc;
 
 select __letter_descriptions_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __letter_descriptions_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __letter_descriptions_identifiers__,
 lateral (
   select
     __letter_descriptions__."id"::text as "0",
@@ -86,12 +71,7 @@ lateral (
 ) as __letter_descriptions_result__;
 
 select __letter_descriptions_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __letter_descriptions_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __letter_descriptions_identifiers__,
 lateral (
   select
     __letter_descriptions__."id"::text as "0",

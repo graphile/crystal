@@ -1,11 +1,5 @@
 select __union_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"float8" as "id0",
-    (ids.value->>1)::"float8" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"float8" as "id0", (ids.value->>1)::"float8" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __union__."0"::text as "0",
@@ -68,12 +62,7 @@ lateral (
 ) as __union_result__;
 
 select __first_party_vulnerabilities_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __first_party_vulnerabilities_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __first_party_vulnerabilities_identifiers__,
 lateral (
   select
     __first_party_vulnerabilities__."cvss_score"::text as "0",
@@ -92,12 +81,7 @@ lateral (
 ) as __first_party_vulnerabilities_result__;
 
 select __third_party_vulnerabilities_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __third_party_vulnerabilities_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __third_party_vulnerabilities_identifiers__,
 lateral (
   select
     __third_party_vulnerabilities__."cvss_score"::text as "0",

@@ -1,13 +1,5 @@
 select __await_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2",
-    (ids.value->>3)::"int4" as "id3"
-  from json_array_elements($1::json) with ordinality as ids
-) as __await_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2", $4::"int4" as "id3") as __await_identifiers__,
 lateral (
   select
     __await__.v::text as "0",
@@ -21,15 +13,7 @@ lateral (
 ) as __await_result__;
 
 select __case_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2",
-    (ids.value->>3)::"int4" as "id3"
-  from json_array_elements($1::json) with ordinality as ids
-) as __case_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2", $4::"int4" as "id3") as __case_identifiers__,
 lateral (
   select
     __case__.v::text as "0",
@@ -43,15 +27,7 @@ lateral (
 ) as __case_result__;
 
 select __value_of_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2",
-    (ids.value->>3)::"int4" as "id3"
-  from json_array_elements($1::json) with ordinality as ids
-) as __value_of_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2", $4::"int4" as "id3") as __value_of_identifiers__,
 lateral (
   select
     __value_of__.v::text as "0",
@@ -65,16 +41,7 @@ lateral (
 ) as __value_of_result__;
 
 select __null_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2",
-    (ids.value->>3)::"int4" as "id3",
-    (ids.value->>4)::"int4" as "id4"
-  from json_array_elements($1::json) with ordinality as ids
-) as __null_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2", $4::"int4" as "id3", $5::"int4" as "id4") as __null_identifiers__,
 lateral (
   select
     ("js_reserved"."null_yield"(

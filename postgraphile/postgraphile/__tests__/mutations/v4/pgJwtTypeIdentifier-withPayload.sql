@@ -1,12 +1,5 @@
 select __authenticate_payload_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"numeric" as "id1",
-    (ids.value->>2)::"int8" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __authenticate_payload_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"numeric" as "id1", $3::"int8" as "id2") as __authenticate_payload_identifiers__,
 lateral (
   select
     __authenticate_payload__."jwt"::text as "0",
@@ -22,12 +15,7 @@ lateral (
 ) as __authenticate_payload_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -41,12 +29,7 @@ lateral (
 ) as __person_result__;
 
 select __frmcdc_jwt_token_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."jwt_token" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_jwt_token_1_identifiers__,
+from (select 0 as idx, $1::"b"."jwt_token" as "id0") as __frmcdc_jwt_token_1_identifiers__,
 lateral (
   select
     __frmcdc_jwt_token_1__::text as "0",

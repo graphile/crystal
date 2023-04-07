@@ -128,12 +128,7 @@ on TRUE
 order by __types__."id" asc;
 
 select __types_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __types_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __types_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -270,12 +265,7 @@ lateral (
 ) as __types_result__;
 
 select __type_function_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __type_function_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __type_function_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -536,13 +526,7 @@ left outer join lateral (select (__frmcdc_nested_compound_type_1_2."b").*) as __
 on TRUE;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __person_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -1025,12 +1009,7 @@ lateral (
 ) as __person_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",

@@ -1,10 +1,5 @@
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -13,12 +8,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __jsonb_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"jsonb" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jsonb_identity_identifiers__,
+from (select 0 as idx, $1::"jsonb" as "id0") as __jsonb_identity_identifiers__,
 lateral (
   select
     __jsonb_identity__.v::text as "0",
@@ -27,12 +17,7 @@ lateral (
 ) as __jsonb_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -41,12 +26,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __jsonb_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"jsonb" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jsonb_identity_identifiers__,
+from (select 0 as idx, $1::"jsonb" as "id0") as __jsonb_identity_identifiers__,
 lateral (
   select
     __jsonb_identity__.v::text as "0",
@@ -55,13 +35,7 @@ lateral (
 ) as __jsonb_identity_result__;
 
 select __add_1_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_1_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_1_query_identifiers__,
 lateral (
   select
     __add_1_query__.v::text as "0",
@@ -73,13 +47,7 @@ lateral (
 ) as __add_1_query_result__;
 
 select __add_2_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_2_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_2_query_identifiers__,
 lateral (
   select
     __add_2_query__.v::text as "0",
@@ -91,13 +59,7 @@ lateral (
 ) as __add_2_query_result__;
 
 select __add_3_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_3_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_3_query_identifiers__,
 lateral (
   select
     __add_3_query__.v::text as "0",
@@ -109,13 +71,7 @@ lateral (
 ) as __add_3_query_result__;
 
 select __add_4_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_4_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_4_query_identifiers__,
 lateral (
   select
     __add_4_query__.v::text as "0",
@@ -127,13 +83,7 @@ lateral (
 ) as __add_4_query_result__;
 
 select __optional_missing_middle_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __optional_missing_middle_1_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __optional_missing_middle_1_identifiers__,
 lateral (
   select
     __optional_missing_middle_1__.v::text as "0",
@@ -145,14 +95,7 @@ lateral (
 ) as __optional_missing_middle_1_result__;
 
 select __optional_missing_middle_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __optional_missing_middle_1_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __optional_missing_middle_1_identifiers__,
 lateral (
   select
     __optional_missing_middle_1__.v::text as "0",
@@ -165,13 +108,7 @@ lateral (
 ) as __optional_missing_middle_1_result__;
 
 select __optional_missing_middle_2_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __optional_missing_middle_2_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __optional_missing_middle_2_identifiers__,
 lateral (
   select
     __optional_missing_middle_2__.v::text as "0",
@@ -183,13 +120,7 @@ lateral (
 ) as __optional_missing_middle_2_result__;
 
 select __optional_missing_middle_3_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __optional_missing_middle_3_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __optional_missing_middle_3_identifiers__,
 lateral (
   select
     __optional_missing_middle_3__.v::text as "0",
@@ -201,14 +132,7 @@ lateral (
 ) as __optional_missing_middle_3_result__;
 
 select __optional_missing_middle_4_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __optional_missing_middle_4_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __optional_missing_middle_4_identifiers__,
 lateral (
   select
     __optional_missing_middle_4__.v::text as "0",
@@ -221,14 +145,7 @@ lateral (
 ) as __optional_missing_middle_4_result__;
 
 select __optional_missing_middle_5_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __optional_missing_middle_5_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __optional_missing_middle_5_identifiers__,
 lateral (
   select
     __optional_missing_middle_5__.v::text as "0",
@@ -241,17 +158,7 @@ lateral (
 ) as __optional_missing_middle_5_result__;
 
 select __types_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int8" as "id0",
-    (ids.value->>1)::"bool" as "id1",
-    (ids.value->>2)::"varchar" as "id2",
-    (ids.value->>3)::"int4"[] as "id3",
-    (ids.value->>4)::"json" as "id4",
-    (ids.value->>5)::"c"."floatrange" as "id5"
-  from json_array_elements($1::json) with ordinality as ids
-) as __types_query_identifiers__,
+from (select 0 as idx, $1::"int8" as "id0", $2::"bool" as "id1", $3::"varchar" as "id2", $4::"int4"[] as "id3", $5::"json" as "id4", $6::"c"."floatrange" as "id5") as __types_query_identifiers__,
 lateral (
   select
     __types_query__.v::text as "0",
@@ -267,17 +174,7 @@ lateral (
 ) as __types_query_result__;
 
 select __types_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int8" as "id0",
-    (ids.value->>1)::"bool" as "id1",
-    (ids.value->>2)::"varchar" as "id2",
-    (ids.value->>3)::"int4"[] as "id3",
-    (ids.value->>4)::"json" as "id4",
-    (ids.value->>5)::"c"."floatrange" as "id5"
-  from json_array_elements($1::json) with ordinality as ids
-) as __types_query_identifiers__,
+from (select 0 as idx, $1::"int8" as "id0", $2::"bool" as "id1", $3::"varchar" as "id2", $4::"int4"[] as "id3", $5::"json" as "id4", $6::"c"."floatrange" as "id5") as __types_query_identifiers__,
 lateral (
   select
     __types_query__.v::text as "0",
@@ -293,12 +190,7 @@ lateral (
 ) as __types_query_result__;
 
 select __compound_type_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_query_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __compound_type_query_identifiers__,
 lateral (
   select
     __compound_type_query__."a"::text as "0",
@@ -315,12 +207,7 @@ lateral (
 ) as __compound_type_query_result__;
 
 select __compound_type_array_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_array_query_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __compound_type_array_query_identifiers__,
 lateral (
   select
     __compound_type_array_query__."a"::text as "0",
@@ -337,12 +224,7 @@ lateral (
 ) as __compound_type_array_query_result__;
 
 select __table_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __table_query_identifiers__,
 lateral (
   select
     __table_query__."id"::text as "0",
@@ -357,12 +239,7 @@ select
 from "c"."no_args_query"() as __no_args_query__(v);
 
 select __query_compound_type_array_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __query_compound_type_array_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __query_compound_type_array_identifiers__,
 lateral (
   select
     __query_compound_type_array__."a"::text as "0",
@@ -416,12 +293,7 @@ from "c"."table_set_query"() as __table_set_query__
 order by __table_set_query__."person_full_name" asc;
 
 select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"varchar" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
+from (select 0 as idx, $1::"varchar" as "id0") as __table_set_query_identifiers__,
 lateral (
   select
     (row_number() over (partition by 1))::text as "0",
@@ -435,13 +307,7 @@ lateral (
 ) as __table_set_query_result__;
 
 select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __table_set_query_identifiers__,
 lateral (
   select
     (row_number() over (partition by 1))::text as "0",
@@ -454,13 +320,7 @@ lateral (
 ) as __table_set_query_result__;
 
 select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __table_set_query_identifiers__,
 lateral (
   select
     (row_number() over (partition by 1))::text as "0",
@@ -473,13 +333,7 @@ lateral (
 ) as __table_set_query_result__;
 
 select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __table_set_query_identifiers__,
 lateral (
   select
     (row_number() over (partition by 1))::text as "0",
@@ -492,13 +346,7 @@ lateral (
 ) as __table_set_query_result__;
 
 select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __table_set_query_identifiers__,
 lateral (
   select
     (row_number() over (partition by 1))::text as "0",
@@ -543,13 +391,7 @@ limit 7
 offset 0;
 
 select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __table_set_query_identifiers__,
 lateral (
   select
     (row_number() over (partition by 1))::text as "0",
@@ -562,13 +404,7 @@ lateral (
 ) as __table_set_query_result__;
 
 select __table_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __table_set_query_identifiers__,
 lateral (
   select
     (row_number() over (partition by 1))::text as "0",
@@ -588,13 +424,7 @@ from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
 limit 3;
 
 select __table_set_query_plpgsql_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_set_query_plpgsql_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __table_set_query_plpgsql_identifiers__,
 lateral (
   select
     (row_number() over (partition by 1))::text as "0",
@@ -607,14 +437,7 @@ lateral (
 ) as __table_set_query_plpgsql_result__;
 
 select __int_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __int_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __int_set_query_identifiers__,
 lateral (
   select
     __int_set_query__.v::text as "0",
@@ -628,14 +451,7 @@ lateral (
 ) as __int_set_query_result__;
 
 select __int_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __int_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __int_set_query_identifiers__,
 lateral (
   select
     (count(*))::text as "0",

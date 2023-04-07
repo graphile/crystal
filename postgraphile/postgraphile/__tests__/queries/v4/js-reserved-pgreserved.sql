@@ -7,12 +7,7 @@ from "js_reserved"."reserved" as __reserved__
 order by __reserved__."id" asc;
 
 select __reserved_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __reserved_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __reserved_identifiers__,
 lateral (
   select
     __reserved__."do" as "0",
@@ -27,12 +22,7 @@ lateral (
 ) as __reserved_result__;
 
 select __reserved_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __reserved_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __reserved_identifiers__,
 lateral (
   select
     __reserved__."case" as "0",
@@ -47,12 +37,7 @@ lateral (
 ) as __reserved_result__;
 
 select __reserved_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __reserved_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __reserved_identifiers__,
 lateral (
   select
     __reserved__."case" as "0",
@@ -68,12 +53,7 @@ lateral (
 ) as __reserved_result__;
 
 select __reserved_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __reserved_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __reserved_identifiers__,
 lateral (
   select
     __reserved__."case" as "0",

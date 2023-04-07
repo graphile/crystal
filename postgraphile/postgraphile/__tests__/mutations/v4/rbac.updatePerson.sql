@@ -17,12 +17,7 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select __frmcdc_wrapped_url_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."wrapped_url" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_wrapped_url_1_identifiers__,
+from (select 0 as idx, $1::"b"."wrapped_url" as "id0") as __frmcdc_wrapped_url_1_identifiers__,
 lateral (
   select
     __frmcdc_wrapped_url_1__."url" as "0",
