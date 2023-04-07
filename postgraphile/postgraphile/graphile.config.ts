@@ -107,6 +107,8 @@ const preset: GraphileConfig.Preset = {
       simpleCollections: "both",
       jwtPgTypeIdentifier: '"b"."jwt_token"',
       dynamicJson: true,
+      graphiql: true,
+      graphiqlRoute: "/",
     }),
   ],
   inflection: {},
