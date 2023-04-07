@@ -391,13 +391,6 @@ export class PgSelectStep<
   private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
   /**
-   * If this plan has queryValues, we must feed the queryValues into the placeholders to
-   * feed into the SQL statement after compiling the query; we'll use this
-   * symbol as the placeholder to replace.
-   */
-  private queryValuesSymbol: symbol;
-
-  /**
    * Values used in this plan.
    */
   private placeholders: Array<PgSelectPlaceholder>;
@@ -563,9 +556,6 @@ export class PgSelectStep<
       : this.addDependency(this.resource.executor.context());
 
     this.name = customName ?? resource.name;
-    this.queryValuesSymbol = cloneFrom
-      ? cloneFrom.queryValuesSymbol
-      : Symbol(this.name + "_identifier_values");
     this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(this.name);
     this._symbolSubstitutes = cloneFrom
       ? new Map(cloneFrom._symbolSubstitutes)
@@ -1262,7 +1252,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         textForSingle,
         rawSqlValues,
         identifierIndex,
-        queryValuesSymbol: this.queryValuesSymbol,
         name,
         eventEmitter,
         useTransaction: this.mode === "mutation",
@@ -1350,7 +1339,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
               text,
               rawSqlValues,
               identifierIndex,
-              queryValuesSymbol: this.queryValuesSymbol,
               eventEmitter,
             },
           )
@@ -1376,7 +1364,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           text: textForDeclare,
           rawSqlValues: rawSqlValuesForDeclare,
           identifierIndex,
-          queryValuesSymbol: this.queryValuesSymbol,
           eventEmitter,
         },
       )
@@ -1884,9 +1871,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.locker.locked = false;
 
     if (!this.isFinalized) {
-      const identifiersAlias = sql.identifier(
-        Symbol(this.name + "_identifiers"),
-      );
+      const identifiersSymbol = Symbol(this.name + "_identifiers");
+      const identifiersAlias = sql.identifier(identifiersSymbol);
 
       this.placeholders.forEach((placeholder) => {
         // NOTE: we're NOT adding to `this.identifierMatches`.
@@ -1999,13 +1985,23 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           // `inner join` in a flattened query instead of a wrapped query with
           // `lateral`?
 
-          const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
+          const wrapperSymbol = Symbol(this.name + "_result");
+          const wrapperAlias = sql.identifier(wrapperSymbol);
 
-          const placeholder = sql`${sql.value(
-            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-            // a value before executing the query.
-            this.queryValuesSymbol as any,
-          )}::json`;
+          const {
+            text: lateralText,
+            values: rawSqlValues,
+            symbolToIdentifier,
+          } = sql.compile(
+            sql`lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`,
+            options,
+          );
+
+          const identifiersAliasText =
+            symbolToIdentifier.get(identifiersSymbol);
+          const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
+
+          let lastPlaceholder = rawSqlValues.length;
 
           /*
            * IMPORTANT: these wrapper queries are necessary so that queries
@@ -2013,49 +2009,36 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
            * identifier group_; that's why this cannot just be another "from"
            * clause.
            */
-          const query = sql`select ${wrapperAlias}.*
-from (${sql`\
-select\n${sql`\
-ids.ordinality - 1 as idx,
-${sql.join(
-  this.queryValues.map(({ codec }, idx) => {
-    return sql`(ids.value->>${sql.literal(idx)})::${
-      codec.sqlType
-    } as ${sql.identifier(`id${idx}`)}`;
-  }),
-  ",\n",
-)}`}
-from json_array_elements(${placeholder}) with ordinality as ids`}) as ${identifiersAlias},
-lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
+          const text = `\
+select ${wrapperAliasText}.*
+from (select ids.ordinality - 1 as idx, ${this.queryValues
+            .map(({ codec }, idx) => {
+              return `(ids.value->>${idx})::${
+                sql.compile(codec.sqlType).text
+              } as "id${idx}"`;
+            })
+            .join(
+              ", ",
+            )} from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
+${lateralText};`;
+
+          lastPlaceholder = rawSqlValues.length;
           /**
            * This is an optimized query to use when there's only one value to
            * feed in, PostgreSQL seems to be able to execute queries using this
            * _significantly_ faster (up to 3x or 200ms faster).
            */
-          const queryForSingle = sql`select ${wrapperAlias}.*
-from (${sql`\
-select\n${sql.indent`\
-0 as idx,
-${sql.join(
-  this.queryValues.map(({ codec }, idx) => {
-    return sql`((${placeholder})->>${sql.literal(idx)})::${
-      codec.sqlType
-    } as ${sql.identifier(`id${idx}`)}`;
-  }),
-  ",\n",
-)}`}
-`}) as ${identifiersAlias},
-lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
-          const { text, values: rawSqlValues } = sql.compile(query, options);
-          const forSingle = sql.compile(queryForSingle, options);
-          let textForSingle: string | undefined = forSingle.text;
-          const rawSqlValuesForSingle = forSingle.values;
-          if (!arraysMatch(rawSqlValues, rawSqlValuesForSingle)) {
-            console.error(
-              `GrafastInternalError<399cca46-2194-460e-a1bb-6275a88cecaa>: the generated rawSqlValues didn't match between text and textForSingle. We're turning off the textForSingle optimization, so this shouldn't cause any major issues for your app. Please report this bug with details of how to reproduce!`,
-            );
-            textForSingle = undefined;
-          }
+          const textForSingle = `\
+select ${wrapperAliasText}.*
+from (select 0 as idx, ${this.queryValues
+            .map(({ codec }, idx) => {
+              return `$${++lastPlaceholder}::${
+                sql.compile(codec.sqlType).text
+              } as "id${idx}"`;
+            })
+            .join(", ")}) as ${identifiersAliasText},
+${lateralText};`;
+
           return { text, textForSingle, rawSqlValues, identifierIndex };
         } else if (
           (limit != null && limit >= 0) ||

@@ -339,6 +339,7 @@ export function compile(
 ): {
   text: string;
   values: SQLRawValue[];
+  symbolToIdentifier: Map<symbol, string>;
 } {
   const placeholderValues = options?.placeholderValues;
   /**
@@ -512,6 +513,7 @@ export function compile(
   return {
     text,
     values,
+    symbolToIdentifier,
   };
 }
 
