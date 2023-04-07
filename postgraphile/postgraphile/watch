@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-export GRAPHILE_ENV=development
-export NODE_ENV=development
+export GRAPHILE_ENV="${GRAPHILE_ENV:-development}"
+export NODE_ENV="${NODE_ENV:-development}"
 export DEBUG="${DEBUG:-graphile-build:warn}"
 
 yarn nodemon \
@@ -10,4 +10,5 @@ yarn nodemon \
   --watch "../../postgraphile/*/dist/**/*" \
   --watch "../../utils/*/dist/**/*" \
   --watch "../../grafast/ruru/bundle/**/*" \
-  -x "node --enable-source-maps dist/cli-run.js -e --watch $*"
+  --watch "../../contrib/*/dist/**/*" \
+  -x "node --enable-source-maps dist/cli-run.js --watch $*"
