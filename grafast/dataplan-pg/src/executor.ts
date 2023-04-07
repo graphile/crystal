@@ -428,19 +428,24 @@ ${duration}
 
             if (remaining.length) {
               const singleMode =
-                remaining.length === 1 && common.textForSingle != null;
+                identifierIndex != null &&
+                remaining.length === 1 &&
+                common.textForSingle != null;
               const text =
                 singleMode && common.textForSingle
                   ? common.textForSingle
                   : common.text;
 
-              const sqlValues = singleMode
-                ? [...rawSqlValues, ...JSON.parse(remaining[0])]
-                : [
-                    ...rawSqlValues,
-                    // Manual JSON-ing
-                    "[" + remaining.join(",") + "]",
-                  ];
+              const sqlValues =
+                identifierIndex == null
+                  ? rawSqlValues
+                  : singleMode
+                  ? [...rawSqlValues, ...JSON.parse(remaining[0])]
+                  : [
+                      ...rawSqlValues,
+                      // Manual JSON-ing
+                      "[" + remaining.join(",") + "]",
+                    ];
 
               // PERF: we could probably make this more efficient by grouping the
               // deferreds further, DataLoader-style, and running one SQL query for
