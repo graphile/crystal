@@ -29,6 +29,7 @@ let cursorCount = 0;
 
 const debug = debugFactory("datasource:pg:PgExecutor");
 const debugVerbose = debug.extend("verbose");
+const debugExplain = debug.extend("explain");
 
 type ExecuteFunction = <TData>(
   text: string,
@@ -166,7 +167,7 @@ export class PgExecutor<TSettings = any> {
     } catch (e) {
       error = e;
     }
-    if (debugVerbose.enabled) {
+    if (debugVerbose.enabled || debugExplain.enabled) {
       const end = process.hrtime.bigint();
       const duration = (Number((end - start) / 10000n) / 100).toFixed(2) + "ms";
       const rows = queryResult?.rows;
@@ -188,7 +189,7 @@ export class PgExecutor<TSettings = any> {
               .join("\n  ") +
             "\n]"
           : inspect(queryResult?.rows, { colors: true, depth: 6 });
-      debugVerbose(
+      (debugVerbose.enabled ? debugVerbose : debugExplain)(
         `\
 
 
@@ -221,6 +222,22 @@ ${duration}
         error ? error : rowResults,
         LOOK_UP,
       );
+
+      if (debugExplain.enabled && /^\s*select/i.test(text)) {
+        const explainResult = await client.query<{ 0: string }>({
+          text: `EXPLAIN ANALYZE ${text}`,
+          values: values as SQLRawValue[],
+          arrayMode: true,
+        });
+        debugExplain(
+          `\
+# EXPLAIN:%s`,
+          "\n" +
+            explainResult.rows
+              .map((r) => r[(Object.keys(r) as ["0"])[0]])
+              .join("\n"),
+        );
+      }
     }
     if (error) {
       throw error;
