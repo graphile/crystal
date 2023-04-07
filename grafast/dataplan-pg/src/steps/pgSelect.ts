@@ -1918,9 +1918,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       const makeQuery = ({
         limit,
         offset,
-      }: { limit?: number; offset?: number } = {}): {
-        query: SQL;
-        queryForSingle?: SQL;
+        options,
+      }: {
+        limit?: number;
+        offset?: number;
+        options?: Parameters<typeof sql.compile>[1];
+      } = {}): {
+        text: string;
+        rawSqlValues: SQLRawValue[];
+        textForSingle?: string;
         identifierIndex: number | null;
       } => {
         const forceOrder = this.streamOptions && this.shouldReverseOrder();
@@ -2040,7 +2046,17 @@ ${sql.join(
 )}`}
 `}) as ${identifiersAlias},
 lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
-          return { query, queryForSingle, identifierIndex };
+          const { text, values: rawSqlValues } = sql.compile(query, options);
+          const forSingle = sql.compile(queryForSingle, options);
+          let textForSingle: string | undefined = forSingle.text;
+          const rawSqlValuesForSingle = forSingle.values;
+          if (!arraysMatch(rawSqlValues, rawSqlValuesForSingle)) {
+            console.error(
+              `GrafastInternalError<399cca46-2194-460e-a1bb-6275a88cecaa>: the generated rawSqlValues didn't match between text and textForSingle. We're turning off the textForSingle optimization, so this shouldn't cause any major issues for your app. Please report this bug with details of how to reproduce!`,
+            );
+            textForSingle = undefined;
+          }
+          return { text, textForSingle, rawSqlValues, identifierIndex };
         } else if (
           (limit != null && limit >= 0) ||
           (offset != null && offset > 0)
@@ -2094,10 +2110,18 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
                     : sql.blank
                 };`
               : sql`${baseQuery};`;
-          return { query: wrappedInnerQuery, identifierIndex: null };
+          const { text, values: rawSqlValues } = sql.compile(
+            wrappedInnerQuery,
+            options,
+          );
+          return { text, rawSqlValues, identifierIndex: null };
         } else {
           const { sql: query } = this.buildQuery();
-          return { query: sql`${query};`, identifierIndex: null };
+          const { text, values: rawSqlValues } = sql.compile(
+            sql`${query};`,
+            options,
+          );
+          return { text, rawSqlValues, identifierIndex: null };
         }
       };
 
@@ -2113,29 +2137,27 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
            * remaining results across all groups.
            */
           const {
-            query: initialFetchQuery,
+            text,
+            rawSqlValues,
             identifierIndex: initialFetchIdentifierIndex,
           } = makeQuery({
             limit: this.streamOptions.initialCount,
+            options: { placeholderValues: this.placeholderValues },
           });
-          const { query: streamQuery, identifierIndex: streamIdentifierIndex } =
-            makeQuery({
-              offset: this.streamOptions.initialCount,
-            });
+          const {
+            text: textForDeclare,
+            rawSqlValues: rawSqlValuesForDeclare,
+            identifierIndex: streamIdentifierIndex,
+          } = makeQuery({
+            offset: this.streamOptions.initialCount,
+            options: { placeholderValues: this.placeholderValues },
+          });
           if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
             throw new Error(
               `GrafastInternalError<3760b02e-dfd0-4924-bf62-2e0ef9399605>: expected identifier indexes to match`,
             );
           }
           const identifierIndex = initialFetchIdentifierIndex;
-          const { text, values: rawSqlValues } = sql.compile(
-            initialFetchQuery,
-            { placeholderValues: this.placeholderValues },
-          );
-          const { text: textForDeclare, values: rawSqlValuesForDeclare } =
-            sql.compile(streamQuery, {
-              placeholderValues: this.placeholderValues,
-            });
           this.finalizeResults = {
             text,
             rawSqlValues,
@@ -2151,14 +2173,16 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
            * we can skip the `initialFetchQuery` and jump straight to the
            * `streamQuery`.
            */
-          const { query: streamQuery, identifierIndex: streamIdentifierIndex } =
-            makeQuery({
-              offset: 0,
-            });
-          const { text: textForDeclare, values: rawSqlValuesForDeclare } =
-            sql.compile(streamQuery, {
+          const {
+            text: textForDeclare,
+            rawSqlValues: rawSqlValuesForDeclare,
+            identifierIndex: streamIdentifierIndex,
+          } = makeQuery({
+            offset: 0,
+            options: {
               placeholderValues: this.placeholderValues,
-            });
+            },
+          });
           this.finalizeResults = {
             // This is a hack since this is the _only_ place we don't want
             // `text`; loosening the types would risk us forgetting in more
@@ -2174,30 +2198,20 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           };
         }
       } else {
-        const { query, queryForSingle, identifierIndex } = makeQuery();
-        const { text, values: rawSqlValues } = sql.compile(query, {
-          placeholderValues: this.placeholderValues,
-        });
+        const { text, rawSqlValues, textForSingle, identifierIndex } =
+          makeQuery({
+            options: {
+              placeholderValues: this.placeholderValues,
+            },
+          });
         this.finalizeResults = {
           text,
+          textForSingle,
           rawSqlValues,
           identifierIndex,
           shouldReverseOrder: this.shouldReverseOrder(),
           name: hash(text),
         };
-        if (queryForSingle) {
-          const { text: textForSingle, values: rawSqlValuesForSingle } =
-            sql.compile(queryForSingle, {
-              placeholderValues: this.placeholderValues,
-            });
-          this.finalizeResults.textForSingle = textForSingle;
-          if (!arraysMatch(rawSqlValues, rawSqlValuesForSingle)) {
-            console.error(
-              `GrafastInternalError<399cca46-2194-460e-a1bb-6275a88cecaa>: the generated rawSqlValues didn't match between text and textForSingle. We're turning off the textForSingle optimization, so this shouldn't cause any major issues for your app. Please report this bug with details of how to reproduce!`,
-            );
-            this.finalizeResults.textForSingle = undefined;
-          }
-        }
       }
     }
 
