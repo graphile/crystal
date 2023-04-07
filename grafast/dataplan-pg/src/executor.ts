@@ -96,6 +96,7 @@ export type PgExecutorInput<TInput> = {
 
 export type PgExecutorOptions = {
   text: string;
+  textForSingle?: string;
   rawSqlValues: Array<SQLRawValue | symbol>;
   identifierIndex?: number | null;
   queryValuesSymbol?: symbol | null;
@@ -417,6 +418,13 @@ ${duration}
             }
 
             if (remaining.length) {
+              const singleMode =
+                remaining.length === 1 && common.textForSingle != null;
+              const text =
+                singleMode && common.textForSingle
+                  ? common.textForSingle
+                  : common.text;
+
               let found = false;
               const sqlValues = rawSqlValues.map((v) => {
                 // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
@@ -427,6 +435,7 @@ ${duration}
                   (v as any) === queryValuesSymbol
                 ) {
                   found = true;
+                  if (singleMode) return remaining[0];
                   // Manual JSON-ing
                   return "[" + remaining.join(",") + "]";
                 } else if (typeof v === "symbol") {

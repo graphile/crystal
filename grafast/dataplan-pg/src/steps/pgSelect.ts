@@ -461,6 +461,8 @@ export class PgSelectStep<
   private finalizeResults: {
     // The SQL query text
     text: string;
+    // An optimized SQL query to use when there's only one input
+    textForSingle?: string;
 
     // The values to feed into the query
     rawSqlValues: SQLRawValue[];
@@ -1232,8 +1234,14 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     if (this.isNullFetch()) {
       return arrayOfLength(count, Object.freeze([]));
     }
-    const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
-      this.finalizeResults;
+    const {
+      text,
+      textForSingle,
+      rawSqlValues,
+      identifierIndex,
+      shouldReverseOrder,
+      name,
+    } = this.finalizeResults;
 
     const executionResult = await this.resource.executeWithCache(
       values[this.contextId].map((context, i) => {
@@ -1251,6 +1259,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       }),
       {
         text,
+        textForSingle,
         rawSqlValues,
         identifierIndex,
         queryValuesSymbol: this.queryValuesSymbol,
@@ -1911,6 +1920,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         offset,
       }: { limit?: number; offset?: number } = {}): {
         query: SQL;
+        queryForSingle?: SQL;
         identifierIndex: number | null;
       } => {
         const forceOrder = this.streamOptions && this.shouldReverseOrder();
@@ -1984,14 +1994,22 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           // `lateral`?
 
           const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
+
+          const placeholder = sql`${sql.value(
+            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+            // a value before executing the query.
+            this.queryValuesSymbol as any,
+          )}::json`;
+
           /*
-           * IMPORTANT: this wrapper query is necessary so that queries that
-           * have a limit/offset get the limit/offset applied _per identifier
-           * group_; that's why this cannot just be another "from" clause.
+           * IMPORTANT: these wrapper queries are necessary so that queries
+           * that have a limit/offset get the limit/offset applied _per
+           * identifier group_; that's why this cannot just be another "from"
+           * clause.
            */
           const query = sql`select ${wrapperAlias}.*
-from (${sql.indent(sql`\
-select\n${sql.indent(sql`\
+from (${sql`\
+select\n${sql`\
 ids.ordinality - 1 as idx,
 ${sql.join(
   this.queryValues.map(({ codec }, idx) => {
@@ -2000,14 +2018,29 @@ ${sql.join(
     } as ${sql.identifier(`id${idx}`)}`;
   }),
   ",\n",
-)}`)}
-from json_array_elements(${sql.value(
-            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-            // a value before executing the query.
-            this.queryValuesSymbol as any,
-          )}::json) with ordinality as ids`)}) as ${identifiersAlias},
+)}`}
+from json_array_elements(${placeholder}) with ordinality as ids`}) as ${identifiersAlias},
 lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
-          return { query, identifierIndex };
+          /**
+           * This is an optimized query to use when there's only one value to
+           * feed in, PostgreSQL seems to be able to execute queries using this
+           * _significantly_ faster (up to 3x or 200ms faster).
+           */
+          const queryForSingle = sql`select ${wrapperAlias}.*
+from (${sql`\
+select\n${sql.indent`\
+0 as idx,
+${sql.join(
+  this.queryValues.map(({ codec }, idx) => {
+    return sql`((${placeholder})->>${sql.literal(idx)})::${
+      codec.sqlType
+    } as ${sql.identifier(`id${idx}`)}`;
+  }),
+  ",\n",
+)}`}
+`}) as ${identifiersAlias},
+lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
+          return { query, queryForSingle, identifierIndex };
         } else if (
           (limit != null && limit >= 0) ||
           (offset != null && offset > 0)
@@ -2069,6 +2102,8 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
       };
 
       if (this.streamOptions) {
+        // TODO: should use the queryForSingle optimization in here too
+
         // When streaming we can't reverse order in JS - we must do it in the DB.
         if (this.streamOptions.initialCount > 0) {
           /*
@@ -2139,7 +2174,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           };
         }
       } else {
-        const { query, identifierIndex } = makeQuery();
+        const { query, queryForSingle, identifierIndex } = makeQuery();
         const { text, values: rawSqlValues } = sql.compile(query, {
           placeholderValues: this.placeholderValues,
         });
@@ -2147,10 +2182,22 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           text,
           rawSqlValues,
           identifierIndex,
-          // FIXME: when streaming we must not set this to true
           shouldReverseOrder: this.shouldReverseOrder(),
           name: hash(text),
         };
+        if (queryForSingle) {
+          const { text: textForSingle, values: rawSqlValuesForSingle } =
+            sql.compile(queryForSingle, {
+              placeholderValues: this.placeholderValues,
+            });
+          this.finalizeResults.textForSingle = textForSingle;
+          if (!arraysMatch(rawSqlValues, rawSqlValuesForSingle)) {
+            console.error(
+              `GrafastInternalError<399cca46-2194-460e-a1bb-6275a88cecaa>: the generated rawSqlValues didn't match between text and textForSingle. We're turning off the textForSingle optimization, so this shouldn't cause any major issues for your app. Please report this bug with details of how to reproduce!`,
+            );
+            this.finalizeResults.textForSingle = undefined;
+          }
+        }
       }
     }
 
