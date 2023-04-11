@@ -1273,7 +1273,7 @@ function addRelations(
     }
     let fields = memo;
     const defaultBehavior = isUnique
-      ? "single -singularRelation:source:list -singularRelation:source:connection"
+      ? "single -singularRelation:resource:list -singularRelation:resource:connection"
       : simpleCollections === "both"
       ? "connection list"
       : simpleCollections === "only"
@@ -1284,7 +1284,7 @@ function addRelations(
       isUnique &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:source:single`,
+        `${relationTypeScope}:resource:single`,
         defaultBehavior,
       )
     ) {
@@ -1295,7 +1295,7 @@ function addRelations(
           [fieldName]: fieldWithHooks(
             {
               fieldName,
-              fieldBehaviorScope: `${relationTypeScope}:source:single`,
+              fieldBehaviorScope: `${relationTypeScope}:resource:single`,
               isPgSingleRelationField: true,
               behavior,
               pgRelationDetails,
@@ -1320,7 +1320,7 @@ function addRelations(
       isReferencee &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:source:connection`,
+        `${relationTypeScope}:resource:connection`,
         defaultBehavior,
       )
     ) {
@@ -1333,7 +1333,7 @@ function addRelations(
             [fieldName]: fieldWithHooks(
               {
                 fieldName,
-                fieldBehaviorScope: `${relationTypeScope}:source:connection`,
+                fieldBehaviorScope: `${relationTypeScope}:resource:connection`,
                 // TODO: rename to pgFieldSource?
                 pgResource,
                 pgFieldCodec,
@@ -1367,7 +1367,7 @@ function addRelations(
       isReferencee &&
       build.behavior.matches(
         behavior,
-        `${relationTypeScope}:source:list`,
+        `${relationTypeScope}:resource:list`,
         defaultBehavior,
       )
     ) {
@@ -1378,7 +1378,7 @@ function addRelations(
           [fieldName]: fieldWithHooks(
             {
               fieldName,
-              fieldBehaviorScope: `${relationTypeScope}:source:list`,
+              fieldBehaviorScope: `${relationTypeScope}:resource:list`,
               pgResource,
               pgFieldCodec,
               isPgFieldSimpleCollection: true,

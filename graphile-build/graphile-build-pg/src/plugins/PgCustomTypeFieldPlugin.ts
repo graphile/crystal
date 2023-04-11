@@ -356,7 +356,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               if (!baseInputType) {
                 const hint =
                   variant === "input"
-                    ? ' (perhaps you used "-insert" behavior instead of "-source:insert")'
+                    ? ' (perhaps you used "-insert" behavior instead of "-resource:insert")'
                     : "";
                 // TODO: convert this to a diagnostic
                 throw new Error(
@@ -1062,8 +1062,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 ]);
 
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
-                const connectionFieldBehaviorScope = `${baseScope}:source:connection`;
-                const listFieldBehaviorScope = `${baseScope}:source:list`;
+                const connectionFieldBehaviorScope = `${baseScope}:resource:connection`;
+                const listFieldBehaviorScope = `${baseScope}:resource:list`;
                 if (
                   canUseConnection &&
                   build.behavior.matches(

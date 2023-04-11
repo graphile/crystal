@@ -52,7 +52,7 @@ export class Behavior {
 }
 
 /**
- * Parses a scope like `query:source:connection:filter` into it's constituent parts.
+ * Parses a scope like `query:resource:connection:filter` into it's constituent parts.
  *
  * @internal
  */
@@ -91,7 +91,7 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
  * `filterScope` can be matched by `specifiedScope` in a positive fashion.
  *
  * @param specifiedScope - the scope the user entered, e.g. from `+query:*:filter`
- * @param filterScope - the scope the plugin says we're in, e.g. from `query:source:connection:filter`
+ * @param filterScope - the scope the plugin says we're in, e.g. from `query:resource:connection:filter`
  *
  * @internal
  */

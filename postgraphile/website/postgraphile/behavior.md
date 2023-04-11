@@ -107,8 +107,8 @@ against it. But for now, this list will have to suffice.
 :::note
 
 Scopes are least specific on the right (broad operations like `select` or
-`update`) and narrow more as prefixes are added to the left (`source:update`
-is narrower than `update`; `constraint:source:update` is narrower still).
+`update`) and narrow more as prefixes are added to the left (`resource:update`
+is narrower than `update`; `constraint:resource:update` is narrower still).
 
 :::
 
@@ -119,14 +119,14 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   mean you can do `select * from users` but it might mean that it's possible to
   see details about a `users` when it's returned by a function or similar. (In
   this case the `codec` has `select` but the `source` has `-select`.)
-- `source:select` - can select rows from this source
-- `source:insert` - can insert into this source
-- `source:update` - can update a record in this source
-- `source:delete` - can delete a record in this source
-- `source:list` - "list" field for a source at any level
-- `source:connection` - "connection" field for a source at any level
-- `constraint:source:update` - can update a record by this constraint
-- `constraint:source:delete` - can delete a record by this constraint
+- `resource:select` - can select rows from this source
+- `resource:insert` - can insert into this source
+- `resource:update` - can update a record in this source
+- `resource:delete` - can delete a record in this source
+- `resource:list` - "list" field for a source at any level
+- `resource:connection` - "connection" field for a source at any level
+- `constraint:resource:update` - can update a record by this constraint
+- `constraint:resource:delete` - can delete a record by this constraint
 - `attribute:select` - can this attribute be selected?
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
@@ -135,20 +135,20 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   specification
 - `list` - list (simple collection)
 - `connection` - connection (GraphQL Cursor Pagination Spec)
-- `query:source:list` - "list" field for a source at the root Query level
-- `query:source:connection` - "connection" field for a source at the root Query level
+- `query:resource:list` - "list" field for a source at the root Query level
+- `query:resource:connection` - "connection" field for a source at the root Query level
 - `queryField` - for procedures: should it become a field on the `Query` type?
 - `typeField` - for procedures: should it become a field on a non-operation
   type?
-- `queryField:source:connection` - should we represent this source with a connection on the `Query` type?
-- `queryField:source:list` - should we represent this source with a list on the `Query` type?
-- `typeField:source:connection` - should we represent this source with a connection on a non-operation type
-- `typeField:source:list` - should we represent this source with a list on a non-operation type
+- `queryField:resource:connection` - should we represent this source with a connection on the `Query` type?
+- `queryField:resource:list` - should we represent this source with a list on the `Query` type?
+- `typeField:resource:connection` - should we represent this source with a connection on a non-operation type
+- `typeField:resource:list` - should we represent this source with a list on a non-operation type
 - `mutationField` - for procedures: should it become a mutation (field on
   `Mutation`)?
 - `order` - can we sort this thing? (source)
-- `query:source:list:order`
-- `query:source:connection:order`
+- `query:resource:list:order`
+- `query:resource:connection:order`
 - `orderBy` - can we order by this thing (e.g. column)?
 - `orderBy:array` - can we order by this thing that's an array?
 - `orderBy:range` - can we order by this thing that's a range?
@@ -159,15 +159,15 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `proc:filterBy` - can we filter by this proc (source)
 - `attribute:filterBy` - can we filter by this attribute (column, property)
 - `single` - can we get just one?
-- `query:source:single` - can we get a single one of these (source) at the root?
-- `singularRelation:source:single` - can we get a single one of these (source) from a
+- `query:resource:single` - can we get a single one of these (source) at the root?
+- `singularRelation:resource:single` - can we get a single one of these (source) from a
   type?
-- `singularRelation:source:list` - should we add a list field to navigate this singular
+- `singularRelation:resource:list` - should we add a list field to navigate this singular
   relationship (when we know there can be at most one)?
-- `singularRelation:source:connection` - should we add a connection field to navigate
+- `singularRelation:resource:connection` - should we add a connection field to navigate
   this singular relationship (when we know there can be at most one)?
-- `manyRelation:source:list`
-- `manyRelation:source:connection`
+- `manyRelation:resource:list`
+- `manyRelation:resource:connection`
 - `jwt` - should the given codec behave as if it were a JWT?
 
 - `insert:input:record` - input to the 'insert' mutation
@@ -230,9 +230,9 @@ if (
 
 ## Future expansions
 
-Would be good to add additional data, e.g. `query:source:single[pk]`,
-`query:source:single[node]`, `query:single[unique]` could all be be added, and would
-allow you to set a rule like `-query:source:single +query:single[node]` to only allow
+Would be good to add additional data, e.g. `query:resource:single[pk]`,
+`query:resource:single[node]`, `query:single[unique]` could all be be added, and would
+allow you to set a rule like `-query:resource:single +query:single[node]` to only allow
 the node accessors.
 
 ## Behaviors to avoid

@@ -46,7 +46,7 @@ const isInsertable = (
     resource.codec.extensions,
     resource.extensions,
   ]);
-  return build.behavior.matches(behavior, "source:insert", "insert") === true;
+  return build.behavior.matches(behavior, "resource:insert", "insert") === true;
 };
 
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
@@ -256,7 +256,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                 [createFieldName]: fieldWithHooks(
                   {
                     fieldName: createFieldName,
-                    fieldBehaviorScope: "source:insert",
+                    fieldBehaviorScope: "resource:insert",
                   },
                   {
                     args: {

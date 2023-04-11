@@ -609,14 +609,14 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             const tableTypeName = inflection.tableType(codec);
             const behavior = getBehavior(codec.extensions);
             const defaultBehavior = [
-              "source:select",
+              "resource:select",
               "table",
-              ...(!codec.isAnonymous ? ["source:insert", "source:update"] : []),
+              ...(!codec.isAnonymous ? ["resource:insert", "resource:update"] : []),
               ...(simpleCollections === "both"
-                ? ["source:connection", "source:list"]
+                ? ["resource:connection", "resource:list"]
                 : simpleCollections === "only"
-                ? ["source:list"]
-                : ["source:connection"]),
+                ? ["resource:list"]
+                : ["resource:connection"]),
             ].join(" ");
 
             const isTable = build.behavior.matches(
@@ -630,7 +630,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
             const selectable = build.behavior.matches(
               behavior,
-              "source:select",
+              "resource:select",
               defaultBehavior,
             );
 
