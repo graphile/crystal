@@ -45,7 +45,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
         (val) => val.name.value === inputFieldName,
       );
       const step = inputPlan(
-        this.opPlan,
+        this.operationPlan,
         inputFieldType,
         seenTypes,
         inputFieldValue?.value,

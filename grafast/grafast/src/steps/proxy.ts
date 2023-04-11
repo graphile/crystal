@@ -22,7 +22,7 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
     this.addDependency($actualDep);
   }
   public toStringMeta(): string | null {
-    const $dep = this.opPlan.dangerouslyGetStep(this.$depId);
+    const $dep = this.operationPlan.dangerouslyGetStep(this.$depId);
     return $dep.toString();
   }
   // Publicly expose this

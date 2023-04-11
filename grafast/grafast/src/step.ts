@@ -118,8 +118,7 @@ export abstract class BaseStep {
    * @internal
    */
   public readonly layerPlan: LayerPlan;
-  /** @deprecated please use layerPlan.operationPlan instead */
-  public readonly opPlan: OperationPlan;
+  public readonly operationPlan: OperationPlan;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   public debug: boolean;
@@ -139,7 +138,7 @@ export abstract class BaseStep {
     this.hasSideEffects = false;
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
-    this.opPlan = layerPlan.operationPlan;
+    this.operationPlan = layerPlan.operationPlan;
   }
 
   public toString(): string {
@@ -361,7 +360,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       }
     }
 
-    return this.opPlan.stepTracker.addStepDependency(this, step);
+    return this.operationPlan.stepTracker.addStepDependency(this, step);
   }
 
   /**

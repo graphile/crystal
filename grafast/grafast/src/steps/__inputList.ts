@@ -47,7 +47,7 @@ export class __InputListStep extends ExecutableStep {
       ) {
         const inputValue = values[inputValueIndex];
         const innerPlan = inputPlan(
-          this.opPlan,
+          this.operationPlan,
           innerType,
           seenTypes,
           inputValue,

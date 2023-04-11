@@ -157,7 +157,7 @@ export class __ListTransformStep<
     );
     this.subroutineLayer.setRootStep(itemPlan);
 
-    this.opPlan.finishSubroutine(this, this.subroutineLayer);
+    this.operationPlan.finishSubroutine(this, this.subroutineLayer);
   }
 
   toStringMeta() {
@@ -211,7 +211,9 @@ export class __ListTransformStep<
     let size = 0;
 
     // TODO: do this better!
-    const itemStepId = this.opPlan.dangerouslyGetStep(this.itemStepId).id;
+    const itemStepId = this.operationPlan.dangerouslyGetStep(
+      this.itemStepId,
+    ).id;
     if (itemStepId == null) {
       throw new Error(
         "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",

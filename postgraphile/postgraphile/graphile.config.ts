@@ -11,6 +11,9 @@ import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
+import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
+import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 declare global {
@@ -110,6 +113,8 @@ const preset: GraphileConfig.Preset = {
       graphiql: true,
       graphiqlRoute: "/",
     }),
+    PgManyToManyPreset,
+    PostGraphileConnectionFilterPreset,
   ],
   inflection: {},
   gather: {},
