@@ -293,12 +293,12 @@ export class PgDeleteStep<
   public finalize(): void {
     if (!this.isFinalized) {
       this.locked = true;
-      const resourceSource = this.resource.source;
+      const resourceSource = this.resource.from;
       if (!sql.isSQL(resourceSource)) {
         throw new Error(
-          `Error in ${this}: can only delete into sources defined as SQL, however ${
+          `Error in ${this}: can only delete into resources defined as SQL, however ${
             this.resource
-          } has ${inspect(this.resource.source)}`,
+          } has ${inspect(this.resource.from)}`,
         );
       }
       const table = sql`${resourceSource} as ${this.alias}`;

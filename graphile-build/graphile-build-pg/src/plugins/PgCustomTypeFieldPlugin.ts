@@ -501,10 +501,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   })),
                   initialArgs.length,
                 );
-                if (typeof resource.source !== "function") {
+                if (typeof resource.from !== "function") {
                   throw new Error("!function");
                 }
-                const src = resource.source(...digests);
+                const src = resource.from(...digests);
                 return src;
               },
             };
@@ -922,7 +922,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         if (
                           resource.isUnique &&
                           !resource.codec.columns &&
-                          typeof resource.source === "function"
+                          typeof resource.from === "function"
                         ) {
                           // This is a scalar computed column, let's inline the expression
                           const placeholders = selectArgs.map((arg, i) => {
@@ -939,7 +939,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           return pgClassExpression(
                             $row,
                             resource.codec,
-                          )`${resource.source(
+                          )`${resource.from(
                             ...placeholders.map((placeholder) => ({
                               placeholder,
                             })),

@@ -736,7 +736,7 @@ export function makePgService(
   }
   const pgSubscriber =
     options.pgSubscriber ?? (pubsub ? new PgSubscriber(pool) : null);
-  const source: GraphileConfig.PgServiceConfiguration = {
+  const service: GraphileConfig.PgServiceConfiguration = {
     name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
     withPgClientKey: withPgClientKey as any,
@@ -751,5 +751,5 @@ export function makePgService(
       superuserConnectionString,
     },
   };
-  return source;
+  return service;
 }

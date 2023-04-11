@@ -187,7 +187,7 @@ export interface PgResourceOptions<
 
   name: TName;
   identifier?: string;
-  source: TParameters extends readonly PgResourceParameter[]
+  from: TParameters extends readonly PgResourceParameter[]
     ? (...args: PgSelectArgumentDigest[]) => SQL
     : SQL;
   uniques?: TUniques;
@@ -227,7 +227,7 @@ export interface PgFunctionResourceOptions<
 > {
   name: TNewName;
   identifier?: string;
-  source: (...args: PgSelectArgumentDigest[]) => SQL;
+  from: (...args: PgSelectArgumentDigest[]) => SQL;
   parameters: TNewParameters;
   returnsSetof: boolean;
   returnsArray: boolean;
@@ -269,7 +269,7 @@ export class PgResource<
   public readonly executor: PgExecutor;
   public readonly name: TName;
   public readonly identifier: string;
-  public readonly source: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
+  public readonly from: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
   private selectAuth?: (
     $step: PgSelectStep<PgResource<any, any, any, any, any>>,
@@ -336,7 +336,7 @@ export class PgResource<
     const resource = EXPORTABLE(
       (codec, executor, name, sql) => ({
         executor,
-        source: sql`(select 1/0 /* codec-only resource; should not select directly */)`,
+        from: sql`(select 1/0 /* codec-only resource; should not select directly */)`,
         codec,
         name,
         identifier: name,
@@ -350,7 +350,7 @@ export class PgResource<
   }
 
   /**
-   * @param source - the SQL for the `FROM` clause (without any
+   * @param from - the SQL for the `FROM` clause (without any
    * aliasing). If this is a subquery don't forget to wrap it in parens.
    * @param name - a nickname for this resource. Doesn't need to be unique
    * (but should be). Used for making the SQL query and debug messages easier
@@ -365,7 +365,7 @@ export class PgResource<
       executor,
       name,
       identifier,
-      source,
+      from,
       uniques,
       extensions,
       parameters,
@@ -383,7 +383,7 @@ export class PgResource<
     this.executor = executor;
     this.name = name;
     this.identifier = identifier ?? name;
-    this.source = source;
+    this.from = from;
     this.uniques = uniques ?? ([] as never);
     this.parameters = parameters as TParameters;
     this.description = description;
@@ -393,8 +393,8 @@ export class PgResource<
     this.isList = !!isList;
     this.isVirtual = isVirtual ?? false;
     this.selectAuth = selectAuth;
-    // parameters is null iff source is not a function
-    const sourceIsFunction = typeof this.source === "function";
+    // parameters is null iff from is not a function
+    const sourceIsFunction = typeof this.from === "function";
     if (this.parameters == null && sourceIsFunction) {
       throw new Error(
         `Resource ${this} is invalid - it's a function but without a parameters array. If the function accepts no parameters please pass an empty array.`,
@@ -436,19 +436,19 @@ export class PgResource<
     overrideOptions: {
       name: TNewName;
       identifier?: string;
-      source: SQL;
+      from: SQL;
       uniques?: TNewUniques;
       extensions?: PgResourceExtensions;
     },
   ): PgResourceOptions<TNewName, TCodec, TNewUniques, undefined> {
-    const { name, identifier, source, uniques, extensions } = overrideOptions;
+    const { name, identifier, from, uniques, extensions } = overrideOptions;
     const { codec, executor, selectAuth } = baseOptions;
     return {
       codec,
       executor,
       name,
       identifier,
-      source,
+      from,
       uniques,
       parameters: undefined,
       extensions,
@@ -482,7 +482,7 @@ export class PgResource<
     const {
       name,
       identifier,
-      source: fnSource,
+      from: fnFrom,
       parameters,
       returnsSetof,
       returnsArray,
@@ -499,7 +499,7 @@ export class PgResource<
         executor,
         name,
         identifier,
-        source: fnSource as any,
+        from: fnFrom as any,
         uniques,
         parameters,
         extensions,
@@ -510,18 +510,18 @@ export class PgResource<
       };
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
-      const source = EXPORTABLE(
-        (fnSource, sql) =>
+      const from = EXPORTABLE(
+        (fnFrom, sql) =>
           (...args: PgSelectArgumentDigest[]) =>
-            sql`unnest(${fnSource(...args)})`,
-        [fnSource, sql],
+            sql`unnest(${fnFrom(...args)})`,
+        [fnFrom, sql],
       );
       return {
         codec,
         executor,
         name,
         identifier,
-        source: source as any,
+        from: from as any,
         uniques,
         parameters,
         extensions,
@@ -535,20 +535,20 @@ export class PgResource<
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
       const sqlTmp = sql.identifier(Symbol(`${name}_tmp`));
       const sqlPartitionByIndex = sql.identifier(Symbol(`${name}_idx`));
-      const source = EXPORTABLE(
-        (fnSource, sql, sqlPartitionByIndex, sqlTmp) =>
+      const from = EXPORTABLE(
+        (fnFrom, sql, sqlPartitionByIndex, sqlTmp) =>
           (...args: PgSelectArgumentDigest[]) =>
-            sql`${fnSource(
+            sql`${fnFrom(
               ...args,
             )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`,
-        [fnSource, sql, sqlPartitionByIndex, sqlTmp],
+        [fnFrom, sql, sqlPartitionByIndex, sqlTmp],
       );
       return {
         codec,
         executor,
         name,
         identifier,
-        source: source as any,
+        from: from as any,
         uniques,
         parameters,
         extensions,

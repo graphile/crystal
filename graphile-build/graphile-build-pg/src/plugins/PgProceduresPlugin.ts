@@ -394,7 +394,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const namespaceName = namespace.nspname;
           const procName = pgProc.proname;
 
-          const sourceCallback = EXPORTABLE(
+          const fromCallback = EXPORTABLE(
             (namespaceName, procName, sql, sqlFromArgDigests) =>
               (...args: PgSelectArgumentDigest[]) =>
                 sql`${sql.identifier(
@@ -489,7 +489,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             const options: PgFunctionResourceOptions = {
               name,
               identifier,
-              source: sourceCallback,
+              from: fromCallback,
               parameters,
               returnsArray,
               returnsSetof,
@@ -527,7 +527,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               executor,
               name,
               identifier,
-              source: sourceCallback,
+              from: fromCallback,
               parameters,
               isUnique: !returnsSetof,
               codec: returnCodec,

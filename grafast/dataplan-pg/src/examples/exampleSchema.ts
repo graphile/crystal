@@ -271,7 +271,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: TYPES.int,
-        source: (...args) =>
+        from: (...args) =>
           sql`app_public.unique_author_count(${sqlFromArgDigests(args)})`,
         name: "unique_author_count",
         parameters: [
@@ -288,7 +288,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: listOfCodec(TYPES.text),
-        source: (...args) =>
+        from: (...args) =>
           sql`app_public.forum_names_array(${sqlFromArgDigests(args)})`,
         name: "forum_names_array",
         parameters: [],
@@ -299,7 +299,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: listOfCodec(TYPES.text),
-        source: (...args) =>
+        from: (...args) =>
           sql`app_public.forum_names_cases(${sqlFromArgDigests(args)})`,
         name: "forum_names_cases",
         parameters: [],
@@ -309,7 +309,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: TYPES.int,
-        source: (...args) =>
+        from: (...args) =>
           sql`app_public.forums_unique_author_count(${sqlFromArgDigests(
             args,
           )})`,
@@ -333,7 +333,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: TYPES.text,
-        source: sql`(select '')`,
+        from: sql`(select '')`,
         name: "text",
       });
 
@@ -341,7 +341,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: messagesCodec,
-        source: sql`app_public.messages`,
+        from: sql`app_public.messages`,
         name: "messages",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -350,7 +350,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: userCodec,
-        source: sql`app_public.users`,
+        from: sql`app_public.users`,
         name: "users",
         uniques: [
           { columns: ["id"], isPrimary: true },
@@ -362,7 +362,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: forumCodec,
-        source: sql`app_public.forums`,
+        from: sql`app_public.forums`,
         name: "forums",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -370,7 +370,7 @@ export function makeExampleSchema(
       const usersMostRecentForumResourceOptions =
         PgResource.functionResourceOptions(forumResourceOptions, {
           name: "users_most_recent_forum",
-          source: (...args) =>
+          from: (...args) =>
             sql`app_public.users_most_recent_forum(${sqlFromArgDigests(args)})`,
           returnsArray: false,
           returnsSetof: false,
@@ -387,7 +387,7 @@ export function makeExampleSchema(
       const featuredMessagesResourceOptions =
         PgResource.functionResourceOptions(messageResourceOptions, {
           name: "featured_messages",
-          source: (...args) =>
+          from: (...args) =>
             sql`app_public.featured_messages(${sqlFromArgDigests(args)})`,
           returnsSetof: true,
           returnsArray: false,
@@ -397,7 +397,7 @@ export function makeExampleSchema(
       const forumsFeaturedMessagesResourceOptions =
         PgResource.functionResourceOptions(messageResourceOptions, {
           name: "forums_featured_messages",
-          source: (...args) =>
+          from: (...args) =>
             sql`app_public.forums_featured_messages(${sqlFromArgDigests(
               args,
             )})`,
@@ -416,7 +416,7 @@ export function makeExampleSchema(
         userResourceOptions,
         {
           name: "random_user_array",
-          source: (...args) =>
+          from: (...args) =>
             sql`app_public.random_user_array(${sqlFromArgDigests(args)})`,
           returnsArray: true,
           returnsSetof: false,
@@ -427,7 +427,7 @@ export function makeExampleSchema(
       const randomUserArraySetResourceOptions =
         PgResource.functionResourceOptions(userResourceOptions, {
           name: "random_user_array_set",
-          source: (...args) =>
+          from: (...args) =>
             sql`app_public.random_user_array_set(${sqlFromArgDigests(args)})`,
           returnsSetof: true,
           returnsArray: true,
@@ -437,7 +437,7 @@ export function makeExampleSchema(
       const forumsMessagesListSetResourceOptions =
         PgResource.functionResourceOptions(messageResourceOptions, {
           name: "forums_messages_list_set",
-          source: (...args) =>
+          from: (...args) =>
             sql`app_public.forums_messages_list_set(${sqlFromArgDigests(
               args,
             )})`,
@@ -482,7 +482,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: personBookmarksCodec,
-        source: sql`interfaces_and_unions.person_bookmarks`,
+        from: sql`interfaces_and_unions.person_bookmarks`,
         name: "person_bookmarks",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -500,7 +500,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: personCodec,
-        source: sql`interfaces_and_unions.people`,
+        from: sql`interfaces_and_unions.people`,
         name: "people",
         uniques: [
           { columns: ["person_id"], isPrimary: true },
@@ -526,7 +526,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: postCodec,
-        source: sql`interfaces_and_unions.posts`,
+        from: sql`interfaces_and_unions.posts`,
         name: "posts",
         uniques: [{ columns: ["post_id"], isPrimary: true }],
       });
@@ -554,7 +554,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: commentCodec,
-        source: sql`interfaces_and_unions.comments`,
+        from: sql`interfaces_and_unions.comments`,
         name: "comments",
         uniques: [{ columns: ["comment_id"], isPrimary: true }],
       });
@@ -584,7 +584,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: enumTableItemTypeCodec,
-        source: sql`interfaces_and_unions.enum_table_item_type`,
+        from: sql`interfaces_and_unions.enum_table_item_type`,
         name: "enum_table_item_type",
         uniques: [{ columns: ["type"], isPrimary: true }],
       });
@@ -639,7 +639,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: singleTableItemsCodec,
-        source: sql`interfaces_and_unions.single_table_items`,
+        from: sql`interfaces_and_unions.single_table_items`,
         name: "single_table_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -683,7 +683,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: relationalItemsCodec,
-        source: sql`interfaces_and_unions.relational_items`,
+        from: sql`interfaces_and_unions.relational_items`,
         name: "relational_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -708,7 +708,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: relationalCommentableCodec,
-        source: sql`interfaces_and_unions.relational_commentables`,
+        from: sql`interfaces_and_unions.relational_commentables`,
         name: "relational_commentables",
       });
 
@@ -766,7 +766,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: relationalTopicsCodec,
-        source: sql`interfaces_and_unions.relational_topics`,
+        from: sql`interfaces_and_unions.relational_topics`,
         name: "relational_topics",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -786,7 +786,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: relationalPostsCodec,
-        source: sql`interfaces_and_unions.relational_posts`,
+        from: sql`interfaces_and_unions.relational_posts`,
         name: "relational_posts",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -805,7 +805,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: relationalDividersCodec,
-        source: sql`interfaces_and_unions.relational_dividers`,
+        from: sql`interfaces_and_unions.relational_dividers`,
         name: "relational_dividers",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -823,7 +823,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: relationalChecklistsCodec,
-        source: sql`interfaces_and_unions.relational_checklists`,
+        from: sql`interfaces_and_unions.relational_checklists`,
         name: "relational_checklists",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -842,7 +842,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: relationalChecklistItemsCodec,
-        source: sql`interfaces_and_unions.relational_checklist_items`,
+        from: sql`interfaces_and_unions.relational_checklist_items`,
         name: "relational_checklist_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -869,7 +869,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: unionItemsCodec,
-        source: sql`interfaces_and_unions.union_items`,
+        from: sql`interfaces_and_unions.union_items`,
         name: "union_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -887,7 +887,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: unionTopicsCodec,
-        source: sql`interfaces_and_unions.union_topics`,
+        from: sql`interfaces_and_unions.union_topics`,
         name: "union_topics",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -907,7 +907,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: unionPostsCodec,
-        source: sql`interfaces_and_unions.union_posts`,
+        from: sql`interfaces_and_unions.union_posts`,
         name: "union_posts",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -926,7 +926,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: unionDividersCodec,
-        source: sql`interfaces_and_unions.union_dividers`,
+        from: sql`interfaces_and_unions.union_dividers`,
         name: "union_dividers",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -944,7 +944,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: unionChecklistsCodec,
-        source: sql`interfaces_and_unions.union_checklists`,
+        from: sql`interfaces_and_unions.union_checklists`,
         name: "union_checklists",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -963,7 +963,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: unionChecklistItemsCodec,
-        source: sql`interfaces_and_unions.union_checklist_items`,
+        from: sql`interfaces_and_unions.union_checklist_items`,
         name: "union_checklist_items",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -972,14 +972,14 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: unionEntityCodec,
-        source: sql`(select null::interfaces_and_unions.union__entity)`,
+        from: sql`(select null::interfaces_and_unions.union__entity)`,
         name: "union__entity",
       });
 
       const entitySearchResourceOptions = PgResource.functionResourceOptions(
         unionEntityResourceOptions,
         {
-          source: (...args) =>
+          from: (...args) =>
             sql`interfaces_and_unions.search(${sqlFromArgDigests(args)})`,
           returnsSetof: true,
           returnsArray: false,
@@ -1017,7 +1017,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: awsApplicationsCodec,
-        source: sql`interfaces_and_unions.aws_applications`,
+        from: sql`interfaces_and_unions.aws_applications`,
         name: "aws_applications",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -1043,7 +1043,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: gcpApplicationsCodec,
-        source: sql`interfaces_and_unions.gcp_applications`,
+        from: sql`interfaces_and_unions.gcp_applications`,
         name: "gcp_applications",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -1066,7 +1066,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: firstPartyVulnerabilitiesCodec,
-        source: sql`interfaces_and_unions.first_party_vulnerabilities`,
+        from: sql`interfaces_and_unions.first_party_vulnerabilities`,
         name: "first_party_vulnerabilities",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });
@@ -1089,7 +1089,7 @@ export function makeExampleSchema(
         executor,
         selectAuth,
         codec: thirdPartyVulnerabilitiesCodec,
-        source: sql`interfaces_and_unions.third_party_vulnerabilities`,
+        from: sql`interfaces_and_unions.third_party_vulnerabilities`,
         name: "third_party_vulnerabilities",
         uniques: [{ columns: ["id"], isPrimary: true }],
       });

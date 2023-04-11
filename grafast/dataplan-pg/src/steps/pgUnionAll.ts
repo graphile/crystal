@@ -629,7 +629,7 @@ export class PgUnionAllStep<
             `${this}: all resources must currently come from same executor`,
           );
         }
-        if (!sql.isSQL(currentResource.source)) {
+        if (!sql.isSQL(currentResource.from)) {
           throw new Error(`${this}: parameterized resources not yet supported`);
         }
 
@@ -645,7 +645,7 @@ export class PgUnionAllStep<
           }
         }
 
-        let sqlSource = sql`${currentResource.source} as ${currentAlias}`;
+        let sqlSource = sql`${currentResource.from} as ${currentAlias}`;
 
         for (const pathEntry of path) {
           const relation = currentResource.getRelation(
@@ -660,15 +660,15 @@ export class PgUnionAllStep<
               `${this}: all resources must currently come from same executor`,
             );
           }
-          if (!sql.isSQL(nextResource.source)) {
+          if (!sql.isSQL(nextResource.from)) {
             throw new Error(
               `${this}: parameterized resources not yet supported`,
             );
           }
 
-          const nextSqlSource: SQL = nextResource.source;
+          const nextSqlFrom: SQL = nextResource.from;
           sqlSource = sql`${sqlSource}
-inner join ${nextSqlSource} as ${nextAlias}
+inner join ${nextSqlFrom} as ${nextAlias}
 on (${sql.indent(
             sql.join(
               relation.localColumns.map(

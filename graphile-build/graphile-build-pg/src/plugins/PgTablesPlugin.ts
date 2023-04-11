@@ -492,7 +492,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 executor,
                 name,
                 identifier,
-                source: codec.sqlType,
+                from: codec.sqlType,
                 codec,
                 uniques,
                 isVirtual,
