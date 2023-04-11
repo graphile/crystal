@@ -913,7 +913,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               second: codec,
             });
             throw new Error(
-              `Two different codecs were created with the same name '${codec.name}'; please ensure all codec names are unique. If you are creating codecs from multiple data sources, consider prefixing the codec names with the resource's name.`,
+              `Two different codecs were created with the same name '${codec.name}'; please ensure all codec names are unique. If you are creating codecs from multiple services, consider prefixing the codec names with the service's name.`,
             );
           } else {
             knownCodecByName.set(codec.name, codec);

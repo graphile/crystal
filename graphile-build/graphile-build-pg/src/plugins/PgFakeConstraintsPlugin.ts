@@ -43,7 +43,7 @@ interface Cache {}
 export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
   name: "PgFakeConstraintsPlugin",
   description:
-    "Looks for the @primaryKey, @foreignKey, @unique and @nonNull smart comments and changes the Data Sources such that it's as if these were concrete constraints",
+    "Looks for the @primaryKey, @foreignKey, @unique and @nonNull smart comments and changes the introspection results such that it's as if these were concrete constraints",
   version: version,
   after: ["smart-tags"],
 

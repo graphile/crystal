@@ -55,8 +55,8 @@ The schema build process in PostGraphile is:
 
 - Synchronously build the inflectors via the `inflection` phase - inflectors are
   used throughout all other phases
-- Asynchronously build the data sources by performing database introspection in
-  the `gather` phase
+- Asynchronously build the registry by performing database introspection in the
+  `gather` phase
 - Synchronously build the GraphQL schema during the `schema` phase
 
 :::
