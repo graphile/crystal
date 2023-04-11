@@ -217,7 +217,7 @@ declare global {
 }
 
 interface State {
-  resourceOptionsByPgClassByDatabase: Map<
+  resourceOptionsByPgClassByService: Map<
     string,
     Map<PgClass, Promise<PgResourceOptions | null>>
   >;
@@ -321,10 +321,10 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     helpers: {
       getResourceOptions(info, serviceName, pgClass) {
         let resourceOptionsByPgClass =
-          info.state.resourceOptionsByPgClassByDatabase.get(serviceName);
+          info.state.resourceOptionsByPgClassByService.get(serviceName);
         if (!resourceOptionsByPgClass) {
           resourceOptionsByPgClass = new Map();
-          info.state.resourceOptionsByPgClassByDatabase.set(
+          info.state.resourceOptionsByPgClassByService.set(
             serviceName,
             resourceOptionsByPgClass,
           );
@@ -541,7 +541,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
       },
     },
     initialState: () => ({
-      resourceOptionsByPgClassByDatabase: new Map(),
+      resourceOptionsByPgClassByService: new Map(),
       resourceByResourceOptions: new Map(),
       detailsByResourceOptions: new Map(),
     }),
@@ -564,7 +564,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         for (const [
           serviceName,
           resourceOptionsByPgClass,
-        ] of info.state.resourceOptionsByPgClassByDatabase.entries()) {
+        ] of info.state.resourceOptionsByPgClassByService.entries()) {
           for (const [
             pgClass,
             resourceOptionsPromise,

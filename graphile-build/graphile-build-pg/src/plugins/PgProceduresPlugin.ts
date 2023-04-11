@@ -103,7 +103,7 @@ declare global {
 }
 
 interface State {
-  resourceOptionsByPgProcByDatabase: Map<
+  resourceOptionsByPgProcByService: Map<
     string,
     Map<PgProc, Promise<PgResourceOptions | null>>
   >;
@@ -140,10 +140,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
     helpers: {
       async getResourceOptions(info, serviceName, pgProc) {
         let resourceOptionsByPgProc =
-          info.state.resourceOptionsByPgProcByDatabase.get(serviceName);
+          info.state.resourceOptionsByPgProcByService.get(serviceName);
         if (!resourceOptionsByPgProc) {
           resourceOptionsByPgProc = new Map();
-          info.state.resourceOptionsByPgProcByDatabase.set(
+          info.state.resourceOptionsByPgProcByService.set(
             serviceName,
             resourceOptionsByPgProc,
           );
@@ -565,7 +565,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
       },
     },
     initialState: () => ({
-      resourceOptionsByPgProcByDatabase: new Map(),
+      resourceOptionsByPgProcByService: new Map(),
     }),
     hooks: {
       async pgIntrospection_proc({ helpers, resolvedPreset }, event) {
