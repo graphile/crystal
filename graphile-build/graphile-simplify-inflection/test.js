@@ -4,7 +4,7 @@ const fsp = require("fs").promises;
 const child_process = require("child_process");
 const { PgSimplifyInflectionPreset } = require("./dist/index.js");
 const { makeSchema } = require("postgraphile");
-const { makePgConfig } = require("@dataplan/pg/adaptors/pg");
+const { makePgService } = require("@dataplan/pg/adaptors/pg");
 const { postgraphilePresetAmber } = require("postgraphile/presets/amber");
 const { makeV4Preset } = require("postgraphile/presets/v4");
 const { printSchema, lexicographicSortSchema } = require("graphql");
@@ -76,7 +76,7 @@ async function getSettings(dir) {
 
 async function getSchema(client, withSimplify, settings) {
   const pgConfigs = [
-    makePgConfig({
+    makePgService({
       connectionString: CONNECTION_STRING,
       schemas: ["app_public"],
     }),

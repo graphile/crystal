@@ -54,19 +54,19 @@ you can run PostGraphile with no (or minimal) CLI flags.
   enables "explain" mode, you won't want this in production but it's very helpful
   in development to know what's going on
 - `--connection <string>` (alias: `-c`)
-  <equivalent>{`{ pgConfigs: [makePgConfig({ connectionString: '...' })] }`}</equivalent>
+  <equivalent>{`{ pgServices: [makePgService({ connectionString: '...' })] }`}</equivalent>
   the PostgreSQL connection string. If omitted, inferred from <a href="https://www.postgresql.org/docs/current/static/libpq-envars.html">
     environmental variables
   </a>
   .<br />
   Examples: <code>db</code>, <code>postgres:///db</code>, <code>postgres://user:password@domain:port/db?ssl=true</code>
 - `--superuser-connection <string>` (alias: `-S`)
-  <equivalent>{`{ pgConfigs: [makePgConfig({ superuserConnectionString:'...' })] }`}</equivalent>
+  <equivalent>{`{ pgServices: [makePgService({ superuserConnectionString:'...' })] }`}</equivalent>
   the PostgreSQL superuser connection string to use for installing watch fixtures
   (if <code>--watch</code> is enabled). If omitted, the regular connection string
   will be used.
 - `--schema <string>` (alias: `-s`)
-  <equivalent>{`{ pgConfigs: [makePgConfig({ schemas: ['...'] })] }`}</equivalent>
+  <equivalent>{`{ pgServices: [makePgService({ schemas: ['...'] })] }`}</equivalent>
   a comma-separated list of PostgreSQL schemas to be introspected.
 - `--watch` (alias: `-w`)
   <equivalent>{`{ server: { watch: true } }`}</equivalent>
