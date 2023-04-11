@@ -407,8 +407,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           addBehaviorToTags(tags, "-filter -order", true);
 
           const extensions: PgResourceExtensions = {
-            tags,
             description,
+            pg: {
+              databaseName,
+              schemaName: pgProc.getNamespace()!.nspname,
+              name: pgProc.proname,
+            },
+            tags,
           };
 
           if (outOrInoutOrTableArgModes.length === 1) {
