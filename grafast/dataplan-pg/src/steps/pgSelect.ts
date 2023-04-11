@@ -39,7 +39,7 @@ import {
   stepsAreInSamePhase,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
-import sql, { arraysMatch } from "pg-sql2";
+import sql, { $$symbolToIdentifier, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
@@ -1994,7 +1994,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           const {
             text: lateralText,
             values: rawSqlValues,
-            symbolToIdentifier,
+            [$$symbolToIdentifier]: symbolToIdentifier,
           } = sql.compile(
             sql`lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`,
             options,

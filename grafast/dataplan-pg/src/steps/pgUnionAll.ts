@@ -28,7 +28,7 @@ import {
 } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
-import { sql } from "pg-sql2";
+import { $$symbolToIdentifier, sql } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
@@ -1728,7 +1728,7 @@ ${unionHaving}\
         const {
           text: lateralText,
           values: rawSqlValues,
-          symbolToIdentifier,
+          [$$symbolToIdentifier]: symbolToIdentifier,
         } = sql.compile(
           sql`lateral (${sql.indent(innerQuery)}) as ${wrapperAlias}`,
           {
