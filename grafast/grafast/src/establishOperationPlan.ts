@@ -26,7 +26,7 @@ interface LinkedList<T> {
 }
 
 /**
- * This represents the list of possible opPlans for a specific document.
+ * This represents the list of possible operationPlans for a specific document.
  *
  * @remarks
  *
@@ -35,11 +35,11 @@ interface LinkedList<T> {
  */
 interface Cache {
   /**
-   * Implemented as a linked list so the hot opPlans can be kept at the top of the
+   * Implemented as a linked list so the hot operationPlans can be kept at the top of the
    * list, and if the list grows beyond a maximum size we can drop the last
    * element.
    */
-  possibleOpPlans: LinkedList<OperationPlan>;
+  possibleOperationPlans: LinkedList<OperationPlan>;
   fragments: Fragments;
 }
 
@@ -89,21 +89,21 @@ const assertFragmentsMatch = !isDev ? noop : reallyAssertFragmentsMatch;
  * @remarks Due to the optimisation in `establishOperationPlan`, the schema, document
  * and operationName checks have already been performed.
  */
-function isOpPlanCompatible<
+function isOperationPlanCompatible<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends Grafast.Context = Grafast.Context,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 >(
-  opPlan: OperationPlan,
+  operationPlan: OperationPlan,
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
-): opPlan is OperationPlan {
+): operationPlan is OperationPlan {
   const {
     variableValuesConstraints,
     contextConstraints,
     rootValueConstraints,
-  } = opPlan;
+  } = operationPlan;
   if (!matchesConstraints(variableValuesConstraints, variableValues)) {
     return false;
   }
@@ -162,19 +162,25 @@ export function establishOperationPlan<
     assertFragmentsMatch(cache.fragments, fragments);
 
     let previousItem: LinkedList<OperationPlan> | null = null;
-    let linkedItem: LinkedList<OperationPlan> | null = cache.possibleOpPlans;
+    let linkedItem: LinkedList<OperationPlan> | null =
+      cache.possibleOperationPlans;
     while (linkedItem) {
       if (
-        isOpPlanCompatible(linkedItem.value, variableValues, context, rootValue)
+        isOperationPlanCompatible(
+          linkedItem.value,
+          variableValues,
+          context,
+          rootValue,
+        )
       ) {
         // Hoist to top of linked list
         if (previousItem) {
           // Remove linkedItem from existing chain
           previousItem.next = linkedItem.next;
           // Add rest of chain after linkedItem
-          linkedItem.next = cache.possibleOpPlans;
+          linkedItem.next = cache.possibleOperationPlans;
           // linkedItem is now head of chain
-          cache.possibleOpPlans = linkedItem;
+          cache.possibleOperationPlans = linkedItem;
         }
 
         // We found a suitable OperationPlan - use that!
@@ -189,7 +195,7 @@ export function establishOperationPlan<
   }
 
   // No suitable OperationPlan found, time to make one.
-  const opPlan = new OperationPlan(
+  const operationPlan = new OperationPlan(
     schema,
     operation,
     fragments,
@@ -207,7 +213,7 @@ export function establishOperationPlan<
   if (!cache) {
     cache = {
       fragments,
-      possibleOpPlans: { value: opPlan, next: null },
+      possibleOperationPlans: { value: operationPlan, next: null },
     };
     cacheByOperation.set(operation, cache);
   } else {
@@ -219,12 +225,12 @@ export function establishOperationPlan<
       // TODO: we should announce this so that people know there's something that needs fixing in their schema (too much eval?)
     }
 
-    // Add new opPlan to top of the linked list.
-    cache.possibleOpPlans = {
-      value: opPlan,
-      next: cache.possibleOpPlans,
+    // Add new operationPlan to top of the linked list.
+    cache.possibleOperationPlans = {
+      value: operationPlan,
+      next: cache.possibleOperationPlans,
     };
   }
 
-  return opPlan;
+  return operationPlan;
 }

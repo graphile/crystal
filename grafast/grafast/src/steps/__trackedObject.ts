@@ -11,15 +11,15 @@ import type { AccessStep } from "./access.js";
 // TODO: rename to __TrackedValueStep? Seems to represent values as well as
 // objects.
 /**
- * Implements the `__TrackedObjectStep(opPlan, object, constraints, path)`
+ * Implements the `__TrackedObjectStep(operationPlan, object, constraints, path)`
  * algorithm used to allow runtime AND plan-time access to the three special
  * entities: `variableValues`, `rootValue` and `context`.
  *
  * ExecutableStep-time access can evaluate the `object` passed to the constructor, and
- * will add constraints to the relevant opPlan.variableValuesConstraints,
- * opPlan.rootValueConstraints or opPlan.contextConstraints to ensure that all
- * future variableValues, rootValues and context will match the assumptions
- * made.
+ * will add constraints to the relevant operationPlan.variableValuesConstraints,
+ * operationPlan.rootValueConstraints or operationPlan.contextConstraints to
+ * ensure that all future variableValues, rootValues and context will match the
+ * assumptions made.
  *
  * Run-time access will see the runtime values of these properties, it will
  * **NOT** reference the `object` passed to the constructor.
@@ -46,7 +46,7 @@ export class __TrackedObjectStep<
 
   /**
    * A reference to the relevant
-   * opPlan.variableValuesConstraints/contextConstraints/rootValueConstraints.
+   * operationPlan.variableValuesConstraints/contextConstraints/rootValueConstraints.
    *
    * @internal
    */

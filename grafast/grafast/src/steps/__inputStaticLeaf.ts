@@ -24,7 +24,7 @@ export class __InputStaticLeafStep<
     // us to call coerceInputValue because we already know this is a scalar,
     // *not* a variable, and not an object/list therefore cannot _contain_ a
     // variable. Otherwise we'd need to process it via
-    // opPlan.trackedVariableValuesStep.
+    // operationPlan.trackedVariableValuesStep.
     this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 

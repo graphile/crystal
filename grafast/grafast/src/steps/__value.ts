@@ -3,7 +3,7 @@ import type { AccessStep } from "./access.js";
 import { access } from "./access.js";
 
 /**
- * Implements `__ValueStep(opPlan)` which is never executed; it's purely
+ * Implements `__ValueStep(operationPlan)` which is never executed; it's purely
  * internal - we populate the value as part of the algorithm - see
  * `GetValueStepId` and `PopulateValueStep`.
  */
