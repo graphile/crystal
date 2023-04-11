@@ -285,10 +285,7 @@ export function makePgSmartTagsPlugin(
           const [rules, rawRules] = rulesFrom(info.state.rules);
 
           rules.forEach((rule, idx) => {
-            if (
-              rule.serviceName != null &&
-              rule.serviceName !== serviceName
-            ) {
+            if (rule.serviceName != null && rule.serviceName !== serviceName) {
               return;
             }
 

@@ -91,7 +91,9 @@ export async function makeSharedPresetAndClient(pool: Pool) {
     },
   };
 
-  const withPgClient = await getWithPgClientFromPgService(preset.pgServices![0]!);
+  const withPgClient = await getWithPgClientFromPgService(
+    preset.pgServices![0]!,
+  );
 
   return {
     preset,

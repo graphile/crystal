@@ -374,9 +374,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             PgExecutor,
             constant,
             context,
-            serviceName,
             object,
             pgSettingsKey,
+            serviceName,
             withPgClientKey,
           ) =>
             new PgExecutor({
@@ -396,9 +396,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             PgExecutor,
             constant,
             context,
-            serviceName,
             object,
             pgSettingsKey,
+            serviceName,
             withPgClientKey,
           ],
         );

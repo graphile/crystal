@@ -611,7 +611,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             const defaultBehavior = [
               "resource:select",
               "table",
-              ...(!codec.isAnonymous ? ["resource:insert", "resource:update"] : []),
+              ...(!codec.isAnonymous
+                ? ["resource:insert", "resource:update"]
+                : []),
               ...(simpleCollections === "both"
                 ? ["resource:connection", "resource:list"]
                 : simpleCollections === "only"
