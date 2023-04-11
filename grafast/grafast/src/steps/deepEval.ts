@@ -41,7 +41,7 @@ export class DeepEvalStep extends ExecutableStep {
 
     // Plan this subroutine
     this.subroutineLayer = new LayerPlan(
-      this.layerPlan.operationPlan,
+      this.operationPlan,
       this.layerPlan,
       {
         type: "subroutine",
@@ -110,7 +110,7 @@ export class DeepEvalStep extends ExecutableStep {
       store.set(planId, []);
       if (!bucket.store.has(planId)) {
         throw new Error(
-          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.layerPlan.operationPlan.dangerouslyGetStep(
+          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.operationPlan.dangerouslyGetStep(
             planId,
           )}) listed in copyStepIds but not available in parent bucket for ${this}`,
         );
