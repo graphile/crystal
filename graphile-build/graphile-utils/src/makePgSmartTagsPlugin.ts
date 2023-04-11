@@ -45,7 +45,7 @@ export type PgSmartTagTags = {
 export interface PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
 > {
-  databaseName?: string;
+  serviceName?: string;
   kind: TKind;
   match: string | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
   tags?: PgSmartTagTags;
@@ -53,7 +53,7 @@ export interface PgSmartTagRule<
 }
 
 interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
-  databaseName?: string;
+  serviceName?: string;
   kind: TKind;
   match: PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
   tags?: PgSmartTagTags;
@@ -280,14 +280,14 @@ export function makePgSmartTagsPlugin(
       hooks: {
         // Run in the 'introspection' phase before anything uses the tags
         pgIntrospection_introspection(info, event) {
-          const { introspection, databaseName } = event;
+          const { introspection, serviceName } = event;
 
           const [rules, rawRules] = rulesFrom(info.state.rules);
 
           rules.forEach((rule, idx) => {
             if (
-              rule.databaseName != null &&
-              rule.databaseName !== databaseName
+              rule.serviceName != null &&
+              rule.serviceName !== serviceName
             ) {
               return;
             }

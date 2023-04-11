@@ -68,103 +68,103 @@ declare global {
     interface GatherHelpers {
       pgIntrospection: {
         getIntrospection(): PromiseOrDirect<IntrospectionResults>;
-        getDatabase(databaseName: string): Promise<{
+        getDatabase(serviceName: string): Promise<{
           introspection: Introspection;
           pgService: GraphileConfig.PgServiceConfiguration;
         }>;
-        getExecutorForDatabase(databaseName: string): PgExecutor;
+        getExecutorForDatabase(serviceName: string): PgExecutor;
 
         getNamespace(
-          databaseName: string,
+          serviceName: string,
           id: string,
         ): Promise<PgNamespace | undefined>;
-        getClasses(databaseName: string): Promise<PgClass[]>;
+        getClasses(serviceName: string): Promise<PgClass[]>;
         getClass(
-          databaseName: string,
+          serviceName: string,
           id: string,
         ): Promise<PgClass | undefined>;
         getConstraint(
-          databaseName: string,
+          serviceName: string,
           id: string,
         ): Promise<PgConstraint | undefined>;
-        getProc(databaseName: string, id: string): Promise<PgProc | undefined>;
+        getProc(serviceName: string, id: string): Promise<PgProc | undefined>;
         getRoles(
-          databaseName: string,
+          serviceName: string,
           id: string,
         ): Promise<PgRoles | undefined>;
-        getType(databaseName: string, id: string): Promise<PgType | undefined>;
-        getEnum(databaseName: string, id: string): Promise<PgEnum | undefined>;
+        getType(serviceName: string, id: string): Promise<PgType | undefined>;
+        getEnum(serviceName: string, id: string): Promise<PgEnum | undefined>;
         getExtension(
-          databaseName: string,
+          serviceName: string,
           id: string,
         ): Promise<PgExtension | undefined>;
         getIndex(
-          databaseName: string,
+          serviceName: string,
           id: string,
         ): Promise<PgIndex | undefined>;
         getLanguage(
-          databaseName: string,
+          serviceName: string,
           id: string,
         ): Promise<PgLanguage | undefined>;
 
         getAttribute(
-          databaseName: string,
+          serviceName: string,
           classId: string,
           attributeNumber: number,
         ): Promise<PgAttribute | undefined>;
         // getAuthMembers(
-        //   databaseName: string,
+        //   serviceName: string,
         //   id: string,
         // ): Promise<PgAuthMembers | undefined>;
-        // getRange(databaseName: string, id: string): Promise<PgRange | undefined>;
+        // getRange(serviceName: string, id: string): Promise<PgRange | undefined>;
         // getDepend(
-        //   databaseName: string,
+        //   serviceName: string,
         //   id: string,
         // ): Promise<PgDepend | undefined>;
         // getDescription(
-        //   databaseName: string,
+        //   serviceName: string,
         //   id: string,
         // ): Promise<PgDescription | undefined>;
 
         getAttributesForClass(
-          databaseName: string,
+          serviceName: string,
           classId: string,
         ): Promise<PgAttribute[]>;
         getConstraintsForClass(
-          databaseName: string,
+          serviceName: string,
           classId: string,
         ): Promise<PgConstraint[]>;
         getForeignConstraintsForClass(
-          databaseName: string,
+          serviceName: string,
           classId: string,
         ): Promise<PgConstraint[]>;
         getInheritedForClass(
-          databaseName: string,
+          serviceName: string,
           classId: string,
         ): Promise<PgInherits[]>;
         getNamespaceByName(
-          databaseName: string,
+          serviceName: string,
           namespaceName: string,
         ): Promise<PgNamespace | undefined>;
         getClassByName(
-          databaseName: string,
+          serviceName: string,
           namespaceName: string,
           tableName: string,
         ): Promise<PgClass | undefined>;
         getTypeByArray(
-          databaseName: string,
+          serviceName: string,
           arrayId: string,
         ): Promise<PgType | undefined>;
         getEnumsForType(
-          databaseName: string,
+          serviceName: string,
           typeId: string,
         ): Promise<PgEnum[]>;
         getRangeByType(
-          databaseName: string,
+          serviceName: string,
           typeId: string,
         ): Promise<PgRange | null>;
         getExtensionByName(
-          databaseName: string,
+          serviceName: string,
           extensionName: string,
         ): Promise<PgExtension | undefined>;
       };
@@ -174,97 +174,97 @@ declare global {
       pgIntrospection_introspection: PluginHook<
         (event: {
           introspection: Introspection;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_namespace: PluginHook<
         (event: {
           entity: PgNamespace;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_class: PluginHook<
         (event: {
           entity: PgClass;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_attribute: PluginHook<
         (event: {
           entity: PgAttribute;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_constraint: PluginHook<
         (event: {
           entity: PgConstraint;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_proc: PluginHook<
         (event: {
           entity: PgProc;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_role: PluginHook<
         (event: {
           entity: PgRoles;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_auth_member: PluginHook<
         (event: {
           entity: PgAuthMembers;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_type: PluginHook<
         (event: {
           entity: PgType;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_enum: PluginHook<
         (event: {
           entity: PgEnum;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_extension: PluginHook<
         (event: {
           entity: PgExtension;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_index: PluginHook<
         (event: {
           entity: PgIndex;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_language: PluginHook<
         (event: {
           entity: PgLanguage;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_range: PluginHook<
         (event: {
           entity: PgRange;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_depend: PluginHook<
         (event: {
           entity: PgDepend;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
       pgIntrospection_description: PluginHook<
         (event: {
           entity: PgDescription;
-          databaseName: string;
+          serviceName: string;
         }) => PromiseOrDirect<void>
       >;
     }
@@ -294,14 +294,14 @@ type PgExecutorContextPlans<TSettings = any> = {
 
 async function getDb(
   info: GatherPluginContext<State, Cache>,
-  databaseName: string,
+  serviceName: string,
 ) {
   const introspections = await info.helpers.pgIntrospection.getIntrospection();
   const relevant = introspections.find(
-    (intro) => intro.pgService.name === databaseName,
+    (intro) => intro.pgService.name === serviceName,
   );
   if (!relevant) {
-    throw new Error(`Could not find database '${databaseName}'`);
+    throw new Error(`Could not find database '${serviceName}'`);
   }
   return relevant;
 }
@@ -311,14 +311,14 @@ function makeGetEntity<
 >(loc: TKey) {
   return async (
     info: GatherPluginContext<State, Cache>,
-    databaseName: string,
+    serviceName: string,
     id: string,
   ): Promise<Introspection[TKey][number] | undefined> => {
-    const relevant = await getDb(info, databaseName);
+    const relevant = await getDb(info, serviceName);
     const list = relevant.introspection[loc];
     if (!list) {
       throw new Error(
-        `Could not find database '${databaseName}''s introspection results for '${loc}'`,
+        `Could not find database '${serviceName}''s introspection results for '${loc}'`,
       );
     }
     return (list as PgEntityWithId[]).find((entity: PgEntityWithId) =>
@@ -336,13 +336,13 @@ function makeGetEntities<
 >(loc: TKey) {
   return async (
     info: GatherPluginContext<State, Cache>,
-    databaseName: string,
+    serviceName: string,
   ): Promise<Introspection[TKey]> => {
-    const relevant = await getDb(info, databaseName);
+    const relevant = await getDb(info, serviceName);
     const list = relevant.introspection[loc];
     if (!list) {
       throw new Error(
-        `Could not find database '${databaseName}''s introspection results for '${loc}'`,
+        `Could not find database '${serviceName}''s introspection results for '${loc}'`,
       );
     }
     return list as any[];
@@ -370,15 +370,15 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       executors: Object.create(null),
     }),
     helpers: {
-      getExecutorForDatabase(info, databaseName) {
-        if (info.state.executors[databaseName]) {
-          return info.state.executors[databaseName];
+      getExecutorForDatabase(info, serviceName) {
+        if (info.state.executors[serviceName]) {
+          return info.state.executors[serviceName];
         }
         const pgService = info.resolvedPreset.pgServices?.find(
-          (db) => db.name === databaseName,
+          (db) => db.name === serviceName,
         );
         if (!pgService) {
-          throw new Error(`Database '${databaseName}' not found`);
+          throw new Error(`Database '${serviceName}' not found`);
         }
         const { pgSettingsKey, withPgClientKey } = pgService;
         const executor = EXPORTABLE(
@@ -386,13 +386,13 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             PgExecutor,
             constant,
             context,
-            databaseName,
+            serviceName,
             object,
             pgSettingsKey,
             withPgClientKey,
           ) =>
             new PgExecutor({
-              name: databaseName,
+              name: serviceName,
               context: () => {
                 const ctx = context<Grafast.Context>();
                 return object({
@@ -408,13 +408,13 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             PgExecutor,
             constant,
             context,
-            databaseName,
+            serviceName,
             object,
             pgSettingsKey,
             withPgClientKey,
           ],
         );
-        info.state.executors[databaseName] = executor;
+        info.state.executors[serviceName] = executor;
         return executor;
       },
 
@@ -437,56 +437,56 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       // getDescription: makeGetEntity("descriptions"),
       //
 
-      async getAttribute(info, databaseName, classId, attributeNumber) {
-        // const pgClass = this.getClass(info, databaseName, classId);
+      async getAttribute(info, serviceName, classId, attributeNumber) {
+        // const pgClass = this.getClass(info, serviceName, classId);
         const attributes = await this.getAttributesForClass(
           info,
-          databaseName,
+          serviceName,
           classId,
         );
         return attributes.find((attr) => attr.attnum === attributeNumber);
       },
 
-      async getAttributesForClass(info, databaseName, classId) {
-        // const pgClass = this.getClass(info, databaseName, classId);
-        const relevant = await getDb(info, databaseName);
+      async getAttributesForClass(info, serviceName, classId) {
+        // const pgClass = this.getClass(info, serviceName, classId);
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.attributes;
         // TODO: cache
         return list.filter((entity) => entity.attrelid === classId);
       },
 
-      async getConstraintsForClass(info, databaseName, classId) {
-        // const pgClass = this.getClass(info, databaseName, classId);
-        const relevant = await getDb(info, databaseName);
+      async getConstraintsForClass(info, serviceName, classId) {
+        // const pgClass = this.getClass(info, serviceName, classId);
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.constraints;
         // TODO: cache
         return list.filter((entity) => entity.conrelid === classId);
       },
 
-      async getForeignConstraintsForClass(info, databaseName, classId) {
-        // const pgClass = this.getClass(info, databaseName, classId);
-        const relevant = await getDb(info, databaseName);
+      async getForeignConstraintsForClass(info, serviceName, classId) {
+        // const pgClass = this.getClass(info, serviceName, classId);
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.constraints;
         // TODO: cache
         return list.filter((entity) => entity.confrelid === classId);
       },
 
-      async getInheritedForClass(info, databaseName, classId) {
-        // const pgClass = this.getClass(info, databaseName, classId);
-        const relevant = await getDb(info, databaseName);
+      async getInheritedForClass(info, serviceName, classId) {
+        // const pgClass = this.getClass(info, serviceName, classId);
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.inherits;
         // TODO: cache
         return list.filter((entity) => entity.inhrelid === classId);
       },
 
-      async getNamespaceByName(info, databaseName, name) {
-        const relevant = await getDb(info, databaseName);
+      async getNamespaceByName(info, serviceName, name) {
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.namespaces;
         return list.find((nsp) => nsp.nspname === name);
       },
 
-      async getClassByName(info, databaseName, schemaName, tableName) {
-        const relevant = await getDb(info, databaseName);
+      async getClassByName(info, serviceName, schemaName, tableName) {
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.classes;
         return list.find(
           (rel) =>
@@ -497,14 +497,14 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 
       // TODO: we should maybe use pg_type.typelem and look up by ID directy
       // instead of having this function
-      async getTypeByArray(info, databaseName, arrayId) {
-        const relevant = await getDb(info, databaseName);
+      async getTypeByArray(info, serviceName, arrayId) {
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.types;
         return list.find((type) => type.typarray === arrayId);
       },
 
-      async getEnumsForType(info, databaseName, typeId) {
-        const relevant = await getDb(info, databaseName);
+      async getEnumsForType(info, serviceName, typeId) {
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.enums;
         // TODO: cache
         return list
@@ -512,15 +512,15 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           .sort((a, z) => a.enumsortorder - z.enumsortorder);
       },
 
-      async getRangeByType(info, databaseName, typeId) {
-        const relevant = await getDb(info, databaseName);
+      async getRangeByType(info, serviceName, typeId) {
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.ranges;
         // TODO: cache
         return list.find((entity) => entity.rngtypid === typeId);
       },
 
-      async getExtensionByName(info, databaseName, extensionName) {
-        const relevant = await getDb(info, databaseName);
+      async getExtensionByName(info, serviceName, extensionName) {
+        const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.extensions;
         // TODO: cache
         return list.find((entity) => entity.extname === extensionName);
@@ -657,7 +657,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                   >
                     ? Parameters<U>[0] extends {
                         entity: infer V;
-                        databaseName: string;
+                        serviceName: string;
                       }
                       ? V[]
                       : never
@@ -668,7 +668,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                     promises.push(
                       (info.process as any)(eventName, {
                         entity: entity,
-                        databaseName: pgService.name,
+                        serviceName: pgService.name,
                       }),
                     );
                   }
@@ -676,7 +676,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 }
                 await info.process("pgIntrospection_introspection", {
                   introspection,
-                  databaseName: pgService.name,
+                  serviceName: pgService.name,
                 });
                 await announce("pgIntrospection_namespace", namespaces);
                 await announce("pgIntrospection_class", classes);
@@ -701,12 +701,12 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 
         return info.state.introspectionResultsPromise;
       },
-      async getDatabase(info, databaseName) {
+      async getDatabase(info, serviceName) {
         const all = await info.helpers.pgIntrospection.getIntrospection();
-        const match = all.find((n) => n.pgService.name === databaseName);
+        const match = all.find((n) => n.pgService.name === serviceName);
         if (!match) {
           throw new Error(
-            `Could not find results for database '${databaseName}'`,
+            `Could not find results for database '${serviceName}'`,
           );
         }
         return match;

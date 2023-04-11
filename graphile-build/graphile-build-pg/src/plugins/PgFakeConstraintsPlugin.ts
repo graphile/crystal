@@ -21,7 +21,7 @@ declare global {
       pgFakeConstraints_constraint: PluginHook<
         (event: {
           introspection: Introspection;
-          databaseName: string;
+          serviceName: string;
           entity: PgConstraint;
         }) => PromiseOrDirect<void>
       >;
@@ -153,7 +153,7 @@ function attributesByNames(
 async function processUnique(
   info: GatherPluginContext<State, Cache>,
   event: {
-    databaseName: string;
+    serviceName: string;
     introspection: Introspection;
   },
   pgClass: PgClass,
@@ -162,7 +162,7 @@ async function processUnique(
 ) {
   const identity = () =>
     `${pgClass.getNamespace()!.nspname}.${pgClass.relname}`;
-  const { introspection, databaseName } = event;
+  const { introspection, serviceName } = event;
   const tag = primaryKey ? "primaryKey" : "unique";
   if (typeof rawSpec !== "string") {
     throw new Error(
@@ -227,7 +227,7 @@ async function processUnique(
     getType: () => undefined,
   };
 
-  await addConstraint(info, introspection, databaseName, pgConstraint);
+  await addConstraint(info, introspection, serviceName, pgConstraint);
 }
 
 const removeQuotes = (str: string) => {
@@ -263,7 +263,7 @@ const parseSqlColumnString = (str: string) => {
 async function processFk(
   info: GatherPluginContext<State, Cache>,
   event: {
-    databaseName: string;
+    serviceName: string;
     introspection: Introspection;
   },
   pgClass: PgClass,
@@ -271,7 +271,7 @@ async function processFk(
 ) {
   const identity = () =>
     `${pgClass.getNamespace()!.nspname}.${pgClass.relname}`;
-  const { databaseName, introspection } = event;
+  const { serviceName, introspection } = event;
   if (typeof rawSpec !== "string") {
     throw new Error(
       `Invalid '@foreignKey' smart tag on ${identity()}; expected a string`,
@@ -300,7 +300,7 @@ async function processFk(
     : null;
 
   const foreignPgClass = await info.helpers.pgIntrospection.getClassByName(
-    databaseName,
+    serviceName,
     foreignSchema,
     foreignTable,
   );
@@ -419,13 +419,13 @@ or use a '@unique ${foreignKeyAttibutes
     getType: () => undefined,
   };
 
-  await addConstraint(info, introspection, databaseName, pgConstraint);
+  await addConstraint(info, introspection, serviceName, pgConstraint);
 }
 
 async function addConstraint(
   info: GatherPluginContext<State, Cache>,
   introspection: Introspection,
-  databaseName: string,
+  serviceName: string,
   pgConstraint: PgConstraint,
 ) {
   introspection.constraints.push(pgConstraint);
@@ -438,7 +438,7 @@ async function addConstraint(
   );
   await info.process("pgFakeConstraints_constraint", {
     introspection,
-    databaseName,
+    serviceName,
     entity: pgConstraint,
   });
 }

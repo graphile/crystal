@@ -5,7 +5,7 @@ import type { SQL, sql } from "pg-sql2";
 import { EXPORTABLE } from "./exportable.js";
 
 export function makeAddPgTableConditionPlugin(
-  match: { databaseName?: string; schemaName: string; tableName: string },
+  match: { serviceName?: string; schemaName: string; tableName: string },
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
     build: GraphileBuild.Build,
@@ -20,7 +20,7 @@ export function makeAddPgTableConditionPlugin(
     },
   ) => SQL | null | undefined,
 ): GraphileConfig.Plugin {
-  const { databaseName = "main", schemaName, tableName } = match;
+  const { serviceName = "main", schemaName, tableName } = match;
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;
   const plugin: GraphileConfig.Plugin = {
     name: displayName,
@@ -58,7 +58,7 @@ export function makeAddPgTableConditionPlugin(
             !isPgCondition ||
             !table ||
             !table.columns ||
-            table.extensions?.pg?.databaseName !== databaseName ||
+            table.extensions?.pg?.serviceName !== serviceName ||
             table.extensions?.pg?.schemaName !== schemaName ||
             table.extensions?.pg?.name !== tableName
           ) {

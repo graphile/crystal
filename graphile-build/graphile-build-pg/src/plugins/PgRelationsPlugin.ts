@@ -51,7 +51,7 @@ declare global {
       resourceRelationName(
         this: Inflection,
         details: {
-          databaseName: string;
+          serviceName: string;
           pgConstraint: PgConstraint;
           localClass: PgClass;
           localColumns: PgAttribute[];
@@ -105,7 +105,7 @@ declare global {
         addRelation(
           event: {
             pgClass: PgClass;
-            databaseName: string;
+            serviceName: string;
             resourceOptions: PgResourceOptions;
           },
           pgConstraint: PgConstraint,
@@ -116,7 +116,7 @@ declare global {
     interface GatherHooks {
       pgRelations_relation: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
           pgConstraint: PgConstraint;
           relation: PgCodecRelationConfig;
@@ -142,7 +142,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       resourceRelationName(
         options,
         {
-          databaseName,
+          serviceName,
           pgConstraint,
           localClass: _localClass,
           localColumns,
@@ -160,7 +160,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           return tags.foreignFieldName;
         }
         const remoteName = this.tableResourceName({
-          databaseName,
+          serviceName,
           pgClass: foreignClass,
         });
         const columns = !isReferencee
@@ -293,24 +293,24 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               );
               return isUnique;
             })();
-        const { databaseName } = event;
+        const { serviceName } = event;
         const localColumns = await Promise.all(
           localColumnNumbers.map((key) =>
             info.helpers.pgIntrospection.getAttribute(
-              databaseName,
+              serviceName,
               pgClass._id,
               key,
             ),
           ),
         );
         const localCodec = await info.helpers.pgCodecs.getCodecFromClass(
-          databaseName,
+          serviceName,
           pgClass._id,
         );
         const foreignColumns = await Promise.all(
           foreignColumnNumbers.map((key) =>
             info.helpers.pgIntrospection.getAttribute(
-              databaseName,
+              serviceName,
               foreignClass!._id,
               key,
             ),
@@ -318,7 +318,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         );
         const foreignResourceOptions =
           (await info.helpers.pgTables.getResourceOptions(
-            databaseName,
+            serviceName,
             foreignClass,
           )) as PgResourceOptions<any, PgCodecWithColumns, any, any>;
         if (
@@ -329,7 +329,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           return;
         }
         const relationName = info.inflection.resourceRelationName({
-          databaseName,
+          serviceName,
           pgConstraint,
           localClass: pgClass,
           localColumns: localColumns as PgAttribute[],
@@ -367,7 +367,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           },
         };
         await info.process("pgRelations_relation", {
-          databaseName,
+          serviceName,
           pgClass,
           pgConstraint,
           relation: newRelation,
@@ -412,16 +412,16 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     },
     hooks: {
       async pgTables_PgResourceOptions_relations(info, event) {
-        const { pgClass, databaseName } = event;
+        const { pgClass, serviceName } = event;
         const constraints =
           await info.helpers.pgIntrospection.getConstraintsForClass(
-            databaseName,
+            serviceName,
             pgClass._id,
           );
 
         const foreignConstraints =
           await info.helpers.pgIntrospection.getForeignConstraintsForClass(
-            databaseName,
+            serviceName,
             pgClass._id,
           );
 

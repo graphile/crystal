@@ -24,12 +24,12 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
     helpers: {},
     hooks: {
       async pgCodecs_column(info, event) {
-        const { pgAttribute, databaseName, column } = event;
+        const { pgAttribute, serviceName, column } = event;
         const pgClass = pgAttribute.getClass();
         if (!pgClass || !["r", "v", "m", "f", "p"].includes(pgClass.relkind)) {
           return;
         }
-        const db = await info.helpers.pgIntrospection.getDatabase(databaseName);
+        const db = await info.helpers.pgIntrospection.getDatabase(serviceName);
         const { introspection } = db;
 
         const introspectionRole = introspection.getCurrentUser();
@@ -94,8 +94,8 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         }
       },
       async pgProcedures_PgResourceOptions(info, event) {
-        const { pgProc, databaseName, resourceOptions } = event;
-        const db = await info.helpers.pgIntrospection.getDatabase(databaseName);
+        const { pgProc, serviceName, resourceOptions } = event;
+        const db = await info.helpers.pgIntrospection.getDatabase(serviceName);
         const { introspection } = db;
 
         const introspectionRole = introspection.getCurrentUser();
@@ -121,11 +121,11 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         }
       },
       async pgTables_PgResourceOptions(info, event) {
-        const { pgClass, resourceOptions, databaseName } = event;
+        const { pgClass, resourceOptions, serviceName } = event;
         if (!["r", "v", "m", "f", "p"].includes(pgClass.relkind)) {
           return;
         }
-        const db = await info.helpers.pgIntrospection.getDatabase(databaseName);
+        const db = await info.helpers.pgIntrospection.getDatabase(serviceName);
         const { introspection } = db;
         resourceOptions.extensions =
           resourceOptions.extensions || Object.create(null);

@@ -63,7 +63,7 @@ declare global {
       _schemaPrefix(
         this: Inflection,
         details: {
-          databaseName: string;
+          serviceName: string;
           pgNamespace: PgNamespace;
         },
       ): string;
@@ -74,7 +74,7 @@ declare global {
       tableResourceName(
         this: Inflection,
         details: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
         },
       ): string;
@@ -170,7 +170,7 @@ declare global {
     interface GatherHelpers {
       pgTables: {
         getResourceOptions(
-          databaseName: string,
+          serviceName: string,
           pgClass: PgClass,
         ): Promise<PgResourceOptions | null>;
       };
@@ -182,7 +182,7 @@ declare global {
        */
       pgTables_unique: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
           pgConstraint: PgConstraint;
           unique: PgResourceUnique;
@@ -193,21 +193,21 @@ declare global {
        */
       pgTables_PgResourceOptions: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
           resourceOptions: PgResourceOptions;
         }) => void | Promise<void>
       >;
       pgTables_PgResourceOptions_relations: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
           resourceOptions: PgResourceOptions;
         }) => Promise<void> | void
       >;
       pgTables_PgResourceOptions_relations_post: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
           resourceOptions: PgResourceOptions;
         }) => Promise<void> | void
@@ -224,7 +224,7 @@ interface State {
   resourceByResourceOptions: Map<PgResourceOptions, Promise<PgResource | null>>;
   detailsByResourceOptions: Map<
     PgResourceOptions,
-    { databaseName: string; pgClass: PgClass }
+    { serviceName: string; pgClass: PgClass }
   >;
 }
 interface Cache {}
@@ -239,12 +239,12 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      _schemaPrefix(options, { pgNamespace, databaseName }) {
+      _schemaPrefix(options, { pgNamespace, serviceName }) {
         const pgService = options.pgServices?.find(
-          (db) => db.name === databaseName,
+          (db) => db.name === serviceName,
         );
         const databasePrefix =
-          databaseName === pgService?.name ? "" : `${databaseName}-`;
+          serviceName === pgService?.name ? "" : `${serviceName}-`;
         const schemaPrefix =
           pgNamespace.nspname === pgService?.schemas?.[0]
             ? ""
@@ -252,7 +252,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         return `${databasePrefix}${schemaPrefix}`;
       },
 
-      tableResourceName(options, { pgClass, databaseName }) {
+      tableResourceName(options, { pgClass, serviceName }) {
         const typeTags = pgClass.getType()!.getTags();
         const classTags = pgClass.getTags();
         if (typeof typeTags?.name === "string") {
@@ -262,7 +262,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           return classTags.name;
         }
         const pgNamespace = pgClass.getNamespace()!;
-        const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
+        const schemaPrefix = this._schemaPrefix({ pgNamespace, serviceName });
         return this.camelCase(`${schemaPrefix}${pgClass.relname}`);
       },
 
@@ -319,13 +319,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   gather: {
     namespace: "pgTables",
     helpers: {
-      getResourceOptions(info, databaseName, pgClass) {
+      getResourceOptions(info, serviceName, pgClass) {
         let resourceOptionsByPgClass =
-          info.state.resourceOptionsByPgClassByDatabase.get(databaseName);
+          info.state.resourceOptionsByPgClassByDatabase.get(serviceName);
         if (!resourceOptionsByPgClass) {
           resourceOptionsByPgClass = new Map();
           info.state.resourceOptionsByPgClassByDatabase.set(
-            databaseName,
+            serviceName,
             resourceOptionsByPgClass,
           );
         }
@@ -335,10 +335,10 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         }
         resourceOptions = (async () => {
           const pgService = info.resolvedPreset.pgServices?.find(
-            (db) => db.name === databaseName,
+            (db) => db.name === serviceName,
           );
           if (!pgService) {
-            throw new Error(`Could not find '${databaseName}' in 'pgServices'`);
+            throw new Error(`Could not find '${serviceName}' in 'pgServices'`);
           }
           const schemas = pgService.schemas ?? ["public"];
 
@@ -362,12 +362,12 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
           const attributes =
             await info.helpers.pgIntrospection.getAttributesForClass(
-              databaseName,
+              serviceName,
               pgClass._id,
             );
 
           const codec = await info.helpers.pgCodecs.getCodecFromClass(
-            databaseName,
+            serviceName,
             pgClass._id,
           );
           if (!codec) {
@@ -376,20 +376,20 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
           const directConstraints =
             await info.helpers.pgIntrospection.getConstraintsForClass(
-              databaseName,
+              serviceName,
               pgClass._id,
             );
 
           const inheritance =
             await info.helpers.pgIntrospection.getInheritedForClass(
-              databaseName,
+              serviceName,
               pgClass._id,
             );
 
           const inheritedConstraints = await Promise.all(
             inheritance.map((inh) => {
               return info.helpers.pgIntrospection.getConstraintsForClass(
-                databaseName,
+                serviceName,
                 inh.inhparent,
               );
             }),
@@ -430,7 +430,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 },
               };
               await info.process("pgTables_unique", {
-                databaseName,
+                serviceName,
                 pgClass,
                 pgConstraint,
                 unique,
@@ -440,12 +440,12 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           );
 
           const executor =
-            info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
+            info.helpers.pgIntrospection.getExecutorForDatabase(serviceName);
           const name = info.inflection.tableResourceName({
-            databaseName,
+            serviceName,
             pgClass,
           });
-          const identifier = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
+          const identifier = `${serviceName}.${namespace.nspname}.${pgClass.relname}`;
 
           const { tags, description } = pgClass.getTagsAndDescription();
 
@@ -469,7 +469,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           const extensions = {
             description,
             pg: {
-              databaseName,
+              serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
             },
@@ -513,7 +513,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           );
 
           await info.process("pgTables_PgResourceOptions", {
-            databaseName,
+            serviceName,
             pgClass,
             resourceOptions: options,
           });
@@ -530,7 +530,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           }
 
           info.state.detailsByResourceOptions.set(resourceOptions, {
-            databaseName,
+            serviceName,
             pgClass,
           });
 
@@ -547,8 +547,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     }),
     hooks: {
       async pgIntrospection_class({ helpers }, event) {
-        const { entity: pgClass, databaseName } = event;
-        helpers.pgTables.getResourceOptions(databaseName, pgClass);
+        const { entity: pgClass, serviceName } = event;
+        helpers.pgTables.getResourceOptions(serviceName, pgClass);
       },
 
       // TODO: Ensure introspection has occurred, to ensure that
@@ -559,10 +559,10 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         const toProcess: Array<{
           resourceOptions: PgResourceOptions;
           pgClass: PgClass;
-          databaseName: string;
+          serviceName: string;
         }> = [];
         for (const [
-          databaseName,
+          serviceName,
           resourceOptionsByPgClass,
         ] of info.state.resourceOptionsByPgClassByDatabase.entries()) {
           for (const [
@@ -571,7 +571,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           ] of resourceOptionsByPgClass.entries()) {
             const resourceOptions = await resourceOptionsPromise;
             if (resourceOptions) {
-              const entry = { resourceOptions, pgClass, databaseName };
+              const entry = { resourceOptions, pgClass, serviceName };
               await info.process("pgTables_PgResourceOptions_relations", entry);
               toProcess.push(entry);
             }

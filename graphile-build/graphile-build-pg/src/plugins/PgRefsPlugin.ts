@@ -157,7 +157,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
         }
       },
       async pgTables_PgResourceOptions_relations_post(info, event) {
-        const { databaseName, resourceOptions, pgClass } = event;
+        const { serviceName, resourceOptions, pgClass } = event;
 
         const getCodecForTableName = async (targetTableIdentifier: string) => {
           const nsp = pgClass.getNamespace();
@@ -174,7 +174,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             );
           const targetPgClass =
             await info.helpers.pgIntrospection.getClassByName(
-              databaseName,
+              serviceName,
               targetSchemaName,
               targetTableName,
             );
@@ -182,7 +182,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             return null;
           }
           const targetCodec = await info.helpers.pgCodecs.getCodecFromClass(
-            databaseName,
+            serviceName,
             targetPgClass._id,
           );
           return targetCodec;

@@ -24,7 +24,7 @@ function makeAddPgTableConditionPlugin(
 In V5, the signature has changed a little.
 
 The first change is trivial: we've combined the first two arguments into a
-"match" object which also optionally accepts the `databaseName`.
+"match" object which also optionally accepts the `serviceName`.
 
 The second change, however, is much more significant - condition generation now
 operates based on the Gra*fast* plan system (which operates based on "steps"
@@ -36,7 +36,7 @@ The (simplified) new signature is:
 ```ts
 // V5 signature
 function makeAddPgTableConditionPlugin(
-  match: { databaseName?: string; schemaName: string; tableName: string },
+  match: { serviceName?: string; schemaName: string; tableName: string },
   conditionFieldName: string,
   fieldSpecGenerator: (build: GraphileBuild.Build) => GraphileInputFieldConfig,
 

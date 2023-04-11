@@ -60,7 +60,7 @@ export interface PgRefDefinitions {
 export interface PgCodecExtensions {
   oid?: string;
   pg?: {
-    databaseName: string;
+    serviceName: string;
     schemaName: string;
     name: string;
   };

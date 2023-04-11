@@ -70,7 +70,7 @@ declare module "@dataplan/pg" {
     singleOutputParameterName?: string;
     /** For v4 compatibility, what's the name of the actual table. */
     pg?: {
-      databaseName: string;
+      serviceName: string;
       schemaName: string;
       name: string;
     };

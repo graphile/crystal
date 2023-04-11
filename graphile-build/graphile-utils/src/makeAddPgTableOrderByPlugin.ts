@@ -21,7 +21,7 @@ const counterByName = new Map<string, number>();
 
 export function makeAddPgTableOrderByPlugin(
   match: {
-    databaseName?: string;
+    serviceName?: string;
     schemaName: string;
     tableName: string;
   },
@@ -30,7 +30,7 @@ export function makeAddPgTableOrderByPlugin(
   ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with makeAddPgTableOrderByPlugin to "${match.schemaName}"."${match.tableName}"`,
 ): GraphileConfig.Plugin {
-  const { databaseName = "main", schemaName, tableName } = match;
+  const { serviceName = "main", schemaName, tableName } = match;
   const baseDisplayName = `makeAddPgTableOrderByPlugin_${schemaName}_${tableName}`;
   let counter = counterByName.get(baseDisplayName);
   if (!counter) {
@@ -56,7 +56,7 @@ export function makeAddPgTableOrderByPlugin(
             !isPgRowSortEnum ||
             !table ||
             !table.columns ||
-            table.extensions?.pg?.databaseName !== databaseName ||
+            table.extensions?.pg?.serviceName !== serviceName ||
             table.extensions?.pg?.schemaName !== schemaName ||
             table.extensions?.pg?.name !== tableName
           ) {
