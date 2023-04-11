@@ -174,6 +174,7 @@ export class PgExecutor<TSettings = any> {
     } catch (e) {
       error = e;
     }
+    const end = process.hrtime.bigint();
     // TODO: this should be based on the headers of the incoming request
     const shouldExplain = debugExplain.enabled;
     const explainAnalyzeSafe = shouldExplain && /^\s*select/i.test(text);
@@ -197,7 +198,6 @@ export class PgExecutor<TSettings = any> {
           : explainResult.rows.map((r) => r[key]).join("\n");
     }
     if (debugVerbose.enabled || debugExplain.enabled) {
-      const end = process.hrtime.bigint();
       const duration = (Number((end - start) / 10000n) / 100).toFixed(2) + "ms";
       const rows = queryResult?.rows;
       const rowResults =
