@@ -28,7 +28,7 @@ import {
 } from "grafast";
 import type { GraphQLObjectType } from "graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
-import { sql } from "pg-sql2";
+import { $$symbolToIdentifier, sql } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
@@ -411,13 +411,6 @@ export class PgUnionAllStep<
   private queryValues: Array<QueryValue>;
 
   /**
-   * If this plan has queryValues, we must feed the queryValues into the placeholders to
-   * feed into the SQL statement after compiling the query; we'll use this
-   * symbol as the placeholder to replace.
-   */
-  private queryValuesSymbol: symbol;
-
-  /**
    * Values used in this plan.
    */
   private placeholders: Array<PgUnionAllPlaceholder>;
@@ -459,6 +452,7 @@ export class PgUnionAllStep<
   private finalizeResults: {
     // The SQL query text
     text: string;
+    textForSingle?: string;
 
     // The values to feed into the query
     rawSqlValues: SQLRawValue[];
@@ -480,6 +474,7 @@ export class PgUnionAllStep<
 
     // For prepared queries
     name?: string;
+    nameForSingle?: string;
   } | null = null;
 
   private limitAndOffsetSQL: SQL | null = null;
@@ -528,7 +523,6 @@ export class PgUnionAllStep<
       this.placeholders = [...cloneFrom.placeholders];
       this.queryValues = [...cloneFrom.queryValues];
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
-      this.queryValuesSymbol = cloneFrom.queryValuesSymbol;
       this.groups = cloneFromMatchingMode
         ? [...cloneFromMatchingMode.groups]
         : [];
@@ -612,7 +606,6 @@ export class PgUnionAllStep<
       this.placeholders = [];
       this.queryValues = [];
       this.placeholderValues = new Map();
-      this.queryValuesSymbol = Symbol("union_identifier_values");
       this.groups = [];
       this.havingConditions = [];
       this.orders = [];
@@ -1687,10 +1680,17 @@ ${unionHaving}\
       return innerQuery;
     };
 
-    const { query: finalQuery, identifierIndex } = (() => {
+    const { text, rawSqlValues, identifierIndex } = ((): {
+      text: string;
+      rawSqlValues: SQLRawValue[];
+      textForSingle?: string;
+      identifierIndex: number | null;
+    } => {
       if (this.queryValues.length > 0 || this.placeholders.length > 0) {
-        const wrapperAlias = sql.identifier(Symbol("union_result"));
-        const identifiersAlias = sql.identifier(Symbol("union_identifiers"));
+        const wrapperSymbol = Symbol("union_result");
+        const wrapperAlias = sql.identifier(wrapperSymbol);
+        const identifiersSymbol = Symbol("union_identifiers");
+        const identifiersAlias = sql.identifier(identifiersSymbol);
         this.placeholders.forEach((placeholder) => {
           // NOTE: we're NOT adding to `this.identifierMatches`.
 
@@ -1725,50 +1725,80 @@ ${unionHaving}\
         // IMPORTANT: this must come after the `selectExpression` call above.
         const innerQuery = makeQuery();
 
+        const {
+          text: lateralText,
+          values: rawSqlValues,
+          [$$symbolToIdentifier]: symbolToIdentifier,
+        } = sql.compile(
+          sql`lateral (${sql.indent(innerQuery)}) as ${wrapperAlias}`,
+          {
+            placeholderValues: this.placeholderValues,
+          },
+        );
+        const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
+        const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
+
+        let lastPlaceholder = rawSqlValues.length;
         /*
-         * IMPORTANT: this wrapper query is necessary so that queries that
-         * have a limit/offset get the limit/offset applied _per identifier
-         * group_; that's why this cannot just be another "from" clause.
+         * IMPORTANT: these wrapper queries are necessary so that queries
+         * that have a limit/offset get the limit/offset applied _per
+         * identifier group_; that's why this cannot just be another "from"
+         * clause.
          */
-        const query = sql`select ${wrapperAlias}.*
-from (${sql.indent(sql`\
-select\n${sql.indent(sql`\
-ids.ordinality - 1 as idx,
-${sql.join(
-  this.queryValues.map(({ codec }, idx) => {
-    return sql`(ids.value->>${sql.literal(idx)})::${
-      codec.sqlType
-    } as ${sql.identifier(`id${idx}`)}`;
-  }),
-  ",\n",
-)}`)}
-from json_array_elements(${sql.value(
-          // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-          // a value before executing the query.
-          this.queryValuesSymbol as any,
-        )}::json) with ordinality as ids`)}) as ${identifiersAlias},
-lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
-        return { query, identifierIndex };
+        const text = `\
+select ${wrapperAliasText}.*
+from (select ids.ordinality - 1 as idx, ${this.queryValues
+          .map(({ codec }, idx) => {
+            return `(ids.value->>${idx})::${
+              sql.compile(codec.sqlType).text
+            } as "id${idx}"`;
+          })
+          .join(
+            ", ",
+          )} from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
+${lateralText};`;
+
+        lastPlaceholder = rawSqlValues.length;
+        /**
+         * This is an optimized query to use when there's only one value to
+         * feed in, PostgreSQL seems to be able to execute queries using this
+         * _significantly_ faster (up to 3x or 200ms faster).
+         */
+        const textForSingle = `\
+select ${wrapperAliasText}.*
+from (select 0 as idx, ${this.queryValues
+          .map(({ codec }, idx) => {
+            return `$${++lastPlaceholder}::${
+              sql.compile(codec.sqlType).text
+            } as "id${idx}"`;
+          })
+          .join(", ")}) as ${identifiersAliasText},
+${lateralText};`;
+
+        return { text, textForSingle, rawSqlValues, identifierIndex };
       } else {
         const query = makeQuery();
-        return { query, identifierIndex: null };
+        const { text, values: rawSqlValues } = sql.compile(query, {
+          placeholderValues: this.placeholderValues,
+        });
+        return { text, rawSqlValues, identifierIndex: null };
       }
     })();
-
-    const { text, values: rawSqlValues } = sql.compile(finalQuery, {
-      placeholderValues: this.placeholderValues,
-    });
 
     const shouldReverseOrder = this.shouldReverseOrder();
 
     // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
 
+    const textForSingle = undefined;
+
     this.finalizeResults = {
       text,
+      textForSingle,
       rawSqlValues,
       identifierIndex,
       shouldReverseOrder,
       name: hash(text),
+      nameForSingle: textForSingle ? hash(textForSingle) : undefined,
     };
 
     super.finalize();
@@ -1806,7 +1836,6 @@ lateral (${sql.indent(innerQuery)}) as ${wrapperAlias};`;
         text,
         rawSqlValues,
         identifierIndex,
-        queryValuesSymbol: this.queryValuesSymbol,
         name,
         eventEmitter,
         useTransaction: false,

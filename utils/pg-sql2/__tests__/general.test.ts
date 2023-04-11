@@ -90,12 +90,12 @@ describe("sql.join", () => {
 describe("sql.compile", () => {
   it("simple", () => {
     const node = sql`select 1`;
-    expect(sql.compile(node)).toEqual({ text: "select 1", values: [] });
+    expect(sql.compile(node)).toMatchObject({ text: "select 1", values: [] });
   });
 
   it("with values", () => {
     const node = sql`select ${sql.value(1)}::integer`;
-    expect(sql.compile(node)).toEqual({
+    expect(sql.compile(node)).toMatchObject({
       text: "select $1::integer",
       values: [1],
     });
@@ -103,7 +103,7 @@ describe("sql.compile", () => {
 
   it("with sub-sub-sub query", () => {
     const node = sql`select ${sql`1 ${sql`from ${sql`foo`}`}`}`;
-    expect(sql.compile(node)).toEqual({
+    expect(sql.compile(node)).toMatchObject({
       text: "select 1 from foo",
       values: [],
     });
@@ -114,7 +114,7 @@ describe("sql.compile", () => {
       "foo",
       'b"z"b"z""b',
     )}`}`}`;
-    expect(sql.compile(node)).toEqual({
+    expect(sql.compile(node)).toMatchObject({
       text: 'select $1 from "foo"."b""z""b""z""""b"',
       values: [1],
     });
@@ -130,7 +130,7 @@ describe("sql.compile", () => {
       ],
       ", ",
     )}`;
-    expect(sql.compile(node)).toEqual({
+    expect(sql.compile(node)).toMatchObject({
       text: 'select $1, "foo"."bar", baz.qux(1, 2, 3), baz.qux($2, 2, 3)',
       values: [1, 1],
     });
@@ -157,7 +157,7 @@ describe("sql.compile", () => {
           "KSLDFJP(J£_RDIGFJf90-2mf)sd_(wng)*nq£(nrgd_f(gkw)dfksdfg)*hd)(jq£_)jermg)ieng_q£j_fopkgpejgt@£lvi:hwn*(twe):jhwoy£@(:iowrljw*yr(ehgso:dihgf(weygpsrhgowev(&",
         ),
       )}`;
-    expect(sql.compile(node)).toEqual({
+    expect(sql.compile(node)).toMatchObject({
       text: `    select 1
     from
       foo __foo__,

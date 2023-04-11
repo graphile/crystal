@@ -1,10 +1,5 @@
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -13,12 +8,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -27,12 +17,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -41,12 +26,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -55,12 +35,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -69,12 +44,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -83,12 +53,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -97,12 +62,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -111,12 +71,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -125,12 +80,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __json_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_identifiers__,
 lateral (
   select
     __json_identity__.v::text as "0",
@@ -139,12 +89,7 @@ lateral (
 ) as __json_identity_result__;
 
 select __jsonb_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"jsonb" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jsonb_identity_identifiers__,
+from (select 0 as idx, $1::"jsonb" as "id0") as __jsonb_identity_identifiers__,
 lateral (
   select
     __jsonb_identity__.v::text as "0",
@@ -153,12 +98,7 @@ lateral (
 ) as __jsonb_identity_result__;
 
 select __jsonb_identity_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"jsonb" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jsonb_identity_identifiers__,
+from (select 0 as idx, $1::"jsonb" as "id0") as __jsonb_identity_identifiers__,
 lateral (
   select
     __jsonb_identity__.v::text as "0",

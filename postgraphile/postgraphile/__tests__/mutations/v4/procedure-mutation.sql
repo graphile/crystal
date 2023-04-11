@@ -1,10 +1,5 @@
 select __json_identity_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_mutation_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_mutation_identifiers__,
 lateral (
   select
     __json_identity_mutation__.v::text as "0",
@@ -13,12 +8,7 @@ lateral (
 ) as __json_identity_mutation_result__;
 
 select __jsonb_identity_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"jsonb" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jsonb_identity_mutation_identifiers__,
+from (select 0 as idx, $1::"jsonb" as "id0") as __jsonb_identity_mutation_identifiers__,
 lateral (
   select
     __jsonb_identity_mutation__.v::text as "0",
@@ -27,12 +17,7 @@ lateral (
 ) as __jsonb_identity_mutation_result__;
 
 select __json_identity_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"json" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __json_identity_mutation_identifiers__,
+from (select 0 as idx, $1::"json" as "id0") as __json_identity_mutation_identifiers__,
 lateral (
   select
     __json_identity_mutation__.v::text as "0",
@@ -41,12 +26,7 @@ lateral (
 ) as __json_identity_mutation_result__;
 
 select __jsonb_identity_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"jsonb" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jsonb_identity_mutation_identifiers__,
+from (select 0 as idx, $1::"jsonb" as "id0") as __jsonb_identity_mutation_identifiers__,
 lateral (
   select
     __jsonb_identity_mutation__.v::text as "0",
@@ -55,12 +35,7 @@ lateral (
 ) as __jsonb_identity_mutation_result__;
 
 select __jsonb_identity_mutation_plpgsql_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"jsonb" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jsonb_identity_mutation_plpgsql_identifiers__,
+from (select 0 as idx, $1::"jsonb" as "id0") as __jsonb_identity_mutation_plpgsql_identifiers__,
 lateral (
   select
     __jsonb_identity_mutation_plpgsql__.v::text as "0",
@@ -73,12 +48,7 @@ select
 from "c"."jsonb_identity_mutation_plpgsql_with_default"() as __jsonb_identity_mutation_plpgsql_with_default__(v);
 
 select __jsonb_identity_mutation_plpgsql_with_default_resul__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"jsonb" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __jsonb_identity_mutation_plpgsql_with_default_ident__,
+from (select 0 as idx, $1::"jsonb" as "id0") as __jsonb_identity_mutation_plpgsql_with_default_ident__,
 lateral (
   select
     __jsonb_identity_mutation_plpgsql_with_default__.v::text as "0",
@@ -87,13 +57,7 @@ lateral (
 ) as __jsonb_identity_mutation_plpgsql_with_default_resul__;
 
 select __add_1_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_1_mutation_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_1_mutation_identifiers__,
 lateral (
   select
     __add_1_mutation__.v::text as "0",
@@ -105,13 +69,7 @@ lateral (
 ) as __add_1_mutation_result__;
 
 select __add_2_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_2_mutation_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_2_mutation_identifiers__,
 lateral (
   select
     __add_2_mutation__.v::text as "0",
@@ -123,13 +81,7 @@ lateral (
 ) as __add_2_mutation_result__;
 
 select __add_3_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_3_mutation_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_3_mutation_identifiers__,
 lateral (
   select
     __add_3_mutation__.v::text as "0",
@@ -141,13 +93,7 @@ lateral (
 ) as __add_3_mutation_result__;
 
 select __add_4_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_4_mutation_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_4_mutation_identifiers__,
 lateral (
   select
     __add_4_mutation__.v::text as "0",
@@ -159,13 +105,7 @@ lateral (
 ) as __add_4_mutation_result__;
 
 select __add_4_mutation_error_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __add_4_mutation_error_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __add_4_mutation_error_identifiers__,
 lateral (
   select
     __add_4_mutation_error__.v::text as "0",
@@ -177,13 +117,7 @@ lateral (
 ) as __add_4_mutation_error_result__;
 
 select __mult_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mult_1_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __mult_1_identifiers__,
 lateral (
   select
     __mult_1__.v::text as "0",
@@ -195,13 +129,7 @@ lateral (
 ) as __mult_1_result__;
 
 select __mult_2_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mult_2_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __mult_2_identifiers__,
 lateral (
   select
     __mult_2__.v::text as "0",
@@ -213,13 +141,7 @@ lateral (
 ) as __mult_2_result__;
 
 select __mult_3_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mult_3_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __mult_3_identifiers__,
 lateral (
   select
     __mult_3__.v::text as "0",
@@ -231,13 +153,7 @@ lateral (
 ) as __mult_3_result__;
 
 select __mult_4_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mult_4_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __mult_4_identifiers__,
 lateral (
   select
     __mult_4__.v::text as "0",
@@ -249,17 +165,7 @@ lateral (
 ) as __mult_4_result__;
 
 select __types_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int8" as "id0",
-    (ids.value->>1)::"bool" as "id1",
-    (ids.value->>2)::"varchar" as "id2",
-    (ids.value->>3)::"int4"[] as "id3",
-    (ids.value->>4)::"json" as "id4",
-    (ids.value->>5)::"c"."floatrange" as "id5"
-  from json_array_elements($1::json) with ordinality as ids
-) as __types_mutation_identifiers__,
+from (select 0 as idx, $1::"int8" as "id0", $2::"bool" as "id1", $3::"varchar" as "id2", $4::"int4"[] as "id3", $5::"json" as "id4", $6::"c"."floatrange" as "id5") as __types_mutation_identifiers__,
 lateral (
   select
     __types_mutation__.v::text as "0",
@@ -275,12 +181,7 @@ lateral (
 ) as __types_mutation_result__;
 
 select __compound_type_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_mutation_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __compound_type_mutation_identifiers__,
 lateral (
   select
     __compound_type_mutation__."a"::text as "0",
@@ -297,12 +198,7 @@ lateral (
 ) as __compound_type_mutation_result__;
 
 select __compound_type_set_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_set_mutation_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __compound_type_set_mutation_identifiers__,
 lateral (
   select
     __compound_type_set_mutation__."a"::text as "0",
@@ -319,12 +215,7 @@ lateral (
 ) as __compound_type_set_mutation_result__;
 
 select __compound_type_array_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __compound_type_array_mutation_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __compound_type_array_mutation_identifiers__,
 lateral (
   select
     __compound_type_array_mutation__."a"::text as "0",
@@ -341,12 +232,7 @@ lateral (
 ) as __compound_type_array_mutation_result__;
 
 select __table_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_mutation_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __table_mutation_identifiers__,
 lateral (
   select
     __table_mutation__."headline" as "0",
@@ -357,12 +243,7 @@ lateral (
 ) as __table_mutation_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -376,12 +257,7 @@ lateral (
 ) as __person_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -395,12 +271,7 @@ lateral (
 ) as __post_result__;
 
 select __table_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __table_mutation_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __table_mutation_identifiers__,
 lateral (
   select
     __table_mutation__."headline" as "0",
@@ -411,12 +282,7 @@ lateral (
 ) as __table_mutation_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -430,12 +296,7 @@ lateral (
 ) as __person_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -453,14 +314,7 @@ select
 from "c"."table_set_mutation"() as __table_set_mutation__;
 
 select __int_set_mutation_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __int_set_mutation_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __int_set_mutation_identifiers__,
 lateral (
   select
     __int_set_mutation__.v::text as "0",
@@ -481,12 +335,7 @@ select
 from "a"."return_void_mutation"() as __return_void_mutation__(v);
 
 select __guid_fn_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."guid" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __guid_fn_identifiers__,
+from (select 0 as idx, $1::"b"."guid" as "id0") as __guid_fn_identifiers__,
 lateral (
   select
     __guid_fn__.v as "0",
@@ -495,12 +344,7 @@ lateral (
 ) as __guid_fn_result__;
 
 select __guid_fn_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."guid" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __guid_fn_identifiers__,
+from (select 0 as idx, $1::"b"."guid" as "id0") as __guid_fn_identifiers__,
 lateral (
   select
     __guid_fn__.v as "0",
@@ -509,12 +353,7 @@ lateral (
 ) as __guid_fn_result__;
 
 select __post_many_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"a"."post"[] as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_many_identifiers__,
+from (select 0 as idx, $1::"a"."post"[] as "id0") as __post_many_identifiers__,
 lateral (
   select
     __post_many__."id"::text as "0",
@@ -525,12 +364,7 @@ lateral (
 ) as __post_many_result__;
 
 select __frmcdc_comptype_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"a"."comptype"[] as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_comptype_1_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."comptype"[] as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
     to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
@@ -541,13 +375,7 @@ lateral (
 ) as __frmcdc_comptype_1_result__;
 
 select __post_with_suffix_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"a"."post" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_with_suffix_identifiers__,
+from (select 0 as idx, $1::"a"."post" as "id0", $2::"text" as "id1") as __post_with_suffix_identifiers__,
 lateral (
   select
     __post_with_suffix__."id"::text as "0",
@@ -570,12 +398,7 @@ select
 from "c"."issue756_set_mutation"() as __issue756_set_mutation__;
 
 select __mutation_compound_type_array_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_compound_type_array_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __mutation_compound_type_array_identifiers__,
 lateral (
   select
     __mutation_compound_type_array__."a"::text as "0",

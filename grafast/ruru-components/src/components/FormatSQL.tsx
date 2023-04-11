@@ -45,7 +45,7 @@ export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
       return parts;
     };
     for (let i = 0, l = lines.length; i < l; i++) {
-      const line = lines[i].trim();
+      const line = lines[i];
       const parts = makeParts(line);
 
       elements.push(

@@ -29,6 +29,13 @@ let cursorCount = 0;
 
 const debug = debugFactory("datasource:pg:PgExecutor");
 const debugVerbose = debug.extend("verbose");
+const debugExplain = debug.extend("explain");
+
+type PublishFunction = (
+  text: string,
+  name: string | undefined,
+  explain: string | undefined,
+) => void;
 
 type ExecuteFunction = <TData>(
   text: string,
@@ -96,10 +103,11 @@ export type PgExecutorInput<TInput> = {
 
 export type PgExecutorOptions = {
   text: string;
-  rawSqlValues: Array<SQLRawValue | symbol>;
+  textForSingle?: string;
+  rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
-  queryValuesSymbol?: symbol | null;
   name?: string;
+  nameForSingle?: string;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
 };
@@ -151,6 +159,7 @@ export class PgExecutor<TSettings = any> {
     text: string,
     values: ReadonlyArray<SQLRawValue>,
     name?: string,
+    publish?: PublishFunction,
   ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
@@ -165,8 +174,30 @@ export class PgExecutor<TSettings = any> {
     } catch (e) {
       error = e;
     }
-    if (debugVerbose.enabled) {
-      const end = process.hrtime.bigint();
+    const end = process.hrtime.bigint();
+    // TODO: this should be based on the headers of the incoming request
+    const shouldExplain = debugExplain.enabled;
+    const explainAnalyzeSafe = shouldExplain && /^\s*select/i.test(text);
+    let explain: string | undefined = undefined;
+    if (shouldExplain) {
+      const explainResult = await client.query<{ 0: string }>({
+        text: `EXPLAIN (${
+          explainAnalyzeSafe ? "ANALYZE, " : ""
+        }COSTS, VERBOSE, BUFFERS, SETTINGS) ${text}`,
+        values: values as SQLRawValue[],
+        arrayMode: true,
+      });
+      const firstResult = explainResult.rows[0];
+      const key = firstResult ? (Object.keys(firstResult)[0] as "0") : "0";
+      explain =
+        explainResult.rows.length === 1 &&
+        typeof firstResult[key] === "object" &&
+        firstResult[key] !== null
+          ? // Support for 'FORMAT JSON'
+            JSON.stringify(firstResult[key], null, 2)
+          : explainResult.rows.map((r) => r[key]).join("\n");
+    }
+    if (debugVerbose.enabled || debugExplain.enabled) {
       const duration = (Number((end - start) / 10000n) / 100).toFixed(2) + "ms";
       const rows = queryResult?.rows;
       const rowResults =
@@ -187,7 +218,7 @@ export class PgExecutor<TSettings = any> {
               .join("\n  ") +
             "\n]"
           : inspect(queryResult?.rows, { colors: true, depth: 6 });
-      debugVerbose(
+      (debugExplain.enabled ? debugExplain : debugVerbose)(
         `\
 
 
@@ -213,13 +244,22 @@ ${duration}
 %s
 
 
+# EXPLAIN
+%s
+
+
 `,
         LOOK_DOWN,
         formatSQLForDebugging(text, error),
         values,
         error ? error : rowResults,
         LOOK_UP,
+        explain ??
+          `(Use 'DEBUG="datasource:pg:PgExecutor:explain"' to enable explain)`,
       );
+    }
+    if (publish) {
+      publish(text, name, explain);
     }
     if (error) {
       throw error;
@@ -236,12 +276,13 @@ ${duration}
     text: string,
     values: ReadonlyArray<SQLRawValue>,
     name?: string,
+    publish?: PublishFunction,
   ) {
     // PERF: we could probably make this more efficient by grouping the
     // deferreds further, DataLoader-style, and running one SQL query for
     // everything.
     return await context.withPgClient(context.pgSettings, (client) =>
-      this._executeWithClient<TData>(client, text, values, name),
+      this._executeWithClient<TData>(client, text, values, name, publish),
     );
   }
 
@@ -291,23 +332,20 @@ ${duration}
   ): Promise<{
     values: GrafastValuesList<ReadonlyArray<TOutput>>;
   }> {
-    const {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      queryValuesSymbol,
-      name,
-      eventEmitter,
-    } = common;
+    const { rawSqlValues, identifierIndex, eventEmitter } = common;
 
-    eventEmitter?.emit("explainOperation", {
-      operation: {
-        type: "sql",
-        title: `SQL query${name ? ` '${name.slice(0, 7)}...'` : ""}`,
-        query: text,
-        explain: undefined, // TODO: add explain output
-      },
-    });
+    const publishExecute: PublishFunction | undefined = eventEmitter
+      ? (text, name, explain) => {
+          eventEmitter.emit("explainOperation", {
+            operation: {
+              type: "sql",
+              title: `SQL query${name ? ` '${name.slice(0, 7)}...'` : ""}`,
+              query: text,
+              explain,
+            },
+          });
+        }
+      : undefined;
 
     const valuesCount = values.length;
     const results: Array<Deferred<Array<TOutput>> | undefined> = [];
@@ -362,7 +400,9 @@ ${duration}
             }
           }
 
-          const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
+          const textAndValues = `${common.text}\n${JSON.stringify(
+            rawSqlValues,
+          )}`;
           let cacheForQuery = cacheForContext.get(textAndValues);
           if (!cacheForQuery) {
             cacheForQuery = new Map();
@@ -417,32 +457,30 @@ ${duration}
             }
 
             if (remaining.length) {
-              let found = false;
-              const sqlValues = rawSqlValues.map((v) => {
-                // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
-                // before executing the query.
-                if (
-                  identifierIndex != null &&
-                  queryValuesSymbol != null &&
-                  (v as any) === queryValuesSymbol
-                ) {
-                  found = true;
-                  // Manual JSON-ing
-                  return "[" + remaining.join(",") + "]";
-                } else if (typeof v === "symbol") {
-                  console.error(formatSQLForDebugging(text));
-                  throw new Error(
-                    `Unhandled symbol when executing query: '${String(v)}'`,
-                  );
-                } else {
-                  return v;
-                }
-              });
-              if (identifierIndex != null && !found) {
-                throw new Error(
-                  "Query with identifiers was executed, but no identifier reference was found in the values passed",
-                );
-              }
+              const singleMode =
+                identifierIndex != null &&
+                remaining.length === 1 &&
+                common.textForSingle != null;
+              const text =
+                singleMode && common.textForSingle
+                  ? common.textForSingle
+                  : common.text;
+              const name =
+                singleMode && common.textForSingle
+                  ? common.nameForSingle
+                  : common.name;
+
+              const sqlValues =
+                identifierIndex == null
+                  ? rawSqlValues
+                  : singleMode
+                  ? [...rawSqlValues, ...JSON.parse(remaining[0])]
+                  : [
+                      ...rawSqlValues,
+                      // Manual JSON-ing
+                      "[" + remaining.join(",") + "]",
+                    ];
+
               // PERF: we could probably make this more efficient by grouping the
               // deferreds further, DataLoader-style, and running one SQL query for
               // everything.
@@ -452,7 +490,13 @@ ${duration}
                     text,
                     values: sqlValues,
                   })
-                : await this._execute<TOutput>(context, text, sqlValues, name);
+                : await this._execute<TOutput>(
+                    context,
+                    text,
+                    sqlValues,
+                    name,
+                    publishExecute,
+                  );
               const { rows } = queryResult;
               const groups: { [valueIndex: number]: any[] } =
                 Object.create(null);
@@ -517,7 +561,7 @@ ${duration}
   ): Promise<{
     streams: GrafastResultStreamList<TOutput>;
   }> {
-    const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
+    const { text, rawSqlValues, identifierIndex } = common;
 
     const valuesCount = values.length;
     const streams: Array<AsyncIterable<TOutput> | Promise<never> | null> = [];
@@ -584,7 +628,6 @@ ${duration}
           );
         }
 
-        let found = false;
         const remaining = [...batchIndexesByIdentifiersJSON.keys()];
         const batchIndexesByValueIndex = [
           ...batchIndexesByIdentifiersJSON.values(),
@@ -592,31 +635,18 @@ ${duration}
 
         // PERF: batchIndexesByIdentifiersJSON = null;
 
-        const sqlValues = rawSqlValues.map((v) => {
-          // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
-          // before executing the query.
-          if (
-            identifierIndex != null &&
-            queryValuesSymbol != null &&
-            (v as any) === queryValuesSymbol
-          ) {
-            found = true;
-            // Manual JSON-ing
-            return "[" + remaining.join(",") + "]";
-          } else if (typeof v === "symbol") {
-            console.error(formatSQLForDebugging(text));
-            throw new Error(
-              `Unhandled symbol when executing query: '${String(v)}'`,
-            );
-          } else {
-            return v;
-          }
-        });
-        if (identifierIndex != null && !found) {
-          throw new Error(
-            "Query with identifiers was executed, but no identifier reference was found in the values passed",
-          );
-        }
+        // TODO: implement singleMode using textForSingle
+        const singleMode = false;
+        const sqlValues =
+          identifierIndex == null
+            ? rawSqlValues
+            : singleMode
+            ? [...rawSqlValues, ...JSON.parse(remaining[0])]
+            : [
+                ...rawSqlValues,
+                // Manual JSON-ing
+                "[" + remaining.join(",") + "]",
+              ];
 
         // Maximum PostgreSQL identifier length is typically 63 bytes.
         // Minus the `__cursor___` text, this leaves 52 characters for this

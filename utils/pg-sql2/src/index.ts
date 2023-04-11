@@ -20,6 +20,9 @@ function exportAs<T>(thing: T, exportName: string) {
   return thing;
 }
 
+/** Experimental! */
+export const $$symbolToIdentifier = Symbol("symbolToIdentifier");
+
 const isDev =
   typeof process !== "undefined" && process.env.GRAPHILE_ENV === "development";
 
@@ -339,6 +342,7 @@ export function compile(
 ): {
   text: string;
   values: SQLRawValue[];
+  [$$symbolToIdentifier]: Map<symbol, string>;
 } {
   const placeholderValues = options?.placeholderValues;
   /**
@@ -355,6 +359,8 @@ export function compile(
    * when constructing large SQL queries with many aliases.
    */
   const symbolToIdentifier = new Map<symbol, string>();
+
+  const valueToPlaceholder = new Map<SQLValueNode, string>();
 
   /**
    * When the same description is used more than once in different symbols we
@@ -433,14 +439,21 @@ export function compile(
           break;
         }
         case "VALUE": {
-          valueCount++;
-          if (valueCount > 65535) {
-            throw new Error(
-              "[pg-sql2] This SQL statement would contain too many placeholders; PostgreSQL supports at most 65535 placeholders. To solve this, consider refactoring the query to use arrays/unnest where possible, or split it into multiple queries.",
-            );
+          const existing = valueToPlaceholder.get(item);
+          if (existing != null) {
+            sqlFragments.push(existing);
+          } else {
+            valueCount++;
+            const sqlString = `$${valueCount}`;
+            valueToPlaceholder.set(item, sqlString);
+            if (valueCount > 65535) {
+              throw new Error(
+                "[pg-sql2] This SQL statement would contain too many placeholders; PostgreSQL supports at most 65535 placeholders. To solve this, consider refactoring the query to use arrays/unnest where possible, or split it into multiple queries.",
+              );
+            }
+            values[valueCount - 1] = item.v;
+            sqlFragments.push(sqlString);
           }
-          values[valueCount - 1] = item.v;
-          sqlFragments.push(`$${valueCount}`);
           break;
         }
         case "INDENT": {
@@ -503,6 +516,7 @@ export function compile(
   return {
     text,
     values,
+    [$$symbolToIdentifier]: symbolToIdentifier,
   };
 }
 

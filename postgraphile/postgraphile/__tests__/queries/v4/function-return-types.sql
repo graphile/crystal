@@ -1,11 +1,5 @@
 select __func_in_inout_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_in_inout_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __func_in_inout_identifiers__,
 lateral (
   select
     __func_in_inout__.v::text as "0",
@@ -17,12 +11,7 @@ lateral (
 ) as __func_in_inout_result__;
 
 select __func_in_out_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_in_out_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __func_in_out_identifiers__,
 lateral (
   select
     __func_in_out__.v::text as "0",
@@ -35,13 +24,7 @@ select
 from "c"."func_out"() as __func_out__(v);
 
 select __func_out_complex_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_out_complex_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __func_out_complex_identifiers__,
 lateral (
   select
     __func_out_complex__."x"::text as "0",
@@ -79,12 +62,7 @@ select
 from "c"."func_out_out"() as __func_out_out__;
 
 select __func_out_out_compound_type_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_out_out_compound_type_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __func_out_out_compound_type_identifiers__,
 lateral (
   select
     __func_out_out_compound_type__."o1"::text as "0",
@@ -121,16 +99,7 @@ select
 from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1",
-    (ids.value->>2)::"int4" as "id2",
-    (ids.value->>3)::"text" as "id3",
-    (ids.value->>4)::"text" as "id4"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1", $3::"int4" as "id2", $4::"text" as "id3", $5::"text" as "id4") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -201,14 +170,7 @@ lateral (
 ) as __person_result__;
 
 select __query_output_two_rows_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"text" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __query_output_two_rows_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"text" as "id2") as __query_output_two_rows_identifiers__,
 lateral (
   select
     __left_arm__."id"::text as "0",
@@ -247,14 +209,7 @@ lateral (
 ) as __query_output_two_rows_result__;
 
 select __query_output_two_rows_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"text" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __query_output_two_rows_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"text" as "id2") as __query_output_two_rows_identifiers__,
 lateral (
   select
     __left_arm__."id"::text as "0",
@@ -299,13 +254,7 @@ select
 from "c"."search_test_summaries"() as __search_test_summaries__;
 
 select __func_out_complex_setof_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_out_complex_setof_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __func_out_complex_setof_identifiers__,
 lateral (
   select
     __func_out_complex_setof__."x"::text as "0",
@@ -337,13 +286,7 @@ lateral (
 ) as __func_out_complex_setof_result__;
 
 select __func_out_complex_setof_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_out_complex_setof_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __func_out_complex_setof_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
@@ -381,12 +324,7 @@ select
 from "c"."func_out_table_setof"() as __func_out_table_setof__;
 
 select __func_returns_table_multi_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_returns_table_multi_col_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_multi_col_identifiers__,
 lateral (
   select
     __func_returns_table_multi_col__."col1"::text as "0",
@@ -397,12 +335,7 @@ lateral (
 ) as __func_returns_table_multi_col_result__;
 
 select __func_returns_table_multi_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_returns_table_multi_col_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_multi_col_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
@@ -411,12 +344,7 @@ lateral (
 ) as __func_returns_table_multi_col_result__;
 
 select __func_returns_table_one_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_returns_table_one_col_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_one_col_identifiers__,
 lateral (
   select
     __func_returns_table_one_col__.v::text as "0",
@@ -425,12 +353,7 @@ lateral (
 ) as __func_returns_table_one_col_result__;
 
 select __func_returns_table_one_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __func_returns_table_one_col_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_one_col_identifiers__,
 lateral (
   select
     (count(*))::text as "0",

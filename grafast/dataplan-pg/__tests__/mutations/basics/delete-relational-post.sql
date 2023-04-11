@@ -3,12 +3,7 @@ delete from interfaces_and_unions.relational_posts as __relational_posts__ where
   __relational_posts__::text as "1";
 
 select __relational_posts_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::interfaces_and_unions.relational_posts as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __relational_posts_identifiers__,
+from (select 0 as idx, $1::interfaces_and_unions.relational_posts as "id0") as __relational_posts_identifiers__,
 lateral (
   select
     __people__."person_id"::text as "0",

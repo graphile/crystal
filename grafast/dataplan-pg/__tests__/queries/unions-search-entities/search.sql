@@ -1,10 +1,5 @@
 select __entity_search_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"text" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __entity_search_identifiers__,
+from (select 0 as idx, $1::"text" as "id0") as __entity_search_identifiers__,
 lateral (
   select
     __entity_search__."person_id"::text as "0",
@@ -19,12 +14,7 @@ lateral (
 ) as __entity_search_result__;
 
 select __people_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __people_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __people_identifiers__,
 lateral (
   select
     __people__."person_id"::text as "0",
@@ -41,12 +31,7 @@ lateral (
 ) as __people_result__;
 
 select __posts_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __posts_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __posts_identifiers__,
 lateral (
   select
     __posts__."post_id"::text as "0",
@@ -66,12 +51,7 @@ lateral (
 ) as __posts_result__;
 
 select __comments_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __comments_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __comments_identifiers__,
 lateral (
   select
     __comments__."comment_id"::text as "0",

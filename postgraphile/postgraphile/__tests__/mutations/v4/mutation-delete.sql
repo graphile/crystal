@@ -46,12 +46,7 @@ delete from "c"."compound_key" as __compound_key__ where ((__compound_key__."per
   __compound_key__."person_id_2"::text as "1";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -65,12 +60,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -88,12 +78,7 @@ delete from "c"."compound_key" as __compound_key__ where ((__compound_key__."per
   __compound_key__."person_id_2"::text as "1";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -107,12 +92,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -135,13 +115,7 @@ delete from "c"."person" as __person__ where (__person__."email" = $1::"b"."emai
   __person__::text as "3";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0",
-    (ids.value->>1)::"b"."email" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
@@ -159,12 +133,7 @@ delete from "c"."person" as __person__ where (__person__."id" = $1::"int4") retu
   __person__::text as "1";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"c"."person" as "id0") as __person_identifiers__,
 lateral (
   select
     "c"."person_first_name"(__person__) as "0",

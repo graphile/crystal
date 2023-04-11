@@ -28,12 +28,7 @@ from "c"."person" as __person__
 order by __person__."person_full_name" desc, __person__."id" asc;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."headline" as "0",
@@ -47,12 +42,7 @@ lateral (
 ) as __post_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."headline" as "0",

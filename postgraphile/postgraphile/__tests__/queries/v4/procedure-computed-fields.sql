@@ -46,21 +46,7 @@ on TRUE
 order by __types__."id" asc;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"text" as "id2",
-    (ids.value->>3)::"int4" as "id3",
-    (ids.value->>4)::"int4" as "id4",
-    (ids.value->>5)::"text" as "id5",
-    (ids.value->>6)::"int4" as "id6",
-    (ids.value->>7)::"text" as "id7",
-    (ids.value->>8)::"int4" as "id8",
-    (ids.value->>9)::"text" as "id9"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"text" as "id2", $4::"int4" as "id3", $5::"int4" as "id4", $6::"text" as "id5", $7::"int4" as "id6", $8::"text" as "id7", $9::"int4" as "id8", $10::"text" as "id9") as __post_identifiers__,
 lateral (
   select
     __post__."headline" as "0",
@@ -149,13 +135,7 @@ select
 from "c"."edge_case" as __edge_case__;
 
 select __post_computed_compound_type_array_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"a"."post" as "id0",
-    (ids.value->>1)::"c"."compound_type" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_computed_compound_type_array_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0", (ids.value->>1)::"c"."compound_type" as "id1" from json_array_elements($1::json) with ordinality as ids) as __post_computed_compound_type_array_identifiers__,
 lateral (
   select
     __post_computed_compound_type_array__."a"::text as "0",

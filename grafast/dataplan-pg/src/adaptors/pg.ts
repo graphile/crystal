@@ -276,7 +276,8 @@ export function makePgAdaptorWithPgClient(
     if (!pgClient[$$isSetup]) {
       pgClient[$$isSetup] = true;
       if (!DONT_DISABLE_JIT) {
-        pgClient.query("set jit = off;").catch((e) => {
+        // We don't actually disable JIT, it's the optimization that's expensive so we disable that.
+        pgClient.query("set jit_optimize_above_cost = -1;").catch((e) => {
           console.error(
             `Error occurred applying @dataplan/pg global Postgres settings: ${e}`,
           );

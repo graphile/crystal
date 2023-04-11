@@ -1,11 +1,5 @@
 select __mutation_in_inout_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_in_inout_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __mutation_in_inout_identifiers__,
 lateral (
   select
     __mutation_in_inout__.v::text as "0",
@@ -17,12 +11,7 @@ lateral (
 ) as __mutation_in_inout_result__;
 
 select __mutation_in_out_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_in_out_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __mutation_in_out_identifiers__,
 lateral (
   select
     __mutation_in_out__.v::text as "0",
@@ -35,13 +24,7 @@ select
 from "c"."mutation_out"() as __mutation_out__(v);
 
 select __mutation_out_complex_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_out_complex_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __mutation_out_complex_identifiers__,
 lateral (
   select
     __mutation_out_complex__."x"::text as "0",
@@ -56,12 +39,7 @@ lateral (
 ) as __mutation_out_complex_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -73,12 +51,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"c"."person" as "id0") as __person_identifiers__,
 lateral (
   select
     (select json_agg(s) from (
@@ -98,13 +71,7 @@ lateral (
 ) as __person_result__;
 
 select __mutation_out_complex_setof_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"text" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_out_complex_setof_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __mutation_out_complex_setof_identifiers__,
 lateral (
   select
     __mutation_out_complex_setof__."x"::text as "0",
@@ -119,12 +86,7 @@ lateral (
 ) as __mutation_out_complex_setof_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -136,12 +98,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"c"."person" as "id0") as __person_identifiers__,
 lateral (
   select
     (select json_agg(s) from (
@@ -167,12 +124,7 @@ select
 from "c"."mutation_out_out"() as __mutation_out_out__;
 
 select __mutation_out_out_compound_type_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_out_out_compound_type_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __mutation_out_out_compound_type_identifiers__,
 lateral (
   select
     __mutation_out_out_compound_type__."o1"::text as "0",
@@ -183,12 +135,7 @@ lateral (
 ) as __mutation_out_out_compound_type_result__;
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -235,12 +182,7 @@ select
 from "c"."mutation_out_unnamed_out_out_unnamed"() as __mutation_out_unnamed_out_out_unnamed__;
 
 select __mutation_returns_table_multi_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_returns_table_multi_col_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __mutation_returns_table_multi_col_identifiers__,
 lateral (
   select
     __mutation_returns_table_multi_col__."col1"::text as "0",
@@ -251,12 +193,7 @@ lateral (
 ) as __mutation_returns_table_multi_col_result__;
 
 select __mutation_returns_table_one_col_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __mutation_returns_table_one_col_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __mutation_returns_table_one_col_identifiers__,
 lateral (
   select
     __mutation_returns_table_one_col__.v::text as "0",

@@ -39,7 +39,7 @@ import {
   stepsAreInSamePhase,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
-import sql, { arraysMatch } from "pg-sql2";
+import sql, { $$symbolToIdentifier, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
@@ -391,13 +391,6 @@ export class PgSelectStep<
   private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
   /**
-   * If this plan has queryValues, we must feed the queryValues into the placeholders to
-   * feed into the SQL statement after compiling the query; we'll use this
-   * symbol as the placeholder to replace.
-   */
-  private queryValuesSymbol: symbol;
-
-  /**
    * Values used in this plan.
    */
   private placeholders: Array<PgSelectPlaceholder>;
@@ -461,6 +454,8 @@ export class PgSelectStep<
   private finalizeResults: {
     // The SQL query text
     text: string;
+    // An optimized SQL query to use when there's only one input
+    textForSingle?: string;
 
     // The values to feed into the query
     rawSqlValues: SQLRawValue[];
@@ -482,6 +477,7 @@ export class PgSelectStep<
 
     // For prepared queries
     name?: string;
+    nameForSingle?: string;
   } | null = null;
 
   // --------------------
@@ -561,9 +557,6 @@ export class PgSelectStep<
       : this.addDependency(this.resource.executor.context());
 
     this.name = customName ?? resource.name;
-    this.queryValuesSymbol = cloneFrom
-      ? cloneFrom.queryValuesSymbol
-      : Symbol(this.name + "_identifier_values");
     this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(this.name);
     this._symbolSubstitutes = cloneFrom
       ? new Map(cloneFrom._symbolSubstitutes)
@@ -1232,8 +1225,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     if (this.isNullFetch()) {
       return arrayOfLength(count, Object.freeze([]));
     }
-    const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
-      this.finalizeResults;
+    const {
+      text,
+      textForSingle,
+      rawSqlValues,
+      identifierIndex,
+      shouldReverseOrder,
+      name,
+      nameForSingle,
+    } = this.finalizeResults;
 
     const executionResult = await this.resource.executeWithCache(
       values[this.contextId].map((context, i) => {
@@ -1251,10 +1251,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       }),
       {
         text,
+        textForSingle,
         rawSqlValues,
         identifierIndex,
-        queryValuesSymbol: this.queryValuesSymbol,
         name,
+        nameForSingle,
         eventEmitter,
         useTransaction: this.mode === "mutation",
       },
@@ -1341,7 +1342,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
               text,
               rawSqlValues,
               identifierIndex,
-              queryValuesSymbol: this.queryValuesSymbol,
               eventEmitter,
             },
           )
@@ -1367,7 +1367,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           text: textForDeclare,
           rawSqlValues: rawSqlValuesForDeclare,
           identifierIndex,
-          queryValuesSymbol: this.queryValuesSymbol,
           eventEmitter,
         },
       )
@@ -1875,9 +1874,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.locker.locked = false;
 
     if (!this.isFinalized) {
-      const identifiersAlias = sql.identifier(
-        Symbol(this.name + "_identifiers"),
-      );
+      const identifiersSymbol = Symbol(this.name + "_identifiers");
+      const identifiersAlias = sql.identifier(identifiersSymbol);
 
       this.placeholders.forEach((placeholder) => {
         // NOTE: we're NOT adding to `this.identifierMatches`.
@@ -1909,8 +1907,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       const makeQuery = ({
         limit,
         offset,
-      }: { limit?: number; offset?: number } = {}): {
-        query: SQL;
+        options,
+      }: {
+        limit?: number;
+        offset?: number;
+        options?: Parameters<typeof sql.compile>[1];
+      } = {}): {
+        text: string;
+        rawSqlValues: SQLRawValue[];
+        textForSingle?: string;
         identifierIndex: number | null;
       } => {
         const forceOrder = this.streamOptions && this.shouldReverseOrder();
@@ -1983,31 +1988,61 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           // `inner join` in a flattened query instead of a wrapped query with
           // `lateral`?
 
-          const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
+          const wrapperSymbol = Symbol(this.name + "_result");
+          const wrapperAlias = sql.identifier(wrapperSymbol);
+
+          const {
+            text: lateralText,
+            values: rawSqlValues,
+            [$$symbolToIdentifier]: symbolToIdentifier,
+          } = sql.compile(
+            sql`lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`,
+            options,
+          );
+
+          const identifiersAliasText =
+            symbolToIdentifier.get(identifiersSymbol);
+          const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
+
+          let lastPlaceholder = rawSqlValues.length;
+
           /*
-           * IMPORTANT: this wrapper query is necessary so that queries that
-           * have a limit/offset get the limit/offset applied _per identifier
-           * group_; that's why this cannot just be another "from" clause.
+           * IMPORTANT: these wrapper queries are necessary so that queries
+           * that have a limit/offset get the limit/offset applied _per
+           * identifier group_; that's why this cannot just be another "from"
+           * clause.
            */
-          const query = sql`select ${wrapperAlias}.*
-from (${sql.indent(sql`\
-select\n${sql.indent(sql`\
-ids.ordinality - 1 as idx,
-${sql.join(
-  this.queryValues.map(({ codec }, idx) => {
-    return sql`(ids.value->>${sql.literal(idx)})::${
-      codec.sqlType
-    } as ${sql.identifier(`id${idx}`)}`;
-  }),
-  ",\n",
-)}`)}
-from json_array_elements(${sql.value(
-            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-            // a value before executing the query.
-            this.queryValuesSymbol as any,
-          )}::json) with ordinality as ids`)}) as ${identifiersAlias},
-lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
-          return { query, identifierIndex };
+          const text = `\
+select ${wrapperAliasText}.*
+from (select ids.ordinality - 1 as idx, ${this.queryValues
+            .map(({ codec }, idx) => {
+              return `(ids.value->>${idx})::${
+                sql.compile(codec.sqlType).text
+              } as "id${idx}"`;
+            })
+            .join(
+              ", ",
+            )} from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
+${lateralText};`;
+
+          lastPlaceholder = rawSqlValues.length;
+          /**
+           * This is an optimized query to use when there's only one value to
+           * feed in, PostgreSQL seems to be able to execute queries using this
+           * _significantly_ faster (up to 3x or 200ms faster).
+           */
+          const textForSingle = `\
+select ${wrapperAliasText}.*
+from (select 0 as idx, ${this.queryValues
+            .map(({ codec }, idx) => {
+              return `$${++lastPlaceholder}::${
+                sql.compile(codec.sqlType).text
+              } as "id${idx}"`;
+            })
+            .join(", ")}) as ${identifiersAliasText},
+${lateralText};`;
+
+          return { text, textForSingle, rawSqlValues, identifierIndex };
         } else if (
           (limit != null && limit >= 0) ||
           (offset != null && offset > 0)
@@ -2061,14 +2096,24 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
                     : sql.blank
                 };`
               : sql`${baseQuery};`;
-          return { query: wrappedInnerQuery, identifierIndex: null };
+          const { text, values: rawSqlValues } = sql.compile(
+            wrappedInnerQuery,
+            options,
+          );
+          return { text, rawSqlValues, identifierIndex: null };
         } else {
           const { sql: query } = this.buildQuery();
-          return { query: sql`${query};`, identifierIndex: null };
+          const { text, values: rawSqlValues } = sql.compile(
+            sql`${query};`,
+            options,
+          );
+          return { text, rawSqlValues, identifierIndex: null };
         }
       };
 
       if (this.streamOptions) {
+        // TODO: should use the queryForSingle optimization in here too
+
         // When streaming we can't reverse order in JS - we must do it in the DB.
         if (this.streamOptions.initialCount > 0) {
           /*
@@ -2078,29 +2123,27 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
            * remaining results across all groups.
            */
           const {
-            query: initialFetchQuery,
+            text,
+            rawSqlValues,
             identifierIndex: initialFetchIdentifierIndex,
           } = makeQuery({
             limit: this.streamOptions.initialCount,
+            options: { placeholderValues: this.placeholderValues },
           });
-          const { query: streamQuery, identifierIndex: streamIdentifierIndex } =
-            makeQuery({
-              offset: this.streamOptions.initialCount,
-            });
+          const {
+            text: textForDeclare,
+            rawSqlValues: rawSqlValuesForDeclare,
+            identifierIndex: streamIdentifierIndex,
+          } = makeQuery({
+            offset: this.streamOptions.initialCount,
+            options: { placeholderValues: this.placeholderValues },
+          });
           if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
             throw new Error(
               `GrafastInternalError<3760b02e-dfd0-4924-bf62-2e0ef9399605>: expected identifier indexes to match`,
             );
           }
           const identifierIndex = initialFetchIdentifierIndex;
-          const { text, values: rawSqlValues } = sql.compile(
-            initialFetchQuery,
-            { placeholderValues: this.placeholderValues },
-          );
-          const { text: textForDeclare, values: rawSqlValuesForDeclare } =
-            sql.compile(streamQuery, {
-              placeholderValues: this.placeholderValues,
-            });
           this.finalizeResults = {
             text,
             rawSqlValues,
@@ -2116,14 +2159,16 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
            * we can skip the `initialFetchQuery` and jump straight to the
            * `streamQuery`.
            */
-          const { query: streamQuery, identifierIndex: streamIdentifierIndex } =
-            makeQuery({
-              offset: 0,
-            });
-          const { text: textForDeclare, values: rawSqlValuesForDeclare } =
-            sql.compile(streamQuery, {
+          const {
+            text: textForDeclare,
+            rawSqlValues: rawSqlValuesForDeclare,
+            identifierIndex: streamIdentifierIndex,
+          } = makeQuery({
+            offset: 0,
+            options: {
               placeholderValues: this.placeholderValues,
-            });
+            },
+          });
           this.finalizeResults = {
             // This is a hack since this is the _only_ place we don't want
             // `text`; loosening the types would risk us forgetting in more
@@ -2139,17 +2184,20 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias};`;
           };
         }
       } else {
-        const { query, identifierIndex } = makeQuery();
-        const { text, values: rawSqlValues } = sql.compile(query, {
-          placeholderValues: this.placeholderValues,
-        });
+        const { text, rawSqlValues, textForSingle, identifierIndex } =
+          makeQuery({
+            options: {
+              placeholderValues: this.placeholderValues,
+            },
+          });
         this.finalizeResults = {
           text,
+          textForSingle,
           rawSqlValues,
           identifierIndex,
-          // FIXME: when streaming we must not set this to true
           shouldReverseOrder: this.shouldReverseOrder(),
           name: hash(text),
+          nameForSingle: textForSingle ? hash(textForSingle) : undefined,
         };
       }
     }

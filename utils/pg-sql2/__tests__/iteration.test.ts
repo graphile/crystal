@@ -3,7 +3,7 @@ import sql from "../src/index.js";
 
 it("table.column::text 1", () => {
   const node = sql`${sql.parens(sql.identifier("table", "column"))}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: '"table"."column"::text',
     values: [],
   });
@@ -13,7 +13,7 @@ it("table.column::text 2", () => {
   const node = sql`${sql.parens(
     sql`${sql.identifier("table")}.${sql.identifier("column")}`,
   )}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: '"table"."column"::text',
     values: [],
   });
@@ -23,7 +23,7 @@ it("table.column::text 3", () => {
   const node = sql`${sql.parens(
     sql`${sql.identifier("table")}."column"`,
   )}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: '"table"."column"::text',
     values: [],
   });
@@ -33,7 +33,7 @@ it("__table__.column::text", () => {
   const node = sql`${sql.parens(
     sql`${sql.identifier(Symbol("table"))}.column`,
   )}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: "__table__.column::text",
     values: [],
   });
@@ -45,7 +45,7 @@ it("((table.column).attr)::text 1", () => {
       "attr",
     )}`,
   )}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: '(("table"."column")."attr")::text',
     values: [],
   });
@@ -58,7 +58,7 @@ it("((table.column).attr)::text 2", () => {
       true,
     )}.${sql.identifier("attr")}`,
   )}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: '(("table"."column")."attr")::text',
     values: [],
   });
@@ -72,7 +72,7 @@ it("((table.column).attr)::text 3", () => {
   const node = sql`${sql.parens(
     sql`${inner}.${sql.identifier("attr")}`,
   )}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: '(("table"."column")."attr")::text',
     values: [],
   });
@@ -88,7 +88,7 @@ it("join(conditions, ' and ') 1", () => {
     conditions.map((c) => sql.parens(sql.indent(c))),
     " and ",
   );
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: `\
 (
   __messages__.archived_at is null
@@ -111,7 +111,7 @@ it("join(conditions, ' and ') 2", () => {
     conditions.map((c) => sql.parens(sql.indent(c))),
     " and ",
   );
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: `\
 (
   __messages__.archived_at is null
@@ -132,7 +132,7 @@ it("join(conditions, ' and ') 3", () => {
     conditions.map((c) => sql.parens(sql.indent(c))),
     " and ",
   );
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: `\
 (
   __messages__."id" > __messages_identifiers__."id0"
@@ -149,7 +149,7 @@ it("join(conditions, ' and ') 4", () => {
     conditions.map((c) => sql.parens(sql.indent(c))),
     " and ",
   );
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: `\
 (
     __person__."id" < __person_identifiers__."id0"
@@ -164,7 +164,7 @@ it("expression column", () => {
       sql`${sql.identifier(Symbol("forums"))}.archived_at is not null`,
     ),
   )}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: `(__forums__.archived_at is not null)::text`,
     values: [],
   });
@@ -176,7 +176,7 @@ it("expression column 2", () => {
       sql`${sql.identifier(Symbol("forums"))}.archived_at is not null`,
     )}`,
   )}::text`;
-  expect(sql.compile(node)).toEqual({
+  expect(sql.compile(node)).toMatchObject({
     text: `(__forums__.archived_at is not null)::text`,
     values: [],
   });

@@ -21,14 +21,7 @@ limit 2
 offset 2;
 
 select __int_set_query_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"int4" as "id2"
-  from json_array_elements($1::json) with ordinality as ids
-) as __int_set_query_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __int_set_query_identifiers__,
 lateral (
   select
     __int_set_query__.v::text as "0",

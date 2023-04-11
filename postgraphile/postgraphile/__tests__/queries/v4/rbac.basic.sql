@@ -3,12 +3,7 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select __person_secret_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_secret_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_secret_identifiers__,
 lateral (
   select
     __person_secret__."person_id"::text as "0",
@@ -28,12 +23,7 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person_secret__."person_id"::text as "0",
@@ -56,12 +46,7 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select __left_arm_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __left_arm_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __left_arm_identifiers__,
 lateral (
   select
     __left_arm__."id"::text as "0",
@@ -83,12 +68,7 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __left_arm__."id"::text as "0",
@@ -113,12 +93,7 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -140,12 +115,7 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     (select json_agg(s) from (

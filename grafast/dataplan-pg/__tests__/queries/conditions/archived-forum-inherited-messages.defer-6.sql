@@ -24,12 +24,7 @@ where
 order by __forums__."id" asc;
 
 select __users_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"uuid" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __users_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __users_identifiers__,
 lateral (
   select
     __users__."username" as "0",

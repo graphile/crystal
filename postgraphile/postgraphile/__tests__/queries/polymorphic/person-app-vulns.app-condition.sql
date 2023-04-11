@@ -6,16 +6,7 @@ order by __people__."person_id" asc
 limit 4;
 
 select __union_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1",
-    (ids.value->>2)::"text" as "id2",
-    (ids.value->>3)::"text" as "id3",
-    (ids.value->>4)::"text" as "id4"
-  from json_array_elements($1::json) with ordinality as ids
-) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1", (ids.value->>2)::"text" as "id2", (ids.value->>3)::"text" as "id3", (ids.value->>4)::"text" as "id4" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __union__."0" as "0",
@@ -87,12 +78,7 @@ lateral (
 ) as __union_result__;
 
 select __aws_applications_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __aws_applications_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __aws_applications_identifiers__,
 lateral (
   select
     __aws_applications__."id"::text as "0",

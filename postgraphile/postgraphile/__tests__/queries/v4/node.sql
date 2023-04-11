@@ -1,10 +1,5 @@
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -18,12 +13,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -37,12 +27,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -56,13 +41,7 @@ lateral (
 ) as __person_result__;
 
 select __compound_key_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __compound_key_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __compound_key_identifiers__,
 lateral (
   select
     __compound_key__."person_id_1"::text as "0",
@@ -79,13 +58,7 @@ lateral (
 ) as __compound_key_result__;
 
 select __compound_key_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __compound_key_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __compound_key_identifiers__,
 lateral (
   select
     __compound_key__."person_id_1"::text as "0",
@@ -102,13 +75,7 @@ lateral (
 ) as __compound_key_result__;
 
 select __compound_key_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::"int4" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __compound_key_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __compound_key_identifiers__,
 lateral (
   select
     __compound_key__."person_id_1"::text as "0",
@@ -125,12 +92,7 @@ lateral (
 ) as __compound_key_result__;
 
 select __similar_table1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __similar_table1_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __similar_table1_identifiers__,
 lateral (
   select
     __similar_table1__."id"::text as "0",
@@ -146,12 +108,7 @@ lateral (
 ) as __similar_table1_result__;
 
 select __similar_table2_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __similar_table2_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __similar_table2_identifiers__,
 lateral (
   select
     __similar_table2__."id"::text as "0",

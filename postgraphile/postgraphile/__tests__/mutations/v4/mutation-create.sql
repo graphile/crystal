@@ -43,12 +43,7 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
   __types__."int8_array_domain"::text as "33";
 
 select __frmcdc_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -64,12 +59,7 @@ lateral (
 ) as __frmcdc_compound_type_1_result__;
 
 select __frmcdc_nested_compound_type_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"b"."nested_compound_type" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_nested_compound_type_1_identifiers__,
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
 lateral (
   select
     __frmcdc_compound_type_1__."a"::text as "0",
@@ -110,12 +100,7 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."id"::text as "8";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -129,12 +114,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -148,12 +128,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -168,12 +143,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -188,12 +158,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -208,13 +173,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0",
-    (ids.value->>1)::"b"."email" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
@@ -239,12 +198,7 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."id"::text as "8";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -258,12 +212,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -277,12 +226,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -297,12 +241,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -317,12 +256,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -337,13 +271,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0",
-    (ids.value->>1)::"b"."email" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
@@ -362,12 +290,7 @@ insert into "c"."compound_key" as __compound_key__ ("person_id_2", "person_id_1"
   __compound_key__."person_id_2"::text as "2";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -381,12 +304,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -417,12 +335,7 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."id"::text as "8";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -436,12 +349,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -455,12 +363,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -475,12 +378,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -495,12 +393,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."email" as "0",
@@ -515,13 +408,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0",
-    (ids.value->>1)::"b"."email" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
@@ -538,13 +425,7 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__::text as "0";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"c"."person" as "id0",
-    (ids.value->>1)::"b"."email" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
@@ -567,12 +448,7 @@ insert into "a"."post" as __post__ ("headline", "comptypes") values ($1::"text",
   __post__."comptypes"::text as "2";
 
 select __frmcdc_comptype_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"a"."comptype"[] as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_comptype_1_identifiers__,
+from (select 0 as idx, $1::"a"."comptype"[] as "id0") as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
     to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
@@ -589,12 +465,7 @@ insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values
   __post__."author_id"::text as "3";
 
 select __person_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __person_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -609,12 +480,7 @@ lateral (
 ) as __person_result__;
 
 select __post_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -638,12 +504,7 @@ lateral (
 ) as __post_result__;
 
 select __frmcdc_comptype_1_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"a"."comptype"[] as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __frmcdc_comptype_1_identifiers__,
+from (select 0 as idx, $1::"a"."comptype"[] as "id0") as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
     to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",

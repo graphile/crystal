@@ -8,12 +8,7 @@ insert into "inheritence"."user_file" as __user_file__ ("filename", "user_id") v
   __user_file__."user_id"::text as "2";
 
 select __user_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __user_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __user_identifiers__,
 lateral (
   select
     __user__."id"::text as "0",

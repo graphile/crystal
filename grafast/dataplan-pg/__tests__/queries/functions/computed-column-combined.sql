@@ -1,11 +1,5 @@
 select __forums_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"uuid" as "id0",
-    (ids.value->>1)::"bool" as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __forums_identifiers__,
+from (select 0 as idx, $1::"uuid" as "id0", $2::"bool" as "id1") as __forums_identifiers__,
 lateral (
   select
     __forums_random_user__."username" as "0",
