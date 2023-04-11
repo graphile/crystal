@@ -27,7 +27,7 @@ import type {
   PgClientResult,
   WithPgClient,
 } from "../executor.js";
-import type { MakePgConfigOptions } from "../interfaces.js";
+import type { MakePgServiceOptions } from "../interfaces.js";
 
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
@@ -697,9 +697,9 @@ declare global {
   }
 }
 
-export function makePgConfig(
-  options: MakePgConfigOptions & { pool?: pg.Pool },
-): GraphileConfig.PgDatabaseConfiguration {
+export function makePgService(
+  options: MakePgServiceOptions & { pool?: pg.Pool },
+): GraphileConfig.PgServiceConfiguration {
   const {
     name = "main",
     connectionString,
@@ -714,7 +714,7 @@ export function makePgConfig(
   } = options;
   if (pgSettings !== undefined && typeof pgSettingsKey !== "string") {
     throw new Error(
-      `makePgConfig called with pgSettings but no pgSettingsKey - please indicate where the settings should be stored, e.g. 'pgSettingsKey: "pgSettings"' (must be unique across sources)`,
+      `makePgService called with pgSettings but no pgSettingsKey - please indicate where the settings should be stored, e.g. 'pgSettingsKey: "pgSettings"' (must be unique across sources)`,
     );
   }
   const Pool = pg.Pool ?? (pg as any).default?.Pool;
@@ -736,7 +736,7 @@ export function makePgConfig(
   }
   const pgSubscriber =
     options.pgSubscriber ?? (pubsub ? new PgSubscriber(pool) : null);
-  const source: GraphileConfig.PgDatabaseConfiguration = {
+  const source: GraphileConfig.PgServiceConfiguration = {
     name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
     withPgClientKey: withPgClientKey as any,

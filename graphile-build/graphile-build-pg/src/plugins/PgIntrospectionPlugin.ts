@@ -32,9 +32,9 @@ import {
 } from "pg-introspection";
 
 import {
-  withPgClientFromPgConfig,
-  withSuperuserPgClientFromPgConfig,
-} from "../pgConfigs.js";
+  withPgClientFromPgService,
+  withSuperuserPgClientFromPgService,
+} from "../pgServices.js";
 import { version } from "../version.js";
 import { watchFixtures } from "../watchFixtures.js";
 
@@ -70,7 +70,7 @@ declare global {
         getIntrospection(): PromiseOrDirect<IntrospectionResults>;
         getDatabase(databaseName: string): Promise<{
           introspection: Introspection;
-          pgConfig: GraphileConfig.PgDatabaseConfiguration;
+          pgService: GraphileConfig.PgServiceConfiguration;
         }>;
         getExecutorForDatabase(databaseName: string): PgExecutor;
 
@@ -272,7 +272,7 @@ declare global {
 }
 
 type IntrospectionResults = Array<{
-  pgConfig: GraphileConfig.PgDatabaseConfiguration;
+  pgService: GraphileConfig.PgServiceConfiguration;
   introspection: Introspection;
 }>;
 
@@ -298,7 +298,7 @@ async function getDb(
 ) {
   const introspections = await info.helpers.pgIntrospection.getIntrospection();
   const relevant = introspections.find(
-    (intro) => intro.pgConfig.name === databaseName,
+    (intro) => intro.pgService.name === databaseName,
   );
   if (!relevant) {
     throw new Error(`Could not find database '${databaseName}'`);
@@ -374,13 +374,13 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         if (info.state.executors[databaseName]) {
           return info.state.executors[databaseName];
         }
-        const pgConfig = info.resolvedPreset.pgConfigs?.find(
+        const pgService = info.resolvedPreset.pgServices?.find(
           (db) => db.name === databaseName,
         );
-        if (!pgConfig) {
+        if (!pgService) {
           throw new Error(`Database '${databaseName}' not found`);
         }
-        const { pgSettingsKey, withPgClientKey } = pgConfig;
+        const { pgSettingsKey, withPgClientKey } = pgService;
         const executor = EXPORTABLE(
           (
             PgExecutor,
@@ -540,7 +540,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             if (info.cache.introspectionResultsPromise) {
               return info.cache.introspectionResultsPromise;
             }
-            if (!info.resolvedPreset.pgConfigs) {
+            if (!info.resolvedPreset.pgServices) {
               return [];
             }
             const seenNames = new Map<string, number>();
@@ -548,20 +548,20 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             const seenWithPgClientKeys = new Map<string, number>();
             // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
             const introspectionPromise = Promise.all(
-              info.resolvedPreset.pgConfigs.map(async (pgConfig, i) => {
-                // Validate there's no conflicts between pgConfigs
-                const { name, pgSettingsKey, withPgClientKey } = pgConfig;
+              info.resolvedPreset.pgServices.map(async (pgService, i) => {
+                // Validate there's no conflicts between pgServices
+                const { name, pgSettingsKey, withPgClientKey } = pgService;
                 if (!name) {
-                  throw new Error(`pgConfigs[${i}] has no name`);
+                  throw new Error(`pgServices[${i}] has no name`);
                 }
                 if (!withPgClientKey) {
-                  throw new Error(`pgConfigs[${i}] has no withPgClientKey`);
+                  throw new Error(`pgServices[${i}] has no withPgClientKey`);
                 }
                 {
                   const existingIndex = seenNames.get(name);
                   if (existingIndex != null) {
                     throw new Error(
-                      `pgConfigs[${i}] has the same name as pgConfigs[${existingIndex}] (${JSON.stringify(
+                      `pgServices[${i}] has the same name as pgServices[${existingIndex}] (${JSON.stringify(
                         name,
                       )})`,
                     );
@@ -573,7 +573,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                     seenWithPgClientKeys.get(withPgClientKey);
                   if (existingIndex != null) {
                     throw new Error(
-                      `pgConfigs[${i}] has the same withPgClientKey as pgConfigs[${existingIndex}] (${JSON.stringify(
+                      `pgServices[${i}] has the same withPgClientKey as pgServices[${existingIndex}] (${JSON.stringify(
                         withPgClientKey,
                       )})`,
                     );
@@ -584,7 +584,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                   const existingIndex = seenPgSettingsKeys.get(pgSettingsKey);
                   if (existingIndex != null) {
                     throw new Error(
-                      `pgConfigs[${i}] has the same pgSettingsKey as pgConfigs[${existingIndex}] (${JSON.stringify(
+                      `pgServices[${i}] has the same pgSettingsKey as pgServices[${existingIndex}] (${JSON.stringify(
                         pgSettingsKey,
                       )})`,
                     );
@@ -596,9 +596,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 const introspectionQuery = makeIntrospectionQuery();
                 const {
                   rows: [row],
-                } = await withPgClientFromPgConfig(
-                  pgConfig,
-                  pgConfig.pgSettingsForIntrospection ?? null,
+                } = await withPgClientFromPgService(
+                  pgService,
+                  pgService.pgSettingsForIntrospection ?? null,
                   (client) =>
                     client.query<{ introspection: string }>({
                       text: introspectionQuery,
@@ -610,7 +610,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 const introspection = parseIntrospectionResults(
                   row.introspection,
                 );
-                return { pgConfig, introspection };
+                return { pgService, introspection };
               }),
             );
 
@@ -628,7 +628,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             // Announce it
             await Promise.all(
               introspections.map(async (result) => {
-                const { introspection, pgConfig } = result;
+                const { introspection, pgService } = result;
 
                 const {
                   namespaces,
@@ -668,7 +668,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                     promises.push(
                       (info.process as any)(eventName, {
                         entity: entity,
-                        databaseName: pgConfig.name,
+                        databaseName: pgService.name,
                       }),
                     );
                   }
@@ -676,7 +676,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 }
                 await info.process("pgIntrospection_introspection", {
                   introspection,
-                  databaseName: pgConfig.name,
+                  databaseName: pgService.name,
                 });
                 await announce("pgIntrospection_namespace", namespaces);
                 await announce("pgIntrospection_class", classes);
@@ -703,7 +703,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
       async getDatabase(info, databaseName) {
         const all = await info.helpers.pgIntrospection.getIntrospection();
-        const match = all.find((n) => n.pgConfig.name === databaseName);
+        const match = all.find((n) => n.pgService.name === databaseName);
         if (!match) {
           throw new Error(
             `Could not find results for database '${databaseName}'`,
@@ -721,27 +721,27 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 
     async watch(info, callback) {
       const unlistens: Array<() => void> = [];
-      for (const pgConfig of info.resolvedPreset.pgConfigs ?? []) {
-        if (!pgConfig.pgSubscriber) {
+      for (const pgService of info.resolvedPreset.pgServices ?? []) {
+        if (!pgService.pgSubscriber) {
           console.warn(
-            `pgConfig '${pgConfig.name}' does not have a pgSubscriber, and thus cannot be used for watch mode`,
+            `pgService '${pgService.name}' does not have a pgSubscriber, and thus cannot be used for watch mode`,
           );
           continue;
         }
         // install the watch fixtures
         if (info.options.installWatchFixtures ?? true) {
           try {
-            await withSuperuserPgClientFromPgConfig(pgConfig, null, (client) =>
+            await withSuperuserPgClientFromPgService(pgService, null, (client) =>
               client.query({ text: watchFixtures }),
             );
           } catch (e) {
             console.warn(
-              `Failed to install watch fixtures into '${pgConfig.name}'.\nInstalling watch fixtures requires superuser privileges; have you correctly configured a 'superuserConnectionString'?\nYou may also opt to configure 'installWatchFixtures: false' and install them yourself.\n\nPostgres says: ${e}`,
+              `Failed to install watch fixtures into '${pgService.name}'.\nInstalling watch fixtures requires superuser privileges; have you correctly configured a 'superuserConnectionString'?\nYou may also opt to configure 'installWatchFixtures: false' and install them yourself.\n\nPostgres says: ${e}`,
             );
           }
         }
         try {
-          const eventStream = await pgConfig.pgSubscriber.subscribe(
+          const eventStream = await pgService.pgSubscriber.subscribe(
             "postgraphile_watch",
           );
           const $$stop = Symbol("stop");
@@ -774,7 +774,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               },
               (e) => {
                 console.error(
-                  `Unexpected error occurred while watching pgConfig '${pgConfig.name}' for schema changes.`,
+                  `Unexpected error occurred while watching pgService '${pgService.name}' for schema changes.`,
                   e,
                 );
                 abort.resolve($$stop);
@@ -783,7 +783,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           };
           waitNext();
         } catch (e) {
-          console.warn(`Failed to watch '${pgConfig.name}': ${e}`);
+          console.warn(`Failed to watch '${pgService.name}': ${e}`);
         }
       }
       return () => {

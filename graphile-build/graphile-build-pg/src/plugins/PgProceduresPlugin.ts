@@ -153,15 +153,15 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           return resourceOptionsPromise;
         }
         resourceOptionsPromise = (async () => {
-          const pgConfig = info.resolvedPreset.pgConfigs?.find(
+          const pgService = info.resolvedPreset.pgServices?.find(
             (db) => db.name === databaseName,
           );
-          if (!pgConfig) {
+          if (!pgService) {
             throw new Error(
-              `Could not find pgConfig '${databaseName}' in pgConfigs`,
+              `Could not find pgService '${databaseName}' in pgServices`,
             );
           }
-          const schemas = pgConfig.schemas ?? ["public"];
+          const schemas = pgService.schemas ?? ["public"];
 
           const namespace = pgProc.getNamespace();
           if (!namespace) {
@@ -571,13 +571,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
       async pgIntrospection_proc({ helpers, resolvedPreset }, event) {
         const { entity: pgProc, databaseName } = event;
 
-        const pgConfig = resolvedPreset.pgConfigs?.find(
+        const pgService = resolvedPreset.pgServices?.find(
           (db) => db.name === databaseName,
         );
-        if (!pgConfig) {
-          throw new Error(`Could not find '${databaseName}' in 'pgConfigs'`);
+        if (!pgService) {
+          throw new Error(`Could not find '${databaseName}' in 'pgServices'`);
         }
-        const schemas = pgConfig.schemas ?? ["public"];
+        const schemas = pgService.schemas ?? ["public"];
 
         // Only process procedures from one of the published namespaces
         const namespace = pgProc.getNamespace();
@@ -589,7 +589,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         // functions that really don’t need to be exposed in an API.
         const introspection = (
           await helpers.pgIntrospection.getIntrospection()
-        ).find((n) => n.pgConfig.name === databaseName)!.introspection;
+        ).find((n) => n.pgService.name === databaseName)!.introspection;
         const rangeType = introspection.types.find(
           (t) =>
             t.typnamespace === pgProc.pronamespace &&

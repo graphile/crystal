@@ -8,7 +8,7 @@ import type {
 } from "pg-introspection";
 import { sql } from "pg-sql2";
 
-import { withPgClientFromPgConfig } from "../pgConfigs.js";
+import { withPgClientFromPgService } from "../pgServices.js";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
@@ -109,12 +109,12 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           )};`,
         );
 
-        const pgConfig = info.resolvedPreset.pgConfigs!.find(
-          (pgConfig) => pgConfig.name === databaseName,
+        const pgService = info.resolvedPreset.pgServices!.find(
+          (pgService) => pgService.name === databaseName,
         );
         try {
-          const { rows } = await withPgClientFromPgConfig(
-            pgConfig!,
+          const { rows } = await withPgClientFromPgService(
+            pgService!,
             null,
             (client) => client.query<Record<string, string>>(query),
           );
@@ -122,8 +122,8 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
         } catch (e) {
           let role = "RELEVANT_POSTGRES_USER";
           try {
-            const { rows } = await withPgClientFromPgConfig(
-              pgConfig!,
+            const { rows } = await withPgClientFromPgService(
+              pgService!,
               null,
               (client) =>
                 client.query<{ user: string }>({

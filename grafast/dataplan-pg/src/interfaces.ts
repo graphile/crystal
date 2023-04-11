@@ -405,7 +405,7 @@ export type KeysOfType<TObject, TValueType> = {
 
 declare global {
   namespace GraphileConfig {
-    interface PgDatabaseConfiguration<
+    interface PgServiceConfiguration<
       TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
     > {
       name: string;
@@ -442,7 +442,7 @@ declare global {
     }
 
     interface Preset {
-      pgConfigs?: ReadonlyArray<PgDatabaseConfiguration>;
+      pgServices?: ReadonlyArray<PgServiceConfiguration>;
     }
 
     interface PgDatabaseAdaptorOptions {
@@ -452,10 +452,10 @@ declare global {
   }
 }
 
-export interface MakePgConfigOptions
+export interface MakePgServiceOptions
   extends Partial<
     Pick<
-      GraphileConfig.PgDatabaseConfiguration,
+      GraphileConfig.PgServiceConfiguration,
       | "name"
       | "pgSettings"
       | "pgSettingsForIntrospection"

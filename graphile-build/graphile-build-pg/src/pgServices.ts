@@ -12,7 +12,7 @@ interface PgClientBySourceCacheValue {
 }
 
 const withPgClientDetailsByConfigCache = new Map<
-  GraphileConfig.PgDatabaseConfiguration,
+  GraphileConfig.PgServiceConfiguration,
   PromiseOrDirect<PgClientBySourceCacheValue>
 >();
 
@@ -60,8 +60,8 @@ function loadAdaptor<
  * Get or build the 'withPgClient' callback function for a given database
  * config, caching it to make future lookups faster.
  */
-export function getWithPgClientFromPgConfig(
-  config: GraphileConfig.PgDatabaseConfiguration,
+export function getWithPgClientFromPgService(
+  config: GraphileConfig.PgServiceConfiguration,
 ): PromiseOrDirect<WithPgClient> {
   const existing = withPgClientDetailsByConfigCache.get(config);
   if (existing) {
@@ -123,15 +123,15 @@ export function getWithPgClientFromPgConfig(
   }
 }
 
-export async function withPgClientFromPgConfig<T>(
-  config: GraphileConfig.PgDatabaseConfiguration,
+export async function withPgClientFromPgService<T>(
+  config: GraphileConfig.PgServiceConfiguration,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
-  const withPgClientFromPgConfig = getWithPgClientFromPgConfig(config);
-  const withPgClient = isPromiseLike(withPgClientFromPgConfig)
-    ? await withPgClientFromPgConfig
-    : withPgClientFromPgConfig;
+  const withPgClientFromPgService = getWithPgClientFromPgService(config);
+  const withPgClient = isPromiseLike(withPgClientFromPgService)
+    ? await withPgClientFromPgService
+    : withPgClientFromPgService;
   try {
     return await withPgClient(pgSettings, callback);
   } finally {
@@ -140,8 +140,8 @@ export async function withPgClientFromPgConfig<T>(
 }
 
 // We don't cache superuser withPgClients
-export async function withSuperuserPgClientFromPgConfig<T>(
-  config: GraphileConfig.PgDatabaseConfiguration,
+export async function withSuperuserPgClientFromPgService<T>(
+  config: GraphileConfig.PgServiceConfiguration,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {

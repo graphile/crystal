@@ -202,7 +202,7 @@ export async function runTestQuery(
   const preset: GraphileConfig.Preset = {
     extends: [AmberPreset],
     plugins: [StreamDeferPlugin],
-    pgConfigs: [
+    pgServices: [
       {
         adaptor: "@dataplan/pg/adaptors/pg",
         name: "main",
@@ -225,7 +225,7 @@ export async function runTestQuery(
         adaptorSettings: {
           connectionString,
         },
-      } as GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/pg">,
+      } as GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
     ],
     schema: {
       pgForbidSetofFunctionsToReturnNull:

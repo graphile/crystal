@@ -240,13 +240,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   inflection: {
     add: {
       _schemaPrefix(options, { pgNamespace, databaseName }) {
-        const pgConfig = options.pgConfigs?.find(
+        const pgService = options.pgServices?.find(
           (db) => db.name === databaseName,
         );
         const databasePrefix =
-          databaseName === pgConfig?.name ? "" : `${databaseName}-`;
+          databaseName === pgService?.name ? "" : `${databaseName}-`;
         const schemaPrefix =
-          pgNamespace.nspname === pgConfig?.schemas?.[0]
+          pgNamespace.nspname === pgService?.schemas?.[0]
             ? ""
             : `${pgNamespace.nspname}-`;
         return `${databasePrefix}${schemaPrefix}`;
@@ -334,13 +334,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           return resourceOptions;
         }
         resourceOptions = (async () => {
-          const pgConfig = info.resolvedPreset.pgConfigs?.find(
+          const pgService = info.resolvedPreset.pgServices?.find(
             (db) => db.name === databaseName,
           );
-          if (!pgConfig) {
-            throw new Error(`Could not find '${databaseName}' in 'pgConfigs'`);
+          if (!pgService) {
+            throw new Error(`Could not find '${databaseName}' in 'pgServices'`);
           }
-          const schemas = pgConfig.schemas ?? ["public"];
+          const schemas = pgService.schemas ?? ["public"];
 
           const namespace = pgClass.getNamespace();
           if (!namespace) {

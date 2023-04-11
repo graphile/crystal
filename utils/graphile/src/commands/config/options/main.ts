@@ -158,7 +158,7 @@ const preset: GraphileConfig.Preset`;
       "disablePlugins",
       "plugins",
       "extends",
-      "pgConfigs",
+      "pgServices",
     ].includes(key);
 
     if (isArray) {

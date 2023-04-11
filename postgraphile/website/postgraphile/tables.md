@@ -89,7 +89,7 @@ practices, this still only results in one GraphQL schema (not one per user), so
 it takes the user account you connect to PostgreSQL with (from your connection
 string) and walks all the roles that this user can become within the database,
 and uses the union of all these permissions. You can influence the settings
-used for this via the `pgConfig.pgSettingsForIntrospection` object. Using this
+used for this via the `pgService.pgSettingsForIntrospection` object. Using this
 plugin is recommended as it results in a much leaner schema that doesn't
 contain functionality that you can't actually use.
 

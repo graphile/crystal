@@ -1,5 +1,5 @@
 import { TYPES } from "@dataplan/pg";
-import { makePgConfig } from "@dataplan/pg/adaptors/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { grafast } from "grafast";
 import type { SchemaResult } from "graphile-build";
 import type { ExecutionResult } from "graphql";
@@ -68,7 +68,7 @@ const getSchema = async (nullsSortMethod?: NullsSortMethod) => {
         appendPlugins: [makePetsPlugin(nullsSortMethod)],
       }),
     ],
-    pgConfigs: [makePgConfig({ pool: pgPool, schemas: ["graphile_utils"] })],
+    pgServices: [makePgService({ pool: pgPool, schemas: ["graphile_utils"] })],
   });
 
   return schemaResult;

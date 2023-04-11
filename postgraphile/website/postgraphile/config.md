@@ -41,7 +41,7 @@ if the same plugin is referenced in multiple presets.
 The preset also accepts keys for each supported scope. `graphile-config` has no
 native scopes, but different Graphile projects can register their own scopes,
 for example `graphile-build` registers the `inflection`, `gather` and `schema`
-scopes, `graphile-build-pg` registers the `pgConfigs` scope, and Grafserv
+scopes, `graphile-build-pg` registers the `pgServices` scope, and Grafserv
 registers the `grafserv` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
@@ -69,7 +69,7 @@ import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
 // Use the 'pg' module to connect to the database
-import { makePgConfig } from "@dataplan/pg/adaptors/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
@@ -85,9 +85,9 @@ const preset = {
   inflection: {
     /* options for the inflection system */
   },
-  pgConfigs: [
+  pgServices: [
     /* list of PG database configurations, e.g.: */
-    makePgConfig({
+    makePgService({
       // Database connection string:
       connectionString: process.env.DATABASE_URL,
 
@@ -165,15 +165,15 @@ _(TypeScript type: `GraphileBuild.InflectionOptions`)_
 
 _None at this time._
 
-### `pgConfigs`
+### `pgServices`
 
-_(TypeScript type: `ReadonlyArray<GraphileConfig.PgDatabaseConfiguration>`)_
+_(TypeScript type: `ReadonlyArray<GraphileConfig.PgServiceConfiguration>`)_
 
 Details the PostgreSQL database(s) for PostGraphile to connect to; this is a
 separate option because it's used in both the `gather` phase (for introspection)
 and at runtime.
 
-Generally it's best to construct this by using the `makePgConfig` helper from
+Generally it's best to construct this by using the `makePgService` helper from
 the adaptor(s) you are using (see below), but if you want to know the
 nitty-gritty: each entry in the list is an object with the following keys (only
 `name` and `adaptor` are required):
@@ -204,7 +204,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 ```js title="Example manual configuration"
 import * as pg from "pg";
 
-const pgConfigs = [
+const pgServices = [
   {
     name: "main",
     schemas: ["app_public"],
@@ -219,7 +219,7 @@ const pgConfigs = [
 ];
 ```
 
-### `makePgConfig`
+### `makePgService`
 
 Every adaptor should expose a helper function that takes a common set of
 optional configuration parameters:
@@ -228,7 +228,7 @@ optional configuration parameters:
 - `schemas`
 - `superuserConnectionString`
 - `pubsub` (create a pgSubscriber entry; should default to `true`)
-- pass-through options (same as in `pgConfigs` above):
+- pass-through options (same as in `pgServices` above):
   - `name` (default: "main")
   - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
   - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
@@ -244,8 +244,8 @@ why every adaptor should support them.
 
 :::caution
 
-The `name` option must be unique across all your `pgConfigs`; therefore if you
-have more than one entry in `pgConfigs` you must give each additional entry an
+The `name` option must be unique across all your `pgServices`; therefore if you
+have more than one entry in `pgServices` you must give each additional entry an
 explicit and unique name.
 
 :::
@@ -254,13 +254,13 @@ It may additionally accept any other options it likes (but care should be taken
 to not conflict with options of other adaptors, or options that we might want
 to add to core in future).
 
-`makePgConfig` will return a fully resolved configuration object, suitable for
-inclusion into the `pgConfigs` array in your `graphile.config.mjs` (or similar)
+`makePgService` will return a fully resolved configuration object, suitable for
+inclusion into the `pgServices` array in your `graphile.config.mjs` (or similar)
 file.
 
-```js title="Example configuration via makePgConfig"
-const pgConfigs = [
-  makePgConfig({
+```js title="Example configuration via makePgService"
+const pgServices = [
+  makePgService({
     // Database connection string:
     connectionString: process.env.DATABASE_URL,
 
@@ -444,7 +444,7 @@ for realtime). Instead, add helpers to get/set the data you need.
 
 ## Exposing HTTP request data to PostgreSQL
 
-Using the `pgSettings` functionality mentioned in the `pgConfigs` section above
+Using the `pgSettings` functionality mentioned in the `pgServices` section above
 you can extend the data made available within PostgreSQL through
 `current_setting(...)`. To do so, include a `pgSettings` entry in the GraphQL
 context mentioned in the "Grafast options" section above, the value for which

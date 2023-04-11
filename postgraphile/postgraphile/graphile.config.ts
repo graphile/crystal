@@ -3,7 +3,7 @@ import "postgraphile";
 import "grafserv/node";
 
 import { jsonParse } from "@dataplan/json";
-import { makePgConfig } from "@dataplan/pg/adaptors/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { context, listen, object } from "grafast";
 import { StreamDeferPlugin } from "graphile-build";
 import { EXPORTABLE } from "graphile-export";
@@ -134,8 +134,8 @@ const preset: GraphileConfig.Preset = {
       mol: 42,
     },
   },
-  pgConfigs: [
-    makePgConfig({
+  pgServices: [
+    makePgService({
       // Database connection string:
       connectionString: process.env.DATABASE_URL,
       // List of schemas to expose:
