@@ -68,40 +68,31 @@ declare global {
     interface GatherHelpers {
       pgIntrospection: {
         getIntrospection(): PromiseOrDirect<IntrospectionResults>;
-        getDatabase(serviceName: string): Promise<{
+        getService(serviceName: string): Promise<{
           introspection: Introspection;
           pgService: GraphileConfig.PgServiceConfiguration;
         }>;
-        getExecutorForDatabase(serviceName: string): PgExecutor;
+        getExecutorForService(serviceName: string): PgExecutor;
 
         getNamespace(
           serviceName: string,
           id: string,
         ): Promise<PgNamespace | undefined>;
         getClasses(serviceName: string): Promise<PgClass[]>;
-        getClass(
-          serviceName: string,
-          id: string,
-        ): Promise<PgClass | undefined>;
+        getClass(serviceName: string, id: string): Promise<PgClass | undefined>;
         getConstraint(
           serviceName: string,
           id: string,
         ): Promise<PgConstraint | undefined>;
         getProc(serviceName: string, id: string): Promise<PgProc | undefined>;
-        getRoles(
-          serviceName: string,
-          id: string,
-        ): Promise<PgRoles | undefined>;
+        getRoles(serviceName: string, id: string): Promise<PgRoles | undefined>;
         getType(serviceName: string, id: string): Promise<PgType | undefined>;
         getEnum(serviceName: string, id: string): Promise<PgEnum | undefined>;
         getExtension(
           serviceName: string,
           id: string,
         ): Promise<PgExtension | undefined>;
-        getIndex(
-          serviceName: string,
-          id: string,
-        ): Promise<PgIndex | undefined>;
+        getIndex(serviceName: string, id: string): Promise<PgIndex | undefined>;
         getLanguage(
           serviceName: string,
           id: string,
@@ -155,10 +146,7 @@ declare global {
           serviceName: string,
           arrayId: string,
         ): Promise<PgType | undefined>;
-        getEnumsForType(
-          serviceName: string,
-          typeId: string,
-        ): Promise<PgEnum[]>;
+        getEnumsForType(serviceName: string, typeId: string): Promise<PgEnum[]>;
         getRangeByType(
           serviceName: string,
           typeId: string,
@@ -370,7 +358,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       executors: Object.create(null),
     }),
     helpers: {
-      getExecutorForDatabase(info, serviceName) {
+      getExecutorForService(info, serviceName) {
         if (info.state.executors[serviceName]) {
           return info.state.executors[serviceName];
         }
@@ -701,7 +689,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 
         return info.state.introspectionResultsPromise;
       },
-      async getDatabase(info, serviceName) {
+      async getService(info, serviceName) {
         const all = await info.helpers.pgIntrospection.getIntrospection();
         const match = all.find((n) => n.pgService.name === serviceName);
         if (!match) {
@@ -731,8 +719,10 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         // install the watch fixtures
         if (info.options.installWatchFixtures ?? true) {
           try {
-            await withSuperuserPgClientFromPgService(pgService, null, (client) =>
-              client.query({ text: watchFixtures }),
+            await withSuperuserPgClientFromPgService(
+              pgService,
+              null,
+              (client) => client.query({ text: watchFixtures }),
             );
           } catch (e) {
             console.warn(

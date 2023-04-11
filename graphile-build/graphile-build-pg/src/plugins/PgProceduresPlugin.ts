@@ -304,7 +304,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           }
 
           const executor =
-            info.helpers.pgIntrospection.getExecutorForDatabase(serviceName);
+            info.helpers.pgIntrospection.getExecutorForService(serviceName);
           // TODO: this isn't a sufficiently unique name, it does not allow for overloaded functions
 
           const parameters: PgResourceParameter[] = [];
@@ -475,7 +475,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   return null;
                 }
                 const executor =
-                  info.helpers.pgIntrospection.getExecutorForDatabase(
+                  info.helpers.pgIntrospection.getExecutorForService(
                     serviceName,
                   );
                 return PgResource.configFromCodec(executor, codec);

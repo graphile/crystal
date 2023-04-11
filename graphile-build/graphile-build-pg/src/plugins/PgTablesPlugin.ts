@@ -440,7 +440,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           );
 
           const executor =
-            info.helpers.pgIntrospection.getExecutorForDatabase(serviceName);
+            info.helpers.pgIntrospection.getExecutorForService(serviceName);
           const name = info.inflection.tableResourceName({
             serviceName,
             pgClass,
