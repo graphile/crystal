@@ -6,9 +6,9 @@ export {
   PgSmartTagsDict,
 } from "./interfaces.js";
 export {
-  getWithPgClientFromPgConfig,
-  withPgClientFromPgConfig,
-} from "./pgConfigs.js";
+  getWithPgClientFromPgService,
+  withPgClientFromPgService,
+} from "./pgServices.js";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
 export { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";

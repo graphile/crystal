@@ -91,7 +91,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     helpers: {},
     hooks: {
       async pgCodecs_recordType_spec(info, event) {
-        const { pgClass, spec, databaseName } = event;
+        const { pgClass, spec, serviceName } = event;
         const extensions: PgCodecExtensions =
           spec.extensions ?? Object.create(null);
         if (!spec.extensions) {
@@ -198,7 +198,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   );
                 const referencedClass =
                   await info.helpers.pgIntrospection.getClassByName(
-                    databaseName,
+                    serviceName,
                     namespaceName,
                     tableName,
                   );
@@ -224,14 +224,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   );
                 }
                 const codec = await info.helpers.pgCodecs.getCodecFromClass(
-                  databaseName,
+                  serviceName,
                   referencedClass._id,
                 );
                 types[typeValue] = {
                   name: info.inflection.tableType(codec!),
                   references,
                   relationName: info.inflection.resourceRelationName({
-                    databaseName,
+                    serviceName,
                     isReferencee: true,
                     isUnique: true,
                     localClass: pgClass,
@@ -276,12 +276,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           }
           const {
             schemaName: resourceSchemaName,
-            databaseName,
+            serviceName,
             name: resourceClassName,
           } = resource.extensions.pg;
 
           const pgClass = await info.helpers.pgIntrospection.getClassByName(
-            databaseName,
+            serviceName,
             resourceSchemaName,
             resourceClassName,
           );
@@ -301,7 +301,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 );
               const pgRelatedClass =
                 await info.helpers.pgIntrospection.getClassByName(
-                  databaseName,
+                  serviceName,
                   schemaName,
                   tableName,
                 );
@@ -311,7 +311,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 );
               }
               const otherCodec = await info.helpers.pgCodecs.getCodecFromClass(
-                databaseName,
+                serviceName,
                 pgRelatedClass._id,
               );
               if (!otherCodec || !otherCodec.columns) {
@@ -351,7 +351,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 );
               }
               const sharedRelationName = info.inflection.resourceRelationName({
-                databaseName,
+                serviceName,
                 isReferencee: false,
                 isUnique: true,
                 localClass: pgRelatedClass,
@@ -405,12 +405,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           }
           const {
             schemaName: resourceSchemaName,
-            databaseName,
+            serviceName,
             name: resourceClassName,
           } = resource.extensions.pg;
 
           const pgClass = await info.helpers.pgIntrospection.getClassByName(
-            databaseName,
+            serviceName,
             resourceSchemaName,
             resourceClassName,
           );
@@ -434,7 +434,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 );
               const pgRelatedClass =
                 await info.helpers.pgIntrospection.getClassByName(
-                  databaseName,
+                  serviceName,
                   schemaName,
                   tableName,
                 );
@@ -444,7 +444,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 );
               }
               const otherCodec = await info.helpers.pgCodecs.getCodecFromClass(
-                databaseName,
+                serviceName,
                 pgRelatedClass._id,
               );
               if (!otherCodec) {
@@ -484,7 +484,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 );
               }
               const sharedRelationName = info.inflection.resourceRelationName({
-                databaseName,
+                serviceName,
                 isReferencee: false,
                 isUnique: true,
                 localClass: pgRelatedClass,
@@ -496,7 +496,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
 
               const otherResourceOptions =
                 await info.helpers.pgTables.getResourceOptions(
-                  databaseName,
+                  serviceName,
                   pgRelatedClass,
                 );
 

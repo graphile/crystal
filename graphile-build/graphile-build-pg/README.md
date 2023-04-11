@@ -10,14 +10,15 @@ your GraphQL schema with types and fields based on the tables, views, functions
 and other resources in your PostgreSQL database.
 
 This is achieved by introspecting your database with [pg-introspection][] and
-then building [@dataplan/pg][] data sources for these entities. Then our plugins
-inspect these data sources and create the relevant GraphQL types, fields, and
-[grafast][] plan resolver functions. The result is a high-performance, powerful,
-auto-generated but highly flexible GraphQL schema.
+then building a [@dataplan/pg][] registry (composed of codecs, resources and
+relations) for these entities. Then our plugins inspect this registry and
+creates the relevant GraphQL types, fields, and [grafast][] plan resolver
+functions. The result is a high-performance, powerful, auto-generated but highly
+flexible GraphQL schema.
 
 If you don't want to use your database introspection results to generate the
-schema, you can instead build the data sources yourself giving you full control
-over what goes into your GraphQL API whilst still saving you significant effort
+schema, you can instead build the registry yourself giving you full control over
+what goes into your GraphQL API whilst still saving you significant effort
 versus writing the schema without auto-generation.
 
 `graphile-build-pg` is a core component of [PostGraphile][], a library that

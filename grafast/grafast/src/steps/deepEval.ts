@@ -41,7 +41,7 @@ export class DeepEvalStep extends ExecutableStep {
 
     // Plan this subroutine
     this.subroutineLayer = new LayerPlan(
-      this.layerPlan.operationPlan,
+      this.operationPlan,
       this.layerPlan,
       {
         type: "subroutine",
@@ -76,7 +76,7 @@ export class DeepEvalStep extends ExecutableStep {
     );
     this.subroutineLayer.setRootStep(itemPlan);
 
-    this.opPlan.finishSubroutine(this, this.subroutineLayer);
+    this.operationPlan.finishSubroutine(this, this.subroutineLayer);
   }
 
   async execute(
@@ -95,7 +95,9 @@ export class DeepEvalStep extends ExecutableStep {
     let size = 0;
 
     // TODO: do this better!
-    const itemStepId = this.opPlan.dangerouslyGetStep(this.itemStepId).id;
+    const itemStepId = this.operationPlan.dangerouslyGetStep(
+      this.itemStepId,
+    ).id;
     if (itemStepId == null) {
       throw new Error(
         "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
@@ -108,7 +110,7 @@ export class DeepEvalStep extends ExecutableStep {
       store.set(planId, []);
       if (!bucket.store.has(planId)) {
         throw new Error(
-          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.layerPlan.operationPlan.dangerouslyGetStep(
+          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.operationPlan.dangerouslyGetStep(
             planId,
           )}) listed in copyStepIds but not available in parent bucket for ${this}`,
         );

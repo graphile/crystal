@@ -47,7 +47,7 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
   public finalize(): void {
     super.finalize();
     if (this.transformStepId != null) {
-      this.transformStepId = this.opPlan.dangerouslyGetStep(
+      this.transformStepId = this.operationPlan.dangerouslyGetStep(
         this.transformStepId,
       ).id;
     }

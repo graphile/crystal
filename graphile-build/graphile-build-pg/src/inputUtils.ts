@@ -44,14 +44,14 @@ export function getCodecMetaLookupFromInput(
   for (const codec of Object.values(input.pgRegistry.pgCodecs) as PgCodec[]) {
     walkCodec(codec, metaLookup);
   }
-  for (const source of Object.values(input.pgRegistry.pgResources)) {
-    walkResource(source, metaLookup, seenResources);
+  for (const resource of Object.values(input.pgRegistry.pgResources)) {
+    walkResource(resource, metaLookup, seenResources);
   }
   return metaLookup;
 }
 
 /**
- * Walks the given source's codecs/relations and pushes all discovered codecs
+ * Walks the given resource's codecs/relations and pushes all discovered codecs
  * into `metaLookup`
  *
  * @internal

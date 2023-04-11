@@ -356,7 +356,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               if (!baseInputType) {
                 const hint =
                   variant === "input"
-                    ? ' (perhaps you used "-insert" behavior instead of "-source:insert")'
+                    ? ' (perhaps you used "-insert" behavior instead of "-resource:insert")'
                     : "";
                 // TODO: convert this to a diagnostic
                 throw new Error(
@@ -501,10 +501,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   })),
                   initialArgs.length,
                 );
-                if (typeof resource.source !== "function") {
+                if (typeof resource.from !== "function") {
                   throw new Error("!function");
                 }
-                const src = resource.source(...digests);
+                const src = resource.from(...digests);
                 return src;
               },
             };
@@ -922,7 +922,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         if (
                           resource.isUnique &&
                           !resource.codec.columns &&
-                          typeof resource.source === "function"
+                          typeof resource.from === "function"
                         ) {
                           // This is a scalar computed column, let's inline the expression
                           const placeholders = selectArgs.map((arg, i) => {
@@ -939,7 +939,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           return pgClassExpression(
                             $row,
                             resource.codec,
-                          )`${resource.source(
+                          )`${resource.from(
                             ...placeholders.map((placeholder) => ({
                               placeholder,
                             })),
@@ -1062,8 +1062,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 ]);
 
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
-                const connectionFieldBehaviorScope = `${baseScope}:source:connection`;
-                const listFieldBehaviorScope = `${baseScope}:source:list`;
+                const connectionFieldBehaviorScope = `${baseScope}:resource:connection`;
+                const listFieldBehaviorScope = `${baseScope}:resource:list`;
                 if (
                   canUseConnection &&
                   build.behavior.matches(

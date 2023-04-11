@@ -54,7 +54,7 @@ export interface PgAdaptor<
   TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
 > {
   createWithPgClient: (
-    adaptorSettings: GraphileConfig.PgDatabaseConfiguration<TAdaptor>["adaptorSettings"],
+    adaptorSettings: GraphileConfig.PgServiceConfiguration<TAdaptor>["adaptorSettings"],
     variant?: "SUPERUSER" | null,
   ) => PromiseOrDirect<WithPgClient>;
 }
@@ -70,7 +70,7 @@ declare module "@dataplan/pg" {
     singleOutputParameterName?: string;
     /** For v4 compatibility, what's the name of the actual table. */
     pg?: {
-      databaseName: string;
+      serviceName: string;
       schemaName: string;
       name: string;
     };

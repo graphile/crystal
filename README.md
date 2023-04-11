@@ -110,8 +110,8 @@ Here's a rough breakdown of the main packages:
   PostGraphile uses this) but also useful for hand-rolled schemas that have a
   lot of modular but widely-used concerns such as connections, naming, etc.
   - **[graphile-build-pg][]** - plugins for `graphile-build` that understand
-    `@dataplan/pg` (i.e. PostgreSQL) data sources and can generate types,
-    relations, mutations, etc for these database resources.
+    `@dataplan/pg` (i.e. PostgreSQL) services and can generate types, relations,
+    mutations, etc for these database resources.
 - **[@graphile/lru][]** - an _obsessively_ performant least-recently-used cache
   (possibly the fastest general purpose LRU cache in Node.js) with a
   ridiculously tiny feature set; you almost certainly want @isaacs' `lru-cache`

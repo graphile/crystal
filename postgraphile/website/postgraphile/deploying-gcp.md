@@ -182,7 +182,7 @@ const app = express();
 
 // node-postgres Pool config (https://node-postgres.com/api/pool,
 // https://node-postgres.com/api/client)
-const pgConfig = {
+const pgService = {
   host: process.env.PGHOST || "localhost",
   port: process.env.PGPORT || 5432,
   user: process.env.PGUSER,
@@ -191,11 +191,11 @@ const pgConfig = {
 };
 
 // Your PostGraphile config:
-// https://www.graphile.org/postgraphile/usage-library/#api-postgraphilepgconfig-schemaname-options
+// https://www.graphile.org/postgraphile/usage-library/#api-postgraphilepgservice-schemaname-options
 const postgraphileOptions = {
   /* ... */
 };
-app.use(postgraphile(pgConfig, "public", postgraphileOptions));
+app.use(postgraphile(pgService, "public", postgraphileOptions));
 
 app.listen(8080);
 ```

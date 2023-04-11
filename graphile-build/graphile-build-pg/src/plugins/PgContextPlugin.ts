@@ -1,6 +1,6 @@
 import type {} from "grafast";
 
-import { withPgClientFromPgConfig } from "../pgConfigs.js";
+import { withPgClientFromPgService } from "../pgServices.js";
 import { version } from "../version.js";
 
 export const PgContextPlugin: GraphileConfig.Plugin = {
@@ -17,23 +17,23 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
           args.contextValue = Object.create(null);
         }
         const contextValue = args.contextValue as Record<string, any>;
-        if (config.pgConfigs) {
-          for (const pgConfig of config.pgConfigs) {
+        if (config.pgServices) {
+          for (const pgService of config.pgServices) {
             const {
               pgSettings,
               pgSettingsKey,
               withPgClientKey,
               pgSubscriberKey,
               pgSubscriber,
-            } = pgConfig;
+            } = pgService;
             if (pgSettings && pgSettingsKey == null) {
               throw new Error(
-                `pgConfig '${pgConfig.name}' specifies pgSettings, but has no pgSettingsKey.`,
+                `pgService '${pgService.name}' specifies pgSettings, but has no pgSettingsKey.`,
               );
             }
             if (pgSubscriber && pgSubscriberKey == null) {
               throw new Error(
-                `pgConfig '${pgConfig.name}' specifies pgSubscriber, but has no pgSubscriberKey.`,
+                `pgService '${pgService.name}' specifies pgSubscriber, but has no pgSubscriberKey.`,
               );
             }
             if (pgSettingsKey != null) {
@@ -60,9 +60,9 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
                 `Key '${withPgClientKey}' already set on the context; refusing to overwrite - please check your configuration.`,
               );
             }
-            contextValue[withPgClientKey] = withPgClientFromPgConfig.bind(
+            contextValue[withPgClientKey] = withPgClientFromPgService.bind(
               null,
-              pgConfig,
+              pgService,
             );
           }
         }

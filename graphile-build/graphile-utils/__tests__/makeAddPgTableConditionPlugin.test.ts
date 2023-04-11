@@ -1,5 +1,5 @@
 import { TYPES } from "@dataplan/pg";
-import { makePgConfig } from "@dataplan/pg/adaptors/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { grafast } from "grafast";
 import type { ExecutionResult } from "graphql";
 import { lexicographicSortSchema } from "graphql";
@@ -73,8 +73,8 @@ it("allows adding a condition to a Relay connection", async () => {
       }),
     ],
     plugins: [PetsCountPlugin],
-    pgConfigs: [
-      makePgConfig({
+    pgServices: [
+      makePgService({
         pool: pgPool!,
         schemas: ["graphile_utils"],
       }),
@@ -123,8 +123,8 @@ it("allows adding a condition to a simple collection", async () => {
       }),
     ],
     plugins: [PetsCountPlugin],
-    pgConfigs: [
-      makePgConfig({
+    pgServices: [
+      makePgService({
         pool: pgPool!,
         schemas: ["graphile_utils"],
       }),

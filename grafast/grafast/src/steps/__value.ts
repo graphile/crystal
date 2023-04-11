@@ -3,7 +3,7 @@ import type { AccessStep } from "./access.js";
 import { access } from "./access.js";
 
 /**
- * Implements `__ValueStep(opPlan)` which is never executed; it's purely
+ * Implements `__ValueStep(operationPlan)` which is never executed; it's purely
  * internal - we populate the value as part of the algorithm - see
  * `GetValueStepId` and `PopulateValueStep`.
  */
@@ -21,12 +21,11 @@ export class __ValueStep<TData> extends ExecutableStep<TData> {
 
   toStringMeta(): string | null {
     switch (this) {
-      case this.layerPlan.operationPlan.rootValueStep:
+      case this.operationPlan.rootValueStep:
         return "rootValue";
-      case this.layerPlan.operationPlan
-        .variableValuesStep as __ValueStep<unknown>:
+      case this.operationPlan.variableValuesStep as __ValueStep<unknown>:
         return "variableValues";
-      case this.layerPlan.operationPlan.contextStep as __ValueStep<unknown>:
+      case this.operationPlan.contextStep as __ValueStep<unknown>:
         return "context";
       default:
         return null;

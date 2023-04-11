@@ -134,14 +134,14 @@ const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 type PgSelectPlanJoin =
   | {
       type: "cross";
-      source: SQL;
+      from: SQL;
       alias: SQL;
       columnNames?: SQL;
       lateral?: boolean;
     }
   | {
       type: "inner" | "left" | "right" | "full";
-      source: SQL;
+      from: SQL;
       alias: SQL;
       columnNames?: SQL;
       conditions: SQL[];
@@ -235,7 +235,7 @@ export interface PgSelectOptions<
   identifiers: Array<PgSelectIdentifierSpec>;
 
   /**
-   * If your `from` (or resource.source if omitted) is a function, the arguments
+   * If your `from` (or resource.from if omitted) is a function, the arguments
    * to pass to the function.
    */
   args?: Array<PgSelectArgumentSpec>;
@@ -243,8 +243,8 @@ export interface PgSelectOptions<
   /**
    * If you want to build the data in a custom way (e.g. calling a function,
    * selecting from a view, building a complex query, etc) then you can
-   * override the `resource.source` here with your own from code. Defaults to
-   * `resource.source`.
+   * override the `resource.from` here with your own from code. Defaults to
+   * `resource.from`.
    */
   from?: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
 
@@ -562,7 +562,7 @@ export class PgSelectStep<
       ? new Map(cloneFrom._symbolSubstitutes)
       : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
-    this.from = inFrom ?? resource.source;
+    this.from = inFrom ?? resource.from;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.placeholderValues = cloneFrom
       ? new Map(cloneFrom.placeholderValues)
@@ -869,14 +869,14 @@ export class PgSelectStep<
       return cachedAlias;
     }
     const alias = sql.identifier(Symbol(relationIdentifier as string));
-    if (typeof remoteResource.source === "function") {
+    if (typeof remoteResource.from === "function") {
       throw new Error(
         "Callback sources not currently supported via singleRelation",
       );
     }
     this.joins.push({
       type: "left",
-      source: remoteResource.source,
+      from: remoteResource.from,
       alias,
       conditions: localColumns.map(
         (col, i) =>
@@ -1473,11 +1473,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private fromExpression(): SQL {
-    const source =
+    const from =
       typeof this.from === "function"
         ? this.from(...this.arguments)
         : this.from;
-    return source;
+    return from;
   }
 
   private buildFrom() {
@@ -1520,9 +1520,9 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           ? sql`cross join`
           : (sql.blank as never);
 
-      return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${
-        j.source
-      } as ${j.alias}${j.columnNames ?? sql.blank}${joinCondition}`;
+      return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${j.from} as ${
+        j.alias
+      }${j.columnNames ?? sql.blank}${joinCondition}`;
     });
 
     return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
@@ -2669,7 +2669,7 @@ ${lateralText};`;
             table.joins.push(
               {
                 type: "left",
-                source: this.fromExpression(),
+                from: this.fromExpression(),
                 alias: this.alias,
                 columnNames: this.resource.codec.columns ? sql.blank : sql`(v)`,
                 conditions,
@@ -2878,7 +2878,7 @@ function joinMatches(
     if (j2.type !== j1.type) {
       return false;
     }
-    if (!sqlIsEquivalent(j1.source, j2.source)) {
+    if (!sqlIsEquivalent(j1.from, j2.from)) {
       return false;
     }
     if (!sqlIsEquivalent(j1.alias, j2.alias)) {
@@ -2889,7 +2889,7 @@ function joinMatches(
     if (j2.type !== j1.type) {
       return false;
     }
-    if (!sqlIsEquivalent(j1.source, j2.source)) {
+    if (!sqlIsEquivalent(j1.from, j2.from)) {
       return false;
     }
     if (!sqlIsEquivalent(j1.alias, j2.alias)) {

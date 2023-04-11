@@ -42,11 +42,11 @@ export class TempTableStep<
   }
 
   fromExpression() {
-    const source = this.resource.source;
-    if (typeof source === "function") {
+    const from = this.resource.from;
+    if (typeof from === "function") {
       throw new Error("TempTableStep doesn't support function sources yet.");
     } else {
-      return source;
+      return from;
     }
   }
 }

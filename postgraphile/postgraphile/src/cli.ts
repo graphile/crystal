@@ -1,4 +1,4 @@
-import type { MakePgConfigOptions } from "@dataplan/pg";
+import type { MakePgServiceOptions } from "@dataplan/pg";
 import { grafserv } from "grafserv/node";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
@@ -177,26 +177,26 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     }
     const schemas = rawSchema?.split(",") ?? ["public"];
     const adaptor =
-      preset.pgConfigs?.[0]?.adaptor ?? "@dataplan/pg/adaptors/pg";
+      preset.pgServices?.[0]?.adaptor ?? "@dataplan/pg/adaptors/pg";
 
     const mod = await import(adaptor);
-    const makePgConfig = (mod.makePgConfig ?? mod.default?.makePgConfig) as (
-      options: MakePgConfigOptions,
-    ) => GraphileConfig.PgDatabaseConfiguration;
-    if (typeof makePgConfig !== "function") {
+    const makePgService = (mod.makePgService ?? mod.default?.makePgService) as (
+      options: MakePgServiceOptions,
+    ) => GraphileConfig.PgServiceConfiguration;
+    if (typeof makePgService !== "function") {
       throw new Error(
-        `Loaded adaptor '${adaptor}' but it does not export a 'makePgConfig' helper`,
+        `Loaded adaptor '${adaptor}' but it does not export a 'makePgService' helper`,
       );
     }
-    const newPgConfigs = [
-      makePgConfig({
+    const newPgServices = [
+      makePgService({
         connectionString,
         schemas,
         superuserConnectionString,
         ...(rawSubscriptions ? { pubsub: true } : null),
       }),
     ];
-    preset.pgConfigs = newPgConfigs;
+    preset.pgServices = newPgServices;
   }
   preset.grafserv = preset.grafserv || {};
   if (rawPort != null) {
@@ -217,7 +217,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   }
 
   const config = resolvePresets([preset]);
-  if (!Array.isArray(config.pgConfigs) || config.pgConfigs.length === 0) {
+  if (!Array.isArray(config.pgServices) || config.pgServices.length === 0) {
     // TODO: respect envvars here?
     console.error(
       `ERROR: Please specify \`--connection\` so we know which database to connect to (or add details to your \`graphile.config.js\`):\n\n  postgraphile${

@@ -81,12 +81,14 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     this.planDep = this.addDependency($plan);
     this.argsDep = this.addDependency($args);
     this.contextDep = this.addDependency(context());
-    this.variableValuesDep = this.addDependency(this.opPlan.variableValuesStep);
-    this.rootValueDep = this.addDependency(this.opPlan.rootValueStep);
+    this.variableValuesDep = this.addDependency(
+      this.operationPlan.variableValuesStep,
+    );
+    this.rootValueDep = this.addDependency(this.operationPlan.rootValueStep);
     this.isNotRoot = ![
-      this.opPlan.queryType,
-      this.opPlan.mutationType,
-      this.opPlan.subscriptionType,
+      this.operationPlan.queryType,
+      this.operationPlan.mutationType,
+      this.operationPlan.subscriptionType,
     ].includes(resolveInfoBase.parentType);
   }
 

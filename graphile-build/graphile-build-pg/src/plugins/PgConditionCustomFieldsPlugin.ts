@@ -106,10 +106,10 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                           $condition: PgConditionStep<PgSelectStep<any>>,
                           val,
                         ) {
-                          if (typeof pgFieldSource.source !== "function") {
-                            throw new Error("Invalid computed column source");
+                          if (typeof pgFieldSource.from !== "function") {
+                            throw new Error("Invalid computed column 'from'");
                           }
-                          const expression = sql`${pgFieldSource.source({
+                          const expression = sql`${pgFieldSource.from({
                             placeholder: $condition.alias,
                           })}`;
                           if (val.getRaw().evalIs(null)) {

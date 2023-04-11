@@ -35,7 +35,7 @@ export const test =
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
         extends: [AmberPreset, v4Preset, additionalPreset],
-        pgConfigs: [
+        pgServices: [
           {
             adaptor: "@dataplan/pg/adaptors/pg",
             name: "main",
@@ -58,7 +58,7 @@ export const test =
             adaptorSettings: {
               poolClient: client,
             },
-          } as any, //GraphileConfig.PgDatabaseConfiguration<"@dataplan/pg/adaptors/pg">,
+          } as any, //GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
         ],
         schema: {
           ...graphileBuildOptions,

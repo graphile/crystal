@@ -55,7 +55,7 @@ import type {
 import { $$proxy } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
-import { withFieldArgsForArguments } from "../opPlan-input.js";
+import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
 import {
   $$noExec,
@@ -1769,7 +1769,7 @@ ${te.join(
       try {
         result = cb();
 
-        // Remove the modifier plans from opPlan and sort them ready for application.
+        // Remove the modifier plans from operationPlan and sort them ready for application.
         plansToApply = this.modifierSteps
           .splice(0, this.modifierSteps.length)
           .reverse();
@@ -1826,7 +1826,7 @@ ${te.join(
         if (val instanceof ExecutableStep) {
           errors.push(
             new Error(
-              `ERROR: ExecutableStep ${step} has illegal reference via property '${key}' to plan ${val}. You must not reference steps directly, instead use the plan id to reference the plan, and look the plan up in \`this.opPlan.steps[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
+              `ERROR: ExecutableStep ${step} has illegal reference via property '${key}' to step ${val}. You must not reference steps directly, instead add the step as a dependency (\`depId = this.addDependency($step)\`) and use \`this.getDep(depId)\` to look the step up (or, if the step is not a dependency, store the step ID and use \`this.getStep(stepId)\` each time you need to reference it). Failure to comply could result in subtle breakage during optimisation.`,
             ),
           );
         }

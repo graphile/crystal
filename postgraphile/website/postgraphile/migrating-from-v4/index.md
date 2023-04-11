@@ -66,7 +66,7 @@ import "graphile-config";
 import PresetAmber from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 // Use the 'pg' module to connect to the database
-import { makePgConfig } from "@dataplan/pg/adaptor/pg";
+import { makePgService } from "@dataplan/pg/adaptor/pg";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
@@ -103,8 +103,8 @@ const preset = {
    * options instead, but we advise configuring it here so all the modes of
    * running PostGraphile can share it.
    */
-  pgConfigs: [
-    makePgConfig({
+  pgServices: [
+    makePgService({
       // Database connection string:
       connectionString: process.env.DATABASE_URL,
       // List of schemas to expose:

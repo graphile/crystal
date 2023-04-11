@@ -96,7 +96,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           if (
             build.behavior.matches(
               behavior,
-              "query:source:list",
+              "query:resource:list",
               defaultBehavior,
             )
           ) {
@@ -107,7 +107,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                 [fieldName]: fieldWithHooks(
                   {
                     fieldName,
-                    fieldBehaviorScope: `query:source:list`,
+                    fieldBehaviorScope: `query:resource:list`,
                     isPgFieldSimpleCollection: true,
                     pgResource: resource,
                   },
@@ -138,7 +138,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           if (
             build.behavior.matches(
               behavior,
-              "query:source:connection",
+              "query:resource:connection",
               defaultBehavior,
             )
           ) {
@@ -153,7 +153,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
-                      fieldBehaviorScope: `query:source:connection`,
+                      fieldBehaviorScope: `query:resource:connection`,
                       isPgFieldConnection: true,
                       pgResource: resource,
                     },

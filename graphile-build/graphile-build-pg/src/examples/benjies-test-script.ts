@@ -39,7 +39,7 @@ import { inspect } from "util";
 import * as ws from "ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
-import { getWithPgClientFromPgConfig } from "../pgConfigs.js";
+import { getWithPgClientFromPgService } from "../pgServices.js";
 
 declare global {
   namespace Grafast {
@@ -65,7 +65,7 @@ pool.on("error", (e) => {
     {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
       plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
-      pgConfigs: [
+      pgServices: [
         {
           name: "main",
           schemas: ["a", "b", "c"],
@@ -129,7 +129,7 @@ pool.on("error", (e) => {
   const rootValue = null;
 
   const contextValue = {
-    withPgClient: getWithPgClientFromPgConfig(config.pgConfigs![0]!),
+    withPgClient: getWithPgClientFromPgService(config.pgServices![0]!),
   };
 
   // Our operation requires no variables

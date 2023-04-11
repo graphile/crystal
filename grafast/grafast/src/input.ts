@@ -254,7 +254,7 @@ function inputVariablePlan(
  * Implements `InputNonNullStep`.
  */
 function inputNonNullPlan(
-  _opPlan: OperationPlan,
+  _operationPlan: OperationPlan,
   innerPlan: InputStep,
 ): InputStep {
   return innerPlan;

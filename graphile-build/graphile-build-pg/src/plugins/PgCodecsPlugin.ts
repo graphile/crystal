@@ -44,10 +44,10 @@ declare global {
     interface Inflection {
       classCodecName(details: {
         pgClass: PgClass;
-        databaseName: string;
+        serviceName: string;
       }): string;
 
-      typeCodecName(details: { pgType: PgType; databaseName: string }): string;
+      typeCodecName(details: { pgType: PgType; serviceName: string }): string;
 
       scalarCodecTypeName(this: Inflection, codec: PgCodecAnyScalar): string;
       enumType(this: Inflection, codec: PgEnumCodec<string, any>): string;
@@ -86,11 +86,11 @@ declare global {
     interface GatherHelpers {
       pgCodecs: {
         getCodecFromClass(
-          databaseName: string,
+          serviceName: string,
           pgClassId: string,
         ): Promise<PgCodec | null>;
         getCodecFromType(
-          databaseName: string,
+          serviceName: string,
           pgTypeId: string,
           pgTypeModifier?: string | number | null,
         ): Promise<PgCodec | null>;
@@ -99,7 +99,7 @@ declare global {
     interface GatherHooks {
       pgCodecs_PgCodec: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgCodec: PgCodec;
           pgClass?: PgClass;
           pgType: PgType;
@@ -108,7 +108,7 @@ declare global {
 
       pgCodecs_column: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
           pgAttribute: PgAttribute;
           column: PgCodecAttribute<any>;
@@ -117,7 +117,7 @@ declare global {
 
       pgCodecs_recordType_spec: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
           spec: PgRecordTypeCodecSpec<string, any>;
         }) => Promise<void> | void
@@ -125,7 +125,7 @@ declare global {
 
       pgCodecs_enumType_extensions: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgType: PgType;
           extensions: any;
         }) => Promise<void> | void
@@ -133,7 +133,7 @@ declare global {
 
       pgCodecs_rangeOfCodec_extensions: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgType: PgType;
           innerCodec: PgCodec;
           extensions: any;
@@ -142,7 +142,7 @@ declare global {
 
       pgCodecs_domainOfCodec_extensions: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgType: PgType;
           innerCodec: PgCodec;
           extensions: any;
@@ -151,7 +151,7 @@ declare global {
 
       pgCodecs_listOfCodec_extensions: PluginHook<
         (event: {
-          databaseName: string;
+          serviceName: string;
           pgType: PgType;
           innerCodec: PgCodec;
           extensions: any;
@@ -175,7 +175,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      classCodecName(options, { pgClass, databaseName }) {
+      classCodecName(options, { pgClass, serviceName }) {
         const typeTags = pgClass.getType()!.getTags();
         const classTags = pgClass.getTags();
         if (typeof typeTags?.name === "string") {
@@ -185,12 +185,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           return classTags.name;
         }
         const pgNamespace = pgClass.getNamespace()!;
-        const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
+        const schemaPrefix = this._schemaPrefix({ pgNamespace, serviceName });
         return this.camelCase(`${schemaPrefix}${pgClass.relname}`);
       },
-      typeCodecName(options, { pgType, databaseName }) {
+      typeCodecName(options, { pgType, serviceName }) {
         const pgNamespace = pgType.getNamespace()!;
-        const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
+        const schemaPrefix = this._schemaPrefix({ pgNamespace, serviceName });
         return this.camelCase(`${schemaPrefix}${pgType.typname}`);
       },
       scalarCodecTypeName(options, codec) {
@@ -297,11 +297,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
       codecByClassIdByDatabaseName: new Map(),
     }),
     helpers: {
-      getCodecFromClass(info, databaseName, classId) {
-        let map = info.state.codecByClassIdByDatabaseName.get(databaseName);
+      getCodecFromClass(info, serviceName, classId) {
+        let map = info.state.codecByClassIdByDatabaseName.get(serviceName);
         if (!map) {
           map = new Map();
-          info.state.codecByClassIdByDatabaseName.set(databaseName, map);
+          info.state.codecByClassIdByDatabaseName.set(serviceName, map);
         }
         if (map.has(classId)) {
           return map.get(classId);
@@ -309,14 +309,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
         const promise = (async () => {
           const pgClass = await info.helpers.pgIntrospection.getClass(
-            databaseName,
+            serviceName,
             classId,
           );
           if (!pgClass) {
             return null;
           }
           const namespace = await info.helpers.pgIntrospection.getNamespace(
-            databaseName,
+            serviceName,
             pgClass.relnamespace,
           );
           if (!namespace) {
@@ -328,7 +328,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const columns: PgCodecAttributes = Object.create(null);
           const allAttributes =
             await info.helpers.pgIntrospection.getAttributesForClass(
-              databaseName,
+              serviceName,
               pgClass._id,
             );
           const columnAttributes = allAttributes
@@ -337,7 +337,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           let hasAtLeastOneColumn = false;
           for (const columnAttribute of columnAttributes) {
             const columnCodec = await info.helpers.pgCodecs.getCodecFromType(
-              databaseName,
+              serviceName,
               columnAttribute.atttypid,
               columnAttribute.atttypmod,
             );
@@ -376,7 +376,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 },
               };
               await info.process("pgCodecs_column", {
-                databaseName,
+                serviceName,
                 pgClass,
                 pgAttribute: columnAttribute,
                 column: columns[columnAttribute.attname],
@@ -393,7 +393,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const nspName = namespace.nspname;
           const className = pgClass.relname;
           const codecName = info.inflection.classCodecName({
-            databaseName,
+            serviceName,
             pgClass,
           });
 
@@ -414,7 +414,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             oid: pgClass.reltype,
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             pg: {
-              databaseName,
+              serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
             },
@@ -431,7 +431,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             [className, codecName, columns, extensions, nspName, sql],
           );
           await info.process("pgCodecs_recordType_spec", {
-            databaseName,
+            serviceName,
             pgClass,
             spec,
           });
@@ -444,7 +444,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             pgCodec: codec,
             pgType: pgClass.getType()!,
             pgClass,
-            databaseName,
+            serviceName,
           });
           return codec;
         })();
@@ -454,11 +454,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         return promise;
       },
 
-      getCodecFromType(info, databaseName, typeId, typeModifier) {
-        let map = info.state.codecByTypeIdByDatabaseName.get(databaseName);
+      getCodecFromType(info, serviceName, typeId, typeModifier) {
+        let map = info.state.codecByTypeIdByDatabaseName.get(serviceName);
         if (!map) {
           map = new Map();
-          info.state.codecByTypeIdByDatabaseName.set(databaseName, map);
+          info.state.codecByTypeIdByDatabaseName.set(serviceName, map);
         }
         if (map.has(typeId)) {
           return map.get(typeId);
@@ -466,7 +466,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
         const promise = (async (): Promise<PgCodec | null> => {
           const type = await info.helpers.pgIntrospection.getType(
-            databaseName,
+            serviceName,
             typeId,
           );
           if (!type) {
@@ -475,18 +475,18 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           const citextExt =
             await info.helpers.pgIntrospection.getExtensionByName(
-              databaseName,
+              serviceName,
               "citext",
             );
           const hstoreExt =
             await info.helpers.pgIntrospection.getExtensionByName(
-              databaseName,
+              serviceName,
               "hstore",
             );
 
           const pgCatalog =
             await info.helpers.pgIntrospection.getNamespaceByName(
-              databaseName,
+              serviceName,
               "pg_catalog",
             );
           if (!pgCatalog) {
@@ -496,14 +496,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           // Class types are handled via getCodecFromClass (they have to add columns)
           if (type.typtype === "c") {
             return info.helpers.pgCodecs.getCodecFromClass(
-              databaseName,
+              serviceName,
               type.typrelid!,
             );
           }
 
           const codec = await (async (): Promise<PgCodec | null> => {
             const namespace = await info.helpers.pgIntrospection.getNamespace(
-              databaseName,
+              serviceName,
               type.typnamespace,
             );
             if (!namespace) {
@@ -536,26 +536,26 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (type.typtype === "e") {
               const enumValues =
                 await info.helpers.pgIntrospection.getEnumsForType(
-                  databaseName,
+                  serviceName,
                   type._id,
                 );
               const typeName = type.typname;
               const codecName = info.inflection.typeCodecName({
                 pgType: type,
-                databaseName,
+                serviceName,
               });
               const enumLabels = enumValues.map((e) => e.enumlabel);
               const extensions = {
                 oid: type._id,
                 pg: {
-                  databaseName,
+                  serviceName,
                   schemaName: type.getNamespace()!.nspname,
                   name: type.typname,
                 },
                 tags: Object.create(null),
               };
               await info.process("pgCodecs_enumType_extensions", {
-                databaseName,
+                serviceName,
                 pgType: type,
                 extensions,
               });
@@ -590,7 +590,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             // Range type
             if (type.typtype === "r") {
               const range = await info.helpers.pgIntrospection.getRangeByType(
-                databaseName,
+                serviceName,
                 type._id,
               );
               if (!range) {
@@ -599,7 +599,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 );
               }
               const innerCodec = (await info.helpers.pgCodecs.getCodecFromType(
-                databaseName,
+                serviceName,
                 range.rngsubtype!,
               )) as
                 | PgCodec<any, undefined, any, any, undefined, any, undefined>
@@ -614,7 +614,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               }
               const codecName = info.inflection.typeCodecName({
                 pgType: type,
-                databaseName,
+                serviceName,
               });
 
               const { tags, description } = type.getTagsAndDescription();
@@ -622,7 +622,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               const extensions: PgCodecExtensions = {
                 oid: type._id,
                 pg: {
-                  databaseName,
+                  serviceName,
                   schemaName: type.getNamespace()!.nspname,
                   name: type.typname,
                 },
@@ -630,7 +630,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 description,
               };
               await info.process("pgCodecs_rangeOfCodec_extensions", {
-                databaseName,
+                serviceName,
                 pgType: type,
                 innerCodec,
                 extensions,
@@ -676,7 +676,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               } = type;
               const innerCodec = baseTypeOid
                 ? await info.helpers.pgCodecs.getCodecFromType(
-                    databaseName,
+                    serviceName,
                     baseTypeOid,
                     baseTypeModifier,
                   )
@@ -688,7 +688,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 const extensions: PgCodecExtensions = {
                   oid: type._id,
                   pg: {
-                    databaseName,
+                    serviceName,
                     schemaName: type.getNamespace()!.nspname,
                     name: type.typname,
                   },
@@ -696,14 +696,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   description,
                 };
                 await info.process("pgCodecs_domainOfCodec_extensions", {
-                  databaseName,
+                  serviceName,
                   pgType: type,
                   innerCodec,
                   extensions,
                 });
                 const codecName = info.inflection.typeCodecName({
                   pgType: type,
-                  databaseName,
+                  serviceName,
                 });
                 return EXPORTABLE(
                   (
@@ -743,14 +743,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (type.typcategory === "A") {
               const innerType =
                 await info.helpers.pgIntrospection.getTypeByArray(
-                  databaseName,
+                  serviceName,
                   type._id,
                 );
 
               if (innerType) {
                 const innerCodec =
                   (await info.helpers.pgCodecs.getCodecFromType(
-                    databaseName,
+                    serviceName,
                     innerType._id,
                     typeModifier, // TODO: is it correct to pass this through?
                   )) as
@@ -762,7 +762,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   const extensions: PgCodecExtensions = {
                     oid: type._id,
                     pg: {
-                      databaseName,
+                      serviceName,
                       schemaName: type.getNamespace()!.nspname,
                       name: type.typname,
                     },
@@ -770,7 +770,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     description,
                   };
                   await info.process("pgCodecs_listOfCodec_extensions", {
-                    databaseName,
+                    serviceName,
                     pgType: type,
                     innerCodec,
                     extensions,
@@ -800,7 +800,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             info.process("pgCodecs_PgCodec", {
               pgCodec: codec as PgCodec<any, any, any, any, any, any, any>,
               pgType: type,
-              databaseName,
+              serviceName,
             });
           }
           return codec;
@@ -913,7 +913,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               second: codec,
             });
             throw new Error(
-              `Two different codecs were created with the same name '${codec.name}'; please ensure all codec names are unique. If you are creating codecs from multiple data sources, consider prefixing the codec names with the data source's name.`,
+              `Two different codecs were created with the same name '${codec.name}'; please ensure all codec names are unique. If you are creating codecs from multiple services, consider prefixing the codec names with the service's name.`,
             );
           } else {
             knownCodecByName.set(codec.name, codec);
@@ -936,7 +936,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               second: resource,
             });
             throw new Error(
-              "Two different resources were created with the same name; please ensure all source names are unique. If you are creating resources from multiple data sources, consider prefixing the source names with the data source's name.",
+              "Two different resources were created with the same name; please ensure all resource names are unique. If you are creating resources from multiple services, consider prefixing the resource names with the service's name.",
             );
           } else {
             knownResourceByName.set(resource.name, resource);

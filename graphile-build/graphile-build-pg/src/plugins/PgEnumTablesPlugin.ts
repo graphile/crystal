@@ -8,7 +8,7 @@ import type {
 } from "pg-introspection";
 import { sql } from "pg-sql2";
 
-import { withPgClientFromPgConfig } from "../pgConfigs.js";
+import { withPgClientFromPgService } from "../pgServices.js";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
@@ -17,12 +17,12 @@ declare global {
     interface GatherHelpers {
       pgEnumTables: {
         getIntrospectionData(
-          databaseName: string,
+          serviceName: string,
           pgClass: PgClass,
           columns: PgAttribute[],
         ): Promise<readonly Record<string, string>[]>;
         processIntrospection(event: {
-          databaseName: string;
+          serviceName: string;
           introspection: Introspection;
         }): Promise<void>;
       };
@@ -34,7 +34,7 @@ declare global {
       enumTableCodec(
         this: Inflection,
         details: {
-          databaseName: string;
+          serviceName: string;
           pgClass: PgClass;
           pgConstraint: PgConstraint;
         },
@@ -67,7 +67,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      enumTableCodec(preset, { databaseName, pgConstraint }) {
+      enumTableCodec(preset, { serviceName, pgConstraint }) {
         const pgClass = pgConstraint.getClass()!;
         const constraintTags = pgConstraint.getTags();
         if (typeof constraintTags.enumName === "string") {
@@ -78,9 +78,9 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           if (typeof classTags.enumName === "string") {
             return classTags.enumName;
           }
-          return this.tableResourceName({ databaseName, pgClass });
+          return this.tableResourceName({ serviceName, pgClass });
         } else {
-          const tableName = this.tableResourceName({ databaseName, pgClass });
+          const tableName = this.tableResourceName({ serviceName, pgClass });
           const pgAttribute = pgClass
             .getAttributes()!
             .find((att) => att.attnum === pgConstraint.conkey![0])!;
@@ -97,7 +97,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
       codecByPgAttribute: new Map(),
     }),
     helpers: {
-      async getIntrospectionData(info, databaseName, pgClass, columns) {
+      async getIntrospectionData(info, serviceName, pgClass, columns) {
         // Load data from the table/view.
         const query = sql.compile(
           sql.fragment`select ${sql.join(
@@ -109,12 +109,12 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           )};`,
         );
 
-        const pgConfig = info.resolvedPreset.pgConfigs!.find(
-          (pgConfig) => pgConfig.name === databaseName,
+        const pgService = info.resolvedPreset.pgServices!.find(
+          (pgService) => pgService.name === serviceName,
         );
         try {
-          const { rows } = await withPgClientFromPgConfig(
-            pgConfig!,
+          const { rows } = await withPgClientFromPgService(
+            pgService!,
             null,
             (client) => client.query<Record<string, string>>(query),
           );
@@ -122,8 +122,8 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
         } catch (e) {
           let role = "RELEVANT_POSTGRES_USER";
           try {
-            const { rows } = await withPgClientFromPgConfig(
-              pgConfig!,
+            const { rows } = await withPgClientFromPgService(
+              pgService!,
               null,
               (client) =>
                 client.query<{ user: string }>({
@@ -151,7 +151,7 @@ Original error: ${e.message}
         }
       },
       async processIntrospection(info, event) {
-        const { introspection, databaseName } = event;
+        const { introspection, serviceName } = event;
         for (const pgClass of introspection.classes) {
           const pgNamespace = pgClass.getNamespace();
           if (!pgNamespace) {
@@ -200,7 +200,7 @@ Original error: ${e.message}
             ].sort((a, z) => a.attnum - z.attnum);
             const allData =
               await info.helpers.pgEnumTables.getIntrospectionData(
-                databaseName,
+                serviceName,
                 pgClass,
                 columns,
               );
@@ -226,7 +226,7 @@ Original error: ${e.message}
 
               const originalCodec =
                 await info.helpers.pgCodecs.getCodecFromType(
-                  databaseName,
+                  serviceName,
                   pgAttribute.atttypid,
                   pgAttribute.atttypmod,
                 );
@@ -248,7 +248,7 @@ Original error: ${e.message}
               // Build the codec
               const codec = enumCodec({
                 name: info.inflection.enumTableCodec({
-                  databaseName,
+                  serviceName,
                   pgClass,
                   pgConstraint,
                 }),

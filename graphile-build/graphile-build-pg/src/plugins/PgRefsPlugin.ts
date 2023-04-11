@@ -157,7 +157,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
         }
       },
       async pgTables_PgResourceOptions_relations_post(info, event) {
-        const { databaseName, resourceOptions, pgClass } = event;
+        const { serviceName, resourceOptions, pgClass } = event;
 
         const getCodecForTableName = async (targetTableIdentifier: string) => {
           const nsp = pgClass.getNamespace();
@@ -174,7 +174,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             );
           const targetPgClass =
             await info.helpers.pgIntrospection.getClassByName(
-              databaseName,
+              serviceName,
               targetSchemaName,
               targetTableName,
             );
@@ -182,7 +182,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             return null;
           }
           const targetCodec = await info.helpers.pgCodecs.getCodecFromClass(
-            databaseName,
+            serviceName,
             targetPgClass._id,
           );
           return targetCodec;
@@ -284,7 +284,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 );
                 if (!targetCodec) {
                   console.error(
-                    `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a source for. Please be sure to indicate the schema if required.`,
+                    `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
                   );
                   continue outerLoop;
                 }
@@ -310,7 +310,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 );
                 if (!targetCodec) {
                   console.error(
-                    `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a source for. Please be sure to indicate the schema if required.`,
+                    `Ref ${refName} has bad via '${via}' which references table '${targetTableIdentifier}' which we either cannot find, or have not generated a resource for. Please be sure to indicate the schema if required.`,
                   );
                   continue outerLoop;
                 }
