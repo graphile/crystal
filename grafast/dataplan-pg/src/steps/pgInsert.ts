@@ -13,8 +13,8 @@ import type { PgCodecAttribute } from "../codecs.js";
 import type { PgResource } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
-  GetPgResourceCodec,
   GetPgResourceAttributes,
+  GetPgResourceCodec,
   PgCodec,
   PgTypedExecutableStep,
 } from "../interfaces.js";

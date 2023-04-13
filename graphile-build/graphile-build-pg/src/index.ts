@@ -10,10 +10,10 @@ export {
   withPgClientFromPgService,
 } from "./pgServices.js";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
-export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
-export { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
 export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
 export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
+export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
+export { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
 export { PgConditionArgumentPlugin } from "./plugins/PgConditionArgumentPlugin.js";
 export { PgConditionCustomFieldsPlugin } from "./plugins/PgConditionCustomFieldsPlugin.js";
 export { PgConnectionArgFirstLastBeforeAfterPlugin } from "./plugins/PgConnectionArgFirstLastBeforeAfterPlugin.js";

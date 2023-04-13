@@ -217,16 +217,7 @@ function processAttribute(
            * joined_thing.attribute`
            */
           return EXPORTABLE(
-            (
-                baseCodec,
-                attributeName,
-                getResource,
-                notNull,
-                pgResources,
-                pgSelectSingleFromRecord,
-                registry,
-              ) =>
-              ($record: PgSelectSingleStep<any>) => {
+            (attributeName, baseCodec, getResource, notNull, pgResources, pgSelectSingleFromRecord, registry) => ($record: PgSelectSingleStep<any>) => {
                 const $plan = $record.get(attributeName);
                 const $select = pgSelectSingleFromRecord(
                   getResource(registry, baseCodec, pgResources, $record),
@@ -238,15 +229,7 @@ function processAttribute(
                 $select.getClassStep().setTrusted();
                 return $select;
               },
-            [
-              baseCodec,
-              attributeName,
-              getResource,
-              notNull,
-              pgResources,
-              pgSelectSingleFromRecord,
-              registry,
-            ],
+            [attributeName, baseCodec, getResource, notNull, pgResources, pgSelectSingleFromRecord, registry],
           );
         } else {
           // Many records from resource
@@ -257,15 +240,7 @@ function processAttribute(
            * joined_thing.attribute`
            */
           return EXPORTABLE(
-            (
-                baseCodec,
-                attributeName,
-                getResource,
-                pgResources,
-                pgSelectFromRecords,
-                registry,
-              ) =>
-              ($record: PgSelectSingleStep<any>) => {
+            (attributeName, baseCodec, getResource, pgResources, pgSelectFromRecords, registry) => ($record: PgSelectSingleStep<any>) => {
                 const $val = $record.get(attributeName) as PgClassExpressionStep<
                   PgCodecList,
                   any
@@ -277,14 +252,7 @@ function processAttribute(
                 $select.setTrusted();
                 return $select;
               },
-            [
-              baseCodec,
-              attributeName,
-              getResource,
-              pgResources,
-              pgSelectFromRecords,
-              registry,
-            ],
+            [attributeName, baseCodec, getResource, pgResources, pgSelectFromRecords, registry],
           );
         }
       }

@@ -422,13 +422,13 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             description,
           };
           const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
-            (className, codecName, attributes, extensions, nspName, sql) => ({
+            (attributes, className, codecName, extensions, nspName, sql) => ({
               name: codecName,
               identifier: sql.identifier(nspName, className),
               attributes,
               extensions,
             }),
-            [className, codecName, attributes, extensions, nspName, sql],
+            [attributes, className, codecName, extensions, nspName, sql],
           );
           await info.process("pgCodecs_recordType_spec", {
             serviceName,

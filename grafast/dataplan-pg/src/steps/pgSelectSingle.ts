@@ -16,8 +16,8 @@ import type {
 import { TYPES } from "../codecs.js";
 import type { PgResource } from "../datasource.js";
 import type {
-  GetPgResourceCodec,
   GetPgResourceAttributes,
+  GetPgResourceCodec,
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,

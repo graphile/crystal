@@ -12,9 +12,9 @@ import {
 import {
   defaultPreset as graphileBuildPgPreset,
   PgAllRowsPlugin,
+  PgAttributesPlugin,
   PgBasicsPlugin,
   PgCodecsPlugin,
-  PgAttributesPlugin,
   PgCustomTypeFieldPlugin,
   PgIntrospectionPlugin,
   PgMutationCreatePlugin,

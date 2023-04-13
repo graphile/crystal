@@ -2,10 +2,10 @@ import "graphile-config";
 
 import { PgRBACPlugin } from "./index.js";
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
-import { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
-import { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
 import { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
 import { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
+import { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
+import { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
 import { PgConditionArgumentPlugin } from "./plugins/PgConditionArgumentPlugin.js";
 import { PgConditionCustomFieldsPlugin } from "./plugins/PgConditionCustomFieldsPlugin.js";
 import { PgConnectionArgFirstLastBeforeAfterPlugin } from "./plugins/PgConnectionArgFirstLastBeforeAfterPlugin.js";

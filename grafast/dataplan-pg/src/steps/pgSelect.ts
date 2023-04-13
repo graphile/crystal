@@ -45,8 +45,8 @@ import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type {
-  GetPgResourceCodec,
   GetPgResourceAttributes,
+  GetPgResourceCodec,
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,

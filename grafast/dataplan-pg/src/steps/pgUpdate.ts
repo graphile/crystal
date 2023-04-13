@@ -11,8 +11,8 @@ import type { PgCodecAttribute } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
-  GetPgResourceCodec,
   GetPgResourceAttributes,
+  GetPgResourceCodec,
   GetPgResourceUniques,
   PgCodec,
   PlanByUniques,
