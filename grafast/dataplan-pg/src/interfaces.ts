@@ -360,7 +360,7 @@ export interface PgGroupSpec {
 }
 
 export type TuplePlanMap<
-  TAttributes extends { [attribute: string]: any },
+  TAttributes extends PgCodecAttributes,
   TTuple extends ReadonlyArray<keyof TAttributes>,
 > = {
   [Index in keyof TTuple]: {
@@ -368,11 +368,11 @@ export type TuplePlanMap<
     [key in keyof TAttributes as Exclude<
       key,
       keyof TTuple[number]
-    >]?: ExecutableStep<ReturnType<TAttributes[key]["pg2gql"]>>;
+    >]?: ExecutableStep<ReturnType<TAttributes[key]["codec"]["fromPg"]>>;
   } & {
     // Required unique combination of attributes
     [key in TTuple[number]]: ExecutableStep<
-      ReturnType<TAttributes[key]["pg2gql"]>
+      ReturnType<TAttributes[key]["codec"]["fromPg"]>
     >;
   };
 };

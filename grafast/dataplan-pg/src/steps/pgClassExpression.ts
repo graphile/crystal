@@ -204,8 +204,7 @@ export class PgClassExpressionStep<
     if (rawValue == null) {
       return null;
     } else {
-      const pg2gql = this.pgCodec.fromPg;
-      return pg2gql(rawValue);
+      return this.pgCodec.fromPg(rawValue);
     }
   }
 
