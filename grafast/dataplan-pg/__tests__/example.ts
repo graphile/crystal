@@ -83,9 +83,7 @@ async function main() {
         : {
             message: stripAnsi(e.message),
             path: e.path?.join("."),
-            locs: e.locations
-              ?.map((l) => `${l.line}:${l.attribute}`)
-              .join(", "),
+            locs: e.locations?.map((l) => `${l.line}:${l.column}`).join(", "),
             stack: e.stack
               ? replaceAll(
                   replaceAll(stripAnsi(e.stack), resolve(process.cwd()), "."),
