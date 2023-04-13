@@ -219,7 +219,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             for (let i = 0, l = numberOfArguments; i < l; i++) {
               const argType = allArgTypes[i];
               const trueArgName = pgProc.proargnames?.[i];
-              const argName = trueArgName || `attribute${i + 1}`;
+              const argName = trueArgName || `column${i + 1}`;
 
               // TODO: smart tag should allow changing the modifier
               const typeModifier = undefined;
