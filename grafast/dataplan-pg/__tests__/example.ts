@@ -48,7 +48,9 @@ function replaceAll(
   if (typeof matcher === "string") {
     return string.replace(new RegExp(regexpEscape(matcher), "g"), replacement);
   } else {
-    // TODO: need to ensure matcher is `/g`
+    if (!matcher.global) {
+      throw new Error("Expected global regex");
+    }
     return string.replace(matcher, replacement);
   }
 }
