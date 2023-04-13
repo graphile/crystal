@@ -213,8 +213,8 @@ function processAttribute(
           /*
            * TODO: if we refactor `PgSelectSingleStep` we can probably
            * optimise this to do inline selection and still join against
-           * the base table using e.g. `(table.attribute).attribute =
-           * joined_thing.attribute`
+           * the base table using e.g. `(table.column).attribute =
+           * joined_thing.column`
            */
           return EXPORTABLE(
             (
@@ -253,8 +253,8 @@ function processAttribute(
           /*
            * TODO: if we refactor `PgSelectSingleStep` we can probably
            * optimise this to do inline selection and still join against
-           * the base table using e.g. `(table.attribute).attribute =
-           * joined_thing.attribute`
+           * the base table using e.g. `(table.column).attribute =
+           * joined_thing.column`
            */
           return EXPORTABLE(
             (
@@ -308,7 +308,7 @@ function processAttribute(
 export const PgAttributesPlugin: GraphileConfig.Plugin = {
   name: "PgAttributesPlugin",
   description:
-    "Adds PostgreSQL attributes (attributes) to the relevant GraphQL object/input object types",
+    "Adds PostgreSQL attributes (columns) to the relevant GraphQL object/input object types",
   version: version,
   // TODO: Requires PgTablesPlugin
 
