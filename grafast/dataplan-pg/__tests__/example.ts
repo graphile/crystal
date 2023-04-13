@@ -14,7 +14,6 @@
  * column, but shows integration of external data into query planning.)
  */
 
-import { makePgAdaptorWithPgClient } from "../dist/adaptors/pg.js";
 import {
   __TrackedObjectStep,
   __ValueStep,
@@ -27,7 +26,10 @@ import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
 
-import { PgSubscriber } from "../dist/adaptors/pg.js";
+import {
+  makePgAdaptorWithPgClient,
+  PgSubscriber,
+} from "../dist/adaptors/pg.js";
 import { makeExampleSchema } from "../dist/examples/exampleSchema.js";
 
 const schema = makeExampleSchema();
