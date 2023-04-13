@@ -64,7 +64,7 @@ const meaningByKind: {
   [kind in PgSmartTagSupportedKinds]: string;
 } = {
   ["class"]: "for tables, composite types, views and materialized views",
-  ["attribute"]: "for columns/attributes (of any 'class' type)",
+  ["attribute"]: "for attributes/attributes (of any 'class' type)",
   ["constraint"]: "for table constraints",
   ["procedure"]: "for functions/procedures",
   ["type"]: "for types",

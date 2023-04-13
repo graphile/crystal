@@ -43,7 +43,7 @@ export interface SQLRawNode {
 }
 
 /**
- * Represents an SQL identifier such as table, column, function, etc name. These
+ * Represents an SQL identifier such as table, attribute, function, etc name. These
  * identifiers will be automatically escaped when compiled, respecting any
  * reserved words.
  */
@@ -642,7 +642,7 @@ export function raw(text: string): SQL {
 
 /**
  * Creates a SQL item for a SQL identifier. A SQL identifier is anything like
- * a table, schema, or column name. An identifier may also have a namespace,
+ * a table, schema, or attribute name. An identifier may also have a namespace,
  * thus why many names are accepted.
  */
 export function identifier(...names: Array<string | symbol>): SQL {
@@ -736,7 +736,7 @@ export function literal(val: string | number | boolean | null): SQL {
 
 /**
  * Join some SQL items together, optionally separated by a string. Useful when
- * dealing with lists of SQL items, for example a dynamic list of columns or
+ * dealing with lists of SQL items, for example a dynamic list of attributes or
  * variadic SQL function arguments.
  */
 export function join(items: Array<SQL>, separator = ""): SQL {
@@ -870,7 +870,7 @@ function parenthesize(fragment: SQL, inFlags = 0): SQLQuery {
  * - A placeholder `$1`
  * - A number `0.123456`
  * - A string `'Foo bar'` / `E'Foo bar'`
- * - An identifier `table.column` / `"MyTaBlE"."MyCoLuMn"`
+ * - An identifier `table.attribute` / `"MyTaBlE"."MyCoLuMn"`
  *
  * The following might seem but are not parens safe:
  *
@@ -878,7 +878,7 @@ function parenthesize(fragment: SQL, inFlags = 0): SQLQuery {
  *   should be `(schema.func(param)).*`
  * - A simple expression `1 = 2` - reason: `1 = 2 = false` is invalid; whereas
  *   `(1 = 2) = false` is fine. Similarly `1 = 2::text` differs from `(1 = 2)::text`.
- * - An identifier `table.column.attribute` / `"MyTaBlE"."MyCoLuMn"."MyAtTrIbUtE"` (this needs to be `(table.column).attribute`)
+ * - An identifier `table.attribute.attribute` / `"MyTaBlE"."MyCoLuMn"."MyAtTrIbUtE"` (this needs to be `(table.attribute).attribute`)
  */
 export function parens(frag: SQL, force?: boolean): SQL {
   if (frag[$$type] === "QUERY") {

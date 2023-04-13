@@ -82,7 +82,7 @@ function walkResource(
 
 /**
  * Adds the given codec to `metaLookup` and also walks the related codecs (for
- * columns, and inner-codecs).
+ * attributes, and inner-codecs).
  *
  * @internal
  */
@@ -91,9 +91,9 @@ function walkCodec(codec: PgCodec, metaLookup: PgCodecMetaLookup): void {
     return;
   }
   metaLookup.set(codec, makePgCodecMeta(codec));
-  if (codec.columns) {
-    for (const columnName in codec.columns) {
-      walkCodec(codec.columns[columnName].codec, metaLookup);
+  if (codec.attributes) {
+    for (const attributeName in codec.attributes) {
+      walkCodec(codec.attributes[attributeName].codec, metaLookup);
     }
   }
   if (codec.arrayOfCodec) {

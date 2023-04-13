@@ -3,7 +3,7 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
@@ -22,7 +22,7 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       // TODO: move this somewhere more shared
-      tableEdgeField(this: Inflection, codec: PgCodecWithColumns): string;
+      tableEdgeField(this: Inflection, codec: PgCodecWithAttributes): string;
     }
 
     interface ScopeObjectFieldsField {
@@ -66,7 +66,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
         if (
           !isMutationPayload ||
           !pgCodec ||
-          !pgCodec.columns ||
+          !pgCodec.attributes ||
           pgCodec.isAnonymous
         ) {
           return fields;
@@ -106,7 +106,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
 
         const resource = resources[0] as PgResource<
           any,
-          PgCodecWithColumns,
+          PgCodecWithAttributes,
           any,
           any,
           any
@@ -118,7 +118,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
         if (!pk) {
           return fields;
         }
-        const pkColumns = pk.columns;
+        const pkAttributes = pk.attributes;
 
         const TableType = build.getGraphQLTypeByPgCodec(pgCodec, "output") as
           | GraphQLObjectType<any, any>
@@ -190,7 +190,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     connection,
                     constant,
                     pgSelectFromRecord,
-                    pkColumns,
+                    pkAttributes,
                     resource,
                     tableOrderByTypeName,
                   ) =>
@@ -213,8 +213,8 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                             $result.record(),
                           );
                         } else {
-                          const spec = pkColumns.reduce((memo, columnName) => {
-                            memo[columnName] = $result.get(columnName);
+                          const spec = pkAttributes.reduce((memo, attributeName) => {
+                            memo[attributeName] = $result.get(attributeName);
                             return memo;
                           }, Object.create(null));
                           return resource.find(spec);
@@ -242,7 +242,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     connection,
                     constant,
                     pgSelectFromRecord,
-                    pkColumns,
+                    pkAttributes,
                     resource,
                     tableOrderByTypeName,
                   ],

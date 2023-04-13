@@ -32,13 +32,13 @@ import type {
 } from "./executor.js";
 import type {
   Expand,
-  GetPgCodecColumns,
+  GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
   GetPgRegistryCodecs,
   PgCodec,
   PgCodecRelation,
   PgCodecRelationConfig,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgRefDefinition,
   PgRegistry,
   PgRegistryConfig,
@@ -122,12 +122,12 @@ export interface PgResourceParameter<
  * Description of a unique constraint on a PgResource.
  */
 export interface PgResourceUnique<
-  TColumns extends PgCodecAttributes = PgCodecAttributes,
+  TAttributes extends PgCodecAttributes = PgCodecAttributes,
 > {
   /**
-   * The columns that are unique
+   * The attributes that are unique
    */
-  columns: ReadonlyArray<keyof TColumns & string>;
+  attributes: ReadonlyArray<keyof TAttributes & string>;
   /**
    * If this is true, this represents the "primary key" of the resource.
    */
@@ -163,8 +163,8 @@ export interface PgResourceOptions<
   TName extends string = string,
   TCodec extends PgCodec = PgCodec,
   TUniques extends ReadonlyArray<
-    PgResourceUnique<GetPgCodecColumns<TCodec>>
-  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+    PgResourceUnique<GetPgCodecAttributes<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
@@ -221,8 +221,8 @@ export interface PgFunctionResourceOptions<
   TNewName extends string = string,
   TCodec extends PgCodec = PgCodec,
   TUniques extends ReadonlyArray<
-    PgResourceUnique<GetPgCodecColumns<TCodec>>
-  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+    PgResourceUnique<GetPgCodecAttributes<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
   TNewParameters extends readonly PgResourceParameter[] = readonly PgResourceParameter[],
 > {
   name: TNewName;
@@ -257,8 +257,8 @@ export class PgResource<
   TName extends string = string,
   TCodec extends PgCodec = PgCodec,
   TUniques extends ReadonlyArray<
-    PgResourceUnique<GetPgCodecColumns<TCodec>>
-  > = ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+    PgResourceUnique<GetPgCodecAttributes<TCodec>>
+  > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
@@ -312,7 +312,7 @@ export class PgResource<
   ): PgResourceOptions<
     string,
     TCodec,
-    ReadonlyArray<PgResourceUnique<GetPgCodecColumns<TCodec>>>,
+    ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
     undefined
   > {
     const codec: CodecWithSource<typeof baseCodec> = baseCodec;
@@ -406,7 +406,7 @@ export class PgResource<
       );
     }
 
-    if (this.codec.arrayOfCodec?.columns) {
+    if (this.codec.arrayOfCodec?.attributes) {
       throw new Error(
         `Resource ${this} is invalid - creating a resource that returns an array of a composite type is forbidden; please \`unnest\` the array.`,
       );
@@ -428,7 +428,7 @@ export class PgResource<
   static alternativeResourceOptions<
     TCodec extends PgCodec,
     const TNewUniques extends ReadonlyArray<
-      PgResourceUnique<GetPgCodecColumns<TCodec>>
+      PgResourceUnique<GetPgCodecAttributes<TCodec>>
     >,
     const TNewName extends string,
   >(
@@ -466,7 +466,7 @@ export class PgResource<
     TCodec extends PgCodec,
     const TNewParameters extends readonly PgResourceParameter[],
     const TNewUniques extends ReadonlyArray<
-      PgResourceUnique<GetPgCodecColumns<TCodec>>
+      PgResourceUnique<GetPgCodecAttributes<TCodec>>
     >,
     const TNewName extends string,
   >(
@@ -593,9 +593,9 @@ export class PgResource<
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
-      if (!relation.remoteResource.codec.columns![attr]) {
+      if (!relation.remoteResource.codec.attributes![attr]) {
         throw new Error(
-          `${this} relation '${via}' does not have column '${attr}'`,
+          `${this} relation '${via}' does not have attribute '${attr}'`,
         );
       }
       return { relation: via, attribute: attr };
@@ -638,10 +638,10 @@ export class PgResource<
         if (relation.remoteResource.codec !== otherCodec) {
           return false;
         }
-        if (!arraysMatch(relation.localColumns, otherRelation.remoteColumns)) {
+        if (!arraysMatch(relation.localAttributes, otherRelation.remoteAttributes)) {
           return false;
         }
-        if (!arraysMatch(relation.remoteColumns, otherRelation.localColumns)) {
+        if (!arraysMatch(relation.remoteAttributes, otherRelation.localAttributes)) {
           return false;
         }
         return true;
@@ -651,10 +651,10 @@ export class PgResource<
   }
 
   public get(
-    spec: PlanByUniques<GetPgCodecColumns<TCodec>, TUniques>,
+    spec: PlanByUniques<GetPgCodecAttributes<TCodec>, TUniques>,
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
-  ): GetPgCodecColumns<TCodec> extends PgCodecAttributes
+  ): GetPgCodecAttributes<TCodec> extends PgCodecAttributes
     ? PgSelectSingleStep<this>
     : PgClassExpressionStep<TCodec, this> {
     if (this.parameters) {
@@ -666,17 +666,17 @@ export class PgResource<
       throw new Error(`Cannot ${this}.get without a valid spec`);
     }
     const keys = Object.keys(spec) as ReadonlyArray<string> as ReadonlyArray<
-      keyof GetPgCodecColumns<TCodec>
+      keyof GetPgCodecAttributes<TCodec>
     >;
     if (
       !this.uniques.some((uniq) =>
-        uniq.columns.every((key) => keys.includes(key as any)),
+        uniq.attributes.every((key) => keys.includes(key as any)),
       )
     ) {
       throw new Error(
         `Attempted to call ${this}.get({${keys.join(
           ", ",
-        )}}) at child field (TODO: which one?) but that combination of columns is not unique (uniques: ${JSON.stringify(
+        )}}) at child field (TODO: which one?) but that combination of attributes is not unique (uniques: ${JSON.stringify(
           this.uniques,
         )}). Did you mean to call .find() instead?`,
       );
@@ -686,7 +686,7 @@ export class PgResource<
 
   public find(
     spec: {
-      [key in keyof GetPgCodecColumns<TCodec>]?:
+      [key in keyof GetPgCodecAttributes<TCodec>]?:
         | ExecutableStep
         | string
         | number;
@@ -697,27 +697,27 @@ export class PgResource<
         ".get() cannot be used with functional resources; please use .execute()",
       );
     }
-    if (!this.codec.columns) {
-      throw new Error("Cannot call find if there's no columns");
+    if (!this.codec.attributes) {
+      throw new Error("Cannot call find if there's no attributes");
     }
-    const columns = this.codec.columns as NonNullable<
-      GetPgCodecColumns<TCodec>
+    const attributes = this.codec.attributes as NonNullable<
+      GetPgCodecAttributes<TCodec>
     >;
-    const keys = Object.keys(spec); /* as Array<keyof typeof columns>*/
-    const invalidKeys = keys.filter((key) => columns[key] == null);
+    const keys = Object.keys(spec); /* as Array<keyof typeof attributes>*/
+    const invalidKeys = keys.filter((key) => attributes[key] == null);
     if (invalidKeys.length > 0) {
       throw new Error(
         `Attempted to call ${this}.get({${keys.join(
           ", ",
-        )}}) but that request included columns that we don't know about: '${invalidKeys.join(
+        )}}) but that request included attributes that we don't know about: '${invalidKeys.join(
           "', '",
         )}'`,
       );
     }
 
     const identifiers = keys.map((key): PgSelectIdentifierSpec => {
-      const column = columns[key];
-      if ("via" in column && column.via) {
+      const attribute = attributes[key];
+      if ("via" in attribute && attribute.via) {
         throw new Error(
           `Attribute '${String(
             key,
@@ -726,7 +726,7 @@ export class PgResource<
           )}').`,
         );
       }
-      const { codec } = column;
+      const { codec } = attribute;
       const stepOrConstant = spec[key];
       if (stepOrConstant == undefined) {
         throw new Error(
@@ -742,8 +742,8 @@ export class PgResource<
             : constant(stepOrConstant),
         codec,
         matches: (alias: SQL) =>
-          typeof column.expression === "function"
-            ? column.expression(alias)
+          typeof attribute.expression === "function"
+            ? attribute.expression(alias)
             : sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
@@ -836,17 +836,17 @@ export class PgResource<
       // Use the user-provided check
       return this.codec.notNullExpression(alias);
     } else {
-      // Every column in a primary key is non-nullable; so just see if one is null
+      // Every attribute in a primary key is non-nullable; so just see if one is null
       const pk = this.uniques.find((u) => u.isPrimary);
-      const nonNullableColumn = this.codec.columns
-        ? Object.entries(this.codec.columns).find(
-            ([_columnName, spec]) =>
+      const nonNullableAttribute = this.codec.attributes
+        ? Object.entries(this.codec.attributes).find(
+            ([_attributeName, spec]) =>
               !spec.via && !spec.expression && spec.notNull,
           )?.[0]
-        : null ?? pk?.columns[0];
-      if (nonNullableColumn) {
-        const firstColumn = sql`${alias}.${sql.identifier(nonNullableColumn)}`;
-        return sql`(not (${firstColumn} is null))::text`;
+        : null ?? pk?.attributes[0];
+      if (nonNullableAttribute) {
+        const firstAttribute = sql`${alias}.${sql.identifier(nonNullableAttribute)}`;
+        return sql`(not (${firstAttribute} is null))::text`;
       } else {
         // Fallback
 
@@ -886,7 +886,7 @@ export interface PgRegistryBuilder<
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        PgResourceOptions<any, PgCodecWithColumns, any, any>
+        PgResourceOptions<any, PgCodecWithAttributes, any, any>
       >;
     };
   },
@@ -971,7 +971,7 @@ export function makeRegistry<
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        PgResourceOptions<any, PgCodecWithColumns, any, any>
+        PgResourceOptions<any, PgCodecWithAttributes, any, any>
       >;
     };
   },
@@ -1015,8 +1015,8 @@ export function makeRegistry<
       // Custom spec, pin it back to the registry
       registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
 
-      if (codec.columns) {
-        const prevCols = codec.columns as PgCodecAttributes;
+      if (codec.attributes) {
+        const prevCols = codec.attributes as PgCodecAttributes;
         for (const col of Object.values(prevCols)) {
           addCodec(col.codec);
         }
@@ -1148,20 +1148,20 @@ function validateRelations(registry: PgRegistry<any, any, any>): void {
   for (const codec of Object.values(reg.pgCodecs)) {
     // Check that all the `via` and `identicalVia` match actual relations.
     const relationKeys = Object.keys(reg.pgRelations[codec.name] ?? {});
-    if (codec.columns) {
-      Object.entries(codec.columns).forEach(([columnName, col]) => {
+    if (codec.attributes) {
+      Object.entries(codec.attributes).forEach(([attributeName, col]) => {
         const { via, identicalVia } = col;
         if (via) {
           if (typeof via === "string") {
             if (!relationKeys.includes(via)) {
               throw new Error(
-                `${codec.name} claims column '${columnName}' is via relation '${via}', but there is no such relation.`,
+                `${codec.name} claims attribute '${attributeName}' is via relation '${via}', but there is no such relation.`,
               );
             }
           } else {
             if (!relationKeys.includes(via.relation)) {
               throw new Error(
-                `${codec.name} claims column '${columnName}' is via relation '${via.relation}', but there is no such relation.`,
+                `${codec.name} claims attribute '${attributeName}' is via relation '${via.relation}', but there is no such relation.`,
               );
             }
           }
@@ -1170,13 +1170,13 @@ function validateRelations(registry: PgRegistry<any, any, any>): void {
           if (typeof identicalVia === "string") {
             if (!relationKeys.includes(identicalVia)) {
               throw new Error(
-                `${codec.name} claims column '${columnName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
+                `${codec.name} claims attribute '${attributeName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
               );
             }
           } else {
             if (!relationKeys.includes(identicalVia.relation)) {
               throw new Error(
-                `${codec.name} claims column '${columnName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
+                `${codec.name} claims attribute '${attributeName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
               );
             }
           }
@@ -1211,8 +1211,8 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
         if (codec.rangeOfCodec) {
           this.addCodec(codec.rangeOfCodec);
         }
-        if (codec.columns) {
-          for (const col of Object.values(codec.columns)) {
+        if (codec.attributes) {
+          for (const col of Object.values(codec.attributes)) {
             this.addCodec(col.codec);
           }
         }
@@ -1245,8 +1245,8 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
         remoteResourceOptions,
         ...relation,
       } as PgCodecRelationConfig<
-        PgCodecWithColumns,
-        PgResourceOptions<any, PgCodecWithColumns, any, any>
+        PgCodecWithAttributes,
+        PgResourceOptions<any, PgCodecWithAttributes, any, any>
       >;
       return builder;
     },

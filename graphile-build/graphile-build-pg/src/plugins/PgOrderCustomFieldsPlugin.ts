@@ -14,7 +14,7 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      computedColumnOrder(
+      computedAttributeOrder(
         this: Inflection,
         details: {
           resource: PgResource<
@@ -33,16 +33,16 @@ declare global {
 
 export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
   name: "PgOrderCustomFieldsPlugin",
-  description: "Adds ordering by 'computed column' functions",
+  description: "Adds ordering by 'computed attribute' functions",
   version: version,
 
-  before: ["PgOrderAllColumnsPlugin"],
+  before: ["PgOrderAllAttributesPlugin"],
 
   inflection: {
     add: {
-      computedColumnOrder(options, { resource, variant }) {
-        const computedColumnName = this.computedColumnField({ resource });
-        return this.constantCase(`${computedColumnName}-${variant}`);
+      computedAttributeOrder(options, { resource, variant }) {
+        const computedAttributeName = this.computedAttributeField({ resource });
+        return this.constantCase(`${computedAttributeName}-${variant}`);
       },
     },
   },
@@ -57,7 +57,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
         if (
           !isPgRowSortEnum ||
           !pgCodec ||
-          !pgCodec.columns ||
+          !pgCodec.attributes ||
           pgCodec.isAnonymous
         ) {
           return values;
@@ -66,7 +66,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (resource.codec.columns) return false;
+          if (resource.codec.attributes) return false;
           if (resource.codec.arrayOfCodec) return false;
           if (resource.codec.rangeOfCodec) return false;
           const parameters: readonly PgResourceParameter[] | undefined =
@@ -87,7 +87,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           values,
           functionSources.reduce((memo, pgFieldSource) => {
             for (const ascDesc of ["asc" as const, "desc" as const]) {
-              const valueName = inflection.computedColumnOrder({
+              const valueName = inflection.computedAttributeOrder({
                 resource: pgFieldSource as PgResource<
                   any,
                   any,
@@ -109,7 +109,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                             (step: PgSelectStep) => {
                               if (typeof pgFieldSource.from !== "function") {
                                 throw new Error(
-                                  "Invalid computed column 'from'",
+                                  "Invalid computed attribute 'from'",
                                 );
                               }
                               const expression = sql`${pgFieldSource.from({
@@ -135,7 +135,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
 
             return memo;
           }, Object.create(null)),
-          `Adding computed column orderable functions to order by for '${pgCodec.name}'`,
+          `Adding computed attribute orderable functions to order by for '${pgCodec.name}'`,
         );
       },
     },

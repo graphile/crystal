@@ -106,12 +106,12 @@ declare global {
         }) => Promise<void> | void
       >;
 
-      pgCodecs_column: PluginHook<
+      pgCodecs_attribute: PluginHook<
         (event: {
           serviceName: string;
           pgClass: PgClass;
           pgAttribute: PgAttribute;
-          column: PgCodecAttribute<any>;
+          attribute: PgCodecAttribute<any>;
         }) => Promise<void> | void
       >;
 
@@ -325,30 +325,30 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             );
           }
 
-          const columns: PgCodecAttributes = Object.create(null);
+          const attributes: PgCodecAttributes = Object.create(null);
           const allAttributes =
             await info.helpers.pgIntrospection.getAttributesForClass(
               serviceName,
               pgClass._id,
             );
-          const columnAttributes = allAttributes
+          const attributeAttributes = allAttributes
             .filter((attr) => attr.attnum >= 1 && attr.attisdropped != true)
             .sort((a, z) => a.attnum - z.attnum);
-          let hasAtLeastOneColumn = false;
-          for (const columnAttribute of columnAttributes) {
-            const columnCodec = await info.helpers.pgCodecs.getCodecFromType(
+          let hasAtLeastOneAttribute = false;
+          for (const attributeAttribute of attributeAttributes) {
+            const attributeCodec = await info.helpers.pgCodecs.getCodecFromType(
               serviceName,
-              columnAttribute.atttypid,
-              columnAttribute.atttypmod,
+              attributeAttribute.atttypid,
+              attributeAttribute.atttypmod,
             );
             const { tags: rawTags, description } =
-              columnAttribute.getTagsAndDescription();
-            if (columnCodec) {
-              hasAtLeastOneColumn = true;
+              attributeAttribute.getTagsAndDescription();
+            if (attributeCodec) {
+              hasAtLeastOneAttribute = true;
 
               // Mutate at will!
               const tags = JSON.parse(JSON.stringify(rawTags));
-              if (columnAttribute.attidentity === "a") {
+              if (attributeAttribute.attidentity === "a") {
                 // Generated ALWAYS so no insert/update
                 addBehaviorToTags(
                   tags,
@@ -357,35 +357,35 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 );
               }
 
-              columns[columnAttribute.attname] = {
+              attributes[attributeAttribute.attname] = {
                 description,
-                codec: columnCodec,
+                codec: attributeCodec,
                 notNull:
-                  columnAttribute.attnotnull === true ||
-                  columnAttribute.getType()?.typnotnull === true,
+                  attributeAttribute.attnotnull === true ||
+                  attributeAttribute.getType()?.typnotnull === true,
                 hasDefault:
-                  (columnAttribute.atthasdef ?? undefined) ||
-                  (columnAttribute.attgenerated != null &&
-                    columnAttribute.attgenerated !== "") ||
-                  (columnAttribute.attidentity != null &&
-                    columnAttribute.attidentity !== "") ||
-                  columnAttribute.getType()?.typdefault != null,
+                  (attributeAttribute.atthasdef ?? undefined) ||
+                  (attributeAttribute.attgenerated != null &&
+                    attributeAttribute.attgenerated !== "") ||
+                  (attributeAttribute.attidentity != null &&
+                    attributeAttribute.attidentity !== "") ||
+                  attributeAttribute.getType()?.typdefault != null,
                 // TODO: identicalVia,
                 extensions: {
                   tags,
                 },
               };
-              await info.process("pgCodecs_column", {
+              await info.process("pgCodecs_attribute", {
                 serviceName,
                 pgClass,
-                pgAttribute: columnAttribute,
-                column: columns[columnAttribute.attname],
+                pgAttribute: attributeAttribute,
+                attribute: attributes[attributeAttribute.attname],
               });
             }
           }
-          if (!hasAtLeastOneColumn) {
+          if (!hasAtLeastOneAttribute) {
             console.warn(
-              `Skipped ${pgClass.relname} because we couldn't give it any columns`,
+              `Skipped ${pgClass.relname} because we couldn't give it any attributes`,
             );
             return null;
           }
@@ -422,13 +422,13 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             description,
           };
           const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
-            (className, codecName, columns, extensions, nspName, sql) => ({
+            (className, codecName, attributes, extensions, nspName, sql) => ({
               name: codecName,
               identifier: sql.identifier(nspName, className),
-              columns,
+              attributes,
               extensions,
             }),
-            [className, codecName, columns, extensions, nspName, sql],
+            [className, codecName, attributes, extensions, nspName, sql],
           );
           await info.process("pgCodecs_recordType_spec", {
             serviceName,
@@ -493,7 +493,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          // Class types are handled via getCodecFromClass (they have to add columns)
+          // Class types are handled via getCodecFromClass (they have to add attributes)
           if (type.typtype === "c") {
             return info.helpers.pgCodecs.getCodecFromClass(
               serviceName,
@@ -860,12 +860,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             walkCodec(codec.arrayOfCodec);
           }
 
-          if (codec.columns) {
-            for (const columnName in codec.columns) {
-              const columnCodec = (codec.columns as PgCodecAttributes)[
-                columnName
+          if (codec.attributes) {
+            for (const attributeName in codec.attributes) {
+              const attributeCodec = (codec.attributes as PgCodecAttributes)[
+                attributeName
               ].codec;
-              walkCodec(columnCodec);
+              walkCodec(attributeCodec);
             }
           }
 
@@ -1089,13 +1089,13 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               return;
             }
 
-            // Process all the columns (if any), then exit.
-            if (codec.columns) {
-              for (const columnName in codec.columns) {
-                const columnCodec = (codec.columns as PgCodecAttributes)[
-                  columnName
+            // Process all the attributes (if any), then exit.
+            if (codec.attributes) {
+              for (const attributeName in codec.attributes) {
+                const attributeCodec = (codec.attributes as PgCodecAttributes)[
+                  attributeName
                 ].codec;
-                prepareTypeForCodec(columnCodec, visited);
+                prepareTypeForCodec(attributeCodec, visited);
               }
 
               // This will be handled by PgTablesPlugin; ignore.

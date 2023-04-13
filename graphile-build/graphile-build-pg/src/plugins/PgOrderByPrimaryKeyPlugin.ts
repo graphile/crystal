@@ -2,7 +2,7 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgResourceUnique,
   PgSelectStep,
 } from "@dataplan/pg";
@@ -36,13 +36,13 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
         if (
           !isPgRowSortEnum ||
           !rawPgCodec ||
-          !rawPgCodec.columns ||
+          !rawPgCodec.attributes ||
           rawPgCodec.isAnonymous
         ) {
           return values;
         }
 
-        const pgCodec = rawPgCodec as PgCodecWithColumns;
+        const pgCodec = rawPgCodec as PgCodecWithAttributes;
 
         const resources = Object.values(
           build.input.pgRegistry.pgResources,
@@ -57,7 +57,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
         if (!primaryKey) {
           return values;
         }
-        const primaryKeyColumns = primaryKey.columns as string[];
+        const primaryKeyAttributes = primaryKey.attributes as string[];
 
         return extend(
           values,
@@ -66,14 +66,14 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
               extensions: {
                 grafast: {
                   applyPlan: EXPORTABLE(
-                    (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
+                    (orderByNullsLast, pgCodec, primaryKeyAttributes, sql) =>
                       (step: PgSelectStep) => {
-                        primaryKeyColumns.forEach((columnName) => {
-                          const column = pgCodec.columns[columnName];
+                        primaryKeyAttributes.forEach((attributeName) => {
+                          const attribute = pgCodec.attributes[attributeName];
                           step.orderBy({
-                            codec: column.codec,
+                            codec: attribute.codec,
                             fragment: sql`${step.alias}.${sql.identifier(
-                              columnName,
+                              attributeName,
                             )}`,
                             direction: "ASC",
                             ...(orderByNullsLast != null
@@ -85,7 +85,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                         });
                         step.setOrderIsUnique();
                       },
-                    [orderByNullsLast, pgCodec, primaryKeyColumns, sql],
+                    [orderByNullsLast, pgCodec, primaryKeyAttributes, sql],
                   ),
                 },
               },
@@ -94,14 +94,14 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
               extensions: {
                 grafast: {
                   applyPlan: EXPORTABLE(
-                    (orderByNullsLast, pgCodec, primaryKeyColumns, sql) =>
+                    (orderByNullsLast, pgCodec, primaryKeyAttributes, sql) =>
                       (step: PgSelectStep) => {
-                        primaryKeyColumns.forEach((columnName) => {
-                          const column = pgCodec.columns[columnName];
+                        primaryKeyAttributes.forEach((attributeName) => {
+                          const attribute = pgCodec.attributes[attributeName];
                           step.orderBy({
-                            codec: column.codec,
+                            codec: attribute.codec,
                             fragment: sql`${step.alias}.${sql.identifier(
-                              columnName,
+                              attributeName,
                             )}`,
                             direction: "DESC",
                             ...(orderByNullsLast != null
@@ -113,7 +113,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                         });
                         step.setOrderIsUnique();
                       },
-                    [orderByNullsLast, pgCodec, primaryKeyColumns, sql],
+                    [orderByNullsLast, pgCodec, primaryKeyAttributes, sql],
                   ),
                 },
               },

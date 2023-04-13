@@ -1,7 +1,7 @@
 import * as core from "./core.js";
 
 test(
-  "doesn't raise an error when a foreignKey references a unique combination of columns",
+  "doesn't raise an error when a foreignKey references a unique combination of attributes",
   core.test(__filename, ["c"], {}, (pgClient) => {
     return pgClient.query(
       `\

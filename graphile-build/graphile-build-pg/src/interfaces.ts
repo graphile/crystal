@@ -4,9 +4,9 @@ import type { PromiseOrDirect } from "grafast";
 export interface PgResourceTags extends PgSmartTagsDict {
   name: string;
 
-  /** For a computed column function/etc, what field name should we use? */
+  /** For a computed attribute function/etc, what field name should we use? */
   fieldName: string;
-  /** For a computed column function that performs a mutation, what field name should we use on the payload to store the result? */
+  /** For a computed attribute function that performs a mutation, what field name should we use on the payload to store the result? */
   resultFieldName: string;
   behavior: string | string[];
   primaryKey: string;
@@ -97,7 +97,7 @@ declare module "@dataplan/pg" {
   }
 
   interface PgCodecExtensions {
-    /** If false but the codec has columns then it's probably a composite type */
+    /** If false but the codec has attributes then it's probably a composite type */
     isTableLike?: boolean;
     tags: Partial<PgCodecTags>;
     description?: string;

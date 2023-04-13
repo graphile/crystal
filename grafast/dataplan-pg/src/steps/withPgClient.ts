@@ -26,7 +26,7 @@ export class WithPgClientStep<
   hasSideEffects = true;
 
   /**
-   * Tells us what we're dealing with - data type, columns, where to insert it,
+   * Tells us what we're dealing with - data type, attributes, where to insert it,
    * what it's called, etc.
    */
   public readonly executor: PgExecutor;

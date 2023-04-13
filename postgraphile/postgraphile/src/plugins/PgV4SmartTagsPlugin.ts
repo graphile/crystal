@@ -39,7 +39,7 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
         for (const pgConstraint of introspection.constraints) {
           processTags(pgConstraint.getTags());
 
-          // In V4, if a column has `@omit read` then any constraint that uses that column also has `@omit read`
+          // In V4, if a attribute has `@omit read` then any constraint that uses that attribute also has `@omit read`
           if (pgConstraint.contype === "f") {
             for (const attr of [
               ...pgConstraint.getAttributes()!,

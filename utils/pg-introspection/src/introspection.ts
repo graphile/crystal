@@ -132,10 +132,10 @@ export interface PgNamespace {
 }
 
 /**
- * The catalog pg_class catalogs tables and most everything else that has columns or is otherwise similar to a table.
+ * The catalog pg_class catalogs tables and most everything else that has attributes or is otherwise similar to a table.
  * This includes indexes (but see also pg_index), sequences (but see also pg_sequence), views, materialized views,
  * composite types, and TOAST tables; see relkind. Below, when we mean all of these kinds of objects we speak of
- * relations. Not all columns are meaningful for all relation types.
+ * relations. Not all attributes are meaningful for all relation types.
  */
 export interface PgClass {
   /* COMMON FIELDS */
@@ -231,7 +231,7 @@ export interface PgClass {
   relkind: string;
 
   /**
-   * Number of user columns in the relation (system columns not counted). There must be this many corresponding entries
+   * Number of user attributes in the relation (system attributes not counted). There must be this many corresponding entries
    * in pg_attribute. See also pg_attribute.attnum.
    */
   relnatts: number | null;
@@ -258,10 +258,10 @@ export interface PgClass {
   relispopulated: boolean | null;
 
   /**
-   * Columns used to form replica identity for rows:
+   * Attributes used to form replica identity for rows:
    * - d = default (primary key, if any),
    * - n = nothing,
-   * - f = all columns,
+   * - f = all attributes,
    * - i = index with indisreplident set
    * (same as nothing if the index used has been dropped)
    */
@@ -324,41 +324,41 @@ export interface PgClass {
 }
 
 /**
- * The catalog pg_attribute stores information about table columns. There will be exactly one pg_attribute row for
- * every column in every table in the database. (There will also be attribute entries for indexes, and indeed all
+ * The catalog pg_attribute stores information about table attributes. There will be exactly one pg_attribute row for
+ * every attribute in every table in the database. (There will also be attribute entries for indexes, and indeed all
  * objects that have pg_class entries.)
  */
 export interface PgAttribute {
   /* COMMON FIELDS */
 
-  /** The table this column belongs to */
+  /** The table this attribute belongs to */
   attrelid: PgOid;
 
-  /** The column name */
+  /** The attribute name */
   attname: PgName;
 
-  /** The data type of this column (zero for a dropped column) */
+  /** The data type of this attribute (zero for a dropped attribute) */
   atttypid: PgOid;
 
   /**
-   * attstattarget controls the level of detail of statistics accumulated for this column by ANALYZE. A zero value
+   * attstattarget controls the level of detail of statistics accumulated for this attribute by ANALYZE. A zero value
    * indicates that no statistics should be collected. A negative value says to use the system default statistics target.
    * The exact meaning of positive values is data type-dependent. For scalar data types, attstattarget is both the target
    * number of most common values to collect, and the target number of histogram bins to create.
    */
   attstattarget: number | null;
 
-  /** A copy of pg_type.typlen of this column's type */
+  /** A copy of pg_type.typlen of this attribute's type */
   attlen: number | null;
 
   /**
-   * The number of the column. Ordinary columns are numbered from 1 up. System columns, such as ctid, have (arbitrary)
+   * The number of the attribute. Ordinary attributes are numbered from 1 up. System attributes, such as ctid, have (arbitrary)
    * negative numbers.
    */
   attnum: number;
 
   /**
-   * Number of dimensions, if the column is an array type; otherwise 0. (Presently, the number of dimensions of an array
+   * Number of dimensions, if the attribute is an array type; otherwise 0. (Presently, the number of dimensions of an array
    * is not enforced, so any nonzero value effectively means it's an array.)
    */
   attndims: number | null;
@@ -371,20 +371,20 @@ export interface PgAttribute {
 
   /**
    * atttypmod records type-specific data supplied at table creation time (for example, the maximum length of a varchar
-   * column). It is passed to type-specific input functions and length coercion functions. The value will generally be -1
+   * attribute). It is passed to type-specific input functions and length coercion functions. The value will generally be -1
    * for types that do not need atttypmod.
    */
   atttypmod: number | null;
 
-  /** A copy of pg_type.typbyval of this column's type */
+  /** A copy of pg_type.typbyval of this attribute's type */
   attbyval: boolean | null;
 
-  /** A copy of pg_type.typalign of this column's type */
+  /** A copy of pg_type.typalign of this attribute's type */
   attalign: string | null;
 
   /**
-   * Normally a copy of pg_type.typstorage of this column's type. For TOAST-able data types, this can be altered after
-   * column creation to control storage policy.
+   * Normally a copy of pg_type.typstorage of this attribute's type. For TOAST-able data types, this can be altered after
+   * attribute creation to control storage policy.
    */
   attstorage: string | null;
 
@@ -392,37 +392,37 @@ export interface PgAttribute {
   attnotnull: boolean | null;
 
   /**
-   * This column has a default expression or generation expression, in which case there will be a corresponding entry in
+   * This attribute has a default expression or generation expression, in which case there will be a corresponding entry in
    * the pg_attrdef catalog that actually defines the expression. (Check attgenerated to determine whether this is a
    * default or a generation expression.)
    */
   atthasdef: boolean | null;
 
-  /** If a zero byte (''), then not an identity column. Otherwise, a = generated always, d = generated by default. */
+  /** If a zero byte (''), then not an identity attribute. Otherwise, a = generated always, d = generated by default. */
   attidentity: string | null;
 
   /**
-   * This column has been dropped and is no longer valid. A dropped column is still physically present in the table, but
+   * This attribute has been dropped and is no longer valid. A dropped attribute is still physically present in the table, but
    * is ignored by the parser and so cannot be accessed via SQL.
    */
   attisdropped: boolean | null;
 
   /**
-   * This column is defined locally in the relation. Note that a column can be locally defined and inherited
+   * This attribute is defined locally in the relation. Note that a attribute can be locally defined and inherited
    * simultaneously.
    */
   attislocal: boolean | null;
 
   /**
-   * The number of direct ancestors this column has. A column with a nonzero number of ancestors cannot be dropped nor
+   * The number of direct ancestors this attribute has. A attribute with a nonzero number of ancestors cannot be dropped nor
    * renamed.
    */
   attinhcount: number | null;
 
-  /** The defined collation of the column, or zero if the column is not of a collatable data type */
+  /** The defined collation of the attribute, or zero if the attribute is not of a collatable data type */
   attcollation: PgOid | null;
 
-  /** Column-level access privileges, if any have been granted specifically on this column */
+  /** Attribute-level access privileges, if any have been granted specifically on this attribute */
   attacl: ReadonlyArray<PgAclItem> | null;
 
   /** Attribute-level options, as keyword=value strings */
@@ -434,7 +434,7 @@ export interface PgAttribute {
   /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
 
   /**
-   * The current compression method of the column. Typically this is `\0` to specify use of the current default setting
+   * The current compression method of the attribute. Typically this is `\0` to specify use of the current default setting
    * (see [guc-default-toast-compression]). Otherwise, 'p' selects pglz compression, while 'l' selects LZ4 compression.
    * However, this field is ignored whenever attstorage does not allow compression.
    *
@@ -443,16 +443,16 @@ export interface PgAttribute {
   attcompression?: string | null | undefined;
 
   /**
-   * This column has a value which is used where the column is entirely missing from the row, as happens when a column is
+   * This attribute has a value which is used where the attribute is entirely missing from the row, as happens when a attribute is
    * added with a non-volatile DEFAULT value after the row is created. The actual value used is stored in the
-   * attmissingval column.
+   * attmissingval attribute.
    *
    * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x
    */
   atthasmissing?: boolean | null | undefined;
 
   /**
-   * If a zero byte (''), then not a generated column. Otherwise, s = stored. (Other values might be added in the
+   * If a zero byte (''), then not a generated attribute. Otherwise, s = stored. (Other values might be added in the
    * future.)
    *
    * @remarks Only in 15.x, 14.x, 13.x, 12.x
@@ -462,7 +462,7 @@ export interface PgAttribute {
 
 /**
  * The catalog pg_constraint stores check, primary key, unique, foreign key, and exclusion constraints on tables.
- * (Column constraints are not treated specially. Every column constraint is equivalent to some table constraint.)
+ * (Attribute constraints are not treated specially. Every attribute constraint is equivalent to some table constraint.)
  * Not-null constraints are represented in the pg_attribute catalog, not here.
  */
 export interface PgConstraint {
@@ -554,10 +554,10 @@ export interface PgConstraint {
   /** This constraint is defined locally for the relation. It is a non-inheritable constraint. */
   connoinherit: boolean | null;
 
-  /** If a table constraint (including foreign keys, but not constraint triggers), list of the constrained columns */
+  /** If a table constraint (including foreign keys, but not constraint triggers), list of the constrained attributes */
   conkey: ReadonlyArray<number> | null;
 
-  /** If a foreign key, list of the referenced columns */
+  /** If a foreign key, list of the referenced attributes */
   confkey: ReadonlyArray<number> | null;
 
   /** If a foreign key, list of the equality operators for PK = FK comparisons */
@@ -569,7 +569,7 @@ export interface PgConstraint {
   /** If a foreign key, list of the equality operators for FK = FK comparisons */
   conffeqop: ReadonlyArray<PgOid> | null;
 
-  /** If an exclusion constraint, list of the per-column exclusion operators */
+  /** If an exclusion constraint, list of the per-attribute exclusion operators */
   conexclop: ReadonlyArray<PgOid> | null;
 
   /**
@@ -588,8 +588,8 @@ export interface PgConstraint {
   conparentid?: PgOid | null | undefined;
 
   /**
-   * If a foreign key with a SET NULL or SET DEFAULT delete action, the columns that will be updated. If null, all of the
-   * referencing columns will be updated.
+   * If a foreign key with a SET NULL or SET DEFAULT delete action, the attributes that will be updated. If null, all of the
+   * referencing attributes will be updated.
    *
    * @remarks Only in 15.x
    */
@@ -913,7 +913,7 @@ export interface PgType {
   typdelim: string | null;
 
   /**
-   * If this is a composite type (see typtype), then this column points to the pg_class entry that defines the
+   * If this is a composite type (see typtype), then this attribute points to the pg_class entry that defines the
    * corresponding table. (For a free-standing composite type, the pg_class entry doesn't really represent a table, but
    * it is needed anyway for the type's pg_attribute entries to link to.) Zero for non-composite types.
    */
@@ -1092,7 +1092,7 @@ export interface PgIndex {
   indrelid: PgOid;
 
   /**
-   * The total number of columns in the index (duplicates pg_class.relnatts); this number includes both key and included
+   * The total number of attributes in the index (duplicates pg_class.relnatts); this number includes both key and included
    * attributes
    */
   indnatts: number | null;
@@ -1141,33 +1141,33 @@ export interface PgIndex {
   indisreplident: boolean | null;
 
   /**
-   * This is an array of indnatts values that indicate which table columns this index indexes. For example, a value of 1
-   * 3 would mean that the first and the third table columns make up the index entries. Key columns come before non-key
-   * (included) columns. A zero in this array indicates that the corresponding index attribute is an expression over the
-   * table columns, rather than a simple column reference.
+   * This is an array of indnatts values that indicate which table attributes this index indexes. For example, a value of 1
+   * 3 would mean that the first and the third table attributes make up the index entries. Key attributes come before non-key
+   * (included) attributes. A zero in this array indicates that the corresponding index attribute is an expression over the
+   * table attributes, rather than a simple attribute reference.
    */
   indkey: ReadonlyArray<number>;
 
   /**
-   * For each column in the index key (indnkeyatts values), this contains the OID of the collation to use for the index,
-   * or zero if the column is not of a collatable data type.
+   * For each attribute in the index key (indnkeyatts values), this contains the OID of the collation to use for the index,
+   * or zero if the attribute is not of a collatable data type.
    */
   indcollation: ReadonlyArray<PgOid> | null;
 
   /**
-   * For each column in the index key (indnkeyatts values), this contains the OID of the operator class to use. See
+   * For each attribute in the index key (indnkeyatts values), this contains the OID of the operator class to use. See
    * pg_opclass for details.
    */
   indclass: ReadonlyArray<PgOid> | null;
 
   /**
-   * This is an array of indnkeyatts values that store per-column flag bits. The meaning of the bits is defined by the
+   * This is an array of indnkeyatts values that store per-attribute flag bits. The meaning of the bits is defined by the
    * index's access method.
    */
   indoption: ReadonlyArray<number> | null;
 
   /**
-   * Expression trees (in nodeToString() representation) for index attributes that are not simple column references. This
+   * Expression trees (in nodeToString() representation) for index attributes that are not simple attribute references. This
    * is a list with one element for each zero entry in indkey. Null if all index attributes are simple references.
    */
   indexprs: string | null;
@@ -1178,7 +1178,7 @@ export interface PgIndex {
   /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
 
   /**
-   * The number of key columns in the index, not counting any included columns, which are merely stored and do not
+   * The number of key attributes in the index, not counting any included attributes, which are merely stored and do not
    * participate in the index semantics
    *
    * @remarks Only in 15.x, 14.x, 13.x, 12.x, 11.x
@@ -1187,8 +1187,8 @@ export interface PgIndex {
 
   /**
    * This value is only used for unique indexes. If false, this unique index will consider null values distinct (so the
-   * index can contain multiple null values in a column, the default PostgreSQL behavior). If it is true, it will
-   * consider null values to be equal (so the index can only contain one null value in a column).
+   * index can contain multiple null values in a attribute, the default PostgreSQL behavior). If it is true, it will
+   * consider null values to be equal (so the index can only contain one null value in a attribute).
    *
    * @remarks Only in 15.x
    */
@@ -1211,7 +1211,7 @@ export interface PgInherits {
 
   /**
    * If there is more than one direct parent for a child table (multiple inheritance), this number tells the order in
-   * which the inherited columns are to be arranged. The count starts at 1.
+   * which the inherited attributes are to be arranged. The count starts at 1.
    */
   inhseqno: number | null;
 
@@ -1318,8 +1318,8 @@ export interface PgDepend {
   objid: PgOid;
 
   /**
-   * For a table column, this is the column number (the objid and classid refer to the table itself). For all other
-   * object types, this column is zero.
+   * For a table attribute, this is the attribute number (the objid and classid refer to the table itself). For all other
+   * object types, this attribute is zero.
    */
   objsubid: number | null;
 
@@ -1330,8 +1330,8 @@ export interface PgDepend {
   refobjid: PgOid;
 
   /**
-   * For a table column, this is the column number (the refobjid and refclassid refer to the table itself). For all other
-   * object types, this column is zero.
+   * For a table attribute, this is the attribute number (the refobjid and refclassid refer to the table itself). For all other
+   * object types, this attribute is zero.
    */
   refobjsubid: number | null;
 
@@ -1352,8 +1352,8 @@ export interface PgDescription {
   classoid: PgOid;
 
   /**
-   * For a comment on a table column, this is the column number (the objoid and classoid refer to the table itself). For
-   * all other object types, this column is zero.
+   * For a comment on a table attribute, this is the attribute number (the objoid and classoid refer to the table itself). For
+   * all other object types, this attribute is zero.
    */
   objsubid: number;
 
@@ -1402,7 +1402,7 @@ export interface Introspection {
 
 /**
  * A PG entity can be any entity represented in a system catalog: a table, view,
- * column, function, index, etc.
+ * attribute, function, index, etc.
  */
 export type PgEntity =
   | PgDatabase

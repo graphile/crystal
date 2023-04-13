@@ -11,7 +11,7 @@
  *
  * To assert the parent organization is up to date with their subscription, we
  * check with Stripe. (Poor example, we'd normally do this with database
- * column, but shows integration of external data into query planning.)
+ * attribute, but shows integration of external data into query planning.)
  */
 
 import {
@@ -83,7 +83,7 @@ async function main() {
         : {
             message: stripAnsi(e.message),
             path: e.path?.join("."),
-            locs: e.locations?.map((l) => `${l.line}:${l.column}`).join(", "),
+            locs: e.locations?.map((l) => `${l.line}:${l.attribute}`).join(", "),
             stack: e.stack
               ? replaceAll(
                   replaceAll(stripAnsi(e.stack), resolve(process.cwd()), "."),

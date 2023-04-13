@@ -5,7 +5,7 @@ import sql from "pg-sql2";
 
 import type { PgResource } from "../datasource.js";
 import type {
-  GetPgCodecColumns,
+  GetPgCodecAttributes,
   PgClassSingleStep,
   PgCodec,
   PgTypedExecutableStep,
@@ -22,8 +22,8 @@ import { PgUpdateStep } from "./pgUpdate.js";
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 /**
- * A plan for selecting a column or column-like expression. Keep in mind that
- * a column might not be a scalar (could be a list, compound type, JSON,
+ * A plan for selecting a attribute or attribute-like expression. Keep in mind that
+ * a attribute might not be a scalar (could be a list, compound type, JSON,
  * geometry, etc), so this might not be a "leaf". The result of this might be used as the input
  * of another layer of plan.
  */
@@ -127,45 +127,45 @@ export class PgClassExpressionStep<
     }
   }
 
-  public get<TAttr extends keyof GetPgCodecColumns<TExpressionCodec>>(
+  public get<TAttr extends keyof GetPgCodecAttributes<TExpressionCodec>>(
     attributeName: TAttr,
   ): PgClassExpressionStep<
-    GetPgCodecColumns<TExpressionCodec>[TAttr]["codec"],
+    GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
     TResource
   > {
-    const columns = this.pgCodec.columns;
-    if (!columns) {
+    const attributes = this.pgCodec.attributes;
+    if (!attributes) {
       throw new Error(
         `Cannot call ${this}.get('${String(
           attributeName,
         )}') because this does not represent a composite type (check your pgCodec).`,
       );
     }
-    const column = columns[attributeName as string];
-    if (!column) {
+    const attribute = attributes[attributeName as string];
+    if (!attribute) {
       throw new Error(
         `Cannot call ${this}.get('${String(
           attributeName,
-        )}') because this does not have that column; supported columns: '${Object.keys(
-          columns,
+        )}') because this does not have that attribute; supported attributes: '${Object.keys(
+          attributes,
         ).join("', '")}'.`,
       );
     }
-    if (column.via) {
+    if (attribute.via) {
       throw new Error(
         `Cannot call ${this}.get('${String(
           attributeName,
         )}') because 'via' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
       );
     }
-    if (column.expression) {
+    if (attribute.expression) {
       throw new Error(
         `Cannot call ${this}.get('${String(
           attributeName,
         )}') because 'expression' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
       );
     }
-    const sqlExpr = pgClassExpression(this.getParentStep(), column.codec);
+    const sqlExpr = pgClassExpression(this.getParentStep(), attribute.codec);
     return sqlExpr`${sql.parens(this.expression, true)}.${sql.identifier(
       attributeName as string,
     )}` as any;

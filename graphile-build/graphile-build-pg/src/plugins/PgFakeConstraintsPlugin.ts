@@ -124,7 +124,7 @@ function attributesByNames(
       return pk.conkey!.map((n) => allAttrs.find((a) => a.attnum === n)!);
     } else {
       throw new Error(
-        `No columns specified for '${pgClass.getNamespace()!.nspname}.${
+        `No attributes specified for '${pgClass.getNamespace()!.nspname}.${
           pgClass.relname
         }' (oid: ${pgClass._id}) and no PK found.`,
       );
@@ -138,7 +138,7 @@ function attributesByNames(
       const col = names[i];
       if (!attr) {
         throw new Error(
-          `${identity()} referenced non-existent column '${col}'; known columns: ${allAttrs
+          `${identity()} referenced non-existent attribute '${col}'; known attributes: ${allAttrs
             .filter((a) => a.attnum >= 0)
             .map((attr) => attr.attname)
             .join(", ")}`,
@@ -170,15 +170,15 @@ async function processUnique(
     );
   }
   const [spec, extraDescription] = parseConstraintSpec(rawSpec);
-  const columns = spec.split(",");
+  const attributes = spec.split(",");
   const attrs = attributesByNames(
     pgClass,
-    columns,
+    attributes,
     () => `'@${tag}' smart tag on ${identity()}`,
   );
 
   if (primaryKey) {
-    // All primary key columns are non-null
+    // All primary key attributes are non-null
     for (const attr of attrs) {
       attr.attnotnull = true;
     }
@@ -240,12 +240,12 @@ const removeQuotes = (str: string) => {
     }
     return trimmed.slice(1, -1);
   } else {
-    // PostgreSQL lower-cases unquoted columns, so we should too.
+    // PostgreSQL lower-cases unquoted attributes, so we should too.
     return trimmed.toLowerCase();
   }
 };
 
-const parseSqlColumnArray = (str: string) => {
+const parseSqlAttributeArray = (str: string) => {
   if (!str) {
     throw new Error(`Cannot parse '${str}'`);
   }
@@ -253,7 +253,7 @@ const parseSqlColumnArray = (str: string) => {
   return parts.map(removeQuotes);
 };
 
-const parseSqlColumnString = (str: string) => {
+const parseSqlAttributeString = (str: string) => {
   if (!str) {
     throw new Error(`Cannot parse '${str}'`);
   }
@@ -286,17 +286,17 @@ async function processFk(
       `Invalid @foreignKey syntax on '${identity()}'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${spec}'`,
     );
   }
-  const [, rawColumns, rawSchemaOrTable, rawTableOnly, rawForeignColumns] =
+  const [, rawAttributes, rawSchemaOrTable, rawTableOnly, rawForeignAttributes] =
     matches;
   const rawSchema = rawTableOnly
     ? rawSchemaOrTable
     : `"${pgClass.getNamespace()!.nspname}"`;
   const rawTable = rawTableOnly || rawSchemaOrTable;
-  const columns: string[] = parseSqlColumnArray(rawColumns);
-  const foreignSchema: string = parseSqlColumnString(rawSchema);
-  const foreignTable: string = parseSqlColumnString(rawTable);
-  const foreignColumns: string[] | null = rawForeignColumns
-    ? parseSqlColumnArray(rawForeignColumns)
+  const attributes: string[] = parseSqlAttributeArray(rawAttributes);
+  const foreignSchema: string = parseSqlAttributeString(rawSchema);
+  const foreignTable: string = parseSqlAttributeString(rawTable);
+  const foreignAttributes: string[] | null = rawForeignAttributes
+    ? parseSqlAttributeArray(rawForeignAttributes)
     : null;
 
   const foreignPgClass = await info.helpers.pgIntrospection.getClassByName(
@@ -311,13 +311,13 @@ async function processFk(
   }
   const keyAttibutes = attributesByNames(
     pgClass,
-    columns,
-    () => `'@foreignKey' smart tag on ${identity()} local columns`,
+    attributes,
+    () => `'@foreignKey' smart tag on ${identity()} local attributes`,
   );
   const foreignKeyAttibutes = attributesByNames(
     foreignPgClass,
-    foreignColumns,
-    () => `'@foreignKey' smart tag on ${identity()} remote columns`,
+    foreignAttributes,
+    () => `'@foreignKey' smart tag on ${identity()} remote attributes`,
   );
 
   // Check that this is unique
@@ -352,11 +352,11 @@ async function processFk(
       );
     } else {
       throw new Error(
-        `Invalid @foreignKey on '${identity()}'; referenced non-unique combination of columns '${foreignSchema}.${foreignTable}' (${foreignKeyAttibutes
+        `Invalid @foreignKey on '${identity()}'; referenced non-unique combination of attributes '${foreignSchema}.${foreignTable}' (${foreignKeyAttibutes
           .map((k) => k.attname)
           .join(
             ", ",
-          )}). If this list of columns is truly unique you should add a unique constraint to the table:
+          )}). If this list of attributes is truly unique you should add a unique constraint to the table:
 
 ALTER TABLE ${escapeSqlIdentifier(foreignSchema)}.${escapeSqlIdentifier(
           foreignTable,

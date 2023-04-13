@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-const v4ComputedColumnChecks = (
+const v4ComputedAttributeChecks = (
   _s: PgResourceOptions,
   pgProc: PgProc,
 ): boolean => {
@@ -50,16 +50,16 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
           behavior.push("-queryField mutationField -typeField");
         } else if (
           s.parameters &&
-          s.parameters?.[0]?.codec?.columns &&
+          s.parameters?.[0]?.codec?.attributes &&
           !s.isMutation &&
-          v4ComputedColumnChecks(s, event.pgProc)
+          v4ComputedAttributeChecks(s, event.pgProc)
         ) {
           behavior.push("-queryField -mutationField typeField");
         } else if (
           !s.isMutation &&
           s.parameters &&
-          // Don't default to this being a queryField if it looks like a computed column function
-          (!firstParameter?.codec?.columns ||
+          // Don't default to this being a queryField if it looks like a computed attribute function
+          (!firstParameter?.codec?.attributes ||
             firstParameter?.codec?.extensions?.isTableLike === false)
         ) {
           behavior.push("queryField -mutationField -typeField");

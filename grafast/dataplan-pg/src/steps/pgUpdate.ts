@@ -12,7 +12,7 @@ import type { PgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceCodec,
-  GetPgResourceColumns,
+  GetPgResourceAttributes,
   GetPgResourceUniques,
   PgCodec,
   PlanByUniques,
@@ -51,7 +51,7 @@ export class PgUpdateStep<
   hasSideEffects = true;
 
   /**
-   * Tells us what we're dealing with - data type, columns, where to update it,
+   * Tells us what we're dealing with - data type, attributes, where to update it,
    * what it's called, etc.
    */
   public readonly resource: TResource;
@@ -72,19 +72,19 @@ export class PgUpdateStep<
   public readonly alias: SQL;
 
   /**
-   * The columns and their dependency ids for us to find the record by.
+   * The attributes and their dependency ids for us to find the record by.
    */
   private getBys: Array<{
-    name: keyof GetPgResourceColumns<TResource>;
+    name: keyof GetPgResourceAttributes<TResource>;
     depId: number;
     pgCodec: PgCodec;
   }> = [];
 
   /**
-   * The columns and their dependency ids for us to update.
+   * The attributes and their dependency ids for us to update.
    */
-  private columns: Array<{
-    name: keyof GetPgResourceColumns<TResource>;
+  private attributes: Array<{
+    name: keyof GetPgResourceAttributes<TResource>;
     depId: number;
     pgCodec: PgCodec;
   }> = [];
@@ -113,11 +113,11 @@ export class PgUpdateStep<
   constructor(
     resource: TResource,
     getBy: PlanByUniques<
-      GetPgResourceColumns<TResource>,
+      GetPgResourceAttributes<TResource>,
       GetPgResourceUniques<TResource>
     >,
-    columns?: {
-      [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TColumns[key]["codec"]>
+    attributes?: {
+      [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
     },
   ) {
     super();
@@ -127,13 +127,13 @@ export class PgUpdateStep<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.resource.executor.context());
 
-    const keys: ReadonlyArray<keyof GetPgResourceColumns<TResource>> = getBy
-      ? (Object.keys(getBy) as Array<keyof GetPgResourceColumns<TResource>>)
+    const keys: ReadonlyArray<keyof GetPgResourceAttributes<TResource>> = getBy
+      ? (Object.keys(getBy) as Array<keyof GetPgResourceAttributes<TResource>>)
       : [];
 
     if (
       !(this.resource.uniques as PgResourceUnique[]).some((uniq) =>
-        uniq.columns.every((key) => keys.includes(key as any)),
+        uniq.attributes.every((key) => keys.includes(key as any)),
       )
     ) {
       throw new Error(
@@ -149,7 +149,7 @@ export class PgUpdateStep<
       if (isDev) {
         if (this.getBys.some((col) => col.name === name)) {
           throw new Error(
-            `Column '${String(
+            `Attribute '${String(
               name,
             )}' was specified more than once in ${this}'s getBy spec`,
           );
@@ -157,18 +157,18 @@ export class PgUpdateStep<
       }
       const value = (getBy as any)![name as any];
       const depId = this.addDependency(value);
-      const column = (
-        this.resource.codec.columns as GetPgResourceColumns<TResource>
+      const attribute = (
+        this.resource.codec.attributes as GetPgResourceAttributes<TResource>
       )[name];
-      const pgCodec = column.codec;
+      const pgCodec = attribute.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
 
-    if (columns) {
-      Object.entries(columns).forEach(([key, value]) => {
+    if (attributes) {
+      Object.entries(attributes).forEach(([key, value]) => {
         if (value) {
           this.set(
-            key as keyof GetPgResourceColumns<TResource>,
+            key as keyof GetPgResourceAttributes<TResource>,
             value as ExecutableStep,
           );
         }
@@ -176,29 +176,29 @@ export class PgUpdateStep<
     }
   }
 
-  set<TKey extends keyof GetPgResourceColumns<TResource>>(
+  set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
-    value: ExecutableStep, // | PgTypedExecutableStep<TColumns[TKey]["codec"]>
+    value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
     }
     if (isDev) {
-      if (this.columns.some((col) => col.name === name)) {
+      if (this.attributes.some((col) => col.name === name)) {
         throw new Error(
-          `Column '${String(name)}' was specified more than once in ${this}`,
+          `Attribute '${String(name)}' was specified more than once in ${this}`,
         );
       }
     }
     const { codec: pgCodec } = (
-      this.resource.codec.columns as GetPgResourceColumns<TResource>
+      this.resource.codec.attributes as GetPgResourceAttributes<TResource>
     )[name];
     const depId = this.addDependency(value);
-    this.columns.push({ name, depId, pgCodec });
+    this.attributes.push({ name, depId, pgCodec });
   }
 
   setPlan(): SetterStep<
-    { [key in keyof GetPgResourceColumns<TResource> & string]: ExecutableStep },
+    { [key in keyof GetPgResourceAttributes<TResource> & string]: ExecutableStep },
     this
   > {
     if (this.locked) {
@@ -210,25 +210,25 @@ export class PgUpdateStep<
   }
 
   /**
-   * Returns a plan representing a named attribute (e.g. column) from the newly
+   * Returns a plan representing a named attribute (e.g. attribute) from the newly
    * updateed row.
    */
-  get<TAttr extends keyof GetPgResourceColumns<TResource>>(
+  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr]["codec"],
+    GetPgResourceAttributes<TResource>[TAttr]["codec"],
     TResource
   > {
-    const resourceColumn: PgCodecAttribute =
-      this.resource.codec.columns![attr as string];
-    if (!resourceColumn) {
+    const resourceAttribute: PgCodecAttribute =
+      this.resource.codec.attributes![attr as string];
+    if (!resourceAttribute) {
       throw new Error(
         `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
-    if (resourceColumn?.via) {
-      throw new Error(`Cannot select a 'via' column from PgUpdateStep`);
+    if (resourceAttribute?.via) {
+      throw new Error(`Cannot select a 'via' attribute from PgUpdateStep`);
     }
 
     /*
@@ -242,9 +242,9 @@ export class PgUpdateStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression(this, resourceColumn.codec);
-    const colPlan = resourceColumn.expression
-      ? sqlExpr`${sql.parens(resourceColumn.expression(this.alias))}`
+    const sqlExpr = pgClassExpression(this, resourceAttribute.codec);
+    const colPlan = resourceAttribute.expression
+      ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
     return colPlan as any;
   }
@@ -369,15 +369,15 @@ export class PgUpdateStep<
        *
        * So we have to make do with single updates, alas.
        */
-      const getByColumnsCount = this.getBys.length;
-      const columnsCount = this.columns.length;
-      if (columnsCount === 0) {
-        // No columns to update?! This isn't allowed.
+      const getByAttributesCount = this.getBys.length;
+      const attributesCount = this.attributes.length;
+      if (attributesCount === 0) {
+        // No attributes to update?! This isn't allowed.
         throw new SafeError(
           "Attempted to update a record, but no new values were specified.",
         );
-      } else if (getByColumnsCount === 0) {
-        // No columns specified to find the row?! This is forbidden.
+      } else if (getByAttributesCount === 0) {
+        // No attributes specified to find the row?! This is forbidden.
         throw new SafeError(
           "Attempted to update a record, but no information on uniquely determining the record was specified.",
         );
@@ -387,7 +387,7 @@ export class PgUpdateStep<
         const sqlSets: SQL[] = [];
         const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
 
-        for (let i = 0; i < getByColumnsCount; i++) {
+        for (let i = 0; i < getByAttributesCount; i++) {
           const { name, depId, pgCodec } = this.getBys[i];
           const symbol = Symbol(name as string);
           sqlWhereClauses[i] = sql.parens(
@@ -403,8 +403,8 @@ export class PgUpdateStep<
           });
         }
 
-        for (let i = 0; i < columnsCount; i++) {
-          const { name, depId, pgCodec } = this.columns[i];
+        for (let i = 0; i < attributesCount; i++) {
+          const { name, depId, pgCodec } = this.attributes[i];
           const symbol = Symbol(name as string);
           sqlSets[i] = sql`${sql.identifier(name as string)} = ${sql.value(
             // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
@@ -442,14 +442,14 @@ export class PgUpdateStep<
 export function pgUpdate<TResource extends PgResource<any, any, any, any>>(
   resource: TResource,
   getBy: PlanByUniques<
-    GetPgResourceColumns<TResource>,
+    GetPgResourceAttributes<TResource>,
     GetPgResourceUniques<TResource>
   >,
-  columns?: {
-    [key in keyof GetPgResourceColumns<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TColumns[key]["codec"]>
+  attributes?: {
+    [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
   },
 ): PgUpdateStep<TResource> {
-  return new PgUpdateStep(resource, getBy, columns);
+  return new PgUpdateStep(resource, getBy, attributes);
 }
 
 exportAs("@dataplan/pg", pgUpdate, "pgUpdate");

@@ -1,7 +1,7 @@
 import * as core from "./core.js";
 
 test(
-  "omit read on column",
+  "omit read on attribute",
   core.test(
     __filename,
     ["d"],

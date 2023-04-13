@@ -39,7 +39,7 @@ const isInsertable = (
   resource: PgResource<any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;
-  if (!resource.codec.columns) return false;
+  if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   const behavior = getBehavior([

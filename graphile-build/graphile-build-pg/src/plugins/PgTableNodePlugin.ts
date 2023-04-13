@@ -39,7 +39,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
           if (resource.codec.isAnonymous) return false;
-          if (!resource.codec.columns) return false;
+          if (!resource.codec.attributes) return false;
           if (resource.codec.polymorphism) return false;
           if (resource.parameters) return false;
           if (!resource.uniques) return false;
@@ -80,7 +80,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           if (!primaryKey) {
             continue;
           }
-          const pk = primaryKey.columns;
+          const pk = primaryKey.attributes;
 
           const identifier =
             // Yes, this behaviour in V4 was ridiculous. Alas.
@@ -91,7 +91,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
           const clean =
             isSafeObjectPropertyName(identifier) &&
-            pk.every((columnName) => isSafeObjectPropertyName(columnName));
+            pk.every((attributeName) => isSafeObjectPropertyName(attributeName));
 
           const firstSource = resources.find((s) => !s.parameters);
 
@@ -109,7 +109,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 return function (list, constant) {
   return $record => list([constant(${te.lit(identifier)}), ${te.join(
                     pk.map(
-                      (columnName) => te`$record.get(${te.lit(columnName)})`,
+                      (attributeName) => te`$record.get(${te.lit(attributeName)})`,
                     ),
                     ", ",
                   )}]);
@@ -121,7 +121,7 @@ return function (list, constant) {
                     ($record: PgSelectSingleStep) => {
                       return list([
                         constant(identifier),
-                        ...pk.map((column) => $record.get(column)),
+                        ...pk.map((attribute) => $record.get(attribute)),
                       ]);
                     },
                   [constant, identifier, list, pk],
@@ -133,8 +133,8 @@ return function (list, constant) {
 return function (access) {
   return $list => ({ ${te.join(
     pk.map(
-      (columnName, index) =>
-        te`${te.dangerousKey(columnName)}: access($list, [${te.lit(
+      (attributeName, index) =>
+        te`${te.dangerousKey(attributeName)}: access($list, [${te.lit(
           index + 1,
         )}])`,
     ),
@@ -145,8 +145,8 @@ return function (access) {
                 )
               : EXPORTABLE(
                   (access, pk) => ($list: ListStep<any[]>) => {
-                    const spec = pk.reduce((memo, column, index) => {
-                      memo[column] = access($list, [index + 1]);
+                    const spec = pk.reduce((memo, attribute, index) => {
+                      memo[attribute] = access($list, [index + 1]);
                       return memo;
                     }, Object.create(null));
                     return spec;

@@ -13,7 +13,7 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
 /**
  * This polymorphic plan is to support polymorphism from a single PostgreSQL
- * table, typically these tables will have a "type" (or similar) column that
+ * table, typically these tables will have a "type" (or similar) attribute that
  * details the type of the data in the row. This class accepts a plan that
  * resolves to the GraphQLObjectType type name (a string), and a second plan
  * that represents a row from this table.

@@ -252,7 +252,7 @@ export function serializeAcl(acl: AclObject) {
 
 export const emptyAclObject = parseAcl("=/postgres");
 
-export const OBJECT_COLUMN = "OBJECT_COLUMN";
+export const OBJECT_ATTRIBUTE = "OBJECT_ATTRIBUTE";
 export const OBJECT_TABLE = "OBJECT_TABLE";
 export const OBJECT_SEQUENCE = "OBJECT_SEQUENCE";
 export const OBJECT_DATABASE = "OBJECT_DATABASE";
@@ -267,7 +267,7 @@ export const OBJECT_DOMAIN = "OBJECT_DOMAIN";
 export const OBJECT_TYPE = "OBJECT_TYPE";
 
 export type AclDefaultObjectType =
-  | typeof OBJECT_COLUMN
+  | typeof OBJECT_ATTRIBUTE
   | typeof OBJECT_TABLE
   | typeof OBJECT_SEQUENCE
   | typeof OBJECT_DATABASE

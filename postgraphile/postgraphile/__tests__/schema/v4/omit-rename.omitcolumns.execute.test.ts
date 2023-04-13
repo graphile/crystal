@@ -1,7 +1,7 @@
 import * as core from "./core.js";
 
 test(
-  "omit execute on computed column",
+  "omit execute on computed attribute",
   core.test(
     __filename,
     ["d"],

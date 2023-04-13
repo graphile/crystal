@@ -145,7 +145,7 @@ export class PgLocker<
     // this.lockParameter("join");
     this.lockParameter("groupBy");
     this.lockParameter("orderBy");
-    // // We must execute where after orderBy because cursor queries require all orderBy columns
+    // // We must execute where after orderBy because cursor queries require all orderBy attributes
     // this.lockParameter("cursorComparator");
     // this.lockParameter("whereBound");
     // this.lockParameter("where");

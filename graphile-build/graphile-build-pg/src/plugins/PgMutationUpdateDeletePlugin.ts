@@ -2,7 +2,7 @@ import "graphile-config";
 
 import type {
   PgClassSingleStep,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgDeleteStep,
   PgResource,
   PgResourceUnique,
@@ -140,7 +140,7 @@ const isUpdatable = (
   resource: PgResource<any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;
-  if (!resource.codec.columns) return false;
+  if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   if (!resource.uniques || resource.uniques.length < 1) return false;
@@ -156,7 +156,7 @@ const isDeletable = (
   resource: PgResource<any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;
-  if (!resource.codec.columns) return false;
+  if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   if (!resource.uniques || resource.uniques.length < 1) return false;
@@ -216,7 +216,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         return this.camelCase(
           `update-${this._singularizedResourceName(
             resource,
-          )}-by-${this._joinColumnNames(resource.codec, unique.columns)}`,
+          )}-by-${this._joinAttributeNames(resource.codec, unique.attributes)}`,
         );
       },
       updateByKeysInputType(options, details) {
@@ -227,7 +227,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         return this.camelCase(
           `delete-${this._singularizedResourceName(
             resource,
-          )}-by-${this._joinColumnNames(resource.codec, unique.columns)}`,
+          )}-by-${this._joinAttributeNames(resource.codec, unique.attributes)}`,
         );
       },
       deleteByKeysInputType(options, details) {
@@ -249,7 +249,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         } = build;
 
         const process = (
-          resource: PgResource<any, PgCodecWithColumns, any, any, any>,
+          resource: PgResource<any, PgCodecWithAttributes, any, any, any>,
           mode: "resource:update" | "resource:delete",
         ) => {
           const modeText = mode === "resource:update" ? "update" : "delete";
@@ -484,20 +484,20 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 type: new GraphQLNonNull(GraphQLID),
                               },
                             }
-                          : (unique.columns as string[]).reduce(
-                              (memo, columnName) => {
-                                const column =
-                                  resource.codec.columns[columnName];
+                          : (unique.attributes as string[]).reduce(
+                              (memo, attributeName) => {
+                                const attribute =
+                                  resource.codec.attributes[attributeName];
                                 memo[
-                                  inflection.column({
-                                    columnName,
+                                  inflection.attribute({
+                                    attributeName,
                                     codec: resource.codec,
                                   })
                                 ] = {
-                                  description: column.description,
+                                  description: attribute.description,
                                   type: new GraphQLNonNull(
                                     build.getGraphQLTypeByPgCodec(
-                                      column.codec,
+                                      attribute.codec,
                                       "input",
                                     )!,
                                   ),
@@ -536,7 +536,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     ),
                   };
                 },
-                `Creating ${mode} input by ${uniqueMode} for ${unique.columns.join(
+                `Creating ${mode} input by ${uniqueMode} for ${unique.attributes.join(
                   ",",
                 )} of ${resource} from PgMutationUpdateDeletePlugin`,
               );
@@ -550,13 +550,13 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         const updatableResources = allResources.filter(
           (
             resource,
-          ): resource is PgResource<any, PgCodecWithColumns, any, any, any> =>
+          ): resource is PgResource<any, PgCodecWithAttributes, any, any, any> =>
             isUpdatable(build, resource),
         );
         const deletableResources = allResources.filter(
           (
             resource,
-          ): resource is PgResource<any, PgCodecWithColumns, any, any, any> =>
+          ): resource is PgResource<any, PgCodecWithAttributes, any, any, any> =>
             isDeletable(build, resource),
         );
 
@@ -664,26 +664,26 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   );
                 }
 
-                const uniqueColumns = (unique.columns as string[]).map(
-                  (columnName) => [
-                    columnName,
-                    inflection.column({
-                      columnName,
+                const uniqueAttributes = (unique.attributes as string[]).map(
+                  (attributeName) => [
+                    attributeName,
+                    inflection.attribute({
+                      attributeName,
                       codec: resource.codec,
                     }),
                   ],
                 );
 
                 /**
-                 * If every column is a safe identifier then we can create an
+                 * If every attribute is a safe identifier then we can create an
                  * optimised function, otherwise we must play it safe and not
                  * do that.
                  */
                 const clean =
                   uniqueMode === "keys" &&
-                  uniqueColumns.every(
-                    ([columnName, fieldName]) =>
-                      isSafeObjectPropertyName(columnName) &&
+                  uniqueAttributes.every(
+                    ([attributeName, fieldName]) =>
+                      isSafeObjectPropertyName(attributeName) &&
                       isSafeObjectPropertyName(fieldName),
                   );
 
@@ -696,10 +696,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                  */
                 const specFromArgsString = clean
                   ? te`{ ${te.join(
-                      uniqueColumns.map(
-                        ([columnName, fieldName]) =>
+                      uniqueAttributes.map(
+                        ([attributeName, fieldName]) =>
                           te`${te.dangerousKey(
-                            columnName,
+                            attributeName,
                           )}: args.get(['input', ${te.lit(fieldName)}])`,
                       ),
                       ", ",
@@ -725,16 +725,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                 const specFromArgs =
                   uniqueMode === "keys"
                     ? EXPORTABLE(
-                        (uniqueColumns) => (args: FieldArgs) => {
-                          return uniqueColumns.reduce(
-                            (memo, [columnName, fieldName]) => {
-                              memo[columnName] = args.get(["input", fieldName]);
+                        (uniqueAttributes) => (args: FieldArgs) => {
+                          return uniqueAttributes.reduce(
+                            (memo, [attributeName, fieldName]) => {
+                              memo[attributeName] = args.get(["input", fieldName]);
                               return memo;
                             },
                             Object.create(null),
                           );
                         },
-                        [uniqueColumns],
+                        [uniqueAttributes],
                       )
                     : EXPORTABLE(
                         (codec, handler, nodeIdFieldName, specFromNodeId) =>

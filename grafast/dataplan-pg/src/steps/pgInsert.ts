@@ -14,7 +14,7 @@ import type { PgResource } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceCodec,
-  GetPgResourceColumns,
+  GetPgResourceAttributes,
   PgCodec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
@@ -40,7 +40,7 @@ interface PgInsertPlanFinalizeResults {
 }
 
 /**
- * Inserts a row into resource with the given specified column values.
+ * Inserts a row into resource with the given specified attribute values.
  */
 export class PgInsertStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
@@ -50,7 +50,7 @@ export class PgInsertStep<
   >
   implements
     SetterCapableStep<{
-      [key in keyof GetPgResourceColumns<TResource> & string]: ExecutableStep;
+      [key in keyof GetPgResourceAttributes<TResource> & string]: ExecutableStep;
     }>
 {
   static $$export = {
@@ -62,7 +62,7 @@ export class PgInsertStep<
   hasSideEffects = true;
 
   /**
-   * Tells us what we're dealing with - data type, columns, where to insert it,
+   * Tells us what we're dealing with - data type, attributes, where to insert it,
    * what it's called, etc.
    */
   public readonly resource: TResource;
@@ -83,10 +83,10 @@ export class PgInsertStep<
   public readonly alias: SQL;
 
   /**
-   * The columns and their dependency ids for us to insert.
+   * The attributes and their dependency ids for us to insert.
    */
-  private columns: Array<{
-    name: keyof GetPgResourceColumns<TResource>;
+  private attributes: Array<{
+    name: keyof GetPgResourceAttributes<TResource>;
     depId: number;
     // TODO: this shouldn't be needed, we can look it up in the codec?
     pgCodec: PgCodec;
@@ -115,9 +115,9 @@ export class PgInsertStep<
 
   constructor(
     resource: TResource,
-    columns?: {
-      [key in keyof GetPgResourceColumns<TResource>]?:
-        | PgTypedExecutableStep<GetPgResourceColumns<TResource>[key]["codec"]>
+    attributes?: {
+      [key in keyof GetPgResourceAttributes<TResource>]?:
+        | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]["codec"]>
         | ExecutableStep;
     },
   ) {
@@ -127,11 +127,11 @@ export class PgInsertStep<
     this.symbol = Symbol(this.name);
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.resource.executor.context());
-    if (columns) {
-      Object.entries(columns).forEach(([key, value]) => {
+    if (attributes) {
+      Object.entries(attributes).forEach(([key, value]) => {
         if (value) {
           this.set(
-            key as keyof GetPgResourceColumns<TResource>,
+            key as keyof GetPgResourceAttributes<TResource>,
             value as ExecutableStep,
           );
         }
@@ -139,36 +139,36 @@ export class PgInsertStep<
     }
   }
 
-  set<TKey extends keyof GetPgResourceColumns<TResource>>(
+  set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
-    value: ExecutableStep, // | PgTypedExecutableStep<TColumns[TKey]["codec"]>
+    value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
     }
     if (isDev) {
-      if (this.columns.some((col) => col.name === name)) {
+      if (this.attributes.some((col) => col.name === name)) {
         throw new Error(
-          `Column '${String(name)}' was specified more than once in ${this}`,
+          `Attribute '${String(name)}' was specified more than once in ${this}`,
         );
       }
     }
-    const column = (
-      this.resource.codec.columns as GetPgResourceColumns<TResource>
+    const attribute = (
+      this.resource.codec.attributes as GetPgResourceAttributes<TResource>
     )?.[name];
-    if (!column) {
+    if (!attribute) {
       throw new Error(
-        `Column ${String(name)} not found in ${this.resource.codec}`,
+        `Attribute ${String(name)} not found in ${this.resource.codec}`,
       );
     }
-    const { codec: pgCodec } = column;
+    const { codec: pgCodec } = attribute;
     const depId = this.addDependency(value);
-    this.columns.push({ name, depId, pgCodec });
+    this.attributes.push({ name, depId, pgCodec });
   }
 
   setPlan(): SetterStep<
     {
-      [key in keyof GetPgResourceColumns<TResource> & string]: ExecutableStep;
+      [key in keyof GetPgResourceAttributes<TResource> & string]: ExecutableStep;
     },
     this
   > {
@@ -181,32 +181,32 @@ export class PgInsertStep<
   }
 
   /**
-   * Returns a plan representing a named attribute (e.g. column) from the newly
+   * Returns a plan representing a named attribute (e.g. attribute) from the newly
    * inserted row.
    */
-  get<TAttr extends keyof GetPgResourceColumns<TResource>>(
+  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<
+    GetPgResourceAttributes<TResource>[TAttr] extends PgCodecAttribute<
       infer UCodec
     >
       ? UCodec
       : never,
     TResource
   > {
-    if (!this.resource.codec.columns) {
-      throw new Error(`Cannot call .get() when there's no columns.`);
+    if (!this.resource.codec.attributes) {
+      throw new Error(`Cannot call .get() when there's no attributes.`);
     }
-    const resourceColumn: PgCodecAttribute =
-      this.resource.codec.columns[attr as string];
-    if (!resourceColumn) {
+    const resourceAttribute: PgCodecAttribute =
+      this.resource.codec.attributes[attr as string];
+    if (!resourceAttribute) {
       throw new Error(
         `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
-    if (resourceColumn?.via) {
-      throw new Error(`Cannot select a 'via' column from PgInsertStep`);
+    if (resourceAttribute?.via) {
+      throw new Error(`Cannot select a 'via' attribute from PgInsertStep`);
     }
 
     /*
@@ -220,9 +220,9 @@ export class PgInsertStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression(this, resourceColumn.codec);
-    const colPlan = resourceColumn.expression
-      ? sqlExpr`${sql.parens(resourceColumn.expression(this.alias))}`
+    const sqlExpr = pgClassExpression(this, resourceAttribute.codec);
+    const colPlan = resourceAttribute.expression
+      ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
     return colPlan as any;
   }
@@ -351,15 +351,15 @@ export class PgInsertStep<
        *
        * So we have to make do with single inserts, alas.
        */
-      const columnsCount = this.columns.length;
-      if (columnsCount > 0) {
+      const attributesCount = this.attributes.length;
+      if (attributesCount > 0) {
         // This is our common path
-        const sqlColumns: SQL[] = [];
+        const sqlAttributes: SQL[] = [];
         const valuePlaceholders: SQL[] = [];
         const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
-        for (let i = 0; i < columnsCount; i++) {
-          const { name, depId, pgCodec } = this.columns[i];
-          sqlColumns[i] = sql.identifier(name as string);
+        for (let i = 0; i < attributesCount; i++) {
+          const { name, depId, pgCodec } = this.attributes[i];
+          sqlAttributes[i] = sql.identifier(name as string);
           const symbol = Symbol(name as string);
           valuePlaceholders[i] = sql`${sql.value(
             // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
@@ -371,9 +371,9 @@ export class PgInsertStep<
             processor: pgCodec.toPg,
           });
         }
-        const columns = sql.join(sqlColumns, ", ");
+        const attributes = sql.join(sqlAttributes, ", ");
         const values = sql.join(valuePlaceholders, ", ");
-        const query = sql`insert into ${table} (${columns}) values (${values})${returning};`;
+        const query = sql`insert into ${table} (${attributes}) values (${values})${returning};`;
         const { text, values: rawSqlValues } = sql.compile(query);
 
         this.finalizeResults = {
@@ -382,7 +382,7 @@ export class PgInsertStep<
           queryValueDetailsBySymbol,
         };
       } else {
-        // No columns to insert?! Odd... but okay.
+        // No attributes to insert?! Odd... but okay.
         const query = sql`insert into ${table} default values${returning};`;
         const { text, values: rawSqlValues } = sql.compile(query);
 
@@ -399,17 +399,17 @@ export class PgInsertStep<
 }
 
 /**
- * Inserts a row into resource with the given specified column values.
+ * Inserts a row into resource with the given specified attribute values.
  */
 export function pgInsert<TResource extends PgResource<any, any, any, any, any>>(
   resource: TResource,
-  columns?: {
-    [key in keyof GetPgResourceColumns<TResource>]?:
-      | PgTypedExecutableStep<GetPgResourceColumns<TResource>[key]["codec"]>
+  attributes?: {
+    [key in keyof GetPgResourceAttributes<TResource>]?:
+      | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]["codec"]>
       | ExecutableStep;
   },
 ): PgInsertStep<TResource> {
-  return new PgInsertStep(resource, columns);
+  return new PgInsertStep(resource, attributes);
 }
 
 exportAs("@dataplan/pg", pgInsert, "pgInsert");

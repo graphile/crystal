@@ -17,7 +17,7 @@ import { TYPES } from "../codecs.js";
 import type { PgResource } from "../datasource.js";
 import type {
   GetPgResourceCodec,
-  GetPgResourceColumns,
+  GetPgResourceAttributes,
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
@@ -42,7 +42,7 @@ export interface PgSelectSinglePlanOptions {
 
 // Types that only take a few bytes so adding them to the selection would be
 // cheap to do.
-const CHEAP_COLUMN_TYPES = new Set([
+const CHEAP_ATTRIBUTE_TYPES = new Set([
   TYPES.int2,
   TYPES.int,
   TYPES.bigint,
@@ -148,13 +148,13 @@ export class PgSelectSingleStep<
   }
 
   /**
-   * Returns a plan representing a named attribute (e.g. column) from the class
+   * Returns a plan representing a named attribute (e.g. attribute) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof GetPgResourceColumns<TResource>>(
+  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr] extends PgCodecAttribute<
+    GetPgResourceAttributes<TResource>[TAttr] extends PgCodecAttribute<
       infer UCodec,
       any
     >
@@ -165,9 +165,9 @@ export class PgSelectSingleStep<
     if (this.mode === "aggregate") {
       throw new Error("Invalid call to .get() on aggregate plan");
     }
-    if (!this.resource.codec.columns && attr !== "") {
+    if (!this.resource.codec.attributes && attr !== "") {
       throw new Error(
-        `Cannot call ${this}.get() when the resource codec (${this.resource.codec.name}) has no columns to get.`,
+        `Cannot call ${this}.get() when the resource codec (${this.resource.codec.name}) has no attributes to get.`,
       );
     }
     const classPlan = this.getClassStep();
@@ -175,25 +175,25 @@ export class PgSelectSingleStep<
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
-    const resourceColumn: PgCodecAttribute | undefined =
-      this.resource.codec.columns?.[attr as string];
-    if (!resourceColumn && attr !== "") {
+    const resourceAttribute: PgCodecAttribute | undefined =
+      this.resource.codec.attributes?.[attr as string];
+    if (!resourceAttribute && attr !== "") {
       throw new Error(
         `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
-    if (resourceColumn?.via) {
+    if (resourceAttribute?.via) {
       const { relation, attribute } = this.resource.resolveVia(
-        resourceColumn.via,
+        resourceAttribute.via,
         attr as string,
       );
       return this.singleRelation(relation as any).get(attribute) as any;
     }
 
-    if (resourceColumn?.identicalVia) {
+    if (resourceAttribute?.identicalVia) {
       const { relation, attribute } = this.resource.resolveVia(
-        resourceColumn.identicalVia,
+        resourceAttribute.identicalVia,
         attr as string,
       );
 
@@ -208,8 +208,8 @@ export class PgSelectSingleStep<
 
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
-      const matchingColumn = (
-        Object.entries($fromPlan.resource.codec.columns!) as Array<
+      const matchingAttribute = (
+        Object.entries($fromPlan.resource.codec.attributes!) as Array<
           [string, PgCodecAttribute]
         >
       ).find(([name, col]) => {
@@ -224,8 +224,8 @@ export class PgSelectSingleStep<
         }
         return false;
       });
-      if (matchingColumn) {
-        return $fromPlan.get(matchingColumn[0]) as any;
+      if (matchingAttribute) {
+        return $fromPlan.get(matchingAttribute[0]) as any;
       }
     }
 
@@ -244,24 +244,24 @@ export class PgSelectSingleStep<
       this,
       attr === ""
         ? this.resource.codec
-        : this.resource.codec.columns![attr as string].codec,
+        : this.resource.codec.attributes![attr as string].codec,
     );
-    const colPlan = resourceColumn
-      ? resourceColumn.expression
-        ? sqlExpr`${sql.parens(resourceColumn.expression(classPlan.alias))}`
+    const colPlan = resourceAttribute
+      ? resourceAttribute.expression
+        ? sqlExpr`${sql.parens(resourceAttribute.expression(classPlan.alias))}`
         : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
-      : sqlExpr`${classPlan.alias}.v`; /* single column */
+      : sqlExpr`${classPlan.alias}.v`; /* single attribute */
 
     if (
-      this.nonNullColumn == null &&
+      this.nonNullAttribute == null &&
       typeof attr === "string" &&
       attr.length > 0 &&
-      resourceColumn &&
-      !resourceColumn.expression &&
-      resourceColumn.notNull
+      resourceAttribute &&
+      !resourceAttribute.expression &&
+      resourceAttribute.notNull
     ) {
       // We know the row is null iff this attribute is null
-      this.nonNullColumn = { column: resourceColumn, attr };
+      this.nonNullAttribute = { attribute: resourceAttribute, attr };
     }
 
     return colPlan as any;
@@ -344,7 +344,7 @@ export class PgSelectSingleStep<
         }`,
       );
     }
-    const { remoteResource, remoteColumns, localColumns } = relation;
+    const { remoteResource, remoteAttributes, localAttributes } = relation;
 
     const options: PgSelectSinglePlanOptions = {
       fromRelation: [
@@ -353,8 +353,8 @@ export class PgSelectSingleStep<
       ],
     };
     return remoteResource.get(
-      remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
-        memo[remoteColumn] = this.get(localColumns[columnIndex]);
+      remoteAttributes.reduce((memo, remoteAttribute, attributeIndex) => {
+        memo[remoteAttribute] = this.get(localAttributes[attributeIndex]);
         return memo;
       }, Object.create(null)),
       options,
@@ -376,11 +376,11 @@ export class PgSelectSingleStep<
         `${String(relationIdentifier)} is not a relation on ${this.resource}`,
       );
     }
-    const { remoteResource, remoteColumns, localColumns } = relation;
+    const { remoteResource, remoteAttributes, localAttributes } = relation;
 
     return (remoteResource as PgResource).find(
-      remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
-        memo[remoteColumn] = this.get(localColumns[columnIndex]);
+      remoteAttributes.reduce((memo, remoteAttribute, attributeIndex) => {
+        memo[remoteAttribute] = this.get(localAttributes[attributeIndex]);
         return memo;
       }, Object.create(null)),
     ) as any;
@@ -489,15 +489,15 @@ export class PgSelectSingleStep<
     }
   }
 
-  private nonNullColumn: { column: PgCodecAttribute; attr: string } | null =
+  private nonNullAttribute: { attribute: PgCodecAttribute; attr: string } | null =
     null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
     const poly = (this.resource.codec as PgCodec).polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       const $class = this.getClassStep();
-      this.typeStepIndexList = poly.typeColumns.map((col) => {
-        const attr = this.resource.codec.columns![col];
+      this.typeStepIndexList = poly.typeAttributes.map((col) => {
+        const attr = this.resource.codec.attributes![col];
         const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
 
         return $class.selectAndReturnIndex(
@@ -510,37 +510,37 @@ export class PgSelectSingleStep<
       this.typeStepIndexList = null;
     }
 
-    const columns = this.resource.codec.columns;
-    if (columns && this.getClassStep().mode !== "aggregate") {
+    const attributes = this.resource.codec.attributes;
+    if (attributes && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
-      // non-null column, but failing that we invoke the codec's
+      // non-null attribute, but failing that we invoke the codec's
       // nonNullExpression (indirectly).
-      const getSuitableColumn = () => {
-        // We want to find a _cheap_ not-null column to select to prove that
-        // the row is not null. Critically this must be a column that we can
-        // always select (i.e.  is not prevented by any column-level select
+      const getSuitableAttribute = () => {
+        // We want to find a _cheap_ not-null attribute to select to prove that
+        // the row is not null. Critically this must be a attribute that we can
+        // always select (i.e.  is not prevented by any attribute-level select
         // privileges).
-        for (const attr of Object.keys(columns)) {
-          const column = columns[attr];
+        for (const attr of Object.keys(attributes)) {
+          const attribute = attributes[attr];
           if (
-            column.notNull &&
-            CHEAP_COLUMN_TYPES.has(column.codec) &&
-            !column.restrictedAccess
+            attribute.notNull &&
+            CHEAP_ATTRIBUTE_TYPES.has(attribute.codec) &&
+            !attribute.restrictedAccess
           ) {
             return {
-              column,
+              attribute,
               attr,
             };
           }
         }
         return null;
       };
-      const nonNullColumn = this.nonNullColumn ?? getSuitableColumn();
-      if (nonNullColumn != null) {
+      const nonNullAttribute = this.nonNullAttribute ?? getSuitableAttribute();
+      if (nonNullAttribute != null) {
         const {
-          column: { codec },
+          attribute: { codec },
           attr,
-        } = nonNullColumn;
+        } = nonNullAttribute;
         const expression = sql`${this.getClassStep().alias}.${sql.identifier(
           attr,
         )}`;
@@ -577,7 +577,7 @@ export class PgSelectSingleStep<
 
   unbatchedExecute(
     extra: ExecutionExtra,
-    result: ObjectFromPgCodecAttributes<GetPgResourceColumns<TResource>>,
+    result: ObjectFromPgCodecAttributes<GetPgResourceAttributes<TResource>>,
   ): unknown[] {
     if (result == null) {
       return this._coalesceToEmptyObject ? Object.create(null) : null;

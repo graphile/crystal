@@ -47,7 +47,7 @@ export interface PgClientQuery {
   text: string;
   /** The values to put in the placeholders */
   values?: Array<any>;
-  /** An optimisation, to avoid you having to decode column names */
+  /** An optimisation, to avoid you having to decode attribute names */
   arrayMode?: boolean;
   /** For prepared statements */
   name?: string;

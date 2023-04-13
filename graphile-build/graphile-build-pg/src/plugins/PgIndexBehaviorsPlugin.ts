@@ -16,7 +16,7 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
 
         // If it's not indexed, remove the list/connection behaviors
         if (relation.isReferencee) {
-          const referencedColumns = pgConstraint
+          const referencedAttributes = pgConstraint
             .getAttributes()!
             .map((att) => att.attname);
           const remoteIndexes = pgConstraint
@@ -26,13 +26,13 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
 
           const isIndexed = remoteIndexes.some((idx) => {
             const cols = idx.getKeys();
-            if (cols.length < referencedColumns.length) {
+            if (cols.length < referencedAttributes.length) {
               return false;
             }
             const firstColNames = cols
-              .slice(0, referencedColumns.length)
+              .slice(0, referencedAttributes.length)
               .map((k) => k?.attname);
-            return referencedColumns.every((key) =>
+            return referencedAttributes.every((key) =>
               firstColNames.includes(key),
             );
           });
@@ -52,10 +52,10 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
         }
       },
 
-      pgCodecs_column(info, event) {
-        const { column, pgAttribute } = event;
+      pgCodecs_attribute(info, event) {
+        const { attribute, pgAttribute } = event;
 
-        // If this column isn't indexed, remove the filter and order behaviors
+        // If this attribute isn't indexed, remove the filter and order behaviors
         const isIndexed = pgAttribute
           .getClass()!
           .getIndexes()
@@ -67,14 +67,14 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
             return keys[0]?.attname === pgAttribute.attname;
           });
         if (!isIndexed) {
-          if (!column.extensions) {
-            column.extensions = Object.create(null);
+          if (!attribute.extensions) {
+            attribute.extensions = Object.create(null);
           }
-          if (!column.extensions!.tags) {
-            column.extensions!.tags = Object.create(null);
+          if (!attribute.extensions!.tags) {
+            attribute.extensions!.tags = Object.create(null);
           }
           addBehaviorToTags(
-            column.extensions!.tags!,
+            attribute.extensions!.tags!,
             "-filterBy -orderBy",
             true,
           );

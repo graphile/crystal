@@ -104,7 +104,7 @@ async function main() {
       const usersCodec = recordCodec({
         name: `app_public.users`,
         identifier: sql`app_public.users`,
-        columns: {
+        attributes: {
           id: {
             codec: TYPES.uuid,
             notNull: true,
@@ -137,7 +137,7 @@ async function main() {
       const forumsCodec = recordCodec({
         name: `app_public.forums`,
         identifier: sql`app_public.forums`,
-        columns: {
+        attributes: {
           id: {
             codec: TYPES.uuid,
             notNull: true,
@@ -166,7 +166,7 @@ async function main() {
       const messagesCodec = recordCodec({
         name: `app_public.messages`,
         identifier: sql`app_public.messages`,
-        columns: {
+        attributes: {
           id: {
             codec: TYPES.uuid,
             notNull: true,
@@ -213,7 +213,7 @@ async function main() {
         executor,
         from: usersCodec.sqlType,
         codec: usersCodec,
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const forumsResourceOptions = makePgResourceOptions({
@@ -222,7 +222,7 @@ async function main() {
         executor,
         from: forumsCodec.sqlType,
         codec: forumsCodec,
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const messagesResourceOptions = makePgResourceOptions({
@@ -230,7 +230,7 @@ async function main() {
         executor,
         from: messagesCodec.sqlType,
         codec: messagesCodec,
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const uniqueAuthorCountResourceOptions = makePgResourceOptions({
@@ -343,8 +343,8 @@ async function main() {
           messagesResourceOptions,
           {
             isUnique: false,
-            localColumns: ["id"],
-            remoteColumns: ["author_id"],
+            localAttributes: ["id"],
+            remoteAttributes: ["author_id"],
           },
         )
         .addRelation(
@@ -353,8 +353,8 @@ async function main() {
           messagesResourceOptions,
           {
             isUnique: false,
-            localColumns: ["id"],
-            remoteColumns: ["forum_id"],
+            localAttributes: ["id"],
+            remoteAttributes: ["forum_id"],
             extensions: {
               tags: {
                 behavior: "connection list",
@@ -368,8 +368,8 @@ async function main() {
           usersResourceOptions,
           {
             isUnique: true,
-            localColumns: ["author_id"],
-            remoteColumns: ["id"],
+            localAttributes: ["author_id"],
+            remoteAttributes: ["id"],
           },
         )
         .addRelation(
@@ -378,8 +378,8 @@ async function main() {
           forumsResourceOptions,
           {
             isUnique: true,
-            localColumns: ["forum_id"],
-            remoteColumns: ["id"],
+            localAttributes: ["forum_id"],
+            remoteAttributes: ["id"],
           },
         )
         .build();

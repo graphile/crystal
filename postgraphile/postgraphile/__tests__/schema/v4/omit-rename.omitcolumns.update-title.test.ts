@@ -1,7 +1,7 @@
 import * as core from "./core.js";
 
 test(
-  "omit update on column",
+  "omit update on attribute",
   core.test(
     __filename,
     ["d"],

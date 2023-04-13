@@ -11,11 +11,11 @@ import type {
   PgCodecPolymorphismRelational,
   PgCodecPolymorphismRelationalTypeSpec,
   PgCodecPolymorphismSingle,
-  PgCodecPolymorphismSingleTypeColumnSpec,
+  PgCodecPolymorphismSingleTypeAttributeSpec,
   PgCodecPolymorphismSingleTypeSpec,
   PgCodecRef,
   PgCodecRelation,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgRefDefinition,
   PgRegistry,
   PgResource,
@@ -56,7 +56,7 @@ declare global {
       pgPolymorphicSingleTableType?: {
         typeIdentifier: string;
         name: string;
-        columns: ReadonlyArray<PgCodecPolymorphismSingleTypeColumnSpec>;
+        attributes: ReadonlyArray<PgCodecPolymorphismSingleTypeAttributeSpec>;
       };
       pgPolymorphicRelationalType?: {
         typeIdentifier: string;
@@ -66,7 +66,7 @@ declare global {
   }
 }
 
-function parseColumn(colSpec: string): PgCodecPolymorphismSingleTypeColumnSpec {
+function parseAttribute(colSpec: string): PgCodecPolymorphismSingleTypeAttributeSpec {
   let spec = colSpec;
   let isNotNull = false;
   if (spec.endsWith("!")) {
@@ -75,7 +75,7 @@ function parseColumn(colSpec: string): PgCodecPolymorphismSingleTypeColumnSpec {
   }
   const [a, b] = spec.split(">");
   return {
-    column: a,
+    attribute: a,
     isNotNull,
     rename: b,
   };
@@ -115,7 +115,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               const attr = pgClass.getAttribute({ name: type });
               if (!attr) {
                 throw new Error(
-                  `Invalid '@interface' smart tag - there is no '${type}' column on ${
+                  `Invalid '@interface' smart tag - there is no '${type}' attribute on ${
                     pgClass.getNamespace()!.nspname
                   }.${pgClass.relname}`,
                 );
@@ -133,31 +133,31 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
 
               const types: PgCodecPolymorphismSingle["types"] =
                 Object.create(null);
-              const specificColumns = new Set<string>();
+              const specificAttributes = new Set<string>();
               for (const typeTag of typeTags) {
                 const {
                   args: [typeValue],
-                  params: { name, columns },
-                } = parseSmartTagsOptsString<"name" | "columns">(typeTag, 1);
+                  params: { name, attributes },
+                } = parseSmartTagsOptsString<"name" | "attributes">(typeTag, 1);
                 if (!name) {
                   throw new Error(`Every type must have a name`);
                 }
                 types[typeValue] = {
                   name,
-                  columns: columns?.split(",").map(parseColumn) ?? [],
+                  attributes: attributes?.split(",").map(parseAttribute) ?? [],
                 };
-                for (const col of types[typeValue].columns) {
-                  specificColumns.add(col.column);
+                for (const col of types[typeValue].attributes) {
+                  specificAttributes.add(col.attribute);
                 }
               }
 
-              const commonColumns = attributeNames.filter(
-                (n) => !specificColumns.has(n),
+              const commonAttributes = attributeNames.filter(
+                (n) => !specificAttributes.has(n),
               );
               spec.polymorphism = {
                 mode: "single",
-                commonColumns,
-                typeColumns: [type],
+                commonAttributes,
+                typeAttributes: [type],
                 types,
               };
               break;
@@ -167,7 +167,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               const attr = pgClass.getAttribute({ name: type });
               if (!attr) {
                 throw new Error(
-                  `Invalid '@interface' smart tag - there is no '${type}' column on ${
+                  `Invalid '@interface' smart tag - there is no '${type}' attribute on ${
                     pgClass.getNamespace()!.nspname
                   }.${pgClass.relname}`,
                 );
@@ -215,7 +215,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   .find((c) => c.contype === "p");
                 const pgConstraint = referencedClass.getConstraints().find(
                   (c) =>
-                    // TODO: this isn't safe, we should also check that the columns match up
+                    // TODO: this isn't safe, we should also check that the attributes match up
                     c.contype === "f" && c.confrelid === pgClass._id,
                 );
                 if (!pk || !remotePk || !pgConstraint) {
@@ -235,9 +235,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     isReferencee: true,
                     isUnique: true,
                     localClass: pgClass,
-                    localColumns: pk.getAttributes()!,
+                    localAttributes: pk.getAttributes()!,
                     foreignClass: referencedClass,
-                    foreignColumns: remotePk.getAttributes()!,
+                    foreignAttributes: remotePk.getAttributes()!,
                     pgConstraint,
                   }),
                 };
@@ -245,7 +245,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
 
               spec.polymorphism = {
                 mode: "relational",
-                typeColumns: [type],
+                typeAttributes: [type],
                 types,
               };
               break;
@@ -268,7 +268,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         for (const resource of Object.values(
           registryConfig.pgResources,
         ) as PgResourceOptions[]) {
-          if (resource.parameters || !resource.codec.columns) {
+          if (resource.parameters || !resource.codec.attributes) {
             continue;
           }
           if (!resource.extensions?.pg) {
@@ -314,7 +314,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 serviceName,
                 pgRelatedClass._id,
               );
-              if (!otherCodec || !otherCodec.columns) {
+              if (!otherCodec || !otherCodec.attributes) {
                 continue;
               }
               const pk = pgRelatedClass
@@ -355,19 +355,19 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 isReferencee: false,
                 isUnique: true,
                 localClass: pgRelatedClass,
-                localColumns: pk.getAttributes()!,
+                localAttributes: pk.getAttributes()!,
                 foreignClass: pgClass,
-                foreignColumns: remotePk.getAttributes()!,
+                foreignAttributes: remotePk.getAttributes()!,
                 pgConstraint,
               });
 
               for (const [colName, colSpec] of Object.entries(
-                resource.codec.columns,
+                resource.codec.attributes,
               )) {
-                if (otherCodec.columns[colName]) {
-                  otherCodec.columns[colName].identicalVia = sharedRelationName;
+                if (otherCodec.attributes[colName]) {
+                  otherCodec.attributes[colName].identicalVia = sharedRelationName;
                 } else {
-                  otherCodec.columns[colName] = {
+                  otherCodec.attributes[colName] = {
                     codec: colSpec.codec,
                     notNull: colSpec.notNull,
                     hasDefault: colSpec.hasDefault,
@@ -390,12 +390,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
 
         const { registry } = event;
         for (const rawResource of Object.values(registry.pgResources)) {
-          if (rawResource.parameters || !rawResource.codec.columns) {
+          if (rawResource.parameters || !rawResource.codec.attributes) {
             continue;
           }
           const resource = rawResource as PgResource<
             string,
-            PgCodecWithColumns,
+            PgCodecWithAttributes,
             any,
             undefined,
             PgRegistry
@@ -488,9 +488,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 isReferencee: false,
                 isUnique: true,
                 localClass: pgRelatedClass,
-                localColumns: pk.getAttributes()!,
+                localAttributes: pk.getAttributes()!,
                 foreignClass: pgClass,
-                foreignColumns: remotePk.getAttributes()!,
+                foreignAttributes: remotePk.getAttributes()!,
                 pgConstraint,
               });
 
@@ -567,8 +567,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         } = build;
         const unionsToRegister = new Map<string, PgCodec[]>();
         for (const codec of build.pgCodecMetaLookup.keys()) {
-          if (!codec.columns) {
-            // Only apply to codecs that define columns
+          if (!codec.attributes) {
+            // Only apply to codecs that define attributes
             continue;
           }
 
@@ -662,8 +662,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         pgPolymorphicSingleTableType: {
                           typeIdentifier,
                           name: spec.name,
-                          columns: (spec as PgCodecPolymorphismSingleTypeSpec)
-                            .columns,
+                          attributes: (spec as PgCodecPolymorphismSingleTypeSpec)
+                            .attributes,
                         },
                       },
                       // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
@@ -789,7 +789,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         for (const codec of build.pgCodecMetaLookup.keys()) {
           const polymorphism = codec.polymorphism;
           if (
-            !codec.columns ||
+            !codec.attributes ||
             !polymorphism ||
             polymorphism.mode !== "relational"
           ) {

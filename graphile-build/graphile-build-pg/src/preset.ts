@@ -4,8 +4,8 @@ import { PgRBACPlugin } from "./index.js";
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 import { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
 import { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
-import { PgColumnDeprecationPlugin } from "./plugins/PgColumnDeprecationPlugin.js";
-import { PgColumnsPlugin } from "./plugins/PgColumnsPlugin.js";
+import { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
+import { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
 import { PgConditionArgumentPlugin } from "./plugins/PgConditionArgumentPlugin.js";
 import { PgConditionCustomFieldsPlugin } from "./plugins/PgConditionCustomFieldsPlugin.js";
 import { PgConnectionArgFirstLastBeforeAfterPlugin } from "./plugins/PgConnectionArgFirstLastBeforeAfterPlugin.js";
@@ -22,7 +22,7 @@ import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 import { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
-import { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin.js";
+import { PgOrderAllAttributesPlugin } from "./plugins/PgOrderAllAttributesPlugin.js";
 import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
 import { PgPolymorphismPlugin } from "./plugins/PgPolymorphismPlugin.js";
@@ -48,12 +48,12 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgTablesPlugin,
     PgMutationCreatePlugin,
     PgProceduresPlugin,
-    PgColumnsPlugin,
+    PgAttributesPlugin,
     PgAllRowsPlugin,
     PgRowByUniquePlugin,
     PgConnectionTotalCountPlugin,
     PgRelationsPlugin,
-    PgColumnDeprecationPlugin,
+    PgAttributeDeprecationPlugin,
     PgCustomTypeFieldPlugin,
     PgConnectionArgFirstLastBeforeAfterPlugin,
     PgConnectionArgOrderByPlugin,
@@ -61,7 +61,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgConditionCustomFieldsPlugin,
     PgFakeConstraintsPlugin,
     PgOrderByPrimaryKeyPlugin,
-    PgOrderAllColumnsPlugin,
+    PgOrderAllAttributesPlugin,
     PgOrderCustomFieldsPlugin,
     PgConnectionArgOrderByDefaultValuePlugin,
     PgTableNodePlugin,

@@ -1,79 +1,79 @@
 import type { SQLQuery } from "../src/index.js";
 import sql from "../src/index.js";
 
-it("table.column::text 1", () => {
-  const node = sql`${sql.parens(sql.identifier("table", "column"))}::text`;
+it("table.attribute::text 1", () => {
+  const node = sql`${sql.parens(sql.identifier("table", "attribute"))}::text`;
   expect(sql.compile(node)).toMatchObject({
-    text: '"table"."column"::text',
+    text: '"table"."attribute"::text',
     values: [],
   });
 });
 
-it("table.column::text 2", () => {
+it("table.attribute::text 2", () => {
   const node = sql`${sql.parens(
-    sql`${sql.identifier("table")}.${sql.identifier("column")}`,
+    sql`${sql.identifier("table")}.${sql.identifier("attribute")}`,
   )}::text`;
   expect(sql.compile(node)).toMatchObject({
-    text: '"table"."column"::text',
+    text: '"table"."attribute"::text',
     values: [],
   });
 });
 
-it("table.column::text 3", () => {
+it("table.attribute::text 3", () => {
   const node = sql`${sql.parens(
-    sql`${sql.identifier("table")}."column"`,
+    sql`${sql.identifier("table")}."attribute"`,
   )}::text`;
   expect(sql.compile(node)).toMatchObject({
-    text: '"table"."column"::text',
+    text: '"table"."attribute"::text',
     values: [],
   });
 });
 
-it("__table__.column::text", () => {
+it("__table__.attribute::text", () => {
   const node = sql`${sql.parens(
-    sql`${sql.identifier(Symbol("table"))}.column`,
+    sql`${sql.identifier(Symbol("table"))}.attribute`,
   )}::text`;
   expect(sql.compile(node)).toMatchObject({
-    text: "__table__.column::text",
+    text: "__table__.attribute::text",
     values: [],
   });
 });
 
-it("((table.column).attr)::text 1", () => {
+it("((table.attribute).attr)::text 1", () => {
   const node = sql`${sql.parens(
-    sql`${sql.parens(sql.identifier("table", "column"), true)}.${sql.identifier(
+    sql`${sql.parens(sql.identifier("table", "attribute"), true)}.${sql.identifier(
       "attr",
     )}`,
   )}::text`;
   expect(sql.compile(node)).toMatchObject({
-    text: '(("table"."column")."attr")::text',
+    text: '(("table"."attribute")."attr")::text',
     values: [],
   });
 });
 
-it("((table.column).attr)::text 2", () => {
+it("((table.attribute).attr)::text 2", () => {
   const node = sql`${sql.parens(
     sql`${sql.parens(
-      sql`${sql.identifier("table", "column")}`,
+      sql`${sql.identifier("table", "attribute")}`,
       true,
     )}.${sql.identifier("attr")}`,
   )}::text`;
   expect(sql.compile(node)).toMatchObject({
-    text: '(("table"."column")."attr")::text',
+    text: '(("table"."attribute")."attr")::text',
     values: [],
   });
 });
 
-it("((table.column).attr)::text 3", () => {
+it("((table.attribute).attr)::text 3", () => {
   const inner = sql.parens(
-    sql`${sql.identifier("table")}.${sql.identifier("column")}`,
+    sql`${sql.identifier("table")}.${sql.identifier("attribute")}`,
     true,
   );
   const node = sql`${sql.parens(
     sql`${inner}.${sql.identifier("attr")}`,
   )}::text`;
   expect(sql.compile(node)).toMatchObject({
-    text: '(("table"."column")."attr")::text',
+    text: '(("table"."attribute")."attr")::text',
     values: [],
   });
 });
@@ -158,7 +158,7 @@ it("join(conditions, ' and ') 4", () => {
   });
 });
 
-it("expression column", () => {
+it("expression attribute", () => {
   const node = sql`${sql.parens(
     sql.parens(
       sql`${sql.identifier(Symbol("forums"))}.archived_at is not null`,
@@ -170,7 +170,7 @@ it("expression column", () => {
   });
 });
 
-it("expression column 2", () => {
+it("expression attribute 2", () => {
   const node = sql`${sql.parens(
     sql`${sql.parens(
       sql`${sql.identifier(Symbol("forums"))}.archived_at is not null`,

@@ -3,7 +3,7 @@ import "graphile-config";
 
 import type {
   PgCodecAttribute,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgResourceUnique,
 } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
@@ -17,12 +17,12 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      orderByColumnEnum(
+      orderByAttributeEnum(
         this: Inflection,
         details: {
-          codec: PgCodecWithColumns;
-          columnName: string;
-          column: PgCodecAttribute;
+          codec: PgCodecWithAttributes;
+          attributeName: string;
+          attribute: PgCodecAttribute;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;
@@ -31,15 +31,15 @@ declare global {
 }
 
 // TODO: respect indexes - via behavior?
-export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
-  name: "PgOrderAllColumnsPlugin",
-  description: "Allows ordering by table columns",
+export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
+  name: "PgOrderAllAttributesPlugin",
+  description: "Allows ordering by table attributes",
   version: version,
 
   inflection: {
     add: {
-      orderByColumnEnum(options, { codec, columnName, variant }) {
-        const fieldName = this._columnName({ columnName, codec });
+      orderByAttributeEnum(options, { codec, attributeName, variant }) {
+        const fieldName = this._attributeName({ attributeName, codec });
         return this.constantCase(`${fieldName}-${variant}`);
       },
     },
@@ -56,23 +56,23 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
         if (
           !isPgRowSortEnum ||
           !rawPgCodec ||
-          !rawPgCodec.columns ||
+          !rawPgCodec.attributes ||
           rawPgCodec.isAnonymous
         ) {
           return values;
         }
-        const pgCodec = rawPgCodec as PgCodecWithColumns;
-        const columns = pgCodec.columns;
+        const pgCodec = rawPgCodec as PgCodecWithAttributes;
+        const attributes = pgCodec.attributes;
         const sources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((s) => s.codec === pgCodec && !s.parameters);
         const uniques = sources.flatMap((s) => s.uniques as PgResourceUnique[]);
         return extend(
           values,
-          Object.entries(columns).reduce((memo, [columnName, column]) => {
+          Object.entries(attributes).reduce((memo, [attributeName, attribute]) => {
             const behavior = getBehavior([
               pgCodec.extensions,
-              column.extensions,
+              attribute.extensions,
             ]);
             // Enable ordering, but don't order by array or range types
             const defaultBehavior =
@@ -86,7 +86,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
             ) {
               return memo;
             }
-            if (column.codec.arrayOfCodec) {
+            if (attribute.codec.arrayOfCodec) {
               if (
                 !build.behavior.matches(
                   behavior,
@@ -97,7 +97,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                 return memo;
               }
             }
-            if (column.codec.rangeOfCodec) {
+            if (attribute.codec.rangeOfCodec) {
               if (
                 !build.behavior.matches(
                   behavior,
@@ -109,19 +109,19 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
               }
             }
             const isUnique = uniques.some(
-              (list) => list.columns[0] === columnName,
+              (list) => list.attributes[0] === attributeName,
             );
 
-            const ascFieldName = inflection.orderByColumnEnum({
-              column,
+            const ascFieldName = inflection.orderByAttributeEnum({
+              attribute,
               codec: pgCodec,
-              columnName,
+              attributeName,
               variant: "asc",
             });
-            const descFieldName = inflection.orderByColumnEnum({
-              column,
+            const descFieldName = inflection.orderByAttributeEnum({
+              attribute,
               codec: pgCodec,
-              columnName,
+              attributeName,
               variant: "desc",
             });
             memo = extend(
@@ -134,7 +134,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                         (
                             PgSelectStep,
                             PgUnionAllStep,
-                            columnName,
+                            attributeName,
                             isUnique,
                             orderByNullsLast,
                           ) =>
@@ -148,7 +148,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                               );
                             }
                             plan.orderBy({
-                              attribute: columnName,
+                              attribute: attributeName,
                               direction: "ASC",
                               ...(orderByNullsLast != null
                                 ? {
@@ -163,7 +163,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                         [
                           PgSelectStep,
                           PgUnionAllStep,
-                          columnName,
+                          attributeName,
                           isUnique,
                           orderByNullsLast,
                         ],
@@ -175,7 +175,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
               `Adding ascending orderBy enum value for ${pgCodec.name}.`,
               // TODO
               /* `You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
-                column,
+                attribute,
                 {
                   name: "newNameHere",
                 },
@@ -191,7 +191,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                         (
                             PgSelectStep,
                             PgUnionAllStep,
-                            columnName,
+                            attributeName,
                             isUnique,
                             orderByNullsLast,
                           ) =>
@@ -205,7 +205,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                               );
                             }
                             plan.orderBy({
-                              attribute: columnName,
+                              attribute: attributeName,
                               direction: "DESC",
                               ...(orderByNullsLast != null
                                 ? {
@@ -220,7 +220,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
                         [
                           PgSelectStep,
                           PgUnionAllStep,
-                          columnName,
+                          attributeName,
                           isUnique,
                           orderByNullsLast,
                         ],
@@ -232,7 +232,7 @@ export const PgOrderAllColumnsPlugin: GraphileConfig.Plugin = {
               `Adding descending orderBy enum value for ${pgCodec.name}.`,
               // TODO
               /* `You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
-                column,
+                attribute,
                 {
                   name: "newNameHere",
                 },

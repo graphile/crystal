@@ -12,7 +12,7 @@ import type { PgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceCodec,
-  GetPgResourceColumns,
+  GetPgResourceAttributes,
   GetPgResourceUniques,
   PgCodec,
   PlanByUniques,
@@ -37,7 +37,7 @@ interface PgDeletePlanFinalizeResults {
 }
 
 /**
- * Deletes a row in the database, can return columns from the deleted row.
+ * Deletes a row in the database, can return attributes from the deleted row.
  */
 export class PgDeleteStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
@@ -51,7 +51,7 @@ export class PgDeleteStep<
   hasSideEffects = true;
 
   /**
-   * Tells us what we're dealing with - data type, columns, where to delete it
+   * Tells us what we're dealing with - data type, attributes, where to delete it
    * from, what it's called, etc.
    */
   public readonly resource: TResource;
@@ -72,10 +72,10 @@ export class PgDeleteStep<
   public readonly alias: SQL;
 
   /**
-   * The columns and their dependency ids for us to find the record by.
+   * The attributes and their dependency ids for us to find the record by.
    */
   private getBys: Array<{
-    name: keyof GetPgResourceColumns<TResource>;
+    name: keyof GetPgResourceAttributes<TResource>;
     depId: number;
     pgCodec: PgCodec;
   }> = [];
@@ -106,7 +106,7 @@ export class PgDeleteStep<
   constructor(
     resource: TResource,
     getBy: PlanByUniques<
-      GetPgResourceColumns<TResource>,
+      GetPgResourceAttributes<TResource>,
       GetPgResourceUniques<TResource>
     >,
   ) {
@@ -117,13 +117,13 @@ export class PgDeleteStep<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.resource.executor.context());
 
-    const keys: ReadonlyArray<keyof GetPgResourceColumns<TResource>> = getBy
-      ? (Object.keys(getBy) as Array<keyof GetPgResourceColumns<TResource>>)
+    const keys: ReadonlyArray<keyof GetPgResourceAttributes<TResource>> = getBy
+      ? (Object.keys(getBy) as Array<keyof GetPgResourceAttributes<TResource>>)
       : [];
 
     if (
       !(this.resource.uniques as PgResourceUnique[]).some((uniq) =>
-        uniq.columns.every((key) => keys.includes(key as any)),
+        uniq.attributes.every((key) => keys.includes(key as any)),
       )
     ) {
       throw new Error(
@@ -139,7 +139,7 @@ export class PgDeleteStep<
       if (isDev) {
         if (this.getBys.some((col) => col.name === name)) {
           throw new Error(
-            `Column '${String(
+            `Attribute '${String(
               name,
             )}' was specified more than once in ${this}'s getBy spec`,
           );
@@ -147,34 +147,34 @@ export class PgDeleteStep<
       }
       const value = (getBy as any)![name as any];
       const depId = this.addDependency(value);
-      const column = (
-        this.resource.codec.columns as GetPgResourceColumns<TResource>
+      const attribute = (
+        this.resource.codec.attributes as GetPgResourceAttributes<TResource>
       )[name];
-      const pgCodec = column.codec;
+      const pgCodec = attribute.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
   }
 
   /**
-   * Returns a plan representing a named attribute (e.g. column) from the newly
+   * Returns a plan representing a named attribute (e.g. attribute) from the newly
    * deleteed row.
    */
-  get<TAttr extends keyof GetPgResourceColumns<TResource>>(
+  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceColumns<TResource>[TAttr]["codec"],
+    GetPgResourceAttributes<TResource>[TAttr]["codec"],
     TResource
   > {
-    const resourceColumn: PgCodecAttribute =
-      this.resource.codec.columns![attr as string];
-    if (!resourceColumn) {
+    const resourceAttribute: PgCodecAttribute =
+      this.resource.codec.attributes![attr as string];
+    if (!resourceAttribute) {
       throw new Error(
         `${this.resource} does not define an attribute named '${String(attr)}'`,
       );
     }
 
-    if (resourceColumn?.via) {
-      throw new Error(`Cannot select a 'via' column from PgDeleteStep`);
+    if (resourceAttribute?.via) {
+      throw new Error(`Cannot select a 'via' attribute from PgDeleteStep`);
     }
 
     /*
@@ -188,9 +188,9 @@ export class PgDeleteStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression(this, resourceColumn.codec);
-    const colPlan = resourceColumn.expression
-      ? sqlExpr`${sql.parens(resourceColumn.expression(this.alias))}`
+    const sqlExpr = pgClassExpression(this, resourceAttribute.codec);
+    const colPlan = resourceAttribute.expression
+      ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
     return colPlan as any;
   }
@@ -327,9 +327,9 @@ export class PgDeleteStep<
        *
        * So we have to make do with single deletes, alas.
        */
-      const getByColumnsCount = this.getBys.length;
-      if (getByColumnsCount === 0) {
-        // No columns specified to find the row?! This is forbidden.
+      const getByAttributesCount = this.getBys.length;
+      if (getByAttributesCount === 0) {
+        // No attributes specified to find the row?! This is forbidden.
         throw new SafeError(
           "Attempted to delete a record, but no information on uniquely determining the record was specified.",
         );
@@ -338,7 +338,7 @@ export class PgDeleteStep<
         const sqlWhereClauses: SQL[] = [];
         const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
 
-        for (let i = 0; i < getByColumnsCount; i++) {
+        for (let i = 0; i < getByAttributesCount; i++) {
           const { name, depId, pgCodec } = this.getBys[i];
           const symbol = Symbol(name as string);
           sqlWhereClauses[i] = sql.parens(
@@ -378,7 +378,7 @@ export class PgDeleteStep<
 export function pgDelete<TResource extends PgResource<any, any, any, any>>(
   resource: TResource,
   getBy: PlanByUniques<
-    GetPgResourceColumns<TResource>,
+    GetPgResourceAttributes<TResource>,
     GetPgResourceUniques<TResource>
   >,
 ): PgDeleteStep<TResource> {

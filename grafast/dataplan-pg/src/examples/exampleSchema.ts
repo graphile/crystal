@@ -105,7 +105,7 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type { GetPgResourceColumns, PgCodec } from "../interfaces";
+import type { GetPgResourceAttributes, PgCodec } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -219,7 +219,7 @@ export function makeExampleSchema(
       const forumCodec = recordCodec({
         name: "forums",
         identifier: sql`app_public.forums`,
-        columns: {
+        attributes: {
           id: col({ notNull: true, codec: TYPES.uuid }),
           name: col({ notNull: true, codec: TYPES.citext }),
           archived_at: col({ codec: TYPES.timestamptz }),
@@ -233,7 +233,7 @@ export function makeExampleSchema(
       const userCodec = recordCodec({
         name: "users",
         identifier: sql`app_public.users`,
-        columns: {
+        attributes: {
           id: col({ notNull: true, codec: TYPES.uuid }),
           username: col({ notNull: true, codec: TYPES.citext }),
           gravatar_url: col({ codec: TYPES.text }),
@@ -244,7 +244,7 @@ export function makeExampleSchema(
       const messagesCodec = recordCodec({
         name: "messages",
         identifier: sql`app_public.messages`,
-        columns: {
+        attributes: {
           id: col({ notNull: true, codec: TYPES.uuid }),
           body: col({ notNull: true, codec: TYPES.text }),
           author_id: col({
@@ -343,7 +343,7 @@ export function makeExampleSchema(
         codec: messagesCodec,
         from: sql`app_public.messages`,
         name: "messages",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const userResourceOptions = makePgResourceOptions({
@@ -353,8 +353,8 @@ export function makeExampleSchema(
         from: sql`app_public.users`,
         name: "users",
         uniques: [
-          { columns: ["id"], isPrimary: true },
-          { columns: ["username"] },
+          { attributes: ["id"], isPrimary: true },
+          { attributes: ["username"] },
         ],
       });
 
@@ -364,7 +364,7 @@ export function makeExampleSchema(
         codec: forumCodec,
         from: sql`app_public.forums`,
         name: "forums",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const usersMostRecentForumResourceOptions =
@@ -454,7 +454,7 @@ export function makeExampleSchema(
       const unionEntityCodec = recordCodec({
         name: "union__entity",
         identifier: sql`interfaces_and_unions.union__entity`,
-        columns: {
+        attributes: {
           person_id: col({ codec: TYPES.int, notNull: false }),
           post_id: col({ codec: TYPES.int, notNull: false }),
           comment_id: col({ codec: TYPES.int, notNull: false }),
@@ -464,7 +464,7 @@ export function makeExampleSchema(
       const personBookmarksCodec = recordCodec({
         name: "person_bookmarks",
         identifier: sql`interfaces_and_unions.person_bookmarks`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           person_id: col({
             codec: TYPES.int,
@@ -484,13 +484,13 @@ export function makeExampleSchema(
         codec: personBookmarksCodec,
         from: sql`interfaces_and_unions.person_bookmarks`,
         name: "person_bookmarks",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const personCodec = recordCodec({
         name: "people",
         identifier: sql`interfaces_and_unions.people`,
-        columns: {
+        attributes: {
           person_id: col({ codec: TYPES.int, notNull: true }),
           username: col({ codec: TYPES.text, notNull: true }),
         },
@@ -503,15 +503,15 @@ export function makeExampleSchema(
         from: sql`interfaces_and_unions.people`,
         name: "people",
         uniques: [
-          { columns: ["person_id"], isPrimary: true },
-          { columns: ["username"] },
+          { attributes: ["person_id"], isPrimary: true },
+          { attributes: ["username"] },
         ],
       });
 
       const postCodec = recordCodec({
         name: "posts",
         identifier: sql`interfaces_and_unions.posts`,
-        columns: {
+        attributes: {
           post_id: col({ codec: TYPES.int, notNull: true }),
           author_id: col({
             codec: TYPES.int,
@@ -528,13 +528,13 @@ export function makeExampleSchema(
         codec: postCodec,
         from: sql`interfaces_and_unions.posts`,
         name: "posts",
-        uniques: [{ columns: ["post_id"], isPrimary: true }],
+        uniques: [{ attributes: ["post_id"], isPrimary: true }],
       });
 
       const commentCodec = recordCodec({
         name: "comments",
         identifier: sql`interfaces_and_unions.comments`,
-        columns: {
+        attributes: {
           comment_id: col({ codec: TYPES.int, notNull: true }),
           author_id: col({
             codec: TYPES.int,
@@ -556,7 +556,7 @@ export function makeExampleSchema(
         codec: commentCodec,
         from: sql`interfaces_and_unions.comments`,
         name: "comments",
-        uniques: [{ columns: ["comment_id"], isPrimary: true }],
+        uniques: [{ attributes: ["comment_id"], isPrimary: true }],
       });
 
       const itemTypeEnumCodec = enumCodec({
@@ -568,7 +568,7 @@ export function makeExampleSchema(
       const enumTableItemTypeCodec = recordCodec({
         name: "enum_table_item_type",
         identifier: sql`interfaces_and_unions.enum_table_item_type`,
-        columns: {
+        attributes: {
           type: {
             codec: TYPES.text,
             notNull: true,
@@ -586,7 +586,7 @@ export function makeExampleSchema(
         codec: enumTableItemTypeCodec,
         from: sql`interfaces_and_unions.enum_table_item_type`,
         name: "enum_table_item_type",
-        uniques: [{ columns: ["type"], isPrimary: true }],
+        uniques: [{ attributes: ["type"], isPrimary: true }],
       });
 
       const enumTableItemTypeEnumCodec = enumCodec({
@@ -598,7 +598,7 @@ export function makeExampleSchema(
       const singleTableItemsCodec = recordCodec({
         name: "single_table_items",
         identifier: sql`interfaces_and_unions.single_table_items`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           type: col({
             codec: itemTypeEnumCodec,
@@ -641,13 +641,13 @@ export function makeExampleSchema(
         codec: singleTableItemsCodec,
         from: sql`interfaces_and_unions.single_table_items`,
         name: "single_table_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const relationalItemsCodec = recordCodec({
         name: "relational_items",
         identifier: sql`interfaces_and_unions.relational_items`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           type: col({
             codec: itemTypeEnumCodec,
@@ -685,13 +685,13 @@ export function makeExampleSchema(
         codec: relationalItemsCodec,
         from: sql`interfaces_and_unions.relational_items`,
         name: "relational_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const relationalCommentableCodec = recordCodec({
         name: "relational_commentables",
         identifier: sql`interfaces_and_unions.relational_commentables`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           type: col({
             codec: itemTypeEnumCodec,
@@ -712,7 +712,7 @@ export function makeExampleSchema(
         name: "relational_commentables",
       });
 
-      const itemColumns = {
+      const itemAttributes = {
         id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
         type: col({ codec: TYPES.text, notNull: true, via: "item" }),
         type2: col({
@@ -756,8 +756,8 @@ export function makeExampleSchema(
       const relationalTopicsCodec = recordCodec({
         name: "relational_topics",
         identifier: sql`interfaces_and_unions.relational_topics`,
-        columns: {
-          ...itemColumns,
+        attributes: {
+          ...itemAttributes,
           title: col({ codec: TYPES.text, notNull: false }),
         },
       });
@@ -768,14 +768,14 @@ export function makeExampleSchema(
         codec: relationalTopicsCodec,
         from: sql`interfaces_and_unions.relational_topics`,
         name: "relational_topics",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const relationalPostsCodec = recordCodec({
         name: "relational_posts",
         identifier: sql`interfaces_and_unions.relational_posts`,
-        columns: {
-          ...itemColumns,
+        attributes: {
+          ...itemAttributes,
           title: col({ codec: TYPES.text, notNull: false }),
           description: col({ codec: TYPES.text, notNull: false }),
           note: col({ codec: TYPES.text, notNull: false }),
@@ -788,14 +788,14 @@ export function makeExampleSchema(
         codec: relationalPostsCodec,
         from: sql`interfaces_and_unions.relational_posts`,
         name: "relational_posts",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const relationalDividersCodec = recordCodec({
         name: "relational_dividers",
         identifier: sql`interfaces_and_unions.relational_dividers`,
-        columns: {
-          ...itemColumns,
+        attributes: {
+          ...itemAttributes,
           title: col({ codec: TYPES.text, notNull: false }),
           color: col({ codec: TYPES.text, notNull: false }),
         },
@@ -807,14 +807,14 @@ export function makeExampleSchema(
         codec: relationalDividersCodec,
         from: sql`interfaces_and_unions.relational_dividers`,
         name: "relational_dividers",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const relationalChecklistsCodec = recordCodec({
         name: "relational_checklists",
         identifier: sql`interfaces_and_unions.relational_checklists`,
-        columns: {
-          ...itemColumns,
+        attributes: {
+          ...itemAttributes,
           title: col({ codec: TYPES.text, notNull: false }),
         },
       });
@@ -825,14 +825,14 @@ export function makeExampleSchema(
         codec: relationalChecklistsCodec,
         from: sql`interfaces_and_unions.relational_checklists`,
         name: "relational_checklists",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const relationalChecklistItemsCodec = recordCodec({
         name: "relational_checklist_items",
         identifier: sql`interfaces_and_unions.relational_checklist_items`,
-        columns: {
-          ...itemColumns,
+        attributes: {
+          ...itemAttributes,
           description: col({ codec: TYPES.text, notNull: true }),
           note: col({ codec: TYPES.text, notNull: false }),
         },
@@ -844,7 +844,7 @@ export function makeExampleSchema(
         codec: relationalChecklistItemsCodec,
         from: sql`interfaces_and_unions.relational_checklist_items`,
         name: "relational_checklist_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       ////////////////////////////////////////
@@ -852,7 +852,7 @@ export function makeExampleSchema(
       const unionItemsCodec = recordCodec({
         name: "union_items",
         identifier: sql`interfaces_and_unions.union_items`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           type: col({
             codec: itemTypeEnumCodec,
@@ -871,13 +871,13 @@ export function makeExampleSchema(
         codec: unionItemsCodec,
         from: sql`interfaces_and_unions.union_items`,
         name: "union_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const unionTopicsCodec = recordCodec({
         name: "union_topics",
         identifier: sql`interfaces_and_unions.union_topics`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           title: col({ codec: TYPES.text, notNull: false }),
         },
@@ -889,13 +889,13 @@ export function makeExampleSchema(
         codec: unionTopicsCodec,
         from: sql`interfaces_and_unions.union_topics`,
         name: "union_topics",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const unionPostsCodec = recordCodec({
         name: "union_posts",
         identifier: sql`interfaces_and_unions.union_posts`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           title: col({ codec: TYPES.text, notNull: false }),
           description: col({ codec: TYPES.text, notNull: false }),
@@ -909,13 +909,13 @@ export function makeExampleSchema(
         codec: unionPostsCodec,
         from: sql`interfaces_and_unions.union_posts`,
         name: "union_posts",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const unionDividersCodec = recordCodec({
         name: "union_dividers",
         identifier: sql`interfaces_and_unions.union_dividers`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           title: col({ codec: TYPES.text, notNull: false }),
           color: col({ codec: TYPES.text, notNull: false }),
@@ -928,13 +928,13 @@ export function makeExampleSchema(
         codec: unionDividersCodec,
         from: sql`interfaces_and_unions.union_dividers`,
         name: "union_dividers",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const unionChecklistsCodec = recordCodec({
         name: "union_checklists",
         identifier: sql`interfaces_and_unions.union_checklists`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           title: col({ codec: TYPES.text, notNull: false }),
         },
@@ -946,13 +946,13 @@ export function makeExampleSchema(
         codec: unionChecklistsCodec,
         from: sql`interfaces_and_unions.union_checklists`,
         name: "union_checklists",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const unionChecklistItemsCodec = recordCodec({
         name: "union_checklist_items",
         identifier: sql`interfaces_and_unions.union_checklist_items`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           description: col({ codec: TYPES.text, notNull: true }),
           note: col({ codec: TYPES.text, notNull: false }),
@@ -965,7 +965,7 @@ export function makeExampleSchema(
         codec: unionChecklistItemsCodec,
         from: sql`interfaces_and_unions.union_checklist_items`,
         name: "union_checklist_items",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const unionEntityResourceOptions = makePgResourceOptions({
@@ -999,7 +999,7 @@ export function makeExampleSchema(
       const awsApplicationsCodec = recordCodec({
         name: "aws_applications",
         identifier: sql`interfaces_and_unions.aws_applications`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           name: col({
             codec: TYPES.text,
@@ -1019,13 +1019,13 @@ export function makeExampleSchema(
         codec: awsApplicationsCodec,
         from: sql`interfaces_and_unions.aws_applications`,
         name: "aws_applications",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const gcpApplicationsCodec = recordCodec({
         name: "gcp_applications",
         identifier: sql`interfaces_and_unions.gcp_applications`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           name: col({
             codec: TYPES.text,
@@ -1045,13 +1045,13 @@ export function makeExampleSchema(
         codec: gcpApplicationsCodec,
         from: sql`interfaces_and_unions.gcp_applications`,
         name: "gcp_applications",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const firstPartyVulnerabilitiesCodec = recordCodec({
         name: "first_party_vulnerabilities",
         identifier: sql`interfaces_and_unions.first_party_vulnerabilities`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           name: col({
             codec: TYPES.text,
@@ -1068,13 +1068,13 @@ export function makeExampleSchema(
         codec: firstPartyVulnerabilitiesCodec,
         from: sql`interfaces_and_unions.first_party_vulnerabilities`,
         name: "first_party_vulnerabilities",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       const thirdPartyVulnerabilitiesCodec = recordCodec({
         name: "third_party_vulnerabilities",
         identifier: sql`interfaces_and_unions.third_party_vulnerabilities`,
-        columns: {
+        attributes: {
           id: col({ codec: TYPES.int, notNull: true }),
           name: col({
             codec: TYPES.text,
@@ -1091,7 +1091,7 @@ export function makeExampleSchema(
         codec: thirdPartyVulnerabilitiesCodec,
         from: sql`interfaces_and_unions.third_party_vulnerabilities`,
         name: "third_party_vulnerabilities",
-        uniques: [{ columns: ["id"], isPrimary: true }],
+        uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
       return makeRegistryBuilder()
@@ -1164,13 +1164,13 @@ export function makeExampleSchema(
         .addCodec(thirdPartyVulnerabilitiesCodec)
         .addResource(thirdPartyVulnerabilitiesResourceOptions)
         .addRelation(messagesCodec, "author", userResourceOptions, {
-          localColumns: [`author_id`],
-          remoteColumns: [`id`],
+          localAttributes: [`author_id`],
+          remoteAttributes: [`id`],
           isUnique: true,
         })
         .addRelation(messagesCodec, "forum", forumResourceOptions, {
-          localColumns: ["forum_id"],
-          remoteColumns: ["id"],
+          localAttributes: ["forum_id"],
+          remoteAttributes: ["id"],
           isUnique: true,
         })
         .addRelation(
@@ -1179,8 +1179,8 @@ export function makeExampleSchema(
           personResourceOptions,
           {
             isUnique: true,
-            localColumns: ["person_id"],
-            remoteColumns: ["person_id"],
+            localAttributes: ["person_id"],
+            remoteAttributes: ["person_id"],
           },
         )
         .addRelation(
@@ -1189,19 +1189,19 @@ export function makeExampleSchema(
           singleTableItemsResourceOptions,
           {
             isUnique: false,
-            localColumns: ["person_id"],
-            remoteColumns: ["author_id"],
+            localAttributes: ["person_id"],
+            remoteAttributes: ["author_id"],
           },
         )
         .addRelation(personCodec, "posts", postResourceOptions, {
           isUnique: false,
-          localColumns: ["person_id"],
-          remoteColumns: ["author_id"],
+          localAttributes: ["person_id"],
+          remoteAttributes: ["author_id"],
         })
         .addRelation(personCodec, "comments", postResourceOptions, {
           isUnique: false,
-          localColumns: ["person_id"],
-          remoteColumns: ["author_id"],
+          localAttributes: ["person_id"],
+          remoteAttributes: ["author_id"],
         })
         .addRelation(
           personCodec,
@@ -1209,29 +1209,29 @@ export function makeExampleSchema(
           personBookmarksResourceOptions,
           {
             isUnique: false,
-            localColumns: ["person_id"],
-            remoteColumns: ["person_id"],
+            localAttributes: ["person_id"],
+            remoteAttributes: ["person_id"],
           },
         )
         .addRelation(postCodec, "author", personResourceOptions, {
           isUnique: true,
-          localColumns: ["author_id"],
-          remoteColumns: ["person_id"],
+          localAttributes: ["author_id"],
+          remoteAttributes: ["person_id"],
         })
         .addRelation(postCodec, "comments", commentResourceOptions, {
           isUnique: false,
-          localColumns: ["post_id"],
-          remoteColumns: ["post_id"],
+          localAttributes: ["post_id"],
+          remoteAttributes: ["post_id"],
         })
         .addRelation(commentCodec, "author", personResourceOptions, {
           isUnique: true,
-          localColumns: ["author_id"],
-          remoteColumns: ["person_id"],
+          localAttributes: ["author_id"],
+          remoteAttributes: ["person_id"],
         })
         .addRelation(commentCodec, "post", postResourceOptions, {
           isUnique: true,
-          localColumns: ["post_id"],
-          remoteColumns: ["post_id"],
+          localAttributes: ["post_id"],
+          remoteAttributes: ["post_id"],
         })
         .addRelation(
           singleTableItemsCodec,
@@ -1239,8 +1239,8 @@ export function makeExampleSchema(
           singleTableItemsResourceOptions,
           {
             isUnique: true,
-            localColumns: ["parent_id"],
-            remoteColumns: ["id"],
+            localAttributes: ["parent_id"],
+            remoteAttributes: ["id"],
           },
         )
         .addRelation(
@@ -1249,14 +1249,14 @@ export function makeExampleSchema(
           singleTableItemsResourceOptions,
           {
             isUnique: false,
-            localColumns: ["id"],
-            remoteColumns: ["parent_id"],
+            localAttributes: ["id"],
+            remoteAttributes: ["parent_id"],
           },
         )
         .addRelation(singleTableItemsCodec, "author", personResourceOptions, {
           isUnique: true,
-          localColumns: ["author_id"],
-          remoteColumns: ["person_id"],
+          localAttributes: ["author_id"],
+          remoteAttributes: ["person_id"],
         })
 
         .addRelation(
@@ -1264,8 +1264,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1274,14 +1274,14 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localColumns: [`parent_id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`parent_id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
         .addRelation(relationalTopicsCodec, "author", personResourceOptions, {
-          localColumns: [`author_id`] as const,
-          remoteColumns: [`person_id`] as const,
+          localAttributes: [`author_id`] as const,
+          remoteAttributes: [`person_id`] as const,
           isUnique: true,
         })
 
@@ -1290,8 +1290,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1300,14 +1300,14 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localColumns: [`parent_id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`parent_id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
         .addRelation(relationalPostsCodec, "author", personResourceOptions, {
-          localColumns: [`author_id`] as const,
-          remoteColumns: [`person_id`] as const,
+          localAttributes: [`author_id`] as const,
+          remoteAttributes: [`person_id`] as const,
           isUnique: true,
         })
         .addRelation(
@@ -1315,8 +1315,8 @@ export function makeExampleSchema(
           "commentable",
           relationalCommentableResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1326,8 +1326,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1336,14 +1336,14 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localColumns: [`parent_id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`parent_id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
         .addRelation(relationalDividersCodec, "author", personResourceOptions, {
-          localColumns: [`author_id`] as const,
-          remoteColumns: [`person_id`] as const,
+          localAttributes: [`author_id`] as const,
+          remoteAttributes: [`person_id`] as const,
           isUnique: true,
         })
         .addRelation(
@@ -1351,8 +1351,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1361,8 +1361,8 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localColumns: [`parent_id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`parent_id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1371,8 +1371,8 @@ export function makeExampleSchema(
           "author",
           personResourceOptions,
           {
-            localColumns: [`author_id`] as const,
-            remoteColumns: [`person_id`] as const,
+            localAttributes: [`author_id`] as const,
+            remoteAttributes: [`person_id`] as const,
             isUnique: true,
           },
         )
@@ -1381,8 +1381,8 @@ export function makeExampleSchema(
           "commentable",
           relationalCommentableResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1391,8 +1391,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1401,8 +1401,8 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localColumns: [`parent_id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`parent_id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1411,8 +1411,8 @@ export function makeExampleSchema(
           "author",
           personResourceOptions,
           {
-            localColumns: [`author_id`] as const,
-            remoteColumns: [`person_id`] as const,
+            localAttributes: [`author_id`] as const,
+            remoteAttributes: [`person_id`] as const,
             isUnique: true,
           },
         )
@@ -1421,8 +1421,8 @@ export function makeExampleSchema(
           "commentable",
           relationalCommentableResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1433,8 +1433,8 @@ export function makeExampleSchema(
           relationalItemsResourceOptions,
           {
             isUnique: true,
-            localColumns: ["parent_id"] as const,
-            remoteColumns: ["id"] as const,
+            localAttributes: ["parent_id"] as const,
+            remoteAttributes: ["id"] as const,
           },
         )
         .addRelation(
@@ -1443,22 +1443,22 @@ export function makeExampleSchema(
           relationalItemsResourceOptions,
           {
             isUnique: false,
-            localColumns: ["id"] as const,
-            remoteColumns: ["parent_id"] as const,
+            localAttributes: ["id"] as const,
+            remoteAttributes: ["parent_id"] as const,
           },
         )
         .addRelation(relationalItemsCodec, "author", personResourceOptions, {
           isUnique: true,
-          localColumns: ["author_id"] as const,
-          remoteColumns: ["person_id"] as const,
+          localAttributes: ["author_id"] as const,
+          remoteAttributes: ["person_id"] as const,
         })
         .addRelation(
           relationalItemsCodec,
           "topic",
           relationalTopicsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1468,8 +1468,8 @@ export function makeExampleSchema(
           "post",
           relationalPostsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1479,8 +1479,8 @@ export function makeExampleSchema(
           "divider",
           relationalDividersResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1490,8 +1490,8 @@ export function makeExampleSchema(
           "checklist",
           relationalChecklistsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1501,8 +1501,8 @@ export function makeExampleSchema(
           "checklistItem",
           relationalChecklistItemsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1513,8 +1513,8 @@ export function makeExampleSchema(
           "post",
           relationalPostsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1524,8 +1524,8 @@ export function makeExampleSchema(
           "checklist",
           relationalChecklistsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1535,26 +1535,26 @@ export function makeExampleSchema(
           "checklistItem",
           relationalChecklistItemsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
             // reciprocal: 'item',
           },
         )
 
         .addRelation(unionItemsCodec, "topic", unionTopicsResourceOptions, {
-          localColumns: [`id`] as const,
-          remoteColumns: [`id`] as const,
+          localAttributes: [`id`] as const,
+          remoteAttributes: [`id`] as const,
           isUnique: true,
         })
         .addRelation(unionItemsCodec, "post", unionPostsResource, {
-          localColumns: [`id`] as const,
-          remoteColumns: [`id`] as const,
+          localAttributes: [`id`] as const,
+          remoteAttributes: [`id`] as const,
           isUnique: true,
         })
         .addRelation(unionItemsCodec, "divider", unionDividersResourceOptions, {
-          localColumns: [`id`] as const,
-          remoteColumns: [`id`] as const,
+          localAttributes: [`id`] as const,
+          remoteAttributes: [`id`] as const,
           isUnique: true,
         })
         .addRelation(
@@ -1562,8 +1562,8 @@ export function makeExampleSchema(
           "checklist",
           unionChecklistsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1572,8 +1572,8 @@ export function makeExampleSchema(
           "checklistItem",
           unionChecklistItemsResourceOptions,
           {
-            localColumns: [`id`] as const,
-            remoteColumns: [`id`] as const,
+            localAttributes: [`id`] as const,
+            remoteAttributes: [`id`] as const,
             isUnique: true,
           },
         )
@@ -1756,7 +1756,7 @@ export function makeExampleSchema(
 
   function attrField<
     TMyResource extends PgResource<any, any, any, any, any>,
-    TAttrName extends keyof GetPgResourceColumns<TMyResource>,
+    TAttrName extends keyof GetPgResourceAttributes<TMyResource>,
   >(attrName: TAttrName, type: GraphQLOutputType) {
     return {
       type,
@@ -2180,9 +2180,9 @@ export function makeExampleSchema(
               $messages.where(sql`${$messages.alias}.archived_at is not null`);
             } else if (
               $value.evalIs("INHERIT") &&
-              // INHERIT only works if the parent has an archived_at column.
+              // INHERIT only works if the parent has an archived_at attribute.
               $parent instanceof PgSelectSingleStep &&
-              !!$parent.resource.codec.columns.archived_at
+              !!$parent.resource.codec.attributes.archived_at
             ) {
               $messages.where(
                 sql`(${
@@ -2400,10 +2400,10 @@ export function makeExampleSchema(
       id: attrField("id", GraphQLString),
       name: attrField("name", GraphQLString),
 
-      // Expression column
+      // Expression attribute
       isArchived: attrField("is_archived", GraphQLBoolean),
 
-      // Custom expression; actual column select shouldn't make it through to the generated query.
+      // Custom expression; actual attribute select shouldn't make it through to the generated query.
       archivedAtIsNotNull: {
         type: GraphQLBoolean,
         plan: EXPORTABLE(
@@ -4653,7 +4653,7 @@ export function makeExampleSchema(
 
   type PgRecord<TResource extends PgResource<any, any, any, any, any>> =
     PgClassExpressionStep<
-      PgCodec<any, GetPgResourceColumns<TResource>, any, any, any, any, any>,
+      PgCodec<any, GetPgResourceAttributes<TResource>, any, any, any, any, any>,
       TResource
     >;
 
@@ -4839,7 +4839,7 @@ export function makeExampleSchema(
                 id: $itemId,
               });
               for (const key of ["title", "description", "note"] as Array<
-                keyof typeof relationalPostsResource.codec.columns
+                keyof typeof relationalPostsResource.codec.attributes
               >) {
                 const $value = args.getRaw(["input", key]);
                 if (!$value.evalIs(undefined)) {
@@ -4964,7 +4964,7 @@ export function makeExampleSchema(
                 id: args.get(["input", "id"]),
               });
               for (const key of ["title", "description", "note"] as Array<
-                keyof typeof relationalPostsResource.codec.columns
+                keyof typeof relationalPostsResource.codec.attributes
               >) {
                 const $rawValue = args.getRaw(["input", "patch", key]);
                 const $value = args.get(["input", "patch", key]);

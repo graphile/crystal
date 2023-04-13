@@ -1,5 +1,5 @@
-// This used to be called "computed columns", but they're not the same as
-// Postgres' own computed columns, and they're not necessarily column-like
+// This used to be called "computed attributes", but they're not the same as
+// Postgres' own computed attributes, and they're not necessarily attribute-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import type {
@@ -26,7 +26,7 @@ import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
 // TODO: these should be used, surely?
-interface _ComputedColumnDetails {
+interface _ComputedAttributeDetails {
   resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
 }
 interface _ArgumentDetails {
@@ -215,11 +215,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             // return type of this function.
 
             const numberOfArguments = allArgTypes.length ?? 0;
-            const columns: PgCodecAttributes = Object.create(null);
+            const attributes: PgCodecAttributes = Object.create(null);
             for (let i = 0, l = numberOfArguments; i < l; i++) {
               const argType = allArgTypes[i];
               const trueArgName = pgProc.proargnames?.[i];
-              const argName = trueArgName || `column${i + 1}`;
+              const argName = trueArgName || `attribute${i + 1}`;
 
               // TODO: smart tag should allow changing the modifier
               const typeModifier = undefined;
@@ -237,13 +237,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 // This argument exists on the record type output
                 // NOTE: we treat `OUT foo`, `INOUT foo` and
                 // `RETURNS TABLE (foo ...)` as the same.
-                const columnCodec =
+                const attributeCodec =
                   await info.helpers.pgCodecs.getCodecFromType(
                     serviceName,
                     argType,
                     typeModifier,
                   );
-                if (!columnCodec) {
+                if (!attributeCodec) {
                   console.warn(
                     `Could not make codec for '${debugProcName}' argument '${argName}' which has type ${argType} (${
                       (await info.helpers.pgIntrospection.getType(
@@ -254,9 +254,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   );
                   return null;
                 }
-                columns[argName] = {
+                attributes[argName] = {
                   notNull: false,
-                  codec: columnCodec,
+                  codec: attributeCodec,
                   extensions: {
                     argIndex: i,
                     argName: trueArgName,
@@ -271,11 +271,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 serviceName,
               });
             return EXPORTABLE(
-              (columns, recordCodec, recordCodecName, sql) =>
+              (attributes, recordCodec, recordCodecName, sql) =>
                 recordCodec({
                   name: recordCodecName,
                   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-                  columns,
+                  attributes,
                   extensions: {
                     description: undefined,
                     // TODO: we should figure out what field this is going to use, and reference that
@@ -285,7 +285,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   },
                   isAnonymous: true,
                 }),
-              [columns, recordCodec, recordCodecName, sql],
+              [attributes, recordCodec, recordCodecName, sql],
             );
           };
 
@@ -371,8 +371,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               /*
               if (!processedFirstInputArg) {
                 processedFirstInputArg = true;
-                if (argCodec.columns && !isMutation) {
-                  // Computed column!
+                if (argCodec.attributes && !isMutation) {
+                  // Computed attribute!
                   required = true;
                   notNull = true;
                 }
@@ -433,7 +433,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           if (
             !returnCodec.isAnonymous &&
-            (returnCodec.columns || returnCodec.arrayOfCodec?.columns)
+            (returnCodec.attributes || returnCodec.arrayOfCodec?.attributes)
           ) {
             const returnPgType = await info.helpers.pgIntrospection.getType(
               serviceName,

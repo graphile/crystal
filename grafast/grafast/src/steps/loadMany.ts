@@ -131,8 +131,8 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
     this.params[paramKey] = value;
   }
   addAttributes(attributes: Set<keyof TData>): void {
-    for (const column of attributes) {
-      this.attributes.add(column);
+    for (const attribute of attributes) {
+      this.attributes.add(attribute);
     }
   }
   finalize() {

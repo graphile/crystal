@@ -33,7 +33,7 @@ declare global {
       // indicate they should only be used from other inflectors
       getBaseName(
         this: GraphileBuild.Inflection,
-        columnName: string,
+        attributeName: string,
       ): string | null;
       baseNameMatches(
         this: GraphileBuild.Inflection,
@@ -49,7 +49,7 @@ declare global {
         this: GraphileBuild.Inflection,
         detailedKeys: Array<{
           codec: PgCodec<any, any, any, any, any, any, any>;
-          columnName: string;
+          attributeName: string;
         }>,
       ): string | null;
     }
@@ -142,8 +142,8 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         }
       },
 
-      getBaseName(_preset, columnName) {
-        const matches = columnName.match(
+      getBaseName(_preset, attributeName) {
+        const matches = attributeName.match(
           /^(.+?)(_row_id|_id|_uuid|_fk|_pk|RowId|Id|Uuid|UUID|Fk|Pk)$/,
         );
         if (matches) {
@@ -183,13 +183,13 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       getBaseNameFromKeys(preset, detailedKeys) {
         if (detailedKeys.length === 1) {
           const key = detailedKeys[0];
-          const columnName = this._columnName(key);
-          return this.getBaseName(columnName);
+          const attributeName = this._attributeName(key);
+          return this.getBaseName(attributeName);
         }
         if (preset.schema?.pgSimplifyMultikeyRelations) {
-          const columnNames = detailedKeys.map((key) => this._columnName(key));
-          const baseNames = columnNames.map((columnName) =>
-            this.getBaseName(columnName),
+          const attributeNames = detailedKeys.map((key) => this._attributeName(key));
+          const baseNames = attributeNames.map((attributeName) =>
+            this.getBaseName(attributeName),
           );
           // Check none are null
           if (baseNames.every((n) => n)) {
@@ -280,10 +280,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
-        const detailedKeys = (relation.localColumns as string[]).map(
-          (columnName) => ({
+        const detailedKeys = (relation.localAttributes as string[]).map(
+          (attributeName) => ({
             codec,
-            columnName,
+            attributeName,
           }),
         );
         const baseName = this.getBaseNameFromKeys(detailedKeys);
@@ -295,7 +295,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         ).find((u) => u.isPrimary);
         if (
           foreignPk &&
-          arraysMatch(foreignPk.columns, relation.remoteColumns)
+          arraysMatch(foreignPk.attributes, relation.remoteAttributes)
         ) {
           return this.camelCase(
             `${this._singularizedCodecName(relation.remoteResource.codec)}`,
@@ -315,10 +315,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (typeof relation.extensions?.tags?.foreignFieldName === "string") {
           return relation.extensions.tags.foreignFieldName;
         }
-        const detailedKeys = (relation.remoteColumns as string[]).map(
-          (columnName) => ({
+        const detailedKeys = (relation.remoteAttributes as string[]).map(
+          (attributeName) => ({
             codec: relation.remoteResource.codec,
-            columnName,
+            attributeName,
           }),
         );
         const baseName = this.getBaseNameFromKeys(detailedKeys);
@@ -348,7 +348,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         const uniques = (possibleResources[0]?.uniques ??
           []) as PgResourceUnique[];
         const pk = uniques.find((u) => u.isPrimary);
-        if (pk && arraysMatch(pk.columns, relation.localColumns)) {
+        if (pk && arraysMatch(pk.attributes, relation.localAttributes)) {
           return this.camelCase(
             `${this._singularizedCodecName(relation.remoteResource.codec)}`,
           );
@@ -363,10 +363,10 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (typeof baseOverride === "string") {
           return baseOverride;
         }
-        const detailedKeys = (relation.remoteColumns as string[]).map(
-          (columnName) => ({
+        const detailedKeys = (relation.remoteAttributes as string[]).map(
+          (attributeName) => ({
             codec: relation.remoteResource.codec,
-            columnName,
+            attributeName,
           }),
         );
         const baseName = this.getBaseNameFromKeys(detailedKeys);
@@ -390,7 +390,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         const pk = (relation.remoteResource.uniques as PgResourceUnique[]).find(
           (u) => u.isPrimary,
         );
-        if (pk && arraysMatch(pk.columns, relation.remoteColumns)) {
+        if (pk && arraysMatch(pk.attributes, relation.remoteAttributes)) {
           return this.camelCase(
             `${this.distinctPluralize(
               this._singularizedCodecName(relation.remoteResource.codec),
@@ -433,13 +433,13 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           previous!.call(this, details),
         );
       },
-      computedColumnConnectionField(previous, _options, details) {
+      computedAttributeConnectionField(previous, _options, details) {
         const listSuffix = details.resource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
         );
       },
-      computedColumnListField(previous, _options, details) {
+      computedAttributeListField(previous, _options, details) {
         const listSuffix = details.resource.extensions?.tags?.listSuffix;
         return overrideListSuffix(listSuffix, () =>
           previous!.call(this, details),
