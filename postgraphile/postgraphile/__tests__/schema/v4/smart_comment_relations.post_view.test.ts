@@ -13,7 +13,7 @@ const offerViewComment = (comment: string) => (pgClient: PoolClient) =>
   );
 
 test(
-  "referencing other view (no columns)",
+  "referencing other view (no attributes)",
   core.test(
     __filename,
     ["smart_comment_relations"],

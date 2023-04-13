@@ -19,7 +19,7 @@ test("raises an error when a foreignKey tries to reference a non-unique combinat
     },
   )();
   await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(`
-          "Invalid @foreignKey on 'c.person_secret'; referenced non-unique combination of columns 'c.person' (about). If this list of columns is truly unique you should add a unique constraint to the table:
+          "Invalid @foreignKey on 'c.person_secret'; referenced non-unique combination of attributes 'c.person' (about). If this list of attributes is truly unique you should add a unique constraint to the table:
 
           ALTER TABLE \\"c\\".\\"person\\"
             ADD UNIQUE (\\"about\\");

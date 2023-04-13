@@ -154,7 +154,7 @@ to work. Something like:
 ```ts
 itemResource.codec.polymorphic = {
   mode: "single",
-  typeColumns: ["type"],
+  typeAttributes: ["type"],
   types: {
     TOPIC: {
       name: "Topic",
@@ -354,7 +354,7 @@ for it to work. Something like:
 ```ts
 itemResource.codec.polymorphic = {
   mode: "relational",
-  typeColumns: ["type"],
+  typeAttributes: ["type"],
   types: {
     TOPIC: {
       name: "Topic",

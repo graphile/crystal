@@ -8,7 +8,7 @@ import type {
   PgCodecRefPath,
   PgCodecRelation,
   PgCodecRelationConfig,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgRefDefinition,
   PgRegistry,
   PgResource,
@@ -36,7 +36,7 @@ declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
       registry: PgRegistry;
-      codec: PgCodecWithColumns;
+      codec: PgCodecWithAttributes;
       relationName: string;
     }
 
@@ -54,9 +54,9 @@ declare global {
           serviceName: string;
           pgConstraint: PgConstraint;
           localClass: PgClass;
-          localColumns: PgAttribute[];
+          localAttributes: PgAttribute[];
           foreignClass: PgClass;
-          foreignColumns: PgAttribute[];
+          foreignAttributes: PgAttribute[];
           isUnique: boolean;
           isReferencee: boolean;
         },
@@ -145,9 +145,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           serviceName,
           pgConstraint,
           localClass: _localClass,
-          localColumns,
+          localAttributes,
           foreignClass,
-          foreignColumns,
+          foreignAttributes,
           isUnique,
           isReferencee,
         },
@@ -163,16 +163,16 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           serviceName,
           pgClass: foreignClass,
         });
-        const columns = !isReferencee
-          ? // We have a column referencing another table
-            localColumns
+        const attributes = !isReferencee
+          ? // We have a attribute referencing another table
+            localAttributes
           : // The other table has a constraint that references us; this is the backwards relation.
-            foreignColumns;
-        const columnNames = columns.map((col) => col.attname);
+            foreignAttributes;
+        const attributeNames = attributes.map((col) => col.attname);
         return this.camelCase(
           `${isUnique ? remoteName : this.pluralize(remoteName)}-by-${
             isReferencee ? "their" : "my"
-          }-${columnNames.join("-and-")}`,
+          }-${attributeNames.join("-and-")}`,
         );
       },
 
@@ -185,9 +185,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
         // E.g. posts(author_id) references users(id)
         const remoteType = this.tableType(relation.remoteResource.codec);
-        const localColumns = relation.localColumns as string[];
+        const localAttributes = relation.localAttributes as string[];
         return this.camelCase(
-          `${remoteType}-by-${this._joinColumnNames(codec, localColumns)}`,
+          `${remoteType}-by-${this._joinAttributeNames(
+            codec,
+            localAttributes,
+          )}`,
         );
       },
       singleRelationBackwards(options, details) {
@@ -203,11 +206,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
         // E.g. posts(author_id) references users(id)
         const remoteType = this.tableType(relation.remoteResource.codec);
-        const remoteColumns = relation.remoteColumns as string[];
+        const remoteAttributes = relation.remoteAttributes as string[];
         return this.camelCase(
-          `${remoteType}-by-${this._joinColumnNames(
+          `${remoteType}-by-${this._joinAttributeNames(
             relation.remoteResource.codec,
-            remoteColumns,
+            remoteAttributes,
           )}`,
         );
       },
@@ -220,11 +223,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
         // E.g. users(id) references posts(author_id)
         const remoteType = this.tableType(relation.remoteResource.codec);
-        const remoteColumns = relation.remoteColumns as string[];
+        const remoteAttributes = relation.remoteAttributes as string[];
         return this.camelCase(
-          `${this.pluralize(remoteType)}-by-${this._joinColumnNames(
+          `${this.pluralize(remoteType)}-by-${this._joinAttributeNames(
             relation.remoteResource.codec,
-            remoteColumns,
+            remoteAttributes,
           )}`,
         );
       },
@@ -263,30 +266,30 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         if (!pgClass || !foreignClass) {
           throw new Error(`Invalid introspection`);
         }
-        const localColumnNumbers = isReferencee
+        const localAttributeNumbers = isReferencee
           ? pgConstraint.confkey!
           : pgConstraint.conkey!;
-        const foreignColumnNumbers = isReferencee
+        const foreignAttributeNumbers = isReferencee
           ? pgConstraint.conkey!
           : pgConstraint.confkey!;
         const isUnique = !isReferencee
           ? true
           : (() => {
               // This relationship is unique if the REFERENCED table (not us!)
-              // has a unique constraint on the remoteColumns the relationship
+              // has a unique constraint on the remoteAttributes the relationship
               // specifies (or a subset thereof).
-              const foreignUniqueColumnOnlyConstraints = foreignClass
+              const foreignUniqueAttributeOnlyConstraints = foreignClass
                 .getConstraints()!
                 .filter(
                   (c) =>
                     ["u", "p"].includes(c.contype) &&
                     c.conkey?.every((k) => k > 0),
                 );
-              const foreignUniqueColumnNumberCombinations =
-                foreignUniqueColumnOnlyConstraints.map((c) => c.conkey!);
-              const isUnique = foreignUniqueColumnNumberCombinations.some(
-                (foreignUniqueColumnNumbers) => {
-                  return foreignUniqueColumnNumbers.every(
+              const foreignUniqueAttributeNumberCombinations =
+                foreignUniqueAttributeOnlyConstraints.map((c) => c.conkey!);
+              const isUnique = foreignUniqueAttributeNumberCombinations.some(
+                (foreignUniqueAttributeNumbers) => {
+                  return foreignUniqueAttributeNumbers.every(
                     (n) => n > 0 && pgConstraint.conkey!.includes(n),
                   );
                 },
@@ -294,8 +297,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               return isUnique;
             })();
         const { serviceName } = event;
-        const localColumns = await Promise.all(
-          localColumnNumbers.map((key) =>
+        const localAttributes = await Promise.all(
+          localAttributeNumbers.map((key) =>
             info.helpers.pgIntrospection.getAttribute(
               serviceName,
               pgClass._id,
@@ -307,8 +310,8 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           serviceName,
           pgClass._id,
         );
-        const foreignColumns = await Promise.all(
-          foreignColumnNumbers.map((key) =>
+        const foreignAttributes = await Promise.all(
+          foreignAttributeNumbers.map((key) =>
             info.helpers.pgIntrospection.getAttribute(
               serviceName,
               foreignClass!._id,
@@ -320,7 +323,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           (await info.helpers.pgTables.getResourceOptions(
             serviceName,
             foreignClass,
-          )) as PgResourceOptions<any, PgCodecWithColumns, any, any>;
+          )) as PgResourceOptions<any, PgCodecWithAttributes, any, any>;
         if (
           !localCodec ||
           !foreignResourceOptions ||
@@ -332,9 +335,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           serviceName,
           pgConstraint,
           localClass: pgClass,
-          localColumns: localColumns as PgAttribute[],
+          localAttributes: localAttributes as PgAttribute[],
           foreignClass,
-          foreignColumns: foreignColumns as PgAttribute[],
+          foreignAttributes: foreignAttributes as PgAttribute[],
           isUnique,
           isReferencee,
         });
@@ -354,9 +357,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           ? tags.backwardDescription
           : tags.forwardDescription ?? constraintDescription;
         const newRelation: PgCodecRelationConfig = {
-          localCodec: localCodec as PgCodecWithColumns,
-          localColumns: localColumns.map((c) => c!.attname),
-          remoteColumns: foreignColumns.map((c) => c!.attname),
+          localCodec: localCodec as PgCodecWithAttributes,
+          localAttributes: localAttributes.map((c) => c!.attname),
+          remoteAttributes: foreignAttributes.map((c) => c!.attname),
           remoteResourceOptions: foreignResourceOptions,
           isUnique,
           isReferencee,
@@ -377,12 +380,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             existingRelation.isUnique === newRelation.isUnique &&
             existingRelation.isReferencee === newRelation.isReferencee &&
             arraysMatch(
-              existingRelation.localColumns,
-              newRelation.localColumns,
+              existingRelation.localAttributes,
+              newRelation.localAttributes,
             ) &&
             arraysMatch(
-              existingRelation.remoteColumns,
-              newRelation.remoteColumns,
+              existingRelation.remoteAttributes,
+              newRelation.remoteAttributes,
             ) &&
             existingRelation.remoteResourceOptions ===
               newRelation.remoteResourceOptions;
@@ -403,7 +406,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           }
         }
         registryBuilder.addRelation(
-          event.resourceOptions.codec as PgCodecWithColumns,
+          event.resourceOptions.codec as PgCodecWithAttributes,
           relationName,
           newRelation.remoteResourceOptions,
           newRelation,
@@ -449,14 +452,14 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
 function makeSpecString(
   identifier: TE,
-  localColumns: readonly string[],
-  remoteColumns: readonly string[],
+  localAttributes: readonly string[],
+  remoteAttributes: readonly string[],
 ) {
   return te`{ ${te.join(
-    remoteColumns.map(
-      (remoteColumnName, i) =>
-        te`${te.dangerousKey(remoteColumnName)}: ${identifier}.get(${te.lit(
-          localColumns[i],
+    remoteAttributes.map(
+      (remoteAttributeName, i) =>
+        te`${te.dangerousKey(remoteAttributeName)}: ${identifier}.get(${te.lit(
+          localAttributes[i],
         )})`,
     ),
     ", ",
@@ -464,8 +467,8 @@ function makeSpecString(
 }
 
 function makeRelationPlans(
-  localColumns: readonly string[],
-  remoteColumns: readonly string[],
+  localAttributes: readonly string[],
+  remoteAttributes: readonly string[],
   otherSource: PgResource,
   isMutationPayload: boolean,
 ) {
@@ -473,29 +476,29 @@ function makeRelationPlans(
     ? te`$record.get("result")`
     : te`$record`;
   const clean =
-    remoteColumns.every(
-      (remoteColumnName) =>
-        typeof remoteColumnName === "string" &&
-        isSafeObjectPropertyName(remoteColumnName),
+    remoteAttributes.every(
+      (remoteAttributeName) =>
+        typeof remoteAttributeName === "string" &&
+        isSafeObjectPropertyName(remoteAttributeName),
     ) &&
-    localColumns.every(
-      (localColumnName) =>
-        typeof localColumnName === "string" &&
-        isSafeObjectPropertyName(localColumnName),
+    localAttributes.every(
+      (localAttributeName) =>
+        typeof localAttributeName === "string" &&
+        isSafeObjectPropertyName(localAttributeName),
     );
 
   const specString = clean
-    ? makeSpecString(recordOrResult, localColumns, remoteColumns)
+    ? makeSpecString(recordOrResult, localAttributes, remoteAttributes)
     : null;
 
   const specFromRecord = EXPORTABLE(
-    (localColumns, remoteColumns) => ($record: PgSelectSingleStep) => {
-      return remoteColumns.reduce((memo, remoteColumnName, i) => {
-        memo[remoteColumnName] = $record.get(localColumns[i] as string);
+    (localAttributes, remoteAttributes) => ($record: PgSelectSingleStep) => {
+      return remoteAttributes.reduce((memo, remoteAttributeName, i) => {
+        memo[remoteAttributeName] = $record.get(localAttributes[i] as string);
         return memo;
       }, Object.create(null));
     },
-    [localColumns, remoteColumns],
+    [localAttributes, remoteAttributes],
   );
   type MutationPayload = ObjectStep<{
     result: PgSelectSingleStep;
@@ -635,7 +638,7 @@ function addRelations(
     allPgResources.find((s) => s.codec === codec && !s.parameters) ??
     allPgResources.find((s) => s.codec === codec && s.isUnique)) as PgResource<
     any,
-    PgCodecWithColumns,
+    PgCodecWithAttributes,
     any,
     any,
     any
@@ -676,9 +679,9 @@ function addRelations(
 
   type Layer = {
     relationName: string;
-    localColumns: string[];
+    localAttributes: string[];
     resource: PgResource;
-    remoteColumns: string[];
+    remoteAttributes: string[];
     isUnique: boolean;
   };
 
@@ -698,8 +701,8 @@ function addRelations(
       ) as PgCodecRelation;
       const {
         isReferencee,
-        localColumns,
-        remoteColumns,
+        localAttributes,
+        remoteAttributes,
         remoteResource: resource,
         isUnique,
       } = relation;
@@ -711,8 +714,8 @@ function addRelations(
       }
       result.layers.push({
         relationName: pathEntry.relationName,
-        localColumns: localColumns as string[],
-        remoteColumns: remoteColumns as string[],
+        localAttributes: localAttributes as string[],
+        remoteAttributes: remoteAttributes as string[],
         resource,
         isUnique,
       });
@@ -748,8 +751,8 @@ function addRelations(
     // Digest relations
     for (const [relationName, relation] of Object.entries(relations)) {
       const {
-        localColumns,
-        remoteColumns,
+        localAttributes,
+        remoteAttributes,
         remoteResource,
         extensions,
         isReferencee,
@@ -782,8 +785,8 @@ function addRelations(
       };
 
       const { singleRecordPlan, listPlan, connectionPlan } = makeRelationPlans(
-        localColumns as string[],
-        remoteColumns as string[],
+        localAttributes as string[],
+        remoteAttributes as string[],
         remoteResource as PgResource,
         isMutationPayload ?? false,
       );
@@ -887,10 +890,10 @@ function addRelations(
         sharedCodec?.polymorphism?.mode === "union" || paths.length > 1;
 
       // If we're pulling from a shared codec into a PgUnionAllStep then we can
-      // use that codec's columns as shared attributes; otherwise there are not
+      // use that codec's attributes as shared attributes; otherwise there are not
       // shared attributes (equivalent to a GraphQL union).
       const unionAttributes: PgUnionAllStepConfigAttributes<any> | undefined =
-        sharedCodec?.columns;
+        sharedCodec?.attributes;
 
       // const isUnique = paths.every((p) => p.isUnique);
 
@@ -913,8 +916,8 @@ function addRelations(
           );
           const remoteResource = relation.remoteResource;
           return makeRelationPlans(
-            relation.localColumns as string[],
-            relation.remoteColumns as string[],
+            relation.localAttributes as string[],
+            relation.remoteAttributes as string[],
             remoteResource as PgResource,
             isMutationPayload ?? false,
           );
@@ -959,10 +962,11 @@ function addRelations(
             let isStillSingular = true;
             for (let i = 0, l = path.layers.length; i < l; i++) {
               const layer = path.layers[i];
-              const { localColumns, remoteColumns, resource, isUnique } = layer;
+              const { localAttributes, remoteAttributes, resource, isUnique } =
+                layer;
               const clean =
-                localColumns.every(isSafeObjectPropertyName) &&
-                remoteColumns.every(isSafeObjectPropertyName);
+                localAttributes.every(isSafeObjectPropertyName) &&
+                remoteAttributes.every(isSafeObjectPropertyName);
               const resourceName = idents.makeSafeIdentifier(
                 `${resource.name}Resource`,
               );
@@ -983,26 +987,26 @@ function addRelations(
                   ),
                 );
                 const specFromRecord = EXPORTABLE(
-                  (localColumns, remoteColumns) =>
+                  (localAttributes, remoteAttributes) =>
                     ($record: PgSelectSingleStep) => {
-                      return remoteColumns.reduce(
-                        (memo, remoteColumnName, i) => {
-                          memo[remoteColumnName] = $record.get(
-                            localColumns[i] as string,
+                      return remoteAttributes.reduce(
+                        (memo, remoteAttributeName, i) => {
+                          memo[remoteAttributeName] = $record.get(
+                            localAttributes[i] as string,
                           );
                           return memo;
                         },
                         Object.create(null),
                       );
                     },
-                  [localColumns, remoteColumns],
+                  [localAttributes, remoteAttributes],
                 );
 
                 const specString = clean
                   ? makeSpecString(
                       previousIdentifier,
-                      localColumns,
-                      remoteColumns,
+                      localAttributes,
+                      remoteAttributes,
                     )
                   : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
                 functionLines.push(
@@ -1022,7 +1026,7 @@ function addRelations(
               `${previousIdentifier}Tuples`,
             );
             functionLines.push(
-              `  const ${tupleIdentifier} = each(${previousIdentifier}, ($entry) => object({ ${localColumns
+              `  const ${tupleIdentifier} = each(${previousIdentifier}, ($entry) => object({ ${localAttributes
                 .map(
                   (c) =>
                     `${evalSafeProperty(c)}: $entry.get(${JSON.stringify(c)})`,
@@ -1035,8 +1039,8 @@ function addRelations(
                 const $entry = te`$entry`;
                 const specString = makeSpecString(
                   $entry,
-                  localColumns,
-                  remoteColumns,
+                  localAttributes,
+                  remoteAttributes,
                 );
                 functionLines.push(
                   te`  const ${newIdentifier} = each(${previousIdentifier}, (${$entry}) => ${te.identifier(
@@ -1125,9 +1129,9 @@ function addRelations(
                     const path = paths[i];
                     const firstLayer = path.layers[0];
                     const member = members[i];
-                    member.match = firstLayer.localColumns.reduce(
+                    member.match = firstLayer.localAttributes.reduce(
                       (memo, col, idx) => {
-                        memo[firstLayer.remoteColumns[idx]] = {
+                        memo[firstLayer.remoteAttributes[idx]] = {
                           step: $record.get(col),
                         };
                         return memo;

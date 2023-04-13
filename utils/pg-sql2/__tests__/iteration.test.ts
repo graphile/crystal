@@ -158,7 +158,7 @@ it("join(conditions, ' and ') 4", () => {
   });
 });
 
-it("expression column", () => {
+it("expression attribute", () => {
   const node = sql`${sql.parens(
     sql.parens(
       sql`${sql.identifier(Symbol("forums"))}.archived_at is not null`,
@@ -170,7 +170,7 @@ it("expression column", () => {
   });
 });
 
-it("expression column 2", () => {
+it("expression attribute 2", () => {
   const node = sql`${sql.parens(
     sql`${sql.parens(
       sql`${sql.identifier(Symbol("forums"))}.archived_at is not null`,

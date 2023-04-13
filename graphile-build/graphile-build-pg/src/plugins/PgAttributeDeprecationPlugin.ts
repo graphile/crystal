@@ -2,21 +2,21 @@ import "graphile-config";
 
 import { version } from "../version.js";
 
-export const PgColumnDeprecationPlugin: GraphileConfig.Plugin = {
-  name: "PgColumnDeprecationPlugin",
-  description: "Marks a column as deprecated if it has the deprecated tag",
+export const PgAttributeDeprecationPlugin: GraphileConfig.Plugin = {
+  name: "PgAttributeDeprecationPlugin",
+  description: "Marks a attribute as deprecated if it has the deprecated tag",
   version: version,
   schema: {
     hooks: {
       GraphQLObjectType_fields_field(field, build, context) {
         const {
-          scope: { fieldName, pgColumn },
+          scope: { fieldName, pgAttribute },
           Self,
         } = context;
-        if (!pgColumn) {
+        if (!pgAttribute) {
           return field;
         }
-        const deprecated = pgColumn?.extensions?.tags?.deprecated;
+        const deprecated = pgAttribute?.extensions?.tags?.deprecated;
         if (!deprecated || field.deprecationReason != null) {
           return field;
         }

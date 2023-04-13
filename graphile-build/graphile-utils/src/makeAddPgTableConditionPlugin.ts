@@ -57,7 +57,7 @@ export function makeAddPgTableConditionPlugin(
           if (
             !isPgCondition ||
             !table ||
-            !table.columns ||
+            !table.attributes ||
             table.extensions?.pg?.serviceName !== serviceName ||
             table.extensions?.pg?.schemaName !== schemaName ||
             table.extensions?.pg?.name !== tableName

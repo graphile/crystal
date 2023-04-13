@@ -84,13 +84,13 @@ export interface PgCodecAttribute<
   // TODO: we could make TypeScript understand the relations on the object
   // rather than just being string.
   /**
-   * If this column actually exists on a relation rather than locally, the name
-   * of the (unique) relation this column belongs to.
+   * If this attribute actually exists on a relation rather than locally, the name
+   * of the (unique) relation this attribute belongs to.
    */
   via?: PgCodecAttributeVia;
 
   /**
-   * If the column exists identically on a relation and locally (e.g.
+   * If the attribute exists identically on a relation and locally (e.g.
    * `posts.author_id` and `users.id` have exactly the same value due to a
    * foreign key reference) then the plans can choose which one to grab.
    *
@@ -113,7 +113,7 @@ export interface PgCodecAttribute<
    * (except in 1-to-1 relationships).
    */
   identicalVia?: PgCodecAttributeVia;
-  // TODO: can identicalVia be plural? Is that useful? Maybe a column that has
+  // TODO: can identicalVia be plural? Is that useful? Maybe a attribute that has
   // multiple foreign key references?
 
   /**
@@ -131,9 +131,9 @@ export interface PgCodecAttribute<
 
 export type PgCodecAttributes<
   TCodecMap extends {
-    [columnName in string]: PgCodecAttribute;
+    [attributeName in string]: PgCodecAttribute;
   } = {
-    [columnName in string]: PgCodecAttribute;
+    [attributeName in string]: PgCodecAttribute;
   },
 > = TCodecMap;
 
@@ -174,7 +174,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       sqlType: sql.identifier(...type.split(".")),
       fromPg: fromPg ?? (identity as any),
       toPg: toPg ?? (identity as any),
-      columns: undefined,
+      attributes: undefined,
       extensions: { oid: oid },
       castFromPg,
       listCastFromPg,
@@ -316,31 +316,31 @@ function recordStringToTuple(value: string): Array<string | null> {
   return tuple;
 }
 
-function realColumnDefs<TColumns extends PgCodecAttributes>(
-  columns: TColumns,
-): Array<[string, TColumns[keyof TColumns]]> {
-  const columnDefs = Object.entries(columns) as Array<
-    [string, TColumns extends infer U ? U[keyof U] : never]
+function realAttributeDefs<TAttributes extends PgCodecAttributes>(
+  attributes: TAttributes,
+): Array<[string, TAttributes[keyof TAttributes]]> {
+  const attributeDefs = Object.entries(attributes) as Array<
+    [string, TAttributes extends infer U ? U[keyof U] : never]
   >;
-  return columnDefs.filter(
-    ([_columnName, spec]) => !spec.expression && !spec.via,
+  return attributeDefs.filter(
+    ([_attributeName, spec]) => !spec.expression && !spec.via,
   );
 }
 
 /**
- * Takes a list of columns and returns a mapping function that takes a
+ * Takes a list of attributes and returns a mapping function that takes a
  * composite value and turns it into a string that PostgreSQL could process as
  * the composite value.
  *
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
-function makeRecordToSQLRawValue<TColumns extends PgCodecAttributes>(
-  columns: TColumns,
-): PgEncode<ObjectFromPgCodecAttributes<TColumns>> {
-  const columnDefs = realColumnDefs(columns);
+function makeRecordToSQLRawValue<TAttributes extends PgCodecAttributes>(
+  attributes: TAttributes,
+): PgEncode<ObjectFromPgCodecAttributes<TAttributes>> {
+  const attributeDefs = realAttributeDefs(attributes);
   return (value) => {
-    const values = columnDefs.map(([columnName, spec]) => {
-      const v = value[columnName];
+    const values = attributeDefs.map(([attributeName, spec]) => {
+      const v = value[attributeName];
       const val = v == null ? null : spec.codec.toPg(v);
       return toRecordString(val);
     });
@@ -348,38 +348,39 @@ function makeRecordToSQLRawValue<TColumns extends PgCodecAttributes>(
   };
 }
 
-export type ObjectFromPgCodecAttributes<TColumns extends PgCodecAttributes> = {
-  [columnName in keyof TColumns]: TColumns[columnName] extends PgCodecAttribute<
-    infer UCodec,
-    infer UNonNull
-  >
-    ? UCodec extends PgCodec<any, any, any, infer UFromJs, any, any, any>
-      ? UNonNull extends true
-        ? Exclude<UFromJs, null | undefined>
-        : UFromJs | null
-      : never
-    : never;
-};
+export type ObjectFromPgCodecAttributes<TAttributes extends PgCodecAttributes> =
+  {
+    [attributeName in keyof TAttributes]: TAttributes[attributeName] extends PgCodecAttribute<
+      infer UCodec,
+      infer UNonNull
+    >
+      ? UCodec extends PgCodec<any, any, any, infer UFromJs, any, any, any>
+        ? UNonNull extends true
+          ? Exclude<UFromJs, null | undefined>
+          : UFromJs | null
+        : never
+      : never;
+  };
 
 /**
- * Takes a list of columns and returns a mapping function that takes a
+ * Takes a list of attributes and returns a mapping function that takes a
  * PostgreSQL record string value (e.g. `(1,2,"hi")`) and turns it into a
  * JavaScript object.
  *
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
-function makeSQLValueToRecord<TColumns extends PgCodecAttributes>(
-  columns: TColumns,
-): (value: string) => ObjectFromPgCodecAttributes<TColumns> {
-  const columnDefs = realColumnDefs(columns);
-  const columnCount = columnDefs.length;
+function makeSQLValueToRecord<TAttributes extends PgCodecAttributes>(
+  attributes: TAttributes,
+): (value: string) => ObjectFromPgCodecAttributes<TAttributes> {
+  const attributeDefs = realAttributeDefs(attributes);
+  const attributeCount = attributeDefs.length;
   return (value) => {
     const tuple = recordStringToTuple(value);
     const record = Object.create(null);
-    for (let i = 0; i < columnCount; i++) {
-      const [columnName, spec] = columnDefs[i];
+    for (let i = 0; i < attributeCount; i++) {
+      const [attributeName, spec] = attributeDefs[i];
       const entry = tuple[i];
-      record[columnName] = entry == null ? null : spec.codec.fromPg(entry);
+      record[attributeName] = entry == null ? null : spec.codec.fromPg(entry);
     }
     return record;
   };
@@ -387,11 +388,11 @@ function makeSQLValueToRecord<TColumns extends PgCodecAttributes>(
 
 export type PgRecordTypeCodecSpec<
   TName extends string,
-  TColumns extends PgCodecAttributes,
+  TAttributes extends PgCodecAttributes,
 > = {
   name: TName;
   identifier: SQL;
-  columns: TColumns;
+  attributes: TAttributes;
   polymorphism?: PgCodecPolymorphism<any>;
   extensions?: Partial<PgCodecExtensions>;
   isAnonymous?: boolean;
@@ -403,20 +404,20 @@ export type PgRecordTypeCodecSpec<
  *
  * name - the name of this type
  * identifier - a pg-sql2 fragment that uniquely identifies this type, suitable to be fed after `::` into an SQL query.
- * columns - the attributes this composite type has
+ * attributes - the attributes this composite type has
  * extensions - an optional object that you can use to associate arbitrary data with this type
  * isAnonymous - if true, this represents an "anonymous" type, typically the return value of a function or something like that. If this is true, then name and identifier are ignored.
  */
 export function recordCodec<
   const TName extends string,
-  const TColumns extends PgCodecAttributes,
+  const TAttributes extends PgCodecAttributes,
 >(
-  config: PgRecordTypeCodecSpec<TName, TColumns>,
+  config: PgRecordTypeCodecSpec<TName, TAttributes>,
 ): PgCodec<
   TName,
-  TColumns,
+  TAttributes,
   string,
-  ObjectFromPgCodecAttributes<TColumns>,
+  ObjectFromPgCodecAttributes<TAttributes>,
   undefined,
   undefined,
   undefined
@@ -424,7 +425,7 @@ export function recordCodec<
   const {
     name,
     identifier,
-    columns,
+    attributes,
     polymorphism,
     extensions,
     isAnonymous = false,
@@ -433,9 +434,9 @@ export function recordCodec<
     name,
     sqlType: identifier,
     isAnonymous,
-    fromPg: makeSQLValueToRecord(columns),
-    toPg: makeRecordToSQLRawValue(columns),
-    columns,
+    fromPg: makeSQLValueToRecord(attributes),
+    toPg: makeRecordToSQLRawValue(attributes),
+    attributes,
     polymorphism,
     extensions,
   };
@@ -470,7 +471,7 @@ export function enumCodec<
     values: values.map((value) =>
       typeof value === "string" ? { value } : value,
     ),
-    columns: undefined,
+    attributes: undefined,
     extensions,
   };
 }
@@ -529,7 +530,7 @@ export function listOfCodec<
   `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
     ? UName
     : never}[]`,
-  undefined, // Array has no columns
+  undefined, // Array has no attributes
   string,
   TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
     ? UFromJs[]
@@ -551,7 +552,7 @@ export function listOfCodec<
     `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? UName
       : never}[]`,
-    undefined, // Array has no columns
+    undefined, // Array has no attributes
     string,
     TInnerCodec extends PgCodec<
       any,
@@ -617,7 +618,7 @@ export function listOfCodec<
       result += "}";
       return result;
     },
-    columns: undefined,
+    attributes: undefined,
     extensions,
     arrayOfCodec: innerCodec,
     castFromPg: innerCodec.listCastFromPg,
@@ -819,7 +820,7 @@ export function rangeOfCodec<
       }
       return str;
     },
-    columns: undefined,
+    attributes: undefined,
   };
 }
 exportAs("@dataplan/pg", rangeOfCodec, "rangeOfCodec");

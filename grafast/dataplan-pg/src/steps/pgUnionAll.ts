@@ -143,7 +143,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
     any
   >;
   match?: {
-    [resourceColumnName: string]:
+    [resourceAttributeName: string]:
       | {
           step: PgTypedExecutableStep<any>;
           codec?: never;
@@ -245,8 +245,8 @@ export class PgUnionAllSingleStep
     }
     const spec = Object.create(null);
     const $parsed = jsonParse(access(this, [this.pkKey]));
-    for (let i = 0, l = pk.columns.length; i < l; i++) {
-      const col = pk.columns[i];
+    for (let i = 0, l = pk.attributes.length; i < l; i++) {
+      const col = pk.attributes[i];
       spec[col] = access($parsed, [i]);
     }
     return resource.get(spec);
@@ -466,7 +466,7 @@ export class PgUnionAllStep<
     // If streaming, what's the initialCount
     streamInitialCount?: number;
 
-    // The column on the result that indicates which group the result belongs to
+    // The attribute on the result that indicates which group the result belongs to
     identifierIndex: number | null;
 
     // If last but not first, reverse order.
@@ -634,9 +634,9 @@ export class PgUnionAllStep<
         }
 
         if (member.match) {
-          for (const [columnName, match] of Object.entries(member.match)) {
+          for (const [attributeName, match] of Object.entries(member.match)) {
             conditions.push(
-              sql`${currentAlias}.${sql.identifier(columnName)} = ${
+              sql`${currentAlias}.${sql.identifier(attributeName)} = ${
                 match.codec
                   ? this.placeholder(match.step, match.codec)
                   : this.placeholder(match.step)
@@ -671,11 +671,13 @@ export class PgUnionAllStep<
 inner join ${nextSqlFrom} as ${nextAlias}
 on (${sql.indent(
             sql.join(
-              relation.localColumns.map(
-                (localColumn, i) =>
+              relation.localAttributes.map(
+                (localAttribute, i) =>
                   sql`${nextAlias}.${sql.identifier(
-                    String(relation.remoteColumns[i]),
-                  )} = ${currentAlias}.${sql.identifier(String(localColumn))}`,
+                    String(relation.remoteAttributes[i]),
+                  )} = ${currentAlias}.${sql.identifier(
+                    String(localAttribute),
+                  )}`,
               ),
               "\nand ",
             ),
@@ -1059,7 +1061,7 @@ on (${sql.indent(
         );
       } else {
         // HACK: this is bad. We're getting the codec from just one of the
-        // members and assuming the type for the given column will match for
+        // members and assuming the type for the given attribute will match for
         // all of them. We should either validate that this is the same, change
         // the signature of `getFragmentAndCodecFromOrder` to pass all the
         // codecs (and maybe even attribute mapping), or... I dunno... fix it
@@ -1083,20 +1085,20 @@ on (${sql.indent(
       if (!pk) {
         throw new Error("No primary key; this should have been caught earlier");
       }
-      const max = orderCount - 1 + pk.columns.length;
+      const max = orderCount - 1 + pk.attributes.length;
       const pkPlaceholder = identifierPlaceholders[orderCount - 1];
-      const pkColumns = finalResource.codec.columns as PgCodecAttributes;
+      const pkAttributes = finalResource.codec.attributes as PgCodecAttributes;
       const condition = (i = 0): SQL => {
         const order = digest.orders[i];
         const [orderFragment, sqlValue, direction] = (() => {
           if (i >= orderCount - 1) {
             // PK
             const pkIndex = i - (orderCount - 1);
-            const pkCol = pk.columns[pkIndex];
+            const pkCol = pk.attributes[pkIndex];
             return [
               sql`${digest.alias}.${sql.identifier(pkCol)}`,
               sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
-                pkColumns[pkCol].codec.sqlType
+                pkAttributes[pkCol].codec.sqlType
               }`,
               "ASC",
             ];
@@ -1393,7 +1395,7 @@ and ${condition(i + 1)}`}
     const hash = createHash("sha256");
 
     // HACK: this is bad. We're getting the codec from just one of the
-    // members and assuming the type for the given column will match for
+    // members and assuming the type for the given attribute will match for
     // all of them. We should either validate that this is the same, change
     // the signature of `getFragmentAndCodecFromOrder` to pass all the
     // codecs (and maybe even attribute mapping), or... I dunno... fix it
@@ -1486,7 +1488,7 @@ and ${condition(i + 1)}`}
                 case "pk": {
                   return [
                     sql`json_build_array(${sql.join(
-                      pk.columns.map(
+                      pk.attributes.map(
                         (c) => sql`(${tableAlias}.${sql.identifier(c)})::text`,
                       ),
                       ",",
@@ -1532,7 +1534,7 @@ and ${condition(i + 1)}`}
 
         const ascOrDesc = this.shouldReverseOrder() ? sql`desc` : sql`asc`;
         const pkOrder = sql.join(
-          pk.columns.map(
+          pk.attributes.map(
             (c) => sql`${tableAlias}.${sql.identifier(c)} ${ascOrDesc}`,
           ),
           ",\n",

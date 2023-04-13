@@ -25,20 +25,23 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         const oldValue = previous!.call(this, value, codec);
         return this.coerceToGraphQLName(this.constantCase(oldValue));
       },
-      _columnName(previous, options, details) {
-        const { codec, columnName } = details;
-        const column = codec.columns[columnName];
-        if (!column) {
+      _attributeName(previous, options, details) {
+        const { codec, attributeName } = details;
+        const attribute = codec.attributes[attributeName];
+        if (!attribute) {
           throw new Error(
-            `Attempted to access column '${columnName}' of codec '${
+            `Attempted to access attribute '${attributeName}' of codec '${
               codec.name
-            }', but it doesn't have that column (known columns: ${Object.keys(
-              codec.columns,
+            }', but it doesn't have that attribute (known attributes: ${Object.keys(
+              codec.attributes,
             ).join(", ")})`,
           );
         }
-        if (column.extensions?.argIndex != null && !column.extensions.argName) {
-          return `arg${column.extensions.argIndex + 1}`;
+        if (
+          attribute.extensions?.argIndex != null &&
+          !attribute.extensions.argName
+        ) {
+          return `arg${attribute.extensions.argIndex + 1}`;
         }
         return previous!.call(this, details);
       },

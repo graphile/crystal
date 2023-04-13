@@ -9,7 +9,7 @@ import type {
   PgCodecAttribute,
   PgCodecAttributes,
   PgCodecList,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgRegistry,
   PgSelectSingleStep,
 } from "@dataplan/pg";
@@ -29,42 +29,42 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       /**
-       * Given a columnName on a PgCodec's columns, should return the field
-       * name to use to represent this column (both for input and output).
+       * Given a attributeName on a PgCodec's attributes, should return the field
+       * name to use to represent this attribute (both for input and output).
        *
        * @remarks The method beginning with `_` implies it's not ment to
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _columnName(
+      _attributeName(
         this: GraphileBuild.Inflection,
         details: {
-          codec: PgCodecWithColumns;
-          columnName: string;
+          codec: PgCodecWithAttributes;
+          attributeName: string;
           skipRowId?: boolean;
         },
       ): string;
 
       /**
-       * Takes a codec and the list of column names from that codec and turns
+       * Takes a codec and the list of attribute names from that codec and turns
        * it into a joined list.
        */
-      _joinColumnNames(
+      _joinAttributeNames(
         this: GraphileBuild.Inflection,
-        codec: PgCodecWithColumns,
+        codec: PgCodecWithAttributes,
         names: readonly string[],
       ): string;
 
       /**
-       * The field name for a given column on that pg_class' table type. May
+       * The field name for a given attribute on that pg_class' table type. May
        * also be used in other places (e.g. the Input or Patch type associated
        * with the table).
        */
-      column(
+      attribute(
         this: GraphileBuild.Inflection,
         details: {
-          columnName: string;
-          codec: PgCodecWithColumns;
+          attributeName: string;
+          codec: PgCodecWithAttributes;
         },
       ): string;
     }
@@ -75,7 +75,7 @@ declare global {
       isPgBaseInput?: boolean;
       isPgRowType?: boolean;
       isPgCompoundType?: boolean;
-      pgColumn?: PgCodecAttribute;
+      pgAttribute?: PgCodecAttribute;
     }
   }
 }
@@ -116,13 +116,13 @@ const getResource = EXPORTABLE(
   [PgResource],
 );
 
-function processColumn(
+function processAttribute(
   fields: GraphQLFieldConfigMap<any, any>,
   build: GraphileBuild.Build,
   context:
     | GraphileBuild.ContextObjectFields
     | GraphileBuild.ContextInterfaceFields,
-  columnName: string,
+  attributeName: string,
   overrideName?: string,
 ): void {
   const {
@@ -136,30 +136,30 @@ function processColumn(
   const {
     scope: { pgCodec: rawPgCodec },
   } = context;
-  if (!rawPgCodec || !rawPgCodec.columns) {
+  if (!rawPgCodec || !rawPgCodec.attributes) {
     return;
   }
-  const pgCodec = rawPgCodec as PgCodecWithColumns;
+  const pgCodec = rawPgCodec as PgCodecWithAttributes;
 
   const isInterface = context.type === "GraphQLInterfaceType";
 
-  const column = pgCodec.columns[columnName];
+  const attribute = pgCodec.attributes[attributeName];
 
-  const behavior = getBehavior([pgCodec.extensions, column.extensions]);
+  const behavior = getBehavior([pgCodec.extensions, attribute.extensions]);
   if (!build.behavior.matches(behavior, "attribute:select", "select")) {
-    // Don't allow selecting this column.
+    // Don't allow selecting this attribute.
     return;
   }
 
-  const columnFieldName =
+  const attributeFieldName =
     overrideName ??
-    inflection.column({
-      columnName,
+    inflection.attribute({
+      attributeName,
       codec: pgCodec,
     });
-  const baseCodec = unwrapCodec(column.codec);
+  const baseCodec = unwrapCodec(attribute.codec);
   const baseType = getGraphQLTypeByPgCodec(baseCodec, "output")!;
-  const arrayOrNotType = column.codec.arrayOfCodec
+  const arrayOrNotType = attribute.codec.arrayOfCodec
     ? new GraphQLList(
         baseType, // TODO: nullability
       )
@@ -168,38 +168,38 @@ function processColumn(
     console.warn(
       `Couldn't find a 'output' variant for PgCodec ${
         pgCodec.name
-      }'s '${columnName}' column (${column.codec.name}; array=${!!column.codec
-        .arrayOfCodec}, domain=${!!column.codec.domainOfCodec}, enum=${!!(
-        column.codec as any
-      ).values})`,
+      }'s '${attributeName}' attribute (${
+        attribute.codec.name
+      }; array=${!!attribute.codec.arrayOfCodec}, domain=${!!attribute.codec
+        .domainOfCodec}, enum=${!!(attribute.codec as any).values})`,
     );
     return;
   }
-  const type = column.notNull
+  const type = attribute.notNull
     ? new GraphQLNonNull(getNullableType(arrayOrNotType))
     : arrayOrNotType;
 
   if (!type) {
     // Could not determine the type, skip this field
     console.warn(
-      `Could not determine the type for column '${columnName}' of ${pgCodec.name}`,
+      `Could not determine the type for attribute '${attributeName}' of ${pgCodec.name}`,
     );
     return;
   }
   const fieldSpec: GrafastFieldConfig<any, any, any, any, any> = {
-    description: column.description,
+    description: attribute.description,
     type: type as GraphQLOutputType,
   };
   if (!isInterface) {
     const makePlan = () => {
       // See if there's a resource to pull record types from (e.g. for relations/etc)
-      if (!baseCodec.columns) {
+      if (!baseCodec.attributes) {
         // Simply get the value
         return EXPORTABLE(
-          (columnName) => ($record: PgSelectSingleStep) => {
-            return $record.get(columnName);
+          (attributeName) => ($record: PgSelectSingleStep) => {
+            return $record.get(attributeName);
           },
-          [columnName],
+          [attributeName],
         );
       } else {
         const pgResources = Object.values(registry.pgResources).filter(
@@ -207,8 +207,8 @@ function processColumn(
             potentialSource.codec === baseCodec && !potentialSource.parameters,
         );
         // TODO: this is pretty horrible in the export; we should fix that.
-        if (!column.codec.arrayOfCodec) {
-          const notNull = column.notNull || column.codec.notNull;
+        if (!attribute.codec.arrayOfCodec) {
+          const notNull = attribute.notNull || attribute.codec.notNull;
           // Single record from resource
           /*
            * TODO: if we refactor `PgSelectSingleStep` we can probably
@@ -218,8 +218,8 @@ function processColumn(
            */
           return EXPORTABLE(
             (
+                attributeName,
                 baseCodec,
-                columnName,
                 getResource,
                 notNull,
                 pgResources,
@@ -227,7 +227,7 @@ function processColumn(
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
-                const $plan = $record.get(columnName);
+                const $plan = $record.get(attributeName);
                 const $select = pgSelectSingleFromRecord(
                   getResource(registry, baseCodec, pgResources, $record),
                   $plan,
@@ -239,8 +239,8 @@ function processColumn(
                 return $select;
               },
             [
+              attributeName,
               baseCodec,
-              columnName,
               getResource,
               notNull,
               pgResources,
@@ -258,18 +258,17 @@ function processColumn(
            */
           return EXPORTABLE(
             (
+                attributeName,
                 baseCodec,
-                columnName,
                 getResource,
                 pgResources,
                 pgSelectFromRecords,
                 registry,
               ) =>
               ($record: PgSelectSingleStep<any>) => {
-                const $val = $record.get(columnName) as PgClassExpressionStep<
-                  PgCodecList,
-                  any
-                >;
+                const $val = $record.get(
+                  attributeName,
+                ) as PgClassExpressionStep<PgCodecList, any>;
                 const $select = pgSelectFromRecords(
                   getResource(registry, baseCodec, pgResources, $record),
                   $val,
@@ -278,8 +277,8 @@ function processColumn(
                 return $select;
               },
             [
+              attributeName,
               baseCodec,
-              columnName,
               getResource,
               pgResources,
               pgSelectFromRecords,
@@ -294,48 +293,48 @@ function processColumn(
   fields = extend(
     fields,
     {
-      [columnFieldName]: context.fieldWithHooks(
+      [attributeFieldName]: context.fieldWithHooks(
         {
-          fieldName: columnFieldName,
-          pgColumn: column,
+          fieldName: attributeFieldName,
+          pgAttribute: attribute,
         },
         fieldSpec,
       ),
     },
-    `Adding '${columnName}' column field to PgCodec '${pgCodec.name}'`,
+    `Adding '${attributeName}' attribute field to PgCodec '${pgCodec.name}'`,
   );
 }
 
-export const PgColumnsPlugin: GraphileConfig.Plugin = {
-  name: "PgColumnsPlugin",
+export const PgAttributesPlugin: GraphileConfig.Plugin = {
+  name: "PgAttributesPlugin",
   description:
-    "Adds PostgreSQL columns (attributes) to the relevant GraphQL object/input object types",
+    "Adds PostgreSQL attributes (columns) to the relevant GraphQL object/input object types",
   version: version,
   // TODO: Requires PgTablesPlugin
 
   inflection: {
     add: {
-      _columnName(options, { columnName, codec }) {
-        const column = codec.columns[columnName];
+      _attributeName(options, { attributeName, codec }) {
+        const attribute = codec.attributes[attributeName];
         return this.coerceToGraphQLName(
-          column.extensions?.tags?.name || columnName,
+          attribute.extensions?.tags?.name || attributeName,
         );
       },
 
-      _joinColumnNames(options, codec, names) {
+      _joinAttributeNames(options, codec, names) {
         return names
-          .map((columnName) => {
-            return this.column({ columnName, codec });
+          .map((attributeName) => {
+            return this.attribute({ attributeName, codec });
           })
           .join("-and-");
       },
 
-      column(options, details) {
-        const columnFieldName = this.camelCase(this._columnName(details));
+      attribute(options, details) {
+        const attributeFieldName = this.camelCase(this._attributeName(details));
         // Avoid conflict with 'id' field used for Relay.
-        return columnFieldName === "id" && !details.codec.isAnonymous
+        return attributeFieldName === "id" && !details.codec.isAnonymous
           ? "rowId"
-          : columnFieldName;
+          : attributeFieldName;
       },
     },
   },
@@ -347,14 +346,14 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
           scope: { pgCodec, pgPolymorphism },
         } = context;
 
-        if (!pgPolymorphism || !pgCodec?.columns) {
+        if (!pgPolymorphism || !pgCodec?.attributes) {
           return fields;
         }
 
-        for (const columnName in pgCodec.columns) {
+        for (const attributeName in pgCodec.attributes) {
           switch (pgPolymorphism.mode) {
             case "single": {
-              if (!pgPolymorphism.commonColumns.includes(columnName)) {
+              if (!pgPolymorphism.commonAttributes.includes(attributeName)) {
                 continue;
               }
               break;
@@ -372,7 +371,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
               );
             }
           }
-          processColumn(fields, build, context, columnName);
+          processAttribute(fields, build, context, attributeName);
         }
         return fields;
       },
@@ -386,20 +385,20 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
           },
         } = context;
 
-        if (!isPgTableType || !pgCodec?.columns) {
+        if (!isPgTableType || !pgCodec?.attributes) {
           return fields;
         }
 
-        for (const columnName in pgCodec.columns) {
+        for (const attributeName in pgCodec.attributes) {
           let overrideName: string | undefined = undefined;
           if (pgPolymorphism) {
             switch (pgPolymorphism.mode) {
               case "single": {
-                const match = pgPolymorphicSingleTableType?.columns.find(
-                  (c) => c.column === columnName,
+                const match = pgPolymorphicSingleTableType?.attributes.find(
+                  (c) => c.attribute === attributeName,
                 );
                 if (
-                  !pgPolymorphism.commonColumns.includes(columnName) &&
+                  !pgPolymorphism.commonAttributes.includes(attributeName) &&
                   !match
                 ) {
                   continue;
@@ -424,7 +423,7 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
               }
             }
           }
-          processColumn(fields, build, context, columnName, overrideName);
+          processAttribute(fields, build, context, attributeName, overrideName);
         }
         return fields;
       },
@@ -443,19 +442,19 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
         if (
           !(isPgRowType || isPgCompoundType) ||
           !rawPgCodec ||
-          !rawPgCodec.columns ||
+          !rawPgCodec.attributes ||
           rawPgCodec.isAnonymous
         ) {
           return fields;
         }
-        const pgCodec = rawPgCodec as PgCodecWithColumns;
+        const pgCodec = rawPgCodec as PgCodecWithAttributes;
 
-        return Object.entries(pgCodec.columns as PgCodecAttributes).reduce(
-          (memo, [columnName, column]) =>
+        return Object.entries(pgCodec.attributes as PgCodecAttributes).reduce(
+          (memo, [attributeName, attribute]) =>
             build.recoverable(memo, () => {
               const behavior = getBehavior([
                 pgCodec.extensions,
-                column.extensions,
+                attribute.extensions,
               ]);
 
               const action = isPgBaseInput
@@ -471,20 +470,20 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                 return memo;
               }
 
-              const fieldName = inflection.column({
-                columnName,
+              const fieldName = inflection.attribute({
+                attributeName,
                 codec: pgCodec,
               });
               if (memo[fieldName]) {
                 throw new Error(
-                  `Two columns produce the same GraphQL field name '${fieldName}' on input PgCodec '${pgCodec.name}'; one of them is '${columnName}'`,
+                  `Two attributes produce the same GraphQL field name '${fieldName}' on input PgCodec '${pgCodec.name}'; one of them is '${attributeName}'`,
                 );
               }
-              const columnType = build.getGraphQLTypeByPgCodec(
-                column.codec,
+              const attributeType = build.getGraphQLTypeByPgCodec(
+                attribute.codec,
                 "input",
               );
-              if (!columnType) {
+              if (!attributeType) {
                 return memo;
               }
               return extend(
@@ -495,25 +494,25 @@ export const PgColumnsPlugin: GraphileConfig.Plugin = {
                       fieldName,
                       fieldBehaviorScope,
                       pgCodec,
-                      pgColumn: column,
+                      pgAttribute: attribute,
                     },
                     {
-                      description: column.description,
+                      description: attribute.description,
                       type: build.nullableIf(
                         isPgBaseInput ||
                           isPgPatch ||
-                          (!column.notNull &&
-                            !column.extensions?.tags?.notNull) ||
-                          column.hasDefault ||
-                          Boolean(column.extensions?.tags?.hasDefault),
-                        columnType,
+                          (!attribute.notNull &&
+                            !attribute.extensions?.tags?.notNull) ||
+                          attribute.hasDefault ||
+                          Boolean(attribute.extensions?.tags?.hasDefault),
+                        attributeType,
                       ),
                       applyPlan: EXPORTABLE(
-                        (columnName) =>
+                        (attributeName) =>
                           function plan($insert: SetterStep<any, any>, val) {
-                            $insert.set(columnName, val.get());
+                            $insert.set(attributeName, val.get());
                           },
-                        [columnName],
+                        [attributeName],
                       ),
                     },
                   ),

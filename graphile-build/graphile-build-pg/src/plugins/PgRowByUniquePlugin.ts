@@ -2,7 +2,7 @@ import "graphile-config";
 
 import type {
   PgCodec,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
@@ -43,10 +43,10 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
         if (typeof unique.extensions?.tags?.fieldName === "string") {
           return unique.extensions?.tags?.fieldName;
         }
-        const uniqueKeys = unique.columns;
+        const uniqueKeys = unique.attributes;
         return this.camelCase(
           // TODO: should this use the _resource_ rather than the _codec_ in case the same codec is used across multiple resources?
-          `${this.tableType(resource.codec)}-by-${this._joinColumnNames(
+          `${this.tableType(resource.codec)}-by-${this._joinAttributeNames(
             resource.codec,
             uniqueKeys,
           )}`,
@@ -73,7 +73,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
           if (resource.parameters) return false;
-          if (!resource.codec.columns) return false;
+          if (!resource.codec.attributes) return false;
           if (!resource.uniques || resource.uniques.length < 1) return false;
           return true;
         });
@@ -85,12 +85,12 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                 (memo, unique) => {
                   const resource = rawResource as PgResource<
                     any,
-                    PgCodecWithColumns,
+                    PgCodecWithAttributes,
                     any,
                     any,
                     any
                   >;
-                  const uniqueKeys = unique.columns as string[];
+                  const uniqueKeys = unique.attributes as string[];
                   const fieldName = build.inflection.rowByUnique({
                     unique,
                     resource,
@@ -103,30 +103,30 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                     return memo;
                   }
 
-                  const detailsByColumnName: {
-                    [columnName: string]: {
+                  const detailsByAttributeName: {
+                    [attributeName: string]: {
                       graphqlName: string;
                       codec: PgCodec;
                     };
                   } = Object.create(null);
-                  uniqueKeys.forEach((columnName) => {
-                    const column = resource.codec.columns![columnName];
-                    const columnArgName = build.inflection.column({
-                      columnName,
+                  uniqueKeys.forEach((attributeName) => {
+                    const attribute = resource.codec.attributes![attributeName];
+                    const attributeArgName = build.inflection.attribute({
+                      attributeName,
                       codec: resource.codec,
                     });
-                    detailsByColumnName[columnName] = {
-                      graphqlName: columnArgName,
-                      codec: column.codec,
+                    detailsByAttributeName[attributeName] = {
+                      graphqlName: attributeArgName,
+                      codec: attribute.codec,
                     };
                   });
 
-                  const columnNames = Object.keys(detailsByColumnName);
-                  const clean = columnNames.every(
+                  const attributeNames = Object.keys(detailsByAttributeName);
+                  const clean = attributeNames.every(
                     (key) =>
                       isSafeObjectPropertyName(key) &&
                       isSafeObjectPropertyName(
-                        detailsByColumnName[key].graphqlName,
+                        detailsByAttributeName[key].graphqlName,
                       ),
                   );
                   const plan = clean
@@ -142,10 +142,10 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                         te.run`\
 return function (resource) {
   return (_$root, args) => resource.get({ ${te.join(
-    columnNames.map(
-      (columnName) =>
-        te`${te.dangerousKey(columnName)}: args.get(${te.lit(
-          detailsByColumnName[columnName].graphqlName,
+    attributeNames.map(
+      (attributeName) =>
+        te`${te.dangerousKey(attributeName)}: args.get(${te.lit(
+          detailsByAttributeName[attributeName].graphqlName,
         )})`,
     ),
     ", ",
@@ -154,17 +154,18 @@ return function (resource) {
                         [resource],
                       )
                     : EXPORTABLE(
-                        (detailsByColumnName, resource) =>
+                        (detailsByAttributeName, resource) =>
                           function plan(_$root: any, args: FieldArgs) {
                             const spec = Object.create(null);
-                            for (const columnName in detailsByColumnName) {
-                              spec[columnName] = args.get(
-                                detailsByColumnName[columnName].graphqlName,
+                            for (const attributeName in detailsByAttributeName) {
+                              spec[attributeName] = args.get(
+                                detailsByAttributeName[attributeName]
+                                  .graphqlName,
                               );
                             }
                             return resource.get(spec);
                           },
-                        [detailsByColumnName, resource],
+                        [detailsByAttributeName, resource],
                       );
 
                   const behavior = getBehavior([
@@ -197,19 +198,20 @@ return function (resource) {
                             resource.extensions?.tags?.deprecated,
                           ),
                           type,
-                          args: uniqueKeys.reduce((args, columnName) => {
-                            const details = detailsByColumnName[columnName];
-                            const columnType = build.getGraphQLTypeByPgCodec(
+                          args: uniqueKeys.reduce((args, attributeName) => {
+                            const details =
+                              detailsByAttributeName[attributeName];
+                            const attributeType = build.getGraphQLTypeByPgCodec(
                               details.codec,
                               "input",
                             );
-                            if (!columnType) {
+                            if (!attributeType) {
                               throw new Error(
-                                `Could not determine type for column`,
+                                `Could not determine type for attribute`,
                               );
                             }
                             args[details.graphqlName] = {
-                              type: new GraphQLNonNull(columnType),
+                              type: new GraphQLNonNull(attributeType),
                             };
                             return args;
                           }, Object.create(null)),
@@ -218,7 +220,7 @@ return function (resource) {
                         }),
                       ),
                     },
-                    `Adding row accessor for ${resource} by unique columns ${uniqueKeys.join(
+                    `Adding row accessor for ${resource} by unique attributes ${uniqueKeys.join(
                       ",",
                     )}`,
                   );

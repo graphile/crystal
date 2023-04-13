@@ -35,7 +35,7 @@ const makePetsPlugin = (nullsSortMethod: NullsSortMethod) =>
       const sqlIdentifier = sql.identifier(Symbol("pet"));
 
       const customOrderBy = orderByAscDesc(
-        "PET_ID_AVERAGE", // this is a ridiculous and unrealistic column but it will serve for testing purposes
+        "PET_ID_AVERAGE", // this is a ridiculous and unrealistic attribute but it will serve for testing purposes
         ($select) => {
           const orderByFrag = sql`(
             select avg(${sqlIdentifier}.id)

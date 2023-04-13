@@ -68,30 +68,30 @@ export interface PgCodecExtensions {
   listItemNonNull?: boolean;
 }
 
-export interface PgCodecPolymorphismSingleTypeColumnSpec<
-  TColumnName extends string = string,
+export interface PgCodecPolymorphismSingleTypeAttributeSpec<
+  TAttributeName extends string = string,
 > {
-  column: TColumnName;
+  attribute: TAttributeName;
   isNotNull?: boolean;
   rename?: string;
 }
 
 export interface PgCodecPolymorphismSingleTypeSpec<
-  TColumnName extends string = string,
+  TAttributeName extends string = string,
 > {
   name: string;
   // TODO: make this optional?
-  columns: Array<PgCodecPolymorphismSingleTypeColumnSpec<TColumnName>>;
+  attributes: Array<PgCodecPolymorphismSingleTypeAttributeSpec<TAttributeName>>;
 }
 export interface PgCodecPolymorphismSingle<
-  TColumnName extends string = string,
+  TAttributeName extends string = string,
 > {
   mode: "single";
-  typeColumns: readonly TColumnName[];
+  typeAttributes: readonly TAttributeName[];
   // TODO: make this optional?
-  commonColumns: readonly TColumnName[];
+  commonAttributes: readonly TAttributeName[];
   types: {
-    [typeKey: string]: PgCodecPolymorphismSingleTypeSpec<TColumnName>;
+    [typeKey: string]: PgCodecPolymorphismSingleTypeSpec<TAttributeName>;
   };
 }
 
@@ -104,10 +104,10 @@ export interface PgCodecPolymorphismRelationalTypeSpec {
   // Currently assumes it's joined via PK, but we might expand that in future
 }
 export interface PgCodecPolymorphismRelational<
-  TColumnName extends string = string,
+  TAttributeName extends string = string,
 > {
   mode: "relational";
-  typeColumns: readonly TColumnName[];
+  typeAttributes: readonly TAttributeName[];
   types: {
     [typeKey: string]: PgCodecPolymorphismRelationalTypeSpec;
   };
@@ -117,9 +117,9 @@ export interface PgCodecPolymorphismUnion {
   mode: "union";
 }
 
-export type PgCodecPolymorphism<TColumnName extends string> =
-  | PgCodecPolymorphismSingle<TColumnName>
-  | PgCodecPolymorphismRelational<TColumnName>
+export type PgCodecPolymorphism<TAttributeName extends string> =
+  | PgCodecPolymorphismSingle<TAttributeName>
+  | PgCodecPolymorphismRelational<TAttributeName>
   | PgCodecPolymorphismUnion;
 
 /**
@@ -129,7 +129,7 @@ export type PgCodecPolymorphism<TColumnName extends string> =
  */
 export interface PgCodec<
   TName extends string = string,
-  TColumns extends PgCodecAttributes | undefined =
+  TAttributes extends PgCodecAttributes | undefined =
     | PgCodecAttributes
     | undefined,
   TFromPostgres = any,
@@ -200,16 +200,16 @@ export interface PgCodec<
 
   // TODO: extract this to a different interface
   /**
-   * If this is a composite type, the columns it supports.
+   * If this is a composite type, the attributes it supports.
    */
-  columns: TColumns;
+  attributes: TAttributes;
 
   /**
    * A callback to return `'true'` (text string) if the composite type
    * represented by this codec is non-null, and `null` or `'false'` otherwise.
    *
    * If this codec represents a composite type (e.g. a row or other type with
-   * multiple columns) and this type can be returned from a function then
+   * multiple attributes) and this type can be returned from a function then
    * there's a risk that the function may return null/an all-nulls composite
    * type. This can occur with `returns some_composite_type` or
    * `returns setof some_composite_type`, though the former is more common as
@@ -258,9 +258,9 @@ export interface PgCodec<
   refs?: PgCodecRefs;
 }
 
-export type PgCodecWithColumns<
-  TColumns extends PgCodecAttributes = PgCodecAttributes,
-> = PgCodec<any, TColumns, any, any, undefined, any, undefined>;
+export type PgCodecWithAttributes<
+  TAttributes extends PgCodecAttributes = PgCodecAttributes,
+> = PgCodec<any, TAttributes, any, any, undefined, any, undefined>;
 
 export type PgCodecAnyScalar = PgCodec<
   string,
@@ -335,7 +335,7 @@ export type PgOrderFragmentSpec = {
 export type PgOrderAttributeSpec = {
   /** The attribute you're using for ordering */
   attribute: string;
-  /** An optional expression to wrap this column with, and the type that expression returns */
+  /** An optional expression to wrap this attribute with, and the type that expression returns */
   callback?: (
     attributeExpression: SQL,
     attributeCodec: PgCodec,
@@ -360,19 +360,19 @@ export interface PgGroupSpec {
 }
 
 export type TuplePlanMap<
-  TColumns extends { [column: string]: any },
-  TTuple extends ReadonlyArray<keyof TColumns>,
+  TAttributes extends PgCodecAttributes,
+  TTuple extends ReadonlyArray<keyof TAttributes>,
 > = {
   [Index in keyof TTuple]: {
-    // Optional columns
-    [key in keyof TColumns as Exclude<
+    // Optional attributes
+    [key in keyof TAttributes as Exclude<
       key,
       keyof TTuple[number]
-    >]?: ExecutableStep<ReturnType<TColumns[key]["pg2gql"]>>;
+    >]?: ExecutableStep<ReturnType<TAttributes[key]["codec"]["fromPg"]>>;
   } & {
-    // Required unique combination of columns
+    // Required unique combination of attributes
     [key in TTuple[number]]: ExecutableStep<
-      ReturnType<TColumns[key]["pg2gql"]>
+      ReturnType<TAttributes[key]["codec"]["fromPg"]>
     >;
   };
 };
@@ -380,16 +380,19 @@ export type TuplePlanMap<
 /**
  * Represents a spec like `{user_id: ExecutableStep}` or
  * `{organization_id: ExecutableStep, item_id: ExecutableStep}`. The keys in
- * the spec can be any of the columns in TColumns, however there must be at
- * least one of the unique sets of columns represented (as specified in
- * TUniqueColumns) - you can then add arbitrary additional columns if you need
+ * the spec can be any of the attributes in TAttributes, however there must be at
+ * least one of the unique sets of attributes represented (as specified in
+ * TUniqueAttributes) - you can then add arbitrary additional attributes if you need
  * to.
  */
 export type PlanByUniques<
-  TColumns extends PgCodecAttributes,
-  TUniqueColumns extends ReadonlyArray<PgResourceUnique<TColumns>>,
-> = TColumns extends PgCodecAttributes
-  ? TuplePlanMap<TColumns, TUniqueColumns[number]["columns"] & string[]>[number]
+  TAttributes extends PgCodecAttributes,
+  TUniqueAttributes extends ReadonlyArray<PgResourceUnique<TAttributes>>,
+> = TAttributes extends PgCodecAttributes
+  ? TuplePlanMap<
+      TAttributes,
+      TUniqueAttributes[number]["attributes"] & string[]
+    >[number]
   : undefined;
 
 export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
@@ -475,20 +478,20 @@ export interface PgCodecRelationExtensions {}
 
 export interface PgCodecRelationBase<
   TLocalCodec extends PgCodec = PgCodec,
-  TRemoteColumns extends string = string,
+  TRemoteAttributes extends string = string,
 > {
   /* Where the relationship starts */
   localCodec: TLocalCodec;
 
   /**
-   * The columns locally used in this relationship.
+   * The attributes locally used in this relationship.
    */
-  localColumns: readonly (keyof TLocalCodec["columns"])[];
+  localAttributes: readonly (keyof TLocalCodec["attributes"])[];
 
   /**
-   * The remote columns that are joined against.
+   * The remote attributes that are joined against.
    */
-  remoteColumns: readonly TRemoteColumns[];
+  remoteAttributes: readonly TRemoteAttributes[];
 
   /**
    * If true then there's at most one record this relationship will find.
@@ -496,8 +499,8 @@ export interface PgCodecRelationBase<
   isUnique: boolean;
 
   /**
-   * If true then this is a reverse lookup (where our local columns are
-   * referenced by the remote tables remote columns, rather than the other way
+   * If true then this is a reverse lookup (where our local attributes are
+   * referenced by the remote tables remote attributes, rather than the other way
    * around), so multiple rows may be found (unless isUnique is true).
    */
   isReferencee?: boolean;
@@ -511,10 +514,10 @@ export interface PgCodecRelationBase<
 }
 
 export interface PgCodecRelationConfig<
-  TLocalCodec extends PgCodec = PgCodecWithColumns,
+  TLocalCodec extends PgCodec = PgCodecWithAttributes,
   TRemoteResourceOptions extends PgResourceOptions = PgResourceOptions<
     any,
-    PgCodecWithColumns,
+    PgCodecWithAttributes,
     any,
     any
   >,
@@ -522,11 +525,11 @@ export interface PgCodecRelationConfig<
     TLocalCodec,
     TRemoteResourceOptions extends PgResourceOptions<
       any,
-      PgCodec<any, infer UColumns, any, any, any, any, any>,
+      PgCodec<any, infer UAttributes, any, any, any, any, any>,
       any,
       any
     >
-      ? keyof UColumns
+      ? keyof UAttributes
       : never
   > {
   remoteResourceOptions: TRemoteResourceOptions;
@@ -536,24 +539,24 @@ export interface PgCodecRelationConfig<
  * Describes a relation from a codec to a resource
  */
 export interface PgCodecRelation<
-  TLocalCodec extends PgCodecWithColumns = PgCodecWithColumns,
+  TLocalCodec extends PgCodecWithAttributes = PgCodecWithAttributes,
   TRemoteResource extends PgResource<
     any,
-    PgCodecWithColumns,
+    PgCodecWithAttributes,
     any,
     any,
     any
-  > = PgResource<any, PgCodecWithColumns, any, any, any>,
+  > = PgResource<any, PgCodecWithAttributes, any, any, any>,
 > extends PgCodecRelationBase<
     TLocalCodec,
     TRemoteResource extends PgResource<
       any,
-      PgCodec<any, infer UColumns, any, any, any, any, any>,
+      PgCodec<any, infer UAttributes, any, any, any, any, any>,
       any,
       any,
       any
     >
-      ? keyof UColumns
+      ? keyof UAttributes
       : never
   > {
   /**
@@ -586,7 +589,7 @@ export interface PgRegistryConfig<
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        PgResourceOptions<any, PgCodecWithColumns, any, any>
+        PgResourceOptions<any, PgCodecWithAttributes, any, any>
       >;
     };
   },
@@ -628,7 +631,7 @@ export interface PgRegistry<
     string,
     PgResourceOptions<
       string,
-      PgCodecWithColumns, // TCodecs[keyof TCodecs],
+      PgCodecWithAttributes, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameter[] | undefined
     >
@@ -642,7 +645,7 @@ export interface PgRegistry<
         PgResourceOptions<
           any,
           // TCodecs[keyof TCodecs] &
-          PgCodecWithColumns,
+          PgCodecWithAttributes,
           any,
           any
         >
@@ -659,7 +662,7 @@ export interface PgRegistry<
         PgResourceOptions<
           any,
           // TCodecs[keyof TCodecs] &
-          PgCodecWithColumns,
+          PgCodecWithAttributes,
           any,
           any
         >
@@ -721,12 +724,12 @@ export type GetPgRegistryCodecRelations<
   TCodec extends PgCodec<any, any, any, any, any, any, any>,
 > = TRegistry["pgRelations"][TCodec["name"]];
 
-export type GetPgCodecColumns<
+export type GetPgCodecAttributes<
   TCodec extends PgCodec<any, any, any, any, any, any, any>,
-> = TCodec extends PgCodec<any, infer UColumns, any, any, any, any, any>
-  ? UColumns extends undefined
+> = TCodec extends PgCodec<any, infer UAttributes, any, any, any, any, any>
+  ? UAttributes extends undefined
     ? never
-    : UColumns
+    : UAttributes
   : PgCodecAttributes;
 
 export type GetPgResourceRegistry<
@@ -737,9 +740,9 @@ export type GetPgResourceCodec<
   TResource extends PgResource<any, any, any, any, any>,
 > = TResource["codec"];
 
-export type GetPgResourceColumns<
+export type GetPgResourceAttributes<
   TResource extends PgResource<any, any, any, any, any>,
-> = GetPgCodecColumns<TResource["codec"]>;
+> = GetPgCodecAttributes<TResource["codec"]>;
 
 export type GetPgResourceRelations<
   TResource extends PgResource<any, any, any, any, any>,

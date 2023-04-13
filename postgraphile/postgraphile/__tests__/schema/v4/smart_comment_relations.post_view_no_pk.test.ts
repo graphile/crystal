@@ -3,7 +3,7 @@ import { isObjectType } from "graphql";
 import * as core from "./core.js";
 
 test(
-  "referencing other view (specifying columns, no PK)",
+  "referencing other view (specifying attributes, no PK)",
   core.test(
     __filename,
     ["smart_comment_relations"],

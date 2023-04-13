@@ -51,7 +51,7 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
         }
 
         const nodeTypeName = codec
-          ? codec.columns
+          ? codec.attributes
             ? inflection.tableType(codec)
             : build.getGraphQLTypeNameByPgCodec(codec, "output")
           : null;

@@ -45,8 +45,8 @@ import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type {
+  GetPgResourceAttributes,
   GetPgResourceCodec,
-  GetPgResourceColumns,
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
@@ -136,14 +136,14 @@ type PgSelectPlanJoin =
       type: "cross";
       from: SQL;
       alias: SQL;
-      columnNames?: SQL;
+      attributeNames?: SQL;
       lateral?: boolean;
     }
   | {
       type: "inner" | "left" | "right" | "full";
       from: SQL;
       alias: SQL;
-      columnNames?: SQL;
+      attributeNames?: SQL;
       conditions: SQL[];
       lateral?: boolean;
     };
@@ -265,7 +265,7 @@ export interface PgSelectOptions<
 
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
- * it represents `SELECT <columns>, <cursor?> FROM <table>`. You can also add
+ * it represents `SELECT <attributes>, <cursor?> FROM <table>`. You can also add
  * `JOIN`, `WHERE`, `ORDER BY`, `LIMIT`, `OFFSET`. You cannot add `GROUP BY`
  * because that would invalidate the identifiers; and as such you can't use
  * `HAVING` or functions that implicitly turn the query into an aggregate. We
@@ -861,7 +861,7 @@ export class PgSelectStep<
         )}' is not unique so cannot be used with singleRelation`,
       );
     }
-    const { remoteResource, localColumns, remoteColumns } = relation;
+    const { remoteResource, localAttributes, remoteAttributes } = relation;
 
     // Join to this relation if we haven't already
     const cachedAlias = this.relationJoins.get(relationIdentifier);
@@ -878,11 +878,11 @@ export class PgSelectStep<
       type: "left",
       from: remoteResource.from,
       alias,
-      conditions: localColumns.map(
+      conditions: localAttributes.map(
         (col, i) =>
           sql`${this.alias}.${sql.identifier(
             col as string,
-          )} = ${alias}.${sql.identifier(remoteColumns[i] as string)}`,
+          )} = ${alias}.${sql.identifier(remoteAttributes[i] as string)}`,
       ),
     });
     this.relationJoins.set(relationIdentifier, alias);
@@ -962,7 +962,7 @@ export class PgSelectStep<
 
   where(
     condition: PgWhereConditionSpec<
-      keyof GetPgResourceColumns<TResource> & string
+      keyof GetPgResourceAttributes<TResource> & string
     >,
   ): void {
     if (this.locker.locked) {
@@ -1027,7 +1027,7 @@ export class PgSelectStep<
 
   having(
     condition: PgHavingConditionSpec<
-      keyof GetPgResourceColumns<TResource> & string
+      keyof GetPgResourceAttributes<TResource> & string
     >,
   ): void {
     if (this.locker.locked) {
@@ -1483,7 +1483,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   private buildFrom() {
     return {
       sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}${
-        this.resource.codec.columns ? sql.blank : sql`(v)`
+        this.resource.codec.attributes ? sql.blank : sql`(v)`
       }`,
     };
   }
@@ -1522,7 +1522,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
       return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${j.from} as ${
         j.alias
-      }${j.columnNames ?? sql.blank}${joinCondition}`;
+      }${j.attributeNames ?? sql.blank}${joinCondition}`;
     });
 
     return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
@@ -2671,7 +2671,9 @@ ${lateralText};`;
                 type: "left",
                 from: this.fromExpression(),
                 alias: this.alias,
-                columnNames: this.resource.codec.columns ? sql.blank : sql`(v)`,
+                attributeNames: this.resource.codec.attributes
+                  ? sql.blank
+                  : sql`(v)`,
                 conditions,
                 lateral: this.joinAsLateral,
               },
@@ -2685,7 +2687,7 @@ ${lateralText};`;
             return list([map(parent, actualKeyByDesiredKey)]);
           } else {
             debugPlanVerbose(
-              "Skipping merging %c into %c (via %c) due to no columns being selected",
+              "Skipping merging %c into %c (via %c) due to no attributes being selected",
               this,
               table,
               parent,
@@ -2806,7 +2808,7 @@ ${lateralText};`;
    * If this plan may only return one record, you can use `.single()` to return
    * a plan that resolves to either that record (in the case of composite
    * types) or the underlying scalar (in the case of a resource whose codec has
-   * no columns).
+   * no attributes).
    *
    * Beware: if you call this and the database might actually return more than
    * one record then you're potentially in for a Bad Time.
@@ -2815,12 +2817,12 @@ ${lateralText};`;
     options?: PgSelectSinglePlanOptions,
   ): TResource extends PgResource<
     any,
-    PgCodec<any, infer UColumns, any, any, any, any, any>,
+    PgCodec<any, infer UAttributes, any, any, any, any, any>,
     any,
     any,
     any
   >
-    ? UColumns extends PgCodecAttributes
+    ? UAttributes extends PgCodecAttributes
       ? PgSelectSingleStep<TResource>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
@@ -2828,7 +2830,7 @@ ${lateralText};`;
         >
     : never {
     const $single = this.singleAsRecord(options);
-    const isScalar = !this.resource.codec.columns;
+    const isScalar = !this.resource.codec.attributes;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
@@ -2849,12 +2851,12 @@ ${lateralText};`;
     itemPlan: ExecutableStep,
   ): TResource extends PgResource<
     any,
-    PgCodec<any, infer UColumns, any, any, any, any, any>,
+    PgCodec<any, infer UAttributes, any, any, any, any, any>,
     any,
     any,
     any
   >
-    ? UColumns extends PgCodecAttributes
+    ? UAttributes extends PgCodecAttributes
       ? PgSelectSingleStep<TResource>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
@@ -2862,7 +2864,7 @@ ${lateralText};`;
         >
     : never {
     const $single = new PgSelectSingleStep(this, itemPlan);
-    const isScalar = !this.resource.codec.columns;
+    const isScalar = !this.resource.codec.attributes;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
@@ -2910,10 +2912,10 @@ function ensureOrderIsUnique(step: PgSelectStep<any>) {
   if (unique) {
     const ordersIsUnique = step.orderIsUnique();
     if (!ordersIsUnique) {
-      unique.columns.forEach((c) => {
+      unique.attributes.forEach((c) => {
         step.orderBy({
           fragment: sql`${step.alias}.${sql.identifier(c as string)}`,
-          codec: step.resource.codec.columns![c].codec,
+          codec: step.resource.codec.attributes![c].codec,
           direction: "ASC",
         });
       });
@@ -3011,7 +3013,7 @@ export function getFragmentAndCodecFromOrder(
 ): [SQL, PgCodec] {
   if (order.attribute != null) {
     const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
-    const colCodec = codec.columns![order.attribute].codec;
+    const colCodec = codec.attributes![order.attribute].codec;
     return order.callback
       ? order.callback(colFrag, colCodec)
       : [colFrag, colCodec];

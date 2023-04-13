@@ -1335,11 +1335,11 @@ create table polymorphic.single_table_items (
 
 comment on table polymorphic.single_table_items is $$
   @interface mode:single type:type
-  @type TOPIC name:SingleTableTopic columns:title!
-  @type POST name:SingleTablePost columns:title>subject,description,note
-  @type DIVIDER name:SingleTableDivider columns:title,color
-  @type CHECKLIST name:SingleTableChecklist columns:title
-  @type CHECKLIST_ITEM name:SingleTableChecklistItem columns:description,note
+  @type TOPIC name:SingleTableTopic attributes:title!
+  @type POST name:SingleTablePost attributes:title>subject,description,note
+  @type DIVIDER name:SingleTableDivider attributes:title,color
+  @type CHECKLIST name:SingleTableChecklist attributes:title
+  @type CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note
   @ref rootTopic to:SingleTableTopic plural via:(root_topic_id)->polymorphic.single_table_items(id)
   $$;
 

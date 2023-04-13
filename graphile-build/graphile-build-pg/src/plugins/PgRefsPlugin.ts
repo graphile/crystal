@@ -3,7 +3,7 @@ import type {
   PgCodecExtensions,
   PgCodecRefPath,
   PgCodecRelationConfig,
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgRefDefinition,
   PgRefDefinitions,
   PgResourceOptions,
@@ -250,7 +250,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             for (const rawPart of parts) {
               type RelationEntry = [
                 string,
-                PgCodecRelationConfig<PgCodecWithColumns, PgResourceOptions>,
+                PgCodecRelationConfig<PgCodecWithAttributes, PgResourceOptions>,
               ];
               const relationEntries = Object.entries(
                 registryConfig.pgRelations[currentResourceOptions.codec.name],
@@ -271,10 +271,10 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 ] = matches;
 
                 // TODO: use proper identifier parsing here!
-                const localColumns = rawLocalCols
+                const localAttributes = rawLocalCols
                   .split(",")
                   .map((t) => t.trim());
-                const maybeTargetColumns = maybeRawTargetCols
+                const maybeTargetAttributes = maybeRawTargetCols
                   ? // TODO: use proper identifier parsing here!
                     maybeRawTargetCols.split(",").map((t) => t.trim())
                   : null;
@@ -293,11 +293,13 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                   if (rel.remoteResourceOptions.codec !== targetCodec) {
                     return false;
                   }
-                  if (!arraysMatch(rel.localColumns, localColumns)) {
+                  if (!arraysMatch(rel.localAttributes, localAttributes)) {
                     return false;
                   }
-                  if (maybeTargetColumns) {
-                    if (!arraysMatch(rel.remoteColumns, maybeTargetColumns)) {
+                  if (maybeTargetAttributes) {
+                    if (
+                      !arraysMatch(rel.remoteAttributes, maybeTargetAttributes)
+                    ) {
                       return false;
                     }
                   }

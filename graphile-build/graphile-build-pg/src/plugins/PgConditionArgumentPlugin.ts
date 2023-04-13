@@ -2,7 +2,7 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgCodecWithColumns,
+  PgCodecWithAttributes,
   PgConditionStep,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
@@ -49,10 +49,10 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         for (const rawCodec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
             // Ignore scalar codecs
-            if (!rawCodec.columns || rawCodec.isAnonymous) {
+            if (!rawCodec.attributes || rawCodec.isAnonymous) {
               return;
             }
-            const codec = rawCodec as PgCodecWithColumns;
+            const codec = rawCodec as PgCodecWithAttributes;
 
             const behavior = getBehavior(codec.extensions);
             // TODO: do we want this filter here? E.g. we might want to enable a bulk delete mutation without allowing any selects?
@@ -77,13 +77,13 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ),
                 fields: (context) => {
                   const { fieldWithHooks } = context;
-                  const columns = codec.columns;
+                  const attributes = codec.attributes;
                   // TODO: move this to a separate plugin
-                  return Object.entries(columns).reduce(
-                    (memo, [columnName, column]) => {
+                  return Object.entries(attributes).reduce(
+                    (memo, [attributeName, attribute]) => {
                       const behavior = getBehavior([
                         codec.extensions,
-                        column.extensions,
+                        attribute.extensions,
                       ]);
                       if (
                         !build.behavior.matches(
@@ -97,12 +97,12 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
 
                       // TODO: add `attribute:filterBy:array`/`:range` ?
 
-                      const fieldName = inflection.column({
-                        columnName,
+                      const fieldName = inflection.attribute({
+                        attributeName,
                         codec,
                       });
                       const type = build.getGraphQLTypeByPgCodec(
-                        column.codec,
+                        attribute.codec,
                         "input",
                       );
                       if (!type) {
@@ -124,7 +124,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                               ),
                               type: type as GraphQLInputType,
                               applyPlan: EXPORTABLE(
-                                (column, columnName, sql) =>
+                                (attribute, attributeName, sql) =>
                                   function plan(
                                     $condition: PgConditionStep<
                                       PgSelectStep<any>
@@ -134,28 +134,28 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                                     if (val.getRaw().evalIs(null)) {
                                       $condition.where({
                                         type: "attribute",
-                                        attribute: columnName,
+                                        attribute: attributeName,
                                         callback: (expression) =>
                                           sql`${expression} is null`,
                                       });
                                     } else {
                                       $condition.where({
                                         type: "attribute",
-                                        attribute: columnName,
+                                        attribute: attributeName,
                                         callback: (expression) =>
                                           sql`${expression} = ${$condition.placeholder(
                                             val.get(),
-                                            column.codec,
+                                            attribute.codec,
                                           )}`,
                                       });
                                     }
                                   },
-                                [column, columnName, sql],
+                                [attribute, attributeName, sql],
                               ),
                             },
                           ),
                         },
-                        `Adding condition argument for ${codec.name}' ${columnName} column`,
+                        `Adding condition argument for ${codec.name}' ${attributeName} attribute`,
                       );
                       return memo;
                     },
@@ -194,12 +194,12 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
 
         const codec = pgFieldCodec ?? pgResource?.codec;
         const isSuitableSource =
-          pgResource && pgResource.codec.columns && !pgResource.isUnique;
+          pgResource && pgResource.codec.attributes && !pgResource.isUnique;
         const isSuitableCodec =
           codec &&
           (isSuitableSource ||
             (!pgResource && codec?.polymorphism?.mode === "union")) &&
-          codec.columns;
+          codec.attributes;
 
         if (!shouldAddCondition || !isSuitableCodec) {
           return args;

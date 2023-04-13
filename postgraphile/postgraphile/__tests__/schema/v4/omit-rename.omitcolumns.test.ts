@@ -1,7 +1,7 @@
 import * as core from "./core.js";
 
 test(
-  "omit create on column",
+  "omit create on attribute",
   core.test(
     __filename,
     ["d"],

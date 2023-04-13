@@ -10,10 +10,10 @@ export {
   withPgClientFromPgService,
 } from "./pgServices.js";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
+export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
+export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
 export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
 export { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
-export { PgColumnDeprecationPlugin } from "./plugins/PgColumnDeprecationPlugin.js";
-export { PgColumnsPlugin } from "./plugins/PgColumnsPlugin.js";
 export { PgConditionArgumentPlugin } from "./plugins/PgConditionArgumentPlugin.js";
 export { PgConditionCustomFieldsPlugin } from "./plugins/PgConditionCustomFieldsPlugin.js";
 export { PgConnectionArgFirstLastBeforeAfterPlugin } from "./plugins/PgConnectionArgFirstLastBeforeAfterPlugin.js";
@@ -28,7 +28,7 @@ export { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 export { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 export { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 export { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
-export { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin.js";
+export { PgOrderAllAttributesPlugin } from "./plugins/PgOrderAllAttributesPlugin.js";
 export { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 export { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
 export { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";

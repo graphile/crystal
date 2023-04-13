@@ -150,7 +150,7 @@ declare global {
       // TODO: put 'field' into all these names?
       pgResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgColumn?: PgCodecAttribute<any>;
+      pgAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -158,7 +158,7 @@ declare global {
       // TODO: put 'field' into all these names?
       pgResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgColumn?: PgCodecAttribute<any>;
+      pgAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -399,29 +399,29 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             ...inheritedConstraints.flatMap((list) => list),
             ...directConstraints,
           ];
-          const uniqueColumnOnlyConstraints = constraints.filter(
+          const uniqueAttributeOnlyConstraints = constraints.filter(
             (c) =>
               ["u", "p"].includes(c.contype) && c.conkey?.every((k) => k > 0),
           );
-          const idx = uniqueColumnOnlyConstraints.findIndex(
+          const idx = uniqueAttributeOnlyConstraints.findIndex(
             (c) => c.contype === "p",
           );
 
           if (idx > 0) {
             // Primary key was found, but wasn't in initial position; let's
             // move it to the front
-            uniqueColumnOnlyConstraints.unshift(
-              ...uniqueColumnOnlyConstraints.splice(idx, 1),
+            uniqueAttributeOnlyConstraints.unshift(
+              ...uniqueAttributeOnlyConstraints.splice(idx, 1),
             );
           }
 
           const uniques = await Promise.all(
-            uniqueColumnOnlyConstraints.map(async (pgConstraint) => {
+            uniqueAttributeOnlyConstraints.map(async (pgConstraint) => {
               const { tags, description } =
                 pgConstraint.getTagsAndDescription();
               const unique: PgResourceUnique = {
                 isPrimary: pgConstraint.contype === "p",
-                columns: pgConstraint.conkey!.map(
+                attributes: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
                 ),
                 extensions: {
@@ -597,8 +597,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
-            if (!codec.columns) {
-              // Only apply to codecs that define columns
+            if (!codec.attributes) {
+              // Only apply to codecs that define attributes
               return;
             }
             if (codec.polymorphism) {

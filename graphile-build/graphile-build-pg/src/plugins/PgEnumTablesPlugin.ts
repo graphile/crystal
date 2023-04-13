@@ -19,7 +19,7 @@ declare global {
         getIntrospectionData(
           serviceName: string,
           pgClass: PgClass,
-          columns: PgAttribute[],
+          attributes: PgAttribute[],
         ): Promise<readonly Record<string, string>[]>;
         processIntrospection(event: {
           serviceName: string;
@@ -49,7 +49,7 @@ interface State {
 }
 interface Cache {}
 
-// TODO: Assert the columns are text
+// TODO: Assert the attributes are text
 /*
 const VARCHAR_ID = "1043";
 const TEXT_ID = "25";
@@ -97,11 +97,11 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
       codecByPgAttribute: new Map(),
     }),
     helpers: {
-      async getIntrospectionData(info, serviceName, pgClass, columns) {
+      async getIntrospectionData(info, serviceName, pgClass, attributes) {
         // Load data from the table/view.
         const query = sql.compile(
           sql.fragment`select ${sql.join(
-            columns.map((col) => sql.identifier(col.attname)),
+            attributes.map((col) => sql.identifier(col.attname)),
             ", ",
           )} from ${sql.identifier(
             pgClass.getNamespace()!.nspname,
@@ -174,45 +174,47 @@ Original error: ${e.message}
               isEnumConstraint(pgClass, pgConstraint, isEnumTable),
           );
 
-          // Get all the columns
-          const enumTableColumns = pgClass.getAttributes();
+          // Get all the attributes
+          const enumTableAttributes = pgClass.getAttributes();
 
-          // Just the columns with enum behaviors
-          const enumColumnNumbers = enumConstraints.map(
+          // Just the attributes with enum behaviors
+          const enumAttributeNumbers = enumConstraints.map(
             (con) => con.conkey![0],
           );
-          const enumColumns = enumTableColumns.filter((pgAttribute) =>
-            enumColumnNumbers.includes(pgAttribute.attnum),
+          const enumAttributes = enumTableAttributes.filter((pgAttribute) =>
+            enumAttributeNumbers.includes(pgAttribute.attnum),
           );
 
-          // Get description column - first column with `@enumDescription` tag, or failing that the column called "description"
-          const descriptionColumn =
-            enumTableColumns.find((attr) => attr.getTags().enumDescription) ||
-            enumTableColumns.find((attr) => attr.attname === "description");
+          // Get description attribute - first attribute with `@enumDescription` tag, or failing that the attribute called "description"
+          const descriptionAttribute =
+            enumTableAttributes.find(
+              (attr) => attr.getTags().enumDescription,
+            ) ||
+            enumTableAttributes.find((attr) => attr.attname === "description");
 
           if (isEnumTable || enumConstraints.length > 0) {
-            // Get the list of columns enums are defined for
-            const columns = [
+            // Get the list of attributes enums are defined for
+            const attributes = [
               ...new Set([
-                ...enumColumns,
-                ...(descriptionColumn ? [descriptionColumn] : []),
+                ...enumAttributes,
+                ...(descriptionAttribute ? [descriptionAttribute] : []),
               ]),
             ].sort((a, z) => a.attnum - z.attnum);
             const allData =
               await info.helpers.pgEnumTables.getIntrospectionData(
                 serviceName,
                 pgClass,
-                columns,
+                attributes,
               );
 
             for (const pgConstraint of enumConstraints) {
-              const pgAttribute = enumTableColumns.find(
+              const pgAttribute = enumTableAttributes.find(
                 (pgAttribute) => pgAttribute.attnum === pgConstraint.conkey![0],
               );
               if (!pgAttribute) {
                 // Should never happen
                 throw new Error(
-                  "GraphileInternalError<89c93c93-7e94-406c-a822-736e2ff1e466>: could not find column for enum constraint",
+                  "GraphileInternalError<89c93c93-7e94-406c-a822-736e2ff1e466>: could not find attribute for enum constraint",
                 );
               }
               const data = allData.filter(
@@ -239,8 +241,8 @@ Original error: ${e.message}
               const values: Array<PgEnumValue> = data.map(
                 (r): PgEnumValue => ({
                   value: r[pgAttribute.attname],
-                  description: descriptionColumn
-                    ? r[descriptionColumn.attname]
+                  description: descriptionAttribute
+                    ? r[descriptionAttribute.attname]
                     : undefined,
                 }),
               );
@@ -291,11 +293,11 @@ Original error: ${e.message}
       async pgIntrospection_introspection(info, event) {
         await info.helpers.pgEnumTables.processIntrospection(event);
       },
-      pgCodecs_column(info, event) {
-        const { column, pgAttribute } = event;
+      pgCodecs_attribute(info, event) {
+        const { attribute, pgAttribute } = event;
         const replacementCodec = info.state.codecByPgAttribute.get(pgAttribute);
         if (replacementCodec) {
-          column.codec = replacementCodec;
+          attribute.codec = replacementCodec;
         }
       },
     },
@@ -317,14 +319,14 @@ function isEnumConstraint(
       const isPrimaryKeyOfEnumTableConstraint =
         pgConstraint.contype === "p" && isEnumTable;
       if (isExplicitEnumConstraint || isPrimaryKeyOfEnumTableConstraint) {
-        const hasExactlyOneColumn = pgConstraint.conkey!.length === 1;
-        if (!hasExactlyOneColumn) {
+        const hasExactlyOneAttribute = pgConstraint.conkey!.length === 1;
+        if (!hasExactlyOneAttribute) {
           throw new Error(
             `Enum table "${pgClass.getNamespace()!.nspname}"."${
               pgClass.relname
             }" enum constraint '${
               pgConstraint.conname
-            }' is composite; it should have exactly one column (found: ${
+            }' is composite; it should have exactly one attribute (found: ${
               pgConstraint.conkey!.length
             })`,
           );

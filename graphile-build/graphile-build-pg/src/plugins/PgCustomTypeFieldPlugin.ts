@@ -132,15 +132,15 @@ declare global {
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      computedColumnField(
+      computedAttributeField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      computedColumnConnectionField(
+      computedAttributeConnectionField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
-      computedColumnListField(
+      computedAttributeListField(
         this: Inflection,
         details: InflectionCustomFieldProcedureDetails,
       ): string;
@@ -178,7 +178,7 @@ function shouldUseCustomConnection(
   const { codec } = pgResource;
   // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
   const setOrArray = !pgResource.isUnique || !!codec.arrayOfCodec;
-  const scalarOrAnonymous = !codec.columns || !!codec.isAnonymous;
+  const scalarOrAnonymous = !codec.attributes || !!codec.isAnonymous;
   return setOrArray && scalarOrAnonymous;
 }
 
@@ -194,8 +194,8 @@ function defaultProcSourceBehavior(
   if (
     !s.isMutation &&
     s.parameters &&
-    // Don't default to this being a queryField if it looks like a computed column function
-    (!firstParameter?.codec?.columns ||
+    // Don't default to this being a queryField if it looks like a computed attribute function
+    (!firstParameter?.codec?.attributes ||
       firstParameter?.codec?.extensions?.isTableLike === false)
   ) {
     behavior.push("queryField");
@@ -209,7 +209,7 @@ function defaultProcSourceBehavior(
     behavior.push("-mutationField");
   }
 
-  if (s.parameters && s.parameters?.[0]?.codec?.columns && !s.isMutation) {
+  if (s.parameters && s.parameters?.[0]?.codec?.attributes && !s.isMutation) {
     behavior.push("typeField");
   } else {
     behavior.push("-typeField");
@@ -279,7 +279,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
       customQueryListField(options, details) {
         return this.listField(this.camelCase(this.customQueryField(details)));
       },
-      computedColumnField(options, details) {
+      computedAttributeField(options, details) {
         const explicitName = details.resource.extensions?.tags?.fieldName;
         if (typeof explicitName === "string") {
           return explicitName;
@@ -294,11 +294,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           return this.camelCase(name);
         }
       },
-      computedColumnConnectionField(options, details) {
-        return this.connectionField(this.computedColumnField(details));
+      computedAttributeConnectionField(options, details) {
+        return this.connectionField(this.computedAttributeField(details));
       },
-      computedColumnListField(options, details) {
-        return this.listField(this.computedColumnField(details));
+      computedAttributeListField(options, details) {
+        return this.listField(this.computedAttributeField(details));
       },
       argument(options, details) {
         return this.coerceToGraphQLName(
@@ -549,17 +549,17 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   readonly PgResourceParameter[],
                   any
                 >;
-                const connectionTypeName = resource.codec.columns
+                const connectionTypeName = resource.codec.attributes
                   ? inflection.recordFunctionConnectionType({
                       resource,
                     })
                   : inflection.scalarFunctionConnectionType({
                       resource,
                     });
-                const edgeTypeName = resource.codec.columns
+                const edgeTypeName = resource.codec.attributes
                   ? inflection.recordFunctionEdgeType({ resource })
                   : inflection.scalarFunctionEdgeType({ resource });
-                const typeName = resource.codec.columns
+                const typeName = resource.codec.attributes
                   ? inflection.tableType(resource.codec)
                   : build.getGraphQLTypeNameByPgCodec(resource.codec, "output");
                 if (typeName) {
@@ -572,7 +572,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       pgCodec: resource.codec,
                     },
                     // When dealing with scalars, nulls are allowed in setof
-                    nonNullNode: resource.codec.columns
+                    nonNullNode: resource.codec.attributes
                       ? options.pgForbidSetofFunctionsToReturnNull
                       : false,
                   });
@@ -789,7 +789,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   defaultProcSourceBehavior(someSource, options),
                 );
               if (isComputedSource) {
-                // TODO: should we allow other forms of computed columns here,
+                // TODO: should we allow other forms of computed attributes here,
                 // e.g. accepting the row id rather than the row itself.
                 const pgCodec = someSource.parameters?.[0]?.codec;
                 if (pgCodec) {
@@ -842,7 +842,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         return procSources.reduce(
           (memo, resource) =>
             build.recoverable(memo, () => {
-              // "Computed columns" skip a parameter
+              // "Computed attributes" skip a parameter
               const remainingParameters = (
                 isRootMutation || isRootQuery
                   ? resource.parameters
@@ -921,10 +921,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         ];
                         if (
                           resource.isUnique &&
-                          !resource.codec.columns &&
+                          !resource.codec.attributes &&
                           typeof resource.from === "function"
                         ) {
-                          // This is a scalar computed column, let's inline the expression
+                          // This is a scalar computed attribute, let's inline the expression
                           const placeholders = selectArgs.map((arg, i) => {
                             if (i === 0) {
                               return $row.getClassStep().alias;
@@ -1015,7 +1015,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                 const fieldName = isRootQuery
                   ? inflection.customQueryField({ resource })
-                  : inflection.computedColumnField({ resource });
+                  : inflection.computedAttributeField({ resource });
                 memo[fieldName] = fieldWithHooks(
                   {
                     fieldName,
@@ -1076,20 +1076,20 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     ? inflection.customQueryConnectionField({
                         resource,
                       })
-                    : inflection.computedColumnConnectionField({
+                    : inflection.computedAttributeConnectionField({
                         resource,
                       });
 
                   const namedType = build.graphql.getNamedType(type!);
                   const connectionTypeName = shouldUseCustomConnection(resource)
-                    ? resource.codec.columns
+                    ? resource.codec.attributes
                       ? inflection.recordFunctionConnectionType({
                           resource,
                         })
                       : inflection.scalarFunctionConnectionType({
                           resource,
                         })
-                    : resource.codec.columns
+                    : resource.codec.attributes
                     ? inflection.tableConnectionType(resource.codec)
                     : namedType
                     ? inflection.connectionType(namedType.name)
@@ -1170,8 +1170,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       ? inflection.customQueryField({ resource })
                       : inflection.customQueryListField({ resource })
                     : resource.isList
-                    ? inflection.computedColumnField({ resource })
-                    : inflection.computedColumnListField({
+                    ? inflection.computedAttributeField({ resource })
+                    : inflection.computedAttributeListField({
                         resource,
                       });
                   memo = build.recoverable(memo, () =>

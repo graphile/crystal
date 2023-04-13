@@ -1,7 +1,7 @@
 import * as core from "./core.js";
 
 test(
-  "simple collection for computed column",
+  "simple collection for computed attribute",
   core.test(
     __filename,
     "simple_collections",

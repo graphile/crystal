@@ -85,14 +85,14 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
         if (!jwtCodec) {
           return _;
         }
-        if (!jwtCodec.columns) {
+        if (!jwtCodec.attributes) {
           throw new Error(
             `JWT codec '${jwtCodec.name}' found, but it does not appear to have any attributes. Please check your configuration, the JWT type should be a composite type.`,
           );
         }
 
         const jwtTypeName = build.inflection.tableType(jwtCodec);
-        const columnNames = Object.keys(jwtCodec.columns);
+        const attributeNames = Object.keys(jwtCodec.attributes);
 
         build.registerScalarType(
           jwtTypeName,
@@ -106,15 +106,15 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
               "type",
             ),
             serialize: EXPORTABLE(
-              (columnNames, pgJwtSecret, pgJwtSignOptions, signJwt) =>
+              (attributeNames, pgJwtSecret, pgJwtSignOptions, signJwt) =>
                 function serialize(value: any) {
-                  const token = columnNames.reduce((memo, columnName) => {
-                    if (columnName === "exp") {
-                      memo[columnName] = value[columnName]
-                        ? parseFloat(value[columnName])
+                  const token = attributeNames.reduce((memo, attributeName) => {
+                    if (attributeName === "exp") {
+                      memo[attributeName] = value[attributeName]
+                        ? parseFloat(value[attributeName])
                         : undefined;
                     } else {
-                      memo[columnName] = value[columnName];
+                      memo[attributeName] = value[attributeName];
                     }
                     return memo;
                   }, {} as any);
@@ -140,7 +140,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                   );
                   return signJwt(token, pgJwtSecret, options);
                 },
-              [columnNames, pgJwtSecret, pgJwtSignOptions, signJwt],
+              [attributeNames, pgJwtSecret, pgJwtSignOptions, signJwt],
             ),
             extensions: {
               grafast: {

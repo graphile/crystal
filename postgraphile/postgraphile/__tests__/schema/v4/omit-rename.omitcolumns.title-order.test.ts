@@ -1,7 +1,7 @@
 import * as core from "./core.js";
 
 test(
-  "omit order on column",
+  "omit order on attribute",
   core.test(
     __filename,
     ["d"],

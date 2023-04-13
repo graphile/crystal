@@ -52,7 +52,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
       init(_, build) {
         const { inflection, pgCodecMetaLookup } = build;
         pgCodecMetaLookup.forEach((meta, codec) => {
-          if (!codec.columns || codec.isAnonymous) return;
+          if (!codec.attributes || codec.isAnonymous) return;
           const behavior = getBehavior(codec.extensions);
           // TODO: should this be `type:order` or similar?
           if (!build.behavior.matches(behavior, "order", "order")) {
@@ -119,12 +119,12 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
 
         const codec = pgFieldCodec ?? pgResource?.codec;
         const isSuitableSource =
-          pgResource && pgResource.codec.columns && !pgResource.isUnique;
+          pgResource && pgResource.codec.attributes && !pgResource.isUnique;
         const isSuitableCodec =
           codec &&
           (isSuitableSource ||
             (!pgResource && codec?.polymorphism?.mode === "union")) &&
-          codec.columns;
+          codec.attributes;
 
         if (!isSuitableCodec) {
           return args;

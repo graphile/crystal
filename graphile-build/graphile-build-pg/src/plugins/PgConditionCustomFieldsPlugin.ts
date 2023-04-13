@@ -37,7 +37,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         if (
           !isPgCondition ||
           !pgCodec ||
-          !pgCodec.columns ||
+          !pgCodec.attributes ||
           pgCodec.isAnonymous
         ) {
           return fields;
@@ -46,7 +46,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (resource.codec.columns) return false;
+          if (resource.codec.attributes) return false;
           if (resource.codec.arrayOfCodec) return false;
           if (resource.codec.rangeOfCodec) return false;
           const parameters: readonly PgResourceParameter[] | undefined =
@@ -76,7 +76,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
               readonly PgResourceParameter[],
               any
             >;
-            const fieldName = inflection.computedColumnField({
+            const fieldName = inflection.computedAttributeField({
               resource: pgFieldSource,
             });
             const type = build.getGraphQLTypeByPgCodec(
@@ -107,7 +107,9 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                           val,
                         ) {
                           if (typeof pgFieldSource.from !== "function") {
-                            throw new Error("Invalid computed column 'from'");
+                            throw new Error(
+                              "Invalid computed attribute 'from'",
+                            );
                           }
                           const expression = sql`${pgFieldSource.from({
                             placeholder: $condition.alias,
@@ -128,11 +130,11 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                   },
                 ),
               },
-              `Adding computed column condition argument for ${pgCodec.name}`,
+              `Adding computed attribute condition argument for ${pgCodec.name}`,
             );
             return memo;
           }, Object.create(null)),
-          `Adding computed column filterable functions to condition for '${pgCodec.name}'`,
+          `Adding computed attribute filterable functions to condition for '${pgCodec.name}'`,
         );
       },
     },

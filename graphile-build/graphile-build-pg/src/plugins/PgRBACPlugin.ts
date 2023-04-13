@@ -23,8 +23,8 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
     namespace: "pgRBAC",
     helpers: {},
     hooks: {
-      async pgCodecs_column(info, event) {
-        const { pgAttribute, serviceName, column } = event;
+      async pgCodecs_attribute(info, event) {
+        const { pgAttribute, serviceName, attribute } = event;
         const pgClass = pgAttribute.getClass();
         if (!pgClass || !["r", "v", "m", "f", "p"].includes(pgClass.relkind)) {
           return;
@@ -37,7 +37,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           // https://youtu.be/3kx7tgkJbjo?t=11
           throw new Error("WHO AM I?");
         }
-        const columnPermissions = resolvePermissions(
+        const attributePermissions = resolvePermissions(
           introspection,
           pgAttribute.getACL(),
           introspectionRole,
@@ -49,14 +49,17 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           introspectionRole,
           true,
         );
-        const canSelect = columnPermissions.select || tablePermissions.select;
-        const canInsert = columnPermissions.insert || tablePermissions.insert;
-        const canUpdate = columnPermissions.update || tablePermissions.update;
+        const canSelect =
+          attributePermissions.select || tablePermissions.select;
+        const canInsert =
+          attributePermissions.insert || tablePermissions.insert;
+        const canUpdate =
+          attributePermissions.update || tablePermissions.update;
         const parts: string[] = [];
         if (!canSelect) {
-          // Only remove `select` privileges if at least one sibling column has
+          // Only remove `select` privileges if at least one sibling attribute has
           // a grant - otherwise assume that this is behind a function or
-          // similar and all columns are allowed you just can't select
+          // similar and all attributes are allowed you just can't select
           // directly.
           const hasSiblingWithSelect = pgClass
             .getAttributes()
@@ -87,10 +90,10 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           console.log(`Site tags: ${parts}`);
         }
         if (parts.length > 0) {
-          column.extensions = column.extensions || Object.create(null);
-          column.extensions!.tags =
-            column.extensions!.tags || Object.create(null);
-          addBehaviorToTags(column.extensions!.tags!, parts.join(" "));
+          attribute.extensions = attribute.extensions || Object.create(null);
+          attribute.extensions!.tags =
+            attribute.extensions!.tags || Object.create(null);
+          addBehaviorToTags(attribute.extensions!.tags!, parts.join(" "));
         }
       },
       async pgProcedures_PgResourceOptions(info, event) {
