@@ -16,8 +16,8 @@ import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import { PgUnionAllSingleStep } from "./pgUnionAll.js";
 import { PgUpdateStep } from "./pgUpdate.js";
 
-// const debugPlan = debugFactory("datasource:pg:PgClassExpressionStep:plan");
-// const debugExecute = debugFactory( "datasource:pg:PgClassExpressionStep:execute",);
+// const debugPlan = debugFactory("@dataplan/pg:PgClassExpressionStep:plan");
+// const debugExecute = debugFactory( "@dataplan/pg:PgClassExpressionStep:execute",);
 // const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 

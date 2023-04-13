@@ -31,8 +31,8 @@ import type { PgSelectMode } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
-// const debugPlan = debugFactory("datasource:pg:PgSelectSingleStep:plan");
-// const debugExecute = debugFactory("datasource:pg:PgSelectSingleStep:execute");
+// const debugPlan = debugFactory("@dataplan/pg:PgSelectSingleStep:plan");
+// const debugExecute = debugFactory("@dataplan/pg:PgSelectSingleStep:execute");
 // const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 

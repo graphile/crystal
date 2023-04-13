@@ -124,8 +124,8 @@ function isStaticInputStep(
   );
 }
 
-const debugPlan = debugFactory("datasource:pg:PgSelectStep:plan");
-// const debugExecute = debugFactory("datasource:pg:PgSelectStep:execute");
+const debugPlan = debugFactory("@dataplan/pg:PgSelectStep:plan");
+// const debugExecute = debugFactory("@dataplan/pg:PgSelectStep:execute");
 const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
