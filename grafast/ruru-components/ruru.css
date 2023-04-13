@@ -70,3 +70,9 @@
 .errorPopupError {
   padding: 10px;
 }
+
+.explain-plan,
+.explain-sql {
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+}

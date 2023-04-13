@@ -63,14 +63,7 @@ export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
     }
     return elements;
   }, [sql, highlitIndex]);
-  return (
-    <pre
-      className="explain-sql"
-      style={{ fontSize: "0.75rem", whiteSpace: "pre-wrap" }}
-    >
-      {formattedSQL}
-    </pre>
-  );
+  return <pre className="explain-sql">{formattedSQL}</pre>;
 };
 
 const COLORS = [
