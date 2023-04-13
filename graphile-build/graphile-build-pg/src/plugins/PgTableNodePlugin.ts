@@ -91,7 +91,9 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
           const clean =
             isSafeObjectPropertyName(identifier) &&
-            pk.every((attributeName) => isSafeObjectPropertyName(attributeName));
+            pk.every((attributeName) =>
+              isSafeObjectPropertyName(attributeName),
+            );
 
           const firstSource = resources.find((s) => !s.parameters);
 
@@ -109,7 +111,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 return function (list, constant) {
   return $record => list([constant(${te.lit(identifier)}), ${te.join(
                     pk.map(
-                      (attributeName) => te`$record.get(${te.lit(attributeName)})`,
+                      (attributeName) =>
+                        te`$record.get(${te.lit(attributeName)})`,
                     ),
                     ", ",
                   )}]);

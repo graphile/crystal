@@ -550,14 +550,24 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         const updatableResources = allResources.filter(
           (
             resource,
-          ): resource is PgResource<any, PgCodecWithAttributes, any, any, any> =>
-            isUpdatable(build, resource),
+          ): resource is PgResource<
+            any,
+            PgCodecWithAttributes,
+            any,
+            any,
+            any
+          > => isUpdatable(build, resource),
         );
         const deletableResources = allResources.filter(
           (
             resource,
-          ): resource is PgResource<any, PgCodecWithAttributes, any, any, any> =>
-            isDeletable(build, resource),
+          ): resource is PgResource<
+            any,
+            PgCodecWithAttributes,
+            any,
+            any,
+            any
+          > => isDeletable(build, resource),
         );
 
         updatableResources.forEach((resource) => {
@@ -728,7 +738,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         (uniqueAttributes) => (args: FieldArgs) => {
                           return uniqueAttributes.reduce(
                             (memo, [attributeName, fieldName]) => {
-                              memo[attributeName] = args.get(["input", fieldName]);
+                              memo[attributeName] = args.get([
+                                "input",
+                                fieldName,
+                              ]);
                               return memo;
                             },
                             Object.create(null),

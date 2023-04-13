@@ -286,8 +286,13 @@ async function processFk(
       `Invalid @foreignKey syntax on '${identity()}'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${spec}'`,
     );
   }
-  const [, rawAttributes, rawSchemaOrTable, rawTableOnly, rawForeignAttributes] =
-    matches;
+  const [
+    ,
+    rawAttributes,
+    rawSchemaOrTable,
+    rawTableOnly,
+    rawForeignAttributes,
+  ] = matches;
   const rawSchema = rawTableOnly
     ? rawSchemaOrTable
     : `"${pgClass.getNamespace()!.nspname}"`;

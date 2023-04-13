@@ -389,7 +389,10 @@ export type PlanByUniques<
   TAttributes extends PgCodecAttributes,
   TUniqueAttributes extends ReadonlyArray<PgResourceUnique<TAttributes>>,
 > = TAttributes extends PgCodecAttributes
-  ? TuplePlanMap<TAttributes, TUniqueAttributes[number]["attributes"] & string[]>[number]
+  ? TuplePlanMap<
+      TAttributes,
+      TUniqueAttributes[number]["attributes"] & string[]
+    >[number]
   : undefined;
 
 export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {

@@ -2671,7 +2671,9 @@ ${lateralText};`;
                 type: "left",
                 from: this.fromExpression(),
                 alias: this.alias,
-                attributeNames: this.resource.codec.attributes ? sql.blank : sql`(v)`,
+                attributeNames: this.resource.codec.attributes
+                  ? sql.blank
+                  : sql`(v)`,
                 conditions,
                 lateral: this.joinAsLateral,
               },

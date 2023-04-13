@@ -50,7 +50,8 @@ export class PgInsertStep<
   >
   implements
     SetterCapableStep<{
-      [key in keyof GetPgResourceAttributes<TResource> & string]: ExecutableStep;
+      [key in keyof GetPgResourceAttributes<TResource> &
+        string]: ExecutableStep;
     }>
 {
   static $$export = {
@@ -117,7 +118,9 @@ export class PgInsertStep<
     resource: TResource,
     attributes?: {
       [key in keyof GetPgResourceAttributes<TResource>]?:
-        | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]["codec"]>
+        | PgTypedExecutableStep<
+            GetPgResourceAttributes<TResource>[key]["codec"]
+          >
         | ExecutableStep;
     },
   ) {
@@ -168,7 +171,8 @@ export class PgInsertStep<
 
   setPlan(): SetterStep<
     {
-      [key in keyof GetPgResourceAttributes<TResource> & string]: ExecutableStep;
+      [key in keyof GetPgResourceAttributes<TResource> &
+        string]: ExecutableStep;
     },
     this
   > {

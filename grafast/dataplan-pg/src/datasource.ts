@@ -638,10 +638,14 @@ export class PgResource<
         if (relation.remoteResource.codec !== otherCodec) {
           return false;
         }
-        if (!arraysMatch(relation.localAttributes, otherRelation.remoteAttributes)) {
+        if (
+          !arraysMatch(relation.localAttributes, otherRelation.remoteAttributes)
+        ) {
           return false;
         }
-        if (!arraysMatch(relation.remoteAttributes, otherRelation.localAttributes)) {
+        if (
+          !arraysMatch(relation.remoteAttributes, otherRelation.localAttributes)
+        ) {
           return false;
         }
         return true;
@@ -845,7 +849,9 @@ export class PgResource<
           )?.[0]
         : null ?? pk?.attributes[0];
       if (nonNullableAttribute) {
-        const firstAttribute = sql`${alias}.${sql.identifier(nonNullableAttribute)}`;
+        const firstAttribute = sql`${alias}.${sql.identifier(
+          nonNullableAttribute,
+        )}`;
         return sql`(not (${firstAttribute} is null))::text`;
       } else {
         // Fallback

@@ -187,7 +187,9 @@ Original error: ${e.message}
 
           // Get description attribute - first attribute with `@enumDescription` tag, or failing that the attribute called "description"
           const descriptionAttribute =
-            enumTableAttributes.find((attr) => attr.getTags().enumDescription) ||
+            enumTableAttributes.find(
+              (attr) => attr.getTags().enumDescription,
+            ) ||
             enumTableAttributes.find((attr) => attr.attname === "description");
 
           if (isEnumTable || enumConstraints.length > 0) {

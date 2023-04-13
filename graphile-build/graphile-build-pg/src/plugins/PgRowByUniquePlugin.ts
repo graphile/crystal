@@ -159,7 +159,8 @@ return function (resource) {
                             const spec = Object.create(null);
                             for (const attributeName in detailsByAttributeName) {
                               spec[attributeName] = args.get(
-                                detailsByAttributeName[attributeName].graphqlName,
+                                detailsByAttributeName[attributeName]
+                                  .graphqlName,
                               );
                             }
                             return resource.get(spec);
@@ -198,7 +199,8 @@ return function (resource) {
                           ),
                           type,
                           args: uniqueKeys.reduce((args, attributeName) => {
-                            const details = detailsByAttributeName[attributeName];
+                            const details =
+                              detailsByAttributeName[attributeName];
                             const attributeType = build.getGraphQLTypeByPgCodec(
                               details.codec,
                               "input",

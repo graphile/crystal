@@ -12,7 +12,10 @@ test.each([
   ["TOPIC name:SingleTableTopic attributes:title>subject!", EXPECTED_VALUE_1],
   ["TOPIC name:SingleTableTopic attributes:title>subject!", EXPECTED_VALUE_1],
   [" TOPIC name:SingleTableTopic attributes:title>subject!", EXPECTED_VALUE_1],
-  [" TOPIC name: SingleTableTopic attributes: title>subject!", EXPECTED_VALUE_1],
+  [
+    " TOPIC name: SingleTableTopic attributes: title>subject!",
+    EXPECTED_VALUE_1,
+  ],
   [
     ' TOPIC name: "SingleTableTopic" attributes: "title>subject!"',
     EXPECTED_VALUE_1,

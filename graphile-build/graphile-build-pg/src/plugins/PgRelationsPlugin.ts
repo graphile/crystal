@@ -187,7 +187,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const remoteType = this.tableType(relation.remoteResource.codec);
         const localAttributes = relation.localAttributes as string[];
         return this.camelCase(
-          `${remoteType}-by-${this._joinAttributeNames(codec, localAttributes)}`,
+          `${remoteType}-by-${this._joinAttributeNames(
+            codec,
+            localAttributes,
+          )}`,
         );
       },
       singleRelationBackwards(options, details) {
@@ -959,7 +962,8 @@ function addRelations(
             let isStillSingular = true;
             for (let i = 0, l = path.layers.length; i < l; i++) {
               const layer = path.layers[i];
-              const { localAttributes, remoteAttributes, resource, isUnique } = layer;
+              const { localAttributes, remoteAttributes, resource, isUnique } =
+                layer;
               const clean =
                 localAttributes.every(isSafeObjectPropertyName) &&
                 remoteAttributes.every(isSafeObjectPropertyName);

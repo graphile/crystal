@@ -66,7 +66,9 @@ declare global {
   }
 }
 
-function parseAttribute(colSpec: string): PgCodecPolymorphismSingleTypeAttributeSpec {
+function parseAttribute(
+  colSpec: string,
+): PgCodecPolymorphismSingleTypeAttributeSpec {
   let spec = colSpec;
   let isNotNull = false;
   if (spec.endsWith("!")) {
@@ -365,7 +367,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 resource.codec.attributes,
               )) {
                 if (otherCodec.attributes[colName]) {
-                  otherCodec.attributes[colName].identicalVia = sharedRelationName;
+                  otherCodec.attributes[colName].identicalVia =
+                    sharedRelationName;
                 } else {
                   otherCodec.attributes[colName] = {
                     codec: colSpec.codec,
@@ -662,8 +665,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         pgPolymorphicSingleTableType: {
                           typeIdentifier,
                           name: spec.name,
-                          attributes: (spec as PgCodecPolymorphismSingleTypeSpec)
-                            .attributes,
+                          attributes: (
+                            spec as PgCodecPolymorphismSingleTypeSpec
+                          ).attributes,
                         },
                       },
                       // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep

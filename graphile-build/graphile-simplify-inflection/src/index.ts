@@ -187,7 +187,9 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           return this.getBaseName(attributeName);
         }
         if (preset.schema?.pgSimplifyMultikeyRelations) {
-          const attributeNames = detailedKeys.map((key) => this._attributeName(key));
+          const attributeNames = detailedKeys.map((key) =>
+            this._attributeName(key),
+          );
           const baseNames = attributeNames.map((attributeName) =>
             this.getBaseName(attributeName),
           );

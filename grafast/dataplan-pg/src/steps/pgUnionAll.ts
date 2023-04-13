@@ -675,7 +675,9 @@ on (${sql.indent(
                 (localAttribute, i) =>
                   sql`${nextAlias}.${sql.identifier(
                     String(relation.remoteAttributes[i]),
-                  )} = ${currentAlias}.${sql.identifier(String(localAttribute))}`,
+                  )} = ${currentAlias}.${sql.identifier(
+                    String(localAttribute),
+                  )}`,
               ),
               "\nand ",
             ),

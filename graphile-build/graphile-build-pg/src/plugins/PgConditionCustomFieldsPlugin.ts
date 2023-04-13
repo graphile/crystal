@@ -107,7 +107,9 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                           val,
                         ) {
                           if (typeof pgFieldSource.from !== "function") {
-                            throw new Error("Invalid computed attribute 'from'");
+                            throw new Error(
+                              "Invalid computed attribute 'from'",
+                            );
                           }
                           const expression = sql`${pgFieldSource.from({
                             placeholder: $condition.alias,

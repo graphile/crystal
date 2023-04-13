@@ -348,18 +348,19 @@ function makeRecordToSQLRawValue<TAttributes extends PgCodecAttributes>(
   };
 }
 
-export type ObjectFromPgCodecAttributes<TAttributes extends PgCodecAttributes> = {
-  [attributeName in keyof TAttributes]: TAttributes[attributeName] extends PgCodecAttribute<
-    infer UCodec,
-    infer UNonNull
-  >
-    ? UCodec extends PgCodec<any, any, any, infer UFromJs, any, any, any>
-      ? UNonNull extends true
-        ? Exclude<UFromJs, null | undefined>
-        : UFromJs | null
-      : never
-    : never;
-};
+export type ObjectFromPgCodecAttributes<TAttributes extends PgCodecAttributes> =
+  {
+    [attributeName in keyof TAttributes]: TAttributes[attributeName] extends PgCodecAttribute<
+      infer UCodec,
+      infer UNonNull
+    >
+      ? UCodec extends PgCodec<any, any, any, infer UFromJs, any, any, any>
+        ? UNonNull extends true
+          ? Exclude<UFromJs, null | undefined>
+          : UFromJs | null
+        : never
+      : never;
+  };
 
 /**
  * Takes a list of attributes and returns a mapping function that takes a

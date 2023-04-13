@@ -37,7 +37,10 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
             ).join(", ")})`,
           );
         }
-        if (attribute.extensions?.argIndex != null && !attribute.extensions.argName) {
+        if (
+          attribute.extensions?.argIndex != null &&
+          !attribute.extensions.argName
+        ) {
           return `arg${attribute.extensions.argIndex + 1}`;
         }
         return previous!.call(this, details);

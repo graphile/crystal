@@ -49,9 +49,12 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           introspectionRole,
           true,
         );
-        const canSelect = attributePermissions.select || tablePermissions.select;
-        const canInsert = attributePermissions.insert || tablePermissions.insert;
-        const canUpdate = attributePermissions.update || tablePermissions.update;
+        const canSelect =
+          attributePermissions.select || tablePermissions.select;
+        const canInsert =
+          attributePermissions.insert || tablePermissions.insert;
+        const canUpdate =
+          attributePermissions.update || tablePermissions.update;
         const parts: string[] = [];
         if (!canSelect) {
           // Only remove `select` privileges if at least one sibling attribute has

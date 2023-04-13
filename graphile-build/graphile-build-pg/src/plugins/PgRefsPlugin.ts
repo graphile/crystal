@@ -297,7 +297,9 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                     return false;
                   }
                   if (maybeTargetAttributes) {
-                    if (!arraysMatch(rel.remoteAttributes, maybeTargetAttributes)) {
+                    if (
+                      !arraysMatch(rel.remoteAttributes, maybeTargetAttributes)
+                    ) {
                       return false;
                     }
                   }

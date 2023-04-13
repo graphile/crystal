@@ -198,7 +198,10 @@ export class PgUpdateStep<
   }
 
   setPlan(): SetterStep<
-    { [key in keyof GetPgResourceAttributes<TResource> & string]: ExecutableStep },
+    {
+      [key in keyof GetPgResourceAttributes<TResource> &
+        string]: ExecutableStep;
+    },
     this
   > {
     if (this.locked) {

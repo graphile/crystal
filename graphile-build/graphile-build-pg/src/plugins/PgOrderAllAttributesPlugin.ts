@@ -69,177 +69,184 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
         const uniques = sources.flatMap((s) => s.uniques as PgResourceUnique[]);
         return extend(
           values,
-          Object.entries(attributes).reduce((memo, [attributeName, attribute]) => {
-            const behavior = getBehavior([
-              pgCodec.extensions,
-              attribute.extensions,
-            ]);
-            // Enable ordering, but don't order by array or range types
-            const defaultBehavior =
-              "orderBy orderBy:* -orderBy:array -orderBy:range";
-            if (
-              !build.behavior.matches(
-                behavior,
-                "attribute:orderBy",
-                defaultBehavior,
-              )
-            ) {
-              return memo;
-            }
-            if (attribute.codec.arrayOfCodec) {
+          Object.entries(attributes).reduce(
+            (memo, [attributeName, attribute]) => {
+              const behavior = getBehavior([
+                pgCodec.extensions,
+                attribute.extensions,
+              ]);
+              // Enable ordering, but don't order by array or range types
+              const defaultBehavior =
+                "orderBy orderBy:* -orderBy:array -orderBy:range";
               if (
                 !build.behavior.matches(
                   behavior,
-                  "attribute:orderBy:array",
+                  "attribute:orderBy",
                   defaultBehavior,
                 )
               ) {
                 return memo;
               }
-            }
-            if (attribute.codec.rangeOfCodec) {
-              if (
-                !build.behavior.matches(
-                  behavior,
-                  "attribute:orderBy:range",
-                  defaultBehavior,
-                )
-              ) {
-                return memo;
+              if (attribute.codec.arrayOfCodec) {
+                if (
+                  !build.behavior.matches(
+                    behavior,
+                    "attribute:orderBy:array",
+                    defaultBehavior,
+                  )
+                ) {
+                  return memo;
+                }
               }
-            }
-            const isUnique = uniques.some(
-              (list) => list.attributes[0] === attributeName,
-            );
+              if (attribute.codec.rangeOfCodec) {
+                if (
+                  !build.behavior.matches(
+                    behavior,
+                    "attribute:orderBy:range",
+                    defaultBehavior,
+                  )
+                ) {
+                  return memo;
+                }
+              }
+              const isUnique = uniques.some(
+                (list) => list.attributes[0] === attributeName,
+              );
 
-            const ascFieldName = inflection.orderByAttributeEnum({
-              attribute,
-              codec: pgCodec,
-              attributeName,
-              variant: "asc",
-            });
-            const descFieldName = inflection.orderByAttributeEnum({
-              attribute,
-              codec: pgCodec,
-              attributeName,
-              variant: "desc",
-            });
-            memo = extend(
-              memo,
-              {
-                [ascFieldName]: {
-                  extensions: {
-                    grafast: {
-                      applyPlan: EXPORTABLE(
-                        (
+              const ascFieldName = inflection.orderByAttributeEnum({
+                attribute,
+                codec: pgCodec,
+                attributeName,
+                variant: "asc",
+              });
+              const descFieldName = inflection.orderByAttributeEnum({
+                attribute,
+                codec: pgCodec,
+                attributeName,
+                variant: "desc",
+              });
+              memo = extend(
+                memo,
+                {
+                  [ascFieldName]: {
+                    extensions: {
+                      grafast: {
+                        applyPlan: EXPORTABLE(
+                          (
+                              PgSelectStep,
+                              PgUnionAllStep,
+                              attributeName,
+                              isUnique,
+                              orderByNullsLast,
+                            ) =>
+                            (plan: ExecutableStep | ModifierStep): void => {
+                              if (
+                                !(plan instanceof PgSelectStep) &&
+                                !(plan instanceof PgUnionAllStep)
+                              ) {
+                                throw new Error(
+                                  "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
+                                );
+                              }
+                              plan.orderBy({
+                                attribute: attributeName,
+                                direction: "ASC",
+                                ...(orderByNullsLast != null
+                                  ? {
+                                      nulls: orderByNullsLast
+                                        ? "LAST"
+                                        : "FIRST",
+                                    }
+                                  : null),
+                              });
+                              if (isUnique) {
+                                plan.setOrderIsUnique();
+                              }
+                            },
+                          [
                             PgSelectStep,
                             PgUnionAllStep,
                             attributeName,
                             isUnique,
                             orderByNullsLast,
-                          ) =>
-                          (plan: ExecutableStep | ModifierStep): void => {
-                            if (
-                              !(plan instanceof PgSelectStep) &&
-                              !(plan instanceof PgUnionAllStep)
-                            ) {
-                              throw new Error(
-                                "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
-                              );
-                            }
-                            plan.orderBy({
-                              attribute: attributeName,
-                              direction: "ASC",
-                              ...(orderByNullsLast != null
-                                ? {
-                                    nulls: orderByNullsLast ? "LAST" : "FIRST",
-                                  }
-                                : null),
-                            });
-                            if (isUnique) {
-                              plan.setOrderIsUnique();
-                            }
-                          },
-                        [
-                          PgSelectStep,
-                          PgUnionAllStep,
-                          attributeName,
-                          isUnique,
-                          orderByNullsLast,
-                        ],
-                      ),
+                          ],
+                        ),
+                      },
                     },
                   },
                 },
-              },
-              `Adding ascending orderBy enum value for ${pgCodec.name}.`,
-              // TODO
-              /* `You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
+                `Adding ascending orderBy enum value for ${pgCodec.name}.`,
+                // TODO
+                /* `You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 attribute,
                 {
                   name: "newNameHere",
                 },
               )}`,*/
-            );
-            memo = extend(
-              memo,
-              {
-                [descFieldName]: {
-                  extensions: {
-                    grafast: {
-                      applyPlan: EXPORTABLE(
-                        (
+              );
+              memo = extend(
+                memo,
+                {
+                  [descFieldName]: {
+                    extensions: {
+                      grafast: {
+                        applyPlan: EXPORTABLE(
+                          (
+                              PgSelectStep,
+                              PgUnionAllStep,
+                              attributeName,
+                              isUnique,
+                              orderByNullsLast,
+                            ) =>
+                            (plan: ExecutableStep | ModifierStep): void => {
+                              if (
+                                !(plan instanceof PgSelectStep) &&
+                                !(plan instanceof PgUnionAllStep)
+                              ) {
+                                throw new Error(
+                                  "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
+                                );
+                              }
+                              plan.orderBy({
+                                attribute: attributeName,
+                                direction: "DESC",
+                                ...(orderByNullsLast != null
+                                  ? {
+                                      nulls: orderByNullsLast
+                                        ? "LAST"
+                                        : "FIRST",
+                                    }
+                                  : null),
+                              });
+                              if (isUnique) {
+                                plan.setOrderIsUnique();
+                              }
+                            },
+                          [
                             PgSelectStep,
                             PgUnionAllStep,
                             attributeName,
                             isUnique,
                             orderByNullsLast,
-                          ) =>
-                          (plan: ExecutableStep | ModifierStep): void => {
-                            if (
-                              !(plan instanceof PgSelectStep) &&
-                              !(plan instanceof PgUnionAllStep)
-                            ) {
-                              throw new Error(
-                                "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
-                              );
-                            }
-                            plan.orderBy({
-                              attribute: attributeName,
-                              direction: "DESC",
-                              ...(orderByNullsLast != null
-                                ? {
-                                    nulls: orderByNullsLast ? "LAST" : "FIRST",
-                                  }
-                                : null),
-                            });
-                            if (isUnique) {
-                              plan.setOrderIsUnique();
-                            }
-                          },
-                        [
-                          PgSelectStep,
-                          PgUnionAllStep,
-                          attributeName,
-                          isUnique,
-                          orderByNullsLast,
-                        ],
-                      ),
+                          ],
+                        ),
+                      },
                     },
                   },
                 },
-              },
-              `Adding descending orderBy enum value for ${pgCodec.name}.`,
-              // TODO
-              /* `You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
+                `Adding descending orderBy enum value for ${pgCodec.name}.`,
+                // TODO
+                /* `You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 attribute,
                 {
                   name: "newNameHere",
                 },
               )}`,*/
-            );
-            return memo;
-          }, {} as GraphQLEnumValueConfigMap),
+              );
+              return memo;
+            },
+            {} as GraphQLEnumValueConfigMap,
+          ),
           `Adding order values from table '${pgCodec.name}'`,
         );
       },

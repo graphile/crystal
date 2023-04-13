@@ -213,10 +213,13 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                             $result.record(),
                           );
                         } else {
-                          const spec = pkAttributes.reduce((memo, attributeName) => {
-                            memo[attributeName] = $result.get(attributeName);
-                            return memo;
-                          }, Object.create(null));
+                          const spec = pkAttributes.reduce(
+                            (memo, attributeName) => {
+                              memo[attributeName] = $result.get(attributeName);
+                              return memo;
+                            },
+                            Object.create(null),
+                          );
                           return resource.find(spec);
                         }
                       })();

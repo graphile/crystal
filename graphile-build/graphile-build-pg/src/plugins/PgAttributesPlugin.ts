@@ -168,10 +168,10 @@ function processAttribute(
     console.warn(
       `Couldn't find a 'output' variant for PgCodec ${
         pgCodec.name
-      }'s '${attributeName}' attribute (${attribute.codec.name}; array=${!!attribute.codec
-        .arrayOfCodec}, domain=${!!attribute.codec.domainOfCodec}, enum=${!!(
-        attribute.codec as any
-      ).values})`,
+      }'s '${attributeName}' attribute (${
+        attribute.codec.name
+      }; array=${!!attribute.codec.arrayOfCodec}, domain=${!!attribute.codec
+        .domainOfCodec}, enum=${!!(attribute.codec as any).values})`,
     );
     return;
   }
@@ -217,7 +217,16 @@ function processAttribute(
            * joined_thing.attribute`
            */
           return EXPORTABLE(
-            (attributeName, baseCodec, getResource, notNull, pgResources, pgSelectSingleFromRecord, registry) => ($record: PgSelectSingleStep<any>) => {
+            (
+                attributeName,
+                baseCodec,
+                getResource,
+                notNull,
+                pgResources,
+                pgSelectSingleFromRecord,
+                registry,
+              ) =>
+              ($record: PgSelectSingleStep<any>) => {
                 const $plan = $record.get(attributeName);
                 const $select = pgSelectSingleFromRecord(
                   getResource(registry, baseCodec, pgResources, $record),
@@ -229,7 +238,15 @@ function processAttribute(
                 $select.getClassStep().setTrusted();
                 return $select;
               },
-            [attributeName, baseCodec, getResource, notNull, pgResources, pgSelectSingleFromRecord, registry],
+            [
+              attributeName,
+              baseCodec,
+              getResource,
+              notNull,
+              pgResources,
+              pgSelectSingleFromRecord,
+              registry,
+            ],
           );
         } else {
           // Many records from resource
@@ -240,11 +257,18 @@ function processAttribute(
            * joined_thing.attribute`
            */
           return EXPORTABLE(
-            (attributeName, baseCodec, getResource, pgResources, pgSelectFromRecords, registry) => ($record: PgSelectSingleStep<any>) => {
-                const $val = $record.get(attributeName) as PgClassExpressionStep<
-                  PgCodecList,
-                  any
-                >;
+            (
+                attributeName,
+                baseCodec,
+                getResource,
+                pgResources,
+                pgSelectFromRecords,
+                registry,
+              ) =>
+              ($record: PgSelectSingleStep<any>) => {
+                const $val = $record.get(
+                  attributeName,
+                ) as PgClassExpressionStep<PgCodecList, any>;
                 const $select = pgSelectFromRecords(
                   getResource(registry, baseCodec, pgResources, $record),
                   $val,
@@ -252,7 +276,14 @@ function processAttribute(
                 $select.setTrusted();
                 return $select;
               },
-            [attributeName, baseCodec, getResource, pgResources, pgSelectFromRecords, registry],
+            [
+              attributeName,
+              baseCodec,
+              getResource,
+              pgResources,
+              pgSelectFromRecords,
+              registry,
+            ],
           );
         }
       }

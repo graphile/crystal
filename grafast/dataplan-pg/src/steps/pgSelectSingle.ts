@@ -489,8 +489,10 @@ export class PgSelectSingleStep<
     }
   }
 
-  private nonNullAttribute: { attribute: PgCodecAttribute; attr: string } | null =
-    null;
+  private nonNullAttribute: {
+    attribute: PgCodecAttribute;
+    attr: string;
+  } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
     const poly = (this.resource.codec as PgCodec).polymorphism;
