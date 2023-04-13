@@ -87,10 +87,12 @@ export const ExplainMain: FC<{
                 <pre className="explain-plan">
                   <code>{selectedResult.explain}</code>
                 </pre>
+                <Copy text={selectedResult.explain}>Copy plan</Copy>
               </>
             ) : null}
             <h4>Executed SQL query:</h4>
             <FormatSQL sql={selectedResult.query} />
+            <Copy text={selectedResult.query}>Copy SQL</Copy>
           </div>
         );
       }
