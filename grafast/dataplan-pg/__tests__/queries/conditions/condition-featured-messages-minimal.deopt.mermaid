@@ -1,72 +1,68 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define plans
+    %% define steps
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access18["Access[18∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access19["Access[19∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object20["Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
-    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
-    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
-    __InputStaticLeaf23["__InputStaticLeaf[23∈0]"]:::plan
-    __InputStaticLeaf26["__InputStaticLeaf[26∈0]"]:::plan
-    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
-    Connection37["Connection[37∈0]<br />ᐸ33ᐳ"]:::plan
-    PgClassExpression38["PgClassExpression[38∈1]<br />ᐸ__forums__...chived_at”ᐳ"]:::plan
-    PgPageInfo39["PgPageInfo[39∈0]"]:::plan
-    PgSelect40[["PgSelect[40∈1]<br />ᐸmessagesᐳ"]]:::plan
-    Lambda41["Lambda[41∈1]<br />ᐸlistHasMoreᐳ"]:::plan
-    PgSelect42[["PgSelect[42∈1]<br />ᐸmessagesᐳ"]]:::plan
-    First43["First[43∈1]"]:::plan
-    PgSelectSingle44["PgSelectSingle[44∈1]<br />ᐸmessagesᐳ"]:::plan
-    PgClassExpression45["PgClassExpression[45∈1]<br />ᐸcount(*)ᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
+    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
+    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
+    __InputStaticLeaf17{{"__InputStaticLeaf[17∈0]"}}:::plan
+    __InputStaticLeaf20{{"__InputStaticLeaf[20∈1]"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
+    Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
+    PgPageInfo30{{"PgPageInfo[30∈3]"}}:::plan
+    PgSelect31[["PgSelect[31∈3]<br />ᐸmessages+1ᐳ"]]:::plan
+    Lambda32{{"Lambda[32∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
+    PgSelect33[["PgSelect[33∈3]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
+    First34{{"First[34∈3]"}}:::plan
+    PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸmessagesᐳ"}}:::plan
+    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
 
     %% plan dependencies
-    __Value3 --> Access18
-    __Value3 --> Access19
-    Access18 & Access19 --> Object20
-    Object20 --> PgSelect17
-    PgSelect17 ==> __Item21
-    __Item21 --> PgSelectSingle22
-    PgSelectSingle22 --> PgClassExpression32
-    __InputStaticLeaf23 --> Connection37
-    PgSelectSingle22 --> PgClassExpression38
-    Object20 & PgClassExpression32 & __InputStaticLeaf26 & PgClassExpression38 & Connection37 --> PgSelect40
-    PgSelect40 --> Lambda41
-    Object20 & PgClassExpression32 & __InputStaticLeaf26 & PgClassExpression38 & Connection37 --> PgSelect42
-    PgSelect42 --> First43
-    First43 --> PgSelectSingle44
-    PgSelectSingle44 --> PgClassExpression45
-
-    %% plan-to-path relationships
-    P0["~"]
-    __Value0 -.-> P0
-    P17["ᐳforums"]
-    PgSelect17 -.-> P17
-    P22["ᐳforums[]"]
-    PgSelectSingle22 -.-> P22
-    P37["ᐳf…]ᐳmessagesConnection"]
-    Connection37 -.-> P37
-    P39["ᐳf…]ᐳm…nᐳpageInfo"]
-    PgPageInfo39 -.-> P39
-    P41["ᐳf…]ᐳm…nᐳp…oᐳhasNextPage"]
-    Lambda41 -.-> P41
-    P45["ᐳf…]ᐳm…nᐳtotalCount"]
-    PgClassExpression45 -.-> P45
+    __Value3 --> Access12
+    __Value3 --> Access13
+    Access12 & Access13 --> Object14
+    Object14 --> PgSelect11
+    PgSelect11 ==> __Item15
+    __Item15 --> PgSelectSingle16
+    PgSelectSingle16 --> PgClassExpression23
+    __InputStaticLeaf17 --> Connection28
+    PgSelectSingle16 --> PgClassExpression29
+    Connection28 --> PgPageInfo30
+    Object14 & PgClassExpression23 & __InputStaticLeaf20 & PgClassExpression29 & Connection28 --> PgSelect31
+    PgSelect31 --> Lambda32
+    Object14 & PgClassExpression23 & __InputStaticLeaf20 & PgClassExpression29 & Connection28 --> PgSelect33
+    PgSelect33 --> First34
+    First34 --> PgSelectSingle35
+    PgSelectSingle35 --> PgClassExpression36
 
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 17, 14, 28<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,Access18,Access19,Object20,__InputStaticLeaf23,__InputStaticLeaf26,Connection37,PgPageInfo39 bucket0
-    Bucket1("Bucket 1 (item21)<br />Deps: 17, 20, 26, 37, 39<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀messagesConnection ᐸ-O- 37<br />⠀⠀⠀messagesConnection.pageInfo ᐸ-O- 39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage ᐸ-L- 41<br />⠀⠀⠀messagesConnection.totalCount ᐸ-L- 45"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,__InputStaticLeaf17,Connection28 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 28, 14<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item21,PgSelectSingle22,PgClassExpression32,PgClassExpression38,PgSelect40,Lambda41,PgSelect42,First43,PgSelectSingle44,PgClassExpression45 bucket1
+    class Bucket1,__Item15,PgSelectSingle16,__InputStaticLeaf20 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 28, 14, 20<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 28, 14, 20<br /><br />ROOT Connectionᐸ24ᐳ[28]<br />1: <br />ᐳ: 23, 29, 30<br />2: PgSelect[31], PgSelect[33]<br />ᐳ: 32, 34, 35, 36"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression23,PgClassExpression29,PgPageInfo30,PgSelect31,Lambda32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36 bucket3
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
     end

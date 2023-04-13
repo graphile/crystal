@@ -6,15 +6,10 @@ where (
   true /* authorization checks */
 )
 order by __relational_commentables__.id asc
-limit 1
+limit 1;
 
 select __relational_posts_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __relational_posts_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __relational_posts_identifiers__,
 lateral (
   select
     __relational_items__."type"::text as "0",
@@ -32,4 +27,4 @@ lateral (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
   order by __relational_posts__."id" asc
-) as __relational_posts_result__
+) as __relational_posts_result__;

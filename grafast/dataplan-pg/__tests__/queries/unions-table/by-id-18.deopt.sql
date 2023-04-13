@@ -1,10 +1,5 @@
 select __union_items_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __union_items_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __union_items_identifiers__,
 lateral (
   select
     __union_items__."type"::text as "0",
@@ -18,15 +13,10 @@ lateral (
       __union_items__."id" = __union_items_identifiers__."id0"
     )
   order by __union_items__."id" asc
-) as __union_items_result__
+) as __union_items_result__;
 
 select __union_checklist_items_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __union_checklist_items_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __union_checklist_items_identifiers__,
 lateral (
   select
     __union_checklist_items__."id"::text as "0",
@@ -41,4 +31,4 @@ lateral (
       __union_checklist_items__."id" = __union_checklist_items_identifiers__."id0"
     )
   order by __union_checklist_items__."id" asc
-) as __union_checklist_items_result__
+) as __union_checklist_items_result__;

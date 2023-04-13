@@ -5,15 +5,10 @@ from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
 )
-order by __people__."person_id" asc
+order by __people__."person_id" asc;
 
 select __single_table_items_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __single_table_items_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __single_table_items_identifiers__,
 lateral (
   select
     __single_table_items__."type"::text as "0",
@@ -33,4 +28,4 @@ lateral (
       __single_table_items__."author_id" = __single_table_items_identifiers__."id0"
     )
   order by __single_table_items__."id" asc
-) as __single_table_items_result__
+) as __single_table_items_result__;

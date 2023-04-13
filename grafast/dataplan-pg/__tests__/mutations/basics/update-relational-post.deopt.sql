@@ -1,14 +1,8 @@
 update interfaces_and_unions.relational_posts as __relational_posts__ set "description" = $1::"text" where (__relational_posts__."id" = $2::"int4") returning
-  __relational_posts__."id"::text as "0"
-
+  __relational_posts__."id"::text as "0";
 
 select __relational_posts_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __relational_posts_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __relational_posts_identifiers__,
 lateral (
   select
     __relational_items__."is_explicitly_archived"::text as "0",
@@ -31,15 +25,10 @@ lateral (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
   order by __relational_posts__."id" asc
-) as __relational_posts_result__
+) as __relational_posts_result__;
 
 select __people_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __people_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __people_identifiers__,
 lateral (
   select
     __people__."person_id"::text as "0",
@@ -53,19 +42,13 @@ lateral (
       __people__."person_id" = __people_identifiers__."id0"
     )
   order by __people__."person_id" asc
-) as __people_result__
+) as __people_result__;
 
 update interfaces_and_unions.relational_posts as __relational_posts__ set "note" = $1::"text" where (__relational_posts__."id" = $2::"int4") returning
-  __relational_posts__."id"::text as "0"
-
+  __relational_posts__."id"::text as "0";
 
 select __relational_posts_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __relational_posts_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __relational_posts_identifiers__,
 lateral (
   select
     __relational_items__."is_explicitly_archived"::text as "0",
@@ -88,15 +71,10 @@ lateral (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
   order by __relational_posts__."id" asc
-) as __relational_posts_result__
+) as __relational_posts_result__;
 
 select __people_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __people_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __people_identifiers__,
 lateral (
   select
     __people__."person_id"::text as "0",
@@ -110,19 +88,13 @@ lateral (
       __people__."person_id" = __people_identifiers__."id0"
     )
   order by __people__."person_id" asc
-) as __people_result__
+) as __people_result__;
 
 update interfaces_and_unions.relational_posts as __relational_posts__ set "description" = $1::"text" where (__relational_posts__."id" = $2::"int4") returning
-  __relational_posts__."id"::text as "0"
-
+  __relational_posts__."id"::text as "0";
 
 select __relational_posts_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __relational_posts_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __relational_posts_identifiers__,
 lateral (
   select
     __relational_items__."is_explicitly_archived"::text as "0",
@@ -145,15 +117,10 @@ lateral (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
   order by __relational_posts__."id" asc
-) as __relational_posts_result__
+) as __relational_posts_result__;
 
 select __people_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __people_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0") as __people_identifiers__,
 lateral (
   select
     __people__."person_id"::text as "0",
@@ -167,7 +134,7 @@ lateral (
       __people__."person_id" = __people_identifiers__."id0"
     )
   order by __people__."person_id" asc
-) as __people_result__
+) as __people_result__;
 
 update interfaces_and_unions.relational_posts as __relational_posts__ set "description" = $1::"text" where (__relational_posts__."id" = $2::"int4") returning
-  __relational_posts__."id"::text as "0"
+  __relational_posts__."id"::text as "0";

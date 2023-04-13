@@ -1,85 +1,78 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define plans
+    %% define steps
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    Access18["Access[18∈0]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access19["Access[19∈0]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object20["Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgSelect17[["PgSelect[17∈0]<br />ᐸforumsᐳ"]]:::plan
-    __Item21>"__Item[21∈1]<br />ᐸ17ᐳ"]:::itemplan
-    PgSelectSingle22["PgSelectSingle[22∈1]<br />ᐸforumsᐳ"]:::plan
-    PgClassExpression23["PgClassExpression[23∈1]<br />ᐸ__forums__.”name”ᐳ"]:::plan
-    PgClassExpression32["PgClassExpression[32∈1]<br />ᐸ__forums__.”id”ᐳ"]:::plan
-    PgSelect33[["PgSelect[33∈1]<br />ᐸmessagesᐳ"]]:::plan
-    __Item37>"__Item[37∈2]<br />ᐸ33ᐳ"]:::itemplan
-    PgSelectSingle38["PgSelectSingle[38∈2]<br />ᐸmessagesᐳ"]:::plan
-    PgClassExpression39["PgClassExpression[39∈2]<br />ᐸ__messages__.”body”ᐳ"]:::plan
-    PgClassExpression40["PgClassExpression[40∈2]<br />ᐸ__messages...author_id”ᐳ"]:::plan
-    PgSelect41[["PgSelect[41∈2]<br />ᐸusersᐳ"]]:::plan
-    First45["First[45∈2]"]:::plan
-    PgSelectSingle46["PgSelectSingle[46∈2]<br />ᐸusersᐳ"]:::plan
-    PgClassExpression47["PgClassExpression[47∈2]<br />ᐸ__users__.”username”ᐳ"]:::plan
-    PgClassExpression48["PgClassExpression[48∈2]<br />ᐸ__users__....vatar_url”ᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
+    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
+    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
+    PgSelect23[["PgSelect[23∈2]<br />ᐸmessagesᐳ"]]:::plan
+    __Item27[/"__Item[27∈3]<br />ᐸ23ᐳ"\]:::itemplan
+    PgSelectSingle28{{"PgSelectSingle[28∈3]<br />ᐸmessagesᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
+    PgClassExpression30{{"PgClassExpression[30∈4]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
+    PgSelect31[["PgSelect[31∈4]<br />ᐸusersᐳ"]]:::plan
+    First35{{"First[35∈4]"}}:::plan
+    PgSelectSingle36{{"PgSelectSingle[36∈4]<br />ᐸusersᐳ"}}:::plan
+    PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
+    PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
 
     %% plan dependencies
-    __Value3 --> Access18
-    __Value3 --> Access19
-    Access18 & Access19 --> Object20
-    Object20 --> PgSelect17
-    PgSelect17 ==> __Item21
-    __Item21 --> PgSelectSingle22
-    PgSelectSingle22 --> PgClassExpression23
-    PgSelectSingle22 --> PgClassExpression32
-    Object20 & PgClassExpression32 --> PgSelect33
-    PgSelect33 ==> __Item37
-    __Item37 --> PgSelectSingle38
-    PgSelectSingle38 --> PgClassExpression39
-    PgSelectSingle38 --> PgClassExpression40
-    Object20 & PgClassExpression40 --> PgSelect41
-    PgSelect41 --> First45
-    First45 --> PgSelectSingle46
-    PgSelectSingle46 --> PgClassExpression47
-    PgSelectSingle46 --> PgClassExpression48
-
-    %% plan-to-path relationships
-    P0["~"]
-    __Value0 -.-> P0
-    P17["ᐳforums"]
-    PgSelect17 -.-> P17
-    P22["ᐳforums[]"]
-    PgSelectSingle22 -.-> P22
-    P23["ᐳf…]ᐳname"]
-    PgClassExpression23 -.-> P23
-    P33["ᐳf…]ᐳmessagesList"]
-    PgSelect33 -.-> P33
-    P38["ᐳf…]ᐳmessagesList[]"]
-    PgSelectSingle38 -.-> P38
-    P39["ᐳf…]ᐳm…]ᐳbody"]
-    PgClassExpression39 -.-> P39
-    P46["ᐳf…]ᐳm…]ᐳauthor"]
-    PgSelectSingle46 -.-> P46
-    P47["ᐳf…]ᐳm…]ᐳa…rᐳusername"]
-    PgClassExpression47 -.-> P47
-    P48["ᐳf…]ᐳm…]ᐳa…rᐳgravatarUrl"]
-    PgClassExpression48 -.-> P48
+    __Value3 --> Access12
+    __Value3 --> Access13
+    Access12 & Access13 --> Object14
+    Object14 --> PgSelect11
+    PgSelect11 ==> __Item15
+    __Item15 --> PgSelectSingle16
+    PgSelectSingle16 --> PgClassExpression17
+    PgSelectSingle16 --> PgClassExpression22
+    Object14 & PgClassExpression22 --> PgSelect23
+    PgSelect23 ==> __Item27
+    __Item27 --> PgSelectSingle28
+    PgSelectSingle28 --> PgClassExpression29
+    PgSelectSingle28 --> PgClassExpression30
+    Object14 & PgClassExpression30 --> PgSelect31
+    PgSelect31 --> First35
+    First35 --> PgSelectSingle36
+    PgSelectSingle36 --> PgClassExpression37
+    PgSelectSingle36 --> PgClassExpression38
 
     subgraph "Buckets for queries/conditions/include-all-archived"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀forums ᐸ-A- 17"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[12], Access[13], Object[14]<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,PgSelect17,Access18,Access19,Object20 bucket0
-    Bucket1("Bucket 1 (item21)<br />Deps: 17, 20<br />~ᐳQuery.forums[]<br />⠀ROOT ᐸ-O- 22<br />⠀⠀name ᐸ-L- 23<br />⠀⠀messagesList ᐸ-A- 33"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 14<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression32,PgSelect33 bucket1
-    Bucket2("Bucket 2 (item37)<br />Deps: 33, 20<br />~ᐳQuery.forums[]ᐳForum.messagesList[]<br />⠀ROOT ᐸ-O- 38<br />⠀⠀body ᐸ-L- 39<br />⠀⠀author ᐸ-O- 46<br />⠀⠀⠀author.username ᐸ-L- 47<br />⠀⠀⠀author.gravatarUrl ᐸ-L- 48"):::bucket
+    class Bucket1,__Item15,PgSelectSingle16 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 14<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 17, 22<br />2: PgSelect[23]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item37,PgSelectSingle38,PgClassExpression39,PgClassExpression40,PgSelect41,First45,PgSelectSingle46,PgClassExpression47,PgClassExpression48 bucket2
+    class Bucket2,PgClassExpression17,PgClassExpression22,PgSelect23 bucket2
+    Bucket3("Bucket 3 (listItem)<br />Deps: 14<br /><br />ROOT __Item{3}ᐸ23ᐳ[27]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item27,PgSelectSingle28 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 28, 14<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[28]<br />1: <br />ᐳ: 29, 30<br />2: PgSelect[31]<br />ᐳ: First[35], PgSelectSingle[36]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgClassExpression29,PgClassExpression30,PgSelect31,First35,PgSelectSingle36 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgSelectSingle{4}ᐸusersᐳ[36]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgClassExpression37,PgClassExpression38 bucket5
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
+    Bucket4 --> Bucket5
     end

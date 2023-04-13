@@ -1,32 +1,35 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 graph TD
     classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:3px,color:#000
-    classDef itemplan fill:#fff,stroke-width:6px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define plans
-    __Value0["__Value[0]"]:::plan
-    __Value3["__Value[3]<br />ᐸcontextᐳ"]:::plan
-    __InputStaticLeaf7["__InputStaticLeaf[7]"]:::plan
-    Access9["Access[9]<br />ᐸ3.pgSettingsᐳ"]:::plan
-    Access10["Access[10]<br />ᐸ3.withPgClientᐳ"]:::plan
-    Object11["Object[11]<br />ᐸ{pgSettings,withPgClient}ᐳ"]:::plan
-    PgSelect8[["PgSelect[8]<br />ᐸrelational_topicsᐳ"]]:::plan
-    First12["First[12]"]:::plan
-    PgSelectSingle13["PgSelectSingle[13]<br />ᐸrelational_topicsᐳ"]:::plan
-    PgClassExpression14["PgClassExpression[14]<br />ᐸ__relation...ics__.”id”ᐳ"]:::plan
-    Map72["Map[72]<br />ᐸ13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"]:::plan
-    PgSelectSingle21["PgSelectSingle[21]<br />ᐸrelational_itemsᐳ"]:::plan
-    PgClassExpression22["PgClassExpression[22]<br />ᐸ__relation...s__.”type”ᐳ"]:::plan
-    PgClassExpression30["PgClassExpression[30]<br />ᐸ__relation...__.”type2”ᐳ"]:::plan
-    PgClassExpression38["PgClassExpression[38]<br />ᐸ__relation...”position”ᐳ"]:::plan
-    PgClassExpression46["PgClassExpression[46]<br />ᐸ__relation...reated_at”ᐳ"]:::plan
-    PgClassExpression54["PgClassExpression[54]<br />ᐸ__relation...pdated_at”ᐳ"]:::plan
-    PgClassExpression62["PgClassExpression[62]<br />ᐸ__relation..._archived”ᐳ"]:::plan
-    PgClassExpression70["PgClassExpression[70]<br />ᐸ__relation...chived_at”ᐳ"]:::plan
-    PgClassExpression71["PgClassExpression[71]<br />ᐸ__relation...__.”title”ᐳ"]:::plan
+    %% define steps
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
+    Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgSelect8[["PgSelect[8∈0]<br />ᐸrelational_topicsᐳ"]]:::plan
+    First12{{"First[12∈0]"}}:::plan
+    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸrelational_topicsᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__relation...ics__.”id”ᐳ"}}:::plan
+    Map72{{"Map[72∈1]<br />ᐸ13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"}}:::plan
+    PgSelectSingle21{{"PgSelectSingle[21∈1]<br />ᐸrelational_itemsᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgClassExpression30{{"PgClassExpression[30∈1]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgClassExpression38{{"PgClassExpression[38∈1]<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgClassExpression46{{"PgClassExpression[46∈1]<br />ᐸ__relation...reated_at”ᐳ"}}:::plan
+    PgClassExpression54{{"PgClassExpression[54∈1]<br />ᐸ__relation...pdated_at”ᐳ"}}:::plan
+    PgClassExpression62{{"PgClassExpression[62∈1]<br />ᐸ__relation..._archived”ᐳ"}}:::plan
+    PgClassExpression70{{"PgClassExpression[70∈1]<br />ᐸ__relation...chived_at”ᐳ"}}:::plan
+    PgClassExpression71{{"PgClassExpression[71∈1]<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
 
     %% plan dependencies
     __Value3 --> Access9
@@ -47,32 +50,12 @@ graph TD
     PgSelectSingle21 --> PgClassExpression70
     PgSelectSingle13 --> PgClassExpression71
 
-    %% plan-to-path relationships
-    P0["~"]
-    __Value0 -.-> P0
-    P13["ᐳrelationalTopicById"]
-    PgSelectSingle13 -.-> P13
-    P14["ᐳr…dᐳid"]
-    PgClassExpression14 -.-> P14
-    P22["ᐳr…dᐳtype"]
-    PgClassExpression22 -.-> P22
-    P30["ᐳr…dᐳtype2"]
-    PgClassExpression30 -.-> P30
-    P38["ᐳr…dᐳposition"]
-    PgClassExpression38 -.-> P38
-    P46["ᐳr…dᐳcreatedAt"]
-    PgClassExpression46 -.-> P46
-    P54["ᐳr…dᐳupdatedAt"]
-    PgClassExpression54 -.-> P54
-    P62["ᐳr…dᐳisExplicitlyArchived"]
-    PgClassExpression62 -.-> P62
-    P70["ᐳr…dᐳarchivedAt"]
-    PgClassExpression70 -.-> P70
-    P71["ᐳr…dᐳtitle"]
-    PgClassExpression71 -.-> P71
-
     subgraph "Buckets for queries/interfaces-relational/single-topic"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT ᐸ-O- 0<br />⠀⠀relationalTopicById ᐸ-O- 13<br />⠀⠀⠀relationalTopicById.id ᐸ-L- 14<br />⠀⠀⠀relationalTopicById.type ᐸ-L- 22<br />⠀⠀⠀relationalTopicById.type2 ᐸ-L- 30<br />⠀⠀⠀relationalTopicById.position ᐸ-L- 38<br />⠀⠀⠀relationalTopicById.createdAt ᐸ-L- 46<br />⠀⠀⠀relationalTopicById.updatedAt ᐸ-L- 54<br />⠀⠀⠀relationalTopicById.isExplicitlyArchived ᐸ-L- 62<br />⠀⠀⠀relationalTopicById.archivedAt ᐸ-L- 70<br />⠀⠀⠀relationalTopicById.title ᐸ-L- 71"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgSelectSingle21,PgClassExpression22,PgClassExpression30,PgClassExpression38,PgClassExpression46,PgClassExpression54,PgClassExpression62,PgClassExpression70,PgClassExpression71,Map72 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸrelational_topicsᐳ[13]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgClassExpression14,PgSelectSingle21,PgClassExpression22,PgClassExpression30,PgClassExpression38,PgClassExpression46,PgClassExpression54,PgClassExpression62,PgClassExpression70,PgClassExpression71,Map72 bucket1
+    Bucket0 --> Bucket1
     end
