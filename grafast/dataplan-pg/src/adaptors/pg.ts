@@ -51,7 +51,7 @@ const $$isSetup = Symbol("isConfiguredForDataplanPg");
  * `@dataplan/pg` is designed for extremely fast queries, but sometimes
  * user code can make Postgres think the cost of the query is going to
  * be very high (this is especially the case when lots of "computed
- * attribute functions" are used), and thus enables JIT. In testing we've
+ * column functions" are used), and thus enables JIT. In testing we've
  * seen queries that would take 50ms with `jit=off` take 8200ms with
  * jit on. As such we've made the decision to disable jit for all
  * queries.

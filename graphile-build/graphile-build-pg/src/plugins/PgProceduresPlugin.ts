@@ -1,5 +1,5 @@
-// This used to be called "computed attributes", but they're not the same as
-// Postgres' own computed attributes, and they're not necessarily attribute-like
+// This used to be called "computed columns", but they're not the same as
+// Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import type {

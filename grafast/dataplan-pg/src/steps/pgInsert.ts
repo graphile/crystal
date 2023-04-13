@@ -62,7 +62,7 @@ export class PgInsertStep<
   hasSideEffects = true;
 
   /**
-   * Tells us what we're dealing with - data type, attributes, where to insert it,
+   * Tells us what we're dealing with - data type, columns, where to insert it,
    * what it's called, etc.
    */
   public readonly resource: TResource;
@@ -181,7 +181,7 @@ export class PgInsertStep<
   }
 
   /**
-   * Returns a plan representing a named attribute (e.g. attribute) from the newly
+   * Returns a plan representing a named attribute (e.g. column) from the newly
    * inserted row.
    */
   get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
@@ -382,7 +382,7 @@ export class PgInsertStep<
           queryValueDetailsBySymbol,
         };
       } else {
-        // No attributes to insert?! Odd... but okay.
+        // No columns to insert?! Odd... but okay.
         const query = sql`insert into ${table} default values${returning};`;
         const { text, values: rawSqlValues } = sql.compile(query);
 

@@ -1,6 +1,6 @@
 import * as core from "./core.js";
 
-test("raises an error when a foreignKey tries to reference a non-unique combination of attributes", async () => {
+test("raises an error when a foreignKey tries to reference a non-unique combination of columns", async () => {
   const promise = core.test(
     __filename,
     ["c"],

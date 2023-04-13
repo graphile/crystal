@@ -37,7 +37,7 @@ interface PgDeletePlanFinalizeResults {
 }
 
 /**
- * Deletes a row in the database, can return attributes from the deleted row.
+ * Deletes a row in the database, can return columns from the deleted row.
  */
 export class PgDeleteStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
@@ -51,7 +51,7 @@ export class PgDeleteStep<
   hasSideEffects = true;
 
   /**
-   * Tells us what we're dealing with - data type, attributes, where to delete it
+   * Tells us what we're dealing with - data type, columns, where to delete it
    * from, what it's called, etc.
    */
   public readonly resource: TResource;
@@ -156,7 +156,7 @@ export class PgDeleteStep<
   }
 
   /**
-   * Returns a plan representing a named attribute (e.g. attribute) from the newly
+   * Returns a plan representing a named attribute (e.g. column) from the newly
    * deleteed row.
    */
   get<TAttr extends keyof GetPgResourceAttributes<TResource>>(

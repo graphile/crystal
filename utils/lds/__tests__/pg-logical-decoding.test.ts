@@ -96,8 +96,8 @@ test("notified on insert", () =>
     }
     expect(change.schema).toEqual("app_public");
     expect(change.table).toEqual("foo");
-    expect(change.attributevalues).toBeTruthy();
-    expect(change.attributevalues).toHaveLength(4);
+    expect(change.columnvalues).toBeTruthy();
+    expect(change.columnvalues).toHaveLength(4);
 
     const changes3 = await ld.getChanges();
     expect(changes3.length).toEqual(0);
@@ -132,9 +132,9 @@ test("notified on update", () =>
     }
     expect(change.schema).toEqual("app_public");
     expect(change.table).toEqual("foo");
-    expect(change.attributevalues).toBeTruthy();
-    expect(change.attributevalues).toHaveLength(4);
-    expect(change.attributevalues[1]).toEqual("Hello World");
+    expect(change.columnvalues).toBeTruthy();
+    expect(change.columnvalues).toHaveLength(4);
+    expect(change.columnvalues[1]).toEqual("Hello World");
     expect(change.oldkeys).toBeTruthy();
     expect(typeof change.oldkeys).toEqual("object");
     expect(change.oldkeys.keynames).toEqual(["id"]);
@@ -219,11 +219,11 @@ test("multiple notifications", () =>
     if (statement1change1.kind !== "insert") {
       throw new Error("Unexpected type");
     }
-    expect(statement1change1.attributevalues[1]).toEqual("temporary1");
+    expect(statement1change1.columnvalues[1]).toEqual("temporary1");
     if (statement1change2.kind !== "insert") {
       throw new Error("Unexpected type");
     }
-    expect(statement1change2.attributevalues[1]).toEqual("temporary2");
+    expect(statement1change2.columnvalues[1]).toEqual("temporary2");
 
     expect(statement2changes).toHaveLength(4);
     const [
@@ -245,11 +245,11 @@ test("multiple notifications", () =>
       throw new Error("Unexpected type");
     }
     expect(statement2change1.oldkeys.keyvalues[0]).toEqual(id1);
-    expect(statement2change2.attributevalues[1]).toEqual("temporary2temporary2");
-    expect(statement2change3.attributevalues[1]).toEqual(
+    expect(statement2change2.columnvalues[1]).toEqual("temporary2temporary2");
+    expect(statement2change3.columnvalues[1]).toEqual(
       "temporary2temporary2temporary2temporary2",
     );
-    expect(statement2change4.attributevalues[1]).toEqual(
+    expect(statement2change4.columnvalues[1]).toEqual(
       "temporary2temporary2temporary2temporary2temporary2temporary2temporary2temporary2",
     );
 

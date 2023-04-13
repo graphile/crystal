@@ -216,7 +216,7 @@ export interface PgCodec<
    * you explicitly need to return nulls in the latter.
    *
    * We can't simply do `not (foo is null)` because you might be using
-   * attribute-level select grants which would prevent this happening. As such we
+   * column-level select grants which would prevent this happening. As such we
    * give you a chance to provide your own non-null check. In most table cases
    * you can use `(${alias}.id is not null)::text` (assuming 'id' is the name
    * of your primary key); for composite types you can normally do

@@ -1,5 +1,5 @@
-// This used to be called "computed attributes", but they're not the same as
-// Postgres' own computed attributes, and they're not necessarily attribute-like
+// This used to be called "computed columns", but they're not the same as
+// Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import "./PgProceduresPlugin.js";
@@ -253,7 +253,7 @@ declare global {
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
-    "Adds GraphQL fields based on PostgreSQL functions (in PostGraphile v4 these were called 'custom query functions', 'custom mutation functions' and 'computed attribute functions'",
+    "Adds GraphQL fields based on PostgreSQL functions (in PostGraphile v4 these were called 'custom query functions', 'custom mutation functions' and 'computed column functions'",
   version: version,
 
   inflection: {
@@ -775,7 +775,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 });
               }
 
-              // "computed attribute"
+              // "computed column"
               // Find non-mutation function sources that accept a row type of the
               // matching codec as the first argument
               const isComputedSource =

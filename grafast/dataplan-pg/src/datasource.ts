@@ -836,7 +836,7 @@ export class PgResource<
       // Use the user-provided check
       return this.codec.notNullExpression(alias);
     } else {
-      // Every attribute in a primary key is non-nullable; so just see if one is null
+      // Every column in a primary key is non-nullable; so just see if one is null
       const pk = this.uniques.find((u) => u.isPrimary);
       const nonNullableAttribute = this.codec.attributes
         ? Object.entries(this.codec.attributes).find(

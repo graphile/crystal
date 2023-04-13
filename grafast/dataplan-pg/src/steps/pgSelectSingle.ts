@@ -148,7 +148,7 @@ export class PgSelectSingleStep<
   }
 
   /**
-   * Returns a plan representing a named attribute (e.g. attribute) from the class
+   * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
   get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
@@ -513,12 +513,12 @@ export class PgSelectSingleStep<
     const attributes = this.resource.codec.attributes;
     if (attributes && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
-      // non-null attribute, but failing that we invoke the codec's
+      // non-null column, but failing that we invoke the codec's
       // nonNullExpression (indirectly).
       const getSuitableAttribute = () => {
         // We want to find a _cheap_ not-null attribute to select to prove that
-        // the row is not null. Critically this must be a attribute that we can
-        // always select (i.e.  is not prevented by any attribute-level select
+        // the row is not null. Critically this must be an attribute that we can
+        // always select (i.e. is not prevented by any column-level select
         // privileges).
         for (const attr of Object.keys(attributes)) {
           const attribute = attributes[attr];

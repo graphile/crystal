@@ -67,7 +67,7 @@ export interface PgCodecAttribute<
   codec: TCodec;
 
   /**
-   * Is the attribute/attribute guaranteed to not be null?
+   * Is the column/attribute guaranteed to not be null?
    */
   notNull: TNotNull;
   hasDefault?: boolean;
@@ -117,7 +117,7 @@ export interface PgCodecAttribute<
   // multiple foreign key references?
 
   /**
-   * Set this true if you're using attribute-level select privileges and there are
+   * Set this true if you're using column-level select privileges and there are
    * roles accessible that do not have permission to select it. This will tell
    * us not to auto-select it to more efficiently resolve row nullability
    * questions - we'll only try when the user explicitly tells us to.

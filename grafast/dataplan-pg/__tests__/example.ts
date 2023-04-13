@@ -11,7 +11,7 @@
  *
  * To assert the parent organization is up to date with their subscription, we
  * check with Stripe. (Poor example, we'd normally do this with database
- * attribute, but shows integration of external data into query planning.)
+ * column, but shows integration of external data into query planning.)
  */
 
 import {

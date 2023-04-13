@@ -931,7 +931,7 @@ export function stepAMayDependOnStepB(
  * push work into the parent phase because it would be faster overall to do
  * that work there, and would not significantly delay the initial payload's
  * execution time - for example it's unlikely that it would make sense to defer
- * selecting an additional boolean attribute from a database table even if the
+ * selecting an additional boolean column from a database table even if the
  * operation indicates that's what you should do.
  *
  * As a step class author, it's your responsiblity to figure out the right

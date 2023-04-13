@@ -61,7 +61,7 @@ const VALID_TYPE_IDS = [VARCHAR_ID, TEXT_ID, CHAR_ID, BPCHAR_ID];
 
 export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
   name: "PgEnumTablesPlugin",
-  description: "Converts attributes that reference `@enum` tables into enums",
+  description: "Converts columns that reference `@enum` tables into enums",
   version,
   after: ["PgFakeConstraintsPlugin"],
 

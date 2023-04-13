@@ -403,7 +403,7 @@ describe('Star Wars Query Tests', () => {
         errors: [
           {
             message: 'secretBackstory is secret.',
-            locations: [{ line: 5, attribute: 13 }],
+            locations: [{ line: 5, column: 13 }],
             path: ['hero', 'secretBackstory'],
           },
         ],
@@ -447,17 +447,17 @@ describe('Star Wars Query Tests', () => {
         errors: [
           {
             message: 'secretBackstory is secret.',
-            locations: [{ line: 7, attribute: 15 }],
+            locations: [{ line: 7, column: 15 }],
             path: ['hero', 'friends', 0, 'secretBackstory'],
           },
           {
             message: 'secretBackstory is secret.',
-            locations: [{ line: 7, attribute: 15 }],
+            locations: [{ line: 7, column: 15 }],
             path: ['hero', 'friends', 1, 'secretBackstory'],
           },
           {
             message: 'secretBackstory is secret.',
-            locations: [{ line: 7, attribute: 15 }],
+            locations: [{ line: 7, column: 15 }],
             path: ['hero', 'friends', 2, 'secretBackstory'],
           },
         ],
@@ -485,7 +485,7 @@ describe('Star Wars Query Tests', () => {
         errors: [
           {
             message: 'secretBackstory is secret.',
-            locations: [{ line: 5, attribute: 13 }],
+            locations: [{ line: 5, column: 13 }],
             path: ['mainHero', 'story'],
           },
         ],

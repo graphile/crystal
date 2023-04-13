@@ -65,7 +65,7 @@ function isNotNullish<T>(v: T | null | undefined): v is T {
 const rowNumberAlias = "n";
 const rowNumberIdent = sql.identifier(rowNumberAlias);
 
-// In future we'll allow mapping attributes to different attributes/types
+// In future we'll allow mapping columns to different attributes/types
 const digestSpecificExpressionFromAttributeName = (
   digest: MemberDigest<any>,
   name: string,

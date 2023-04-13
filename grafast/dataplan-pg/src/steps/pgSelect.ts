@@ -217,7 +217,7 @@ export interface PgSelectOptions<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > {
   /**
-   * Tells us what we're dealing with - data type, attributes, where to get it
+   * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
    * below.
    */
@@ -380,7 +380,7 @@ export class PgSelectStep<
   /**
    * This is the list of SQL fragments in the result that are compared to some
    * of the above `queryValues` to determine if there's a match or not. Typically
-   * this will be a list of attributes (e.g. primary or foreign keys on the
+   * this will be a list of columns (e.g. primary or foreign keys on the
    * table).
    */
   private identifierMatches: readonly SQL[];
@@ -469,7 +469,7 @@ export class PgSelectStep<
     // If streaming, what's the initialCount
     streamInitialCount?: number;
 
-    // The attribute on the result that indicates which group the result belongs to
+    // The column on the result that indicates which group the result belongs to
     identifierIndex: number | null;
 
     // If last but not first, reverse order.

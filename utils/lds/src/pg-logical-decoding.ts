@@ -35,18 +35,18 @@ export interface InsertChange extends Change {
   kind: "insert";
 
   // https://github.com/eulerto/wal2json/blob/f81bf7af09324da656be87dfd53d20741c01e1e0/wal2json.c#L969
-  attributenames: Array<string>;
-  attributetypes: Array<string>;
-  attributevalues: Array<any>;
+  columnnames: Array<string>;
+  columntypes: Array<string>;
+  columnvalues: Array<any>;
 }
 
 export interface UpdateChange extends Change {
   kind: "update";
 
   // https://github.com/eulerto/wal2json/blob/f81bf7af09324da656be87dfd53d20741c01e1e0/wal2json.c#L973
-  attributenames: Array<string>;
-  attributetypes: Array<string>;
-  attributevalues: Array<any>;
+  columnnames: Array<string>;
+  columntypes: Array<string>;
+  columnvalues: Array<any>;
 
   // https://github.com/eulerto/wal2json/blob/f81bf7af09324da656be87dfd53d20741c01e1e0/wal2json.c#L992-L1003
   oldkeys: Keys;
@@ -60,9 +60,9 @@ export interface DeleteChange extends Change {
 }
 
 export const changeToRecord = (change: InsertChange | UpdateChange) => {
-  const { attributenames, attributevalues } = change;
-  return attributenames.reduce((memo, name, i) => {
-    memo[name] = attributevalues[i];
+  const { columnnames, columnvalues } = change;
+  return columnnames.reduce((memo, name, i) => {
+    memo[name] = columnvalues[i];
     return memo;
   }, Object.create(null));
 };

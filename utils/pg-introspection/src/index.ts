@@ -134,7 +134,7 @@ declare module "./introspection" {
     getClass(): PgClass | undefined;
     /**
      * The PgAttributes that are in this index; a null indicates that the entry
-     * is an expression rather than a attribute.
+     * is an expression rather than a column.
      */
     getKeys(): Array<PgAttribute | null>;
   }

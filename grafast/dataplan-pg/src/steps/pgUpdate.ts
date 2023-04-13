@@ -51,7 +51,7 @@ export class PgUpdateStep<
   hasSideEffects = true;
 
   /**
-   * Tells us what we're dealing with - data type, attributes, where to update it,
+   * Tells us what we're dealing with - data type, columns, where to update it,
    * what it's called, etc.
    */
   public readonly resource: TResource;
@@ -210,7 +210,7 @@ export class PgUpdateStep<
   }
 
   /**
-   * Returns a plan representing a named attribute (e.g. attribute) from the newly
+   * Returns a plan representing a named attribute (e.g. column) from the newly
    * updateed row.
    */
   get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
