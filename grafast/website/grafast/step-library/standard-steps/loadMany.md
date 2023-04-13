@@ -34,7 +34,7 @@ const friendshipsByUserIdCallback = (ids, { attributes }) => {
   // Your business logic would be called here; e.g. this might be the same
   // function that your DataLoaders would call, except we can pass additional
   // information to it:
-  return getFriendshipsByUserIds(ids, { columns: attributes });
+  return getFriendshipsByUserIds(ids, { attributes: attributes });
 };
 ```
 

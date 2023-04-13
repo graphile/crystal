@@ -71,17 +71,17 @@ To have PostGraphile generate an interface for this table, you might use a comme
 ```sql
 comment on table polymorphic.single_table_items is $$
   @interface mode:single type:type
-  @type TOPIC name:SingleTableTopic columns:title
-  @type POST name:SingleTablePost columns:title,description,note
-  @type DIVIDER name:SingleTableDivider columns:title,color
-  @type CHECKLIST name:SingleTableChecklist columns:title
-  @type CHECKLIST_ITEM name:SingleTableChecklistItem columns:description,note
+  @type TOPIC name:SingleTableTopic attributes:title
+  @type POST name:SingleTablePost attributes:title,description,note
+  @type DIVIDER name:SingleTableDivider attributes:title,color
+  @type CHECKLIST name:SingleTableChecklist attributes:title
+  @type CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note
   $$;
 ```
 
 The `@type` tags take the value of the `type` column as the first argument and
-then accept `name:` and `columns:` arguments; `name` being the name to create
-the GraphQL object type with and `columns:` to be a comma-separated list of any
+then accept `name:` and `attributes:` arguments; `name` being the name to create
+the GraphQL object type with and `attributes:` to be a comma-separated list of any
 columns that are specific to this type (and shouldn't be on the main
 interface).
 

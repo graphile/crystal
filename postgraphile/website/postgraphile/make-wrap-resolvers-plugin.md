@@ -143,7 +143,7 @@ module.exports = makeWrapResolversPlugin({
   User: {
     email: {
       requires: {
-        siblingColumns: [{ column: "id", alias: "$user_id" }],
+        siblingAttributes: [{ attribute: "id", alias: "$user_id" }],
       },
       resolve(resolver, user, args, context, _resolveInfo) {
         if (context.jwtClaims.user_id !== user.$user_id) return null;
@@ -265,7 +265,7 @@ export const CreatePostPlugin = makeWrapResolversPlugin({
   Mutation: {
     createPost: {
       requires: {
-        childColumns: [{ column: "id", alias: "$post_id" }],
+        childAttributes: [{ attribute: "id", alias: "$post_id" }],
       },
       async resolve(resolve: any, _source, _args, context: any, _resolveInfo) {
         // The pgClient on context is already in a transaction configured for the user:

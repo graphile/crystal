@@ -11,13 +11,13 @@ const {
 } = require("grafast");
 
 const userByIdCallback = loadOneCallback((ids, { attributes }) =>
-  getUsersByIds(ids, { columns: attributes }),
+  getUsersByIds(ids, { attributes: attributes }),
 );
 userByIdCallback.displayName = "userById";
 exports.userById = ($id) => loadOne($id, userByIdCallback);
 
 const friendshipsByUserIdCallback = loadManyCallback((ids, { attributes }) =>
-  getFriendshipsByUserIds(ids, { columns: attributes }),
+  getFriendshipsByUserIds(ids, { attributes: attributes }),
 );
 friendshipsByUserIdCallback.displayName = "friendshipsByUserId";
 exports.friendshipsByUserId = ($id) =>
