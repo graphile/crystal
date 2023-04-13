@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
 /*
- * TODO: THIS FILE IS SUPER OUT OF DATE... WE SHOULD DELETE IT?
- */
-
-/*
  * Regular forum. Except, some forums are private.
  *
  * Forums are owned by an organization.
@@ -18,7 +14,6 @@
  * column, but shows integration of external data into query planning.)
  */
 
-import { makePgAdaptorWithPgClient } from "@dataplan/pg/adaptors/pg";
 import {
   __TrackedObjectStep,
   __ValueStep,
@@ -31,44 +26,13 @@ import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
 
-import { PgSubscriber } from "../src/adaptors/pg.js";
-import { makeExampleSchema } from "../src/examples/exampleSchema.js";
-import { WithPgClient } from "../src/index.js";
+import {
+  makePgAdaptorWithPgClient,
+  PgSubscriber,
+} from "../dist/adaptors/pg.js";
+import { makeExampleSchema } from "../dist/examples/exampleSchema.js";
 
 const schema = makeExampleSchema();
-
-// Convenience so we don't have to type these out each time. These used to be
-// separate plans, but required too much maintenance.
-/*+--------------------------------------------------------------------------+
-  |                            PLANS SPECS                                   |
-  +--------------------------------------------------------------------------+*/
-
-/*+--------------------------------------------------------------------------+
-  |                          GRAPHQL HELPERS                                 |
-  +--------------------------------------------------------------------------+*/
-
-/*
-class ConnectionStep<TSubplan extends ExecutableStep> extends ExecutableStep<Opaque<any>> {
-  constructor(public readonly subplan: TSubplan) {
-    super();
-  }
-
-  /*
-  executeWith(deps: any) {
-    /*
-     * Connection doesn't do anything itself; so `connection { __typename }` is
-     * basically a no-op. However subfields will need access to the deps so
-     * that they may determine which fetched rows relate to them.
-     * /
-    return { ...deps };
-  }
-  * /
-}
-*/
-
-/*+--------------------------------------------------------------------------+
-  |                             THE EXAMPLE                                  |
-  +--------------------------------------------------------------------------+*/
 
 function regexpEscape(str: string): string {
   return str.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
@@ -86,7 +50,9 @@ function replaceAll(
   if (typeof matcher === "string") {
     return string.replace(new RegExp(regexpEscape(matcher), "g"), replacement);
   } else {
-    // TODO: need to ensure matcher is `/g`
+    if (!matcher.global) {
+      throw new Error("Expected global regex");
+    }
     return string.replace(matcher, replacement);
   }
 }

@@ -2936,7 +2936,7 @@ export function makeExampleSchema(
    * and so on.
    */
   const entityUnion = EXPORTABLE(
-    (PgSelectSingleStep, entityPolymorphicTypeMap, list, pgPolymorphic) =>
+    (entityPolymorphicTypeMap, list, pgPolymorphic) =>
       <TCodec extends typeof unionEntityCodec>(
         $item:
           | PgSelectSingleStep<PgResource<any, TCodec, any, any, any>>
@@ -2945,21 +2945,13 @@ export function makeExampleSchema(
         pgPolymorphic(
           $item,
           list([
-            // TODO: this ridiculous code is just to appease TypeScript; we should
-            // be able to just `$item.get("person_id")`.
-            $item instanceof PgSelectSingleStep
-              ? $item.get("person_id")
-              : $item.get("person_id"),
-            $item instanceof PgSelectSingleStep
-              ? $item.get("post_id")
-              : $item.get("post_id"),
-            $item instanceof PgSelectSingleStep
-              ? $item.get("comment_id")
-              : $item.get("comment_id"),
+            $item.get("person_id"),
+            $item.get("post_id"),
+            $item.get("comment_id"),
           ]),
           entityPolymorphicTypeMap,
         ),
-    [PgSelectSingleStep, entityPolymorphicTypeMap, list, pgPolymorphic],
+    [entityPolymorphicTypeMap, list, pgPolymorphic],
   );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =

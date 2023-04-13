@@ -654,11 +654,7 @@ export async function watchSchema(
         } catch (e) {
           // Retrying this on its own is pointless, we need the gather phase to
           // give us more data so we can just await regular watch for that.
-          console.error(
-            `Error occurred during watch schema generation:\n  ${String(
-              e,
-            ).replace(/\n/g, "\n  ")}`,
-          );
+          console.error(`Error occurred during watch schema generation:`, e);
         }
       }
     },

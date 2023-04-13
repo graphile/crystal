@@ -27,7 +27,7 @@ class Wrapped<T extends Error | typeof $$FINISHED = Error | typeof $$FINISHED> {
 
 let cursorCount = 0;
 
-const debug = debugFactory("datasource:pg:PgExecutor");
+const debug = debugFactory("@dataplan/pg:PgExecutor");
 const debugVerbose = debug.extend("verbose");
 const debugExplain = debug.extend("explain");
 
@@ -255,7 +255,7 @@ ${duration}
         error ? error : rowResults,
         LOOK_UP,
         explain ??
-          `(Use 'DEBUG="datasource:pg:PgExecutor:explain"' to enable explain)`,
+          `(Use 'DEBUG="@dataplan/pg:PgExecutor:explain"' to enable explain)`,
       );
     }
     if (publish) {

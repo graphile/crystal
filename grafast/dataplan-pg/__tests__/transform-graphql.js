@@ -211,10 +211,4 @@ it('matches plan (mermaid) snapshots with inlining disabled', () => assertSnapsh
     };
   };
 
-exports.process = exports.makeProcess(
-  // TODO: delete this argument
-  {
-    includeDeoptimize: false,
-    includeStringified: true,
-  },
-);
+exports.process = exports.makeProcess();

@@ -2,8 +2,7 @@
  * This is an adaptor for the `pg` module.
  */
 
-// TODO: don't import 'pg' or '@graphile/lru', we don't want these to be dependencies of @dataplan/pg.
-// TODO: This file should only be available via direct (path) import, it should not be included in the main package exports.
+// IMPORTANT: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
 import "../interfaces.js";
 

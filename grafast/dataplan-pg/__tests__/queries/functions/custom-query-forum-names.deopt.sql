@@ -3,4 +3,4 @@ select
 from app_public.forum_names() as __forum_names__(v)
 where (
   true /* authorization checks */
-)
+);

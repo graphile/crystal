@@ -4,4 +4,4 @@ select
 from unnest(app_public.random_user_array()) as __random_user_array__
 where (
   true /* authorization checks */
-)
+);

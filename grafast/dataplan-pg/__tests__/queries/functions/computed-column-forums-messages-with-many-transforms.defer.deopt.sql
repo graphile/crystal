@@ -8,7 +8,7 @@ where
   ) and (
     true /* authorization checks */
   )
-order by __forums__."id" asc
+order by __forums__."id" asc;
 
 select
   __messages__."body" as "0",
@@ -19,4 +19,4 @@ from app_public.messages as __messages__
 where (
   true /* authorization checks */
 )
-order by __messages__."id" asc
+order by __messages__."id" asc;

@@ -566,7 +566,8 @@ export class PgResource<
   }
 
   public getRelations(): GetPgRegistryCodecRelations<TRegistry, TCodec> {
-    return this.registry.pgRelations[this.codec.name] as any;
+    return (this.registry.pgRelations[this.codec.name] ??
+      Object.create(null)) as any;
   }
 
   public getRelation<

@@ -8,15 +8,10 @@ where
   ) and (
     true /* authorization checks */
   )
-order by __forums__."id" asc
+order by __forums__."id" asc;
 
 select __forums_messages_list_set_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::app_public.forums as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __forums_messages_list_set_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::app_public.forums as "id0" from json_array_elements($1::json) with ordinality as ids) as __forums_messages_list_set_identifiers__,
 lateral (
   select
     __forums_messages_list_set__."body" as "0",
@@ -28,4 +23,4 @@ lateral (
   where (
     true /* authorization checks */
   )
-) as __forums_messages_list_set_result__
+) as __forums_messages_list_set_result__;

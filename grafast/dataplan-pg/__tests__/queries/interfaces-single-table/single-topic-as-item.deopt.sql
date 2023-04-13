@@ -1,11 +1,5 @@
 select __single_table_items_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"int4" as "id0",
-    (ids.value->>1)::interfaces_and_unions.item_type as "id1"
-  from json_array_elements($1::json) with ordinality as ids
-) as __single_table_items_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::interfaces_and_unions.item_type as "id1") as __single_table_items_identifiers__,
 lateral (
   select
     __single_table_items__."id"::text as "0",
@@ -28,4 +22,4 @@ lateral (
       __single_table_items__."type" = __single_table_items_identifiers__."id1"
     )
   order by __single_table_items__."id" asc
-) as __single_table_items_result__
+) as __single_table_items_result__;

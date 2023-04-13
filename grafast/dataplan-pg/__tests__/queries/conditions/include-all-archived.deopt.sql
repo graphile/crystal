@@ -6,15 +6,10 @@ where (
   true /* authorization checks */
 )
 order by __forums__."id" asc
-limit 2
+limit 2;
 
 select __messages_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"uuid" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __messages_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __messages_identifiers__,
 lateral (
   select
     __messages__."body" as "0",
@@ -26,15 +21,10 @@ lateral (
   )
   order by __messages__."id" asc
   limit 2
-) as __messages_result__
+) as __messages_result__;
 
 select __users_result__.*
-from (
-  select
-    ids.ordinality - 1 as idx,
-    (ids.value->>0)::"uuid" as "id0"
-  from json_array_elements($1::json) with ordinality as ids
-) as __users_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __users_identifiers__,
 lateral (
   select
     __users__."username" as "0",
@@ -48,4 +38,4 @@ lateral (
       __users__."id" = __users_identifiers__."id0"
     )
   order by __users__."id" asc
-) as __users_result__
+) as __users_result__;
