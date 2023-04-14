@@ -87,7 +87,7 @@ export class DeepEvalStep extends ExecutableStep {
     const bucket = extra._bucket;
 
     const childLayerPlan = this.subroutineLayer;
-    const copyStepIds = childLayerPlan.copyPlanIds;
+    const copyStepIds = childLayerPlan.copyStepIds;
 
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: string[] = [];

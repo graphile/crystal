@@ -294,12 +294,12 @@ export function executePreemptive(
     const store: Bucket["store"] = new Map();
     const newBucketIndex = 0;
 
-    for (const depId of layerPlan.copyPlanIds) {
+    for (const depId of layerPlan.copyStepIds) {
       store.set(depId, []);
     }
 
     store.set(layerPlan.rootStep!.id, [payload]);
-    for (const depId of layerPlan.copyPlanIds) {
+    for (const depId of layerPlan.copyStepIds) {
       store.get(depId)![newBucketIndex] =
         rootBucket.store.get(depId)![bucketIndex];
     }
@@ -666,7 +666,7 @@ async function processStream(
     const listItemStepIdList: any[] = [];
     store.set(listItemStepId, listItemStepIdList);
 
-    for (const copyPlanId of directLayerPlanChild.copyPlanIds) {
+    for (const copyPlanId of directLayerPlanChild.copyStepIds) {
       store.set(copyPlanId, []);
     }
 
@@ -677,7 +677,7 @@ async function processStream(
 
       polymorphicPathList[bucketIndex] =
         spec.bucket.polymorphicPathList[spec.bucketIndex];
-      for (const copyPlanId of directLayerPlanChild.copyPlanIds) {
+      for (const copyPlanId of directLayerPlanChild.copyStepIds) {
         const list = spec.bucket.store.get(copyPlanId);
         if (!list) {
           throw new Error(
@@ -831,7 +831,7 @@ function processSingleDeferred(
   const store: Bucket["store"] = new Map();
   const polymorphicPathList: string[] = [];
 
-  for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
+  for (const copyPlanId of outputPlan.layerPlan.copyStepIds) {
     store.set(copyPlanId, []);
   }
 
@@ -839,7 +839,7 @@ function processSingleDeferred(
   for (const [, spec] of specs) {
     polymorphicPathList[bucketIndex] =
       spec.bucket.polymorphicPathList[spec.bucketIndex];
-    for (const copyPlanId of outputPlan.layerPlan.copyPlanIds) {
+    for (const copyPlanId of outputPlan.layerPlan.copyStepIds) {
       store.get(copyPlanId)![bucketIndex] =
         spec.bucket.store.get(copyPlanId)![spec.bucketIndex];
     }

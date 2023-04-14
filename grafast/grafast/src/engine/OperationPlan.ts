@@ -2683,7 +2683,7 @@ ${te.join(
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
-        if (currentLayerPlan.copyPlanIds.includes(dep.id)) {
+        if (currentLayerPlan.copyStepIds.includes(dep.id)) {
           break;
         }
         if (isDev && this.stepTracker.getStepById(dep.id) !== dep) {
@@ -2691,7 +2691,7 @@ ${te.join(
             `Plan mismatch - ${dep} != ${this.stepTracker.getStepById(dep.id)}`,
           );
         }
-        currentLayerPlan.copyPlanIds.push(dep.id);
+        currentLayerPlan.copyStepIds.push(dep.id);
         currentLayerPlan = currentLayerPlan.parentLayerPlan;
         if (!currentLayerPlan) {
           throw new Error(
