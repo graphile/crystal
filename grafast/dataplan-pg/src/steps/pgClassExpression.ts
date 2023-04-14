@@ -41,14 +41,13 @@ export class PgClassExpressionStep<
 
   isSyncAndSafe = true;
 
-  // TODO: rename to 'row'?
   /**
    * The dependency id of the parent table row (from SELECT,
    * INSERT...RETURNING, etc).
    *
    * @internal
    */
-  public readonly tableId: number;
+  public readonly rowDependencyId: number;
 
   /**
    * This is the numeric index of this expression within the grandparent
@@ -70,7 +69,7 @@ export class PgClassExpressionStep<
     this.needsPolymorphicUnwrap =
       $table instanceof PgUnionAllSingleStep &&
       $table.getClassStep().mode === "normal";
-    this.tableId = this.addDependency($table);
+    this.rowDependencyId = this.addDependency($table);
     if (strings.length !== dependencies.length + 1) {
       throw new Error(
         `Invalid call to PgClassExpressionStep; should have exactly one more string (found ${strings.length}) than dependency (found ${dependencies.length}). Recommend using the tagged template literal helper pgClassExpression.`,
@@ -172,7 +171,7 @@ export class PgClassExpressionStep<
   }
 
   public getParentStep(): PgClassSingleStep<TResource> | PgUnionAllSingleStep {
-    const step = this.getDep(this.tableId);
+    const step = this.getDep(this.rowDependencyId);
     if (
       !(step instanceof PgSelectSingleStep) &&
       !(step instanceof PgInsertStep) &&

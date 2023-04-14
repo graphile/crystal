@@ -2516,7 +2516,7 @@ ${lateralText};`;
         } else if (dep instanceof ConnectionStep) {
           // We only have this to detect errors, it's an empty object. Safe.
         } else if (dep instanceof PgClassExpressionStep) {
-          const p2 = dep.getDep(dep.tableId);
+          const p2 = dep.getDep(dep.rowDependencyId);
           const t2Parent = dep.getParentStep();
           if (!(t2Parent instanceof PgSelectSingleStep)) {
             continue;
