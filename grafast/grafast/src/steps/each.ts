@@ -39,7 +39,7 @@ export function each<
   TListStep extends ExecutableStep<readonly any[]>,
   TResultItemStep extends ExecutableStep,
 >(
-  listPlan: TListStep,
+  listStep: TListStep,
   mapper: (
     itemPlan: TListStep extends ListCapableStep<any, any>
       ? ReturnType<TListStep["listItem"]>
@@ -47,14 +47,14 @@ export function each<
   ) => TResultItemStep,
 ): __ListTransformStep<any, any, any, any> {
   return listTransform<any, any, any, any>({
-    listPlan,
+    listStep,
     itemPlanCallback: eachItemPlanCallback,
     initialState: eachInitialState,
     reduceCallback: eachReduceCallback,
-    listItem: isListCapableStep(listPlan)
-      ? eachCallbackForListPlan(listPlan, mapper)
+    listItem: isListCapableStep(listStep)
+      ? eachCallbackForListPlan(listStep, mapper)
       : mapper,
-    meta: `each:${chalk.yellow(listPlan.id)}${
+    meta: `each:${chalk.yellow(listStep.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,
     optimize(this) {

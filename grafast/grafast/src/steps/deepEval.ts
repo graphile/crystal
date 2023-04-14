@@ -190,7 +190,11 @@ export class DeepEvalStep extends ExecutableStep {
 
 // TODO: document this better. (Had to do it for `each($items, $item =>
 // object({...}))` JSON transform in pg-many-to-many
-// TODO: rename this!
+
+// TODO: rename this! Don't want to confuse with `eval()`.
+// Ideas: "evaluate", "resolve", "conclude", "finalize", "execute".
+// Don't like any of these really. `deepEvaluate` is probably the best, but is
+// it worth the effort?
 /**
  * If you want to use a step that might represent a list and you need all of
  * the `listItem` transforms to have already taken place (e.g. you're going to

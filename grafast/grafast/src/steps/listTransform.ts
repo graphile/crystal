@@ -36,7 +36,7 @@ export interface ListTransformOptions<
   TMemo,
   TItemStep extends ExecutableStep | undefined = undefined,
 > {
-  listPlan: TListStep;
+  listStep: TListStep;
   // TODO: rename this:
   itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
   initialState(): TMemo;
@@ -100,7 +100,7 @@ export class __ListTransformStep<
   ) {
     super();
     const {
-      listPlan,
+      listStep,
       itemPlanCallback,
       initialState,
       reduceCallback,
@@ -109,7 +109,7 @@ export class __ListTransformStep<
       meta,
       optimize,
     } = options;
-    this.listPlanDepId = this.addDependency(listPlan);
+    this.listPlanDepId = this.addDependency(listStep);
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
     this.reduceCallback = reduceCallback;
@@ -128,18 +128,18 @@ export class __ListTransformStep<
         type: "subroutine",
         parentStep: this,
       },
-      listPlan.polymorphicPaths,
+      listStep.polymorphicPaths,
     );
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
-      listPlan.polymorphicPaths,
+      listStep.polymorphicPaths,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
-        const $__listItem = new __ItemStep(listPlan);
+        const $__listItem = new __ItemStep(listStep);
         $__listItem.transformStepId = this.id;
         this.itemStepId = $__listItem.id;
-        const $listItem = isListCapableStep(listPlan)
-          ? listPlan.listItem($__listItem)
+        const $listItem = isListCapableStep(listStep)
+          ? listStep.listItem($__listItem)
           : $__listItem;
         const $newListItem = this.itemPlanCallback($listItem as any);
 
