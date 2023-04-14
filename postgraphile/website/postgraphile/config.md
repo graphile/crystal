@@ -341,7 +341,7 @@ to determine the options that they offer.
 - `pgJwtSignOptions`
 - `pgUseCustomNetworkScalars: boolean` - if not false, adds the `CidrAddress`,
   `MacAddress` and similar types for PostgreSQL network scalars.
-- `orderByNullsLast: boolean | undefined` - if true, orders such that nulls are
+- `pgOrderByNullsLast: boolean | undefined` - if true, orders such that nulls are
   always last; if false, orders such that nulls are always first; otherwise uses
   the default ordering
 - `pgForbidSetofFunctionsToReturnNull: boolean` - if true, setof functions

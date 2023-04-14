@@ -51,7 +51,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
         const {
           scope: { isPgRowSortEnum, pgCodec: rawPgCodec },
         } = context;
-        const { orderByNullsLast } = options;
+        const { pgOrderByNullsLast } = options;
         if (
           !isPgRowSortEnum ||
           !rawPgCodec ||
@@ -136,7 +136,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                               PgUnionAllStep,
                               attributeName,
                               isUnique,
-                              orderByNullsLast,
+                              pgOrderByNullsLast,
                             ) =>
                             (plan: ExecutableStep | ModifierStep): void => {
                               if (
@@ -150,9 +150,9 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                               plan.orderBy({
                                 attribute: attributeName,
                                 direction: "ASC",
-                                ...(orderByNullsLast != null
+                                ...(pgOrderByNullsLast != null
                                   ? {
-                                      nulls: orderByNullsLast
+                                      nulls: pgOrderByNullsLast
                                         ? "LAST"
                                         : "FIRST",
                                     }
@@ -167,7 +167,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                             PgUnionAllStep,
                             attributeName,
                             isUnique,
-                            orderByNullsLast,
+                            pgOrderByNullsLast,
                           ],
                         ),
                       },
@@ -195,7 +195,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                               PgUnionAllStep,
                               attributeName,
                               isUnique,
-                              orderByNullsLast,
+                              pgOrderByNullsLast,
                             ) =>
                             (plan: ExecutableStep | ModifierStep): void => {
                               if (
@@ -209,9 +209,9 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                               plan.orderBy({
                                 attribute: attributeName,
                                 direction: "DESC",
-                                ...(orderByNullsLast != null
+                                ...(pgOrderByNullsLast != null
                                   ? {
-                                      nulls: orderByNullsLast
+                                      nulls: pgOrderByNullsLast
                                         ? "LAST"
                                         : "FIRST",
                                     }
@@ -226,7 +226,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                             PgUnionAllStep,
                             attributeName,
                             isUnique,
-                            orderByNullsLast,
+                            pgOrderByNullsLast,
                           ],
                         ),
                       },
