@@ -56,7 +56,7 @@ const ctx = {};
 const result = await grafast(
   {
     schema,
-    resource: /* GraphQL */ `
+    source: /* GraphQL */ `
       query MyQuery {
         __typename
       }
@@ -114,13 +114,13 @@ import preset from "./graphile.config.js";
 const schemaResultPromise = makeSchema(preset);
 
 /**
- * Given a request context `ctx`, GraphQL query text `resource` and optionally
+ * Given a request context `ctx`, GraphQL query text `source` and optionally
  * variable values and operation name, execute the given GraphQL operation
  * against our schema and return the result.
  */
 export async function executeQuery(
   ctx: Grafast.RequestContext,
-  resource: string,
+  source: string,
   variableValues?: Record<string, unknown> | null,
   operationName?: string,
 ) {
@@ -128,7 +128,7 @@ export async function executeQuery(
   const { schema, resolvedPreset } = await schemaResultPromise;
 
   // Parse the GraphQL query text:
-  const document = parse(resource);
+  const document = parse(source);
 
   // Validate the GraphQL document against the schema:
   const errors = validate(schema, document);
