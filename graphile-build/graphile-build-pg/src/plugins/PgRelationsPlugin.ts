@@ -1343,7 +1343,6 @@ function addRelations(
                 isPgFieldConnection: true,
                 isPgManyRelationConnectionField: true,
                 pgRelationDetails,
-                // TODO: rename to pgFieldBehavior?
                 fieldBehavior: behavior,
               },
               {

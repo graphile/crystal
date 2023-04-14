@@ -226,7 +226,6 @@ interface State {
 }
 interface Cache {}
 
-// TODO: rename to "PgClassesPlugin"? This coverse more than just tables.
 export const PgTablesPlugin: GraphileConfig.Plugin = {
   name: "PgTablesPlugin",
   description:
