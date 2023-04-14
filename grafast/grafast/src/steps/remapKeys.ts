@@ -47,7 +47,7 @@ function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
 export class RemapKeysStep extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
-    exportName: "MapStep",
+    exportName: "RemapKeysStep",
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
