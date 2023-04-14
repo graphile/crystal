@@ -13,29 +13,48 @@ export function stringifyPayload(
     throw new Error("Haven't implemented incremental yet");
   }
   if (payload.errors !== undefined) {
-    if (!first) str += ",";
-    first = false;
+    if (!first) {
+      str += ",";
+      first = false;
+    }
     str += `"errors":${JSON.stringify(payload.errors)}`;
   }
-  if (payload.data !== undefined) {
-    if (!first) str += ",";
-    first = false;
-    // TODO: assert that data is a string
-    str += `"data":${payload.data ?? "null"}`;
+  if (payload.data === undefined) {
+    // noop
+  } else if (payload.data === null) {
+    if (!first) {
+      str += ",";
+      first = false;
+    }
+    str += `"data":null`;
+  } else if (typeof payload.data === "string") {
+    if (!first) {
+      str += ",";
+      first = false;
+    }
+    str += `"data":${payload.data}`;
+  } else {
+    throw new Error(`Expected data to be null, undefined, or a JSON string`);
   }
   if (payload.extensions !== undefined) {
-    if (!first) str += ",";
-    first = false;
+    if (!first) {
+      str += ",";
+      first = false;
+    }
     str += `"extensions":${JSON.stringify(payload.extensions)}`;
   }
   if (payload.label !== undefined) {
-    if (!first) str += ",";
-    first = false;
+    if (!first) {
+      str += ",";
+      first = false;
+    }
     str += `"label":${JSON.stringify(payload.label)}`;
   }
   if (payload.hasNext !== undefined) {
-    if (!first) str += ",";
-    first = false;
+    if (!first) {
+      str += ",";
+      first = false;
+    }
     str += `"hasNext":${JSON.stringify(payload.hasNext)}`;
   }
   str += "}";
