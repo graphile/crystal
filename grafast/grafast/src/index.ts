@@ -30,7 +30,7 @@ import {
   SafeError,
 } from "./error.js";
 import { execute } from "./execute.js";
-import { grafastGraphql, grafastGraphqlSync } from "./grafastGraphql.js";
+import { grafast, grafastSync } from "./grafastGraphql.js";
 import { InputStep } from "./input.js";
 import {
   $$bypassGraphQL,
@@ -266,7 +266,7 @@ export {
   first,
   FirstStep,
   getEnumValueConfig,
-  grafastGraphql as grafast, // TODO: rename grafastGraphql to just grafast
+  grafast,
   GrafastArgumentConfig,
   GrafastArgumentExtensions,
   GrafastEnumValueExtensions,
@@ -274,8 +274,8 @@ export {
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastFieldExtensions,
-  grafastGraphql,
-  grafastGraphqlSync,
+  grafast as grafastGraphql,
+  grafastSync as grafastGraphqlSync,
   GrafastInputFieldConfig,
   GrafastInputFieldConfigMap,
   GrafastInputFieldExtensions,
@@ -287,7 +287,7 @@ export {
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastSubscriber,
-  grafastGraphqlSync as grafastSync, // TODO: rename grafastGraphqlSync to just grafastSync
+  grafastSync,
   GrafastValuesList,
   GraphQLItemHandler,
   graphqlItemHandler,
@@ -404,8 +404,8 @@ exportAsMany("grafast", {
   OperationPlan,
   defer,
   execute,
-  grafastGraphql,
-  grafastGraphqlSync,
+  grafast,
+  grafastSync,
   subscribe,
   __InputListStep,
   stringifyPayload,
