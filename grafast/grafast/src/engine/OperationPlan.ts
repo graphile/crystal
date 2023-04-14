@@ -2869,7 +2869,7 @@ ${te.join(
         ensurePlanAvailableInLayer($root, layerPlan);
       }
 
-      // Copy polymorphic parentPlanId
+      // Copy polymorphic parentStepId
       if (layerPlan.reason.type === "polymorphic") {
         const parentStep = layerPlan.reason.parentStep;
         ensurePlanAvailableInLayer(parentStep, layerPlan);
