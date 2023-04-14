@@ -325,7 +325,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgUpdateSingleStep | PgDeleteSingleStep;
+                                      result:
+                                        | PgUpdateSingleStep
+                                        | PgDeleteSingleStep;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -775,7 +777,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 function plan(
                                   _: any,
                                   $object: ObjectStep<{
-                                    result: PgUpdateSingleStep | PgDeleteSingleStep;
+                                    result:
+                                      | PgUpdateSingleStep
+                                      | PgDeleteSingleStep;
                                   }>,
                                 ) {
                                   return $object;
@@ -813,7 +817,12 @@ return (_$root, args) => {
                                   [object, pgUpdateSingle, resource],
                                 )
                               : (EXPORTABLE(
-                                  (object, pgUpdateSingle, resource, specFromArgs) =>
+                                  (
+                                    object,
+                                    pgUpdateSingle,
+                                    resource,
+                                    specFromArgs,
+                                  ) =>
                                     function plan(
                                       _$root: ExecutableStep,
                                       args: FieldArgs,
@@ -827,7 +836,12 @@ return (_$root, args) => {
                                       args.apply(plan);
                                       return plan;
                                     },
-                                  [object, pgUpdateSingle, resource, specFromArgs],
+                                  [
+                                    object,
+                                    pgUpdateSingle,
+                                    resource,
+                                    specFromArgs,
+                                  ],
                                 ) as any)
                             : specFromArgsString
                             ? // eslint-disable-next-line graphile-export/exhaustive-deps
@@ -843,7 +857,12 @@ return (_$root, args) => {
                                 [object, pgDeleteSingle, resource],
                               )
                             : (EXPORTABLE(
-                                (object, pgDeleteSingle, resource, specFromArgs) =>
+                                (
+                                  object,
+                                  pgDeleteSingle,
+                                  resource,
+                                  specFromArgs,
+                                ) =>
                                   function plan(
                                     _$root: ExecutableStep,
                                     args: FieldArgs,
@@ -857,7 +876,12 @@ return (_$root, args) => {
                                     args.apply(plan);
                                     return plan;
                                   },
-                                [object, pgDeleteSingle, resource, specFromArgs],
+                                [
+                                  object,
+                                  pgDeleteSingle,
+                                  resource,
+                                  specFromArgs,
+                                ],
                               ) as any),
                       },
                     ),

@@ -287,7 +287,10 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       (object, pgInsertSingle, resource) =>
                         function plan(_: any, args: FieldArgs) {
                           const plan = object({
-                            result: pgInsertSingle(resource, Object.create(null)),
+                            result: pgInsertSingle(
+                              resource,
+                              Object.create(null),
+                            ),
                           });
                           args.apply(plan);
                           return plan;

@@ -65,7 +65,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
               extensions: {
                 grafast: {
                   applyPlan: EXPORTABLE(
-                    (pgOrderByNullsLast, pgCodec, primaryKeyAttributes, sql) =>
+                    (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
                       (step: PgSelectStep) => {
                         primaryKeyAttributes.forEach((attributeName) => {
                           const attribute = pgCodec.attributes[attributeName];
@@ -84,7 +84,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                         });
                         step.setOrderIsUnique();
                       },
-                    [pgOrderByNullsLast, pgCodec, primaryKeyAttributes, sql],
+                    [pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql],
                   ),
                 },
               },
@@ -93,7 +93,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
               extensions: {
                 grafast: {
                   applyPlan: EXPORTABLE(
-                    (pgOrderByNullsLast, pgCodec, primaryKeyAttributes, sql) =>
+                    (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
                       (step: PgSelectStep) => {
                         primaryKeyAttributes.forEach((attributeName) => {
                           const attribute = pgCodec.attributes[attributeName];
@@ -112,7 +112,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                         });
                         step.setOrderIsUnique();
                       },
-                    [pgOrderByNullsLast, pgCodec, primaryKeyAttributes, sql],
+                    [pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql],
                   ),
                 },
               },
