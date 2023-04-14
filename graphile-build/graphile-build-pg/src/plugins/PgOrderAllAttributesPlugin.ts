@@ -30,7 +30,6 @@ declare global {
   }
 }
 
-// TODO: respect indexes - via behavior?
 export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
   name: "PgOrderAllAttributesPlugin",
   description: "Allows ordering by table attributes",

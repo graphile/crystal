@@ -144,7 +144,6 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
             ),
             extensions: {
               grafast: {
-                // TODO: optimized version of this
                 plan: EXPORTABLE(
                   () =>
                     function plan($in) {
