@@ -209,6 +209,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             serviceName,
             pgProc,
           });
+          // TODO: this isn't a sufficiently unique name, it does not allow for overloaded functions
           const identifier = `${serviceName}.${namespace.nspname}.${pgProc.proname}(...)`;
           const makeCodecFromReturn = async (): Promise<PgCodec | null> => {
             // We're building a PgCodec to represent specifically the
@@ -305,7 +306,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const executor =
             info.helpers.pgIntrospection.getExecutorForService(serviceName);
-          // TODO: this isn't a sufficiently unique name, it does not allow for overloaded functions
 
           const parameters: PgResourceParameter[] = [];
 
