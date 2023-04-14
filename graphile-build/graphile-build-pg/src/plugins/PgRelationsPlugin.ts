@@ -45,7 +45,7 @@ declare global {
       isPgManyRelationConnectionField?: boolean;
       isPgManyRelationListField?: boolean;
       pgRelationDetails?: PgRelationsPluginRelationDetails;
-      behavior?: string;
+      fieldBehavior?: string;
     }
     interface Inflection {
       resourceRelationName(
@@ -614,8 +614,8 @@ function addRelations(
   // const objectMode = context.type === "GraphQLObjectType";
 
   const { pgCodec } = scope;
-  const isPgTableType =
-    "isPgTableType" in scope ? scope.isPgTableType : undefined;
+  const isPgClassType =
+    "isPgClassType" in scope ? scope.isPgClassType : undefined;
   const pgTypeResource =
     "pgTypeResource" in scope ? scope.pgTypeResource : undefined;
   const isMutationPayload =
@@ -625,7 +625,7 @@ function addRelations(
 
   const codec = (pgTypeResource?.codec ?? pgCodec) as PgCodec;
   // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
-  if (!(isPgTableType || isMutationPayload || pgPolymorphism) || !codec) {
+  if (!(isPgClassType || isMutationPayload || pgPolymorphism) || !codec) {
     return fields;
   }
   const allPgResources = Object.values(build.input.pgRegistry.pgResources);
@@ -1258,7 +1258,7 @@ function addRelations(
       isReferencee,
       identifier,
       description,
-      pgResource,
+      pgResource: pgFieldResource,
       pgCodec: pgFieldCodec,
       pgRelationDetails,
       relatedTypeName,
@@ -1301,7 +1301,7 @@ function addRelations(
               fieldName,
               fieldBehaviorScope: `${relationTypeScope}:resource:single`,
               isPgSingleRelationField: true,
-              behavior,
+              fieldBehavior: behavior,
               pgRelationDetails,
             },
             {
@@ -1338,15 +1338,13 @@ function addRelations(
               {
                 fieldName,
                 fieldBehaviorScope: `${relationTypeScope}:resource:connection`,
-                // TODO: rename to pgFieldSource?
-                pgResource,
+                pgFieldResource: pgFieldResource,
                 pgFieldCodec,
                 isPgFieldConnection: true,
                 isPgManyRelationConnectionField: true,
-                // TODO: rename to pgFieldRelationDetails?
                 pgRelationDetails,
                 // TODO: rename to pgFieldBehavior?
-                behavior,
+                fieldBehavior: behavior,
               },
               {
                 description:
@@ -1383,12 +1381,12 @@ function addRelations(
             {
               fieldName,
               fieldBehaviorScope: `${relationTypeScope}:resource:list`,
-              pgResource,
+              pgFieldResource: pgFieldResource,
               pgFieldCodec,
               isPgFieldSimpleCollection: true,
               isPgManyRelationListField: true,
               pgRelationDetails,
-              behavior,
+              fieldBehavior: behavior,
             },
             {
               description:

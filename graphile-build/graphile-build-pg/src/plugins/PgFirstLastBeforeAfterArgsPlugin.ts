@@ -57,7 +57,7 @@ function commonFn(
     fieldName,
     isPgFieldConnection,
     isPgFieldSimpleCollection,
-    pgResource,
+    pgFieldResource: pgResource,
     pgFieldCodec,
   } = scope;
 

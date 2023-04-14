@@ -825,11 +825,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         } = build;
         const {
           Self,
-          scope: { isPgTableType, pgCodec, isRootQuery, isRootMutation },
+          scope: { isPgClassType, pgCodec, isRootQuery, isRootMutation },
           fieldWithHooks,
         } = context;
         const SelfName = Self.name;
-        if (!(isPgTableType && pgCodec) && !isRootQuery && !isRootMutation) {
+        if (!(isPgClassType && pgCodec) && !isRootQuery && !isRootMutation) {
           return fields;
         }
         const procSources = isRootQuery
@@ -1112,7 +1112,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               fieldName,
                               fieldBehaviorScope: connectionFieldBehaviorScope,
                               isPgFieldConnection: true,
-                              pgResource: resource,
+                              pgFieldResource: resource,
                             },
                             {
                               description:
@@ -1188,7 +1188,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             isPgFieldSimpleCollection: resource.isList
                               ? false // No pagination if it returns an array - just return it.
                               : true,
-                            pgResource: resource,
+                            pgFieldResource: resource,
                           },
                           {
                             description: resource.description,

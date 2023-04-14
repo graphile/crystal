@@ -296,7 +296,7 @@ function processAttribute(
       [attributeFieldName]: context.fieldWithHooks(
         {
           fieldName: attributeFieldName,
-          pgAttribute: attribute,
+          pgFieldAttribute: attribute,
         },
         fieldSpec,
       ),
@@ -379,13 +379,13 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         const {
           scope: {
             pgCodec,
-            isPgTableType,
+            isPgClassType,
             pgPolymorphism,
             pgPolymorphicSingleTableType,
           },
         } = context;
 
-        if (!isPgTableType || !pgCodec?.attributes) {
+        if (!isPgClassType || !pgCodec?.attributes) {
           return fields;
         }
 

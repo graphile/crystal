@@ -142,23 +142,20 @@ declare global {
 
     interface ScopeObject {
       pgCodec?: PgCodec<any, any, any, any, any, any, any>;
-      // TODO: rename this to isPgClassType?
-      isPgTableType?: boolean;
+      isPgClassType?: boolean;
       isPgConnectionRelated?: true;
     }
     interface ScopeObjectFieldsField {
-      // TODO: put 'field' into all these names?
-      pgResource?: PgResource<any, any, any, any, any>;
+      pgFieldResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgAttribute?: PgCodecAttribute<any>;
+      pgFieldAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
     interface ScopeInterfaceFieldsField {
-      // TODO: put 'field' into all these names?
-      pgResource?: PgResource<any, any, any, any, any>;
+      pgFieldResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgAttribute?: PgCodecAttribute<any>;
+      pgFieldAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -641,7 +638,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 tableTypeName,
                 {
                   pgCodec: codec,
-                  isPgTableType: true,
+                  isPgClassType: true,
                 },
                 assertPgClassSingleStep,
                 () => ({

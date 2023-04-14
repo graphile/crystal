@@ -109,7 +109,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     fieldName,
                     fieldBehaviorScope: `query:resource:list`,
                     isPgFieldSimpleCollection: true,
-                    pgResource: resource,
+                    pgFieldResource: resource,
                   },
                   () => ({
                     type: new GraphQLList(
@@ -155,7 +155,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                       fieldName,
                       fieldBehaviorScope: `query:resource:connection`,
                       isPgFieldConnection: true,
-                      pgResource: resource,
+                      pgFieldResource: resource,
                     },
                     () => ({
                       type: connectionType,

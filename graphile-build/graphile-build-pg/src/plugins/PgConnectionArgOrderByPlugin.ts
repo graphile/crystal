@@ -108,7 +108,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           fieldName,
           isPgFieldConnection,
           isPgFieldSimpleCollection,
-          pgResource,
+          pgFieldResource: pgResource,
           pgFieldCodec,
         } = scope;
 
