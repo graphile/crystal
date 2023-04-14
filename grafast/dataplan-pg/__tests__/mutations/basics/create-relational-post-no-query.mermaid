@@ -20,9 +20,9 @@ graph TD
     Access14{{"Access[14∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access15{{"Access[15∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object16{{"Object[16∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgInsert13[["PgInsert[13∈1]"]]:::sideeffectplan
+    PgInsertSingle13[["PgInsertSingle[13∈1]"]]:::sideeffectplan
     PgClassExpression17{{"PgClassExpression[17∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgInsert18[["PgInsert[18∈1]"]]:::sideeffectplan
+    PgInsertSingle18[["PgInsertSingle[18∈1]"]]:::sideeffectplan
     PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸ__relational_posts__ᐳ"}}:::plan
     __InputStaticLeaf24{{"__InputStaticLeaf[24∈0]"}}:::plan
     __InputStaticLeaf25{{"__InputStaticLeaf[25∈0]"}}:::plan
@@ -32,9 +32,9 @@ graph TD
     Access30{{"Access[30∈3]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access31{{"Access[31∈3]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object32{{"Object[32∈3]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgInsert29[["PgInsert[29∈3]"]]:::sideeffectplan
+    PgInsertSingle29[["PgInsertSingle[29∈3]"]]:::sideeffectplan
     PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgInsert34[["PgInsert[34∈3]"]]:::sideeffectplan
+    PgInsertSingle34[["PgInsertSingle[34∈3]"]]:::sideeffectplan
     PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__relational_posts__ᐳ"}}:::plan
     __InputStaticLeaf39{{"__InputStaticLeaf[39∈4]"}}:::plan
     PgSelect40[["PgSelect[40∈4]<br />ᐸrelational_itemsᐳ"]]:::plan
@@ -119,9 +119,9 @@ graph TD
     Access202{{"Access[202∈9]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access203{{"Access[203∈9]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object204{{"Object[204∈9]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgInsert201[["PgInsert[201∈9]"]]:::sideeffectplan
+    PgInsertSingle201[["PgInsertSingle[201∈9]"]]:::sideeffectplan
     PgClassExpression205{{"PgClassExpression[205∈9]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgInsert206[["PgInsert[206∈9]"]]:::sideeffectplan
+    PgInsertSingle206[["PgInsertSingle[206∈9]"]]:::sideeffectplan
     PgClassExpression210{{"PgClassExpression[210∈9]<br />ᐸ__relational_posts__ᐳ"}}:::plan
     __InputStaticLeaf211{{"__InputStaticLeaf[211∈10]"}}:::plan
     PgSelect212[["PgSelect[212∈10]<br />ᐸrelational_itemsᐳ"]]:::plan
@@ -203,17 +203,17 @@ graph TD
     __Value3 --> Access14
     __Value3 --> Access15
     Access14 & Access15 --> Object16
-    Object16 & Constant11 & Constant12 --> PgInsert13
-    PgInsert13 --> PgClassExpression17
-    Object16 & PgClassExpression17 & __InputStaticLeaf8 & __InputStaticLeaf9 & __InputStaticLeaf10 --> PgInsert18
-    PgInsert18 --> PgClassExpression22
+    Object16 & Constant11 & Constant12 --> PgInsertSingle13
+    PgInsertSingle13 --> PgClassExpression17
+    Object16 & PgClassExpression17 & __InputStaticLeaf8 & __InputStaticLeaf9 & __InputStaticLeaf10 --> PgInsertSingle18
+    PgInsertSingle18 --> PgClassExpression22
     __Value3 --> Access30
     __Value3 --> Access31
     Access30 & Access31 --> Object32
-    Object32 & Constant27 & Constant28 --> PgInsert29
-    PgInsert29 --> PgClassExpression33
-    Object32 & PgClassExpression33 & __InputStaticLeaf24 & __InputStaticLeaf25 & __InputStaticLeaf26 --> PgInsert34
-    PgInsert34 --> PgClassExpression38
+    Object32 & Constant27 & Constant28 --> PgInsertSingle29
+    PgInsertSingle29 --> PgClassExpression33
+    Object32 & PgClassExpression33 & __InputStaticLeaf24 & __InputStaticLeaf25 & __InputStaticLeaf26 --> PgInsertSingle34
+    PgInsertSingle34 --> PgClassExpression38
     Object32 & __InputStaticLeaf39 --> PgSelect40
     PgSelect40 --> First44
     First44 --> PgSelectSingle45
@@ -289,10 +289,10 @@ graph TD
     __Value3 --> Access202
     __Value3 --> Access203
     Access202 & Access203 --> Object204
-    Object204 & Constant199 & Constant200 --> PgInsert201
-    PgInsert201 --> PgClassExpression205
-    Object204 & PgClassExpression205 & __InputStaticLeaf196 & __InputStaticLeaf197 & __InputStaticLeaf198 --> PgInsert206
-    PgInsert206 --> PgClassExpression210
+    Object204 & Constant199 & Constant200 --> PgInsertSingle201
+    PgInsertSingle201 --> PgClassExpression205
+    Object204 & PgClassExpression205 & __InputStaticLeaf196 & __InputStaticLeaf197 & __InputStaticLeaf198 --> PgInsertSingle206
+    PgInsertSingle206 --> PgClassExpression210
     Object204 & __InputStaticLeaf211 --> PgSelect212
     PgSelect212 --> First216
     First216 --> PgSelectSingle217
@@ -370,15 +370,15 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf8,__InputStaticLeaf9,__InputStaticLeaf10,Constant11,Constant12,Access14,Access15,Object16,__InputStaticLeaf24,__InputStaticLeaf25,__InputStaticLeaf26,__InputStaticLeaf196,__InputStaticLeaf197,__InputStaticLeaf198 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsert[13]<br />2: PgClassExpression[17]<br />3: PgInsert[18]<br />4: <br />ᐳ: PgClassExpression[22]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 11, 12, 8, 9, 10<br /><br />1: PgInsertSingle[13]<br />2: PgClassExpression[17]<br />3: PgInsertSingle[18]<br />4: <br />ᐳ: PgClassExpression[22]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert13,PgClassExpression17,PgInsert18,PgClassExpression22 bucket1
+    class Bucket1,PgInsertSingle13,PgClassExpression17,PgInsertSingle18,PgClassExpression22 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (mutationField)<br />Deps: 3, 24, 25, 26, 5<br /><br />1: Access[30]<br />2: Access[31]<br />3: Object[32]<br />4: Constant[27]<br />5: Constant[28]<br />6: PgInsert[29]<br />7: PgClassExpression[33]<br />8: PgInsert[34]<br />9: <br />ᐳ: PgClassExpression[38]"):::bucket
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 3, 24, 25, 26, 5<br /><br />1: Access[30]<br />2: Access[31]<br />3: Object[32]<br />4: Constant[27]<br />5: Constant[28]<br />6: PgInsertSingle[29]<br />7: PgClassExpression[33]<br />8: PgInsertSingle[34]<br />9: <br />ᐳ: PgClassExpression[38]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,Constant27,Constant28,PgInsert29,Access30,Access31,Object32,PgClassExpression33,PgInsert34,PgClassExpression38 bucket3
+    class Bucket3,Constant27,Constant28,PgInsertSingle29,Access30,Access31,Object32,PgClassExpression33,PgInsertSingle34,PgClassExpression38 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 32, 38, 5<br /><br />ROOT PgClassExpression{3}ᐸ__relational_posts__ᐳ[38]<br />1: <br />ᐳ: 39, 91, 143<br />2: 40, 92, 144<br />ᐳ: 44, 45, 48, 96, 97, 100, 148, 149, 152"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__InputStaticLeaf39,PgSelect40,First44,PgSelectSingle45,PgClassExpression48,__InputStaticLeaf91,PgSelect92,First96,PgSelectSingle97,PgClassExpression100,__InputStaticLeaf143,PgSelect144,First148,PgSelectSingle149,PgClassExpression152 bucket4
@@ -394,9 +394,9 @@ graph TD
     Bucket8("Bucket 8 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 32, 152, 151<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgSelect153,First157,PgSelectSingle158,PgSelect161,First165,PgSelectSingle166,PgClassExpression168,PgClassExpression169,PgClassExpression170,PgSelect172,First176,PgSelectSingle177,PgSelect180,First184,PgSelectSingle185,PgSelect188,First192,PgSelectSingle193 bucket8
-    Bucket9("Bucket 9 (mutationField)<br />Deps: 3, 196, 197, 198, 5<br /><br />1: Access[202]<br />2: Access[203]<br />3: Object[204]<br />4: Constant[199]<br />5: Constant[200]<br />6: PgInsert[201]<br />7: PgClassExpression[205]<br />8: PgInsert[206]<br />9: <br />ᐳ: PgClassExpression[210]"):::bucket
+    Bucket9("Bucket 9 (mutationField)<br />Deps: 3, 196, 197, 198, 5<br /><br />1: Access[202]<br />2: Access[203]<br />3: Object[204]<br />4: Constant[199]<br />5: Constant[200]<br />6: PgInsertSingle[201]<br />7: PgClassExpression[205]<br />8: PgInsertSingle[206]<br />9: <br />ᐳ: PgClassExpression[210]"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,Constant199,Constant200,PgInsert201,Access202,Access203,Object204,PgClassExpression205,PgInsert206,PgClassExpression210 bucket9
+    class Bucket9,Constant199,Constant200,PgInsertSingle201,Access202,Access203,Object204,PgClassExpression205,PgInsertSingle206,PgClassExpression210 bucket9
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 204, 210, 5<br /><br />ROOT PgClassExpression{9}ᐸ__relational_posts__ᐳ[210]<br />1: <br />ᐳ: 211, 263, 315<br />2: 212, 264, 316<br />ᐳ: 216, 217, 220, 268, 269, 272, 320, 321, 324"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,__InputStaticLeaf211,PgSelect212,First216,PgSelectSingle217,PgClassExpression220,__InputStaticLeaf263,PgSelect264,First268,PgSelectSingle269,PgClassExpression272,__InputStaticLeaf315,PgSelect316,First320,PgSelectSingle321,PgClassExpression324 bucket10

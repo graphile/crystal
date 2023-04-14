@@ -88,7 +88,7 @@ graph TD
     Object116{{"Object[116∈0]<br />ᐸ{points}ᐳ"}}:::plan
     Object117{{"Object[117∈0]<br />ᐸ{x,y}ᐳ"}}:::plan
     Object118{{"Object[118∈0]<br />ᐸ{center,radius}ᐳ"}}:::plan
-    PgInsert84[["PgInsert[84∈1]"]]:::sideeffectplan
+    PgInsertSingle84[["PgInsertSingle[84∈1]"]]:::sideeffectplan
     Object88{{"Object[88∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression119{{"PgClassExpression[119∈3]<br />ᐸ__geom__.”id”ᐳ"}}:::plan
     PgClassExpression120{{"PgClassExpression[120∈3]<br />ᐸ__geom__.”point”ᐳ"}}:::plan
@@ -140,35 +140,35 @@ graph TD
     List115 --> Object116
     __InputStaticLeaf81 & __InputStaticLeaf82 --> Object117
     Object117 & __InputStaticLeaf83 --> Object118
-    Object87 & Object89 & Object92 & Object95 & Object98 & Object104 & Object110 & Object116 & Object118 --> PgInsert84
-    PgInsert84 --> Object88
-    PgInsert84 --> PgClassExpression119
-    PgInsert84 --> PgClassExpression120
-    PgInsert84 --> PgClassExpression123
-    PgInsert84 --> PgClassExpression130
-    PgInsert84 --> PgClassExpression137
-    PgInsert84 --> PgClassExpression144
+    Object87 & Object89 & Object92 & Object95 & Object98 & Object104 & Object110 & Object116 & Object118 --> PgInsertSingle84
+    PgInsertSingle84 --> Object88
+    PgInsertSingle84 --> PgClassExpression119
+    PgInsertSingle84 --> PgClassExpression120
+    PgInsertSingle84 --> PgClassExpression123
+    PgInsertSingle84 --> PgClassExpression130
+    PgInsertSingle84 --> PgClassExpression137
+    PgInsertSingle84 --> PgClassExpression144
     PgClassExpression144 --> Access146
     Access146 ==> __Item147
-    PgInsert84 --> PgClassExpression150
+    PgInsertSingle84 --> PgClassExpression150
     PgClassExpression150 --> Access152
     Access152 ==> __Item153
-    PgInsert84 --> PgClassExpression156
+    PgInsertSingle84 --> PgClassExpression156
     PgClassExpression156 --> Access157
     Access157 ==> __Item158
-    PgInsert84 --> PgClassExpression161
+    PgInsertSingle84 --> PgClassExpression161
 
     subgraph "Buckets for mutations/v4/geometry.mutations"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,__InputStaticLeaf20,__InputStaticLeaf23,__InputStaticLeaf24,__InputStaticLeaf26,__InputStaticLeaf27,__InputStaticLeaf30,__InputStaticLeaf31,__InputStaticLeaf33,__InputStaticLeaf34,__InputStaticLeaf38,__InputStaticLeaf39,__InputStaticLeaf41,__InputStaticLeaf42,__InputStaticLeaf44,__InputStaticLeaf45,__InputStaticLeaf47,__InputStaticLeaf48,__InputStaticLeaf49,__InputStaticLeaf53,__InputStaticLeaf54,__InputStaticLeaf56,__InputStaticLeaf57,__InputStaticLeaf59,__InputStaticLeaf60,__InputStaticLeaf62,__InputStaticLeaf63,__InputStaticLeaf64,__InputStaticLeaf68,__InputStaticLeaf69,__InputStaticLeaf71,__InputStaticLeaf72,__InputStaticLeaf74,__InputStaticLeaf75,__InputStaticLeaf77,__InputStaticLeaf78,__InputStaticLeaf81,__InputStaticLeaf82,__InputStaticLeaf83,Access85,Access86,Object87,Object89,Object90,Object91,Object92,Object93,Object94,Object95,Object96,Object97,Object98,Object99,Object100,Object101,Object102,List103,Object104,Object105,Object106,Object107,Object108,List109,Object110,Object111,Object112,Object113,Object114,List115,Object116,Object117,Object118 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 87, 89, 92, 95, 98, 104, 110, 116, 118<br /><br />1: PgInsert[84]<br />2: <br />ᐳ: Object[88]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 87, 89, 92, 95, 98, 104, 110, 116, 118<br /><br />1: PgInsertSingle[84]<br />2: <br />ᐳ: Object[88]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert84,Object88 bucket1
+    class Bucket1,PgInsertSingle84,Object88 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 88, 84<br /><br />ROOT Object{1}ᐸ{result}ᐳ[88]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 84<br /><br />ROOT PgInsert{1}[84]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 84<br /><br />ROOT PgInsertSingle{1}[84]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression119,PgClassExpression120,PgClassExpression123,PgClassExpression130,PgClassExpression137,PgClassExpression144,PgClassExpression150,PgClassExpression156,PgClassExpression161 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 120<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”point”ᐳ[120]"):::bucket

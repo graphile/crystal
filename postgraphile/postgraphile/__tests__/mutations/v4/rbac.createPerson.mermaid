@@ -23,7 +23,7 @@ graph TD
     Object21{{"Object[21∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     List23{{"List[23∈0]<br />ᐸ12,13ᐳ"}}:::plan
     Object24{{"Object[24∈0]<br />ᐸ{url}ᐳ"}}:::plan
-    PgInsert18[["PgInsert[18∈1]"]]:::sideeffectplan
+    PgInsertSingle18[["PgInsertSingle[18∈1]"]]:::sideeffectplan
     Object22{{"Object[22∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
@@ -43,15 +43,15 @@ graph TD
     Access19 & Access20 --> Object21
     __InputStaticLeaf12 & __InputStaticLeaf13 --> List23
     __InputStaticLeaf17 --> Object24
-    Object21 & __InputStaticLeaf10 & List23 & __InputStaticLeaf14 & __InputStaticLeaf15 & Object24 --> PgInsert18
-    PgInsert18 --> Object22
-    PgInsert18 --> PgClassExpression25
-    PgInsert18 --> PgClassExpression26
-    PgInsert18 --> PgClassExpression27
+    Object21 & __InputStaticLeaf10 & List23 & __InputStaticLeaf14 & __InputStaticLeaf15 & Object24 --> PgInsertSingle18
+    PgInsertSingle18 --> Object22
+    PgInsertSingle18 --> PgClassExpression25
+    PgInsertSingle18 --> PgClassExpression26
+    PgInsertSingle18 --> PgClassExpression27
     PgClassExpression27 ==> __Item28
-    PgInsert18 --> PgClassExpression29
-    PgInsert18 --> PgClassExpression30
-    PgInsert18 --> PgClassExpression31
+    PgInsertSingle18 --> PgClassExpression29
+    PgInsertSingle18 --> PgClassExpression30
+    PgInsertSingle18 --> PgClassExpression31
     Object21 & PgClassExpression31 --> PgSelect32
     PgSelect32 --> First36
     First36 --> PgSelectSingle37
@@ -61,13 +61,13 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,__InputStaticLeaf17,Access19,Access20,Object21,List23,Object24 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 21, 10, 23, 14, 15, 24<br /><br />1: PgInsert[18]<br />2: <br />ᐳ: Object[22]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 21, 10, 23, 14, 15, 24<br /><br />1: PgInsertSingle[18]<br />2: <br />ᐳ: Object[22]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert18,Object22 bucket1
+    class Bucket1,PgInsertSingle18,Object22 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 18, 21<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 21<br /><br />ROOT PgInsert{1}[18]<br />1: <br />ᐳ: 25, 26, 27, 29, 30, 31<br />2: PgSelect[32]<br />ᐳ: First[36], PgSelectSingle[37]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 21<br /><br />ROOT PgInsertSingle{1}[18]<br />1: <br />ᐳ: 25, 26, 27, 29, 30, 31<br />2: PgSelect[32]<br />ᐳ: First[36], PgSelectSingle[37]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgSelect32,First36,PgSelectSingle37 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ27ᐳ[28]"):::bucket

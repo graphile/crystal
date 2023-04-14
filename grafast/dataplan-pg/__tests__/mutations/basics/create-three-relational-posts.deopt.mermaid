@@ -17,28 +17,28 @@ graph TD
     Access10{{"Access[10∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgInsert9[["PgInsert[9∈1]"]]:::sideeffectplan
+    PgInsertSingle9[["PgInsertSingle[9∈1]"]]:::sideeffectplan
     PgClassExpression13{{"PgClassExpression[13∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Constant14{{"Constant[14∈0]"}}:::plan
     Constant15{{"Constant[15∈0]"}}:::plan
     Constant16{{"Constant[16∈0]"}}:::plan
-    PgInsert17[["PgInsert[17∈1]"]]:::sideeffectplan
+    PgInsertSingle17[["PgInsertSingle[17∈1]"]]:::sideeffectplan
     Constant21{{"Constant[21∈0]"}}:::plan
     Constant22{{"Constant[22∈0]"}}:::plan
-    PgInsert23[["PgInsert[23∈1]"]]:::sideeffectplan
+    PgInsertSingle23[["PgInsertSingle[23∈1]"]]:::sideeffectplan
     PgClassExpression27{{"PgClassExpression[27∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Constant28{{"Constant[28∈0]"}}:::plan
     Constant29{{"Constant[29∈0]"}}:::plan
     Constant30{{"Constant[30∈0]"}}:::plan
-    PgInsert31[["PgInsert[31∈1]"]]:::sideeffectplan
+    PgInsertSingle31[["PgInsertSingle[31∈1]"]]:::sideeffectplan
     Constant35{{"Constant[35∈0]"}}:::plan
     Constant36{{"Constant[36∈0]"}}:::plan
-    PgInsert37[["PgInsert[37∈1]"]]:::sideeffectplan
+    PgInsertSingle37[["PgInsertSingle[37∈1]"]]:::sideeffectplan
     PgClassExpression41{{"PgClassExpression[41∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Constant42{{"Constant[42∈0]"}}:::plan
     Constant43{{"Constant[43∈0]"}}:::plan
     Constant44{{"Constant[44∈0]"}}:::plan
-    PgInsert45[["PgInsert[45∈1]"]]:::sideeffectplan
+    PgInsertSingle45[["PgInsertSingle[45∈1]"]]:::sideeffectplan
     PgClassExpression49{{"PgClassExpression[49∈1]<br />ᐸ__relational_posts__ᐳ"}}:::plan
     __InputStaticLeaf50{{"__InputStaticLeaf[50∈2]"}}:::plan
     PgSelect51[["PgSelect[51∈2]<br />ᐸrelational_itemsᐳ"]]:::plan
@@ -120,16 +120,16 @@ graph TD
     __Value3 --> Access10
     __Value3 --> Access11
     Access10 & Access11 --> Object12
-    Object12 & Constant7 & Constant8 --> PgInsert9
-    PgInsert9 --> PgClassExpression13
-    Object12 & PgClassExpression13 & Constant14 & Constant15 & Constant16 --> PgInsert17
-    Object12 & Constant21 & Constant22 --> PgInsert23
-    PgInsert23 --> PgClassExpression27
-    Object12 & PgClassExpression27 & Constant28 & Constant29 & Constant30 --> PgInsert31
-    Object12 & Constant35 & Constant36 --> PgInsert37
-    PgInsert37 --> PgClassExpression41
-    Object12 & PgClassExpression41 & Constant42 & Constant43 & Constant44 --> PgInsert45
-    PgInsert45 --> PgClassExpression49
+    Object12 & Constant7 & Constant8 --> PgInsertSingle9
+    PgInsertSingle9 --> PgClassExpression13
+    Object12 & PgClassExpression13 & Constant14 & Constant15 & Constant16 --> PgInsertSingle17
+    Object12 & Constant21 & Constant22 --> PgInsertSingle23
+    PgInsertSingle23 --> PgClassExpression27
+    Object12 & PgClassExpression27 & Constant28 & Constant29 & Constant30 --> PgInsertSingle31
+    Object12 & Constant35 & Constant36 --> PgInsertSingle37
+    PgInsertSingle37 --> PgClassExpression41
+    Object12 & PgClassExpression41 & Constant42 & Constant43 & Constant44 --> PgInsertSingle45
+    PgInsertSingle45 --> PgClassExpression49
     Object12 & __InputStaticLeaf50 --> PgSelect51
     PgSelect51 --> First55
     First55 --> PgSelectSingle56
@@ -207,9 +207,9 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,Constant7,Constant8,Access10,Access11,Object12,Constant14,Constant15,Constant16,Constant21,Constant22,Constant28,Constant29,Constant30,Constant35,Constant36,Constant42,Constant43,Constant44 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 7, 8, 14, 15, 16, 21, 22, 28, 29, 30, 35, 36, 42, 43, 44, 5<br /><br />1: PgInsert[9]<br />2: PgClassExpression[13]<br />3: PgInsert[17]<br />4: PgInsert[23]<br />5: PgClassExpression[27]<br />6: PgInsert[31]<br />7: PgInsert[37]<br />8: PgClassExpression[41]<br />9: PgInsert[45]<br />10: <br />ᐳ: PgClassExpression[49]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 7, 8, 14, 15, 16, 21, 22, 28, 29, 30, 35, 36, 42, 43, 44, 5<br /><br />1: PgInsertSingle[9]<br />2: PgClassExpression[13]<br />3: PgInsertSingle[17]<br />4: PgInsertSingle[23]<br />5: PgClassExpression[27]<br />6: PgInsertSingle[31]<br />7: PgInsertSingle[37]<br />8: PgClassExpression[41]<br />9: PgInsertSingle[45]<br />10: <br />ᐳ: PgClassExpression[49]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert9,PgClassExpression13,PgInsert17,PgInsert23,PgClassExpression27,PgInsert31,PgInsert37,PgClassExpression41,PgInsert45,PgClassExpression49 bucket1
+    class Bucket1,PgInsertSingle9,PgClassExpression13,PgInsertSingle17,PgInsertSingle23,PgClassExpression27,PgInsertSingle31,PgInsertSingle37,PgClassExpression41,PgInsertSingle45,PgClassExpression49 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 49, 5<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[49]<br />1: <br />ᐳ: 50, 102, 154<br />2: 51, 103, 155<br />ᐳ: 55, 56, 59, 107, 108, 111, 159, 160, 163"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__InputStaticLeaf50,PgSelect51,First55,PgSelectSingle56,PgClassExpression59,__InputStaticLeaf102,PgSelect103,First107,PgSelectSingle108,PgClassExpression111,__InputStaticLeaf154,PgSelect155,First159,PgSelectSingle160,PgClassExpression163 bucket2

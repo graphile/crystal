@@ -19,7 +19,7 @@ graph TD
     PgSelect8[["PgSelect[8∈0]<br />ᐸforumsᐳ"]]:::plan
     First12{{"First[12∈0]"}}:::plan
     PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸforumsᐳ"}}:::plan
-    Map23{{"Map[23∈1]<br />ᐸ13:{”0”:0,”1”:1}ᐳ"}}:::plan
+    RemapKeys23{{"RemapKeys[23∈1]<br />ᐸ13:{”0”:0,”1”:1}ᐳ"}}:::plan
     PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸusersᐳ"}}:::plan
     PgClassExpression21{{"PgClassExpression[21∈2]<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
     PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
@@ -31,8 +31,8 @@ graph TD
     Object11 & __InputStaticLeaf7 --> PgSelect8
     PgSelect8 --> First12
     First12 --> PgSelectSingle13
-    PgSelectSingle13 --> Map23
-    Map23 --> PgSelectSingle20
+    PgSelectSingle13 --> RemapKeys23
+    RemapKeys23 --> PgSelectSingle20
     PgSelectSingle20 --> PgClassExpression21
     PgSelectSingle20 --> PgClassExpression22
 
@@ -42,7 +42,7 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelectSingle20,Map23 bucket1
+    class Bucket1,PgSelectSingle20,RemapKeys23 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression21,PgClassExpression22 bucket2

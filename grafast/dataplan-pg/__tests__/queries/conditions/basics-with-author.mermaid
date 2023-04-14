@@ -23,7 +23,7 @@ graph TD
     __Item28[/"__Item[28∈3]<br />ᐸ42ᐳ"\]:::itemplan
     PgSelectSingle29{{"PgSelectSingle[29∈3]<br />ᐸmessagesᐳ"}}:::plan
     PgClassExpression30{{"PgClassExpression[30∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    Map40{{"Map[40∈4]<br />ᐸ29:{”0”:1,”1”:2}ᐳ"}}:::plan
+    RemapKeys40{{"RemapKeys[40∈4]<br />ᐸ29:{”0”:1,”1”:2}ᐳ"}}:::plan
     PgSelectSingle37{{"PgSelectSingle[37∈4]<br />ᐸusersᐳ"}}:::plan
     PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgClassExpression39{{"PgClassExpression[39∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
@@ -40,8 +40,8 @@ graph TD
     Access42 ==> __Item28
     __Item28 --> PgSelectSingle29
     PgSelectSingle29 --> PgClassExpression30
-    PgSelectSingle29 --> Map40
-    Map40 --> PgSelectSingle37
+    PgSelectSingle29 --> RemapKeys40
+    RemapKeys40 --> PgSelectSingle37
     PgSelectSingle37 --> PgClassExpression38
     PgSelectSingle37 --> PgClassExpression39
 
@@ -60,7 +60,7 @@ graph TD
     class Bucket3,__Item28,PgSelectSingle29 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[29]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression30,PgSelectSingle37,Map40 bucket4
+    class Bucket4,PgClassExpression30,PgSelectSingle37,RemapKeys40 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37<br /><br />ROOT PgSelectSingle{4}ᐸusersᐳ[37]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression38,PgClassExpression39 bucket5

@@ -22,7 +22,7 @@ graph TD
     PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__messages__.”forum_id”ᐳ"}}:::plan
-    Map25{{"Map[25∈1]<br />ᐸ13:{”0”:2}ᐳ"}}:::plan
+    RemapKeys25{{"RemapKeys[25∈1]<br />ᐸ13:{”0”:2}ᐳ"}}:::plan
     PgSelectSingle22{{"PgSelectSingle[22∈1]<br />ᐸforumsᐳ"}}:::plan
     PgClassExpression24{{"PgClassExpression[24∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
 
@@ -36,8 +36,8 @@ graph TD
     PgSelectSingle13 --> PgClassExpression14
     PgSelectSingle13 --> PgClassExpression15
     PgSelectSingle13 --> PgClassExpression16
-    PgSelectSingle13 --> Map25
-    Map25 --> PgSelectSingle22
+    PgSelectSingle13 --> RemapKeys25
+    RemapKeys25 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression24
 
     subgraph "Buckets for queries/relations/basics"
@@ -46,7 +46,7 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸmessagesᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression14,PgClassExpression15,PgSelectSingle22,Map25 bucket1
+    class Bucket1,PgClassExpression14,PgClassExpression15,PgSelectSingle22,RemapKeys25 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 22<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression16,PgClassExpression24 bucket2

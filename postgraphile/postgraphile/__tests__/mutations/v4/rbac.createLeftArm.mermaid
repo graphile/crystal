@@ -16,7 +16,7 @@ graph TD
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgInsert11[["PgInsert[11∈1]"]]:::sideeffectplan
+    PgInsertSingle11[["PgInsertSingle[11∈1]"]]:::sideeffectplan
     Object15{{"Object[15∈1]<br />ᐸ{result}ᐳ"}}:::plan
     Constant16{{"Constant[16∈3]"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈3]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
@@ -30,26 +30,26 @@ graph TD
     __Value3 --> Access12
     __Value3 --> Access13
     Access12 & Access13 --> Object14
-    Object14 & __InputStaticLeaf10 --> PgInsert11
-    PgInsert11 --> Object15
-    PgInsert11 --> PgClassExpression17
+    Object14 & __InputStaticLeaf10 --> PgInsertSingle11
+    PgInsertSingle11 --> Object15
+    PgInsertSingle11 --> PgClassExpression17
     Constant16 & PgClassExpression17 --> List18
     List18 --> Lambda19
-    PgInsert11 --> PgClassExpression21
-    PgInsert11 --> PgClassExpression22
-    PgInsert11 --> PgClassExpression23
+    PgInsertSingle11 --> PgClassExpression21
+    PgInsertSingle11 --> PgClassExpression22
+    PgInsertSingle11 --> PgClassExpression23
 
     subgraph "Buckets for mutations/v4/rbac.createLeftArm"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf10,Access12,Access13,Object14 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 10<br /><br />1: PgInsert[11]<br />2: <br />ᐳ: Object[15]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 10<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert11,Object15 bucket1
+    class Bucket1,PgInsertSingle11,Object15 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 11<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11<br /><br />ROOT PgInsert{1}[11]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11<br /><br />ROOT PgInsertSingle{1}[11]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,Constant16,PgClassExpression17,List18,Lambda19,PgClassExpression21,PgClassExpression22,PgClassExpression23 bucket3
     Bucket0 --> Bucket1
