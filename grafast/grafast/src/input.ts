@@ -30,7 +30,6 @@ import {
   constant,
 } from "./steps/index.js";
 
-// TODO: should this have `__` prefix?
 export type InputStep =
   | __TrackedObjectStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
   | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)

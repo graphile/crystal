@@ -692,7 +692,7 @@ export type NodeIdHandler<
    */
   typeName: string;
 
-  // TODO: this should use the codec directly, since Grafast has no codec
+  // FIXME: this should use the codec directly, since Grafast has no codec
   // lookup by name functionality?
   /**
    * Which codec are we using to encode/decode the NodeID string?
@@ -784,7 +784,6 @@ export type ExecutionEventMap = {
 
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
-// TODO: rename this?
 export interface ExecutionExtra {
   meta: Record<string, unknown>;
   eventEmitter: ExecutionEventEmitter | undefined;
