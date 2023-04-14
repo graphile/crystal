@@ -152,7 +152,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         let canUpdate = tablePermissions.update;
         const canDelete = tablePermissions.delete;
         if (!canInsert || !canUpdate || !canSelect) {
-          // TODO: this is computationally expensive; we should really make this more efficient.
+          // PERF: this is computationally expensive; we should really make this more efficient.
           // Need to check the attributes
           const attributePermissions = pgClass
             .getAttributes()
