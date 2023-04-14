@@ -39,12 +39,12 @@ interface PgDeletePlanFinalizeResults {
 /**
  * Deletes a row in the database, can return columns from the deleted row.
  */
-export class PgDeleteStep<
+export class PgDeleteSingleStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "PgDeleteStep",
+    exportName: "PgDeleteSingleStep",
   };
   isSyncAndSafe = false;
 
@@ -127,7 +127,7 @@ export class PgDeleteStep<
       )
     ) {
       throw new Error(
-        `Attempted to build 'PgDeleteStep' with a non-unique getBy keys ('${keys.join(
+        `Attempted to build 'PgDeleteSingleStep' with a non-unique getBy keys ('${keys.join(
           "', '",
         )}') - please ensure your 'getBy' spec uniquely identifiers a row (resource = ${
           this.resource
@@ -174,7 +174,9 @@ export class PgDeleteStep<
     }
 
     if (resourceAttribute?.via) {
-      throw new Error(`Cannot select a 'via' attribute from PgDeleteStep`);
+      throw new Error(
+        `Cannot select a 'via' attribute from PgDeleteSingleStep`,
+      );
     }
 
     /*
@@ -375,14 +377,16 @@ export class PgDeleteStep<
 /**
  * Delete a row in `resource` identified by the `getBy` unique condition.
  */
-export function pgDelete<TResource extends PgResource<any, any, any, any>>(
+export function pgDeleteSingle<
+  TResource extends PgResource<any, any, any, any>,
+>(
   resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceAttributes<TResource>,
     GetPgResourceUniques<TResource>
   >,
-): PgDeleteStep<TResource> {
-  return new PgDeleteStep(resource, getBy);
+): PgDeleteSingleStep<TResource> {
+  return new PgDeleteSingleStep(resource, getBy);
 }
 
-exportAs("@dataplan/pg", pgDelete, "pgDelete");
+exportAs("@dataplan/pg", pgDeleteSingle, "pgDeleteSingle");

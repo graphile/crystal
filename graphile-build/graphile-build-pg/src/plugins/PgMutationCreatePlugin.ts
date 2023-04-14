@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import type { PgInsertStep, PgResource } from "@dataplan/pg";
-import { pgInsert } from "@dataplan/pg";
+import type { PgInsertSingleStep, PgResource } from "@dataplan/pg";
+import { pgInsertSingle } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
 import { constant, ExecutableStep, object } from "grafast";
 import { EXPORTABLE } from "graphile-export";
@@ -126,7 +126,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgInsertStep;
+                                      result: PgInsertSingleStep;
                                     }>,
                                   ) {
                                     const $record =
@@ -200,7 +200,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgInsertStep;
+                                      result: PgInsertSingleStep;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -267,7 +267,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                             function plan(
                               _: any,
                               $object: ObjectStep<{
-                                result: PgInsertStep;
+                                result: PgInsertSingleStep;
                               }>,
                             ) {
                               return $object;
@@ -284,15 +284,15 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       resource.extensions?.tags?.deprecated,
                     ),
                     plan: EXPORTABLE(
-                      (object, pgInsert, resource) =>
+                      (object, pgInsertSingle, resource) =>
                         function plan(_: any, args: FieldArgs) {
                           const plan = object({
-                            result: pgInsert(resource, Object.create(null)),
+                            result: pgInsertSingle(resource, Object.create(null)),
                           });
                           args.apply(plan);
                           return plan;
                         },
-                      [object, pgInsert, resource],
+                      [object, pgInsertSingle, resource],
                     ),
                   },
                 ),

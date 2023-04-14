@@ -8,14 +8,14 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgCodec,
-  PgDeleteStep,
-  PgInsertStep,
+  PgDeleteSingleStep,
+  PgInsertSingleStep,
   PgResource,
   PgResourceParameter,
   PgSelectArgumentSpec,
   PgSelectStep,
   PgTypedExecutableStep,
-  PgUpdateStep,
+  PgUpdateSingleStep,
 } from "@dataplan/pg";
 import {
   digestsFromArgumentSpecs,
@@ -233,7 +233,11 @@ function defaultProcSourceBehavior(
 
 function hasRecord(
   $row: ExecutableStep,
-): $row is PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep {
+): $row is
+  | PgSelectSingleStep
+  | PgInsertSingleStep
+  | PgUpdateSingleStep
+  | PgDeleteSingleStep {
   return "record" in $row && typeof ($row as any).record === "function";
 }
 
@@ -892,9 +896,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       ) =>
                       ($in, args, _info) => {
                         if (!hasRecord($in)) {
-                          // TODO: these should be PgInsertSingleStep, etc
                           throw new Error(
-                            `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertStep', 'PgUpdateStep' or 'PgDeleteStep', but found ${$in}`,
+                            `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
                           );
                         }
                         const extraSelectArgs = makeArgs(args);

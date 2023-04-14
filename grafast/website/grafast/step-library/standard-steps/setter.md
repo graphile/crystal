@@ -5,7 +5,7 @@ A ModifierStep for setting given values onto a parent step.
 Usage:
 
 ```ts
-const $update = pgUpdate(...);
+const $update = pgUpdateSingle(...);
 return setter($update);
 ```
 

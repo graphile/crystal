@@ -10,11 +10,11 @@ import type {
   PgCodec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
-import { PgDeleteStep } from "./pgDelete.js";
-import { PgInsertStep } from "./pgInsert.js";
+import { PgDeleteSingleStep } from "./pgDeleteSingle.js";
+import { PgInsertSingleStep } from "./pgInsertSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import { PgUnionAllSingleStep } from "./pgUnionAll.js";
-import { PgUpdateStep } from "./pgUpdate.js";
+import { PgUpdateSingleStep } from "./pgUpdateSingle.js";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgClassExpressionStep:plan");
 // const debugExecute = debugFactory( "@dataplan/pg:PgClassExpressionStep:execute",);
@@ -174,13 +174,13 @@ export class PgClassExpressionStep<
     const step = this.getDep(this.rowDependencyId);
     if (
       !(step instanceof PgSelectSingleStep) &&
-      !(step instanceof PgInsertStep) &&
-      !(step instanceof PgUpdateStep) &&
-      !(step instanceof PgDeleteStep) &&
+      !(step instanceof PgInsertSingleStep) &&
+      !(step instanceof PgUpdateSingleStep) &&
+      !(step instanceof PgDeleteSingleStep) &&
       !(step instanceof PgUnionAllSingleStep)
     ) {
       throw new Error(
-        `Expected ${step} to be a PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep | PgUnionAllSingleStep`,
+        `Expected ${step} to be a PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep | PgDeleteSingleStep | PgUnionAllSingleStep`,
       );
     }
     return step;

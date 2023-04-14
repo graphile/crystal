@@ -28,7 +28,7 @@ type QueryValueDetailsBySymbol = Map<
   { depId: number; processor: (value: any) => SQLRawValue }
 >;
 
-interface PgInsertPlanFinalizeResults {
+interface PgInsertSinglePlanFinalizeResults {
   /** The SQL query text */
   text: string;
 
@@ -42,7 +42,7 @@ interface PgInsertPlanFinalizeResults {
 /**
  * Inserts a row into resource with the given specified attribute values.
  */
-export class PgInsertStep<
+export class PgInsertSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
   extends ExecutableStep<
@@ -56,7 +56,7 @@ export class PgInsertStep<
 {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "PgInsertStep",
+    exportName: "PgInsertSingleStep",
   };
 
   isSyncAndSafe = false;
@@ -107,7 +107,7 @@ export class PgInsertStep<
    * When finalized, we build the SQL query, queryValues, and note where to feed in
    * the relevant queryValues. This saves repeating this work at execution time.
    */
-  private finalizeResults: PgInsertPlanFinalizeResults | null = null;
+  private finalizeResults: PgInsertSinglePlanFinalizeResults | null = null;
 
   /**
    * The list of things we're selecting.
@@ -186,7 +186,7 @@ export class PgInsertStep<
 
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
-   * inserted row.
+   * insertSingleed row.
    */
   get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
     attr: TAttr,
@@ -210,7 +210,9 @@ export class PgInsertStep<
     }
 
     if (resourceAttribute?.via) {
-      throw new Error(`Cannot select a 'via' attribute from PgInsertStep`);
+      throw new Error(
+        `Cannot select a 'via' attribute from PgInsertSingleStep`,
+      );
     }
 
     /*
@@ -405,15 +407,17 @@ export class PgInsertStep<
 /**
  * Inserts a row into resource with the given specified attribute values.
  */
-export function pgInsert<TResource extends PgResource<any, any, any, any, any>>(
+export function pgInsertSingle<
+  TResource extends PgResource<any, any, any, any, any>,
+>(
   resource: TResource,
   attributes?: {
     [key in keyof GetPgResourceAttributes<TResource>]?:
       | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]["codec"]>
       | ExecutableStep;
   },
-): PgInsertStep<TResource> {
-  return new PgInsertStep(resource, attributes);
+): PgInsertSingleStep<TResource> {
+  return new PgInsertSingleStep(resource, attributes);
 }
 
-exportAs("@dataplan/pg", pgInsert, "pgInsert");
+exportAs("@dataplan/pg", pgInsertSingle, "pgInsertSingle");

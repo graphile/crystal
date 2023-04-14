@@ -167,7 +167,7 @@ const plans = {
       const spec = specFromNodeId(base64JSONCodec, userHandler, $nodeId);
 
       // Now use this specifier to plan an update for this user:
-      const $result = pgUpdate(userSource, spec);
+      const $result = pgUpdateSingle(userSource, spec);
 
       // Leave space in our result so we can add more properties later:
       const $payload = object({ result: $result });

@@ -2,10 +2,10 @@ import type { ExecutableStep } from "grafast";
 
 import type { PgResource } from "./datasource.js";
 import type { PgClassSingleStep } from "./interfaces.js";
-import { PgDeleteStep } from "./steps/pgDelete.js";
-import { PgInsertStep } from "./steps/pgInsert.js";
+import { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
+import { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
 import { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
-import { PgUpdateStep } from "./steps/pgUpdate.js";
+import { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
 
 export function assertPgClassSingleStep<
   TResource extends PgResource<any, any, any, any, any>,
@@ -15,13 +15,13 @@ export function assertPgClassSingleStep<
   if (
     !(
       step instanceof PgSelectSingleStep ||
-      step instanceof PgInsertStep ||
-      step instanceof PgUpdateStep ||
-      step instanceof PgDeleteStep
+      step instanceof PgInsertSingleStep ||
+      step instanceof PgUpdateSingleStep ||
+      step instanceof PgDeleteSingleStep
     )
   ) {
     throw new Error(
-      `Expected a PgSelectSingleStep, PgInsertStep, PgUpdateStep or PgDeleteStep, however we received '${step}'.`,
+      `Expected a PgSelectSingleStep, PgInsertSingleStep, PgUpdateSingleStep or PgDeleteSingleStep, however we received '${step}'.`,
     );
   }
 }

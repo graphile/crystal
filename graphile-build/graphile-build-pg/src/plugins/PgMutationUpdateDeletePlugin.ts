@@ -3,12 +3,12 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgCodecWithAttributes,
-  PgDeleteStep,
+  PgDeleteSingleStep,
   PgResource,
   PgResourceUnique,
-  PgUpdateStep,
+  PgUpdateSingleStep,
 } from "@dataplan/pg";
-import { pgDelete, pgUpdate } from "@dataplan/pg";
+import { pgDeleteSingle, pgUpdateSingle } from "@dataplan/pg";
 import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
@@ -325,7 +325,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgUpdateStep | PgDeleteStep;
+                                      result: PgUpdateSingleStep | PgDeleteSingleStep;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -521,7 +521,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectStep<{
-                                      result: PgUpdateStep;
+                                      result: PgUpdateSingleStep;
                                     }>,
                                   ) {
                                     const $record =
@@ -698,7 +698,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   );
 
                 /**
-                 * Builds a pgUpdate/pgDelete spec describing the row to
+                 * Builds a pgUpdateSingle/pgDeleteSingle spec describing the row to
                  * update/delete as a string containing raw JS code if it's
                  * safe to do so. This enables us to create an optimised
                  * function for the plan resolver, especially good for the
@@ -730,7 +730,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
                 /**
                  * The fallback to `specFromArgsString`; builds a
-                 * pgUpdate/pgDelete spec describing the row to update/delete.
+                 * pgUpdateSingle/pgDeleteSingle spec describing the row to update/delete.
                  */
                 const specFromArgs =
                   uniqueMode === "keys"
@@ -775,7 +775,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 function plan(
                                   _: any,
                                   $object: ObjectStep<{
-                                    result: PgUpdateStep | PgDeleteStep;
+                                    result: PgUpdateSingleStep | PgDeleteSingleStep;
                                   }>,
                                 ) {
                                   return $object;
@@ -803,23 +803,23 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                                 EXPORTABLE(
                                   te.run`\
-return function(object, pgUpdate, resource) {
+return function(object, pgUpdateSingle, resource) {
 return (_$root, args) => {
-  const plan = object({ result: pgUpdate(resource, ${specFromArgsString}) });
+  const plan = object({ result: pgUpdateSingle(resource, ${specFromArgsString}) });
   args.apply(plan);
   return plan;
 }
 }` as any,
-                                  [object, pgUpdate, resource],
+                                  [object, pgUpdateSingle, resource],
                                 )
                               : (EXPORTABLE(
-                                  (object, pgUpdate, resource, specFromArgs) =>
+                                  (object, pgUpdateSingle, resource, specFromArgs) =>
                                     function plan(
                                       _$root: ExecutableStep,
                                       args: FieldArgs,
                                     ) {
                                       const plan = object({
-                                        result: pgUpdate(
+                                        result: pgUpdateSingle(
                                           resource,
                                           specFromArgs(args),
                                         ),
@@ -827,29 +827,29 @@ return (_$root, args) => {
                                       args.apply(plan);
                                       return plan;
                                     },
-                                  [object, pgUpdate, resource, specFromArgs],
+                                  [object, pgUpdateSingle, resource, specFromArgs],
                                 ) as any)
                             : specFromArgsString
                             ? // eslint-disable-next-line graphile-export/exhaustive-deps
                               EXPORTABLE(
                                 te.run`\
-return function (object, pgDelete, resource) {
+return function (object, pgDeleteSingle, resource) {
 return (_$root, args) => {
-  const plan = object({ result: pgDelete(resource, ${specFromArgsString}) });
+  const plan = object({ result: pgDeleteSingle(resource, ${specFromArgsString}) });
   args.apply(plan);
   return plan;
 }
 }` as any,
-                                [object, pgDelete, resource],
+                                [object, pgDeleteSingle, resource],
                               )
                             : (EXPORTABLE(
-                                (object, pgDelete, resource, specFromArgs) =>
+                                (object, pgDeleteSingle, resource, specFromArgs) =>
                                   function plan(
                                     _$root: ExecutableStep,
                                     args: FieldArgs,
                                   ) {
                                     const plan = object({
-                                      result: pgDelete(
+                                      result: pgDeleteSingle(
                                         resource,
                                         specFromArgs(args),
                                       ),
@@ -857,7 +857,7 @@ return (_$root, args) => {
                                     args.apply(plan);
                                     return plan;
                                   },
-                                [object, pgDelete, resource, specFromArgs],
+                                [object, pgDeleteSingle, resource, specFromArgs],
                               ) as any),
                       },
                     ),

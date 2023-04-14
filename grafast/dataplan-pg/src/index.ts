@@ -121,8 +121,8 @@ import {
   pgWhereConditionSpecListToSQL,
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
-import { pgDelete, PgDeleteStep } from "./steps/pgDelete.js";
-import { pgInsert, PgInsertStep } from "./steps/pgInsert.js";
+import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
+import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.js";
 import { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
 import {
   pgPolymorphic,
@@ -162,7 +162,7 @@ import {
   PgUnionAllStepMember,
   PgUnionAllStepOrder,
 } from "./steps/pgUnionAll.js";
-import { pgUpdate, PgUpdateStep } from "./steps/pgUpdate.js";
+import { pgUpdateSingle, PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
 import {
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
@@ -244,8 +244,8 @@ export {
   PgConditionStepExtensions,
   PgCursorStep,
   PgDecode,
-  pgDelete,
-  PgDeleteStep,
+  pgDeleteSingle,
+  PgDeleteSingleStep,
   PgEncode,
   PgEnumCodec,
   PgEnumCodecSpec,
@@ -260,8 +260,8 @@ export {
   PgGroupSpec,
   PgHavingConditionSpec,
   PgHStore,
-  pgInsert,
-  PgInsertStep,
+  pgInsertSingle,
+  PgInsertSingleStep,
   PgInterval,
   PgLine,
   PgLockableParameter,
@@ -312,8 +312,8 @@ export {
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
   PgUnionAllStepOrder,
-  pgUpdate,
-  PgUpdateStep,
+  pgUpdateSingle,
+  PgUpdateSingleStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
   PgWhereConditionSpec,
@@ -359,10 +359,10 @@ exportAsMany("@dataplan/pg", {
   PgConditionStep,
   pgWhereConditionSpecListToSQL,
   PgCursorStep,
-  pgDelete,
-  PgDeleteStep,
-  pgInsert,
-  PgInsertStep,
+  pgDeleteSingle,
+  PgDeleteSingleStep,
+  pgInsertSingle,
+  PgInsertSingleStep,
   pgPageInfo,
   PgPageInfoStep,
   pgPolymorphic,
@@ -380,8 +380,8 @@ exportAsMany("@dataplan/pg", {
   PgUnionAllSingleStep,
   PgUnionAllStep,
   PgSingleTablePolymorphicStep,
-  pgUpdate,
-  PgUpdateStep,
+  pgUpdateSingle,
+  PgUpdateSingleStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
   TempTableStep,
