@@ -760,7 +760,7 @@ export function rangeOfCodec<
           },
         }
       : null),
-    // TODO: shouldn't these include `innerCodec.fromPg` calls for internal values?
+    // FIXME: shouldn't these include `innerCodec.fromPg` calls for internal values?
     fromPg: needsCast
       ? function (value) {
           const json = JSON.parse(value);

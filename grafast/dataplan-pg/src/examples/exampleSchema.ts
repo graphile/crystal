@@ -4834,7 +4834,6 @@ export function makeExampleSchema(
                 author_id: constant(2),
               });
               const $itemId = $item.get("id");
-              // TODO: make this TypeScript stuff automatic
               const $post = pgInsert(relationalPostsResource, {
                 id: $itemId,
               });

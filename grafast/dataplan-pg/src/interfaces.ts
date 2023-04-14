@@ -168,7 +168,6 @@ export interface PgCodec<
    */
   fromPg: PgDecode<TFromJavaScript, TFromPostgres>;
 
-  // TODO: rename?
   /**
    * We'll append `::text` by default to each selection; however if this type
    * needs something special (e.g. `money` should be converted to `numeric`
@@ -198,7 +197,6 @@ export interface PgCodec<
    */
   isAnonymous?: boolean;
 
-  // TODO: extract this to a different interface
   /**
    * If this is a composite type, the attributes it supports.
    */
@@ -595,7 +593,6 @@ export interface PgRegistryConfig<
   },
 > {
   pgCodecs: TCodecs;
-  // TODO: Rename to pgResourceOptions?
   pgResources: TResourceOptions;
   pgRelations: TRelations;
 }
