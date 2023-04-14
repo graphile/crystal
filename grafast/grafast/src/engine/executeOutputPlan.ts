@@ -93,9 +93,6 @@ export interface SubsequentStreamSpec {
   startIndex: number;
 }
 
-// TODO: to start with we're going to do looping here; but later we can compile
-// the output plans (even nested ones) into simple functions that just generate
-// the resulting objects directly without looping.
 /**
  * @internal
  */
