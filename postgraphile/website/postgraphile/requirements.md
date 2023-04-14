@@ -50,7 +50,7 @@ experience.
   or primary key is defined for a table." --
   [PG docs](https://www.postgresql.org/docs/current/static/indexes-unique.html)
 - **Use the defaults** for formatting output; we only run tests for the
-  defaults so you may have an issue if you were to use
+  defaults so you may have an issue if you were to use, for example,
   `intervalstyle = 'iso_8601'` rather than the default
   `intervalstyle = 'postgres'`.
 - **Use UTF8 encoding**: GraphQL operates over the UTF8 character set, using
