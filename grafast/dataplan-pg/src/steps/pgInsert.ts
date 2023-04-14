@@ -89,7 +89,7 @@ export class PgInsertStep<
   private attributes: Array<{
     name: keyof GetPgResourceAttributes<TResource>;
     depId: number;
-    // TODO: this shouldn't be needed, we can look it up in the codec?
+    // This isn't really needed, we can look it up in the codec, but it acts as a quick reference.
     pgCodec: PgCodec;
   }> = [];
 

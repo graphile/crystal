@@ -637,43 +637,13 @@ export class PgSelectStep<
       ? cloneFromMatchingMode.fetchOneExtra
       : false;
     this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
-    this.beforeStepId =
-      cloneFromMatchingMode && cloneFromMatchingMode.beforeStepId != null
-        ? // TODO: these `addDependency` calls are redundant; we've already copied all the dependencies above!
-          this.addDependency(
-            cloneFromMatchingMode.getDep(cloneFromMatchingMode.beforeStepId),
-          )
-        : null;
-    this.afterStepId =
-      cloneFromMatchingMode && cloneFromMatchingMode.afterStepId != null
-        ? this.addDependency(
-            cloneFromMatchingMode.getDep(cloneFromMatchingMode.afterStepId),
-          )
-        : null;
-    this.lowerIndexStepId =
-      cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexStepId != null
-        ? this.addDependency(
-            cloneFromMatchingMode.getDep(
-              cloneFromMatchingMode.lowerIndexStepId,
-            ),
-          )
-        : null;
-    this.upperIndexStepId =
-      cloneFromMatchingMode && cloneFromMatchingMode.upperIndexStepId != null
-        ? this.addDependency(
-            cloneFromMatchingMode.getDep(
-              cloneFromMatchingMode.upperIndexStepId,
-            ),
-          )
-        : null;
-    this.limitAndOffsetId =
-      cloneFromMatchingMode && cloneFromMatchingMode.limitAndOffsetId != null
-        ? this.addDependency(
-            cloneFromMatchingMode.getDep(
-              cloneFromMatchingMode.limitAndOffsetId,
-            ),
-          )
-        : null;
+
+    // dependencies were already added, so we can just copy the dependency references
+    this.beforeStepId = cloneFromMatchingMode?.beforeStepId ?? null;
+    this.afterStepId = cloneFromMatchingMode?.afterStepId ?? null;
+    this.lowerIndexStepId = cloneFromMatchingMode?.lowerIndexStepId ?? null;
+    this.upperIndexStepId = cloneFromMatchingMode?.upperIndexStepId ?? null;
+    this.limitAndOffsetId = cloneFromMatchingMode?.limitAndOffsetId ?? null;
 
     this.locker.afterLock("orderBy", () => {
       if (this.beforeStepId != null) {
