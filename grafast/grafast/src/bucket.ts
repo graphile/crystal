@@ -27,7 +27,7 @@ export interface RequestTools {
    * If we're running inside GraphQL then we should not serialize scalars,
    * otherwise we'll face the double-serialization problem.
    */
-  insideGraphQL: boolean;
+  insideGraphQL: false;
 }
 
 /**
