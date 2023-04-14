@@ -39,7 +39,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
   name: "PgAllRowsPlugin",
   description: "Adds 'all rows' accessors for all table-like datasources.",
   version: version,
-  // TODO: Requires PgTablesPlugin
+  after: ["PgTablesPlugin"],
 
   inflection: {
     add: {

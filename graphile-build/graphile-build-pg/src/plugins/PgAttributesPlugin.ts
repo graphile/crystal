@@ -310,7 +310,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
   description:
     "Adds PostgreSQL attributes (columns) to the relevant GraphQL object/input object types",
   version: version,
-  // TODO: Requires PgTablesPlugin
+  after: ["PgTablesPlugin"],
 
   inflection: {
     add: {

@@ -75,7 +75,6 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     graphiqlOnGraphQLGET = true,
     graphiqlPath = "/",
     watch = false,
-    // TODO: Why 'Path' for graphqlPath and graphiqlPath, but 'Route' for this?!
     eventStreamPath = "/graphql/stream",
     maxRequestLength = 100_000,
     outputDataAsString = false,
