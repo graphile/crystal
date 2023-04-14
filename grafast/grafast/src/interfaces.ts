@@ -19,7 +19,7 @@ import type {
   GraphQLType,
 } from "graphql";
 
-import type { Bucket, RequestContext } from "./bucket.js";
+import type { Bucket, RequestTools } from "./bucket.js";
 import type { InputStep } from "./input.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
@@ -794,7 +794,7 @@ export interface ExecutionExtra {
   /** @internal */
   _bucket: Bucket;
   /** @internal */
-  _requestContext: RequestContext;
+  _requestContext: RequestTools;
 }
 
 export interface LocationDetails {

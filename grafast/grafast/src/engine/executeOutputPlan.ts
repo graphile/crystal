@@ -1,7 +1,7 @@
 import type { GraphQLError } from "graphql";
 
 import * as assert from "../assert.js";
-import type { Bucket, RequestContext } from "../bucket.js";
+import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { JSONValue } from "../interfaces.js";
 import type { OutputPlan } from "./OutputPlan.js";
@@ -62,7 +62,7 @@ export interface PayloadRoot {
 }
 
 export interface OutputPlanContext {
-  requestContext: RequestContext;
+  requestContext: RequestTools;
   root: PayloadRoot;
   path: ReadonlyArray<string | number>;
 }

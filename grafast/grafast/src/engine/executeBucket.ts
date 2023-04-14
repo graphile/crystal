@@ -1,7 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.js";
-import type { Bucket, RequestContext } from "../bucket.js";
+import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { $$error, isGrafastError, newGrafastError } from "../error.js";
@@ -67,7 +67,7 @@ type StreamMoreableArray<T> = Array<T> & {
 /** @internal */
 export function executeBucket(
   bucket: Bucket,
-  requestContext: RequestContext,
+  requestContext: RequestTools,
 ): PromiseOrDirect<void> {
   /**
    * Execute the step directly; since there's no errors we can pass the

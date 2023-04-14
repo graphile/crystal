@@ -8,7 +8,7 @@ import { buildExecutionContext } from "graphql/execution/execute";
 import { isAsyncIterable } from "iterall";
 
 import * as assert from "./assert.js";
-import type { Bucket, RequestContext } from "./bucket.js";
+import type { Bucket, RequestTools } from "./bucket.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
@@ -177,7 +177,7 @@ function outputBucket(
   outputPlan: OutputPlan,
   rootBucket: Bucket,
   rootBucketIndex: number,
-  requestContext: RequestContext,
+  requestContext: RequestTools,
   path: readonly (string | number)[],
   variables: { [key: string]: any },
   asString: boolean,
@@ -272,7 +272,7 @@ export function executePreemptive(
     hasErrors: false,
     polymorphicPathList,
   });
-  const requestContext: RequestContext = {
+  const requestContext: RequestTools = {
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
     metaByMetaKey: operationPlan.makeMetaByMetaKey(),
@@ -632,7 +632,7 @@ function newIterator<T = any>(
 }
 
 async function processStream(
-  requestContext: RequestContext,
+  requestContext: RequestTools,
   iterator: ResultIterator,
   spec: SubsequentStreamSpec,
   outputDataAsString: boolean,
@@ -822,7 +822,7 @@ async function processStream(
 }
 
 function processSingleDeferred(
-  requestContext: RequestContext,
+  requestContext: RequestTools,
   outputPlan: OutputPlan,
   specs: Array<[ResultIterator, SubsequentPayloadSpec]>,
   asString: boolean,
@@ -910,8 +910,8 @@ function processSingleDeferred(
 }
 
 function processBatches(
-  batchesByRequestContext: Map<
-    RequestContext,
+  batchesByRequestTools: Map<
+    RequestTools,
     Map<OutputPlan, Array<[ResultIterator, SubsequentPayloadSpec]>>
   >,
   whenDone: Deferred<void>,
@@ -919,7 +919,7 @@ function processBatches(
 ) {
   // Key is only used for batching
   const promises: PromiseLike<void>[] = [];
-  for (const [requestContext, batches] of batchesByRequestContext.entries()) {
+  for (const [requestContext, batches] of batchesByRequestTools.entries()) {
     for (const [outputPlan, specs] of batches.entries()) {
       const promise = processSingleDeferred(
         requestContext,
@@ -943,8 +943,8 @@ function processBatches(
 }
 
 function processBatchAsString() {
-  const batchesByRequestContext = deferredBatchesByRequestContextAsString;
-  deferredBatchesByRequestContextAsString = new Map();
+  const batchesByRequestContext = deferredBatchesByRequestToolsAsString;
+  deferredBatchesByRequestToolsAsString = new Map();
   const whenDone = nextBatchAsString!;
   nextBatchAsString = null;
 
@@ -952,8 +952,8 @@ function processBatchAsString() {
 }
 
 function processBatchNotAsString() {
-  const batchesByRequestContext = deferredBatchesByRequestContextNotAsString;
-  deferredBatchesByRequestContextNotAsString = new Map();
+  const batchesByRequestContext = deferredBatchesByRequestToolsNotAsString;
+  deferredBatchesByRequestToolsNotAsString = new Map();
   const whenDone = nextBatchNotAsString!;
   nextBatchNotAsString = null;
 
@@ -961,27 +961,27 @@ function processBatchNotAsString() {
 }
 
 type DBBRC = Map<
-  RequestContext,
+  RequestTools,
   Map<OutputPlan, Array<[ResultIterator, SubsequentPayloadSpec]>>
 >;
-let deferredBatchesByRequestContextAsString: DBBRC = new Map();
-let deferredBatchesByRequestContextNotAsString: DBBRC = new Map();
+let deferredBatchesByRequestToolsAsString: DBBRC = new Map();
+let deferredBatchesByRequestToolsNotAsString: DBBRC = new Map();
 let nextBatchAsString: Deferred<void> | null = null;
 let nextBatchNotAsString: Deferred<void> | null = null;
 
 function processDeferred(
-  requestContext: RequestContext,
+  requestContext: RequestTools,
   iterator: ResultIterator,
   spec: SubsequentPayloadSpec,
   outputDataAsString: boolean,
 ): PromiseLike<void> {
-  const deferredBatchesByRequestContext = outputDataAsString
-    ? deferredBatchesByRequestContextAsString
-    : deferredBatchesByRequestContextNotAsString;
-  let deferredBatches = deferredBatchesByRequestContext.get(requestContext);
+  const deferredBatchesByRequestTools = outputDataAsString
+    ? deferredBatchesByRequestToolsAsString
+    : deferredBatchesByRequestToolsNotAsString;
+  let deferredBatches = deferredBatchesByRequestTools.get(requestContext);
   if (!deferredBatches) {
     deferredBatches = new Map();
-    deferredBatchesByRequestContext.set(requestContext, deferredBatches);
+    deferredBatchesByRequestTools.set(requestContext, deferredBatches);
   }
   const list = deferredBatches.get(spec.outputPlan);
   if (list) {
