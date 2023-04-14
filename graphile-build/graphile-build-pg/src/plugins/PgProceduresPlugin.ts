@@ -19,7 +19,7 @@ import {
 } from "@dataplan/pg";
 import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
-import type { PgProc } from "pg-introspection";
+import type { PgProc, PgProcArgument } from "pg-introspection";
 import sql from "pg-sql2";
 
 import { addBehaviorToTags } from "../utils.js";
@@ -109,6 +109,15 @@ interface State {
   >;
 }
 interface Cache {}
+
+function argTypeName(arg: PgProcArgument): string {
+  const nsp = arg.type.getNamespace()!;
+  if (["pg_catalog", "public"].includes(nsp.nspname)) {
+    return arg.type.typname;
+  } else {
+    return `${nsp.nspname}.${arg.type.typname}`;
+  }
+}
 
 export const PgProceduresPlugin: GraphileConfig.Plugin = {
   name: "PgProceduresPlugin",
@@ -209,8 +218,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             serviceName,
             pgProc,
           });
-          // TODO: this isn't a sufficiently unique name, it does not allow for overloaded functions
-          const identifier = `${serviceName}.${namespace.nspname}.${pgProc.proname}(...)`;
+          const identifier = `${serviceName}.${namespace.nspname}.${
+            pgProc.proname
+          }(${pgProc.getArguments().map(argTypeName).join(",")})`;
           const makeCodecFromReturn = async (): Promise<PgCodec | null> => {
             // We're building a PgCodec to represent specifically the
             // return type of this function.
