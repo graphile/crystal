@@ -1134,8 +1134,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
-  // TODO: rename?
-  // TODO: should this be a static method?
   parseCursor(
     $cursorPlan: __InputStaticLeafStep<string>,
   ): PgSelectParsedCursorStep | null {
