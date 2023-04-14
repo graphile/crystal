@@ -3,7 +3,6 @@ import type { ExecutionArgs } from "graphql";
 import { hook, NULL_PRESET } from "./config.js";
 import { isPromiseLike } from "./utils.js";
 
-// TODO: rename this.
 /**
  * Applies Graphile Config hooks to your GraphQL request, e.g. to
  * populate context or similar.
@@ -15,7 +14,7 @@ export function hookArgs(
   resolvedPreset: GraphileConfig.ResolvedPreset,
   ctx: Partial<Grafast.RequestContext>,
 ): ExecutionArgs | PromiseLike<ExecutionArgs> {
-  // TODO: assert that args haven't already been hooked
+  // FIXME: assert that args haven't already been hooked
 
   // Make context mutable
   args.contextValue = Object.assign(Object.create(null), args.contextValue);

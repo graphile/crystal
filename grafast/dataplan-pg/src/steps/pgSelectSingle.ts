@@ -171,10 +171,6 @@ export class PgSelectSingleStep<
       );
     }
     const classPlan = this.getClassStep();
-    // TODO: where do we do the SQL conversion, e.g. to_json for dates to
-    // enforce ISO8601? Perhaps this should be the datasource itself, and
-    // `attr` should be an SQL expression? This would allow for computed
-    // fields/etc too (admittedly those without arguments).
     const resourceAttribute: PgCodecAttribute | undefined =
       this.resource.codec.attributes?.[attr as string];
     if (!resourceAttribute && attr !== "") {

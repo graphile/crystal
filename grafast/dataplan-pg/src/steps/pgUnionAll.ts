@@ -833,9 +833,6 @@ on (${sql.indent(
    */
   singleAsRecord(): PgUnionAllSingleStep {
     // this.setUnique(true);
-    // TODO: should this be on a clone plan? I don't currently think so since
-    // PgSelectSingleStep does not allow for `.where` divergence (since it
-    // does not support `.where`).
     return new PgUnionAllSingleStep(this, first(this));
   }
 
@@ -1145,8 +1142,6 @@ and ${condition(i + 1)}`}
     }
   }
 
-  // TODO: rename?
-  // TODO: should this be a static method?
   parseCursor(
     $cursorPlan: __InputStaticLeafStep<string>,
   ): PgSelectParsedCursorStep | null {
