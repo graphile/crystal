@@ -12,7 +12,7 @@ import { UnbatchedExecutableStep } from "../step.js";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
-export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
+function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
   const entries = Object.entries(actualKeyByDesiredKey);
   if (
     entries.every(
@@ -44,7 +44,7 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
  * A plan that returns an object resulting from extracting the given
  * `actualKey` from the input and storing it as the `desiredKey` in the output.
  */
-export class MapStep extends UnbatchedExecutableStep {
+export class RemapKeysStep extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "MapStep",
@@ -81,7 +81,7 @@ export class MapStep extends UnbatchedExecutableStep {
     return this.mapper(value);
   }
 
-  deduplicate(peers: MapStep[]): MapStep[] {
+  deduplicate(peers: RemapKeysStep[]): RemapKeysStep[] {
     const myMap = JSON.stringify(this.actualKeyByDesiredKey);
     return peers.filter(
       (p) => JSON.stringify(p.actualKeyByDesiredKey) === myMap,
@@ -89,16 +89,13 @@ export class MapStep extends UnbatchedExecutableStep {
   }
 }
 
-// TODO: people think of 'map' in turns of mapping over an array, or Maps,
-// rather than a mathematical-style mapping of the keys of an object. We should
-// rename this - objectMap or something?
 /**
  * A plan that returns an object resulting from extracting the given
  * `actualKey` from the input and storing it as the `desiredKey` in the output.
  */
-export function map(
+export function remapKeys(
   $step: ExecutableStep,
   actualKeyByDesiredKey: { [desiredKey: string]: string },
-): MapStep {
-  return new MapStep($step, actualKeyByDesiredKey);
+): RemapKeysStep {
+  return new RemapKeysStep($step, actualKeyByDesiredKey);
 }

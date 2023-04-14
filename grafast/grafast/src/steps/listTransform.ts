@@ -37,7 +37,6 @@ export interface ListTransformOptions<
   TItemStep extends ExecutableStep | undefined = undefined,
 > {
   listStep: TListStep;
-  // TODO: rename this:
   itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
   initialState(): TMemo;
   reduceCallback: ListTransformReduce<
@@ -76,7 +75,7 @@ export class __ListTransformStep<
   // TODO: change this to 'true' and rewrite execute to be synchronous
   isSyncAndSafe = false;
 
-  private listPlanDepId: number;
+  private listStepDepId: number;
   public itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
   public initialState: () => TMemo;
   public reduceCallback: ListTransformReduce<
@@ -109,7 +108,7 @@ export class __ListTransformStep<
       meta,
       optimize,
     } = options;
-    this.listPlanDepId = this.addDependency(listStep);
+    this.listStepDepId = this.addDependency(listStep);
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
     this.reduceCallback = reduceCallback;
@@ -165,7 +164,7 @@ export class __ListTransformStep<
   }
 
   getListStep(): TListStep {
-    return this.getDep(this.listPlanDepId) as TListStep;
+    return this.getDep(this.listStepDepId) as TListStep;
   }
 
   [$$deepDepSkip]() {
@@ -173,7 +172,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.dependencies[this.listPlanDepId] as TListStep;
+    return this.dependencies[this.listStepDepId] as TListStep;
   }
 
   deduplicate(
@@ -233,7 +232,7 @@ export class __ListTransformStep<
       }
     }
 
-    const listValues = values[this.listPlanDepId];
+    const listValues = values[this.listStepDepId];
 
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.

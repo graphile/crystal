@@ -31,7 +31,7 @@ import {
   isPromiseLike,
   lambda,
   list,
-  map,
+  remapKeys,
   reverse,
   reverseArray,
   SafeError,
@@ -2625,7 +2625,7 @@ ${lateralText};`;
             // `first` plan on us.
             // NOTE: we don't need to reverse the list for relay pagination
             // because it only contains one entry.
-            return list([map(parent, actualKeyByDesiredKey)]);
+            return list([remapKeys(parent, actualKeyByDesiredKey)]);
           } else {
             debugPlanVerbose(
               "Skipping merging %c into %c (via %c) due to no attributes being selected",

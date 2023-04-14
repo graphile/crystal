@@ -51,7 +51,11 @@ export {
   ListTransformOptions,
   ListTransformReduce,
 } from "./listTransform.js";
-export { ActualKeyByDesiredKey, makeMapper, map, MapStep } from "./map.js";
+export {
+  ActualKeyByDesiredKey,
+  remapKeys,
+  RemapKeysStep,
+} from "./remapKeys.js";
 export { node, NodeStep, specFromNodeId } from "./node.js";
 export { object, ObjectPlanMeta, ObjectStep } from "./object.js";
 export { partitionByIndex } from "./partitionByIndex.js";
