@@ -1388,20 +1388,17 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private buildSelect(
     options: {
-      asArray?: boolean;
       extraSelects?: readonly SQL[];
     } = Object.create(null),
   ) {
-    const { asArray = false, extraSelects = EMPTY_ARRAY } = options;
+    const { extraSelects = EMPTY_ARRAY } = options;
     const selects = [...this.selects, ...extraSelects];
     const l = this.selects.length;
     const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
-    const fragmentsWithAliases = asArray
-      ? selects
-      : selects.map(
-          (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
-        );
+    const fragmentsWithAliases = selects.map(
+      (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
+    );
 
     const sqlAliases: SQL[] = [];
     for (const [a, b] of this._symbolSubstitutes.entries()) {
@@ -1409,35 +1406,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     }
     const aliases = sql.join(sqlAliases, "");
 
-    if (asArray) {
-      if (fragmentsWithAliases.length > 100) {
-        // The maximum number of arguments you can pass to a PostgreSQL
-        // function is 100, so we need to concatenate multiple arrays
-        // TODO: concatenate via `(jsonb_build_array(...) || jsonb_build_array(...))::json`
-        throw new SafeError(
-          "Please select fewer fields, support for this many fields has not yet been added.",
-        );
-      }
-      const selection = fragmentsWithAliases.length
-        ? sql` json_build_array(\n${sql.indent(
-            sql.join(fragmentsWithAliases, ",\n"),
-          )}) as _`
-        : /*
-           * In the case where our array is empty, we must add something or
-           * PostgreSQL will fail with 'ERROR:  2202E: cannot accumulate empty
-           * arrays'
-           */
-          sql` '[]'::json as _ /* NOTHING?! */`;
+    const selection =
+      fragmentsWithAliases.length > 0
+        ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
+        : sql` /* NOTHING?! */`;
 
-      return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
-    } else {
-      const selection =
-        fragmentsWithAliases.length > 0
-          ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
-          : sql` /* NOTHING?! */`;
-
-      return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
-    }
+    return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
   }
 
   private fromExpression(): SQL {
@@ -1792,7 +1766,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private buildQuery(
     options: {
-      asArray?: boolean;
       asJsonAgg?: boolean;
       withIdentifiers?: boolean;
       extraSelects?: SQL[];
@@ -2691,7 +2664,6 @@ ${lateralText};`;
             // No need to do arrays; the json_agg handles this for us - we can
             // return objects with numeric keys just fine and JS will be fine
             // with it.
-            asArray: false,
             asJsonAgg: true,
           });
           const selfIndex = table.selectAndReturnIndex(sql`(${query})`);
