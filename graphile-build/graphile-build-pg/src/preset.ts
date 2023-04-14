@@ -8,7 +8,6 @@ import { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
 import { PgCodecsPlugin } from "./plugins/PgCodecsPlugin.js";
 import { PgConditionArgumentPlugin } from "./plugins/PgConditionArgumentPlugin.js";
 import { PgConditionCustomFieldsPlugin } from "./plugins/PgConditionCustomFieldsPlugin.js";
-import { PgConnectionArgFirstLastBeforeAfterPlugin } from "./plugins/PgConnectionArgFirstLastBeforeAfterPlugin.js";
 import { PgConnectionArgOrderByDefaultValuePlugin } from "./plugins/PgConnectionArgOrderByDefaultValuePlugin.js";
 import { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPlugin.js";
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin.js";
@@ -16,6 +15,7 @@ import { PgContextPlugin } from "./plugins/PgContextPlugin.js";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
 import { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.js";
 import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
+import { PgFirstLastBeforeAfterArgsPlugin } from "./plugins/PgFirstLastBeforeAfterArgsPlugin.js";
 import { PgIndexBehaviorsPlugin } from "./plugins/PgIndexBehaviorsPlugin.js";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
@@ -55,7 +55,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgRelationsPlugin,
     PgAttributeDeprecationPlugin,
     PgCustomTypeFieldPlugin,
-    PgConnectionArgFirstLastBeforeAfterPlugin,
+    PgFirstLastBeforeAfterArgsPlugin,
     PgConnectionArgOrderByPlugin,
     PgConditionArgumentPlugin,
     PgConditionCustomFieldsPlugin,

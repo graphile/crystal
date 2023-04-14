@@ -32,7 +32,6 @@ declare global {
   }
 }
 
-// TODO: rename this, it's not just for connections
 export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
   name: "PgConnectionArgOrderByPlugin",
   description:

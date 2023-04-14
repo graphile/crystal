@@ -25,21 +25,19 @@ declare global {
   }
 }
 
-// TODO: rename this, it's not just for connections
-export const PgConnectionArgFirstLastBeforeAfterPlugin: GraphileConfig.Plugin =
-  {
-    name: "PgConnectionArgFirstLastBeforeAfterPlugin",
-    description:
-      "Adds the 'first', 'last', 'before' and 'after' arguments to connection fields",
-    version: version,
+export const PgFirstLastBeforeAfterArgsPlugin: GraphileConfig.Plugin = {
+  name: "PgFirstLastBeforeAfterArgsPlugin",
+  description:
+    "Adds the 'first', 'last', 'before' and 'after' arguments to connection and list fields",
+  version: version,
 
-    schema: {
-      hooks: {
-        GraphQLObjectType_fields_field_args: commonFn,
-        GraphQLInterfaceType_fields_field_args: commonFn,
-      },
+  schema: {
+    hooks: {
+      GraphQLObjectType_fields_field_args: commonFn,
+      GraphQLInterfaceType_fields_field_args: commonFn,
     },
-  };
+  },
+};
 
 function commonFn(
   args: GrafastFieldConfigArgumentMap<any, any, any, any>,
