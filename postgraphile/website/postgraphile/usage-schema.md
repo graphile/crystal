@@ -56,7 +56,7 @@ const ctx = {};
 const result = await grafast(
   {
     schema,
-    source: /* GraphQL */ `
+    resource: /* GraphQL */ `
       query MyQuery {
         __typename
       }
