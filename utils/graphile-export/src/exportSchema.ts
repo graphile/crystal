@@ -1325,7 +1325,9 @@ function exportSchemaGraphQLJS({
         "schema.extensions",
         "schema.extensions",
       ),
-      enableDeferStream: t.booleanLiteral(false),
+      enableDeferStream: t.booleanLiteral(
+        process.env.ENABLE_DEFER_STREAM === "1",
+      ),
       /*
       // TODO: use the below once https://github.com/graphql/graphql-js/pull/3450 is fixed:
       enableDeferStream:
