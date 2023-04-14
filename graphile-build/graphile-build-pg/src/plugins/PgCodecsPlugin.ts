@@ -419,13 +419,13 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               name: pgClass.relname,
             },
             tags,
-            description,
           };
           const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
             (attributes, className, codecName, extensions, nspName, sql) => ({
               name: codecName,
               identifier: sql.identifier(nspName, className),
               attributes,
+              description,
               extensions,
             }),
             [attributes, className, codecName, extensions, nspName, sql],
@@ -627,7 +627,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   name: type.typname,
                 },
                 tags,
-                description,
               };
               await info.process("pgCodecs_rangeOfCodec_extensions", {
                 serviceName,
@@ -650,7 +649,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     innerCodec,
                     codecName,
                     sql.identifier(namespaceName, typeName),
-                    { extensions },
+                    {
+                      description,
+                      extensions,
+                    },
                   ),
                 [
                   codecName,
@@ -693,7 +695,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     name: type.typname,
                   },
                   tags,
-                  description,
                 };
                 await info.process("pgCodecs_domainOfCodec_extensions", {
                   serviceName,
@@ -721,6 +722,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       codecName,
                       sql.identifier(namespaceName, typeName),
                       {
+                        description,
                         extensions,
                         notNull,
                       },
@@ -767,7 +769,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       name: type.typname,
                     },
                     tags,
-                    description,
                   };
                   await info.process("pgCodecs_listOfCodec_extensions", {
                     serviceName,
@@ -777,7 +778,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   });
                   return EXPORTABLE(
                     (extensions, innerCodec, listOfCodec, typeDelim) =>
-                      listOfCodec(innerCodec, extensions, typeDelim),
+                      listOfCodec(innerCodec, {
+                        extensions,
+                        typeDelim,
+                        description,
+                      }),
                     [extensions, innerCodec, listOfCodec, typeDelim],
                   );
                 }

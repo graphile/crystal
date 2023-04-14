@@ -628,7 +628,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     pgPolymorphism: polymorphism,
                   },
                   () => ({
-                    description: codec.extensions?.description,
+                    description: codec.description,
                   }),
                   `PgPolymorphismPlugin single/relational interface type for ${codec.name}`,
                 );
@@ -673,7 +673,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
                       ExecutableStep, // PgClassSingleStep
                       () => ({
-                        description: codec.extensions?.description,
+                        description: codec.description,
                         interfaces: [
                           build.getTypeByName(
                             interfaceTypeName,
@@ -705,7 +705,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     pgPolymorphism: polymorphism,
                   },
                   () => ({
-                    description: codec.extensions?.description,
+                    description: codec.description,
                   }),
                   `PgPolymorphismPlugin union interface type for ${codec.name}`,
                 );

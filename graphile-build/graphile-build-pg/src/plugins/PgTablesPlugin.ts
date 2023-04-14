@@ -420,8 +420,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 attributes: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
                 ),
+                description,
                 extensions: {
-                  description,
                   tags,
                 },
               };
@@ -492,7 +492,6 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 codec,
                 uniques,
                 isVirtual,
-                // TODO: consistency: either remove `description` from here or from `extensions` throughout.
                 description,
                 extensions,
               } as const),
@@ -641,7 +640,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 },
                 assertPgClassSingleStep,
                 () => ({
-                  description: codec.extensions?.description,
+                  description: codec.description,
                 }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );

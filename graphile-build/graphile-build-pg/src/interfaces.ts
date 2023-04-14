@@ -66,7 +66,6 @@ export interface PgAdaptor<
 declare module "@dataplan/pg" {
   interface PgResourceExtensions {
     tags: Partial<PgResourceTags>;
-    description?: string;
     singleOutputParameterName?: string;
     /** For v4 compatibility, what's the name of the actual table. */
     pg?: {
@@ -78,29 +77,24 @@ declare module "@dataplan/pg" {
 
   interface PgResourceUniqueExtensions {
     tags: Partial<PgResourceUniqueTags>;
-    description?: string;
   }
 
   interface PgCodecRelationExtensions {
     tags: Partial<PgCodecRelationTags>;
-    description?: string;
   }
 
   interface PgCodecRefExtensions {
     tags: Partial<PgCodecRefTags>;
-    description?: string;
   }
 
   interface PgCodecAttributeExtensions {
     tags: Partial<PgCodecAttributeTags>;
-    description?: string;
   }
 
   interface PgCodecExtensions {
     /** If false but the codec has attributes then it's probably a composite type */
     isTableLike?: boolean;
     tags: Partial<PgCodecTags>;
-    description?: string;
   }
 }
 

@@ -984,7 +984,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 memo[fieldName] = fieldWithHooks(
                   { fieldName, fieldBehaviorScope: "mutationField" },
                   {
-                    description: resource.extensions?.description,
+                    description: resource.description,
                     deprecationReason: tagToString(
                       resource.extensions?.tags?.deprecated,
                     ),

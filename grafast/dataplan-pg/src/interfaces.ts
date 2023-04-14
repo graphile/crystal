@@ -45,6 +45,7 @@ export interface PgRefDefinitionExtensions {}
 export interface PgRefDefinition {
   graphqlType?: string;
   singular?: boolean;
+  description?: string;
   extensions?: PgRefDefinitionExtensions;
   singleRecordFieldName?: string;
   listFieldName?: string;
@@ -64,7 +65,6 @@ export interface PgCodecExtensions {
     schemaName: string;
     name: string;
   };
-  description?: string;
   listItemNonNull?: boolean;
 }
 
@@ -243,6 +243,8 @@ export interface PgCodec<
   rangeOfCodec?: TRangeItemCodec;
 
   polymorphism?: PgCodecPolymorphism<any>;
+
+  description?: string;
 
   /**
    * Arbitrary metadata

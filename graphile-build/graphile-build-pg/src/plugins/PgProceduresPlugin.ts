@@ -287,8 +287,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   name: recordCodecName,
                   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   attributes,
+                  description: undefined,
                   extensions: {
-                    description: undefined,
                     // TODO: we should figure out what field this is going to use, and reference that
                     /* `The return type of our \`${name}\` ${
                       pgProc.provolatile === "v" ? "mutation" : "query"
@@ -417,7 +417,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           addBehaviorToTags(tags, "-filter -order", true);
 
           const extensions: PgResourceExtensions = {
-            description,
             pg: {
               serviceName,
               schemaName: pgProc.getNamespace()!.nspname,
