@@ -26,7 +26,7 @@ import {
 } from "@dataplan/pg";
 import type {
   __InputObjectStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   ExecutableStep,
   FieldArgs,
   FieldInfo,

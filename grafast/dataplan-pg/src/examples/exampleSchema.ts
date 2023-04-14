@@ -16,7 +16,7 @@ import { writeFileSync } from "fs";
 import type {
   __InputObjectStep,
   __InputStaticLeafStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   AccessStep,
   BaseGraphQLRootValue,
   GrafastArgumentConfig,
@@ -2173,7 +2173,7 @@ export function makeExampleSchema(
             const $messages = getClassStep($field);
             const $value = val.getRaw() as
               | __InputStaticLeafStep
-              | __TrackedObjectStep;
+              | __TrackedValueStep;
             if ($value.evalIs("YES")) {
               // No restriction
             } else if ($value.evalIs("EXCLUSIVELY")) {

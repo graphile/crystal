@@ -8,10 +8,8 @@ import { UnbatchedExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
 import type { AccessStep } from "./access.js";
 
-// TODO: rename to __TrackedValueStep? Seems to represent values as well as
-// objects.
 /**
- * Implements the `__TrackedObjectStep(operationPlan, object, constraints, path)`
+ * Implements the `__TrackedValueStep(operationPlan, object, constraints, path)`
  * algorithm used to allow runtime AND plan-time access to the three special
  * entities: `variableValues`, `rootValue` and `context`.
  *
@@ -29,12 +27,12 @@ import type { AccessStep } from "./access.js";
  * change the query plan, but it can also be used within plan resolvers to
  * branch the logic of a plan based on something in these entities.
  */
-export class __TrackedObjectStep<
+export class __TrackedValueStep<
   TData = any,
 > extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
-    exportName: "__TrackedObjectStep",
+    exportName: "__TrackedValueStep",
   };
   isSyncAndSafe = true;
 
@@ -95,17 +93,12 @@ export class __TrackedObjectStep<
    */
   get<TAttribute extends keyof TData & string>(
     attrName: TAttribute,
-  ): __TrackedObjectStep<TData[TAttribute]> {
+  ): __TrackedValueStep<TData[TAttribute]> {
     const { value, path, constraints } = this;
     const newValue = value?.[attrName];
     const newValuePlan = this.getValuePlan().get(attrName);
     const newPath = [...path, attrName];
-    return new __TrackedObjectStep(
-      newValue,
-      newValuePlan,
-      constraints,
-      newPath,
-    );
+    return new __TrackedValueStep(newValue, newValuePlan, constraints, newPath);
   }
 
   /**
@@ -113,17 +106,12 @@ export class __TrackedObjectStep<
    */
   at<TIndex extends keyof TData & number>(
     index: TIndex,
-  ): __TrackedObjectStep<TData[TIndex]> {
+  ): __TrackedValueStep<TData[TIndex]> {
     const { value, path, constraints } = this;
     const newValue = value?.[index];
     const newValuePlan = this.getValuePlan().at(index);
     const newPath = [...path, index];
-    return new __TrackedObjectStep(
-      newValue,
-      newValuePlan,
-      constraints,
-      newPath,
-    );
+    return new __TrackedValueStep(newValue, newValuePlan, constraints, newPath);
   }
 
   /**
@@ -226,7 +214,7 @@ export class __TrackedObjectStep<
     return length;
   }
 
-  // At runtime, __TrackedObjectStep doesn't need to exist
+  // At runtime, __TrackedValueStep doesn't need to exist
   optimize() {
     return this.getDep(0);
   }

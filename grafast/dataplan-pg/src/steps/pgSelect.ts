@@ -17,7 +17,7 @@ import {
   __InputObjectStep,
   __InputStaticLeafStep,
   __ItemStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   access,
   arrayOfLength,
   ConnectionStep,
@@ -2448,7 +2448,7 @@ ${lateralText};`;
           continue;
         }
         const dep = this.getDep(dependencyIndex);
-        if (dep instanceof __TrackedObjectStep) {
+        if (dep instanceof __TrackedValueStep) {
           // This has come from a variable, context or rootValue, therefore
           // it's shared and thus safe.
         } else if (isStaticInputStep(dep)) {

@@ -16,7 +16,7 @@ import {
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { SafeError } from "./error.js";
-import type { __TrackedObjectStep } from "./steps/index.js";
+import type { __TrackedValueStep } from "./steps/index.js";
 
 /**
  * Given a selection, finds the first directive named `directiveName`.
@@ -47,7 +47,7 @@ export function evalDirectiveArg<T = unknown>(
   selection: SelectionNode,
   directiveName: string,
   argumentName: string,
-  variableValuesStep: __TrackedObjectStep,
+  variableValuesStep: __TrackedValueStep,
 ): T | undefined {
   const directive = getDirective(selection, directiveName);
   const argument = directive?.arguments?.find(

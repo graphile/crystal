@@ -27,7 +27,7 @@ import type {
   __InputListStep,
   __InputObjectStep,
   __InputStaticLeafStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
 

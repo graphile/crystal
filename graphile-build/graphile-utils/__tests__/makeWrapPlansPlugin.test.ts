@@ -1,7 +1,7 @@
 /* eslint-disable graphile-export/export-methods  */
 import type { ExecutableStep, FieldPlanResolver } from "grafast";
 import {
-  __TrackedObjectStep,
+  __TrackedValueStep,
   constant,
   grafast,
   lambda,
@@ -108,7 +108,7 @@ describe("wrapping named plans", () => {
       expect(spy).toHaveBeenCalledTimes(1);
       const spyArgs = spy.mock.calls[0];
       const [$parent, args, info] = spyArgs;
-      expect($parent).toBeInstanceOf(__TrackedObjectStep);
+      expect($parent).toBeInstanceOf(__TrackedValueStep);
       expect(args).toBeTruthy();
       expect(info).toBeTruthy();
     },
@@ -271,7 +271,7 @@ describe("wrapping named plans", () => {
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
-    expect($parent).toBeInstanceOf(__TrackedObjectStep);
+    expect($parent).toBeInstanceOf(__TrackedValueStep);
     expect(args).toBeTruthy();
     expect(info).toBeTruthy();
   });
@@ -313,7 +313,7 @@ describe("wrapping named plans", () => {
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
-    expect($parent).toBeInstanceOf(__TrackedObjectStep);
+    expect($parent).toBeInstanceOf(__TrackedValueStep);
     expect(args).toBeTruthy();
     expect(info).toBeTruthy();
   });

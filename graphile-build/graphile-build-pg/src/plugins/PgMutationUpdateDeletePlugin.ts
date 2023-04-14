@@ -12,7 +12,7 @@ import { pgDelete, pgUpdate } from "@dataplan/pg";
 import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   lambda,
   object,
   ObjectStep,

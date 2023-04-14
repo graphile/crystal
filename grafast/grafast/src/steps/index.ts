@@ -63,7 +63,7 @@ export { __InputListStep } from "./__inputList.js";
 export { __InputObjectStep } from "./__inputObject.js";
 export { __InputStaticLeafStep } from "./__inputStaticLeaf.js";
 export { __ItemStep } from "./__item.js";
-export { __TrackedObjectStep } from "./__trackedObject.js";
+export { __TrackedValueStep } from "./__trackedValue.js";
 export { __ValueStep } from "./__value.js";
 export { deepEval, DeepEvalStep } from "./deepEval.js";
 export {
