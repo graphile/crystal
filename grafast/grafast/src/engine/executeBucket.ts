@@ -75,6 +75,19 @@ export function executeBucket(
    */
   const reallyExecuteStepWithNoErrors = executeOrStream;
 
+  // TODO: metaByMetaKey might belong to the bucket (`inheritMeta: boolean`)
+  // rather than the request context? Mutations and subscriptions shouldn't
+  // re-use caches.
+  const { layerPlan } = bucket;
+  if (
+    layerPlan.reason.type === "root" ||
+    layerPlan.reason.type === "mutationField" ||
+    layerPlan.reason.type === "subscription"
+  ) {
+    // Reset the metaByMetaKey
+    requestContext.metaByMetaKey = layerPlan.operationPlan.makeMetaByMetaKey();
+  }
+
   const { metaByMetaKey } = requestContext;
   const {
     size,
