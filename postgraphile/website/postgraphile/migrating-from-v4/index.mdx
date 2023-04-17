@@ -218,7 +218,7 @@ API how you need, but we suggest that if possible you accept these new changes.
   this the wrong way around in V4.
 - For `fooEdge` fields on mutation payloads, the `orderBy` argument is now
   non-nullable. It still has a default, so this will only affect you if you were
-  explicitly passing `null` (why would you do that?!).
+  explicitly passing `null`.
 - The `fooEdge` fields on mutation payloads now only exist if the table has a
   primary key.
 - If you disable `NodePlugin` then the `deletedFooId` field on mutation
