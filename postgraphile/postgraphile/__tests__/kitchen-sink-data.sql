@@ -463,6 +463,25 @@ insert into polymorphic.single_table_items
   (20, 'CHECKLIST_ITEM', 16,        2,         3,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Garbage-collection of unused plans', null, 3),
   (21, 'CHECKLIST_ITEM', 16,        1,         4,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Supports newest GraphQL features', null, null);
 
+with recursive cte as (
+  select
+    id as rti,
+    id
+  from polymorphic.single_table_items
+  where parent_id is null
+union all
+  select
+    rti,
+    single_table_items.id
+  from polymorphic.single_table_items, cte
+  where single_table_items.parent_id = cte.id
+)
+update polymorphic.single_table_items
+  set root_topic_id = rti
+  from cte
+  where single_table_items.id = cte.id
+  and cte.id != cte.rti;
+
 insert into polymorphic.relational_items
   (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at) values
   (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null),
