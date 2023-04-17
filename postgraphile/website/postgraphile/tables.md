@@ -25,6 +25,8 @@ CREATE TABLE app_public.users (
 
 For a table like this, PostGraphile will:
 
+**TODO**: Are the inflectors up to date?
+
 - Create a GraphQL type, `User`, for the table, named in UpperCamelCase &
   singularized
   ([inflector: `tableType`](https://github.com/graphile/graphile-engine/blob/f332cb11fc32c7b50428c8d19d88121ead00d95d/packages/graphile-build-pg/src/plugins/PgBasicsPlugin.js#L485-L487)).
