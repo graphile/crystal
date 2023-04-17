@@ -238,7 +238,7 @@ Other changes:
 - In some circumstances the location where a `null` is returned or an error is
   thrown may differ slightly between V4 and V5; this will still respect the
   GraphQL schema though, of course.
-- What was `--no-ignore-indexes` and is now `PgIndexBehaviorsPlugin` now
+- What was `--no-ignore-indexes` (which has been renamed `PgIndexBehaviorsPlugin`) now
   only removes the backwards relation when a relation is unindexed, since the
   forwards (to one) relation is always indexed
 
@@ -287,7 +287,7 @@ Currently the main options are:
 - `-S postgres://...` - your superuser connection string (replaces V4's
   `-C`/`--owner-connection` flag)
 - `-s app_public` - your list of PostgreSQL schemas (same as in V4)
-- `-e` - enable "explain" - this allows GraphiQL (now called Ruru) to render the
+- `-e` - enable "explain" - this allows PostGraphiQL (now called Ruru) to render the
   operation plan and SQL queries that were executed
 - `-C` - the config file to load; if not set we'll try and load
   `graphile.config.js` (or similar) but won't raise an error if it doesn't exist
@@ -506,7 +506,7 @@ PostgreSQL documentation built in via TypeScript hints.
 The schema build process has been split into two phases:
 
 - `gather`: looks at the introspection results and uses them to generate
-  sources, codecs, relations and behaviors (the 4 building blocks)
+  sources, codecs, relations and behaviors (the four building blocks)
 - `schema`: looks at these sources, codecs, relations and behaviors and
   generates a GraphQL schema from them
 
@@ -581,7 +581,7 @@ In PostGraphile V4 the main modules you'd deal with were:
 - `pg-sql2` - build SQL via template literals.
 - `graphile-utils` - a collection of plugin generators to help you extend your `graphile-engine`-based schema
 
-In PostGraphile V5, we have split things up into more packages that each have specific focusses:
+In PostGraphile V5, we have split things up into more packages that each have a specific focus:
 
 - `postgraphile` - much thinner now, acts as just the orchestration layer and CLI
 - `graphile-config` - system for managing presets and plugins
