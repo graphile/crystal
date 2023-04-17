@@ -1,0 +1,19 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+{
+  allLogEntries {
+    nodes {
+      id
+      author {
+        __typename
+        ... on Person {
+          username
+        }
+        ... on Organization {
+          name
+        }
+      }
+    }
+  }
+}
