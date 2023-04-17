@@ -1,6 +1,6 @@
 #> directPg: true
 #> checkErrorSnapshots: false
-#! const id = 'ccc00000-0000-0000-0000-000000000ccc';
+#! const id = 'ccc00000-4321-1234-5678-000000000ccc';
 #! const query0 = 'delete from app_public.messages where id = $1;';
 #! const query1 = 'insert into app_public.messages (id, forum_id, author_id, body) values ($1, $2, $3, $4);';
 #! const query2 = 'update app_public.messages set body = $2 where id = $1;';

@@ -4,7 +4,7 @@
       forumMessage: {
         operationType: "insert",
         message: {
-          id: "ccc00000-0000-0000-0000-000000000ccc",
+          id: "<UUID 1>",
           featured: false,
           body: "Body 1",
           isArchived: false,
@@ -29,7 +29,7 @@
       forumMessage: {
         operationType: "update",
         message: {
-          id: "ccc00000-0000-0000-0000-000000000ccc",
+          id: "<UUID 1>",
           featured: false,
           body: "Body 2",
           isArchived: false,
@@ -54,7 +54,7 @@
       forumMessage: {
         operationType: "update",
         message: {
-          id: "ccc00000-0000-0000-0000-000000000ccc",
+          id: "<UUID 1>",
           featured: false,
           body: "Body 3",
           isArchived: false,
@@ -79,7 +79,7 @@
       forumMessage: {
         operationType: "update",
         message: {
-          id: "ccc00000-0000-0000-0000-000000000ccc",
+          id: "<UUID 1>",
           featured: false,
           body: "Body 4",
           isArchived: false,
