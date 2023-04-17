@@ -92,6 +92,9 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
               },
             )}`,*/
           );
+          if (codec.polymorphism?.mode === "single") {
+            // TODO: register OrderBy for each concrete type
+          }
         });
         return _;
       },

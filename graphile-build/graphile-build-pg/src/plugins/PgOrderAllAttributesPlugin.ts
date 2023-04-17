@@ -49,7 +49,11 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
       GraphQLEnumType_values(values, build, context) {
         const { extend, inflection, options } = build;
         const {
-          scope: { isPgRowSortEnum, pgCodec: rawPgCodec },
+          scope: {
+            isPgRowSortEnum,
+            pgCodec: rawPgCodec,
+            pgPolymorphicSingleTableType,
+          },
         } = context;
         const { pgOrderByNullsLast } = options;
         if (
@@ -61,7 +65,29 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
           return values;
         }
         const pgCodec = rawPgCodec as PgCodecWithAttributes;
-        const attributes = pgCodec.attributes;
+        const allAttributes = pgCodec.attributes;
+        const allowedAttributes =
+          pgCodec.polymorphism?.mode === "single"
+            ? [
+                ...pgCodec.polymorphism.commonAttributes,
+                ...(pgPolymorphicSingleTableType
+                  ? pgCodec.polymorphism.types[
+                      pgPolymorphicSingleTableType.typeIdentifier
+                    ].attributes.map(
+                      (attr) =>
+                        // FIXME: we should be factoring in the attr.rename
+                        attr.attribute,
+                    )
+                  : []),
+              ]
+            : null;
+        const attributes = allowedAttributes
+          ? Object.fromEntries(
+              Object.entries(allAttributes).filter(([attrName, _attr]) =>
+                allowedAttributes.includes(attrName),
+              ),
+            )
+          : allAttributes;
         const sources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((s) => s.codec === pgCodec && !s.parameters);

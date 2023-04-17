@@ -63,6 +63,13 @@ declare global {
         name: string;
       };
     }
+    interface ScopeEnum {
+      pgPolymorphicSingleTableType?: {
+        typeIdentifier: string;
+        name: string;
+        attributes: ReadonlyArray<PgCodecPolymorphismSingleTypeAttributeSpec>;
+      };
+    }
   }
 }
 
