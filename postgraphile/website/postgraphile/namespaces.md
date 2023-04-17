@@ -7,7 +7,7 @@ title: Namespaces (PostgreSQL "schemas")
 In PostgreSQL, each database consists of a number of "schemas". The default
 schema is named "public" and many users only ever deal with this one schema.
 
-In PostGraphile we advise you to use schemas to help organise your application -
+In PostGraphile we advise you to use schemas to help organize your application -
 you can use one schema for the tables that will be exposed to GraphQL, another
 for the tables that should be completely private (e.g. where you store the
 bcrypted user passwords or other secrets never to be exposed!), and you can use
