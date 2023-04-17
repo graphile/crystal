@@ -275,7 +275,8 @@ export function executePreemptive(
   const requestContext: RequestTools = {
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
-    metaByMetaKey: operationPlan.makeMetaByMetaKey(),
+    metaByMetaKey:
+      null as any /* This is now set during 'root' bucket execution'; access before this is forbidden */,
     insideGraphQL: false,
   };
 

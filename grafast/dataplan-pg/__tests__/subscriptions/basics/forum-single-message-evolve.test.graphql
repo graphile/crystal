@@ -1,0 +1,42 @@
+#> directPg: true
+#> checkErrorSnapshots: false
+#! const id = 'ccc00000-4321-1234-5678-000000000ccc';
+#! const query0 = 'delete from app_public.messages where id = $1;';
+#! const query1 = 'insert into app_public.messages (id, forum_id, author_id, body) values ($1, $2, $3, $4);';
+#! const query2 = 'update app_public.messages set body = $2 where id = $1;';
+#! await pgClient.query(query0, [id]);
+#! await pgClient.query(query1, [id, "ca700000-0000-0000-0000-000000000ca7", "a11ce000-0000-0000-0000-0000000a11ce", "Body 1"]);
+#! await waitFor(() => payloads.length >= 1, 15000);
+#! await pgClient.query(query2, [id, "Body 2"]);
+#! await waitFor(() => payloads.length >= 2, 15000);
+#! await pgClient.query(query2, [id, "Body 3"]);
+#! await waitFor(() => payloads.length >= 3, 15000);
+#! await pgClient.query(query2, [id, "Body 4"]);
+#! await waitFor(() => payloads.length >= 4, 15000);
+## expect(payloads[0].data.forumMessage.message.body).toEqual("Body 1")
+## expect(payloads[1].data.forumMessage.message.body).toEqual("Body 2")
+## expect(payloads[2].data.forumMessage.message.body).toEqual("Body 3")
+## expect(payloads[3].data.forumMessage.message.body).toEqual("Body 4")
+subscription {
+  forumMessage(forumId: "ca700000-0000-0000-0000-000000000ca7") {
+    operationType
+    message {
+      id
+      featured
+      body
+      isArchived
+      forum {
+        id
+        name
+        isArchived
+        self {
+          name
+        }
+      }
+      author {
+        username
+        gravatarUrl
+      }
+    }
+  }
+}
