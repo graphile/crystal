@@ -1308,6 +1308,13 @@ create type polymorphic.item_type as enum (
   'CHECKLIST_ITEM'
 );
 
+-- This table itself is not polymorphic
+create table polymorphic.priorities (
+  id serial primary key,
+  title text not null
+);
+comment on table polymorphic.priorities is E'@omit create,update,delete,filter,order';
+
 create table polymorphic.single_table_items (
   id serial primary key,
 
@@ -1328,7 +1335,9 @@ create table polymorphic.single_table_items (
   title text,
   description text,
   note text,
-  color text
+  color text,
+  -- This relationship is _only_ used by CHECKLIST_ITEM and POST
+  priority_id int references polymorphic.priorities
 );
 
 
@@ -1336,10 +1345,10 @@ create table polymorphic.single_table_items (
 comment on table polymorphic.single_table_items is $$
   @interface mode:single type:type
   @type TOPIC name:SingleTableTopic attributes:title!
-  @type POST name:SingleTablePost attributes:title>subject,description,note
+  @type POST name:SingleTablePost attributes:title>subject,description,note,priority_id
   @type DIVIDER name:SingleTableDivider attributes:title,color
   @type CHECKLIST name:SingleTableChecklist attributes:title
-  @type CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note
+  @type CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note,priority_id
   @ref rootTopic to:SingleTableTopic plural via:(root_topic_id)->polymorphic.single_table_items(id)
   $$;
 

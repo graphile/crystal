@@ -79,17 +79,22 @@ export interface PgCodecPolymorphismSingleTypeAttributeSpec<
 export interface PgCodecPolymorphismSingleTypeSpec<
   TAttributeName extends string = string,
 > {
+  /** The name of the polymorphic subentry of the parent single table polymorphic codec */
   name: string;
   // TODO: make this optional?
+  /** The attributes that are specific to this concrete type (including any modifiers) */
   attributes: Array<PgCodecPolymorphismSingleTypeAttributeSpec<TAttributeName>>;
 }
 export interface PgCodecPolymorphismSingle<
   TAttributeName extends string = string,
 > {
   mode: "single";
+  /** The list of attributes that is used to determine which polymorphic type the record is. Currently this should always have length 1. */
   typeAttributes: readonly TAttributeName[];
   // TODO: make this optional?
+  /** These attributes are shared by every concrete type of this codec */
   commonAttributes: readonly TAttributeName[];
+  /** Details the concrete types from this polymorphic single table, including what to call it, and what columns it has. */
   types: {
     [typeKey: string]: PgCodecPolymorphismSingleTypeSpec<TAttributeName>;
   };
@@ -480,8 +485,10 @@ export interface PgCodecRelationBase<
   TLocalCodec extends PgCodec = PgCodec,
   TRemoteAttributes extends string = string,
 > {
-  /* Where the relationship starts */
+  /** Where the relationship starts */
   localCodec: TLocalCodec;
+  /** If localCodec is polymorphic, which of the concrete subtypes should this relationship apply to? */
+  localCodecPolymorphicTypes?: string[];
 
   /**
    * The attributes locally used in this relationship.

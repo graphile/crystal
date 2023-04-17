@@ -77,7 +77,33 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ),
                 fields: (context) => {
                   const { fieldWithHooks } = context;
-                  const attributes = codec.attributes;
+                  const allAttributes = codec.attributes;
+                  const allowedAttributes =
+                    codec.polymorphism?.mode === "single"
+                      ? [
+                          ...codec.polymorphism.commonAttributes,
+                          // TODO: add condition input type for the underlying concrete types, which should also include something like:
+                          /*
+                          ...(pgPolymorphicSingleTableType
+                            ? codec.polymorphism.types[
+                                pgPolymorphicSingleTableType.typeIdentifier
+                              ].attributes.map(
+                                (attr) =>
+                                  // FIXME: we should be factoring in the attr.rename
+                                  attr.attribute,
+                              )
+                            : []),
+                          */
+                        ]
+                      : null;
+                  const attributes = allowedAttributes
+                    ? Object.fromEntries(
+                        Object.entries(allAttributes).filter(
+                          ([attrName, _attr]) =>
+                            allowedAttributes.includes(attrName),
+                        ),
+                      )
+                    : allAttributes;
                   // TODO: move this to a separate plugin
                   return Object.entries(attributes).reduce(
                     (memo, [attributeName, attribute]) => {

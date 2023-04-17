@@ -48,6 +48,7 @@ delete from polymorphic.relational_posts cascade;
 delete from polymorphic.relational_topics cascade;
 delete from polymorphic.relational_items cascade;
 delete from polymorphic.single_table_items cascade;
+delete from polymorphic.priorities cascade;
 delete from polymorphic.log_entries cascade;
 delete from polymorphic.people cascade;
 delete from polymorphic.organizations cascade;
@@ -433,30 +434,34 @@ insert into polymorphic.log_entries (id, person_id, organization_id, text) value
   (13, 8, null, 'I''d like to introduce my wife'),
   (14, 8, null, 'I''m moving to America');
   
+insert into polymorphic.priorities (id, title) values
+  (1, 'High'),
+  (2, 'Medium'),
+  (3, 'Low');
 
 insert into polymorphic.single_table_items 
-  (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at,            color,   title, description, note) values
-  (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'PostGraphile version 5', null, null),
-  (2,  'TOPIC',          null,      1,         0,        '2020-03-26T13:00:00Z', '2020-03-26T14:00:00Z', true,                   '2020-03-26T14:00:00Z', null,    'Temporary test topic', null, null),
-  (3,  'DIVIDER',        1,         2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null,                   'green', 'Headline features', null, null),
-  (4,  'POST',           1,         2,         1,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Better planning', null, null),
-  (5,  'POST',           1,         2,         2,        '2020-01-28T11:02:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Easier to code', null, null),
-  (6,  'POST',           1,         2,         3,        '2020-01-28T11:03:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'More features', 'E.g. interfaces and unions', 'Also things like querying from multiple databases'),
-  (7,  'POST',           1,         2,         4,        '2020-01-28T11:04:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Better performance', null, null),
-  (8,  'DIVIDER',        1,         2,         5,        '2020-01-28T11:05:00Z', '2021-07-30T14:24:00Z', false,                  null,                   'blue',  'Timescale', null, null),
-  (9,  'POST',           1,         2,         6,        '2020-01-28T11:06:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'When have I ever committed to a timescale?', ':D', 'It''ll be done when it''s done, I prefer longer development time and longer stable time than multiple major releases in a year or two.'),
-  (10, 'TOPIC',          1,         2,         7,        '2020-01-28T11:07:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Notes', null, null),
-  (11, 'TOPIC',          10,        2,         0,        '2020-01-28T11:08:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Other aims', null, null),
-  (12, 'POST',           11,        2,         0,        '2020-01-28T11:09:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Fix legacy issues', null, null),
-  (13, 'POST',           11,        2,         1,        '2020-01-28T11:10:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Full TypeScript conversion', null, null),
-  (14, 'POST',           11,        2,         2,        '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Monorepo', null, null),
-  (15, 'POST',           2,         1,         0,        '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false,                  '2020-03-26T14:00:00Z', null,    'Just a test', null, null),
-  (16, 'CHECKLIST',      4,         2,         0,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Planning goals', null, null),
-  (17, 'CHECKLIST_ITEM', 16,        2,         0,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Follows pattern of GraphQL resolver flow', null),
-  (18, 'CHECKLIST_ITEM', 16,        3,         1,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Has an optimisation phase', null),
-  (19, 'CHECKLIST_ITEM', 16,        2,         2,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Plan deduplication at the field level', null),
-  (20, 'CHECKLIST_ITEM', 16,        2,         3,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Garbage-collection of unused plans', null),
-  (21, 'CHECKLIST_ITEM', 16,        1,         4,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Supports newest GraphQL features', null);
+  (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at,            color,   title, description, note, priority_id) values
+  (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'PostGraphile version 5', null, null, null),
+  (2,  'TOPIC',          null,      1,         0,        '2020-03-26T13:00:00Z', '2020-03-26T14:00:00Z', true,                   '2020-03-26T14:00:00Z', null,    'Temporary test topic', null, null, null),
+  (3,  'DIVIDER',        1,         2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null,                   'green', 'Headline features', null, null, null),
+  (4,  'POST',           1,         2,         1,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Better planning', null, null, 1),
+  (5,  'POST',           1,         2,         2,        '2020-01-28T11:02:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Easier to code', null, null, 2),
+  (6,  'POST',           1,         2,         3,        '2020-01-28T11:03:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'More features', 'E.g. interfaces and unions', 'Also things like querying from multiple databases', 3),
+  (7,  'POST',           1,         2,         4,        '2020-01-28T11:04:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Better performance', null, null, 1),
+  (8,  'DIVIDER',        1,         2,         5,        '2020-01-28T11:05:00Z', '2021-07-30T14:24:00Z', false,                  null,                   'blue',  'Timescale', null, null, null),
+  (9,  'POST',           1,         2,         6,        '2020-01-28T11:06:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'When have I ever committed to a timescale?', ':D', 'It''ll be done when it''s done, I prefer longer development time and longer stable time than multiple major releases in a year or two.', 2),
+  (10, 'TOPIC',          1,         2,         7,        '2020-01-28T11:07:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Notes', null, null, null),
+  (11, 'TOPIC',          10,        2,         0,        '2020-01-28T11:08:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Other aims', null, null, null),
+  (12, 'POST',           11,        2,         0,        '2020-01-28T11:09:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Fix legacy issues', null, null, null),
+  (13, 'POST',           11,        2,         1,        '2020-01-28T11:10:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Full TypeScript conversion', null, null, null),
+  (14, 'POST',           11,        2,         2,        '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Monorepo', null, null, null),
+  (15, 'POST',           2,         1,         0,        '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false,                  '2020-03-26T14:00:00Z', null,    'Just a test', null, null, null),
+  (16, 'CHECKLIST',      4,         2,         0,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'Planning goals', null, null, null),
+  (17, 'CHECKLIST_ITEM', 16,        2,         0,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Follows pattern of GraphQL resolver flow', null, null),
+  (18, 'CHECKLIST_ITEM', 16,        3,         1,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Has an optimisation phase', null, 1),
+  (19, 'CHECKLIST_ITEM', 16,        2,         2,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Plan deduplication at the field level', null, 2),
+  (20, 'CHECKLIST_ITEM', 16,        2,         3,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Garbage-collection of unused plans', null, 3),
+  (21, 'CHECKLIST_ITEM', 16,        1,         4,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    null, 'Supports newest GraphQL features', null, null);
 
 insert into polymorphic.relational_items
   (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at) values
