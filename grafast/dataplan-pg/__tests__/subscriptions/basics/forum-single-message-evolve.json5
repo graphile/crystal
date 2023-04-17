@@ -1,0 +1,77 @@
+[
+  {
+    data: {
+      forumMessage: {
+        operationType: "insert",
+        message: {
+          id: "ccc00000-0000-0000-0000-000000000ccc",
+          featured: false,
+          body: "Body 2",
+          isArchived: false,
+          forum: {
+            id: "ca700000-0000-0000-0000-000000000ca7",
+            name: "Cats",
+            isArchived: false,
+            self: {
+              name: "Cats",
+            },
+          },
+          author: {
+            username: "Alice",
+            gravatarUrl: null,
+          },
+        },
+      },
+    },
+  },
+  {
+    data: {
+      forumMessage: {
+        operationType: "update",
+        message: {
+          id: "ccc00000-0000-0000-0000-000000000ccc",
+          featured: false,
+          body: "Body 2",
+          isArchived: false,
+          forum: {
+            id: "ca700000-0000-0000-0000-000000000ca7",
+            name: "Cats",
+            isArchived: false,
+            self: {
+              name: "Cats",
+            },
+          },
+          author: {
+            username: "Alice",
+            gravatarUrl: null,
+          },
+        },
+      },
+    },
+  },
+  {
+    data: {
+      forumMessage: {
+        operationType: "update",
+        message: {
+          id: "ccc00000-0000-0000-0000-000000000ccc",
+          featured: false,
+          body: "Body 2",
+          isArchived: false,
+          forum: {
+            id: "ca700000-0000-0000-0000-000000000ca7",
+            name: "Cats",
+            isArchived: false,
+            self: {
+              name: "Cats",
+            },
+          },
+          author: {
+            username: "Alice",
+            gravatarUrl: null,
+          },
+        },
+      },
+    },
+  },
+]
