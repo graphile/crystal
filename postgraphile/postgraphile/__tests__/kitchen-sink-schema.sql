@@ -1313,6 +1313,7 @@ create table polymorphic.priorities (
   id serial primary key,
   title text not null
 );
+comment on table polymorphic.priorities is E'@omit create,update,delete,filter,order';
 
 create table polymorphic.single_table_items (
   id serial primary key,

@@ -343,10 +343,49 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         });
         const registryBuilder =
           await info.helpers.pgRegistry.getRegistryBuilder();
+        const { codec } = event.resourceOptions;
+        let localCodecPolymorphicTypes: string[] | undefined = undefined;
+        if (codec.polymorphism?.mode === "single") {
+          const poly = codec.polymorphism;
+          if (
+            localAttributes.every((attr) =>
+              poly.commonAttributes.includes(attr!.attname),
+            )
+          ) {
+            // Common to all types
+          } else {
+            if (isReferencee) {
+              // TODO: consider supporting backward relationships for single
+              // table polymorphic types. It's not immediately clear what the
+              // user would want in these cases: is it separate fields for each
+              // type (that would inflate the schema), or is it a relation to
+              // the underlying polymorphic type even though we know certain
+              // concrete types from it will never appear? For now we're
+              // skipping it entirely because then we can add whatever makes
+              // sense later.
+              return;
+            }
+            localCodecPolymorphicTypes = [];
+            for (const [typeKey, typeDetails] of Object.entries(poly.types)) {
+              if (
+                localAttributes.every(
+                  (attr) =>
+                    poly.commonAttributes.includes(attr!.attname) ||
+                    typeDetails.attributes.some(
+                      (a) => a.attribute === attr!.attname,
+                    ),
+                )
+              ) {
+                // MATCH!
+                localCodecPolymorphicTypes.push(typeKey);
+              }
+            }
+          }
+        }
         const existingRelation =
-          registryBuilder.getRegistryConfig().pgRelations[
-            event.resourceOptions.codec.name
-          ]?.[relationName];
+          registryBuilder.getRegistryConfig().pgRelations[codec.name]?.[
+            relationName
+          ];
         const { tags: rawTags, description: constraintDescription } =
           pgConstraint.getTagsAndDescription();
         // Clone the tags because we use the same tags on both relations
@@ -358,6 +397,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           : tags.forwardDescription ?? constraintDescription;
         const newRelation: PgCodecRelationConfig = {
           localCodec: localCodec as PgCodecWithAttributes,
+          localCodecPolymorphicTypes,
           localAttributes: localAttributes.map((c) => c!.attname),
           remoteAttributes: foreignAttributes.map((c) => c!.attname),
           remoteResourceOptions: foreignResourceOptions,
@@ -406,7 +446,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           }
         }
         registryBuilder.addRelation(
-          event.resourceOptions.codec as PgCodecWithAttributes,
+          codec as PgCodecWithAttributes,
           relationName,
           newRelation.remoteResourceOptions,
           newRelation,
@@ -622,6 +662,10 @@ function addRelations(
     "isMutationPayload" in scope ? scope.isMutationPayload : undefined;
   const pgPolymorphism =
     "pgPolymorphism" in scope ? scope.pgPolymorphism : undefined;
+  const pgPolymorphicSingleTableType =
+    "pgPolymorphicSingleTableType" in scope
+      ? scope.pgPolymorphicSingleTableType
+      : undefined;
 
   const codec = (pgTypeResource?.codec ?? pgCodec) as PgCodec;
   // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
@@ -751,6 +795,7 @@ function addRelations(
     // Digest relations
     for (const [relationName, relation] of Object.entries(relations)) {
       const {
+        localCodecPolymorphicTypes,
         localAttributes,
         remoteAttributes,
         remoteResource,
@@ -761,6 +806,28 @@ function addRelations(
         // Don't add backwards relations to mutation payloads
         continue;
       }
+
+      if (localCodecPolymorphicTypes) {
+        if (!pgPolymorphicSingleTableType) {
+          if (context.type === "GraphQLInterfaceType") {
+            // Ignore on interface
+            continue;
+          } else {
+            throw new Error(
+              `Relationship indicates it only relates to certain polymorphic subtypes, but this type doesn't seem to be polymorphic?`,
+            );
+          }
+        }
+        if (
+          !localCodecPolymorphicTypes.some(
+            (t) => t === pgPolymorphicSingleTableType.typeIdentifier,
+          )
+        ) {
+          // Does not apply to this polymorphic subtype; skip.
+          continue;
+        }
+      }
+
       // The behavior is the relation behavior PLUS the remote table
       // behavior. But the relation settings win.
       const behavior =
