@@ -1289,6 +1289,18 @@ function addRelations(
       identifier,
     });
 
+    if (!hasReferencee && !refSpec.singular) {
+      console.warn(
+        `Ignoring non-singular '@ref' with no "referencee" - this probably means you forgot to add 'singular' to your '@ref' spec even though it looks like a "belongs to" relationship. [type: ${
+          Self.name
+        }, codec: ${codec.name}, ref: ${identifier}${
+          codec.extensions?.pg
+            ? `, pg: ${codec.extensions?.pg?.serviceName}/${codec.extensions?.pg?.schemaName}.${codec.extensions?.pg?.name}`
+            : ``
+        }]`,
+      );
+    }
+
     const digest: Digest = {
       identifier,
       isReferencee: hasReferencee,
