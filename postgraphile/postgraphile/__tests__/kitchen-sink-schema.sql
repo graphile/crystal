@@ -1349,7 +1349,7 @@ comment on table polymorphic.single_table_items is $$
   @type DIVIDER name:SingleTableDivider attributes:title,color
   @type CHECKLIST name:SingleTableChecklist attributes:title
   @type CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note,priority_id
-  @ref rootTopic to:SingleTableTopic plural via:(root_topic_id)->polymorphic.single_table_items(id)
+  @ref rootTopic to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)
   $$;
 
 comment on constraint single_table_items_root_topic_fkey on polymorphic.single_table_items is $$
