@@ -41,12 +41,12 @@ comment on table books is $$
   $$;
 ```
 
-We can use multiple targets to indicate polymorphism (see [the polymorphism
+We can also use multiple targets to indicate polymorphism (see [the polymorphism
 docs](./polymorphism) for full details):
 
 ```sql
 comment on table log_entries is $$
-  @ref author to:PersonOrOrganization plural
+  @ref author to:PersonOrOrganization singular
   @refVia author via:(person_id)->people(person_id)
   @refVia author via:(organization_id)->organizations(organization_id)
   $$;

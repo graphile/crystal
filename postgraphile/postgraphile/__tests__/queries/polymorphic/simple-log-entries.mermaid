@@ -1,0 +1,89 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+
+    %% define steps
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    PgSelect20[["PgSelect[20∈1]<br />ᐸlogEntriesᐳ"]]:::plan
+    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸlogEntriesᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__log_entr...person_id”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__log_entr...zation_id”ᐳ"}}:::plan
+    PgUnionAll26[["PgUnionAll[26∈3]"]]:::plan
+    First30{{"First[30∈3]"}}:::plan
+    PgUnionAllSingle31["PgUnionAllSingle[31∈3]"]:::plan
+    Access32{{"Access[32∈3]<br />ᐸ31.1ᐳ"}}:::plan
+    JSONParse33[["JSONParse[33∈4]<br />ᐸ32ᐳ<br />ᐳOrganization"]]:::plan
+    Access34{{"Access[34∈4]<br />ᐸ33.0ᐳ"}}:::plan
+    PgSelect35[["PgSelect[35∈4]<br />ᐸorganizationsᐳ<br />ᐳOrganization"]]:::plan
+    First39{{"First[39∈4]"}}:::plan
+    PgSelectSingle40{{"PgSelectSingle[40∈4]<br />ᐸorganizationsᐳ"}}:::plan
+    PgClassExpression41{{"PgClassExpression[41∈4]<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
+    JSONParse43[["JSONParse[43∈4]<br />ᐸ32ᐳ<br />ᐳPerson"]]:::plan
+    Access44{{"Access[44∈4]<br />ᐸ43.0ᐳ"}}:::plan
+    PgSelect45[["PgSelect[45∈4]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
+    First49{{"First[49∈4]"}}:::plan
+    PgSelectSingle50{{"PgSelectSingle[50∈4]<br />ᐸpeopleᐳ"}}:::plan
+    PgClassExpression51{{"PgClassExpression[51∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+
+    %% plan dependencies
+    __Value3 --> Access16
+    __Value3 --> Access17
+    Access16 & Access17 --> Object18
+    Object18 & Connection19 --> PgSelect20
+    PgSelect20 ==> __Item21
+    __Item21 --> PgSelectSingle22
+    PgSelectSingle22 --> PgClassExpression23
+    PgSelectSingle22 --> PgClassExpression24
+    PgSelectSingle22 --> PgClassExpression25
+    Object18 & PgClassExpression24 & PgClassExpression25 --> PgUnionAll26
+    PgUnionAll26 --> First30
+    First30 --> PgUnionAllSingle31
+    PgUnionAllSingle31 --> Access32
+    Access32 --> JSONParse33
+    JSONParse33 --> Access34
+    Object18 & Access34 --> PgSelect35
+    PgSelect35 --> First39
+    First39 --> PgSelectSingle40
+    PgSelectSingle40 --> PgClassExpression41
+    Access32 --> JSONParse43
+    JSONParse43 --> Access44
+    Object18 & Access44 --> PgSelect45
+    PgSelect45 --> First49
+    First49 --> PgSelectSingle50
+    PgSelectSingle50 --> PgClassExpression51
+
+    subgraph "Buckets for queries/polymorphic/simple-log-entries"
+    Bucket0("Bucket 0 (root)"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgSelect20 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 18<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item21,PgSelectSingle22 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 18<br /><br />ROOT PgSelectSingle{2}ᐸlogEntriesᐳ[22]<br />1: <br />ᐳ: 23, 24, 25<br />2: PgUnionAll[26]<br />ᐳ: First[30]<br />3: PgUnionAllSingle[31]<br />ᐳ: Access[32]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgUnionAll26,First30,PgUnionAllSingle31,Access32 bucket3
+    Bucket4("Bucket 4 (polymorphic)<br />Organization,Person<br />Deps: 32, 18, 31<br />ᐳOrganization<br />ᐳPerson<br />1: JSONParse[33], JSONParse[43]<br />ᐳ: Access[34], Access[44]<br />2: PgSelect[35], PgSelect[45]<br />ᐳ: 39, 40, 41, 49, 50, 51"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,JSONParse33,Access34,PgSelect35,First39,PgSelectSingle40,PgClassExpression41,JSONParse43,Access44,PgSelect45,First49,PgSelectSingle50,PgClassExpression51 bucket4
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
+    end

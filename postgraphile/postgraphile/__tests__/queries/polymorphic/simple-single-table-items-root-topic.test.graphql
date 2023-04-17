@@ -1,0 +1,17 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allSingleTableItems {
+    nodes {
+      id
+      type
+      rootTopicId
+      rootTopic {
+        id
+        title
+      }
+    }
+  }
+}

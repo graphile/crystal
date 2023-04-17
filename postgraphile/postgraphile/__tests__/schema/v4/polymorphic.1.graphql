@@ -1671,6 +1671,10 @@ enum LogEntriesOrderBy {
 }
 
 type LogEntry implements Node {
+  """
+  Reads a single `PersonOrOrganization` that is related to this `LogEntry`.
+  """
+  author: PersonOrOrganization
   id: Int!
 
   """
@@ -4697,6 +4701,11 @@ type SingleTableChecklist implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklist`.
+  """
+  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4754,6 +4763,11 @@ type SingleTableChecklistItem implements SingleTableItem {
   """Reads a single `Priority` that is related to this `SingleTableItem`."""
   priorityByPriorityId: Priority
   priorityId: Int
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklistItem`.
+  """
+  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4805,6 +4819,11 @@ type SingleTableDivider implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableDivider`.
+  """
+  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4856,6 +4875,11 @@ interface SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableItem`.
+  """
+  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -4995,6 +5019,11 @@ type SingleTablePost implements SingleTableItem {
   """Reads a single `Priority` that is related to this `SingleTableItem`."""
   priorityByPriorityId: Priority
   priorityId: Int
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTablePost`.
+  """
+  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """
@@ -5046,6 +5075,11 @@ type SingleTableTopic implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableTopic`.
+  """
+  rootTopic: SingleTableTopic
   rootTopicId: Int
 
   """

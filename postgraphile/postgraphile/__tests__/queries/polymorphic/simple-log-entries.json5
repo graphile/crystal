@@ -1,0 +1,104 @@
+{
+  allLogEntries: {
+    nodes: [
+      {
+        id: 1,
+        author: {
+          __typename: "Person",
+          username: "Alice",
+        },
+      },
+      {
+        id: 2,
+        author: {
+          __typename: "Organization",
+          name: "Umbrella Corporation",
+        },
+      },
+      {
+        id: 3,
+        author: {
+          __typename: "Organization",
+          name: "Cyberdyne Systems",
+        },
+      },
+      {
+        id: 4,
+        author: {
+          __typename: "Person",
+          username: "Dave",
+        },
+      },
+      {
+        id: 5,
+        author: {
+          __typename: "Person",
+          username: "Dave",
+        },
+      },
+      {
+        id: 6,
+        author: {
+          __typename: "Organization",
+          name: "Delos Incorporated",
+        },
+      },
+      {
+        id: 7,
+        author: {
+          __typename: "Organization",
+          name: "Cyberdyne Systems",
+        },
+      },
+      {
+        id: 8,
+        author: {
+          __typename: "Organization",
+          name: "Wayne Enterprises",
+        },
+      },
+      {
+        id: 9,
+        author: {
+          __typename: "Person",
+          username: "Benjie",
+        },
+      },
+      {
+        id: 10,
+        author: {
+          __typename: "Organization",
+          name: "Stark Industries",
+        },
+      },
+      {
+        id: 11,
+        author: {
+          __typename: "Organization",
+          name: "Umbrella Corporation",
+        },
+      },
+      {
+        id: 12,
+        author: {
+          __typename: "Organization",
+          name: "Aperture Science",
+        },
+      },
+      {
+        id: 13,
+        author: {
+          __typename: "Person",
+          username: "Harry",
+        },
+      },
+      {
+        id: 14,
+        author: {
+          __typename: "Person",
+          username: "Harry",
+        },
+      },
+    ],
+  },
+}
