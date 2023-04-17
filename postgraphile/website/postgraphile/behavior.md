@@ -197,31 +197,31 @@ ScopeMatches(fragment, filter):
     equal, return false.
 - Return true.
 
-Here's an annotated example of how `PgOrderAllColumnsPlugin` determines whether
-it should allow ordering by a given column (attribute) of a codec:
+Here's an annotated example of how `PgOrderAllAttributesPlugin` determines whether
+it should allow ordering by a given attribute (eg. column) of a codec:
 
 ```js
-// Get the behaviors from the column type and the column itself
-const behavior = getBehavior([pgCodec.extensions, column.extensions]);
+// Get the behaviors from the attribute type and the attribute itself
+const behavior = getBehavior([pgCodec.extensions, attribute.extensions]);
 
 // By default we want to enable orderBy, except when dealing with `array` and
 // `range` types
 const defaultBehavior = "orderBy orderBy:* -orderBy:array -orderBy:range";
 
-// If the column behavior isn't a match then abort
+// If the attribute behavior isn't a match then abort
 if (!build.behavior.matches(behavior, "attribute:orderBy", defaultBehavior)) {
   return memo;
 }
-// If the column is an array and the behavior isn't a match then abort
+// If the attribute is an array and the behavior isn't a match then abort
 if (
-  column.codec.arrayOfCodec &&
+  attribute.codec.arrayOfCodec &&
   !build.behavior.matches(behavior, "attribute:orderBy:array", defaultBehavior)
 ) {
   return memo;
 }
-// If the column is a range and the behavior isn't a match then abort
+// If the attribute is a range and the behavior isn't a match then abort
 if (
-  column.codec.rangeOfCodec &&
+  attribute.codec.rangeOfCodec &&
   !build.behavior.matches(behavior, "attribute:orderBy:range", defaultBehavior)
 ) {
   return memo;
