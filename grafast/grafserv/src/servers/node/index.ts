@@ -1,5 +1,4 @@
 import { CloseCode, makeServer } from "graphql-ws";
-import type { Extra } from "graphql-ws/lib/use/ws";
 import type {
   IncomingMessage,
   Server as HTTPServer,
@@ -23,10 +22,24 @@ declare global {
   namespace Grafast {
     interface RequestContext {
       node: {
-        req: IncomingMessage;
-        res: ServerResponse;
+        readonly req: IncomingMessage;
+        readonly res: ServerResponse;
       };
-      ws: Extra;
+      ws: {
+        // 'socket' and 'request' come from `import type { Extra } from "graphql-ws/lib/use/ws";`
+        /**
+         * The actual socket connection between the server and the client.
+         */
+        readonly socket: WebSocket;
+        /**
+         * The initial HTTP upgrade request before the actual
+         * socket and connection is established.
+         */
+        readonly request: IncomingMessage;
+
+        /** The parameters passed during the connection initialisation. */
+        readonly connectionParams: Record<string, unknown> | undefined;
+      };
     }
   }
 }

@@ -160,7 +160,7 @@ export function httpError(
   return Object.assign(new Error(message), { statusCode, safeMessage: true });
 }
 
-const $$extra = Symbol("ws-extra");
+const $$ws = Symbol("websocket-details");
 
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   const {
@@ -170,20 +170,26 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   return {
     context(ctx, msg, args) {
       const context = args.contextValue ?? Object.create(null);
-      context[$$extra] = ctx.extra;
+      const { connectionParams } = ctx;
+      const extra = ctx.extra as { request?: any; socket?: any } | undefined;
+      context[$$ws] = {
+        request: extra?.request,
+        socket: extra?.socket,
+        connectionParams,
+      };
       return context;
     },
     schema: async () => instance.getSchema(),
     // PERF: we can remove the async/await and only use when context is async
     execute: async (args: ExecutionArgs) => {
       await hookArgs(args, instance.resolvedPreset, {
-        ws: (args.contextValue as any)?.[$$extra],
+        ws: (args.contextValue as any)?.[$$ws],
       });
       return maskExecutionResult(await execute(args, resolvedPreset));
     },
     subscribe: async (args: ExecutionArgs) => {
       await hookArgs(args, instance.resolvedPreset, {
-        ws: (args.contextValue as any)?.[$$extra],
+        ws: (args.contextValue as any)?.[$$ws],
       });
       return maskExecutionResult(await subscribe(args, resolvedPreset));
     },
