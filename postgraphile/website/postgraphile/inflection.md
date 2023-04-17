@@ -71,7 +71,7 @@ arguments.
 
 ### Advice
 
-The relation field names are quite explicit to avoid accidental conflicts, and
+The relation field names are explicit to avoid accidental conflicts, and
 can make your schema quite verbose, e.g. `userByAuthorId`, `userByEditorId`,
 `userByPublisherId`, etc.
 
