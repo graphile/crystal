@@ -30,12 +30,12 @@ declare global {
         /**
          * The actual socket connection between the server and the client.
          */
-        readonly socket: WebSocket;
+        readonly socket: WebSocket | undefined;
         /**
          * The initial HTTP upgrade request before the actual
          * socket and connection is established.
          */
-        readonly request: IncomingMessage;
+        readonly request: IncomingMessage | undefined;
 
         /** The parameters passed during the connection initialisation. */
         readonly connectionParams: Record<string, unknown> | undefined;
