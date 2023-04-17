@@ -33,7 +33,7 @@ export function filter<
   TListStep extends ExecutableStep<readonly any[]>,
   TItemStep extends ExecutableStep<boolean>,
 >(
-  listPlan: TListStep,
+  listStep: TListStep,
   filterCallback: ListTransformItemPlanCallback<TListStep, TItemStep>,
 ): __ListTransformStep<
   TListStep,
@@ -44,14 +44,14 @@ export function filter<
     : __ItemStep<any>
 > {
   return listTransform<TListStep, TItemStep, FilterPlanMemo, any>({
-    listPlan,
+    listStep,
     itemPlanCallback: filterCallback,
     initialState,
     reduceCallback: reduceCallback,
-    listItem: isListCapableStep(listPlan)
-      ? (itemPlan) => listPlan.listItem(itemPlan as any)
+    listItem: isListCapableStep(listStep)
+      ? (itemPlan) => listStep.listItem(itemPlan as any)
       : undefined,
-    meta: `filter:${chalk.yellow(listPlan.id)}${
+    meta: `filter:${chalk.yellow(listStep.id)}${
       filterCallback.name ? `/${filterCallback.name}` : ""
     }`,
   });

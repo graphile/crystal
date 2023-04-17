@@ -142,23 +142,20 @@ declare global {
 
     interface ScopeObject {
       pgCodec?: PgCodec<any, any, any, any, any, any, any>;
-      // TODO: rename this to isPgClassType?
-      isPgTableType?: boolean;
+      isPgClassType?: boolean;
       isPgConnectionRelated?: true;
     }
     interface ScopeObjectFieldsField {
-      // TODO: put 'field' into all these names?
-      pgResource?: PgResource<any, any, any, any, any>;
+      pgFieldResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgAttribute?: PgCodecAttribute<any>;
+      pgFieldAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
     interface ScopeInterfaceFieldsField {
-      // TODO: put 'field' into all these names?
-      pgResource?: PgResource<any, any, any, any, any>;
+      pgFieldResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgAttribute?: PgCodecAttribute<any>;
+      pgFieldAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -229,7 +226,6 @@ interface State {
 }
 interface Cache {}
 
-// TODO: rename to "PgClassesPlugin"? This coverse more than just tables.
 export const PgTablesPlugin: GraphileConfig.Plugin = {
   name: "PgTablesPlugin",
   description:
@@ -424,8 +420,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 attributes: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
                 ),
+                description,
                 extensions: {
-                  description,
                   tags,
                 },
               };
@@ -496,7 +492,6 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 codec,
                 uniques,
                 isVirtual,
-                // TODO: consistency: either remove `description` from here or from `extensions` throughout.
                 description,
                 extensions,
               } as const),
@@ -641,11 +636,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 tableTypeName,
                 {
                   pgCodec: codec,
-                  isPgTableType: true,
+                  isPgClassType: true,
                 },
                 assertPgClassSingleStep,
                 () => ({
-                  description: codec.extensions?.description,
+                  description: codec.description,
                 }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );

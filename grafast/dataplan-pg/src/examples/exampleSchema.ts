@@ -16,7 +16,7 @@ import { writeFileSync } from "fs";
 import type {
   __InputObjectStep,
   __InputStaticLeafStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   AccessStep,
   BaseGraphQLRootValue,
   GrafastArgumentConfig,
@@ -72,7 +72,7 @@ import type {
   PgCodecAttributeVia,
   PgConditionStep,
   PgExecutorContextPlans,
-  PgInsertStep,
+  PgInsertSingleStep,
   PgSelectStep,
   WithPgClient,
 } from "../";
@@ -90,18 +90,18 @@ import {
   ManyFilterStep,
   pgClassExpression,
   PgClassExpressionStep,
-  pgDelete,
-  PgDeleteStep,
+  pgDeleteSingle,
+  PgDeleteSingleStep,
   PgExecutor,
-  pgInsert,
+  pgInsertSingle,
   pgPolymorphic,
   PgResource,
   pgSelect,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
   pgSingleTablePolymorphic,
-  pgUpdate,
-  PgUpdateStep,
+  pgUpdateSingle,
+  PgUpdateSingleStep,
   recordCodec,
   TYPES,
 } from "../index.js";
@@ -2173,7 +2173,7 @@ export function makeExampleSchema(
             const $messages = getClassStep($field);
             const $value = val.getRaw() as
               | __InputStaticLeafStep
-              | __TrackedObjectStep;
+              | __TrackedValueStep;
             if ($value.evalIs("YES")) {
               // No restriction
             } else if ($value.evalIs("EXCLUSIVELY")) {
@@ -4698,8 +4698,8 @@ export function makeExampleSchema(
 
   const UpdateRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgUpdateStep<typeof relationalPostsResource>
-  >(PgUpdateStep)({
+    PgUpdateSingleStep<typeof relationalPostsResource>
+  >(PgUpdateSingleStep)({
     name: "UpdateRelationalPostByIdPayload",
     fields: {
       post: {
@@ -4737,8 +4737,8 @@ export function makeExampleSchema(
 
   const DeleteRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgDeleteStep<typeof relationalPostsResource>
-  >(PgDeleteStep)({
+    PgDeleteSingleStep<typeof relationalPostsResource>
+  >(PgDeleteSingleStep)({
     name: "DeleteRelationalPostByIdPayload",
     fields: {
       // Since we've deleted the post we cannot go and fetch it; so we must
@@ -4824,18 +4824,17 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (
             constant,
-            pgInsert,
+            pgInsertSingle,
             relationalItemsResource,
             relationalPostsResource,
           ) =>
             function plan(_$root, args) {
-              const $item = pgInsert(relationalItemsResource, {
+              const $item = pgInsertSingle(relationalItemsResource, {
                 type: constant`POST`,
                 author_id: constant(2),
               });
               const $itemId = $item.get("id");
-              // TODO: make this TypeScript stuff automatic
-              const $post = pgInsert(relationalPostsResource, {
+              const $post = pgInsertSingle(relationalPostsResource, {
                 id: $itemId,
               });
               for (const key of ["title", "description", "note"] as Array<
@@ -4863,7 +4862,7 @@ export function makeExampleSchema(
             },
           [
             constant,
-            pgInsert,
+            pgInsertSingle,
             relationalItemsResource,
             relationalPostsResource,
           ],
@@ -4877,7 +4876,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (
             constant,
-            pgInsert,
+            pgInsertSingle,
             relationalItemsResource,
             relationalPostsResource,
           ) =>
@@ -4885,14 +4884,14 @@ export function makeExampleSchema(
               // Only the _last_ post plan is returned; there's no dependency on
               // the first two posts, and yet they should not be tree-shaken
               // because they're mutations.
-              let $post: PgInsertStep<typeof relationalPostsResource>;
+              let $post: PgInsertSingleStep<typeof relationalPostsResource>;
               for (let i = 0; i < 3; i++) {
-                const $item = pgInsert(relationalItemsResource, {
+                const $item = pgInsertSingle(relationalItemsResource, {
                   type: constant`POST`,
                   author_id: constant(2),
                 });
                 const $itemId = $item.get("id");
-                $post = pgInsert(relationalPostsResource, {
+                $post = pgInsertSingle(relationalPostsResource, {
                   id: $itemId,
                   title: constant(`Post #${i + 1}`),
                   description: constant(`Desc ${i + 1}`),
@@ -4905,7 +4904,7 @@ export function makeExampleSchema(
             },
           [
             constant,
-            pgInsert,
+            pgInsertSingle,
             relationalItemsResource,
             relationalPostsResource,
           ],
@@ -4958,9 +4957,9 @@ export function makeExampleSchema(
         },
         type: UpdateRelationalPostByIdPayload,
         plan: EXPORTABLE(
-          (pgUpdate, relationalPostsResource) =>
+          (pgUpdateSingle, relationalPostsResource) =>
             function plan(_$root, args) {
-              const $post = pgUpdate(relationalPostsResource, {
+              const $post = pgUpdateSingle(relationalPostsResource, {
                 id: args.get(["input", "id"]),
               });
               for (const key of ["title", "description", "note"] as Array<
@@ -4976,7 +4975,7 @@ export function makeExampleSchema(
               }
               return $post;
             },
-          [pgUpdate, relationalPostsResource],
+          [pgUpdateSingle, relationalPostsResource],
         ),
       },
 
@@ -4988,14 +4987,14 @@ export function makeExampleSchema(
         },
         type: DeleteRelationalPostByIdPayload,
         plan: EXPORTABLE(
-          (pgDelete, relationalPostsResource) =>
+          (pgDeleteSingle, relationalPostsResource) =>
             function plan(_$root, args) {
-              const $post = pgDelete(relationalPostsResource, {
+              const $post = pgDeleteSingle(relationalPostsResource, {
                 id: args.get(["input", "id"]),
               });
               return $post;
             },
-          [pgDelete, relationalPostsResource],
+          [pgDeleteSingle, relationalPostsResource],
         ),
       },
 

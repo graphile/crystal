@@ -17,7 +17,7 @@ import {
   __InputObjectStep,
   __InputStaticLeafStep,
   __ItemStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   access,
   arrayOfLength,
   ConnectionStep,
@@ -31,7 +31,7 @@ import {
   isPromiseLike,
   lambda,
   list,
-  map,
+  remapKeys,
   reverse,
   reverseArray,
   SafeError,
@@ -637,43 +637,13 @@ export class PgSelectStep<
       ? cloneFromMatchingMode.fetchOneExtra
       : false;
     this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
-    this.beforeStepId =
-      cloneFromMatchingMode && cloneFromMatchingMode.beforeStepId != null
-        ? // TODO: these `addDependency` calls are redundant; we've already copied all the dependencies above!
-          this.addDependency(
-            cloneFromMatchingMode.getDep(cloneFromMatchingMode.beforeStepId),
-          )
-        : null;
-    this.afterStepId =
-      cloneFromMatchingMode && cloneFromMatchingMode.afterStepId != null
-        ? this.addDependency(
-            cloneFromMatchingMode.getDep(cloneFromMatchingMode.afterStepId),
-          )
-        : null;
-    this.lowerIndexStepId =
-      cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexStepId != null
-        ? this.addDependency(
-            cloneFromMatchingMode.getDep(
-              cloneFromMatchingMode.lowerIndexStepId,
-            ),
-          )
-        : null;
-    this.upperIndexStepId =
-      cloneFromMatchingMode && cloneFromMatchingMode.upperIndexStepId != null
-        ? this.addDependency(
-            cloneFromMatchingMode.getDep(
-              cloneFromMatchingMode.upperIndexStepId,
-            ),
-          )
-        : null;
-    this.limitAndOffsetId =
-      cloneFromMatchingMode && cloneFromMatchingMode.limitAndOffsetId != null
-        ? this.addDependency(
-            cloneFromMatchingMode.getDep(
-              cloneFromMatchingMode.limitAndOffsetId,
-            ),
-          )
-        : null;
+
+    // dependencies were already added, so we can just copy the dependency references
+    this.beforeStepId = cloneFromMatchingMode?.beforeStepId ?? null;
+    this.afterStepId = cloneFromMatchingMode?.afterStepId ?? null;
+    this.lowerIndexStepId = cloneFromMatchingMode?.lowerIndexStepId ?? null;
+    this.upperIndexStepId = cloneFromMatchingMode?.upperIndexStepId ?? null;
+    this.limitAndOffsetId = cloneFromMatchingMode?.limitAndOffsetId ?? null;
 
     this.locker.afterLock("orderBy", () => {
       if (this.beforeStepId != null) {
@@ -1164,8 +1134,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
-  // TODO: rename?
-  // TODO: should this be a static method?
   parseCursor(
     $cursorPlan: __InputStaticLeafStep<string>,
   ): PgSelectParsedCursorStep | null {
@@ -1420,20 +1388,17 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private buildSelect(
     options: {
-      asArray?: boolean;
       extraSelects?: readonly SQL[];
     } = Object.create(null),
   ) {
-    const { asArray = false, extraSelects = EMPTY_ARRAY } = options;
+    const { extraSelects = EMPTY_ARRAY } = options;
     const selects = [...this.selects, ...extraSelects];
     const l = this.selects.length;
     const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
-    const fragmentsWithAliases = asArray
-      ? selects
-      : selects.map(
-          (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
-        );
+    const fragmentsWithAliases = selects.map(
+      (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
+    );
 
     const sqlAliases: SQL[] = [];
     for (const [a, b] of this._symbolSubstitutes.entries()) {
@@ -1441,35 +1406,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     }
     const aliases = sql.join(sqlAliases, "");
 
-    if (asArray) {
-      if (fragmentsWithAliases.length > 100) {
-        // The maximum number of arguments you can pass to a PostgreSQL
-        // function is 100, so we need to concatenate multiple arrays
-        // TODO: concatenate via `(jsonb_build_array(...) || jsonb_build_array(...))::json`
-        throw new SafeError(
-          "Please select fewer fields, support for this many fields has not yet been added.",
-        );
-      }
-      const selection = fragmentsWithAliases.length
-        ? sql` json_build_array(\n${sql.indent(
-            sql.join(fragmentsWithAliases, ",\n"),
-          )}) as _`
-        : /*
-           * In the case where our array is empty, we must add something or
-           * PostgreSQL will fail with 'ERROR:  2202E: cannot accumulate empty
-           * arrays'
-           */
-          sql` '[]'::json as _ /* NOTHING?! */`;
+    const selection =
+      fragmentsWithAliases.length > 0
+        ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
+        : sql` /* NOTHING?! */`;
 
-      return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
-    } else {
-      const selection =
-        fragmentsWithAliases.length > 0
-          ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
-          : sql` /* NOTHING?! */`;
-
-      return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
-    }
+    return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
   }
 
   private fromExpression(): SQL {
@@ -1824,7 +1766,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private buildQuery(
     options: {
-      asArray?: boolean;
       asJsonAgg?: boolean;
       withIdentifiers?: boolean;
       extraSelects?: SQL[];
@@ -2507,7 +2448,7 @@ ${lateralText};`;
           continue;
         }
         const dep = this.getDep(dependencyIndex);
-        if (dep instanceof __TrackedObjectStep) {
+        if (dep instanceof __TrackedValueStep) {
           // This has come from a variable, context or rootValue, therefore
           // it's shared and thus safe.
         } else if (isStaticInputStep(dep)) {
@@ -2516,7 +2457,7 @@ ${lateralText};`;
         } else if (dep instanceof ConnectionStep) {
           // We only have this to detect errors, it's an empty object. Safe.
         } else if (dep instanceof PgClassExpressionStep) {
-          const p2 = dep.getDep(dep.tableId);
+          const p2 = dep.getDep(dep.rowDependencyId);
           const t2Parent = dep.getParentStep();
           if (!(t2Parent instanceof PgSelectSingleStep)) {
             continue;
@@ -2684,7 +2625,7 @@ ${lateralText};`;
             // `first` plan on us.
             // NOTE: we don't need to reverse the list for relay pagination
             // because it only contains one entry.
-            return list([map(parent, actualKeyByDesiredKey)]);
+            return list([remapKeys(parent, actualKeyByDesiredKey)]);
           } else {
             debugPlanVerbose(
               "Skipping merging %c into %c (via %c) due to no attributes being selected",
@@ -2723,7 +2664,6 @@ ${lateralText};`;
             // No need to do arrays; the json_agg handles this for us - we can
             // return objects with numeric keys just fine and JS will be fine
             // with it.
-            asArray: false,
             asJsonAgg: true,
           });
           const selfIndex = table.selectAndReturnIndex(sql`(${query})`);
@@ -2798,9 +2738,6 @@ ${lateralText};`;
     options?: PgSelectSinglePlanOptions,
   ): PgSelectSingleStep<TResource> {
     this.setUnique(true);
-    // TODO: should this be on a clone plan? I don't currently think so since
-    // PgSelectSingleStep does not allow for `.where` divergence (since it
-    // does not support `.where`).
     return new PgSelectSingleStep(this, first(this), options);
   }
 

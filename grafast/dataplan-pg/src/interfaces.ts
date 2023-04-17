@@ -11,10 +11,10 @@ import type {
   PgResourceUnique,
 } from "./datasource.js";
 import type { WithPgClient } from "./executor.js";
-import type { PgDeleteStep } from "./steps/pgDelete.js";
-import type { PgInsertStep } from "./steps/pgInsert.js";
+import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
+import type { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
-import type { PgUpdateStep } from "./steps/pgUpdate.js";
+import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -24,9 +24,9 @@ export type PgClassSingleStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > =
   | PgSelectSingleStep<TResource>
-  | PgInsertStep<TResource>
-  | PgUpdateStep<TResource>
-  | PgDeleteStep<TResource>;
+  | PgInsertSingleStep<TResource>
+  | PgUpdateSingleStep<TResource>
+  | PgDeleteSingleStep<TResource>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
@@ -45,6 +45,7 @@ export interface PgRefDefinitionExtensions {}
 export interface PgRefDefinition {
   graphqlType?: string;
   singular?: boolean;
+  description?: string;
   extensions?: PgRefDefinitionExtensions;
   singleRecordFieldName?: string;
   listFieldName?: string;
@@ -64,7 +65,6 @@ export interface PgCodecExtensions {
     schemaName: string;
     name: string;
   };
-  description?: string;
   listItemNonNull?: boolean;
 }
 
@@ -168,7 +168,6 @@ export interface PgCodec<
    */
   fromPg: PgDecode<TFromJavaScript, TFromPostgres>;
 
-  // TODO: rename?
   /**
    * We'll append `::text` by default to each selection; however if this type
    * needs something special (e.g. `money` should be converted to `numeric`
@@ -198,7 +197,6 @@ export interface PgCodec<
    */
   isAnonymous?: boolean;
 
-  // TODO: extract this to a different interface
   /**
    * If this is a composite type, the attributes it supports.
    */
@@ -245,6 +243,8 @@ export interface PgCodec<
   rangeOfCodec?: TRangeItemCodec;
 
   polymorphism?: PgCodecPolymorphism<any>;
+
+  description?: string;
 
   /**
    * Arbitrary metadata
@@ -595,7 +595,6 @@ export interface PgRegistryConfig<
   },
 > {
   pgCodecs: TCodecs;
-  // TODO: Rename to pgResourceOptions?
   pgResources: TResourceOptions;
   pgRelations: TRelations;
 }

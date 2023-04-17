@@ -20,8 +20,7 @@ function rmEmptyTypeDescription<
     | GraphileBuild.GrafastInterfaceTypeConfig<any, any>
     | GraphQLEnumTypeConfig,
 >(type: T): T {
-  // TODO: should we trim before comparison?
-  if (type.description === "") {
+  if (type.description?.trim() === "") {
     type.description = null;
   }
   return type;

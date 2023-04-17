@@ -9,7 +9,7 @@ import { Kind } from "graphql";
 import { SafeError } from "../error.js";
 import type { ExecutionExtra } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import type { __TrackedObjectStep } from "./__trackedObject.js";
+import type { __TrackedValueStep } from "./__trackedValue.js";
 
 /**
  * Handles "leaves" (scalars)
@@ -129,7 +129,7 @@ export class __InputDynamicScalarStep<
 
   eval(): TLeaf {
     const variableValues = this.variableNames.map((variableName, i) =>
-      (this.getDep(i) as __TrackedObjectStep).eval(),
+      (this.getDep(i) as __TrackedValueStep).eval(),
     );
     return this.valueFromValues(variableValues);
   }

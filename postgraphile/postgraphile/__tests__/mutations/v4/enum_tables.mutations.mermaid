@@ -16,7 +16,7 @@ graph TD
     Access11{{"Access[11∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgDelete10[["PgDelete[10∈1]"]]:::sideeffectplan
+    PgDeleteSingle10[["PgDeleteSingle[10∈1]"]]:::sideeffectplan
     Object14{{"Object[14∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression15{{"PgClassExpression[15∈3]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈3]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
@@ -27,7 +27,7 @@ graph TD
     Access26{{"Access[26∈4]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access27{{"Access[27∈4]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object28{{"Object[28∈4]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgInsert25[["PgInsert[25∈4]"]]:::sideeffectplan
+    PgInsertSingle25[["PgInsertSingle[25∈4]"]]:::sideeffectplan
     Object29{{"Object[29∈4]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression30{{"PgClassExpression[30∈6]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
     PgClassExpression31{{"PgClassExpression[31∈6]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
@@ -50,20 +50,20 @@ graph TD
     __Value3 --> Access11
     __Value3 --> Access12
     Access11 & Access12 --> Object13
-    Object13 & __InputStaticLeaf9 --> PgDelete10
-    PgDelete10 --> Object14
-    PgDelete10 --> PgClassExpression15
-    PgDelete10 --> PgClassExpression16
-    PgDelete10 --> PgClassExpression17
+    Object13 & __InputStaticLeaf9 --> PgDeleteSingle10
+    PgDeleteSingle10 --> Object14
+    PgDeleteSingle10 --> PgClassExpression15
+    PgDeleteSingle10 --> PgClassExpression16
+    PgDeleteSingle10 --> PgClassExpression17
     __Value3 --> Access26
     __Value3 --> Access27
     Access26 & Access27 --> Object28
-    Object28 & __InputStaticLeaf22 & __InputStaticLeaf23 & __InputStaticLeaf24 --> PgInsert25
-    PgInsert25 --> Object29
-    PgInsert25 --> PgClassExpression30
-    PgInsert25 --> PgClassExpression31
-    PgInsert25 --> PgClassExpression32
-    PgInsert25 --> PgClassExpression33
+    Object28 & __InputStaticLeaf22 & __InputStaticLeaf23 & __InputStaticLeaf24 --> PgInsertSingle25
+    PgInsertSingle25 --> Object29
+    PgInsertSingle25 --> PgClassExpression30
+    PgInsertSingle25 --> PgClassExpression31
+    PgInsertSingle25 --> PgClassExpression32
+    PgInsertSingle25 --> PgClassExpression33
     __InputStaticLeaf38 & __InputStaticLeaf39 & __InputStaticLeaf40 --> Object41
     __Value3 --> Access43
     __Value3 --> Access44
@@ -78,22 +78,22 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf9,Access11,Access12,Object13,__InputStaticLeaf22,__InputStaticLeaf23,__InputStaticLeaf24,__InputStaticLeaf38,__InputStaticLeaf39,__InputStaticLeaf40 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 9<br /><br />1: PgDelete[10]<br />2: <br />ᐳ: Object[14]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 9<br /><br />1: PgDeleteSingle[10]<br />2: <br />ᐳ: Object[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgDelete10,Object14 bucket1
+    class Bucket1,PgDeleteSingle10,Object14 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 10<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10<br /><br />ROOT PgDelete{1}[10]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10<br /><br />ROOT PgDeleteSingle{1}[10]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression15,PgClassExpression16,PgClassExpression17 bucket3
-    Bucket4("Bucket 4 (mutationField)<br />Deps: 22, 23, 24, 3<br /><br />1: Access[26]<br />2: Access[27]<br />3: Object[28]<br />4: PgInsert[25]<br />5: <br />ᐳ: Object[29]"):::bucket
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 22, 23, 24, 3<br /><br />1: Access[26]<br />2: Access[27]<br />3: Object[28]<br />4: PgInsertSingle[25]<br />5: <br />ᐳ: Object[29]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgInsert25,Access26,Access27,Object28,Object29 bucket4
+    class Bucket4,PgInsertSingle25,Access26,Access27,Object28,Object29 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 29, 25<br /><br />ROOT Object{4}ᐸ{result}ᐳ[29]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 25<br /><br />ROOT PgInsert{4}[25]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 25<br /><br />ROOT PgInsertSingle{4}[25]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket6
     Bucket7("Bucket 7 (mutationField)<br />Deps: 38, 39, 40, 3<br /><br />1: Access[43]<br />2: Access[44]<br />3: Object[45]<br />4: Object[41]<br />5: PgSelect[42]<br />6: <br />ᐳ: 46, 47, 48, 49"):::bucket

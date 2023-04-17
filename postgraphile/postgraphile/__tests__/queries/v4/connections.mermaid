@@ -620,7 +620,7 @@ graph TD
     __Item1005[/"__Item[1005∈65]<br />ᐸ1004ᐳ"\]:::itemplan
     PgSelectSingle1006{{"PgSelectSingle[1006∈65]<br />ᐸpostᐳ"}}:::plan
     PgClassExpression1007{{"PgClassExpression[1007∈66]<br />ᐸ__post__.”id”ᐳ"}}:::plan
-    Map1163{{"Map[1163∈66]<br />ᐸ1006:{”0”:1,”1”:2}ᐳ"}}:::plan
+    RemapKeys1163{{"RemapKeys[1163∈66]<br />ᐸ1006:{”0”:1,”1”:2}ᐳ"}}:::plan
     PgSelectSingle1014{{"PgSelectSingle[1014∈66]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression1015{{"PgClassExpression[1015∈67]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression1016{{"PgClassExpression[1016∈66]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
@@ -1248,8 +1248,8 @@ graph TD
     PgSelect1004 ==> __Item1005
     __Item1005 --> PgSelectSingle1006
     PgSelectSingle1006 --> PgClassExpression1007
-    PgSelectSingle1006 --> Map1163
-    Map1163 --> PgSelectSingle1014
+    PgSelectSingle1006 --> RemapKeys1163
+    RemapKeys1163 --> PgSelectSingle1014
     PgSelectSingle1014 --> PgClassExpression1015
     PgSelectSingle1006 --> PgClassExpression1016
     PgSelectSingle1014 --> PgClassExpression1024
@@ -1517,7 +1517,7 @@ graph TD
     class Bucket65,__Item1005,PgSelectSingle1006 bucket65
     Bucket66("Bucket 66 (nullableBoundary)<br />Deps: 1006<br /><br />ROOT PgSelectSingle{65}ᐸpostᐳ[1006]"):::bucket
     classDef bucket66 stroke:#ff00ff
-    class Bucket66,PgClassExpression1007,PgSelectSingle1014,PgClassExpression1016,Map1163 bucket66
+    class Bucket66,PgClassExpression1007,PgSelectSingle1014,PgClassExpression1016,RemapKeys1163 bucket66
     Bucket67("Bucket 67 (nullableBoundary)<br />Deps: 1014<br /><br />ROOT PgSelectSingle{66}ᐸpersonᐳ[1014]"):::bucket
     classDef bucket67 stroke:#f5deb3
     class Bucket67,PgClassExpression1015,PgClassExpression1024 bucket67

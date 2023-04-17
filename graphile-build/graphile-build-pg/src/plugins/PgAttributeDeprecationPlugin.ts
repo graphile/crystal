@@ -10,7 +10,7 @@ export const PgAttributeDeprecationPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType_fields_field(field, build, context) {
         const {
-          scope: { fieldName, pgAttribute },
+          scope: { fieldName, pgFieldAttribute: pgAttribute },
           Self,
         } = context;
         if (!pgAttribute) {

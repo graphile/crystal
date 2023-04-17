@@ -22,13 +22,13 @@ graph TD
     PgSelect8[["PgSelect[8∈0]<br />ᐸforumsᐳ"]]:::plan
     First12{{"First[12∈0]"}}:::plan
     PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸforumsᐳ"}}:::plan
-    Map41{{"Map[41∈1]<br />ᐸ13:{”0”:0}ᐳ"}}:::plan
+    RemapKeys41{{"RemapKeys[41∈1]<br />ᐸ13:{”0”:0}ᐳ"}}:::plan
     PgSelectSingle21{{"PgSelectSingle[21∈1]<br />ᐸforums_unique_author_countᐳ"}}:::plan
     PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
-    Map43{{"Map[43∈1]<br />ᐸ13:{”0”:1}ᐳ"}}:::plan
+    RemapKeys43{{"RemapKeys[43∈1]<br />ᐸ13:{”0”:1}ᐳ"}}:::plan
     PgSelectSingle30{{"PgSelectSingle[30∈1]<br />ᐸforums_unique_author_countᐳ"}}:::plan
     PgClassExpression31{{"PgClassExpression[31∈1]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
-    Map45{{"Map[45∈1]<br />ᐸ13:{”0”:2}ᐳ"}}:::plan
+    RemapKeys45{{"RemapKeys[45∈1]<br />ᐸ13:{”0”:2}ᐳ"}}:::plan
     PgSelectSingle39{{"PgSelectSingle[39∈1]<br />ᐸforums_unique_author_countᐳ"}}:::plan
     PgClassExpression40{{"PgClassExpression[40∈1]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
 
@@ -39,14 +39,14 @@ graph TD
     Object11 & __InputStaticLeaf7 & Constant14 & __InputStaticLeaf23 & __InputStaticLeaf32 --> PgSelect8
     PgSelect8 --> First12
     First12 --> PgSelectSingle13
-    PgSelectSingle13 --> Map41
-    Map41 --> PgSelectSingle21
+    PgSelectSingle13 --> RemapKeys41
+    RemapKeys41 --> PgSelectSingle21
     PgSelectSingle21 --> PgClassExpression22
-    PgSelectSingle13 --> Map43
-    Map43 --> PgSelectSingle30
+    PgSelectSingle13 --> RemapKeys43
+    RemapKeys43 --> PgSelectSingle30
     PgSelectSingle30 --> PgClassExpression31
-    PgSelectSingle13 --> Map45
-    Map45 --> PgSelectSingle39
+    PgSelectSingle13 --> RemapKeys45
+    RemapKeys45 --> PgSelectSingle39
     PgSelectSingle39 --> PgClassExpression40
 
     subgraph "Buckets for queries/functions/computed-column-scalar"
@@ -55,6 +55,6 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant14,__InputStaticLeaf23,__InputStaticLeaf32 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelectSingle21,PgClassExpression22,PgSelectSingle30,PgClassExpression31,PgSelectSingle39,PgClassExpression40,Map41,Map43,Map45 bucket1
+    class Bucket1,PgSelectSingle21,PgClassExpression22,PgSelectSingle30,PgClassExpression31,PgSelectSingle39,PgClassExpression40,RemapKeys41,RemapKeys43,RemapKeys45 bucket1
     Bucket0 --> Bucket1
     end

@@ -385,7 +385,7 @@ const plans = {
     updateUser(parent, fieldArgs) {
       const $nodeId = fieldArgs.get("id");
       const spec = specFromNodeId(codec, handler, $nodeId);
-      const plan = object({ result: pgUpdate(userSource, spec) });
+      const plan = object({ result: pgUpdateSingle(userSource, spec) });
       fieldArgs.apply(plan);
       return plan;
     },

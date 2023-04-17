@@ -7,7 +7,7 @@ import type {
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
-import { PgDeleteStep, pgSelectFromRecord } from "@dataplan/pg";
+import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
 import { connection, constant, EdgeStep } from "grafast";
 import { EXPORTABLE } from "graphile-export";
@@ -185,7 +185,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (
                     EdgeStep,
-                    PgDeleteStep,
+                    PgDeleteSingleStep,
                     applyOrderToPlan,
                     connection,
                     constant,
@@ -207,7 +207,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       }
 
                       const $select = (() => {
-                        if ($result instanceof PgDeleteStep) {
+                        if ($result instanceof PgDeleteSingleStep) {
                           return pgSelectFromRecord(
                             $result.resource,
                             $result.record(),
@@ -240,7 +240,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     },
                   [
                     EdgeStep,
-                    PgDeleteStep,
+                    PgDeleteSingleStep,
                     applyOrderToPlan,
                     connection,
                     constant,

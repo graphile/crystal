@@ -17,6 +17,562 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
+  """Get a single `Input`."""
+  inputById(id: Int!): Input
+
+  """Get a single `Patch`."""
+  patchById(id: Int!): Patch
+
+  """Get a single `Reserved`."""
+  reservedById(id: Int!): Reserved
+
+  """Get a single `ReservedPatchRecord`."""
+  reservedPatchRecordById(id: Int!): ReservedPatchRecord
+
+  """Get a single `ReservedInputRecord`."""
+  reservedInputRecordById(id: Int!): ReservedInputRecord
+
+  """Get a single `DefaultValue`."""
+  defaultValueById(id: Int!): DefaultValue
+
+  """Get a single `NoPrimaryKey`."""
+  noPrimaryKeyById(id: Int!): NoPrimaryKey
+
+  """Get a single `UniqueForeignKey`."""
+  uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
+
+  """Get a single `MyTable`."""
+  myTableById(id: Int!): MyTable
+
+  """Get a single `PersonSecret`."""
+  personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Get a single `ViewTable`."""
+  viewTableById(id: Int!): ViewTable
+
+  """Get a single `CompoundKey`."""
+  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+
+  """Get a single `SimilarTable1`."""
+  similarTable1ById(id: Int!): SimilarTable1
+
+  """Get a single `SimilarTable2`."""
+  similarTable2ById(id: Int!): SimilarTable2
+
+  """Get a single `NullTestRecord`."""
+  nullTestRecordById(id: Int!): NullTestRecord
+
+  """Get a single `Issue756`."""
+  issue756ById(id: Int!): Issue756
+
+  """Get a single `LeftArm`."""
+  leftArmById(id: Int!): LeftArm
+
+  """Get a single `LeftArm`."""
+  leftArmByPersonId(personId: Int!): LeftArm
+
+  """Get a single `Post`."""
+  postById(id: Int!): Post
+
+  """Get a single `Person`."""
+  personById(id: Int!): Person
+
+  """Get a single `Person`."""
+  personByEmail(email: Email!): Person
+
+  """Get a single `Type`."""
+  typeById(id: Int!): Type
+  currentUserId: Int
+  funcOut: Int
+
+  """Reads and enables pagination through a set of `Int4`."""
+  funcOutSetof(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): FuncOutSetofConnection
+  funcOutUnnamed: Int
+  noArgsQuery: Int
+
+  """Reads and enables pagination through a set of `Interval`."""
+  queryIntervalSet(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): QueryIntervalSetConnection
+
+  """Reads and enables pagination through a set of `Int8`."""
+  staticBigInteger(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): StaticBigIntegerConnection
+  funcInOut(i: Int): Int
+
+  """Reads and enables pagination through a set of `Int4`."""
+  funcReturnsTableOneCol(
+    i: Int
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): FuncReturnsTableOneColConnection
+  jsonIdentity(json: JSON): JSON
+  jsonbIdentity(json: JSON): JSON
+
+  """lol, add some stuff 1 query"""
+  add1Query(arg0: Int!, arg1: Int!): Int
+
+  """lol, add some stuff 2 query"""
+  add2Query(a: Int!, b: Int): Int
+
+  """lol, add some stuff 3 query"""
+  add3Query(a: Int, arg1: Int): Int
+
+  """lol, add some stuff 4 query"""
+  add4Query(arg0: Int, b: Int): Int
+  funcInInout(i: Int, ino: Int): Int
+  funcOutOut: FuncOutOutRecord
+
+  """Reads and enables pagination through a set of `FuncOutOutSetofRecord`."""
+  funcOutOutSetof(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): FuncOutOutSetofConnection
+  funcOutOutUnnamed: FuncOutOutUnnamedRecord
+  searchTestSummariesList(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+  ): [SearchTestSummariesRecord]
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, b: Int, arg2: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
+  funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
+
+  """
+  Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
+  """
+  funcReturnsTableMultiCol(
+    i: Int
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): FuncReturnsTableMultiColConnection
+
+  """Reads and enables pagination through a set of `Int4`."""
+  intSetQuery(
+    x: Int
+    y: Int
+    z: Int
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): IntSetQueryConnection
+  queryIntervalArray: [Interval]
+  queryTextArray: [String]
+  returnTableWithoutGrants: CompoundKey
+  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+  funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+
+  """Reads and enables pagination through a set of `CompoundType`."""
+  compoundTypeSetQuery(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): CompoundTypesConnection
+  compoundTypeQuery(object: CompoundTypeInput): CompoundType
+  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
+  tableQuery(id: Int): Post
+  funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+
+  """
+  Reads and enables pagination through a set of `FuncOutComplexSetofRecord`.
+  """
+  funcOutComplexSetof(
+    a: Int
+    b: String
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): FuncOutComplexSetofConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  badlyBehavedFunction(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
+  funcOutTable: Person
+
+  """Reads and enables pagination through a set of `Person`."""
+  funcOutTableSetof(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  tableSetQuery(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  tableSetQueryPlpgsql(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Type`."""
+  typeFunctionConnection(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): TypesConnection
+  typeFunction(id: Int): Type
+  typeFunctionList: [Type]
+
+  """Reads a single `Input` using its globally unique `ID`."""
+  input(
+    """The globally unique `ID` to be used in selecting a single `Input`."""
+    nodeId: ID!
+  ): Input
+
+  """Reads a single `Patch` using its globally unique `ID`."""
+  patch(
+    """The globally unique `ID` to be used in selecting a single `Patch`."""
+    nodeId: ID!
+  ): Patch
+
+  """Reads a single `Reserved` using its globally unique `ID`."""
+  reserved(
+    """The globally unique `ID` to be used in selecting a single `Reserved`."""
+    nodeId: ID!
+  ): Reserved
+
+  """Reads a single `ReservedPatchRecord` using its globally unique `ID`."""
+  reservedPatchRecord(
+    """
+    The globally unique `ID` to be used in selecting a single `ReservedPatchRecord`.
+    """
+    nodeId: ID!
+  ): ReservedPatchRecord
+
+  """Reads a single `ReservedInputRecord` using its globally unique `ID`."""
+  reservedInputRecord(
+    """
+    The globally unique `ID` to be used in selecting a single `ReservedInputRecord`.
+    """
+    nodeId: ID!
+  ): ReservedInputRecord
+
+  """Reads a single `DefaultValue` using its globally unique `ID`."""
+  defaultValue(
+    """
+    The globally unique `ID` to be used in selecting a single `DefaultValue`.
+    """
+    nodeId: ID!
+  ): DefaultValue
+
+  """Reads a single `MyTable` using its globally unique `ID`."""
+  myTable(
+    """The globally unique `ID` to be used in selecting a single `MyTable`."""
+    nodeId: ID!
+  ): MyTable
+
+  """Reads a single `PersonSecret` using its globally unique `ID`."""
+  personSecret(
+    """
+    The globally unique `ID` to be used in selecting a single `PersonSecret`.
+    """
+    nodeId: ID!
+  ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Reads a single `ViewTable` using its globally unique `ID`."""
+  viewTable(
+    """The globally unique `ID` to be used in selecting a single `ViewTable`."""
+    nodeId: ID!
+  ): ViewTable
+
+  """Reads a single `CompoundKey` using its globally unique `ID`."""
+  compoundKey(
+    """
+    The globally unique `ID` to be used in selecting a single `CompoundKey`.
+    """
+    nodeId: ID!
+  ): CompoundKey
+
+  """Reads a single `SimilarTable1` using its globally unique `ID`."""
+  similarTable1(
+    """
+    The globally unique `ID` to be used in selecting a single `SimilarTable1`.
+    """
+    nodeId: ID!
+  ): SimilarTable1
+
+  """Reads a single `SimilarTable2` using its globally unique `ID`."""
+  similarTable2(
+    """
+    The globally unique `ID` to be used in selecting a single `SimilarTable2`.
+    """
+    nodeId: ID!
+  ): SimilarTable2
+
+  """Reads a single `NullTestRecord` using its globally unique `ID`."""
+  nullTestRecord(
+    """
+    The globally unique `ID` to be used in selecting a single `NullTestRecord`.
+    """
+    nodeId: ID!
+  ): NullTestRecord
+
+  """Reads a single `Issue756` using its globally unique `ID`."""
+  issue756(
+    """The globally unique `ID` to be used in selecting a single `Issue756`."""
+    nodeId: ID!
+  ): Issue756
+
+  """Reads a single `LeftArm` using its globally unique `ID`."""
+  leftArm(
+    """The globally unique `ID` to be used in selecting a single `LeftArm`."""
+    nodeId: ID!
+  ): LeftArm
+
+  """Reads a single `Post` using its globally unique `ID`."""
+  post(
+    """The globally unique `ID` to be used in selecting a single `Post`."""
+    nodeId: ID!
+  ): Post
+
+  """Reads a single `Person` using its globally unique `ID`."""
+  person(
+    """The globally unique `ID` to be used in selecting a single `Person`."""
+    nodeId: ID!
+  ): Person
+
+  """Reads a single `Type` using its globally unique `ID`."""
+  type(
+    """The globally unique `ID` to be used in selecting a single `Type`."""
+    nodeId: ID!
+  ): Type
+
   """Reads and enables pagination through a set of `NonUpdatableView`."""
   allNonUpdatableViews(
     """Only read the first `n` values of the set."""
@@ -712,562 +1268,6 @@ type Query implements Node {
     """
     condition: TypeCondition
   ): TypesConnection
-
-  """Get a single `Input`."""
-  inputById(id: Int!): Input
-
-  """Get a single `Patch`."""
-  patchById(id: Int!): Patch
-
-  """Get a single `Reserved`."""
-  reservedById(id: Int!): Reserved
-
-  """Get a single `ReservedPatchRecord`."""
-  reservedPatchRecordById(id: Int!): ReservedPatchRecord
-
-  """Get a single `ReservedInputRecord`."""
-  reservedInputRecordById(id: Int!): ReservedInputRecord
-
-  """Get a single `DefaultValue`."""
-  defaultValueById(id: Int!): DefaultValue
-
-  """Get a single `NoPrimaryKey`."""
-  noPrimaryKeyById(id: Int!): NoPrimaryKey
-
-  """Get a single `UniqueForeignKey`."""
-  uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
-
-  """Get a single `MyTable`."""
-  myTableById(id: Int!): MyTable
-
-  """Get a single `PersonSecret`."""
-  personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-
-  """Get a single `ViewTable`."""
-  viewTableById(id: Int!): ViewTable
-
-  """Get a single `CompoundKey`."""
-  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
-
-  """Get a single `SimilarTable1`."""
-  similarTable1ById(id: Int!): SimilarTable1
-
-  """Get a single `SimilarTable2`."""
-  similarTable2ById(id: Int!): SimilarTable2
-
-  """Get a single `NullTestRecord`."""
-  nullTestRecordById(id: Int!): NullTestRecord
-
-  """Get a single `Issue756`."""
-  issue756ById(id: Int!): Issue756
-
-  """Get a single `LeftArm`."""
-  leftArmById(id: Int!): LeftArm
-
-  """Get a single `LeftArm`."""
-  leftArmByPersonId(personId: Int!): LeftArm
-
-  """Get a single `Post`."""
-  postById(id: Int!): Post
-
-  """Get a single `Person`."""
-  personById(id: Int!): Person
-
-  """Get a single `Person`."""
-  personByEmail(email: Email!): Person
-
-  """Get a single `Type`."""
-  typeById(id: Int!): Type
-  currentUserId: Int
-  funcOut: Int
-
-  """Reads and enables pagination through a set of `Int4`."""
-  funcOutSetof(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): FuncOutSetofConnection
-  funcOutUnnamed: Int
-  noArgsQuery: Int
-
-  """Reads and enables pagination through a set of `Interval`."""
-  queryIntervalSet(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): QueryIntervalSetConnection
-
-  """Reads and enables pagination through a set of `Int8`."""
-  staticBigInteger(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): StaticBigIntegerConnection
-  funcInOut(i: Int): Int
-
-  """Reads and enables pagination through a set of `Int4`."""
-  funcReturnsTableOneCol(
-    i: Int
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): FuncReturnsTableOneColConnection
-  jsonIdentity(json: JSON): JSON
-  jsonbIdentity(json: JSON): JSON
-
-  """lol, add some stuff 1 query"""
-  add1Query(arg0: Int!, arg1: Int!): Int
-
-  """lol, add some stuff 2 query"""
-  add2Query(a: Int!, b: Int): Int
-
-  """lol, add some stuff 3 query"""
-  add3Query(a: Int, arg1: Int): Int
-
-  """lol, add some stuff 4 query"""
-  add4Query(arg0: Int, b: Int): Int
-  funcInInout(i: Int, ino: Int): Int
-  funcOutOut: FuncOutOutRecord
-
-  """Reads and enables pagination through a set of `FuncOutOutSetofRecord`."""
-  funcOutOutSetof(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): FuncOutOutSetofConnection
-  funcOutOutUnnamed: FuncOutOutUnnamedRecord
-  searchTestSummariesList(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Skip the first `n` values."""
-    offset: Int
-  ): [SearchTestSummariesRecord]
-  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
-  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
-  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
-  optionalMissingMiddle4(arg0: Int!, b: Int, arg2: Int): Int
-  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
-  funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
-
-  """
-  Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
-  """
-  funcReturnsTableMultiCol(
-    i: Int
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): FuncReturnsTableMultiColConnection
-
-  """Reads and enables pagination through a set of `Int4`."""
-  intSetQuery(
-    x: Int
-    y: Int
-    z: Int
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): IntSetQueryConnection
-  queryIntervalArray: [Interval]
-  queryTextArray: [String]
-  returnTableWithoutGrants: CompoundKey
-  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
-  funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
-
-  """Reads and enables pagination through a set of `CompoundType`."""
-  compoundTypeSetQuery(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): CompoundTypesConnection
-  compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
-  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
-  compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
-  tableQuery(id: Int): Post
-  funcOutComplex(a: Int, b: String): FuncOutComplexRecord
-
-  """
-  Reads and enables pagination through a set of `FuncOutComplexSetofRecord`.
-  """
-  funcOutComplexSetof(
-    a: Int
-    b: String
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): FuncOutComplexSetofConnection
-
-  """Reads and enables pagination through a set of `Person`."""
-  badlyBehavedFunction(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
-  funcOutTable: Person
-
-  """Reads and enables pagination through a set of `Person`."""
-  funcOutTableSetof(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): PeopleConnection
-
-  """Reads and enables pagination through a set of `Person`."""
-  tableSetQuery(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `Person`."""
-    orderBy: [PeopleOrderBy!]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PersonCondition
-  ): PeopleConnection
-
-  """Reads and enables pagination through a set of `Person`."""
-  tableSetQueryPlpgsql(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): PeopleConnection
-
-  """Reads and enables pagination through a set of `Type`."""
-  typeFunctionConnection(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): TypesConnection
-  typeFunction(id: Int): Type
-  typeFunctionList: [Type]
-
-  """Reads a single `Input` using its globally unique `ID`."""
-  input(
-    """The globally unique `ID` to be used in selecting a single `Input`."""
-    nodeId: ID!
-  ): Input
-
-  """Reads a single `Patch` using its globally unique `ID`."""
-  patch(
-    """The globally unique `ID` to be used in selecting a single `Patch`."""
-    nodeId: ID!
-  ): Patch
-
-  """Reads a single `Reserved` using its globally unique `ID`."""
-  reserved(
-    """The globally unique `ID` to be used in selecting a single `Reserved`."""
-    nodeId: ID!
-  ): Reserved
-
-  """Reads a single `ReservedPatchRecord` using its globally unique `ID`."""
-  reservedPatchRecord(
-    """
-    The globally unique `ID` to be used in selecting a single `ReservedPatchRecord`.
-    """
-    nodeId: ID!
-  ): ReservedPatchRecord
-
-  """Reads a single `ReservedInputRecord` using its globally unique `ID`."""
-  reservedInputRecord(
-    """
-    The globally unique `ID` to be used in selecting a single `ReservedInputRecord`.
-    """
-    nodeId: ID!
-  ): ReservedInputRecord
-
-  """Reads a single `DefaultValue` using its globally unique `ID`."""
-  defaultValue(
-    """
-    The globally unique `ID` to be used in selecting a single `DefaultValue`.
-    """
-    nodeId: ID!
-  ): DefaultValue
-
-  """Reads a single `MyTable` using its globally unique `ID`."""
-  myTable(
-    """The globally unique `ID` to be used in selecting a single `MyTable`."""
-    nodeId: ID!
-  ): MyTable
-
-  """Reads a single `PersonSecret` using its globally unique `ID`."""
-  personSecret(
-    """
-    The globally unique `ID` to be used in selecting a single `PersonSecret`.
-    """
-    nodeId: ID!
-  ): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-
-  """Reads a single `ViewTable` using its globally unique `ID`."""
-  viewTable(
-    """The globally unique `ID` to be used in selecting a single `ViewTable`."""
-    nodeId: ID!
-  ): ViewTable
-
-  """Reads a single `CompoundKey` using its globally unique `ID`."""
-  compoundKey(
-    """
-    The globally unique `ID` to be used in selecting a single `CompoundKey`.
-    """
-    nodeId: ID!
-  ): CompoundKey
-
-  """Reads a single `SimilarTable1` using its globally unique `ID`."""
-  similarTable1(
-    """
-    The globally unique `ID` to be used in selecting a single `SimilarTable1`.
-    """
-    nodeId: ID!
-  ): SimilarTable1
-
-  """Reads a single `SimilarTable2` using its globally unique `ID`."""
-  similarTable2(
-    """
-    The globally unique `ID` to be used in selecting a single `SimilarTable2`.
-    """
-    nodeId: ID!
-  ): SimilarTable2
-
-  """Reads a single `NullTestRecord` using its globally unique `ID`."""
-  nullTestRecord(
-    """
-    The globally unique `ID` to be used in selecting a single `NullTestRecord`.
-    """
-    nodeId: ID!
-  ): NullTestRecord
-
-  """Reads a single `Issue756` using its globally unique `ID`."""
-  issue756(
-    """The globally unique `ID` to be used in selecting a single `Issue756`."""
-    nodeId: ID!
-  ): Issue756
-
-  """Reads a single `LeftArm` using its globally unique `ID`."""
-  leftArm(
-    """The globally unique `ID` to be used in selecting a single `LeftArm`."""
-    nodeId: ID!
-  ): LeftArm
-
-  """Reads a single `Post` using its globally unique `ID`."""
-  post(
-    """The globally unique `ID` to be used in selecting a single `Post`."""
-    nodeId: ID!
-  ): Post
-
-  """Reads a single `Person` using its globally unique `ID`."""
-  person(
-    """The globally unique `ID` to be used in selecting a single `Person`."""
-    nodeId: ID!
-  ): Person
-
-  """Reads a single `Type` using its globally unique `ID`."""
-  type(
-    """The globally unique `ID` to be used in selecting a single `Type`."""
-    nodeId: ID!
-  ): Type
 }
 
 """An object with a globally unique `ID`."""
@@ -1276,89 +1276,6 @@ interface Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-}
-
-"""A connection to a list of `NonUpdatableView` values."""
-type NonUpdatableViewsConnection {
-  """A list of `NonUpdatableView` objects."""
-  nodes: [NonUpdatableView]!
-
-  """
-  A list of edges which contains the `NonUpdatableView` and cursor to aid in pagination.
-  """
-  edges: [NonUpdatableViewsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `NonUpdatableView` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-type NonUpdatableView {
-  column: Int
-}
-
-"""A `NonUpdatableView` edge in the connection."""
-type NonUpdatableViewsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `NonUpdatableView` at the end of the edge."""
-  node: NonUpdatableView
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
-"""Methods to use when ordering `NonUpdatableView`."""
-enum NonUpdatableViewsOrderBy {
-  NATURAL
-  COLUMN_ASC
-  COLUMN_DESC
-}
-
-"""
-A condition to be used against `NonUpdatableView` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input NonUpdatableViewCondition {
-  """Checks for equality with the object’s `column` field."""
-  column: Int
-}
-
-"""A connection to a list of `Input` values."""
-type InputsConnection {
-  """A list of `Input` objects."""
-  nodes: [Input]!
-
-  """
-  A list of edges which contains the `Input` and cursor to aid in pagination.
-  """
-  edges: [InputsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Input` you could get from the connection."""
-  totalCount: Int!
 }
 
 """Should output as Input"""
@@ -1370,49 +1287,6 @@ type Input implements Node {
   id: Int!
 }
 
-"""A `Input` edge in the connection."""
-type InputsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Input` at the end of the edge."""
-  node: Input
-}
-
-"""Methods to use when ordering `Input`."""
-enum InputsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-}
-
-"""
-A condition to be used against `Input` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input InputCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-}
-
-"""A connection to a list of `Patch` values."""
-type PatchesConnection {
-  """A list of `Patch` objects."""
-  nodes: [Patch]!
-
-  """
-  A list of edges which contains the `Patch` and cursor to aid in pagination.
-  """
-  edges: [PatchesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Patch` you could get from the connection."""
-  totalCount: Int!
-}
-
 """Should output as Patch"""
 type Patch implements Node {
   """
@@ -1422,101 +1296,12 @@ type Patch implements Node {
   id: Int!
 }
 
-"""A `Patch` edge in the connection."""
-type PatchesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Patch` at the end of the edge."""
-  node: Patch
-}
-
-"""Methods to use when ordering `Patch`."""
-enum PatchesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-}
-
-"""
-A condition to be used against `Patch` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PatchCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-}
-
-"""A connection to a list of `Reserved` values."""
-type ReservedsConnection {
-  """A list of `Reserved` objects."""
-  nodes: [Reserved]!
-
-  """
-  A list of edges which contains the `Reserved` and cursor to aid in pagination.
-  """
-  edges: [ReservedsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Reserved` you could get from the connection."""
-  totalCount: Int!
-}
-
 type Reserved implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
   id: Int!
-}
-
-"""A `Reserved` edge in the connection."""
-type ReservedsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Reserved` at the end of the edge."""
-  node: Reserved
-}
-
-"""Methods to use when ordering `Reserved`."""
-enum ReservedsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-}
-
-"""
-A condition to be used against `Reserved` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input ReservedCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-}
-
-"""A connection to a list of `ReservedPatchRecord` values."""
-type ReservedPatchRecordsConnection {
-  """A list of `ReservedPatchRecord` objects."""
-  nodes: [ReservedPatchRecord]!
-
-  """
-  A list of edges which contains the `ReservedPatchRecord` and cursor to aid in pagination.
-  """
-  edges: [ReservedPatchRecordsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `ReservedPatchRecord` you could get from the connection.
-  """
-  totalCount: Int!
 }
 
 """
@@ -1530,52 +1315,6 @@ type ReservedPatchRecord implements Node {
   id: Int!
 }
 
-"""A `ReservedPatchRecord` edge in the connection."""
-type ReservedPatchRecordsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `ReservedPatchRecord` at the end of the edge."""
-  node: ReservedPatchRecord
-}
-
-"""Methods to use when ordering `ReservedPatchRecord`."""
-enum ReservedPatchRecordsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-}
-
-"""
-A condition to be used against `ReservedPatchRecord` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input ReservedPatchRecordCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-}
-
-"""A connection to a list of `ReservedInputRecord` values."""
-type ReservedInputRecordsConnection {
-  """A list of `ReservedInputRecord` objects."""
-  nodes: [ReservedInputRecord]!
-
-  """
-  A list of edges which contains the `ReservedInputRecord` and cursor to aid in pagination.
-  """
-  edges: [ReservedInputRecordsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `ReservedInputRecord` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
 """
 `reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table
 """
@@ -1587,50 +1326,6 @@ type ReservedInputRecord implements Node {
   id: Int!
 }
 
-"""A `ReservedInputRecord` edge in the connection."""
-type ReservedInputRecordsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `ReservedInputRecord` at the end of the edge."""
-  node: ReservedInputRecord
-}
-
-"""Methods to use when ordering `ReservedInputRecord`."""
-enum ReservedInputRecordsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-}
-
-"""
-A condition to be used against `ReservedInputRecord` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input ReservedInputRecordCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-}
-
-"""A connection to a list of `DefaultValue` values."""
-type DefaultValuesConnection {
-  """A list of `DefaultValue` objects."""
-  nodes: [DefaultValue]!
-
-  """
-  A list of edges which contains the `DefaultValue` and cursor to aid in pagination.
-  """
-  edges: [DefaultValuesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `DefaultValue` you could get from the connection."""
-  totalCount: Int!
-}
-
 type DefaultValue implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -1640,182 +1335,69 @@ type DefaultValue implements Node {
   nullValue: String
 }
 
-"""A `DefaultValue` edge in the connection."""
-type DefaultValuesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `DefaultValue` at the end of the edge."""
-  node: DefaultValue
-}
-
-"""Methods to use when ordering `DefaultValue`."""
-enum DefaultValuesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NULL_VALUE_ASC
-  NULL_VALUE_DESC
-}
-
-"""
-A condition to be used against `DefaultValue` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input DefaultValueCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `nullValue` field."""
-  nullValue: String
-}
-
-"""A connection to a list of `NoPrimaryKey` values."""
-type NoPrimaryKeysConnection {
-  """A list of `NoPrimaryKey` objects."""
-  nodes: [NoPrimaryKey]!
-
-  """
-  A list of edges which contains the `NoPrimaryKey` and cursor to aid in pagination.
-  """
-  edges: [NoPrimaryKeysEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `NoPrimaryKey` you could get from the connection."""
-  totalCount: Int!
-}
-
 type NoPrimaryKey {
   id: Int!
   str: String!
 }
 
-"""A `NoPrimaryKey` edge in the connection."""
-type NoPrimaryKeysEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `NoPrimaryKey` at the end of the edge."""
-  node: NoPrimaryKey
-}
-
-"""Methods to use when ordering `NoPrimaryKey`."""
-enum NoPrimaryKeysOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  STR_ASC
-  STR_DESC
-}
-
-"""
-A condition to be used against `NoPrimaryKey` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input NoPrimaryKeyCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `str` field."""
-  str: String
-}
-
-"""A connection to a list of `MyTable` values."""
-type MyTablesConnection {
-  """A list of `MyTable` objects."""
-  nodes: [MyTable]!
+type UniqueForeignKey {
+  compoundKey1: Int
+  compoundKey2: Int
 
   """
-  A list of edges which contains the `MyTable` and cursor to aid in pagination.
+  Reads a single `CompoundKey` that is related to this `UniqueForeignKey`.
   """
-  edges: [MyTablesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `MyTable` you could get from the connection."""
-  totalCount: Int!
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
 }
 
-type MyTable implements Node {
+type CompoundKey implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-  id: Int!
-  jsonData: JSON
-}
+  personId2: Int!
+  personId1: Int!
+  extra: Boolean
 
-"""
-A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId1: Person
 
-"""A `MyTable` edge in the connection."""
-type MyTablesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+  """Reads a single `Person` that is related to this `CompoundKey`."""
+  personByPersonId2: Person
 
-  """The `MyTable` at the end of the edge."""
-  node: MyTable
-}
+  """Reads and enables pagination through a set of `ForeignKey`."""
+  foreignKeysByCompoundKey1AndCompoundKey2(
+    """Only read the first `n` values of the set."""
+    first: Int
 
-"""Methods to use when ordering `MyTable`."""
-enum MyTablesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  JSON_DATA_ASC
-  JSON_DATA_DESC
-}
+    """Only read the last `n` values of the set."""
+    last: Int
 
-"""
-A condition to be used against `MyTable` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input MyTableCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
 
-  """Checks for equality with the object’s `jsonData` field."""
-  jsonData: JSON
-}
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
 
-"""A connection to a list of `PersonSecret` values."""
-type PersonSecretsConnection {
-  """A list of `PersonSecret` objects."""
-  nodes: [PersonSecret]!
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ForeignKey`."""
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ForeignKeyCondition
+  ): ForeignKeysConnection!
 
   """
-  A list of edges which contains the `PersonSecret` and cursor to aid in pagination.
+  Reads a single `UniqueForeignKey` that is related to this `CompoundKey`.
   """
-  edges: [PersonSecretsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `PersonSecret` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Tracks the person's secret"""
-type PersonSecret implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  personId: Int!
-
-  """A secret held by the associated Person"""
-  secret: String
-
-  """The `Person` this `PersonSecret` belongs to."""
-  personByPersonId: Person
+  uniqueForeignKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey
 }
 
 """Person test comment"""
@@ -1824,21 +1406,6 @@ type Person implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-
-  """The primary unique identifier for the person"""
-  id: Int!
-
-  """The person’s name"""
-  name: String!
-  aliases: [String]!
-  about: String
-  email: Email!
-  site: WrappedUrl @deprecated(reason: "Don’t use me")
-  config: KeyValueHash
-  lastLoginFromIp: InternetAddress
-  lastLoginFromSubnet: String
-  userMac: String
-  createdAt: Datetime
   computedOut: String!
   firstName: String
   computedOutOut: PersonComputedOutOutRecord
@@ -1896,6 +1463,21 @@ type Person implements Node {
   ): TypesConnection!
   typeFunction(id: Int): Type
   typeFunctionList: [Type]
+
+  """The primary unique identifier for the person"""
+  id: Int!
+
+  """The person’s name"""
+  name: String!
+  aliases: [String]!
+  about: String
+  email: Email!
+  site: WrappedUrl @deprecated(reason: "Don’t use me")
+  config: KeyValueHash
+  lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
+  userMac: String
+  createdAt: Datetime
 
   """Reads and enables pagination through a set of `Post`."""
   postsByAuthorId(
@@ -2020,28 +1602,6 @@ type Person implements Node {
   ): CompoundKeysConnection!
 }
 
-scalar Email
-
-type WrappedUrl {
-  url: NotNullUrl!
-}
-
-scalar NotNullUrl
-
-"""
-A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
-"""
-scalar KeyValueHash
-
-"""An IPv4 or IPv6 host address, and optionally its subnet."""
-scalar InternetAddress
-
-"""
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
-"""
-scalar Datetime
-
 type PersonComputedOutOutRecord {
   o1: String
   o2: String
@@ -2051,6 +1611,8 @@ type PersonComputedInoutOutRecord {
   ino: String
   o: String
 }
+
+scalar Email
 
 type PersonComputedFirstArgInoutOutRecord {
   person: Person
@@ -2065,6 +1627,7 @@ type PersonComputedComplexRecord {
 
 """Awesome feature!"""
 type CompoundType {
+  computedField: Int
   a: Int
   b: String
   c: Color
@@ -2073,7 +1636,6 @@ type CompoundType {
   f: EnumWithEmptyString
   g: Interval
   fooBar: Int
-  computedField: Int
 }
 
 enum Color {
@@ -2132,12 +1694,6 @@ type Post implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-  id: Int!
-  headline: String!
-  body: String
-  authorId: Int
-  enums: [AnEnum]
-  comptypes: [Comptype]
 
   """Reads and enables pagination through a set of `Interval`."""
   computedIntervalSet(
@@ -2167,6 +1723,12 @@ type Post implements Node {
   headlineTrimmedNoDefaults(length: Int, omission: String): String
   headlineTrimmedStrict(length: Int, omission: String): String
   computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  id: Int!
+  headline: String!
+  body: String
+  authorId: Int
+  enums: [AnEnum]
+  comptypes: [Comptype]
 
   """Reads a single `Person` that is related to this `Post`."""
   personByAuthorId: Person
@@ -2204,32 +1766,6 @@ type Post implements Node {
   typeById: Type
 }
 
-enum AnEnum {
-  AWAITING
-  REJECTED
-  PUBLISHED
-  ASTERISK
-  ASTERISK_ASTERISK
-  ASTERISK_ASTERISK_ASTERISK
-  FOO_ASTERISK
-  FOO_ASTERISK_
-  _FOO_ASTERISK
-  ASTERISK_BAR
-  ASTERISK_BAR_
-  _ASTERISK_BAR_
-  ASTERISK_BAZ_ASTERISK
-  _ASTERISK_BAZ_ASTERISK_
-  PERCENT
-  GREATER_THAN_OR_EQUAL
-  LIKE
-  DOLLAR
-}
-
-type Comptype {
-  schedule: Datetime
-  isOptimised: Boolean
-}
-
 """A connection to a list of `Interval` values."""
 type PostComputedIntervalSetConnection {
   """A list of `Interval` objects."""
@@ -2254,6 +1790,24 @@ type PostComputedIntervalSetEdge {
 
   """The `Interval` at the end of the edge."""
   node: Interval
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
 }
 
 """An input for mutations affecting `CompoundType`"""
@@ -2294,6 +1848,38 @@ input IntervalInput {
   """A quantity of years."""
   years: Int
 }
+
+enum AnEnum {
+  AWAITING
+  REJECTED
+  PUBLISHED
+  ASTERISK
+  ASTERISK_ASTERISK
+  ASTERISK_ASTERISK_ASTERISK
+  FOO_ASTERISK
+  FOO_ASTERISK_
+  _FOO_ASTERISK
+  ASTERISK_BAR
+  ASTERISK_BAR_
+  _ASTERISK_BAR_
+  ASTERISK_BAZ_ASTERISK
+  _ASTERISK_BAZ_ASTERISK_
+  PERCENT
+  GREATER_THAN_OR_EQUAL
+  LIKE
+  DOLLAR
+}
+
+type Comptype {
+  schedule: Datetime
+  isOptimised: Boolean
+}
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+"""
+scalar Datetime
 
 """A connection to a list of `Type` values."""
 type TypesConnection {
@@ -2386,6 +1972,11 @@ scalar AnInt
 
 scalar AnotherInt
 
+"""
+A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
 """A range of `BigFloat`."""
 type BigFloatRange {
   """The starting bound of our range."""
@@ -2465,6 +2056,9 @@ type Point {
   x: Float!
   y: Float!
 }
+
+"""An IPv4 or IPv6 host address, and optionally its subnet."""
+scalar InternetAddress
 
 """A builtin object identifier type for a function name"""
 scalar RegProc
@@ -2850,6 +2444,17 @@ enum PeopleOrderBy {
   CREATED_AT_DESC
 }
 
+type WrappedUrl {
+  url: NotNullUrl!
+}
+
+scalar NotNullUrl
+
+"""
+A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
+"""
+scalar KeyValueHash
+
 """A connection to a list of `Post` values."""
 type PostsConnection {
   """A list of `Post` objects."""
@@ -2954,54 +2559,13 @@ type ForeignKey {
   personByPersonId: Person
 }
 
-type CompoundKey implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  personId2: Int!
-  personId1: Int!
-  extra: Boolean
+"""A `ForeignKey` edge in the connection."""
+type ForeignKeysEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
 
-  """Reads a single `Person` that is related to this `CompoundKey`."""
-  personByPersonId1: Person
-
-  """Reads a single `Person` that is related to this `CompoundKey`."""
-  personByPersonId2: Person
-
-  """Reads and enables pagination through a set of `ForeignKey`."""
-  foreignKeysByCompoundKey1AndCompoundKey2(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `ForeignKey`."""
-    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ForeignKeyCondition
-  ): ForeignKeysConnection!
-
-  """
-  Reads a single `UniqueForeignKey` that is related to this `CompoundKey`.
-  """
-  uniqueForeignKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey
+  """The `ForeignKey` at the end of the edge."""
+  node: ForeignKey
 }
 
 """Methods to use when ordering `ForeignKey`."""
@@ -3030,23 +2594,19 @@ input ForeignKeyCondition {
   compoundKey2: Int
 }
 
-type UniqueForeignKey {
-  compoundKey1: Int
-  compoundKey2: Int
-
+"""Tracks the person's secret"""
+type PersonSecret implements Node {
   """
-  Reads a single `CompoundKey` that is related to this `UniqueForeignKey`.
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
-}
+  nodeId: ID!
+  personId: Int!
 
-"""A `ForeignKey` edge in the connection."""
-type ForeignKeysEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+  """A secret held by the associated Person"""
+  secret: String
 
-  """The `ForeignKey` at the end of the edge."""
-  node: ForeignKey
+  """The `Person` this `PersonSecret` belongs to."""
+  personByPersonId: Person
 }
 
 """Tracks metadata about the left arms of various people"""
@@ -3118,111 +2678,13 @@ input CompoundKeyCondition {
   extra: Boolean
 }
 
-"""A `PersonSecret` edge in the connection."""
-type PersonSecretsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `PersonSecret` at the end of the edge."""
-  node: PersonSecret
-}
-
-"""Methods to use when ordering `PersonSecret`."""
-enum PersonSecretsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  SECRET_ASC
-  SECRET_DESC
-}
-
-"""
-A condition to be used against `PersonSecret` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input PersonSecretCondition {
-  """Checks for equality with the object’s `personId` field."""
-  personId: Int
-
-  """Checks for equality with the object’s `secret` field."""
-  secret: String
-}
-
-"""A connection to a list of `Testview` values."""
-type TestviewsConnection {
-  """A list of `Testview` objects."""
-  nodes: [Testview]!
-
+type MyTable implements Node {
   """
-  A list of edges which contains the `Testview` and cursor to aid in pagination.
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  edges: [TestviewsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Testview` you could get from the connection."""
-  totalCount: Int!
-}
-
-type Testview {
-  testviewid: Int
-  col1: Int
-  col2: Int
-}
-
-"""A `Testview` edge in the connection."""
-type TestviewsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Testview` at the end of the edge."""
-  node: Testview
-}
-
-"""Methods to use when ordering `Testview`."""
-enum TestviewsOrderBy {
-  NATURAL
-  TESTVIEWID_ASC
-  TESTVIEWID_DESC
-  COL1_ASC
-  COL1_DESC
-  COL2_ASC
-  COL2_DESC
-}
-
-"""
-A condition to be used against `Testview` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input TestviewCondition {
-  """Checks for equality with the object’s `testviewid` field."""
-  testviewid: Int
-
-  """Checks for equality with the object’s `col1` field."""
-  col1: Int
-
-  """Checks for equality with the object’s `col2` field."""
-  col2: Int
-}
-
-"""A connection to a list of `ViewTable` values."""
-type ViewTablesConnection {
-  """A list of `ViewTable` objects."""
-  nodes: [ViewTable]!
-
-  """
-  A list of edges which contains the `ViewTable` and cursor to aid in pagination.
-  """
-  edges: [ViewTablesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `ViewTable` you could get from the connection."""
-  totalCount: Int!
+  nodeId: ID!
+  id: Int!
+  jsonData: JSON
 }
 
 type ViewTable implements Node {
@@ -3233,60 +2695,6 @@ type ViewTable implements Node {
   id: Int!
   col1: Int
   col2: Int
-}
-
-"""A `ViewTable` edge in the connection."""
-type ViewTablesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `ViewTable` at the end of the edge."""
-  node: ViewTable
-}
-
-"""Methods to use when ordering `ViewTable`."""
-enum ViewTablesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  COL1_ASC
-  COL1_DESC
-  COL2_ASC
-  COL2_DESC
-}
-
-"""
-A condition to be used against `ViewTable` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input ViewTableCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `col1` field."""
-  col1: Int
-
-  """Checks for equality with the object’s `col2` field."""
-  col2: Int
-}
-
-"""A connection to a list of `SimilarTable1` values."""
-type SimilarTable1SConnection {
-  """A list of `SimilarTable1` objects."""
-  nodes: [SimilarTable1]!
-
-  """
-  A list of edges which contains the `SimilarTable1` and cursor to aid in pagination.
-  """
-  edges: [SimilarTable1SEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `SimilarTable1` you could get from the connection."""
-  totalCount: Int!
 }
 
 type SimilarTable1 implements Node {
@@ -3300,65 +2708,6 @@ type SimilarTable1 implements Node {
   col3: Int!
 }
 
-"""A `SimilarTable1` edge in the connection."""
-type SimilarTable1SEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `SimilarTable1` at the end of the edge."""
-  node: SimilarTable1
-}
-
-"""Methods to use when ordering `SimilarTable1`."""
-enum SimilarTable1SOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  COL1_ASC
-  COL1_DESC
-  COL2_ASC
-  COL2_DESC
-  COL3_ASC
-  COL3_DESC
-}
-
-"""
-A condition to be used against `SimilarTable1` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input SimilarTable1Condition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `col1` field."""
-  col1: Int
-
-  """Checks for equality with the object’s `col2` field."""
-  col2: Int
-
-  """Checks for equality with the object’s `col3` field."""
-  col3: Int
-}
-
-"""A connection to a list of `SimilarTable2` values."""
-type SimilarTable2SConnection {
-  """A list of `SimilarTable2` objects."""
-  nodes: [SimilarTable2]!
-
-  """
-  A list of edges which contains the `SimilarTable2` and cursor to aid in pagination.
-  """
-  edges: [SimilarTable2SEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `SimilarTable2` you could get from the connection."""
-  totalCount: Int!
-}
-
 type SimilarTable2 implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -3368,132 +2717,6 @@ type SimilarTable2 implements Node {
   col3: Int!
   col4: Int
   col5: Int
-}
-
-"""A `SimilarTable2` edge in the connection."""
-type SimilarTable2SEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `SimilarTable2` at the end of the edge."""
-  node: SimilarTable2
-}
-
-"""Methods to use when ordering `SimilarTable2`."""
-enum SimilarTable2SOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  COL3_ASC
-  COL3_DESC
-  COL4_ASC
-  COL4_DESC
-  COL5_ASC
-  COL5_DESC
-}
-
-"""
-A condition to be used against `SimilarTable2` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input SimilarTable2Condition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `col3` field."""
-  col3: Int
-
-  """Checks for equality with the object’s `col4` field."""
-  col4: Int
-
-  """Checks for equality with the object’s `col5` field."""
-  col5: Int
-}
-
-"""A connection to a list of `UpdatableView` values."""
-type UpdatableViewsConnection {
-  """A list of `UpdatableView` objects."""
-  nodes: [UpdatableView]!
-
-  """
-  A list of edges which contains the `UpdatableView` and cursor to aid in pagination.
-  """
-  edges: [UpdatableViewsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `UpdatableView` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""YOYOYO!!"""
-type UpdatableView {
-  x: Int
-  name: String
-  description: String
-
-  """This is constantly 2"""
-  constant: Int
-}
-
-"""A `UpdatableView` edge in the connection."""
-type UpdatableViewsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `UpdatableView` at the end of the edge."""
-  node: UpdatableView
-}
-
-"""Methods to use when ordering `UpdatableView`."""
-enum UpdatableViewsOrderBy {
-  NATURAL
-  X_ASC
-  X_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  CONSTANT_ASC
-  CONSTANT_DESC
-}
-
-"""
-A condition to be used against `UpdatableView` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input UpdatableViewCondition {
-  """Checks for equality with the object’s `x` field."""
-  x: Int
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `description` field."""
-  description: String
-
-  """Checks for equality with the object’s `constant` field."""
-  constant: Int
-}
-
-"""A connection to a list of `NullTestRecord` values."""
-type NullTestRecordsConnection {
-  """A list of `NullTestRecord` objects."""
-  nodes: [NullTestRecord]!
-
-  """
-  A list of edges which contains the `NullTestRecord` and cursor to aid in pagination.
-  """
-  edges: [NullTestRecordsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `NullTestRecord` you could get from the connection."""
-  totalCount: Int!
 }
 
 type NullTestRecord implements Node {
@@ -3507,124 +2730,6 @@ type NullTestRecord implements Node {
   nonNullText: String!
 }
 
-"""A `NullTestRecord` edge in the connection."""
-type NullTestRecordsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `NullTestRecord` at the end of the edge."""
-  node: NullTestRecord
-}
-
-"""Methods to use when ordering `NullTestRecord`."""
-enum NullTestRecordsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NULLABLE_TEXT_ASC
-  NULLABLE_TEXT_DESC
-  NULLABLE_INT_ASC
-  NULLABLE_INT_DESC
-  NON_NULL_TEXT_ASC
-  NON_NULL_TEXT_DESC
-}
-
-"""
-A condition to be used against `NullTestRecord` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input NullTestRecordCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `nullableText` field."""
-  nullableText: String
-
-  """Checks for equality with the object’s `nullableInt` field."""
-  nullableInt: Int
-
-  """Checks for equality with the object’s `nonNullText` field."""
-  nonNullText: String
-}
-
-"""A connection to a list of `EdgeCase` values."""
-type EdgeCasesConnection {
-  """A list of `EdgeCase` objects."""
-  nodes: [EdgeCase]!
-
-  """
-  A list of edges which contains the `EdgeCase` and cursor to aid in pagination.
-  """
-  edges: [EdgeCasesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `EdgeCase` you could get from the connection."""
-  totalCount: Int!
-}
-
-type EdgeCase {
-  notNullHasDefault: Boolean!
-  wontCastEasy: Int
-  rowId: Int
-  computed: String
-}
-
-"""A `EdgeCase` edge in the connection."""
-type EdgeCasesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `EdgeCase` at the end of the edge."""
-  node: EdgeCase
-}
-
-"""Methods to use when ordering `EdgeCase`."""
-enum EdgeCasesOrderBy {
-  NATURAL
-  NOT_NULL_HAS_DEFAULT_ASC
-  NOT_NULL_HAS_DEFAULT_DESC
-  WONT_CAST_EASY_ASC
-  WONT_CAST_EASY_DESC
-  ROW_ID_ASC
-  ROW_ID_DESC
-}
-
-"""
-A condition to be used against `EdgeCase` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input EdgeCaseCondition {
-  """Checks for equality with the object’s `notNullHasDefault` field."""
-  notNullHasDefault: Boolean
-
-  """Checks for equality with the object’s `wontCastEasy` field."""
-  wontCastEasy: Int
-
-  """Checks for equality with the object’s `rowId` field."""
-  rowId: Int
-}
-
-"""A connection to a list of `Issue756` values."""
-type Issue756SConnection {
-  """A list of `Issue756` objects."""
-  nodes: [Issue756]!
-
-  """
-  A list of edges which contains the `Issue756` and cursor to aid in pagination.
-  """
-  edges: [Issue756SEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Issue756` you could get from the connection."""
-  totalCount: Int!
-}
-
 type Issue756 implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -3635,142 +2740,6 @@ type Issue756 implements Node {
 }
 
 scalar NotNullTimestamp
-
-"""A `Issue756` edge in the connection."""
-type Issue756SEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Issue756` at the end of the edge."""
-  node: Issue756
-}
-
-"""Methods to use when ordering `Issue756`."""
-enum Issue756SOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  TS_ASC
-  TS_DESC
-}
-
-"""
-A condition to be used against `Issue756` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input Issue756Condition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `ts` field."""
-  ts: NotNullTimestamp
-}
-
-"""A connection to a list of `LeftArm` values."""
-type LeftArmsConnection {
-  """A list of `LeftArm` objects."""
-  nodes: [LeftArm]!
-
-  """
-  A list of edges which contains the `LeftArm` and cursor to aid in pagination.
-  """
-  edges: [LeftArmsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `LeftArm` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `LeftArm` edge in the connection."""
-type LeftArmsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `LeftArm` at the end of the edge."""
-  node: LeftArm
-}
-
-"""Methods to use when ordering `LeftArm`."""
-enum LeftArmsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  LENGTH_IN_METRES_ASC
-  LENGTH_IN_METRES_DESC
-  MOOD_ASC
-  MOOD_DESC
-}
-
-"""
-A condition to be used against `LeftArm` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input LeftArmCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `personId` field."""
-  personId: Int
-
-  """Checks for equality with the object’s `lengthInMetres` field."""
-  lengthInMetres: Float
-
-  """Checks for equality with the object’s `mood` field."""
-  mood: String
-}
-
-"""
-A condition to be used against `Person` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PersonCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `aliases` field."""
-  aliases: [String]
-
-  """Checks for equality with the object’s `about` field."""
-  about: String
-
-  """Checks for equality with the object’s `email` field."""
-  email: Email
-
-  """Checks for equality with the object’s `site` field."""
-  site: WrappedUrlInput
-
-  """Checks for equality with the object’s `config` field."""
-  config: KeyValueHash
-
-  """Checks for equality with the object’s `lastLoginFromIp` field."""
-  lastLoginFromIp: InternetAddress
-
-  """Checks for equality with the object’s `lastLoginFromSubnet` field."""
-  lastLoginFromSubnet: String
-
-  """Checks for equality with the object’s `userMac` field."""
-  userMac: String
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `computedOut` field."""
-  computedOut: String
-}
-
-"""An input for mutations affecting `WrappedUrl`"""
-input WrappedUrlInput {
-  url: NotNullUrl!
-}
 
 """A connection to a list of `Int` values."""
 type FuncOutSetofConnection {
@@ -4084,6 +3053,1037 @@ type FuncOutComplexSetofEdge {
 
   """The `FuncOutComplexSetofRecord` at the end of the edge."""
   node: FuncOutComplexSetofRecord
+}
+
+"""
+A condition to be used against `Person` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PersonCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `aliases` field."""
+  aliases: [String]
+
+  """Checks for equality with the object’s `about` field."""
+  about: String
+
+  """Checks for equality with the object’s `email` field."""
+  email: Email
+
+  """Checks for equality with the object’s `site` field."""
+  site: WrappedUrlInput
+
+  """Checks for equality with the object’s `config` field."""
+  config: KeyValueHash
+
+  """Checks for equality with the object’s `lastLoginFromIp` field."""
+  lastLoginFromIp: InternetAddress
+
+  """Checks for equality with the object’s `lastLoginFromSubnet` field."""
+  lastLoginFromSubnet: String
+
+  """Checks for equality with the object’s `userMac` field."""
+  userMac: String
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `computedOut` field."""
+  computedOut: String
+}
+
+"""An input for mutations affecting `WrappedUrl`"""
+input WrappedUrlInput {
+  url: NotNullUrl!
+}
+
+"""A connection to a list of `NonUpdatableView` values."""
+type NonUpdatableViewsConnection {
+  """A list of `NonUpdatableView` objects."""
+  nodes: [NonUpdatableView]!
+
+  """
+  A list of edges which contains the `NonUpdatableView` and cursor to aid in pagination.
+  """
+  edges: [NonUpdatableViewsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `NonUpdatableView` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type NonUpdatableView {
+  column: Int
+}
+
+"""A `NonUpdatableView` edge in the connection."""
+type NonUpdatableViewsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NonUpdatableView` at the end of the edge."""
+  node: NonUpdatableView
+}
+
+"""Methods to use when ordering `NonUpdatableView`."""
+enum NonUpdatableViewsOrderBy {
+  NATURAL
+  COLUMN_ASC
+  COLUMN_DESC
+}
+
+"""
+A condition to be used against `NonUpdatableView` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input NonUpdatableViewCondition {
+  """Checks for equality with the object’s `column` field."""
+  column: Int
+}
+
+"""A connection to a list of `Input` values."""
+type InputsConnection {
+  """A list of `Input` objects."""
+  nodes: [Input]!
+
+  """
+  A list of edges which contains the `Input` and cursor to aid in pagination.
+  """
+  edges: [InputsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Input` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Input` edge in the connection."""
+type InputsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Input` at the end of the edge."""
+  node: Input
+}
+
+"""Methods to use when ordering `Input`."""
+enum InputsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against `Input` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input InputCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""A connection to a list of `Patch` values."""
+type PatchesConnection {
+  """A list of `Patch` objects."""
+  nodes: [Patch]!
+
+  """
+  A list of edges which contains the `Patch` and cursor to aid in pagination.
+  """
+  edges: [PatchesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Patch` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Patch` edge in the connection."""
+type PatchesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Patch` at the end of the edge."""
+  node: Patch
+}
+
+"""Methods to use when ordering `Patch`."""
+enum PatchesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against `Patch` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PatchCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""A connection to a list of `Reserved` values."""
+type ReservedsConnection {
+  """A list of `Reserved` objects."""
+  nodes: [Reserved]!
+
+  """
+  A list of edges which contains the `Reserved` and cursor to aid in pagination.
+  """
+  edges: [ReservedsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Reserved` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Reserved` edge in the connection."""
+type ReservedsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Reserved` at the end of the edge."""
+  node: Reserved
+}
+
+"""Methods to use when ordering `Reserved`."""
+enum ReservedsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against `Reserved` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ReservedCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""A connection to a list of `ReservedPatchRecord` values."""
+type ReservedPatchRecordsConnection {
+  """A list of `ReservedPatchRecord` objects."""
+  nodes: [ReservedPatchRecord]!
+
+  """
+  A list of edges which contains the `ReservedPatchRecord` and cursor to aid in pagination.
+  """
+  edges: [ReservedPatchRecordsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ReservedPatchRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ReservedPatchRecord` edge in the connection."""
+type ReservedPatchRecordsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ReservedPatchRecord` at the end of the edge."""
+  node: ReservedPatchRecord
+}
+
+"""Methods to use when ordering `ReservedPatchRecord`."""
+enum ReservedPatchRecordsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against `ReservedPatchRecord` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input ReservedPatchRecordCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""A connection to a list of `ReservedInputRecord` values."""
+type ReservedInputRecordsConnection {
+  """A list of `ReservedInputRecord` objects."""
+  nodes: [ReservedInputRecord]!
+
+  """
+  A list of edges which contains the `ReservedInputRecord` and cursor to aid in pagination.
+  """
+  edges: [ReservedInputRecordsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ReservedInputRecord` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ReservedInputRecord` edge in the connection."""
+type ReservedInputRecordsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ReservedInputRecord` at the end of the edge."""
+  node: ReservedInputRecord
+}
+
+"""Methods to use when ordering `ReservedInputRecord`."""
+enum ReservedInputRecordsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against `ReservedInputRecord` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input ReservedInputRecordCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""A connection to a list of `DefaultValue` values."""
+type DefaultValuesConnection {
+  """A list of `DefaultValue` objects."""
+  nodes: [DefaultValue]!
+
+  """
+  A list of edges which contains the `DefaultValue` and cursor to aid in pagination.
+  """
+  edges: [DefaultValuesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `DefaultValue` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `DefaultValue` edge in the connection."""
+type DefaultValuesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `DefaultValue` at the end of the edge."""
+  node: DefaultValue
+}
+
+"""Methods to use when ordering `DefaultValue`."""
+enum DefaultValuesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NULL_VALUE_ASC
+  NULL_VALUE_DESC
+}
+
+"""
+A condition to be used against `DefaultValue` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input DefaultValueCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `nullValue` field."""
+  nullValue: String
+}
+
+"""A connection to a list of `NoPrimaryKey` values."""
+type NoPrimaryKeysConnection {
+  """A list of `NoPrimaryKey` objects."""
+  nodes: [NoPrimaryKey]!
+
+  """
+  A list of edges which contains the `NoPrimaryKey` and cursor to aid in pagination.
+  """
+  edges: [NoPrimaryKeysEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `NoPrimaryKey` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `NoPrimaryKey` edge in the connection."""
+type NoPrimaryKeysEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NoPrimaryKey` at the end of the edge."""
+  node: NoPrimaryKey
+}
+
+"""Methods to use when ordering `NoPrimaryKey`."""
+enum NoPrimaryKeysOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  STR_ASC
+  STR_DESC
+}
+
+"""
+A condition to be used against `NoPrimaryKey` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input NoPrimaryKeyCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `str` field."""
+  str: String
+}
+
+"""A connection to a list of `MyTable` values."""
+type MyTablesConnection {
+  """A list of `MyTable` objects."""
+  nodes: [MyTable]!
+
+  """
+  A list of edges which contains the `MyTable` and cursor to aid in pagination.
+  """
+  edges: [MyTablesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MyTable` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `MyTable` edge in the connection."""
+type MyTablesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MyTable` at the end of the edge."""
+  node: MyTable
+}
+
+"""Methods to use when ordering `MyTable`."""
+enum MyTablesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  JSON_DATA_ASC
+  JSON_DATA_DESC
+}
+
+"""
+A condition to be used against `MyTable` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input MyTableCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `jsonData` field."""
+  jsonData: JSON
+}
+
+"""A connection to a list of `PersonSecret` values."""
+type PersonSecretsConnection {
+  """A list of `PersonSecret` objects."""
+  nodes: [PersonSecret]!
+
+  """
+  A list of edges which contains the `PersonSecret` and cursor to aid in pagination.
+  """
+  edges: [PersonSecretsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PersonSecret` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PersonSecret` edge in the connection."""
+type PersonSecretsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PersonSecret` at the end of the edge."""
+  node: PersonSecret
+}
+
+"""Methods to use when ordering `PersonSecret`."""
+enum PersonSecretsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  SECRET_ASC
+  SECRET_DESC
+}
+
+"""
+A condition to be used against `PersonSecret` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input PersonSecretCondition {
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+
+  """Checks for equality with the object’s `secret` field."""
+  secret: String
+}
+
+"""A connection to a list of `Testview` values."""
+type TestviewsConnection {
+  """A list of `Testview` objects."""
+  nodes: [Testview]!
+
+  """
+  A list of edges which contains the `Testview` and cursor to aid in pagination.
+  """
+  edges: [TestviewsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Testview` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Testview {
+  testviewid: Int
+  col1: Int
+  col2: Int
+}
+
+"""A `Testview` edge in the connection."""
+type TestviewsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Testview` at the end of the edge."""
+  node: Testview
+}
+
+"""Methods to use when ordering `Testview`."""
+enum TestviewsOrderBy {
+  NATURAL
+  TESTVIEWID_ASC
+  TESTVIEWID_DESC
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
+}
+
+"""
+A condition to be used against `Testview` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input TestviewCondition {
+  """Checks for equality with the object’s `testviewid` field."""
+  testviewid: Int
+
+  """Checks for equality with the object’s `col1` field."""
+  col1: Int
+
+  """Checks for equality with the object’s `col2` field."""
+  col2: Int
+}
+
+"""A connection to a list of `ViewTable` values."""
+type ViewTablesConnection {
+  """A list of `ViewTable` objects."""
+  nodes: [ViewTable]!
+
+  """
+  A list of edges which contains the `ViewTable` and cursor to aid in pagination.
+  """
+  edges: [ViewTablesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ViewTable` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `ViewTable` edge in the connection."""
+type ViewTablesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ViewTable` at the end of the edge."""
+  node: ViewTable
+}
+
+"""Methods to use when ordering `ViewTable`."""
+enum ViewTablesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
+}
+
+"""
+A condition to be used against `ViewTable` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ViewTableCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `col1` field."""
+  col1: Int
+
+  """Checks for equality with the object’s `col2` field."""
+  col2: Int
+}
+
+"""A connection to a list of `SimilarTable1` values."""
+type SimilarTable1SConnection {
+  """A list of `SimilarTable1` objects."""
+  nodes: [SimilarTable1]!
+
+  """
+  A list of edges which contains the `SimilarTable1` and cursor to aid in pagination.
+  """
+  edges: [SimilarTable1SEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `SimilarTable1` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `SimilarTable1` edge in the connection."""
+type SimilarTable1SEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SimilarTable1` at the end of the edge."""
+  node: SimilarTable1
+}
+
+"""Methods to use when ordering `SimilarTable1`."""
+enum SimilarTable1SOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
+  COL3_ASC
+  COL3_DESC
+}
+
+"""
+A condition to be used against `SimilarTable1` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input SimilarTable1Condition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `col1` field."""
+  col1: Int
+
+  """Checks for equality with the object’s `col2` field."""
+  col2: Int
+
+  """Checks for equality with the object’s `col3` field."""
+  col3: Int
+}
+
+"""A connection to a list of `SimilarTable2` values."""
+type SimilarTable2SConnection {
+  """A list of `SimilarTable2` objects."""
+  nodes: [SimilarTable2]!
+
+  """
+  A list of edges which contains the `SimilarTable2` and cursor to aid in pagination.
+  """
+  edges: [SimilarTable2SEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `SimilarTable2` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `SimilarTable2` edge in the connection."""
+type SimilarTable2SEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SimilarTable2` at the end of the edge."""
+  node: SimilarTable2
+}
+
+"""Methods to use when ordering `SimilarTable2`."""
+enum SimilarTable2SOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  COL3_ASC
+  COL3_DESC
+  COL4_ASC
+  COL4_DESC
+  COL5_ASC
+  COL5_DESC
+}
+
+"""
+A condition to be used against `SimilarTable2` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input SimilarTable2Condition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `col3` field."""
+  col3: Int
+
+  """Checks for equality with the object’s `col4` field."""
+  col4: Int
+
+  """Checks for equality with the object’s `col5` field."""
+  col5: Int
+}
+
+"""A connection to a list of `UpdatableView` values."""
+type UpdatableViewsConnection {
+  """A list of `UpdatableView` objects."""
+  nodes: [UpdatableView]!
+
+  """
+  A list of edges which contains the `UpdatableView` and cursor to aid in pagination.
+  """
+  edges: [UpdatableViewsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `UpdatableView` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""YOYOYO!!"""
+type UpdatableView {
+  x: Int
+  name: String
+  description: String
+
+  """This is constantly 2"""
+  constant: Int
+}
+
+"""A `UpdatableView` edge in the connection."""
+type UpdatableViewsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `UpdatableView` at the end of the edge."""
+  node: UpdatableView
+}
+
+"""Methods to use when ordering `UpdatableView`."""
+enum UpdatableViewsOrderBy {
+  NATURAL
+  X_ASC
+  X_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  CONSTANT_ASC
+  CONSTANT_DESC
+}
+
+"""
+A condition to be used against `UpdatableView` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input UpdatableViewCondition {
+  """Checks for equality with the object’s `x` field."""
+  x: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `constant` field."""
+  constant: Int
+}
+
+"""A connection to a list of `NullTestRecord` values."""
+type NullTestRecordsConnection {
+  """A list of `NullTestRecord` objects."""
+  nodes: [NullTestRecord]!
+
+  """
+  A list of edges which contains the `NullTestRecord` and cursor to aid in pagination.
+  """
+  edges: [NullTestRecordsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `NullTestRecord` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `NullTestRecord` edge in the connection."""
+type NullTestRecordsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `NullTestRecord` at the end of the edge."""
+  node: NullTestRecord
+}
+
+"""Methods to use when ordering `NullTestRecord`."""
+enum NullTestRecordsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NULLABLE_TEXT_ASC
+  NULLABLE_TEXT_DESC
+  NULLABLE_INT_ASC
+  NULLABLE_INT_DESC
+  NON_NULL_TEXT_ASC
+  NON_NULL_TEXT_DESC
+}
+
+"""
+A condition to be used against `NullTestRecord` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input NullTestRecordCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `nullableText` field."""
+  nullableText: String
+
+  """Checks for equality with the object’s `nullableInt` field."""
+  nullableInt: Int
+
+  """Checks for equality with the object’s `nonNullText` field."""
+  nonNullText: String
+}
+
+"""A connection to a list of `EdgeCase` values."""
+type EdgeCasesConnection {
+  """A list of `EdgeCase` objects."""
+  nodes: [EdgeCase]!
+
+  """
+  A list of edges which contains the `EdgeCase` and cursor to aid in pagination.
+  """
+  edges: [EdgeCasesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `EdgeCase` you could get from the connection."""
+  totalCount: Int!
+}
+
+type EdgeCase {
+  computed: String
+  notNullHasDefault: Boolean!
+  wontCastEasy: Int
+  rowId: Int
+}
+
+"""A `EdgeCase` edge in the connection."""
+type EdgeCasesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `EdgeCase` at the end of the edge."""
+  node: EdgeCase
+}
+
+"""Methods to use when ordering `EdgeCase`."""
+enum EdgeCasesOrderBy {
+  NATURAL
+  NOT_NULL_HAS_DEFAULT_ASC
+  NOT_NULL_HAS_DEFAULT_DESC
+  WONT_CAST_EASY_ASC
+  WONT_CAST_EASY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
+}
+
+"""
+A condition to be used against `EdgeCase` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input EdgeCaseCondition {
+  """Checks for equality with the object’s `notNullHasDefault` field."""
+  notNullHasDefault: Boolean
+
+  """Checks for equality with the object’s `wontCastEasy` field."""
+  wontCastEasy: Int
+
+  """Checks for equality with the object’s `rowId` field."""
+  rowId: Int
+}
+
+"""A connection to a list of `Issue756` values."""
+type Issue756SConnection {
+  """A list of `Issue756` objects."""
+  nodes: [Issue756]!
+
+  """
+  A list of edges which contains the `Issue756` and cursor to aid in pagination.
+  """
+  edges: [Issue756SEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Issue756` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Issue756` edge in the connection."""
+type Issue756SEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Issue756` at the end of the edge."""
+  node: Issue756
+}
+
+"""Methods to use when ordering `Issue756`."""
+enum Issue756SOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  TS_ASC
+  TS_DESC
+}
+
+"""
+A condition to be used against `Issue756` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input Issue756Condition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `ts` field."""
+  ts: NotNullTimestamp
+}
+
+"""A connection to a list of `LeftArm` values."""
+type LeftArmsConnection {
+  """A list of `LeftArm` objects."""
+  nodes: [LeftArm]!
+
+  """
+  A list of edges which contains the `LeftArm` and cursor to aid in pagination.
+  """
+  edges: [LeftArmsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `LeftArm` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `LeftArm` edge in the connection."""
+type LeftArmsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LeftArm` at the end of the edge."""
+  node: LeftArm
+}
+
+"""Methods to use when ordering `LeftArm`."""
+enum LeftArmsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  LENGTH_IN_METRES_ASC
+  LENGTH_IN_METRES_DESC
+  MOOD_ASC
+  MOOD_DESC
+}
+
+"""
+A condition to be used against `LeftArm` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input LeftArmCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+
+  """Checks for equality with the object’s `lengthInMetres` field."""
+  lengthInMetres: Float
+
+  """Checks for equality with the object’s `mood` field."""
+  mood: String
 }
 
 """

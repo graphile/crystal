@@ -15,7 +15,12 @@ export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
       GraphQLObjectType_fields_field_args_arg(arg, build, context) {
         const { extend, getTypeByName, inflection } = build;
         const {
-          scope: { fieldName, isPgFieldConnection, pgResource, argName },
+          scope: {
+            fieldName,
+            isPgFieldConnection,
+            pgFieldResource: pgResource,
+            argName,
+          },
           Self,
         } = context;
 

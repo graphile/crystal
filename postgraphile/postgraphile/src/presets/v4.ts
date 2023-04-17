@@ -15,6 +15,7 @@ type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
 export interface V4GraphileBuildOptions {
   pgUseCustomNetworkScalars?: boolean;
   pgStrictFunctions?: boolean;
+  orderByNullsLast?: boolean;
 }
 
 export interface V4Options<
@@ -173,6 +174,7 @@ export const makeV4Preset = (
   const {
     pgUseCustomNetworkScalars,
     pgStrictFunctions,
+    orderByNullsLast,
     ...otherGraphileBuildOptions
   } = options.graphileBuildOptions ?? {};
   if (options.enableQueryBatching) {
@@ -202,6 +204,7 @@ export const makeV4Preset = (
     schema: {
       ...otherGraphileBuildOptions,
       pgUseCustomNetworkScalars: pgUseCustomNetworkScalars ?? false,
+      pgOrderByNullsLast: orderByNullsLast,
       pgV4UseTableNameForNodeIdentifier: true,
       pgForbidSetofFunctionsToReturnNull:
         options.setofFunctionsContainNulls === false,

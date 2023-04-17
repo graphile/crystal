@@ -254,8 +254,8 @@ export function printPlanGraph(
     graph.push(
       `    Bucket${layerPlan.id}(${mermaidEscape(
         `Bucket ${layerPlan.id}${raisonDEtre}${
-          layerPlan.copyPlanIds.length > 0
-            ? `\nDeps: ${layerPlan.copyPlanIds
+          layerPlan.copyStepIds.length > 0
+            ? `\nDeps: ${layerPlan.copyStepIds
                 .map((pId) => steps[pId].id)
                 .join(", ")}\n`
             : ""

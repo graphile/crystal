@@ -36,8 +36,7 @@ export interface ListTransformOptions<
   TMemo,
   TItemStep extends ExecutableStep | undefined = undefined,
 > {
-  listPlan: TListStep;
-  // TODO: rename this:
+  listStep: TListStep;
   itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
   initialState(): TMemo;
   reduceCallback: ListTransformReduce<
@@ -76,7 +75,7 @@ export class __ListTransformStep<
   // TODO: change this to 'true' and rewrite execute to be synchronous
   isSyncAndSafe = false;
 
-  private listPlanDepId: number;
+  private listStepDepId: number;
   public itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
   public initialState: () => TMemo;
   public reduceCallback: ListTransformReduce<
@@ -100,7 +99,7 @@ export class __ListTransformStep<
   ) {
     super();
     const {
-      listPlan,
+      listStep,
       itemPlanCallback,
       initialState,
       reduceCallback,
@@ -109,7 +108,7 @@ export class __ListTransformStep<
       meta,
       optimize,
     } = options;
-    this.listPlanDepId = this.addDependency(listPlan);
+    this.listStepDepId = this.addDependency(listStep);
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
     this.reduceCallback = reduceCallback;
@@ -128,18 +127,18 @@ export class __ListTransformStep<
         type: "subroutine",
         parentStep: this,
       },
-      listPlan.polymorphicPaths,
+      listStep.polymorphicPaths,
     );
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
-      listPlan.polymorphicPaths,
+      listStep.polymorphicPaths,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
-        const $__listItem = new __ItemStep(listPlan);
+        const $__listItem = new __ItemStep(listStep);
         $__listItem.transformStepId = this.id;
         this.itemStepId = $__listItem.id;
-        const $listItem = isListCapableStep(listPlan)
-          ? listPlan.listItem($__listItem)
+        const $listItem = isListCapableStep(listStep)
+          ? listStep.listItem($__listItem)
           : $__listItem;
         const $newListItem = this.itemPlanCallback($listItem as any);
 
@@ -165,7 +164,7 @@ export class __ListTransformStep<
   }
 
   getListStep(): TListStep {
-    return this.getDep(this.listPlanDepId) as TListStep;
+    return this.getDep(this.listStepDepId) as TListStep;
   }
 
   [$$deepDepSkip]() {
@@ -173,7 +172,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.dependencies[this.listPlanDepId] as TListStep;
+    return this.dependencies[this.listStepDepId] as TListStep;
   }
 
   deduplicate(
@@ -203,7 +202,7 @@ export class __ListTransformStep<
     const bucket = extra._bucket;
 
     const childLayerPlan = this.subroutineLayer;
-    const copyStepIds = childLayerPlan.copyPlanIds;
+    const copyStepIds = childLayerPlan.copyStepIds;
 
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: string[] = [];
@@ -233,7 +232,7 @@ export class __ListTransformStep<
       }
     }
 
-    const listValues = values[this.listPlanDepId];
+    const listValues = values[this.listStepDepId];
 
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.

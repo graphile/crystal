@@ -36,7 +36,7 @@ graph TD
     First34{{"First[34∈3]"}}:::plan
     PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸpostsᐳ"}}:::plan
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
-    Map71{{"Map[71∈3]<br />ᐸ35:{”0”:1}ᐳ"}}:::plan
+    RemapKeys71{{"RemapKeys[71∈3]<br />ᐸ35:{”0”:1}ᐳ"}}:::plan
     PgSelectSingle43{{"PgSelectSingle[43∈3]<br />ᐸpeopleᐳ"}}:::plan
     PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgClassExpression45{{"PgClassExpression[45∈3]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
@@ -44,10 +44,10 @@ graph TD
     First50{{"First[50∈3]"}}:::plan
     PgSelectSingle51{{"PgSelectSingle[51∈3]<br />ᐸcommentsᐳ"}}:::plan
     PgClassExpression52{{"PgClassExpression[52∈3]<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
-    Map73{{"Map[73∈3]<br />ᐸ51:{”0”:1}ᐳ"}}:::plan
+    RemapKeys73{{"RemapKeys[73∈3]<br />ᐸ51:{”0”:1}ᐳ"}}:::plan
     PgSelectSingle59{{"PgSelectSingle[59∈3]<br />ᐸpeopleᐳ"}}:::plan
     PgClassExpression60{{"PgClassExpression[60∈5]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    Map75{{"Map[75∈3]<br />ᐸ51:{”0”:2,”1”:3}ᐳ"}}:::plan
+    RemapKeys75{{"RemapKeys[75∈3]<br />ᐸ51:{”0”:2,”1”:3}ᐳ"}}:::plan
     PgSelectSingle67{{"PgSelectSingle[67∈3]<br />ᐸpostsᐳ"}}:::plan
     PgClassExpression68{{"PgClassExpression[68∈6]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
     PgClassExpression69{{"PgClassExpression[69∈6]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
@@ -77,19 +77,19 @@ graph TD
     PgSelect30 --> First34
     First34 --> PgSelectSingle35
     PgSelectSingle35 --> PgClassExpression36
-    PgSelectSingle35 --> Map71
-    Map71 --> PgSelectSingle43
+    PgSelectSingle35 --> RemapKeys71
+    RemapKeys71 --> PgSelectSingle43
     PgSelectSingle43 --> PgClassExpression44
     PgSelectSingle35 --> PgClassExpression45
     Object11 & PgClassExpression19 --> PgSelect46
     PgSelect46 --> First50
     First50 --> PgSelectSingle51
     PgSelectSingle51 --> PgClassExpression52
-    PgSelectSingle51 --> Map73
-    Map73 --> PgSelectSingle59
+    PgSelectSingle51 --> RemapKeys73
+    RemapKeys73 --> PgSelectSingle59
     PgSelectSingle59 --> PgClassExpression60
-    PgSelectSingle51 --> Map75
-    Map75 --> PgSelectSingle67
+    PgSelectSingle51 --> RemapKeys75
+    RemapKeys75 --> PgSelectSingle67
     PgSelectSingle67 --> PgClassExpression68
     PgSelectSingle67 --> PgClassExpression69
     PgSelectSingle51 --> PgClassExpression70
@@ -106,7 +106,7 @@ graph TD
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19,List20,PgPolymorphic21 bucket2
     Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 11, 17, 18, 19, 21<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgSelectSingle67,PgClassExpression70,Map71,Map73,Map75 bucket3
+    class Bucket3,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgSelect30,First34,PgSelectSingle35,PgClassExpression36,PgSelectSingle43,PgClassExpression45,PgSelect46,First50,PgSelectSingle51,PgClassExpression52,PgSelectSingle59,PgSelectSingle67,PgClassExpression70,RemapKeys71,RemapKeys73,RemapKeys75 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 43<br />ᐳPost<br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[43]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression44 bucket4

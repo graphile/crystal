@@ -419,16 +419,32 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               name: pgClass.relname,
             },
             tags,
-            description,
           };
           const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
-            (attributes, className, codecName, extensions, nspName, sql) => ({
+            (
+              attributes,
+              className,
+              codecName,
+              description,
+              extensions,
+              nspName,
+              sql,
+            ) => ({
               name: codecName,
               identifier: sql.identifier(nspName, className),
               attributes,
+              description,
               extensions,
             }),
-            [attributes, className, codecName, extensions, nspName, sql],
+            [
+              attributes,
+              className,
+              codecName,
+              description,
+              extensions,
+              nspName,
+              sql,
+            ],
           );
           await info.process("pgCodecs_recordType_spec", {
             serviceName,
@@ -627,7 +643,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   name: type.typname,
                 },
                 tags,
-                description,
               };
               await info.process("pgCodecs_rangeOfCodec_extensions", {
                 serviceName,
@@ -639,6 +654,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               return EXPORTABLE(
                 (
                   codecName,
+                  description,
                   extensions,
                   innerCodec,
                   namespaceName,
@@ -650,10 +666,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     innerCodec,
                     codecName,
                     sql.identifier(namespaceName, typeName),
-                    { extensions },
+                    {
+                      description,
+                      extensions,
+                    },
                   ),
                 [
                   codecName,
+                  description,
                   extensions,
                   innerCodec,
                   namespaceName,
@@ -693,7 +713,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     name: type.typname,
                   },
                   tags,
-                  description,
                 };
                 await info.process("pgCodecs_domainOfCodec_extensions", {
                   serviceName,
@@ -708,6 +727,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 return EXPORTABLE(
                   (
                     codecName,
+                    description,
                     domainOfCodec,
                     extensions,
                     innerCodec,
@@ -721,12 +741,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       codecName,
                       sql.identifier(namespaceName, typeName),
                       {
+                        description,
                         extensions,
                         notNull,
                       },
                     ) as PgCodec,
                   [
                     codecName,
+                    description,
                     domainOfCodec,
                     extensions,
                     innerCodec,
@@ -767,7 +789,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       name: type.typname,
                     },
                     tags,
-                    description,
                   };
                   await info.process("pgCodecs_listOfCodec_extensions", {
                     serviceName,
@@ -776,9 +797,25 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     extensions,
                   });
                   return EXPORTABLE(
-                    (extensions, innerCodec, listOfCodec, typeDelim) =>
-                      listOfCodec(innerCodec, extensions, typeDelim),
-                    [extensions, innerCodec, listOfCodec, typeDelim],
+                    (
+                      description,
+                      extensions,
+                      innerCodec,
+                      listOfCodec,
+                      typeDelim,
+                    ) =>
+                      listOfCodec(innerCodec, {
+                        extensions,
+                        typeDelim,
+                        description,
+                      }),
+                    [
+                      description,
+                      extensions,
+                      innerCodec,
+                      listOfCodec,
+                      typeDelim,
+                    ],
                   );
                 }
               }

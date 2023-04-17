@@ -14,7 +14,7 @@ import {
 } from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { __InputObjectStep, __TrackedObjectStep } from "./index.js";
+import type { __InputObjectStep, __TrackedValueStep } from "./index.js";
 import { BaseStep } from "./index.js";
 import type { InputStep } from "./input.js";
 import type {
@@ -69,7 +69,7 @@ function withFieldArgsForArgumentsOrInputObject<
   operationPlan: OperationPlan,
   typeContainingFields: GraphQLInputType | null,
   parentPlan: TParentStep,
-  $current: TrackedArguments | InputStep, //__TrackedObjectStep | __InputObjectStep,
+  $current: TrackedArguments | InputStep, //__TrackedValueStep | __InputObjectStep,
   fields: {
     [key: string]: GraphQLArgument | GraphQLInputField;
   } | null,
@@ -97,7 +97,7 @@ function withFieldArgsForArgumentsOrInputObject<
 
     const $currentObject = $current as
       | TrackedArguments
-      | __TrackedObjectStep
+      | __TrackedValueStep
       | __InputObjectStep
       | ConstantStep<undefined>;
 
@@ -140,7 +140,7 @@ function withFieldArgsForArgumentsOrInputObject<
         );
       }
       $value = (
-        ($value as __TrackedObjectStep | __InputObjectStep).get as (
+        ($value as __TrackedValueStep | __InputObjectStep).get as (
           name: string,
         ) => InputStep
       )(name);
@@ -260,7 +260,7 @@ function withFieldArgsForArgumentsOrInputObject<
     } else if (isListType(currentType)) {
       if (!("evalLength" in $value)) {
         throw new Error(
-          `GrafastInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedObjectStep (i.e. to have 'evalLength')`,
+          `GrafastInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedValueStep (i.e. to have 'evalLength')`,
         );
       }
       const l = $value.evalLength();
@@ -323,7 +323,7 @@ function withFieldArgsForArgumentsOrInputObject<
     } else if (isListType(currentType)) {
       if (!("evalLength" in $value)) {
         throw new Error(
-          `GrafastInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedObjectStep (i.e. to have 'evalLength')`,
+          `GrafastInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$value} to be a __InputListStep or __TrackedValueStep (i.e. to have 'evalLength')`,
         );
       }
       const l = $value.evalLength();

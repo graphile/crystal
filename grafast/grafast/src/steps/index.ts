@@ -51,10 +51,14 @@ export {
   ListTransformOptions,
   ListTransformReduce,
 } from "./listTransform.js";
-export { ActualKeyByDesiredKey, makeMapper, map, MapStep } from "./map.js";
 export { node, NodeStep, specFromNodeId } from "./node.js";
 export { object, ObjectPlanMeta, ObjectStep } from "./object.js";
 export { partitionByIndex } from "./partitionByIndex.js";
+export {
+  ActualKeyByDesiredKey,
+  remapKeys,
+  RemapKeysStep,
+} from "./remapKeys.js";
 export { reverse, reverseArray, ReverseStep } from "./reverse.js";
 export { setter, SetterCapableStep, SetterStep } from "./setter.js";
 
@@ -63,7 +67,7 @@ export { __InputListStep } from "./__inputList.js";
 export { __InputObjectStep } from "./__inputObject.js";
 export { __InputStaticLeafStep } from "./__inputStaticLeaf.js";
 export { __ItemStep } from "./__item.js";
-export { __TrackedObjectStep } from "./__trackedObject.js";
+export { __TrackedValueStep } from "./__trackedValue.js";
 export { __ValueStep } from "./__value.js";
 export { deepEval, DeepEvalStep } from "./deepEval.js";
 export {

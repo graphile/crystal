@@ -8,14 +8,14 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgCodec,
-  PgDeleteStep,
-  PgInsertStep,
+  PgDeleteSingleStep,
+  PgInsertSingleStep,
   PgResource,
   PgResourceParameter,
   PgSelectArgumentSpec,
   PgSelectStep,
   PgTypedExecutableStep,
-  PgUpdateStep,
+  PgUpdateSingleStep,
 } from "@dataplan/pg";
 import {
   digestsFromArgumentSpecs,
@@ -26,7 +26,7 @@ import {
 } from "@dataplan/pg";
 import type {
   __InputObjectStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   ExecutableStep,
   FieldArgs,
   FieldInfo,
@@ -233,7 +233,11 @@ function defaultProcSourceBehavior(
 
 function hasRecord(
   $row: ExecutableStep,
-): $row is PgSelectSingleStep | PgInsertStep | PgUpdateStep | PgDeleteStep {
+): $row is
+  | PgSelectSingleStep
+  | PgInsertSingleStep
+  | PgUpdateSingleStep
+  | PgDeleteSingleStep {
   return "record" in $row && typeof ($row as any).record === "function";
 }
 
@@ -821,11 +825,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         } = build;
         const {
           Self,
-          scope: { isPgTableType, pgCodec, isRootQuery, isRootMutation },
+          scope: { isPgClassType, pgCodec, isRootQuery, isRootMutation },
           fieldWithHooks,
         } = context;
         const SelfName = Self.name;
-        if (!(isPgTableType && pgCodec) && !isRootQuery && !isRootMutation) {
+        if (!(isPgClassType && pgCodec) && !isRootQuery && !isRootMutation) {
           return fields;
         }
         const procSources = isRootQuery
@@ -892,9 +896,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       ) =>
                       ($in, args, _info) => {
                         if (!hasRecord($in)) {
-                          // TODO: these should be PgInsertSingleStep, etc
                           throw new Error(
-                            `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertStep', 'PgUpdateStep' or 'PgDeleteStep', but found ${$in}`,
+                            `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
                           );
                         }
                         const extraSelectArgs = makeArgs(args);
@@ -981,7 +984,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 memo[fieldName] = fieldWithHooks(
                   { fieldName, fieldBehaviorScope: "mutationField" },
                   {
-                    description: resource.extensions?.description,
+                    description: resource.description,
                     deprecationReason: tagToString(
                       resource.extensions?.tags?.deprecated,
                     ),
@@ -1109,7 +1112,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               fieldName,
                               fieldBehaviorScope: connectionFieldBehaviorScope,
                               isPgFieldConnection: true,
-                              pgResource: resource,
+                              pgFieldResource: resource,
                             },
                             {
                               description:
@@ -1185,7 +1188,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             isPgFieldSimpleCollection: resource.isList
                               ? false // No pagination if it returns an array - just return it.
                               : true,
-                            pgResource: resource,
+                            pgFieldResource: resource,
                           },
                           {
                             description: resource.description,

@@ -394,6 +394,7 @@ export type PgRecordTypeCodecSpec<
   identifier: SQL;
   attributes: TAttributes;
   polymorphism?: PgCodecPolymorphism<any>;
+  description?: string;
   extensions?: Partial<PgCodecExtensions>;
   isAnonymous?: boolean;
 };
@@ -427,6 +428,7 @@ export function recordCodec<
     identifier,
     attributes,
     polymorphism,
+    description,
     extensions,
     isAnonymous = false,
   } = config;
@@ -438,6 +440,7 @@ export function recordCodec<
     toPg: makeRecordToSQLRawValue(attributes),
     attributes,
     polymorphism,
+    description,
     extensions,
   };
 }
@@ -523,9 +526,12 @@ export function listOfCodec<
   TInnerCodec extends PgCodec<string, any, any, any, undefined, any, any>,
 >(
   listedCodec: TInnerCodec,
-  extensions?: Partial<PgCodecExtensions>,
-  typeDelim = `,`,
-  identifier: SQL = sql`${listedCodec.sqlType}[]`,
+  config: {
+    description?: string;
+    extensions?: Partial<PgCodecExtensions>;
+    typeDelim?: string;
+    identifier?: SQL;
+  } = {},
 ): PgCodec<
   `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
     ? UName
@@ -539,6 +545,12 @@ export function listOfCodec<
   undefined,
   undefined
 > {
+  const {
+    description,
+    extensions,
+    identifier = sql`${listedCodec.sqlType}[]`,
+    typeDelim = `,`,
+  } = config;
   const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
   if (innerCodec.arrayOfCodec) {
     throw new Error("Array types cannot be nested");
@@ -619,6 +631,7 @@ export function listOfCodec<
       return result;
     },
     attributes: undefined,
+    description,
     extensions,
     arrayOfCodec: innerCodec,
     castFromPg: innerCodec.listCastFromPg,
@@ -647,6 +660,7 @@ export function domainOfCodec<
   name: TName,
   identifier: SQL,
   config: {
+    description?: string;
     extensions?: Partial<PgCodecExtensions>;
     notNull?: boolean | null;
   } = {},
@@ -658,7 +672,7 @@ export function domainOfCodec<
   TInnerCodec,
   undefined
 > {
-  const { extensions, notNull } = config;
+  const { description, extensions, notNull } = config;
   return {
     // Generally same as underlying type:
     ...innerCodec,
@@ -666,6 +680,7 @@ export function domainOfCodec<
     // Overriding:
     name,
     sqlType: identifier,
+    description,
     extensions,
     domainOfCodec: innerCodec,
     notNull: Boolean(notNull),
@@ -718,7 +733,10 @@ export function rangeOfCodec<
   innerCodec: TInnerCodec,
   name: TName,
   identifier: SQL,
-  config: { extensions?: Partial<PgCodecExtensions> } = {},
+  config: {
+    description?: string;
+    extensions?: Partial<PgCodecExtensions>;
+  } = {},
 ): PgCodec<
   TName,
   undefined,
@@ -728,7 +746,7 @@ export function rangeOfCodec<
   undefined,
   TInnerCodec
 > {
-  const { extensions } = config;
+  const { description, extensions } = config;
   const needsCast = innerCodec.castFromPg;
 
   const castFromPg = needsCast
@@ -746,6 +764,7 @@ export function rangeOfCodec<
   return {
     name,
     sqlType: identifier,
+    description,
     extensions,
     rangeOfCodec: innerCodec,
     ...(castFromPg
@@ -760,7 +779,7 @@ export function rangeOfCodec<
           },
         }
       : null),
-    // TODO: shouldn't these include `innerCodec.fromPg` calls for internal values?
+    // FIXME: shouldn't these include `innerCodec.fromPg` calls for internal values?
     fromPg: needsCast
       ? function (value) {
           const json = JSON.parse(value);

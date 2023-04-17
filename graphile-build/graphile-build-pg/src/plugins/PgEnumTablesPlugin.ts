@@ -237,7 +237,6 @@ Original error: ${e.message}
                 continue;
               }
 
-              // TODO: values should be an object array to leave space for description, etc?
               const values: Array<PgEnumValue> = data.map(
                 (r): PgEnumValue => ({
                   value: r[pgAttribute.attname],

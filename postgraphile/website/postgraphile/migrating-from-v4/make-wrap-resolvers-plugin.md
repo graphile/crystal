@@ -41,7 +41,7 @@ makeWrapPlansPlugin({
       // Call the original plan
       const $planResult = plan();
 
-      // Get a reference to the `PgInsertStep`.
+      // Get a reference to the `PgInsertSingleStep`.
       // Remember: it's a step, it has not executed yet, so we can still
       // augment what it will do.
       const $insert = $planResult.get("result");
@@ -55,7 +55,7 @@ makeWrapPlansPlugin({
         true,
       );
 
-      // Now set this as the value of 'name' in the PgInsertStep:
+      // Now set this as the value of 'name' in the PgInsertSingleStep:
       $insert.set("name", $name);
 
       // Our result is the same as before (otherwise dependent plans may fail)

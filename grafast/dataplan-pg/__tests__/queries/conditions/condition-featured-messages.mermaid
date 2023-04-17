@@ -27,7 +27,7 @@ graph TD
     __Item32[/"__Item[32∈4]<br />ᐸ84ᐳ"\]:::itemplan
     PgSelectSingle33{{"PgSelectSingle[33∈4]<br />ᐸmessagesᐳ"}}:::plan
     PgClassExpression34{{"PgClassExpression[34∈5]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    Map79{{"Map[79∈5]<br />ᐸ33:{”0”:1,”1”:2}ᐳ"}}:::plan
+    RemapKeys79{{"RemapKeys[79∈5]<br />ᐸ33:{”0”:1,”1”:2}ᐳ"}}:::plan
     PgSelectSingle41{{"PgSelectSingle[41∈5]<br />ᐸusersᐳ"}}:::plan
     PgClassExpression42{{"PgClassExpression[42∈6]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgClassExpression43{{"PgClassExpression[43∈6]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
@@ -35,7 +35,7 @@ graph TD
     List48{{"List[48∈7]<br />ᐸ47ᐳ"}}:::plan
     PgCursor46{{"PgCursor[46∈7]"}}:::plan
     PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    Map81{{"Map[81∈7]<br />ᐸ33:{”0”:4,”1”:5}ᐳ"}}:::plan
+    RemapKeys81{{"RemapKeys[81∈7]<br />ᐸ33:{”0”:4,”1”:5}ᐳ"}}:::plan
     PgSelectSingle56{{"PgSelectSingle[56∈7]<br />ᐸusersᐳ"}}:::plan
     PgClassExpression57{{"PgClassExpression[57∈8]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgClassExpression58{{"PgClassExpression[58∈8]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
@@ -71,16 +71,16 @@ graph TD
     Lambda84 ==> __Item32
     __Item32 --> PgSelectSingle33
     PgSelectSingle33 --> PgClassExpression34
-    PgSelectSingle33 --> Map79
-    Map79 --> PgSelectSingle41
+    PgSelectSingle33 --> RemapKeys79
+    RemapKeys79 --> PgSelectSingle41
     PgSelectSingle41 --> PgClassExpression42
     PgSelectSingle41 --> PgClassExpression43
     PgSelectSingle33 --> PgClassExpression47
     PgClassExpression47 --> List48
     List48 --> PgCursor46
     PgSelectSingle33 --> PgClassExpression49
-    PgSelectSingle33 --> Map81
-    Map81 --> PgSelectSingle56
+    PgSelectSingle33 --> RemapKeys81
+    RemapKeys81 --> PgSelectSingle56
     PgSelectSingle56 --> PgClassExpression57
     PgSelectSingle56 --> PgClassExpression58
     Connection29 --> PgPageInfo59
@@ -118,13 +118,13 @@ graph TD
     class Bucket4,__Item32,PgSelectSingle33 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 33<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[33]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression34,PgSelectSingle41,Map79 bucket5
+    class Bucket5,PgClassExpression34,PgSelectSingle41,RemapKeys79 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 41<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[41]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression42,PgClassExpression43 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 33<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[33]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgCursor46,PgClassExpression47,List48,PgClassExpression49,PgSelectSingle56,Map81 bucket7
+    class Bucket7,PgCursor46,PgClassExpression47,List48,PgClassExpression49,PgSelectSingle56,RemapKeys81 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 56<br /><br />ROOT PgSelectSingle{7}ᐸusersᐳ[56]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression57,PgClassExpression58 bucket8

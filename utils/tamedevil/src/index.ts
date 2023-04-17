@@ -525,7 +525,7 @@ export function stringifyString(value: string): string {
   return `"${value}"`;
 }
 
-// TODO: more optimal stringifier
+// PERF: more optimal stringifier
 // TODO: rename to jsonStringify?
 /**
  * Equivalent to JSON.stringify, but typically faster.

@@ -107,7 +107,7 @@ const parseAndValidate = (
  * A replacement for GraphQL.js' `graphql` method that calls Grafast's
  * execute instead
  */
-export function grafastGraphql(
+export function grafast(
   args: GraphQLArgs,
   resolvedPreset?: GraphileConfig.ResolvedPreset,
   ctx?: Partial<Grafast.RequestContext>,
@@ -165,12 +165,12 @@ export function grafastGraphql(
   }
 }
 
-export function grafastGraphqlSync(
+export function grafastSync(
   args: GraphQLArgs,
   resolvedPreset?: GraphileConfig.ResolvedPreset,
   ctx?: Partial<Grafast.RequestContext>,
 ): ExecutionResult {
-  const result = grafastGraphql(args, resolvedPreset, ctx);
+  const result = grafast(args, resolvedPreset, ctx);
   if (isPromiseLike(result)) {
     throw new SafeError("Grafast execution failed to complete synchronously.");
   }

@@ -19,7 +19,7 @@ import type {
   GraphQLType,
 } from "graphql";
 
-import type { Bucket, RequestContext } from "./bucket.js";
+import type { Bucket, RequestTools } from "./bucket.js";
 import type { InputStep } from "./input.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
@@ -27,7 +27,7 @@ import type {
   __InputListStep,
   __InputObjectStep,
   __InputStaticLeafStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
 
@@ -692,7 +692,7 @@ export type NodeIdHandler<
    */
   typeName: string;
 
-  // TODO: this should use the codec directly, since Grafast has no codec
+  // FIXME: this should use the codec directly, since Grafast has no codec
   // lookup by name functionality?
   /**
    * Which codec are we using to encode/decode the NodeID string?
@@ -784,7 +784,6 @@ export type ExecutionEventMap = {
 
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
-// TODO: rename this?
 export interface ExecutionExtra {
   meta: Record<string, unknown>;
   eventEmitter: ExecutionEventEmitter | undefined;
@@ -794,7 +793,7 @@ export interface ExecutionExtra {
   /** @internal */
   _bucket: Bucket;
   /** @internal */
-  _requestContext: RequestContext;
+  _requestContext: RequestTools;
 }
 
 export interface LocationDetails {

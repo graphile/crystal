@@ -53,7 +53,6 @@ export type PgEntityWithId =
 
 declare global {
   namespace GraphileBuild {
-    // TODO: Should we move this interface (which is defined in many places) to GraphileConfig?
     interface GatherOptions {
       /**
        * Should we attempt to install the watch fixtures into the database?

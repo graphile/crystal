@@ -36,7 +36,7 @@ import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { ModifierStep } from "../index.js";
 import {
   __ItemStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   __ValueStep,
   error,
   ExecutableStep,
@@ -173,7 +173,7 @@ export class OperationPlan {
   /** Stores the actual variableValues. @internal */
   public readonly variableValuesStep: __ValueStep<{ [key: string]: any }>;
   /** A step for accessing variableValues in a tracked manner (allowing eval). @internal */
-  public readonly trackedVariableValuesStep: __TrackedObjectStep<{
+  public readonly trackedVariableValuesStep: __TrackedValueStep<{
     [key: string]: any;
   }>;
 
@@ -182,7 +182,7 @@ export class OperationPlan {
   /** Stores the actual value of the context. @internal */
   public readonly contextStep: __ValueStep<Grafast.Context>;
   /** Allows accessing context in a tracked manner (allowing eval). @internal */
-  public readonly trackedContextStep: __TrackedObjectStep<{
+  public readonly trackedContextStep: __TrackedValueStep<{
     [key: string]: any;
   }>;
 
@@ -191,7 +191,7 @@ export class OperationPlan {
   /** Stores the actual value of rootValue. @internal */
   public readonly rootValueStep: __ValueStep<any>;
   /** Allows accessing rootValue in a tracked manner (allowing eval). @internal */
-  public readonly trackedRootValueStep: __TrackedObjectStep<any>;
+  public readonly trackedRootValueStep: __TrackedValueStep<any>;
 
   /** @internal */
   public makeMetaByMetaKey: () => MetaByMetaKey;
@@ -1799,7 +1799,7 @@ ${te.join(
   private track(
     value: any,
     constraints: Constraint[],
-  ): [__ValueStep<any>, __TrackedObjectStep] {
+  ): [__ValueStep<any>, __TrackedValueStep] {
     const valueStep = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
@@ -1808,7 +1808,7 @@ ${te.join(
     const trackedObjectStep = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
-      () => new __TrackedObjectStep(value, valueStep, constraints),
+      () => new __TrackedValueStep(value, valueStep, constraints),
     );
     return [valueStep, trackedObjectStep];
   }
@@ -2683,7 +2683,7 @@ ${te.join(
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
-        if (currentLayerPlan.copyPlanIds.includes(dep.id)) {
+        if (currentLayerPlan.copyStepIds.includes(dep.id)) {
           break;
         }
         if (isDev && this.stepTracker.getStepById(dep.id) !== dep) {
@@ -2691,7 +2691,7 @@ ${te.join(
             `Plan mismatch - ${dep} != ${this.stepTracker.getStepById(dep.id)}`,
           );
         }
-        currentLayerPlan.copyPlanIds.push(dep.id);
+        currentLayerPlan.copyStepIds.push(dep.id);
         currentLayerPlan = currentLayerPlan.parentLayerPlan;
         if (!currentLayerPlan) {
           throw new Error(
@@ -2869,7 +2869,7 @@ ${te.join(
         ensurePlanAvailableInLayer($root, layerPlan);
       }
 
-      // Copy polymorphic parentPlanId
+      // Copy polymorphic parentStepId
       if (layerPlan.reason.type === "polymorphic") {
         const parentStep = layerPlan.reason.parentStep;
         ensurePlanAvailableInLayer(parentStep, layerPlan);

@@ -17,11 +17,18 @@ export function stringifyPayload(
     first = false;
     str += `"errors":${JSON.stringify(payload.errors)}`;
   }
-  if (payload.data !== undefined) {
+  if (payload.data === undefined) {
+    // noop
+  } else if (payload.data === null) {
     if (!first) str += ",";
     first = false;
-    // TODO: assert that data is a string
-    str += `"data":${payload.data ?? "null"}`;
+    str += `"data":null`;
+  } else if (typeof payload.data === "string") {
+    if (!first) str += ",";
+    first = false;
+    str += `"data":${payload.data}`;
+  } else {
+    throw new Error(`Expected data to be null, undefined, or a JSON string`);
   }
   if (payload.extensions !== undefined) {
     if (!first) str += ",";

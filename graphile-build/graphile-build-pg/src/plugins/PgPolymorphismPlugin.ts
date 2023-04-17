@@ -628,7 +628,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     pgPolymorphism: polymorphism,
                   },
                   () => ({
-                    description: codec.extensions?.description,
+                    description: codec.description,
                   }),
                   `PgPolymorphismPlugin single/relational interface type for ${codec.name}`,
                 );
@@ -660,7 +660,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       tableTypeName,
                       {
                         pgCodec: codec,
-                        isPgTableType: true,
+                        isPgClassType: true,
                         pgPolymorphism: polymorphism,
                         pgPolymorphicSingleTableType: {
                           typeIdentifier,
@@ -673,7 +673,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
                       ExecutableStep, // PgClassSingleStep
                       () => ({
-                        description: codec.extensions?.description,
+                        description: codec.description,
                         interfaces: [
                           build.getTypeByName(
                             interfaceTypeName,
@@ -705,7 +705,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     pgPolymorphism: polymorphism,
                   },
                   () => ({
-                    description: codec.extensions?.description,
+                    description: codec.description,
                   }),
                   `PgPolymorphismPlugin union interface type for ${codec.name}`,
                 );
@@ -770,10 +770,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
       GraphQLObjectType_interfaces(interfaces, build, context) {
         const { inflection } = build;
         const {
-          scope: { pgCodec, isPgTableType },
+          scope: { pgCodec, isPgClassType },
         } = context;
         const rawImplements = pgCodec?.extensions?.tags?.implements;
-        if (rawImplements && isPgTableType) {
+        if (rawImplements && isPgClassType) {
           const interfaceNames = Array.isArray(rawImplements)
             ? rawImplements
             : [rawImplements];

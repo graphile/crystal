@@ -1,7 +1,7 @@
 import type { GraphQLError } from "graphql";
 
 import * as assert from "../assert.js";
-import type { Bucket, RequestContext } from "../bucket.js";
+import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { JSONValue } from "../interfaces.js";
 import type { OutputPlan } from "./OutputPlan.js";
@@ -30,7 +30,7 @@ export interface PayloadRoot {
    * Serialization works differently if we're running inside GraphQL. (Namely:
    * we don't serialize - that's GraphQL's job.)
    */
-  insideGraphQL: boolean;
+  insideGraphQL: false;
 
   /**
    * The errors that have occurred; these are proper GraphQLErrors and will be
@@ -62,7 +62,7 @@ export interface PayloadRoot {
 }
 
 export interface OutputPlanContext {
-  requestContext: RequestContext;
+  requestContext: RequestTools;
   root: PayloadRoot;
   path: ReadonlyArray<string | number>;
 }
@@ -93,9 +93,6 @@ export interface SubsequentStreamSpec {
   startIndex: number;
 }
 
-// TODO: to start with we're going to do looping here; but later we can compile
-// the output plans (even nested ones) into simple functions that just generate
-// the resulting objects directly without looping.
 /**
  * @internal
  */

@@ -132,6 +132,7 @@ export interface PgResourceUnique<
    * If this is true, this represents the "primary key" of the resource.
    */
   isPrimary?: boolean;
+  description?: string;
   /**
    * Space for you to add your own metadata
    */
@@ -149,6 +150,7 @@ export interface PgCodecRefExtensions {}
 export interface PgCodecRef {
   definition: PgRefDefinition;
   paths: Array<PgCodecRefPath>;
+  description?: string;
   extensions?: PgCodecRefExtensions;
 }
 

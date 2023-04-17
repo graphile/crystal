@@ -39,12 +39,12 @@ interface PgUpdatePlanFinalizeResults {
 /**
  * Update a single row identified by the 'getBy' argument.
  */
-export class PgUpdateStep<
+export class PgUpdateSingleStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "PgUpdateStep",
+    exportName: "PgUpdateSingleStep",
   };
   isSyncAndSafe = false;
 
@@ -137,7 +137,7 @@ export class PgUpdateStep<
       )
     ) {
       throw new Error(
-        `Attempted to build 'PgUpdateStep' with a non-unique getBy keys ('${keys.join(
+        `Attempted to build 'PgUpdateSingleStep' with a non-unique getBy keys ('${keys.join(
           "', '",
         )}') - please ensure your 'getBy' spec uniquely identifiers a row (resource = ${
           this.resource
@@ -231,7 +231,9 @@ export class PgUpdateStep<
     }
 
     if (resourceAttribute?.via) {
-      throw new Error(`Cannot select a 'via' attribute from PgUpdateStep`);
+      throw new Error(
+        `Cannot select a 'via' attribute from PgUpdateSingleStep`,
+      );
     }
 
     /*
@@ -442,7 +444,9 @@ export class PgUpdateStep<
 /**
  * Update a single row identified by the 'getBy' argument.
  */
-export function pgUpdate<TResource extends PgResource<any, any, any, any>>(
+export function pgUpdateSingle<
+  TResource extends PgResource<any, any, any, any>,
+>(
   resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceAttributes<TResource>,
@@ -451,8 +455,8 @@ export function pgUpdate<TResource extends PgResource<any, any, any, any>>(
   attributes?: {
     [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
   },
-): PgUpdateStep<TResource> {
-  return new PgUpdateStep(resource, getBy, attributes);
+): PgUpdateSingleStep<TResource> {
+  return new PgUpdateSingleStep(resource, getBy, attributes);
 }
 
-exportAs("@dataplan/pg", pgUpdate, "pgUpdate");
+exportAs("@dataplan/pg", pgUpdateSingle, "pgUpdateSingle");

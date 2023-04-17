@@ -15,7 +15,7 @@
  */
 
 import {
-  __TrackedObjectStep,
+  __TrackedValueStep,
   __ValueStep,
   grafastGraphql,
   isAsyncIterable,

@@ -24,7 +24,7 @@ graph TD
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__types__....namespace”ᐳ"}}:::plan
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
     __Item27[/"__Item[27∈4]<br />ᐸ26ᐳ"\]:::itemplan
-    Map82{{"Map[82∈3]<br />ᐸ22:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9,”6”:10,”7”:11}ᐳ"}}:::plan
+    RemapKeys82{{"RemapKeys[82∈3]<br />ᐸ22:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9,”6”:10,”7”:11}ᐳ"}}:::plan
     PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ"}}:::plan
     PgClassExpression35{{"PgClassExpression[35∈5]<br />ᐸ__frmcdc_d...pe_1__.”a”ᐳ"}}:::plan
     PgClassExpression36{{"PgClassExpression[36∈5]<br />ᐸ__frmcdc_d...pe_1__.”b”ᐳ"}}:::plan
@@ -38,7 +38,7 @@ graph TD
     PgClassExpression46{{"PgClassExpression[46∈6]<br />ᐸ__types__....namespace”ᐳ"}}:::plan
     PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
     __Item48[/"__Item[48∈7]<br />ᐸ47ᐳ"\]:::itemplan
-    Map84{{"Map[84∈6]<br />ᐸ22:{”0”:12,”1”:13,”2”:14,”3”:15,”4”:16,”5”:17,”6”:18,”7”:19}ᐳ"}}:::plan
+    RemapKeys84{{"RemapKeys[84∈6]<br />ᐸ22:{”0”:12,”1”:13,”2”:14,”3”:15,”4”:16,”5”:17,”6”:18,”7”:19}ᐳ"}}:::plan
     PgSelectSingle55{{"PgSelectSingle[55∈6]<br />ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ"}}:::plan
     PgClassExpression56{{"PgClassExpression[56∈8]<br />ᐸ__frmcdc_d...pe_1__.”a”ᐳ"}}:::plan
     PgClassExpression57{{"PgClassExpression[57∈8]<br />ᐸ__frmcdc_d...pe_1__.”b”ᐳ"}}:::plan
@@ -77,8 +77,8 @@ graph TD
     PgSelectSingle22 --> PgClassExpression25
     PgSelectSingle22 --> PgClassExpression26
     PgClassExpression26 ==> __Item27
-    PgSelectSingle22 --> Map82
-    Map82 --> PgSelectSingle34
+    PgSelectSingle22 --> RemapKeys82
+    RemapKeys82 --> PgSelectSingle34
     PgSelectSingle34 --> PgClassExpression35
     PgSelectSingle34 --> PgClassExpression36
     PgSelectSingle34 --> PgClassExpression37
@@ -91,8 +91,8 @@ graph TD
     PgSelectSingle22 --> PgClassExpression46
     PgSelectSingle22 --> PgClassExpression47
     PgClassExpression47 ==> __Item48
-    PgSelectSingle22 --> Map84
-    Map84 --> PgSelectSingle55
+    PgSelectSingle22 --> RemapKeys84
+    RemapKeys84 --> PgSelectSingle55
     PgSelectSingle55 --> PgClassExpression56
     PgSelectSingle55 --> PgClassExpression57
     PgSelectSingle55 --> PgClassExpression58
@@ -128,7 +128,7 @@ graph TD
     class Bucket2,__Item21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸtypesᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgSelectSingle34,Map82 bucket3
+    class Bucket3,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgSelectSingle34,RemapKeys82 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ26ᐳ[27]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item27 bucket4
@@ -137,7 +137,7 @@ graph TD
     class Bucket5,PgClassExpression35,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression39,PgClassExpression40,PgClassExpression41 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸtypesᐳ[22]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47,PgSelectSingle55,Map84 bucket6
+    class Bucket6,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47,PgSelectSingle55,RemapKeys84 bucket6
     Bucket7("Bucket 7 (listItem)<br />ROOT __Item{7}ᐸ47ᐳ[48]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,__Item48 bucket7

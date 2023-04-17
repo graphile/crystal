@@ -4,11 +4,10 @@ import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByMetaKey } from "./engine/OperationPlan";
 import type { ExecutionEventEmitter } from "./interfaces.js";
 
-// TODO: rename this, it clashes with Grafast.RequestContext.
 /**
  * @internal
  */
-export interface RequestContext {
+export interface RequestTools {
   // readonly toSerialize: Array<{
   //   /** object (or array) */
   //   o: object;
@@ -28,7 +27,7 @@ export interface RequestContext {
    * If we're running inside GraphQL then we should not serialize scalars,
    * otherwise we'll face the double-serialization problem.
    */
-  insideGraphQL: boolean;
+  insideGraphQL: false;
 }
 
 /**

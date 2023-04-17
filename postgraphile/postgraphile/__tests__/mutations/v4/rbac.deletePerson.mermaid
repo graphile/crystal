@@ -16,7 +16,7 @@ graph TD
     Access11{{"Access[11∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgDelete10[["PgDelete[10∈1]"]]:::sideeffectplan
+    PgDeleteSingle10[["PgDeleteSingle[10∈1]"]]:::sideeffectplan
     Object14{{"Object[14∈1]<br />ᐸ{result}ᐳ"}}:::plan
     Constant15{{"Constant[15∈2]"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__person__.”id”ᐳ"}}:::plan
@@ -27,9 +27,9 @@ graph TD
     __Value3 --> Access11
     __Value3 --> Access12
     Access11 & Access12 --> Object13
-    Object13 & __InputStaticLeaf9 --> PgDelete10
-    PgDelete10 --> Object14
-    PgDelete10 --> PgClassExpression16
+    Object13 & __InputStaticLeaf9 --> PgDeleteSingle10
+    PgDeleteSingle10 --> Object14
+    PgDeleteSingle10 --> PgClassExpression16
     Constant15 & PgClassExpression16 --> List17
     List17 --> Lambda18
 
@@ -37,9 +37,9 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf9,Access11,Access12,Object13 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 9<br /><br />1: PgDelete[10]<br />2: <br />ᐳ: Object[14]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 9<br /><br />1: PgDeleteSingle[10]<br />2: <br />ᐳ: Object[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgDelete10,Object14 bucket1
+    class Bucket1,PgDeleteSingle10,Object14 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 10, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,Constant15,PgClassExpression16,List17,Lambda18 bucket2

@@ -26,13 +26,12 @@ import type { ConstantStep } from "./steps/index.js";
 import {
   __InputListStep,
   __InputStaticLeafStep,
-  __TrackedObjectStep,
+  __TrackedValueStep,
   constant,
 } from "./steps/index.js";
 
-// TODO: should this have `__` prefix?
 export type InputStep =
-  | __TrackedObjectStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
+  | __TrackedValueStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
   | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
   | __InputStaticLeafStep // .eval(), .evalIs()
   | __InputDynamicScalarStep // .eval(), .evalIs()
@@ -42,7 +41,7 @@ export type InputStep =
 export function assertInputStep(
   itemPlan: unknown,
 ): asserts itemPlan is InputStep {
-  if (itemPlan instanceof __TrackedObjectStep) return;
+  if (itemPlan instanceof __TrackedValueStep) return;
   if (itemPlan instanceof __InputListStep) return;
   if (itemPlan instanceof __InputStaticLeafStep) return;
   if (itemPlan instanceof __InputObjectStep) return;

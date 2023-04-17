@@ -185,7 +185,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
           fieldBehaviorScope,
           isPgFieldConnection,
           isPgFieldSimpleCollection,
-          pgResource,
+          pgFieldResource: pgResource,
           pgFieldCodec,
         } = scope;
 

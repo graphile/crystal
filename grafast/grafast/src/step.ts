@@ -611,7 +611,6 @@ export function isStreamableStep<TData>(
 }
 
 export type PolymorphicStep = ExecutableStep & {
-  // TODO: rename me to stepForType
   planForType(objectType: GraphQLObjectType): ExecutableStep;
 };
 

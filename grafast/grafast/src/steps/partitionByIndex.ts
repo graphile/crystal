@@ -77,7 +77,7 @@ export function partitionByIndex<
   TListStep extends ExecutableStep<readonly any[]>,
   TItemStep extends ExecutableStep<number>,
 >(
-  listPlan: TListStep,
+  listStep: TListStep,
   mapper: ListTransformItemPlanCallback<TListStep, TItemStep>,
   startIndex: 0 | 1 = 0,
 ): __ListTransformStep<TListStep, TItemStep, unknown[][], any> {
@@ -87,18 +87,18 @@ export function partitionByIndex<
     );
   }
   return listTransform<TListStep, TItemStep, unknown[][], any>({
-    listPlan,
+    listStep,
     itemPlanCallback: mapper,
     initialState,
     reduceCallback: startIndex === 1 ? reduceCallback1 : reduceCallback0,
-    listItem: isListCapableStep(listPlan)
+    listItem: isListCapableStep(listStep)
       ? (itemPlan) => {
           return each(itemPlan as any, ($item) =>
-            listPlan.listItem($item as any),
+            listStep.listItem($item as any),
           );
         }
       : undefined,
-    meta: `partitionByIndex${startIndex}:${chalk.yellow(listPlan.id)}${
+    meta: `partitionByIndex${startIndex}:${chalk.yellow(listStep.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,
   });

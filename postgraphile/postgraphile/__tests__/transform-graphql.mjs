@@ -3,7 +3,7 @@ import transform from "../../../grafast/dataplan-pg/__tests__/transform-graphql.
 export default {
   process: transform.makeProcess({
     includeDeoptimize: false,
-    // TODO: change includeStringified to 'true'
+    // TODO: change includeStringified to 'true' (currently disabled due to memory exhaustion on CI)
     includeStringified: false,
   }),
 };

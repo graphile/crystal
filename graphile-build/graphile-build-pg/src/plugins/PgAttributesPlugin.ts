@@ -296,7 +296,7 @@ function processAttribute(
       [attributeFieldName]: context.fieldWithHooks(
         {
           fieldName: attributeFieldName,
-          pgAttribute: attribute,
+          pgFieldAttribute: attribute,
         },
         fieldSpec,
       ),
@@ -310,7 +310,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
   description:
     "Adds PostgreSQL attributes (columns) to the relevant GraphQL object/input object types",
   version: version,
-  // TODO: Requires PgTablesPlugin
+  after: ["PgTablesPlugin"],
 
   inflection: {
     add: {
@@ -379,13 +379,13 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         const {
           scope: {
             pgCodec,
-            isPgTableType,
+            isPgClassType,
             pgPolymorphism,
             pgPolymorphicSingleTableType,
           },
         } = context;
 
-        if (!isPgTableType || !pgCodec?.attributes) {
+        if (!isPgClassType || !pgCodec?.attributes) {
           return fields;
         }
 

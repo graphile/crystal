@@ -39,22 +39,22 @@ export function groupBy<
   TListStep extends ExecutableStep<readonly any[]>,
   TItemStep extends ExecutableStep<number>,
 >(
-  listPlan: TListStep,
+  listStep: TListStep,
   mapper: ListTransformItemPlanCallback<TListStep, TItemStep>,
 ): __ListTransformStep<TListStep, TItemStep, GroupByPlanMemo, any> {
   return listTransform<TListStep, TItemStep, GroupByPlanMemo, any>({
-    listPlan,
+    listStep,
     itemPlanCallback: mapper,
     initialState,
     reduceCallback: reduceCallback,
-    listItem: isListCapableStep(listPlan)
+    listItem: isListCapableStep(listStep)
       ? (itemPlan) => {
           return each(itemPlan as any, ($item) =>
-            listPlan.listItem($item as any),
+            listStep.listItem($item as any),
           );
         }
       : undefined,
-    meta: `groupBy:${chalk.yellow(listPlan.id)}${
+    meta: `groupBy:${chalk.yellow(listStep.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,
   });

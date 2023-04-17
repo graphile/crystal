@@ -18,7 +18,7 @@ graph TD
     Access15{{"Access[15∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access16{{"Access[16∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgInsert14[["PgInsert[14∈1]"]]:::sideeffectplan
+    PgInsertSingle14[["PgInsertSingle[14∈1]"]]:::sideeffectplan
     Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
     Constant19{{"Constant[19∈3]"}}:::plan
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__network__.”id”ᐳ"}}:::plan
@@ -32,26 +32,26 @@ graph TD
     __Value3 --> Access15
     __Value3 --> Access16
     Access15 & Access16 --> Object17
-    Object17 & __InputStaticLeaf11 & __InputStaticLeaf12 & __InputStaticLeaf13 --> PgInsert14
-    PgInsert14 --> Object18
-    PgInsert14 --> PgClassExpression20
+    Object17 & __InputStaticLeaf11 & __InputStaticLeaf12 & __InputStaticLeaf13 --> PgInsertSingle14
+    PgInsertSingle14 --> Object18
+    PgInsertSingle14 --> PgClassExpression20
     Constant19 & PgClassExpression20 --> List21
     List21 --> Lambda22
-    PgInsert14 --> PgClassExpression24
-    PgInsert14 --> PgClassExpression25
-    PgInsert14 --> PgClassExpression26
+    PgInsertSingle14 --> PgClassExpression24
+    PgInsertSingle14 --> PgClassExpression25
+    PgInsertSingle14 --> PgClassExpression26
 
     subgraph "Buckets for mutations/v4/network_types.createNetwork"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf11,__InputStaticLeaf12,__InputStaticLeaf13,Access15,Access16,Object17 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 11, 12, 13<br /><br />1: PgInsert[14]<br />2: <br />ᐳ: Object[18]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 11, 12, 13<br /><br />1: PgInsertSingle[14]<br />2: <br />ᐳ: Object[18]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsert14,Object18 bucket1
+    class Bucket1,PgInsertSingle14,Object18 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgInsert{1}[14]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgInsertSingle{1}[14]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,Constant19,PgClassExpression20,List21,Lambda22,PgClassExpression24,PgClassExpression25,PgClassExpression26 bucket3
     Bucket0 --> Bucket1

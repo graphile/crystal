@@ -31,11 +31,11 @@ graph TD
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ(__message... not null)ᐳ"}}:::plan
     PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ__messages__.”forum_id”ᐳ"}}:::plan
-    Map47{{"Map[47∈3]<br />ᐸ22:{”0”:4,”1”:5}ᐳ"}}:::plan
+    RemapKeys47{{"RemapKeys[47∈3]<br />ᐸ22:{”0”:4,”1”:5}ᐳ"}}:::plan
     PgSelectSingle33{{"PgSelectSingle[33∈3]<br />ᐸforumsᐳ"}}:::plan
     PgClassExpression35{{"PgClassExpression[35∈4]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ(__forums_... not null)ᐳ"}}:::plan
-    Map49{{"Map[49∈3]<br />ᐸ22:{”0”:7,”1”:8}ᐳ"}}:::plan
+    RemapKeys49{{"RemapKeys[49∈3]<br />ᐸ22:{”0”:7,”1”:8}ᐳ"}}:::plan
     PgSelectSingle44{{"PgSelectSingle[44∈3]<br />ᐸusersᐳ"}}:::plan
     PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
@@ -60,12 +60,12 @@ graph TD
     PgSelectSingle22 --> PgClassExpression25
     PgSelectSingle22 --> PgClassExpression26
     PgSelectSingle22 --> PgClassExpression27
-    PgSelectSingle22 --> Map47
-    Map47 --> PgSelectSingle33
+    PgSelectSingle22 --> RemapKeys47
+    RemapKeys47 --> PgSelectSingle33
     PgSelectSingle33 --> PgClassExpression35
     PgSelectSingle33 --> PgClassExpression36
-    PgSelectSingle22 --> Map49
-    Map49 --> PgSelectSingle44
+    PgSelectSingle22 --> RemapKeys49
+    RemapKeys49 --> PgSelectSingle44
     PgSelectSingle44 --> PgClassExpression45
     PgSelectSingle44 --> PgClassExpression46
 
@@ -81,7 +81,7 @@ graph TD
     class Bucket2,Access14,Lambda15,Access16,PgSelect17,First21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgSelectSingle33,PgSelectSingle44,Map47,Map49 bucket3
+    class Bucket3,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgSelectSingle33,PgSelectSingle44,RemapKeys47,RemapKeys49 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 22, 33<br /><br />ROOT PgSelectSingle{3}ᐸforumsᐳ[33]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression27,PgClassExpression35,PgClassExpression36 bucket4

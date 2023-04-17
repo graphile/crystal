@@ -221,8 +221,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * @internal
    */
-  // TODO: rename to copyStepIds
-  public copyPlanIds: number[] = [];
+  public copyStepIds: number[] = [];
 
   /** @internal */
   public children: LayerPlan[] = [];
@@ -286,7 +285,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       this.reason.type === "polymorphic"
         ? `{${this.reason.typeNames.join(",")}}`
         : "";
-    const deps = this.copyPlanIds.length > 0 ? `%${this.copyPlanIds}` : "";
+    const deps = this.copyStepIds.length > 0 ? `%${this.copyStepIds}` : "";
     return `LayerPlan<${this.id}${chain}?${this.reason.type}${reasonExtra}!${
       this.rootStep?.id ?? "x"
     }${deps}>`;
@@ -363,7 +362,7 @@ ${inner}
   }
 
   public finalize(): void {
-    const copyStepIds = [...this.copyPlanIds];
+    const copyStepIds = [...this.copyStepIds];
     if (this.reason.type === "nullableBoundary") {
       // PERF: if parent bucket has no nulls/errors in itemStepId
       // then we can just copy everything wholesale rather than building
@@ -488,7 +487,7 @@ ${te.join(
   }
 
   public newBucket(parentBucket: Bucket): Bucket | null {
-    const copyStepIds = this.copyPlanIds;
+    const copyStepIds = this.copyStepIds;
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: string[] =
       this.reason.type === "mutationField"
