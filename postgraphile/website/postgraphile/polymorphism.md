@@ -260,7 +260,7 @@ create table polymorphic.log_entries (
 );
 
 comment on table polymorphic.log_entries is $$
-  @ref author to:PersonOrOrganization
+  @ref author to:PersonOrOrganization singular
   @refVia author via:(person_id)->people(person_id)
   @refVia author via:(organization_id)->organizations(organization_id)
   $$;
@@ -275,7 +275,7 @@ Since the `log_entries` table only has one reference to `people` and one to
 
 ```sql
 comment on table polymorphic.log_entries is $$
-  @ref author to:PersonOrOrganization
+  @ref author to:PersonOrOrganization singular
   @refVia author via:people
   @refVia author via:organizations
   $$;

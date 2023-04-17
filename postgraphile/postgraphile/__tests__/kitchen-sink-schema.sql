@@ -1295,7 +1295,7 @@ create table polymorphic.log_entries (
 );
 
 comment on table polymorphic.log_entries is $$
-  @ref author to:PersonOrOrganization
+  @ref author to:PersonOrOrganization singular
   @refVia author via:people
   @refVia author via:organizations
   $$;
