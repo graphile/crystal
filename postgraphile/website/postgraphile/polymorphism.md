@@ -8,7 +8,7 @@ Polymorphism in PostgreSQL schemas can take many forms. For PostGraphile to
 detect and generate GraphQL interfaces and unions (rather than regular object
 types) from your database tables, you need to provide PostGraphile some hints
 or instructions; one way to do this is with smart tags. Which smart tags to
-apply will depends on what shape your data is.
+apply will depend on what shape your data is.
 
 :::tip
 
