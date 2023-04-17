@@ -186,7 +186,7 @@ export class PgInsertSingleStep<
 
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
-   * insertSingleed row.
+   * inserted row.
    */
   get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
     attr: TAttr,
