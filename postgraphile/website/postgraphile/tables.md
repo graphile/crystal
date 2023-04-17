@@ -38,6 +38,13 @@ For a table like this, PostGraphile will:
 - Add to related table types:
   - Reverse [relations for each forward relation](./relations/) (e.g.
     `Organization.usersByOrganizationId`\*).
+- Add an `allUsers` [connection](./connections/) field with pagination, filtering,
+  and ordering (inflector: `allRows`)
+- Add a number of `userByKey(key: ...)` fields (e.g. `userById`, `userByUsername`),
+  one for each of the unique constraints on the table (inflector:
+  `rowByUniqueKeys`)
+- Add a `foo(nodeId: ID!)` field to get the row by its `nodeId`
+- Add [CRUD Mutations](./crud-mutations/) to the root `Mutation` type
 - Add to the root `Query` type:
 
 ```graphql
@@ -59,14 +66,6 @@ type Query implements Node {
   user(nodeId: ID!): User
 }
 ```
-
-- An `allUsers` [connection](./connections/) field with pagination, filtering,
-  and ordering (inflector: `allRows`)
-- A number of `userByKey(key: ...)` fields (e.g. `userById`, `userByUsername`),
-  one for each of the unique constraints on the table (inflector:
-  `rowByUniqueKeys`)
-- A `foo(nodeId: ID!)` field to get the row by its `nodeId`
-- Add [CRUD Mutations](./crud-mutations/) to the root `Mutation` type
 
 \* Remember these fields can be simplified by loading the
 `@graphile/simplify-inflection` plugin.
