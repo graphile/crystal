@@ -72,7 +72,7 @@ arguments.
 ### Advice
 
 The relation field names are explicit to avoid accidental conflicts, and
-can make your schema quite verbose, e.g. `userByAuthorId`, `userByEditorId`,
+can make your schema somewhat verbose, e.g. `userByAuthorId`, `userByEditorId`,
 `userByPublisherId`, etc.
 
 Some people like this verbosity, however if you prefer shorter names we
