@@ -4799,23 +4799,14 @@ input SingleTableItemCondition {
   """Checks for equality with the object’s `authorId` field."""
   authorId: Int
 
-  """Checks for equality with the object’s `color` field."""
-  color: String
-
   """Checks for equality with the object’s `createdAt` field."""
   createdAt: Datetime
-
-  """Checks for equality with the object’s `description` field."""
-  description: String
 
   """Checks for equality with the object’s `id` field."""
   id: Int
 
   """Checks for equality with the object’s `isExplicitlyArchived` field."""
   isExplicitlyArchived: Boolean
-
-  """Checks for equality with the object’s `note` field."""
-  note: String
 
   """Checks for equality with the object’s `parentId` field."""
   parentId: Int
@@ -4825,9 +4816,6 @@ input SingleTableItemCondition {
 
   """Checks for equality with the object’s `rootTopicId` field."""
   rootTopicId: Int
-
-  """Checks for equality with the object’s `title` field."""
-  title: String
 
   """Checks for equality with the object’s `type` field."""
   type: ItemType
