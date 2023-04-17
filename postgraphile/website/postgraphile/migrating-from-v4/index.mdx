@@ -1,3 +1,9 @@
+---
+title: "Migrating from V4"
+---
+
+import Mermaid from "@theme/Mermaid";
+
 # Migrating from V4
 
 One of the main aims for PostGraphile V5 was to replace the "lookahead engine"
@@ -596,7 +602,8 @@ In PostGraphile V5, we have split things up into more packages that each have sp
 
 One major advantage of this approach is that when you export your GraphQL schema as executable code, very few of these dependencies will be needed, making your runtime dependencies much smaller. Another advantage is that it increases the audience for a lot of these modules, for example `grafast` contains a drop-in replacement for `graphql`'s `execute` method and can result in much faster GraphQL schemas even without going anywhere near schema autogeneration. A larger audience means more eyes on the code and ultimately higher quality software for everyone.
 
-```mermaid
+<Mermaid
+  chart={`
 graph TD;
   postgraphile-->grafserv;
   grafserv-->ruru;
@@ -619,7 +626,8 @@ graph TD;
   graphile-build-pg-->pg-sql2;
   graphile-build-pg-->dataplan__pg["@dataplan/pg"];
   graphile-build-pg-->dataplan__json["@dataplan/json"];
-```
+`}
+></Mermaid>
 
 [grafast]: https://grafast.org
 [ruru]: https://grafast.org/ruru
