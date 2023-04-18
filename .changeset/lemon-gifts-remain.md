@@ -12,11 +12,9 @@
 "@dataplan/json": patch
 "graphile-config": patch
 "graphile-export": patch
-"@localrepo/postgraphile-website": patch
 "@dataplan/pg": patch
 "grafserv": patch
 "grafast": patch
-"@localrepo/grafast-website": patch
 "tamedevil": patch
 "graphile": patch
 "pg-sql2": patch
