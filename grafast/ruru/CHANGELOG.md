@@ -1,5 +1,21 @@
 # ruru
 
+## 2.0.0-1.1
+
+### Patch Changes
+
+- [#267](https://github.com/benjie/postgraphile-private/pull/267)
+  [`159735204`](https://github.com/benjie/postgraphile-private/commit/15973520462d4a95e3cdf04fdacfc71ca851122f)
+  Thanks [@benjie](https://github.com/benjie)! - Add formatting for SQL aliases
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+  Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
+
+- Updated dependencies
+  [[`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)]:
+  - graphile-config@0.0.1-1.1
+
 ## 2.0.0-0.13
 
 ### Patch Changes

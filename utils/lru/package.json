@@ -1,6 +1,6 @@
 {
   "name": "@graphile/lru",
-  "version": "5.0.0-1.0",
+  "version": "5.0.0-1.1",
   "description": "Extremely simple zero-dependencies ES6 LRU (you probably want lru-cache instead)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

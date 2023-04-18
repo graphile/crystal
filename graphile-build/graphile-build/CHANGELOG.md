@@ -1,5 +1,61 @@
 # graphile-build
 
+## 5.0.0-1.1
+
+### Patch Changes
+
+- [#287](https://github.com/benjie/postgraphile-private/pull/287)
+  [`c5d89d705`](https://github.com/benjie/postgraphile-private/commit/c5d89d7052dfaaf4c597c8c36858795fa7227b07)
+  Thanks [@benjie](https://github.com/benjie)! - Fix the type definition of
+  GatherHooks to allow plugins to indicate individual gather hook ordering.
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+  Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
+
+- [#265](https://github.com/benjie/postgraphile-private/pull/265)
+  [`22ec50e36`](https://github.com/benjie/postgraphile-private/commit/22ec50e360d90de41c586c5c220438f780c10ee8)
+  Thanks [@benjie](https://github.com/benjie)! - 'extensions.graphile' is now
+  'extensions.grafast'
+
+- [#271](https://github.com/benjie/postgraphile-private/pull/271)
+  [`261eb520b`](https://github.com/benjie/postgraphile-private/commit/261eb520b33fe3673fe3a7712085e50291aed1e5)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **RENAME ALL THE THINGS**
+
+  The term 'source' was overloaded, and 'configs' was too vague, and
+  'databaseName' was misleading, and 'source' behaviours actually applied to
+  resources, and more. So, we've renamed lots of things as part of the API
+  stabilization work. You're probably only affected by the first 2 bullet
+  points.
+
+  - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
+    as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
+    `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent
+    file
+  - All `*:source:*` behaviors are now `*:resource:*` behaviors (use regexp
+    `/:source\b|\bsource:[a-z$]/` to find the places that need updating)
+  - `PgDatabaseConfiguration` -> `PgServiceConfiguration`
+  - `databaseName` -> `serviceName` (because it's not the name of the database,
+    it's the name of the `pgServices` (which was `pgConfigs`) entry)
+  - `PgResourceConfig::source` -> `PgResourceConfig.from` ('source' is
+    overloaded, so use a more direct term)
+  - `PgResource::source` -> `PgResource.from`
+  - `PgSelectPlanJoin::source` -> `PgSelectPlanJoin.from`
+  - `helpers.pgIntrospection.getDatabase` ->
+    `helpers.pgIntrospection.getService`
+  - `helpers.pgIntrospection.getExecutorForDatabase` ->
+    `helpers.pgIntrospection.getExecutorForService`
+
+- Updated dependencies
+  [[`ae304b33c`](https://github.com/benjie/postgraphile-private/commit/ae304b33c7c5a04d36b552177ae24a7b7b522645),
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c),
+  [`22ec50e36`](https://github.com/benjie/postgraphile-private/commit/22ec50e360d90de41c586c5c220438f780c10ee8),
+  [`0f4709356`](https://github.com/benjie/postgraphile-private/commit/0f47093560cf4f8b1f215853bc91d7f6531278cc),
+  [`395b4a2dd`](https://github.com/benjie/postgraphile-private/commit/395b4a2dd24044bad25f5e411a7a7cfa43883eef)]:
+  - grafast@0.0.1-1.1
+  - graphile-config@0.0.1-1.1
+  - graphile-export@0.0.2-1.1
+
 ## 5.0.0-0.29
 
 ### Patch Changes

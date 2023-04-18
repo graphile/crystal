@@ -1,5 +1,87 @@
 # v8.0.0
 
+## 8.0.0-1.1
+
+### Patch Changes
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+  Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`96b0bd14e`](https://github.com/benjie/postgraphile-private/commit/96b0bd14ed9039d60612e75b3aeb63dcaef271d4)
+  Thanks [@benjie](https://github.com/benjie)! - `PgSource` has been renamed to
+  `PgResource`, `PgTypeCodec` to `PgCodec`, `PgEnumTypeCodec` to `PgEnumCodec`,
+  `PgTypeColumn` to `PgCodecAttribute` (and similar for related
+  types/interfaces). `source` has been replaced by `resource` in various of the
+  APIs where it relates to a `PgResource`.
+
+  `PgSourceBuilder` is no more, instead being replaced with `PgResourceOptions`
+  and being built into the final `PgResource` via the new
+  `makeRegistryBuilder`/`makeRegistry` functions.
+
+  `build.input` no longer contains the `pgSources` directly, instead
+  `build.input.pgRegistry.pgResources` should be used.
+
+  The new registry system also means that various of the hooks in the gather
+  phase have been renamed/replaced, there's a new `PgRegistryPlugin` plugin in
+  the default preset. The only plugin that uses the `main` method in the
+  `gather` phase is now `PgRegistryPlugin` - if you are using the `main`
+  function for Postgres-related behaviors you should consider moving your logic
+  to hooks instead.
+
+  Plugin ordering has changed and thus the shape of the final schema is likely
+  to change (please use `lexicographicSortSchema` on your before/after schemas
+  when comparing).
+
+  Relationships are now from a codec to a resource, rather than from resource to
+  resource, so all the relationship inflectors (`singleRelation`,
+  `singleRelationBackwards`, `_manyRelation`, `manyRelationConnection`,
+  `manyRelationList`) now accept different parameters
+  (`{registry, codec, relationName}` instead of `{source, relationaName}`).
+
+  Significant type overhaul, most generic types no longer require generics to be
+  explicitly passed in many circumstances. `PgSelectStep`, `PgSelectSingleStep`,
+  `PgInsertStep`, `PgUpdateStep` and `PgDeleteStep` now all accept the resource
+  as their single type parameter rather than accepting the 4 generics they did
+  previously. `PgClassExpressionStep` now accepts just a codec and a resource as
+  generics. `PgResource` and `PgCodec` have gained a new `TName extends string`
+  generic at the very front that is used by the registry system to massively
+  improve continuity of the types through all the various APIs.
+
+  Fixed various issues in schema exporting, and detect more potential
+  issues/oversights automatically.
+
+  Fixes an RBAC bug when using superuser role for introspection.
+
+- [#271](https://github.com/benjie/postgraphile-private/pull/271)
+  [`261eb520b`](https://github.com/benjie/postgraphile-private/commit/261eb520b33fe3673fe3a7712085e50291aed1e5)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **RENAME ALL THE THINGS**
+
+  The term 'source' was overloaded, and 'configs' was too vague, and
+  'databaseName' was misleading, and 'source' behaviours actually applied to
+  resources, and more. So, we've renamed lots of things as part of the API
+  stabilization work. You're probably only affected by the first 2 bullet
+  points.
+
+  - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
+    as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
+    `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent
+    file
+  - All `*:source:*` behaviors are now `*:resource:*` behaviors (use regexp
+    `/:source\b|\bsource:[a-z$]/` to find the places that need updating)
+  - `PgDatabaseConfiguration` -> `PgServiceConfiguration`
+  - `databaseName` -> `serviceName` (because it's not the name of the database,
+    it's the name of the `pgServices` (which was `pgConfigs`) entry)
+  - `PgResourceConfig::source` -> `PgResourceConfig.from` ('source' is
+    overloaded, so use a more direct term)
+  - `PgResource::source` -> `PgResource.from`
+  - `PgSelectPlanJoin::source` -> `PgSelectPlanJoin.from`
+  - `helpers.pgIntrospection.getDatabase` ->
+    `helpers.pgIntrospection.getService`
+  - `helpers.pgIntrospection.getExecutorForDatabase` ->
+    `helpers.pgIntrospection.getExecutorForService`
+
 ## 8.0.0-0.5
 
 ### Patch Changes

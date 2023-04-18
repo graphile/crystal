@@ -1,5 +1,29 @@
 # grafserv
 
+## 0.0.1-1.1
+
+### Patch Changes
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+  Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
+
+- [#282](https://github.com/benjie/postgraphile-private/pull/282)
+  [`f6e644bd3`](https://github.com/benjie/postgraphile-private/commit/f6e644bd35be1ee2b63c8636785a241d863b8b5d)
+  Thanks [@benjie](https://github.com/benjie)! - Allow accessing websocket
+  connection params via `(ctx as Grafast.RequestContext).ws?.connectionParams`.
+- Updated dependencies
+  [[`ae304b33c`](https://github.com/benjie/postgraphile-private/commit/ae304b33c7c5a04d36b552177ae24a7b7b522645),
+  [`159735204`](https://github.com/benjie/postgraphile-private/commit/15973520462d4a95e3cdf04fdacfc71ca851122f),
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c),
+  [`22ec50e36`](https://github.com/benjie/postgraphile-private/commit/22ec50e360d90de41c586c5c220438f780c10ee8),
+  [`0f4709356`](https://github.com/benjie/postgraphile-private/commit/0f47093560cf4f8b1f215853bc91d7f6531278cc),
+  [`395b4a2dd`](https://github.com/benjie/postgraphile-private/commit/395b4a2dd24044bad25f5e411a7a7cfa43883eef)]:
+  - grafast@0.0.1-1.1
+  - ruru@2.0.0-1.1
+  - graphile-config@0.0.1-1.1
+  - @graphile/lru@5.0.0-1.1
+
 ## 0.0.1-0.25
 
 ### Patch Changes

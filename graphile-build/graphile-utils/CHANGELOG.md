@@ -1,5 +1,63 @@
 # graphile-utils
 
+## 5.0.0-1.1
+
+### Patch Changes
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+  Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
+
+- [#271](https://github.com/benjie/postgraphile-private/pull/271)
+  [`261eb520b`](https://github.com/benjie/postgraphile-private/commit/261eb520b33fe3673fe3a7712085e50291aed1e5)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **RENAME ALL THE THINGS**
+
+  The term 'source' was overloaded, and 'configs' was too vague, and
+  'databaseName' was misleading, and 'source' behaviours actually applied to
+  resources, and more. So, we've renamed lots of things as part of the API
+  stabilization work. You're probably only affected by the first 2 bullet
+  points.
+
+  - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
+    as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
+    `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent
+    file
+  - All `*:source:*` behaviors are now `*:resource:*` behaviors (use regexp
+    `/:source\b|\bsource:[a-z$]/` to find the places that need updating)
+  - `PgDatabaseConfiguration` -> `PgServiceConfiguration`
+  - `databaseName` -> `serviceName` (because it's not the name of the database,
+    it's the name of the `pgServices` (which was `pgConfigs`) entry)
+  - `PgResourceConfig::source` -> `PgResourceConfig.from` ('source' is
+    overloaded, so use a more direct term)
+  - `PgResource::source` -> `PgResource.from`
+  - `PgSelectPlanJoin::source` -> `PgSelectPlanJoin.from`
+  - `helpers.pgIntrospection.getDatabase` ->
+    `helpers.pgIntrospection.getService`
+  - `helpers.pgIntrospection.getExecutorForDatabase` ->
+    `helpers.pgIntrospection.getExecutorForService`
+
+- Updated dependencies
+  [[`2df36c5a1`](https://github.com/benjie/postgraphile-private/commit/2df36c5a1b228be50ed325962b334290e7e3e8a7),
+  [`c5d89d705`](https://github.com/benjie/postgraphile-private/commit/c5d89d7052dfaaf4c597c8c36858795fa7227b07),
+  [`a73f9c709`](https://github.com/benjie/postgraphile-private/commit/a73f9c709959b9d6ddef18d714783f864a3d8e26),
+  [`ae304b33c`](https://github.com/benjie/postgraphile-private/commit/ae304b33c7c5a04d36b552177ae24a7b7b522645),
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c),
+  [`22ec50e36`](https://github.com/benjie/postgraphile-private/commit/22ec50e360d90de41c586c5c220438f780c10ee8),
+  [`0f4709356`](https://github.com/benjie/postgraphile-private/commit/0f47093560cf4f8b1f215853bc91d7f6531278cc),
+  [`c22dcde7b`](https://github.com/benjie/postgraphile-private/commit/c22dcde7b53af323d907b22a0a69924841072aa9),
+  [`bd37be707`](https://github.com/benjie/postgraphile-private/commit/bd37be7075804b1299e10dd2dcb4473159bb26f1),
+  [`96b0bd14e`](https://github.com/benjie/postgraphile-private/commit/96b0bd14ed9039d60612e75b3aeb63dcaef271d4),
+  [`d951897ee`](https://github.com/benjie/postgraphile-private/commit/d951897eea824acabdb17baab4bf900b4b3b842f),
+  [`366b166dc`](https://github.com/benjie/postgraphile-private/commit/366b166dc88a340de7f092f92840b0fba1f03d60),
+  [`261eb520b`](https://github.com/benjie/postgraphile-private/commit/261eb520b33fe3673fe3a7712085e50291aed1e5),
+  [`395b4a2dd`](https://github.com/benjie/postgraphile-private/commit/395b4a2dd24044bad25f5e411a7a7cfa43883eef),
+  [`a14cf5f4c`](https://github.com/benjie/postgraphile-private/commit/a14cf5f4c233cd794eb4d3c6f2281e747d234a71)]:
+  - graphile-build-pg@5.0.0-1.1
+  - graphile-build@5.0.0-1.1
+  - grafast@0.0.1-1.1
+  - pg-introspection@0.0.1-1.1
+  - graphile-config@0.0.1-1.1
+
 ## 5.0.0-0.35
 
 ### Patch Changes

@@ -1,5 +1,171 @@
 # graphile-build-pg
 
+## 5.0.0-1.1
+
+### Patch Changes
+
+- [#279](https://github.com/benjie/postgraphile-private/pull/279)
+  [`2df36c5a1`](https://github.com/benjie/postgraphile-private/commit/2df36c5a1b228be50ed325962b334290e7e3e8a7)
+  Thanks [@benjie](https://github.com/benjie)! - `description` moved out of
+  `extensions` to live directly on all the relevant entities.
+
+- [#287](https://github.com/benjie/postgraphile-private/pull/287)
+  [`c5d89d705`](https://github.com/benjie/postgraphile-private/commit/c5d89d7052dfaaf4c597c8c36858795fa7227b07)
+  Thanks [@benjie](https://github.com/benjie)! - Fix the type definition of
+  GatherHooks to allow plugins to indicate individual gather hook ordering.
+
+- [#279](https://github.com/benjie/postgraphile-private/pull/279)
+  [`a73f9c709`](https://github.com/benjie/postgraphile-private/commit/a73f9c709959b9d6ddef18d714783f864a3d8e26)
+  Thanks [@benjie](https://github.com/benjie)! -
+  `PgConnectionArgFirstLastBeforeAfterPlugin` is now
+  `PgFirstLastBeforeAfterArgsPlugin` (because it applies to lists as well as
+  connections).
+  `PgInsertStep`/`pgInsert()`/`PgUpdateStep`/`pgUpdate()`/`PgDeleteStep`/`pgDelete()`
+  are now
+  `PgInsertSingleStep`/`pgInsertSingle()`/`PgUpdateSingleStep`/`pgUpdateSingle()`/`PgDeleteSingleStep`/`pgDeleteSingle()`
+  (to make space to add a future bulk API if we want to).
+  `config.schema.orderByNullsLast` is now `config.schema.pgOrderByNullsLast` for
+  consistency (V4 preset users are unaffected). Lots of field scopes in
+  `graphile-build-pg` have been updated to incorporate `field` into their names.
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+  Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
+
+- [#259](https://github.com/benjie/postgraphile-private/pull/259)
+  [`c22dcde7b`](https://github.com/benjie/postgraphile-private/commit/c22dcde7b53af323d907b22a0a69924841072aa9)
+  Thanks [@benjie](https://github.com/benjie)! - Renamed `recordType` codec
+  factory to `recordCodec`. `recordCodec()` now only accepts a single object
+  argument. Renamed `enumType` codec factory to `enumCodec`. `enumCodec()` now
+  only accepts a single object argument. Rename `listOfType` to `listOfCodec`.
+
+  Massive overhaul of PgTypeCodec, PgTypeColumn and PgTypeColumns generics -
+  types should be passed through much deeper now, but if you reference any of
+  these types directly you'll need to update your code.
+
+- [#285](https://github.com/benjie/postgraphile-private/pull/285)
+  [`bd37be707`](https://github.com/benjie/postgraphile-private/commit/bd37be7075804b1299e10dd2dcb4473159bb26f1)
+  Thanks [@benjie](https://github.com/benjie)! - Single table inheritance no
+  longer exposes non-shared columns via condition/order, and also only exposes
+  the relationships on the types where they are appropriate.
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`96b0bd14e`](https://github.com/benjie/postgraphile-private/commit/96b0bd14ed9039d60612e75b3aeb63dcaef271d4)
+  Thanks [@benjie](https://github.com/benjie)! - `PgSource` has been renamed to
+  `PgResource`, `PgTypeCodec` to `PgCodec`, `PgEnumTypeCodec` to `PgEnumCodec`,
+  `PgTypeColumn` to `PgCodecAttribute` (and similar for related
+  types/interfaces). `source` has been replaced by `resource` in various of the
+  APIs where it relates to a `PgResource`.
+
+  `PgSourceBuilder` is no more, instead being replaced with `PgResourceOptions`
+  and being built into the final `PgResource` via the new
+  `makeRegistryBuilder`/`makeRegistry` functions.
+
+  `build.input` no longer contains the `pgSources` directly, instead
+  `build.input.pgRegistry.pgResources` should be used.
+
+  The new registry system also means that various of the hooks in the gather
+  phase have been renamed/replaced, there's a new `PgRegistryPlugin` plugin in
+  the default preset. The only plugin that uses the `main` method in the
+  `gather` phase is now `PgRegistryPlugin` - if you are using the `main`
+  function for Postgres-related behaviors you should consider moving your logic
+  to hooks instead.
+
+  Plugin ordering has changed and thus the shape of the final schema is likely
+  to change (please use `lexicographicSortSchema` on your before/after schemas
+  when comparing).
+
+  Relationships are now from a codec to a resource, rather than from resource to
+  resource, so all the relationship inflectors (`singleRelation`,
+  `singleRelationBackwards`, `_manyRelation`, `manyRelationConnection`,
+  `manyRelationList`) now accept different parameters
+  (`{registry, codec, relationName}` instead of `{source, relationaName}`).
+
+  Significant type overhaul, most generic types no longer require generics to be
+  explicitly passed in many circumstances. `PgSelectStep`, `PgSelectSingleStep`,
+  `PgInsertStep`, `PgUpdateStep` and `PgDeleteStep` now all accept the resource
+  as their single type parameter rather than accepting the 4 generics they did
+  previously. `PgClassExpressionStep` now accepts just a codec and a resource as
+  generics. `PgResource` and `PgCodec` have gained a new `TName extends string`
+  generic at the very front that is used by the registry system to massively
+  improve continuity of the types through all the various APIs.
+
+  Fixed various issues in schema exporting, and detect more potential
+  issues/oversights automatically.
+
+  Fixes an RBAC bug when using superuser role for introspection.
+
+- [#271](https://github.com/benjie/postgraphile-private/pull/271)
+  [`d951897ee`](https://github.com/benjie/postgraphile-private/commit/d951897eea824acabdb17baab4bf900b4b3b842f)
+  Thanks [@benjie](https://github.com/benjie)! - Add extensions.pg to Postgres
+  function resources (makes it easier for plugins to hook them).
+
+- [#286](https://github.com/benjie/postgraphile-private/pull/286)
+  [`366b166dc`](https://github.com/benjie/postgraphile-private/commit/366b166dc88a340de7f092f92840b0fba1f03d60)
+  Thanks [@benjie](https://github.com/benjie)! - Add detection for `@ref` that
+  is missing `singular`, fix docs and test schema and add tests for same.
+
+- [#271](https://github.com/benjie/postgraphile-private/pull/271)
+  [`261eb520b`](https://github.com/benjie/postgraphile-private/commit/261eb520b33fe3673fe3a7712085e50291aed1e5)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **RENAME ALL THE THINGS**
+
+  The term 'source' was overloaded, and 'configs' was too vague, and
+  'databaseName' was misleading, and 'source' behaviours actually applied to
+  resources, and more. So, we've renamed lots of things as part of the API
+  stabilization work. You're probably only affected by the first 2 bullet
+  points.
+
+  - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
+    as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
+    `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent
+    file
+  - All `*:source:*` behaviors are now `*:resource:*` behaviors (use regexp
+    `/:source\b|\bsource:[a-z$]/` to find the places that need updating)
+  - `PgDatabaseConfiguration` -> `PgServiceConfiguration`
+  - `databaseName` -> `serviceName` (because it's not the name of the database,
+    it's the name of the `pgServices` (which was `pgConfigs`) entry)
+  - `PgResourceConfig::source` -> `PgResourceConfig.from` ('source' is
+    overloaded, so use a more direct term)
+  - `PgResource::source` -> `PgResource.from`
+  - `PgSelectPlanJoin::source` -> `PgSelectPlanJoin.from`
+  - `helpers.pgIntrospection.getDatabase` ->
+    `helpers.pgIntrospection.getService`
+  - `helpers.pgIntrospection.getExecutorForDatabase` ->
+    `helpers.pgIntrospection.getExecutorForService`
+
+- [#268](https://github.com/benjie/postgraphile-private/pull/268)
+  [`a14cf5f4c`](https://github.com/benjie/postgraphile-private/commit/a14cf5f4c233cd794eb4d3c6f2281e747d234a71)
+  Thanks [@benjie](https://github.com/benjie)! - PgV4NoIgnoreIndexesPlugin is
+  now PgIndexBehaviorsPlugin, moved to graphile-build-pg, and is enabled by
+  default
+- Updated dependencies
+  [[`2df36c5a1`](https://github.com/benjie/postgraphile-private/commit/2df36c5a1b228be50ed325962b334290e7e3e8a7),
+  [`c5d89d705`](https://github.com/benjie/postgraphile-private/commit/c5d89d7052dfaaf4c597c8c36858795fa7227b07),
+  [`a73f9c709`](https://github.com/benjie/postgraphile-private/commit/a73f9c709959b9d6ddef18d714783f864a3d8e26),
+  [`ae304b33c`](https://github.com/benjie/postgraphile-private/commit/ae304b33c7c5a04d36b552177ae24a7b7b522645),
+  [`ef42d717c`](https://github.com/benjie/postgraphile-private/commit/ef42d717c38df7fddc1cd3a5b97dc8d68419417a),
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c),
+  [`22ec50e36`](https://github.com/benjie/postgraphile-private/commit/22ec50e360d90de41c586c5c220438f780c10ee8),
+  [`0f4709356`](https://github.com/benjie/postgraphile-private/commit/0f47093560cf4f8b1f215853bc91d7f6531278cc),
+  [`c22dcde7b`](https://github.com/benjie/postgraphile-private/commit/c22dcde7b53af323d907b22a0a69924841072aa9),
+  [`bd37be707`](https://github.com/benjie/postgraphile-private/commit/bd37be7075804b1299e10dd2dcb4473159bb26f1),
+  [`f8954fb17`](https://github.com/benjie/postgraphile-private/commit/f8954fb17bbcb0f6633475d09924cdd9f94aaf23),
+  [`96b0bd14e`](https://github.com/benjie/postgraphile-private/commit/96b0bd14ed9039d60612e75b3aeb63dcaef271d4),
+  [`f93c79b94`](https://github.com/benjie/postgraphile-private/commit/f93c79b94eb93ae04b1b2e0478f5106e1aca8ee2),
+  [`fbf1da26a`](https://github.com/benjie/postgraphile-private/commit/fbf1da26a9208519ee58f7ac34dd7e569bf1f9e5),
+  [`53e164cbc`](https://github.com/benjie/postgraphile-private/commit/53e164cbca7eaf1e6e03c849ac1bbe1789c61105),
+  [`c564825f3`](https://github.com/benjie/postgraphile-private/commit/c564825f3fda0083e536154c4c34ce0b2948eba4),
+  [`261eb520b`](https://github.com/benjie/postgraphile-private/commit/261eb520b33fe3673fe3a7712085e50291aed1e5),
+  [`395b4a2dd`](https://github.com/benjie/postgraphile-private/commit/395b4a2dd24044bad25f5e411a7a7cfa43883eef)]:
+  - @dataplan/pg@0.0.1-1.1
+  - graphile-build@5.0.0-1.1
+  - grafast@0.0.1-1.1
+  - pg-introspection@0.0.1-1.1
+  - graphile-config@0.0.1-1.1
+  - graphile-export@0.0.2-1.1
+  - tamedevil@0.0.0-1.1
+  - pg-sql2@5.0.0-1.1
+
 ## 5.0.0-0.34
 
 ### Patch Changes

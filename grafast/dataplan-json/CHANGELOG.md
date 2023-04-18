@@ -1,5 +1,29 @@
 # @dataplan/json
 
+## 0.0.1-1.1
+
+### Patch Changes
+
+- [#260](https://github.com/benjie/postgraphile-private/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+  Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
+
+- [#266](https://github.com/benjie/postgraphile-private/pull/266)
+  [`395b4a2dd`](https://github.com/benjie/postgraphile-private/commit/395b4a2dd24044bad25f5e411a7a7cfa43883eef)
+  Thanks [@benjie](https://github.com/benjie)! - The Grafast step class
+  'execute' and 'stream' methods now have a new additional first argument
+  `count` which indicates how many results they must return. This means we don't
+  need to rely on the `values[0].length` trick to determine how many results to
+  return, and thus we can pass through an empty tuple to steps that have no
+  dependencies.
+- Updated dependencies
+  [[`ae304b33c`](https://github.com/benjie/postgraphile-private/commit/ae304b33c7c5a04d36b552177ae24a7b7b522645),
+  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c),
+  [`22ec50e36`](https://github.com/benjie/postgraphile-private/commit/22ec50e360d90de41c586c5c220438f780c10ee8),
+  [`0f4709356`](https://github.com/benjie/postgraphile-private/commit/0f47093560cf4f8b1f215853bc91d7f6531278cc),
+  [`395b4a2dd`](https://github.com/benjie/postgraphile-private/commit/395b4a2dd24044bad25f5e411a7a7cfa43883eef)]:
+  - grafast@0.0.1-1.1
+
 ## 0.0.1-0.23
 
 ### Patch Changes
