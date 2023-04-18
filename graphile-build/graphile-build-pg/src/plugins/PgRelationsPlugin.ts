@@ -20,7 +20,6 @@ import type {
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
 import { arraysMatch, connection, list, object } from "grafast";
-import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";

@@ -20,7 +20,6 @@ import {
   recordCodec,
   TYPES,
 } from "@dataplan/pg";
-import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";

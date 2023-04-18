@@ -2,7 +2,6 @@
 import type { PgRegistry, PgRegistryBuilder } from "@dataplan/pg";
 import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
-import type { PluginHook } from "graphile-config";
 
 import { version } from "../version.js";
 

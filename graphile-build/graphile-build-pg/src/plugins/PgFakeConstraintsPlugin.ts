@@ -1,6 +1,5 @@
 import type { PromiseOrDirect } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
-import type { PluginHook } from "graphile-config";
 import type {
   Introspection,
   PgAttribute,

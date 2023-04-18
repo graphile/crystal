@@ -17,7 +17,6 @@ import {
   recordCodec,
   sqlFromArgDigests,
 } from "@dataplan/pg";
-import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 import sql from "pg-sql2";

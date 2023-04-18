@@ -5,7 +5,6 @@ import { PgExecutor } from "@dataplan/pg";
 import type { ExecutableStep, PromiseOrDirect } from "grafast";
 import { constant, context, defer, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
-import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type {
   Introspection,

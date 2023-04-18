@@ -9,7 +9,6 @@ import type {
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
-import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
