@@ -12041,9 +12041,9 @@ __metadata:
     tslib: "npm:^2.4.0"
     typescript: "npm:^5.0.0-beta"
   peerDependencies:
-    grafast: "workspace:^0.0.1-0.4"
+    grafast: "workspace:^0.0.1-1.1"
     graphql: ^16.1.0-experimental-stream-defer.6
-    pg-sql2: "workspace:^5.0.0-0.0"
+    pg-sql2: "workspace:^5.0.0-1.1"
   languageName: unknown
   linkType: soft
 
