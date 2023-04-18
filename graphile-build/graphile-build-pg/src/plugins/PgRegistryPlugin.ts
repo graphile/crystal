@@ -2,7 +2,6 @@
 import type { PgRegistry, PgRegistryBuilder } from "@dataplan/pg";
 import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
-import type { PluginHook } from "graphile-config";
 
 import { version } from "../version.js";
 
@@ -16,36 +15,24 @@ declare global {
     }
 
     interface GatherHooks {
-      pgRegistry_PgRegistryBuilder_init: PluginHook<
-        (event: {
-          registryBuilder: PgRegistryBuilder<any, any, any>;
-        }) => PromiseOrDirect<void>
-      >;
-      pgRegistry_PgRegistryBuilder_pgCodecs: PluginHook<
-        (event: {
-          registryBuilder: PgRegistryBuilder<any, any, any>;
-        }) => PromiseOrDirect<void>
-      >;
-      pgRegistry_PgRegistryBuilder_pgResources: PluginHook<
-        (event: {
-          registryBuilder: PgRegistryBuilder<any, any, any>;
-        }) => PromiseOrDirect<void>
-      >;
-      pgRegistry_PgRegistryBuilder_pgRelations: PluginHook<
-        (event: {
-          registryBuilder: PgRegistryBuilder<any, any, any>;
-        }) => PromiseOrDirect<void>
-      >;
-      pgRegistry_PgRegistryBuilder_finalize: PluginHook<
-        (event: {
-          registryBuilder: PgRegistryBuilder<any, any, any>;
-        }) => PromiseOrDirect<void>
-      >;
-      pgRegistry_PgRegistry: PluginHook<
-        (event: {
-          registry: PgRegistry<any, any, any>;
-        }) => PromiseOrDirect<void>
-      >;
+      pgRegistry_PgRegistryBuilder_init(event: {
+        registryBuilder: PgRegistryBuilder<any, any, any>;
+      }): PromiseOrDirect<void>;
+      pgRegistry_PgRegistryBuilder_pgCodecs(event: {
+        registryBuilder: PgRegistryBuilder<any, any, any>;
+      }): PromiseOrDirect<void>;
+      pgRegistry_PgRegistryBuilder_pgResources(event: {
+        registryBuilder: PgRegistryBuilder<any, any, any>;
+      }): PromiseOrDirect<void>;
+      pgRegistry_PgRegistryBuilder_pgRelations(event: {
+        registryBuilder: PgRegistryBuilder<any, any, any>;
+      }): PromiseOrDirect<void>;
+      pgRegistry_PgRegistryBuilder_finalize(event: {
+        registryBuilder: PgRegistryBuilder<any, any, any>;
+      }): PromiseOrDirect<void>;
+      pgRegistry_PgRegistry(event: {
+        registry: PgRegistry<any, any, any>;
+      }): PromiseOrDirect<void>;
     }
   }
 }

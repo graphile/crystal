@@ -17,7 +17,6 @@ import {
   recordCodec,
   sqlFromArgDigests,
 } from "@dataplan/pg";
-import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 import sql from "pg-sql2";
@@ -82,22 +81,18 @@ declare global {
     }
 
     interface GatherHooks {
-      pgProcedures_functionResourceOptions: PluginHook<
-        (event: {
-          serviceName: string;
-          pgProc: PgProc;
-          baseResourceOptions: PgResourceOptions;
-          functionResourceOptions: PgFunctionResourceOptions;
-        }) => void | Promise<void>
-      >;
+      pgProcedures_functionResourceOptions(event: {
+        serviceName: string;
+        pgProc: PgProc;
+        baseResourceOptions: PgResourceOptions;
+        functionResourceOptions: PgFunctionResourceOptions;
+      }): void | Promise<void>;
 
-      pgProcedures_PgResourceOptions: PluginHook<
-        (event: {
-          serviceName: string;
-          pgProc: PgProc;
-          resourceOptions: PgResourceOptions;
-        }) => void | Promise<void>
-      >;
+      pgProcedures_PgResourceOptions(event: {
+        serviceName: string;
+        pgProc: PgProc;
+        resourceOptions: PgResourceOptions;
+      }): void | Promise<void>;
     }
   }
 }

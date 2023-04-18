@@ -5,7 +5,6 @@ import { PgExecutor } from "@dataplan/pg";
 import type { ExecutableStep, PromiseOrDirect } from "grafast";
 import { constant, context, defer, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
-import type { PluginHook } from "graphile-config";
 import { EXPORTABLE } from "graphile-export";
 import type {
   Introspection,
@@ -158,102 +157,70 @@ declare global {
     }
 
     interface GatherHooks {
-      pgIntrospection_introspection: PluginHook<
-        (event: {
-          introspection: Introspection;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_namespace: PluginHook<
-        (event: {
-          entity: PgNamespace;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_class: PluginHook<
-        (event: {
-          entity: PgClass;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_attribute: PluginHook<
-        (event: {
-          entity: PgAttribute;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_constraint: PluginHook<
-        (event: {
-          entity: PgConstraint;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_proc: PluginHook<
-        (event: {
-          entity: PgProc;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_role: PluginHook<
-        (event: {
-          entity: PgRoles;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_auth_member: PluginHook<
-        (event: {
-          entity: PgAuthMembers;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_type: PluginHook<
-        (event: {
-          entity: PgType;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_enum: PluginHook<
-        (event: {
-          entity: PgEnum;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_extension: PluginHook<
-        (event: {
-          entity: PgExtension;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_index: PluginHook<
-        (event: {
-          entity: PgIndex;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_language: PluginHook<
-        (event: {
-          entity: PgLanguage;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_range: PluginHook<
-        (event: {
-          entity: PgRange;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_depend: PluginHook<
-        (event: {
-          entity: PgDepend;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
-      pgIntrospection_description: PluginHook<
-        (event: {
-          entity: PgDescription;
-          serviceName: string;
-        }) => PromiseOrDirect<void>
-      >;
+      pgIntrospection_introspection(event: {
+        introspection: Introspection;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_namespace(event: {
+        entity: PgNamespace;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_class(event: {
+        entity: PgClass;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_attribute(event: {
+        entity: PgAttribute;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_constraint(event: {
+        entity: PgConstraint;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_proc(event: {
+        entity: PgProc;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_role(event: {
+        entity: PgRoles;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_auth_member(event: {
+        entity: PgAuthMembers;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_type(event: {
+        entity: PgType;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_enum(event: {
+        entity: PgEnum;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_extension(event: {
+        entity: PgExtension;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_index(event: {
+        entity: PgIndex;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_language(event: {
+        entity: PgLanguage;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_range(event: {
+        entity: PgRange;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_depend(event: {
+        entity: PgDepend;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
+      pgIntrospection_description(event: {
+        entity: PgDescription;
+        serviceName: string;
+      }): PromiseOrDirect<void>;
     }
   }
 }
@@ -639,15 +606,11 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                   TEvent extends keyof GraphileConfig.GatherHooks,
                 >(
                   eventName: TEvent,
-                  entities: GraphileConfig.GatherHooks[TEvent] extends PluginHook<
-                    infer U
-                  >
-                    ? Parameters<U>[0] extends {
-                        entity: infer V;
-                        serviceName: string;
-                      }
-                      ? V[]
-                      : never
+                  entities: GraphileConfig.GatherHooks[TEvent] extends (
+                    firstArg: { entity: infer V; serviceName: string },
+                    ...rest: any[]
+                  ) => any
+                    ? V[]
                     : never,
                 ) {
                   const promises: Promise<any>[] = [];

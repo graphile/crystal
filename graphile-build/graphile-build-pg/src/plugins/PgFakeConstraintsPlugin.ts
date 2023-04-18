@@ -1,6 +1,5 @@
 import type { PromiseOrDirect } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
-import type { PluginHook } from "graphile-config";
 import type {
   Introspection,
   PgAttribute,
@@ -18,13 +17,11 @@ declare global {
       pgFakeConstraints: Record<string, never>;
     }
     interface GatherHooks {
-      pgFakeConstraints_constraint: PluginHook<
-        (event: {
-          introspection: Introspection;
-          serviceName: string;
-          entity: PgConstraint;
-        }) => PromiseOrDirect<void>
-      >;
+      pgFakeConstraints_constraint(event: {
+        introspection: Introspection;
+        serviceName: string;
+        entity: PgConstraint;
+      }): PromiseOrDirect<void>;
     }
   }
   namespace GraphileBuild {
