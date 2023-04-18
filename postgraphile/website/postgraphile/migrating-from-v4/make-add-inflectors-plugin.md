@@ -11,7 +11,7 @@ little easier to write it yourself so the abstraction is no longer required.
 
 Set `inflection.replace.inflectorName` in a plugin to a new inflector function;
 the function will be passed the previous inflector function as the first
-argument (null if there wasn't one), the resolved GraphileConfig preset as the
+argument (`null` if there wasn't one), the resolved `GraphileConfig` preset as the
 second argument, and any data passed to it as the remaining arguments.
 
 This following plugin replaces the `builtin` inflector with one that returns
