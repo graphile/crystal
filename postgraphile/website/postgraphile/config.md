@@ -14,7 +14,7 @@ The PostGraphile base presets are named after crystals; the first preset availab
 `postgraphile/presets/amber`, so you'll definitely want that. **If you're coming
 from PostGraphile V4** you may also want to make your own preset with the
 `makeV4Preset()` factory - see the
-[V4 migration docs](./migrating-from-v4/index.md) for more information.
+[V4 migration docs](./migrating-from-v4/) for more information.
 
 :::caution
 
