@@ -1,8 +1,12 @@
-import { addBehaviorToTags } from "graphile-build-pg";
+import { addBehaviorToTags } from "../utils.js";
 
 export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
   name: "PgIndexBehaviorsPlugin",
   version: "0.0.0",
+  // We want the "prepend" of addBehaviorToTags to prepend to a position
+  // _before_ anything added by smart tags (where the user has overridden
+  // things) - so we have to run _after_ that.
+  after: ["smart-tags"],
 
   gather: {
     hooks: {
