@@ -178,14 +178,14 @@ declare global {
       };
 
       hooks?: {
-        [key in keyof GatherHooks]?: GatherHooks[key] extends PluginHook<
-          infer U
-        >
-          ? (
-              info: GatherPluginContext<TState, TCache>,
-              ...args: Parameters<U>
-            ) => ReturnType<U>
-          : never;
+        [key in keyof GatherHooks]?: PluginHook<
+          GatherHooks[key] extends (...args: infer UArgs) => infer UResult
+            ? (
+                info: GatherPluginContext<TState, TCache>,
+                ...args: UArgs
+              ) => UResult
+            : never
+        >;
       };
 
       /**

@@ -177,38 +177,30 @@ declare global {
       /**
        * Determines the uniques to include in a PgResourceOptions when it is built
        */
-      pgTables_unique: PluginHook<
-        (event: {
-          serviceName: string;
-          pgClass: PgClass;
-          pgConstraint: PgConstraint;
-          unique: PgResourceUnique;
-        }) => void | Promise<void>
-      >;
+      pgTables_unique(event: {
+        serviceName: string;
+        pgClass: PgClass;
+        pgConstraint: PgConstraint;
+        unique: PgResourceUnique;
+      }): void | Promise<void>;
       /**
        * Passed the PgResourceOptions before it's added to the PgRegistryBuilder.
        */
-      pgTables_PgResourceOptions: PluginHook<
-        (event: {
-          serviceName: string;
-          pgClass: PgClass;
-          resourceOptions: PgResourceOptions;
-        }) => void | Promise<void>
-      >;
-      pgTables_PgResourceOptions_relations: PluginHook<
-        (event: {
-          serviceName: string;
-          pgClass: PgClass;
-          resourceOptions: PgResourceOptions;
-        }) => Promise<void> | void
-      >;
-      pgTables_PgResourceOptions_relations_post: PluginHook<
-        (event: {
-          serviceName: string;
-          pgClass: PgClass;
-          resourceOptions: PgResourceOptions;
-        }) => Promise<void> | void
-      >;
+      pgTables_PgResourceOptions(event: {
+        serviceName: string;
+        pgClass: PgClass;
+        resourceOptions: PgResourceOptions;
+      }): void | Promise<void>;
+      pgTables_PgResourceOptions_relations(event: {
+        serviceName: string;
+        pgClass: PgClass;
+        resourceOptions: PgResourceOptions;
+      }): Promise<void> | void;
+      pgTables_PgResourceOptions_relations_post(event: {
+        serviceName: string;
+        pgClass: PgClass;
+        resourceOptions: PgResourceOptions;
+      }): Promise<void> | void;
     }
   }
 }

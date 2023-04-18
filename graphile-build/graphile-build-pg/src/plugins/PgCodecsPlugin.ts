@@ -97,66 +97,52 @@ declare global {
       };
     }
     interface GatherHooks {
-      pgCodecs_PgCodec: PluginHook<
-        (event: {
-          serviceName: string;
-          pgCodec: PgCodec;
-          pgClass?: PgClass;
-          pgType: PgType;
-        }) => Promise<void> | void
-      >;
+      pgCodecs_PgCodec(event: {
+        serviceName: string;
+        pgCodec: PgCodec;
+        pgClass?: PgClass;
+        pgType: PgType;
+      }): Promise<void> | void;
 
-      pgCodecs_attribute: PluginHook<
-        (event: {
-          serviceName: string;
-          pgClass: PgClass;
-          pgAttribute: PgAttribute;
-          attribute: PgCodecAttribute<any>;
-        }) => Promise<void> | void
-      >;
+      pgCodecs_attribute(event: {
+        serviceName: string;
+        pgClass: PgClass;
+        pgAttribute: PgAttribute;
+        attribute: PgCodecAttribute<any>;
+      }): Promise<void> | void;
 
-      pgCodecs_recordType_spec: PluginHook<
-        (event: {
-          serviceName: string;
-          pgClass: PgClass;
-          spec: PgRecordTypeCodecSpec<string, any>;
-        }) => Promise<void> | void
-      >;
+      pgCodecs_recordType_spec(event: {
+        serviceName: string;
+        pgClass: PgClass;
+        spec: PgRecordTypeCodecSpec<string, any>;
+      }): Promise<void> | void;
 
-      pgCodecs_enumType_extensions: PluginHook<
-        (event: {
-          serviceName: string;
-          pgType: PgType;
-          extensions: any;
-        }) => Promise<void> | void
-      >;
+      pgCodecs_enumType_extensions(event: {
+        serviceName: string;
+        pgType: PgType;
+        extensions: any;
+      }): Promise<void> | void;
 
-      pgCodecs_rangeOfCodec_extensions: PluginHook<
-        (event: {
-          serviceName: string;
-          pgType: PgType;
-          innerCodec: PgCodec;
-          extensions: any;
-        }) => Promise<void> | void
-      >;
+      pgCodecs_rangeOfCodec_extensions(event: {
+        serviceName: string;
+        pgType: PgType;
+        innerCodec: PgCodec;
+        extensions: any;
+      }): Promise<void> | void;
 
-      pgCodecs_domainOfCodec_extensions: PluginHook<
-        (event: {
-          serviceName: string;
-          pgType: PgType;
-          innerCodec: PgCodec;
-          extensions: any;
-        }) => Promise<void> | void
-      >;
+      pgCodecs_domainOfCodec_extensions(event: {
+        serviceName: string;
+        pgType: PgType;
+        innerCodec: PgCodec;
+        extensions: any;
+      }): Promise<void> | void;
 
-      pgCodecs_listOfCodec_extensions: PluginHook<
-        (event: {
-          serviceName: string;
-          pgType: PgType;
-          innerCodec: PgCodec;
-          extensions: any;
-        }) => Promise<void> | void
-      >;
+      pgCodecs_listOfCodec_extensions(event: {
+        serviceName: string;
+        pgType: PgType;
+        innerCodec: PgCodec;
+        extensions: any;
+      }): Promise<void> | void;
     }
   }
 }

@@ -114,14 +114,12 @@ declare global {
       };
     }
     interface GatherHooks {
-      pgRelations_relation: PluginHook<
-        (event: {
-          serviceName: string;
-          pgClass: PgClass;
-          pgConstraint: PgConstraint;
-          relation: PgCodecRelationConfig;
-        }) => Promise<void> | void
-      >;
+      pgRelations_relation(event: {
+        serviceName: string;
+        pgClass: PgClass;
+        pgConstraint: PgConstraint;
+        relation: PgCodecRelationConfig;
+      }): Promise<void> | void;
     }
   }
 }
