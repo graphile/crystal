@@ -35,11 +35,25 @@ can then maintain yourself ─ there's no lock-in.
 
 :::tip
 
-PostGraphile doesn't have to be (and _generally_ should not be) a 1-to-1 map of
-your database. PostGraphile will automatically reflect the permissions in your
+PostGraphile doesn't have to be (and _generally_ should not be) a "1-to-1 map"
+of your database.
+
+Via schema extensions you can add any types/fields/args that you need to, which
+can communicate with any data source that Node itself can communicate with. You
+can also use the plugin interface to wrap _plan resolvers_ with your own logic,
+which gives huge control over authorization, presentation, filtering, and
+various other topics.
+
+PostGraphile will automatically reflect the permissions in your
 database and only expose the tables, columns, functions and mutations that are
 granted to it; but you should use [smart tags](./smart-tags) and similar
 techniques to hone the GraphQL API to your needs.
+
+By exporting the executable schema you can see the plan resolvers/types/fields
+that PostGraphile has generated for you and, should you choose to, you can take
+this code and make it your own - either for the entire schema, or for specific
+portions of it. This can be used to enable you to evolve your database tables
+without breaking your GraphQL schema.
 
 We strongly advise that you start with as small a GraphQL API as you can, and
 then add features to it as you need them, rather than going for a "kitchen sink"
@@ -98,7 +112,7 @@ The easiest way to get started is with the [CLI interface](./usage-cli/); if you
 have `npx` installed you can try it out with:
 
 ```
-npx postgraphile -P postgraphile/presets/amber -e -c 'postgres:///mydb'
+npx postgraphile -P postgraphile/presets/amber -e -c 'postgres:///mydb' -s public
 ```
 
 (replacing the connection string with a PostgreSQL connection string to your
