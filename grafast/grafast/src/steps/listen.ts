@@ -1,6 +1,5 @@
-import { SafeError } from "grafast";
-
 import { isDev } from "../dev.js";
+import { SafeError } from "../index.js";
 import type {
   GrafastResultStreamList,
   GrafastSubscriber,
