@@ -112,7 +112,7 @@ The easiest way to get started is with the [CLI interface](./usage-cli/); if you
 have `npx` installed you can try it out with:
 
 ```
-npx postgraphile -P postgraphile/presets/amber -e -c 'postgres:///mydb'
+npx postgraphile -P postgraphile/presets/amber -e -c 'postgres:///mydb' -s public
 ```
 
 (replacing the connection string with a PostgreSQL connection string to your
