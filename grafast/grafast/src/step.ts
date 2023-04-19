@@ -474,8 +474,7 @@ export abstract class UnbatchedExecutableStep<
   finalize() {
     // If they've not replaced 'execute', use our optimized form
     if (this.execute === UnbatchedExecutableStep.prototype.execute) {
-      const depIndexes =
-        this.dependencies.length > 0 ? this.dependencies.map((_, i) => i) : [0];
+      const depIndexes = this.dependencies.map((_, i) => i);
       const tryOrNot = (inFrag: TE): TE => {
         if (this.isSyncAndSafe) {
           return inFrag;
