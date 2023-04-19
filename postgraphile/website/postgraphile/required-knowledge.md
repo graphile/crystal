@@ -44,7 +44,7 @@ as "shouty".
 It's common to use snake_case as the naming convention in SQL because of this
 case-insensitivity, to save having to escape all the identifiers.
 
-#### The word `user` is reserved
+#### The word `user` is reserved, among others
 
 If you want to call your table `user` you need to escape it; e.g.
 

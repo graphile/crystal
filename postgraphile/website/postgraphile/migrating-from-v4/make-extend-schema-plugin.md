@@ -29,7 +29,7 @@ behavior so you might as well adopt plans, right? :wink:
 
 In V4 we had `@requires(columns: [...])` which would ensure the parent object
 passed into your resolver had the given columns (though they might have
-different capitalisation :grimacing:).
+different capitalization :grimacing:).
 
 In a V5 plan you can simply `.get(...)` each of the columns from the parent
 plan.
@@ -102,7 +102,7 @@ performance optimization to work around computed column functions or similar
 that were not being inlined by PostgreSQL.
 
 In V5, this concern should be handled via a plan. You have a number of choices
-what plan you need, depending on what you're trying to achieve.
+of what plan you need, depending on what you're trying to achieve.
 
 For leaf fields, if you need to do the calculation in the database rather than
 in JS, you might use the `pgClassExpression` step.
@@ -171,7 +171,7 @@ TODO: once `@dataplan/pg` documentation is written, add links to it here.
 
 ## `selectGraphQLResultFromTable`
 
-In version 4, this method was needed to kick off a "look-ahead" enhanced data
+In Version 4, this method was needed to kick off a "look-ahead" enhanced data
 fetch from a GraphQL resolver, but was always at risk of introducing the N+1
 problem. Many users found it confusing, and would often try and use it to
 retrieve data for themselves to use inside a resolver, which did not align with
@@ -179,9 +179,9 @@ its intent at all.
 
 In Version 5 there is no need for this helper any more - every plan step is
 opted into the planning system without any ceremony, and the N+1 problem is
-automatically solved by Gra*fast*. And requesting data to use in the plan
-versus to use as the result of the field is exactly the same, so no more
-confusion.
+automatically solved by Gra*fast*. The method to retrieve the data to use in
+the plan, and the method to populate the data are now the same so there's no
+more confusion between the two methods.
 
 Here's an example of porting an example from the Version 4 documentation to
 Version 5. First we find the `pgResource` that represents the `match_user`
@@ -237,7 +237,7 @@ wrapped in a `SAVEPOINT` to ensure that if a single mutation failed, all the
 other mutations would not be rolled back (so called "partial success").
 
 In PostGraphile V5, transactions are created on demand, so the use of savepoints
-is no longer necessary. That's quite good if you're
+is no longer necessary. That's good if you're
 [concerned about SAVEPOINT impact on performance](https://about.gitlab.com/blog/2021/09/29/why-we-spent-the-last-month-eliminating-postgresql-subtransactions/).
 
 ## `context.pgClient.query`

@@ -25,6 +25,8 @@ CREATE TABLE app_public.users (
 
 For a table like this, PostGraphile will:
 
+**TODO**: Are the inflectors up to date?
+
 - Create a GraphQL type, `User`, for the table, named in UpperCamelCase &
   singularized
   ([inflector: `tableType`](https://github.com/graphile/graphile-engine/blob/f332cb11fc32c7b50428c8d19d88121ead00d95d/packages/graphile-build-pg/src/plugins/PgBasicsPlugin.js#L485-L487)).
@@ -38,7 +40,14 @@ For a table like this, PostGraphile will:
 - Add to related table types:
   - Reverse [relations for each forward relation](./relations/) (e.g.
     `Organization.usersByOrganizationId`\*).
+- Add [CRUD Mutations](./crud-mutations/) to the root `Mutation` type.
 - Add to the root `Query` type:
+  - An `allUsers` [connection](./connections/) field with pagination, filtering,
+    and ordering (inflector: `allRows`).
+  - A number of `userByKey(key: ...)` fields (e.g. `userById`, `userByUsername`),
+    one for each of the unique constraints on the table (inflector:
+    `rowByUniqueKeys`).
+  - A `foo(nodeId: ID!)` field to get the row by its `nodeId`.
 
 ```graphql
 type Query implements Node {
@@ -59,14 +68,6 @@ type Query implements Node {
   user(nodeId: ID!): User
 }
 ```
-
-- An `allUsers` [connection](./connections/) field with pagination, filtering,
-  and ordering (inflector: `allRows`)
-- A number of `userByKey(key: ...)` fields (e.g. `userById`, `userByUsername`),
-  one for each of the unique constraints on the table (inflector:
-  `rowByUniqueKeys`)
-- A `foo(nodeId: ID!)` field to get the row by its `nodeId`
-- Add [CRUD Mutations](./crud-mutations/) to the root `Mutation` type
 
 \* Remember these fields can be simplified by loading the
 `@graphile/simplify-inflection` plugin.

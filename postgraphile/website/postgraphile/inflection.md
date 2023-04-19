@@ -14,7 +14,7 @@ typically use `camelCase`; and enum values typically use `CONSTANT_CASE`. The
 default inflectors attempt to map things to natural names in GraphQL whilst
 avoiding naming conflicts. For example:
 
-- Table names are singularised and changed to UpperCamelCase: `pending_users` →
+- Table names are singularized and changed to UpperCamelCase: `pending_users` →
   `PendingUser`
 - Column names are changed to camelCase: `created_at` → `createdAt`
 - Relations reference the target type and the referencing columns:
@@ -71,8 +71,8 @@ arguments.
 
 ### Advice
 
-The relation field names are quite explicit to avoid accidental conflicts, and
-can make your schema quite verbose, e.g. `userByAuthorId`, `userByEditorId`,
+The relation field names are explicit to avoid accidental conflicts, and
+can make your schema somewhat verbose, e.g. `userByAuthorId`, `userByEditorId`,
 `userByPublisherId`, etc.
 
 Some people like this verbosity, however if you prefer shorter names we

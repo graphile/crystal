@@ -94,7 +94,7 @@ const sidebars = {
     "debugging",
     {
       type: "html",
-      value: "<h4>CUSTOMISING</h4>",
+      value: "<h4>CUSTOMIZING</h4>",
       defaultStyle: false,
     },
     {

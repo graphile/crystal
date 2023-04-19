@@ -15,8 +15,8 @@ the very plan of what will be done!
 
 - No need for `requires` any more, since you can use the methods on steps to get
   what you need
-- No resolveInfo since it's not needed in Gra*fast*
-- No context (but you can retrieve it via the [`context()` step][context] if you
+- No `resolveInfo` since it's not needed in Gra*fast*
+- No `context` (but you can retrieve it via the [`context()` step][context] if you
   need it)
 
 [context]: https://grafast.org/grafast/step-library/standard-steps/context
@@ -26,9 +26,9 @@ Now let's look at some of the things you might have used
 
 ## Setting a create/update mutation column value
 
-You could use makeWrapResolversPlugin in V4 as a clumsy workaround to set
-specific column values in a builtin CRUD mutation by overriding what the system
-thought the arguments were. Fortunately V5's plan system means that you no
+You could use `makeWrapResolversPlugin` in V4 as a clumsy workaround to set
+specific column values in a built-in CRUD mutation by overriding what the system
+thought the arguments were. Fortunately, V5's plan system means that you no
 longer need to do this and you can address the problem more directly - you don't
 even have to have the column in your GraphQL schema in order to set it any more!
 :sweat_smile:
