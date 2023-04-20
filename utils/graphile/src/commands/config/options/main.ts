@@ -3,6 +3,7 @@ import {
   configVfs,
   prettyDisplayParts,
   prettyDocumentation,
+  accessKey,
 } from "../../../utils/typescriptVfs";
 
 export function main(options: { filename?: string }) {
@@ -75,6 +76,10 @@ modules).\
       for (const entry of completions.entries) {
         if (entry.kind === "property") {
           keys.push(entry.name);
+        } else {
+          console.error(
+            `Did not understand '${entry.kind}' entry on GraphileConfig.Preset`,
+          );
         }
       }
     }
@@ -88,15 +93,6 @@ modules).\
     }
     keys.unshift(key);
   });
-
-  const accessKey = (key: string): string => {
-    // TODO: improve?
-    if (/^[A-Za-z0-9_]+$/.test(key)) {
-      return `.${key}`;
-    } else {
-      return `[${JSON.stringify(key)}]`;
-    }
-  };
 
   let later: Array<string | undefined> = [];
   function outLater(str?: string): void {

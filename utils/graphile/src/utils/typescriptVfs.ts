@@ -82,6 +82,9 @@ ${initialCode}`;
   return { env, FAKE_FILENAME, BASE_CONTENT, getCompletions, getQuickInfo };
 }
 
+/**
+ * @deprecated use prettyQuickInfoDisplayParts instead
+ */
 export function prettyDisplayParts(
   displayParts: ReadonlyArray<ts.SymbolDisplayPart> | undefined,
   trimUntil = ":",
@@ -106,6 +109,44 @@ export function prettyDisplayParts(
   return str.trim();
 }
 
+export function prettyQuickInfoDisplayParts(
+  quickInfo: ts.QuickInfo | undefined,
+  omitThis = true,
+): string {
+  if (!quickInfo || !quickInfo.displayParts) {
+    return "";
+  }
+  const fullText = quickInfo.displayParts.map((p) => p.text).join("");
+  function tidy(text: string): string {
+    const withoutThis = omitThis
+      ? text.replace(/this: [^,)]+(, |(?=[)]))/g, "")
+      : text;
+    return withoutThis.trim();
+  }
+  if (quickInfo.kind === "method") {
+    const secondBracket = fullText.indexOf("(", 1);
+    if (secondBracket < 0) {
+      throw new Error(
+        `Do not understand TypeScript displayParts(${quickInfo.kind}) format '${fullText}'`,
+      );
+    }
+    return tidy(fullText.substring(secondBracket));
+  } else if (quickInfo.kind === "property") {
+    const colon = fullText.indexOf("(", 1);
+    if (colon < 0) {
+      throw new Error(
+        `Do not understand TypeScript displayParts(${quickInfo.kind}) format '${fullText}'`,
+      );
+    }
+    return tidy(fullText.substring(colon));
+  } else {
+    console.error(
+      `Do not understand TypeScript displayParts(${quickInfo.kind}). '${fullText}'`,
+    );
+    return tidy(fullText);
+  }
+}
+
 export function prettyDocumentation(
   parts: ReadonlyArray<ts.SymbolDisplayPart> | undefined,
 ): string {
@@ -127,6 +168,14 @@ export function prettyDocumentation(
   }
   return text.trim();
 }
+export const accessKey = (key: string): string => {
+  // TODO: improve?
+  if (/^[A-Za-z0-9_]+$/.test(key)) {
+    return `.${key}`;
+  } else {
+    return `[${JSON.stringify(key)}]`;
+  }
+};
 
 /*
 debugger;

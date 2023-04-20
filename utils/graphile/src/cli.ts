@@ -1,6 +1,8 @@
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 
 import * as configCmd from "./commands/config/cli.js";
+import * as inflectionCmd from "./commands/inflection/cli.js";
+
 export function options(yargs: Argv) {
   return yargs
     .parserConfiguration({
@@ -16,6 +18,12 @@ export function options(yargs: Argv) {
       "Tools for helping with config",
       (yargs) => configCmd.options(yargs),
       configCmd.run,
+    )
+    .command(
+      "inflection",
+      "Tools for helping with inflection",
+      (yargs) => inflectionCmd.options(yargs),
+      inflectionCmd.run,
     )
     .demandCommand();
 }
