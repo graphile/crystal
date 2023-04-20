@@ -138,7 +138,7 @@ export function prettyQuickInfoDisplayParts(
         `Do not understand TypeScript displayParts(${quickInfo.kind}) format '${fullText}'`,
       );
     }
-    return tidy(fullText.substring(colon));
+    return ": " + tidy(fullText.substring(colon));
   } else {
     console.error(
       `Do not understand TypeScript displayParts(${quickInfo.kind}). '${fullText}'`,
@@ -168,6 +168,80 @@ export function prettyDocumentation(
   }
   return text.trim();
 }
+
+export function truncate(text: string, length = 80): string {
+  if (text.length < length) {
+    return text;
+  } else {
+    return text.substring(0, length - 1) + "…";
+  }
+}
+
+export function tightDocumentation(
+  info: ts.QuickInfo | undefined,
+  length = 60,
+) {
+  if (!info) return "";
+  return truncate(
+    prettyDocumentation(info.documentation).replace(/[\r\n]+/g, " "),
+    length,
+  );
+}
+
+function stripArgTypes(text: string): string {
+  let depth = -1;
+  let result = "";
+  for (let i = 0, l = text.length; i < l; i++) {
+    const char = text[i];
+    if (depth < 0) {
+      if (char === "(") {
+        depth++;
+      }
+      result += char;
+    } else if (depth === 0) {
+      if (char === ":") {
+        depth = 1;
+      } else if (char === ")") {
+        depth--;
+        result += char;
+      } else {
+        result += char;
+      }
+    } else {
+      if (depth === 1 && char === ",") {
+        depth--;
+        if (text[i + 1] === " ") {
+          i += 1;
+        }
+      } else if (depth === 1 && char === ")") {
+        depth--;
+        depth--;
+        result += char;
+      } else {
+        if (char === "<" || char === "(" || char === "[") {
+          depth++;
+        } else if (char === ">" || char === ")" || char === "]") {
+          depth--;
+        }
+      }
+    }
+  }
+  return result;
+}
+
+export function tightDisplayParts(info: ts.QuickInfo | undefined, length = 60) {
+  if (!info) return "";
+  if (info.kind === "method" || info.kind === "property") {
+    const text = prettyQuickInfoDisplayParts(info);
+    const withoutArgTypes = stripArgTypes(text);
+    return truncate(withoutArgTypes, length);
+  } else {
+    throw new Error(
+      `Don't know how to print tightDisplayParts for ${info.kind}`,
+    );
+  }
+}
+
 export const accessKey = (key: string): string => {
   // TODO: improve?
   if (/^[A-Za-z0-9_]+$/.test(key)) {

@@ -4,6 +4,8 @@ import {
   configVfs,
   prettyDocumentation,
   prettyQuickInfoDisplayParts,
+  tightDisplayParts,
+  tightDocumentation,
 } from "../../../utils/typescriptVfs";
 
 export function main(options: { filename?: string }) {
@@ -53,12 +55,25 @@ on the plugins and presets you use. You should regenerate it from time to time
     later.push(str);
   }
   const entries: string[] = [];
+  const INDENT = 2;
   for (const entry of completions) {
     const key = entry.name;
     const withProperty = accessKey(key);
     const info = getQuickInfo(withProperty);
+    //entries.push(
+    //  `${chalk.cyanBright(key)}${prettyQuickInfoDisplayParts(info)};`,
+    //);
+    const doc = tightDocumentation(info, 80 - INDENT - 7);
     entries.push(
-      `${chalk.cyanBright(key)}${prettyQuickInfoDisplayParts(info)};`,
+      `${
+        doc
+          ? chalk.gray(`/** ${doc} */
+`)
+          : ``
+      }${chalk.cyanBright(key)}${tightDisplayParts(
+        info,
+        80 - INDENT - key.length,
+      )}`,
     );
 
     outLater(chalk.whiteBright.bold(`## ${chalk.cyanBright.bold(key)}`));
@@ -69,9 +84,9 @@ on the plugins and presets you use. You should regenerate it from time to time
 
   if (entries.length) {
     out("```ts");
-    out(`{`);
+    out(chalk.cyanBright(`interface GraphileBuild.Inflection`) + ` {`);
     for (const entry of entries) {
-      out("  " + entry);
+      out("  " + entry.replace(/\n/g, "\n  "));
     }
     out("}");
     out("```");
