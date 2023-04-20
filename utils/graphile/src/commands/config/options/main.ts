@@ -1,10 +1,11 @@
 import chalk from "chalk";
+
 import {
+  accessKey,
   configVfs,
   prettyDisplayParts,
   prettyDocumentation,
-  accessKey,
-} from "../../../utils/typescriptVfs";
+} from "../../../utils/typescriptVfs.js";
 
 export function main(options: { filename?: string }) {
   const { filename } = options;
