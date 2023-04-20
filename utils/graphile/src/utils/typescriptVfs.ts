@@ -210,9 +210,7 @@ function stripArgTypes(text: string): string {
     } else {
       if (depth === 1 && char === ",") {
         depth--;
-        if (text[i + 1] === " ") {
-          i += 1;
-        }
+        result += char;
       } else if (depth === 1 && char === ")") {
         depth--;
         depth--;
