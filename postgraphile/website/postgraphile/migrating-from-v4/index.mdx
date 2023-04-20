@@ -619,13 +619,15 @@ graph TD;
   grafserv-->grafast;
   graphile-build-->grafast;
   graphile-build-pg-->grafast;
+  dataplan__pg-->grafast;
+  dataplan__json-->grafast;
   %% graphile;
   %% graphile-export;
   %% eslint-plugin-graphile-export;
-  graphile-build-pg-->pg-introspection;
-  graphile-build-pg-->pg-sql2;
   graphile-build-pg-->dataplan__pg["@dataplan/pg"];
   graphile-build-pg-->dataplan__json["@dataplan/json"];
+  graphile-build-pg-->pg-introspection;
+  graphile-build-pg-->pg-sql2;
 `}
 ></Mermaid>
 
