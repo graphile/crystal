@@ -13,7 +13,7 @@ apply will depend on what shape your data is.
 :::tip
 
 Under the hood, PostGraphile polymorphism is powered by
-[@dataplan/pg-polymorphism](https://grafast.org/grafast/step-library/dataplan-pg/polymorphism);
+[@dataplan/pg's polymorphism](https://grafast.org/grafast/step-library/dataplan-pg/polymorphism);
 some restrictions may apply to what PostGraphile generates for polymorphic
 types and fields based on what `@dataplan/pg` supports.
 
