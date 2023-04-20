@@ -1,5 +1,15 @@
 # graphile
 
+## 5.0.0-1.2
+
+### Patch Changes
+
+- [#291](https://github.com/benjie/postgraphile-private/pull/291)
+  [`611f00140`](https://github.com/benjie/postgraphile-private/commit/611f00140d7f5b0620e274fc21869ec82055e080)
+  Thanks [@benjie](https://github.com/benjie)! - New `graphile inflection list`
+  command to list the available inflectors (and their docs/types) based on your
+  plugins and presets.
+
 ## 5.0.0-1.1
 
 ### Patch Changes
