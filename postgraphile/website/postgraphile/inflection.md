@@ -9,10 +9,15 @@ schema. "Inflection" is the system of naming things; it's composed of a large
 set of named functions, and we call each of these inflection functions an
 "inflector."
 
-In GraphQL types typically use `PascalCase`; fields, arguments and directives
-typically use `camelCase`; and enum values typically use `CONSTANT_CASE`. The
-default inflectors attempt to map things to natural names in GraphQL whilst
-avoiding naming conflicts. For example:
+The inflectors that you have available will depend on the plugins and presets
+you're using, to get a list of the inflectors available to you, install the
+`graphile` package and run `yarn graphile inflection list` (or equivalent for
+other package managers).
+
+In GraphQL types typically use singular `UpperCamelCase` (`PascalCase`);
+fields, arguments and directives typically use `camelCase`; and enum values
+typically use `CONSTANT_CASE`. The default inflectors attempt to map things to
+natural names in GraphQL whilst avoiding naming conflicts. For example:
 
 - Table names are singularized and changed to UpperCamelCase: `pending_users` →
   `PendingUser`
@@ -86,3 +91,24 @@ postgraphile --append-plugins @graphile/simplify-inflection
 ```
 
 I, Benjie, prefer to use this plugin in all my projects.
+
+## Listing available inflectors
+
+```bash npm2yarn
+npm install --save-dev graphile
+npx graphile inflection list
+```
+
+<figure>
+
+![Initial output of the `graphile inflection list` command](./graphile-inflection-list-1.png)
+
+<figcaption>Screenshot showing the initial output of the <code>graphile inflection list</code> command, including a summary of the available inflectors and their arguments.</figcaption>
+</figure>
+
+<figure>
+
+![More detailed output from later in the `graphile inflection list` command](./graphile-inflection-list-2.png)
+
+<figcaption>Screenshot from lower down in the output of the <code>graphile inflection list</code> command, detailing each inflector, its documentation and its rough TypeScript definition.</figcaption>
+</figure>
