@@ -80,6 +80,10 @@ on the plugins and presets you use. You should regenerate it from time to time
     outLater();
     outLater(prettyDocumentation(info?.documentation));
     outLater();
+    outLater("```ts");
+    outLater(key + prettyQuickInfoDisplayParts(info));
+    outLater("```");
+    outLater();
   }
 
   if (entries.length) {
