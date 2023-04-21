@@ -17,6 +17,7 @@ const {
 const { makeDataLoaders } = require("./dataloaders");
 const { userById, friendshipsByUserId } = require("./plans");
 const fsp = require("node:fs/promises");
+const { resolvePresets } = require("graphile-config");
 
 // Benchmark settings
 const NUMBER_OF_REQUESTS = 10000;
@@ -138,6 +139,7 @@ async function runGraphQL() {
 }
 
 const baseContext = { currentUserId: 1 };
+const resolvedPreset = resolvePresets([{}]);
 async function runGrafastWithGraphQLSchema() {
   const result = await grafastExecute(
     {
@@ -145,7 +147,7 @@ async function runGrafastWithGraphQLSchema() {
       document,
       contextValue: { ...baseContext, ...makeDataLoaders() },
     },
-    {},
+    resolvedPreset,
     asString,
   );
   return stringifyPayload(result, asString);
@@ -158,7 +160,7 @@ async function runGrafast() {
       document,
       contextValue: baseContext,
     },
-    {},
+    resolvedPreset,
     asString,
   );
   return stringifyPayload(result, asString);
@@ -215,7 +217,6 @@ async function benchmark(callback) {
 }
 
 async function runCompare() {
-  console.log("GRAPHQL");
   const graphqlResult = await graphql({
     schema: schemaDL,
     source,
@@ -224,44 +225,80 @@ async function runCompare() {
       ...makeDataLoaders(),
     },
   });
-  console.dir(graphqlResult, { depth: Infinity });
-
-  console.log("GRAFAST");
   const grafastResult = await grafast({
     schema: schemaGF,
     source,
     contextValue: baseContext,
   });
+  const grafastResolversResult = await grafast({
+    schema: schemaDL,
+    source,
+    contextValue: {
+      ...baseContext,
+      ...makeDataLoaders(),
+    },
+  });
+  console.log("GRAPHQL");
+  console.dir(graphqlResult, { depth: Infinity });
+
+  console.log("GRAFAST");
   console.dir(grafastResult, { depth: Infinity });
 
-  console.log(
-    "Same?",
-    JSON.stringify(graphqlResult) === JSON.stringify(grafastResult),
-  );
+  console.log("GRAFAST (RESOLVERS)");
+  console.dir(grafastResolversResult, { depth: Infinity });
 
-  console.log("GRAFAST AGAIN");
-  const grafastResultWithPlan = await grafast(
-    {
-      schema: schemaGF,
-      source,
-      contextValue: baseContext,
-    },
-    { grafast: { explain: ["mermaid-js"] } },
-  );
-  await fsp.writeFile(
-    `${__dirname}/plan.mermaid`,
-    grafastResultWithPlan.extensions.explain.operations[0].diagram,
-  );
+  const same =
+    JSON.stringify(graphqlResult) === JSON.stringify(grafastResult) &&
+    JSON.stringify(graphqlResult) === JSON.stringify(grafastResolversResult);
+
+  if (!same) {
+    console.error("Results do not match!");
+    process.exit(1);
+  } else {
+    console.error("All results match");
+  }
 }
 
 async function main() {
   switch (process.argv[2]) {
-    case "graphql":
+    case "docs": {
+      console.log("Generating query plan for documentation");
+      const grafastResultWithPlan = await grafast(
+        {
+          schema: schemaGF,
+          source: /* GraphQL */ `
+            {
+              currentUser {
+                name
+                friends {
+                  name
+                }
+              }
+            }
+          `,
+          contextValue: baseContext,
+        },
+        { grafast: { explain: ["mermaid-js"] } },
+      );
+      await fsp.writeFile(
+        `${__dirname}/plan.mermaid`,
+        grafastResultWithPlan.extensions.explain.operations[0].diagram,
+      );
+      console.log("... query plan written successfully");
+      return;
+    }
+    case "graphql": {
+      console.log("Benchmarking GraphQL.js");
       return benchmark(runGraphQL);
-    case "grafast":
+    }
+    case "grafast": {
+      console.log("Benchmarking Grafast");
       return benchmark(runGrafast);
-    case "grafast-resolvers":
+    }
+    case "grafast-resolvers": {
+      console.log("Benchmarking Grafast with resolvers");
       return benchmark(runGrafastWithGraphQLSchema);
+    }
     default: {
       return runCompare();
     }
