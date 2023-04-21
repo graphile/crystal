@@ -16,9 +16,7 @@ flowchart TD
     LoadOne8[["LoadOne[8∈0]<br />ᐸuserByIdᐳ"]]:::plan
     Access10{{"Access[10∈1]<br />ᐸ8.idᐳ"}}:::plan
     LoadMany11[["LoadMany[11∈1]<br />ᐸfriendshipsByUserIdᐳ"]]:::plan
-    __ListTransform12[["__ListTransform[12∈1]<br />ᐸeach:11ᐳ"]]:::plan
-    __Item13[/"__Item[13∈2]<br />ᐸ11ᐳ"\]:::itemplan
-    __Item15[/"__Item[15∈3]<br />ᐸ12ᐳ"\]:::itemplan
+    __Item15[/"__Item[15∈3]<br />ᐸ11ᐳ"\]:::itemplan
     Access17{{"Access[17∈3]<br />ᐸ15.friend_idᐳ"}}:::plan
     LoadOne18[["LoadOne[18∈3]<br />ᐸuserByIdᐳ"]]:::plan
 
@@ -27,27 +25,22 @@ flowchart TD
     Access7 --> LoadOne8
     LoadOne8 --> Access10
     Access10 --> LoadMany11
-    LoadMany11 --> __ListTransform12
-    LoadMany11 -.-> __Item13
-    __ListTransform12 ==> __Item15
+    LoadMany11 ==> __Item15
     __Item15 --> Access17
     Access17 --> LoadOne18
 
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[7]<br />2: LoadOne[8]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,Access7,LoadOne8 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8<br /><br />ROOT LoadOneᐸuserByIdᐳ[8]<br />1: <br />ᐳ: Access[10]<br />2: LoadMany[11]<br />3: __ListTransform[12]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8<br /><br />ROOT LoadOneᐸuserByIdᐳ[8]<br />1: <br />ᐳ: Access[10]<br />2: LoadMany[11]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access10,LoadMany11,__ListTransform12 bucket1
-    Bucket2("Bucket 2 (subroutine)<br />ROOT __Item{2}ᐸ11ᐳ[13]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item13 bucket2
-    Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ12ᐳ[15]<br />1: <br />ᐳ: Access[17]<br />2: LoadOne[18]"):::bucket
+    class Bucket1,Access10,LoadMany11 bucket1
+    Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ11ᐳ[15]<br />1: <br />ᐳ: Access[17]<br />2: LoadOne[18]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item15,Access17,LoadOne18 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18<br /><br />ROOT LoadOne{3}ᐸuserByIdᐳ[18]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     Bucket0 --> Bucket1
-    Bucket1 --> Bucket2 & Bucket3
+    Bucket1 --> Bucket3
     Bucket3 --> Bucket4
