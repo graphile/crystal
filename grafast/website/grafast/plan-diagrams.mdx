@@ -62,14 +62,16 @@ due to polymorphic filtering or excluding null results from further processing.
 
 Here's an example of a bucket node:
 
-<Mermaid chart={`
+<Mermaid
+  chart={`
 %%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 flowchart TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8<br /><br />ROOT LoadOneᐸuserByIdᐳ[8]<br />1: <br />ᐳ: Access[10]<br />2: LoadMany[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access10,LoadMany11 bucket1
-`} />
+`}
+/>
 
 ### First line (e.g. `Bucket 1 (nullableBoundary)`)
 
@@ -105,7 +107,6 @@ Immediately following a numbered line, there may be a line that begins with
 "ᐳ:". This indicates the "synchronous and safe" unbatched steps that will be
 executed immediately after the numbered line - this is an optimization that
 means the system doesn't need to loop multiple times to satisfy these needs.
-
 
 ## Steps
 
@@ -150,7 +151,6 @@ ${init}
 `}
 />
 
-
 These appear very similar to synchronous steps, except that they have a double
 border on the left and right. The key difference with these steps, and why they
 render more prominently, is that this is typically where your work will take
@@ -169,7 +169,6 @@ ${init}
     class __Item15 bucket3
 `}
 />
-
 
 `__ItemStep` steps never execute, they're managed by <grafast /> manually to
 represent individual entries in a list or stream (including subscription event
@@ -192,7 +191,6 @@ confers no benefit from batching. This allows the system to calculate their
 values alongside their dependencies without having to loop multiple times.
 Typically they're used for trivial operations such as accessing a named
 property from an object or accessing the first/last entry in a list.
-
 
 ## How to see a request's plan diagram
 
