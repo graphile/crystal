@@ -1887,6 +1887,21 @@ ${te.join(
             }
           }
         }
+        // PERF: we should calculate this _once only_ rather than for every step!
+        const childLayerPlans =
+          this.stepTracker.layerPlansByParentStep.get(step);
+        const subroutineLayerPlans =
+          childLayerPlans && childLayerPlans.size > 0
+            ? [...childLayerPlans].filter((l) => l.reason.type === "subroutine")
+            : null;
+        if (subroutineLayerPlans !== null && subroutineLayerPlans.length > 0) {
+          for (const subroutineLayerPlan of subroutineLayerPlans) {
+            const $root = subroutineLayerPlan.rootStep;
+            if ($root) {
+              processStep($root);
+            }
+          }
+        }
       } else {
         for (const $processFirst of step.dependencies) {
           if ($processFirst.id >= fromStepId && !processed.has($processFirst)) {

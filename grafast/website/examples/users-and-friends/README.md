@@ -22,8 +22,7 @@ resolvers and plan resolvers, so we've attempted to create a clean separation:
 ## `node index.js`
 
 Running this will run the example query through the GraphQL.js schema and the
-Grafast schema, will ensure that the stringified data matches, and will output
-the Grafast plan to [./plan.mermaid](./plan.mermaid).
+Grafast schema, and will ensure that the stringified data matches.
 
 ## Benchmarks
 
@@ -58,3 +57,8 @@ GraphQL's execute / schemaDL: 7180ms
 Grafast's execute / schemaDL: 6551ms
 Grafast's execute / schemaGF: 5072ms
 ```
+
+## `node index.js docs`
+
+Runs a simplified query via Grafast and writes the plan to
+[./plan.mermaid](./plan.mermaid).
