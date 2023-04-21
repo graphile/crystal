@@ -35,19 +35,29 @@ logic layer - any valid GraphQL schema could be implemented with <grafast />,
 and a <grafast /> schema can query any data source, service, or business logic
 that Node.js can query.
 
+:::info
+
+Currently <grafast /> is implemented in TypeScript, but we're working on a
+specification with hopes to extend <grafast />'s execution approach to other
+programming languages. If you're interested in implementing <grafast />'s
+execution algorithm in a language other than JavaScript, please get in touch!
+
+:::
+
 ## Planning
 
 _This is just an overview, for full documentation see
 [Plan Resolvers](./plan-resolvers)._
 
-Where in a traditional GraphQL schema you would add a resolver, in a <grafast
-/> schema you would instead add a
-[**plan&nbsp;resolver**](/grafast/plan-resolvers). These plan resolvers are
+In a traditional GraphQL schema each field has a resolver. In a <grafast />
+schema, though resolvers are still supported, you are encourage to instead use
+[**plan&nbsp;resolvers**](/grafast/plan-resolvers). These plan resolvers are
 generally small functions, like regular resolvers should be, but instead of
-being called many times and dealing with concrete runtime values, they are
-called only once at planning time and they build and manipulate **steps** which
-are the building blocks of an [**execution
-plan**](/grafast/operation-plan#execution-plan).
+being called many times during execution and dealing with concrete runtime
+values, they are called only once at planning time and they build and
+manipulate **steps** which are the building blocks of an [**execution
+plan**](/grafast/operation-plan#execution-plan) which details all the actions
+necessary to satisfy the GraphQL request.
 
 Imagine that we have this GraphQL schema:
 
@@ -114,11 +124,11 @@ const planResolvers = {
 
 As you can see, the shape of the logic is quite similar, but the <grafast />
 plan resolvers are synchronous since their job isn't to get the data to use,
-but instead to outline the steps required to get the data. As the `friends`
-Gra*fast* plan resolver cannot explicitly loop through the data (it hasn't
-been fetched yet!), it uses an
-[`each` step](/grafast/step-library/standard-steps/each) to detail which steps
-to take for each item made available later.
+but instead to outline the steps required to get the data. For example, since
+the `User.friends` Gra*fast* plan resolver cannot explicitly loop through the
+data (it hasn't been fetched yet!), it uses an [`each`
+step](/grafast/step-library/standard-steps/each) to detail which steps to take
+for each item made available later.
 
 :::tip
 
@@ -158,22 +168,23 @@ For more information about understanding plan diagrams please see
 
 :::
 
-Creating an operation plan should only happen once for each new GraphQL
-operation that's seen, when the same operation is seen again its existing plan
-can (generally) be reused.
+When the same operation is seen again its existing plan can (generally) be
+reused, this is why to get the very best performance from <grafast /> you
+should use static GraphQL documents and pass variables at run-time.
 
 The [**execution plan**](/grafast/operation-plan#execution-plan) diagram you
 see above is the final form of the plan, there were many intermediate states
 that it will have gone through in order to reach this most optimal form, made
-possible by Grafast's plan lifecycle.
+possible by <grafast />'s plan lifecycle.
 
 ## Plan lifecycle
 
 _This is just an overview, for full documentation see [lifecycle][lifecycle]._
 
 All plan lifecycle methods are optional, and due to the always-batched nature
-of <grafast /> plans you can get good performance without using any of them.
-However, if you leverage them, your performance can go from "good" to
+of <grafast /> plans you can get good performance without using any of them
+(performance generally on a par with reliable usage of DataLoader). However, if
+you leverage lifecycle methods your performance can go from "good" to
 :sparkles:**_amazing_**:rocket:.
 
 One of the great things about <grafast />'s design is that you don't need to
@@ -199,13 +210,15 @@ replace the new step, thereby reducing the number of steps in the plan.
 data that will be needed. This should not change the observed behavior of the
 ancestor (e.g. you should not use it to apply filters to an ancestor!) but it
 can be used to ask the ancestor to fetch additional data. This method can also
-be used to replace the step with an alternative (presumably more-optimal) step.
+be used to replace the step being optimized with an alternative (presumably
+more-optimal) step.
 
 In the "friends" example above, this was used to change the DataLoader-style
 `select * from ...` query to a more optimal `select id, full_name from ...`
 query. In more advanced plans (for example those made available through
 [@dataplan/pg][]), optimize can go much further, for example inlining its data
-requirements into a parent and replacing itself with a simple "mapper" function.
+requirements into a parent and replacing itself with a simple "remap keys"
+function.
 
 ### Finalize
 
