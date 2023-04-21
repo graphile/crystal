@@ -6,19 +6,27 @@ sidebar_position: 4
 
 The most common use of a GraphQL schema is via an HTTP API. Serving a <grafast />
 schema over HTTP is very much the same as serving a regular GraphQL schema over
-HTTP, the main difference is that you should use Grafast's `execute`/`grafast`
+HTTP, the main difference is that you should use <grafast />'s `execute`/`grafast`
 function to execute requests rather than graphql-js' `execute`/`graphql`
-function, though it's also really important to memoize the parsing of documents
-to ensure that the same operation plan can be used again in future requests.
+function, though it's also really important to memoize the parsing (and ideally
+validation) of documents to ensure that the same operation plan can be used
+again in future requests.
 
 You can use any GraphQL server that allows you to substitute the `execute`
-method with Grafast's; we have our native [Grafserv][] server, or if you don't
-need the absolute best possible performance you can use any of the GraphQL
-servers that Envelop supports with our `useGrafast` envelop plugin.
+method with <grafast />'s; we have our native [Grafserv][] server, or you can
+use any of the GraphQL servers that Envelop supports with our `useGrafast`
+envelop plugin.
+
+:::note
+
+If you maintain a GraphQL server in JavaScript/TypeScript and you want to
+add <grafast /> support, don't hesitate to get in touch!
+
+:::
 
 ## Grafserv
 
-[Grafserv][] is Grafast's companion server; it's probably the fastest
+[Grafserv][] is <grafast />'s companion server; it's probably the fastest
 general-purpose GraphQL server available in Node.js, but due to its youth it
 doesn't yet have the large ecosystem of extensions that other servers have.
 Grafserv automatically implements all optimisations that we could think of for
@@ -31,7 +39,7 @@ Read more in [Grafserv's documentation][grafserv].
 
 [Envelop][] is an excellent plugin system written by the fine folks at [The
 Guild][]; it can be used with most major GraphQL servers in Node.js (and some in
-other environments!) so is a great way of integrating Grafast into an existing
+other environments!) so is a great way of integrating <grafast /> into an existing
 project. We bundle a `useGrafast()` envelop plugin which you can use alongside
 `useParserCache()` to get an optimized execution pipeline very easily, here's
 part of an example:

@@ -10,37 +10,36 @@ sidebar_position: 2
 for building the schema, and parsing and validating requests. So the first thing
 you need to do to get started is to install `grafast` and `graphql`:
 
-```
-yarn install grafast graphql
-```
-
-or with `npm`:
-
-```
+```bash npm2yarn
 npm install --save grafast graphql
 ```
 
-Other package managers are available :wink:
-
 :::note
 
-We intend to write up a specification so that other languages may implement the
-Grafast execution strategy, but for now Grafast is JavaScript/TypeScript only.
+We intend to write up a specification so that other languages may implement
+the <grafast /> execution strategy, but for now <grafast /> is JavaScript/TypeScript only.
 
 :::
 
-If you have an existing GraphQL.js schema, you can run it through Grafast ─ see
+If you have an existing GraphQL.js schema, you can run it through <grafast /> ─ see
 [using with an existing schema](./existing-schema).
 
 ## My first plan
 
-Let's build a simple GraphQL schema powered by Grafast plans and query it.
+Let's build a simple GraphQL schema powered by <grafast /> plans and query it.
 
 :::info
 
 There are many ways to build a GraphQL schema, we're going to use the "schema
-first" approach in this example, but there's no reason that a Grafast schema
+first" approach in this example, but there's no reason that a <grafast /> schema
 couldn't be produced "code first" or "database first" or any other approach.
+
+:::
+
+:::tip
+
+We have a [playground](/playground/) you can use for experimenting with <grafast />
+without having to install any software.
 
 :::
 
@@ -78,7 +77,7 @@ const plans = {
 :::tip
 
 `lambda` is a bit of an escape hatch ─ it enables one-by-one processing of
-values rather than the batched processing that Grafast prefers for efficiency.
+values rather than the batched processing that <grafast /> prefers for efficiency.
 It can be handy as a utility function when batching would confer no benefit,
 but in general you should pick a [more suitable step][step library].
 
@@ -136,7 +135,7 @@ We could then [serve this schema over HTTP][servers] using a server such as
 ## My first step class
 
 The building blocks of an operation plan are "steps." Steps are instances of
-"step classes," and Grafast makes available a modest range of [standard steps][]
+"step classes," and <grafast /> makes available a modest range of [standard steps][]
 that you can use; but when these aren't enough you can write your own. Full
 details for doing so can be found in [Step classes][], but let's build ourselves
 a simple one now to replace the `lambda` usage above.
@@ -155,12 +154,13 @@ class AddStep extends ExecutableStep {
   }
 
   execute(count, [allA, allB]) {
-    // allA and allB are guaranteed to have the same length. We have to return
-    // a list with the same length as allA and allB, so in this case we can
-    // simply map:
-    return allA.map((a, i) => {
-      return a + allB[i];
-    );
+    const results = [];
+    // `allA` and `allB` have the same length, which is `count`, and the
+    // entries at the same index in each list relate to each other.
+    for (let i = 0; i < count; i++) {
+      results.push(allA[i] + allB[i]);
+    }
+    return results;
   }
 }
 ```
@@ -168,7 +168,8 @@ class AddStep extends ExecutableStep {
 By convention, we always define a function that calls our class so we don't see
 the `new` calls in our plan resolver functions. This makes them easier to read,
 but the layer of abstraction often allows us to do some minor manipulations
-before handing off to the class constructor.
+before handing off to the class constructor (and makes the APIs more
+future-proof).
 
 ```ts
 function add($a, $b) {
@@ -191,7 +192,7 @@ Now we can use this method to add our numbers, rather than the lambda plan:
  };
 ```
 
-You may well be able to write an entire Grafast schema using off-the-shelf step
+You may well be able to write an entire <grafast /> schema using off-the-shelf step
 classes, but it's worth being aware of how step classes work in case you want to
 push your optimizations further. [Read more about step classes][step classes],
 or continue through the documentation.

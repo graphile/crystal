@@ -14,69 +14,191 @@ flowchart TD
     classDef bucket0 stroke:#696969
     classDef bucket2 stroke:#7f007f
 `;
+import mermaidPlan from "../examples/users-and-friends/plan.mermaid?raw";
 
 # Plan diagrams
 
-TODO: add images and more detail
-
-## What they mean
-
-A plan diagram is a directed acyclic graph made of a number of step nodes
-connected by arrows which show the flow of data. It also details the LayerPlans
+A plan diagram is a directed acyclic graph made of a number of **step** nodes
+connected by arrows which show the flow of data. It also details the **LayerPlans**
 (aka "buckets") and the relationships between them.
 
-### Synchronous steps
+## Example
 
-A synchronous step is represented by a rectangle, something like:
+For the following GraphQL request:
+
+```graphql
+{
+  currentUser {
+    name
+    friends {
+      name
+    }
+  }
+}
+```
+
+You might see a plan diagram such as:
+
+<Mermaid chart={mermaidPlan} />
+
+This diagram has two main sections: the **steps**, and the **buckets**. We'll
+talk about the buckets first.
+
+:::note
+
+If you're able to convince mermaid to reliably render these two things on the
+same diagram in a more independent manner, please get in touch!
+
+:::
+
+## Buckets (aka layer plans)
+
+A bucket, or layer plan, is where data for steps at a similar "layer" in the
+operation go. For each layer, the cardinality is the same for every step -
+every step deals with the same number of results. Generally buckets are
+introduced where this may no longer be the case - for example when we start
+handling more results due to processing the items in a list, or fewer results
+due to polymorphic filtering or excluding null results from further processing.
+
+Here's an example of a bucket node:
 
 <Mermaid
-  chart={`\
-${init}
-    Access7["Access[7∈0]<br />ᐸ3.currentUserIdᐳ"]:::plan
-    class Access7 bucket0
+  chart={`
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+flowchart TD
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8<br /><br />ROOT LoadOneᐸuserByIdᐳ[8]<br />1: <br />ᐳ: Access[10]<br />2: LoadMany[11]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,Access10,LoadMany11 bucket1
 `}
 />
 
-`Access` is the name of the Step (but with the redundant 'Step' removed - truly it's called "AccessStep").
+### First line (e.g. `Bucket 1 (nullableBoundary)`)
 
-`7` is the step ID - every step has a unique identifier.
+The first line in the bucket node always start with the word `Bucket` followed by the bucket number.
+Buckets are numbered from `0`, but during the optimization of the operation
+plan the need for certain buckets may be eradicated, resulting in "gaps" in the
+numbering. Afterwards comes the reason for the bucket, in parenthesis: `root`,
+`nullableBoundary`, `listItem`, `subscription`, `mutationField`, `defer`,
+`polymorphic`, `subroutine` or other.
 
-`∈0` means that the step "belongs" to LayerPlan (aka "bucket") numbered `0`.
+### `Deps:`
 
-The next line contains additional step-specific metadata; in this case it's telling us that we're accessing the `currentUserId` property of the step with id `3`.
+A line starting with `Deps:` indicates the buckets "dependencies" - that is to
+say the data from the parent bucket that will be copied into this bucket when
+it is created, before execution of any of the steps within the bucket
+commences.
 
-### Asynchronous steps
+### `ROOT`
 
-These are identical to synchronous steps, except that they have a double border on the left and right (and the run asynchronously):
+A line starting with `ROOT` indicates the step that represents the "root" of
+the bucket, this is often used for checking for nulls/errors and similar
+purposes.
+
+### `1:`
+
+Lines beginning with a number indicate the order in which the steps will be
+executed in that bucket. Numbered lines with multiple steps listed will execute
+those steps in parallel since they are independent of each other.
+
+### `ᐳ:`
+
+Immediately following a numbered line, there may be a line that begins with
+"ᐳ:". This indicates the "synchronous and safe" unbatched steps that will be
+executed immediately after the numbered line - this is an optimization that
+means the system doesn't need to loop multiple times to satisfy these needs.
+
+## Steps
+
+Generally when looking at a plan diagram, you care more about the steps than
+the buckets. Each step contains a first line that consists of the step class
+name with `Step` removed (for brevity), followed by `[X∈Y]` where X is the id
+of the step, and Y is the number of the bucket to which it belongs - the latter
+of which is also indicated by the border colour of the step.
+
+Often steps will have a second line of text such as `ᐸ3.currentUserIdᐳ` - this
+is metadata specific to that particular step class that gives more detail on
+what this step is doing.
+
+The shape of the step's border also reveals more details about the step:
+
+### Standard synchronous steps
 
 <Mermaid
   chart={`\
 ${init}
-    LoadOne18[["LoadOne[18∈2]<br />ᐸuserByIdᐳ"]]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    class __Value5 bucket0
+`}
+/>
+
+A standard synchronous step is represented by a simple rectangle.
+
+In this example:
+
+- `__Value` is the name of the Step (but with the redundant 'Step' removed - truly it's called `__ValueStep`).
+- `5` is the step ID - every step has a unique identifier.
+- `∈0` means that the step "belongs" to LayerPlan (aka "bucket") number `0`.
+- The next line contains additional step-specific metadata; in this case it's telling us that the step represents the GraphQL `rootValue`
+
+### Asynchronous steps
+
+<Mermaid
+  chart={`\
+${init}
+    LoadOne18[["LoadOne[18∈3]<br />ᐸuserByIdᐳ"]]:::plan
     class LoadOne18 bucket2
 `}
 />
 
-### Item steps
+These appear very similar to synchronous steps, except that they have a double
+border on the left and right. The key difference with these steps, and why they
+render more prominently, is that this is typically where your work will take
+place - they execute asynchronously, and so can communicate with remote
+services and resources.
 
-`__ItemStep` steps never execute, they're managed by <grafast /> manually to
-represent individual entries in a list or stream. They look something like
-this:
+All step classes you create will generate asynchronous steps unless you
+specifically opt them in to one of the optimized forms.
+
+### Item steps
 
 <Mermaid
   chart={`\
 ${init}
-    __Item15>"__Item[15∈2]<br />ᐸ11ᐳ"]:::itemplan
-    class __Item15 bucket2
+    __Item15[/"__Item[15∈3]<br />ᐸ11ᐳ"\\]:::itemplan
+    class __Item15 bucket3
 `}
 />
 
-## How to see them
+`__ItemStep` steps never execute, they're managed by <grafast /> manually to
+represent individual entries in a list or stream (including subscription event
+streams). They look like a trapezoid (US) / trapezium (UK) to imply that they
+are going from a smaller set to a larger set, though this isn't always the
+case.
 
-Your server must be configured to expose plans; if it is then you can use a
-tool such as [Ruru][] to view the operation plan, or you can render it directly
-from the JSON response. The diagrams are currently built in mermaid-js syntax,
-so you can load them into the [mermaid live editor][].
+### Unbatched synchronous steps
+
+<Mermaid
+  chart={`\
+${init}
+    Access17{{"Access[17∈3]<br />ᐸ15.friend_idᐳ"}}:::plan
+    class Access17 bucket3
+`}
+/>
+
+An unbatched synchronous step is a special variant of a synchronous step that
+confers no benefit from batching. This allows the system to calculate their
+values alongside their dependencies without having to loop multiple times.
+Typically they're used for trivial operations such as accessing a named
+property from an object or accessing the first/last entry in a list.
+
+## How to see a request's plan diagram
+
+Your server must be configured to expose plans for you to be able to see them;
+if it is then you can use a tool such as [Ruru][] to view the operation plan,
+or you can render it directly from the JSON response. The diagrams are
+currently built in mermaid-js syntax, so you can load them into the [mermaid
+live editor][].
 
 [ruru]: /ruru
 [mermaid live editor]: https://mermaid-js.github.io/mermaid-live-editor/edit

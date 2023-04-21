@@ -41,6 +41,8 @@ Replace any calls to graphql.js' `graphql` or `execute` functions with Grafast's
    source: ...
 ```
 
+## Cache parse and validation
+
 At this point you should be able to execute your GraphQL API as you previously
 did, but we're not yet as optimal as we could be. If you use `execute` directly
 then it's likely that you'll be planning each request every time, rather than
@@ -50,10 +52,10 @@ or use a server/framework that does this for you; see [Servers][].
 
 ## Replacing resolvers with plans
 
-&ZeroWidthSpace;<grafast /> automatically supports resolvers to help maintain
-compatibility with legacy schemas, but if you're ready to get the next level of
-performance you can replace the resolver with a plan on a field-by-field basis
-in a schema.
+&ZeroWidthSpace;<grafast /> automatically supports resolvers (with the
+"Requirements" mentioned above) to help maintain compatibility with legacy
+schemas, but if you're ready to get the next level of performance you can
+replace the resolver with a plan on a field-by-field basis in a schema.
 
 For more information, see [Plan Resolvers](../plan-resolvers).
 

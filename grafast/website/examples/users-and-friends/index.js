@@ -206,7 +206,7 @@ async function benchmark(callback) {
   const stop = process.hrtime.bigint();
 
   // Output
-  console.log(result);
+  console.log(result.replace(/\n/g, "").slice(0, 200));
   console.log(
     `Served ${NUMBER_OF_REQUESTS} requests, each producing the above. Took ${
       (stop - start) / 1000000n
@@ -262,23 +262,51 @@ async function runCompare() {
 async function main() {
   switch (process.argv[2]) {
     case "docs": {
-      console.log("Generating query plan for documentation");
-      // TODO: remove this, replace with explain options
-      global.grafastExplainMermaidSkipBuckets = true;
+      console.log("Generating query plans for documentation");
+
+      // Simplified query
+      const source = /* GraphQL */ `
+        {
+          currentUser {
+            name
+            friends {
+              name
+            }
+          }
+        }
+      `;
+
       const grafastResultWithPlan = await grafast(
         {
           schema: schemaGF,
           source,
           contextValue: baseContext,
         },
-        // TODO: something like { grafast: { explain: [{ "mermaid-js": { skipBuckets: true } }] } },
         { grafast: { explain: ["mermaid-js"] } },
       );
       await fsp.writeFile(
         `${__dirname}/plan.mermaid`,
         grafastResultWithPlan.extensions.explain.operations[0].diagram,
       );
-      console.log("... query plan written successfully");
+
+      // TODO: remove this, replace with explain options
+      global.grafastExplainMermaidSkipBuckets = true;
+      const grafastResultWithSimplifiedPlan = await grafast(
+        {
+          schema: schemaGF,
+          source: source + " ", // Force re-planning
+          contextValue: baseContext,
+        },
+        // TODO: something like { grafast: { explain: [{ "mermaid-js": { skipBuckets: true } }] } },
+        { grafast: { explain: ["mermaid-js"] } },
+      );
+      await fsp.writeFile(
+        `${__dirname}/plan-simplified.mermaid`,
+        grafastResultWithSimplifiedPlan.extensions.explain.operations[0]
+          .diagram,
+      );
+
+      console.log("... query plans written successfully");
       return;
     }
     case "graphql": {
