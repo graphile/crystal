@@ -1,4 +1,4 @@
-# map
+# remapKeys
 
 Returns an object resulting from extracting the given `actualKey` from the input
 and storing it as the `desiredKey` in the output.
@@ -6,12 +6,12 @@ and storing it as the `desiredKey` in the output.
 Usage:
 
 ```ts
-const $mapped = map(
+const $mapped = remapKeys(
   $original,
 
   // Take the `first_name` and `id` properties of the original object, and
   // return a new object where these are stored into the `name` and `row_id`
-  // properties respective.
+  // properties respectively.
   {
     name: "first_name",
     row_id: "id",
