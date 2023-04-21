@@ -19,6 +19,11 @@ flowchart TD
     __Item15[/"__Item[15∈3]<br />ᐸ11ᐳ"\]:::itemplan
     Access17{{"Access[17∈3]<br />ᐸ15.friend_idᐳ"}}:::plan
     LoadOne18[["LoadOne[18∈3]<br />ᐸuserByIdᐳ"]]:::plan
+    Access20{{"Access[20∈4]<br />ᐸ18.idᐳ"}}:::plan
+    LoadMany21[["LoadMany[21∈4]<br />ᐸfriendshipsByUserIdᐳ"]]:::plan
+    __Item25[/"__Item[25∈6]<br />ᐸ21ᐳ"\]:::itemplan
+    Access27{{"Access[27∈6]<br />ᐸ25.friend_idᐳ"}}:::plan
+    LoadOne28[["LoadOne[28∈6]<br />ᐸuserByIdᐳ"]]:::plan
 
     %% plan dependencies
     __Value3 --> Access7
@@ -28,6 +33,11 @@ flowchart TD
     LoadMany11 ==> __Item15
     __Item15 --> Access17
     Access17 --> LoadOne18
+    LoadOne18 --> Access20
+    Access20 --> LoadMany21
+    LoadMany21 ==> __Item25
+    __Item25 --> Access27
+    Access27 --> LoadOne28
 
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,Access7,LoadOne8 bucket0
@@ -36,4 +46,8 @@ flowchart TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item15,Access17,LoadOne18 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4 bucket4
+    class Bucket4,Access20,LoadMany21 bucket4
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,__Item25,Access27,LoadOne28 bucket6
+    classDef bucket7 stroke:#808000
+    class Bucket7 bucket7

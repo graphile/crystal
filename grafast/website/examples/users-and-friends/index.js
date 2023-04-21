@@ -268,16 +268,7 @@ async function main() {
       const grafastResultWithPlan = await grafast(
         {
           schema: schemaGF,
-          source: /* GraphQL */ `
-            {
-              currentUser {
-                name
-                friends {
-                  name
-                }
-              }
-            }
-          `,
+          source,
           contextValue: baseContext,
         },
         // TODO: something like { grafast: { explain: [{ "mermaid-js": { skipBuckets: true } }] } },
