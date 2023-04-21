@@ -74,6 +74,7 @@ export interface PrintPlanGraphOptions {
   printPathRelations?: boolean;
   includePaths?: boolean;
   concise?: boolean;
+  skipBuckets?: boolean;
 }
 
 /**
@@ -87,6 +88,7 @@ export function printPlanGraph(
   {
     // printPathRelations = false,
     concise = false,
+    skipBuckets = (global as any).grafastExplainMermaidSkipBuckets ?? false,
   }: PrintPlanGraphOptions,
   {
     steps,
@@ -251,23 +253,25 @@ export function printPlanGraph(
         ? `\n${layerPlan.reason.typeNames}`
         : ``);
     const outputMapStuff: string[] = [];
-    graph.push(
-      `    Bucket${layerPlan.id}(${mermaidEscape(
-        `Bucket ${layerPlan.id}${raisonDEtre}${
-          layerPlan.copyStepIds.length > 0
-            ? `\nDeps: ${layerPlan.copyStepIds
-                .map((pId) => steps[pId].id)
-                .join(", ")}\n`
-            : ""
-        }${pp(layerPlan.polymorphicPaths)}${
-          layerPlan.rootStep != null && layerPlan.reason.type !== "root"
-            ? `\nROOT ${operationPlan.dangerouslyGetStep(
-                layerPlan.rootStep.id,
-              )}`
-            : ""
-        }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
-      )}):::bucket`,
-    );
+    if (!skipBuckets) {
+      graph.push(
+        `    Bucket${layerPlan.id}(${mermaidEscape(
+          `Bucket ${layerPlan.id}${raisonDEtre}${
+            layerPlan.copyStepIds.length > 0
+              ? `\nDeps: ${layerPlan.copyStepIds
+                  .map((pId) => steps[pId].id)
+                  .join(", ")}\n`
+              : ""
+          }${pp(layerPlan.polymorphicPaths)}${
+            layerPlan.rootStep != null && layerPlan.reason.type !== "root"
+              ? `\nROOT ${operationPlan.dangerouslyGetStep(
+                  layerPlan.rootStep.id,
+                )}`
+              : ""
+          }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
+        )}):::bucket`,
+      );
+    }
     graph.push(
       `    classDef bucket${layerPlan.id} stroke:${color(layerPlan.id)}`,
     );
@@ -278,14 +282,20 @@ export function printPlanGraph(
       ].join(",")} bucket${layerPlan.id}`,
     );
   }
-  for (let i = 0, l = operationPlan.stepTracker.layerPlans.length; i < l; i++) {
-    const layerPlan = operationPlan.stepTracker.layerPlans[i];
-    if (!layerPlan || layerPlan.id !== i) {
-      continue;
-    }
-    const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
-    if (childNodes.length > 0) {
-      graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
+  if (!skipBuckets) {
+    for (
+      let i = 0, l = operationPlan.stepTracker.layerPlans.length;
+      i < l;
+      i++
+    ) {
+      const layerPlan = operationPlan.stepTracker.layerPlans[i];
+      if (!layerPlan || layerPlan.id !== i) {
+        continue;
+      }
+      const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
+      if (childNodes.length > 0) {
+        graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
+      }
     }
   }
   if (!concise) graph.push("    end");

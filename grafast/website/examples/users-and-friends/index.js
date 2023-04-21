@@ -263,6 +263,8 @@ async function main() {
   switch (process.argv[2]) {
     case "docs": {
       console.log("Generating query plan for documentation");
+      // TODO: remove this, replace with explain options
+      global.grafastExplainMermaidSkipBuckets = true;
       const grafastResultWithPlan = await grafast(
         {
           schema: schemaGF,
@@ -278,6 +280,7 @@ async function main() {
           `,
           contextValue: baseContext,
         },
+        // TODO: something like { grafast: { explain: [{ "mermaid-js": { skipBuckets: true } }] } },
         { grafast: { explain: ["mermaid-js"] } },
       );
       await fsp.writeFile(

@@ -29,18 +29,11 @@ flowchart TD
     __Item15 --> Access17
     Access17 --> LoadOne18
 
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[7]<br />2: LoadOne[8]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,Access7,LoadOne8 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8<br /><br />ROOT LoadOneᐸuserByIdᐳ[8]<br />1: <br />ᐳ: Access[10]<br />2: LoadMany[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access10,LoadMany11 bucket1
-    Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ11ᐳ[15]<br />1: <br />ᐳ: Access[17]<br />2: LoadOne[18]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item15,Access17,LoadOne18 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18<br /><br />ROOT LoadOne{3}ᐸuserByIdᐳ[18]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket3
-    Bucket3 --> Bucket4
