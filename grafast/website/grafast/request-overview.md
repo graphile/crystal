@@ -42,18 +42,18 @@ operation plan whose constraints fit the request. If there is one then this
 operation plan can be executed, otherwise a new operation plan is created (see
 previous paragraph).
 
-## Execute operation and output plan
+## Execute operation plan
 
 &ZeroWidthSpace;<grafast /> will populate the relevant system steps in the plan
 with the variables, context value, root value, etc and will then execute the
-plan, the execution flowing down through the operation plan's step graph,
+execution plan, the execution flowing down through the execution plan's step graph,
 executing each step exactly once (and sometimes in parallel with other steps)
 until all steps have been executed. Since each step is only executed once per
 request, the execution must process all of the data in a batch. Thus, it is fed
 a list of data from each of its dependencies, and it must return a
 corresponding list of data that its dependents may themselves consume.
 
-Once the operation plan has executed to completion, the values gathered are ran
+Once the execution plan has executed to completion, the values gathered are ran
 through the output plan to produce the output. Typically this is a JSON object,
 however for an optimization <grafast /> may optionally output stringified JSON
 instead without ever building the intermediary JavaScript objects.

@@ -5,7 +5,7 @@ sidebar_position: 5
 # Plan resolvers
 
 When planning a GraphQL operation, we combine the plans from every field
-requested in the operation into an operation plan that we then optimize. "Field
+requested in the operation into an execution plan that we then optimize. "Field
 plan resolvers" are the functions that detail the plan for each field (there
 can also be plan resolvers on arguments, input fields, and even enum values;
 but that's more advanced than most people need).

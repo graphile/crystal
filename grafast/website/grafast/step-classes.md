@@ -8,8 +8,8 @@ A step details a particular action or transform that needs to be performed when
 executing a GraphQL request. Each step is an instance of a specific _step
 class_, produced during the planning of a field. Each step may depend on 0 or
 more other steps, and through these dependencies ultimately form a directed
-acyclic graph which we refer to as the _operation plan_. Thus the steps are the
-building blocks of an operation plan.
+acyclic graph which we refer to as the _execution plan_. Thus the steps are the
+building blocks of an execution plan.
 
 A modest range of [standard step classes][standard steps] are available for you
 to use; but when these aren't enough you are encouraged to write your own (or
@@ -248,7 +248,7 @@ deduplicate(
 ```
 
 After a field has been fully planned, <grafast /> will call this method on each
-new step when more than one step exists in the draft operation plan with the
+new step when more than one step exists in the draft execution plan with the
 same step class and the same dependencies. These "peers" (including the step
 itself) will be passed in to the deduplicate method, and this method should
 return the list of the peers that are equivalent (or could cheaply be made
