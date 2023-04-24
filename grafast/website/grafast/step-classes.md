@@ -20,6 +20,21 @@ define is `execute`, but you may also implement the various lifecycle methods,
 or add methods of your own to make it easier for you to write [plan
 resolvers][].
 
+<!-- prettier-ignore -->
+```ts
+/** XKCD-221 step class @ref https://xkcd.com/221/ */
+class GetRandomNumberStep extends ExecutableStep {
+  execute(count) {
+    return new Array(count).fill(4); // chosen by fair dice roll.
+                                     // guaranteed to be random.
+  }
+}
+
+function getRandomNumber() {
+  return new GetRandomNumberStep();
+}
+```
+
 :::tip
 
 If you add any custom fields or methods to your step classes we recommend that
