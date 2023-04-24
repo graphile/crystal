@@ -48,8 +48,8 @@ represents an entry from the list or the concrete object type for polymorphism.
 ### Field arguments
 
 The second argument, the "field arguments" (`fieldArgs`), is an object with
-access methods to read the arguments. We'll expand on `FieldArgs` below because
-it's a little bit subtle.
+access methods to read the arguments. We'll expand on that below in the
+[FieldArgs](#fieldargs) section.
 
 ### Example
 
@@ -118,7 +118,7 @@ to allow the changes to stack up. This is particularly useful when building
 "patch" objects to be used with a mutation, or "filter" objects to be used
 against a collection.
 
-## `FieldArgs`
+## FieldArgs
 
 The `FieldArgs` object gives access to the arguments of a field (when used in a
 field plan resolver) or to the input fields of an input object (when used for
