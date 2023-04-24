@@ -4,24 +4,29 @@ sidebar_position: 5
 
 # Plan resolvers
 
-Each field in the schema may implement a synchronous `plan` method, called a
-"plan resolver." At operation planning time, each time this field is referenced
-the plan resolver may be called with Grafast passing the resulting step of the
-parent plan[^1] and a "field args" object. The plan resolver may create as many
-intermediate steps as it likes, but it must return exactly one step that its
-children may use (or, in the case of a leaf, that may be used by the output
-plan). Plan resolvers
+When planning a GraphQL operation, we combine the plans from every field
+requested in the operation into an operation plan that we then optimize. "Field
+plan resolvers" are the functions that detail the plan for each field (there
+can also be plan resolvers on arguments, input fields, and even enum values;
+but that's more advanced than most people need).
 
-[^1]:
-    The resulting step will be the returned step from the parent field when that
-    field has an object type, but when the field has a list or polymorphic type
-    the resulting step will likely differ.
+Plan resolvers are synchronous (they must not return promises) since they do
+not deal with actual runtime data, instead detailing the steps needed to
+process all possible data that will be seen at runtime.
+
+## Field plan resolvers
+
+At operation planning time, each time a field is referenced that field's plan
+resolver will be called and the result will be combined into the operation
+plan. When calling the field's resolver, <grafast /> will pass the "parent
+step" and a "field args" object. The plan resolver may create as many
+intermediate steps as it likes, but it must return exactly one step that
+represents the result of the field.
 
 In the case of a field that has a polymorphic type, the step that is returned
-must be a polymorphic-capable plan. (TODO: document polymorphism.)
-
-In the case of a field that has a list type, the step that is returned must
-produce lists when executed. (TODO: document listItem step class method.)
+must be a polymorphic-capable plan (see [polymorphism](./polymorphism.mdx)). In
+the case of a field that has a list type, the step that is returned must
+produce lists when executed.
 
 A plan resolver can be used instead of, or in addition to, a traditional
 resolver. Since plan resolvers run only when the operation is being planned, not
@@ -30,14 +35,23 @@ steps.
 
 Like regular resolvers, the first two arguments to a plan resolver represent the
 parent data and the arguments respectively. However, since we're dealing in
-potentials rather than concrete data, both of these are a little different.
+potentials rather than concrete data, both of these are a little different:
+
+### Parent step
 
 The first argument, the "parent step," is a step that represents the data from
-the parent. Note that if the parent field returned an array then the parent step
-will represent an item from this array, rather than the whole collection.
+the parent. When the parent field has an object type, the "parent step" is
+simply the step that the parent field resolved to. When the parent field has a
+list or polymorphic type, the "parent step" will be the resolved step that
+represents an entry from the list or the concrete object type for polymorphism.
 
-The second argument, the "field arguments," is an object with access methods to
-read the arguments. We'll expand on that below because it's a little bit subtle.
+### Field arguments
+
+The second argument, the "field arguments" (`fieldArgs`), is an object with
+access methods to read the arguments. We'll expand on `FieldArgs` below because
+it's a little bit subtle.
+
+### Example
 
 A plan resolver might look something like:
 
@@ -101,12 +115,14 @@ The `applyPlan` may either manipulate the target step directly, or it may return
 a ModifierStep which will gather changes and then apply them all at once. The
 ModifierStep is passed to child input fields `applyPlan` plan resolvers (if any)
 to allow the changes to stack up. This is particularly useful when building
-"patch" or objects to be used with a mutation, or "filter" objects to be used
+"patch" objects to be used with a mutation, or "filter" objects to be used
 against a collection.
 
-## Field arguments (`FieldArgs`)
+## `FieldArgs`
 
-The FieldArgs object gives access to field arguments. It contains three methods:
+The `FieldArgs` object gives access to the arguments of a field (when used in a
+field plan resolver) or to the input fields of an input object (when used for
+`applyPlan`/`inputPlan`) or similar for other inputs. It contains three methods:
 
 ### FieldArgs.get
 
