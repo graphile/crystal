@@ -169,7 +169,7 @@ For more information about understanding plan diagrams please see
 :::
 
 When the same operation is seen again its existing plan can (generally) be
-reused, this is why to get the very best performance from <grafast /> you
+reused; this is why, to get the very best performance from <grafast />, you
 should use static GraphQL documents and pass variables at run-time.
 
 The [**execution plan**](/grafast/operation-plan#execution-plan) diagram you
@@ -194,24 +194,35 @@ logic _or_ your plan resolvers!
 
 As a very approximate overview:
 
-- when a field is planned we **deduplicate** each new step
+- once a field is planned we **deduplicate** each new step
 - once the operation plan is complete, we **optimize** each step
 - finally, we **finalize** each step
 
 ### Deduplicate
 
-**Deduplicate** lets a step indicate which of its siblings (defined
-by <grafast />) are equivalent to it. One of these siblings can then, if possible,
-replace the new step, thereby reducing the number of steps in the plan.
+**Deduplicate** lets a step indicate which of its peers (defined by <grafast
+/>) are equivalent to it. One of these peers can then, if possible, replace the
+new step, thereby reducing the number of steps in the plan (and allowing more
+optimal code paths deeper in the plan tree).
 
 ### Optimize
 
-**Optimize** lets a step "talk" to its ancestors, typically to tell them about
-data that will be needed. This should not change the observed behavior of the
-ancestor (e.g. you should not use it to apply filters to an ancestor!) but it
-can be used to ask the ancestor to fetch additional data. This method can also
-be used to replace the step being optimized with an alternative (presumably
-more-optimal) step.
+**Optimize** serves two purposes.
+
+Purpose one is that optimize lets a step "talk" to its ancestors, typically to
+tell them about data that will be needed so that they may fetch it proactively.
+This should not change the observed behavior of the ancestor (e.g. you should
+not use it to apply filters to an ancestor - this may contradict the GraphQL
+specification!) but it can be used to ask the ancestor to fetch additional
+data.
+
+The second purpose is that optimize can be used to replace the step being
+optimized with an alternative (presumably more-optimal) step. This may result
+in multiple steps being dropped from the plan graph due to "tree shaking." This
+might be used when the step has told an ancestor to fetch additional data and
+the step can then replace itself with a simple "access" step. It can also be
+used to dispose of plan-only steps that have meaning at planning time but have
+no execution-time behaviors.
 
 In the "friends" example above, this was used to change the DataLoader-style
 `select * from ...` query to a more optimal `select id, full_name from ...`
@@ -224,9 +235,9 @@ function.
 
 **Finalize** is the final method called on a step, it gives the step a chance to
 do anything that it would generally only need to do once; for example a step
-that issues a GraphQL query might take this opportunity to build the GraphQL
-query string once. A step that converts a tuple into an object might build an
-optimized function to do so.
+that issues a GraphQL query to a remote server might take this opportunity to
+build the GraphQL query string once. A step that converts a tuple into an
+object might build an optimized function to do so.
 
 ## Further optimizations
 
@@ -234,8 +245,8 @@ optimized function to do so.
 steps, it also optimizes how your data is output once it has been determined.
 This means that even without making a single change to your existing GraphQL
 schema (i.e. without adopting plans), running it though <grafast /> rather than
-graphql-js should result in a modest speedup, and an even better one if you need
-to output your result as a string (e.g. over a network socket/HTTP).
+graphql-js should result in a modest speedup, especially if you need to output
+your result as a string (e.g. over a network socket/HTTP).
 
 ## Convinced?
 
