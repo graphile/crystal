@@ -439,6 +439,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   /* abstract */ execute(
     count: number,
     values: ReadonlyArray<GrafastValuesList<any>>,
+    // EXPERIMENTAL
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
     // ESLint/TS: ignore not used.

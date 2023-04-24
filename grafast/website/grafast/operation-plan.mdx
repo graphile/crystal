@@ -97,12 +97,12 @@ plans).
 ### Tree shake
 
 Once every selection set has been fully visited and every field has been
-planned, the operation plan is complete.
+planned, the execution plan is complete.
 
 &ZeroWidthSpace;<grafast /> then walks through the output plans, their required steps and those
 steps dependencies (and their dependencies and so on), marking them as active.
 Any step that is not active is "unreachable" and thus is no longer needed,
-therefore it can be be removed from the operation plan.
+therefore it can be be removed from the execution plan.
 
 Certain steps are immune to tree shaking (they're seen as always active), in
 particular these include certain system steps, and any step that has side
@@ -110,7 +110,7 @@ effects.
 
 ### Optimize
 
-Once the operation plan is complete and the unnecessary steps have been tree
+Once the execution plan is complete and the unnecessary steps have been tree
 shaken away, <grafast /> optimizes the plan by calling the `optimize` lifecycle
 method on each step that supports it. This gives each step a chance to replace
 themselves with more optimal forms by inspecting and interacting with their
@@ -127,13 +127,13 @@ operation.
 :::
 
 The optimize method is called starting with the dependencies (leaves) and
-working its way up the dependents (trunk) of the operation plan's directed
+working its way up the dependents (trunk) of the execution plan's directed
 acyclic graph. Since plans should only talk to their ancestors (and not their
 descendents) during optimize, this ensures that their dependencies remain what
 the class expects until after it is optimized.
 
 Once optimization is complete, <grafast /> tree shakes again to remove any
-unnecessary steps from the operation plan.
+unnecessary steps from the execution plan.
 
 ### Finalize
 

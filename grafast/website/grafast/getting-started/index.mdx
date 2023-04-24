@@ -65,9 +65,9 @@ const { lambda } = require("grafast");
 
 const plans = {
   Query: {
-    addTwoNumbers(_, args) {
-      const $a = args.get("a");
-      const $b = args.get("b");
+    addTwoNumbers(_, fieldArgs) {
+      const $a = fieldArgs.get("a");
+      const $b = fieldArgs.get("b");
       return lambda([$a, $b], ([a, b]) => a + b);
     },
   },
@@ -80,6 +80,15 @@ const plans = {
 values rather than the batched processing that <grafast /> prefers for efficiency.
 It can be handy as a utility function when batching would confer no benefit,
 but in general you should pick a [more suitable step][step library].
+
+:::
+
+:::tip
+
+Making the callback function to `lambda` a global (defined once) function
+would enable <grafast/> to potentially detect multiple uses of it and
+deduplicate them. This is important for performance if a similar lambda
+callback is used in lots of places in a query.
 
 :::
 
@@ -122,10 +131,11 @@ The result is what we'd expect:
 
 :::info
 
-Our schema is so simple the query could be ran synchronously with `grafastSync`,
-but most queries in the real world should be executed through `grafast` and will
-return a promise, or even an async iterable for `@stream`, `@defer`,
-subscriptions and similar!
+Our schema is so simple the query could be ran synchronously with
+`grafastSync(...)`, but most queries in the real world should be executed
+through `grafast(...)` and will return either the result, a promise to the
+result, or even an async iterable for `@stream`, `@defer`, subscriptions and
+similar!
 
 :::
 
@@ -136,12 +146,14 @@ We could then [serve this schema over HTTP][servers] using a server such as
 
 The building blocks of an operation plan are "steps." Steps are instances of
 "step classes," and <grafast /> makes available a modest range of [standard steps][]
-that you can use; but when these aren't enough you can write your own. Full
-details for doing so can be found in [Step classes][], but let's build ourselves
-a simple one now to replace the `lambda` usage above.
+that you can use; but when these aren't enough you can write your own.
+Step classes extend the `ExecutableStep` class. The only required method to
+define is `execute`, however most steps will also have a `constructor` in which
+they accept their arguments (some of which may be dependencies) and may also
+have the various lifecycle methods.
 
-Step classes extend the `ExecutableStep` class, the only required method to
-define is `execute`.
+Full details for doing so can be found in [Step classes][], but let's build
+ourselves a simple one now to replace the `lambda` usage above:
 
 ```ts
 const { ExecutableStep } = require("grafast");
@@ -155,21 +167,34 @@ class AddStep extends ExecutableStep {
 
   execute(count, [allA, allB]) {
     const results = [];
-    // `allA` and `allB` have the same length, which is `count`, and the
-    // entries at the same index in each list relate to each other.
     for (let i = 0; i < count; i++) {
-      results.push(allA[i] + allB[i]);
+      // `allA` and `allB` have the same length, which is `count`, and the
+      // entries at the same index in each list relate to each other.
+      const a = allA[i];
+      const b = allB[i];
+      results.push(a + b);
     }
     return results;
   }
 }
 ```
 
-By convention, we always define a function that calls our class so we don't see
-the `new` calls in our plan resolver functions. This makes them easier to read,
-but the layer of abstraction often allows us to do some minor manipulations
-before handing off to the class constructor (and makes the APIs more
-future-proof).
+:::tip
+
+The above example of `execute` is verbose to ease understanding, but could have
+leveraged the knowledge that there's exactly two dependencies and that the two
+lists have the same length in order to use a much more concise implementation:
+
+```ts
+  execute(count, [allA, allB]) {
+    return allA.map((a, i) => a + allB[i]);
+  }
+```
+
+:::
+
+By convention, we always define a function that constructs an instance of our
+class:
 
 ```ts
 function add($a, $b) {
@@ -177,7 +202,23 @@ function add($a, $b) {
 }
 ```
 
-Now we can use this method to add our numbers, rather than the lambda plan:
+:::note
+
+There's multiple reasons for this, a simple one is to make the plan code
+easier to read: we won't see the `new` calls in our plan resolver functions,
+nor the redundant `Step` wording, resulting in a higher signal-to-noise ratio.
+More importantly, though, is that the small layer of indirection allows us to
+do some minor manipulations before handing off to the class constructor, and
+makes the APIs more future-proof since we can have the function return
+something different in future without having to refactor our plans in the
+schema. And remember that this cost is only incurred at planning time (which is
+generally cached and can be re-used for similar future requests), and each
+field is only planned once, so the overhead of an additional function call is
+negligible.
+
+:::
+
+Now we can use this function to add our numbers, rather than the lambda plan:
 
 ```diff
  const plans = {

@@ -11,18 +11,21 @@ following hold:
 
 - Your resolvers are built into your schema as is the norm (not passed via `rootValue`)
 - If any of your resolvers use `GraphQLResolveInfo` (the 4th argument to the
-  resolver) then they must not rely on `path` since we can't currently populate
-  that in an equivalent fashion
+  resolver) then they must not rely on the `path` property since we can't
+  currently populate that in an equivalent fashion
 - `context` must be an object (anything suitable to be used as the key to a
   `WeakMap`); if you do not need a context then `{}` is perfectly acceptable
 - `rootValue`, if specified, must be an object or `null`/`undefined`
+
+(If you face any issues with your resolvers, please file an issue - it's
+possible that this list of constraints is not complete.)
 
 ## Installation
 
 Ensure that you have both the `graphql` and `grafast` modules installed:
 
 ```bash npm2yarn
-npm install grafast graphql
+npm install --save grafast graphql
 ```
 
 ## Running
@@ -44,11 +47,16 @@ Replace any calls to graphql.js' `graphql` or `execute` functions with Grafast's
 ## Cache parse and validation
 
 At this point you should be able to execute your GraphQL API as you previously
-did, but we're not yet as optimal as we could be. If you use `execute` directly
-then it's likely that you'll be planning each request every time, rather than
-reusing operation plans. To solve this, you should cache the parsing of the
-GraphQL request. You can either handle this yourself, use the `grafast` method,
-or use a server/framework that does this for you; see [Servers][].
+did, but unless you're using the `grafast` function we're not yet as optimal as
+we could be.
+
+Without further intervention, using `execute` directly makes it likely you'll
+be planning each request every time, rather than reusing operation plans. To
+solve this, you should cache the parsing of the GraphQL request so that when
+the same document is seen again the exact same parsed document AST will be
+passed to <grafast />. You can either handle this yourself, use the `grafast`
+function instead, or use a server/framework that does this for you; see
+[Servers][].
 
 ## Replacing resolvers with plans
 

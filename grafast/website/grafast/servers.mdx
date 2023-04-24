@@ -37,12 +37,12 @@ Read more in [Grafserv's documentation][grafserv].
 
 ## Envelop
 
-[Envelop][] is an excellent plugin system written by the fine folks at [The
-Guild][]; it can be used with most major GraphQL servers in Node.js (and some in
-other environments!) so is a great way of integrating <grafast /> into an existing
-project. We bundle a `useGrafast()` envelop plugin which you can use alongside
-`useParserCache()` to get an optimized execution pipeline very easily, here's
-part of an example:
+[Envelop][] is an excellent GraphQL runtime plugin system written by the fine
+folks at [The Guild][]; it can be used with most major GraphQL servers in
+Node.js (and some in other environments!) so is a great way of
+integrating <grafast /> into an existing project. We bundle a `useGrafast()`
+envelop plugin which you can use alongside `useParserCache()` to get an
+optimized execution pipeline very easily, here's a snippet:
 
 ```ts
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
@@ -57,10 +57,13 @@ const getEnveloped = envelop({
     // Caching the parser results is critical for Grafast, otherwise it
     // must re-plan every GraphQL request!
     useParserCache(),
+    // And we might as well cache validation whilst we're at it:
     useValidationCache(),
 
-    // Our context says how to communicate with Postgres
-    useExtendContext(() => contextValue),
+    // Pass your GraphQL context here:
+    useExtendContext(() => ({
+      /* ... */
+    })),
 
     // This replaces graphql-js' `execute` with Grafast's own
     useGrafast(),
