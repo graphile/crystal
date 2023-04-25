@@ -1,10 +1,4 @@
-import {
-  execute,
-  hookArgs,
-  isPromiseLike,
-  stripAnsi,
-  subscribe,
-} from "grafast";
+import { execute, hookArgs, stripAnsi, subscribe } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
@@ -13,8 +7,10 @@ import type {
 } from "graphql";
 import { GraphQLError } from "graphql";
 import type { ServerOptions } from "graphql-ws";
+import type { Extra } from "graphql-ws/lib/use/ws";
 import type { Readable } from "node:stream";
 
+import { getGrafservHooks } from "./hooks.js";
 import type { GrafservBase } from "./index.js";
 import type {
   GrafservBody,
@@ -24,8 +20,6 @@ import type {
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
-import { getGrafservHooks } from "./hooks.js";
-import { Extra } from "graphql-ws/lib/use/ws";
 import {
   makeParseAndValidateFunction,
   validateGraphQLBody,
@@ -176,8 +170,6 @@ export function httpError(
 ): Error & { statusCode: number } {
   return Object.assign(new Error(message), { statusCode, safeMessage: true });
 }
-
-const $$ws = Symbol("websocket-details");
 
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   const {

@@ -1,16 +1,16 @@
 import "graphile-config";
 
 import type { PromiseOrDirect } from "grafast";
+import type { PluginHook } from "graphile-config";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
   GraphQLError,
   GraphQLSchema,
 } from "graphql";
+import type { Context } from "graphql-ws";
 
 import type { OptionsFromConfig } from "./options";
-import { PluginHook } from "graphile-config";
-import { Context } from "graphql-ws";
 
 export type ContextCallback = (
   requestContext: Grafast.RequestContext,
@@ -141,7 +141,7 @@ declare global {
     }
 
     interface GrafservHooks {
-      init(event: {}): PromiseOrDirect<void>;
+      init(event: Record<string, never>): PromiseOrDirect<void>;
       processBody(event: ProcessBodyEvent): PromiseOrDirect<void>;
     }
   }

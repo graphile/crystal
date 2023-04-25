@@ -1,8 +1,8 @@
 export { GrafservBase } from "./core/base.js";
 export {
   GrafservConfig,
-  ParsedGraphQLBody,
-  ValidatedGraphQLBody,
   NormalizedRequestDigest,
+  ParsedGraphQLBody,
   ProcessBodyEvent,
+  ValidatedGraphQLBody,
 } from "./interfaces.js";

@@ -19,6 +19,7 @@ import {
 import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { makeAcceptMatcher } from "../accept.js";
+import { getGrafservHooks } from "../hooks.js";
 import type {
   GrafservBody,
   HandlerResult,
@@ -30,7 +31,6 @@ import type {
 import { $$normalizedHeaders } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 import { httpError } from "../utils.js";
-import { getGrafservHooks } from "../hooks.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
