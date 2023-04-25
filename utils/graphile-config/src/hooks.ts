@@ -1,3 +1,4 @@
+import { inspect } from "util";
 import type { PluginHook, PluginHookObject } from "./interfaces.js";
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
@@ -48,9 +49,9 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
         if (result != null) {
           if (isDev && typeof result.then !== "function") {
             throw new Error(
-              `Hook ${
-                event as string
-              } returned invalid value - must be 'undefined' or a Promise.`,
+              `Hook '${event as string}' returned invalid value '${inspect(
+                result,
+              )}' - must be 'undefined' or a Promise.`,
             );
           }
           chain = result;

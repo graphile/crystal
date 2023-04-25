@@ -91,7 +91,7 @@ declare global {
           args: ExecutionArgs;
           ctx: Grafast.RequestContext;
           resolvedPreset: GraphileConfig.ResolvedPreset;
-        }) => PromiseOrValue<ExecutionArgs>
+        }) => PromiseOrValue<void>
       >;
     }
     interface Plugin {

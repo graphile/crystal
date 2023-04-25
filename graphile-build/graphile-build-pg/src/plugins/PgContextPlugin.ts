@@ -66,7 +66,6 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
             );
           }
         }
-        return args;
       },
     },
   },
