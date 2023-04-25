@@ -52,6 +52,7 @@
     { "path": "utils/graphile" },
     { "path": "grafast/ruru-components" },
     { "path": "grafast/ruru" },
+    { "path": "grafast/persisted" },
     { "path": "postgraphile/postgraphile" }
   ]
 }
