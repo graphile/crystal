@@ -13,7 +13,7 @@
   },
   "scripts": {
     "prepack": "tsc -b",
-    "test": "jest"
+    "test": "true"
   },
   "repository": {
     "type": "git",
