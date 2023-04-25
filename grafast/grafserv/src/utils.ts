@@ -1,8 +1,15 @@
-import { execute, hookArgs, stripAnsi, subscribe } from "grafast";
+import {
+  execute,
+  hookArgs,
+  isPromiseLike,
+  stripAnsi,
+  subscribe,
+} from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionResult,
+  GraphQLSchema,
 } from "graphql";
 import { GraphQLError } from "graphql";
 import type { ServerOptions } from "graphql-ws";
@@ -13,9 +20,19 @@ import type {
   GrafservBody,
   JSONValue,
   NormalizedRequestDigest,
+  ParsedGraphQLBody,
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
+import { getGrafservHooks } from "./hooks.js";
+import { Extra } from "graphql-ws/lib/use/ws";
+import {
+  makeParseAndValidateFunction,
+  validateGraphQLBody,
+} from "./middleware/graphql.js";
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,
@@ -167,30 +184,68 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
     resolvedPreset,
     dynamicOptions: { maskExecutionResult },
   } = instance;
+
+  const hooks = getGrafservHooks(resolvedPreset);
+
+  let latestSchema: GraphQLSchema;
+  let latestSchemaPromise: PromiseLike<GraphQLSchema> | GraphQLSchema;
+  let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+
   return {
-    context(ctx, msg, args) {
-      const context = args.contextValue ?? Object.create(null);
-      const { connectionParams } = ctx;
-      const extra = ctx.extra as { request?: any; socket?: any } | undefined;
-      context[$$ws] = {
-        request: extra?.request,
-        socket: extra?.socket,
-        connectionParams,
-      };
-      return context;
-    },
-    schema: async () => instance.getSchema(),
-    // PERF: we can remove the async/await and only use when context is async
-    execute: async (args: ExecutionArgs) => {
-      await hookArgs(args, instance.resolvedPreset, {
-        ws: (args.contextValue as any)?.[$$ws],
+    async onSubscribe(ctx, message) {
+      // Get up to date schema, in case we're in watch mode
+      const schemaPromise = instance.getSchema();
+      if (schemaPromise !== latestSchemaPromise) {
+        const result = await Promise.race([
+          schemaPromise,
+          sleep(instance.dynamicOptions.schemaWaitTime),
+        ]);
+        if (result) {
+          latestSchema = result;
+          latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
+        } else {
+          // Handle missing schema
+          throw new Error(`Schema isn't ready`);
+        }
+      }
+      const schema = latestSchema;
+      const parseAndValidate = latestParseAndValidate;
+
+      const parsedBody = { ...message.payload } as ParsedGraphQLBody;
+      await hooks.process("processBody", {
+        body: parsedBody,
+        graphqlWsContext: ctx,
       });
+
+      const { query, operationName, variableValues } =
+        validateGraphQLBody(parsedBody);
+      const { errors, document } = parseAndValidate(query);
+      if (errors) {
+        return errors;
+      }
+      const args: ExecutionArgs = {
+        schema,
+        document,
+        rootValue: null,
+        contextValue: Object.create(null),
+        variableValues,
+        operationName,
+      };
+
+      await hookArgs(args, resolvedPreset, {
+        ws: {
+          request: (ctx.extra as Extra).request,
+          socket: (ctx.extra as Extra).socket,
+          connectionParams: ctx.connectionParams,
+        },
+      });
+
+      return args;
+    },
+    async execute(args: ExecutionArgs) {
       return maskExecutionResult(await execute(args, resolvedPreset));
     },
-    subscribe: async (args: ExecutionArgs) => {
-      await hookArgs(args, instance.resolvedPreset, {
-        ws: (args.contextValue as any)?.[$$ws],
-      });
+    async subscribe(args: ExecutionArgs) {
       return maskExecutionResult(await subscribe(args, resolvedPreset));
     },
   };

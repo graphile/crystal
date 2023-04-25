@@ -24,10 +24,13 @@ import type {
   HandlerResult,
   JSONValue,
   NormalizedRequestDigest,
+  ParsedGraphQLBody,
+  ValidatedGraphQLBody,
 } from "../interfaces.js";
 import { $$normalizedHeaders } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 import { httpError } from "../utils.js";
+import { getGrafservHooks } from "../hooks.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -41,7 +44,7 @@ const calculateQueryHash = (queryString: string): string => {
   return lastHash;
 };
 
-function makeParseAndValidateFunction(schema: GraphQLSchema) {
+export function makeParseAndValidateFunction(schema: GraphQLSchema) {
   type ParseAndValidateResult =
     | { document: DocumentNode; errors?: undefined }
     | { document?: undefined; errors: readonly GraphQLError[] };
@@ -98,34 +101,11 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
   return parseAndValidate;
 }
 
-/**
- * Represents the core parameters from the GraphQL request, these may not yet
- * be fully validated to allow for things such as persisted operations to kick
- * in later.
- */
-interface ParsedGraphQLBody {
-  id: unknown;
-  query: unknown;
-  operationName: unknown;
-  variableValues: unknown;
-  extensions: unknown;
-}
-
-/**
- * The validated GraphQL request parameters, after any transforms (such as
- * persisted operations) are applied; ready to be fed to Grafast.
- */
-interface ValidatedGraphQLBody {
-  query: string;
-  operationName: string | undefined;
-  variableValues: Record<string, any> | undefined;
-  extensions: Record<string, any> | undefined;
-}
-
 function parseGraphQLQueryParams(
   params: Record<string, string | string[] | undefined>,
 ): ParsedGraphQLBody {
   const id = params.id;
+  const documentId = params.documentId;
   const query = params.query;
   const operationName = params.operationName ?? undefined;
   const variablesString = params.variables ?? undefined;
@@ -140,6 +120,7 @@ function parseGraphQLQueryParams(
       : undefined;
   return {
     id,
+    documentId,
     query,
     operationName,
     variableValues,
@@ -155,12 +136,14 @@ function parseGraphQLJSONBody(params: JSONValue): ParsedGraphQLBody {
     throw httpError(400, "Invalid body; expected object");
   }
   const id = params.id;
+  const documentId = params.documentId;
   const query = params.query;
   const operationName = params.operationName ?? undefined;
   const variableValues = params.variables ?? undefined;
   const extensions = params.extensions ?? undefined;
   return {
     id,
+    documentId,
     query,
     operationName,
     variableValues,
@@ -230,6 +213,7 @@ function parseGraphQLBody(
         case "text": {
           return {
             id: undefined,
+            documentId: undefined,
             query: body.text,
             operationName: undefined,
             variableValues: undefined,
@@ -239,6 +223,7 @@ function parseGraphQLBody(
         case "buffer": {
           return {
             id: undefined,
+            documentId: undefined,
             query: body.buffer.toString("utf8"),
             operationName: undefined,
             variableValues: undefined,
@@ -281,9 +266,9 @@ const graphqlOrHTMLAcceptMatcher = makeAcceptMatcher([
   TEXT_HTML,
 ]);
 
-function validateBody(parsed: ParsedGraphQLBody): ValidatedGraphQLBody {
-  // TODO: add hooks here
-
+export function validateGraphQLBody(
+  parsed: ParsedGraphQLBody,
+): ValidatedGraphQLBody {
   const { query, operationName, variableValues, extensions } = parsed;
 
   if (typeof query !== "string") {
@@ -359,6 +344,8 @@ export const makeGraphQLHandler = (
 
   const outputDataAsString = dynamicOptions.outputDataAsString;
   const { maskIterator, maskPayload, maskError } = dynamicOptions;
+
+  const hooks = getGrafservHooks(resolvedPreset);
 
   return async (
     request: NormalizedRequestDigest,
@@ -436,12 +423,23 @@ export const makeGraphQLHandler = (
 
     let body: ValidatedGraphQLBody;
     try {
-      const rawBody =
+      // Read the body
+      const parsedBody =
         request.method === "POST"
           ? parseGraphQLBody(request, await request.getBody())
           : parseGraphQLQueryParams(await request.getQueryParams());
-      // TODO: add hooks here
-      body = validateBody(rawBody);
+
+      // Apply our hooks (if any) to the body (they will mutate the body in place)
+      const hookResult =
+        hooks.callbacks.processBody != null
+          ? hooks.process("processBody", { body: parsedBody, request })
+          : undefined;
+      if (hookResult) {
+        await hookResult;
+      }
+
+      // Validate that the body is of the right shape
+      body = validateGraphQLBody(parsedBody);
     } catch (e) {
       if (
         typeof e.statusCode === "number" &&
@@ -460,7 +458,6 @@ export const makeGraphQLHandler = (
     }
 
     const { query, operationName, variableValues } = body;
-
     const { errors, document } = parseAndValidate(query);
 
     if (errors) {
