@@ -215,6 +215,7 @@ function processAndValidateBody(
       }
     }
     case "application/x-www-form-urlencoded": {
+      // FIXME: CSRF risk here; ensure the user has opted into this (i.e. isn't using cookies/etc)
       switch (body.type) {
         case "buffer": {
           return processAndValidateQueryParams(
