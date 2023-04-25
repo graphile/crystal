@@ -1,6 +1,8 @@
 import type { PluginHook, PluginHookObject } from "./interfaces.js";
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
+const isDev = process.env.GRAPHILE_ENV === "development";
+
 export type HookObject<T> = Record<
   keyof T,
   PluginHook<(...args: any[]) => any>
@@ -25,24 +27,42 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
    * Hooks can _mutate_ the argument, they cannot return a replacement. This
    * allows us to completely side-step the problem of recursive calls.
    */
-  async process<THookName extends keyof THooks>(
+  process<THookName extends keyof THooks>(
     event: THookName,
     ...args: Parameters<
       THooks[THookName] extends PluginHook<infer U> ? U : never
     >
-  ): Promise<void> {
-    const [arg, ...rest] = args;
+  ): void | Promise<void> {
     const callbacks = this.callbacks[event];
-    if (callbacks) {
-      for (const callback of callbacks!) {
-        await callback(arg, ...rest);
+    if (!callbacks) {
+      return;
+    }
+    const l = callbacks.length;
+    let chain = undefined;
+    for (let i = 0; i < l; i++) {
+      const callback = callbacks[i];
+      if (chain !== undefined) {
+        chain = chain.then(() => callback.apply(null, args));
+      } else {
+        const result = callback.apply(null, args);
+        if (result != null) {
+          if (isDev && typeof result.then !== "function") {
+            throw new Error(
+              `Hook ${
+                event as string
+              } returned invalid value - must be 'undefined' or a Promise.`,
+            );
+          }
+          chain = result;
+        }
       }
     }
+    return chain;
   }
 }
 
 export function applyHooks<THooks extends HookObject<THooks>>(
-  plugins: GraphileConfig.Plugin[],
+  plugins: GraphileConfig.Plugin[] | undefined,
   hooksRetriever: (
     plugin: GraphileConfig.Plugin,
   ) => Partial<THooks> | undefined,
@@ -65,47 +85,49 @@ export function applyHooks<THooks extends HookObject<THooks>>(
     [key in keyof THooks]?: Array<FullHookSpec>;
   } = Object.create(null);
   let uid = 0;
-  for (const plugin of plugins) {
-    const hooks = hooksRetriever(plugin);
-    if (!hooks) {
-      continue;
-    }
-    const keys = Object.keys(hooks) as unknown as Array<keyof typeof hooks>;
-    for (const key of keys) {
-      const hookSpecRaw: THooks[typeof key] | undefined = hooks[key];
-      if (!hookSpecRaw) {
+  if (plugins) {
+    for (const plugin of plugins) {
+      const hooks = hooksRetriever(plugin);
+      if (!hooks) {
         continue;
       }
+      const keys = Object.keys(hooks) as unknown as Array<keyof typeof hooks>;
+      for (const key of keys) {
+        const hookSpecRaw: THooks[typeof key] | undefined = hooks[key];
+        if (!hookSpecRaw) {
+          continue;
+        }
 
-      // TypeScript nonsense
-      const isPluginHookObject = <T extends (...args: any[]) => any>(
-        v: PluginHook<T>,
-      ): v is PluginHookObject<T> => typeof v !== "function";
-      const isPluginHookFunction = <T extends (...args: any[]) => any>(
-        v: PluginHook<T>,
-      ): v is T => typeof v === "function";
+        // TypeScript nonsense
+        const isPluginHookObject = <T extends (...args: any[]) => any>(
+          v: PluginHook<T>,
+        ): v is PluginHookObject<T> => typeof v !== "function";
+        const isPluginHookFunction = <T extends (...args: any[]) => any>(
+          v: PluginHook<T>,
+        ): v is T => typeof v === "function";
 
-      const callback: THooks[typeof key] extends PluginHook<infer U>
-        ? U
-        : never = (
-        isPluginHookFunction(hookSpecRaw) ? hookSpecRaw : hookSpecRaw.callback
-      ) as any;
-      const { provides, before, after } = isPluginHookObject(hookSpecRaw)
-        ? hookSpecRaw
-        : ({} as { provides?: never[]; before?: never[]; after?: never });
-      if (!allHooks[key]) {
-        allHooks[key] = [];
+        const callback: THooks[typeof key] extends PluginHook<infer U>
+          ? U
+          : never = (
+          isPluginHookFunction(hookSpecRaw) ? hookSpecRaw : hookSpecRaw.callback
+        ) as any;
+        const { provides, before, after } = isPluginHookObject(hookSpecRaw)
+          ? hookSpecRaw
+          : ({} as { provides?: never[]; before?: never[]; after?: never });
+        if (!allHooks[key]) {
+          allHooks[key] = [];
+        }
+        // We need to give each hook a unique ID
+        const id = String(uid++);
+        allHooks[key]!.push({
+          id,
+          plugin,
+          callback,
+          provides: [...(provides || []), id],
+          before: before || [],
+          after: after || [],
+        });
       }
-      // We need to give each hook a unique ID
-      const id = String(uid++);
-      allHooks[key]!.push({
-        id,
-        plugin,
-        callback,
-        provides: [...(provides || []), id],
-        before: before || [],
-        after: after || [],
-      });
     }
   }
 

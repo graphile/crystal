@@ -441,7 +441,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             (recordCodec, spec) => recordCodec(spec),
             [recordCodec, spec],
           );
-          info.process("pgCodecs_PgCodec", {
+          await info.process("pgCodecs_PgCodec", {
             pgCodec: codec,
             pgType: pgClass.getType()!,
             pgClass,
@@ -819,7 +819,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           })();
           if (codec) {
             // Be careful not to call this for class codecs!
-            info.process("pgCodecs_PgCodec", {
+            await info.process("pgCodecs_PgCodec", {
               pgCodec: codec as PgCodec<any, any, any, any, any, any, any>,
               pgType: type,
               serviceName,
