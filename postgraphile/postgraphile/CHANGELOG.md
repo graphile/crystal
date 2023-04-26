@@ -1,5 +1,33 @@
 # postgraphile
 
+## 5.0.0-1.3
+
+### Patch Changes
+
+- [#297](https://github.com/benjie/postgraphile-private/pull/297)
+  [`90ed0cb7a`](https://github.com/benjie/postgraphile-private/commit/90ed0cb7a78479b85115cd1ce045ac253107b3eb)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul websocket handling in
+  Grafserv providing cleaner integration with Grafast.
+
+- [#297](https://github.com/benjie/postgraphile-private/pull/297)
+  [`56be761c2`](https://github.com/benjie/postgraphile-private/commit/56be761c29343e28ba4980c62c955b5adaef25c0)
+  Thanks [@benjie](https://github.com/benjie)! - Grafserv now has a plugin
+  system (via graphile-config), first plugin hook enables manipulating the
+  incoming request body which is useful for persisted operations.
+- Updated dependencies
+  [[`90ed0cb7a`](https://github.com/benjie/postgraphile-private/commit/90ed0cb7a78479b85115cd1ce045ac253107b3eb),
+  [`56be761c2`](https://github.com/benjie/postgraphile-private/commit/56be761c29343e28ba4980c62c955b5adaef25c0),
+  [`8d270ead3`](https://github.com/benjie/postgraphile-private/commit/8d270ead3fa8331e28974aae052bd48ad537d1bf),
+  [`1a012bdd7`](https://github.com/benjie/postgraphile-private/commit/1a012bdd7d3748ac9a4ca9b1f771876654988f25),
+  [`b4eaf89f4`](https://github.com/benjie/postgraphile-private/commit/b4eaf89f401ca207de08770361d07903f6bb9cb0)]:
+  - grafserv@0.0.1-1.3
+  - grafast@0.0.1-1.3
+  - graphile-config@0.0.1-1.2
+  - graphile-build-pg@5.0.0-1.3
+  - @dataplan/pg@0.0.1-1.3
+  - graphile-build@5.0.0-1.3
+  - ruru@2.0.0-1.2
+
 ## 5.0.0-1.2
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # grafast
 
+## 0.0.1-1.3
+
+### Patch Changes
+
+- [#293](https://github.com/benjie/postgraphile-private/pull/293)
+  [`8d270ead3`](https://github.com/benjie/postgraphile-private/commit/8d270ead3fa8331e28974aae052bd48ad537d1bf)
+  Thanks [@benjie](https://github.com/benjie)! - Ensure subroutine steps are
+  processed before their subroutine parent in dependents-first mode to simplify
+  plan diagrams.
+- Updated dependencies
+  [[`b4eaf89f4`](https://github.com/benjie/postgraphile-private/commit/b4eaf89f401ca207de08770361d07903f6bb9cb0)]:
+  - graphile-config@0.0.1-1.2
+
 ## 0.0.1-1.2
 
 ### Patch Changes

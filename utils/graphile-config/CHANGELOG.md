@@ -1,5 +1,15 @@
 # graphile-config
 
+## 0.0.1-1.2
+
+### Patch Changes
+
+- [#297](https://github.com/benjie/postgraphile-private/pull/297)
+  [`b4eaf89f4`](https://github.com/benjie/postgraphile-private/commit/b4eaf89f401ca207de08770361d07903f6bb9cb0)
+  Thanks [@benjie](https://github.com/benjie)! - AsyncHooks can now execute
+  synchronously if all registered hooks are synchronous. May impact ordering of
+  fields/types in GraphQL schema.
+
 ## 0.0.1-1.1
 
 ### Patch Changes

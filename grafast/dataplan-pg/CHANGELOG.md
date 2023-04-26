@@ -1,5 +1,14 @@
 # @dataplan/pg
 
+## 0.0.1-1.3
+
+### Patch Changes
+
+- Updated dependencies
+  [[`8d270ead3`](https://github.com/benjie/postgraphile-private/commit/8d270ead3fa8331e28974aae052bd48ad537d1bf)]:
+  - grafast@0.0.1-1.3
+  - @dataplan/json@0.0.1-1.3
+
 ## 0.0.1-1.2
 
 ### Patch Changes

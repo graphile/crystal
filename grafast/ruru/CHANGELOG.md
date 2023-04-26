@@ -1,5 +1,13 @@
 # ruru
 
+## 2.0.0-1.2
+
+### Patch Changes
+
+- Updated dependencies
+  [[`b4eaf89f4`](https://github.com/benjie/postgraphile-private/commit/b4eaf89f401ca207de08770361d07903f6bb9cb0)]:
+  - graphile-config@0.0.1-1.2
+
 ## 2.0.0-1.1
 
 ### Patch Changes
