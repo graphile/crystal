@@ -1,7 +1,7 @@
 ---
 title: PostGraphile V5 alpha is here!
 description: PostGraphile Version 5 is now ready to run in some production environments!
-slug: 2023-26-04-version-5-alpha
+slug: 2023-04-26-version-5-alpha
 authors:
   - name: Benjie
     title: Creator of PostGraphile
