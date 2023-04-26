@@ -3,9 +3,9 @@ import type { ParsedGraphQLBody, ProcessBodyEvent } from "grafserv";
 import type {} from "graphile-config";
 import fsp from "node:fs/promises";
 
-import {} from "./interfaces.js";
+export type { PersistedOperationGetter } from "./interfaces.js";
 
-const version = require("./package.json").version;
+const version = require("../package.json").version;
 
 const PersistedPlugin: GraphileConfig.Plugin = {
   name: "PersistedPlugin",
