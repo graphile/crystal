@@ -187,7 +187,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   let latestSchema: GraphQLSchema;
   let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
   let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
-  let wait: Promise<void> | null = null;
+  let schemaPrepare: Promise<boolean> | null = null;
 
   return {
     async onSubscribe(ctx, message) {
@@ -196,21 +196,12 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       if (schemaOrPromise !== latestSchemaOrPromise) {
         if ("then" in schemaOrPromise) {
           latestSchemaOrPromise = schemaOrPromise;
-          wait = (async () => {
-            const schemaOrTimeout = await Promise.race([
-              schemaOrPromise,
-              sleep(instance.dynamicOptions.schemaWaitTime),
-            ]);
-            if (schemaOrTimeout) {
-              latestSchemaOrPromise = schemaOrPromise;
-              latestSchema = schemaOrTimeout;
-              latestParseAndValidate =
-                makeParseAndValidateFunction(latestSchema);
-            } else {
-              // Handle missing schema
-              throw new Error(`Schema isn't ready`);
-            }
-            wait = null;
+          schemaPrepare = (async () => {
+            latestSchema = await schemaOrPromise;
+            latestSchemaOrPromise = schemaOrPromise;
+            latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
+            schemaPrepare = null;
+            return true;
           })();
         } else {
           latestSchemaOrPromise = schemaOrPromise;
@@ -222,8 +213,15 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
           }
         }
       }
-      if (wait !== null) {
-        await wait;
+      if (schemaPrepare !== null) {
+        const schemaReady = await Promise.race([
+          schemaPrepare,
+          sleep(instance.dynamicOptions.schemaWaitTime),
+        ]);
+        if (schemaReady !== true) {
+          // Handle missing schema
+          throw new Error(`Schema isn't ready`);
+        }
       }
       const schema = latestSchema;
       const parseAndValidate = latestParseAndValidate;

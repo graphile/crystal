@@ -438,7 +438,7 @@ export const makeGraphQLHandler = (
               request,
             })
           : undefined;
-      if (hookResult) {
+      if (hookResult != null) {
         await hookResult;
       }
 
