@@ -24,6 +24,7 @@ tar tzf $BUILD_DIR/dataplan__pg.tgz
 tar tzf $BUILD_DIR/graphile-build-pg.tgz
 tar tzf $BUILD_DIR/postgraphile.tgz
 tar tzf $BUILD_DIR/graphile__simplify-inflection.tgz
+tar tzf $BUILD_DIR/grafserv__persisted.tgz
 tar tzf $BUILD_DIR/graphile.tgz
 
 read -n1 -p "Publish? [y,n]" doit
@@ -49,6 +50,7 @@ case $doit in
     npm publish --access=public --tag=prealpha $BUILD_DIR/graphile-build-pg.tgz
     npm publish --access=public --tag=prealpha $BUILD_DIR/postgraphile.tgz
     npm publish --access=public --tag=prealpha $BUILD_DIR/graphile__simplify-inflection.tgz
+    npm publish --access=public --tag=prealpha $BUILD_DIR/grafserv__persisted.tgz
     npm publish --access=public --tag=prealpha $BUILD_DIR/graphile.tgz
     ;;
   *) echo 'Not publishing' ;;
