@@ -1,4 +1,4 @@
-# @grafast/persisted
+# @grafserv/persisted
 
 <span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support Graphile development on Patreon"><img src="https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg" alt="Patreon sponsor button" /></a></span>
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
@@ -48,18 +48,18 @@ And please give some love to our featured sponsors 🤩:
 ## Installation
 
 ```sh
-yarn add @grafast/persisted
-# or: npm install --save @grafast/persisted
+yarn add @grafserv/persisted
+# or: npm install --save @grafserv/persisted
 ```
 
 ## Usage
 
-Import `PersistedPlugin` from `@grafast/persisted` and then add it to the
+Import `PersistedPlugin` from `@grafserv/persisted` and then add it to the
 `plugins` list in your `graphile.config.ts` (or equivalent) file:
 
 ```ts
 import "graphile-config";
-import PersistedPlugin from "@grafast/persisted";
+import PersistedPlugin from "@grafserv/persisted";
 
 const preset: GraphileConfig.Preset = {
   plugins: [PersistedPlugin],

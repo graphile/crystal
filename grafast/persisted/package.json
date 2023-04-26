@@ -1,5 +1,5 @@
 {
-  "name": "@grafast/persisted",
+  "name": "@grafserv/persisted",
   "version": "0.0.0-1.0",
   "description": "Persisted operations support for Grafserv",
   "type": "commonjs",

@@ -2838,9 +2838,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafast/persisted@workspace:grafast/persisted":
+"@grafserv/persisted@workspace:grafast/persisted":
   version: 0.0.0-use.local
-  resolution: "@grafast/persisted@workspace:grafast/persisted"
+  resolution: "@grafserv/persisted@workspace:grafast/persisted"
   dependencies:
     grafast: "workspace:^"
     grafserv: "workspace:^"
