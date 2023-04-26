@@ -31,12 +31,19 @@ const PersistedPlugin: GraphileConfig.Plugin = {
             { statusCode: 500 },
           );
         }
-        // Always overwrite
-        body.query = persistedOperationFromPayload(
+        const realQuery = persistedOperationFromPayload(
           body,
           options,
           shouldAllowUnpersistedOperation(options, event),
         );
+        // Always overwrite
+        if (realQuery != null && typeof realQuery !== "string") {
+          return realQuery.then((q) => {
+            body.query = q;
+          });
+        } else {
+          body.query = realQuery;
+        }
       },
     },
   },
@@ -48,12 +55,14 @@ export default PersistedPlugin;
  * This fallback hashFromPayload method is compatible with Apollo Client and
  * Relay.
  */
-function defaultHashFromPayload(payload: ParsedGraphQLBody) {
+function defaultHashFromPayload(payload: RequestPayload) {
   return (
     // https://github.com/apollographql/apollo-link-persisted-queries#protocol
-    (payload?.extensions as any)?.persistedQuery?.sha256Hash ||
+    payload?.extensions?.persistedQuery?.sha256Hash ||
     // https://relay.dev/docs/en/persisted-queries#network-layer-changes
-    payload?.documentId
+    payload?.documentId ||
+    // Benjie's memory
+    payload?.id
   );
 }
 
@@ -66,13 +75,9 @@ function persistedOperationGetterForCache(cache: { [key: string]: string }) {
 }
 
 function makeGetterForDirectory(directory: string) {
-  // NOTE: it's generally a bad practice to do synchronous filesystem
-  // operations in Node servers; however PostGraphile's hooks are synchronous
-  // and we want to only load the files on demand, so we have to bite the
-  // bullet. To mitigate the impact of this we cache the results, and we
-  // periodically scan the folder to see what files it contains so that we
-  // can reject requests to non-existent files to avoid DOS attacks having us
-  // make synchronous requests to the filesystem.
+  // NOTE: We periodically scan the folder to see what files it contains so
+  // that we can reject requests to non-existent files to avoid DOS attacks
+  // having us make lots of requests to the filesystem.
 
   let files: string[] = [];
 
@@ -81,13 +86,16 @@ function makeGetterForDirectory(directory: string) {
    */
   async function scanDirectory() {
     try {
-      files = (await fsp.readdir(directory)).filter((name) =>
-        name.endsWith(".graphql"),
-      );
+      const allFiles = await fsp.readdir(directory);
+      files = allFiles.filter((name) => name.endsWith(".graphql"));
     } catch (e) {
       console.error(`Error occurred whilst scanning '${directory}'`);
       console.error(e);
     } finally {
+      // TODO: This interval should be configurable.
+      // TODO: This might not be needed in production, and if so should be able to be disabled.
+      // TODO: In dev watching the folder might be a better experience.
+
       // We don't know how long the scanning takes, so rather than setting an
       // interval, we wait 5 seconds between scans before kicking off the next
       // one.
@@ -97,7 +105,7 @@ function makeGetterForDirectory(directory: string) {
 
   scanDirectory();
 
-  const operationFromHash = new Map<string, PromiseOrDirect<string>>();
+  const operationFromHash = new Map<string, Promise<string> | string>();
   function getOperationFromHash(hash: string): PromiseOrDirect<string> {
     if (!/^[a-zA-Z0-9_-]+$/.test(hash)) {
       throw new Error("Invalid hash");
@@ -110,11 +118,12 @@ function makeGetterForDirectory(directory: string) {
       }
       operation = fsp.readFile(`${directory}/${filename}`, "utf8");
       operationFromHash.set(hash, operation);
+      // Once resolved, replace reference to string to avoid unnecessary ticks
       operation
         .then((operationText) => {
           operationFromHash.set(hash, operationText);
         })
-        .then(null, () => {
+        .catch(() => {
           /* noop */
         });
     }
@@ -124,7 +133,10 @@ function makeGetterForDirectory(directory: string) {
   return getOperationFromHash;
 }
 
-const directoryGetterByDirectory = new Map();
+const directoryGetterByDirectory = new Map<
+  string,
+  ReturnType<typeof makeGetterForDirectory>
+>();
 
 /**
  * Given a directory, get or make the persisted operations getter.
@@ -174,7 +186,10 @@ function getterFromOptionsCore(options: GraphileConfig.GrafservOptions) {
 // TODO: use an LRU? For users using lots of new options objects this will
 // cause a memory leak. But LRUs have a performance cost... Maybe switch to LRU
 // once the size has grown?
-const getterFromOptionsCache = new Map();
+const getterFromOptionsCache = new Map<
+  GraphileConfig.GrafservOptions,
+  ReturnType<typeof getterFromOptionsCore>
+>();
 
 /**
  * Returns a cached getter for performance reasons.
@@ -188,35 +203,39 @@ function getterFromOptions(options: GraphileConfig.GrafservOptions) {
   return getter;
 }
 
-/*
+/**
  * The payload of the request would normally have
  * query/operationName/variables/extensions; but in persisted operations it may
  * have something else other than `query`. We've typed a few of the more common
  * versions, if this doesn't work for you you'll need to cast `payload as any`.
-interface RequestPayload {
-  /** As used by Apollo https://github.com/apollographql/apollo-link-persisted-queries#protocol * /
-  extensions?: {
-    persistedQuery?: {
-      sha256Hash?: string;
-    };
-  };
-
-  /** As used by Relay https://relay.dev/docs/en/persisted-queries#network-layer-changes * /
-  documentId?: string;
-
-  /** Non-standard. * /
-  id?: string;
-
-  /** The actual query; we're generally expecting a hash via one of the methods above instead * /
-  query?: string | DocumentNode;
-
-  /** GraphQL operation variables * /
-  variables?: { [key: string]: unknown };
-
-  /** If the document contains more than one operation; the name of the one to execute. * /
-  operationName?: string;
-}
  */
+interface RequestPayload extends ParsedGraphQLBody {
+  /** As used by Relay https://relay.dev/docs/en/persisted-queries#network-layer-changes */
+  documentId: string | undefined;
+
+  /** Non-standard. */
+  id: string | undefined;
+
+  /** The actual query; we're generally expecting a hash via one of the methods above instead */
+  query: string | undefined;
+
+  /** GraphQL operation variables */
+  variables: Record<string, unknown> | undefined;
+
+  /** If the document contains more than one operation; the name of the one to execute. */
+  operationName: string | undefined;
+
+  /** As used by Apollo https://github.com/apollographql/apollo-link-persisted-queries#protocol */
+  extensions:
+    | {
+        [key: string]: any;
+        persistedQuery?: {
+          [key: string]: any;
+          sha256Hash?: string;
+        };
+      }
+    | undefined;
+}
 
 function shouldAllowUnpersistedOperation(
   options: GraphileConfig.GrafservOptions,
@@ -237,10 +256,10 @@ function persistedOperationFromPayload(
   payload: ParsedGraphQLBody,
   options: GraphileConfig.GrafservOptions,
   allowUnpersistedOperation: boolean,
-): string | null {
+): PromiseOrDirect<string | null> {
   try {
     const hashFromPayload = options.hashFromPayload || defaultHashFromPayload;
-    const hash = hashFromPayload(payload);
+    const hash = hashFromPayload(payload as RequestPayload);
     if (typeof hash !== "string") {
       if (allowUnpersistedOperation && typeof payload?.query === "string") {
         return payload.query;
