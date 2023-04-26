@@ -391,8 +391,41 @@ function parseAccepts(acceptHeader: string) {
       }
     }
   }
-  if (state !== State.EXPECT_TYPE) {
-    /*@__INLINE__*/ next();
+  // Now finish parsing
+  switch (state) {
+    case State.EXPECT_TYPE:
+    case State.CONTINUE_SUBTYPE:
+    case State.EXPECT_COMMA_OR_SEMICOLON: {
+      /*@__INLINE__*/ next();
+      break;
+    }
+    case State.CONTINUE_PARAMETER_VALUE: {
+      currentAccept!.parameters[currentParameterName] = currentParameterValue;
+      /*@__INLINE__*/ next();
+      break;
+    }
+    case State.CONTINUE_TYPE: {
+      throw new Error("Invalid 'accept' header, expected slash");
+    }
+    case State.EXPECT_SUBTYPE: {
+      throw new Error("Invalid 'accept' header, expected subtype");
+    }
+    case State.EXPECT_PARAMETER_NAME: {
+      throw new Error("Invalid 'accept' header, expected parameter name");
+    }
+    case State.CONTINUE_PARAMETER_NAME: {
+      throw new Error("Invalid 'accept' header, expected parameter value");
+    }
+    case State.EXPECT_PARAMETER_VALUE: {
+      throw new Error("Invalid 'accept' header, expected parameter value");
+    }
+    case State.CONTINUE_QUOTED_PARAMETER_VALUE: {
+      throw new Error("Invalid 'accept' header, expected closing quote");
+    }
+    default: {
+      const never: never = state;
+      throw new Error(`Unhandled terminal state '${never}'`);
+    }
   }
 
   // Sort `accepts` by precedence. Precedence is how accurate the match is:
