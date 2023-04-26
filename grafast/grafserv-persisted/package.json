@@ -37,7 +37,7 @@
   "bugs": {
     "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/heart/tree/main/grafast/persisted",
+  "homepage": "https://github.com/graphile/heart/tree/main/grafast/grafserv-persisted",
   "dependencies": {
     "graphile-config": "workspace:^",
     "tslib": "^2.4.0"
