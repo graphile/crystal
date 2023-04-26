@@ -29,6 +29,11 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+figure {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 figure p {
   margin: 0;
 }
