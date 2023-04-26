@@ -4,6 +4,7 @@ import "grafserv/node";
 
 import { jsonParse } from "@dataplan/json";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import PersistedPlugin from "@grafserv/persisted";
 import { context, listen, object } from "grafast";
 import { StreamDeferPlugin } from "graphile-build";
 import { EXPORTABLE } from "graphile-export";
@@ -103,6 +104,7 @@ const preset: GraphileConfig.Preset = {
       },
     }),
     // PrimaryKeyMutationsOnlyPlugin,
+    PersistedPlugin,
   ],
   extends: [
     postgraphilePresetAmber,
@@ -128,6 +130,8 @@ const preset: GraphileConfig.Preset = {
     graphqlPath: "/v2/graphql",
     websockets: true,
     graphqlOverGET: true,
+    persistedOperationsDirectory: `${process.cwd()}/.persisted_operations`,
+    allowUnpersistedOperation: true,
   },
   grafast: {
     context: {
