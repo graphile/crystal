@@ -2,13 +2,13 @@
 
 <span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support Graphile development on Patreon"><img src="https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg" alt="Patreon sponsor button" /></a></span>
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Package on npm](https://img.shields.io/npm/v/grafserv.svg?style=flat)](https://www.npmjs.com/package/grafserv)
-![MIT license](https://img.shields.io/npm/l/grafserv.svg)
+[![Package on npm](https://img.shields.io/npm/v/@grafserv/persisted.svg?style=flat)](https://www.npmjs.com/package/@grafserv/persisted)
+![MIT license](https://img.shields.io/npm/l/@grafserv/persisted.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
 Persisted operations (aka "persisted queries", "query allowlist", "persisted
 documents") support for [Grafserv](https://grafast.org/grafserv). Applies to
-both standard POST requests and to websocket connections. Works for all
+both standard GET and POST requests and to websocket connections. Works for all
 operation types (queries, mutations and subscriptions).
 
 We recommend that all GraphQL servers (PostGraphile or otherwise) that only
@@ -78,24 +78,23 @@ This plugin adds the following options to the Grafserv options:
 
 ````ts
 /**
- * This function will be passed a GraphQL request object (normally `{query:
- * string, variables?: any, operationName?: string, extensions?: any}`, but
- * in the case of persisted operations it likely won't have a `query`
+ * This function will be passed a GraphQL request object (normally
+ * `{query: string, variables?: any, operationName?: string, extensions?: any}`,
+ * but in the case of persisted operations it likely won't have a `query`
  * property), and must extract the hash to use to identify the persisted
  * operation. For Apollo Client, this might be something like:
  * `request?.extensions?.persistedQuery?.sha256Hash`; for Relay something
  * like: `request?.documentId`.
  */
-hashFromPayload?(request: any): string;
+hashFromPayload?(request: ParsedGraphQLBody): string | undefined;
 
 /**
  * We can read persisted operations from a folder (they must be named
- * `<hash>.graphql`); this is mostly used for PostGraphile CLI. When used
- * in this way, the first request for a hash will read the file
- * synchronously, and then the result will be cached such that the
- * **synchronous filesystem read** will only impact the first use of that
- * hash. We periodically scan the folder for new files, requests for hashes
- * that were not present in our last scan of the folder will be rejected to
+ * `<hash>.graphql`). When used in this way, the first request for a hash
+ * will read the file, and then the result will be cached such that the
+ * **filesystem read** will only impact the first use of that hash. We
+ * periodically scan the folder for new files, requests for hashes that
+ * were not present in our last scan of the folder will be rejected to
  * mitigate denial of service attacks asking for non-existent hashes.
  */
 persistedOperationsDirectory?: string;
@@ -110,10 +109,8 @@ persistedOperations?: { [hash: string]: string };
 /**
  * If your known persisted operations may change over time, or you'd rather
  * load them on demand, you may supply this function. Note this function is
- * both **synchronous** and **performance critical** so you should use
- * caching to improve performance of any follow-up requests for the same
- * hash. This function is not suitable for fetching operations from remote
- * stores (e.g. S3).
+ * **performance critical** so you should use caching to improve
+ * performance of any follow-up requests for the same hash.
  */
 persistedOperationsGetter?: PersistedOperationGetter;
 
@@ -131,13 +128,15 @@ persistedOperationsGetter?: PersistedOperationGetter;
  *
  * ```
  * app.use(postgraphile(DATABASE_URL, SCHEMAS, {
- *   allowUnpersistedOperation(req) {
- *     return process.env.NODE_ENV === "development" && req.headers.referer?.endsWith("/graphiql");
+ *   allowUnpersistedOperation(event) {
+ *     return process.env.NODE_ENV === "development" && event.request?.getHeader('referer')?.endsWith("/graphiql");
  *   }
  * });
  * ```
  */
- allowUnpersistedOperation?: boolean | ((request: IncomingMessage, payload: RequestPayload): boolean);
+allowUnpersistedOperation?:
+  | boolean
+  | ((event: ProcessGraphQLRequestBodyEvent) => boolean);
 ````
 
 All these options are optional; but you should specify exactly one of
