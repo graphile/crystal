@@ -14,12 +14,6 @@ const PersistedPlugin: GraphileConfig.Plugin = {
 
   grafserv: {
     hooks: {
-      init(info) {
-        const options = info.resolvedPreset.grafserv;
-        // In case there's a filesystem getter, this lets us get a head-start on
-        // scanning the directory before the first request comes in.
-        if (options) getterFromOptions(options);
-      },
       processBody(info, event) {
         const { body } = event;
         const options = info.resolvedPreset.grafserv;
@@ -79,7 +73,7 @@ function makeGetterForDirectory(directory: string) {
   // that we can reject requests to non-existent files to avoid DOS attacks
   // having us make lots of requests to the filesystem.
 
-  let files: string[] = [];
+  let files: string[] | null = null;
 
   /**
    * This function must never reject.
@@ -105,27 +99,28 @@ function makeGetterForDirectory(directory: string) {
 
   scanDirectory();
 
-  const operationFromHash = new Map<string, Promise<string> | string>();
-  function getOperationFromHash(hash: string): PromiseOrDirect<string> {
+  const operationFromHash = new Map<
+    string,
+    Promise<string | null> | string | null
+  >();
+  function getOperationFromHash(hash: string): PromiseOrDirect<string | null> {
     if (!/^[a-zA-Z0-9_-]+$/.test(hash)) {
       throw new Error("Invalid hash");
     }
     let operation = operationFromHash.get(hash);
     if (!operation) {
       const filename = `${hash}.graphql`;
-      if (!files.includes(filename)) {
+      if (files && !files.includes(filename)) {
         throw new Error(`Could not find file for hash '${hash}'`);
       }
-      operation = fsp.readFile(`${directory}/${filename}`, "utf8");
+      operation = fsp
+        .readFile(`${directory}/${filename}`, "utf8")
+        .catch(() => null);
       operationFromHash.set(hash, operation);
       // Once resolved, replace reference to string to avoid unnecessary ticks
-      operation
-        .then((operationText) => {
-          operationFromHash.set(hash, operationText);
-        })
-        .catch(() => {
-          /* noop */
-        });
+      operation.then((operationText) => {
+        operationFromHash.set(hash, operationText);
+      });
     }
     return operation;
   }
