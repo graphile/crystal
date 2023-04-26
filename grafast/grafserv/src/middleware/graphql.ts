@@ -7,6 +7,7 @@ import {
   hookArgs,
   isAsyncIterable,
   isPromiseLike,
+  SafeError,
 } from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import {
@@ -441,7 +442,7 @@ export const makeGraphQLHandler = (
       // Validate that the body is of the right shape
       body = validateGraphQLBody(parsedBody);
     } catch (e) {
-      if (e instanceof GraphQLError) {
+      if (e instanceof SafeError) {
         throw e;
       } else if (
         typeof e.statusCode === "number" &&

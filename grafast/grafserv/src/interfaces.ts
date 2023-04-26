@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PromiseOrDirect } from "grafast";
+import type { PromiseOrDirect, SafeError } from "grafast";
 import type { PluginHook } from "graphile-config";
 import type {
   AsyncExecutionResult,
@@ -266,7 +266,7 @@ export interface ErrorResult {
   type: "error";
   statusCode: number;
   headers: Record<string, string>;
-  error: Error & { statusCode?: number; safeMessage?: boolean };
+  error: Error | SafeError;
 }
 
 export interface BufferResult {

@@ -1,4 +1,4 @@
-import { execute, hookArgs, stripAnsi, subscribe } from "grafast";
+import { SafeError, execute, hookArgs, stripAnsi, subscribe } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
@@ -165,11 +165,8 @@ export function normalizeRequest(
   return request as NormalizedRequestDigest;
 }
 
-export function httpError(
-  statusCode: number,
-  message: string,
-): Error & { statusCode: number } {
-  return Object.assign(new Error(message), { statusCode, safeMessage: true });
+export function httpError(statusCode: number, message: string): SafeError {
+  return new SafeError(message, { statusCode });
 }
 
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {

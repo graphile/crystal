@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
-import { isPromiseLike, stringifyPayload } from "grafast";
+import { isPromiseLike, stringifyPayload, SafeError } from "grafast";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 import { GraphQLError, isSchema, validateSchema } from "graphql";
@@ -28,22 +28,19 @@ import { handleErrors, normalizeRequest } from "../utils.js";
 function handleGraphQLHandlerError(
   request: NormalizedRequestDigest,
   dynamicOptions: OptionsFromConfig,
-  e: Error & { statusCode?: number; safeMessage?: boolean },
+  e: Error | SafeError,
 ) {
-  if (e.safeMessage && e.statusCode) {
+  if (e instanceof SafeError) {
     return {
       type: "graphql",
       request,
       dynamicOptions,
       payload: {
         errors: [
-          new GraphQLError(e.message, null, null, null, null, e, {
-            // TODO: do we want this here or not?
-            statusCode: e.statusCode,
-          }),
+          new GraphQLError(e.message, null, null, null, null, e, e.extensions),
         ],
       },
-      statusCode: e.statusCode,
+      statusCode: e.extensions?.statusCode ?? 500,
       // TODO: we should respect the `accept` header here if we can.
       contentType: APPLICATION_JSON,
     } as HandlerResult;
