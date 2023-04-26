@@ -1,6 +1,7 @@
-import type { PromiseOrDirect } from "grafast";
+import { PromiseOrDirect, SafeError } from "grafast";
 import type { ParsedGraphQLBody, ProcessBodyEvent } from "grafserv";
 import type {} from "graphile-config";
+import { GraphQLError } from "graphql";
 import fsp from "node:fs/promises";
 
 export type { PersistedOperationGetter } from "./interfaces.js";
@@ -33,10 +34,24 @@ const PersistedPlugin: GraphileConfig.Plugin = {
         // Always overwrite
         if (realQuery != null && typeof realQuery !== "string") {
           return realQuery.then((q) => {
-            body.query = q;
+            if (typeof q === "string") {
+              body.query = q;
+            } else {
+              throw new SafeError(
+                "Persisted operations are enabled on this server, only previously approved GraphQL documents may be issued.",
+                { statusCode: 400 },
+              );
+            }
           });
         } else {
-          body.query = realQuery;
+          if (typeof realQuery === "string") {
+            body.query = realQuery;
+          } else {
+            throw new SafeError(
+              "Persisted operations are enabled on this server, only previously approved GraphQL documents may be issued.",
+              { statusCode: 400 },
+            );
+          }
         }
       },
     },
