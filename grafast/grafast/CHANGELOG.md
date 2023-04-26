@@ -1,5 +1,19 @@
 # grafast
 
+## 0.0.1-alpha.1
+
+### Patch Changes
+
+- [`759ad403d`](https://github.com/benjie/postgraphile-private/commit/759ad403d71363312c5225c165873ae84b8a098c)
+  Thanks [@benjie](https://github.com/benjie)! - Alpha release - see
+  https://postgraphile.org/news/2023-04-26-version-5-alpha
+
+- Updated dependencies
+  [[`759ad403d`](https://github.com/benjie/postgraphile-private/commit/759ad403d71363312c5225c165873ae84b8a098c)]:
+  - graphile-config@0.0.1-alpha.1
+  - @graphile/lru@5.0.0-alpha.1
+  - tamedevil@0.0.0-alpha.1
+
 ## 0.0.1-1.3
 
 ### Patch Changes
