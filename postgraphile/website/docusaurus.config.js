@@ -87,6 +87,24 @@ const config = {
         };
       },
     }),
+    [
+      "@docusaurus/plugin-content-blog",
+      {
+        /**
+         * Required for any multi-instance plugin
+         */
+        id: "news",
+        /**
+         * URL route for the blog section of your site.
+         * *DO NOT* include a trailing slash.
+         */
+        routeBasePath: "news",
+        /**
+         * Path to data on filesystem relative to site dir.
+         */
+        path: "./news",
+      },
+    ],
   ],
 
   themeConfig:
@@ -113,6 +131,11 @@ const config = {
             docsPluginId: "default",
             position: "left",
             label: "PostGraphile",
+          },
+          {
+            to: "news",
+            label: "News",
+            position: "left",
           },
           {
             type: "docsVersionDropdown",
