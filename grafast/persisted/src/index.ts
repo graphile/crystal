@@ -1,7 +1,7 @@
-import { PromiseOrDirect, SafeError } from "grafast";
+import type { PromiseOrDirect } from "grafast";
+import { SafeError } from "grafast";
 import type { ParsedGraphQLBody, ProcessBodyEvent } from "grafserv";
 import type {} from "graphile-config";
-import { GraphQLError } from "graphql";
 import fsp from "node:fs/promises";
 
 export type { PersistedOperationGetter } from "./interfaces.js";
