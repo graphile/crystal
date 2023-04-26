@@ -1,6 +1,6 @@
 {
   "name": "ruru-components",
-  "version": "2.0.0-1.1",
+  "version": "2.0.0-alpha.0",
   "description": "Grafast-flavoured GraphiQL distribution; the underlying React components",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

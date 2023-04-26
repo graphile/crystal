@@ -1,6 +1,6 @@
 {
   "name": "jest-serializer-graphql-schema",
-  "version": "5.0.0-1.1",
+  "version": "5.0.0-alpha.0",
   "description": "Jest serializer for GraphQLSchema objects",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
