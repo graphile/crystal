@@ -7,6 +7,7 @@ import {
   hookArgs,
   isAsyncIterable,
   isPromiseLike,
+  SafeError,
 } from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
 import {
@@ -16,14 +17,17 @@ import {
   Source,
   validate,
 } from "graphql";
-import { parse as parseQueryString } from "node:querystring";
+import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { makeAcceptMatcher } from "../accept.js";
+import { getGrafservHooks } from "../hooks.js";
 import type {
   GrafservBody,
   HandlerResult,
   JSONValue,
   NormalizedRequestDigest,
+  ParsedGraphQLBody,
+  ValidatedGraphQLBody,
 } from "../interfaces.js";
 import { $$normalizedHeaders } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
@@ -41,7 +45,7 @@ const calculateQueryHash = (queryString: string): string => {
   return lastHash;
 };
 
-function makeParseAndValidateFunction(schema: GraphQLSchema) {
+export function makeParseAndValidateFunction(schema: GraphQLSchema) {
   type ParseAndValidateResult =
     | { document: DocumentNode; errors?: undefined }
     | { document?: undefined; errors: readonly GraphQLError[] };
@@ -98,47 +102,26 @@ function makeParseAndValidateFunction(schema: GraphQLSchema) {
   return parseAndValidate;
 }
 
-interface ValidatedBody {
-  query: string;
-  operationName: string | undefined;
-  variableValues: Record<string, any> | undefined;
-  extensions: Record<string, any> | undefined;
-}
-
-function processAndValidateQueryParams(
+function parseGraphQLQueryParams(
   params: Record<string, string | string[] | undefined>,
-): ValidatedBody {
+): ParsedGraphQLBody {
+  const id = params.id;
+  const documentId = params.documentId;
   const query = params.query;
-  if (typeof query !== "string") {
-    throw httpError(400, "query must be a string");
-  }
   const operationName = params.operationName ?? undefined;
-  if (operationName != null && typeof operationName !== "string") {
-    throw httpError(400, "operationName, if given, must be a string");
-  }
   const variablesString = params.variables ?? undefined;
   const variableValues =
     typeof variablesString === "string"
       ? JSON.parse(variablesString)
       : undefined;
-  if (
-    variableValues != null &&
-    (typeof variableValues !== "object" || Array.isArray(variableValues))
-  ) {
-    throw httpError(400, "Invalid variables; expected JSON-encoded object");
-  }
   const extensionsString = params.extensions ?? undefined;
   const extensions =
     typeof extensionsString === "string"
       ? JSON.parse(extensionsString)
       : undefined;
-  if (
-    extensions != null &&
-    (typeof extensions !== "object" || Array.isArray(extensions))
-  ) {
-    throw httpError(400, "Invalid extensions; expected JSON-encoded object");
-  }
   return {
+    id,
+    documentId,
     query,
     operationName,
     variableValues,
@@ -146,36 +129,22 @@ function processAndValidateQueryParams(
   };
 }
 
-function processAndValidateJSON(params: JSONValue): ValidatedBody {
+function parseGraphQLJSONBody(params: JSONValue): ParsedGraphQLBody {
   if (!params) {
     throw httpError(400, "No body");
   }
   if (typeof params !== "object" || Array.isArray(params)) {
     throw httpError(400, "Invalid body; expected object");
   }
+  const id = params.id;
+  const documentId = params.documentId;
   const query = params.query;
-  if (typeof query !== "string") {
-    throw httpError(400, "query must be a string");
-  }
   const operationName = params.operationName ?? undefined;
-  if (operationName != null && typeof operationName !== "string") {
-    throw httpError(400, "operationName, if given, must be a string");
-  }
   const variableValues = params.variables ?? undefined;
-  if (
-    variableValues != null &&
-    (typeof variableValues !== "object" || Array.isArray(variableValues))
-  ) {
-    throw httpError(400, "Invalid variables; expected JSON-encoded object");
-  }
   const extensions = params.extensions ?? undefined;
-  if (
-    extensions != null &&
-    (typeof extensions !== "object" || Array.isArray(extensions))
-  ) {
-    throw httpError(400, "Invalid extensions; expected JSON-encoded object");
-  }
   return {
+    id,
+    documentId,
     query,
     operationName,
     variableValues,
@@ -183,10 +152,10 @@ function processAndValidateJSON(params: JSONValue): ValidatedBody {
   };
 }
 
-function processAndValidateBody(
+function parseGraphQLBody(
   request: NormalizedRequestDigest,
   body: GrafservBody,
-): ValidatedBody {
+): ParsedGraphQLBody {
   const contentType = request[$$normalizedHeaders]["content-type"];
   if (!contentType) {
     throw httpError(400, "Could not determine the Content-Type of the request");
@@ -198,15 +167,13 @@ function processAndValidateBody(
     case "application/json": {
       switch (body.type) {
         case "buffer": {
-          return processAndValidateJSON(
-            JSON.parse(body.buffer.toString("utf8")),
-          );
+          return parseGraphQLJSONBody(JSON.parse(body.buffer.toString("utf8")));
         }
         case "text": {
-          return processAndValidateJSON(JSON.parse(body.text));
+          return parseGraphQLJSONBody(JSON.parse(body.text));
         }
         case "json": {
-          return processAndValidateJSON(body.json);
+          return parseGraphQLJSONBody(body.json);
         }
         default: {
           const never: never = body;
@@ -215,14 +182,15 @@ function processAndValidateBody(
       }
     }
     case "application/x-www-form-urlencoded": {
+      // FIXME: CSRF risk here; ensure the user has opted into this (i.e. isn't using cookies/etc)
       switch (body.type) {
         case "buffer": {
-          return processAndValidateQueryParams(
-            parseQueryString(body.buffer.toString("utf8")),
+          return parseGraphQLQueryParams(
+            parseGraphQLQueryString(body.buffer.toString("utf8")),
           );
         }
         case "text": {
-          return processAndValidateQueryParams(parseQueryString(body.text));
+          return parseGraphQLQueryParams(parseGraphQLQueryString(body.text));
         }
         case "json": {
           if (
@@ -232,9 +200,7 @@ function processAndValidateBody(
           ) {
             throw httpError(400, `Invalid body`);
           }
-          return processAndValidateQueryParams(
-            body.json as Record<string, any>,
-          );
+          return parseGraphQLQueryParams(body.json as Record<string, any>);
         }
         default: {
           const never: never = body;
@@ -247,6 +213,8 @@ function processAndValidateBody(
       switch (body.type) {
         case "text": {
           return {
+            id: undefined,
+            documentId: undefined,
             query: body.text,
             operationName: undefined,
             variableValues: undefined,
@@ -255,6 +223,8 @@ function processAndValidateBody(
         }
         case "buffer": {
           return {
+            id: undefined,
+            documentId: undefined,
             query: body.buffer.toString("utf8"),
             operationName: undefined,
             variableValues: undefined,
@@ -262,7 +232,8 @@ function processAndValidateBody(
           };
         }
         case "json": {
-          return processAndValidateJSON(body.json);
+          // TODO: non-standard; perhaps raise a warning?
+          return parseGraphQLJSONBody(body.json);
         }
         default: {
           const never: never = body;
@@ -295,6 +266,32 @@ const graphqlOrHTMLAcceptMatcher = makeAcceptMatcher([
   // situations
   TEXT_HTML,
 ]);
+
+export function validateGraphQLBody(
+  parsed: ParsedGraphQLBody,
+): ValidatedGraphQLBody {
+  const { query, operationName, variableValues, extensions } = parsed;
+
+  if (typeof query !== "string") {
+    throw httpError(400, "query must be a string");
+  }
+  if (operationName != null && typeof operationName !== "string") {
+    throw httpError(400, "operationName, if given, must be a string");
+  }
+  if (
+    variableValues != null &&
+    (typeof variableValues !== "object" || Array.isArray(variableValues))
+  ) {
+    throw httpError(400, "Invalid variables; expected JSON-encoded object");
+  }
+  if (
+    extensions != null &&
+    (typeof extensions !== "object" || Array.isArray(extensions))
+  ) {
+    throw httpError(400, "Invalid extensions; expected JSON-encoded object");
+  }
+  return parsed as ValidatedGraphQLBody;
+}
 
 export const makeGraphQLHandler = (
   resolvedPreset: GraphileConfig.ResolvedPreset,
@@ -348,6 +345,8 @@ export const makeGraphQLHandler = (
 
   const outputDataAsString = dynamicOptions.outputDataAsString;
   const { maskIterator, maskPayload, maskError } = dynamicOptions;
+
+  const hooks = getGrafservHooks(resolvedPreset);
 
   return async (
     request: NormalizedRequestDigest,
@@ -423,14 +422,32 @@ export const makeGraphQLHandler = (
     const schema = latestSchema;
     const parseAndValidate = latestParseAndValidate;
 
-    let body: ValidatedBody;
+    let body: ValidatedGraphQLBody;
     try {
-      body =
+      // Read the body
+      const parsedBody =
         request.method === "POST"
-          ? processAndValidateBody(request, await request.getBody())
-          : processAndValidateQueryParams(await request.getQueryParams());
+          ? parseGraphQLBody(request, await request.getBody())
+          : parseGraphQLQueryParams(await request.getQueryParams());
+
+      // Apply our hooks (if any) to the body (they will mutate the body in place)
+      const hookResult =
+        hooks.callbacks.processGraphQLRequestBody != null
+          ? hooks.process("processGraphQLRequestBody", {
+              body: parsedBody,
+              request,
+            })
+          : undefined;
+      if (hookResult != null) {
+        await hookResult;
+      }
+
+      // Validate that the body is of the right shape
+      body = validateGraphQLBody(parsedBody);
     } catch (e) {
-      if (
+      if (e instanceof SafeError) {
+        throw e;
+      } else if (
         typeof e.statusCode === "number" &&
         e.statusCode >= 400 &&
         e.statusCode < 600
@@ -447,7 +464,6 @@ export const makeGraphQLHandler = (
     }
 
     const { query, operationName, variableValues } = body;
-
     const { errors, document } = parseAndValidate(query);
 
     if (errors) {

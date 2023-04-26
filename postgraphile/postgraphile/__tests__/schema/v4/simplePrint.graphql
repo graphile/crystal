@@ -776,6 +776,35 @@ type Query implements Node {
     condition: DefaultValueCondition
   ): DefaultValuesConnection
 
+  """Reads and enables pagination through a set of `ForeignKey`."""
+  allForeignKeys(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ForeignKey`."""
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ForeignKeyCondition
+  ): ForeignKeysConnection
+
   """Reads and enables pagination through a set of `NoPrimaryKey`."""
   allNoPrimaryKeys(
     """Only read the first `n` values of the set."""
@@ -804,6 +833,35 @@ type Query implements Node {
     """
     condition: NoPrimaryKeyCondition
   ): NoPrimaryKeysConnection
+
+  """Reads and enables pagination through a set of `Testview`."""
+  allTestviews(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Testview`."""
+    orderBy: [TestviewsOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TestviewCondition
+  ): TestviewsConnection
 
   """Reads and enables pagination through a set of `MyTable`."""
   allMyTables(
@@ -862,64 +920,6 @@ type Query implements Node {
     """
     condition: PersonSecretCondition
   ): PersonSecretsConnection @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-
-  """Reads and enables pagination through a set of `ForeignKey`."""
-  allForeignKeys(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `ForeignKey`."""
-    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ForeignKeyCondition
-  ): ForeignKeysConnection
-
-  """Reads and enables pagination through a set of `Testview`."""
-  allTestviews(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `Testview`."""
-    orderBy: [TestviewsOrderBy!] = [NATURAL]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: TestviewCondition
-  ): TestviewsConnection
 
   """Reads and enables pagination through a set of `ViewTable`."""
   allViewTables(
@@ -3467,6 +3467,64 @@ input NoPrimaryKeyCondition {
   str: String
 }
 
+"""A connection to a list of `Testview` values."""
+type TestviewsConnection {
+  """A list of `Testview` objects."""
+  nodes: [Testview]!
+
+  """
+  A list of edges which contains the `Testview` and cursor to aid in pagination.
+  """
+  edges: [TestviewsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Testview` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Testview {
+  testviewid: Int
+  col1: Int
+  col2: Int
+}
+
+"""A `Testview` edge in the connection."""
+type TestviewsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Testview` at the end of the edge."""
+  node: Testview
+}
+
+"""Methods to use when ordering `Testview`."""
+enum TestviewsOrderBy {
+  NATURAL
+  TESTVIEWID_ASC
+  TESTVIEWID_DESC
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
+}
+
+"""
+A condition to be used against `Testview` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input TestviewCondition {
+  """Checks for equality with the object’s `testviewid` field."""
+  testviewid: Int
+
+  """Checks for equality with the object’s `col1` field."""
+  col1: Int
+
+  """Checks for equality with the object’s `col2` field."""
+  col2: Int
+}
+
 """A connection to a list of `MyTable` values."""
 type MyTablesConnection {
   """A list of `MyTable` objects."""
@@ -3562,64 +3620,6 @@ input PersonSecretCondition {
 
   """Checks for equality with the object’s `secret` field."""
   secret: String
-}
-
-"""A connection to a list of `Testview` values."""
-type TestviewsConnection {
-  """A list of `Testview` objects."""
-  nodes: [Testview]!
-
-  """
-  A list of edges which contains the `Testview` and cursor to aid in pagination.
-  """
-  edges: [TestviewsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Testview` you could get from the connection."""
-  totalCount: Int!
-}
-
-type Testview {
-  testviewid: Int
-  col1: Int
-  col2: Int
-}
-
-"""A `Testview` edge in the connection."""
-type TestviewsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Testview` at the end of the edge."""
-  node: Testview
-}
-
-"""Methods to use when ordering `Testview`."""
-enum TestviewsOrderBy {
-  NATURAL
-  TESTVIEWID_ASC
-  TESTVIEWID_DESC
-  COL1_ASC
-  COL1_DESC
-  COL2_ASC
-  COL2_DESC
-}
-
-"""
-A condition to be used against `Testview` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input TestviewCondition {
-  """Checks for equality with the object’s `testviewid` field."""
-  testviewid: Int
-
-  """Checks for equality with the object’s `col1` field."""
-  col1: Int
-
-  """Checks for equality with the object’s `col2` field."""
-  col2: Int
 }
 
 """A connection to a list of `ViewTable` values."""
@@ -4320,12 +4320,6 @@ type Mutation {
     """
     input: LeftArmIdentityInput!
   ): LeftArmIdentityPayload
-  typesMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: TypesMutationInput!
-  ): TypesMutationPayload
   authenticateMany(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4338,6 +4332,12 @@ type Mutation {
     """
     input: AuthenticatePayloadInput!
   ): AuthenticatePayloadPayload
+  typesMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: TypesMutationInput!
+  ): TypesMutationPayload
   mutationOutOutCompoundType(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4483,6 +4483,14 @@ type Mutation {
     input: CreateDefaultValueInput!
   ): CreateDefaultValuePayload
 
+  """Creates a single `ForeignKey`."""
+  createForeignKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateForeignKeyInput!
+  ): CreateForeignKeyPayload
+
   """Creates a single `NoPrimaryKey`."""
   createNoPrimaryKey(
     """
@@ -4490,6 +4498,14 @@ type Mutation {
     """
     input: CreateNoPrimaryKeyInput!
   ): CreateNoPrimaryKeyPayload
+
+  """Creates a single `Testview`."""
+  createTestview(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTestviewInput!
+  ): CreateTestviewPayload
 
   """Creates a single `MyTable`."""
   createMyTable(
@@ -4506,22 +4522,6 @@ type Mutation {
     """
     input: CreatePersonSecretInput!
   ): CreatePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-
-  """Creates a single `ForeignKey`."""
-  createForeignKey(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateForeignKeyInput!
-  ): CreateForeignKeyPayload
-
-  """Creates a single `Testview`."""
-  createTestview(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateTestviewInput!
-  ): CreateTestviewPayload
 
   """Creates a single `ViewTable`."""
   createViewTable(
@@ -6244,36 +6244,6 @@ input LeftArmBaseInput {
   mood: String
 }
 
-"""The output of our `typesMutation` mutation."""
-type TypesMutationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  boolean: Boolean
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `typesMutation` mutation."""
-input TypesMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  a: BigInt!
-  b: Boolean!
-  c: String!
-  d: [Int]!
-  e: JSON!
-  f: FloatRangeInput!
-}
-
 """The output of our `authenticateMany` mutation."""
 type AuthenticateManyPayload {
   """
@@ -6338,6 +6308,36 @@ input AuthenticatePayloadInput {
   a: Int
   b: BigFloat
   c: BigInt
+}
+
+"""The output of our `typesMutation` mutation."""
+type TypesMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  boolean: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `typesMutation` mutation."""
+input TypesMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  a: BigInt!
+  b: Boolean!
+  c: String!
+  d: [Int]!
+  e: JSON!
+  f: FloatRangeInput!
 }
 
 """The output of our `mutationOutOutCompoundType` mutation."""
@@ -7042,6 +7042,48 @@ input DefaultValueInput {
   nullValue: String
 }
 
+"""The output of our create `ForeignKey` mutation."""
+type CreateForeignKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ForeignKey` that was created by this mutation."""
+  foreignKey: ForeignKey
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `CompoundKey` that is related to this `ForeignKey`."""
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+
+  """Reads a single `Person` that is related to this `ForeignKey`."""
+  personByPersonId: Person
+}
+
+"""All input for the create `ForeignKey` mutation."""
+input CreateForeignKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ForeignKey` to be created by this mutation."""
+  foreignKey: ForeignKeyInput!
+}
+
+"""An input for mutations affecting `ForeignKey`"""
+input ForeignKeyInput {
+  personId: Int
+  compoundKey1: Int
+  compoundKey2: Int
+}
+
 """The output of our create `NoPrimaryKey` mutation."""
 type CreateNoPrimaryKeyPayload {
   """
@@ -7075,6 +7117,42 @@ input CreateNoPrimaryKeyInput {
 input NoPrimaryKeyInput {
   id: Int!
   str: String!
+}
+
+"""The output of our create `Testview` mutation."""
+type CreateTestviewPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Testview` that was created by this mutation."""
+  testview: Testview
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Testview` mutation."""
+input CreateTestviewInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Testview` to be created by this mutation."""
+  testview: TestviewInput!
+}
+
+"""An input for mutations affecting `Testview`"""
+input TestviewInput {
+  testviewid: Int
+  col1: Int
+  col2: Int
 }
 
 """The output of our create `MyTable` mutation."""
@@ -7162,84 +7240,6 @@ input PersonSecretInput {
 
   """A secret held by the associated Person"""
   secret: String
-}
-
-"""The output of our create `ForeignKey` mutation."""
-type CreateForeignKeyPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ForeignKey` that was created by this mutation."""
-  foreignKey: ForeignKey
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """Reads a single `CompoundKey` that is related to this `ForeignKey`."""
-  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
-
-  """Reads a single `Person` that is related to this `ForeignKey`."""
-  personByPersonId: Person
-}
-
-"""All input for the create `ForeignKey` mutation."""
-input CreateForeignKeyInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `ForeignKey` to be created by this mutation."""
-  foreignKey: ForeignKeyInput!
-}
-
-"""An input for mutations affecting `ForeignKey`"""
-input ForeignKeyInput {
-  personId: Int
-  compoundKey1: Int
-  compoundKey2: Int
-}
-
-"""The output of our create `Testview` mutation."""
-type CreateTestviewPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Testview` that was created by this mutation."""
-  testview: Testview
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `Testview` mutation."""
-input CreateTestviewInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Testview` to be created by this mutation."""
-  testview: TestviewInput!
-}
-
-"""An input for mutations affecting `Testview`"""
-input TestviewInput {
-  testviewid: Int
-  col1: Int
-  col2: Int
 }
 
 """The output of our create `ViewTable` mutation."""

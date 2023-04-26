@@ -1,21 +1,33 @@
-import { execute, hookArgs, stripAnsi, subscribe } from "grafast";
+import type { PromiseOrDirect } from "grafast";
+import { execute, hookArgs, SafeError, stripAnsi, subscribe } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionResult,
+  GraphQLSchema,
 } from "graphql";
 import { GraphQLError } from "graphql";
 import type { ServerOptions } from "graphql-ws";
+import type { Extra } from "graphql-ws/lib/use/ws";
 import type { Readable } from "node:stream";
 
+import { getGrafservHooks } from "./hooks.js";
 import type { GrafservBase } from "./index.js";
 import type {
   GrafservBody,
   JSONValue,
   NormalizedRequestDigest,
+  ParsedGraphQLBody,
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
+import {
+  makeParseAndValidateFunction,
+  validateGraphQLBody,
+} from "./middleware/graphql.js";
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,
@@ -29,6 +41,7 @@ export function handleErrors(
       return Object.assign(obj, {
         message: stripAnsi(obj.message),
         extensions: {
+          ...(e instanceof GraphQLError ? e.extensions : null),
           ...(e.stack
             ? {
                 stack: stripAnsi(e.stack).split("\n"),
@@ -153,44 +166,95 @@ export function normalizeRequest(
   return request as NormalizedRequestDigest;
 }
 
-export function httpError(
-  statusCode: number,
-  message: string,
-): Error & { statusCode: number } {
-  return Object.assign(new Error(message), { statusCode, safeMessage: true });
+export function httpError(statusCode: number, message: string): SafeError {
+  return new SafeError(message, { statusCode });
 }
-
-const $$ws = Symbol("websocket-details");
 
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   const {
     resolvedPreset,
     dynamicOptions: { maskExecutionResult },
   } = instance;
+
+  const hooks = getGrafservHooks(resolvedPreset);
+
+  let latestSchema: GraphQLSchema;
+  let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
+  let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+  let schemaPrepare: Promise<boolean> | null = null;
+
   return {
-    context(ctx, msg, args) {
-      const context = args.contextValue ?? Object.create(null);
-      const { connectionParams } = ctx;
-      const extra = ctx.extra as { request?: any; socket?: any } | undefined;
-      context[$$ws] = {
-        request: extra?.request,
-        socket: extra?.socket,
-        connectionParams,
-      };
-      return context;
-    },
-    schema: async () => instance.getSchema(),
-    // PERF: we can remove the async/await and only use when context is async
-    execute: async (args: ExecutionArgs) => {
-      await hookArgs(args, instance.resolvedPreset, {
-        ws: (args.contextValue as any)?.[$$ws],
+    async onSubscribe(ctx, message) {
+      // Get up to date schema, in case we're in watch mode
+      const schemaOrPromise = instance.getSchema();
+      if (schemaOrPromise !== latestSchemaOrPromise) {
+        if ("then" in schemaOrPromise) {
+          latestSchemaOrPromise = schemaOrPromise;
+          schemaPrepare = (async () => {
+            latestSchema = await schemaOrPromise;
+            latestSchemaOrPromise = schemaOrPromise;
+            latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
+            schemaPrepare = null;
+            return true;
+          })();
+        } else {
+          latestSchemaOrPromise = schemaOrPromise;
+          if (latestSchema === schemaOrPromise) {
+            // No action necessary
+          } else {
+            latestSchema = schemaOrPromise;
+            latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
+          }
+        }
+      }
+      if (schemaPrepare !== null) {
+        const schemaReady = await Promise.race([
+          schemaPrepare,
+          sleep(instance.dynamicOptions.schemaWaitTime),
+        ]);
+        if (schemaReady !== true) {
+          // Handle missing schema
+          throw new Error(`Schema isn't ready`);
+        }
+      }
+      const schema = latestSchema;
+      const parseAndValidate = latestParseAndValidate;
+
+      const parsedBody = { ...message.payload } as ParsedGraphQLBody;
+      await hooks.process("processGraphQLRequestBody", {
+        body: parsedBody,
+        graphqlWsContext: ctx,
       });
+
+      const { query, operationName, variableValues } =
+        validateGraphQLBody(parsedBody);
+      const { errors, document } = parseAndValidate(query);
+      if (errors) {
+        return errors;
+      }
+      const args: ExecutionArgs = {
+        schema,
+        document,
+        rootValue: null,
+        contextValue: Object.create(null),
+        variableValues,
+        operationName,
+      };
+
+      await hookArgs(args, resolvedPreset, {
+        ws: {
+          request: (ctx.extra as Extra).request,
+          socket: (ctx.extra as Extra).socket,
+          connectionParams: ctx.connectionParams,
+        },
+      });
+
+      return args;
+    },
+    async execute(args: ExecutionArgs) {
       return maskExecutionResult(await execute(args, resolvedPreset));
     },
-    subscribe: async (args: ExecutionArgs) => {
-      await hookArgs(args, instance.resolvedPreset, {
-        ws: (args.contextValue as any)?.[$$ws],
-      });
+    async subscribe(args: ExecutionArgs) {
       return maskExecutionResult(await subscribe(args, resolvedPreset));
     },
   };

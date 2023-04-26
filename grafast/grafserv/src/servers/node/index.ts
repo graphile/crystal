@@ -1,3 +1,4 @@
+import { SafeError } from "grafast";
 import { CloseCode, makeServer } from "graphql-ws";
 import type {
   IncomingMessage,
@@ -129,7 +130,7 @@ export class NodeGrafservBase extends GrafservBase {
 
         switch (result.type) {
           case "error": {
-            if (result.error.safeMessage && result.error.statusCode) {
+            if (result.error instanceof SafeError) {
               const payload = Buffer.from(result.error.message, "utf8");
               res.writeHead(result.statusCode, {
                 "Content-Type": "text/plain; charset=utf-8",

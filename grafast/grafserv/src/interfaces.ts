@@ -1,12 +1,14 @@
 import "graphile-config";
 
-import type { PromiseOrDirect } from "grafast";
+import type { PromiseOrDirect, SafeError } from "grafast";
+import type { PluginHook } from "graphile-config";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
   GraphQLError,
   GraphQLSchema,
 } from "graphql";
+import type { Context } from "graphql-ws";
 
 import type { OptionsFromConfig } from "./options";
 
@@ -19,67 +21,39 @@ export interface GrafservConfig {
   preset?: GraphileConfig.Preset;
 }
 
-export interface GrafservOptions {
-  /** Port number to listen on */
-  port?: number;
-  /** Host to listen on */
-  host?: string;
-
-  /** The path at which GraphQL will be available; usually /graphql */
-  graphqlPath?: string;
-  /** The path at which the GraphQL event stream would be made available; usually /graphql/stream */
-  eventStreamPath?: string;
-
-  /** If true, allow GraphQL over GET requests. This has security ramifications, exercise caution. */
-  graphqlOverGET?: boolean;
-
-  graphiql?: boolean;
-  /** If true, then we will render GraphiQL on GET requests to the /graphql endpoint */
-  graphiqlOnGraphQLGET?: boolean;
-  /** The path at which GraphiQL will be available; usually / */
-  graphiqlPath?: string;
-
-  /** Set true to enable watch mode */
-  watch?: boolean;
-
-  /** The length, in bytes, for the largest request body that grafserv will accept */
-  maxRequestLength?: number;
-
-  /** How long (in milliseconds) should we wait for a schema promise to resolve before sending a failure to the client? */
-  schemaWaitTime?: number;
-
-  /**
-   * Use grafast 'string' optimization - response will be partially stringified
-   * already, use `stringifyPayload` before sending to the user
-   *
-   * @remarks
-   *
-   * This is a `grafserv` option rather than a `grafast` option because the
-   * server is responsible for stringifying the body before sending it to the
-   * user, via `stringifyPayload`. If we were to make this a `grafast` option
-   * then everything using grafast would be affected by it, and code expecting
-   * objects would break.
-   */
-  outputDataAsString?: boolean;
-
-  /**
-   * Temporary hack to allow easy testing with graphql-http.com
-   */
-  dangerouslyAllowAllCORSRequests?: boolean;
-
-  /**
-   * Should we enable a websockets transport if available?
-   */
-  websockets?: boolean;
-
-  /**
-   * If you would like to customize the way in which errors are masked, you may
-   * pass your own error masking function here. You can also import
-   * `defaultMaskError` from `grafserv`.
-   */
-  maskError?: (error: GraphQLError) => GraphQLError;
+/**
+ * Represents the core parameters from the GraphQL request, these may not yet
+ * be fully validated to allow for things such as persisted operations to kick
+ * in later.
+ */
+export interface ParsedGraphQLBody {
+  id: unknown;
+  documentId: unknown;
+  query: unknown;
+  operationName: unknown;
+  variableValues: unknown;
+  extensions: unknown;
 }
 
+/**
+ * The validated GraphQL request parameters, after any transforms (such as
+ * persisted operations) are applied; ready to be fed to Grafast.
+ */
+export interface ValidatedGraphQLBody {
+  query: string;
+  operationName: string | undefined;
+  variableValues: Record<string, any> | undefined;
+  extensions: Record<string, any> | undefined;
+}
+
+export interface GrafservPluginContext {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+}
+export interface ProcessGraphQLRequestBodyEvent {
+  body: ParsedGraphQLBody;
+  request?: NormalizedRequestDigest;
+  graphqlWsContext?: Context;
+}
 declare global {
   namespace Grafast {
     interface RequestContext {
@@ -93,6 +67,84 @@ declare global {
        * Configuration options for Grafserv
        */
       grafserv?: GrafservOptions;
+    }
+    interface Plugin {
+      grafserv?: {
+        hooks?: {
+          [key in keyof GrafservHooks]?: PluginHook<
+            GrafservHooks[key] extends (...args: infer UArgs) => infer UResult
+              ? (info: GrafservPluginContext, ...args: UArgs) => UResult
+              : never
+          >;
+        };
+      };
+    }
+    interface GrafservOptions {
+      /** Port number to listen on */
+      port?: number;
+      /** Host to listen on */
+      host?: string;
+
+      /** The path at which GraphQL will be available; usually /graphql */
+      graphqlPath?: string;
+      /** The path at which the GraphQL event stream would be made available; usually /graphql/stream */
+      eventStreamPath?: string;
+
+      /** If true, allow GraphQL over GET requests. This has security ramifications, exercise caution. */
+      graphqlOverGET?: boolean;
+
+      graphiql?: boolean;
+      /** If true, then we will render GraphiQL on GET requests to the /graphql endpoint */
+      graphiqlOnGraphQLGET?: boolean;
+      /** The path at which GraphiQL will be available; usually / */
+      graphiqlPath?: string;
+
+      /** Set true to enable watch mode */
+      watch?: boolean;
+
+      /** The length, in bytes, for the largest request body that grafserv will accept */
+      maxRequestLength?: number;
+
+      /** How long (in milliseconds) should we wait for a schema promise to resolve before sending a failure to the client? */
+      schemaWaitTime?: number;
+
+      /**
+       * Use grafast 'string' optimization - response will be partially stringified
+       * already, use `stringifyPayload` before sending to the user
+       *
+       * @remarks
+       *
+       * This is a `grafserv` option rather than a `grafast` option because the
+       * server is responsible for stringifying the body before sending it to the
+       * user, via `stringifyPayload`. If we were to make this a `grafast` option
+       * then everything using grafast would be affected by it, and code expecting
+       * objects would break.
+       */
+      outputDataAsString?: boolean;
+
+      /**
+       * Temporary hack to allow easy testing with graphql-http.com
+       */
+      dangerouslyAllowAllCORSRequests?: boolean;
+
+      /**
+       * Should we enable a websockets transport if available?
+       */
+      websockets?: boolean;
+
+      /**
+       * If you would like to customize the way in which errors are masked, you may
+       * pass your own error masking function here. You can also import
+       * `defaultMaskError` from `grafserv`.
+       */
+      maskError?: (error: GraphQLError) => GraphQLError;
+    }
+
+    interface GrafservHooks {
+      init(event: Record<string, never>): PromiseOrDirect<void>;
+      processGraphQLRequestBody(
+        event: ProcessGraphQLRequestBodyEvent,
+      ): PromiseOrDirect<void>;
     }
   }
 }
@@ -216,7 +268,7 @@ export interface ErrorResult {
   type: "error";
   statusCode: number;
   headers: Record<string, string>;
-  error: Error & { statusCode?: number; safeMessage?: boolean };
+  error: Error | SafeError;
 }
 
 export interface BufferResult {
