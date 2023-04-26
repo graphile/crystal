@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
-import { isPromiseLike, stringifyPayload, SafeError } from "grafast";
+import { isPromiseLike, SafeError, stringifyPayload } from "grafast";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 import { GraphQLError, isSchema, validateSchema } from "graphql";

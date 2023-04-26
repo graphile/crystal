@@ -38,7 +38,7 @@ const PersistedPlugin: GraphileConfig.Plugin = {
               body.query = q;
             } else {
               throw new SafeError(
-                "Persisted operations are enabled on this server, only previously approved GraphQL documents may be issued.",
+                "Persisted operations are enabled on this server, please provide an approved document id.",
                 { statusCode: 400 },
               );
             }
@@ -48,7 +48,7 @@ const PersistedPlugin: GraphileConfig.Plugin = {
             body.query = realQuery;
           } else {
             throw new SafeError(
-              "Persisted operations are enabled on this server, only previously approved GraphQL documents may be issued.",
+              "Persisted operations are enabled on this server, please provide an approved document id.",
               { statusCode: 400 },
             );
           }
