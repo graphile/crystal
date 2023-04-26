@@ -1,11 +1,5 @@
-import {
-  execute,
-  hookArgs,
-  PromiseOrDirect,
-  SafeError,
-  stripAnsi,
-  subscribe,
-} from "grafast";
+import type { PromiseOrDirect } from "grafast";
+import { execute, hookArgs, SafeError, stripAnsi, subscribe } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
