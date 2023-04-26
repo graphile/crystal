@@ -36,7 +36,12 @@ function handleGraphQLHandlerError(
       request,
       dynamicOptions,
       payload: {
-        errors: [new GraphQLError(e.message, null, null, null, null, e)],
+        errors: [
+          new GraphQLError(e.message, null, null, null, null, e, {
+            // TODO: do we want this here or not?
+            statusCode: e.statusCode,
+          }),
+        ],
       },
       statusCode: e.statusCode,
       // TODO: we should respect the `accept` header here if we can.
@@ -58,7 +63,8 @@ function handleGraphQLHandlerError(
     request,
     dynamicOptions,
     payload: { errors: [graphqlError] },
-    statusCode: 500,
+    statusCode:
+      (graphqlError.extensions?.statusCode as number | undefined) ?? 500,
     // Fall back to application/json; this is when an unexpected error happens
     // so it shouldn't be hit.
     contentType: APPLICATION_JSON,

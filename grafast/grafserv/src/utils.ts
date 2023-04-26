@@ -40,6 +40,7 @@ export function handleErrors(
       return Object.assign(obj, {
         message: stripAnsi(obj.message),
         extensions: {
+          ...(e instanceof GraphQLError ? e.extensions : null),
           ...(e.stack
             ? {
                 stack: stripAnsi(e.stack).split("\n"),

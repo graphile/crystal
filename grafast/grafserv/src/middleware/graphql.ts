@@ -441,7 +441,9 @@ export const makeGraphQLHandler = (
       // Validate that the body is of the right shape
       body = validateGraphQLBody(parsedBody);
     } catch (e) {
-      if (
+      if (e instanceof GraphQLError) {
+        throw e;
+      } else if (
         typeof e.statusCode === "number" &&
         e.statusCode >= 400 &&
         e.statusCode < 600
