@@ -22,10 +22,8 @@ const PersistedPlugin: GraphileConfig.Plugin = {
         const { body } = event;
         const options = info.resolvedPreset.grafserv;
         if (!options) {
-          throw Object.assign(
-            new Error(
-              "Persisted operations misconfigured; rejecting requests.",
-            ),
+          throw new SafeError(
+            "Persisted operations misconfigured; rejecting requests.",
             { statusCode: 500 },
           );
         }
