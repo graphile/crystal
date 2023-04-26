@@ -432,8 +432,11 @@ export const makeGraphQLHandler = (
 
       // Apply our hooks (if any) to the body (they will mutate the body in place)
       const hookResult =
-        hooks.callbacks.processBody != null
-          ? hooks.process("processBody", { body: parsedBody, request })
+        hooks.callbacks.processGraphQLRequestBody != null
+          ? hooks.process("processGraphQLRequestBody", {
+              body: parsedBody,
+              request,
+            })
           : undefined;
       if (hookResult) {
         await hookResult;

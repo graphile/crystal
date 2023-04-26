@@ -1,6 +1,9 @@
 import type { PromiseOrDirect } from "grafast";
 import { SafeError } from "grafast";
-import type { ParsedGraphQLBody, ProcessBodyEvent } from "grafserv";
+import type {
+  ParsedGraphQLBody,
+  ProcessGraphQLRequestBodyEvent,
+} from "grafserv";
 import type {} from "graphile-config";
 import fsp from "node:fs/promises";
 
@@ -15,7 +18,7 @@ const PersistedPlugin: GraphileConfig.Plugin = {
 
   grafserv: {
     hooks: {
-      processBody(info, event) {
+      processGraphQLRequestBody(info, event) {
         const { body } = event;
         const options = info.resolvedPreset.grafserv;
         if (!options) {
@@ -249,7 +252,7 @@ interface RequestPayload extends ParsedGraphQLBody {
 
 function shouldAllowUnpersistedOperation(
   options: GraphileConfig.GrafservOptions,
-  event: ProcessBodyEvent,
+  event: ProcessGraphQLRequestBodyEvent,
 ): boolean {
   const { allowUnpersistedOperation } = options;
   if (typeof allowUnpersistedOperation === "function") {

@@ -3,6 +3,6 @@ export {
   GrafservConfig,
   NormalizedRequestDigest,
   ParsedGraphQLBody,
-  ProcessBodyEvent,
+  ProcessGraphQLRequestBodyEvent,
   ValidatedGraphQLBody,
 } from "./interfaces.js";

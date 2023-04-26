@@ -1,5 +1,8 @@
 import type { PromiseOrDirect } from "grafast";
-import type { ParsedGraphQLBody, ProcessBodyEvent } from "grafserv";
+import type {
+  ParsedGraphQLBody,
+  ProcessGraphQLRequestBodyEvent,
+} from "grafserv";
 import type {} from "graphile-config";
 
 /**
@@ -72,7 +75,7 @@ declare global {
        */
       allowUnpersistedOperation?:
         | boolean
-        | ((event: ProcessBodyEvent) => boolean);
+        | ((event: ProcessGraphQLRequestBodyEvent) => boolean);
     }
   }
 }

@@ -49,7 +49,7 @@ export interface ValidatedGraphQLBody {
 export interface GrafservPluginContext {
   resolvedPreset: GraphileConfig.ResolvedPreset;
 }
-export interface ProcessBodyEvent {
+export interface ProcessGraphQLRequestBodyEvent {
   body: ParsedGraphQLBody;
   request?: NormalizedRequestDigest;
   graphqlWsContext?: Context;
@@ -142,7 +142,9 @@ declare global {
 
     interface GrafservHooks {
       init(event: Record<string, never>): PromiseOrDirect<void>;
-      processBody(event: ProcessBodyEvent): PromiseOrDirect<void>;
+      processGraphQLRequestBody(
+        event: ProcessGraphQLRequestBodyEvent,
+      ): PromiseOrDirect<void>;
     }
   }
 }

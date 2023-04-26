@@ -202,7 +202,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       const parseAndValidate = latestParseAndValidate;
 
       const parsedBody = { ...message.payload } as ParsedGraphQLBody;
-      await hooks.process("processBody", {
+      await hooks.process("processGraphQLRequestBody", {
         body: parsedBody,
         graphqlWsContext: ctx,
       });
