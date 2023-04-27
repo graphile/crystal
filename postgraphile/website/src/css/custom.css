@@ -53,8 +53,27 @@ figure figcaption {
   padding-bottom: 0;
   background: transparent;
 }
+.featureSummary details > div > div {
+  border-radius: 7px;
+  background-color: var(--ifm-alert-background-color);
+  padding: 1rem;
+}
+.featureSummary details > div > div {
+  border-top: none;
+}
+.featureSummary details img {
+  max-width: calc(100%);
+}
+.featureSummary details figure {
+  margin: 0;
+  padding: 0;
+}
+
 .featureSummary details > * {
   padding-left: 1rem;
+}
+.featureSummary details > summary > p {
+  display: inline;
 }
 .featureSummary details > summary::after {
   content: "(click to expand)";
