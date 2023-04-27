@@ -128,7 +128,7 @@ Generate personalized documentation based on which plugins/presets you're using
 
 <figure>
 
-[![Cropped screenshot of 'graphile config options'](../graphile-config-options-screenshot.png)](./graphile-config-options-screenshot.png)
+[![Cropped screenshot of 'graphile config options'](../graphile-config-options-screenshot.png)](../graphile-config-options-screenshot.png)
 
 <figcaption>Screenshot of part of the coloured markdown output from executing <code>graphile config options</code> showing the options available to be set inside the config file.</figcaption>
 </figure>
@@ -149,7 +149,7 @@ Generate personalized documentation based on which plugins/presets you're using
 
 <figure>
 
-[![Cropped screenshot of 'graphile config print'](../graphile-config-print-screenshot.png)](./graphile-config-print-screenshot.png)
+[![Cropped screenshot of 'graphile config print'](../graphile-config-print-screenshot.png)](../graphile-config-print-screenshot.png)
 
 <figcaption>Screenshot of part of the coloured output from executing <code>graphile config print</code> showing the options that the local configuration file is using.</figcaption>
 </figure>
