@@ -1,8 +1,8 @@
 ---
-title: "V5 Feature Summary"
+title: "V5 New Feature Summary"
 ---
 
-# Version 5 Feature Summary
+# Version 5 New Feature Summary
 
 One of the main aims for PostGraphile V5 was to replace the cumbersome "lookahead engine"
 with something much more pleasant and powerful. After many iterations, we ultimately invented
