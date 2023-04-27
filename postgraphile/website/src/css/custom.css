@@ -43,3 +43,53 @@ figure figcaption {
   font-style: italic;
   text-align: center;
 }
+
+.featureSummary details {
+  border: none;
+  box-shadow: none;
+  color: var(--ifm-font-color-base); /* TODO: should be theme variable */
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  background: transparent;
+}
+.featureSummary details > div > div {
+  border-radius: 7px;
+  background-color: var(--ifm-alert-background-color);
+  padding: 1rem;
+}
+.featureSummary details > div > div {
+  border-top: none;
+}
+.featureSummary details img {
+  max-width: calc(100%);
+}
+.featureSummary details figure {
+  margin: 0;
+  padding: 0;
+}
+
+.featureSummary details > * {
+  padding-left: 1rem;
+}
+.featureSummary details > summary > p {
+  display: inline;
+}
+.featureSummary details > summary::after {
+  content: "(click to expand)";
+  margin-left: 0.5rem;
+  font-size: small;
+  color: var(--docusaurus-details-decoration-color);
+}
+.featureSummary details[open] > summary::after {
+  content: "(close)";
+}
+.featureSummary ul {
+  margin-bottom: 0;
+}
+.featureSummary details ul {
+  margin-bottom: 1rem;
+}
+.featureSummary code {
+  background-color: var(--docusaurus-highlighted-code-line-bg);
+}

@@ -155,6 +155,7 @@ const sidebars = {
         id: "migrating-from-v4/index",
       },
       items: [
+        "migrating-from-v4/v5-new-feature-summary",
         "migrating-from-v4/make-plugin-by-combining-plugins",
         "migrating-from-v4/make-wrap-resolvers-plugin",
         "migrating-from-v4/make-add-inflectors-plugin",
