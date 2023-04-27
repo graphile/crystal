@@ -11,6 +11,12 @@ Coming from PostGraphile Version 4? Check out the
 
 :::
 
+:::info
+
+To run PostGraphile Version 5, you will need an environmental variable whilst the software is still Sponsors Only. See [the Gra*fast* caveats page](https://grafast.org/caveats/) for details. You can enter the Gra*fast* website using the same access code you used to get here.
+
+:::
+
 If you already use PostgreSQL then you understand the value that a strongly
 typed and well defined schema can bring to application development; GraphQL is
 the perfect match for this technology when it comes to making your data layer
