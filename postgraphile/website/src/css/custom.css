@@ -87,3 +87,6 @@ figure figcaption {
 .featureSummary ul {
   margin-bottom: 0;
 }
+.featureSummary code {
+  background-color: var(--docusaurus-highlighted-code-line-bg);
+}
