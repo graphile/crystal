@@ -43,3 +43,28 @@ figure figcaption {
   font-style: italic;
   text-align: center;
 }
+
+.featureSummary details {
+  border: none;
+  box-shadow: none;
+  color: var(--ifm-font-color-base); /* TODO: should be theme variable */
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  background: transparent;
+}
+.featureSummary details > * {
+  padding-left: 1rem;
+}
+.featureSummary details > summary::after {
+  content: "(click to expand)";
+  margin-left: 0.5rem;
+  font-size: small;
+  color: var(--docusaurus-details-decoration-color);
+}
+.featureSummary details[open] > summary::after {
+  content: "(close)";
+}
+.featureSummary ul {
+  margin-bottom: 0;
+}
