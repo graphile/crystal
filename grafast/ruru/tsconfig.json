@@ -8,9 +8,7 @@
     "target": "es2021",
     "lib": ["dom", "es2021"],
 
-    "noUncheckedIndexedAccess": false,
     "moduleResolution": "Nodenext",
-    "module": "nodenext"
   },
   "include": ["src"],
   "references": [

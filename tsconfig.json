@@ -9,7 +9,7 @@
     "declarationMap": true,
     "allowJs": false,
 
-    "module": "nodenext",
+    "module": "commonjs",
     "moduleResolution": "nodenext",
     "target": "ES2022",
     "lib": ["ES2022"],
@@ -53,6 +53,6 @@
     { "path": "grafast/ruru-components" },
     { "path": "grafast/ruru" },
     { "path": "grafast/grafserv-persisted" },
-    { "path": "postgraphile/postgraphile" }
+    { "path": "postgraphile/postgraphile/tsconfig.build.json" }
   ]
 }

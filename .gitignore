@@ -9,6 +9,7 @@ dist
 yarn-error.log
 npm-debug.log
 tsconfig.tsbuildinfo
+tsconfig.build.tsbuildinfo
 .env
 _LOCAL
 .DS_Store

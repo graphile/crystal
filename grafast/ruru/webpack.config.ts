@@ -53,7 +53,7 @@ export default {
   entry: "./src/bundle.tsx",
   output: {
     // @ts-ignore
-    path: `${path.dirname(fileURLToPath(import.meta.url))}/bundle`,
+    path: `${__dirname}/bundle`,
     filename: "ruru.min.js",
     library: "RuruBundle",
   },

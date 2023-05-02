@@ -11,6 +11,6 @@
     { "path": "../../grafast/dataplan-pg" },
     { "path": "../graphile-build" },
     { "path": "../graphile-build-pg" },
-    { "path": "../../postgraphile/postgraphile" }
+    { "path": "../../postgraphile/postgraphile/tsconfig.build.json" }
   ]
 }

@@ -1,17 +1,14 @@
 import { readFileSync } from "fs";
 import type { GraphiQLProps } from "graphiql";
-import { fileURLToPath } from "node:url";
 import * as path from "path";
+export { RuruConfig } from "./interfaces.js";
 
 const { version } = JSON.parse(
-  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+  readFileSync(path.resolve(__dirname, `../package.json`), "utf8"),
 );
 // TODO: make this 'readFileSync' call webpackable
 const graphiQLContent = readFileSync(
-  path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "../bundle/ruru.min.js",
-  ),
+  path.resolve(__dirname, "../bundle/ruru.min.js"),
   "utf8",
 );
 
