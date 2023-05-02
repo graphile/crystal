@@ -1,8 +1,9 @@
+import type { RuruHTMLParts, RuruServerConfig } from "ruru/server";
+import { defaultHTMLParts, makeHTMLParts, ruruHTML } from "ruru/server";
+
+import { getGrafservHooks } from "../hooks.js";
 import type { HandlerResult, NormalizedRequestDigest } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
-import { getGrafservHooks } from "../hooks.js";
-import type { RuruHTMLParts, RuruServerConfig } from "ruru/server";
-import { ruruHTML, makeHTMLParts, defaultHTMLParts } from "ruru/server";
 
 // TODO: use a specific version of mermaid
 export function makeGraphiQLHandler(

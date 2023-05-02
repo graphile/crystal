@@ -4,7 +4,7 @@
     "rootDir": "src",
     "declarationDir": "./dist",
     "outDir": "./dist",
-    "noEmit": false,
+    "noEmit": false
   },
   "include": ["src"],
   "references": [
@@ -12,4 +12,3 @@
     { "path": "../ruru-components" }
   ]
 }
-

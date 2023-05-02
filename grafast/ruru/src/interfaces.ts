@@ -1,4 +1,4 @@
-import { RuruHTMLParts } from "./server.js";
+import type { RuruHTMLParts } from "./server.js";
 
 declare global {
   namespace GraphileConfig {

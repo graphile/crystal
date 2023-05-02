@@ -4,7 +4,7 @@
     "rootDir": "src",
     "declarationDir": "./dist",
     "outDir": "./dist",
-    "noEmit": false,
+    "noEmit": false
   },
   "include": ["src"],
   "exclude": ["__tests__", "dist"],
@@ -19,4 +19,3 @@
     { "path": "../../utils/graphile-config" }
   ]
 }
-

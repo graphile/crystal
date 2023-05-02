@@ -1,4 +1,4 @@
-import type { Resolver, Configuration } from "webpack";
+import type { Configuration, Resolver } from "webpack";
 import webpack from "webpack";
 
 const JSX_REGEXP = /\.jsx?$/;

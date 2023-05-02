@@ -1,17 +1,16 @@
 /* eslint-disable import/no-unresolved */
-import type {} from "postgraphile";
-import type {} from "grafserv/node";
-import { defaultHTMLParts } from "ruru/server";
-
 import { jsonParse } from "@dataplan/json";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { context, listen, object } from "grafast";
+import type {} from "grafserv/node";
 import { StreamDeferPlugin } from "graphile-build";
 import { EXPORTABLE } from "graphile-export";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import type {} from "postgraphile";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
+import { defaultHTMLParts } from "ruru/server";
 
 import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
 import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";

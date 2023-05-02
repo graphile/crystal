@@ -9,8 +9,8 @@
     "target": "es2021",
     "lib": ["dom", "es2021"],
 
-    "moduleResolution": "Nodenext",
+    "moduleResolution": "Nodenext"
   },
   "include": ["."],
-  "exclude": ["dist", "node_modules"],
+  "exclude": ["dist", "node_modules"]
 }

@@ -9,9 +9,9 @@ import type {
   GraphQLSchema,
 } from "graphql";
 import type { Context } from "graphql-ws";
+import type { RuruHTMLParts } from "ruru/server";
 
 import type { OptionsFromConfig } from "./options";
-import { RuruHTMLParts } from "ruru/server";
 
 export type ContextCallback = (
   requestContext: Grafast.RequestContext,

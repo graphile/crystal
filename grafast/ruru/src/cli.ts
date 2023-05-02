@@ -1,10 +1,11 @@
+import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
-import { resolvePresets } from "graphile-config";
 import type { createProxyServer } from "http-proxy";
 import { createServer } from "node:http";
 
-import { RuruConfig, makeHTMLParts, ruruHTML } from "./server.js";
+import type { RuruConfig } from "./server.js";
+import { makeHTMLParts, ruruHTML } from "./server.js";
 
 export function options(yargs: Argv) {
   return yargs
