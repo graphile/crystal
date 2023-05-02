@@ -4,7 +4,7 @@ import { resolvePresets } from "graphile-config";
 import type { createProxyServer } from "http-proxy";
 import { createServer } from "node:http";
 
-import { RuruConfig, defaultHTMLParts, ruruHTML } from "./server.js";
+import { RuruConfig, makeHTMLParts, ruruHTML } from "./server.js";
 
 export function options(yargs: Argv) {
   return yargs
@@ -109,7 +109,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   } = config.ruru ?? {};
 
   const htmlParts = {
-    ...defaultHTMLParts(),
+    ...makeHTMLParts(),
     ...config.ruru?.htmlParts,
   };
 

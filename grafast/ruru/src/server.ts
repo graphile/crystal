@@ -75,7 +75,7 @@ export interface RuruServerConfig {
 
 /**
  * The parts of the HTML page created to serve Ruru. Create the defaults via
- * `defaultHTMLParts()` and then customize them as you see fit.
+ * `makeHTMLParts()` and then customize them as you see fit.
  */
 export interface RuruHTMLParts {
   /**
@@ -121,7 +121,7 @@ export interface RuruHTMLParts {
   bodyInitScript: string;
 }
 
-export function defaultHTMLParts(): RuruHTMLParts {
+export function makeHTMLParts(): RuruHTMLParts {
   return {
     metaTags: baseMetaTags,
     titleTag: baseTitleTag,
@@ -132,9 +132,12 @@ export function defaultHTMLParts(): RuruHTMLParts {
     bodyInitScript: baseBodyInitScript,
   };
 }
-export const baseHTMLParts = Object.freeze(defaultHTMLParts());
+export const defaultHTMLParts = Object.freeze(makeHTMLParts());
 
-export function ruruHTML(config: RuruServerConfig, htmlParts = baseHTMLParts) {
+export function ruruHTML(
+  config: RuruServerConfig,
+  htmlParts = defaultHTMLParts,
+) {
   const {
     metaTags,
     titleTag,

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import type {} from "postgraphile";
 import type {} from "grafserv/node";
-import { baseHTMLParts } from "ruru/server";
+import { defaultHTMLParts } from "ruru/server";
 
 import { jsonParse } from "@dataplan/json";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
@@ -151,7 +151,7 @@ const preset: GraphileConfig.Preset = {
   ],
   ruru: {
     htmlParts: {
-      metaTags: baseHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
+      metaTags: defaultHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
     },
   },
   inflection: {},
