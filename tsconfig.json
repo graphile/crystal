@@ -51,7 +51,7 @@
     { "path": "utils/pg-introspection" },
     { "path": "utils/graphile" },
     { "path": "grafast/ruru-components" },
-    { "path": "grafast/ruru" },
+    { "path": "grafast/ruru/tsconfig.build.json" },
     { "path": "grafast/grafserv-persisted" },
     { "path": "postgraphile/postgraphile/tsconfig.build.json" }
   ]

@@ -1,6 +1,4 @@
-import * as path from "node:path";
-import { fileURLToPath } from "node:url";
-import type { Resolver } from "webpack";
+import type { Resolver, Configuration } from "webpack";
 import webpack from "webpack";
 
 const JSX_REGEXP = /\.jsx?$/;
@@ -49,7 +47,7 @@ class TsResolvePlugin {
   }
 }
 
-export default {
+const config: Configuration = {
   entry: "./src/bundle.tsx",
   output: {
     // @ts-ignore
@@ -61,8 +59,11 @@ export default {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        loader: "ts-loader",
         exclude: /node_modules/,
+        options: {
+          configFile: "tsconfig.build.json",
+        },
         resolve: { plugins: [new TsResolvePlugin()] },
       },
       {
@@ -88,3 +89,5 @@ export default {
     }),
   ],
 };
+
+export default config;

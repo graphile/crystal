@@ -29,7 +29,7 @@
   "bin": "./dist/cli-run.js",
   "scripts": {
     "test": "jest -i __tests__/queries && jest -i __tests__/mutations && jest -i __tests__/schema",
-    "prepack": "tsc -b"
+    "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {
     "type": "git",

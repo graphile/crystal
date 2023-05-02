@@ -14,7 +14,7 @@
     { "path": "../../grafast/grafast" },
     { "path": "../../grafast/grafserv" },
     { "path": "../../utils/graphile-export" },
-    { "path": "../../grafast/ruru" },
+    { "path": "../../grafast/ruru/tsconfig.build.json" },
     { "path": "../../grafast/grafserv-persisted" },
     { "path": "../../utils/graphile-config" }
   ]

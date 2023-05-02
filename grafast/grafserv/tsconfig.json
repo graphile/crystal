@@ -11,6 +11,6 @@
     { "path": "../../utils/lru" },
     { "path": "../../utils/graphile-config" },
     { "path": "../grafast" },
-    { "path": "../ruru" }
+    { "path": "../ruru/tsconfig.build.json" }
   ]
 }
