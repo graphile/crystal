@@ -11,6 +11,7 @@ import type {
 import type { Context } from "graphql-ws";
 
 import type { OptionsFromConfig } from "./options";
+import { RuruHTMLParts } from "ruru/server";
 
 export type ContextCallback = (
   requestContext: Grafast.RequestContext,
@@ -147,23 +148,7 @@ declare global {
       ): PromiseOrDirect<void>;
       ruruHTMLParts(event: {
         request: NormalizedRequestDigest;
-
-        /**
-         * Copy of `import { RuruHTMLParts } from 'ruru/server'` to avoid TypeScript ESM woes.
-         *
-         * @see https://github.com/microsoft/TypeScript/pull/53426
-         * @see https://github.com/microsoft/TypeScript/issues/49721
-         * @see https://github.com/microsoft/TypeScript/issues/47338
-         */
-        parts: {
-          metaTags: string;
-          titleTag: string;
-          styleTags: string;
-          headerScripts: string;
-          bodyContent: string;
-          bodyScripts: string;
-          bodyInitScript: string;
-        };
+        parts: RuruHTMLParts;
       }): PromiseOrDirect<void>;
     }
   }

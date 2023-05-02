@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unresolved */
-import "postgraphile";
-import "grafserv/node";
+import type {} from "postgraphile";
+import type {} from "grafserv/node";
+import { baseHTMLParts } from "ruru/server";
 
 import { jsonParse } from "@dataplan/json";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
@@ -69,7 +70,7 @@ function escapeHTML(rawText: string): string {
 
 function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
   return {
-    name: "RuruTitle",
+    name: "RuruTitlePlugin",
     version: "0.0.0",
 
     grafserv: {
@@ -148,6 +149,11 @@ const preset: GraphileConfig.Preset = {
     PgManyToManyPreset,
     PostGraphileConnectionFilterPreset,
   ],
+  ruru: {
+    htmlParts: {
+      metaTags: baseHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
+    },
+  },
   inflection: {},
   gather: {},
   schema: {

@@ -14,7 +14,8 @@
     },
     "./server": {
       "types": "./dist/server.d.ts",
-      "node": "./dist/server.js"
+      "node": "./dist/server.js",
+      "default": "./dist/server.js"
     },
     "./cli": {
       "types": "./dist/cli.d.ts",
