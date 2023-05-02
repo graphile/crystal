@@ -20,31 +20,36 @@ const escapeJS = (str: string) => {
     .replaceAll("<script", "<\\script");
 };
 
-const graphiQLHeader = `\
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8" />
-<title>Ruru</title>
+const baseMetaTags = `\
+<meta charset="utf-8" />`;
+const baseTitleTag = `\
+<title>Ruru - GraphQL/Grafast IDE</title>
+`;
+const baseStyleTags = `\
+<style>
+body {
+  margin: 0;
+}
+#ruru-root {
+ height: 100vh;
+}
+</style>`;
+const baseHeaderScripts = `\
 <script src="https://unpkg.com/prettier@1.13.0/standalone.js"></script>
-<script src="https://unpkg.com/prettier@1.13.0/parser-graphql.js"></script>
-</head>
-<body style="margin: 0;">
-<div style="height: 100vh;" id="ruru-root"></div>
-<script>${escapeJS(graphiQLContent)}</script>
+<script src="https://unpkg.com/prettier@1.13.0/parser-graphql.js"></script>`;
+
+const baseElements = `\
+<div id="ruru-root"></div>`;
+const baseBodyScripts = `\
+<script>${escapeJS(graphiQLContent)}</script>`;
+const baseBodyInitScript = `\
 <script>
   const { React, createRoot, Ruru } = RuruBundle;
-  const tree = React.createElement(Ruru, `;
-
-const graphiQLFooter = `\
-);
+  const tree = React.createElement(Ruru, RURU_CONFIG);
   const container = document.getElementById("ruru-root");
   const root = createRoot(container);
   root.render(tree);
-</script>
-</body>
-</html>
-`;
+</script>`;
 
 export interface RuruServerConfig {
   /**
@@ -67,8 +72,92 @@ export interface RuruServerConfig {
   debugTools?: Array<"explain" | "plan">;
 }
 
-export function ruruHTML(config: RuruServerConfig) {
-  return `${graphiQLHeader}${escapeJS(
-    JSON.stringify(config),
-  )}${graphiQLFooter}`;
+/**
+ * The parts of the HTML page created to serve Ruru. Create the defaults via
+ * `defaultHTMLParts()` and then customize them as you see fit.
+ */
+export interface RuruHTMLParts {
+  /**
+   * `<meta />` tags to add to the `<head>` of the HTML page; by default this
+   * is `<meta charset="utf-8" />`
+   */
+  metaTags: string;
+
+  /**
+   * The `<title>...</title>` tag to include in the HTML page.
+   */
+  titleTag: string;
+
+  /**
+   * `<style>` tags in the head of the HTML (or `<link rel="stylesheet" ... />`
+   * if you prefer)
+   */
+  styleTags: string;
+
+  /**
+   * `<script>` tags to put in the header; by default this installs `prettier`.
+   */
+  headerScripts: string;
+
+  /**
+   * Any non-`<script>` tags to put in the `<body>` tag - you _must_ ensure
+   * that this contains `<div id="ruru-root"></div>` for Ruru to be mounted into.
+   */
+  bodyContent: string;
+
+  /**
+   * `<script>` tags to add below the `bodyContent` in the HTML `<body>`. By
+   * default this is the Ruru bundle, but you might consider replacing it with a
+   * `<script src="..."></script>` to enable better browser caching, or even
+   * replace with your own custom Ruru bundle.
+   */
+  bodyScripts: string;
+
+  /**
+   * The very last `<script>` tag in the HTML `<body>`; this is what triggers
+   * Ruru to start running.
+   */
+  bodyInitScript: string;
+}
+
+export function defaultHTMLParts(): RuruHTMLParts {
+  return {
+    metaTags: baseMetaTags,
+    titleTag: baseTitleTag,
+    styleTags: baseStyleTags,
+    headerScripts: baseHeaderScripts,
+    bodyContent: baseElements,
+    bodyScripts: baseBodyScripts,
+    bodyInitScript: baseBodyInitScript,
+  };
+}
+export const baseHTMLParts = Object.freeze(defaultHTMLParts());
+
+export function ruruHTML(config: RuruServerConfig, htmlParts = baseHTMLParts) {
+  const {
+    metaTags,
+    titleTag,
+    styleTags,
+    headerScripts,
+    bodyContent,
+    bodyScripts,
+    bodyInitScript,
+  } = htmlParts;
+
+  return `\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+${metaTags}
+${titleTag}
+${styleTags}
+<script>const RURU_CONFIG = ${escapeJS(JSON.stringify(config))};</script>
+${headerScripts}
+</head>
+<body>
+${bodyContent}
+${bodyScripts}
+${bodyInitScript}
+</body>
+</html>`;
 }

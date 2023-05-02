@@ -53,6 +53,35 @@ const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
 };
 */
 
+const HTML_ESCAPES = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+};
+function escapeHTML(rawText: string): string {
+  return rawText.replace(
+    /[&<>"']/g,
+    (l) => HTML_ESCAPES[l as keyof typeof HTML_ESCAPES],
+  );
+}
+
+function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
+  return {
+    name: "RuruTitle",
+    version: "0.0.0",
+
+    grafserv: {
+      hooks: {
+        ruruHTMLParts(_info, event) {
+          event.parts.titleTag = `<title>${escapeHTML(title)}</title>`;
+        },
+      },
+    },
+  };
+}
+
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
@@ -105,6 +134,7 @@ const preset: GraphileConfig.Preset = {
     }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
+    makeRuruTitlePlugin("<New title text here!>"),
   ],
   extends: [
     postgraphilePresetAmber,
