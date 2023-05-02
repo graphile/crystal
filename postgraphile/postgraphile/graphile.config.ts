@@ -163,7 +163,7 @@ const preset: GraphileConfig.Preset = {
     sortExport: true,
   },
   grafserv: {
-    graphqlPath: "/v2/graphql",
+    graphqlPath: "/graphql",
     websockets: true,
     graphqlOverGET: true,
     persistedOperationsDirectory: `${process.cwd()}/.persisted_operations`,
