@@ -3,6 +3,9 @@ import type { GraphiQLProps } from "graphiql";
 import { fileURLToPath } from "node:url";
 import * as path from "path";
 
+const { version } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+);
 // TODO: make this 'readFileSync' call webpackable
 const graphiQLContent = readFileSync(
   path.resolve(
@@ -41,7 +44,8 @@ const baseHeaderScripts = `\
 const baseElements = `\
 <div id="ruru-root"></div>`;
 const baseBodyScripts = `\
-<script>${escapeJS(graphiQLContent)}</script>`;
+<script>/*! For license information, see https://unpkg.com/ruru@${version}/bundle/ruru.min.js.LICENSE.txt */
+${escapeJS(graphiQLContent)}</script>`;
 const baseBodyInitScript = `\
 <script>
   const { React, createRoot, Ruru } = RuruBundle;
