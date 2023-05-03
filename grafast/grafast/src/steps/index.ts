@@ -77,18 +77,14 @@ export {
   GraphQLResolverStep,
 } from "./graphqlResolver.js";
 export {
+  LoadedRecordStep,
   loadMany,
   LoadManyCallback,
   loadManyCallback,
-  LoadManyOptions,
-  LoadManySingleRecordStep,
-  LoadManyStep,
-} from "./loadMany.js";
-export {
   loadOne,
   LoadOneCallback,
   loadOneCallback,
-  LoadOneOptions,
-  LoadOneStep,
-} from "./loadOne.js";
+  LoadOptions,
+  LoadStep,
+} from "./load.js";
 export { proxy, ProxyStep } from "./proxy.js";
