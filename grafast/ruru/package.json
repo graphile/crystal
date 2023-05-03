@@ -2,7 +2,7 @@
   "name": "ruru",
   "version": "2.0.0-alpha.1",
   "description": "Grafast-flavoured GraphiQL distribution",
-  "type": "module",
+  "type": "commonjs",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": "./dist/cli-run.js",
@@ -14,7 +14,8 @@
     },
     "./server": {
       "types": "./dist/server.d.ts",
-      "node": "./dist/server.js"
+      "node": "./dist/server.js",
+      "default": "./dist/server.js"
     },
     "./cli": {
       "types": "./dist/cli.d.ts",
@@ -24,7 +25,7 @@
   "scripts": {
     "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\"",
     "watch": "yarn webpack --watch --mode=development",
-    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo && tsc -b && yarn webpack --mode=production"
+    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && tsc -b tsconfig.build.json && yarn webpack --mode=production"
   },
   "repository": {
     "type": "git",

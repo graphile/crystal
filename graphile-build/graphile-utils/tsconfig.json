@@ -10,6 +10,6 @@
   "references": [
     { "path": "../../utils/graphile-config" },
     { "path": "../../grafast/grafast" },
-    { "path": "../../postgraphile/postgraphile" }
+    { "path": "../../postgraphile/postgraphile/tsconfig.build.json" }
   ]
 }

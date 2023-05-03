@@ -1,20 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
+    "rootDir": ".",
     "declarationDir": "./dist",
     "outDir": "./dist",
+    "noEmit": true,
     "jsx": "react-jsx",
     "target": "es2021",
     "lib": ["dom", "es2021"],
 
-    "noUncheckedIndexedAccess": false,
-    "moduleResolution": "Nodenext",
-    "module": "nodenext"
+    "moduleResolution": "Nodenext"
   },
-  "include": ["src"],
-  "references": [
-    { "path": "../../utils/graphile-config" },
-    { "path": "../ruru-components" }
-  ]
+  "include": ["."],
+  "exclude": ["dist", "node_modules"]
 }

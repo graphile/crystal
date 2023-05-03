@@ -1,20 +1,31 @@
+import type { RuruHTMLParts, RuruServerConfig } from "ruru/server";
+import { defaultHTMLParts, makeHTMLParts, ruruHTML } from "ruru/server";
+
+import { getGrafservHooks } from "../hooks.js";
 import type { HandlerResult, NormalizedRequestDigest } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 
-const ruruServer = import("ruru/server");
-type RuruHTMLFunction = Awaited<typeof ruruServer>["ruruHTML"];
-let ruruHTML: RuruHTMLFunction | undefined = undefined;
-
 // TODO: use a specific version of mermaid
 export function makeGraphiQLHandler(
-  _resolvedPreset: GraphileConfig.ResolvedPreset,
+  resolvedPreset: GraphileConfig.ResolvedPreset,
   dynamicOptions: OptionsFromConfig,
 ) {
+  const { htmlParts: htmlPartsFromConfig } = resolvedPreset?.ruru ?? {};
+  const hooks = getGrafservHooks(resolvedPreset);
+  const unhookedHTMLParts: RuruHTMLParts = {
+    ...defaultHTMLParts,
+    ...htmlPartsFromConfig,
+  };
   return async (request: NormalizedRequestDigest): Promise<HandlerResult> => {
-    if (!ruruHTML) {
-      ruruHTML = (await ruruServer).ruruHTML;
+    let htmlParts = unhookedHTMLParts!;
+    if (hooks.callbacks.ruruHTMLParts) {
+      htmlParts = {
+        ...makeHTMLParts(),
+        ...htmlPartsFromConfig,
+      };
+      await hooks.process("ruruHTMLParts", htmlParts, { request });
     }
-    const config: Parameters<RuruHTMLFunction>[0] = {
+    const config: RuruServerConfig = {
       endpoint: dynamicOptions.graphqlPath,
       // TODO: websocket endpoint
       debugTools:
@@ -29,7 +40,7 @@ export function makeGraphiQLHandler(
       request,
       dynamicOptions,
       type: "html",
-      payload: Buffer.from(ruruHTML(config), "utf8"),
+      payload: Buffer.from(ruruHTML(config, htmlParts), "utf8"),
     };
   };
 }

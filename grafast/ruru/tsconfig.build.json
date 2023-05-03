@@ -1,16 +1,14 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "declarationDir": "./dist",
     "outDir": "./dist",
-    "moduleResolution": "nodenext"
+    "noEmit": false
   },
   "include": ["src"],
   "references": [
-    { "path": "../../utils/lru" },
     { "path": "../../utils/graphile-config" },
-    { "path": "../grafast" },
-    { "path": "../ruru/tsconfig.build.json" }
+    { "path": "../ruru-components" }
   ]
 }

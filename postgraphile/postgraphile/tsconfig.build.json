@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
+    "noEmit": false
+  },
+  "include": ["src"],
+  "exclude": ["__tests__", "dist"],
+  "references": [
+    { "path": "../../graphile-build/graphile-build" },
+    { "path": "../../graphile-build/graphile-build-pg" },
+    { "path": "../../grafast/grafast" },
+    { "path": "../../grafast/grafserv" },
+    { "path": "../../utils/graphile-export" },
+    { "path": "../../grafast/ruru/tsconfig.build.json" },
+    { "path": "../../grafast/grafserv-persisted" },
+    { "path": "../../utils/graphile-config" }
+  ]
+}

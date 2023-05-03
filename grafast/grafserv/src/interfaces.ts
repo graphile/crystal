@@ -9,6 +9,7 @@ import type {
   GraphQLSchema,
 } from "graphql";
 import type { Context } from "graphql-ws";
+import type { RuruHTMLParts } from "ruru/server";
 
 import type { OptionsFromConfig } from "./options";
 
@@ -144,6 +145,12 @@ declare global {
       init(event: Record<string, never>): PromiseOrDirect<void>;
       processGraphQLRequestBody(
         event: ProcessGraphQLRequestBodyEvent,
+      ): PromiseOrDirect<void>;
+      ruruHTMLParts(
+        parts: RuruHTMLParts,
+        extra: {
+          request: NormalizedRequestDigest;
+        },
       ): PromiseOrDirect<void>;
     }
   }

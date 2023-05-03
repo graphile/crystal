@@ -15,7 +15,7 @@
     { "path": "../graphile-build" },
     { "path": "../../grafast/grafast" },
     { "path": "../../utils/graphile-export" },
-    { "path": "../../grafast/ruru" },
+    { "path": "../../grafast/ruru/tsconfig.build.json" },
     { "path": "../../utils/graphile-config" },
     { "path": "../../utils/pg-introspection" },
     { "path": "../../utils/tamedevil" }

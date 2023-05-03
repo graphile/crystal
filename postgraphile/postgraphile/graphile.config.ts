@@ -1,16 +1,16 @@
 /* eslint-disable import/no-unresolved */
-import "postgraphile";
-import "grafserv/node";
-
 import { jsonParse } from "@dataplan/json";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { context, listen, object } from "grafast";
+import type {} from "grafserv/node";
 import { StreamDeferPlugin } from "graphile-build";
 import { EXPORTABLE } from "graphile-export";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import type {} from "postgraphile";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
+import { defaultHTMLParts } from "ruru/server";
 
 import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
 import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";
@@ -52,6 +52,37 @@ const PrimaryKeyMutationsOnlyPlugin: GraphileConfig.Plugin = {
   },
 };
 */
+
+const HTML_ESCAPES = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+};
+function escapeHTML(rawText: string): string {
+  return rawText.replace(
+    /[&<>"']/g,
+    (l) => HTML_ESCAPES[l as keyof typeof HTML_ESCAPES],
+  );
+}
+
+function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
+  return {
+    name: "RuruTitlePlugin",
+    version: "0.0.0",
+
+    grafserv: {
+      hooks: {
+        ruruHTMLParts(_info, parts, extra) {
+          parts.titleTag = `<title>${escapeHTML(
+            title + " | " + extra.request.getHeader("host"),
+          )}</title>`;
+        },
+      },
+    },
+  };
+}
 
 const preset: GraphileConfig.Preset = {
   plugins: [
@@ -105,6 +136,7 @@ const preset: GraphileConfig.Preset = {
     }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
+    makeRuruTitlePlugin("<New title text here!>"),
   ],
   extends: [
     postgraphilePresetAmber,
@@ -118,6 +150,11 @@ const preset: GraphileConfig.Preset = {
     PgManyToManyPreset,
     PostGraphileConnectionFilterPreset,
   ],
+  ruru: {
+    htmlParts: {
+      metaTags: defaultHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
+    },
+  },
   inflection: {},
   gather: {},
   schema: {
@@ -127,7 +164,7 @@ const preset: GraphileConfig.Preset = {
     sortExport: true,
   },
   grafserv: {
-    graphqlPath: "/v2/graphql",
+    graphqlPath: "/graphql",
     websockets: true,
     graphqlOverGET: true,
     persistedOperationsDirectory: `${process.cwd()}/.persisted_operations`,

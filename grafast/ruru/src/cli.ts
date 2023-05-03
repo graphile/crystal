@@ -1,8 +1,11 @@
+import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
+import { loadConfig } from "graphile-config/load";
 import type { createProxyServer } from "http-proxy";
 import { createServer } from "node:http";
 
-import { ruruHTML } from "./server.js";
+import type { RuruConfig } from "./server.js";
+import { makeHTMLParts, ruruHTML } from "./server.js";
 
 export function options(yargs: Argv) {
   return yargs
@@ -15,13 +18,11 @@ export function options(yargs: Argv) {
       alias: "e",
       type: "string",
       description: "endpoint for query and mutation operations",
-      default: "http://localhost:5678/graphql",
     })
     .option("port", {
       alias: "p",
       type: "number",
       description: "port number to run the server on",
-      default: 1337,
     })
     .option("proxy", {
       alias: "P",
@@ -32,12 +33,17 @@ export function options(yargs: Argv) {
       alias: "S",
       type: "boolean",
       description: "enable subscriptions, converting --endpoint to a ws:// URL",
-      default: false,
     })
     .option("subscription-endpoint", {
       alias: "s",
       type: "string",
       description: "endpoint for subscription operations (overrides -S)",
+    })
+    .option("config", {
+      alias: "C",
+      type: "string",
+      description: "The path to the graphile.config.mjs (or similar) file",
+      normalize: true,
     });
 }
 
@@ -55,14 +61,59 @@ async function tryLoadHttpProxyCreateProxyServer(): Promise<
   }
 }
 
-export async function run(args: ArgsFromOptions<typeof options>) {
+async function configFromArgs(args: ArgsFromOptions<typeof options>) {
   const {
     port,
     endpoint,
     subscriptionEndpoint,
     subscriptions,
     proxy: enableProxy,
+    config: configFileLocation,
   } = args;
+
+  const userPreset = await loadConfig(configFileLocation);
+
+  const preset = {
+    extends: [...(userPreset ? [userPreset] : [])],
+    ruru: {} as RuruConfig,
+  } satisfies GraphileConfig.Preset;
+
+  if (port) {
+    preset.ruru.port = port;
+  }
+  if (endpoint) {
+    preset.ruru.endpoint = endpoint;
+  }
+  if (subscriptionEndpoint) {
+    preset.ruru.subscriptionEndpoint = subscriptionEndpoint;
+  }
+  if (subscriptions) {
+    preset.ruru.subscriptions = subscriptions;
+  }
+  if (enableProxy) {
+    preset.ruru.enableProxy = enableProxy;
+  }
+
+  const config = resolvePresets([preset]);
+  return config;
+}
+
+export async function run(args: ArgsFromOptions<typeof options>) {
+  const config = await configFromArgs(args);
+
+  const {
+    port = 1337,
+    endpoint = "http://localhost:5678/graphql",
+    subscriptionEndpoint,
+    subscriptions = false,
+    enableProxy,
+  } = config.ruru ?? {};
+
+  const htmlParts = {
+    ...makeHTMLParts(),
+    ...config.ruru?.htmlParts,
+  };
+
   const createProxyServer = enableProxy
     ? await tryLoadHttpProxyCreateProxyServer()
     : null;
@@ -117,16 +168,19 @@ export async function run(args: ArgsFromOptions<typeof options>) {
         "Content-Type": "text/html; charset=utf-8",
       });
       res.end(
-        ruruHTML({
-          endpoint: proxy
-            ? endpointUrl.pathname + endpointUrl.search
-            : endpoint,
-          subscriptionEndpoint:
-            proxy && subscriptionsEndpointUrl
-              ? subscriptionsEndpointUrl.pathname +
-                subscriptionsEndpointUrl.search
-              : subscriptionEndpoint,
-        }),
+        ruruHTML(
+          {
+            endpoint: proxy
+              ? endpointUrl.pathname + endpointUrl.search
+              : endpoint,
+            subscriptionEndpoint:
+              proxy && subscriptionsEndpointUrl
+                ? subscriptionsEndpointUrl.pathname +
+                  subscriptionsEndpointUrl.search
+                : subscriptionEndpoint,
+          },
+          htmlParts,
+        ),
       );
       return;
     }
@@ -150,7 +204,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   server.listen(port, () => {
     console.log(
-      `Serving Ruru at http://localhost:${port} for GraphQL API at '${args.endpoint}'`,
+      `Serving Ruru at http://localhost:${port} for GraphQL API at '${endpoint}'`,
     );
   });
 }
