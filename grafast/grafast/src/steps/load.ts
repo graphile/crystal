@@ -150,16 +150,7 @@ export class LoadStep<
   TData extends TItem | ReadonlyArray<TItem>,
   TParams extends Record<string, any>,
 > extends ExecutableStep {
-  /*
-  implements
-    ListCapableStep<
-      TItem,
-      LoadedRecordStep<
-        TItem,
-        TParams
-      >
-    >
-*/
+  /* implements ListCapableStep<TItem, LoadedRecordStep<TItem, TParams>> */
   static $$export = { moduleName: "grafast", exportName: "LoadStep" };
 
   loadOptions: LoadOptions<TItem, TParams> | null = null;
