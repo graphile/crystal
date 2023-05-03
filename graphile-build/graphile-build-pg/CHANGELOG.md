@@ -1,5 +1,15 @@
 # graphile-build-pg
 
+## 5.0.0-alpha.2
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3df3f1726`](https://github.com/benjie/postgraphile-private/commit/3df3f17269bb896cdee90ed8c4ab46fb821a1509)]:
+  - grafast@0.0.1-alpha.2
+  - @dataplan/pg@0.0.1-alpha.2
+  - graphile-build@5.0.0-alpha.2
+
 ## 5.0.0-alpha.1
 
 ### Patch Changes

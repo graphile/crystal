@@ -1,5 +1,16 @@
 # @grafserv/persisted
 
+## 0.0.0-alpha.2
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3cf35fdb4`](https://github.com/benjie/postgraphile-private/commit/3cf35fdb41d08762e9ff838a55dd7fc6004941f8),
+  [`7c45eaf4e`](https://github.com/benjie/postgraphile-private/commit/7c45eaf4ed6edf3b9e7bb17846d553f5504e0fb4),
+  [`3df3f1726`](https://github.com/benjie/postgraphile-private/commit/3df3f17269bb896cdee90ed8c4ab46fb821a1509)]:
+  - grafserv@0.0.1-alpha.2
+  - grafast@0.0.1-alpha.2
+
 ## 0.0.0-alpha.1
 
 ### Patch Changes

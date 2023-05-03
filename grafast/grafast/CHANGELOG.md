@@ -1,5 +1,27 @@
 # grafast
 
+## 0.0.1-alpha.2
+
+### Patch Changes
+
+- [#308](https://github.com/benjie/postgraphile-private/pull/308)
+  [`3df3f1726`](https://github.com/benjie/postgraphile-private/commit/3df3f17269bb896cdee90ed8c4ab46fb821a1509)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 LoadOneStep/LoadManyStep and
+  related helpers have been merged into `LoadStep` so that the underlying
+  business logic can be shared.
+
+  `loadOne`/`loadMany` are still used exactly as before, but some of the related
+  types and helpers have been renamed and `loadOne` now results in the same step
+  class as an item from a `loadMany` (`LoadedRecordStep`).
+
+  References to `LoadOneStep` and `LoadManySingleRecordStep` both need to be
+  replaced with `LoadedRecordStep`.
+
+  References to `LoadManyStep` need to be replaced with `LoadStep`.
+
+  `LoadOneOptions` and `LoadManyOptions` are now both `LoadOptions` (and types
+  refer to the _item_ type).
+
 ## 0.0.1-alpha.1
 
 ### Patch Changes
