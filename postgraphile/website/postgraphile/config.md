@@ -377,7 +377,8 @@ _(TypeScript type: `GraphileConfig.GrafservOptions`)_
 - `eventStreamPath: string` - The path at which the GraphQL event stream would
   be made available; usually `/graphql/stream`
 - `graphqlOverGET: boolean` - If true, we'll support GraphQL queries over the
-  GET method
+  GET method (beware of the security implications, for example cross-site
+  timing attacks)
 - `graphiql: boolean`
 - `graphiqlOnGraphQLGET: boolean` - If true, then we will render GraphiQL on GET
   requests to the `/graphql` endpoint
