@@ -3,20 +3,15 @@ const {
   getFriendshipsByUserIds,
 } = require("./businessLogic.js");
 
-const {
-  loadOneCallback,
-  loadOne,
-  loadManyCallback,
-  loadMany,
-} = require("grafast");
+const { loadOne, loadCallback, loadMany } = require("grafast");
 
-const userByIdCallback = loadOneCallback((ids, { attributes }) =>
+const userByIdCallback = loadCallback((ids, { attributes }) =>
   getUsersByIds(ids, { columns: attributes }),
 );
 userByIdCallback.displayName = "userById";
 exports.userById = ($id) => loadOne($id, userByIdCallback);
 
-const friendshipsByUserIdCallback = loadManyCallback((ids, { attributes }) =>
+const friendshipsByUserIdCallback = loadCallback((ids, { attributes }) =>
   getFriendshipsByUserIds(ids, { columns: attributes }),
 );
 friendshipsByUserIdCallback.displayName = "friendshipsByUserId";

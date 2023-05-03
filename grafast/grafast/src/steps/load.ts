@@ -5,59 +5,60 @@ import type {
   GrafastValuesList,
   PromiseOrDirect,
 } from "../interfaces.js";
-import type { ListCapableStep } from "../step.js";
 import { ExecutableStep } from "../step.js";
 import { canonicalJSONStringify } from "../utils.js";
 import { access } from "./access.js";
 
-export interface LoadManyOptions<TData, TParams extends Record<string, any>> {
-  attributes: ReadonlyArray<keyof TData> | null;
+export interface LoadOptions<TData, TParams extends Record<string, any>> {
+  attributes: ReadonlyArray<
+    TData extends ReadonlyArray<infer UItemData> ? keyof UItemData : keyof TData
+  > | null;
   params: Partial<TParams>;
 }
 
-export type LoadManyCallback<
-  TSpec,
-  TData,
-  TParams extends Record<string, any>,
-> = {
+export type LoadCallback<TSpec, TData, TParams extends Record<string, any>> = {
   (
     specs: ReadonlyArray<TSpec>,
-    options: LoadManyOptions<TData, TParams>,
-  ): PromiseOrDirect<ReadonlyArray<ReadonlyArray<TData>>>;
+    options: LoadOptions<TData, TParams>,
+  ): PromiseOrDirect<ReadonlyArray<TData>>;
   displayName?: string;
 };
 
 /**
  * A TypeScript Identity Function to help you strongly type your
- * LoadManyCallback.
+ * LoadCallback.
  */
-export function loadManyCallback<
-  TSpec,
-  TData,
-  TParams extends Record<string, any>,
->(
-  callback: LoadManyCallback<TSpec, TData, TParams>,
-): LoadManyCallback<TSpec, TData, TParams> {
+export function loadCallback<TSpec, TData, TParams extends Record<string, any>>(
+  callback: LoadCallback<TSpec, TData, TParams>,
+): LoadCallback<TSpec, TData, TParams> {
   return callback;
 }
 
-const idByLoad = new WeakMap<LoadManyCallback<any, any, any>, string>();
+interface LoadMeta {
+  cache?: Map<any, any>;
+}
+
+const idByLoad = new WeakMap<LoadCallback<any, any, any>, string>();
 let loadCounter = 0;
 
 /**
- * You shouldn't create instances of this yourself - use `loadMany` or `loadOne`.
+ * You shouldn't create instances of this yourself - use `load` or `loadOne`.
  *
  * @internal
  */
-export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
+export class LoadedRecordStep<
+  TData,
+  TParams extends Record<string, any>,
+> extends ExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
-    exportName: "LoadManySingleRecordStep",
+    exportName: "LoadedRecordStep",
   };
 
   isSyncAndSafe = true;
 
   attributes = new Set<keyof TData>();
+  params: Partial<TParams> = Object.create(null);
   constructor(
     $data: ExecutableStep<TData>,
     private sourceDescription?: string,
@@ -72,15 +73,24 @@ export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
     this.attributes.add(attr);
     return access(this, attr);
   }
+  setParam<TParamKey extends keyof TParams>(
+    paramKey: TParamKey,
+    value: TParams[TParamKey],
+  ): void {
+    this.params[paramKey] = value;
+  }
   optimize() {
     const $source = this.getDepDeep(0);
-    if ($source instanceof LoadManyStep) {
+    if ($source instanceof LoadStep) {
       // Tell our parent we only need certain attributes
       $source.addAttributes(this.attributes);
+      for (const [key, value] of Object.entries(this.params)) {
+        $source.setParam(key, value);
+      }
     } else {
       // This should never happen
       console.warn(
-        `LoadManySingleRecordStep could not find the parent LoadManyStep; instead found ${$source}`,
+        `LoadedRecordStep could not find the parent LoadStep; instead found ${$source}`,
       );
     }
 
@@ -88,6 +98,7 @@ export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
     // can replace ourself with our dependency:
     return this.getDep(0);
   }
+  // This'll never be called, due to `optimize` above.
   execute(
     _count: number,
     [records]: [GrafastValuesList<TData>],
@@ -96,24 +107,33 @@ export class LoadManySingleRecordStep<TData> extends ExecutableStep<TData> {
   }
 }
 
-interface LoadManyMeta {
-  cache?: Map<any, readonly any[]>;
-}
+export class LoadStep<
+  TSpec,
+  TData,
+  TParams extends Record<string, any>,
+> extends ExecutableStep {
+  /*
+  implements
+    ListCapableStep<
+      TData extends ReadonlyArray<infer UItemData> ? UItemData : never,
+      LoadedRecordStep<
+        TData extends ReadonlyArray<infer UItemData> ? UItemData : never,
+        TParams
+      >
+    >
+*/
+  static $$export = { moduleName: "grafast", exportName: "LoadStep" };
 
-export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
-  extends ExecutableStep
-  implements ListCapableStep<TData, LoadManySingleRecordStep<TData>>
-{
-  static $$export = { moduleName: "grafast", exportName: "LoadManyStep" };
-
-  loadOptions: LoadManyOptions<TData, TParams> | null = null;
+  loadOptions: LoadOptions<TData, TParams> | null = null;
   loadOptionsKey = "";
 
-  attributes = new Set<keyof TData>();
+  attributes = new Set<
+    TData extends ReadonlyArray<infer UItemData> ? keyof UItemData : keyof TData
+  >();
   params: Partial<TParams> = Object.create(null);
   constructor(
     $spec: ExecutableStep<TSpec>,
-    private load: LoadManyCallback<TSpec, TData, TParams>,
+    private load: LoadCallback<TSpec, TData, TParams>,
   ) {
     super();
     this.addDependency($spec);
@@ -122,7 +142,15 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
     return this.load.displayName || this.load.name;
   }
   listItem($item: __ItemStep<this>) {
-    return new LoadManySingleRecordStep<TData>($item, this.toStringMeta());
+    return new LoadedRecordStep<
+      TData extends ReadonlyArray<infer UItemData> ? UItemData : never,
+      TParams
+    >($item, this.toStringMeta());
+  }
+  single(): TData extends ReadonlyArray<any>
+    ? never
+    : LoadedRecordStep<TData, TParams> {
+    return new LoadedRecordStep(this, this.toStringMeta()) as any;
   }
   setParam<TParamKey extends keyof TParams>(
     paramKey: TParamKey,
@@ -130,7 +158,13 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
   ): void {
     this.params[paramKey] = value;
   }
-  addAttributes(attributes: Set<keyof TData>): void {
+  addAttributes(
+    attributes: Set<
+      TData extends ReadonlyArray<infer UChildData>
+        ? keyof UChildData
+        : keyof TData
+    >,
+  ): void {
     for (const attribute of attributes) {
       this.attributes.add(attribute);
     }
@@ -140,7 +174,7 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
     // equivalent params and then match their list of attributes together.
     const stringifiedParams = canonicalJSONStringify(this.params);
     const kin = this.operationPlan
-      .getStepsByStepClass(LoadManyStep)
+      .getStepsByStepClass(LoadStep)
       .filter((step) => {
         if (step.id === this.id) return false;
         if (step.load !== this.load) return false;
@@ -166,16 +200,16 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
       loadId = String(++loadCounter);
       idByLoad.set(this.load, loadId);
     }
-    this.metaKey = `LoadManyStep|${loadId}|${this.loadOptionsKey}`;
+    this.metaKey = `LoadStep|${loadId}|${this.loadOptionsKey}`;
   }
 
   execute(
     count: number,
     [specs]: [GrafastValuesList<TSpec>],
     extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<ReadonlyArray<TData>>> {
+  ): PromiseOrDirect<GrafastResultsList<TData>> {
     const loadOptions = this.loadOptions!;
-    const meta = extra.meta as LoadManyMeta;
+    const meta = extra.meta as LoadMeta;
     let cache = meta.cache;
     if (!cache) {
       cache = new Map();
@@ -183,7 +217,7 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
     }
     const batch = new Map<TSpec, number[]>();
 
-    const results: Array<PromiseOrDirect<readonly TData[]> | null> = [];
+    const results: Array<PromiseOrDirect<TData> | null> = [];
     for (let i = 0; i < count; i++) {
       const spec = specs[i];
       if (cache.has(spec)) {
@@ -217,16 +251,30 @@ export class LoadManyStep<TSpec, TData, TParams extends Record<string, any>>
             results[targetIndex] = loadResult;
           }
         }
-        return results as Array<PromiseOrDirect<readonly TData[]>>;
+        return results as Array<PromiseOrDirect<TData>>;
       })();
     }
-    return results as Array<PromiseOrDirect<readonly TData[]>>;
+    return results as Array<PromiseOrDirect<TData>>;
   }
 }
 
-export function loadMany<TSpec, TData, TParams extends Record<string, any>>(
+function load<TSpec, TData, TParams extends Record<string, any>>(
   $spec: ExecutableStep<TSpec>,
-  load: LoadManyCallback<TSpec, TData, TParams>,
+  loadCallback: LoadCallback<TSpec, TData, TParams>,
 ) {
-  return new LoadManyStep($spec, load);
+  return new LoadStep($spec, loadCallback);
+}
+
+export function loadMany<TSpec, TItemData, TParams extends Record<string, any>>(
+  $spec: ExecutableStep<TSpec>,
+  loadCallback: LoadCallback<TSpec, ReadonlyArray<TItemData>, TParams>,
+) {
+  return load($spec, loadCallback);
+}
+
+export function loadOne<TSpec, TData, TParams extends Record<string, any>>(
+  $spec: ExecutableStep<TSpec>,
+  loadCallback: LoadCallback<TSpec, TData, TParams>,
+) {
+  return load($spec, loadCallback).single();
 }

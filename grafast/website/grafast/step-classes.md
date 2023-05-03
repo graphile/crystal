@@ -329,14 +329,14 @@ needs to execute and can enable significantly more efficient data fetching.
 Another use case for `optimize` is to make planning-time only steps "evaporate"
 by replacing them with their parent or a different step.
 
-The `loadMany` step represents each record via a `LoadManySingleRecordStep`
-instance which can be used to `.get(attr)` a named attribute. This reference is
-then stored, and and optimize time the `LoadManySingleRecordStep` can tell the
-`LoadManyStep` to request this attribute (so that the `loadMany` callback
-doesn't need to do the equivalent of `SELECT *` - it can be more selective).
-However, since `LoadManySingleRecordStep` has no run-time behavior (only
-planning-time behavior) it can simply replace itself during `optimize` with its
-parent step (typically an `__ItemStep`).
+The `loadMany` step represents each record via a `LoadedRecordStep` instance
+which can be used to `.get(attr)` a named attribute. This reference is then
+stored, and at optimize time the `LoadedRecordStep` can tell the `LoadStep` to
+request this attribute (so that the `loadMany` callback doesn't need to do the
+equivalent of `SELECT *` - it can be more selective). However, since
+`LoadedRecordStep` has no run-time behavior (only planning-time behavior) it
+can simply replace itself during `optimize` with its parent step (typically an
+`__ItemStep`).
 
 The builtin `each` step uses `optimize` to replace itself with the underlying
 list where possible.
