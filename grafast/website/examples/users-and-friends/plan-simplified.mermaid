@@ -13,27 +13,27 @@ flowchart TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Access7{{"Access[7∈0]<br />ᐸ3.currentUserIdᐳ"}}:::plan
-    LoadOne8[["LoadOne[8∈0]<br />ᐸuserByIdᐳ"]]:::plan
-    Access10{{"Access[10∈1]<br />ᐸ8.idᐳ"}}:::plan
-    LoadMany11[["LoadMany[11∈1]<br />ᐸfriendshipsByUserIdᐳ"]]:::plan
-    __Item15[/"__Item[15∈3]<br />ᐸ11ᐳ"\]:::itemplan
-    Access17{{"Access[17∈3]<br />ᐸ15.friend_idᐳ"}}:::plan
-    LoadOne18[["LoadOne[18∈3]<br />ᐸuserByIdᐳ"]]:::plan
+    Load8[["Load[8∈0]<br />ᐸuserByIdᐳ"]]:::plan
+    Access11{{"Access[11∈1]<br />ᐸ8.idᐳ"}}:::plan
+    Load12[["Load[12∈1]<br />ᐸfriendshipsByUserIdᐳ"]]:::plan
+    __Item16[/"__Item[16∈3]<br />ᐸ12ᐳ"\]:::itemplan
+    Access18{{"Access[18∈3]<br />ᐸ16.friend_idᐳ"}}:::plan
+    Load19[["Load[19∈3]<br />ᐸuserByIdᐳ"]]:::plan
 
     %% plan dependencies
     __Value3 --> Access7
-    Access7 --> LoadOne8
-    LoadOne8 --> Access10
-    Access10 --> LoadMany11
-    LoadMany11 ==> __Item15
-    __Item15 --> Access17
-    Access17 --> LoadOne18
+    Access7 --> Load8
+    Load8 --> Access11
+    Access11 --> Load12
+    Load12 ==> __Item16
+    __Item16 --> Access18
+    Access18 --> Load19
 
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access7,LoadOne8 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Access7,Load8 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access10,LoadMany11 bucket1
+    class Bucket1,Access11,Load12 bucket1
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item15,Access17,LoadOne18 bucket3
+    class Bucket3,__Item16,Access18,Load19 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
