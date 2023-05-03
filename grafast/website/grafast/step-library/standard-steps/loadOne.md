@@ -4,6 +4,12 @@ Similar to [DataLoader][]'s load method, uses the given callback function to
 read a single result from your business logic layer. To load a list, see
 `loadMany`.
 
+As an enhancement over DataLoader, `loadOne` also keeps track of the attributes
+that were accessed via `.get(attrName)` and any parameters set via
+`.setParam(key, value)`. This information will be passed through to your
+callback function such that you may make more optimal calls to your backend
+business logic, only retrieving the data you need.
+
 Usage:
 
 ```ts
@@ -16,8 +22,8 @@ records to load, and the second is the callback function called with these specs
 responsible for loading them.
 
 The callback function is called with two arguments, the first is a list of the
-values from the step and the second is options that may affect the fetching of
-the records.
+values from the specifier step and the second is options that may affect the
+fetching of the records.
 
 :::tip
 
