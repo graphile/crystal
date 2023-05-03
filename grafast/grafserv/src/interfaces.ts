@@ -22,6 +22,11 @@ export interface GrafservConfig {
   preset?: GraphileConfig.Preset;
 }
 
+export type RequestContentType =
+  | "application/json"
+  | "application/graphql"
+  | "application/x-www-form-urlencoded";
+
 /**
  * Represents the core parameters from the GraphQL request, these may not yet
  * be fully validated to allow for things such as persisted operations to kick
@@ -139,6 +144,19 @@ declare global {
        * `defaultMaskError` from `grafserv`.
        */
       maskError?: (error: GraphQLError) => GraphQLError;
+
+      /**
+       * By default `application/json` and `application/graphql` are supported
+       * (`DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES`). You may add
+       * `application/x-www-form-urlencoded` to the list, but be aware that
+       * doing so potentially opens you to CSRF issues even if you're not using
+       * CORS since this media type is handled specially by browsers - ensure
+       * that you have CSRF protections in place.
+       *
+       * Note further that if you're using CORS the other media types are not
+       * safe, and you should still use CSRF protection.
+       */
+      allowedRequestContentTypes?: readonly RequestContentType[];
     }
 
     interface GrafservHooks {

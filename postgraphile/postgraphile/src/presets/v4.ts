@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
 import type { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
@@ -290,6 +291,10 @@ export const makeV4Preset = (
         : null),
       watch: options.watchPg,
       websockets: options.subscriptions,
+      allowedRequestContentTypes: [
+        ...DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES,
+        "application/x-www-form-urlencoded",
+      ],
     },
   };
 };

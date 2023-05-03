@@ -6,3 +6,4 @@ export {
   ProcessGraphQLRequestBodyEvent,
   ValidatedGraphQLBody,
 } from "./interfaces.js";
+export { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "./middleware/graphql.js";
