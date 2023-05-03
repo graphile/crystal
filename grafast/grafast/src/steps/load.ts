@@ -9,8 +9,8 @@ import { ExecutableStep } from "../step.js";
 import { canonicalJSONStringify } from "../utils.js";
 import { access } from "./access.js";
 
-export interface LoadOptions<TData, TParams extends Record<string, any>> {
-  attributes: ReadonlyArray<keyof TData> | null;
+export interface LoadOptions<TItem, TParams extends Record<string, any>> {
+  attributes: ReadonlyArray<keyof TItem> | null;
   params: Partial<TParams>;
 }
 
@@ -29,9 +29,9 @@ type LoadCallback<
 
 export type LoadOneCallback<
   TSpec,
-  TData,
+  TItem,
   TParams extends Record<string, any>,
-> = LoadCallback<TSpec, TData, TData, TParams>;
+> = LoadCallback<TSpec, TItem, TItem, TParams>;
 export type LoadManyCallback<
   TSpec,
   TItem,
@@ -44,11 +44,11 @@ export type LoadManyCallback<
  */
 export function loadOneCallback<
   TSpec,
-  TData,
+  TItem,
   TParams extends Record<string, any>,
 >(
-  callback: LoadOneCallback<TSpec, TData, TParams>,
-): LoadOneCallback<TSpec, TData, TParams> {
+  callback: LoadOneCallback<TSpec, TItem, TParams>,
+): LoadOneCallback<TSpec, TItem, TParams> {
   return callback;
 }
 /**
@@ -78,9 +78,9 @@ let loadCounter = 0;
  * @internal
  */
 export class LoadedRecordStep<
-  TData,
+  TItem,
   TParams extends Record<string, any>,
-> extends ExecutableStep<TData> {
+> extends ExecutableStep<TItem> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LoadedRecordStep",
@@ -88,10 +88,10 @@ export class LoadedRecordStep<
 
   isSyncAndSafe = true;
 
-  attributes = new Set<keyof TData>();
+  attributes = new Set<keyof TItem>();
   params: Partial<TParams> = Object.create(null);
   constructor(
-    $data: ExecutableStep<TData>,
+    $data: ExecutableStep<TItem>,
     private sourceDescription?: string,
   ) {
     super();
@@ -100,7 +100,7 @@ export class LoadedRecordStep<
   toStringMeta() {
     return this.sourceDescription ?? null;
   }
-  get(attr: keyof TData & (string | number)) {
+  get(attr: keyof TItem & (string | number)) {
     this.attributes.add(attr);
     return access(this, attr);
   }
@@ -132,8 +132,8 @@ export class LoadedRecordStep<
   // This'll never be called, due to `optimize` above.
   execute(
     _count: number,
-    [records]: [GrafastValuesList<TData>],
-  ): GrafastResultsList<TData> {
+    [records]: [GrafastValuesList<TItem>],
+  ): GrafastResultsList<TItem> {
     return records;
   }
 }
@@ -147,9 +147,9 @@ export class LoadStep<
   /*
   implements
     ListCapableStep<
-      TData extends ReadonlyArray<infer UItem> ? UItem : never,
+      TItem,
       LoadedRecordStep<
-        TData extends ReadonlyArray<infer UItem> ? UItem : never,
+        TItem,
         TParams
       >
     >
@@ -304,11 +304,11 @@ export function loadMany<
 
 export function loadOne<
   TSpec,
-  TData,
+  TItem,
   TParams extends Record<string, any> = Record<string, any>,
 >(
   $spec: ExecutableStep<TSpec>,
-  loadCallback: LoadOneCallback<TSpec, TData, TParams>,
+  loadCallback: LoadOneCallback<TSpec, TItem, TParams>,
 ) {
   return load($spec, loadCallback).single();
 }
