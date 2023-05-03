@@ -92,7 +92,8 @@ export class LoadedRecordStep<
   params: Partial<TParams> = Object.create(null);
   constructor(
     $data: ExecutableStep<TItem>,
-    private sourceDescription?: string,
+    private isSingle: boolean,
+    private sourceDescription: string,
   ) {
     super();
     this.addDependency($data);
@@ -108,6 +109,11 @@ export class LoadedRecordStep<
     paramKey: TParamKey,
     value: TParams[TParamKey],
   ): void {
+    if (!this.isSingle) {
+      throw new Error(
+        "setParam should not be called on list items - call it on the collection (`loadMany()` step)",
+      );
+    }
     this.params[paramKey] = value;
   }
   optimize() {
@@ -172,12 +178,16 @@ export class LoadStep<
     return this.load.displayName || this.load.name;
   }
   listItem($item: __ItemStep<this>) {
-    return new LoadedRecordStep<TItem, TParams>($item, this.toStringMeta());
+    return new LoadedRecordStep<TItem, TParams>(
+      $item,
+      false,
+      this.toStringMeta(),
+    );
   }
   single(): TData extends ReadonlyArray<any>
     ? never
     : LoadedRecordStep<TItem, TParams> {
-    return new LoadedRecordStep(this, this.toStringMeta()) as any;
+    return new LoadedRecordStep(this, true, this.toStringMeta()) as any;
   }
   setParam<TParamKey extends keyof TParams>(
     paramKey: TParamKey,
