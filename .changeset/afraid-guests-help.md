@@ -37,10 +37,10 @@ const RuruMetaPlugin: GraphileConfig.Plugin = {
   version: "0.0.0",
   grafserv: {
     hooks: {
-      ruruHTMLParts(_info, event) {
-        // event.request gives you access to request details, so you can customize it for the user
+      ruruHTMLParts(_info, parts, extra) {
+        // extra.request gives you access to request details, so you can customize `parts` for the user
 
-        event.parts.metaTags += `<meta name="viewport" content="width=device-width, initial-scale=1" />`;
+        parts.metaTags += `<meta name="viewport" content="width=device-width, initial-scale=1" />`;
       },
     },
   },

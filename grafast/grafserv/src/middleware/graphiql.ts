@@ -19,15 +19,11 @@ export function makeGraphiQLHandler(
   return async (request: NormalizedRequestDigest): Promise<HandlerResult> => {
     let htmlParts = unhookedHTMLParts!;
     if (hooks.callbacks.ruruHTMLParts) {
-      const hookData = {
-        request,
-        parts: {
-          ...makeHTMLParts(),
-          ...htmlPartsFromConfig,
-        },
+      htmlParts = {
+        ...makeHTMLParts(),
+        ...htmlPartsFromConfig,
       };
-      await hooks.process("ruruHTMLParts", hookData);
-      htmlParts = hookData.parts;
+      await hooks.process("ruruHTMLParts", htmlParts, { request });
     }
     const config: RuruServerConfig = {
       endpoint: dynamicOptions.graphqlPath,

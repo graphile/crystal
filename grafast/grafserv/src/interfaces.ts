@@ -146,10 +146,12 @@ declare global {
       processGraphQLRequestBody(
         event: ProcessGraphQLRequestBodyEvent,
       ): PromiseOrDirect<void>;
-      ruruHTMLParts(event: {
-        request: NormalizedRequestDigest;
-        parts: RuruHTMLParts;
-      }): PromiseOrDirect<void>;
+      ruruHTMLParts(
+        parts: RuruHTMLParts,
+        extra: {
+          request: NormalizedRequestDigest;
+        },
+      ): PromiseOrDirect<void>;
     }
   }
 }
