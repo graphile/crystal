@@ -27,6 +27,7 @@ import type {
   JSONValue,
   NormalizedRequestDigest,
   ParsedGraphQLBody,
+  RequestContentType,
   ValidatedGraphQLBody,
 } from "../interfaces.js";
 import { $$normalizedHeaders } from "../interfaces.js";
@@ -152,17 +153,46 @@ function parseGraphQLJSONBody(params: JSONValue): ParsedGraphQLBody {
   };
 }
 
+/**
+ * The default allowed request content types do not include
+ * `application/x-www-form-urlencoded` because that is treated specially by
+ * browsers (e.g. it can be submitted cross origins without CORS).
+ *
+ * If you're using CORS then no media type is CSRF safe - it's up to you to
+ * manage your CSRF protection.
+ */
+export const DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES = Object.freeze([
+  "application/json",
+  "application/graphql",
+  // CSRF risk:
+  // "application/x-www-form-urlencoded",
+  // Not supported, AND CSRF risk:
+  // 'multipart/form-data'
+]) satisfies readonly RequestContentType[];
+
 function parseGraphQLBody(
+  resolvedPreset: GraphileConfig.ResolvedPreset,
   request: NormalizedRequestDigest,
   body: GrafservBody,
 ): ParsedGraphQLBody {
+  const supportedContentTypes =
+    resolvedPreset.grafserv?.allowedRequestContentTypes ??
+    DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES;
   const contentType = request[$$normalizedHeaders]["content-type"];
   if (!contentType) {
     throw httpError(400, "Could not determine the Content-Type of the request");
   }
   const semi = contentType.indexOf(";");
-  const ct = semi >= 0 ? contentType.slice(0, semi).trim() : contentType.trim();
+  const rawContentType =
+    semi >= 0 ? contentType.slice(0, semi).trim() : contentType.trim();
+
+  if (!(supportedContentTypes as string[]).includes(rawContentType)) {
+    throw httpError(415, `Media type '${rawContentType}' is not allowed`);
+  }
+  const ct = rawContentType as RequestContentType;
+
   // TODO: we should probably at least look at the parameters... e.g. throw if encoding !== utf-8
+
   switch (ct) {
     case "application/json": {
       switch (body.type) {
@@ -182,7 +212,6 @@ function parseGraphQLBody(
       }
     }
     case "application/x-www-form-urlencoded": {
-      // FIXME: CSRF risk here; ensure the user has opted into this (i.e. isn't using cookies/etc)
       switch (body.type) {
         case "buffer": {
           return parseGraphQLQueryParams(
@@ -242,7 +271,8 @@ function parseGraphQLBody(
       }
     }
     default: {
-      throw httpError(400, `Do not understand content type`);
+      const never: never = ct;
+      throw httpError(415, `Media type '${never}' is not understood`);
     }
   }
 }
@@ -427,7 +457,7 @@ export const makeGraphQLHandler = (
       // Read the body
       const parsedBody =
         request.method === "POST"
-          ? parseGraphQLBody(request, await request.getBody())
+          ? parseGraphQLBody(resolvedPreset, request, await request.getBody())
           : parseGraphQLQueryParams(await request.getQueryParams());
 
       // Apply our hooks (if any) to the body (they will mutate the body in place)
