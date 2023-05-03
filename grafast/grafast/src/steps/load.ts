@@ -10,27 +10,58 @@ import { canonicalJSONStringify } from "../utils.js";
 import { access } from "./access.js";
 
 export interface LoadOptions<TData, TParams extends Record<string, any>> {
-  attributes: ReadonlyArray<
-    TData extends ReadonlyArray<infer UItemData> ? keyof UItemData : keyof TData
-  > | null;
+  attributes: ReadonlyArray<keyof TData> | null;
   params: Partial<TParams>;
 }
 
-export type LoadCallback<TSpec, TData, TParams extends Record<string, any>> = {
+type LoadCallback<
+  TSpec,
+  TItem,
+  TData extends TItem | ReadonlyArray<TItem>,
+  TParams extends Record<string, any>,
+> = {
   (
     specs: ReadonlyArray<TSpec>,
-    options: LoadOptions<TData, TParams>,
+    options: LoadOptions<TItem, TParams>,
   ): PromiseOrDirect<ReadonlyArray<TData>>;
   displayName?: string;
 };
 
+export type LoadOneCallback<
+  TSpec,
+  TData,
+  TParams extends Record<string, any>,
+> = LoadCallback<TSpec, TData, TData, TParams>;
+export type LoadManyCallback<
+  TSpec,
+  TItem,
+  TParams extends Record<string, any>,
+> = LoadCallback<TSpec, TItem, ReadonlyArray<TItem>, TParams>;
+
 /**
  * A TypeScript Identity Function to help you strongly type your
- * LoadCallback.
+ * LoadOneCallback.
  */
-export function loadCallback<TSpec, TData, TParams extends Record<string, any>>(
-  callback: LoadCallback<TSpec, TData, TParams>,
-): LoadCallback<TSpec, TData, TParams> {
+export function loadOneCallback<
+  TSpec,
+  TData,
+  TParams extends Record<string, any>,
+>(
+  callback: LoadOneCallback<TSpec, TData, TParams>,
+): LoadOneCallback<TSpec, TData, TParams> {
+  return callback;
+}
+/**
+ * A TypeScript Identity Function to help you strongly type your
+ * LoadManyCallback.
+ */
+export function loadManyCallback<
+  TSpec,
+  TItem,
+  TParams extends Record<string, any>,
+>(
+  callback: LoadManyCallback<TSpec, TItem, TParams>,
+): LoadManyCallback<TSpec, TItem, TParams> {
   return callback;
 }
 
@@ -38,7 +69,7 @@ interface LoadMeta {
   cache?: Map<any, any>;
 }
 
-const idByLoad = new WeakMap<LoadCallback<any, any, any>, string>();
+const idByLoad = new WeakMap<LoadCallback<any, any, any, any>, string>();
 let loadCounter = 0;
 
 /**
@@ -109,31 +140,30 @@ export class LoadedRecordStep<
 
 export class LoadStep<
   TSpec,
-  TData,
+  TItem,
+  TData extends TItem | ReadonlyArray<TItem>,
   TParams extends Record<string, any>,
 > extends ExecutableStep {
   /*
   implements
     ListCapableStep<
-      TData extends ReadonlyArray<infer UItemData> ? UItemData : never,
+      TData extends ReadonlyArray<infer UItem> ? UItem : never,
       LoadedRecordStep<
-        TData extends ReadonlyArray<infer UItemData> ? UItemData : never,
+        TData extends ReadonlyArray<infer UItem> ? UItem : never,
         TParams
       >
     >
 */
   static $$export = { moduleName: "grafast", exportName: "LoadStep" };
 
-  loadOptions: LoadOptions<TData, TParams> | null = null;
+  loadOptions: LoadOptions<TItem, TParams> | null = null;
   loadOptionsKey = "";
 
-  attributes = new Set<
-    TData extends ReadonlyArray<infer UItemData> ? keyof UItemData : keyof TData
-  >();
+  attributes = new Set<keyof TItem>();
   params: Partial<TParams> = Object.create(null);
   constructor(
     $spec: ExecutableStep<TSpec>,
-    private load: LoadCallback<TSpec, TData, TParams>,
+    private load: LoadCallback<TSpec, TItem, TData, TParams>,
   ) {
     super();
     this.addDependency($spec);
@@ -142,14 +172,11 @@ export class LoadStep<
     return this.load.displayName || this.load.name;
   }
   listItem($item: __ItemStep<this>) {
-    return new LoadedRecordStep<
-      TData extends ReadonlyArray<infer UItemData> ? UItemData : never,
-      TParams
-    >($item, this.toStringMeta());
+    return new LoadedRecordStep<TItem, TParams>($item, this.toStringMeta());
   }
   single(): TData extends ReadonlyArray<any>
     ? never
-    : LoadedRecordStep<TData, TParams> {
+    : LoadedRecordStep<TItem, TParams> {
     return new LoadedRecordStep(this, this.toStringMeta()) as any;
   }
   setParam<TParamKey extends keyof TParams>(
@@ -158,13 +185,7 @@ export class LoadStep<
   ): void {
     this.params[paramKey] = value;
   }
-  addAttributes(
-    attributes: Set<
-      TData extends ReadonlyArray<infer UChildData>
-        ? keyof UChildData
-        : keyof TData
-    >,
-  ): void {
+  addAttributes(attributes: Set<keyof TItem>): void {
     for (const attribute of attributes) {
       this.attributes.add(attribute);
     }
@@ -258,23 +279,36 @@ export class LoadStep<
   }
 }
 
-function load<TSpec, TData, TParams extends Record<string, any>>(
+function load<
+  TSpec,
+  TItem,
+  TData extends TItem | ReadonlyArray<TItem>,
+  TParams extends Record<string, any>,
+>(
   $spec: ExecutableStep<TSpec>,
-  loadCallback: LoadCallback<TSpec, TData, TParams>,
+  loadCallback: LoadCallback<TSpec, TItem, TData, TParams>,
 ) {
   return new LoadStep($spec, loadCallback);
 }
 
-export function loadMany<TSpec, TItemData, TParams extends Record<string, any>>(
+export function loadMany<
+  TSpec,
+  TItem,
+  TParams extends Record<string, any> = Record<string, any>,
+>(
   $spec: ExecutableStep<TSpec>,
-  loadCallback: LoadCallback<TSpec, ReadonlyArray<TItemData>, TParams>,
+  loadCallback: LoadManyCallback<TSpec, TItem, TParams>,
 ) {
   return load($spec, loadCallback);
 }
 
-export function loadOne<TSpec, TData, TParams extends Record<string, any>>(
+export function loadOne<
+  TSpec,
+  TData,
+  TParams extends Record<string, any> = Record<string, any>,
+>(
   $spec: ExecutableStep<TSpec>,
-  loadCallback: LoadCallback<TSpec, TData, TParams>,
+  loadCallback: LoadOneCallback<TSpec, TData, TParams>,
 ) {
   return load($spec, loadCallback).single();
 }
