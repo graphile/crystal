@@ -73,7 +73,7 @@ const idByLoad = new WeakMap<LoadCallback<any, any, any, any>, string>();
 let loadCounter = 0;
 
 /**
- * You shouldn't create instances of this yourself - use `load` or `loadOne`.
+ * You shouldn't create instances of this yourself - use `loadOne` or `loadMany` instead.
  *
  * @internal
  */
