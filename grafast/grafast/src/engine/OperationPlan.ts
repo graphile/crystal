@@ -1946,6 +1946,9 @@ ${te.join(
       if (replacementStep != step) {
         this.replaceStep(step, replacementStep);
       }
+      if (actionDescription !== "deduplicate") {
+        this.deduplicateSteps();
+      }
 
       return replacementStep;
     };
