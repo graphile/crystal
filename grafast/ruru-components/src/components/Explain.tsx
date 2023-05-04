@@ -1,3 +1,4 @@
+import mermaid from "mermaid";
 import type { FC } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -70,6 +71,30 @@ export const ExplainMain: FC<{
     };
   }, [node]);
 
+  const [saving, setSaving] = useState(false);
+  const saveSVG = useCallback(() => {
+    if (!selectedResult || selectedResult.type !== "mermaid-js") return;
+    setSaving(true);
+    setTimeout(() => {
+      mermaid.mermaidAPI.render("id1", selectedResult.diagram, (svg) => {
+        const file = new File([svg], "grafast-plan.svg");
+
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(file);
+        a.download = file.name;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        setSaving(false);
+
+        setTimeout(() => {
+          URL.revokeObjectURL(a.href);
+          a.parentNode!.removeChild(a);
+        }, 0);
+      });
+    }, 0);
+  }, [selectedResult]);
+
   const component = (() => {
     switch (selectedResult?.type) {
       case "sql": {
@@ -102,6 +127,9 @@ export const ExplainMain: FC<{
             <Copy text={selectedResult.diagram}>
               Copy Mermaid.js Definition
             </Copy>
+            <button onClick={saveSVG} disabled={saving}>
+              Save Mermaid Diagram
+            </button>
             <div onClick={expand}>
               <Mermaid diagram={selectedResult.diagram} />
             </div>
