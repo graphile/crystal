@@ -1,3 +1,4 @@
+import { inspect } from "../inspect.js";
 import type { GrafastResultsList } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
@@ -14,6 +15,13 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
 
   constructor(public readonly data: TData) {
     super();
+  }
+  toStringMeta() {
+    // TODO: use nicer simplification
+    // FIXME: give users a way to opt out of this, in case the data is security sensitive.
+    return inspect(this.data)
+      .replace(/[\r\n]/g, " ")
+      .slice(0, 60);
   }
 
   deduplicate(peers: readonly ConstantStep<any>[]) {
