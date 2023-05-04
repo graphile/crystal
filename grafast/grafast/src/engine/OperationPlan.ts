@@ -2612,7 +2612,10 @@ ${te.join(
    * communicate with its (deep) dependencies, and even to replace itself with
    * a different plan.
    */
-  private optimizeStep(step: ExecutableStep): ExecutableStep {
+  private optimizeStep(inStep: ExecutableStep): ExecutableStep {
+    const step = inStep.allowMultipleOptimizations
+      ? this.deduplicateStep(inStep)
+      : inStep;
     if (step.isOptimized && !step.allowMultipleOptimizations) {
       return step;
     }
