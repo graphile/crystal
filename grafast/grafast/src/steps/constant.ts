@@ -12,8 +12,12 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
   };
   isSyncAndSafe = true;
 
-  constructor(private data: TData) {
+  constructor(public readonly data: TData) {
     super();
+  }
+
+  deduplicate(peers: readonly ConstantStep<any>[]) {
+    return peers.filter((p) => p.data === this.data);
   }
 
   execute(count: number): GrafastResultsList<TData> {
