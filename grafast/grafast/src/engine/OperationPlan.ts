@@ -2110,6 +2110,20 @@ ${te.join(
     if (this.isImmoveable(step)) {
       return;
     }
+    // PERF: would be nice to prevent ConstantStep from being hoisted - we
+    // don't want to keep multiplying up and up its data as it traverses the buckets - would be better
+    // to push the step down to the furthest level and then have it run there straight away.
+    // PERF: actually... might be better to specifically replace all
+    // ConstantStep dependencies with a bucket-local ConstantStep as one of the
+    // final steps of optimize.
+
+    /* // This is disabled because it breaks pgSelect's `mergePlaceholdersInto` logic.
+    if (step instanceof __InputStaticLeafStep || step instanceof ConstantStep) {
+      // More optimal to not hoist these - they convert to `constant()` which executes to produce a filled array incredibly efficiently.
+      return true;
+    }
+    */
+
     if (step.layerPlan.parentLayerPlan?.reason.type === "mutationField") {
       // Never hoist into a mutation layer
       return;
