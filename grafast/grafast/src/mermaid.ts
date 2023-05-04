@@ -199,8 +199,10 @@ export function printPlanGraph(
     | "dependencies-first"
     | "most-dependencies-first"
     | "deepest-bucket-first"
-    | "deepest-bucket-first-then-most-dependencies";
-  const strategy = "deepest-bucket-first-then-most-dependencies" as Strategy;
+    | "deepest-bucket-first-then-most-dependencies"
+    | "shallowest-bucket-first-then-most-dependencies"
+    | "most-dependencies-first-then-deepest-bucket";
+  const strategy = "shallowest-bucket-first-then-most-dependencies" as Strategy;
   if (strategy === "most-dependencies-first") {
     sortedSteps.sort((a, z) => z.dependencies.length - a.dependencies.length);
   } else if (strategy === "deepest-bucket-first") {
@@ -208,6 +210,14 @@ export function printPlanGraph(
   } else if (strategy === "deepest-bucket-first-then-most-dependencies") {
     const weight = (step: ExecutableStep) =>
       layerPlanDepth(step) * 1000 + step.dependencies.length;
+    sortedSteps.sort((a, z) => weight(z) - weight(a));
+  } else if (strategy === "shallowest-bucket-first-then-most-dependencies") {
+    const weight = (step: ExecutableStep) =>
+      layerPlanDepth(step) * 1000 - step.dependencies.length;
+    sortedSteps.sort((a, z) => weight(a) - weight(z));
+  } else if (strategy === "most-dependencies-first-then-deepest-bucket") {
+    const weight = (step: ExecutableStep) =>
+      step.dependencies.length * 1000000 + layerPlanDepth(step);
     sortedSteps.sort((a, z) => weight(z) - weight(a));
   }
 
