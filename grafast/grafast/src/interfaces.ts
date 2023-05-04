@@ -651,6 +651,7 @@ export interface StepOptions {
  */
 export interface StepOptimizeOptions {
   stream: StepStreamOptions | null;
+  meta: Record<string, unknown>;
 }
 
 /**

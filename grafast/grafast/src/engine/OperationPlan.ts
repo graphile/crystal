@@ -208,6 +208,11 @@ export class OperationPlan {
    */
   public pure = true;
 
+  private optimizeMeta = new Map<
+    string | number | symbol,
+    Record<string, any>
+  >();
+
   constructor(
     public readonly schema: GraphQLSchema,
     public readonly operation: OperationDefinitionNode,
@@ -335,6 +340,9 @@ ${te.join(
 )}
   return metaByMetaKey;
 };`;
+
+    // Allow this to be garbage collected
+    this.optimizeMeta = null as any;
   }
 
   /**
@@ -2611,7 +2619,15 @@ ${te.join(
 
     // We know if it's streaming or not based on the LayerPlan it's contained within.
     const stepOptions = this.getStepOptionsForStep(step);
-    const replacementStep = step.optimize(stepOptions);
+    let meta = this.optimizeMeta.get(step.optimizeMetaKey);
+    if (!meta) {
+      meta = Object.create(null) as Record<string, any>;
+      this.optimizeMeta.set(step.optimizeMetaKey, meta);
+    }
+    const replacementStep = step.optimize({
+      ...stepOptions,
+      meta,
+    });
     if (!replacementStep) {
       throw new Error(
         `Bug in ${step}'s class: the 'optimize' method must return a step. Hint: did you forget 'return this;'?`,
