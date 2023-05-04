@@ -84,6 +84,7 @@ import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
+import { GrafastPrepareOptions } from "../prepare.js";
 
 const EMPTY_ARRAY: readonly never[] = Object.freeze([]);
 
@@ -115,6 +116,12 @@ export type OperationPlanPhase =
 export interface MetaByMetaKey {
   [metaKey: string | number | symbol]: Record<string, any>;
 }
+
+// performance.now() is supported in most modern browsers, plus node.
+const timeSource =
+  typeof performance !== "undefined" && typeof performance.now === "function"
+    ? performance
+    : Date;
 
 export class OperationPlan {
   public readonly queryType: GraphQLObjectType;
@@ -208,6 +215,14 @@ export class OperationPlan {
    */
   public pure = true;
 
+  private startTime = timeSource.now();
+  private planningTimeout: number | null = null;
+  private laps: Array<{
+    category: string;
+    subcategory: string | undefined;
+    elapsed: number;
+  }> = [];
+
   private optimizeMeta = new Map<
     string | number | symbol,
     Record<string, any>
@@ -222,7 +237,9 @@ export class OperationPlan {
     public readonly variableValues: { [key: string]: any },
     public readonly context: { [key: string]: any },
     public readonly rootValue: any,
+    options: GrafastPrepareOptions,
   ) {
+    this.planningTimeout = options.timeouts?.planning ?? null;
     const queryType = schema.getQueryType();
     assert.ok(queryType, "Schema must have a query type");
     this.queryType = queryType;
@@ -275,16 +292,26 @@ export class OperationPlan {
 
     this.deduplicateSteps();
 
+    this.lap("init");
+
     // Plan the operation
     this.planOperation();
 
+    this.checkTimeout();
+    this.lap("planOperation");
+
     // Now perform hoisting (and repeat deduplication)
     this.hoistSteps();
+
+    this.checkTimeout();
+    this.lap("hoistSteps", "planOperation");
 
     if (isDev) {
       this.phase = "validate";
       // Helpfully check steps don't do forbidden things.
       this.validateSteps();
+
+      this.lap("validateSteps");
     }
 
     this.phase = "optimize";
@@ -294,11 +321,20 @@ export class OperationPlan {
     // or similar.)
     this.stepTracker.treeShakeSteps();
 
+    this.checkTimeout();
+    this.lap("treeShakeSteps", "optimize");
+
     // Replace/inline/optimise steps
     this.optimizeSteps();
 
+    this.checkTimeout();
+    this.lap("optimizeSteps");
+
     // Replace access plans with direct access, etc
     this.optimizeOutputPlans();
+
+    this.checkTimeout();
+    this.lap("optimizeOutputPlans");
 
     this.phase = "finalize";
 
@@ -306,16 +342,28 @@ export class OperationPlan {
     // (we shouldn't see any new steps or dependencies after here)
     this.stepTracker.treeShakeSteps();
 
+    this.checkTimeout();
+    this.lap("treeShakeSteps", "finalize");
+
     // Now shove steps as deep down as they can go (opposite of hoist)
     this.pushDownSteps();
+
+    this.checkTimeout();
+    this.lap("pushDownSteps");
 
     // Plans are expected to execute later; they may take steps here to prepare
     // themselves (e.g. compiling SQL queries ahead of time).
     this.finalizeSteps();
 
+    this.lap("finalizeSteps");
+
     this.finalizeLayerPlans();
 
+    this.lap("finalizeLayerPlans");
+
     this.finalizeOutputPlans();
+
+    this.lap("finalizeOutputPlans");
 
     this.phase = "ready";
 
@@ -341,8 +389,39 @@ ${te.join(
   return metaByMetaKey;
 };`;
 
+    this.lap("ready");
+
+    const elapsed = timeSource.now() - this.startTime;
+    console.log(`Planning took ${elapsed.toFixed(1)}ms`);
+    let ts = 0;
+    const entries: Array<{ process: string; duration: string }> = [];
+    for (const lap of this.laps) {
+      const elapsed = lap.elapsed - ts;
+      ts = lap.elapsed;
+      entries.push({
+        process: `${lap.category}${
+          lap.subcategory ? `[${lap.subcategory}]` : ``
+        }`,
+        duration: `${elapsed.toFixed(1)}ms`,
+      });
+    }
+    console.table(entries);
+
     // Allow this to be garbage collected
     this.optimizeMeta = null as any;
+  }
+
+  private lap(category: string, subcategory?: string): void {
+    const elapsed = timeSource.now() - this.startTime;
+    this.laps.push({ category, subcategory, elapsed });
+  }
+
+  private checkTimeout() {
+    if (this.planningTimeout === null) return;
+    const elapsed = timeSource.now() - this.startTime;
+    if (elapsed > this.planningTimeout) {
+      throw new Error("Operation took too long to plan; aborted");
+    }
   }
 
   /**

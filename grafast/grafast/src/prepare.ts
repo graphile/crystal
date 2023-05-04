@@ -52,6 +52,14 @@ export interface GrafastPrepareOptions {
    * similar.
    */
   outputDataAsString?: boolean;
+
+  timeouts?: {
+    /**
+     * How many milliseconds should we allow for planning. Remember: planning is
+     * synchronous, so whilst it is happening the event loop is blocked.
+     */
+    planning?: number;
+  };
 }
 
 const bypassGraphQLObj = Object.assign(Object.create(null), {
@@ -498,6 +506,7 @@ export function grafastPrepare(
     variableValues,
     context as any,
     rootValue,
+    options,
   );
 
   if (

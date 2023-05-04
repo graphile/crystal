@@ -13,6 +13,7 @@ import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
 } from "./interfaces.js";
+import { GrafastPrepareOptions } from "./prepare.js";
 
 const debug = debugFactory("grafast:establishOperationPlan");
 
@@ -148,6 +149,7 @@ export function establishOperationPlan<
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
+  options: GrafastPrepareOptions,
 ): OperationPlan {
   let cacheByOperation = schema[$$cacheByOperation];
 
@@ -202,6 +204,7 @@ export function establishOperationPlan<
     variableValues,
     context,
     rootValue,
+    options,
   );
 
   // Store it to the cache
