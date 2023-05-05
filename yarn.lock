@@ -3664,6 +3664,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@localrepo/grafast-bench@workspace:grafast/bench":
+  version: 0.0.0-use.local
+  resolution: "@localrepo/grafast-bench@workspace:grafast/bench"
+  dependencies:
+    grafast: "workspace:^"
+    graphile-config: "workspace:^"
+    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    ts-node: "npm:^10.9.1"
+    tslib: "npm:^2.4.0"
+    typescript: "npm:^5.0.0-beta"
+  bin:
+    grafast-bench: dist/cli-run.js
+  languageName: unknown
+  linkType: soft
+
 "@localrepo/grafast-website@workspace:grafast/website":
   version: 0.0.0-use.local
   resolution: "@localrepo/grafast-website@workspace:grafast/website"
@@ -11892,6 +11907,13 @@ __metadata:
   version: 16.1.0-experimental-stream-defer.6
   resolution: "graphql@npm:16.1.0-experimental-stream-defer.6"
   checksum: 8e280798cf5738f2013c30891fd4f720d5e0fa1b074061176597af95db7779bc435d981fd7da31b89c10c84b35ce9b3377e2f7891be62d63386bebcf45f3c2d9
+  languageName: node
+  linkType: hard
+
+"graphql@npm:^16.1.0-experimental-stream-defer.6":
+  version: 16.6.0
+  resolution: "graphql@npm:16.6.0"
+  checksum: 686582916b9ca247f3562f086c34a6363155475da909e1f891f9a76a3b5273ed6c7034cd5a82e768670ac5a74d539a6f1be282253a92b49be3a489fc82e83a5b
   languageName: node
   linkType: hard
 

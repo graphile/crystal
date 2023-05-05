@@ -53,6 +53,7 @@
     { "path": "grafast/ruru-components" },
     { "path": "grafast/ruru/tsconfig.build.json" },
     { "path": "grafast/grafserv-persisted" },
-    { "path": "postgraphile/postgraphile/tsconfig.build.json" }
+    { "path": "postgraphile/postgraphile/tsconfig.build.json" },
+    { "path": "grafast/bench" }
   ]
 }
