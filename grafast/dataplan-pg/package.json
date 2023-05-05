@@ -83,6 +83,7 @@
     "@types/license-checker-webpack-plugin": "^0",
     "@types/nodemon": "1.19.1",
     "eventemitter3": "^4.0.7",
+    "glob": "^7.2.0",
     "grafserv": "workspace:*",
     "graphile-export": "workspace:*",
     "graphql": "16.1.0-experimental-stream-defer.6",
