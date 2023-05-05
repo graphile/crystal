@@ -2,7 +2,7 @@ import mermaid from "mermaid";
 import type { FC } from "react";
 import { useEffect } from "react";
 
-(mermaid as any).initialize({
+mermaid.initialize({
   startOnLoad: true,
   maxTextSize: 1000000,
 });
@@ -10,7 +10,7 @@ import { useEffect } from "react";
 export const Mermaid: FC<{ diagram: string }> = ({ diagram }) => {
   useEffect(() => {
     if (diagram) {
-      (mermaid as any).contentLoaded();
+      mermaid.contentLoaded();
     }
   }, [diagram]);
   return (
