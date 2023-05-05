@@ -8,33 +8,33 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant23{{"Constant[23∈0]<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
+    Access9 & Access10 --> Object11
     PgSelect8[["PgSelect[8∈0]<br />ᐸforumsᐳ"]]:::plan
-    First12{{"First[12∈0]"}}:::plan
-    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸforumsᐳ"}}:::plan
-    Access22{{"Access[22∈1]<br />ᐸ12.0ᐳ"}}:::plan
-    __Item19[/"__Item[19∈2]<br />ᐸ22ᐳ"\]:::itemplan
-    PgSelectSingle20{{"PgSelectSingle[20∈2]<br />ᐸforums_featured_messagesᐳ"}}:::plan
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__forums_f...s__.”body”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Constant23{{"Constant[23∈0]<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
+    Object11 & Constant23 --> PgSelect8
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
-    Access9 & Access10 --> Object11
-    Object11 & Constant23 --> PgSelect8
+    First12{{"First[12∈0]"}}:::plan
     PgSelect8 --> First12
+    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸforumsᐳ"}}:::plan
     First12 --> PgSelectSingle13
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Access22{{"Access[22∈1]<br />ᐸ12.0ᐳ"}}:::plan
     First12 --> Access22
+    __Item19[/"__Item[19∈2]<br />ᐸ22ᐳ"\]:::itemplan
     Access22 ==> __Item19
+    PgSelectSingle20{{"PgSelectSingle[20∈2]<br />ᐸforums_featured_messagesᐳ"}}:::plan
     __Item19 --> PgSelectSingle20
+    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__forums_f...s__.”body”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression21
+
+    %% define steps
 
     subgraph "Buckets for queries/functions/computed-column-setof-message"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 23, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket

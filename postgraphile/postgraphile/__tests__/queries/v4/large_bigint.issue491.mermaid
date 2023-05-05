@@ -8,72 +8,72 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
-    PgSelect20[["PgSelect[20∈1]<br />ᐸlargeNodeIdᐳ"]]:::plan
-    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸlargeNodeIdᐳ"}}:::plan
-    Constant23{{"Constant[23∈0]<br />ᐸ'large_node_ids'ᐳ"}}:::plan
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
-    List25{{"List[25∈3]<br />ᐸ23,24ᐳ"}}:::plan
-    Lambda26{{"Lambda[26∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
-    Constant59{{"Constant[59∈0]<br />ᐸ'WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0='ᐳ"}}:::plan
-    Lambda30{{"Lambda[30∈0]<br />ᐸspecifier_LargeNodeId_base64JSONᐳ"}}:::plan
-    Access31{{"Access[31∈0]<br />ᐸ30.1ᐳ"}}:::plan
+    Access16 & Access17 --> Object18
     PgSelect32[["PgSelect[32∈0]<br />ᐸlargeNodeIdᐳ"]]:::plan
-    First36{{"First[36∈0]"}}:::plan
-    PgSelectSingle37{{"PgSelectSingle[37∈0]<br />ᐸlargeNodeIdᐳ"}}:::plan
-    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
-    List40{{"List[40∈4]<br />ᐸ23,39ᐳ"}}:::plan
-    Lambda41{{"Lambda[41∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression43{{"PgClassExpression[43∈4]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
-    Constant60{{"Constant[60∈0]<br />ᐸ'WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ=='ᐳ"}}:::plan
-    Lambda45{{"Lambda[45∈0]<br />ᐸspecifier_LargeNodeId_base64JSONᐳ"}}:::plan
-    Access46{{"Access[46∈0]<br />ᐸ45.1ᐳ"}}:::plan
+    Access31{{"Access[31∈0]<br />ᐸ30.1ᐳ"}}:::plan
+    Object18 & Access31 --> PgSelect32
     PgSelect47[["PgSelect[47∈0]<br />ᐸlargeNodeIdᐳ"]]:::plan
-    First51{{"First[51∈0]"}}:::plan
-    PgSelectSingle52{{"PgSelectSingle[52∈0]<br />ᐸlargeNodeIdᐳ"}}:::plan
-    PgClassExpression54{{"PgClassExpression[54∈5]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
-    List55{{"List[55∈5]<br />ᐸ23,54ᐳ"}}:::plan
-    Lambda56{{"Lambda[56∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Access46{{"Access[46∈0]<br />ᐸ45.1ᐳ"}}:::plan
+    Object18 & Access46 --> PgSelect47
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access16
     __Value3 --> Access17
-    Access16 & Access17 --> Object18
-    Object18 & Connection19 --> PgSelect20
-    PgSelect20 ==> __Item21
-    __Item21 --> PgSelectSingle22
-    PgSelectSingle22 --> PgClassExpression24
-    Constant23 & PgClassExpression24 --> List25
-    List25 --> Lambda26
-    PgSelectSingle22 --> PgClassExpression28
+    Lambda30{{"Lambda[30∈0]<br />ᐸspecifier_LargeNodeId_base64JSONᐳ"}}:::plan
+    Constant59{{"Constant[59∈0]<br />ᐸ'WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0='ᐳ"}}:::plan
     Constant59 --> Lambda30
     Lambda30 --> Access31
-    Object18 & Access31 --> PgSelect32
+    First36{{"First[36∈0]"}}:::plan
     PgSelect32 --> First36
+    PgSelectSingle37{{"PgSelectSingle[37∈0]<br />ᐸlargeNodeIdᐳ"}}:::plan
     First36 --> PgSelectSingle37
-    PgSelectSingle37 --> PgClassExpression39
-    Constant23 & PgClassExpression39 --> List40
-    List40 --> Lambda41
-    PgSelectSingle37 --> PgClassExpression43
+    Lambda45{{"Lambda[45∈0]<br />ᐸspecifier_LargeNodeId_base64JSONᐳ"}}:::plan
+    Constant60{{"Constant[60∈0]<br />ᐸ'WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ=='ᐳ"}}:::plan
     Constant60 --> Lambda45
     Lambda45 --> Access46
-    Object18 & Access46 --> PgSelect47
+    First51{{"First[51∈0]"}}:::plan
     PgSelect47 --> First51
+    PgSelectSingle52{{"PgSelectSingle[52∈0]<br />ᐸlargeNodeIdᐳ"}}:::plan
     First51 --> PgSelectSingle52
-    PgSelectSingle52 --> PgClassExpression54
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Constant23{{"Constant[23∈0]<br />ᐸ'large_node_ids'ᐳ"}}:::plan
+    List55{{"List[55∈5]<br />ᐸ23,54ᐳ"}}:::plan
+    PgClassExpression54{{"PgClassExpression[54∈5]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
     Constant23 & PgClassExpression54 --> List55
+    PgSelectSingle52 --> PgClassExpression54
+    Lambda56{{"Lambda[56∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List55 --> Lambda56
+    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
     PgSelectSingle52 --> PgClassExpression58
+    List40{{"List[40∈4]<br />ᐸ23,39ᐳ"}}:::plan
+    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
+    Constant23 & PgClassExpression39 --> List40
+    PgSelectSingle37 --> PgClassExpression39
+    Lambda41{{"Lambda[41∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List40 --> Lambda41
+    PgClassExpression43{{"PgClassExpression[43∈4]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression43
+    PgSelect20[["PgSelect[20∈1]<br />ᐸlargeNodeIdᐳ"]]:::plan
+    Object18 & Connection19 --> PgSelect20
+    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
+    PgSelect20 ==> __Item21
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸlargeNodeIdᐳ"}}:::plan
+    __Item21 --> PgSelectSingle22
+    List25{{"List[25∈3]<br />ᐸ23,24ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
+    Constant23 & PgClassExpression24 --> List25
+    PgSelectSingle22 --> PgClassExpression24
+    Lambda26{{"Lambda[26∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List25 --> Lambda26
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression28
+
+    %% define steps
 
     subgraph "Buckets for queries/v4/large_bigint.issue491"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 23, 59, 60, 18, 30, 31, 45, 46<br />2: PgSelect[32], PgSelect[47]<br />ᐳ: 36, 37, 51, 52"):::bucket

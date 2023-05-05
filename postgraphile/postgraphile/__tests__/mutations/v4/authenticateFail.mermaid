@@ -8,28 +8,28 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgSelect9[["PgSelect[9∈1]<br />ᐸauthenticate_fail(mutation)ᐳ"]]:::sideeffectplan
-    First13{{"First[13∈1]"}}:::plan
-    PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸauthenticate_failᐳ"}}:::plan
-    Object15{{"Object[15∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
-
-    %% plan dependencies
+    Access10 & Access11 --> Object12
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access10
     __Value3 --> Access11
-    Access10 & Access11 --> Object12
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    PgSelect9[["PgSelect[9∈1]<br />ᐸauthenticate_fail(mutation)ᐳ"]]:::sideeffectplan
     Object12 --> PgSelect9
+    First13{{"First[13∈1]"}}:::plan
     PgSelect9 --> First13
+    PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸauthenticate_failᐳ"}}:::plan
     First13 --> PgSelectSingle14
+    Object15{{"Object[15∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle14 --> Object15
+    PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression16
+
+    %% define steps
 
     subgraph "Buckets for mutations/v4/authenticateFail"
     Bucket0("Bucket 0 (root)"):::bucket

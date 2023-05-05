@@ -8,54 +8,54 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
+    %% plan dependencies
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0]<br />ᐸ2ᐳ"}}:::plan
+    Lambda20{{"Lambda[20∈0]<br />ᐸparseCursorᐳ"}}:::plan
+    Constant46 & Lambda20 --> Connection19
+    Constant47{{"Constant[47∈0]<br />ᐸ'WyI5NjdkZTdmYTdlIiwzXQ=='ᐳ"}}:::plan
+    Constant47 --> Lambda20
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    PgSelect21[["PgSelect[21∈1]<br />ᐸpeopleᐳ"]]:::plan
+    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgValidateParsedCursor22["PgValidateParsedCursor[22∈1]"]:::plan
+    ToPg24{{"ToPg[24∈1]"}}:::plan
+    Object18 & Connection19 & Lambda20 & PgValidateParsedCursor22 & ToPg24 --> PgSelect21
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant46{{"Constant[46∈0]<br />ᐸ2ᐳ"}}:::plan
-    Constant47{{"Constant[47∈0]<br />ᐸ'WyI5NjdkZTdmYTdlIiwzXQ=='ᐳ"}}:::plan
-    Lambda20{{"Lambda[20∈0]<br />ᐸparseCursorᐳ"}}:::plan
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
-    PgValidateParsedCursor22["PgValidateParsedCursor[22∈1]"]:::plan
-    Access23{{"Access[23∈1]<br />ᐸ20.1ᐳ"}}:::plan
-    ToPg24{{"ToPg[24∈1]"}}:::plan
-    PgSelect21[["PgSelect[21∈1]<br />ᐸpeopleᐳ"]]:::plan
-    __Item25[/"__Item[25∈2]<br />ᐸ21ᐳ"\]:::itemplan
-    PgSelectSingle26{{"PgSelectSingle[26∈2]<br />ᐸpeopleᐳ"}}:::plan
-    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Access45{{"Access[45∈3]<br />ᐸ25.0ᐳ"}}:::plan
-    __Item36[/"__Item[36∈4]<br />ᐸ45ᐳ"\]:::itemplan
-    PgSelectSingle37{{"PgSelectSingle[37∈4]<br />ᐸlogEntriesᐳ"}}:::plan
-    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
-    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
-    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    List44{{"List[44∈3]<br />ᐸ31ᐳ"}}:::plan
-    PgCursor42{{"PgCursor[42∈3]"}}:::plan
-
-    %% plan dependencies
+    Access16 & Access17 --> Object18
     __Value3 --> Access16
     __Value3 --> Access17
-    Access16 & Access17 --> Object18
-    Constant47 --> Lambda20
-    Constant46 & Lambda20 --> Connection19
     Lambda20 --> PgValidateParsedCursor22
+    Access23{{"Access[23∈1]<br />ᐸ20.1ᐳ"}}:::plan
     Lambda20 --> Access23
     Access23 --> ToPg24
-    Object18 & Connection19 & Lambda20 & PgValidateParsedCursor22 & ToPg24 --> PgSelect21
+    __Item25[/"__Item[25∈2]<br />ᐸ21ᐳ"\]:::itemplan
     PgSelect21 ==> __Item25
+    PgSelectSingle26{{"PgSelectSingle[26∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item25 --> PgSelectSingle26
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression31
+    Access45{{"Access[45∈3]<br />ᐸ25.0ᐳ"}}:::plan
     __Item25 --> Access45
-    Access45 ==> __Item36
-    __Item36 --> PgSelectSingle37
-    PgSelectSingle37 --> PgClassExpression38
-    PgSelectSingle37 --> PgClassExpression39
+    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression41
+    List44{{"List[44∈3]<br />ᐸ31ᐳ"}}:::plan
     PgClassExpression31 --> List44
+    PgCursor42{{"PgCursor[42∈3]"}}:::plan
     List44 --> PgCursor42
+    __Item36[/"__Item[36∈4]<br />ᐸ45ᐳ"\]:::itemplan
+    Access45 ==> __Item36
+    PgSelectSingle37{{"PgSelectSingle[37∈4]<br />ᐸlogEntriesᐳ"}}:::plan
+    __Item36 --> PgSelectSingle37
+    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression38
+    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression39
+
+    %% define steps
 
     subgraph "Buckets for queries/polymorphic/person-log-entries.after-caroline"
     Bucket0("Bucket 0 (root)"):::bucket

@@ -8,41 +8,41 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access16 & Access17 --> Object18
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value3 --> Access16
+    __Value3 --> Access17
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant29{{"Constant[29∈0]<br />ᐸ'10.0.0.0'ᐳ"}}:::plan
     Constant30{{"Constant[30∈0]<br />ᐸ'10.0.0.0/8'ᐳ"}}:::plan
     Constant31{{"Constant[31∈0]<br />ᐸ'000000000000'ᐳ"}}:::plan
     Constant32{{"Constant[32∈0]<br />ᐸ'0000000000000000'ᐳ"}}:::plan
     PgInsertSingle15[["PgInsertSingle[15∈1]"]]:::sideeffectplan
+    Object18 & Constant29 & Constant30 & Constant31 & Constant32 --> PgInsertSingle15
     Object19{{"Object[19∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle15 --> Object19
+    List22{{"List[22∈3]<br />ᐸ20,21ᐳ"}}:::plan
     Constant20{{"Constant[20∈3]<br />ᐸ'networks'ᐳ"}}:::plan
     PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__network__.”id”ᐳ"}}:::plan
-    List22{{"List[22∈3]<br />ᐸ20,21ᐳ"}}:::plan
-    Lambda23{{"Lambda[23∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__network__.”inet”ᐳ"}}:::plan
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__network__.”cidr”ᐳ"}}:::plan
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__network__.”macaddr”ᐳ"}}:::plan
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__network__.”macaddr8”ᐳ"}}:::plan
-
-    %% plan dependencies
-    __Value3 --> Access16
-    __Value3 --> Access17
-    Access16 & Access17 --> Object18
-    Object18 & Constant29 & Constant30 & Constant31 & Constant32 --> PgInsertSingle15
-    PgInsertSingle15 --> Object19
-    PgInsertSingle15 --> PgClassExpression21
     Constant20 & PgClassExpression21 --> List22
+    PgInsertSingle15 --> PgClassExpression21
+    Lambda23{{"Lambda[23∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List22 --> Lambda23
+    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__network__.”inet”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__network__.”cidr”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression26
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__network__.”macaddr”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression27
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__network__.”macaddr8”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression28
+
+    %% define steps
 
     subgraph "Buckets for mutations/v4/pg11.network_types.createNetwork"
     Bucket0("Bucket 0 (root)"):::bucket

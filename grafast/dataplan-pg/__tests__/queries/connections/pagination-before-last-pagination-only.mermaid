@@ -8,45 +8,45 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
+    %% plan dependencies
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0]<br />ᐸ3ᐳ"}}:::plan
+    Lambda20{{"Lambda[20∈0]<br />ᐸparseCursorᐳ"}}:::plan
+    Constant32 & Lambda20 --> Connection19
+    Constant33{{"Constant[33∈0]<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
+    Constant33 --> Lambda20
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    PgSelect23[["PgSelect[23∈1]<br />ᐸmessages+1ᐳ"]]:::plan
+    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgValidateParsedCursor25["PgValidateParsedCursor[25∈1]"]:::plan
+    ToPg27{{"ToPg[27∈1]"}}:::plan
+    Object18 & Connection19 & Lambda20 & PgValidateParsedCursor25 & ToPg27 --> PgSelect23
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0]<br />ᐸ3ᐳ"}}:::plan
-    Constant33{{"Constant[33∈0]<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
-    Lambda20{{"Lambda[20∈0]<br />ᐸparseCursorᐳ"}}:::plan
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
-    PgPageInfo21{{"PgPageInfo[21∈1]"}}:::plan
-    Constant22{{"Constant[22∈1]<br />ᐸfalseᐳ"}}:::plan
-    PgValidateParsedCursor25["PgValidateParsedCursor[25∈1]"]:::plan
-    Access26{{"Access[26∈1]<br />ᐸ20.1ᐳ"}}:::plan
-    ToPg27{{"ToPg[27∈1]"}}:::plan
-    PgSelect23[["PgSelect[23∈1]<br />ᐸmessages+1ᐳ"]]:::plan
-    Lambda24{{"Lambda[24∈1]<br />ᐸlistHasMoreᐳ"}}:::plan
+    Access16 & Access17 --> Object18
     PgSelect28[["PgSelect[28∈1]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
-    First29{{"First[29∈1]"}}:::plan
-    PgSelectSingle30{{"PgSelectSingle[30∈1]<br />ᐸmessagesᐳ"}}:::plan
-    PgClassExpression31{{"PgClassExpression[31∈1]<br />ᐸcount(*)ᐳ"}}:::plan
-
-    %% plan dependencies
+    Object18 & Connection19 --> PgSelect28
     __Value3 --> Access16
     __Value3 --> Access17
-    Access16 & Access17 --> Object18
-    Constant33 --> Lambda20
-    Constant32 & Lambda20 --> Connection19
+    PgPageInfo21{{"PgPageInfo[21∈1]"}}:::plan
     Connection19 --> PgPageInfo21
     Lambda20 --> PgValidateParsedCursor25
+    Access26{{"Access[26∈1]<br />ᐸ20.1ᐳ"}}:::plan
     Lambda20 --> Access26
     Access26 --> ToPg27
-    Object18 & Connection19 & Lambda20 & PgValidateParsedCursor25 & ToPg27 --> PgSelect23
+    Lambda24{{"Lambda[24∈1]<br />ᐸlistHasMoreᐳ"}}:::plan
     PgSelect23 --> Lambda24
-    Object18 & Connection19 --> PgSelect28
+    First29{{"First[29∈1]"}}:::plan
     PgSelect28 --> First29
+    PgSelectSingle30{{"PgSelectSingle[30∈1]<br />ᐸmessagesᐳ"}}:::plan
     First29 --> PgSelectSingle30
+    PgClassExpression31{{"PgClassExpression[31∈1]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression31
+    Constant22{{"Constant[22∈1]<br />ᐸfalseᐳ"}}:::plan
+
+    %% define steps
 
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
     Bucket0("Bucket 0 (root)"):::bucket

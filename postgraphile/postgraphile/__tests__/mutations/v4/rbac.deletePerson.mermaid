@@ -8,30 +8,30 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant19{{"Constant[19∈0]<br />ᐸ3ᐳ"}}:::plan
-    PgDeleteSingle10[["PgDeleteSingle[10∈1]"]]:::sideeffectplan
-    Object14{{"Object[14∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    Constant15{{"Constant[15∈2]<br />ᐸ'people'ᐳ"}}:::plan
-    PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    List17{{"List[17∈2]<br />ᐸ15,16ᐳ"}}:::plan
-    Lambda18{{"Lambda[18∈2]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-
-    %% plan dependencies
+    Access11 & Access12 --> Object13
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access11
     __Value3 --> Access12
-    Access11 & Access12 --> Object13
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Constant19{{"Constant[19∈0]<br />ᐸ3ᐳ"}}:::plan
+    PgDeleteSingle10[["PgDeleteSingle[10∈1]"]]:::sideeffectplan
     Object13 & Constant19 --> PgDeleteSingle10
+    Object14{{"Object[14∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle10 --> Object14
-    PgDeleteSingle10 --> PgClassExpression16
+    List17{{"List[17∈2]<br />ᐸ15,16ᐳ"}}:::plan
+    Constant15{{"Constant[15∈2]<br />ᐸ'people'ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant15 & PgClassExpression16 --> List17
+    PgDeleteSingle10 --> PgClassExpression16
+    Lambda18{{"Lambda[18∈2]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List17 --> Lambda18
+
+    %% define steps
 
     subgraph "Buckets for mutations/v4/rbac.deletePerson"
     Bucket0("Bucket 0 (root)"):::bucket

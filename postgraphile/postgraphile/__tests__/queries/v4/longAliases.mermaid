@@ -8,52 +8,52 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant53{{"Constant[53∈0]<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
+    Access9 & Access10 --> Object11
     PgSelect8[["PgSelect[8∈0]<br />ᐸpersonᐳ"]]:::plan
-    First12{{"First[12∈0]"}}:::plan
-    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸpersonᐳ"}}:::plan
-    Constant14{{"Constant[14∈1]<br />ᐸ'people'ᐳ"}}:::plan
-    PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    List16{{"List[16∈1]<br />ᐸ14,15ᐳ"}}:::plan
-    Lambda17{{"Lambda[17∈1]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    Connection30{{"Connection[30∈1]<br />ᐸ26ᐳ"}}:::plan
-    Access51{{"Access[51∈1]<br />ᐸ12.2ᐳ"}}:::plan
-    First32{{"First[32∈1]"}}:::plan
-    PgSelectSingle33{{"PgSelectSingle[33∈1]<br />ᐸperson_friendsᐳ"}}:::plan
-    PgClassExpression34{{"PgClassExpression[34∈1]<br />ᐸcount(*)ᐳ"}}:::plan
-    Connection46{{"Connection[46∈1]<br />ᐸ42ᐳ"}}:::plan
-    Access52{{"Access[52∈1]<br />ᐸ12.3ᐳ"}}:::plan
-    First48{{"First[48∈1]"}}:::plan
-    PgSelectSingle49{{"PgSelectSingle[49∈1]<br />ᐸperson_friendsᐳ"}}:::plan
-    PgClassExpression50{{"PgClassExpression[50∈1]<br />ᐸcount(*)ᐳ"}}:::plan
-
-    %% plan dependencies
+    Constant53{{"Constant[53∈0]<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
+    Object11 & Constant53 --> PgSelect8
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
-    Access9 & Access10 --> Object11
-    Object11 & Constant53 --> PgSelect8
+    First12{{"First[12∈0]"}}:::plan
     PgSelect8 --> First12
+    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸpersonᐳ"}}:::plan
     First12 --> PgSelectSingle13
-    PgSelectSingle13 --> PgClassExpression15
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    List16{{"List[16∈1]<br />ᐸ14,15ᐳ"}}:::plan
+    Constant14{{"Constant[14∈1]<br />ᐸ'people'ᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant14 & PgClassExpression15 --> List16
+    PgSelectSingle13 --> PgClassExpression15
+    Lambda17{{"Lambda[17∈1]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List16 --> Lambda17
+    PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__person__.”email”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression18
+    Access51{{"Access[51∈1]<br />ᐸ12.2ᐳ"}}:::plan
     First12 --> Access51
+    First32{{"First[32∈1]"}}:::plan
     Access51 --> First32
+    PgSelectSingle33{{"PgSelectSingle[33∈1]<br />ᐸperson_friendsᐳ"}}:::plan
     First32 --> PgSelectSingle33
+    PgClassExpression34{{"PgClassExpression[34∈1]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression34
+    Access52{{"Access[52∈1]<br />ᐸ12.3ᐳ"}}:::plan
     First12 --> Access52
+    First48{{"First[48∈1]"}}:::plan
     Access52 --> First48
+    PgSelectSingle49{{"PgSelectSingle[49∈1]<br />ᐸperson_friendsᐳ"}}:::plan
     First48 --> PgSelectSingle49
+    PgClassExpression50{{"PgClassExpression[50∈1]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression50
+    Connection30{{"Connection[30∈1]<br />ᐸ26ᐳ"}}:::plan
+    Connection46{{"Connection[46∈1]<br />ᐸ42ᐳ"}}:::plan
+
+    %% define steps
 
     subgraph "Buckets for queries/v4/longAliases"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 53, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket

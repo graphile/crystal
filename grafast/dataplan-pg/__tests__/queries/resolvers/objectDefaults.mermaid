@@ -8,23 +8,23 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    GraphQLResolver9[["GraphQLResolver[9∈0]<br />ᐸresolveᐳ"]]:::unbatchedplan
     Constant7{{"Constant[7∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
     Constant20{{"Constant[20∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
-    GraphQLResolver9[["GraphQLResolver[9∈0]<br />ᐸresolveᐳ"]]:::unbatchedplan
-    Access11{{"Access[11∈1]<br />ᐸ9.numbersᐳ"}}:::plan
-    __Item12[/"__Item[12∈2]<br />ᐸ11ᐳ"\]:::itemplan
-    Access13{{"Access[13∈1]<br />ᐸ9.friendᐳ"}}:::plan
-
-    %% plan dependencies
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant7 & Constant20 & __Value3 & __Value1 & __Value5 --> GraphQLResolver9
+    __Value0["__Value[0∈0]"]:::plan
+    Access11{{"Access[11∈1]<br />ᐸ9.numbersᐳ"}}:::plan
     GraphQLResolver9 --> Access11
-    Access11 ==> __Item12
+    Access13{{"Access[13∈1]<br />ᐸ9.friendᐳ"}}:::plan
     GraphQLResolver9 --> Access13
+    __Item12[/"__Item[12∈2]<br />ᐸ11ᐳ"\]:::itemplan
+    Access11 ==> __Item12
+
+    %% define steps
 
     subgraph "Buckets for queries/resolvers/objectDefaults"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Constant[7], Constant[20]<br />2: GraphQLResolver[9]"):::bucket

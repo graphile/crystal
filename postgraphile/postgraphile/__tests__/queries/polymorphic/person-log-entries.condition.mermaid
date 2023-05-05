@@ -8,40 +8,40 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
+    %% plan dependencies
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection21{{"Connection[21∈0]<br />ᐸ17ᐳ"}}:::plan
+    PgSelect22[["PgSelect[22∈1]<br />ᐸpeopleᐳ"]]:::plan
+    Object20{{"Object[20∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant42{{"Constant[42∈1]<br />ᐸ'Dave'ᐳ"}}:::plan
+    Object20 & Constant42 & Connection21 --> PgSelect22
     Access18{{"Access[18∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access19{{"Access[19∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object20{{"Object[20∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Connection21{{"Connection[21∈0]<br />ᐸ17ᐳ"}}:::plan
-    Constant42{{"Constant[42∈1]<br />ᐸ'Dave'ᐳ"}}:::plan
-    PgSelect22[["PgSelect[22∈1]<br />ᐸpeopleᐳ"]]:::plan
-    __Item23[/"__Item[23∈2]<br />ᐸ22ᐳ"\]:::itemplan
-    PgSelectSingle24{{"PgSelectSingle[24∈2]<br />ᐸpeopleᐳ"}}:::plan
-    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Access41{{"Access[41∈3]<br />ᐸ23.0ᐳ"}}:::plan
-    __Item35[/"__Item[35∈4]<br />ᐸ41ᐳ"\]:::itemplan
-    PgSelectSingle36{{"PgSelectSingle[36∈4]<br />ᐸlogEntriesᐳ"}}:::plan
-    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
-    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
-    PgClassExpression40{{"PgClassExpression[40∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Access18 & Access19 --> Object20
     __Value3 --> Access18
     __Value3 --> Access19
-    Access18 & Access19 --> Object20
-    Object20 & Constant42 & Connection21 --> PgSelect22
+    __Item23[/"__Item[23∈2]<br />ᐸ22ᐳ"\]:::itemplan
     PgSelect22 ==> __Item23
+    PgSelectSingle24{{"PgSelectSingle[24∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item23 --> PgSelectSingle24
+    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression30
+    Access41{{"Access[41∈3]<br />ᐸ23.0ᐳ"}}:::plan
     __Item23 --> Access41
-    Access41 ==> __Item35
-    __Item35 --> PgSelectSingle36
-    PgSelectSingle36 --> PgClassExpression37
-    PgSelectSingle36 --> PgClassExpression38
+    PgClassExpression40{{"PgClassExpression[40∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression40
+    __Item35[/"__Item[35∈4]<br />ᐸ41ᐳ"\]:::itemplan
+    Access41 ==> __Item35
+    PgSelectSingle36{{"PgSelectSingle[36∈4]<br />ᐸlogEntriesᐳ"}}:::plan
+    __Item35 --> PgSelectSingle36
+    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression37
+    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression38
+
+    %% define steps
 
     subgraph "Buckets for queries/polymorphic/person-log-entries.condition"
     Bucket0("Bucket 0 (root)"):::bucket

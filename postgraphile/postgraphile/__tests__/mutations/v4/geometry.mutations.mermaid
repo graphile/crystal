@@ -8,13 +8,16 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object87{{"Object[87∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access85{{"Access[85∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access86{{"Access[86∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object87{{"Object[87∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access85 & Access86 --> Object87
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value3 --> Access85
+    __Value3 --> Access86
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant223{{"Constant[223∈0]<br />ᐸ[Object: null prototype] { x: 99, y: 1234 }ᐳ"}}:::plan
     Constant236{{"Constant[236∈0]<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
     Constant237{{"Constant[237∈0]<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
@@ -24,44 +27,41 @@ graph TD
     Constant243{{"Constant[243∈0]<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
     Constant240{{"Constant[240∈0]<br />ᐸ[Object: null prototype] {   center: [Object: null prototypeᐳ"}}:::plan
     PgInsertSingle84[["PgInsertSingle[84∈1]"]]:::sideeffectplan
-    Object88{{"Object[88∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression119{{"PgClassExpression[119∈3]<br />ᐸ__geom__.”id”ᐳ"}}:::plan
-    PgClassExpression120{{"PgClassExpression[120∈3]<br />ᐸ__geom__.”point”ᐳ"}}:::plan
-    PgClassExpression123{{"PgClassExpression[123∈3]<br />ᐸ__geom__.”line”ᐳ"}}:::plan
-    PgClassExpression130{{"PgClassExpression[130∈3]<br />ᐸ__geom__.”lseg”ᐳ"}}:::plan
-    PgClassExpression137{{"PgClassExpression[137∈3]<br />ᐸ__geom__.”box”ᐳ"}}:::plan
-    PgClassExpression144{{"PgClassExpression[144∈3]<br />ᐸ__geom__.”open_path”ᐳ"}}:::plan
-    Access146{{"Access[146∈8]<br />ᐸ144.pointsᐳ"}}:::plan
-    __Item147[/"__Item[147∈9]<br />ᐸ146ᐳ"\]:::itemplan
-    PgClassExpression150{{"PgClassExpression[150∈3]<br />ᐸ__geom__.”closed_path”ᐳ"}}:::plan
-    Access152{{"Access[152∈10]<br />ᐸ150.pointsᐳ"}}:::plan
-    __Item153[/"__Item[153∈11]<br />ᐸ152ᐳ"\]:::itemplan
-    PgClassExpression156{{"PgClassExpression[156∈3]<br />ᐸ__geom__.”polygon”ᐳ"}}:::plan
-    Access157{{"Access[157∈12]<br />ᐸ156.pointsᐳ"}}:::plan
-    __Item158[/"__Item[158∈13]<br />ᐸ157ᐳ"\]:::itemplan
-    PgClassExpression161{{"PgClassExpression[161∈3]<br />ᐸ__geom__.”circle”ᐳ"}}:::plan
-
-    %% plan dependencies
-    __Value3 --> Access85
-    __Value3 --> Access86
-    Access85 & Access86 --> Object87
     Object87 & Constant223 & Constant236 & Constant237 & Constant238 & Constant241 & Constant242 & Constant243 & Constant240 --> PgInsertSingle84
+    Object88{{"Object[88∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle84 --> Object88
+    PgClassExpression119{{"PgClassExpression[119∈3]<br />ᐸ__geom__.”id”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression119
+    PgClassExpression120{{"PgClassExpression[120∈3]<br />ᐸ__geom__.”point”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression120
+    PgClassExpression123{{"PgClassExpression[123∈3]<br />ᐸ__geom__.”line”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression123
+    PgClassExpression130{{"PgClassExpression[130∈3]<br />ᐸ__geom__.”lseg”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression130
+    PgClassExpression137{{"PgClassExpression[137∈3]<br />ᐸ__geom__.”box”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression137
+    PgClassExpression144{{"PgClassExpression[144∈3]<br />ᐸ__geom__.”open_path”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression144
-    PgClassExpression144 --> Access146
-    Access146 ==> __Item147
+    PgClassExpression150{{"PgClassExpression[150∈3]<br />ᐸ__geom__.”closed_path”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression150
-    PgClassExpression150 --> Access152
-    Access152 ==> __Item153
+    PgClassExpression156{{"PgClassExpression[156∈3]<br />ᐸ__geom__.”polygon”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression156
-    PgClassExpression156 --> Access157
-    Access157 ==> __Item158
+    PgClassExpression161{{"PgClassExpression[161∈3]<br />ᐸ__geom__.”circle”ᐳ"}}:::plan
     PgInsertSingle84 --> PgClassExpression161
+    Access157{{"Access[157∈12]<br />ᐸ156.pointsᐳ"}}:::plan
+    PgClassExpression156 --> Access157
+    Access152{{"Access[152∈10]<br />ᐸ150.pointsᐳ"}}:::plan
+    PgClassExpression150 --> Access152
+    Access146{{"Access[146∈8]<br />ᐸ144.pointsᐳ"}}:::plan
+    PgClassExpression144 --> Access146
+    __Item147[/"__Item[147∈9]<br />ᐸ146ᐳ"\]:::itemplan
+    Access146 ==> __Item147
+    __Item153[/"__Item[153∈11]<br />ᐸ152ᐳ"\]:::itemplan
+    Access152 ==> __Item153
+    __Item158[/"__Item[158∈13]<br />ᐸ157ᐳ"\]:::itemplan
+    Access157 ==> __Item158
+
+    %% define steps
 
     subgraph "Buckets for mutations/v4/geometry.mutations"
     Bucket0("Bucket 0 (root)"):::bucket

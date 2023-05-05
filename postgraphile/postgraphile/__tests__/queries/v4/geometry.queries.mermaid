@@ -8,55 +8,55 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
+    %% plan dependencies
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Access16 & Access17 --> Object18
     PgSelect20[["PgSelect[20∈1]<br />ᐸgeomᐳ"]]:::plan
-    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸgeomᐳ"}}:::plan
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__geom__.”id”ᐳ"}}:::plan
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__geom__.”point”ᐳ"}}:::plan
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__geom__.”line”ᐳ"}}:::plan
-    PgClassExpression34{{"PgClassExpression[34∈3]<br />ᐸ__geom__.”lseg”ᐳ"}}:::plan
-    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__geom__.”box”ᐳ"}}:::plan
-    PgClassExpression48{{"PgClassExpression[48∈3]<br />ᐸ__geom__.”open_path”ᐳ"}}:::plan
-    Access50{{"Access[50∈8]<br />ᐸ48.pointsᐳ"}}:::plan
-    __Item51[/"__Item[51∈9]<br />ᐸ50ᐳ"\]:::itemplan
-    PgClassExpression54{{"PgClassExpression[54∈3]<br />ᐸ__geom__.”closed_path”ᐳ"}}:::plan
-    Access56{{"Access[56∈10]<br />ᐸ54.pointsᐳ"}}:::plan
-    __Item57[/"__Item[57∈11]<br />ᐸ56ᐳ"\]:::itemplan
-    PgClassExpression60{{"PgClassExpression[60∈3]<br />ᐸ__geom__.”polygon”ᐳ"}}:::plan
-    Access61{{"Access[61∈12]<br />ᐸ60.pointsᐳ"}}:::plan
-    __Item62[/"__Item[62∈13]<br />ᐸ61ᐳ"\]:::itemplan
-    PgClassExpression65{{"PgClassExpression[65∈3]<br />ᐸ__geom__.”circle”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Object18 & Connection19 --> PgSelect20
     __Value3 --> Access16
     __Value3 --> Access17
-    Access16 & Access17 --> Object18
-    Object18 & Connection19 --> PgSelect20
+    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelect20 ==> __Item21
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸgeomᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__geom__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__geom__.”point”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__geom__.”line”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression27
+    PgClassExpression34{{"PgClassExpression[34∈3]<br />ᐸ__geom__.”lseg”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression34
+    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__geom__.”box”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression41
+    PgClassExpression48{{"PgClassExpression[48∈3]<br />ᐸ__geom__.”open_path”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression48
-    PgClassExpression48 --> Access50
-    Access50 ==> __Item51
+    PgClassExpression54{{"PgClassExpression[54∈3]<br />ᐸ__geom__.”closed_path”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression54
-    PgClassExpression54 --> Access56
-    Access56 ==> __Item57
+    PgClassExpression60{{"PgClassExpression[60∈3]<br />ᐸ__geom__.”polygon”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression60
-    PgClassExpression60 --> Access61
-    Access61 ==> __Item62
+    PgClassExpression65{{"PgClassExpression[65∈3]<br />ᐸ__geom__.”circle”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression65
+    Access61{{"Access[61∈12]<br />ᐸ60.pointsᐳ"}}:::plan
+    PgClassExpression60 --> Access61
+    Access56{{"Access[56∈10]<br />ᐸ54.pointsᐳ"}}:::plan
+    PgClassExpression54 --> Access56
+    Access50{{"Access[50∈8]<br />ᐸ48.pointsᐳ"}}:::plan
+    PgClassExpression48 --> Access50
+    __Item51[/"__Item[51∈9]<br />ᐸ50ᐳ"\]:::itemplan
+    Access50 ==> __Item51
+    __Item57[/"__Item[57∈11]<br />ᐸ56ᐳ"\]:::itemplan
+    Access56 ==> __Item57
+    __Item62[/"__Item[62∈13]<br />ᐸ61ᐳ"\]:::itemplan
+    Access61 ==> __Item62
+
+    %% define steps
 
     subgraph "Buckets for queries/v4/geometry.queries"
     Bucket0("Bucket 0 (root)"):::bucket

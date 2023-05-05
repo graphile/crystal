@@ -8,57 +8,57 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object15{{"Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access14{{"Access[14∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object15{{"Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access13 & Access14 --> Object15
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value3 --> Access13
+    __Value3 --> Access14
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant47{{"Constant[47∈0]<br />ᐸ1ᐳ"}}:::plan
     Constant48{{"Constant[48∈0]<br />ᐸ'2'ᐳ"}}:::plan
     Constant49{{"Constant[49∈0]<br />ᐸ'3'ᐳ"}}:::plan
     PgSelect12[["PgSelect[12∈1]<br />ᐸauthenticate_payload(mutation)ᐳ"]]:::sideeffectplan
-    First16{{"First[16∈1]"}}:::plan
-    PgSelectSingle17{{"PgSelectSingle[17∈1]<br />ᐸauthenticate_payloadᐳ"}}:::plan
-    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__authenti...ad__.”jwt”ᐳ"}}:::plan
-    PgSelect20[["PgSelect[20∈3]<br />ᐸfrmcdc_jwtToken_1ᐳ"]]:::plan
-    First24{{"First[24∈3]"}}:::plan
-    PgSelectSingle25{{"PgSelectSingle[25∈3]<br />ᐸfrmcdc_jwtToken_1ᐳ"}}:::plan
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__frmcdc_jwt_token_1__ᐳ"}}:::plan
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__authenti...__.”admin”ᐳ"}}:::plan
-    PgClassExpression38{{"PgClassExpression[38∈2]<br />ᐸ__authenti...oad__.”id”ᐳ"}}:::plan
-    PgSelect30[["PgSelect[30∈2]<br />ᐸpersonᐳ"]]:::plan
-    First34{{"First[34∈2]"}}:::plan
-    PgSelectSingle35{{"PgSelectSingle[35∈2]<br />ᐸpersonᐳ"}}:::plan
-    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-
-    %% plan dependencies
-    __Value3 --> Access13
-    __Value3 --> Access14
-    Access13 & Access14 --> Object15
     Object15 & Constant47 & Constant48 & Constant49 --> PgSelect12
+    First16{{"First[16∈1]"}}:::plan
     PgSelect12 --> First16
+    PgSelectSingle17{{"PgSelectSingle[17∈1]<br />ᐸauthenticate_payloadᐳ"}}:::plan
     First16 --> PgSelectSingle17
+    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle17 --> Object18
-    PgSelectSingle17 --> PgClassExpression19
-    Object15 & PgClassExpression19 --> PgSelect20
-    PgSelect20 --> First24
-    First24 --> PgSelectSingle25
-    PgSelectSingle25 --> PgClassExpression26
-    PgSelectSingle17 --> PgClassExpression28
-    PgSelectSingle17 --> PgClassExpression38
+    PgSelect30[["PgSelect[30∈2]<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression38{{"PgClassExpression[38∈2]<br />ᐸ__authenti...oad__.”id”ᐳ"}}:::plan
     Object15 & PgClassExpression38 --> PgSelect30
+    PgSelectSingle17 --> PgClassExpression38
+    First34{{"First[34∈2]"}}:::plan
     PgSelect30 --> First34
+    PgSelectSingle35{{"PgSelectSingle[35∈2]<br />ᐸpersonᐳ"}}:::plan
     First34 --> PgSelectSingle35
-    PgSelectSingle35 --> PgClassExpression36
-    PgSelectSingle35 --> PgClassExpression37
+    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression45
+    PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression46
+    PgSelect20[["PgSelect[20∈3]<br />ᐸfrmcdc_jwtToken_1ᐳ"]]:::plan
+    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__authenti...ad__.”jwt”ᐳ"}}:::plan
+    Object15 & PgClassExpression19 --> PgSelect20
+    PgSelectSingle17 --> PgClassExpression19
+    First24{{"First[24∈3]"}}:::plan
+    PgSelect20 --> First24
+    PgSelectSingle25{{"PgSelectSingle[25∈3]<br />ᐸfrmcdc_jwtToken_1ᐳ"}}:::plan
+    First24 --> PgSelectSingle25
+    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__frmcdc_jwt_token_1__ᐳ"}}:::plan
+    PgSelectSingle25 --> PgClassExpression26
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__authenti...__.”admin”ᐳ"}}:::plan
+    PgSelectSingle17 --> PgClassExpression28
+    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression36
+    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression37
+
+    %% define steps
 
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier-withPayload"
     Bucket0("Bucket 0 (root)"):::bucket
