@@ -1,4 +1,3 @@
-import { ConstantStep, constant } from "./constant.js";
 import type {
   ExecutionExtra,
   StepOptimizeOptions,
@@ -6,6 +5,7 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { constant, ConstantStep } from "./constant.js";
 
 export class ListStep<
   const TPlanTuple extends readonly ExecutableStep[],

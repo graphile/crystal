@@ -5,8 +5,8 @@ import te, { isSafeObjectPropertyName } from "tamedevil";
 import type { ExecutionExtra, StepOptimizeOptions } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { constant, ConstantStep } from "./constant.js";
 import type { SetterCapableStep } from "./setter.js";
-import { ConstantStep, constant } from "./constant.js";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
