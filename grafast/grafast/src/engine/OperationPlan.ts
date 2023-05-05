@@ -2124,8 +2124,8 @@ ${te.join(
             if (
               dDependencyIndex === dependencyIndex &&
               dStep !== step &&
-              !allPeers.includes(dStep) &&
               dStep.dependencies.length === dependencyCount &&
+              !allPeers.includes(dStep) &&
               isMaybeAPeer(step, compatibleLayerPlans, dStep)
             ) {
               allPeers.push(dStep);
