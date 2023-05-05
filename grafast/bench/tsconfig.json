@@ -1,14 +1,14 @@
+// This includes `noEmit` and `include: ["."]` so that `graphile.config.ts` works with moduleResolution: "nodenext".
+// See tsconfig.build.json for the build version.
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "declarationDir": "./dist",
     "outDir": "./dist",
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "noEmit": true
   },
-  "include": ["src"],
-  "references": [
-    { "path": "../../utils/graphile-config" },
-    { "path": "../grafast" }
-  ]
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
 }
