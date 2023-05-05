@@ -22,13 +22,13 @@ graph TD
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__material__.”valueOf”ᐳ"}}:::plan
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__material__.”class”ᐳ"}}:::plan
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__material__.”id”ᐳ"}}:::plan
-    __InputStaticLeaf26{{"__InputStaticLeaf[26∈0]"}}:::plan
+    Constant75{{"Constant[75∈0]<br />ᐸ'concrete'ᐳ"}}:::plan
     PgSelect27[["PgSelect[27∈0]<br />ᐸmaterialᐳ"]]:::plan
     First31{{"First[31∈0]"}}:::plan
     PgSelectSingle32{{"PgSelectSingle[32∈0]<br />ᐸmaterialᐳ"}}:::plan
     PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__material__.”class”ᐳ"}}:::plan
     PgClassExpression34{{"PgClassExpression[34∈4]<br />ᐸ__material__.”id”ᐳ"}}:::plan
-    __InputStaticLeaf35{{"__InputStaticLeaf[35∈0]"}}:::plan
+    Constant76{{"Constant[76∈0]<br />ᐸ'spongy'ᐳ"}}:::plan
     PgSelect36[["PgSelect[36∈0]<br />ᐸmaterialᐳ"]]:::plan
     First40{{"First[40∈0]"}}:::plan
     PgSelectSingle41{{"PgSelectSingle[41∈0]<br />ᐸmaterialᐳ"}}:::plan
@@ -40,13 +40,13 @@ graph TD
     PgClassExpression54{{"PgClassExpression[54∈6]<br />ᐸ__crop__.”id”ᐳ"}}:::plan
     PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
     PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__crop__.”yield”ᐳ"}}:::plan
-    __InputStaticLeaf57{{"__InputStaticLeaf[57∈0]"}}:::plan
+    Constant77{{"Constant[77∈0]<br />ᐸ1ᐳ"}}:::plan
     PgSelect58[["PgSelect[58∈0]<br />ᐸcropᐳ"]]:::plan
     First62{{"First[62∈0]"}}:::plan
     PgSelectSingle63{{"PgSelectSingle[63∈0]<br />ᐸcropᐳ"}}:::plan
     PgClassExpression64{{"PgClassExpression[64∈7]<br />ᐸ__crop__.”yield”ᐳ"}}:::plan
     PgClassExpression65{{"PgClassExpression[65∈7]<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
-    __InputStaticLeaf66{{"__InputStaticLeaf[66∈0]"}}:::plan
+    Constant78{{"Constant[78∈0]<br />ᐸ'corn'ᐳ"}}:::plan
     PgSelect67[["PgSelect[67∈0]<br />ᐸcropᐳ"]]:::plan
     First71{{"First[71∈0]"}}:::plan
     PgSelectSingle72{{"PgSelectSingle[72∈0]<br />ᐸcropᐳ"}}:::plan
@@ -63,12 +63,12 @@ graph TD
     PgSelectSingle22 --> PgClassExpression23
     PgSelectSingle22 --> PgClassExpression24
     PgSelectSingle22 --> PgClassExpression25
-    Object18 & __InputStaticLeaf26 --> PgSelect27
+    Object18 & Constant75 --> PgSelect27
     PgSelect27 --> First31
     First31 --> PgSelectSingle32
     PgSelectSingle32 --> PgClassExpression33
     PgSelectSingle32 --> PgClassExpression34
-    Object18 & __InputStaticLeaf35 --> PgSelect36
+    Object18 & Constant76 --> PgSelect36
     PgSelect36 --> First40
     First40 --> PgSelectSingle41
     PgSelectSingle41 --> PgClassExpression42
@@ -79,21 +79,21 @@ graph TD
     PgSelectSingle53 --> PgClassExpression54
     PgSelectSingle53 --> PgClassExpression55
     PgSelectSingle53 --> PgClassExpression56
-    Object18 & __InputStaticLeaf57 --> PgSelect58
+    Object18 & Constant77 --> PgSelect58
     PgSelect58 --> First62
     First62 --> PgSelectSingle63
     PgSelectSingle63 --> PgClassExpression64
     PgSelectSingle63 --> PgClassExpression65
-    Object18 & __InputStaticLeaf66 --> PgSelect67
+    Object18 & Constant78 --> PgSelect67
     PgSelect67 --> First71
     First71 --> PgSelectSingle72
     PgSelectSingle72 --> PgClassExpression73
     PgSelectSingle72 --> PgClassExpression74
 
     subgraph "Buckets for queries/v4/js-reserved-keywords-as-columns"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 26, 35, 57, 66, 18<br />2: 27, 36, 48, 58, 67<br />ᐳ: 31, 32, 40, 41, 62, 63, 71, 72"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 75, 76, 77, 78, 18<br />2: 27, 36, 48, 58, 67<br />ᐳ: 31, 32, 40, 41, 62, 63, 71, 72"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,__InputStaticLeaf26,PgSelect27,First31,PgSelectSingle32,__InputStaticLeaf35,PgSelect36,First40,PgSelectSingle41,PgSelect48,__InputStaticLeaf57,PgSelect58,First62,PgSelectSingle63,__InputStaticLeaf66,PgSelect67,First71,PgSelectSingle72 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,PgSelect27,First31,PgSelectSingle32,PgSelect36,First40,PgSelectSingle41,PgSelect48,PgSelect58,First62,PgSelectSingle63,PgSelect67,First71,PgSelectSingle72,Constant75,Constant76,Constant77,Constant78 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20 bucket1

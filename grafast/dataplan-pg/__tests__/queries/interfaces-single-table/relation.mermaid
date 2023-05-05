@@ -12,10 +12,10 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant297{{"Constant[297∈0]<br />ᐸ15ᐳ"}}:::plan
     PgSelect8[["PgSelect[8∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
     First12{{"First[12∈0]"}}:::plan
     PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸsingle_table_itemsᐳ"}}:::plan
@@ -40,7 +40,7 @@ graph TD
     __Value3 --> Access9
     __Value3 --> Access10
     Access9 & Access10 --> Object11
-    Object11 & __InputStaticLeaf7 --> PgSelect8
+    Object11 & Constant297 --> PgSelect8
     PgSelect8 --> First12
     First12 --> PgSelectSingle13
     PgSelectSingle13 --> PgClassExpression14
@@ -61,9 +61,9 @@ graph TD
     PgSelectSingle13 --> PgClassExpression72
 
     subgraph "Buckets for queries/interfaces-single-table/relation"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 11<br />2: PgSelect[8]<br />ᐳ: 12, 13, 14, 15, 17, 72<br />3: PgSingleTablePolymorphic[16]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 297, 11<br />2: PgSelect[8]<br />ᐳ: 12, 13, 14, 15, 17, 72<br />3: PgSingleTablePolymorphic[16]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,Lambda15,PgSingleTablePolymorphic16,PgClassExpression17,PgClassExpression72 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,Lambda15,PgSingleTablePolymorphic16,PgClassExpression17,PgClassExpression72,Constant297 bucket0
     Bucket1("Bucket 1 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 11, 17, 16, 13, 72<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br />1: PgSelect[18]<br />ᐳ: 22, 23, 24, 25, 28<br />2: PgSingleTablePolymorphic[26]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect18,First22,PgSelectSingle23,PgClassExpression24,Lambda25,PgSingleTablePolymorphic26,PgClassExpression28 bucket1

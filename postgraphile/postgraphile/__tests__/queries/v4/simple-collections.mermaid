@@ -39,13 +39,12 @@ graph TD
     PgClassExpression58{{"PgClassExpression[58∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression59{{"PgClassExpression[59∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgClassExpression60{{"PgClassExpression[60∈4]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    __InputStaticLeaf68{{"__InputStaticLeaf[68∈0]"}}:::plan
+    Constant177{{"Constant[177∈0]<br />ᐸ2ᐳ"}}:::plan
     PgSelect72[["PgSelect[72∈0]<br />ᐸpostᐳ"]]:::plan
     __Item76[/"__Item[76∈5]<br />ᐸ72ᐳ"\]:::itemplan
     PgSelectSingle77{{"PgSelectSingle[77∈5]<br />ᐸpostᐳ"}}:::plan
     PgClassExpression78{{"PgClassExpression[78∈5]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgClassExpression79{{"PgClassExpression[79∈5]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
-    __InputStaticLeaf87{{"__InputStaticLeaf[87∈0]"}}:::plan
     PgSelect91[["PgSelect[91∈0]<br />ᐸpostᐳ"]]:::plan
     __Item95[/"__Item[95∈6]<br />ᐸ91ᐳ"\]:::itemplan
     PgSelectSingle96{{"PgSelectSingle[96∈6]<br />ᐸpostᐳ"}}:::plan
@@ -103,12 +102,12 @@ graph TD
     PgSelectSingle57 --> PgClassExpression58
     PgSelectSingle57 --> PgClassExpression59
     PgSelectSingle57 --> PgClassExpression60
-    Object14 & __InputStaticLeaf68 --> PgSelect72
+    Object14 & Constant177 --> PgSelect72
     PgSelect72 ==> __Item76
     __Item76 --> PgSelectSingle77
     PgSelectSingle77 --> PgClassExpression78
     PgSelectSingle77 --> PgClassExpression79
-    Object14 & __InputStaticLeaf87 --> PgSelect91
+    Object14 & Constant177 --> PgSelect91
     PgSelect91 ==> __Item95
     __Item95 --> PgSelectSingle96
     PgSelectSingle96 --> PgClassExpression97
@@ -138,9 +137,9 @@ graph TD
     PgSelectSingle174 --> PgClassExpression176
 
     subgraph "Buckets for queries/v4/simple-collections"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 68, 87, 14<br />2: 11, 24, 38, 52, 72, 91, 103, 116, 154, 169"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 177, 14<br />2: 11, 24, 38, 52, 72, 91, 103, 116, 154, 169"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,PgSelect24,PgSelect38,PgSelect52,__InputStaticLeaf68,PgSelect72,__InputStaticLeaf87,PgSelect91,PgSelect103,PgSelect116,PgSelect154,PgSelect169 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,PgSelect24,PgSelect38,PgSelect52,PgSelect72,PgSelect91,PgSelect103,PgSelect116,PgSelect154,PgSelect169,Constant177 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19 bucket1

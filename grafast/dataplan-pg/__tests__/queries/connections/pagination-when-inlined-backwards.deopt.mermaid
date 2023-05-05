@@ -19,8 +19,8 @@ graph TD
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
-    __InputStaticLeaf19{{"__InputStaticLeaf[19∈0]"}}:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
+    Constant77{{"Constant[77∈0]<br />ᐸ2ᐳ"}}:::plan
     Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
     PgSelect29[["PgSelect[29∈3]<br />ᐸmessages+1ᐳ"]]:::plan
     __Item30[/"__Item[30∈4]<br />ᐸ29ᐳ"\]:::itemplan
@@ -43,7 +43,7 @@ graph TD
     PgClassExpression55{{"PgClassExpression[55∈8]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgClassExpression56{{"PgClassExpression[56∈8]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgPageInfo57{{"PgPageInfo[57∈3]"}}:::plan
-    Constant58{{"Constant[58∈1]"}}:::plan
+    Constant58{{"Constant[58∈1]<br />ᐸfalseᐳ"}}:::plan
     Lambda60{{"Lambda[60∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
     First62{{"First[62∈3]"}}:::plan
     PgSelectSingle63{{"PgSelectSingle[63∈3]<br />ᐸmessagesᐳ"}}:::plan
@@ -69,7 +69,7 @@ graph TD
     __Item15 --> PgSelectSingle16
     PgSelectSingle16 --> PgClassExpression17
     PgSelectSingle16 --> PgClassExpression23
-    __InputStaticLeaf19 --> Connection28
+    Constant77 --> Connection28
     Object14 & PgClassExpression23 & Connection28 --> PgSelect29
     PgSelect29 ==> __Item30
     __Item30 --> PgSelectSingle31
@@ -108,9 +108,9 @@ graph TD
     PgSelectSingle75 --> PgClassExpression76
 
     subgraph "Buckets for queries/connections/pagination-when-inlined-backwards"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 19, 14, 28<br />2: PgSelect[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 77, 14, 28<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,__InputStaticLeaf19,Connection28 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection28,Constant77 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 14, 28<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16,Constant58 bucket1

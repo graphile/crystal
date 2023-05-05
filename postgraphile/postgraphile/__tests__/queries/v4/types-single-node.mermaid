@@ -12,7 +12,7 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
+    Constant159{{"Constant[159∈0]<br />ᐸ'WyJ0eXBlcyIsMTFd'ᐳ"}}:::plan
     Lambda9{{"Lambda[9∈0]<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
     Node8{{"Node[8∈0]"}}:::plan
     Access14{{"Access[14∈1]<br />ᐸ3.pgSettingsᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
@@ -77,7 +77,7 @@ graph TD
     PgSelectSingle156{{"PgSelectSingle[156∈1]<br />ᐸissue756ᐳ"}}:::plan
 
     %% plan dependencies
-    __InputStaticLeaf7 --> Lambda9
+    Constant159 --> Lambda9
     Lambda9 --> Node8
     __Value3 --> Access14
     __Value3 --> Access15
@@ -143,7 +143,7 @@ graph TD
     subgraph "Buckets for queries/v4/types-single-node"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf7,Node8,Lambda9 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Node8,Lambda9,Constant159 bucket0
     Bucket1("Bucket 1 (polymorphic)<br />Query,Input,Patch,Reserved,ReservedPatchRecord,ReservedInputRecord,DefaultValue,CompoundKey,Person,Post,Type,PersonSecret,LeftArm,MyTable,ViewTable,SimilarTable1,SimilarTable2,NullTestRecord,Issue756<br />Deps: 3, 9, 8, 5<br />ᐳQuery<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />1: <br />ᐳ: 14, 15, 157, 158, 16<br />2: 13, 21, 29, 37, 45, 53, 62, 70, 78, 86, 95, 103, 111, 119, 127, 135, 143, 151<br />ᐳ: 17, 18, 25, 26, 33, 34, 41, 42, 49, 50, 57, 58, 66, 67, 74, 75, 82, 83, 90, 91, 92, 99, 100, 107, 108, 115, 116, 123, 124, 131, 132, 139, 140, 147, 148, 155, 156"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect13,Access14,Access15,Object16,First17,PgSelectSingle18,PgSelect21,First25,PgSelectSingle26,PgSelect29,First33,PgSelectSingle34,PgSelect37,First41,PgSelectSingle42,PgSelect45,First49,PgSelectSingle50,PgSelect53,First57,PgSelectSingle58,PgSelect62,First66,PgSelectSingle67,PgSelect70,First74,PgSelectSingle75,PgSelect78,First82,PgSelectSingle83,PgSelect86,First90,PgSelectSingle91,PgClassExpression92,PgSelect95,First99,PgSelectSingle100,PgSelect103,First107,PgSelectSingle108,PgSelect111,First115,PgSelectSingle116,PgSelect119,First123,PgSelectSingle124,PgSelect127,First131,PgSelectSingle132,PgSelect135,First139,PgSelectSingle140,PgSelect143,First147,PgSelectSingle148,PgSelect151,First155,PgSelectSingle156,Access157,Access158 bucket1

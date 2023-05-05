@@ -12,18 +12,14 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf9{{"__InputStaticLeaf[9∈0]"}}:::plan
-    __InputStaticLeaf12{{"__InputStaticLeaf[12∈0]"}}:::plan
-    __InputStaticLeaf13{{"__InputStaticLeaf[13∈0]"}}:::plan
-    __InputStaticLeaf15{{"__InputStaticLeaf[15∈0]"}}:::plan
-    __InputStaticLeaf16{{"__InputStaticLeaf[16∈0]"}}:::plan
-    __InputStaticLeaf17{{"__InputStaticLeaf[17∈0]"}}:::plan
-    __InputStaticLeaf19{{"__InputStaticLeaf[19∈0]"}}:::plan
     Access28{{"Access[28∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access29{{"Access[29∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object30{{"Object[30∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    List32{{"List[32∈0]<br />ᐸ15,16,17ᐳ"}}:::plan
-    Object33{{"Object[33∈0]<br />ᐸ{a}ᐳ"}}:::plan
+    Constant98{{"Constant[98∈0]<br />ᐸ12ᐳ"}}:::plan
+    Constant99{{"Constant[99∈0]<br />ᐸ'postgraphile_test_authenticator'ᐳ"}}:::plan
+    Constant100{{"Constant[100∈0]<br />ᐸ'pg11'ᐳ"}}:::plan
+    Constant111{{"Constant[111∈0]<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
+    Constant112{{"Constant[112∈0]<br />ᐸ[Object: null prototype] { a: 1 }ᐳ"}}:::plan
     PgUpdateSingle27[["PgUpdateSingle[27∈1]"]]:::sideeffectplan
     Object31{{"Object[31∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression34{{"PgClassExpression[34∈3]<br />ᐸ__types__.”id”ᐳ"}}:::plan
@@ -42,17 +38,13 @@ graph TD
     PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__frmcdc_d...pe_1__.”e”ᐳ"}}:::plan
     PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__frmcdc_d...pe_1__.”f”ᐳ"}}:::plan
     PgClassExpression52{{"PgClassExpression[52∈5]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
-    __InputStaticLeaf57{{"__InputStaticLeaf[57∈0]"}}:::plan
-    __InputStaticLeaf58{{"__InputStaticLeaf[58∈0]"}}:::plan
-    __InputStaticLeaf60{{"__InputStaticLeaf[60∈0]"}}:::plan
-    __InputStaticLeaf61{{"__InputStaticLeaf[61∈0]"}}:::plan
-    __InputStaticLeaf62{{"__InputStaticLeaf[62∈0]"}}:::plan
-    __InputStaticLeaf64{{"__InputStaticLeaf[64∈0]"}}:::plan
     Access73{{"Access[73∈6]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access74{{"Access[74∈6]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object75{{"Object[75∈6]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    List77{{"List[77∈6]<br />ᐸ60,61,62ᐳ"}}:::plan
-    Object78{{"Object[78∈6]<br />ᐸ{a}ᐳ"}}:::plan
+    Constant105{{"Constant[105∈0]<br />ᐸ'postgraphile_test_visitor'ᐳ"}}:::plan
+    Constant106{{"Constant[106∈0]<br />ᐸ'c'ᐳ"}}:::plan
+    Constant113{{"Constant[113∈6]<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
+    Constant114{{"Constant[114∈6]<br />ᐸ[Object: null prototype] { a: 1 }ᐳ"}}:::plan
     PgInsertSingle72[["PgInsertSingle[72∈6]"]]:::sideeffectplan
     Object76{{"Object[76∈6]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression79{{"PgClassExpression[79∈8]<br />ᐸ__types__.”id”ᐳ"}}:::plan
@@ -76,9 +68,7 @@ graph TD
     __Value3 --> Access28
     __Value3 --> Access29
     Access28 & Access29 --> Object30
-    __InputStaticLeaf15 & __InputStaticLeaf16 & __InputStaticLeaf17 --> List32
-    __InputStaticLeaf19 --> Object33
-    Object30 & __InputStaticLeaf9 & __InputStaticLeaf12 & __InputStaticLeaf13 & List32 & Object33 --> PgUpdateSingle27
+    Object30 & Constant98 & Constant99 & Constant100 & Constant111 & Constant112 --> PgUpdateSingle27
     PgUpdateSingle27 --> Object31
     PgUpdateSingle27 --> PgClassExpression34
     PgUpdateSingle27 --> PgClassExpression35
@@ -99,9 +89,7 @@ graph TD
     __Value3 --> Access73
     __Value3 --> Access74
     Access73 & Access74 --> Object75
-    __InputStaticLeaf60 & __InputStaticLeaf61 & __InputStaticLeaf62 --> List77
-    __InputStaticLeaf64 --> Object78
-    Object75 & __InputStaticLeaf57 & __InputStaticLeaf58 & List77 & Object78 --> PgInsertSingle72
+    Object75 & Constant105 & Constant106 & Constant113 & Constant114 --> PgInsertSingle72
     PgInsertSingle72 --> Object76
     PgInsertSingle72 --> PgClassExpression79
     PgInsertSingle72 --> PgClassExpression80
@@ -123,8 +111,8 @@ graph TD
     subgraph "Buckets for mutations/v4/pg11.types"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf17,__InputStaticLeaf19,Access28,Access29,Object30,List32,Object33,__InputStaticLeaf57,__InputStaticLeaf58,__InputStaticLeaf60,__InputStaticLeaf61,__InputStaticLeaf62,__InputStaticLeaf64 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 30, 9, 12, 13, 32, 33<br /><br />1: PgUpdateSingle[27]<br />2: <br />ᐳ: Object[31]"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Access28,Access29,Object30,Constant98,Constant99,Constant100,Constant105,Constant106,Constant111,Constant112 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 30, 98, 99, 100, 111, 112<br /><br />1: PgUpdateSingle[27]<br />2: <br />ᐳ: Object[31]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle27,Object31 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 31, 27, 30<br /><br />ROOT Object{1}ᐸ{result}ᐳ[31]"):::bucket
@@ -139,9 +127,9 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 45<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_domainConstrainedCompoundType_1ᐳ[45]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression46,PgClassExpression47,PgClassExpression48,PgClassExpression49,PgClassExpression50,PgClassExpression51,PgClassExpression52 bucket5
-    Bucket6("Bucket 6 (mutationField)<br />Deps: 57, 58, 3, 60, 61, 62, 64<br /><br />1: Access[73]<br />2: Access[74]<br />3: Object[75]<br />4: List[77]<br />5: Object[78]<br />6: PgInsertSingle[72]<br />7: <br />ᐳ: Object[76]"):::bucket
+    Bucket6("Bucket 6 (mutationField)<br />Deps: 105, 106, 3<br /><br />1: Access[73]<br />2: Access[74]<br />3: Object[75]<br />4: Constant[113]<br />5: Constant[114]<br />6: PgInsertSingle[72]<br />7: <br />ᐳ: Object[76]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgInsertSingle72,Access73,Access74,Object75,Object76,List77,Object78 bucket6
+    class Bucket6,PgInsertSingle72,Access73,Access74,Object75,Object76,Constant113,Constant114 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 76, 72, 75<br /><br />ROOT Object{6}ᐸ{result}ᐳ[76]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7 bucket7

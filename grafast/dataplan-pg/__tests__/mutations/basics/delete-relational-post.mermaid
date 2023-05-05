@@ -12,10 +12,10 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf8{{"__InputStaticLeaf[8∈0]"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant103{{"Constant[103∈0]<br />ᐸ4ᐳ"}}:::plan
     PgDeleteSingle9[["PgDeleteSingle[9∈1]"]]:::sideeffectplan
     PgClassExpression13{{"PgClassExpression[13∈2]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgClassExpression14{{"PgClassExpression[14∈2]<br />ᐸ__relational_posts__ᐳ"}}:::plan
@@ -35,10 +35,10 @@ graph TD
     PgSelectSingle46{{"PgSelectSingle[46∈3]<br />ᐸpeopleᐳ"}}:::plan
     PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgClassExpression48{{"PgClassExpression[48∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    __InputStaticLeaf50{{"__InputStaticLeaf[50∈0]"}}:::plan
     Access52{{"Access[52∈5]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access53{{"Access[53∈5]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object54{{"Object[54∈5]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant104{{"Constant[104∈0]<br />ᐸ3141592ᐳ"}}:::plan
     PgDeleteSingle51[["PgDeleteSingle[51∈5]"]]:::sideeffectplan
     PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__relational_posts__ᐳ"}}:::plan
@@ -63,7 +63,7 @@ graph TD
     __Value3 --> Access10
     __Value3 --> Access11
     Access10 & Access11 --> Object12
-    Object12 & __InputStaticLeaf8 --> PgDeleteSingle9
+    Object12 & Constant103 --> PgDeleteSingle9
     PgDeleteSingle9 --> PgClassExpression13
     PgDeleteSingle9 --> PgClassExpression14
     Object12 & PgClassExpression14 --> PgSelect15
@@ -85,7 +85,7 @@ graph TD
     __Value3 --> Access52
     __Value3 --> Access53
     Access52 & Access53 --> Object54
-    Object54 & __InputStaticLeaf50 --> PgDeleteSingle51
+    Object54 & Constant104 --> PgDeleteSingle51
     PgDeleteSingle51 --> PgClassExpression55
     PgDeleteSingle51 --> PgClassExpression56
     Object54 & PgClassExpression56 --> PgSelect57
@@ -108,8 +108,8 @@ graph TD
     subgraph "Buckets for mutations/basics/delete-relational-post"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf8,Access10,Access11,Object12,__InputStaticLeaf50 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Access10,Access11,Object12,Constant103,Constant104 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 103"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle9 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 12<br /><br />ROOT PgDeleteSingle{1}[9]<br />1: <br />ᐳ: 13, 14<br />2: PgSelect[15]<br />ᐳ: First[19], PgSelectSingle[20]"):::bucket
@@ -121,7 +121,7 @@ graph TD
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 46<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[46]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression47,PgClassExpression48 bucket4
-    Bucket5("Bucket 5 (mutationField)<br />Deps: 50, 3<br /><br />1: Access[52]<br />2: Access[53]<br />3: Object[54]<br />4: PgDeleteSingle[51]"):::bucket
+    Bucket5("Bucket 5 (mutationField)<br />Deps: 104, 3<br /><br />1: Access[52]<br />2: Access[53]<br />3: Object[54]<br />4: PgDeleteSingle[51]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgDeleteSingle51,Access52,Access53,Object54 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 54<br /><br />ROOT PgDeleteSingle{5}[51]<br />1: <br />ᐳ: 55, 56<br />2: PgSelect[57]<br />ᐳ: First[61], PgSelectSingle[62]"):::bucket

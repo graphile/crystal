@@ -12,13 +12,13 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf12{{"__InputStaticLeaf[12∈0]"}}:::plan
-    __InputStaticLeaf13{{"__InputStaticLeaf[13∈0]"}}:::plan
-    __InputStaticLeaf14{{"__InputStaticLeaf[14∈0]"}}:::plan
-    __InputStaticLeaf15{{"__InputStaticLeaf[15∈0]"}}:::plan
     Access17{{"Access[17∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access18{{"Access[18∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object19{{"Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0]<br />ᐸ'Doe'ᐳ"}}:::plan
+    Constant31{{"Constant[31∈0]<br />ᐸ'create2'ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0]<br />ᐸ'create1'ᐳ"}}:::plan
+    Constant33{{"Constant[33∈0]<br />ᐸ'create3'ᐳ"}}:::plan
     PgInsertSingle16[["PgInsertSingle[16∈1]"]]:::sideeffectplan
     Object20{{"Object[20∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
@@ -35,7 +35,7 @@ graph TD
     __Value3 --> Access17
     __Value3 --> Access18
     Access17 & Access18 --> Object19
-    Object19 & __InputStaticLeaf12 & __InputStaticLeaf13 & __InputStaticLeaf14 & __InputStaticLeaf15 --> PgInsertSingle16
+    Object19 & Constant30 & Constant31 & Constant32 & Constant33 --> PgInsertSingle16
     PgInsertSingle16 --> Object20
     PgInsertSingle16 --> PgClassExpression21
     PgInsertSingle16 --> PgClassExpression22
@@ -50,8 +50,8 @@ graph TD
     subgraph "Buckets for mutations/v4/d.createPerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf12,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,Access17,Access18,Object19 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 12, 13, 14, 15<br /><br />1: PgInsertSingle[16]<br />2: <br />ᐳ: Object[20]"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Access17,Access18,Object19,Constant30,Constant31,Constant32,Constant33 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 30, 31, 32, 33<br /><br />1: PgInsertSingle[16]<br />2: <br />ᐳ: Object[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle16,Object20 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 16<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket

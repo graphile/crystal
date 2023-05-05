@@ -12,13 +12,13 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf10{{"__InputStaticLeaf[10∈0]"}}:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant24{{"Constant[24∈0]<br />ᐸ0.66ᐳ"}}:::plan
     PgInsertSingle11[["PgInsertSingle[11∈1]"]]:::sideeffectplan
     Object15{{"Object[15∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    Constant16{{"Constant[16∈3]"}}:::plan
+    Constant16{{"Constant[16∈3]<br />ᐸ'left_arms'ᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈3]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     List18{{"List[18∈3]<br />ᐸ16,17ᐳ"}}:::plan
     Lambda19{{"Lambda[19∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
@@ -30,7 +30,7 @@ graph TD
     __Value3 --> Access12
     __Value3 --> Access13
     Access12 & Access13 --> Object14
-    Object14 & __InputStaticLeaf10 --> PgInsertSingle11
+    Object14 & Constant24 --> PgInsertSingle11
     PgInsertSingle11 --> Object15
     PgInsertSingle11 --> PgClassExpression17
     Constant16 & PgClassExpression17 --> List18
@@ -42,8 +42,8 @@ graph TD
     subgraph "Buckets for mutations/v4/rbac.createLeftArm"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf10,Access12,Access13,Object14 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 10<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[15]"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Access12,Access13,Object14,Constant24 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 24<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle11,Object15 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 11<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket

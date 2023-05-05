@@ -33,9 +33,9 @@ graph TD
     __Item44[/"__Item[44∈6]<br />ᐸ40ᐳ"\]:::itemplan
     PgSelectSingle45{{"PgSelectSingle[45∈6]<br />ᐸtable_set_queryᐳ"}}:::plan
     PgClassExpression46{{"PgClassExpression[46∈7]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
-    __InputStaticLeaf47{{"__InputStaticLeaf[47∈0]"}}:::plan
-    __InputStaticLeaf49{{"__InputStaticLeaf[49∈0]"}}:::plan
-    Constant52{{"Constant[52∈0]"}}:::plan
+    Constant52{{"Constant[52∈0]<br />ᐸnullᐳ"}}:::plan
+    Constant108{{"Constant[108∈0]<br />ᐸ5ᐳ"}}:::plan
+    Constant109{{"Constant[109∈0]<br />ᐸ6ᐳ"}}:::plan
     PgSelect53[["PgSelect[53∈0]<br />ᐸint_set_queryᐳ"]]:::plan
     __Item57[/"__Item[57∈8]<br />ᐸ53ᐳ"\]:::itemplan
     PgSelectSingle58{{"PgSelectSingle[58∈8]<br />ᐸint_set_queryᐳ"}}:::plan
@@ -79,7 +79,7 @@ graph TD
     PgSelect40 ==> __Item44
     __Item44 --> PgSelectSingle45
     PgSelectSingle45 --> PgClassExpression46
-    Object12 & __InputStaticLeaf47 & Constant52 & __InputStaticLeaf49 --> PgSelect53
+    Object12 & Constant108 & Constant52 & Constant109 --> PgSelect53
     PgSelect53 ==> __Item57
     __Item57 --> PgSelectSingle58
     PgSelectSingle58 --> PgClassExpression59
@@ -101,9 +101,9 @@ graph TD
     PgSelectSingle103 --> PgClassExpression104
 
     subgraph "Buckets for queries/v4/simple-procedure-query"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 10, 11, 47, 49, 52, 12<br />2: 9, 29, 40, 53, 62, 71, 88"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 10, 11, 52, 108, 109, 12<br />2: 9, 29, 40, 53, 62, 71, 88"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect9,Access10,Access11,Object12,PgSelect29,PgSelect40,__InputStaticLeaf47,__InputStaticLeaf49,Constant52,PgSelect53,PgSelect62,PgSelect71,PgSelect88 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect9,Access10,Access11,Object12,PgSelect29,PgSelect40,Constant52,PgSelect53,PgSelect62,PgSelect71,PgSelect88,Constant108,Constant109 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ9ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1

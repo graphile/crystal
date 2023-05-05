@@ -13,23 +13,23 @@ graph TD
     __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant7{{"Constant[7∈0]"}}:::plan
-    Object8{{"Object[8∈0]<br />ᐸ{}ᐳ"}}:::plan
+    Constant7{{"Constant[7∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
+    Constant20{{"Constant[20∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
     GraphQLResolver9[["GraphQLResolver[9∈0]<br />ᐸresolveᐳ"]]:::unbatchedplan
     Access11{{"Access[11∈1]<br />ᐸ9.numbersᐳ"}}:::plan
     __Item12[/"__Item[12∈2]<br />ᐸ11ᐳ"\]:::itemplan
     Access13{{"Access[13∈1]<br />ᐸ9.friendᐳ"}}:::plan
 
     %% plan dependencies
-    Constant7 & Object8 & __Value3 & __Value1 & __Value5 --> GraphQLResolver9
+    Constant7 & Constant20 & __Value3 & __Value1 & __Value5 --> GraphQLResolver9
     GraphQLResolver9 --> Access11
     Access11 ==> __Item12
     GraphQLResolver9 --> Access13
 
     subgraph "Buckets for queries/resolvers/objectDefaults"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Constant[7], Object[8]<br />2: GraphQLResolver[9]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Constant[7], Constant[20]<br />2: GraphQLResolver[9]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value1,__Value3,__Value5,Constant7,Object8,GraphQLResolver9 bucket0
+    class Bucket0,__Value0,__Value1,__Value3,__Value5,Constant7,GraphQLResolver9,Constant20 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 9<br /><br />ROOT GraphQLResolverᐸresolveᐳ[9]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access11,Access13 bucket1

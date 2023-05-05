@@ -39,7 +39,7 @@ graph TD
     PgClassExpression64{{"PgClassExpression[64∈9]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     PgClassExpression65{{"PgClassExpression[65∈9]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     PgClassExpression66{{"PgClassExpression[66∈9]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
-    __InputStaticLeaf67{{"__InputStaticLeaf[67∈0]"}}:::plan
+    Constant137{{"Constant[137∈0]<br />ᐸ'B'ᐳ"}}:::plan
     PgSelect68[["PgSelect[68∈0]<br />ᐸletterDescriptionsᐳ"]]:::plan
     First72{{"First[72∈0]"}}:::plan
     PgSelectSingle73{{"PgSelectSingle[73∈0]<br />ᐸletterDescriptionsᐳ"}}:::plan
@@ -47,7 +47,6 @@ graph TD
     PgClassExpression75{{"PgClassExpression[75∈10]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     PgClassExpression76{{"PgClassExpression[76∈10]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     PgClassExpression77{{"PgClassExpression[77∈10]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
-    __InputStaticLeaf78{{"__InputStaticLeaf[78∈0]"}}:::plan
     PgSelect79[["PgSelect[79∈0]<br />ᐸletterDescriptionsᐳ"]]:::plan
     First83{{"First[83∈0]"}}:::plan
     PgSelectSingle84{{"PgSelectSingle[84∈0]<br />ᐸletterDescriptionsᐳ"}}:::plan
@@ -55,8 +54,8 @@ graph TD
     PgClassExpression86{{"PgClassExpression[86∈11]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     PgClassExpression87{{"PgClassExpression[87∈11]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     PgClassExpression88{{"PgClassExpression[88∈11]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
-    __InputStaticLeaf98{{"__InputStaticLeaf[98∈12]"}}:::plan
     Connection105{{"Connection[105∈0]<br />ᐸ101ᐳ"}}:::plan
+    Constant139{{"Constant[139∈0]<br />ᐸ'C'ᐳ"}}:::plan
     PgSelect106[["PgSelect[106∈12]<br />ᐸletterDescriptionsᐳ"]]:::plan
     __Item107[/"__Item[107∈13]<br />ᐸ106ᐳ"\]:::itemplan
     PgSelectSingle108{{"PgSelectSingle[108∈13]<br />ᐸletterDescriptionsᐳ"}}:::plan
@@ -64,7 +63,6 @@ graph TD
     PgClassExpression110{{"PgClassExpression[110∈14]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     PgClassExpression111{{"PgClassExpression[111∈14]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     PgClassExpression112{{"PgClassExpression[112∈14]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
-    __InputStaticLeaf123{{"__InputStaticLeaf[123∈15]"}}:::plan
     Connection129{{"Connection[129∈0]<br />ᐸ125ᐳ"}}:::plan
     PgSelect130[["PgSelect[130∈15]<br />ᐸletterDescriptionsᐳ"]]:::plan
     __Item131[/"__Item[131∈16]<br />ᐸ130ᐳ"\]:::itemplan
@@ -99,28 +97,28 @@ graph TD
     PgSelectSingle62 --> PgClassExpression64
     PgSelectSingle62 --> PgClassExpression65
     PgSelectSingle62 --> PgClassExpression66
-    Object18 & __InputStaticLeaf67 --> PgSelect68
+    Object18 & Constant137 --> PgSelect68
     PgSelect68 --> First72
     First72 --> PgSelectSingle73
     PgSelectSingle73 --> PgClassExpression74
     PgSelectSingle73 --> PgClassExpression75
     PgSelectSingle73 --> PgClassExpression76
     PgSelectSingle73 --> PgClassExpression77
-    Object18 & __InputStaticLeaf78 --> PgSelect79
+    Object18 & Constant137 --> PgSelect79
     PgSelect79 --> First83
     First83 --> PgSelectSingle84
     PgSelectSingle84 --> PgClassExpression85
     PgSelectSingle84 --> PgClassExpression86
     PgSelectSingle84 --> PgClassExpression87
     PgSelectSingle84 --> PgClassExpression88
-    Object18 & __InputStaticLeaf98 & Connection105 --> PgSelect106
+    Object18 & Constant139 & Connection105 --> PgSelect106
     PgSelect106 ==> __Item107
     __Item107 --> PgSelectSingle108
     PgSelectSingle108 --> PgClassExpression109
     PgSelectSingle108 --> PgClassExpression110
     PgSelectSingle108 --> PgClassExpression111
     PgSelectSingle108 --> PgClassExpression112
-    Object18 & __InputStaticLeaf123 & Connection129 --> PgSelect130
+    Object18 & Constant139 & Connection129 --> PgSelect130
     PgSelect130 ==> __Item131
     __Item131 --> PgSelectSingle132
     PgSelectSingle132 --> PgClassExpression133
@@ -129,9 +127,9 @@ graph TD
     PgSelectSingle132 --> PgClassExpression136
 
     subgraph "Buckets for queries/v4/enum_tables.queries"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 39, 59, 67, 78, 105, 129, 18<br />2: PgSelect[68], PgSelect[79]<br />ᐳ: 72, 73, 83, 84"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 39, 59, 105, 129, 137, 139, 18<br />2: PgSelect[68], PgSelect[79]<br />ᐳ: 72, 73, 83, 84"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Connection39,Connection59,__InputStaticLeaf67,PgSelect68,First72,PgSelectSingle73,__InputStaticLeaf78,PgSelect79,First83,PgSelectSingle84,Connection105,Connection129 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Connection39,Connection59,PgSelect68,First72,PgSelectSingle73,PgSelect79,First83,PgSelectSingle84,Connection105,Connection129,Constant137,Constant139 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20 bucket1
@@ -165,18 +163,18 @@ graph TD
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 84<br /><br />ROOT PgSelectSingleᐸletterDescriptionsᐳ[84]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11,PgClassExpression85,PgClassExpression86,PgClassExpression87,PgClassExpression88 bucket11
-    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 18, 105<br /><br />ROOT Connectionᐸ101ᐳ[105]<br />1: <br />ᐳ: __InputStaticLeaf[98]<br />2: PgSelect[106]"):::bucket
+    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 18, 139, 105<br /><br />ROOT Connectionᐸ101ᐳ[105]"):::bucket
     classDef bucket12 stroke:#4169e1
-    class Bucket12,__InputStaticLeaf98,PgSelect106 bucket12
+    class Bucket12,PgSelect106 bucket12
     Bucket13("Bucket 13 (listItem)<br />ROOT __Item{13}ᐸ106ᐳ[107]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,__Item107,PgSelectSingle108 bucket13
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 108<br /><br />ROOT PgSelectSingle{13}ᐸletterDescriptionsᐳ[108]"):::bucket
     classDef bucket14 stroke:#a52a2a
     class Bucket14,PgClassExpression109,PgClassExpression110,PgClassExpression111,PgClassExpression112 bucket14
-    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 18, 129<br /><br />ROOT Connectionᐸ125ᐳ[129]<br />1: <br />ᐳ: __InputStaticLeaf[123]<br />2: PgSelect[130]"):::bucket
+    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 18, 139, 129<br /><br />ROOT Connectionᐸ125ᐳ[129]"):::bucket
     classDef bucket15 stroke:#ff00ff
-    class Bucket15,__InputStaticLeaf123,PgSelect130 bucket15
+    class Bucket15,PgSelect130 bucket15
     Bucket16("Bucket 16 (listItem)<br />ROOT __Item{16}ᐸ130ᐳ[131]"):::bucket
     classDef bucket16 stroke:#f5deb3
     class Bucket16,__Item131,PgSelectSingle132 bucket16

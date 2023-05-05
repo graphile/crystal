@@ -12,11 +12,11 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf18{{"__InputStaticLeaf[18∈1]"}}:::plan
     Access23{{"Access[23∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access24{{"Access[24∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object25{{"Object[25∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Connection26{{"Connection[26∈0]<br />ᐸ22ᐳ"}}:::plan
+    Constant39{{"Constant[39∈1]<br />ᐸ'col_no_create1'ᐳ"}}:::plan
     PgSelect27[["PgSelect[27∈1]<br />ᐸpersonᐳ"]]:::plan
     __Item28[/"__Item[28∈2]<br />ᐸ27ᐳ"\]:::itemplan
     PgSelectSingle29{{"PgSelectSingle[29∈2]<br />ᐸpersonᐳ"}}:::plan
@@ -34,7 +34,7 @@ graph TD
     __Value3 --> Access23
     __Value3 --> Access24
     Access23 & Access24 --> Object25
-    Object25 & __InputStaticLeaf18 & Connection26 --> PgSelect27
+    Object25 & Constant39 & Connection26 --> PgSelect27
     PgSelect27 ==> __Item28
     __Item28 --> PgSelectSingle29
     PgSelectSingle29 --> PgClassExpression30
@@ -51,9 +51,9 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,Connection26 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 26<br /><br />ROOT Connectionᐸ22ᐳ[26]<br />1: <br />ᐳ: 18, 23, 24, 25<br />2: PgSelect[27]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 26<br /><br />ROOT Connectionᐸ22ᐳ[26]<br />1: <br />ᐳ: 23, 24, 39, 25<br />2: PgSelect[27]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__InputStaticLeaf18,Access23,Access24,Object25,PgSelect27 bucket1
+    class Bucket1,Access23,Access24,Object25,PgSelect27,Constant39 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ27ᐳ[28]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item28,PgSelectSingle29 bucket2

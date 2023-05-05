@@ -12,18 +12,15 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf9{{"__InputStaticLeaf[9∈0]"}}:::plan
-    __InputStaticLeaf11{{"__InputStaticLeaf[11∈0]"}}:::plan
-    __InputStaticLeaf13{{"__InputStaticLeaf[13∈0]"}}:::plan
-    __InputStaticLeaf14{{"__InputStaticLeaf[14∈0]"}}:::plan
-    __InputStaticLeaf15{{"__InputStaticLeaf[15∈0]"}}:::plan
-    __InputStaticLeaf16{{"__InputStaticLeaf[16∈0]"}}:::plan
-    __InputStaticLeaf18{{"__InputStaticLeaf[18∈0]"}}:::plan
     Access20{{"Access[20∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access21{{"Access[21∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object22{{"Object[22∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    List24{{"List[24∈0]<br />ᐸ13,14ᐳ"}}:::plan
-    Object25{{"Object[25∈0]<br />ᐸ{url}ᐳ"}}:::plan
+    Constant40{{"Constant[40∈0]<br />ᐸ3ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0]<br />ᐸ'Budd Daay'ᐳ"}}:::plan
+    Constant47{{"Constant[47∈0]<br />ᐸ[ 'BD', 'Buddy' ]ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0]<br />ᐸnullᐳ"}}:::plan
+    Constant45{{"Constant[45∈0]<br />ᐸ'buddy@example.com'ᐳ"}}:::plan
+    Constant48{{"Constant[48∈0]<br />ᐸ[Object: null prototype] { url: 'http://buddy.com' }ᐳ"}}:::plan
     PgUpdateSingle19[["PgUpdateSingle[19∈1]"]]:::sideeffectplan
     Object23{{"Object[23∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
@@ -42,9 +39,7 @@ graph TD
     __Value3 --> Access20
     __Value3 --> Access21
     Access20 & Access21 --> Object22
-    __InputStaticLeaf13 & __InputStaticLeaf14 --> List24
-    __InputStaticLeaf18 --> Object25
-    Object22 & __InputStaticLeaf9 & __InputStaticLeaf11 & List24 & __InputStaticLeaf15 & __InputStaticLeaf16 & Object25 --> PgUpdateSingle19
+    Object22 & Constant40 & Constant41 & Constant47 & Constant44 & Constant45 & Constant48 --> PgUpdateSingle19
     PgUpdateSingle19 --> Object23
     PgUpdateSingle19 --> PgClassExpression26
     PgUpdateSingle19 --> PgClassExpression27
@@ -61,8 +56,8 @@ graph TD
     subgraph "Buckets for mutations/v4/rbac.updatePerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf9,__InputStaticLeaf11,__InputStaticLeaf13,__InputStaticLeaf14,__InputStaticLeaf15,__InputStaticLeaf16,__InputStaticLeaf18,Access20,Access21,Object22,List24,Object25 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 22, 9, 11, 24, 15, 16, 25<br /><br />1: PgUpdateSingle[19]<br />2: <br />ᐳ: Object[23]"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Access20,Access21,Object22,Constant40,Constant41,Constant44,Constant45,Constant47,Constant48 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 22, 40, 41, 47, 44, 45, 48<br /><br />1: PgUpdateSingle[19]<br />2: <br />ᐳ: Object[23]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle19,Object23 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 23, 19, 22<br /><br />ROOT Object{1}ᐸ{result}ᐳ[23]"):::bucket

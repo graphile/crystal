@@ -18,12 +18,12 @@ graph TD
     PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
-    __InputStaticLeaf17{{"__InputStaticLeaf[17∈0]"}}:::plan
-    __InputStaticLeaf20{{"__InputStaticLeaf[20∈1]"}}:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
+    Constant37{{"Constant[37∈0]<br />ᐸ5ᐳ"}}:::plan
     Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
     PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
     PgPageInfo30{{"PgPageInfo[30∈3]"}}:::plan
+    Constant38{{"Constant[38∈1]<br />ᐸtrueᐳ"}}:::plan
     PgSelect31[["PgSelect[31∈3]<br />ᐸmessages+1ᐳ"]]:::plan
     Lambda32{{"Lambda[32∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
     PgSelect33[["PgSelect[33∈3]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
@@ -39,27 +39,27 @@ graph TD
     PgSelect11 ==> __Item15
     __Item15 --> PgSelectSingle16
     PgSelectSingle16 --> PgClassExpression23
-    __InputStaticLeaf17 --> Connection28
+    Constant37 --> Connection28
     PgSelectSingle16 --> PgClassExpression29
     Connection28 --> PgPageInfo30
-    Object14 & PgClassExpression23 & __InputStaticLeaf20 & PgClassExpression29 & Connection28 --> PgSelect31
+    Object14 & PgClassExpression23 & Constant38 & PgClassExpression29 & Connection28 --> PgSelect31
     PgSelect31 --> Lambda32
-    Object14 & PgClassExpression23 & __InputStaticLeaf20 & PgClassExpression29 & Connection28 --> PgSelect33
+    Object14 & PgClassExpression23 & Constant38 & PgClassExpression29 & Connection28 --> PgSelect33
     PgSelect33 --> First34
     First34 --> PgSelectSingle35
     PgSelectSingle35 --> PgClassExpression36
 
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 17, 14, 28<br />2: PgSelect[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 37, 14, 28<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,__InputStaticLeaf17,Connection28 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection28,Constant37 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 28, 14<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item15,PgSelectSingle16,__InputStaticLeaf20 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 28, 14, 20<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
+    class Bucket1,__Item15,PgSelectSingle16,Constant38 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 28, 14, 38<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 28, 14, 20<br /><br />ROOT Connectionᐸ24ᐳ[28]<br />1: <br />ᐳ: 23, 29, 30<br />2: PgSelect[31], PgSelect[33]<br />ᐳ: 32, 34, 35, 36"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 28, 14, 38<br /><br />ROOT Connectionᐸ24ᐳ[28]<br />1: <br />ᐳ: 23, 29, 30<br />2: PgSelect[31], PgSelect[33]<br />ᐳ: 32, 34, 35, 36"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,PgClassExpression29,PgPageInfo30,PgSelect31,Lambda32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36 bucket3
     Bucket0 --> Bucket1
