@@ -216,6 +216,7 @@ export class OperationPlan {
   public pure = true;
 
   private startTime = timeSource.now();
+  private previousLap = this.startTime;
   private planningTimeout: number | null = null;
   private laps: Array<{
     category: string;
@@ -419,7 +420,9 @@ ${te.join(
   }
 
   private lap(category: string, subcategory?: string): void {
-    const elapsed = timeSource.now() - this.startTime;
+    const now = timeSource.now();
+    const elapsed = now - this.previousLap;
+    this.previousLap = now;
     this.laps.push({ category, subcategory, elapsed });
   }
 

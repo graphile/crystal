@@ -35,7 +35,7 @@ export async function bench(
   }
 
   // debugger;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     for (const operation of operations) {
       const document = parse(operation.source);
       const errors = validate(schema, document);
@@ -91,19 +91,49 @@ export async function bench(
       // console.log(JSON.stringify(payloads, null, 2));
     }
   }
+  const extraTotal = Object.create(null);
+  let planningTotal = 0;
   const tableData = Object.entries(runs).map(([name, timings]) => {
-    const planning = timings[timings.length - 1].planning?.toFixed(2);
-    const times = timings.map((t) => t.elapsed);
+    const planning = timings[timings.length - 1].planning!;
     let min = Infinity;
     let max = 0;
     let sum = 0;
+    const laps = timings[0].laps;
     for (const timing of timings) {
       const { elapsed } = timing;
       if (elapsed < min) min = elapsed;
       if (elapsed > max) max = elapsed;
       sum += elapsed;
     }
-    return { name, planning, min, max, avg: sum / times.length };
+    planningTotal += planning;
+    const extra = laps!.reduce((memo, l) => {
+      memo[l.category] = (memo[l.category] ?? 0) + l.elapsed;
+      extraTotal[l.category] = (extraTotal[l.category] ?? 0) + l.elapsed;
+      return memo;
+    }, Object.create(null));
+    return {
+      name,
+      planning,
+      min,
+      max,
+      //avg: sum / times.length,
+      ...extra,
+    };
+  });
+  tableData.push({
+    name: "TOTAL",
+    planning: planningTotal,
+    min: null,
+    max: null,
+    ...Object.fromEntries(
+      Object.entries(extraTotal).map(([k, v]) => {
+        if (typeof v !== "number" || k === "planning") {
+          return [k, v];
+        } else {
+          return [k, ((100 * v) / planningTotal).toFixed(1) + "%"];
+        }
+      }),
+    ),
   });
   console.table(tableData);
 }
