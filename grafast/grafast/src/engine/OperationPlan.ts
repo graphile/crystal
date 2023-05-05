@@ -392,6 +392,8 @@ ${te.join(
     this.lap("ready");
 
     const elapsed = timeSource.now() - this.startTime;
+
+    /*
     console.log(`Planning took ${elapsed.toFixed(1)}ms`);
     let ts = 0;
     const entries: Array<{ process: string; duration: string }> = [];
@@ -406,9 +408,14 @@ ${te.join(
       });
     }
     console.table(entries);
+    */
 
     // Allow this to be garbage collected
     this.optimizeMeta = null as any;
+    context.grafastMetricsEmitter?.emit("plan", {
+      elapsed,
+      laps: this.laps,
+    });
   }
 
   private lap(category: string, subcategory?: string): void {
