@@ -93,8 +93,10 @@ export async function bench(
   }
   const extraTotal = Object.create(null);
   let planningTotal = 0;
+  let executionTotal = 0;
   const tableData = Object.entries(runs).map(([name, timings]) => {
-    const planning = timings[timings.length - 1].planning!;
+    const final = timings[timings.length - 1];
+    const planning = final.planning!;
     let min = Infinity;
     let max = 0;
     let sum = 0;
@@ -106,6 +108,7 @@ export async function bench(
       sum += elapsed;
     }
     planningTotal += planning;
+    executionTotal += final.elapsed;
     const extra = laps!.reduce((memo, l) => {
       memo[l.category] = (memo[l.category] ?? 0) + l.elapsed;
       extraTotal[l.category] = (extraTotal[l.category] ?? 0) + l.elapsed;
@@ -122,12 +125,15 @@ export async function bench(
   });
   tableData.push({
     name: "TOTAL",
-    planning: planningTotal,
+    planning: `${planningTotal.toFixed(2)} (${(
+      (100 * planningTotal) /
+      executionTotal
+    ).toFixed(1)}%)`,
     min: null,
     max: null,
     ...Object.fromEntries(
       Object.entries(extraTotal).map(([k, v]) => {
-        if (typeof v !== "number" || k === "planning") {
+        if (typeof v !== "number") {
           return [k, v];
         } else {
           return [k, ((100 * v) / planningTotal).toFixed(1) + "%"];
