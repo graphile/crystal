@@ -19,7 +19,7 @@ graph TD
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
-    __InputStaticLeaf18{{"__InputStaticLeaf[18∈0]"}}:::plan
+    Constant84{{"Constant[84∈0]<br />ᐸ2ᐳ"}}:::plan
     Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
     Access81{{"Access[81∈3]<br />ᐸ15.1ᐳ"}}:::plan
     Lambda82{{"Lambda[82∈3]"}}:::plan
@@ -40,7 +40,7 @@ graph TD
     PgClassExpression56{{"PgClassExpression[56∈8]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgPageInfo57{{"PgPageInfo[57∈3]"}}:::plan
     Lambda59{{"Lambda[59∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
-    Constant60{{"Constant[60∈1]"}}:::plan
+    Constant60{{"Constant[60∈1]<br />ᐸfalseᐳ"}}:::plan
     First62{{"First[62∈3]"}}:::plan
     PgSelectSingle63{{"PgSelectSingle[63∈3]<br />ᐸmessagesᐳ"}}:::plan
     PgClassExpression65{{"PgClassExpression[65∈3]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
@@ -64,7 +64,7 @@ graph TD
     PgSelect11 ==> __Item15
     __Item15 --> PgSelectSingle16
     PgSelectSingle16 --> PgClassExpression17
-    __InputStaticLeaf18 --> Connection28
+    Constant84 --> Connection28
     __Item15 --> Access81
     Access81 --> Lambda82
     Lambda82 ==> __Item30
@@ -100,9 +100,9 @@ graph TD
     PgSelectSingle75 --> PgClassExpression76
 
     subgraph "Buckets for queries/connections/pagination-when-inlined"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 18, 14, 28<br />2: PgSelect[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 84, 14, 28<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,__InputStaticLeaf18,Connection28 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection28,Constant84 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 28<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16,Constant60 bucket1

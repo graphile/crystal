@@ -2,9 +2,10 @@
 
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import type { ExecutionExtra } from "../interfaces.js";
+import type { ExecutionExtra, StepOptimizeOptions } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { constant, ConstantStep } from "./constant.js";
 import type { SetterCapableStep } from "./setter.js";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -50,6 +51,10 @@ export class ObjectStep<
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
   private keys: Array<keyof TPlans & string>;
+
+  // Optimize needs the same 'meta' for all ObjectSteps
+  optimizeMetaKey = "ObjectStep";
+
   constructor(obj: TPlans) {
     super();
     this.keys = Object.keys(obj);
@@ -216,6 +221,39 @@ ${inner}
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
     const myKeys = JSON.stringify(this.keys);
     return peers.filter((p) => JSON.stringify(p.keys) === myKeys);
+  }
+
+  optimize(opts: StepOptimizeOptions) {
+    if (this.dependencies.every((dep) => dep instanceof ConstantStep)) {
+      // Replace self with constant
+
+      // We'll cache so that the constants can be more easily deduplicated
+      const meta = opts.meta as Record<string, Record<string, any>[]>;
+      const keysJoined = this.keys.join(",");
+      if (!meta[keysJoined]) {
+        meta[keysJoined] = [];
+      }
+      const existing = meta[keysJoined].find((existingObj) =>
+        this.keys.every(
+          (key, i) =>
+            existingObj[key] ===
+            (this.dependencies[i] as ConstantStep<any>).data,
+        ),
+      );
+      if (existing) {
+        return constant(existing);
+      } else {
+        const obj = Object.create(null);
+        for (let i = 0, l = this.keys.length; i < l; i++) {
+          const key = this.keys[i];
+          const value = (this.dependencies[i] as ConstantStep<any>).data;
+          obj[key] = value;
+        }
+        meta[keysJoined].push(obj);
+        return constant(obj);
+      }
+    }
+    return this;
   }
 
   /**

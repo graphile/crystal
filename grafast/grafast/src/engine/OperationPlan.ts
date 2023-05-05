@@ -208,6 +208,11 @@ export class OperationPlan {
    */
   public pure = true;
 
+  private optimizeMeta = new Map<
+    string | number | symbol,
+    Record<string, any>
+  >();
+
   constructor(
     public readonly schema: GraphQLSchema,
     public readonly operation: OperationDefinitionNode,
@@ -335,6 +340,9 @@ ${te.join(
 )}
   return metaByMetaKey;
 };`;
+
+    // Allow this to be garbage collected
+    this.optimizeMeta = null as any;
   }
 
   /**
@@ -1938,6 +1946,9 @@ ${te.join(
       if (replacementStep != step) {
         this.replaceStep(step, replacementStep);
       }
+      if (actionDescription !== "deduplicate") {
+        this.deduplicateSteps();
+      }
 
       return replacementStep;
     };
@@ -2102,6 +2113,20 @@ ${te.join(
     if (this.isImmoveable(step)) {
       return;
     }
+    // PERF: would be nice to prevent ConstantStep from being hoisted - we
+    // don't want to keep multiplying up and up its data as it traverses the buckets - would be better
+    // to push the step down to the furthest level and then have it run there straight away.
+    // PERF: actually... might be better to specifically replace all
+    // ConstantStep dependencies with a bucket-local ConstantStep as one of the
+    // final steps of optimize.
+
+    /* // This is disabled because it breaks pgSelect's `mergePlaceholdersInto` logic.
+    if (step instanceof __InputStaticLeafStep || step instanceof ConstantStep) {
+      // More optimal to not hoist these - they convert to `constant()` which executes to produce a filled array incredibly efficiently.
+      return true;
+    }
+    */
+
     if (step.layerPlan.parentLayerPlan?.reason.type === "mutationField") {
       // Never hoist into a mutation layer
       return;
@@ -2604,14 +2629,25 @@ ${te.join(
    * communicate with its (deep) dependencies, and even to replace itself with
    * a different plan.
    */
-  private optimizeStep(step: ExecutableStep): ExecutableStep {
+  private optimizeStep(inStep: ExecutableStep): ExecutableStep {
+    const step = inStep.allowMultipleOptimizations
+      ? this.deduplicateStep(inStep)
+      : inStep;
     if (step.isOptimized && !step.allowMultipleOptimizations) {
       return step;
     }
 
     // We know if it's streaming or not based on the LayerPlan it's contained within.
     const stepOptions = this.getStepOptionsForStep(step);
-    const replacementStep = step.optimize(stepOptions);
+    let meta = this.optimizeMeta.get(step.optimizeMetaKey);
+    if (!meta) {
+      meta = Object.create(null) as Record<string, any>;
+      this.optimizeMeta.set(step.optimizeMetaKey, meta);
+    }
+    const replacementStep = step.optimize({
+      ...stepOptions,
+      meta,
+    });
     if (!replacementStep) {
       throw new Error(
         `Bug in ${step}'s class: the 'optimize' method must return a step. Hint: did you forget 'return this;'?`,

@@ -2,6 +2,7 @@ import type { GraphQLLeafType, ValueNode } from "graphql";
 import { valueFromAST } from "graphql";
 
 import { UnbatchedExecutableStep } from "../step.js";
+import { constant } from "./constant.js";
 
 /**
  * Implements `InputStaticLeafStep`
@@ -30,6 +31,10 @@ export class __InputStaticLeafStep<
 
   unbatchedExecute(): TLeaf {
     return this.coercedValue;
+  }
+
+  optimize() {
+    return constant(this.coercedValue);
   }
 
   eval(): TLeaf {

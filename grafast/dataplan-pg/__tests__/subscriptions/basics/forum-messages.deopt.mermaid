@@ -11,7 +11,7 @@ graph TD
     %% define steps
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf7{{"__InputStaticLeaf[7∈0]"}}:::plan
+    Constant47{{"Constant[47∈0]<br />ᐸ'ca700000-0000-0000-0000-000000000ca7'ᐳ"}}:::plan
     Lambda8{{"Lambda[8∈0]"}}:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.pgSubscriberᐳ"}}:::plan
     Listen10["Listen[10∈0]"]:::plan
@@ -44,7 +44,7 @@ graph TD
     PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
 
     %% plan dependencies
-    __InputStaticLeaf7 --> Lambda8
+    Constant47 --> Lambda8
     __Value3 --> Access9
     Access9 & Lambda8 --> Listen10
     Listen10 ==> __Item11
@@ -76,9 +76,9 @@ graph TD
     PgSelectSingle44 --> PgClassExpression46
 
     subgraph "Buckets for subscriptions/basics/forum-messages"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 18, 19, 8, 20<br />2: Listen[10]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 18, 19, 47, 8, 20<br />2: Listen[10]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value3,__Value5,__InputStaticLeaf7,Lambda8,Access9,Listen10,Access18,Access19,Object20 bucket0
+    class Bucket0,__Value3,__Value5,Lambda8,Access9,Listen10,Access18,Access19,Object20,Constant47 bucket0
     Bucket1("Bucket 1 (subscription)<br />Deps: 20, 5<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,JSONParse12 bucket1

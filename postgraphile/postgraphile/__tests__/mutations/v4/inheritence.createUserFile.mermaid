@@ -12,23 +12,22 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __InputStaticLeaf10{{"__InputStaticLeaf[10∈0]"}}:::plan
-    __InputStaticLeaf11{{"__InputStaticLeaf[11∈0]"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access14{{"Access[14∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object15{{"Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0]<br />ᐸ1ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0]<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
     PgInsertSingle12[["PgInsertSingle[12∈1]"]]:::sideeffectplan
     Object16{{"Object[16∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    Constant17{{"Constant[17∈3]"}}:::plan
+    Constant17{{"Constant[17∈3]<br />ᐸ'users'ᐳ"}}:::plan
     PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__user__.”id”ᐳ"}}:::plan
     List19{{"List[19∈3]<br />ᐸ17,18ᐳ"}}:::plan
     Lambda20{{"Lambda[20∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__user__.”name”ᐳ"}}:::plan
-    __InputStaticLeaf27{{"__InputStaticLeaf[27∈0]"}}:::plan
-    __InputStaticLeaf28{{"__InputStaticLeaf[28∈0]"}}:::plan
     Access30{{"Access[30∈4]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access31{{"Access[31∈4]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object32{{"Object[32∈4]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant47{{"Constant[47∈0]<br />ᐸ'foo.txt'ᐳ"}}:::plan
     PgInsertSingle29[["PgInsertSingle[29∈4]"]]:::sideeffectplan
     Object33{{"Object[33∈4]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__user_file__.”id”ᐳ"}}:::plan
@@ -44,7 +43,7 @@ graph TD
     __Value3 --> Access13
     __Value3 --> Access14
     Access13 & Access14 --> Object15
-    Object15 & __InputStaticLeaf10 & __InputStaticLeaf11 --> PgInsertSingle12
+    Object15 & Constant45 & Constant46 --> PgInsertSingle12
     PgInsertSingle12 --> Object16
     PgInsertSingle12 --> PgClassExpression18
     Constant17 & PgClassExpression18 --> List19
@@ -53,7 +52,7 @@ graph TD
     __Value3 --> Access30
     __Value3 --> Access31
     Access30 & Access31 --> Object32
-    Object32 & __InputStaticLeaf27 & __InputStaticLeaf28 --> PgInsertSingle29
+    Object32 & Constant47 & Constant45 --> PgInsertSingle29
     PgInsertSingle29 --> Object33
     PgInsertSingle29 --> PgClassExpression34
     PgInsertSingle29 --> PgClassExpression35
@@ -67,8 +66,8 @@ graph TD
     subgraph "Buckets for mutations/v4/inheritence.createUserFile"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,__InputStaticLeaf10,__InputStaticLeaf11,Access13,Access14,Object15,__InputStaticLeaf27,__InputStaticLeaf28 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11<br /><br />1: PgInsertSingle[12]<br />2: <br />ᐳ: Object[16]"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Access13,Access14,Object15,Constant45,Constant46,Constant47 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 45, 46<br /><br />1: PgInsertSingle[12]<br />2: <br />ᐳ: Object[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle12,Object16 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 12<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
@@ -77,7 +76,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgInsertSingle{1}[12]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,Constant17,PgClassExpression18,List19,Lambda20,PgClassExpression22 bucket3
-    Bucket4("Bucket 4 (mutationField)<br />Deps: 27, 28, 3<br /><br />1: Access[30]<br />2: Access[31]<br />3: Object[32]<br />4: PgInsertSingle[29]<br />5: <br />ᐳ: Object[33]"):::bucket
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 47, 45, 3<br /><br />1: Access[30]<br />2: Access[31]<br />3: Object[32]<br />4: PgInsertSingle[29]<br />5: <br />ᐳ: Object[33]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgInsertSingle29,Access30,Access31,Object32,Object33 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 33, 29, 32<br /><br />ROOT Object{4}ᐸ{result}ᐳ[33]"):::bucket

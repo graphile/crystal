@@ -1,6 +1,11 @@
-import type { ExecutionExtra, UnwrapPlanTuple } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  StepOptimizeOptions,
+  UnwrapPlanTuple,
+} from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { constant, ConstantStep } from "./constant.js";
 
 export class ListStep<
   const TPlanTuple extends readonly ExecutableStep[],
@@ -11,6 +16,7 @@ export class ListStep<
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
+  optimizeMetaKey = "ListStep";
 
   constructor(list: TPlanTuple) {
     super();
@@ -43,6 +49,31 @@ export class ListStep<
 
   deduplicate(peers: ListStep<TPlanTuple>[]): ListStep<TPlanTuple>[] {
     return peers;
+  }
+
+  optimize(opts: StepOptimizeOptions) {
+    if (this.dependencies.every((dep) => dep instanceof ConstantStep)) {
+      const meta = opts.meta as { lists?: any[][] };
+      if (!meta.lists) {
+        meta.lists = [];
+      }
+      const existing = meta.lists.find((l) =>
+        l.every(
+          (v, i) => v === (this.dependencies[i] as ConstantStep<any>).data,
+        ),
+      );
+      if (existing) {
+        return constant(existing);
+      } else {
+        // Replace self with constant
+        const arr = this.dependencies.map(
+          (dep) => (dep as ConstantStep<any>).data,
+        );
+        meta.lists.push(arr);
+        return constant(arr);
+      }
+    }
+    return this;
   }
 
   /**

@@ -15,8 +15,7 @@ graph TD
     Access10{{"Access[10∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant13{{"Constant[13∈0]"}}:::plan
-    Constant14{{"Constant[14∈0]"}}:::plan
+    Constant13{{"Constant[13∈0]<br />ᐸ6ᐳ"}}:::plan
     PgUnionAll9[["PgUnionAll[9∈0]"]]:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ9ᐳ"\]:::itemplan
     PgUnionAllSingle16["PgUnionAllSingle[16∈1]"]:::plan
@@ -44,7 +43,7 @@ graph TD
     __Value3 --> Access10
     __Value3 --> Access11
     Access10 & Access11 --> Object12
-    Object12 & Constant13 & Constant14 --> PgUnionAll9
+    Object12 & Constant13 & Constant13 --> PgUnionAll9
     PgUnionAll9 ==> __Item15
     __Item15 --> PgUnionAllSingle16
     PgUnionAllSingle16 --> Access17
@@ -68,9 +67,9 @@ graph TD
     PgSelectSingle38 --> PgClassExpression42
 
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilities"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 10, 11, 13, 14, 12<br />2: PgUnionAll[9]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 10, 11, 13, 12<br />2: PgUnionAll[9]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgUnionAll9,Access10,Access11,Object12,Constant13,Constant14 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgUnionAll9,Access10,Access11,Object12,Constant13 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 12<br /><br />ROOT __Item{1}ᐸ9ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgUnionAllSingle16,Access17 bucket1

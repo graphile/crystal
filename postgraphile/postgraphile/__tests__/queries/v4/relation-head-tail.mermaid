@@ -16,13 +16,13 @@ graph TD
     Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
-    __InputStaticLeaf53{{"__InputStaticLeaf[53∈1]"}}:::plan
+    Constant154{{"Constant[154∈1]<br />ᐸ'Large bet on myself in round one.'ᐳ"}}:::plan
     PgSelect20[["PgSelect[20∈1]<br />ᐸpersonᐳ"]]:::plan
     __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸpersonᐳ"}}:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    __InputStaticLeaf26{{"__InputStaticLeaf[26∈1]"}}:::plan
+    Constant153{{"Constant[153∈1]<br />ᐸ2ᐳ"}}:::plan
     Connection38{{"Connection[38∈1]<br />ᐸ34ᐳ"}}:::plan
     Access147{{"Access[147∈3]<br />ᐸ21.0ᐳ"}}:::plan
     Reverse148{{"Reverse[148∈3]"}}:::plan
@@ -66,12 +66,12 @@ graph TD
     __Value3 --> Access16
     __Value3 --> Access17
     Access16 & Access17 --> Object18
-    Object18 & Connection19 & __InputStaticLeaf53 --> PgSelect20
+    Object18 & Connection19 & Constant154 --> PgSelect20
     PgSelect20 ==> __Item21
     __Item21 --> PgSelectSingle22
     PgSelectSingle22 --> PgClassExpression23
     PgSelectSingle22 --> PgClassExpression24
-    __InputStaticLeaf26 --> Connection38
+    Constant153 --> Connection38
     __Item21 --> Access147
     Access147 --> Reverse148
     Reverse148 ==> __Item40
@@ -109,9 +109,9 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Connection120 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 26, 53, 64, 83, 102, 38<br />2: PgSelect[20]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 64, 83, 102, 153, 154, 38<br />2: PgSelect[20]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect20,__InputStaticLeaf26,Connection38,__InputStaticLeaf53,Connection64,Connection83,Connection102 bucket1
+    class Bucket1,PgSelect20,Connection38,Connection64,Connection83,Connection102,Constant153,Constant154 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 38, 64, 83, 102<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item21,PgSelectSingle22 bucket2

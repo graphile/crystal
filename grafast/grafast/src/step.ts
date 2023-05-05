@@ -263,6 +263,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * steps of the same class (or even a family of step classes).
    */
   public metaKey: number | string | symbol;
+  /**
+   * Like `metaKey` but for the optimize phase
+   */
+  public optimizeMetaKey: number | string | symbol;
 
   constructor() {
     super();
@@ -277,6 +281,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     // @ts-ignore
     if (this.metaKey === undefined) {
       this.metaKey = this.id;
+    }
+    // @ts-ignore
+    if (this.optimizeMetaKey === undefined) {
+      this.optimizeMetaKey = this.id;
     }
   }
 
