@@ -259,15 +259,20 @@ function compile(fragment: TE): {
      */
     const teFragments: string[] = [];
 
-    const trustedInput = enforceValidNode(untrustedInput, ``);
+    const trustedInput =
+      untrustedInput[$$type] !== undefined
+        ? untrustedInput
+        : enforceValidNode(untrustedInput);
     const items: ReadonlyArray<TENode> =
-      trustedInput[$$type] === "QUERY"
-        ? expandQueryNodes(trustedInput)
-        : [trustedInput];
+      trustedInput[$$type] === "QUERY" ? trustedInput.n : [trustedInput];
     const itemCount = items.length;
 
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-      const item = enforceValidNode(items[itemIndex], `item ${itemIndex}`);
+      const rawItem = items[itemIndex];
+      const item =
+        rawItem[$$type] !== undefined
+          ? rawItem
+          : enforceValidNode(rawItem as TENode, `item ${itemIndex}`);
       switch (item[$$type]) {
         case "RAW": {
           if (item.t === "") {
@@ -356,23 +361,25 @@ const teBase = function te(
     );
   }
   const stringsLength = strings.length;
-  const first = strings[0];
   // Reduce memory churn with a cache
   if (stringsLength === 1) {
+    const first = strings[0];
     if (first === "") {
       return blankNode;
     }
-    let node = CACHE_SIMPLE_FRAGMENTS.get(first);
-    if (!node) {
-      node = makeRawNode(first);
-      CACHE_SIMPLE_FRAGMENTS.set(first, node);
+    const existing = CACHE_SIMPLE_FRAGMENTS.get(first);
+    if (existing) {
+      return existing;
     }
+    const node = makeRawNode(first);
+    CACHE_SIMPLE_FRAGMENTS.set(first, node);
     return node;
   }
 
   // Special case te`${...}` - just return the node directly
   if (stringsLength === 2 && strings[0] === "" && strings[1] === "") {
-    return enforceValidNode(values[0]);
+    const v = values[0];
+    return v[$$type] !== undefined ? v : enforceValidNode(v);
   }
 
   const items: Array<TENode> = [];
@@ -380,21 +387,17 @@ const teBase = function te(
   const finalStringIndex = stringsLength - 1;
   for (let i = 0; i < stringsLength; i++) {
     const text = strings[i];
-    if (typeof text !== "string") {
-      throw new Error(
-        "[tamedevil] te must be invoked as a template literal, not a function call.",
-      );
-    }
     currentText += text;
-    if (i < finalStringIndex) {
-      const valid: TE = enforceValidNode(
-        values[i],
-        `template literal placeholder ${i}`,
-      );
+    if (i !== finalStringIndex) {
+      const v = values[i];
+      const valid: TE =
+        v[$$type] !== undefined
+          ? v
+          : enforceValidNode(v, `literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
         currentText += valid.t;
       } else if (valid[$$type] === "QUERY") {
-        const nodes = expandQueryNodes(valid);
+        const nodes = valid.n;
         const nodeCount = nodes.length;
 
         for (let nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++) {
@@ -805,7 +808,7 @@ function tempVar(symbol = Symbol()): TE {
  * @experimental
  */
 function tmp(obj: TE, callback: (tmp: TE) => TE): TE {
-  const trustedObj = enforceValidNode(obj);
+  const trustedObj = obj[$$type] !== undefined ? obj : enforceValidNode(obj);
   // ENHANCEMENT: we should be able to reuse these tempvars between tmp calls
   // that aren't nested (or are nested at the same level).
   const varName = te.tempVar();
@@ -829,7 +832,10 @@ function run<TResult>(
   if (values.length > 0) {
     throw new Error("Invalid call to `te.run`");
   }
-  const fragment = enforceValidNode(fragmentOrStrings);
+  const fragment =
+    fragmentOrStrings[$$type] !== undefined
+      ? fragmentOrStrings
+      : enforceValidNode(fragmentOrStrings);
   const compiled = compile(fragment);
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
@@ -876,7 +882,10 @@ function join(items: Array<TE>, separator = ""): TE {
     return blankNode;
   } else if (items.length === 1) {
     const rawNode = items[0];
-    const node: TE = enforceValidNode(rawNode, `join item ${0}`);
+    const node: TE =
+      rawNode[$$type] !== undefined
+        ? rawNode
+        : enforceValidNode(rawNode, `join item ${0}`);
     return node;
   }
 
@@ -885,13 +894,16 @@ function join(items: Array<TE>, separator = ""): TE {
   const currentItems: Array<TENode> = [];
   for (let i = 0, l = items.length; i < l; i++) {
     const rawNode = items[i];
-    const node: TE = enforceValidNode(rawNode, `join item ${i}`);
+    const node: TE =
+      rawNode[$$type] !== undefined
+        ? rawNode
+        : enforceValidNode(rawNode, `join item ${i}`);
     const addSeparator = i > 0 && hasSeparator;
     if (addSeparator) {
       currentText += separator;
     }
     if (node[$$type] === "QUERY") {
-      for (const innerNode of expandQueryNodes(node)) {
+      for (const innerNode of node.n) {
         if (innerNode[$$type] === "RAW") {
           currentText += innerNode.t;
         } else {
@@ -921,11 +933,6 @@ function join(items: Array<TE>, separator = ""): TE {
     : makeQueryNode(currentItems);
 }
 
-/** @internal */
-function expandQueryNodes(node: TEQuery): ReadonlyArray<TENode> {
-  return node.n;
-}
-
 /**
  * Indicates that the given fragment should be indented when output in debug
  * mode. (Has no effect in production mode.)
@@ -943,6 +950,8 @@ function indent(
   const fragment =
     "raw" in fragmentOrStrings
       ? te(fragmentOrStrings, ...values)
+      : fragmentOrStrings[$$type] !== undefined
+      ? fragmentOrStrings
       : enforceValidNode(fragmentOrStrings);
   if (!isDev) {
     return fragment;
@@ -955,7 +964,8 @@ function indent(
  * node, otherwise it will be returned verbatim.
  */
 function indentIf(condition: boolean, fragment: TE): TE {
-  const trusted = enforceValidNode(fragment);
+  const trusted =
+    fragment[$$type] !== undefined ? fragment : enforceValidNode(fragment);
   return isDev && condition ? makeIndentNode(trusted) : trusted;
 }
 
