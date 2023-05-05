@@ -30,7 +30,12 @@ export async function bench(
   contextFactory?: (operation: BenchOperation) => object,
 ) {
   const runs: Record<string, Timing[]> = Object.create(null);
-  for (let i = 0; i < 5; i++) {
+  for (const operation of operations) {
+    runs[operation.name] = [];
+  }
+
+  // debugger;
+  for (let i = 0; i < 2; i++) {
     for (const operation of operations) {
       const document = parse(operation.source);
       const errors = validate(schema, document);
@@ -81,18 +86,24 @@ export async function bench(
       timing.elapsed = elapsed;
 
       grafastMetricsEmitter.off("plan", onPlan);
-      console.log(operation.name);
-      if (!runs[operation.name]) {
-        runs[operation.name] = [];
-      }
       runs[operation.name].push(timing);
+      // console.log(operation.name);
       // console.log(JSON.stringify(payloads, null, 2));
     }
   }
   const tableData = Object.entries(runs).map(([name, timings]) => {
-    const planning = timings[0].planning?.toFixed(2);
-    const times = timings.map((t) => t.elapsed.toFixed(2));
-    return { name, planning, times };
+    const planning = timings[timings.length - 1].planning?.toFixed(2);
+    const times = timings.map((t) => t.elapsed);
+    let min = Infinity;
+    let max = 0;
+    let sum = 0;
+    for (const timing of timings) {
+      const { elapsed } = timing;
+      if (elapsed < min) min = elapsed;
+      if (elapsed > max) max = elapsed;
+      sum += elapsed;
+    }
+    return { name, planning, min, max, avg: sum / times.length };
   });
   console.table(tableData);
 }
