@@ -8,44 +8,44 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
-    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
-    Access33{{"Access[33∈2]<br />ᐸ15.0ᐳ"}}:::plan
-    __ListTransform22[["__ListTransform[22∈2]<br />ᐸpartitionByIndex1:18ᐳ"]]:::plan
-    __Item23[/"__Item[23∈3]<br />ᐸ33ᐳ"\]:::itemplan
-    PgSelectSingle24{{"PgSelectSingle[24∈3]<br />ᐸforums_messages_list_setᐳ"}}:::plan
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__forums_m..._set_idx__ᐳ"}}:::plan
-    __Item26[/"__Item[26∈4]<br />ᐸ22ᐳ"\]:::itemplan
-    __Item29[/"__Item[29∈6]<br />ᐸ26ᐳ"\]:::itemplan
-    PgSelectSingle30{{"PgSelectSingle[30∈6]<br />ᐸforums_messages_list_setᐳ"}}:::plan
-    PgClassExpression31{{"PgClassExpression[31∈7]<br />ᐸ__forums_m...t__.”body”ᐳ"}}:::plan
-    PgClassExpression32{{"PgClassExpression[32∈7]<br />ᐸ__forums_m...”featured”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Access12 & Access13 --> Object14
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    Access12 & Access13 --> Object14
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
     Object14 --> PgSelect11
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item15
+    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
+    Access33{{"Access[33∈2]<br />ᐸ15.0ᐳ"}}:::plan
     __Item15 --> Access33
+    __ListTransform22[["__ListTransform[22∈2]<br />ᐸpartitionByIndex1:18ᐳ"]]:::plan
     Access33 --> __ListTransform22
-    Access33 -.-> __Item23
-    __Item23 --> PgSelectSingle24
-    PgSelectSingle24 --> PgClassExpression25
+    __Item26[/"__Item[26∈4]<br />ᐸ22ᐳ"\]:::itemplan
     __ListTransform22 ==> __Item26
+    __Item23[/"__Item[23∈3]<br />ᐸ33ᐳ"\]:::itemplan
+    Access33 -.-> __Item23
+    PgSelectSingle24{{"PgSelectSingle[24∈3]<br />ᐸforums_messages_list_setᐳ"}}:::plan
+    __Item23 --> PgSelectSingle24
+    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__forums_m..._set_idx__ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression25
+    __Item29[/"__Item[29∈6]<br />ᐸ26ᐳ"\]:::itemplan
     __Item26 ==> __Item29
+    PgSelectSingle30{{"PgSelectSingle[30∈6]<br />ᐸforums_messages_list_setᐳ"}}:::plan
     __Item29 --> PgSelectSingle30
+    PgClassExpression31{{"PgClassExpression[31∈7]<br />ᐸ__forums_m...t__.”body”ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression31
+    PgClassExpression32{{"PgClassExpression[32∈7]<br />ᐸ__forums_m...”featured”ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression32
+
+    %% define steps
 
     subgraph "Buckets for queries/functions/computed-column-forums-messages-list-set"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[12], Access[13], Object[14]<br />2: PgSelect[11]"):::bucket

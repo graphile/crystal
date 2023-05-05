@@ -8,83 +8,83 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
+    %% plan dependencies
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Access16 & Access17 --> Object18
     PgSelect20[["PgSelect[20∈1]<br />ᐸpersonᐳ"]]:::plan
-    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸpersonᐳ"}}:::plan
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    List25{{"List[25∈3]<br />ᐸ24ᐳ"}}:::plan
-    PgCursor23{{"PgCursor[23∈3]"}}:::plan
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    RemapKeys81{{"RemapKeys[81∈3]<br />ᐸ22:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5}ᐳ"}}:::plan
-    PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸleftArmᐳ"}}:::plan
-    Constant37{{"Constant[37∈1]<br />ᐸ'left_arms'ᐳ"}}:::plan
-    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    List39{{"List[39∈4]<br />ᐸ37,38ᐳ"}}:::plan
-    Lambda40{{"Lambda[40∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    RemapKeys79{{"RemapKeys[79∈4]<br />ᐸ36:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
-    PgSelectSingle49{{"PgSelectSingle[49∈4]<br />ᐸpersonᐳ"}}:::plan
-    PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgClassExpression53{{"PgClassExpression[53∈5]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    PgClassExpression54{{"PgClassExpression[54∈4]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    RemapKeys85{{"RemapKeys[85∈3]<br />ᐸ22:{”0”:6,”1”:7,”2”:8,”3”:9,”4”:10}ᐳ"}}:::plan
-    PgSelectSingle61{{"PgSelectSingle[61∈3]<br />ᐸpersonSecretᐳ"}}:::plan
-    Constant62{{"Constant[62∈1]<br />ᐸ'person_secrets'ᐳ"}}:::plan
-    PgClassExpression63{{"PgClassExpression[63∈6]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
-    List64{{"List[64∈6]<br />ᐸ62,63ᐳ"}}:::plan
-    Lambda65{{"Lambda[65∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    RemapKeys83{{"RemapKeys[83∈6]<br />ᐸ61:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
-    PgSelectSingle73{{"PgSelectSingle[73∈6]<br />ᐸpersonᐳ"}}:::plan
-    PgClassExpression74{{"PgClassExpression[74∈7]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgClassExpression75{{"PgClassExpression[75∈7]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgClassExpression77{{"PgClassExpression[77∈7]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    PgClassExpression78{{"PgClassExpression[78∈6]<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Object18 & Connection19 --> PgSelect20
     __Value3 --> Access16
     __Value3 --> Access17
-    Access16 & Access17 --> Object18
-    Object18 & Connection19 --> PgSelect20
+    Constant37{{"Constant[37∈1]<br />ᐸ'left_arms'ᐳ"}}:::plan
+    Constant62{{"Constant[62∈1]<br />ᐸ'person_secrets'ᐳ"}}:::plan
+    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelect20 ==> __Item21
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸpersonᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
+    List25{{"List[25∈3]<br />ᐸ24ᐳ"}}:::plan
     PgClassExpression24 --> List25
+    PgCursor23{{"PgCursor[23∈3]"}}:::plan
     List25 --> PgCursor23
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression27
+    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression29
+    RemapKeys81{{"RemapKeys[81∈3]<br />ᐸ22:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5}ᐳ"}}:::plan
     PgSelectSingle22 --> RemapKeys81
+    PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸleftArmᐳ"}}:::plan
     RemapKeys81 --> PgSelectSingle36
-    PgSelectSingle36 --> PgClassExpression38
-    Constant37 & PgClassExpression38 --> List39
-    List39 --> Lambda40
-    PgSelectSingle36 --> PgClassExpression42
-    PgSelectSingle36 --> RemapKeys79
-    RemapKeys79 --> PgSelectSingle49
-    PgSelectSingle49 --> PgClassExpression50
-    PgSelectSingle49 --> PgClassExpression51
-    PgSelectSingle49 --> PgClassExpression53
-    PgSelectSingle36 --> PgClassExpression54
+    RemapKeys85{{"RemapKeys[85∈3]<br />ᐸ22:{”0”:6,”1”:7,”2”:8,”3”:9,”4”:10}ᐳ"}}:::plan
     PgSelectSingle22 --> RemapKeys85
+    PgSelectSingle61{{"PgSelectSingle[61∈3]<br />ᐸpersonSecretᐳ"}}:::plan
     RemapKeys85 --> PgSelectSingle61
-    PgSelectSingle61 --> PgClassExpression63
+    List64{{"List[64∈6]<br />ᐸ62,63ᐳ"}}:::plan
+    PgClassExpression63{{"PgClassExpression[63∈6]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant62 & PgClassExpression63 --> List64
+    PgSelectSingle61 --> PgClassExpression63
+    Lambda65{{"Lambda[65∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List64 --> Lambda65
+    RemapKeys83{{"RemapKeys[83∈6]<br />ᐸ61:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle61 --> RemapKeys83
+    PgSelectSingle73{{"PgSelectSingle[73∈6]<br />ᐸpersonᐳ"}}:::plan
     RemapKeys83 --> PgSelectSingle73
-    PgSelectSingle73 --> PgClassExpression74
-    PgSelectSingle73 --> PgClassExpression75
-    PgSelectSingle73 --> PgClassExpression77
+    PgClassExpression78{{"PgClassExpression[78∈6]<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
     PgSelectSingle61 --> PgClassExpression78
+    List39{{"List[39∈4]<br />ᐸ37,38ᐳ"}}:::plan
+    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
+    Constant37 & PgClassExpression38 --> List39
+    PgSelectSingle36 --> PgClassExpression38
+    Lambda40{{"Lambda[40∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List39 --> Lambda40
+    PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression42
+    RemapKeys79{{"RemapKeys[79∈4]<br />ᐸ36:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
+    PgSelectSingle36 --> RemapKeys79
+    PgSelectSingle49{{"PgSelectSingle[49∈4]<br />ᐸpersonᐳ"}}:::plan
+    RemapKeys79 --> PgSelectSingle49
+    PgClassExpression54{{"PgClassExpression[54∈4]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression54
+    PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle49 --> PgClassExpression50
+    PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle49 --> PgClassExpression51
+    PgClassExpression53{{"PgClassExpression[53∈5]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
+    PgSelectSingle49 --> PgClassExpression53
+    PgClassExpression74{{"PgClassExpression[74∈7]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle73 --> PgClassExpression74
+    PgClassExpression75{{"PgClassExpression[75∈7]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle73 --> PgClassExpression75
+    PgClassExpression77{{"PgClassExpression[77∈7]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
+    PgSelectSingle73 --> PgClassExpression77
+
+    %% define steps
 
     subgraph "Buckets for queries/v4/one-to-one-backward"
     Bucket0("Bucket 0 (root)"):::bucket

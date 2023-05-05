@@ -8,43 +8,43 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
+    %% plan dependencies
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Access16 & Access17 --> Object18
     PgSelect20[["PgSelect[20∈1]<br />ᐸpersonᐳ"]]:::plan
-    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸpersonᐳ"}}:::plan
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
-    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
-    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
-    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Object18 & Connection19 --> PgSelect20
     __Value3 --> Access16
     __Value3 --> Access17
-    Access16 & Access17 --> Object18
-    Object18 & Connection19 --> PgSelect20
+    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelect20 ==> __Item21
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸpersonᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
+    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression26
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression27
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression28
+    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression29
+    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression30
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression31
+
+    %% define steps
 
     subgraph "Buckets for queries/v4/d.order"
     Bucket0("Bucket 0 (root)"):::bucket

@@ -8,45 +8,45 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object20{{"Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access18{{"Access[18∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access19{{"Access[19∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object20{{"Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access18 & Access19 --> Object20
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value3 --> Access18
+    __Value3 --> Access19
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant31{{"Constant[31∈0]<br />ᐸ1ᐳ"}}:::plan
     Constant32{{"Constant[32∈0]<br />ᐸ'Doe'ᐳ"}}:::plan
     Constant33{{"Constant[33∈0]<br />ᐸ'update2'ᐳ"}}:::plan
     Constant34{{"Constant[34∈0]<br />ᐸ'update1'ᐳ"}}:::plan
     Constant35{{"Constant[35∈0]<br />ᐸ'update3'ᐳ"}}:::plan
     PgUpdateSingle17[["PgUpdateSingle[17∈1]"]]:::sideeffectplan
-    Object21{{"Object[21∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
-    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
-    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
-
-    %% plan dependencies
-    __Value3 --> Access18
-    __Value3 --> Access19
-    Access18 & Access19 --> Object20
     Object20 & Constant31 & Constant32 & Constant33 & Constant34 & Constant35 --> PgUpdateSingle17
+    Object21{{"Object[21∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle17 --> Object21
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression24
+    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression26
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression27
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression28
+    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression29
+    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
     PgUpdateSingle17 --> PgClassExpression30
+
+    %% define steps
 
     subgraph "Buckets for mutations/v4/d.updatePerson"
     Bucket0("Bucket 0 (root)"):::bucket

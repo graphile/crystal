@@ -8,84 +8,84 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgSelect8[["PgSelect[8∈0]<br />ᐸrelational_commentablesᐳ"]]:::plan
-    __ListTransform12[["__ListTransform[12∈0]<br />ᐸeach:8ᐳ"]]:::plan
-    __Item13[/"__Item[13∈1]<br />ᐸ8ᐳ"\]:::itemplan
-    PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸrelational_commentablesᐳ"}}:::plan
-    __Item15[/"__Item[15∈2]<br />ᐸ12ᐳ"\]:::itemplan
-    PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸrelational_commentablesᐳ"}}:::plan
-    PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgPolymorphic18{{"PgPolymorphic[18∈2]"}}:::plan
-    PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__relation...les__.”id”ᐳ"}}:::plan
-    PgSelect20[["PgSelect[20∈3]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
-    First24{{"First[24∈3]"}}:::plan
-    PgSelectSingle25{{"PgSelectSingle[25∈3]<br />ᐸrelational_postsᐳ"}}:::plan
-    RemapKeys112{{"RemapKeys[112∈3]<br />ᐸ25:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
-    PgSelectSingle32{{"PgSelectSingle[32∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
-    PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
-    PgClassExpression49{{"PgClassExpression[49∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
-    PgSelect51[["PgSelect[51∈3]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
-    First55{{"First[55∈3]"}}:::plan
-    PgSelectSingle56{{"PgSelectSingle[56∈3]<br />ᐸrelational_checklistsᐳ"}}:::plan
-    RemapKeys114{{"RemapKeys[114∈3]<br />ᐸ56:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
-    PgSelectSingle63{{"PgSelectSingle[63∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
-    PgClassExpression64{{"PgClassExpression[64∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgClassExpression72{{"PgClassExpression[72∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
-    PgClassExpression80{{"PgClassExpression[80∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
-    PgSelect82[["PgSelect[82∈3]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
-    First86{{"First[86∈3]"}}:::plan
-    PgSelectSingle87{{"PgSelectSingle[87∈3]<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
-    RemapKeys116{{"RemapKeys[116∈3]<br />ᐸ87:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
-    PgSelectSingle94{{"PgSelectSingle[94∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
-    PgClassExpression95{{"PgClassExpression[95∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgClassExpression103{{"PgClassExpression[103∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
-    PgClassExpression111{{"PgClassExpression[111∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Access9 & Access10 --> Object11
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
-    Access9 & Access10 --> Object11
+    PgSelect8[["PgSelect[8∈0]<br />ᐸrelational_commentablesᐳ"]]:::plan
     Object11 --> PgSelect8
+    __ListTransform12[["__ListTransform[12∈0]<br />ᐸeach:8ᐳ"]]:::plan
     PgSelect8 --> __ListTransform12
-    PgSelect8 -.-> __Item13
-    __Item13 --> PgSelectSingle14
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    PgPolymorphic18{{"PgPolymorphic[18∈2]"}}:::plan
+    PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸrelational_commentablesᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle16 & PgClassExpression17 --> PgPolymorphic18
+    __Item15[/"__Item[15∈2]<br />ᐸ12ᐳ"\]:::itemplan
     __ListTransform12 ==> __Item15
     __Item15 --> PgSelectSingle16
     PgSelectSingle16 --> PgClassExpression17
-    PgSelectSingle16 & PgClassExpression17 --> PgPolymorphic18
+    PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__relation...les__.”id”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression19
+    __Item13[/"__Item[13∈1]<br />ᐸ8ᐳ"\]:::itemplan
+    PgSelect8 -.-> __Item13
+    PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸrelational_commentablesᐳ"}}:::plan
+    __Item13 --> PgSelectSingle14
+    PgSelect20[["PgSelect[20∈3]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     Object11 & PgClassExpression19 --> PgSelect20
-    PgSelect20 --> First24
-    First24 --> PgSelectSingle25
-    PgSelectSingle25 --> RemapKeys112
-    RemapKeys112 --> PgSelectSingle32
-    PgSelectSingle32 --> PgClassExpression33
-    PgSelectSingle32 --> PgClassExpression41
-    PgSelectSingle32 --> PgClassExpression49
+    PgSelect51[["PgSelect[51∈3]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
     Object11 & PgClassExpression19 --> PgSelect51
-    PgSelect51 --> First55
-    First55 --> PgSelectSingle56
-    PgSelectSingle56 --> RemapKeys114
-    RemapKeys114 --> PgSelectSingle63
-    PgSelectSingle63 --> PgClassExpression64
-    PgSelectSingle63 --> PgClassExpression72
-    PgSelectSingle63 --> PgClassExpression80
+    PgSelect82[["PgSelect[82∈3]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
     Object11 & PgClassExpression19 --> PgSelect82
+    First24{{"First[24∈3]"}}:::plan
+    PgSelect20 --> First24
+    PgSelectSingle25{{"PgSelectSingle[25∈3]<br />ᐸrelational_postsᐳ"}}:::plan
+    First24 --> PgSelectSingle25
+    RemapKeys112{{"RemapKeys[112∈3]<br />ᐸ25:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    PgSelectSingle25 --> RemapKeys112
+    PgSelectSingle32{{"PgSelectSingle[32∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
+    RemapKeys112 --> PgSelectSingle32
+    PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression33
+    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression41
+    PgClassExpression49{{"PgClassExpression[49∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression49
+    First55{{"First[55∈3]"}}:::plan
+    PgSelect51 --> First55
+    PgSelectSingle56{{"PgSelectSingle[56∈3]<br />ᐸrelational_checklistsᐳ"}}:::plan
+    First55 --> PgSelectSingle56
+    RemapKeys114{{"RemapKeys[114∈3]<br />ᐸ56:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
+    PgSelectSingle56 --> RemapKeys114
+    PgSelectSingle63{{"PgSelectSingle[63∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
+    RemapKeys114 --> PgSelectSingle63
+    PgClassExpression64{{"PgClassExpression[64∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression64
+    PgClassExpression72{{"PgClassExpression[72∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression72
+    PgClassExpression80{{"PgClassExpression[80∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression80
+    First86{{"First[86∈3]"}}:::plan
     PgSelect82 --> First86
+    PgSelectSingle87{{"PgSelectSingle[87∈3]<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First86 --> PgSelectSingle87
+    RemapKeys116{{"RemapKeys[116∈3]<br />ᐸ87:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
     PgSelectSingle87 --> RemapKeys116
+    PgSelectSingle94{{"PgSelectSingle[94∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
     RemapKeys116 --> PgSelectSingle94
+    PgClassExpression95{{"PgClassExpression[95∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle94 --> PgClassExpression95
+    PgClassExpression103{{"PgClassExpression[103∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
     PgSelectSingle94 --> PgClassExpression103
+    PgClassExpression111{{"PgClassExpression[111∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
     PgSelectSingle94 --> PgClassExpression111
+
+    %% define steps
 
     subgraph "Buckets for queries/interfaces-relational/commentables-simple"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[9], Access[10], Object[11]<br />2: PgSelect[8]<br />3: __ListTransform[12]"):::bucket

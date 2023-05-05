@@ -8,53 +8,53 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant44{{"Constant[44∈0]<br />ᐸ'DynaTAC'ᐳ"}}:::plan
+    Access9 & Access10 --> Object11
     PgSelect8[["PgSelect[8∈0]<br />ᐸprojectᐳ"]]:::plan
-    First12{{"First[12∈0]"}}:::plan
-    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸprojectᐳ"}}:::plan
-    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
-    PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__project__.”id”ᐳ"}}:::plan
-    Constant45{{"Constant[45∈0]<br />ᐸ2ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0]<br />ᐸ'DynaTAC'ᐳ"}}:::plan
+    Object11 & Constant44 --> PgSelect8
     PgSelect17[["PgSelect[17∈0]<br />ᐸprojectᐳ"]]:::plan
-    First21{{"First[21∈0]"}}:::plan
-    PgSelectSingle22{{"PgSelectSingle[22∈0]<br />ᐸprojectᐳ"}}:::plan
-    PgClassExpression23{{"PgClassExpression[23∈2]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
-    PgClassExpression24{{"PgClassExpression[24∈2]<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
-    Connection37{{"Connection[37∈0]<br />ᐸ33ᐳ"}}:::plan
-    PgSelect38[["PgSelect[38∈3]<br />ᐸprojectᐳ"]]:::plan
-    __Item39[/"__Item[39∈4]<br />ᐸ38ᐳ"\]:::itemplan
-    PgSelectSingle40{{"PgSelectSingle[40∈4]<br />ᐸprojectᐳ"}}:::plan
-    PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
-    PgClassExpression42{{"PgClassExpression[42∈5]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
-    PgClassExpression43{{"PgClassExpression[43∈5]<br />ᐸ__project__.”id”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Constant45{{"Constant[45∈0]<br />ᐸ2ᐳ"}}:::plan
+    Object11 & Constant45 --> PgSelect17
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
-    Access9 & Access10 --> Object11
-    Object11 & Constant44 --> PgSelect8
+    First12{{"First[12∈0]"}}:::plan
     PgSelect8 --> First12
+    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸprojectᐳ"}}:::plan
     First12 --> PgSelectSingle13
-    PgSelectSingle13 --> PgClassExpression14
-    PgSelectSingle13 --> PgClassExpression15
-    Object11 & Constant45 --> PgSelect17
+    First21{{"First[21∈0]"}}:::plan
     PgSelect17 --> First21
+    PgSelectSingle22{{"PgSelectSingle[22∈0]<br />ᐸprojectᐳ"}}:::plan
     First21 --> PgSelectSingle22
-    PgSelectSingle22 --> PgClassExpression23
-    PgSelectSingle22 --> PgClassExpression24
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection37{{"Connection[37∈0]<br />ᐸ33ᐳ"}}:::plan
+    PgSelect38[["PgSelect[38∈3]<br />ᐸprojectᐳ"]]:::plan
     Object11 & Connection37 --> PgSelect38
+    PgClassExpression23{{"PgClassExpression[23∈2]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈2]<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression24
+    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression14
+    PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__project__.”id”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression15
+    __Item39[/"__Item[39∈4]<br />ᐸ38ᐳ"\]:::itemplan
     PgSelect38 ==> __Item39
+    PgSelectSingle40{{"PgSelectSingle[40∈4]<br />ᐸprojectᐳ"}}:::plan
     __Item39 --> PgSelectSingle40
+    PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression41
+    PgClassExpression42{{"PgClassExpression[42∈5]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression42
+    PgClassExpression43{{"PgClassExpression[43∈5]<br />ᐸ__project__.”id”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression43
+
+    %% define steps
 
     subgraph "Buckets for queries/v4/js-reserved-proto"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 37, 44, 45, 11<br />2: PgSelect[8], PgSelect[17]<br />ᐳ: 12, 13, 21, 22"):::bucket

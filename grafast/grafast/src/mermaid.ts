@@ -170,24 +170,59 @@ export function printPlanGraph(
   };
 
   graph.push("");
-  graph.push("    %% define steps");
-  operationPlan.processSteps(
-    "printingPlans",
-    0,
-    "dependencies-first",
-    (plan) => {
-      planId(plan);
-      return plan;
-    },
-  );
-
-  graph.push("");
   graph.push("    %% plan dependencies");
   const chainByDep: { [depNode: string]: string } = Object.create(null);
+
+  const sortedSteps: ExecutableStep[] = [];
   operationPlan.processSteps(
     "printingPlanDeps",
     0,
     "dependencies-first",
+    (plan) => {
+      sortedSteps.push(plan);
+      return plan;
+    },
+  );
+
+  const layerPlanDepth = (step: ExecutableStep) => {
+    let depth = 0;
+    let lp: LayerPlan | null = step.layerPlan;
+    if (lp.parentLayerPlan) {
+      depth -= lp.parentLayerPlan.children.indexOf(lp);
+    }
+    while ((lp = lp.parentLayerPlan)) {
+      depth += 100;
+    }
+    return depth;
+  };
+  type Strategy =
+    | "dependencies-first"
+    | "most-dependencies-first"
+    | "deepest-bucket-first"
+    | "deepest-bucket-first-then-most-dependencies"
+    | "shallowest-bucket-first-then-most-dependencies"
+    | "most-dependencies-first-then-deepest-bucket";
+  const strategy = "shallowest-bucket-first-then-most-dependencies" as Strategy;
+  if (strategy === "most-dependencies-first") {
+    sortedSteps.sort((a, z) => z.dependencies.length - a.dependencies.length);
+  } else if (strategy === "deepest-bucket-first") {
+    sortedSteps.sort((a, z) => layerPlanDepth(z) - layerPlanDepth(a));
+  } else if (strategy === "deepest-bucket-first-then-most-dependencies") {
+    const weight = (step: ExecutableStep) =>
+      layerPlanDepth(step) * 1000 + step.dependencies.length;
+    sortedSteps.sort((a, z) => weight(z) - weight(a));
+  } else if (strategy === "shallowest-bucket-first-then-most-dependencies") {
+    const weight = (step: ExecutableStep) =>
+      layerPlanDepth(step) * 1000 - step.dependencies.length;
+    sortedSteps.sort((a, z) => weight(a) - weight(z));
+  } else if (strategy === "most-dependencies-first-then-deepest-bucket") {
+    const weight = (step: ExecutableStep) =>
+      step.dependencies.length * 1000000 + layerPlanDepth(step);
+    sortedSteps.sort((a, z) => weight(z) - weight(a));
+  }
+
+  sortedSteps.forEach(
+    // This comment is here purely to maintain the previous formatting to reduce a git diff.
     (plan) => {
       const planNode = planId(plan);
       const depNodes = plan.dependencies.map(($dep) => {
@@ -235,6 +270,13 @@ export function printPlanGraph(
       return plan;
     },
   );
+
+  graph.push("");
+  graph.push("    %% define steps");
+  operationPlan.processSteps("printingPlans", 0, "dependents-first", (plan) => {
+    planId(plan);
+    return plan;
+  });
 
   graph.push("");
   if (!concise) graph.push("    subgraph Buckets");

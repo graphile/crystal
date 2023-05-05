@@ -8,14 +8,14 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
+    %% plan dependencies
+    Lambda16{{"Lambda[16∈0]<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant15{{"Constant[15∈0]<br />ᐸ'query'ᐳ"}}:::plan
+    Constant15 --> Lambda16
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant15{{"Constant[15∈0]<br />ᐸ'query'ᐳ"}}:::plan
-    Lambda16{{"Lambda[16∈0]<br />ᐸrawEncodeᐳ"}}:::plan
 
-    %% plan dependencies
-    Constant15 --> Lambda16
+    %% define steps
 
     subgraph "Buckets for queries/v4/directives"
     Bucket0("Bucket 0 (root)"):::bucket

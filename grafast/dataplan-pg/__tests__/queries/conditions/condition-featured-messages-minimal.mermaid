@@ -8,44 +8,44 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant41{{"Constant[41∈0]<br />ᐸtrueᐳ"}}:::plan
+    Access12 & Access13 --> Object14
     PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
-    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
-    Constant40{{"Constant[40∈0]<br />ᐸ5ᐳ"}}:::plan
-    Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
-    PgPageInfo30{{"PgPageInfo[30∈3]"}}:::plan
-    Access37{{"Access[37∈3]<br />ᐸ15.0ᐳ"}}:::plan
-    Lambda38{{"Lambda[38∈3]"}}:::plan
-    Lambda32{{"Lambda[32∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
-    Access39{{"Access[39∈3]<br />ᐸ15.1ᐳ"}}:::plan
-    First34{{"First[34∈3]"}}:::plan
-    PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸmessagesᐳ"}}:::plan
-    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
-
-    %% plan dependencies
+    Constant41{{"Constant[41∈0]<br />ᐸtrueᐳ"}}:::plan
+    Object14 & Constant41 --> PgSelect11
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    Access12 & Access13 --> Object14
-    Object14 & Constant41 --> PgSelect11
-    PgSelect11 ==> __Item15
-    __Item15 --> PgSelectSingle16
+    Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
+    Constant40{{"Constant[40∈0]<br />ᐸ5ᐳ"}}:::plan
     Constant40 --> Connection28
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
+    PgSelect11 ==> __Item15
+    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
+    __Item15 --> PgSelectSingle16
+    PgPageInfo30{{"PgPageInfo[30∈3]"}}:::plan
     Connection28 --> PgPageInfo30
+    Access37{{"Access[37∈3]<br />ᐸ15.0ᐳ"}}:::plan
     __Item15 --> Access37
+    Lambda38{{"Lambda[38∈3]"}}:::plan
     Access37 --> Lambda38
+    Lambda32{{"Lambda[32∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
     Lambda38 --> Lambda32
+    Access39{{"Access[39∈3]<br />ᐸ15.1ᐳ"}}:::plan
     __Item15 --> Access39
+    First34{{"First[34∈3]"}}:::plan
     Access39 --> First34
+    PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸmessagesᐳ"}}:::plan
     First34 --> PgSelectSingle35
+    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression36
+
+    %% define steps
 
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 40, 41, 14, 28<br />2: PgSelect[11]"):::bucket

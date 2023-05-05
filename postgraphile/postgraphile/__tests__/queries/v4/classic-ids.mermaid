@@ -8,45 +8,45 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object25{{"Object[25∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access23{{"Access[23∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access24{{"Access[24∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object25{{"Object[25∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Connection26{{"Connection[26∈0]<br />ᐸ22ᐳ"}}:::plan
-    Constant56{{"Constant[56∈1]<br />ᐸ1ᐳ"}}:::plan
-    PgSelect27[["PgSelect[27∈1]<br />ᐸpostᐳ"]]:::plan
-    __Item28[/"__Item[28∈2]<br />ᐸ27ᐳ"\]:::itemplan
-    PgSelectSingle29{{"PgSelectSingle[29∈2]<br />ᐸpostᐳ"}}:::plan
-    Constant30{{"Constant[30∈1]<br />ᐸ'posts'ᐳ"}}:::plan
-    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__post__.”id”ᐳ"}}:::plan
-    List32{{"List[32∈3]<br />ᐸ30,31ᐳ"}}:::plan
-    Lambda33{{"Lambda[33∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    PgClassExpression35{{"PgClassExpression[35∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
-    Connection51{{"Connection[51∈0]<br />ᐸ47ᐳ"}}:::plan
-    Constant57{{"Constant[57∈4]<br />ᐸ2ᐳ"}}:::plan
-    PgSelect52[["PgSelect[52∈4]<br />ᐸedgeCaseᐳ"]]:::plan
-    __Item53[/"__Item[53∈5]<br />ᐸ52ᐳ"\]:::itemplan
-    PgSelectSingle54{{"PgSelectSingle[54∈5]<br />ᐸedgeCaseᐳ"}}:::plan
-    PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__edge_case__.”row_id”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Access23 & Access24 --> Object25
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access23
     __Value3 --> Access24
-    Access23 & Access24 --> Object25
-    Object25 & Constant56 & Connection26 --> PgSelect27
-    PgSelect27 ==> __Item28
-    __Item28 --> PgSelectSingle29
-    PgSelectSingle29 --> PgClassExpression31
-    Constant30 & PgClassExpression31 --> List32
-    List32 --> Lambda33
-    PgSelectSingle29 --> PgClassExpression35
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection26{{"Connection[26∈0]<br />ᐸ22ᐳ"}}:::plan
+    Connection51{{"Connection[51∈0]<br />ᐸ47ᐳ"}}:::plan
+    PgSelect52[["PgSelect[52∈4]<br />ᐸedgeCaseᐳ"]]:::plan
+    Constant57{{"Constant[57∈4]<br />ᐸ2ᐳ"}}:::plan
     Object25 & Constant57 & Connection51 --> PgSelect52
+    PgSelect27[["PgSelect[27∈1]<br />ᐸpostᐳ"]]:::plan
+    Constant56{{"Constant[56∈1]<br />ᐸ1ᐳ"}}:::plan
+    Object25 & Constant56 & Connection26 --> PgSelect27
+    Constant30{{"Constant[30∈1]<br />ᐸ'posts'ᐳ"}}:::plan
+    __Item28[/"__Item[28∈2]<br />ᐸ27ᐳ"\]:::itemplan
+    PgSelect27 ==> __Item28
+    PgSelectSingle29{{"PgSelectSingle[29∈2]<br />ᐸpostᐳ"}}:::plan
+    __Item28 --> PgSelectSingle29
+    __Item53[/"__Item[53∈5]<br />ᐸ52ᐳ"\]:::itemplan
     PgSelect52 ==> __Item53
+    PgSelectSingle54{{"PgSelectSingle[54∈5]<br />ᐸedgeCaseᐳ"}}:::plan
     __Item53 --> PgSelectSingle54
+    List32{{"List[32∈3]<br />ᐸ30,31ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__post__.”id”ᐳ"}}:::plan
+    Constant30 & PgClassExpression31 --> List32
+    PgSelectSingle29 --> PgClassExpression31
+    Lambda33{{"Lambda[33∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List32 --> Lambda33
+    PgClassExpression35{{"PgClassExpression[35∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
+    PgSelectSingle29 --> PgClassExpression35
+    PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__edge_case__.”row_id”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression55
+
+    %% define steps
 
     subgraph "Buckets for queries/v4/classic-ids"
     Bucket0("Bucket 0 (root)"):::bucket

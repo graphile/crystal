@@ -8,31 +8,31 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0]<br />ᐸ934ᐳ"}}:::plan
+    Access9 & Access10 --> Object11
     PgSelect8[["PgSelect[8∈0]<br />ᐸrangeTestᐳ"]]:::plan
-    First12{{"First[12∈0]"}}:::plan
-    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸrangeTestᐳ"}}:::plan
-    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__range_test__.”int8”ᐳ"}}:::plan
-    Access15{{"Access[15∈2]<br />ᐸ14.startᐳ"}}:::plan
-    Access18{{"Access[18∈2]<br />ᐸ14.endᐳ"}}:::plan
-
-    %% plan dependencies
+    Constant25{{"Constant[25∈0]<br />ᐸ934ᐳ"}}:::plan
+    Object11 & Constant25 --> PgSelect8
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
-    Access9 & Access10 --> Object11
-    Object11 & Constant25 --> PgSelect8
+    First12{{"First[12∈0]"}}:::plan
     PgSelect8 --> First12
+    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸrangeTestᐳ"}}:::plan
     First12 --> PgSelectSingle13
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__range_test__.”int8”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
+    Access15{{"Access[15∈2]<br />ᐸ14.startᐳ"}}:::plan
     PgClassExpression14 --> Access15
+    Access18{{"Access[18∈2]<br />ᐸ14.endᐳ"}}:::plan
     PgClassExpression14 --> Access18
+
+    %% define steps
 
     subgraph "Buckets for queries/v4/bigint"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 25, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket

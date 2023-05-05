@@ -8,34 +8,34 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant21{{"Constant[21∈0]<br />ᐸ4ᐳ"}}:::plan
-    PgDeleteSingle9[["PgDeleteSingle[9∈1]"]]:::sideeffectplan
-    PgClassExpression13{{"PgClassExpression[13∈2]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    Access17{{"Access[17∈3]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access18{{"Access[18∈3]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object19{{"Object[19∈3]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant22{{"Constant[22∈0]<br />ᐸ3141592ᐳ"}}:::plan
-    PgDeleteSingle16[["PgDeleteSingle[16∈3]"]]:::sideeffectplan
-    PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Access10 & Access11 --> Object12
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access10
     __Value3 --> Access11
-    Access10 & Access11 --> Object12
-    Object12 & Constant21 --> PgDeleteSingle9
-    PgDeleteSingle9 --> PgClassExpression13
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Constant21{{"Constant[21∈0]<br />ᐸ4ᐳ"}}:::plan
+    Constant22{{"Constant[22∈0]<br />ᐸ3141592ᐳ"}}:::plan
+    Object19{{"Object[19∈3]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access17{{"Access[17∈3]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈3]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access17 & Access18 --> Object19
+    PgDeleteSingle16[["PgDeleteSingle[16∈3]"]]:::sideeffectplan
+    Object19 & Constant22 --> PgDeleteSingle16
     __Value3 --> Access17
     __Value3 --> Access18
-    Access17 & Access18 --> Object19
-    Object19 & Constant22 --> PgDeleteSingle16
+    PgDeleteSingle9[["PgDeleteSingle[9∈1]"]]:::sideeffectplan
+    Object12 & Constant21 --> PgDeleteSingle9
+    PgClassExpression13{{"PgClassExpression[13∈2]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    PgDeleteSingle9 --> PgClassExpression13
+    PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgDeleteSingle16 --> PgClassExpression20
+
+    %% define steps
 
     subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
     Bucket0("Bucket 0 (root)"):::bucket

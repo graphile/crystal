@@ -8,31 +8,31 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object15{{"Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access14{{"Access[14∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object15{{"Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access13 & Access14 --> Object15
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value3 --> Access13
+    __Value3 --> Access14
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant20{{"Constant[20∈0]<br />ᐸ1ᐳ"}}:::plan
     Constant21{{"Constant[21∈0]<br />ᐸ'1234567890123456789.123456789'ᐳ"}}:::plan
     Constant22{{"Constant[22∈0]<br />ᐸ'987654321098765432'ᐳ"}}:::plan
     PgSelect12[["PgSelect[12∈1]<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
-    First16{{"First[16∈1]"}}:::plan
-    PgSelectSingle17{{"PgSelectSingle[17∈1]<br />ᐸauthenticateᐳ"}}:::plan
-    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__authenticate__ᐳ"}}:::plan
-
-    %% plan dependencies
-    __Value3 --> Access13
-    __Value3 --> Access14
-    Access13 & Access14 --> Object15
     Object15 & Constant20 & Constant21 & Constant22 --> PgSelect12
+    First16{{"First[16∈1]"}}:::plan
     PgSelect12 --> First16
+    PgSelectSingle17{{"PgSelectSingle[17∈1]<br />ᐸauthenticateᐳ"}}:::plan
     First16 --> PgSelectSingle17
+    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle17 --> Object18
+    PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__authenticate__ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression19
+
+    %% define steps
 
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier-bigNumbers"
     Bucket0("Bucket 0 (root)"):::bucket

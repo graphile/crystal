@@ -8,32 +8,32 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access15{{"Access[15∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access16{{"Access[16∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15 & Access16 --> Object17
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value3 --> Access15
+    __Value3 --> Access16
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant23{{"Constant[23∈0]<br />ᐸ'a3'ᐳ"}}:::plan
     Constant24{{"Constant[24∈0]<br />ᐸ'b4'ᐳ"}}:::plan
     PgInsertSingle14[["PgInsertSingle[14∈1]"]]:::sideeffectplan
-    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__referenc...ble__.”id”ᐳ"}}:::plan
-    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__referenc..._.”enum_1”ᐳ"}}:::plan
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__referenc..._.”enum_2”ᐳ"}}:::plan
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__referenc..._.”enum_3”ᐳ"}}:::plan
-
-    %% plan dependencies
-    __Value3 --> Access15
-    __Value3 --> Access16
-    Access15 & Access16 --> Object17
     Object17 & Constant23 & Constant24 --> PgInsertSingle14
+    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle14 --> Object18
+    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__referenc...ble__.”id”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression19
+    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__referenc..._.”enum_1”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression20
+    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__referenc..._.”enum_2”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression21
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__referenc..._.”enum_3”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression22
+
+    %% define steps
 
     subgraph "Buckets for mutations/v4/enum_tables.mutations2"
     Bucket0("Bucket 0 (root)"):::bucket

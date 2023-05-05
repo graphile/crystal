@@ -8,42 +8,42 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    %% plan dependencies
+    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
-    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
-    PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
-    Access41{{"Access[41∈2]<br />ᐸ15.1ᐳ"}}:::plan
-    __Item27[/"__Item[27∈3]<br />ᐸ41ᐳ"\]:::itemplan
-    PgSelectSingle28{{"PgSelectSingle[28∈3]<br />ᐸmessagesᐳ"}}:::plan
-    PgClassExpression29{{"PgClassExpression[29∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    RemapKeys39{{"RemapKeys[39∈4]<br />ᐸ28:{”0”:1,”1”:2}ᐳ"}}:::plan
-    PgSelectSingle36{{"PgSelectSingle[36∈4]<br />ᐸusersᐳ"}}:::plan
-    PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
-    PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-
-    %% plan dependencies
+    Access12 & Access13 --> Object14
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    Access12 & Access13 --> Object14
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
     Object14 --> PgSelect11
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item15
+    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
+    PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17
+    Access41{{"Access[41∈2]<br />ᐸ15.1ᐳ"}}:::plan
     __Item15 --> Access41
+    __Item27[/"__Item[27∈3]<br />ᐸ41ᐳ"\]:::itemplan
     Access41 ==> __Item27
+    PgSelectSingle28{{"PgSelectSingle[28∈3]<br />ᐸmessagesᐳ"}}:::plan
     __Item27 --> PgSelectSingle28
+    PgClassExpression29{{"PgClassExpression[29∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression29
+    RemapKeys39{{"RemapKeys[39∈4]<br />ᐸ28:{”0”:1,”1”:2}ᐳ"}}:::plan
     PgSelectSingle28 --> RemapKeys39
+    PgSelectSingle36{{"PgSelectSingle[36∈4]<br />ᐸusersᐳ"}}:::plan
     RemapKeys39 --> PgSelectSingle36
+    PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression37
+    PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression38
+
+    %% define steps
 
     subgraph "Buckets for queries/conditions/include-all-archived"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[12], Access[13], Object[14]<br />2: PgSelect[11]"):::bucket
