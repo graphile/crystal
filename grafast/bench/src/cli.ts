@@ -54,7 +54,6 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const {
     schema: schemaFile = "schema.mjs",
     operations: operationsGlob = "queries/*.graphql",
-    contextFactory,
   } = config.bench ?? {};
   const mod = await import(schemaFile);
   const schema = isSchema(mod.default)
@@ -85,5 +84,5 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       };
     }),
   );
-  await bench(schema, operations, contextFactory);
+  await bench(schema, operations, config.bench ?? {});
 }
