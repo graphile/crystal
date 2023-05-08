@@ -103,7 +103,6 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     super();
     this.path = path;
     this.addDependency(parentPlan);
-    this.unbatchedExecute = constructDestructureFunction(this.path, fallback);
   }
 
   toStringMeta(): string {
@@ -146,6 +145,10 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   finalize(): void {
+    this.unbatchedExecute = constructDestructureFunction(
+      this.path,
+      this.fallback,
+    );
     super.finalize();
   }
 
