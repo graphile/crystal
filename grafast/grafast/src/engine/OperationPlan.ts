@@ -2114,7 +2114,10 @@ ${te.join(
           // share dependencies)
           return [step];
         }
-        if (dependencyIndex === 0) {
+        if (dependencyIndex === dependencyCount - 1) {
+          // Check the final dependency - this is likely to have the fewest
+          // dependents (since it was added last it's more likely to be
+          // unique).
           for (const {
             dependencyIndex: peerDependencyIndex,
             step: possiblyPeer,
@@ -2137,13 +2140,16 @@ ${te.join(
         }
       }
       const allPeers: ExecutableStep[] = [step];
-      for (const possiblyPeer of possiblePeers) {
-        if (
-          possiblyPeer.layerPlan.depth >= minDepth &&
-          arraysMatch(deps, possiblyPeer.dependencies)
-        ) {
-          allPeers.push(possiblyPeer);
+      outerloop: for (const possiblyPeer of possiblePeers) {
+        if (possiblyPeer.layerPlan.depth < minDepth) continue;
+        // We know the final dependency matches and the dependency count
+        // matches - check the other dependencies match.
+        for (let i = 0; i < dependencyCount - 1; i++) {
+          if (deps[i] !== possiblyPeer.dependencies[i]) {
+            continue outerloop;
+          }
         }
+        allPeers.push(possiblyPeer);
       }
       return allPeers;
     } else {
