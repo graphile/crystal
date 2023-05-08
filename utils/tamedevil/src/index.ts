@@ -175,6 +175,115 @@ function enforceValidNode(node: unknown, where?: string): TE {
   );
 }
 
+const makeRef = (
+  refs: { [key: string]: any },
+  refMap: Map<any, string>,
+  value: any,
+  suggestedName?: string,
+): string => {
+  const existingIdentifier = refMap.get(value);
+  if (existingIdentifier) {
+    return existingIdentifier;
+  }
+  const refCount = refMap.size + 1;
+  // Arbitrary
+  if (refCount > 65535) {
+    throw new Error(
+      "[tamedevil] This TE statement would contain too many placeholders; tamedevil supports at most 65535 placeholders. To solve this, consider passing multiple values in using a single array or object.",
+    );
+  }
+  const identifier = suggestedName ?? `_$$_ref_${refCount}`;
+  refMap.set(value, identifier);
+  refs[identifier] = value;
+  return identifier;
+};
+
+const getVar = (varMap: Map<symbol, string>, sym: symbol) => {
+  const existing = varMap.get(sym);
+  if (existing) {
+    return existing;
+  }
+  const tmpCounter = varMap.size + 1;
+  const varName = `_$_tmp${tmpCounter}`;
+  varMap.set(sym, varName);
+  return varName;
+};
+
+function print(
+  untrustedInput: TE,
+  refs: { [key: string]: any },
+  refMap: Map<any, string>,
+  varMap: Map<symbol, string>,
+  variables: string[],
+  indent = 0,
+) {
+  /**
+   * Join this to generate the TE string
+   */
+  const teFragments: string[] = [];
+
+  const trustedInput =
+    untrustedInput[$$type] !== undefined
+      ? untrustedInput
+      : enforceValidNode(untrustedInput);
+  const items: ReadonlyArray<TENode> =
+    trustedInput[$$type] === "QUERY" ? trustedInput.n : [trustedInput];
+  const itemCount = items.length;
+
+  for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
+    const rawItem = items[itemIndex];
+    const item =
+      rawItem[$$type] !== undefined
+        ? rawItem
+        : enforceValidNode(rawItem as TENode, `item ${itemIndex}`);
+    switch (item[$$type]) {
+      case "RAW": {
+        if (item.t === "") {
+          // No need to add blank raw text!
+          break;
+        }
+        // IMPORTANT: this **must not** mangle primitives. Fortunately they're all single line so it should be fine.
+        teFragments.push(
+          isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
+        );
+        break;
+      }
+      case "REF": {
+        const identifier = makeRef(refs, refMap, item.v, item.n);
+        teFragments.push(identifier);
+        if (item.n != null && identifier !== item.n) {
+          variables.push(`const ${item.n} = ${identifier};`);
+        }
+        break;
+      }
+      case "VARIABLE": {
+        const identifier = getVar(varMap, item.s);
+        teFragments.push(identifier);
+        break;
+      }
+      case "INDENT": {
+        if (!isDev) {
+          throw new Error("INDENT nodes only allowed in development mode");
+        }
+        teFragments.push(
+          "\n" +
+            "  ".repeat(indent + 1) +
+            print(item.c, refs, refMap, varMap, variables, indent + 1) +
+            "\n" +
+            "  ".repeat(indent),
+        );
+        break;
+      }
+      default: {
+        const never: never = item;
+        // This cannot happen
+        throw new Error(`Unsupported node found in TE: ${String(never)}`);
+      }
+    }
+  }
+  return teFragments.join("");
+}
+
 /**
  * Accepts an te`...` expression and compiles it out to the function body
  * `string` and the `refs` that need to be passed via the closure.
@@ -191,108 +300,11 @@ function compile(fragment: TE): {
    * time.
    */
   const refs: { [key: string]: any } = Object.create(null);
-  let refCount = 0;
   const refMap = new Map<any, string>();
-  const makeRef = (value: any, suggestedName?: string): string => {
-    const existingIdentifier = refMap.get(value);
-    if (existingIdentifier) {
-      return existingIdentifier;
-    }
-    refCount++;
-    // Arbitrary
-    if (refCount > 65535) {
-      throw new Error(
-        "[tamedevil] This TE statement would contain too many placeholders; tamedevil supports at most 65535 placeholders. To solve this, consider passing multiple values in using a single array or object.",
-      );
-    }
-    const identifier = suggestedName ?? `_$$_ref_${refCount}`;
-    refMap.set(value, identifier);
-    refs[identifier] = value;
-    return identifier;
-  };
-
   const varMap = new Map<symbol, string>();
-  let tmpCounter = 0;
-  const getVar = (sym: symbol) => {
-    const existing = varMap.get(sym);
-    if (existing) {
-      return existing;
-    }
-    const varName = `_$_tmp${tmpCounter++}`;
-    varMap.set(sym, varName);
-    return varName;
-  };
-
   const variables: string[] = [];
 
-  function print(untrustedInput: TE, indent = 0) {
-    /**
-     * Join this to generate the TE string
-     */
-    const teFragments: string[] = [];
-
-    const trustedInput =
-      untrustedInput[$$type] !== undefined
-        ? untrustedInput
-        : enforceValidNode(untrustedInput);
-    const items: ReadonlyArray<TENode> =
-      trustedInput[$$type] === "QUERY" ? trustedInput.n : [trustedInput];
-    const itemCount = items.length;
-
-    for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-      const rawItem = items[itemIndex];
-      const item =
-        rawItem[$$type] !== undefined
-          ? rawItem
-          : enforceValidNode(rawItem as TENode, `item ${itemIndex}`);
-      switch (item[$$type]) {
-        case "RAW": {
-          if (item.t === "") {
-            // No need to add blank raw text!
-            break;
-          }
-          // IMPORTANT: this **must not** mangle primitives. Fortunately they're all single line so it should be fine.
-          teFragments.push(
-            isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
-          );
-          break;
-        }
-        case "REF": {
-          const identifier = makeRef(item.v, item.n);
-          teFragments.push(identifier);
-          if (item.n != null && identifier !== item.n) {
-            variables.push(`const ${item.n} = ${identifier};`);
-          }
-          break;
-        }
-        case "VARIABLE": {
-          const identifier = getVar(item.s);
-          teFragments.push(identifier);
-          break;
-        }
-        case "INDENT": {
-          if (!isDev) {
-            throw new Error("INDENT nodes only allowed in development mode");
-          }
-          teFragments.push(
-            "\n" +
-              "  ".repeat(indent + 1) +
-              print(item.c, indent + 1) +
-              "\n" +
-              "  ".repeat(indent),
-          );
-          break;
-        }
-        default: {
-          const never: never = item;
-          // This cannot happen
-          throw new Error(`Unsupported node found in TE: ${String(never)}`);
-        }
-      }
-    }
-    return teFragments.join("");
-  }
-  let str = print(fragment);
+  let str = print(fragment, refs, refMap, varMap, variables);
   for (const varName of varMap.values()) {
     variables.push(`let ${varName};`);
   }
@@ -869,8 +881,8 @@ function batch(callback: () => void): void {
     activeBatch = null;
   }
   const finalCode = te`return [\n${te.join(
-    batch.map((entry) => te`(() => {${entry.fragment}})()`),
-    ",\n  ",
+    batch.map((entry, i) => te`(function(){\n${entry.fragment}\n})()`),
+    ",\n",
   )}\n];`;
   const result = te.run<any[]>(finalCode);
   for (let i = 0, l = batch.length; i < l; i++) {
