@@ -343,11 +343,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return this.operationPlan._addModifierStep(step);
   }
 
-  public makeNewBucketCallback(
+  private makeNewBucketCallback(
     this: LayerPlan<TReason>,
     inner: TE,
-  ): typeof this.newBucket {
-    return te.run`\
+    callback: (fn: typeof this.newBucket) => void,
+  ): void {
+    return te.runInBatch(
+      te`\
 const that = ${te.ref(this)};
 const newBucket = ${te.ref(newBucket)};
 return function ${te.identifier(`newBucket${this.id}`)}(parentBucket) {
@@ -383,7 +385,9 @@ ${inner}
     return null;
   }
 }
-`;
+`,
+      callback,
+    );
   }
 
   public finalize(): void {
@@ -393,7 +397,8 @@ ${inner}
       // then we can just copy everything wholesale rather than building
       // new arrays and looping.
 
-      this.newBucket = this.makeNewBucketCallback(te`\
+      this.makeNewBucketCallback(
+        te`\
 ${
   isDev
     ? te`/*
@@ -452,9 +457,14 @@ ${te.join(
 )}
     }
   }
-`);
+`,
+        (fn) => {
+          this.newBucket = fn;
+        },
+      );
     } else if (this.reason.type === "listItem") {
-      this.newBucket = this.makeNewBucketCallback(te`\
+      this.makeNewBucketCallback(
+        te`\
   const listStepStore = parentBucket.store.get(${te.lit(
     this.reason.parentStep.id,
   )});
@@ -507,7 +517,11 @@ ${te.join(
     }
   }
 
-`);
+`,
+        (fn) => {
+          this.newBucket = fn;
+        },
+      );
     }
   }
 
