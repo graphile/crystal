@@ -209,79 +209,84 @@ const getVar = (varMap: Map<symbol, string>, sym: symbol) => {
   return varName;
 };
 
-function print(
-  untrustedInput: TE,
+function serialize(
+  item: TE,
+  teFragments: string[],
   refs: { [key: string]: any },
   refMap: Map<any, string>,
   varMap: Map<symbol, string>,
   variables: string[],
   indent = 0,
-) {
-  /**
-   * Join this to generate the TE string
-   */
-  const teFragments: string[] = [];
-
-  const trustedInput =
-    untrustedInput[$$type] !== undefined
-      ? untrustedInput
-      : enforceValidNode(untrustedInput);
-  const items: ReadonlyArray<TENode> =
-    trustedInput[$$type] === "QUERY" ? trustedInput.n : [trustedInput];
-  const itemCount = items.length;
-
-  for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-    const rawItem = items[itemIndex];
-    const item =
-      rawItem[$$type] !== undefined
-        ? rawItem
-        : enforceValidNode(rawItem as TENode, `item ${itemIndex}`);
-    switch (item[$$type]) {
-      case "RAW": {
-        if (item.t === "") {
-          // No need to add blank raw text!
-          break;
-        }
-        // IMPORTANT: this **must not** mangle primitives. Fortunately they're all single line so it should be fine.
-        teFragments.push(
-          isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
+): void {
+  if (item == null) {
+    enforceValidNode(item);
+  }
+  switch (item[$$type]) {
+    case "QUERY": {
+      const itemCount = item.n.length;
+      for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
+        const listItem = item.n[itemIndex];
+        serialize(
+          listItem,
+          teFragments,
+          refs,
+          refMap,
+          varMap,
+          variables,
+          indent,
         );
+      }
+      break;
+    }
+    case "RAW": {
+      if (item.t === "") {
+        // No need to add blank raw text!
         break;
       }
-      case "REF": {
-        const identifier = makeRef(refs, refMap, item.v, item.n);
-        teFragments.push(identifier);
-        if (item.n != null && identifier !== item.n) {
-          variables.push(`const ${item.n} = ${identifier};`);
-        }
-        break;
+      // IMPORTANT: this **must not** mangle primitives. Fortunately they're all single line so it should be fine.
+      teFragments.push(
+        isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
+      );
+      break;
+    }
+    case "REF": {
+      const identifier = makeRef(refs, refMap, item.v, item.n);
+      teFragments.push(identifier);
+      if (item.n != null && identifier !== item.n) {
+        variables.push(`const ${item.n} = ${identifier};`);
       }
-      case "VARIABLE": {
-        const identifier = getVar(varMap, item.s);
-        teFragments.push(identifier);
-        break;
+      break;
+    }
+    case "VARIABLE": {
+      const identifier = getVar(varMap, item.s);
+      teFragments.push(identifier);
+      break;
+    }
+    case "INDENT": {
+      if (!isDev) {
+        throw new Error("INDENT nodes only allowed in development mode");
       }
-      case "INDENT": {
-        if (!isDev) {
-          throw new Error("INDENT nodes only allowed in development mode");
-        }
-        teFragments.push(
-          "\n" +
-            "  ".repeat(indent + 1) +
-            print(item.c, refs, refMap, varMap, variables, indent + 1) +
-            "\n" +
-            "  ".repeat(indent),
-        );
-        break;
-      }
-      default: {
-        const never: never = item;
-        // This cannot happen
-        throw new Error(`Unsupported node found in TE: ${String(never)}`);
-      }
+      teFragments.push("\n" + "  ".repeat(indent + 1));
+      serialize(
+        item.c,
+        teFragments,
+        refs,
+        refMap,
+        varMap,
+        variables,
+        indent + 1,
+      );
+      teFragments.push("\n" + "  ".repeat(indent));
+      break;
+    }
+    default: {
+      const never: never = item;
+      // This cannot happen
+      throw new Error(
+        `Unsupported node found in TE: ${String(enforceValidNode(never))}`,
+      );
     }
   }
-  return teFragments.join("");
 }
 
 /**
@@ -304,7 +309,12 @@ function compile(fragment: TE): {
   const varMap = new Map<symbol, string>();
   const variables: string[] = [];
 
-  let str = print(fragment, refs, refMap, varMap, variables);
+  /**
+   * Join this to generate the TE string
+   */
+  const teFragments: string[] = [];
+  serialize(fragment, teFragments, refs, refMap, varMap, variables);
+  let str = teFragments.join("");
   for (const varName of varMap.values()) {
     variables.push(`let ${varName};`);
   }
