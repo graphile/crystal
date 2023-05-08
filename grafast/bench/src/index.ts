@@ -48,8 +48,9 @@ export async function bench(
 
   const setupResult = await setup();
   try {
-    // debugger;
-    for (let i = 0; i < 1; i++) {
+    debugger;
+    console.profile();
+    for (let i = 0; i < 200; i++) {
       for (const operation of operations) {
         const document = parse(operation.source);
         const errors = validate(schema, document);

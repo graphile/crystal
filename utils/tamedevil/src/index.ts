@@ -305,12 +305,12 @@ function compile(fragment: TE): {
   const refs: { [key: string]: any } = Object.create(null);
   const refMap = new Map<any, string>();
   const varMap = new Map<symbol, string>();
-  const variables: string[] = [];
+  const variables: string[] = [""];
 
   /**
    * Join this to generate the TE string
    */
-  const teFragments: string[] = [];
+  const teFragments: string[] = [""];
   serialize(fragment, teFragments, refs, refMap, varMap, variables);
   let str = teFragments.join("");
   for (const varName of varMap.values()) {
