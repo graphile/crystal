@@ -244,6 +244,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    * The list of layerPlans that steps added to this LayerPlan may depend upon.
    * Note this includes self, so it has one more entry than `depth`.
    *
+   * ```
+   * this.ancestry[this.depth] === this;
+   * ```
+   *
    * @internal
    */
   ancestry: LayerPlan[];
@@ -253,12 +257,19 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /** The depth at which a "defer boundary" occurs (OperationPlan.getPeers cannot pass a defer boundary), or 0. */
   deferBoundaryDepth: number;
 
+  /**
+   * An optimization for OperationPlan.getPeers; this tracks the steps in this
+   * layer plan, grouped by their step class.
+   */
+  stepsByConstructor: Map<Function, Set<ExecutableStep>>;
+
   constructor(
     public readonly operationPlan: OperationPlan,
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
     public polymorphicPaths: ReadonlySet<string>,
   ) {
+    this.stepsByConstructor = new Map();
     if (parentLayerPlan) {
       this.depth = parentLayerPlan.depth + 1;
       this.ancestry = [...parentLayerPlan.ancestry, this];

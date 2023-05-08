@@ -76,6 +76,7 @@ export class StepTracker {
     this.stepsWithNoDependencies.add($step);
     this.stepById[stepId] = $step;
     this.aliasesById[stepId] = undefined;
+    this.addStepToItsLayerPlan($step);
     return stepId;
   }
 
@@ -437,6 +438,7 @@ export class StepTracker {
    * then they can also be eradicated _except_ during the 'plan' phase.
    */
   private eradicate($original: ExecutableStep) {
+    this.removeStepFromItsLayerPlan($original);
     const oldAliases = this.aliasesById[$original.id];
     if (oldAliases) {
       for (const id of oldAliases) {
@@ -512,5 +514,24 @@ export class StepTracker {
 
     // Referencing $original after this will likely cause errors.
     $original.destroy();
+  }
+
+  moveStepToLayerPlan(step: ExecutableStep, targetLayerPlan: LayerPlan) {
+    this.removeStepFromItsLayerPlan(step);
+    (step.layerPlan as any) = targetLayerPlan;
+    this.addStepToItsLayerPlan(step);
+  }
+
+  addStepToItsLayerPlan(step: ExecutableStep) {
+    let set = step.layerPlan.stepsByConstructor.get(step.constructor);
+    if (!set) {
+      set = new Set();
+      step.layerPlan.stepsByConstructor.set(step.constructor, set);
+    }
+    set.add(step);
+  }
+
+  removeStepFromItsLayerPlan(step: ExecutableStep) {
+    step.layerPlan.stepsByConstructor.get(step.constructor)!.delete(step);
   }
 }

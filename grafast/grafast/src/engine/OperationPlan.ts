@@ -33,7 +33,7 @@ import {
   graphqlCollectFields,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import type { ModifierStep } from "../index.js";
+import { ModifierStep, arraysMatch } from "../index.js";
 import {
   __ItemStep,
   __TrackedValueStep,
@@ -2087,6 +2087,7 @@ ${te.join(
       layerPlan: { depth: maxDepth, ancestry, deferBoundaryDepth },
       constructor: stepConstructor,
     } = step;
+    const dependencyCount = deps.length;
 
     /**
      * "compatible" layer plans are calculated by walking up the layer plan tree,
@@ -2116,10 +2117,13 @@ ${te.join(
     // Peers have the same dependencies, so an intersection of the dependencies
     // dependents is a quick way to avoid having to scan every single step.
     const l = deps.length;
-    if (l > 0) {
+    if (
+      l > 0 &&
+      depDependentsTotalCount < 20 /* TODO: what should this number be */
+    ) {
       let allPeers: Array<ExecutableStep> = [step];
       for (
-        let dependencyIndex = 0, dependencyCount = deps.length;
+        let dependencyIndex = 0;
         dependencyIndex < dependencyCount;
         dependencyIndex++
       ) {
@@ -2162,6 +2166,23 @@ ${te.join(
             // Shortcut
             return [step];
           }
+        }
+      }
+      return allPeers;
+    } else if (l > 0) {
+      // There'd be a lot of depDependents to scan over, so lets just scan the compatible layer plans instead
+      const allPeers: Array<ExecutableStep> = [step];
+      for (let i = minDepth; i <= maxDepth; i++) {
+        const layerPlan = ancestry[i];
+        const potentialPeers =
+          layerPlan.stepsByConstructor.get(stepConstructor);
+        if (!potentialPeers) continue;
+        for (const possiblyPeer of potentialPeers) {
+          if (possiblyPeer === step) continue;
+          if (possiblyPeer.hasSideEffects) continue;
+          const peerDeps = possiblyPeer.dependencies;
+          if (!arraysMatch(peerDeps, deps)) continue;
+          allPeers.push(possiblyPeer);
         }
       }
       return allPeers;
@@ -2350,7 +2371,7 @@ ${te.join(
         : null;
 
     // 2: move it up a layer
-    (step.layerPlan as any) = step.layerPlan.parentLayerPlan;
+    this.stepTracker.moveStepToLayerPlan(step, step.layerPlan.parentLayerPlan);
 
     // 3: if it's was in a subroutine, the subroutine parent plan needs to list it as a dependency
     if ($subroutine) {
@@ -2522,7 +2543,7 @@ ${te.join(
     }
 
     // 2: move it to target layer
-    (step.layerPlan as any) = deepest;
+    this.stepTracker.moveStepToLayerPlan(step, deepest);
   }
 
   private _deduplicateInnerLogic(step: ExecutableStep) {

@@ -308,16 +308,24 @@ export function isDeferred<T>(
 export function arraysMatch<T>(
   array1: ReadonlyArray<T>,
   array2: ReadonlyArray<T>,
-  comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
+  comparator?: (val1: T, val2: T) => boolean,
 ): boolean {
   if (array1 === array2) return true;
   const l = array1.length;
   if (l !== array2.length) {
     return false;
   }
-  for (let i = 0; i < l; i++) {
-    if (!comparator(array1[i], array2[i])) {
-      return false;
+  if (comparator) {
+    for (let i = 0; i < l; i++) {
+      if (!comparator(array1[i], array2[i])) {
+        return false;
+      }
+    }
+  } else {
+    for (let i = 0; i < l; i++) {
+      if (array1[i] !== array2[i]) {
+        return false;
+      }
     }
   }
   return true;
