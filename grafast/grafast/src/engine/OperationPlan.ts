@@ -334,7 +334,9 @@ export class OperationPlan {
     this.lap("optimizeSteps");
 
     // Replace access plans with direct access, etc
-    this.optimizeOutputPlans();
+    te.batch(() => {
+      this.optimizeOutputPlans();
+    });
 
     this.checkTimeout();
     this.lap("optimizeOutputPlans");
