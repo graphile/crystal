@@ -2136,13 +2136,17 @@ ${te.join(
           minDepth = d;
         }
       }
-      return [...possiblePeers].filter((possiblyPeer) => {
-        return (
+      const allPeers: ExecutableStep[] = [];
+      for (const possiblyPeer of possiblePeers) {
+        if (
           possiblyPeer.layerPlan.depth >= minDepth &&
           possiblyPeer.layerPlan === ancestry[possiblyPeer.layerPlan.depth] &&
           arraysMatch(deps, possiblyPeer.dependencies)
-        );
-      });
+        ) {
+          allPeers.push(possiblyPeer);
+        }
+      }
+      return allPeers;
     } else {
       const result = [step];
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
