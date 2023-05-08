@@ -406,11 +406,9 @@ ${te.join(
 
     /*
     console.log(`Planning took ${elapsed.toFixed(1)}ms`);
-    let ts = 0;
     const entries: Array<{ process: string; duration: string }> = [];
     for (const lap of this.laps) {
-      const elapsed = lap.elapsed - ts;
-      ts = lap.elapsed;
+      const elapsed = lap.elapsed;
       entries.push({
         process: `${lap.category}${
           lap.subcategory ? `[${lap.subcategory}]` : ``
