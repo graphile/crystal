@@ -835,6 +835,39 @@ function run<TResult>(
   }
 }
 
+let activeBatch: Array<{ fragment: TE; callback: (r: any) => void }> | null =
+  null;
+
+function runInBatch<TResult>(
+  fragment: TE,
+  callback: (r: TResult) => void,
+): void {
+  if (!activeBatch) {
+    throw new Error(`te.runInBatch failed - there's no active batch`);
+  }
+  activeBatch.push({ fragment, callback });
+}
+
+function batch(callback: () => void): void {
+  if (activeBatch) {
+    throw new Error(`te.batch failed - there's already a batch in progress`);
+  }
+  try {
+    activeBatch = [];
+    callback();
+    const finalCode = te`return [\n${te.join(
+      activeBatch.map((entry) => te`(() => {${entry.fragment}})()`),
+      ",\n  ",
+    )}\n];`;
+    const result = te.run<any[]>(finalCode);
+    for (let i = 0, l = activeBatch.length; i < l; i++) {
+      activeBatch[i].callback(result[i]);
+    }
+  } finally {
+    activeBatch = null;
+  }
+}
+
 /** Because `new Function` retains the scope, we do it at top level to avoid capturing extra values */
 function newFunction(...args: string[]) {
   return new Function(...args);
@@ -1008,6 +1041,8 @@ export {
   optionalGet,
   ref,
   run,
+  runInBatch,
+  batch,
   set,
   subcomment,
   substring,
@@ -1044,6 +1079,8 @@ export interface TamedEvil {
     <TResult>(fragment: TE): TResult;
     <TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
   };
+  runInBatch: typeof runInBatch;
+  batch: typeof batch;
   compile: typeof compile;
   indent: typeof indent;
   indentIf: typeof indentIf;
@@ -1072,6 +1109,8 @@ const attributes = {
   tempVar,
   run,
   eval: run,
+  runInBatch,
+  batch,
   compile,
   indent,
   indentIf,
