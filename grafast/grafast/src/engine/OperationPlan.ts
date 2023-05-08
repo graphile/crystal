@@ -33,7 +33,7 @@ import {
   graphqlCollectFields,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import { ModifierStep, arraysMatch } from "../index.js";
+import { ModifierStep } from "../index.js";
 import {
   __ItemStep,
   __TrackedValueStep,
