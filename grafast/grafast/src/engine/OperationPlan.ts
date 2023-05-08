@@ -354,15 +354,21 @@ export class OperationPlan {
 
     // Plans are expected to execute later; they may take steps here to prepare
     // themselves (e.g. compiling SQL queries ahead of time).
-    this.finalizeSteps();
+    te.batch(() => {
+      this.finalizeSteps();
+    });
 
     this.lap("finalizeSteps");
 
-    this.finalizeLayerPlans();
+    te.batch(() => {
+      this.finalizeLayerPlans();
+    });
 
     this.lap("finalizeLayerPlans");
 
-    this.finalizeOutputPlans();
+    te.batch(() => {
+      this.finalizeOutputPlans();
+    });
 
     this.lap("finalizeOutputPlans");
 
