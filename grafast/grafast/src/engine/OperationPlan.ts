@@ -2084,118 +2084,73 @@ ${te.join(
 
     const {
       dependencies: deps,
-      layerPlan: { depth: maxDepth, ancestry, deferBoundaryDepth },
+      layerPlan: layerPlan,
       constructor: stepConstructor,
     } = step;
     const dependencyCount = deps.length;
 
-    /**
-     * "compatible" layer plans are calculated by walking up the layer plan tree,
-     * however:
-     *
-     * - do not pass the LayerPlan of one of the dependencies
-     * - do not pass a "deferred" layer plan
-     *
-     * Compatible layer plans are no less deep than minDepth.
-     */
-    let minDepth = deferBoundaryDepth;
-    let depDependentsTotalCount = 0;
-    for (const dep of deps) {
-      const dl = dep.dependents.length;
-      if (dl === 1) {
-        // We're the only dependent; therefore we have no peers (since peers
-        // share dependencies)
-        return [step];
-      }
-      depDependentsTotalCount += dl;
-      let d = dep.layerPlan.depth;
-      if (d > minDepth) {
-        minDepth = d;
-      }
-    }
-
-    // Peers have the same dependencies, so an intersection of the dependencies
-    // dependents is a quick way to avoid having to scan every single step.
-    const l = deps.length;
-    if (
-      l > 0 &&
-      depDependentsTotalCount < 20 /* TODO: what should this number be */
-    ) {
-      let allPeers: Array<ExecutableStep> = [step];
+    if (dependencyCount > 0) {
+      const { ancestry, deferBoundaryDepth } = layerPlan;
+      /**
+       * "compatible" layer plans are calculated by walking up the layer plan tree,
+       * however:
+       *
+       * - do not pass the LayerPlan of one of the dependencies
+       * - do not pass a "deferred" layer plan
+       *
+       * Compatible layer plans are no less deep than minDepth.
+       */
+      let minDepth = deferBoundaryDepth;
+      let depDependentsTotalCount = 0;
+      const possiblePeers = new Set<ExecutableStep>();
+      possiblePeers.add(step);
       for (
         let dependencyIndex = 0;
         dependencyIndex < dependencyCount;
         dependencyIndex++
       ) {
         const dep = deps[dependencyIndex];
-        if (dependencyIndex === 0) {
-          // SLOW!
-          for (const {
-            dependencyIndex: peerDependencyIndex,
-            step: possiblyPeer,
-          } of dep.dependents) {
-            if (
-              peerDependencyIndex === dependencyIndex &&
-              possiblyPeer !== step &&
-              !possiblyPeer.hasSideEffects &&
-              possiblyPeer.layerPlan.depth >= minDepth &&
-              possiblyPeer.layerPlan.depth <= maxDepth &&
-              possiblyPeer.constructor === stepConstructor &&
-              possiblyPeer.dependencies.length === dependencyCount &&
-              possiblyPeer.layerPlan ===
-                ancestry[possiblyPeer.layerPlan.depth] &&
-              !allPeers.includes(possiblyPeer)
-            ) {
-              allPeers.push(possiblyPeer);
-            }
-          }
-        } else {
-          const stillPeers: Array<ExecutableStep> = [step];
-          for (const d of dep.dependents) {
-            if (
-              d.dependencyIndex === dependencyIndex &&
-              d.step !== step &&
-              allPeers.includes(d.step) &&
-              !stillPeers.includes(d.step)
-            ) {
-              stillPeers.push(d.step);
-            }
-          }
-          allPeers = stillPeers;
-          if (allPeers.length === 0) {
-            // Shortcut
-            return [step];
+        const dl = dep.dependents.length;
+        if (dl === 1) {
+          // We're the only dependent; therefore we have no peers (since peers
+          // share dependencies)
+          return [step];
+        }
+        depDependentsTotalCount += dl;
+        for (const {
+          dependencyIndex: peerDependencyIndex,
+          step: possiblyPeer,
+        } of dep.dependents) {
+          if (
+            possiblyPeer !== step &&
+            peerDependencyIndex === dependencyIndex &&
+            !possiblyPeer.hasSideEffects &&
+            possiblyPeer.constructor === stepConstructor &&
+            possiblyPeer.dependencies.length === dependencyCount
+          ) {
+            possiblePeers.add(possiblyPeer);
           }
         }
-      }
-      return allPeers;
-    } else if (l > 0) {
-      // There'd be a lot of depDependents to scan over, so lets just scan the compatible layer plans instead
-      const allPeers: Array<ExecutableStep> = [step];
-      for (let i = minDepth; i <= maxDepth; i++) {
-        const layerPlan = ancestry[i];
-        const potentialPeers =
-          layerPlan.stepsByConstructor.get(stepConstructor);
-        if (!potentialPeers) continue;
-        for (const possiblyPeer of potentialPeers) {
-          if (possiblyPeer === step) continue;
-          if (possiblyPeer.hasSideEffects) continue;
-          const peerDeps = possiblyPeer.dependencies;
-          if (!arraysMatch(peerDeps, deps)) continue;
-          allPeers.push(possiblyPeer);
+        let d = dep.layerPlan.depth;
+        if (d > minDepth) {
+          minDepth = d;
         }
       }
-      return allPeers;
+      return [...possiblePeers].filter((possiblyPeer) => {
+        return (
+          possiblyPeer.layerPlan.depth >= minDepth &&
+          possiblyPeer.layerPlan === ancestry[possiblyPeer.layerPlan.depth] &&
+          arraysMatch(deps, possiblyPeer.dependencies)
+        );
+      });
     } else {
       const result = [step];
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
-          possiblyPeer.layerPlan.depth >= minDepth &&
-          possiblyPeer.layerPlan.depth <= maxDepth &&
-          possiblyPeer.constructor === stepConstructor &&
-          possiblyPeer.layerPlan === ancestry[possiblyPeer.layerPlan.depth]
+          possiblyPeer.layerPlan === layerPlan &&
+          possiblyPeer.constructor === stepConstructor
         ) {
           result.push(possiblyPeer);
         }
