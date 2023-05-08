@@ -393,6 +393,19 @@ const teBase = function te(
   return items.length === 1 ? items[0] : makeQueryNode(items);
 };
 
+const teCacheCache = Object.create(null);
+function cache(strings: TemplateStringsArray): TE {
+  if (strings.length !== 1) {
+    throw new Error(`te.cache can currently only be used with a static string`);
+  }
+  const str = strings[0];
+  const existing = teCacheCache[str];
+  if (existing) return existing;
+  const node = makeRawNode(str);
+  teCacheCache[str] = node;
+  return node;
+}
+
 let rawWarningOutput = false;
 /**
  * Creates a TE node for a raw code string. Just plain ol‘ raw code - EXTREMELY
@@ -993,6 +1006,7 @@ export {
   subcomment,
   substring,
   te,
+  cache,
   tempVar,
   tmp,
   undefinedNode as undefined,
@@ -1001,6 +1015,7 @@ export {
 export interface TamedEvil {
   (strings: TemplateStringsArray, ...values: Array<TE>): TE;
   te: TamedEvil;
+  cache: typeof cache;
   ref: typeof ref;
   reference: typeof ref;
   lit: typeof lit;
@@ -1034,6 +1049,7 @@ export interface TamedEvil {
 
 const attributes = {
   te,
+  cache,
   ref,
   reference: ref,
   lit,
