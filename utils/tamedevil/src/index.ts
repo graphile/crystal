@@ -241,7 +241,7 @@ function serialize(
       const identifier = makeRef(refs, refMap, item.v, item.n);
       str += identifier;
       if (item.n != null && identifier !== item.n) {
-        variables.push(`const ${item.n} = ${identifier};`);
+        variables.push(`const ${item.n} = ${identifier};\n`);
       }
       break;
     }
@@ -295,10 +295,11 @@ function compile(fragment: TE): {
    */
   let str = serialize(fragment, refs, refMap, varMap, variables);
   for (const varName of varMap.values()) {
-    variables.push(`let ${varName};`);
+    variables.push(`let ${varName};\n`);
   }
-  if (variables.length > 0) {
-    str = variables.join("\n") + "\n" + str;
+  const variablesString = variables.join("");
+  if (variablesString.length > 0) {
+    str = variablesString + "\n" + str;
   }
   const string = isDev ? str.replace(/\n\s*\n/g, "\n") : str;
 
