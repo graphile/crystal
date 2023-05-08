@@ -431,11 +431,14 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           $parent,
         );
         const [expression, fallback] = expressionDetails;
-        this.processRoot = te.run<
-          (value: any) => any
-        >`return value => (value${expression})${
-          fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
-        };`;
+        te.runInBatch<(value: any) => any>(
+          te`return value => (value${expression})${
+            fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
+          };`,
+          (fn) => {
+            this.processRoot = fn;
+          },
+        );
       }
     }
   }
@@ -543,19 +546,25 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
               spec.outputPlan.layerPlan.id === this.layerPlan.id,
           };
         }
-        this.execute = makeObjectExecutor(
+        makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
           type.mode === "root",
           false,
+          (fn) => {
+            this.execute = fn;
+          },
         );
-        this.executeString = makeObjectExecutor(
+        makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
           type.mode === "root",
           true,
+          (fn) => {
+            this.executeString = fn;
+          },
         );
         break;
       }
@@ -728,12 +737,30 @@ function makeExecutor<TAsString extends boolean>(
   nameExtra: TE,
   asString: TAsString,
   // this.type.mode === "introspection" || this.type.mode === "root"
-  skipNullHandling = false,
-  preamble: TE = te.blank,
+  skipNullHandling?: boolean,
+  preamble?: TE,
 ): TAsString extends true
   ? typeof OutputPlan.prototype.executeString
-  : typeof OutputPlan.prototype.execute {
-  return te.run`
+  : typeof OutputPlan.prototype.execute;
+function makeExecutor<TAsString extends boolean>(
+  inner: TE,
+  nameExtra: TE,
+  asString: TAsString,
+  // this.type.mode === "introspection" || this.type.mode === "root"
+  skipNullHandling: boolean,
+  preamble: TE,
+  callback: (fn: any) => void,
+): void;
+function makeExecutor(
+  inner: TE,
+  nameExtra: TE,
+  asString: boolean,
+  // this.type.mode === "introspection" || this.type.mode === "root"
+  skipNullHandling = false,
+  preamble: TE = te.blank,
+  callback?: (fn: any) => void,
+): any {
+  const expression = te`
 return function compiledOutputPlan${
     asString ? te.cache`String` : te.blank
   }_${nameExtra}(
@@ -764,6 +791,11 @@ ${preamble}\
   }
 ${inner}
 }`;
+  if (callback) {
+    te.runInBatch(expression, callback);
+  } else {
+    return te.run(expression);
+  }
 }
 
 const teChildBucket = te.cache`childBucket`;
@@ -1229,9 +1261,12 @@ function makeObjectExecutor<TAsString extends boolean>(
   // this.type.mode === "root",
   isRoot: boolean,
   asString: TAsString,
-): TAsString extends true
-  ? typeof OutputPlan.prototype.executeString
-  : typeof OutputPlan.prototype.execute {
+  callback: (
+    fn: TAsString extends true
+      ? typeof OutputPlan.prototype.executeString
+      : typeof OutputPlan.prototype.execute,
+  ) => void,
+): void {
   // PERF: figure out how to memoize this (without introducing memory leaks)
 
   const keys = Object.keys(fieldTypes);
@@ -1374,5 +1409,5 @@ ${
   // PERF: figure out how to memoize this. Should be able to key it on:
   // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
   // - existence of deferredOutputPlans
-  return makeExecutor(inner, te.cache`object`, asString, isRoot);
+  makeExecutor(inner, te.cache`object`, asString, isRoot, te.blank, callback);
 }
