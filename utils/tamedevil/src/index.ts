@@ -1,5 +1,3 @@
-import LRU from "@graphile/lru";
-
 import { reservedWords } from "./reservedWords.js";
 
 type Primitive = null | boolean | number | string;
@@ -95,45 +93,19 @@ export interface TEQuery {
  */
 export type TE = TENode | TEQuery;
 
-/**
- * This helps us to avoid GC overhead of allocating new raw nodes all the time
- * when they're likely to be the same values over and over. The average raw
- * string is likely to be around 20 bytes; allowing for 50 bytes once this has
- * been turned into an object, 10000 would mean 500kB which seems an acceptable
- * amount of memory to consume for this.
- */
-const CACHE_RAW_NODES = new LRU<string, TERawNode>({ maxLength: 10000 });
-const CACHE_MAX_ENTRY_LENGTH = 50;
+function makeRawNode(text: string): TERawNode {
+  return {
+    [$$type]: "RAW" as const,
+    t: text,
+  } as TERawNode;
+}
 
-function makeRawNode(text: string, exportName?: string): TERawNode {
-  // Don't use the cache for longer texts
-  if (text.length > CACHE_MAX_ENTRY_LENGTH && exportName === undefined) {
-    return Object.freeze({
-      [$$type]: "RAW" as const,
-      t: text,
-    });
-  }
-
-  const n = CACHE_RAW_NODES.get(text);
-  if (n) {
-    return n;
-  }
-  if (typeof text !== "string") {
-    throw new Error(
-      `[tamedevil] Invalid argument to makeRawNode - expected string, but received '${String(
-        text,
-      )}'`,
-    );
-  }
+function makeExportedRawNode(text: string, exportName: string): TERawNode {
   const newNode: TERawNode = {
     [$$type]: "RAW" as const,
     t: text,
   };
-  if (exportName) {
-    exportAs(newNode, exportName);
-  }
-  Object.freeze(newNode);
-  CACHE_RAW_NODES.set(text, newNode);
+  exportAs(newNode, exportName);
   return newNode;
 }
 
@@ -335,9 +307,6 @@ function compile(fragment: TE): {
   };
 }
 
-// LRU not necessary
-const CACHE_SIMPLE_FRAGMENTS = new Map<string, TERawNode>();
-
 /**
  * A template string tag function that creates a `TE` query out of some strings and
  * some TE values. Use this to prepare all dynamically executed code code
@@ -366,14 +335,10 @@ const teBase = function te(
     const first = strings[0];
     if (first === "") {
       return blankNode;
+    } else if (first === "undefined") {
+      return undefinedNode;
     }
-    const existing = CACHE_SIMPLE_FRAGMENTS.get(first);
-    if (existing) {
-      return existing;
-    }
-    const node = makeRawNode(first);
-    CACHE_SIMPLE_FRAGMENTS.set(first, node);
-    return node;
+    return makeRawNode(first);
   }
 
   // Special case te`${...}` - just return the node directly
@@ -476,8 +441,8 @@ function ref(val: any, name?: string): TE {
   }
 }
 
-const blankNode = makeRawNode(``, "blank");
-const undefinedNode = makeRawNode(`undefined`, "undefined");
+const blankNode = makeExportedRawNode(``, "blank");
+const undefinedNode = makeExportedRawNode(`undefined`, "undefined");
 
 /**
  * A regexp that matches the first character that might need escaping in a JSON
