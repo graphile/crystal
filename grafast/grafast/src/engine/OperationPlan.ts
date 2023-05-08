@@ -413,7 +413,7 @@ ${te.join(
 
     // Allow this to be garbage collected
     this.optimizeMeta = null as any;
-    context.grafastMetricsEmitter?.emit("plan", {
+    context?.grafastMetricsEmitter?.emit("plan", {
       elapsed,
       laps: this.laps,
     });
