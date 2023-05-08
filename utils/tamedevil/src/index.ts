@@ -725,9 +725,11 @@ function canAccessViaDot(str: string): boolean {
 function get(key: string | symbol | number): TE {
   return typeof key === "string" && canAccessViaDot(key)
     ? // ._mySimpleProperty
-      te`.${makeRawNode(key)}`
+      makeRawNode(`.${key}`)
     : // ["@@meaning"]
-      te`[${te.lit(key)}]`;
+    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
+    ? makeRawNode(`[${toJSON(key)}]`)
+    : te`[${te.lit(key)}]`;
 }
 
 /**
@@ -740,9 +742,11 @@ function get(key: string | symbol | number): TE {
 function optionalGet(key: string | symbol | number): TE {
   return typeof key === "string" && canAccessViaDot(key)
     ? // ?._mySimpleProperty
-      te`?.${makeRawNode(key)}`
+      makeRawNode(`?.${key}`)
     : // ?.["@@meaning"]
-      te`?.[${te.lit(key)}]`;
+    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
+    ? makeRawNode(`?.[${toJSON(key)}]`)
+    : te`?.[${te.lit(key)}]`;
 }
 
 // TODO: rename this. 'leftSet'? 'leftAccess'? 'safeAccess'?
@@ -767,9 +771,11 @@ function set(key: string | symbol | number, hasNullPrototype = false): TE {
   }
   return typeof key === "string" && canAccessViaDot(key)
     ? // ._mySimpleProperty
-      te`.${makeRawNode(key)}`
+      makeRawNode(`.${key}`)
     : // ["@@meaning"]
-      te`[${te.lit(key)}]`;
+    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
+    ? makeRawNode(`[${toJSON(key)}]`)
+    : te`[${te.lit(key)}]`;
 }
 
 /**
