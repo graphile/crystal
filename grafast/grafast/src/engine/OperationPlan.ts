@@ -2101,9 +2101,7 @@ ${te.join(
        * Compatible layer plans are no less deep than minDepth.
        */
       let minDepth = deferBoundaryDepth;
-      let depDependentsTotalCount = 0;
-      const possiblePeers = new Set<ExecutableStep>();
-      possiblePeers.add(step);
+      const possiblePeers: ExecutableStep[] = [];
       for (
         let dependencyIndex = 0;
         dependencyIndex < dependencyCount;
@@ -2116,19 +2114,21 @@ ${te.join(
           // share dependencies)
           return [step];
         }
-        depDependentsTotalCount += dl;
-        for (const {
-          dependencyIndex: peerDependencyIndex,
-          step: possiblyPeer,
-        } of dep.dependents) {
-          if (
-            possiblyPeer !== step &&
-            peerDependencyIndex === dependencyIndex &&
-            !possiblyPeer.hasSideEffects &&
-            possiblyPeer.constructor === stepConstructor &&
-            possiblyPeer.dependencies.length === dependencyCount
-          ) {
-            possiblePeers.add(possiblyPeer);
+        if (dependencyIndex === 0) {
+          for (const {
+            dependencyIndex: peerDependencyIndex,
+            step: possiblyPeer,
+          } of dep.dependents) {
+            if (
+              possiblyPeer !== step &&
+              peerDependencyIndex === dependencyIndex &&
+              !possiblyPeer.hasSideEffects &&
+              possiblyPeer.constructor === stepConstructor &&
+              possiblyPeer.dependencies.length === dependencyCount &&
+              possiblyPeer.layerPlan === ancestry[possiblyPeer.layerPlan.depth]
+            ) {
+              possiblePeers.push(possiblyPeer);
+            }
           }
         }
         let d = dep.layerPlan.depth;
@@ -2136,11 +2136,10 @@ ${te.join(
           minDepth = d;
         }
       }
-      const allPeers: ExecutableStep[] = [];
+      const allPeers: ExecutableStep[] = [step];
       for (const possiblyPeer of possiblePeers) {
         if (
           possiblyPeer.layerPlan.depth >= minDepth &&
-          possiblyPeer.layerPlan === ancestry[possiblyPeer.layerPlan.depth] &&
           arraysMatch(deps, possiblyPeer.dependencies)
         ) {
           allPeers.push(possiblyPeer);
