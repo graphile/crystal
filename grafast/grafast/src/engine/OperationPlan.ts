@@ -2082,13 +2082,11 @@ ${te.join(
       return [step];
     }
 
-    let minDepth = 0;
-    for (const dep of step.dependencies) {
-      let d = dep.layerPlan.depth;
-      if (d > minDepth) {
-        minDepth = d;
-      }
-    }
+    const {
+      dependencies: deps,
+      layerPlan: { depth: maxDepth, ancestry, deferBoundaryDepth },
+      constructor: stepConstructor,
+    } = step;
 
     /**
      * "compatible" layer plans are calculated by walking up the layer plan tree,
@@ -2096,47 +2094,55 @@ ${te.join(
      *
      * - do not pass the LayerPlan of one of the dependencies
      * - do not pass a "deferred" layer plan
+     *
+     * Compatible layer plans are no less deep than minDepth.
      */
-    const compatibleLayerPlans: Array<LayerPlan> = [];
-    const ancestry = step.layerPlan.ancestry;
-    for (let i = 0, stop = step.layerPlan.depth - minDepth; i <= stop; i++) {
-      const currentLayerPlan = ancestry[i];
-      compatibleLayerPlans.push(currentLayerPlan);
-      if (isDeferredLayerPlan(currentLayerPlan)) {
-        break;
+    let minDepth = deferBoundaryDepth;
+    let depDependentsTotalCount = 0;
+    for (const dep of deps) {
+      const dl = dep.dependents.length;
+      if (dl === 1) {
+        // We're the only dependent; therefore we have no peers (since peers
+        // share dependencies)
+        return [step];
+      }
+      depDependentsTotalCount += dl;
+      let d = dep.layerPlan.depth;
+      if (d > minDepth) {
+        minDepth = d;
       }
     }
 
     // Peers have the same dependencies, so an intersection of the dependencies
     // dependents is a quick way to avoid having to scan every single step.
-    const l = step.dependencies.length;
+    const l = deps.length;
     if (l > 0) {
       let allPeers: Array<ExecutableStep> = [step];
-      const deps = step.dependencies;
       for (
         let dependencyIndex = 0, dependencyCount = deps.length;
         dependencyIndex < dependencyCount;
         dependencyIndex++
       ) {
         const dep = deps[dependencyIndex];
-        if (dep.dependents.length === 1) {
-          // I must be the only step!
-          return [step];
-        }
         if (dependencyIndex === 0) {
           // SLOW!
           for (const {
-            dependencyIndex: dDependencyIndex,
-            step: dStep,
+            dependencyIndex: peerDependencyIndex,
+            step: possiblyPeer,
           } of dep.dependents) {
             if (
-              dDependencyIndex === dependencyIndex &&
-              dStep !== step &&
-              dStep.dependencies.length === dependencyCount &&
-              !allPeers.includes(dStep) &&
-              isMaybeAPeer(step, compatibleLayerPlans, dStep)
+              peerDependencyIndex === dependencyIndex &&
+              possiblyPeer !== step &&
+              !possiblyPeer.hasSideEffects &&
+              possiblyPeer.layerPlan.depth >= minDepth &&
+              possiblyPeer.layerPlan.depth <= maxDepth &&
+              possiblyPeer.constructor === stepConstructor &&
+              possiblyPeer.dependencies.length === dependencyCount &&
+              possiblyPeer.layerPlan ===
+                ancestry[possiblyPeer.layerPlan.depth] &&
+              !allPeers.includes(possiblyPeer)
             ) {
-              allPeers.push(dStep);
+              allPeers.push(possiblyPeer);
             }
           }
         } else {
@@ -2162,7 +2168,14 @@ ${te.join(
     } else {
       const result = [step];
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
-        if (isMaybeAPeer(step, compatibleLayerPlans, possiblyPeer)) {
+        if (
+          possiblyPeer !== step &&
+          !possiblyPeer.hasSideEffects &&
+          possiblyPeer.layerPlan.depth >= minDepth &&
+          possiblyPeer.layerPlan.depth <= maxDepth &&
+          possiblyPeer.constructor === stepConstructor &&
+          possiblyPeer.layerPlan === ancestry[possiblyPeer.layerPlan.depth]
+        ) {
           result.push(possiblyPeer);
         }
       }
@@ -3136,16 +3149,4 @@ ${te.join(
 
 function makeDefaultPlan(fieldName: string) {
   return ($step: ExecutableStep) => access($step, [fieldName]);
-}
-function isMaybeAPeer(
-  step: ExecutableStep,
-  compatibleLayerPlans: ReadonlyArray<LayerPlan>,
-  potentialPeer: ExecutableStep,
-) {
-  return (
-    potentialPeer.id !== step.id &&
-    !potentialPeer.hasSideEffects &&
-    compatibleLayerPlans.includes(potentialPeer.layerPlan) &&
-    potentialPeer.constructor === step.constructor
-  );
 }

@@ -250,6 +250,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   /** How "deep" this layer plan is (how many ancestors it has). The root layer plan has a depth of 0. */
   depth: number;
+  /** The depth at which a "defer boundary" occurs (OperationPlan.getPeers cannot pass a defer boundary), or 0. */
+  deferBoundaryDepth: number;
 
   constructor(
     public readonly operationPlan: OperationPlan,
@@ -258,11 +260,18 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public polymorphicPaths: ReadonlySet<string>,
   ) {
     if (parentLayerPlan) {
-      this.ancestry = [this, ...parentLayerPlan.ancestry];
+      this.depth = parentLayerPlan.depth + 1;
+      this.ancestry = [...parentLayerPlan.ancestry, this];
+      if (isDeferredLayerPlan(this)) {
+        this.deferBoundaryDepth = this.depth;
+      } else {
+        this.deferBoundaryDepth = parentLayerPlan.deferBoundaryDepth;
+      }
     } else {
+      this.depth = 0;
       this.ancestry = [this];
+      this.deferBoundaryDepth = 0;
     }
-    this.depth = this.ancestry.length - 1;
     this.id = operationPlan.addLayerPlan(this);
     if (!parentLayerPlan) {
       assert.strictEqual(
