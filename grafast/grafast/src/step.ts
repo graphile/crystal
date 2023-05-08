@@ -497,7 +497,8 @@ ${te.indent(inFrag)}
 `;
         }
       };
-      this.execute = te.run`
+      te.runInBatch<any>(
+        te`
 return function execute(count, values, extra) {
   const [
 ${te.join(
@@ -516,7 +517,11 @@ ${tryOrNot(te`\
   }
   return results;
 }
-` as any;
+`,
+        (fn) => {
+          this.execute = fn;
+        },
+      );
     }
     super.finalize();
   }

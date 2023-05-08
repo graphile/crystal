@@ -66,12 +66,13 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   }
 
   finalize() {
-    this.unbatchedExecute = te.run`return function (extra, ${te.join(
-      this.dependencies.map((_, dependencyIndex) =>
-        te.identifier(`val${dependencyIndex}`),
-      ),
-      ", ",
-    )}) {
+    te.runInBatch<typeof this.unbatchedExecute>(
+      te`return function (extra, ${te.join(
+        this.dependencies.map((_, dependencyIndex) =>
+          te.identifier(`val${dependencyIndex}`),
+        ),
+        ", ",
+      )}) {
   const resultValues = Object.create(null);
   ${te.join(
     Object.entries(this.inputFields).map(
@@ -88,7 +89,11 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     "\n",
   )}
   return resultValues;
-}` as any;
+}`,
+      (fn) => {
+        this.unbatchedExecute = fn;
+      },
+    );
     super.finalize();
   }
 

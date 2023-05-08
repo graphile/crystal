@@ -132,13 +132,17 @@ export class ObjectStep<
   }
   */
 
-  tupleToObjectJIT(): (
-    extra: ExecutionExtra,
-    ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
-  ) => DataFromPlans<TPlans> {
+  tupleToObjectJIT(
+    callback: (
+      fn: (
+        extra: ExecutionExtra,
+        ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
+      ) => DataFromPlans<TPlans>,
+    ) => void,
+  ): void {
     if (this.keys.length === 0) {
       // Shortcut simple case
-      return () => EMPTY_OBJECT;
+      return callback(() => EMPTY_OBJECT);
     }
     const keysAreSafe = this.keys.every(isSafeObjectPropertyName);
     const inner = keysAreSafe
@@ -162,11 +166,12 @@ ${te.join(
   "",
 )}\
 `;
-    return te.run`\
+    return te.runInBatch<Parameters<typeof callback>[0]>(
+      te`\
 return function ({ meta }, ${te.join(
-      this.keys.map((_k, i) => te.identifier(`val${i}`)),
-      ", ",
-    )}) {
+        this.keys.map((_k, i) => te.identifier(`val${i}`)),
+        ", ",
+      )}) {
   if (meta.nextIndex) {
     for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
@@ -194,11 +199,15 @@ ${inner}
   meta.nextIndex = meta.nextIndex === 9 ? 0 : meta.nextIndex + 1;
   return newObj;
 }
-`;
+`,
+      callback,
+    );
   }
 
   finalize() {
-    this.unbatchedExecute = this.tupleToObjectJIT();
+    this.tupleToObjectJIT((fn) => {
+      this.unbatchedExecute = fn;
+    });
     return super.finalize();
   }
 
