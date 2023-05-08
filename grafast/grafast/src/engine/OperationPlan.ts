@@ -2579,11 +2579,19 @@ ${te.join(
     }
 
     const peers = this.getPeers(step);
+    // Even if there is just one peer, we must still deduplicate because
+    // `deduplicate` is called to indicate that the field is done being
+    // planned, which the step class may want to acknowledge by locking certain
+    // facets of its functionality (such as adding filters). We'll simplify its
+    // work though by giving it an empty array to filter.
     const equivalentSteps = step.deduplicate(
       peers.length === 1 ? EMPTY_ARRAY : peers,
     );
-    if (equivalentSteps.length === 0) {
-      // No equivalents, we're the original
+    if (
+      equivalentSteps.length === 0 ||
+      (equivalentSteps.length === 1 && equivalentSteps[0] === step)
+    ) {
+      // No other equivalents
       return null;
     }
 
