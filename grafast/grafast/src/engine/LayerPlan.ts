@@ -242,10 +242,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   /**
    * The list of layerPlans that steps added to this LayerPlan may depend upon.
+   * Note this includes self, so it has one more entry than `depth`.
    *
    * @internal
    */
   ancestry: LayerPlan[];
+
+  /** How "deep" this layer plan is (how many ancestors it has). The root layer plan has a depth of 0. */
+  depth: number;
 
   constructor(
     public readonly operationPlan: OperationPlan,
@@ -254,10 +258,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public polymorphicPaths: ReadonlySet<string>,
   ) {
     if (parentLayerPlan) {
-      this.ancestry = [...parentLayerPlan.ancestry, this];
+      this.ancestry = [this, ...parentLayerPlan.ancestry];
     } else {
       this.ancestry = [this];
     }
+    this.depth = this.ancestry.length - 1;
     this.id = operationPlan.addLayerPlan(this);
     if (!parentLayerPlan) {
       assert.strictEqual(

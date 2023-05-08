@@ -2082,6 +2082,14 @@ ${te.join(
       return [step];
     }
 
+    let minDepth = 0;
+    for (const dep of step.dependencies) {
+      let d = dep.layerPlan.depth;
+      if (d > minDepth) {
+        minDepth = d;
+      }
+    }
+
     /**
      * "compatible" layer plans are calculated by walking up the layer plan tree,
      * however:
@@ -2090,24 +2098,14 @@ ${te.join(
      * - do not pass a "deferred" layer plan
      */
     const compatibleLayerPlans: Array<LayerPlan> = [];
-    let currentLayerPlan: LayerPlan | null = step.layerPlan;
-    const doNotPass: Array<LayerPlan> = [];
-    for (const dep of step.dependencies) {
-      if (!doNotPass.includes(dep.layerPlan)) {
-        doNotPass.push(dep.layerPlan);
-      }
-    }
-
-    do {
+    const ancestry = step.layerPlan.ancestry;
+    for (let i = 0, stop = step.layerPlan.depth - minDepth; i <= stop; i++) {
+      const currentLayerPlan = ancestry[i];
       compatibleLayerPlans.push(currentLayerPlan);
-
-      if (doNotPass.includes(currentLayerPlan)) {
-        break;
-      }
       if (isDeferredLayerPlan(currentLayerPlan)) {
         break;
       }
-    } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
+    }
 
     // Peers have the same dependencies, so an intersection of the dependencies
     // dependents is a quick way to avoid having to scan every single step.
