@@ -735,7 +735,7 @@ function makeExecutor<TAsString extends boolean>(
   : typeof OutputPlan.prototype.execute {
   return te.run`
 return function compiledOutputPlan${
-    asString ? te`String` : te.blank
+    asString ? te.cache`String` : te.blank
   }_${nameExtra}(
   root,
   mutablePath,
@@ -748,11 +748,11 @@ ${preamble}\
   if (bucketRootValue == null) {
     ${
       skipNullHandling
-        ? te`// root/introspection, null is fine\n`
-        : te`return ${asString ? te`"null"` : te`null`};\n`
+        ? te.cache`// root/introspection, null is fine\n`
+        : te`return ${asString ? te.cache`"null"` : te.cache`null`};\n`
     }\
   }${
-    skipNullHandling ? te` else ` : te`\n  `
+    skipNullHandling ? te.cache` else ` : te.cache`\n  `
   }if (typeof bucketRootValue === 'object' && ${te.ref(
     $$error,
     "$$error",
@@ -766,14 +766,16 @@ ${inner}
 }`;
 }
 
+const teChildBucket = te.cache`childBucket`;
+const teChildBucketIndex = te.cache`childBucketIndex`;
 function makeExecuteChildPlanCode(
   setTargetOrReturn: TE,
   locationDetails: TE,
   childOutputPlan: TE,
   isNonNull: boolean,
   asString: boolean,
-  childBucket: TE = te`childBucket`,
-  childBucketIndex: TE = te`childBucketIndex`,
+  childBucket: TE = teChildBucket,
+  childBucketIndex: TE = teChildBucketIndex,
 ) {
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
@@ -786,9 +788,9 @@ function makeExecuteChildPlanCode(
         )}(${locationDetails}, mutablePath.slice(1));
       }
       const fieldResult = ${childOutputPlan}.${
-      asString ? te`executeString` : te`execute`
+      asString ? te.cache`executeString` : te.cache`execute`
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
-      if (fieldResult == ${asString ? te`"null"` : te`null`}) {
+      if (fieldResult == ${asString ? te.cache`"null"` : te.cache`null`}) {
         throw ${te.ref(
           nonNullError,
           "nonNullError",
@@ -800,9 +802,9 @@ function makeExecuteChildPlanCode(
     return te`
       try {
         const fieldResult = ${childBucket} == null ? ${
-      asString ? te`"null"` : te`null`
+      asString ? te.cache`"null"` : te.cache`null`
     } : ${childOutputPlan}.${
-      asString ? te`executeString` : te`execute`
+      asString ? te.cache`executeString` : te.cache`execute`
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
       } catch (e) {
@@ -816,7 +818,7 @@ function makeExecuteChildPlanCode(
           mutablePath.splice(pathLengthTarget, overSize);
         }
         root.errors.push(error);
-        ${setTargetOrReturn} ${asString ? te`"null"` : te`null`};
+        ${setTargetOrReturn} ${asString ? te.cache`"null"` : te.cache`null`};
       }`;
   }
 }
@@ -827,8 +829,16 @@ function makeExecuteChildPlanCode(
  * and increasing the probability of optimization).
  */
 
-const nullExecutor = makeExecutor(te`  return null;`, te`null`, false);
-const nullExecutorString = makeExecutor(te`  return "null";`, te`null`, true);
+const nullExecutor = makeExecutor(
+  te.cache`  return null;`,
+  te.cache`null`,
+  false,
+);
+const nullExecutorString = makeExecutor(
+  te.cache`  return "null";`,
+  te.cache`null`,
+  true,
+);
 
 /* This is what leafExecutor should use if insideGraphQL (which isn't currently
  * supported)
@@ -844,7 +854,7 @@ const leafExecutor = makeExecutor(
   te`\
   return this.type.serialize(bucketRootValue);
 `,
-  te`leaf`,
+  te.cache`leaf`,
   false,
 );
 
@@ -852,7 +862,7 @@ const leafExecutorString = makeExecutor(
   te`\
   return ${te.ref(toJSON, "toJSON")}(this.type.serialize(bucketRootValue));
 `,
-  te`leaf`,
+  te.cache`leaf`,
   true,
 );
 
@@ -861,7 +871,7 @@ const booleanLeafExecutorString = makeExecutor(
   const val = this.type.serialize(bucketRootValue);
   return val === true ? 'true' : 'false';
 `,
-  te`booleanLeaf`,
+  te.cache`booleanLeaf`,
   true,
   false,
   te`\
@@ -874,7 +884,7 @@ const intLeafExecutorString = makeExecutor(
   te`\
   return '' + this.type.serialize(bucketRootValue);
 `,
-  te`intLeaf`,
+  te.cache`intLeaf`,
   true,
   false,
   // Fast check to see if number is 32 bit integer
@@ -889,7 +899,7 @@ const floatLeafExecutorString = makeExecutor(
   te`\
   return String(this.type.serialize(bucketRootValue));
 `,
-  te`floatLeaf`,
+  te.cache`floatLeaf`,
   true,
   false,
   te`\
@@ -906,7 +916,7 @@ const stringLeafExecutorString = makeExecutor(
     "stringifyString",
   )}(this.type.serialize(bucketRootValue));
 `,
-  te`stringLeaf`,
+  te.cache`stringLeaf`,
   true,
   false,
   te`\
@@ -939,7 +949,7 @@ ${
     );
   }
 `
-    : te``
+    : te.blank
 }\
   const typeName = bucketRootValue[${te.ref($$concreteType, "$$concreteType")}];
   const childOutputPlan = this.childByTypeName[typeName];
@@ -955,13 +965,13 @@ ${
       \`GrafastInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
     );
   }`
-      : te``
+      : te.blank
   }
 
   const directChild = bucket.children[childOutputPlan.layerPlan.id];
   if (directChild) {
     return childOutputPlan.${
-      asString ? te`executeString` : te`execute`
+      asString ? te.cache`executeString` : te.cache`execute`
     }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
   } else {
     const c = ${te.ref(getChildBucketAndIndex, "getChildBucketAndIndex")}(
@@ -975,11 +985,11 @@ ${
     }
     const [childBucket, childBucketIndex] = c;
     return childOutputPlan.${
-      asString ? te`executeString` : te`execute`
+      asString ? te.cache`executeString` : te.cache`execute`
     }(root, mutablePath, childBucket, childBucketIndex);
   }
 `,
-    te`polymorphic`,
+    te.cache`polymorphic`,
     asString,
   );
 }
@@ -999,16 +1009,16 @@ function makeArrayExecutor<TAsString extends boolean>(
       inspect,
       "inspect",
     )}(bucketRootValue)} coercion to mode 'array'\`);
-    return ${asString ? te`"null"` : te`null`};
+    return ${asString ? te.cache`"null"` : te.cache`null`};
   }
 
   const childOutputPlan = this.child;
   const l = bucketRootValue.length;
-  ${asString ? te`let string;` : te`const data = [];`}
+  ${asString ? te.cache`let string;` : te.cache`const data = [];`}
   if (l === 0) {
-${asString ? te`    string = "[]";` : te`    /* noop */`}
+${asString ? te.cache`    string = "[]";` : te.cache`    /* noop */`}
   } else {
-${asString ? te`    string = "[";\n` : te.blank}\
+${asString ? te.cache`    string = "[";\n` : te.blank}\
     const mutablePathIndex = mutablePath.push(-1) - 1;
 
     // Now to populate the children...
@@ -1037,18 +1047,18 @@ ${asString ? te`    string = "[";\n` : te.blank}\
       }
 
       mutablePath[mutablePathIndex] = i;
-${asString ? te`\n      if (i > 0) { string += ","; }` : te.blank}
+${asString ? te.cache`\n      if (i > 0) { string += ","; }` : te.blank}
 ${makeExecuteChildPlanCode(
-  asString ? te`string +=` : te`data[i] =`,
-  te`this.locationDetails`,
-  te`childOutputPlan`,
+  asString ? te.cache`string +=` : te.cache`data[i] =`,
+  te.cache`this.locationDetails`,
+  te.cache`childOutputPlan`,
   childIsNonNull,
   asString,
 )}
     }
 
     mutablePath.pop();
-${asString ? te`    string += "]";\n` : te.blank}
+${asString ? te.cache`    string += "]";\n` : te.blank}
   }
 ${
   canStream
@@ -1069,13 +1079,13 @@ ${
       startIndex: bucketRootValue.length,
     });
   }`
-    : te``
+    : te.blank
 }
 
-  return ${asString ? te`string` : te`data`};
+  return ${asString ? te.cache`string` : te.cache`data`};
 `,
-    te`array${childIsNonNull ? te`_nonNull` : te.blank}${
-      canStream ? te`_stream` : te.blank
+    te`array${childIsNonNull ? te.cache`_nonNull` : te.blank}${
+      canStream ? te.cache`_stream` : te.blank
     }`,
     asString,
   );
@@ -1193,7 +1203,7 @@ const introspectionExecutor = makeExecutor(
     introspect,
     "introspect",
   )}(root, this, mutablePath, false)`,
-  te`introspection`,
+  te.cache`introspection`,
   false,
   true,
 );
@@ -1202,7 +1212,7 @@ const introspectionExecutorString = makeExecutor(
     introspect,
     "introspect",
   )}(root, this, mutablePath, true)`,
-  te`introspection`,
+  te.cache`introspection`,
   true,
   true,
 );
@@ -1243,7 +1253,11 @@ function makeObjectExecutor<TAsString extends boolean>(
   }
 
   const inner = te`\
-  ${asString ? te`let string = "{";` : te`const obj = Object.create(null);`}
+  ${
+    asString
+      ? te.cache`let string = "{";`
+      : te.cache`const obj = Object.create(null);`
+  }
   const { keys } = this;
   const { children } = bucket;
   const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
@@ -1258,7 +1272,7 @@ ${te.join(
             // not require any quoting in JSON/JS - they must conform to GraphQL
             // `Name`.
             return te`    string += \`${
-              i === 0 ? te.blank : te`,`
+              i === 0 ? te.blank : te.cache`,`
             }"${te.substring(fieldName, "`")}":"${te.substring(
               typeName,
               "`",
@@ -1278,17 +1292,17 @@ ${
     ? te`\
 ${makeExecuteChildPlanCode(
   asString
-    ? te`string += \`${i === 0 ? te.blank : te`,`}"${te.substring(
+    ? te`string += \`${i === 0 ? te.blank : te.cache`,`}"${te.substring(
         fieldName,
         "`",
       )}":\` +`
     : te`obj${te.set(fieldName, true)} =`,
-  te`spec.locationDetails`,
-  te`spec.outputPlan`,
+  te.cache`spec.locationDetails`,
+  te.cache`spec.outputPlan`,
   fieldType === "outputPlan!",
   asString,
-  te`bucket`,
-  te`bucketIndex`,
+  te.cache`bucket`,
+  te.cache`bucketIndex`,
 )}`
     : te`\
       let childBucket, childBucketIndex;
@@ -1311,13 +1325,13 @@ ${makeExecuteChildPlanCode(
       }
 ${makeExecuteChildPlanCode(
   asString
-    ? te`string += \`${i === 0 ? te.blank : te`,`}"${te.substring(
+    ? te`string += \`${i === 0 ? te.blank : te.cache`,`}"${te.substring(
         fieldName,
         "`",
       )}":\` +`
     : te`obj${te.set(fieldName, true)} =`,
-  te`spec.locationDetails`,
-  te`spec.outputPlan`,
+  te.cache`spec.locationDetails`,
+  te.cache`spec.outputPlan`,
   fieldType === "outputPlan!",
   asString,
 )}`
@@ -1337,7 +1351,7 @@ ${makeExecuteChildPlanCode(
 )}
 
   mutablePath.pop();
-${asString ? te`  string += "}";\n` : te.blank}\
+${asString ? te.cache`  string += "}";\n` : te.blank}\
 ${
   hasDeferredOutputPlans
     ? te`
@@ -1353,12 +1367,12 @@ ${
     });
   }
 `
-    : te``
+    : te.blank
 }
-  return ${asString ? te`string` : te`obj`};`;
+  return ${asString ? te.cache`string` : te.cache`obj`};`;
 
   // PERF: figure out how to memoize this. Should be able to key it on:
   // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
   // - existence of deferredOutputPlans
-  return makeExecutor(inner, te`object`, asString, isRoot);
+  return makeExecutor(inner, te.cache`object`, asString, isRoot);
 }
