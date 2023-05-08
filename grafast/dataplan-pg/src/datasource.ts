@@ -606,6 +606,7 @@ export class PgResource<
     }
   }
 
+  // PERF: this needs optimization.
   public getReciprocal<
     TOtherCodec extends GetPgRegistryCodecs<TRegistry>,
     TOtherRelationName extends keyof GetPgRegistryCodecRelations<
