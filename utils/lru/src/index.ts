@@ -87,7 +87,28 @@ export class LRU<KeyType = any, ValueType = any> {
   public get(key: KeyType): ValueType | undefined {
     const hit = this.c.get(key);
     if (hit) {
-      this.r(hit);
+      // HOIST
+      if (hit !== this.h) {
+        if (!this.h) {
+          this.h = this.t = hit;
+        } else {
+          // Remove newHead from old position
+          hit.p!.n = hit.n;
+          if (hit.n) {
+            hit.n.p = hit.p;
+          } else {
+            // It was the t, now hit.prev is the t
+            this.t = hit.p;
+          }
+          // Add hit at top
+          hit.n = this.h;
+          this.h!.p = hit;
+          this.h = hit;
+          hit.p = null;
+        }
+      }
+
+      // RETURN
       return hit.v;
     }
     return undefined;
@@ -107,30 +128,6 @@ export class LRU<KeyType = any, ValueType = any> {
       this.c.set(key, newHead);
       this.a(newHead);
     }
-  }
-
-  /** hoist (aka "raise") */
-  private r(newHead: Node<KeyType, ValueType>) {
-    if (newHead === this.h) {
-      return;
-    }
-    if (!this.h) {
-      this.h = this.t = newHead;
-      return;
-    }
-    // Remove newHead from old position
-    newHead.p!.n = newHead.n;
-    if (newHead.n) {
-      newHead.n.p = newHead.p;
-    } else {
-      // It was the t, now newHead.prev is the t
-      this.t = newHead.p;
-    }
-    // Add newHead at top
-    newHead.n = this.h;
-    this.h.p = newHead;
-    this.h = newHead;
-    newHead.p = null;
   }
 
   /** add */
