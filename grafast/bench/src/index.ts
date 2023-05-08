@@ -109,12 +109,12 @@ export async function bench(
     let planningTotal = 0;
     let executionTotal = 0;
     const tableData = Object.entries(runs).map(([name, timings]) => {
-      const final = timings[timings.length - 1];
-      const planning = final.planning!;
+      const focus = timings[timings.length - 1];
+      const planning = focus.planning!;
       let min = Infinity;
       let max = 0;
       let sum = 0;
-      const laps = timings[0].laps;
+      const laps = focus.laps;
       for (const timing of timings) {
         const { elapsed } = timing;
         if (elapsed < min) min = elapsed;
@@ -122,7 +122,7 @@ export async function bench(
         sum += elapsed;
       }
       planningTotal += planning;
-      executionTotal += final.elapsed;
+      executionTotal += focus.elapsed;
       const extra = laps!.reduce((memo, l) => {
         memo[l.category] = (memo[l.category] ?? 0) + l.elapsed;
         extraTotal[l.category] = (extraTotal[l.category] ?? 0) + l.elapsed;
