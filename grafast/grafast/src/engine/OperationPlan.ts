@@ -326,7 +326,9 @@ export class OperationPlan {
     this.lap("treeShakeSteps", "optimize");
 
     // Replace/inline/optimise steps
-    this.optimizeSteps();
+    te.batch(() => {
+      this.optimizeSteps();
+    });
 
     this.checkTimeout();
     this.lap("optimizeSteps");
