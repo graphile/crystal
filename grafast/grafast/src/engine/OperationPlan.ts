@@ -2089,7 +2089,43 @@ ${te.join(
     } = step;
     const dependencyCount = deps.length;
 
-    if (dependencyCount > 0) {
+    if (dependencyCount === 1) {
+      // Optimized form for steps that have one dependency (extremely common!)
+      const { ancestry, deferBoundaryDepth } = layerPlan;
+      const dep = deps[0];
+
+      const dl = dep.dependents.length;
+      if (dl === 1) {
+        // We're the only dependent; therefore we have no peers (since peers
+        // share dependencies)
+        return [step];
+      }
+
+      const minDepth = Math.max(deferBoundaryDepth, dep.layerPlan.depth);
+      const allPeers: ExecutableStep[] = [step];
+
+      // Check the final dependency - this is likely to have the fewest
+      // dependents (since it was added last it's more likely to be
+      // unique).
+      for (const {
+        dependencyIndex: peerDependencyIndex,
+        step: possiblyPeer,
+      } of dep.dependents) {
+        const { layerPlan: peerLayerPlan } = possiblyPeer;
+        if (
+          possiblyPeer !== step &&
+          peerDependencyIndex === 0 &&
+          !possiblyPeer.hasSideEffects &&
+          possiblyPeer.constructor === stepConstructor &&
+          peerLayerPlan.depth >= minDepth &&
+          possiblyPeer.dependencies.length === dependencyCount &&
+          peerLayerPlan === ancestry[peerLayerPlan.depth]
+        ) {
+          allPeers.push(possiblyPeer);
+        }
+      }
+      return allPeers;
+    } else if (dependencyCount > 1) {
       const { ancestry, deferBoundaryDepth } = layerPlan;
       /**
        * "compatible" layer plans are calculated by walking up the layer plan tree,
