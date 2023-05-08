@@ -2089,8 +2089,22 @@ ${te.join(
     } = step;
     const dependencyCount = deps.length;
 
-    if (dependencyCount === 1) {
+    if (dependencyCount === 0) {
+      const allPeers: ExecutableStep[] = [step];
+      for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
+        if (
+          possiblyPeer !== step &&
+          !possiblyPeer.hasSideEffects &&
+          possiblyPeer.layerPlan === layerPlan &&
+          possiblyPeer.constructor === stepConstructor
+        ) {
+          allPeers.push(possiblyPeer);
+        }
+      }
+      return allPeers;
+    } else if (dependencyCount === 1) {
       // Optimized form for steps that have one dependency (extremely common!)
+
       const { ancestry, deferBoundaryDepth } = layerPlan;
       const dep = deps[0];
 
@@ -2104,9 +2118,6 @@ ${te.join(
       const minDepth = Math.max(deferBoundaryDepth, dep.layerPlan.depth);
       const allPeers: ExecutableStep[] = [step];
 
-      // Check the final dependency - this is likely to have the fewest
-      // dependents (since it was added last it's more likely to be
-      // unique).
       for (const {
         dependencyIndex: peerDependencyIndex,
         step: possiblyPeer,
@@ -2125,7 +2136,7 @@ ${te.join(
         }
       }
       return allPeers;
-    } else if (dependencyCount > 1) {
+    } else {
       const { ancestry, deferBoundaryDepth } = layerPlan;
       /**
        * "compatible" layer plans are calculated by walking up the layer plan tree,
@@ -2188,19 +2199,6 @@ ${te.join(
         allPeers.push(possiblyPeer);
       }
       return allPeers;
-    } else {
-      const result = [step];
-      for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
-        if (
-          possiblyPeer !== step &&
-          !possiblyPeer.hasSideEffects &&
-          possiblyPeer.layerPlan === layerPlan &&
-          possiblyPeer.constructor === stepConstructor
-        ) {
-          result.push(possiblyPeer);
-        }
-      }
-      return result;
     }
   }
 
