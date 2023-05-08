@@ -211,28 +211,20 @@ const getVar = (varMap: Map<symbol, string>, sym: symbol) => {
 
 function serialize(
   item: TE,
-  teFragments: string[],
   refs: { [key: string]: any },
   refMap: Map<any, string>,
   varMap: Map<symbol, string>,
   variables: string[],
   indent = 0,
-): void {
+): string {
+  let str = "";
   if (item == null) {
     enforceValidNode(item);
   }
   switch (item[$$type]) {
     case "QUERY": {
       for (const listItem of item.n) {
-        serialize(
-          listItem,
-          teFragments,
-          refs,
-          refMap,
-          varMap,
-          variables,
-          indent,
-        );
+        str += serialize(listItem, refs, refMap, varMap, variables, indent);
       }
       break;
     }
@@ -242,14 +234,12 @@ function serialize(
         break;
       }
       // IMPORTANT: this **must not** mangle primitives. Fortunately they're all single line so it should be fine.
-      teFragments.push(
-        isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
-      );
+      str += isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t;
       break;
     }
     case "REF": {
       const identifier = makeRef(refs, refMap, item.v, item.n);
-      teFragments.push(identifier);
+      str += identifier;
       if (item.n != null && identifier !== item.n) {
         variables.push(`const ${item.n} = ${identifier};`);
       }
@@ -257,24 +247,16 @@ function serialize(
     }
     case "VARIABLE": {
       const identifier = getVar(varMap, item.s);
-      teFragments.push(identifier);
+      str += identifier;
       break;
     }
     case "INDENT": {
       if (!isDev) {
         throw new Error("INDENT nodes only allowed in development mode");
       }
-      teFragments.push("\n" + "  ".repeat(indent + 1));
-      serialize(
-        item.c,
-        teFragments,
-        refs,
-        refMap,
-        varMap,
-        variables,
-        indent + 1,
-      );
-      teFragments.push("\n" + "  ".repeat(indent));
+      str += "\n" + "  ".repeat(indent + 1);
+      str += serialize(item.c, refs, refMap, varMap, variables, indent + 1);
+      str += "\n" + "  ".repeat(indent);
       break;
     }
     default: {
@@ -285,6 +267,7 @@ function serialize(
       );
     }
   }
+  return str;
 }
 
 /**
@@ -310,9 +293,7 @@ function compile(fragment: TE): {
   /**
    * Join this to generate the TE string
    */
-  const teFragments: string[] = [""];
-  serialize(fragment, teFragments, refs, refMap, varMap, variables);
-  let str = teFragments.join("");
+  let str = serialize(fragment, refs, refMap, varMap, variables);
   for (const varName of varMap.values()) {
     variables.push(`let ${varName};`);
   }
