@@ -223,9 +223,7 @@ function serialize(
   }
   switch (item[$$type]) {
     case "QUERY": {
-      const itemCount = item.n.length;
-      for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-        const listItem = item.n[itemIndex];
+      for (const listItem of item.n) {
         serialize(
           listItem,
           teFragments,
