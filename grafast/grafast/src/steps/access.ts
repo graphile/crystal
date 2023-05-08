@@ -20,7 +20,8 @@ export const expressionSymbol = Symbol("expression");
 function constructDestructureFunction(
   path: (string | number | symbol)[],
   fallback: any,
-): (_extra: ExecutionExtra, value: any) => any {
+  callback: (fn: (_extra: ExecutionExtra, value: any) => any) => void,
+): void {
   const jitParts: TE[] = [];
 
   let slowMode = false;
@@ -48,29 +49,32 @@ function constructDestructureFunction(
   // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
   // a JIT-d function.
   if (slowMode) {
-    return function slowlyExtractValueAtPath(_meta: any, value: any): any {
+    callback(function slowlyExtractValueAtPath(_meta: any, value: any): any {
       let current = value;
       for (let i = 0, l = path.length; i < l && current != null; i++) {
         const pathItem = path[i];
         current = current[pathItem];
       }
       return fallback !== undefined ? current ?? fallback : current;
-    };
+    });
   } else {
     // ?.blah?.bog?.["!!!"]?.[0]
     const expression = te.join(jitParts, "");
 
     // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
-    const quicklyExtractValueAtPath = te.run<any>`\
+    te.runInBatch<any>(
+      te`\
 return function quicklyExtractValueAtPath(extra, value) {
   return (value${expression})${
-      fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
-    };
-};`;
-
-    // JIT this for great performance.
-    quicklyExtractValueAtPath[expressionSymbol] = [expression, fallback];
-    return quicklyExtractValueAtPath;
+        fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
+      };
+};`,
+      (quicklyExtractValueAtPath) => {
+        // JIT this for great performance.
+        quicklyExtractValueAtPath[expressionSymbol] = [expression, fallback];
+        callback(quicklyExtractValueAtPath);
+      },
+    );
   }
 }
 
@@ -145,10 +149,9 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   finalize(): void {
-    this.unbatchedExecute = constructDestructureFunction(
-      this.path,
-      this.fallback,
-    );
+    constructDestructureFunction(this.path, this.fallback, (fn) => {
+      this.unbatchedExecute = fn;
+    });
     super.finalize();
   }
 
