@@ -2615,15 +2615,7 @@ ${te.join(
     let minDepth = Infinity;
     let stepsAtMinDepth: ExecutableStep[] = [];
     for (const step of allEquivalentSteps) {
-      let depth = 0;
-      let layer: LayerPlan | null = step.layerPlan;
-      while ((layer = layer.parentLayerPlan)) {
-        depth++;
-        if (depth > minDepth) {
-          // No point digging deeper
-          break;
-        }
-      }
+      const depth = step.layerPlan.depth;
       if (depth < minDepth) {
         minDepth = depth;
         stepsAtMinDepth = [step];
