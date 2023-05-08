@@ -823,6 +823,11 @@ function run<TResult>(
   const compiled = compile(fragment);
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
+  if (isDev && activeBatch) {
+    throw new Error(
+      `te.run called, but batch is active - recommend you use runInBatch`,
+    );
+  }
   try {
     return newFunction(...argNames, compiled.string)(...argValues) as TResult;
   } catch (e) {
@@ -835,8 +840,11 @@ function run<TResult>(
   }
 }
 
-let activeBatch: Array<{ fragment: TE; callback: (r: any) => void }> | null =
-  null;
+interface Batch {
+  fragment: TE;
+  callback: (r: any) => void;
+}
+let activeBatch: Array<Batch> | null = null;
 
 function runInBatch<TResult>(
   fragment: TE,
@@ -852,19 +860,21 @@ function batch(callback: () => void): void {
   if (activeBatch) {
     throw new Error(`te.batch failed - there's already a batch in progress`);
   }
+  let batch: Array<Batch>;
   try {
     activeBatch = [];
     callback();
-    const finalCode = te`return [\n${te.join(
-      activeBatch.map((entry) => te`(() => {${entry.fragment}})()`),
-      ",\n  ",
-    )}\n];`;
-    const result = te.run<any[]>(finalCode);
-    for (let i = 0, l = activeBatch.length; i < l; i++) {
-      activeBatch[i].callback(result[i]);
-    }
+    batch = activeBatch;
   } finally {
     activeBatch = null;
+  }
+  const finalCode = te`return [\n${te.join(
+    batch.map((entry) => te`(() => {${entry.fragment}})()`),
+    ",\n  ",
+  )}\n];`;
+  const result = te.run<any[]>(finalCode);
+  for (let i = 0, l = batch.length; i < l; i++) {
+    batch[i].callback(result[i]);
   }
 }
 
