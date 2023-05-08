@@ -2019,8 +2019,8 @@ __metadata:
     chalk: "npm:^4.1.2"
     jest: "npm:^28.1.3"
     jest-serializer-simple: "workspace:^"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     grafast: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
@@ -2057,10 +2057,10 @@ __metadata:
     postgres-array: "npm:~2.0.0"
     postgres-range: "npm:^1.1.1"
     terser-webpack-plugin: "npm:^5.1.3"
-    ts-loader: "npm:^9.4.1"
+    ts-loader: "npm:^9.4.2"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
     webpack: "npm:^5.74.0"
     webpack-cli: "npm:^4.10.0"
     webpack-node-externals: "npm:^3.0.0"
@@ -2849,8 +2849,8 @@ __metadata:
     jest: "npm:^28.1.3"
     jest-serializer-graphql-schema: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     grafast: "workspace:^"
     grafserv: "workspace:^"
@@ -2867,8 +2867,8 @@ __metadata:
     jest: "npm:^28.1.3"
     pg: "npm:^8.7.1"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
     ws: "npm:^8.4.0"
   bin:
     graphile-lds: ./dist/cli.js
@@ -2883,8 +2883,8 @@ __metadata:
     "@types/node": "npm:^18.15.5"
     jest: "npm:^28.1.3"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
 
@@ -2894,7 +2894,7 @@ __metadata:
   dependencies:
     "@types/node": "npm:^18.15.5"
     postgraphile: "workspace:^"
-    typescript: "npm:^5.0.0-beta"
+    typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
 
@@ -3690,8 +3690,8 @@ __metadata:
     graphql: "npm:^16.1.0-experimental-stream-defer.6"
     nodemon: "npm:^2.0.15"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   bin:
     grafast-bench: dist/cli-run.js
   languageName: unknown
@@ -5373,14 +5373,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.57.0":
-  version: 5.57.0
-  resolution: "@typescript-eslint/eslint-plugin@npm:5.57.0"
+"@typescript-eslint/eslint-plugin@npm:^5.59.2":
+  version: 5.59.2
+  resolution: "@typescript-eslint/eslint-plugin@npm:5.59.2"
   dependencies:
     "@eslint-community/regexpp": "npm:^4.4.0"
-    "@typescript-eslint/scope-manager": "npm:5.57.0"
-    "@typescript-eslint/type-utils": "npm:5.57.0"
-    "@typescript-eslint/utils": "npm:5.57.0"
+    "@typescript-eslint/scope-manager": "npm:5.59.2"
+    "@typescript-eslint/type-utils": "npm:5.59.2"
+    "@typescript-eslint/utils": "npm:5.59.2"
     debug: "npm:^4.3.4"
     grapheme-splitter: "npm:^1.0.4"
     ignore: "npm:^5.2.0"
@@ -5393,24 +5393,24 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 91f9484747d8fad9d12516f52994e9792ae3529650bbc09277feed4b1880ca944280746278c550a0974512d87b93309e9fbf08974c3baa0b0eaffc8d55555b6f
+  checksum: 777969bdcc25925df91f8bf0c8b16400defad020dbdb2ea77091f1ecceeb57704d5c045d195c67a3c877231419c34e8f0c03f45d22abf0cb607596b455118dff
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.57.0":
-  version: 5.57.0
-  resolution: "@typescript-eslint/parser@npm:5.57.0"
+"@typescript-eslint/parser@npm:^5.59.2":
+  version: 5.59.2
+  resolution: "@typescript-eslint/parser@npm:5.59.2"
   dependencies:
-    "@typescript-eslint/scope-manager": "npm:5.57.0"
-    "@typescript-eslint/types": "npm:5.57.0"
-    "@typescript-eslint/typescript-estree": "npm:5.57.0"
+    "@typescript-eslint/scope-manager": "npm:5.59.2"
+    "@typescript-eslint/types": "npm:5.59.2"
+    "@typescript-eslint/typescript-estree": "npm:5.59.2"
     debug: "npm:^4.3.4"
   peerDependencies:
     eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 147c20b5c08a1ce02fd79473ab8a6e6d12eb107b1e591dccdbb434db5f21347b9e63e4ef0db6836233442191c2e1c5e1bf78afd654164b46ede6ca35990a2e2d
+  checksum: 86d9a46672f9eedf17c0073f0f02ab941100b7cdd7158757095e5793e8e4d7c56c3f4887aa3afd9c3218706108d9647ec7729401ff7c13abfd420738b2bc72d5
   languageName: node
   linkType: hard
 
@@ -5424,12 +5424,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/type-utils@npm:5.57.0":
-  version: 5.57.0
-  resolution: "@typescript-eslint/type-utils@npm:5.57.0"
+"@typescript-eslint/scope-manager@npm:5.59.2":
+  version: 5.59.2
+  resolution: "@typescript-eslint/scope-manager@npm:5.59.2"
   dependencies:
-    "@typescript-eslint/typescript-estree": "npm:5.57.0"
-    "@typescript-eslint/utils": "npm:5.57.0"
+    "@typescript-eslint/types": "npm:5.59.2"
+    "@typescript-eslint/visitor-keys": "npm:5.59.2"
+  checksum: 4cd52a2f008d7ee68ec8424c0cfe1c6f668aa2d981a506abb7514a165e47f48dcda711b83d297ea23074005abca5eb30ff9c594938c1ff9c73700019e0d44548
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/type-utils@npm:5.59.2":
+  version: 5.59.2
+  resolution: "@typescript-eslint/type-utils@npm:5.59.2"
+  dependencies:
+    "@typescript-eslint/typescript-estree": "npm:5.59.2"
+    "@typescript-eslint/utils": "npm:5.59.2"
     debug: "npm:^4.3.4"
     tsutils: "npm:^3.21.0"
   peerDependencies:
@@ -5437,7 +5447,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 42ffcee993ceb67a18f09e9db5cd0cc69711dfd24b22a0990b61e551d7041538ddd24973f631d03070faa4501e62db30d421fa19eb3b8760aa6094147ca3f4fa
+  checksum: bc3aa3e29bf39a9adb6df6756e76e57e435d730f1597181dce432fb91ee0e9961b9c163d7d8975057fbcd982f4a9d70a36452ab1e260f58052e43b11749cfd35
   languageName: node
   linkType: hard
 
@@ -5448,7 +5458,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/typescript-estree@npm:5.57.0, @typescript-eslint/typescript-estree@npm:^5.57.0":
+"@typescript-eslint/types@npm:5.59.2":
+  version: 5.59.2
+  resolution: "@typescript-eslint/types@npm:5.59.2"
+  checksum: 4d565653b8d6cb6f5b72134bcd1efb3af18ca5792257613bd263f47b5be8faf94e3a90072758699900ef3e43a5ab68180f081b27a54b76a6d7006759ec63dc8f
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/typescript-estree@npm:5.57.0":
   version: 5.57.0
   resolution: "@typescript-eslint/typescript-estree@npm:5.57.0"
   dependencies:
@@ -5466,7 +5483,43 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/utils@npm:5.57.0, @typescript-eslint/utils@npm:^5.10.0":
+"@typescript-eslint/typescript-estree@npm:5.59.2, @typescript-eslint/typescript-estree@npm:^5.59.2":
+  version: 5.59.2
+  resolution: "@typescript-eslint/typescript-estree@npm:5.59.2"
+  dependencies:
+    "@typescript-eslint/types": "npm:5.59.2"
+    "@typescript-eslint/visitor-keys": "npm:5.59.2"
+    debug: "npm:^4.3.4"
+    globby: "npm:^11.1.0"
+    is-glob: "npm:^4.0.3"
+    semver: "npm:^7.3.7"
+    tsutils: "npm:^3.21.0"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 01f7a9abb914fe5399d4212990fa20c5b0b4ae61319a98730d10c95dfd04d3722637576c58dd95906c66a0f0cca503a25c844e922142f1f3e9c8d10c99a77a19
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/utils@npm:5.59.2":
+  version: 5.59.2
+  resolution: "@typescript-eslint/utils@npm:5.59.2"
+  dependencies:
+    "@eslint-community/eslint-utils": "npm:^4.2.0"
+    "@types/json-schema": "npm:^7.0.9"
+    "@types/semver": "npm:^7.3.12"
+    "@typescript-eslint/scope-manager": "npm:5.59.2"
+    "@typescript-eslint/types": "npm:5.59.2"
+    "@typescript-eslint/typescript-estree": "npm:5.59.2"
+    eslint-scope: "npm:^5.1.1"
+    semver: "npm:^7.3.7"
+  peerDependencies:
+    eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
+  checksum: 18d221a1ed44ca1149fb8effa1957992e569ab49c88a7c4bc874a2233cbb005b7eba5abcfa1c100a358455bdaabb46dfbf7ee4e485f023ce3a91e7b8fb475e3a
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/utils@npm:^5.10.0":
   version: 5.57.0
   resolution: "@typescript-eslint/utils@npm:5.57.0"
   dependencies:
@@ -5491,6 +5544,16 @@ __metadata:
     "@typescript-eslint/types": "npm:5.57.0"
     eslint-visitor-keys: "npm:^3.3.0"
   checksum: 19a09590cf2a4218dbc5a5ddf09acf989a450a635c881d9ca77ae2f7075fc5f14386fa4cf9ceb2bdbfd4166e81ff0089ab1b6c6ee999ed32830374ff25f87ea1
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/visitor-keys@npm:5.59.2":
+  version: 5.59.2
+  resolution: "@typescript-eslint/visitor-keys@npm:5.59.2"
+  dependencies:
+    "@typescript-eslint/types": "npm:5.59.2"
+    eslint-visitor-keys: "npm:^3.3.0"
+  checksum: de546e6677b091c0f3f0b27e48f7d84fbdc4ffd21891d1634a1598a22953071690475c4caea99e5529dabebd0d1fb5b161221819129130e84b5ef3efcdbcf6ec
   languageName: node
   linkType: hard
 
@@ -9897,8 +9960,8 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     jest: "npm:^28.1.3"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
   languageName: unknown
@@ -11643,10 +11706,10 @@ __metadata:
     spec-md: "npm:^3.0.2"
     tamedevil: "workspace:^"
     terser-webpack-plugin: "npm:^5.1.3"
-    ts-loader: "npm:^9.4.1"
+    ts-loader: "npm:^9.4.2"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
     webpack: "npm:^5.74.0"
     webpack-cli: "npm:^4.10.0"
     zx: "npm:^7.0.8"
@@ -11686,8 +11749,8 @@ __metadata:
     nodemon: "npm:^2.0.15"
     ruru: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     grafast: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
@@ -11739,8 +11802,8 @@ __metadata:
     ruru: "workspace:^"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
     ws: "npm:^8.4.0"
   languageName: unknown
   linkType: soft
@@ -11765,8 +11828,8 @@ __metadata:
     pluralize: "npm:^7.0.0"
     semver: "npm:^7.3.5"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
@@ -11787,8 +11850,8 @@ __metadata:
     jest: "npm:^28.1.3"
     semver: "npm:^7.3.5"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
     yargs: "npm:^17.4.1"
   languageName: unknown
   linkType: soft
@@ -11811,8 +11874,8 @@ __metadata:
     jest: "npm:^28.1.3"
     prettier: "npm:^2.8.7"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     grafast: "workspace:^0.0.1-alpha.1"
     graphql: ^16.1.0-experimental-stream-defer.6
@@ -11834,8 +11897,8 @@ __metadata:
     nodemon: "npm:^2.0.15"
     postgraphile: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     grafast: "workspace:^"
     graphile-build: "workspace:^"
@@ -11856,8 +11919,8 @@ __metadata:
     graphile-config: "workspace:^"
     jest: "npm:^28.1.3"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   bin:
     graphile: dist/cli-run.js
   languageName: unknown
@@ -13750,8 +13813,8 @@ __metadata:
     jest: "npm:^28.1.3"
     pretty-format: "npm:^27.5.1"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     graphql: ">=15 <17"
   languageName: unknown
@@ -13768,8 +13831,8 @@ __metadata:
     prettier: "npm:^2.8.7"
     pretty-format: "npm:^27.5.1"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
 
@@ -16446,8 +16509,8 @@ __metadata:
     "@types/node": "npm:18.15.5"
     jest: "npm:^28.1.3"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
 
@@ -16478,8 +16541,8 @@ __metadata:
     jest: "npm:^28.1.3"
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
 
@@ -17129,8 +17192,8 @@ __metadata:
     pg-introspection: "workspace:^"
     ruru: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   bin:
     postgraphile: ./dist/cli-run.js
   languageName: unknown
@@ -18462,9 +18525,9 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/mock-fs": "npm:4.13.1"
     "@types/node": "npm:^18.15.5"
-    "@typescript-eslint/eslint-plugin": "npm:^5.57.0"
-    "@typescript-eslint/parser": "npm:^5.57.0"
-    "@typescript-eslint/typescript-estree": "npm:^5.57.0"
+    "@typescript-eslint/eslint-plugin": "npm:^5.59.2"
+    "@typescript-eslint/parser": "npm:^5.59.2"
+    "@typescript-eslint/typescript-estree": "npm:^5.59.2"
     babel-jest: "npm:^28.1.3"
     babel-plugin-transform-import-meta: "npm:^2.2.0"
     concurrently: "npm:^6.5.1"
@@ -18487,7 +18550,7 @@ __metadata:
     prettier: "npm:^2.8.7"
     typedoc: "npm:^0.22.15"
     typedoc-monorepo-link-types: "npm:^0.0.2"
-    typescript: "npm:^5.0.0-beta"
+    typescript: "npm:^5.0.4"
     webpack: "npm:^5.65.0"
   languageName: unknown
   linkType: soft
@@ -18544,8 +18607,8 @@ __metadata:
     nodemon: "npm:^2.0.15"
     react: "npm:>=16 <17"
     react-dom: "npm:>=16 <17"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   peerDependencies:
     graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
@@ -18565,9 +18628,9 @@ __metadata:
     ruru-components: "workspace:^"
     style-loader: "npm:^3.3.1"
     svg-inline-loader: "npm:^0.8.2"
-    ts-loader: "npm:^9.3.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    ts-loader: "npm:^9.4.2"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
     webpack: "npm:^5.72.0"
     webpack-cli: "npm:^4.9.2"
     yargs: "npm:^17.6.2"
@@ -19949,8 +20012,8 @@ __metadata:
     jest: "npm:^28.1.3"
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.4.0"
-    typescript: "npm:^5.0.0-beta"
+    tslib: "npm:^2.5.0"
+    typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
 
@@ -20301,7 +20364,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-loader@npm:^9.3.1, ts-loader@npm:^9.4.1":
+"ts-loader@npm:^9.4.2":
   version: 9.4.2
   resolution: "ts-loader@npm:9.4.2"
   dependencies:
@@ -20592,23 +20655,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.0.0-beta":
-  version: 5.0.2
-  resolution: "typescript@npm:5.0.2"
+"typescript@npm:^5.0.4":
+  version: 5.0.4
+  resolution: "typescript@npm:5.0.4"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: a305d149166e376acb51bcd1bab9f2ab55c5bd52d0b43f0e49b58ea5cf085cd7c0a3d38ea58f3991aa7b04c97907b6c17c8611334d7f0e54db3d31d7897d9661
+  checksum: 56649de784c427e8f3f63d4ebfcada4fcf03bb2a301f3327342111798db7f26f8a86285f979f376cf6cec4774bd96b4650f2693a07fc409f4544ad4c4d9fe4c9
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.0.0-beta#optional!builtin<compat/typescript>":
-  version: 5.0.2
-  resolution: "typescript@patch:typescript@npm%3A5.0.2#optional!builtin<compat/typescript>::version=5.0.2&hash=ad5954"
+"typescript@patch:typescript@npm%3A^5.0.4#optional!builtin<compat/typescript>":
+  version: 5.0.4
+  resolution: "typescript@patch:typescript@npm%3A5.0.4#optional!builtin<compat/typescript>::version=5.0.4&hash=ad5954"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 31dbad12f89374659895753700df361b121b35a789a956fc7d9a2f4f8fa0bf897bd289133a6989829d106d58a5f044b201b7fce0a26cf652e95299228e4268d7
+  checksum: be94f10d96a8443e5524bce56705712ae1aa6c67618dd2c316ddb616ea614a3eb675c34e4af16ab09f1a0ab694173c704ba5b23d8b8bda31cb31c1ca078c486f
   languageName: node
   linkType: hard
 

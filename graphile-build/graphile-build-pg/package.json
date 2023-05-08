@@ -50,7 +50,7 @@
     "pg-introspection": "workspace:^",
     "pg-sql2": "workspace:^",
     "tamedevil": "workspace:^",
-    "tslib": "^2.4.0"
+    "tslib": "^2.5.0"
   },
   "engines": {
     "node": ">=16"
@@ -79,7 +79,7 @@
     "pg": "^8.7.1",
     "ruru": "workspace:^",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.0-beta",
+    "typescript": "^5.0.4",
     "ws": "^8.4.0"
   }
 }

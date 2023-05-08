@@ -46,7 +46,7 @@
   "dependencies": {
     "graphile-config": "workspace:^",
     "http-proxy": "^1.18.1",
-    "tslib": "^2.4.0",
+    "tslib": "^2.5.0",
     "yargs": "^17.6.2"
   },
   "engines": {
@@ -69,8 +69,8 @@
     "ruru-components": "workspace:^",
     "style-loader": "^3.3.1",
     "svg-inline-loader": "^0.8.2",
-    "ts-loader": "^9.3.1",
-    "typescript": "^5.0.0-beta",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.4",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2"
   }
