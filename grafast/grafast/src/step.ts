@@ -539,7 +539,8 @@ function buildOptimizedExecute(
   // Try and satisfy from cache
   const cache = isSyncAndSafe ? safeCache : unsafeCache;
   if (depCount <= MAX_DEPENDENCIES_TO_CACHE) {
-    return cache[depCount];
+    callback(cache[depCount]);
+    return;
   }
 
   // Build it
