@@ -2004,15 +2004,9 @@ ${te.join(
    */
   public processSteps(
     actionDescription: string,
-    fromStepId: number,
     order: "dependents-first" | "dependencies-first",
     callback: (plan: ExecutableStep) => ExecutableStep,
   ): void {
-    if (fromStepId === this.stepTracker.stepCount) {
-      // Nothing to do since there are no plans to process
-      return;
-    }
-
     const previousStepCount = this.stepTracker.stepCount;
 
     const processed = new Set<ExecutableStep>();
@@ -2029,7 +2023,7 @@ ${te.join(
         for (let i = 0; i < step.dependents.length; i++) {
           const entry = step.dependents[i];
           const { step: $processFirst } = entry;
-          if ($processFirst.id >= fromStepId && !processed.has($processFirst)) {
+          if (!processed.has($processFirst)) {
             processStep($processFirst);
             if (step.dependents[i] !== entry) {
               // The world has change; go back to the start
@@ -2054,7 +2048,7 @@ ${te.join(
         }
       } else {
         for (const $processFirst of step.dependencies) {
-          if ($processFirst.id >= fromStepId && !processed.has($processFirst)) {
+          if (!processed.has($processFirst)) {
             processStep($processFirst);
           }
         }
@@ -2090,14 +2084,12 @@ ${te.join(
       if (replacementStep != step) {
         this.replaceStep(step, replacementStep);
       }
-      if (actionDescription !== "deduplicate") {
-        this.deduplicateSteps();
-      }
+      this.deduplicateSteps();
 
       return replacementStep;
     };
 
-    for (let i = fromStepId; i < this.stepTracker.stepCount; i++) {
+    for (let i = 0; i < this.stepTracker.stepCount; i++) {
       const step = this.stepTracker.getStepById(i, true);
       // Check it hasn't been tree-shaken away, or already processed
       if (!step || step.id !== i || processed.has(step)) continue;
@@ -2753,16 +2745,41 @@ ${te.join(
    * our child plans would be expecting.
    */
   private deduplicateSteps() {
-    if (this.maxDeduplicatedStepId === this.stepTracker.stepCount - 1) {
+    // TODO: Creating steps during deduplicate is forbidden, we should add code to enforce this
+    const start = this.stepTracker.lastDeduplicatedStepId + 1;
+    const end = this.stepTracker.stepCount - 1;
+    if (end === start) {
       return;
     }
-    this.processSteps(
-      "deduplicate",
-      this.maxDeduplicatedStepId + 1,
-      "dependencies-first",
-      this.deduplicateStep,
-    );
-    this.maxDeduplicatedStepId = this.stepTracker.stepCount - 1;
+    const processed = new Set<ExecutableStep>();
+    const process = (step: ExecutableStep) => {
+      processed.add(step);
+      const replacementStep = withGlobalLayerPlan(
+        step.layerPlan,
+        step.polymorphicPaths,
+        this.deduplicateStep,
+        this,
+        step,
+      );
+      if (replacementStep != step) {
+        this.replaceStep(step, replacementStep);
+      }
+    };
+    for (let i = start; i <= end; i++) {
+      const step = this.stepTracker.stepById[i];
+      if (!step) {
+        throw new Error(`No step '${i}'`);
+      }
+      if (processed.has(step)) continue;
+      for (const dep of step.dependencies) {
+        if (dep.id >= start && !processed.has(dep)) {
+          process(dep);
+        }
+      }
+      process(step);
+    }
+
+    this.stepTracker.lastDeduplicatedStepId = end;
   }
 
   private hoistAndDeduplicate(step: ExecutableStep) {
@@ -2773,16 +2790,11 @@ ${te.join(
   }
 
   private hoistSteps() {
-    this.processSteps(
-      "hoist",
-      0,
-      "dependencies-first",
-      this.hoistAndDeduplicate,
-    );
+    this.processSteps("hoist", "dependencies-first", this.hoistAndDeduplicate);
   }
 
   private pushDownSteps() {
-    this.processSteps("pushDown", 0, "dependents-first", this.pushDown);
+    this.processSteps("pushDown", "dependents-first", this.pushDown);
   }
 
   private getStepOptionsForStep(step: ExecutableStep): StepOptions {
@@ -2850,7 +2862,6 @@ ${te.join(
       let replacedPlan = false;
       this.processSteps(
         "optimize",
-        0,
         "dependents-first",
         loops === 0
           ? (step) => {

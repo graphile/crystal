@@ -176,7 +176,6 @@ export function printPlanGraph(
   const sortedSteps: ExecutableStep[] = [];
   operationPlan.processSteps(
     "printingPlanDeps",
-    0,
     "dependencies-first",
     (plan) => {
       sortedSteps.push(plan);
@@ -273,7 +272,7 @@ export function printPlanGraph(
 
   graph.push("");
   graph.push("    %% define steps");
-  operationPlan.processSteps("printingPlans", 0, "dependents-first", (plan) => {
+  operationPlan.processSteps("printingPlans", "dependents-first", (plan) => {
     planId(plan);
     return plan;
   });

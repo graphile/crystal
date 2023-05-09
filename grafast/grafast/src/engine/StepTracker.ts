@@ -61,6 +61,8 @@ export class StepTracker {
    */
   public allOutputPlans: OutputPlan[] = [];
 
+  public lastDeduplicatedStepId = -1;
+
   constructor(private readonly operationPlan: OperationPlan) {}
 
   private assertPhaseNot(phase: OperationPlanPhase) {
