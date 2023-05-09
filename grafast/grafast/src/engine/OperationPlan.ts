@@ -676,13 +676,12 @@ ${te.join(
     const groupedFieldSet = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
-      () =>
-        graphqlCollectFields(
-          this,
-          this.trackedRootValueStep.id,
-          rootType,
-          selectionSet.selections,
-        ),
+      graphqlCollectFields,
+      null,
+      this,
+      this.trackedRootValueStep.id,
+      rootType,
+      selectionSet.selections,
     );
     if (groupedFieldSet.deferred.length > 0) {
       throw new SafeError(
@@ -720,7 +719,10 @@ ${te.join(
     const trackedArguments = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
-      () => this.getTrackedArguments(rootType, field),
+      this.getTrackedArguments,
+      this,
+      rootType,
+      field,
     );
     if (subscriptionPlanResolver) {
       // PERF: optimize this
@@ -777,7 +779,9 @@ ${te.join(
         ? withGlobalLayerPlan(
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
-            () => subscribeStep.itemPlan($__item),
+            subscribeStep.itemPlan,
+            subscribeStep,
+            $__item,
           )
         : $__item;
 
@@ -878,7 +882,9 @@ ${te.join(
         ? withGlobalLayerPlan(
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
-            () => subscribeStep.itemPlan($__item),
+            subscribeStep.itemPlan,
+            subscribeStep,
+            $__item,
           )
         : $__item;
 
@@ -1033,14 +1039,13 @@ ${te.join(
     const groupedFieldSet = withGlobalLayerPlan(
       outputPlan.layerPlan,
       new Set([polymorphicPath]),
-      () =>
-        graphqlCollectFields(
-          this,
-          parentStep.id,
-          objectType,
-          selections,
-          isMutation,
-        ),
+      graphqlCollectFields,
+      null,
+      this,
+      parentStep.id,
+      objectType,
+      selections,
+      isMutation,
     );
     const objectTypeFields = objectType.getFields();
     const processGroupedFieldSet = (
@@ -1248,7 +1253,10 @@ ${te.join(
         const trackedArguments = withGlobalLayerPlan(
           fieldLayerPlan,
           polymorphicPaths,
-          () => this.getTrackedArguments(objectType, fieldNodes[0]),
+          this.getTrackedArguments,
+          this,
+          objectType,
+          fieldNodes[0],
         );
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
@@ -1390,8 +1398,12 @@ ${te.join(
         listDepth,
       );
       const $item = isListCapableStep($step)
-        ? withGlobalLayerPlan($__item.layerPlan, polymorphicPaths, () =>
-            ($step as ListCapableStep<any>).listItem($__item),
+        ? withGlobalLayerPlan(
+            $__item.layerPlan,
+            polymorphicPaths,
+            ($step as ListCapableStep<any>).listItem,
+            $step,
+            $__item,
           )
         : $__item;
       this.planIntoOutputPlan(
@@ -1412,8 +1424,13 @@ ${te.join(
       assertNotAsync(scalarPlanResolver, `${nullableFieldType.name}.plan`);
       const $leaf =
         typeof scalarPlanResolver === "function"
-          ? withGlobalLayerPlan(parentLayerPlan, polymorphicPaths, () =>
-              scalarPlanResolver($step, { schema: this.schema }),
+          ? withGlobalLayerPlan(
+              parentLayerPlan,
+              polymorphicPaths,
+              scalarPlanResolver,
+              null,
+              $step,
+              { schema: this.schema },
             )
           : $step;
 
@@ -1625,7 +1642,9 @@ ${te.join(
         const $root = withGlobalLayerPlan(
           polymorphicLayerPlan,
           new Set([newPolymorphicPath]),
-          () => $step.planForType(type),
+          $step.planForType,
+          $step,
+          type,
         );
         const objectOutputPlan = new OutputPlan(
           polymorphicLayerPlan,
@@ -1739,20 +1758,22 @@ ${te.join(
     try {
       let _fieldArgs!: FieldArgs;
 
-      let step = withGlobalLayerPlan(layerPlan, polymorphicPaths, () =>
-        withFieldArgsForArguments(
-          this,
-          parentStep,
-          trackedArguments,
-          field,
-          (fieldArgs) => {
-            _fieldArgs = fieldArgs;
-            return planResolver(parentStep, fieldArgs, {
-              field,
-              schema: this.schema,
-            });
-          },
-        ),
+      let step = withGlobalLayerPlan(
+        layerPlan,
+        polymorphicPaths,
+        withFieldArgsForArguments,
+        null,
+        this,
+        parentStep,
+        trackedArguments,
+        field,
+        (fieldArgs) => {
+          _fieldArgs = fieldArgs;
+          return planResolver(parentStep, fieldArgs, {
+            field,
+            schema: this.schema,
+          });
+        },
       );
       let haltTree = false;
       if (step === null || (step instanceof ConstantStep && step.isNull())) {
@@ -1815,8 +1836,12 @@ ${te.join(
 
       return { step, haltTree };
     } catch (e) {
-      const step = withGlobalLayerPlan(layerPlan, polymorphicPaths, () =>
-        error(e),
+      const step = withGlobalLayerPlan(
+        layerPlan,
+        polymorphicPaths,
+        error,
+        null,
+        e,
       );
       const haltTree = true;
       this.modifierSteps = [];
@@ -2045,7 +2070,9 @@ ${te.join(
         replacementStep = withGlobalLayerPlan(
           step.layerPlan,
           step.polymorphicPaths,
-          () => callback(step),
+          callback,
+          this,
+          step,
         );
       } catch (e) {
         console.error(
@@ -2413,9 +2440,9 @@ ${te.join(
    * Attempts to push the step into the lowest layerPlan to minimize the need
    * for copying between layer plans.
    */
-  private pushDown(step: ExecutableStep): void {
+  private pushDown<T extends ExecutableStep>(step: T): T {
     if (this.isImmoveable(step)) {
-      return;
+      return step;
     }
     switch (step.layerPlan.reason.type) {
       case "root":
@@ -2436,7 +2463,7 @@ ${te.join(
         } else {
           // Side effects should take place inside the mutation field plan
           // (that's the whole point), so we should not push these down.
-          return;
+          return step;
         }
       }
       default: {
@@ -2456,7 +2483,7 @@ ${te.join(
     if (outputPlans) {
       for (const outputPlan of outputPlans) {
         if (outputPlan.layerPlan === step.layerPlan) {
-          return;
+          return step;
         } else {
           dependentLayerPlans.add(outputPlan.layerPlan);
         }
@@ -2465,7 +2492,7 @@ ${te.join(
 
     for (const { step: s } of step.dependents) {
       if (s.layerPlan === step.layerPlan) {
-        return;
+        return step;
       } else {
         dependentLayerPlans.add(s.layerPlan);
       }
@@ -2476,7 +2503,7 @@ ${te.join(
     if (layerPlansByParent) {
       for (const layerPlan of layerPlansByParent) {
         if (layerPlan.parentLayerPlan === step.layerPlan) {
-          return;
+          return step;
         } else {
           dependentLayerPlans.add(layerPlan.parentLayerPlan!);
         }
@@ -2487,7 +2514,7 @@ ${te.join(
     if (layerPlansByRoot) {
       for (const layerPlan of layerPlansByRoot) {
         if (layerPlan === step.layerPlan) {
-          return;
+          return step;
         } else {
           dependentLayerPlans.add(layerPlan);
         }
@@ -2553,7 +2580,7 @@ ${te.join(
     }
 
     if (deepest === step.layerPlan) {
-      return;
+      return step;
     }
 
     // All our checks passed, shove it down!
@@ -2570,6 +2597,8 @@ ${te.join(
 
     // 2: move it to target layer
     this.stepTracker.moveStepToLayerPlan(step, deepest);
+
+    return step;
   }
 
   private _deduplicateInnerLogic(step: ExecutableStep) {
@@ -2728,25 +2757,29 @@ ${te.join(
       "deduplicate",
       this.maxDeduplicatedStepId + 1,
       "dependencies-first",
-      (step) => this.deduplicateStep(step),
+      this.deduplicateStep,
     );
     this.maxDeduplicatedStepId = this.stepTracker.stepCount - 1;
   }
 
+  private hoistAndDeduplicate(step: ExecutableStep) {
+    this.hoistStep(step);
+    // Even if step wasn't hoisted, its deps may have been so we should still
+    // re-deduplicate it.
+    return this.deduplicateStep(step);
+  }
+
   private hoistSteps() {
-    this.processSteps("hoist", 0, "dependencies-first", (step) => {
-      this.hoistStep(step);
-      // Even if step wasn't hoisted, its deps may have been so we should still
-      // re-deduplicate it.
-      return this.deduplicateStep(step);
-    });
+    this.processSteps(
+      "hoist",
+      0,
+      "dependencies-first",
+      this.hoistAndDeduplicate,
+    );
   }
 
   private pushDownSteps() {
-    this.processSteps("pushDown", 0, "dependents-first", (step) => {
-      this.pushDown(step);
-      return step;
-    });
+    this.processSteps("pushDown", 0, "dependents-first", this.pushDown);
   }
 
   private getStepOptionsForStep(step: ExecutableStep): StepOptions {

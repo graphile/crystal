@@ -3,17 +3,23 @@ import type { LayerPlan } from "../LayerPlan";
 let globalData_layerPlan: LayerPlan | null = null;
 let globalData_polymorphicPaths: ReadonlySet<string> | null = null;
 
-export function withGlobalLayerPlan<T>(
+export function withGlobalLayerPlan<
+  T,
+  TThis = any,
+  TArgs extends [...args: any[]] = [...args: any[]],
+>(
   layerPlan: LayerPlan,
   polymorphicPaths: ReadonlySet<string>,
-  callback: () => T,
+  callback: (this: TThis, ...args: TArgs) => T,
+  callbackThis?: TThis,
+  ...callbackArgs: TArgs
 ): T {
   const oldLayerPlan = globalData_layerPlan;
   globalData_layerPlan = layerPlan;
   const oldPolymorphicPaths = globalData_polymorphicPaths;
   globalData_polymorphicPaths = polymorphicPaths;
   try {
-    return callback();
+    return callback.apply(callbackThis as TThis, callbackArgs);
   } finally {
     globalData_layerPlan = oldLayerPlan;
     globalData_polymorphicPaths = oldPolymorphicPaths;
