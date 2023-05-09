@@ -472,147 +472,28 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 }
 
-function executeSafe0(
-  this: UnbatchedExecutableStep,
-  count: number,
-  _values: ReadonlyArray<GrafastValuesList<any>>,
-  extra: ExecutionExtra,
-): GrafastResultsList<any> {
-  const results = [];
-  for (let i = 0; i < count; i++) {
-    results[i] = this.unbatchedExecute(extra);
+function _buildOptimizedExecuteExpression(
+  depCount: number,
+  isSyncAndSafe: boolean,
+) {
+  const depIndexes = [];
+  for (let i = 0; i < depCount; i++) {
+    depIndexes.push(i);
   }
-  return results;
-}
-
-function executeUnsafe0(
-  this: UnbatchedExecutableStep,
-  count: number,
-  _values: ReadonlyArray<GrafastValuesList<any>>,
-  extra: ExecutionExtra,
-): GrafastResultsList<any> {
-  const results = [];
-  for (let i = 0; i < count; i++) {
+  const tryOrNot = (inFrag: TE): TE => {
+    if (isSyncAndSafe) {
+      return inFrag;
+    } else {
+      return te`\
     try {
-      results[i] = this.unbatchedExecute(extra);
+  ${te.indent(inFrag)}
     } catch (e) {
       results[i] = e instanceof Error ? e : Promise.reject(e);
-    }
-  }
-  return results;
-}
-
-function executeSafe1(
-  this: UnbatchedExecutableStep,
-  count: number,
-  values: ReadonlyArray<GrafastValuesList<any>>,
-  extra: ExecutionExtra,
-): GrafastResultsList<any> {
-  const [list0] = values;
-  const results = [];
-  for (let i = 0; i < count; i++) {
-    results[i] = this.unbatchedExecute(extra, list0[i]);
-  }
-  return results;
-}
-
-function executeUnsafe1(
-  this: UnbatchedExecutableStep,
-  count: number,
-  values: ReadonlyArray<GrafastValuesList<any>>,
-  extra: ExecutionExtra,
-): GrafastResultsList<any> {
-  const [list0] = values;
-  const results = [];
-  for (let i = 0; i < count; i++) {
-    try {
-      results[i] = this.unbatchedExecute(extra, list0[i]);
-    } catch (e) {
-      results[i] = e instanceof Error ? e : Promise.reject(e);
-    }
-  }
-  return results;
-}
-
-function executeSafe2(
-  this: UnbatchedExecutableStep,
-  count: number,
-  values: ReadonlyArray<GrafastValuesList<any>>,
-  extra: ExecutionExtra,
-): GrafastResultsList<any> {
-  const [list0, list1] = values;
-  const results = [];
-  for (let i = 0; i < count; i++) {
-    results[i] = this.unbatchedExecute(extra, list0[i], list1[i]);
-  }
-  return results;
-}
-
-function executeUnsafe2(
-  this: UnbatchedExecutableStep,
-  count: number,
-  values: ReadonlyArray<GrafastValuesList<any>>,
-  extra: ExecutionExtra,
-): GrafastResultsList<any> {
-  const [list0, list1] = values;
-  const results = [];
-  for (let i = 0; i < count; i++) {
-    try {
-      results[i] = this.unbatchedExecute(extra, list0[i], list1[i]);
-    } catch (e) {
-      results[i] = e instanceof Error ? e : Promise.reject(e);
-    }
-  }
-  return results;
-}
-
-export abstract class UnbatchedExecutableStep<
-  TData = any,
-> extends ExecutableStep<TData> {
-  static $$export = {
-    moduleName: "grafast",
-    exportName: "UnbatchedExecutableStep",
-  };
-
-  finalize() {
-    // If they've not replaced 'execute', use our optimized form
-    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
-      // Handle the common cases to avoid unnecessary eval
-      if (this.dependencies.length === 0) {
-        if (this.isSyncAndSafe) {
-          this.execute = executeSafe0;
-        } else {
-          this.execute = executeUnsafe0;
-        }
-      } else if (this.dependencies.length === 1) {
-        if (this.isSyncAndSafe) {
-          this.execute = executeSafe1;
-        } else {
-          this.execute = executeUnsafe1;
-        }
-      } else if (this.dependencies.length === 2) {
-        if (this.isSyncAndSafe) {
-          this.execute = executeSafe2;
-        } else {
-          this.execute = executeUnsafe2;
-        }
-      } else {
-        const depIndexes = this.dependencies.map((_, i) => i);
-        const tryOrNot = (inFrag: TE): TE => {
-          if (this.isSyncAndSafe) {
-            return inFrag;
-          } else {
-            return te`\
-      try {
-${te.indent(inFrag)}
-      } catch (e) {
-        results[i] = e instanceof Error ? e : Promise.reject(e);
-      }
+    }\
 `;
-          }
-        };
-        te.runInBatch<any>(
-          te`\
+    }
+  };
+  return te`\
 (function execute(count, values, extra) {
   const [
 ${te.join(
@@ -626,16 +507,66 @@ ${tryOrNot(te`\
     results[i] = this.unbatchedExecute(extra, ${te.join(
       depIndexes.map((depIndex) => te`${te.identifier(`list${depIndex}`)}[i]`),
       ", ",
-    )});
-`)}\
+    )});\
+`)}
   }
   return results;
-})`,
-          (fn) => {
-            this.execute = fn;
-          },
-        );
-      }
+})`;
+}
+
+const MAX_DEPENDENCIES_TO_CACHE = 10;
+const unsafeCache: any[] = [];
+const safeCache: any[] = [];
+te.batch(() => {
+  for (let i = 0; i <= MAX_DEPENDENCIES_TO_CACHE; i++) {
+    const depCount = i;
+    const unsafeExpression = _buildOptimizedExecuteExpression(depCount, false);
+    te.runInBatch(unsafeExpression, (fn) => {
+      unsafeCache[depCount] = fn;
+    });
+    const safeExpression = _buildOptimizedExecuteExpression(depCount, true);
+    te.runInBatch(safeExpression, (fn) => {
+      safeCache[depCount] = fn;
+    });
+  }
+});
+
+function buildOptimizedExecute(
+  depCount: number,
+  isSyncAndSafe: boolean,
+  callback: (fn: any) => void,
+) {
+  // Try and satisfy from cache
+  const cache = isSyncAndSafe ? safeCache : unsafeCache;
+  if (depCount <= MAX_DEPENDENCIES_TO_CACHE) {
+    return cache[depCount];
+  }
+
+  // Build it
+  const expression = _buildOptimizedExecuteExpression(depCount, isSyncAndSafe);
+  te.runInBatch<any>(expression, (fn) => {
+    callback(fn);
+  });
+}
+
+export abstract class UnbatchedExecutableStep<
+  TData = any,
+> extends ExecutableStep<TData> {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "UnbatchedExecutableStep",
+  };
+
+  finalize() {
+    // If they've not replaced 'execute', use our optimized form
+    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
+      buildOptimizedExecute(
+        this.dependencies.length,
+        this.isSyncAndSafe,
+        (fn) => {
+          this.execute = fn;
+        },
+      );
     }
     super.finalize();
   }
