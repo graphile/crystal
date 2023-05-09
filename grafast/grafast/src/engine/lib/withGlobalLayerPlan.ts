@@ -8,21 +8,15 @@ export function withGlobalLayerPlan<T>(
   polymorphicPaths: ReadonlySet<string>,
   callback: () => T,
 ): T {
-  const oldGlobalData = globalData_layerPlan
-    ? {
-        layerPlan: globalData_layerPlan,
-        polymorphicPaths: globalData_polymorphicPaths,
-      }
-    : null;
+  const oldLayerPlan = globalData_layerPlan;
   globalData_layerPlan = layerPlan;
+  const oldPolymorphicPaths = globalData_polymorphicPaths;
   globalData_polymorphicPaths = polymorphicPaths;
   try {
     return callback();
   } finally {
-    if (oldGlobalData !== null) {
-      globalData_layerPlan = oldGlobalData.layerPlan;
-      globalData_polymorphicPaths = oldGlobalData.polymorphicPaths;
-    }
+    globalData_layerPlan = oldLayerPlan;
+    globalData_polymorphicPaths = oldPolymorphicPaths;
   }
 }
 
