@@ -168,7 +168,7 @@ ${te.join(
 `;
     return te.runInBatch<Parameters<typeof callback>[0]>(
       te`\
-return function ({ meta }, ${te.join(
+(function ({ meta }, ${te.join(
         this.keys.map((_k, i) => te.identifier(`val${i}`)),
         ", ",
       )}) {
@@ -198,8 +198,7 @@ ${inner}
   // Only cache 10 results, use a round-robin
   meta.nextIndex = meta.nextIndex === 9 ? 0 : meta.nextIndex + 1;
   return newObj;
-}
-`,
+})`,
       callback,
     );
   }

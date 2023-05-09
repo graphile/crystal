@@ -498,8 +498,8 @@ ${te.indent(inFrag)}
         }
       };
       te.runInBatch<any>(
-        te`
-return function execute(count, values, extra) {
+        te`\
+(function execute(count, values, extra) {
   const [
 ${te.join(
   depIndexes.map((i) => te`    ${te.identifier(`list${i}`)},\n`),
@@ -516,8 +516,7 @@ ${tryOrNot(te`\
 `)}\
   }
   return results;
-}
-`,
+})`,
         (fn) => {
           this.execute = fn;
         },

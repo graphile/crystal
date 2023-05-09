@@ -884,7 +884,7 @@ function batch(callback: () => void): void {
     activeBatch = null;
   }
   const finalCode = te`return [\n${te.join(
-    batch.map((entry, i) => te`(function(){\n${entry.fragment}\n})()`),
+    batch.map((entry) => entry.fragment),
     ",\n",
   )}\n];`;
   const result = te.run<any[]>(finalCode);

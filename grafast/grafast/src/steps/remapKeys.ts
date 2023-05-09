@@ -25,12 +25,12 @@ function makeMapper(
   ) {
     // We can do a fast custom conversion
     return te.runInBatch<any>(
-      te`return function(obj) {
+      te`(function(obj) {
   return (obj == null ? obj : { ${te.join(
     entries.map(([key, val]) => te`${te.dangerousKey(key)}: obj${te.get(val)}`),
     ", ",
   )} });
-}`,
+})`,
       callback,
     );
   }

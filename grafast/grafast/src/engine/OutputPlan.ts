@@ -447,9 +447,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         );
         const [expression, fallback] = expressionDetails;
         te.runInBatch<(value: any) => any>(
-          te`return value => (value${expression})${
+          te`(value => (value${expression})${
             fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
-          };`,
+          })`,
           (fn) => {
             this.processRoot = fn;
           },
@@ -775,8 +775,8 @@ function makeExecutor(
   preamble: TE = te.blank,
   callback?: (fn: any) => void,
 ): any {
-  const expression = te`
-return function compiledOutputPlan${
+  const expression = te`\
+(function compiledOutputPlan${
     asString ? te.cache`String` : te.blank
   }_${nameExtra}(
   root,
@@ -799,11 +799,11 @@ ${preamble}\
     throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
-}`;
+})`;
   if (callback) {
     te.runInBatch(expression, callback);
   } else {
-    return te.run(expression);
+    return te.run(te`return ${expression}`);
   }
 }
 

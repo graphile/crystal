@@ -348,11 +348,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     inner: TE,
     callback: (fn: typeof this.newBucket) => void,
   ): void {
+    const ref_layerPlan = te.ref(this, "layerPlan");
+    const ref_newBucket = te.ref(newBucket, "newBucket");
     return te.runInBatch(
       te`\
-const that = ${te.ref(this)};
-const newBucket = ${te.ref(newBucket)};
-return function ${te.identifier(`newBucket${this.id}`)}(parentBucket) {
+(function ${te.identifier(`newBucket${this.id}`)}(parentBucket) {
   const store = new Map();
   const polymorphicPathList = ${
     this.reason.type === "mutationField"
@@ -366,8 +366,8 @@ ${inner}
 
   if (size > 0) {
     // Reference
-    const childBucket = newBucket({
-      layerPlan: that,
+    const childBucket = ${ref_newBucket}({
+      layerPlan: ${ref_layerPlan},
       size,
       store,
       // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
@@ -384,8 +384,7 @@ ${inner}
   } else {
     return null;
   }
-}
-`,
+})`,
       callback,
     );
   }

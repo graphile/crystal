@@ -112,11 +112,11 @@ function constructDestructureFunction(
       // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
       te.runInBatch<any>(
         te`\
-return function quicklyExtractValueAtPath(extra, value) {
+(function quicklyExtractValueAtPath(extra, value) {
   return (value${expression})${
           fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
         };
-};`,
+})`,
         (quicklyExtractValueAtPath) => {
           // JIT this for great performance.
           quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;

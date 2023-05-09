@@ -67,7 +67,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
 
   finalize() {
     te.runInBatch<typeof this.unbatchedExecute>(
-      te`return function (extra, ${te.join(
+      te`(function (extra, ${te.join(
         this.dependencies.map((_, dependencyIndex) =>
           te.identifier(`val${dependencyIndex}`),
         ),
@@ -89,7 +89,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     "\n",
   )}
   return resultValues;
-}`,
+})`,
       (fn) => {
         this.unbatchedExecute = fn;
       },
