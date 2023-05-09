@@ -11,6 +11,40 @@ import { UnbatchedExecutableStep } from "../step.js";
 /** @internal */
 export const expressionSymbol = Symbol("expression");
 
+function access1(key1: number | string | symbol, fallback: any) {
+  if (fallback !== undefined) {
+    return function quicklyAccessKey1WithFallback(
+      _extra: ExecutionExtra,
+      value: any,
+    ) {
+      return value?.[key1] ?? fallback;
+    };
+  } else {
+    return function quicklyAccessKey1(_extra: ExecutionExtra, value: any) {
+      return value?.[key1];
+    };
+  }
+}
+
+function access2(
+  key1: number | string | symbol,
+  key2: number | string | symbol,
+  fallback: any,
+) {
+  if (fallback !== undefined) {
+    return function quicklyAccessKey2WithFallback(
+      _extra: ExecutionExtra,
+      value: any,
+    ) {
+      return value?.[key1]?.[key2] ?? fallback;
+    };
+  } else {
+    return function quicklyAccessKey2(_extra: ExecutionExtra, value: any) {
+      return value?.[key1]?.[key2];
+    };
+  }
+}
+
 /**
  * Returns a function that will extract the value at the given path from an
  * incoming object. If possible it will return a dynamically constructed
@@ -60,21 +94,36 @@ function constructDestructureFunction(
   } else {
     // ?.blah?.bog?.["!!!"]?.[0]
     const expression = te.join(jitParts, "");
+    const expressionDetail = [expression, fallback];
 
-    // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
-    te.runInBatch<any>(
-      te`\
+    if (path.length === 1) {
+      const quicklyExtractValueAtPath = access1(path[0], fallback) as any;
+      quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
+      callback(quicklyExtractValueAtPath);
+    } else if (path.length === 2) {
+      const quicklyExtractValueAtPath = access2(
+        path[0],
+        path[1],
+        fallback,
+      ) as any;
+      quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
+      callback(quicklyExtractValueAtPath);
+    } else {
+      // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
+      te.runInBatch<any>(
+        te`\
 return function quicklyExtractValueAtPath(extra, value) {
   return (value${expression})${
-        fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
-      };
+          fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
+        };
 };`,
-      (quicklyExtractValueAtPath) => {
-        // JIT this for great performance.
-        quicklyExtractValueAtPath[expressionSymbol] = [expression, fallback];
-        callback(quicklyExtractValueAtPath);
-      },
-    );
+        (quicklyExtractValueAtPath) => {
+          // JIT this for great performance.
+          quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
+          callback(quicklyExtractValueAtPath);
+        },
+      );
+    }
   }
 }
 
