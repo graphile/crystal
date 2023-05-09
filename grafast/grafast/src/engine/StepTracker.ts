@@ -326,9 +326,10 @@ export class StepTracker {
       // Transfer step dependents of $original to $replacement
       const dependents = $original.dependents;
       const replacementDependents = writeableArray($replacement.dependents);
-      for (const { step: $dependent, dependencyIndex } of dependents) {
-        writeableArray($dependent.dependencies)[dependencyIndex] = $replacement;
-        replacementDependents.push({ step: $dependent, dependencyIndex });
+      for (const dependent of dependents) {
+        writeableArray(dependent.step.dependencies)[dependent.dependencyIndex] =
+          $replacement;
+        replacementDependents.push(dependent);
       }
       ($original.dependents as any) = [];
     }
@@ -418,16 +419,15 @@ export class StepTracker {
    * Return true if this step can be tree-shaken.
    */
   private isNotNeeded($step: ExecutableStep): boolean {
+    if ($step.dependents.length !== 0) return false;
+    if ($step.hasSideEffects) return false;
     const s1 = this.outputPlansByRootStep.get($step);
+    if (s1 && s1.size !== 0) return false;
     const s2 = this.layerPlansByRootStep.get($step);
+    if (s2 && s2.size !== 0) return false;
     const s3 = this.layerPlansByParentStep.get($step);
-    return (
-      $step.dependents.length === 0 &&
-      !$step.hasSideEffects &&
-      (!s1 || s1.size === 0) &&
-      (!s2 || s2.size === 0) &&
-      (!s3 || s3.size === 0)
-    );
+    if (s3 && s3.size !== 0) return false;
+    return true;
   }
 
   /**
