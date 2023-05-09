@@ -472,6 +472,100 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 }
 
+function executeSafe0(
+  this: UnbatchedExecutableStep,
+  count: number,
+  _values: ReadonlyArray<GrafastValuesList<any>>,
+  extra: ExecutionExtra,
+): GrafastResultsList<any> {
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    results[i] = this.unbatchedExecute(extra);
+  }
+  return results;
+}
+
+function executeUnsafe0(
+  this: UnbatchedExecutableStep,
+  count: number,
+  _values: ReadonlyArray<GrafastValuesList<any>>,
+  extra: ExecutionExtra,
+): GrafastResultsList<any> {
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    try {
+      results[i] = this.unbatchedExecute(extra);
+    } catch (e) {
+      results[i] = e instanceof Error ? e : Promise.reject(e);
+    }
+  }
+  return results;
+}
+
+function executeSafe1(
+  this: UnbatchedExecutableStep,
+  count: number,
+  values: ReadonlyArray<GrafastValuesList<any>>,
+  extra: ExecutionExtra,
+): GrafastResultsList<any> {
+  const [list0] = values;
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    results[i] = this.unbatchedExecute(extra, list0[i]);
+  }
+  return results;
+}
+
+function executeUnsafe1(
+  this: UnbatchedExecutableStep,
+  count: number,
+  values: ReadonlyArray<GrafastValuesList<any>>,
+  extra: ExecutionExtra,
+): GrafastResultsList<any> {
+  const [list0] = values;
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    try {
+      results[i] = this.unbatchedExecute(extra, list0[i]);
+    } catch (e) {
+      results[i] = e instanceof Error ? e : Promise.reject(e);
+    }
+  }
+  return results;
+}
+
+function executeSafe2(
+  this: UnbatchedExecutableStep,
+  count: number,
+  values: ReadonlyArray<GrafastValuesList<any>>,
+  extra: ExecutionExtra,
+): GrafastResultsList<any> {
+  const [list0, list1] = values;
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    results[i] = this.unbatchedExecute(extra, list0[i], list1[i]);
+  }
+  return results;
+}
+
+function executeUnsafe2(
+  this: UnbatchedExecutableStep,
+  count: number,
+  values: ReadonlyArray<GrafastValuesList<any>>,
+  extra: ExecutionExtra,
+): GrafastResultsList<any> {
+  const [list0, list1] = values;
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    try {
+      results[i] = this.unbatchedExecute(extra, list0[i], list1[i]);
+    } catch (e) {
+      results[i] = e instanceof Error ? e : Promise.reject(e);
+    }
+  }
+  return results;
+}
+
 export abstract class UnbatchedExecutableStep<
   TData = any,
 > extends ExecutableStep<TData> {
@@ -483,22 +577,42 @@ export abstract class UnbatchedExecutableStep<
   finalize() {
     // If they've not replaced 'execute', use our optimized form
     if (this.execute === UnbatchedExecutableStep.prototype.execute) {
-      const depIndexes = this.dependencies.map((_, i) => i);
-      const tryOrNot = (inFrag: TE): TE => {
+      // Handle the common cases to avoid unnecessary eval
+      if (this.dependencies.length === 0) {
         if (this.isSyncAndSafe) {
-          return inFrag;
+          this.execute = executeSafe0;
         } else {
-          return te`\
+          this.execute = executeUnsafe0;
+        }
+      } else if (this.dependencies.length === 1) {
+        if (this.isSyncAndSafe) {
+          this.execute = executeSafe1;
+        } else {
+          this.execute = executeUnsafe1;
+        }
+      } else if (this.dependencies.length === 2) {
+        if (this.isSyncAndSafe) {
+          this.execute = executeSafe2;
+        } else {
+          this.execute = executeUnsafe2;
+        }
+      } else {
+        const depIndexes = this.dependencies.map((_, i) => i);
+        const tryOrNot = (inFrag: TE): TE => {
+          if (this.isSyncAndSafe) {
+            return inFrag;
+          } else {
+            return te`\
       try {
 ${te.indent(inFrag)}
       } catch (e) {
         results[i] = e instanceof Error ? e : Promise.reject(e);
       }
 `;
-        }
-      };
-      te.runInBatch<any>(
-        te`\
+          }
+        };
+        te.runInBatch<any>(
+          te`\
 (function execute(count, values, extra) {
   const [
 ${te.join(
@@ -517,10 +631,11 @@ ${tryOrNot(te`\
   }
   return results;
 })`,
-        (fn) => {
-          this.execute = fn;
-        },
-      );
+          (fn) => {
+            this.execute = fn;
+          },
+        );
+      }
     }
     super.finalize();
   }
