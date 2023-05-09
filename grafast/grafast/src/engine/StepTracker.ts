@@ -300,7 +300,7 @@ export class StepTracker {
     this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($original)) {
       // OPTIMIZE: seems like there's unnecessary work being done here.
-      // console.warn(`${$original} should be replaced with ${$replacement} but it's no longer alive`);
+      // console.trace(`${$original} should be replaced with ${$replacement} but it's no longer alive`);
 
       // Already handled
       return;
