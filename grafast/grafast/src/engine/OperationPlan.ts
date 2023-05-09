@@ -2744,16 +2744,13 @@ ${te.join(
         this.deduplicateStepsProcess(processed, start, dep);
       }
     }
-    const replacementStep = withGlobalLayerPlan(
+    withGlobalLayerPlan(
       step.layerPlan,
       step.polymorphicPaths,
       this.deduplicateStep,
       this,
       step,
     );
-    if (replacementStep != step) {
-      this.replaceStep(step, replacementStep);
-    }
   }
 
   /**
