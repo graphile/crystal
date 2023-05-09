@@ -2624,7 +2624,7 @@ ${te.join(
     // planned, which the step class may want to acknowledge by locking certain
     // facets of its functionality (such as adding filters). We'll simplify its
     // work though by giving it an empty array to filter.
-    const equivalentSteps = step.deduplicate(peers);
+    const equivalentSteps = step.deduplicate!(peers);
     if (equivalentSteps.length === 0) {
       // No other equivalents
       return null;
@@ -2659,6 +2659,7 @@ ${te.join(
   }
 
   private deduplicateStep(step: ExecutableStep): ExecutableStep {
+    if (!step.deduplicate) return step;
     const result = this._deduplicateInnerLogic(step);
     if (result == null) {
       return step;
@@ -2681,12 +2682,12 @@ ${te.join(
 
     // Give the steps a chance to pass their responsibilities to the winner.
     if (winner !== step) {
-      step.deduplicatedWith(winner);
+      step.deduplicatedWith?.(winner);
       this.stepTracker.replaceStep(step, winner);
     }
     for (const target of equivalentSteps) {
       if (winner !== target) {
-        target.deduplicatedWith(winner);
+        target.deduplicatedWith?.(winner);
         this.stepTracker.replaceStep(target, winner);
       }
     }
@@ -2736,6 +2737,7 @@ ${te.join(
         this.deduplicateStepsProcess(processed, start, dep);
       }
     }
+    if (!step.deduplicate) return;
     withGlobalLayerPlan(
       step.layerPlan,
       step.polymorphicPaths,
@@ -2778,7 +2780,7 @@ ${te.join(
     this.hoistStep(step);
     // Even if step wasn't hoisted, its deps may have been so we should still
     // re-deduplicate it.
-    return this.deduplicateStep(step);
+    return step.deduplicate ? this.deduplicateStep(step) : step;
   }
 
   private hoistSteps() {
@@ -2817,9 +2819,14 @@ ${te.join(
    * a different plan.
    */
   private optimizeStep(inStep: ExecutableStep): ExecutableStep {
-    const step = inStep.allowMultipleOptimizations
-      ? this.deduplicateStep(inStep)
-      : inStep;
+    const step =
+      inStep.allowMultipleOptimizations && inStep.deduplicate
+        ? this.deduplicateStep(inStep)
+        : inStep;
+    if (!step.optimize) {
+      step.isOptimized = true;
+      return step;
+    }
     if (step.isOptimized && !step.allowMultipleOptimizations) {
       return step;
     }

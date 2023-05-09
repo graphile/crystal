@@ -381,26 +381,22 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * If you need to transform the peer to be equivalent you should do so via
    * the `deduplicatedWith` callback later.
    */
-  public deduplicate(
+  public deduplicate?(
     _peers: readonly ExecutableStep[],
-  ): readonly ExecutableStep[] {
-    return [];
-  }
+  ): readonly ExecutableStep[];
 
   /**
    * If this plan is replaced via deduplication, this method gives it a chance
    * to hand over its responsibilities to its replacement.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public deduplicatedWith(replacement: ExecutableStep): void {}
+  public deduplicatedWith?(replacement: ExecutableStep): void;
 
   /**
    * Our chance to optimise the plan (which could go as far as to inline the
    * plan into the parent plan).
    */
-  public optimize(_options: StepOptimizeOptions): ExecutableStep {
-    return this;
-  }
+  public optimize?(_options: StepOptimizeOptions): ExecutableStep;
 
   public finalize() {
     if (typeof (this as any).isSyncAndSafe !== "boolean") {
