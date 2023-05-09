@@ -2753,6 +2753,9 @@ ${te.join(
    * our child plans would be expecting.
    */
   private deduplicateSteps() {
+    if (this.maxDeduplicatedStepId === this.stepTracker.stepCount - 1) {
+      return;
+    }
     this.processSteps(
       "deduplicate",
       this.maxDeduplicatedStepId + 1,
