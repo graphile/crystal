@@ -1,13 +1,13 @@
-import {
+import { execute, isAsyncIterable } from "grafast";
+import type {
   ExecutionPatchResult,
   ExecutionResult,
   GraphQLSchema,
-  parse,
-  validate,
 } from "graphql";
-import { execute, isAsyncIterable } from "grafast";
-import { BenchOperation, GrafastBenchSetupResult } from "./interfaces.js";
+import { parse, validate } from "graphql";
 import { EventEmitter } from "node:stream";
+
+import type { BenchOperation, GrafastBenchSetupResult } from "./interfaces.js";
 export { GrafastBenchConfig } from "./interfaces.js";
 
 const grafastMetricsEmitter = new EventEmitter();
@@ -48,8 +48,6 @@ export async function bench(
 
   const setupResult = await setup();
   try {
-    debugger;
-    console.profile();
     for (let i = 0; i < 200; i++) {
       for (const operation of operations) {
         const document = parse(operation.source);
@@ -114,13 +112,13 @@ export async function bench(
       const planning = focus.planning!;
       let min = Infinity;
       let max = 0;
-      let sum = 0;
+      // let sum = 0;
       const laps = focus.laps;
       for (const timing of timings) {
         const { elapsed } = timing;
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;
-        sum += elapsed;
+        // sum += elapsed;
       }
       planningTotal += planning;
       executionTotal += focus.elapsed;
@@ -156,7 +154,6 @@ export async function bench(
         }),
       ),
     });
-    console.profileEnd();
     console.table(tableData);
     console.dir(tableData[tableData.length - 1]);
   } finally {

@@ -261,6 +261,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    * An optimization for OperationPlan.getPeers; this tracks the steps in this
    * layer plan, grouped by their step class.
    */
+  // eslint-disable-next-line @typescript-eslint/ban-types
   stepsByConstructor: Map<Function, Set<ExecutableStep>>;
 
   constructor(

@@ -33,7 +33,7 @@ import {
   graphqlCollectFields,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import { ModifierStep } from "../index.js";
+import type { ModifierStep } from "../index.js";
 import {
   __ItemStep,
   __TrackedValueStep,
@@ -56,6 +56,7 @@ import { $$proxy } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
+import type { GrafastPrepareOptions } from "../prepare.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
 import {
   $$noExec,
@@ -80,11 +81,10 @@ import type {
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
-import { isDeferredLayerPlan, LayerPlan } from "./LayerPlan.js";
+import { LayerPlan } from "./LayerPlan.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
-import { GrafastPrepareOptions } from "../prepare.js";
 
 const EMPTY_ARRAY: readonly never[] = Object.freeze([]);
 
@@ -2189,7 +2189,7 @@ ${te.join(
             }
           }
         }
-        let d = dep.layerPlan.depth;
+        const d = dep.layerPlan.depth;
         if (d > minDepth) {
           minDepth = d;
         }

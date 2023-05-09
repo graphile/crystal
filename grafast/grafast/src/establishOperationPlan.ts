@@ -13,7 +13,7 @@ import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
 } from "./interfaces.js";
-import { GrafastPrepareOptions } from "./prepare.js";
+import type { GrafastPrepareOptions } from "./prepare.js";
 
 const debug = debugFactory("grafast:establishOperationPlan");
 

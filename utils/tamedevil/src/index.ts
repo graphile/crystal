@@ -1054,6 +1054,8 @@ const te = teBase as TamedEvil;
 export default te;
 
 export {
+  batch,
+  cache,
   compile,
   dangerousKey,
   dangerouslyIncludeRawCode,
@@ -1068,12 +1070,10 @@ export {
   ref,
   run,
   runInBatch,
-  batch,
   set,
   subcomment,
   substring,
   te,
-  cache,
   tempVar,
   tmp,
   undefinedNode as undefined,

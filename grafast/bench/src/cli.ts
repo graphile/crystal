@@ -1,11 +1,13 @@
+import { glob } from "glob";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
-import { GrafastBenchConfig, bench } from ".";
 import { isSchema } from "graphql";
-import { glob } from "glob";
 import * as fsp from "node:fs/promises";
 import * as path from "node:path";
+
+import type { GrafastBenchConfig } from ".";
+import { bench } from ".";
 
 export function options(yargs: Argv) {
   return yargs
