@@ -1928,7 +1928,7 @@ ${te.join(
     const valueStep = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
-      () => new __ValueStep(),
+      newValueStepCallback,
     );
     const trackedObjectStep = withGlobalLayerPlan(
       this.rootLayerPlan,
