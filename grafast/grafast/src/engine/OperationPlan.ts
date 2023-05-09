@@ -2746,8 +2746,8 @@ ${te.join(
    */
   private deduplicateSteps() {
     // TODO: Creating steps during deduplicate is forbidden, we should add code to enforce this
-    const start = this.stepTracker.lastDeduplicatedStepId + 1;
-    const end = this.stepTracker.stepCount - 1;
+    const start = this.stepTracker.nextStepIdToDeduplicate;
+    const end = this.stepTracker.stepCount;
     if (end === start) {
       return;
     }
@@ -2765,11 +2765,8 @@ ${te.join(
         this.replaceStep(step, replacementStep);
       }
     };
-    for (let i = start; i <= end; i++) {
+    for (let i = start; i < end; i++) {
       const step = this.stepTracker.stepById[i];
-      if (!step) {
-        throw new Error(`No step '${i}'`);
-      }
       if (processed.has(step)) continue;
       for (const dep of step.dependencies) {
         if (dep.id >= start && !processed.has(dep)) {
@@ -2779,7 +2776,7 @@ ${te.join(
       process(step);
     }
 
-    this.stepTracker.lastDeduplicatedStepId = end;
+    this.stepTracker.nextStepIdToDeduplicate = end;
   }
 
   private hoistAndDeduplicate(step: ExecutableStep) {
