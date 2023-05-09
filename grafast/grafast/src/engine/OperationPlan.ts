@@ -123,6 +123,9 @@ const timeSource =
     ? performance
     : Date;
 
+const REASON_ROOT = Object.freeze({ type: "root" });
+const newValueStepCallback = () => new __ValueStep();
+
 export class OperationPlan {
   public readonly queryType: GraphQLObjectType;
   public readonly mutationType: GraphQLObjectType | null;
@@ -280,7 +283,7 @@ export class OperationPlan {
     this.rootLayerPlan = new LayerPlan(
       this,
       null,
-      { type: "root" },
+      REASON_ROOT,
       POLYMORPHIC_ROOT_PATHS,
     );
 
@@ -289,7 +292,7 @@ export class OperationPlan {
     const rootSelectionSetStep = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
-      () => new __ValueStep(),
+      newValueStepCallback,
     );
     this.rootLayerPlan.setRootStep(rootSelectionSetStep);
 
