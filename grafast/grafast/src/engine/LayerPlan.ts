@@ -348,7 +348,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     inner: TE,
     callback: (fn: typeof this.newBucket) => void,
   ): void {
-    const ref_layerPlan = te.ref(this, "layerPlan");
+    const ref_layerPlan = te.ref(this, `layerPlan${this.id}`);
     const ref_newBucket = te.ref(newBucket, "newBucket");
     return te.runInBatch(
       te`\
