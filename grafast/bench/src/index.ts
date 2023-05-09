@@ -156,6 +156,7 @@ export async function bench(
         }),
       ),
     });
+    console.profileEnd();
     console.table(tableData);
     console.dir(tableData[tableData.length - 1]);
   } finally {
