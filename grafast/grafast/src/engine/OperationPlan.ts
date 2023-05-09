@@ -2122,11 +2122,11 @@ ${te.join(
   /**
    * Peers are steps of the same type (but not the same step!) that are in
    * compatible layers and have the same dependencies. Peers must not have side
-   * effects.
+   * effects. A step is not its own peer.
    */
   private getPeers(step: ExecutableStep): ExecutableStep[] {
     if (step.hasSideEffects) {
-      return [step];
+      return [];
     }
 
     const {
@@ -2137,7 +2137,7 @@ ${te.join(
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
-      const allPeers: ExecutableStep[] = [step];
+      const allPeers: ExecutableStep[] = [];
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
         if (
           possiblyPeer !== step &&
@@ -2159,11 +2159,11 @@ ${te.join(
       if (dl === 1) {
         // We're the only dependent; therefore we have no peers (since peers
         // share dependencies)
-        return [step];
+        return [];
       }
 
       const minDepth = Math.max(deferBoundaryDepth, dep.layerPlan.depth);
-      const allPeers: ExecutableStep[] = [step];
+      const allPeers: ExecutableStep[] = [];
 
       for (const {
         dependencyIndex: peerDependencyIndex,
@@ -2206,7 +2206,7 @@ ${te.join(
         if (dl === 1) {
           // We're the only dependent; therefore we have no peers (since peers
           // share dependencies)
-          return [step];
+          return [];
         }
         if (dependencyIndex === dependencyCount - 1) {
           // Check the final dependency - this is likely to have the fewest
@@ -2233,7 +2233,10 @@ ${te.join(
           minDepth = d;
         }
       }
-      const allPeers: ExecutableStep[] = [step];
+      const allPeers: ExecutableStep[] = [];
+      if (possiblePeers.length === 0) {
+        return allPeers;
+      }
       outerloop: for (const possiblyPeer of possiblePeers) {
         if (possiblyPeer.layerPlan.depth < minDepth) continue;
         // We know the final dependency matches and the dependency count
@@ -2606,11 +2609,9 @@ ${te.join(
       return null;
     }
 
-    const stepOptions = this.getStepOptionsForStep(step);
-    const shouldStream = !!stepOptions?.stream;
     // OPTIMIZE: Past Benjie thought we might want to revisit this under the
     // new Grafast system. No idea what he had in mind there though...
-    if (shouldStream) {
+    if (step._stepOptions.stream) {
       // Never deduplicate streaming plans, we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
       // entries to be garbage collected).
@@ -2623,13 +2624,8 @@ ${te.join(
     // planned, which the step class may want to acknowledge by locking certain
     // facets of its functionality (such as adding filters). We'll simplify its
     // work though by giving it an empty array to filter.
-    const equivalentSteps = step.deduplicate(
-      peers.length === 1 ? EMPTY_ARRAY : peers,
-    );
-    if (
-      equivalentSteps.length === 0 ||
-      (equivalentSteps.length === 1 && equivalentSteps[0] === step)
-    ) {
+    const equivalentSteps = step.deduplicate(peers);
+    if (equivalentSteps.length === 0) {
       // No other equivalents
       return null;
     }
@@ -2641,19 +2637,15 @@ ${te.join(
         )
       ) {
         throw new Error(
-          `deduplicatePlan error: Expected to replace step ${step} with one of its (identical) peers; instead found ${equivalentSteps}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
+          `deduplicatePlan error: '${step}.deduplicate' may only return steps from its peers peers (peers = ${peers}), but it returned ${equivalentSteps}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
         );
       }
     }
 
-    const allEquivalentSteps = equivalentSteps.includes(step)
-      ? equivalentSteps
-      : [step, ...equivalentSteps];
-
     // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
-    let minDepth = Infinity;
-    let stepsAtMinDepth: ExecutableStep[] = [];
-    for (const step of allEquivalentSteps) {
+    let minDepth = step.layerPlan.depth;
+    let stepsAtMinDepth: ExecutableStep[] = [step];
+    for (const step of equivalentSteps) {
       const depth = step.layerPlan.depth;
       if (depth < minDepth) {
         minDepth = depth;
@@ -2663,7 +2655,7 @@ ${te.join(
       }
     }
     stepsAtMinDepth.sort((a, z) => a.id - z.id);
-    return { stepsAtMinDepth, allEquivalentSteps };
+    return { stepsAtMinDepth, equivalentSteps };
   }
 
   private deduplicateStep(step: ExecutableStep): ExecutableStep {
@@ -2672,30 +2664,30 @@ ${te.join(
       return step;
     }
 
-    const { stepsAtMinDepth, allEquivalentSteps } = result;
-    if (allEquivalentSteps.length === 1) {
-      const [first] = allEquivalentSteps;
-      if (first === step) {
-        return step;
-      }
-    }
+    const { stepsAtMinDepth, equivalentSteps } = result;
 
     // Hooray, one winning layer! Find the first one by id.
     const winner = stepsAtMinDepth[0];
 
-    const polymorphicPaths = new Set<string>();
-    for (const s of stepsAtMinDepth) {
-      for (const p of s.polymorphicPaths) {
-        polymorphicPaths.add(p);
+    if (winner.polymorphicPaths.size > 1 || !winner.polymorphicPaths.has("")) {
+      const polymorphicPaths = new Set<string>();
+      for (const s of stepsAtMinDepth) {
+        for (const p of s.polymorphicPaths) {
+          polymorphicPaths.add(p);
+        }
       }
+      winner.polymorphicPaths = polymorphicPaths;
     }
-    winner.polymorphicPaths = polymorphicPaths;
 
     // Give the steps a chance to pass their responsibilities to the winner.
-    for (const target of allEquivalentSteps) {
+    if (winner !== step) {
+      step.deduplicatedWith(winner);
+      this.stepTracker.replaceStep(step, winner);
+    }
+    for (const target of equivalentSteps) {
       if (winner !== target) {
         target.deduplicatedWith(winner);
-        this.replaceStep(target, winner);
+        this.stepTracker.replaceStep(target, winner);
       }
     }
 
