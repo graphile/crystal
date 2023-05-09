@@ -2597,8 +2597,6 @@ ${te.join(
   }
 
   private _deduplicateInnerLogic(step: ExecutableStep) {
-    step.isArgumentsFinalized = true;
-
     if (step.hasSideEffects) {
       // Never deduplicate plans with side effects.
       return null;
@@ -2659,6 +2657,7 @@ ${te.join(
   }
 
   private deduplicateStep(step: ExecutableStep): ExecutableStep {
+    step.isArgumentsFinalized = true;
     if (!step.deduplicate) return step;
     const result = this._deduplicateInnerLogic(step);
     if (result == null) {
@@ -2737,7 +2736,6 @@ ${te.join(
         this.deduplicateStepsProcess(processed, start, dep);
       }
     }
-    if (!step.deduplicate) return;
     withGlobalLayerPlan(
       step.layerPlan,
       step.polymorphicPaths,
