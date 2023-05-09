@@ -747,6 +747,11 @@ export function getChildBucketAndIndex(
   return [currentBucket, currentIndex];
 }
 
+const te_String = te.cache`String`;
+const te_else = te.cache` else `;
+const te_newline_indent = te.cache`\n  `;
+const te_nullIsFineComment = te.cache`// root/introspection, null is fine\n`;
+
 function makeExecutor<TAsString extends boolean>(
   inner: TE,
   nameExtra: TE,
@@ -776,9 +781,7 @@ function makeExecutor(
   callback?: (fn: any) => void,
 ): any {
   const expression = te`\
-(function compiledOutputPlan${
-    asString ? te.cache`String` : te.blank
-  }_${nameExtra}(
+(function compiledOutputPlan${asString ? te_String : te.blank}_${nameExtra}(
   root,
   mutablePath,
   bucket,
@@ -790,11 +793,11 @@ ${preamble}\
   if (bucketRootValue == null) {
     ${
       skipNullHandling
-        ? te.cache`// root/introspection, null is fine\n`
-        : te`return ${asString ? te.cache`"null"` : te.cache`null`};\n`
+        ? te_nullIsFineComment
+        : te`return ${asString ? te_nullString : te_null};\n`
     }\
   }${
-    skipNullHandling ? te.cache` else ` : te.cache`\n  `
+    skipNullHandling ? te_else : te_newline_indent
   }if (typeof bucketRootValue === 'object' && ${ref_$$error} in bucketRootValue) {
     throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
@@ -807,16 +810,21 @@ ${inner}
   }
 }
 
-const teChildBucket = te.cache`childBucket`;
-const teChildBucketIndex = te.cache`childBucketIndex`;
+const te_nullString = te.cache`"null"`;
+const te_null = te.cache`null`;
+const te_childBucket = te.cache`childBucket`;
+const te_childBucketIndex = te.cache`childBucketIndex`;
+const te_executeString = te.cache`executeString`;
+const te_execute = te.cache`execute`;
+
 function makeExecuteChildPlanCode(
   setTargetOrReturn: TE,
   locationDetails: TE,
   childOutputPlan: TE,
   isNonNull: boolean,
   asString: boolean,
-  childBucket: TE = teChildBucket,
-  childBucketIndex: TE = teChildBucketIndex,
+  childBucket: TE = te_childBucket,
+  childBucketIndex: TE = te_childBucketIndex,
 ) {
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
@@ -826,9 +834,9 @@ function makeExecuteChildPlanCode(
         throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
       }
       const fieldResult = ${childOutputPlan}.${
-      asString ? te.cache`executeString` : te.cache`execute`
+      asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
-      if (fieldResult == ${asString ? te.cache`"null"` : te.cache`null`}) {
+      if (fieldResult == ${asString ? te_nullString : te_null}) {
         throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
       }
       ${setTargetOrReturn} fieldResult;`;
@@ -837,9 +845,9 @@ function makeExecuteChildPlanCode(
     return te`
       try {
         const fieldResult = ${childBucket} == null ? ${
-      asString ? te.cache`"null"` : te.cache`null`
+      asString ? te_nullString : te_null
     } : ${childOutputPlan}.${
-      asString ? te.cache`executeString` : te.cache`execute`
+      asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
       } catch (e) {
@@ -850,7 +858,7 @@ function makeExecuteChildPlanCode(
           mutablePath.splice(pathLengthTarget, overSize);
         }
         root.errors.push(error);
-        ${setTargetOrReturn} ${asString ? te.cache`"null"` : te.cache`null`};
+        ${setTargetOrReturn} ${asString ? te_nullString : te_null};
       }`;
   }
 }
@@ -960,6 +968,8 @@ const stringLeafExecutorString = makeExecutor(
 // call overhead. Longer term it should just be read directly from a different
 // store.
 
+const te_polymorphic = te.cache`polymorphic`;
+
 function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
@@ -1000,7 +1010,7 @@ ${
   const directChild = bucket.children[childOutputPlan.layerPlan.id];
   if (directChild) {
     return childOutputPlan.${
-      asString ? te.cache`executeString` : te.cache`execute`
+      asString ? te_executeString : te_execute
     }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
   } else {
     const c = ${ref_getChildBucketAndIndex}(
@@ -1014,11 +1024,11 @@ ${
     }
     const [childBucket, childBucketIndex] = c;
     return childOutputPlan.${
-      asString ? te.cache`executeString` : te.cache`execute`
+      asString ? te_executeString : te_execute
     }(root, mutablePath, childBucket, childBucketIndex);
   }
 `,
-    te.cache`polymorphic`,
+    te_polymorphic,
     asString,
   );
 }
@@ -1035,7 +1045,7 @@ function makeArrayExecutor<TAsString extends boolean>(
     te`\
   if (!Array.isArray(bucketRootValue)) {
     console.warn(\`Hit fallback for value \${${ref_inspect}(bucketRootValue)} coercion to mode 'array'\`);
-    return ${asString ? te.cache`"null"` : te.cache`null`};
+    return ${asString ? te_nullString : te_null};
   }
 
   const childOutputPlan = this.child;
@@ -1236,6 +1246,32 @@ const introspectionExecutorString = makeExecutor(
   true,
 );
 
+const te_letStringLbrace = te.cache`let string = "{";`;
+const te_stringPlusEqualsRbrace = te.cache`  string += "}";\n`;
+const te_constObjEqualsObjectCreateNull = te.cache`const obj = Object.create(null);`;
+const te_comma = te.cache`,`;
+const te_specDotLocationDetails = te.cache`spec.locationDetails`;
+const te_specDotOutputPlan = te.cache`spec.outputPlan`;
+const te_bucket = te.cache`bucket`;
+const te_bucketIndex = te.cache`bucketIndex`;
+const te_handleDeferred = te`
+  // Everything seems okay; queue any deferred payloads
+  for (const defer of this.deferredOutputPlans) {
+    root.queue.push({
+      root,
+      path: mutablePath.slice(1),
+      bucket,
+      bucketIndex,
+      outputPlan: defer,
+      label: defer.type.deferLabel,
+    });
+  }
+`;
+
+const te_string = te.cache`string`;
+const te_object = te.cache`object`;
+const te_obj = te.cache`obj`;
+
 function makeObjectExecutor<TAsString extends boolean>(
   typeName: string,
   fieldTypes: {
@@ -1275,11 +1311,7 @@ function makeObjectExecutor<TAsString extends boolean>(
   }
 
   const inner = te`\
-  ${
-    asString
-      ? te.cache`let string = "{";`
-      : te.cache`const obj = Object.create(null);`
-  }
+  ${asString ? te_letStringLbrace : te_constObjEqualsObjectCreateNull}
   const { keys } = this;
   const { children } = bucket;
   const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
@@ -1294,7 +1326,7 @@ ${te.join(
             // not require any quoting in JSON/JS - they must conform to GraphQL
             // `Name`.
             return te`    string += \`${
-              i === 0 ? te.blank : te.cache`,`
+              i === 0 ? te.blank : te_comma
             }"${te.substring(fieldName, "`")}":"${te.substring(
               typeName,
               "`",
@@ -1314,17 +1346,17 @@ ${
     ? te`\
 ${makeExecuteChildPlanCode(
   asString
-    ? te`string += \`${i === 0 ? te.blank : te.cache`,`}"${te.substring(
+    ? te`string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
         fieldName,
         "`",
       )}":\` +`
     : te`obj${te.set(fieldName, true)} =`,
-  te.cache`spec.locationDetails`,
-  te.cache`spec.outputPlan`,
+  te_specDotLocationDetails,
+  te_specDotOutputPlan,
   fieldType === "outputPlan!",
   asString,
-  te.cache`bucket`,
-  te.cache`bucketIndex`,
+  te_bucket,
+  te_bucketIndex,
 )}`
     : te`\
       let childBucket, childBucketIndex;
@@ -1347,13 +1379,13 @@ ${makeExecuteChildPlanCode(
       }
 ${makeExecuteChildPlanCode(
   asString
-    ? te`string += \`${i === 0 ? te.blank : te.cache`,`}"${te.substring(
+    ? te`string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
         fieldName,
         "`",
       )}":\` +`
     : te`obj${te.set(fieldName, true)} =`,
-  te.cache`spec.locationDetails`,
-  te.cache`spec.outputPlan`,
+  te_specDotLocationDetails,
+  te_specDotOutputPlan,
   fieldType === "outputPlan!",
   asString,
 )}`
@@ -1373,28 +1405,12 @@ ${makeExecuteChildPlanCode(
 )}
 
   mutablePath.pop();
-${asString ? te.cache`  string += "}";\n` : te.blank}\
-${
-  hasDeferredOutputPlans
-    ? te`
-  // Everything seems okay; queue any deferred payloads
-  for (const defer of this.deferredOutputPlans) {
-    root.queue.push({
-      root,
-      path: mutablePath.slice(1),
-      bucket,
-      bucketIndex,
-      outputPlan: defer,
-      label: defer.type.deferLabel,
-    });
-  }
-`
-    : te.blank
-}
-  return ${asString ? te.cache`string` : te.cache`obj`};`;
+${asString ? te_stringPlusEqualsRbrace : te.blank}\
+${hasDeferredOutputPlans ? te_handleDeferred : te.blank}
+  return ${asString ? te_string : te_obj};`;
 
   // PERF: figure out how to memoize this. Should be able to key it on:
   // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
   // - existence of deferredOutputPlans
-  makeExecutor(inner, te.cache`object`, asString, isRoot, te.blank, callback);
+  makeExecutor(inner, te_object, asString, isRoot, te.blank, callback);
 }
