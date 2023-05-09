@@ -86,8 +86,6 @@ import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
-const EMPTY_ARRAY: readonly never[] = Object.freeze([]);
-
 export const POLYMORPHIC_ROOT_PATH = "";
 const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
   POLYMORPHIC_ROOT_PATH,
