@@ -2771,10 +2771,11 @@ ${te.join(
     if (end === start) {
       return;
     }
+
     const processed = new Set<ExecutableStep>();
     for (let i = start; i < end; i++) {
       const step = this.stepTracker.stepById[i];
-      if (processed.has(step)) continue;
+      if (step.id !== i || processed.has(step)) continue;
       this.deduplicateStepsProcess(processed, start, step);
     }
 
