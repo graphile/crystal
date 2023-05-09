@@ -142,6 +142,21 @@ export type OutputPlanKeyValueOutputPlanWithCachedBits =
     layerPlanId: number;
   };
 
+const ref_$$error = te.ref($$error, "$$error");
+const ref_coerceError = te.ref(coerceError, "coerceError");
+const ref_nonNullError = te.ref(nonNullError, "nonNullError");
+const ref_stringifyString = te.ref(stringifyString, "stringifyString");
+const ref_toJSON = te.ref(toJSON, "toJSON");
+const ref_isPolymorphicData = te.ref(isPolymorphicData, "isPolymorphicData");
+const ref_$$concreteType = te.ref($$concreteType, "$$concreteType");
+const ref_assert = te.ref(assert, "assert");
+const ref_getChildBucketAndIndex = te.ref(
+  getChildBucketAndIndex,
+  "getChildBucketAndIndex",
+);
+const ref_inspect = te.ref(inspect, "inspect");
+const ref_$$streamMore = te.ref($$streamMore, "$$streamMore");
+
 /**
  * Defines a way of taking a layerPlan and converting it into an output value.
  *
@@ -780,14 +795,8 @@ ${preamble}\
     }\
   }${
     skipNullHandling ? te.cache` else ` : te.cache`\n  `
-  }if (typeof bucketRootValue === 'object' && ${te.ref(
-    $$error,
-    "$$error",
-  )} in bucketRootValue) {
-    throw ${te.ref(
-      coerceError,
-      "coerceError",
-    )}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
+  }if (typeof bucketRootValue === 'object' && ${ref_$$error} in bucketRootValue) {
+    throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
 }`;
@@ -814,19 +823,13 @@ function makeExecuteChildPlanCode(
     // No need to catch error
     return te`
       if (${childBucket} == null) {
-        throw ${te.ref(
-          nonNullError,
-          "nonNullError",
-        )}(${locationDetails}, mutablePath.slice(1));
+        throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
       }
       const fieldResult = ${childOutputPlan}.${
       asString ? te.cache`executeString` : te.cache`execute`
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
       if (fieldResult == ${asString ? te.cache`"null"` : te.cache`null`}) {
-        throw ${te.ref(
-          nonNullError,
-          "nonNullError",
-        )}(${locationDetails}, mutablePath.slice(1));
+        throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
       }
       ${setTargetOrReturn} fieldResult;`;
   } else {
@@ -840,10 +843,7 @@ function makeExecuteChildPlanCode(
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
         ${setTargetOrReturn} fieldResult;
       } catch (e) {
-        const error = ${te.ref(
-          coerceError,
-          "coerceError",
-        )}(e, ${locationDetails}, mutablePath.slice(1));
+        const error = ${ref_coerceError}(e, ${locationDetails}, mutablePath.slice(1));
         const pathLengthTarget = mutablePathIndex + 1;
         const overSize = mutablePath.length - pathLengthTarget;
         if (overSize > 0) {
@@ -892,7 +892,7 @@ const leafExecutor = makeExecutor(
 
 const leafExecutorString = makeExecutor(
   te`\
-  return ${te.ref(toJSON, "toJSON")}(this.type.serialize(bucketRootValue));
+  return ${ref_toJSON}(this.type.serialize(bucketRootValue));
 `,
   te.cache`leaf`,
   true,
@@ -943,17 +943,14 @@ const floatLeafExecutorString = makeExecutor(
 
 const stringLeafExecutorString = makeExecutor(
   te`\
-  return ${te.ref(
-    stringifyString,
-    "stringifyString",
-  )}(this.type.serialize(bucketRootValue));
+  return ${ref_stringifyString}(this.type.serialize(bucketRootValue));
 `,
   te.cache`stringLeaf`,
   true,
   false,
   te`\
   if (typeof bucketRootValue === 'string') {
-    return ${te.ref(stringifyString, "stringifyString")}(bucketRootValue);
+    return ${ref_stringifyString}(bucketRootValue);
   }
 `,
 );
@@ -971,8 +968,8 @@ function makePolymorphicExecutor<TAsString extends boolean>(
 ${
   isDev
     ? te`\
-  if (!${te.ref(isPolymorphicData, "isPolymorphicData")}(bucketRootValue)) {
-    throw ${te.ref(coerceError, "coerceError")}(
+  if (!${ref_isPolymorphicData}(bucketRootValue)) {
+    throw ${ref_coerceError}(
       new Error(
         "GrafastInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
       ),
@@ -983,16 +980,16 @@ ${
 `
     : te.blank
 }\
-  const typeName = bucketRootValue[${te.ref($$concreteType, "$$concreteType")}];
+  const typeName = bucketRootValue[${ref_$$concreteType}];
   const childOutputPlan = this.childByTypeName[typeName];
   ${
     isDev
       ? te`{
-    ${te.ref(assert, "assert")}.ok(
+    ${ref_assert}.ok(
       typeName,
       "GrafastInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
     );
-    ${te.ref(assert, "assert")}.ok(
+    ${ref_assert}.ok(
       childOutputPlan,
       \`GrafastInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
     );
@@ -1006,7 +1003,7 @@ ${
       asString ? te.cache`executeString` : te.cache`execute`
     }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
   } else {
-    const c = ${te.ref(getChildBucketAndIndex, "getChildBucketAndIndex")}(
+    const c = ${ref_getChildBucketAndIndex}(
       childOutputPlan,
       this,
       bucket,
@@ -1037,10 +1034,7 @@ function makeArrayExecutor<TAsString extends boolean>(
   return makeExecutor(
     te`\
   if (!Array.isArray(bucketRootValue)) {
-    console.warn(\`Hit fallback for value \${${te.ref(
-      inspect,
-      "inspect",
-    )}(bucketRootValue)} coercion to mode 'array'\`);
+    console.warn(\`Hit fallback for value \${${ref_inspect}(bucketRootValue)} coercion to mode 'array'\`);
     return ${asString ? te.cache`"null"` : te.cache`null`};
   }
 
@@ -1064,7 +1058,7 @@ ${asString ? te.cache`    string = "[";\n` : te.blank}\
       if (directChild) {
         childBucketIndex = lookup[i];
       } else {
-        const c = ${te.ref(getChildBucketAndIndex, "getChildBucketAndIndex")}(
+        const c = ${ref_getChildBucketAndIndex}(
           childOutputPlan,
           this,
           bucket,
@@ -1095,10 +1089,7 @@ ${asString ? te.cache`    string += "]";\n` : te.blank}
 ${
   canStream
     ? te`\
-  const stream = bucketRootValue[${te.ref(
-    $$streamMore,
-    "$$streamMore",
-  )}] /* as | AsyncIterableIterator<any> | undefined*/;
+  const stream = bucketRootValue[${ref_$$streamMore}] /* as | AsyncIterableIterator<any> | undefined*/;
   if (stream) {
     root.streams.push({
       root,
@@ -1230,20 +1221,16 @@ const introspect = (
   return asString ? JSON.stringify(result) : result;
 };
 
+const ref_introspect = te.ref(introspect, "introspect");
+
 const introspectionExecutor = makeExecutor(
-  te`  return ${te.ref(
-    introspect,
-    "introspect",
-  )}(root, this, mutablePath, false)`,
+  te`  return ${ref_introspect}(root, this, mutablePath, false)`,
   te.cache`introspection`,
   false,
   true,
 );
 const introspectionExecutorString = makeExecutor(
-  te`  return ${te.ref(
-    introspect,
-    "introspect",
-  )}(root, this, mutablePath, true)`,
+  te`  return ${ref_introspect}(root, this, mutablePath, true)`,
   te.cache`introspection`,
   true,
   true,
@@ -1346,7 +1333,7 @@ ${makeExecuteChildPlanCode(
         childBucket = directChild.bucket;
         childBucketIndex = directChild.map.get(bucketIndex);
       } else {
-        const c = ${te.ref(getChildBucketAndIndex, "getChildBucketAndIndex")}(
+        const c = ${ref_getChildBucketAndIndex}(
           spec.outputPlan,
           this,
           bucket,

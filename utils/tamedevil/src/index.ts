@@ -175,6 +175,22 @@ function enforceValidNode(node: unknown, where?: string): TE {
   );
 }
 
+function findAvailableName(
+  refs: { [key: string]: any },
+  suggestedName: string,
+) {
+  if (!(suggestedName in refs)) {
+    return suggestedName;
+  }
+  for (let i = 0; i < 1000000; i++) {
+    const name = suggestedName + i;
+    if (!(name in refs)) {
+      return name;
+    }
+  }
+  throw new Error("Failed to find an available variable name to use");
+}
+
 const makeRef = (
   refs: { [key: string]: any },
   refMap: Map<any, string>,
@@ -192,7 +208,9 @@ const makeRef = (
       "[tamedevil] This TE statement would contain too many placeholders; tamedevil supports at most 65535 placeholders. To solve this, consider passing multiple values in using a single array or object.",
     );
   }
-  const identifier = suggestedName ?? `_$$_ref_${refCount}`;
+  const identifier = suggestedName
+    ? findAvailableName(refs, suggestedName)
+    : `_$$_ref_${refCount}`;
   refMap.set(value, identifier);
   refs[identifier] = value;
   return identifier;

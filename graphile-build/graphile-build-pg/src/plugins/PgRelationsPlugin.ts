@@ -19,7 +19,7 @@ import type {
 } from "@dataplan/pg";
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
-import { arraysMatch, connection, list, object } from "grafast";
+import { arraysMatch, connection, each, list, object } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
@@ -1017,11 +1017,18 @@ function addRelations(
 
             // ENHANCEMENT: these ensure that the variables are defined in
             // the closure, but they also output noise
-            // (`list;object;connection;sql;`) which could be eliminated.
-            prefixLines.push(te`${te.ref(list, "list")};`);
-            prefixLines.push(te`${te.ref(object, "object")};`);
-            prefixLines.push(te`${te.ref(connection, "connection")};`);
-            prefixLines.push(te`${te.ref(sql, "sql")};`);
+            // (`list;object;connection;sql;each;`) which could be eliminated.
+
+            const ref_list = te.ref(list, "list");
+            const ref_object = te.ref(object, "object");
+            const ref_connection = te.ref(connection, "connection");
+            const ref_sql = te.ref(sql, "sql");
+            const ref_each = te.ref(each, "each");
+            prefixLines.push(te`${ref_list};`);
+            prefixLines.push(te`${ref_object};`);
+            prefixLines.push(te`${ref_connection};`);
+            prefixLines.push(te`${ref_sql};`);
+            prefixLines.push(te`${ref_each};`);
 
             let isStillSingular = true;
             for (let i = 0, l = path.layers.length; i < l; i++) {
@@ -1107,7 +1114,7 @@ function addRelations(
                   remoteAttributes,
                 );
                 functionLines.push(
-                  te`  const ${newIdentifier} = each(${previousIdentifier}, (${$entry}) => ${te.identifier(
+                  te`  const ${newIdentifier} = ${ref_each}(${previousIdentifier}, (${$entry}) => ${te.identifier(
                     resourceName,
                   )}.get(${specString}));`,
                 );
@@ -1118,14 +1125,14 @@ function addRelations(
             if (isStillSingular && !single) {
               const newIdentifier = te.identifier("$list");
               functionLines.push(
-                te`  const ${newIdentifier} = list([${previousIdentifier}]);`,
+                te`  const ${newIdentifier} = ${ref_list}([${previousIdentifier}]);`,
               );
               previousIdentifier = newIdentifier;
             }
 
             if (isConnection) {
               functionLines.push(
-                te`  return connection(${previousIdentifier});`,
+                te`  return ${ref_connection}(${previousIdentifier});`,
               );
             } else {
               functionLines.push(te`  return ${previousIdentifier};`);
