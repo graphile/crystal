@@ -2733,6 +2733,29 @@ ${te.join(
    * non-deferred plans, push it a layer up.
    */
 
+  private deduplicateStepsProcess(
+    processed: Set<ExecutableStep>,
+    start: number,
+    step: ExecutableStep,
+  ) {
+    processed.add(step);
+    for (const dep of step.dependencies) {
+      if (dep.id >= start && !processed.has(dep)) {
+        this.deduplicateStepsProcess(processed, start, dep);
+      }
+    }
+    const replacementStep = withGlobalLayerPlan(
+      step.layerPlan,
+      step.polymorphicPaths,
+      this.deduplicateStep,
+      this,
+      step,
+    );
+    if (replacementStep != step) {
+      this.replaceStep(step, replacementStep);
+    }
+  }
+
   /**
    * Gives us a chance to replace nearly-duplicate plans with other existing
    * plans (and adding the necessary transforms); this means that by the time
@@ -2752,28 +2775,10 @@ ${te.join(
       return;
     }
     const processed = new Set<ExecutableStep>();
-    const process = (step: ExecutableStep) => {
-      processed.add(step);
-      for (const dep of step.dependencies) {
-        if (dep.id >= start && !processed.has(dep)) {
-          process(dep);
-        }
-      }
-      const replacementStep = withGlobalLayerPlan(
-        step.layerPlan,
-        step.polymorphicPaths,
-        this.deduplicateStep,
-        this,
-        step,
-      );
-      if (replacementStep != step) {
-        this.replaceStep(step, replacementStep);
-      }
-    };
     for (let i = start; i < end; i++) {
       const step = this.stepTracker.stepById[i];
       if (processed.has(step)) continue;
-      process(step);
+      this.deduplicateStepsProcess(processed, start, step);
     }
 
     this.stepTracker.nextStepIdToDeduplicate = end;
