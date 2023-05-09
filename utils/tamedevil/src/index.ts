@@ -883,6 +883,9 @@ function batch(callback: () => void): void {
   } finally {
     activeBatch = null;
   }
+  if (batch.length === 0) {
+    return;
+  }
   const finalCode = te`return [\n${te.join(
     batch.map((entry) => entry.fragment),
     ",\n",
