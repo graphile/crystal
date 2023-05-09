@@ -1041,9 +1041,8 @@ function addRelations(
               const resourceName = idents.makeSafeIdentifier(
                 `${resource.name}Resource`,
               );
-              prefixLines.push(
-                te`const ${te.identifier(resourceName)} = ${te.ref(resource)};`,
-              );
+              const ref_resource = te.ref(resource, resourceName);
+              prefixLines.push(te`${ref_resource};`);
               if (isStillSingular) {
                 if (!isUnique) {
                   isStillSingular = false;
@@ -1081,9 +1080,9 @@ function addRelations(
                     )
                   : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
                 functionLines.push(
-                  te`  const ${newIdentifier} = ${te.identifier(
-                    resourceName,
-                  )}.${isUnique ? te`get` : te`find`}(${specString});`,
+                  te`  const ${newIdentifier} = ${ref_resource}.${
+                    isUnique ? te`get` : te`find`
+                  }(${specString});`,
                 );
                 previousIdentifier = newIdentifier;
               } else {
@@ -1114,9 +1113,7 @@ function addRelations(
                   remoteAttributes,
                 );
                 functionLines.push(
-                  te`  const ${newIdentifier} = ${ref_each}(${previousIdentifier}, (${$entry}) => ${te.identifier(
-                    resourceName,
-                  )}.get(${specString}));`,
+                  te`  const ${newIdentifier} = ${ref_each}(${previousIdentifier}, (${$entry}) => ${ref_resource}.get(${specString}));`,
                 );
                 previousIdentifier = newIdentifier;
               }

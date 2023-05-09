@@ -232,7 +232,6 @@ function serialize(
   refs: { [key: string]: any },
   refMap: Map<any, string>,
   varMap: Map<symbol, string>,
-  variables: string[],
   indent = 0,
 ): string {
   let str = "";
@@ -242,7 +241,7 @@ function serialize(
   switch (item[$$type]) {
     case "QUERY": {
       for (const listItem of item.n) {
-        str += serialize(listItem, refs, refMap, varMap, variables, indent);
+        str += serialize(listItem, refs, refMap, varMap, indent);
       }
       break;
     }
@@ -258,9 +257,6 @@ function serialize(
     case "REF": {
       const identifier = makeRef(refs, refMap, item.v, item.n);
       str += identifier;
-      if (item.n != null && identifier !== item.n) {
-        variables.push(`const ${item.n} = ${identifier};\n`);
-      }
       break;
     }
     case "VARIABLE": {
@@ -273,7 +269,7 @@ function serialize(
         throw new Error("INDENT nodes only allowed in development mode");
       }
       str += "\n" + "  ".repeat(indent + 1);
-      str += serialize(item.c, refs, refMap, varMap, variables, indent + 1);
+      str += serialize(item.c, refs, refMap, varMap, indent + 1);
       str += "\n" + "  ".repeat(indent);
       break;
     }
@@ -306,18 +302,17 @@ function compile(fragment: TE): {
   const refs: { [key: string]: any } = Object.create(null);
   const refMap = new Map<any, string>();
   const varMap = new Map<symbol, string>();
-  const variables: string[] = [""];
 
   /**
    * Join this to generate the TE string
    */
-  let str = serialize(fragment, refs, refMap, varMap, variables);
+  let str = serialize(fragment, refs, refMap, varMap);
+  let variables = "";
   for (const varName of varMap.values()) {
-    variables.push(`let ${varName};\n`);
+    variables = variables + `let ${varName};\n`;
   }
-  const variablesString = variables.join("");
-  if (variablesString.length > 0) {
-    str = variablesString + "\n" + str;
+  if (variables.length > 0) {
+    str = variables + "\n" + str;
   }
   const string = isDev ? str.replace(/\n\s*\n/g, "\n") : str;
 
@@ -1035,9 +1030,10 @@ export class Idents {
     }
   }
 
+  // TODO: we need a proper understanding of lexical scope so we can generate truly safe identifiers
   makeSafeIdentifier(str: string): string {
     const { idents } = this;
-    const safe = str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
+    const safe = "i_" + str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
     let ident: string | undefined = undefined;
     for (let i = 1; i < 10000; i++) {
       const val = safe + (i > 1 ? String(i) : "");
