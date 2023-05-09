@@ -2754,6 +2754,11 @@ ${te.join(
     const processed = new Set<ExecutableStep>();
     const process = (step: ExecutableStep) => {
       processed.add(step);
+      for (const dep of step.dependencies) {
+        if (dep.id >= start && !processed.has(dep)) {
+          process(dep);
+        }
+      }
       const replacementStep = withGlobalLayerPlan(
         step.layerPlan,
         step.polymorphicPaths,
@@ -2768,11 +2773,6 @@ ${te.join(
     for (let i = start; i < end; i++) {
       const step = this.stepTracker.stepById[i];
       if (processed.has(step)) continue;
-      for (const dep of step.dependencies) {
-        if (dep.id >= start && !processed.has(dep)) {
-          process(dep);
-        }
-      }
       process(step);
     }
 
