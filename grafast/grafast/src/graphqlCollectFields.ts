@@ -138,7 +138,7 @@ const processFragment = (
   selectionSetDigest: SelectionSetDigest,
   selection: SelectionNode,
   fragmentSelectionSet: SelectionSetNode,
-  visitedFragments: ReadonlyArray<string>,
+  visitedFragments: { [fragmentName: string]: true },
 ) => {
   const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
   const defer = selection.directives?.find((d) => d.name.value === "defer");
@@ -166,7 +166,7 @@ const processFragment = (
           deferred: [],
         }
       : null;
-  if (deferredDigest) {
+  if (deferredDigest !== null) {
     selectionSetDigest.deferred.push(deferredDigest);
   }
   graphqlCollectFields(
@@ -194,7 +194,8 @@ export function graphqlCollectFields(
   objectType: GraphQLObjectType,
   selections: readonly SelectionNode[],
   isMutation = false,
-  visitedFragments: ReadonlyArray<string> = [],
+  // This is significantly faster than an array or a Set
+  visitedFragments: { [fragmentName: string]: true } = Object.create(null),
   selectionSetDigest: SelectionSetDigest = {
     label: undefined,
     fields: new Map(),
@@ -233,46 +234,57 @@ export function graphqlCollectFields(
     switch (selection.kind) {
       case "Field": {
         const field = selection;
-        const responseKey = field.alias?.value ?? field.name.value;
+        const responseKey = field.alias ? field.alias.value : field.name.value;
         let groupForResponseKey = selectionSetDigest.fields.get(responseKey);
-        if (groupForResponseKey !== undefined) {
-          groupForResponseKey.push(field);
-        } else {
+        if (groupForResponseKey === undefined) {
           groupForResponseKey = [field];
           selectionSetDigest.fields.set(responseKey, groupForResponseKey);
+        } else {
+          groupForResponseKey.push(field);
         }
         break;
       }
 
       case "FragmentSpread": {
         const fragmentSpreadName = selection.name.value;
-        if (visitedFragments.includes(fragmentSpreadName)) {
+        if (visitedFragments[fragmentSpreadName]) {
           continue;
         }
         const fragment = operationPlan.fragments[fragmentSpreadName];
-        if (fragment == null) {
-          continue;
-        }
+
+        // This is forbidden by validation
+        if (fragment == null) continue;
+
         const fragmentTypeName = fragment.typeCondition.name.value;
-        const fragmentType = operationPlan.schema.getType(fragmentTypeName);
+        if (fragmentTypeName === objectType.name) {
+          // No further checks needed
+        } else {
+          const fragmentType = operationPlan.schema.getType(fragmentTypeName);
 
-        // This is forbidden by Validation
-        if (!fragmentType) continue;
+          // This is forbidden by validation
+          if (!fragmentType) continue;
 
-        if (
-          fragmentType !== objectType &&
-          (fragmentType.constructor === GraphQLObjectType ||
+          if (
+            fragmentType.constructor === GraphQLObjectType ||
             /* According to validation, this must be the case */
             // !(isInterfaceType(fragmentType) || isUnionType(fragmentType)) ||
             !graphqlDoesFragmentTypeApply(
               objectType,
               fragmentType as GraphQLUnionType | GraphQLInterfaceType,
-            ))
-        ) {
-          continue;
+            )
+          ) {
+            continue;
+          }
         }
 
         const fragmentSelectionSet = fragment.selectionSet;
+
+        const newVisitedFragments = Object.assign(
+          Object.create(null),
+          visitedFragments,
+        );
+        newVisitedFragments[fragmentSpreadName] = true;
+
         processFragment(
           operationPlan,
           parentStepId,
@@ -281,7 +293,7 @@ export function graphqlCollectFields(
           selectionSetDigest,
           selection,
           fragmentSelectionSet,
-          [...visitedFragments, fragmentSpreadName],
+          newVisitedFragments,
         );
         break;
       }
@@ -290,23 +302,29 @@ export function graphqlCollectFields(
         const fragmentTypeAst = selection.typeCondition;
         if (fragmentTypeAst != null) {
           const fragmentTypeName = fragmentTypeAst.name.value;
-          const fragmentType = operationPlan.schema.getType(fragmentTypeName);
-          if (fragmentType == null) {
-            throw new GraphQLError(
-              `We don't have a type named '${fragmentTypeName}'`,
-            );
-          }
-          if (
-            fragmentType !== objectType &&
-            (fragmentType.constructor === GraphQLObjectType ||
+          if (fragmentTypeName === objectType.name) {
+            // No further checks required
+          } else {
+            const fragmentType = operationPlan.schema.getType(fragmentTypeName);
+
+            // This is forbidden by validation
+            if (fragmentType == null) {
+              throw new GraphQLError(
+                `We don't have a type named '${fragmentTypeName}'`,
+              );
+            }
+
+            if (
+              fragmentType.constructor === GraphQLObjectType ||
               /* According to validation, this must be the case */
               // !(isInterfaceType(fragmentType) || isUnionType(fragmentType)) ||
               !graphqlDoesFragmentTypeApply(
                 objectType,
                 fragmentType as GraphQLUnionType | GraphQLInterfaceType,
-              ))
-          ) {
-            continue;
+              )
+            ) {
+              continue;
+            }
           }
         }
         const fragmentSelectionSet = selection.selectionSet;
