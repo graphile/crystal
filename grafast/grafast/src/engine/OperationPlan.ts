@@ -4,6 +4,7 @@ import type {
   FragmentDefinitionNode,
   GraphQLField,
   GraphQLFieldMap,
+  GraphQLFieldResolver,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
@@ -962,7 +963,6 @@ ${te.join(
       // All grouped fields are equivalent, as mandated by GraphQL validation rules. Thus we can take the first one.
       const field = fieldNodes[0];
       const fieldName = field.name.value;
-      const objectField = objectTypeFields[fieldName];
 
       const locationDetails: LocationDetails = {
         parentTypeName: objectType.name,
@@ -970,37 +970,38 @@ ${te.join(
         node: fieldNodes,
       };
 
-      if (fieldName.startsWith("__")) {
-        if (fieldName === "__typename") {
-          outputPlan.addChild(objectType, responseKey, {
-            type: "__typename",
+      // explicit matches are the fastest: https://jsben.ch/ajZNf
+      if (fieldName === "__typename") {
+        outputPlan.addChild(objectType, responseKey, {
+          type: "__typename",
+          locationDetails,
+        });
+        continue;
+      } else if (fieldName === "__schema" || fieldName === "__type") {
+        const variableNames = findVariableNamesUsed(this, field);
+        outputPlan.addChild(objectType, responseKey, {
+          type: "outputPlan",
+          isNonNull: fieldName === "__schema",
+          outputPlan: new OutputPlan(
+            outputPlan.layerPlan,
+            this.rootValueStep,
+            {
+              mode: "introspection",
+              field,
+              variableNames,
+              // PERF: if variableNames.length === 0 we should be able to optimize this!
+              introspectionCacheByVariableValues: new LRU({
+                maxLength: 3,
+              }),
+            },
             locationDetails,
-          });
-        } else {
-          const variableNames = findVariableNamesUsed(this, field);
-          outputPlan.addChild(objectType, responseKey, {
-            type: "outputPlan",
-            isNonNull: fieldName === "__schema",
-            outputPlan: new OutputPlan(
-              outputPlan.layerPlan,
-              this.rootValueStep,
-              {
-                mode: "introspection",
-                field,
-                variableNames,
-                // PERF: if variableNames.length === 0 we should be able to optimize this!
-                introspectionCacheByVariableValues: new LRU({
-                  maxLength: 3,
-                }),
-              },
-              locationDetails,
-            ),
-            locationDetails,
-          });
-        }
+          ),
+          locationDetails,
+        });
         continue;
       }
 
+      const objectField = objectTypeFields[fieldName];
       if (!objectField) {
         // Field does not exist; this should have been caught by validation
         // but the spec says to just skip it.
@@ -1009,28 +1010,24 @@ ${te.join(
 
       const fieldType = objectField.type;
       const rawPlanResolver = objectField.extensions?.grafast?.plan;
-      assertNotAsync(rawPlanResolver, `${objectType.name}.${fieldName}.plan`);
+      if (rawPlanResolver?.constructor?.name === "AsyncFunction") {
+        throw new Error(
+          `Plans must be synchronous, but this schema has an async function at '${
+            objectType.name
+          }.${fieldName}.plan': ${rawPlanResolver.toString()}`,
+        );
+      }
       const namedReturnType = getNamedType(fieldType);
 
-      /**
-       * This could be the grafast resolver or a user-supplied resolver or
-       * nothing.
-       */
-      const rawResolver = objectField.resolve;
-      const rawSubscriber = objectField.subscribe;
-
-      /**
-       * This will never be the grafast resolver - only ever the user-supplied
-       * resolver or nothing
-       */
-      const resolvedResolver = rawResolver;
+      const resolvedResolver = objectField.resolve as
+        | GraphQLFieldResolver<any, any>
+        | undefined;
+      const subscriber = objectField.subscribe;
 
       const usesDefaultResolver =
-        !resolvedResolver || resolvedResolver === defaultFieldResolver;
+        resolvedResolver == null || resolvedResolver === defaultFieldResolver;
 
-      const resolver =
-        resolvedResolver && !usesDefaultResolver ? resolvedResolver : null;
-      const subscriber = rawSubscriber;
+      const resolver = usesDefaultResolver ? null : resolvedResolver;
 
       // Apply a default plan to fields that do not have a plan nor a resolver.
       const planResolver =
@@ -1091,8 +1088,6 @@ ${te.join(
        *        directly.)
        */
 
-      const typePlan = objectType.extensions?.grafast?.Step;
-
       if (resolver) {
         this.pure = false;
       }
@@ -1109,6 +1104,7 @@ ${te.join(
       // just a recommendation to the user, not a hard requirement... So we
       // should remove it.
       /*
+      const typePlan = objectType.extensions?.grafast?.Step;
         if (typePlan && !fieldHasPlan) {
           throw new Error(
             `Every field within a planned type must have a plan; object type ${
@@ -1122,7 +1118,11 @@ ${te.join(
         }
         */
 
-      if (!typePlan && resultIsPlanned && !fieldHasPlan) {
+      if (
+        resultIsPlanned &&
+        !fieldHasPlan &&
+        !objectType.extensions?.grafast?.Step
+      ) {
         throw new Error(
           `Field ${objectType.name}.${fieldName} returns a ${namedReturnType.name} which expects a plan to be available; however this field has no plan() method to produce such a plan; please add 'extensions.grafast.plan' to this field.`,
         );
@@ -1298,7 +1298,9 @@ ${te.join(
       );
     }
 
-    assertObjectType(objectType);
+    if (isDev) {
+      assertObjectType(objectType);
+    }
     const groupedFieldSet = withGlobalLayerPlan(
       outputPlan.layerPlan,
       new Set([polymorphicPath]),
