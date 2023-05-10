@@ -951,6 +951,7 @@ ${te.join(
     outputPlan: OutputPlan,
     path: readonly string[],
     polymorphicPath: string,
+    polymorphicPaths: ReadonlySet<string>,
     parentStep: ExecutableStep,
     objectType: GraphQLObjectType,
     objectTypeFields: GraphQLFieldMap<any, any>,
@@ -1136,7 +1137,6 @@ ${te.join(
 
       let step: ExecutableStep | PolymorphicStep;
       let haltTree = false;
-      const polymorphicPaths: ReadonlySet<string> = new Set([polymorphicPath]);
       const fieldLayerPlan = isMutation
         ? new LayerPlan(
             this,
@@ -1262,6 +1262,7 @@ ${te.join(
           deferredOutputPlan,
           path,
           polymorphicPath,
+          polymorphicPaths,
           parentStep,
           objectType,
           objectTypeFields,
@@ -1313,10 +1314,12 @@ ${te.join(
       isMutation,
     );
     const objectTypeFields = objectType.getFields();
+    const polymorphicPaths: ReadonlySet<string> = new Set([polymorphicPath]);
     this.processGroupedFieldSet(
       outputPlan,
       path,
       polymorphicPath,
+      polymorphicPaths,
       parentStep,
       objectType,
       objectTypeFields,
