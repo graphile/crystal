@@ -86,6 +86,7 @@ export interface LayerPlanReasonPolymorphic {
    * Needed for execution (see `executeBucket`).
    */
   parentStep: ExecutableStep;
+  polymorphicPaths: Set<string>;
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonSubroutine {
@@ -268,7 +269,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public readonly operationPlan: OperationPlan,
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
-    public polymorphicPaths: ReadonlySet<string>,
   ) {
     this.stepsByConstructor = new Map();
     if (parentLayerPlan) {

@@ -40,15 +40,10 @@ export class DeepEvalStep extends ExecutableStep {
     this.addDependency(listPlan);
 
     // Plan this subroutine
-    this.subroutineLayer = new LayerPlan(
-      this.operationPlan,
-      this.layerPlan,
-      {
-        type: "subroutine",
-        parentStep: this,
-      },
-      listPlan.polymorphicPaths,
-    );
+    this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
+      type: "subroutine",
+      parentStep: this,
+    });
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listPlan.polymorphicPaths,

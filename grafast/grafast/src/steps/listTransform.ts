@@ -120,15 +120,10 @@ export class __ListTransformStep<
     }
 
     // Plan this subroutine
-    this.subroutineLayer = new LayerPlan(
-      this.operationPlan,
-      this.layerPlan,
-      {
-        type: "subroutine",
-        parentStep: this,
-      },
-      listStep.polymorphicPaths,
-    );
+    this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
+      type: "subroutine",
+      parentStep: this,
+    });
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listStep.polymorphicPaths,

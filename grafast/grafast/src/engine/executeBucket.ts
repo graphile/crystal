@@ -641,7 +641,9 @@ export function executeBucket(
         }
       }
       const isSelectiveStep =
-        step.polymorphicPaths.size !== step.layerPlan.polymorphicPaths.size;
+        step.layerPlan.reason.type === "polymorphic" &&
+        step.polymorphicPaths.size !==
+          step.layerPlan.reason.polymorphicPaths.size;
       const result =
         bucket.hasErrors || isSelectiveStep
           ? reallyExecuteStepWithErrorsOrSelective(

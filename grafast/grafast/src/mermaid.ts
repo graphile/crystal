@@ -303,7 +303,11 @@ export function printPlanGraph(
                   .map((pId) => steps[pId].id)
                   .join(", ")}\n`
               : ""
-          }${pp(layerPlan.polymorphicPaths)}${
+          }${
+            layerPlan.reason.type === "polymorphic"
+              ? pp(layerPlan.reason.polymorphicPaths)
+              : ""
+          }${
             layerPlan.rootStep != null && layerPlan.reason.type !== "root"
               ? `\nROOT ${operationPlan.dangerouslyGetStep(
                   layerPlan.rootStep.id,

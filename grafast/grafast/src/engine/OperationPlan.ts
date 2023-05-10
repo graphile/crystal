@@ -89,7 +89,7 @@ import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
 export const POLYMORPHIC_ROOT_PATH = "";
-const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
+export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
   POLYMORPHIC_ROOT_PATH,
 ]);
 Object.freeze(POLYMORPHIC_ROOT_PATHS);
@@ -281,12 +281,7 @@ export class OperationPlan {
     this.operationType = operation.operation;
 
     this.phase = "plan";
-    this.rootLayerPlan = new LayerPlan(
-      this,
-      null,
-      REASON_ROOT,
-      POLYMORPHIC_ROOT_PATHS,
-    );
+    this.rootLayerPlan = new LayerPlan(this, null, REASON_ROOT);
 
     // This doesn't do anything, it only exists to align plans more closely
     // with an older version of the planner (to reduce the diff).
@@ -755,7 +750,6 @@ ${te.join(
         {
           type: "subscription",
         },
-        this.rootLayerPlan.polymorphicPaths,
       );
 
       // TODO: move this somewhere else
@@ -856,7 +850,6 @@ ${te.join(
         {
           type: "subscription",
         },
-        this.rootLayerPlan.polymorphicPaths,
       );
 
       // TODO: move this somewhere else
@@ -926,16 +919,11 @@ ${te.join(
       return this.stepTracker.getStepById(itemStepId) as __ItemStep<TData>;
     }
     // Create a new LayerPlan for this list item
-    const layerPlan = new LayerPlan(
-      this,
-      parentLayerPlan,
-      {
-        type: "listItem",
-        parentStep: listStep,
-        stream: listStep._stepOptions.stream ?? undefined,
-      },
-      listStep.polymorphicPaths,
-    );
+    const layerPlan = new LayerPlan(this, parentLayerPlan, {
+      type: "listItem",
+      parentStep: listStep,
+      stream: listStep._stepOptions.stream ?? undefined,
+    });
     const itemPlan = withGlobalLayerPlan(
       layerPlan,
       listStep.polymorphicPaths,
@@ -1138,15 +1126,10 @@ ${te.join(
       let step: ExecutableStep | PolymorphicStep;
       let haltTree = false;
       const fieldLayerPlan = isMutation
-        ? new LayerPlan(
-            this,
-            outputPlan.layerPlan,
-            {
-              type: "mutationField",
-              mutationIndex: ++mutationIndex,
-            },
-            outputPlan.layerPlan.polymorphicPaths,
-          )
+        ? new LayerPlan(this, outputPlan.layerPlan, {
+            type: "mutationField",
+            mutationIndex: ++mutationIndex,
+          })
         : outputPlan.layerPlan;
       const trackedArguments = withGlobalLayerPlan(
         fieldLayerPlan,
@@ -1236,15 +1219,10 @@ ${te.join(
     }
     if (groupedFieldSet.deferred) {
       for (const deferred of groupedFieldSet.deferred) {
-        const deferredLayerPlan = new LayerPlan(
-          this,
-          outputPlan.layerPlan,
-          {
-            type: "defer",
-            label: deferred.label,
-          },
-          new Set([polymorphicPath]),
-        );
+        const deferredLayerPlan = new LayerPlan(this, outputPlan.layerPlan, {
+          type: "defer",
+          label: deferred.label,
+        });
         const deferredOutputPlan = new OutputPlan(
           deferredLayerPlan,
           outputPlan.rootStep,
@@ -1496,15 +1474,10 @@ ${te.join(
         if (match) {
           objectLayerPlan = match;
         } else {
-          objectLayerPlan = new LayerPlan(
-            this,
-            parentLayerPlan,
-            {
-              type: "nullableBoundary",
-              parentStep: $step,
-            },
-            new Set([polymorphicPath]),
-          );
+          objectLayerPlan = new LayerPlan(this, parentLayerPlan, {
+            type: "nullableBoundary",
+            parentStep: $step,
+          });
           objectLayerPlan.setRootStep($step);
         }
       }
@@ -1608,10 +1581,7 @@ ${te.join(
       for (const type of allPossibleObjectTypes) {
         // Bit of a hack, but saves passing it around through all the arguments
         const newPolymorphicPath = `${polymorphicPath}>${type.name}`;
-        polymorphicLayerPlan.polymorphicPaths = new Set([
-          ...polymorphicLayerPlan.polymorphicPaths,
-          newPolymorphicPath,
-        ]);
+        polymorphicLayerPlan.reason.polymorphicPaths.add(newPolymorphicPath);
 
         const $root = withGlobalLayerPlan(
           polymorphicLayerPlan,
@@ -1694,16 +1664,12 @@ ${te.join(
       }
       return layerPlan;
     } else {
-      const layerPlan = new LayerPlan(
-        this,
-        parentLayerPlan,
-        {
-          type: "polymorphic",
-          typeNames: allPossibleObjectTypes.map((t) => t.name),
-          parentStep: $step,
-        },
-        new Set(),
-      );
+      const layerPlan = new LayerPlan(this, parentLayerPlan, {
+        type: "polymorphic",
+        typeNames: allPossibleObjectTypes.map((t) => t.name),
+        parentStep: $step,
+        polymorphicPaths: new Set(),
+      });
       polymorphicLayerPlanByPath.set(pathString, {
         stepId: $step.id,
         layerPlan,
@@ -2293,7 +2259,8 @@ ${te.join(
         // May only need to be evaluated for certain types, so avoid hoisting anything expensive.
         if (
           step.isSyncAndSafe &&
-          step.polymorphicPaths.size === step.layerPlan.polymorphicPaths.size
+          step.polymorphicPaths.size ===
+            step.layerPlan.reason.polymorphicPaths.size
         ) {
           // It's cheap and covers all types, try and hoist it.
           // NOTE: I have concerns about whether this is safe or not, but I
@@ -2365,26 +2332,38 @@ ${te.join(
     );
 
     // 1: adjust polymorphicPaths to fit new layerPlan
-    const parentPolymorphicPaths =
-      step.layerPlan.parentLayerPlan.polymorphicPaths;
-    const myPaths = [...step.polymorphicPaths];
-    if (parentPolymorphicPaths.has(myPaths[0])) {
-      // All the others must be valid too
-    } else {
-      const layerPaths = [...step.layerPlan.polymorphicPaths];
-      const newPaths = new Set<string>();
-      for (const path of parentPolymorphicPaths) {
-        const prefix = path + ">";
-        const matches = myPaths.filter((p) => p.startsWith(prefix));
-        const layerMatches = layerPaths.filter((p) => p.startsWith(prefix));
-        if (matches.length !== layerMatches.length) {
-          // Can't hoist because it's not used for all polymorphicPaths of this type
-          return;
-        } else if (matches.length > 0) {
-          newPaths.add(path);
+    if (step.layerPlan.reason.type === "polymorphic") {
+      /** The closest ancestor layer plan that is polymorphic */
+      let ancestor: LayerPlan | null = step.layerPlan;
+      while ((ancestor = ancestor.parentLayerPlan)) {
+        if (ancestor.reason.type === "polymorphic") {
+          break;
         }
       }
-      step.polymorphicPaths = newPaths;
+      const parentPolymorphicPaths = ancestor
+        ? (ancestor as LayerPlan<LayerPlanReasonPolymorphic>).reason
+            .polymorphicPaths
+        : POLYMORPHIC_ROOT_PATHS;
+
+      const myPaths = [...step.polymorphicPaths];
+      if (parentPolymorphicPaths.has(myPaths[0])) {
+        // All the others must be valid too
+      } else {
+        const layerPaths = [...step.layerPlan.reason.polymorphicPaths];
+        const newPaths = new Set<string>();
+        for (const path of parentPolymorphicPaths) {
+          const prefix = path + ">";
+          const matches = myPaths.filter((p) => p.startsWith(prefix));
+          const layerMatches = layerPaths.filter((p) => p.startsWith(prefix));
+          if (matches.length !== layerMatches.length) {
+            // Can't hoist because it's not used for all polymorphicPaths of this type
+            return;
+          } else if (matches.length > 0) {
+            newPaths.add(path);
+          }
+        }
+        step.polymorphicPaths = newPaths;
+      }
     }
 
     const $subroutine =
@@ -2555,14 +2534,15 @@ ${te.join(
     // All our checks passed, shove it down!
 
     // 1: no need to adjust polymorphicPaths, since we don't cross polymorphic boundary
-    const targetPolymorphicPaths = deepest.polymorphicPaths;
-    if (!targetPolymorphicPaths.has([...step.polymorphicPaths][0])) {
-      throw new Error(
-        `GrafastInternalError<53907e56-940a-4173-979d-bc620e4f1ff8>: polymorphic assumption doesn't hold. Mine = ${[
-          ...step.polymorphicPaths,
-        ]}; theirs = ${[...deepest.polymorphicPaths]}`,
-      );
-    }
+
+    // const targetPolymorphicPaths = deepest.polymorphicPaths;
+    // if (!targetPolymorphicPaths.has([...step.polymorphicPaths][0])) {
+    //   throw new Error(
+    //     `GrafastInternalError<53907e56-940a-4173-979d-bc620e4f1ff8>: polymorphic assumption doesn't hold. Mine = ${[
+    //       ...step.polymorphicPaths,
+    //     ]}; theirs = ${[...deepest.polymorphicPaths]}`,
+    //   );
+    // }
 
     // 2: move it to target layer
     this.stepTracker.moveStepToLayerPlan(step, deepest);

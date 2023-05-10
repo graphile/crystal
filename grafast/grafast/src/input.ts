@@ -19,6 +19,7 @@ import {
 
 import { withGlobalLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
+import { POLYMORPHIC_ROOT_PATHS } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
@@ -104,7 +105,7 @@ export function inputPlan(
 
   return withGlobalLayerPlan(
     operationPlan.rootLayerPlan,
-    operationPlan.rootLayerPlan.polymorphicPaths,
+    POLYMORPHIC_ROOT_PATHS,
     () => {
       let inputValue = rawInputValue;
       if (inputValue?.kind === "Variable") {
