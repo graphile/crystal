@@ -1408,7 +1408,6 @@ ${te.join(
           {
             mode: "leaf",
             // stepId: $leaf.id,
-            serialize: this.makeSerialize(nullableFieldType),
             graphqlType: nullableFieldType,
           },
           locationDetails,
@@ -1424,7 +1423,6 @@ ${te.join(
           $step,
           {
             mode: "leaf",
-            serialize: this.makeSerialize(nullableFieldType),
             graphqlType: nullableFieldType,
           },
           locationDetails,
@@ -3192,19 +3190,6 @@ ${te.join(
       }
     }
     return matches;
-  }
-  _serializeCache = new Map<
-    GraphQLScalarType | GraphQLEnumType,
-    (...args: any[]) => any
-  >();
-  private makeSerialize(type: GraphQLScalarType | GraphQLEnumType) {
-    const existing = this._serializeCache.get(type);
-    if (existing) {
-      return existing;
-    }
-    const fn = type.serialize.bind(type);
-    this._serializeCache.set(type, fn);
-    return fn;
   }
 }
 

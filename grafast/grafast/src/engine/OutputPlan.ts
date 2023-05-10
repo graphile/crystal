@@ -91,7 +91,6 @@ export type OutputPlanTypeLeaf = {
    */
   mode: "leaf";
   // stepId: number;
-  serialize: GraphQLScalarType["serialize"];
   graphqlType: GraphQLScalarType | GraphQLEnumType;
 };
 export type OutputPlanTypeNull = {
@@ -887,12 +886,12 @@ const nullExecutorString = makeExecutor(
     // Don't serialize to avoid the double serialization problem
     return bucketRootValue;
   } else {
-    return this.type.serialize(bucketRootValue);
+    return this.type.graphqlType.serialize(bucketRootValue);
   }
 ` */
 const leafExecutor = makeExecutor(
   te`\
-  return this.type.serialize(bucketRootValue);
+  return this.type.graphqlType.serialize(bucketRootValue);
 `,
   te.cache`leaf`,
   false,
@@ -900,7 +899,7 @@ const leafExecutor = makeExecutor(
 
 const leafExecutorString = makeExecutor(
   te`\
-  return ${ref_toJSON}(this.type.serialize(bucketRootValue));
+  return ${ref_toJSON}(this.type.graphqlType.serialize(bucketRootValue));
 `,
   te.cache`leaf`,
   true,
@@ -908,7 +907,7 @@ const leafExecutorString = makeExecutor(
 
 const booleanLeafExecutorString = makeExecutor(
   te`\
-  const val = this.type.serialize(bucketRootValue);
+  const val = this.type.graphqlType.serialize(bucketRootValue);
   return val === true ? 'true' : 'false';
 `,
   te.cache`booleanLeaf`,
@@ -922,7 +921,7 @@ const booleanLeafExecutorString = makeExecutor(
 
 const intLeafExecutorString = makeExecutor(
   te`\
-  return '' + this.type.serialize(bucketRootValue);
+  return '' + this.type.graphqlType.serialize(bucketRootValue);
 `,
   te.cache`intLeaf`,
   true,
@@ -937,7 +936,7 @@ const intLeafExecutorString = makeExecutor(
 
 const floatLeafExecutorString = makeExecutor(
   te`\
-  return String(this.type.serialize(bucketRootValue));
+  return String(this.type.graphqlType.serialize(bucketRootValue));
 `,
   te.cache`floatLeaf`,
   true,
@@ -951,7 +950,7 @@ const floatLeafExecutorString = makeExecutor(
 
 const stringLeafExecutorString = makeExecutor(
   te`\
-  return ${ref_stringifyString}(this.type.serialize(bucketRootValue));
+  return ${ref_stringifyString}(this.type.graphqlType.serialize(bucketRootValue));
 `,
   te.cache`stringLeaf`,
   true,
