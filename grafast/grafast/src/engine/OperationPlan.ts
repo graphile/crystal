@@ -1216,7 +1216,8 @@ ${te.join(
           [...path, responseKey],
           polymorphicPath,
           polymorphicPaths,
-          fieldNodes[0].selectionSet
+          // If one field has a selection set, they all have a selection set (guaranteed by validation).
+          field.selectionSet != null
             ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
             : undefined,
           objectType,
