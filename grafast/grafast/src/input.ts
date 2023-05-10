@@ -89,18 +89,19 @@ export function graphqlGetTypeForNode(
 export function inputPlan(
   operationPlan: OperationPlan,
   inputType: GraphQLInputType,
-  seenTypes: Set<GraphQLInputType>,
   rawInputValue: ValueNode | undefined,
   defaultValue: ValueNode | undefined = undefined,
+  inSeenTypes: ReadonlyArray<GraphQLInputType> = [],
 ): InputStep {
   if (rawInputValue === undefined && defaultValue === undefined) {
     return constant(undefined);
   }
 
-  if (seenTypes.has(inputType)) {
-    // TODO: Stop recursion if no data
+  let seenTypes = inSeenTypes;
+  if (inSeenTypes.includes(inputType)) {
+    // FIXME: Stop recursion if no data
   } else {
-    seenTypes.add(inputType);
+    seenTypes = [...inSeenTypes, inputType];
   }
 
   return withGlobalLayerPlan(
@@ -143,8 +144,9 @@ export function inputPlan(
         const valuePlan = inputPlan(
           operationPlan,
           innerType,
-          seenTypes,
           inputValue,
+          undefined,
+          seenTypes,
         );
         return inputNonNullPlan(operationPlan, valuePlan);
       } else if (inputType instanceof GraphQLList) {
@@ -187,7 +189,7 @@ function inputVariablePlan(
   operationPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
-  seenTypes: Set<GraphQLInputType>,
+  seenTypes: ReadonlyArray<GraphQLInputType>,
   inputType: GraphQLInputType,
   defaultValue: ValueNode | undefined = undefined,
 ): InputStep {
@@ -243,9 +245,9 @@ function inputVariablePlan(
     return inputPlan(
       operationPlan,
       inputType,
-      seenTypes,
       undefined,
       defaultValue,
+      seenTypes,
     );
   }
 }

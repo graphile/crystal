@@ -22,7 +22,7 @@ export class __InputListStep extends ExecutableStep {
 
   constructor(
     inputType: GraphQLList<GraphQLInputType>,
-    seenTypes: Set<GraphQLInputType>,
+    seenTypes: ReadonlyArray<GraphQLInputType>,
     private readonly inputValues: ValueNode | undefined,
   ) {
     super();
@@ -49,8 +49,9 @@ export class __InputListStep extends ExecutableStep {
         const innerPlan = inputPlan(
           this.operationPlan,
           innerType,
-          seenTypes,
           inputValue,
+          undefined,
+          seenTypes,
         );
         this.addDependency(innerPlan);
         this.itemCount++;
