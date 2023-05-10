@@ -73,7 +73,6 @@ import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
 import {
-  assertNotAsync,
   defaultValueToValueNode,
   findVariableNamesUsed,
   isTypePlanned,
@@ -1388,7 +1387,13 @@ ${te.join(
       );
     } else if (isScalarType(nullableFieldType)) {
       const scalarPlanResolver = nullableFieldType.extensions?.grafast?.plan;
-      assertNotAsync(scalarPlanResolver, `${nullableFieldType.name}.plan`);
+      if (scalarPlanResolver?.constructor?.name === "AsyncFunction") {
+        throw new Error(
+          `Plans must be synchronous, but this schema has an async function at '${
+            nullableFieldType.name
+          }.plan': ${scalarPlanResolver.toString()}`,
+        );
+      }
       const $leaf =
         typeof scalarPlanResolver === "function"
           ? withGlobalLayerPlan(
