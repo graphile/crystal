@@ -1811,39 +1811,43 @@ ${te.join(
     field: FieldNode,
   ): TrackedArguments {
     if (field.arguments) {
-      const trackedArgumentValues = Object.create(null);
       const argumentValues = field.arguments;
-      const fieldName = field.name.value;
-      const fieldSpec = objectTypeFields[fieldName];
-      const argumentDefinitions = fieldSpec.args;
+      const trackedArgumentValues = Object.create(null);
 
-      const seenNames = isDev ? new Set() : null;
-      for (const argumentDefinition of argumentDefinitions) {
-        const argumentName = argumentDefinition.name;
-        if (seenNames !== null) {
-          if (seenNames.has(argumentName)) {
-            throw new SafeError(
-              `Argument name '${argumentName}' seen twice; aborting.`,
-            );
+      withGlobalLayerPlan(this.rootLayerPlan, POLYMORPHIC_ROOT_PATHS, () => {
+        const fieldName = field.name.value;
+        const fieldSpec = objectTypeFields[fieldName];
+        const argumentDefinitions = fieldSpec.args;
+
+        const seenNames = isDev ? new Set() : null;
+
+        for (const argumentDefinition of argumentDefinitions) {
+          const argumentName = argumentDefinition.name;
+          if (seenNames !== null) {
+            if (seenNames.has(argumentName)) {
+              throw new SafeError(
+                `Argument name '${argumentName}' seen twice; aborting.`,
+              );
+            }
+            seenNames.add(argumentName);
           }
-          seenNames.add(argumentName);
+          const argumentType = argumentDefinition.type;
+          const defaultValue = defaultValueToValueNode(
+            argumentType,
+            argumentDefinition.defaultValue,
+          );
+          const argumentValue = argumentValues.find(
+            (v) => v.name.value === argumentName,
+          );
+          const argumentPlan = inputPlan(
+            this,
+            argumentType,
+            argumentValue?.value,
+            defaultValue,
+          );
+          trackedArgumentValues[argumentName] = argumentPlan;
         }
-        const argumentType = argumentDefinition.type;
-        const defaultValue = defaultValueToValueNode(
-          argumentType,
-          argumentDefinition.defaultValue,
-        );
-        const argumentValue = argumentValues.find(
-          (v) => v.name.value === argumentName,
-        );
-        const argumentPlan = inputPlan(
-          this,
-          argumentType,
-          argumentValue?.value,
-          defaultValue,
-        );
-        trackedArgumentValues[argumentName] = argumentPlan;
-      }
+      });
       return {
         get(name) {
           return trackedArgumentValues[name];
