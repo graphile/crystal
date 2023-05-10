@@ -126,6 +126,7 @@ const timeSource =
 
 const REASON_ROOT = Object.freeze({ type: "root" });
 const OUTPUT_PLAN_TYPE_NULL = Object.freeze({ mode: "null" });
+const OUTPUT_PLAN_TYPE_ARRAY = Object.freeze({ mode: "array" });
 const newValueStepCallback = () => new __ValueStep();
 
 const NO_ARGS: TrackedArguments = {
@@ -1343,9 +1344,7 @@ ${te.join(
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
         $step,
-        {
-          mode: "array",
-        },
+        OUTPUT_PLAN_TYPE_ARRAY,
         locationDetails,
       );
       parentOutputPlan.addChild(parentObjectType, responseKey, {
