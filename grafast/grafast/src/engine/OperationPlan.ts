@@ -1836,10 +1836,9 @@ ${te.join(
         );
       }
       const argumentType = argumentDefinition.type;
-      const defaultValue = defaultValueToValueNode(
-        argumentType,
-        argumentDefinition.defaultValue,
-      );
+      const defaultValue = argumentDefinition.defaultValue
+        ? defaultValueToValueNode(argumentType, argumentDefinition.defaultValue)
+        : undefined;
       const argumentValue = argumentValues?.find(
         (v) => v.name.value === argumentName,
       );
