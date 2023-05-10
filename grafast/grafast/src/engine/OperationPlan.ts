@@ -1149,8 +1149,8 @@ ${te.join(
       const trackedArguments =
         objectFieldArgs.length > 0
           ? withGlobalLayerPlan(
-              fieldLayerPlan,
-              polymorphicPaths,
+              this.rootLayerPlan,
+              POLYMORPHIC_ROOT_PATHS,
               this.getTrackedArguments,
               this,
               objectFieldArgs,
