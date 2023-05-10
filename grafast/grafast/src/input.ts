@@ -29,7 +29,6 @@ import {
   __TrackedValueStep,
   constant,
 } from "./steps/index.js";
-import { NotVariableValueNode } from "./interfaces.js";
 
 export type InputStep =
   | __TrackedValueStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()

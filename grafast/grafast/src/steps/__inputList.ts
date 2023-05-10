@@ -66,15 +66,10 @@ export class __InputListStep extends ExecutableStep {
     if (inputValues?.kind === "NullValue") {
       return constant(null);
     } else {
-      const arr: InputStep[] = [];
-      for (
-        let itemPlanIndex = 0;
-        itemPlanIndex < this.itemCount;
-        itemPlanIndex++
-      ) {
-        const itemPlan = this.getDep(itemPlanIndex);
-        assertInputStep(itemPlan);
-        arr[itemPlanIndex] = itemPlan;
+      const arr: ExecutableStep[] = [];
+      for (let idx = 0; idx < this.itemCount; idx++) {
+        const itemPlan = this.getDep(idx);
+        arr[idx] = itemPlan;
       }
       return list(arr);
     }
