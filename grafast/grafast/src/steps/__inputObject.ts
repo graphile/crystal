@@ -33,10 +33,13 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     for (const inputFieldName in inputFieldDefinitions) {
       const inputFieldDefinition = inputFieldDefinitions[inputFieldName];
       const inputFieldType = inputFieldDefinition.type;
-      const defaultValue = defaultValueToValueNode(
-        inputFieldType,
-        inputFieldDefinition.defaultValue,
-      );
+      const defaultValue =
+        inputFieldDefinition.defaultValue !== undefined
+          ? defaultValueToValueNode(
+              inputFieldType,
+              inputFieldDefinition.defaultValue,
+            )
+          : undefined;
       const inputFieldValue = inputFields?.find(
         (val) => val.name.value === inputFieldName,
       );
