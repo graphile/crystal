@@ -326,19 +326,22 @@ export class StepTracker {
     {
       // Transfer step dependents of $original to $replacement
       const dependents = $original.dependents;
-      const replacementDependents = writeableArray($replacement.dependents);
-      for (const dependent of dependents) {
-        writeableArray(dependent.step.dependencies)[dependent.dependencyIndex] =
-          $replacement;
-        replacementDependents.push(dependent);
+      if (dependents.length > 0) {
+        const replacementDependents = writeableArray($replacement.dependents);
+        for (const dependent of dependents) {
+          writeableArray(dependent.step.dependencies)[
+            dependent.dependencyIndex
+          ] = $replacement;
+          replacementDependents.push(dependent);
+        }
+        ($original.dependents as any) = [];
       }
-      ($original.dependents as any) = [];
     }
 
     {
       // Convert root step of output plans from $original to $replacement
       const outputPlans = this.outputPlansByRootStep.get($original);
-      if (outputPlans) {
+      if (outputPlans?.size) {
         let outputPlansByReplacementStep =
           this.outputPlansByRootStep.get($replacement);
         if (!outputPlansByReplacementStep) {
@@ -359,7 +362,7 @@ export class StepTracker {
     {
       // Convert root step of layer plans from $original to $replacement
       const layerPlans = this.layerPlansByRootStep.get($original)!;
-      if (layerPlans) {
+      if (layerPlans?.size) {
         let layerPlansByReplacementRootStep =
           this.layerPlansByRootStep.get($replacement);
         if (!layerPlansByReplacementRootStep) {
@@ -383,7 +386,7 @@ export class StepTracker {
     {
       // Convert parent step of layer plans from $original to $replacement
       const layerPlans = this.layerPlansByParentStep.get($original);
-      if (layerPlans) {
+      if (layerPlans?.size) {
         let layerPlansByReplacementParentStep =
           this.layerPlansByParentStep.get($replacement);
         if (!layerPlansByReplacementParentStep) {
