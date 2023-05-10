@@ -128,6 +128,12 @@ const REASON_ROOT = Object.freeze({ type: "root" });
 const OUTPUT_PLAN_TYPE_NULL = Object.freeze({ mode: "null" });
 const newValueStepCallback = () => new __ValueStep();
 
+const NO_ARGS: TrackedArguments = {
+  get() {
+    throw new Error(`This field doesn't have any arguments`);
+  },
+};
+
 export class OperationPlan {
   public readonly queryType: GraphQLObjectType;
   public readonly mutationType: GraphQLObjectType | null;
@@ -716,14 +722,17 @@ ${te.join(
     const subscriptionPlanResolver = rawSubscriptionPlanResolver;
 
     const fieldArgsSpec = fieldSpec.args;
-    const trackedArguments = withGlobalLayerPlan(
-      this.rootLayerPlan,
-      POLYMORPHIC_ROOT_PATHS,
-      this.getTrackedArguments,
-      this,
-      fieldArgsSpec,
-      field,
-    );
+    const trackedArguments =
+      fieldArgsSpec.length > 0
+        ? withGlobalLayerPlan(
+            this.rootLayerPlan,
+            POLYMORPHIC_ROOT_PATHS,
+            this.getTrackedArguments,
+            this,
+            fieldArgsSpec,
+            field,
+          )
+        : NO_ARGS;
     if (subscriptionPlanResolver) {
       // PERF: optimize this
       const { haltTree, step: subscribeStep } = this.planField(
@@ -1137,14 +1146,17 @@ ${te.join(
           })
         : outputPlan.layerPlan;
       const objectFieldArgs = objectField.args;
-      const trackedArguments = withGlobalLayerPlan(
-        fieldLayerPlan,
-        polymorphicPaths,
-        this.getTrackedArguments,
-        this,
-        objectFieldArgs,
-        fieldNodes[0],
-      );
+      const trackedArguments =
+        objectFieldArgs.length > 0
+          ? withGlobalLayerPlan(
+              fieldLayerPlan,
+              polymorphicPaths,
+              this.getTrackedArguments,
+              this,
+              objectFieldArgs,
+              field,
+            )
+          : NO_ARGS;
       if (typeof planResolver === "function") {
         ({ step, haltTree } = this.planField(
           fieldLayerPlan,
