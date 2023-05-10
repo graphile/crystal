@@ -36,7 +36,7 @@ export class StepTracker {
   } = [];
   /** @internal */
   private aliasesById: {
-    [stepId: number]: Set<number> | undefined;
+    [stepId: number]: Array<number> | undefined;
   } = [];
   /** @internal */
   public stepsWithNoDependencies = new Set<ExecutableStep>();
@@ -309,18 +309,17 @@ export class StepTracker {
 
     // Replace all references to $original with $replacement
     const oldAliases = this.aliasesById[$original.id];
-    const newAliases =
-      this.aliasesById[$replacement.id] ?? new Set([$replacement.id]);
+    const newAliases = this.aliasesById[$replacement.id] ?? [$replacement.id];
     this.aliasesById[$replacement.id] = newAliases;
     if (oldAliases) {
       for (const id of oldAliases) {
         this.stepById[id] = $replacement;
-        newAliases.add(id);
+        newAliases.push(id);
       }
       this.aliasesById[$original.id] = undefined;
     } else {
       this.stepById[$original.id] = $replacement;
-      newAliases.add($original.id);
+      newAliases.push($original.id);
     }
 
     {
