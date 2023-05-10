@@ -122,6 +122,7 @@ const timeSource =
     : Date;
 
 const REASON_ROOT = Object.freeze({ type: "root" });
+const OUTPUT_PLAN_TYPE_NULL = Object.freeze({ mode: "null" });
 const newValueStepCallback = () => new __ValueStep();
 
 export class OperationPlan {
@@ -951,7 +952,6 @@ ${te.join(
    * @param objectType - The object type that this selection set is being evaluated for (note polymorphic selection should already have been handled by this point)
    * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
    * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
-   * @param customRecurse - By default we'll auto-recurse, but you can add recursion to a queue instead (e.g. when handling polymorphism); if you provide this then we also won't deduplicate
    */
   private planSelectionSet(
     outputPlan: OutputPlan,
@@ -961,77 +961,14 @@ ${te.join(
     objectType: GraphQLObjectType,
     selections: readonly SelectionNode[],
     isMutation = false,
-    customRecurse: null | ((nextUp: () => void) => void) = null,
   ) {
-    if (this.loc)
+    if (this.loc) {
       this.loc.push(
         `planSelectionSet(${objectType.name} @ ${
           outputPlan.layerPlan.id
         } @ ${path.join(".")} @ ${polymorphicPath})`,
       );
-    interface NextUp {
-      outputPlan: OutputPlan;
-      haltTree: boolean;
-      stepId: number;
-      responseKey: string;
-      fieldType: GraphQLOutputType;
-      fieldNodes: FieldNode[];
-      fieldLayerPlan: LayerPlan;
-      locationDetails: LocationDetails;
     }
-    const nextUpList: NextUp[] = [];
-
-    const next: (nextUp: NextUp) => void = customRecurse
-      ? (nextUp) => void nextUpList.push(nextUp)
-      : (nextUp) => processNextUp(nextUp);
-
-    const processNextUp = (nextUp: NextUp): void => {
-      const {
-        haltTree,
-        stepId,
-        responseKey,
-        fieldType,
-        fieldNodes,
-        fieldLayerPlan,
-        locationDetails,
-        // Deliberately shadow
-        outputPlan,
-      } = nextUp;
-
-      // May have changed due to deduplicate
-      const step = this.stepTracker.getStepById(stepId);
-      if (haltTree) {
-        const isNonNull = isNonNullType(fieldType);
-        outputPlan.addChild(objectType, responseKey, {
-          type: "outputPlan",
-          outputPlan: new OutputPlan(
-            fieldLayerPlan,
-            step,
-            {
-              mode: "null",
-            },
-            locationDetails,
-          ),
-          isNonNull,
-          locationDetails,
-        });
-      } else {
-        this.planIntoOutputPlan(
-          outputPlan,
-          fieldLayerPlan,
-          [...path, responseKey],
-          polymorphicPath,
-          fieldNodes[0].selectionSet
-            ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
-            : undefined,
-          objectType,
-          responseKey,
-          fieldType,
-          step,
-          locationDetails,
-        );
-      }
-    };
 
     assertObjectType(objectType);
     const groupedFieldSet = withGlobalLayerPlan(
@@ -1302,16 +1239,37 @@ ${te.join(
           });
         }
 
-        next({
-          haltTree,
-          stepId: step.id,
-          responseKey,
-          fieldType,
-          fieldNodes,
-          fieldLayerPlan,
-          locationDetails,
-          outputPlan,
-        });
+        // May have changed due to deduplicate
+        step = this.stepTracker.getStepById(step.id);
+        if (haltTree) {
+          const isNonNull = isNonNullType(fieldType);
+          outputPlan.addChild(objectType, responseKey, {
+            type: "outputPlan",
+            outputPlan: new OutputPlan(
+              fieldLayerPlan,
+              step,
+              OUTPUT_PLAN_TYPE_NULL,
+              locationDetails,
+            ),
+            isNonNull,
+            locationDetails,
+          });
+        } else {
+          this.planIntoOutputPlan(
+            outputPlan,
+            fieldLayerPlan,
+            [...path, responseKey],
+            polymorphicPath,
+            fieldNodes[0].selectionSet
+              ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
+              : undefined,
+            objectType,
+            responseKey,
+            fieldType,
+            step,
+            locationDetails,
+          );
+        }
       }
       if (groupedFieldSet.deferred) {
         for (const deferred of groupedFieldSet.deferred) {
@@ -1342,14 +1300,6 @@ ${te.join(
       }
     };
     processGroupedFieldSet(outputPlan, groupedFieldSet);
-
-    if (customRecurse) {
-      customRecurse(() => {
-        for (const nextUp of nextUpList) {
-          processNextUp(nextUp);
-        }
-      });
-    }
 
     if (this.loc) this.loc.pop();
   }
