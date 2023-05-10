@@ -1765,6 +1765,7 @@ ${te.join(
                       "stream",
                       "initialCount",
                       this.trackedVariableValuesStep,
+                      null,
                     ),
                   ) || 0,
               }

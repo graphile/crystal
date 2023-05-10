@@ -48,9 +48,12 @@ export function evalDirectiveArg<T = unknown>(
   directiveName: string,
   argumentName: string,
   variableValuesStep: __TrackedValueStep,
+  defaultValue: T,
 ): T | undefined {
   const directive = getDirective(selection, directiveName);
-  const argument = directive?.arguments?.find(
+  if (!directive) return undefined;
+  if (!directive.arguments) return defaultValue;
+  const argument = directive.arguments.find(
     (a) => a.name.value === argumentName,
   );
   if (argument) {
@@ -74,8 +77,9 @@ export function evalDirectiveArg<T = unknown>(
         );
       }
     }
+  } else {
+    return defaultValue;
   }
-  return undefined;
 }
 
 /**
@@ -143,6 +147,7 @@ export function graphqlCollectFields(
         "skip",
         "if",
         trackedVariableValuesStep,
+        true,
       ) === true
     ) {
       continue;
@@ -153,6 +158,7 @@ export function graphqlCollectFields(
         "include",
         "if",
         trackedVariableValuesStep,
+        true,
       ) === false
     ) {
       continue;
@@ -168,6 +174,7 @@ export function graphqlCollectFields(
         "defer",
         "if",
         trackedVariableValuesStep,
+        true,
       );
       const label =
         evalDirectiveArg<string | null>(
@@ -175,6 +182,7 @@ export function graphqlCollectFields(
           "defer",
           "label",
           trackedVariableValuesStep,
+          null,
         ) ?? undefined;
       const deferredDigest: SelectionSetDigest | null =
         !defer || deferIf === false
