@@ -526,10 +526,14 @@ export class StepTracker {
   }
 
   addStepToItsLayerPlan(step: ExecutableStep) {
-    let set = step.layerPlan.stepsByConstructor.get(step.constructor);
+    const {
+      layerPlan: { stepsByConstructor },
+      constructor,
+    } = step;
+    let set = stepsByConstructor.get(constructor);
     if (!set) {
       set = new Set();
-      step.layerPlan.stepsByConstructor.set(step.constructor, set);
+      stepsByConstructor.set(constructor, set);
     }
     set.add(step);
   }
