@@ -719,7 +719,7 @@ ${te.join(
       POLYMORPHIC_ROOT_PATHS,
       this.getTrackedArguments,
       this,
-      rootType,
+      rootTypeFields,
       field,
     );
     if (subscriptionPlanResolver) {
@@ -728,7 +728,6 @@ ${te.join(
         this.rootLayerPlan,
         path,
         POLYMORPHIC_ROOT_PATHS,
-        rootType,
         fields,
         subscriptionPlanResolver,
         this.trackedRootValueStep,
@@ -1140,7 +1139,7 @@ ${te.join(
         polymorphicPaths,
         this.getTrackedArguments,
         this,
-        objectType,
+        objectTypeFields,
         fieldNodes[0],
       );
       if (typeof planResolver === "function") {
@@ -1148,7 +1147,6 @@ ${te.join(
           fieldLayerPlan,
           path,
           polymorphicPaths,
-          objectType,
           fieldNodes,
           planResolver,
           parentStep,
@@ -1691,7 +1689,6 @@ ${te.join(
     layerPlan: LayerPlan,
     path: readonly string[],
     polymorphicPaths: ReadonlySet<string>,
-    objectType: GraphQLObjectType,
     fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
     rawParentStep: ExecutableStep,
@@ -1810,25 +1807,27 @@ ${te.join(
    * @see https://spec.graphql.org/draft/#CoerceArgumentValues()
    */
   private getTrackedArguments(
-    objectType: GraphQLObjectType,
+    objectTypeFields: GraphQLFieldMap<any, any>,
     field: FieldNode,
   ): TrackedArguments {
-    const trackedArgumentValues = Object.create(null);
     if (field.arguments) {
+      const trackedArgumentValues = Object.create(null);
       const argumentValues = field.arguments;
       const fieldName = field.name.value;
-      const fieldSpec = objectType.getFields()[fieldName];
+      const fieldSpec = objectTypeFields[fieldName];
       const argumentDefinitions = fieldSpec.args;
 
-      const seenNames = new Set();
+      const seenNames = isDev ? new Set() : null;
       for (const argumentDefinition of argumentDefinitions) {
         const argumentName = argumentDefinition.name;
-        if (seenNames.has(argumentName)) {
-          throw new SafeError(
-            `Argument name '${argumentName}' seen twice; aborting.`,
-          );
+        if (seenNames !== null) {
+          if (seenNames.has(argumentName)) {
+            throw new SafeError(
+              `Argument name '${argumentName}' seen twice; aborting.`,
+            );
+          }
+          seenNames.add(argumentName);
         }
-        seenNames.add(argumentName);
         const argumentType = argumentDefinition.type;
         const defaultValue = defaultValueToValueNode(
           argumentType,
@@ -1846,12 +1845,18 @@ ${te.join(
         );
         trackedArgumentValues[argumentName] = argumentPlan;
       }
+      return {
+        get(name) {
+          return trackedArgumentValues[name];
+        },
+      };
+    } else {
+      return {
+        get() {
+          return undefined as any;
+        },
+      };
     }
-    return {
-      get(name) {
-        return trackedArgumentValues[name];
-      },
-    };
   }
 
   public withModifiers<T>(cb: () => T): T {
