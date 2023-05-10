@@ -240,6 +240,8 @@ export class OperationPlan {
     Record<string, any>
   >();
 
+  private scalarPlanInfo: { schema: GraphQLSchema };
+
   constructor(
     public readonly schema: GraphQLSchema,
     public readonly operation: OperationDefinitionNode,
@@ -251,6 +253,7 @@ export class OperationPlan {
     public readonly rootValue: any,
     options: GrafastPrepareOptions,
   ) {
+    this.scalarPlanInfo = { schema: this.schema };
     this.planningTimeout = options.timeouts?.planning ?? null;
     const queryType = schema.getQueryType();
     assert.ok(queryType, "Schema must have a query type");
@@ -1392,7 +1395,7 @@ ${te.join(
               scalarPlanResolver,
               null,
               $step,
-              { schema: this.schema },
+              this.scalarPlanInfo,
             )
           : $step;
 
