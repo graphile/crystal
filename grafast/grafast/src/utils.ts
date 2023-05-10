@@ -1,5 +1,7 @@
 import type {
   ArgumentNode,
+  ConstObjectFieldNode,
+  ConstValueNode,
   DirectiveNode,
   FieldNode,
   GraphQLEnumValueConfig,
@@ -46,6 +48,7 @@ import type {
   BaseGraphQLArguments,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
+  NotVariableValueNode,
   OutputPlanForType,
 } from "./interfaces.js";
 import type { ExecutableStep, ModifierStep } from "./step.js";
@@ -80,7 +83,7 @@ export function assertNullPrototype(
  * (since they can use any ValueNode) - other parts of the GraphQL schema
  * should use explicitly compatible ValueNodes.
  */
-function dangerousRawValueToValueNode(value: JSON): ValueNode {
+function dangerousRawValueToValueNode(value: JSON): ConstValueNode {
   if (value == null) {
     return { kind: Kind.NULL };
   }
@@ -131,7 +134,7 @@ function dangerousRawValueToValueNode(value: JSON): ValueNode {
 function rawValueToValueNode(
   type: GraphQLInputType,
   value: any,
-): ValueNode | undefined {
+): ConstValueNode | undefined {
   // TODO: move this to input object section
   if (type instanceof GraphQLNonNull) {
     if (value == null) {
@@ -222,7 +225,7 @@ function rawValueToValueNode(
       );
     }
     const fieldDefs = type.getFields();
-    const fields: ObjectFieldNode[] = [];
+    const fields: ConstObjectFieldNode[] = [];
     for (const fieldName in fieldDefs) {
       const fieldDef = fieldDefs[fieldName];
       const fieldType = fieldDef.type;
@@ -260,7 +263,7 @@ function rawValueToValueNode(
 export function defaultValueToValueNode(
   type: GraphQLInputType,
   defaultValue: unknown,
-): ValueNode | undefined {
+): ConstValueNode | undefined {
   // NOTE: even if `type` is non-null it's okay for `defaultValue` to be
   // undefined. However it is not okay for defaultValue to be null if type is
   // non-null.

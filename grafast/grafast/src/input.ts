@@ -1,4 +1,5 @@
 import type {
+  ConstValueNode,
   GraphQLInputType,
   GraphQLType,
   ListTypeNode,
@@ -28,6 +29,7 @@ import {
   __TrackedValueStep,
   constant,
 } from "./steps/index.js";
+import { NotVariableValueNode } from "./interfaces.js";
 
 export type InputStep =
   | __TrackedValueStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
@@ -88,7 +90,7 @@ export function inputPlan(
   operationPlan: OperationPlan,
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
-  defaultValue: ValueNode | undefined = undefined,
+  defaultValue: ConstValueNode | undefined = undefined,
   inSeenTypes: ReadonlyArray<GraphQLInputType> = [],
 ): InputStep {
   if (rawInputValue === undefined && defaultValue === undefined) {
@@ -183,7 +185,7 @@ function inputVariablePlan(
   variableType: GraphQLInputType,
   seenTypes: ReadonlyArray<GraphQLInputType>,
   inputType: GraphQLInputType,
-  defaultValue: ValueNode | undefined = undefined,
+  defaultValue: ConstValueNode | undefined = undefined,
 ): InputStep {
   if (
     variableType instanceof GraphQLNonNull &&

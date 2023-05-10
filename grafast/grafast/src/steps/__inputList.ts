@@ -1,4 +1,4 @@
-import type { GraphQLInputType, ValueNode } from "graphql";
+import type { GraphQLInputType } from "graphql";
 import { GraphQLList, Kind } from "graphql";
 
 import * as assert from "../assert.js";
@@ -7,6 +7,8 @@ import { assertInputStep, inputPlan } from "../input.js";
 import { ExecutableStep } from "../step.js";
 import type { ConstantStep } from "./constant.js";
 import { constant } from "./constant.js";
+import { list } from "./list.js";
+import { NotVariableValueNode } from "../interfaces.js";
 
 /**
  * Implements `__InputListStep`.
@@ -23,7 +25,7 @@ export class __InputListStep extends ExecutableStep {
   constructor(
     inputType: GraphQLList<GraphQLInputType>,
     seenTypes: ReadonlyArray<GraphQLInputType>,
-    private readonly inputValues: ValueNode | undefined,
+    private readonly inputValues: NotVariableValueNode | undefined,
   ) {
     super();
     assert.ok(
@@ -59,12 +61,12 @@ export class __InputListStep extends ExecutableStep {
     }
   }
 
-  optimize() {
+  optimize(): ExecutableStep {
     const { inputValues } = this;
     if (inputValues?.kind === "NullValue") {
       return constant(null);
     } else {
-      const list: any[] = [];
+      const arr: InputStep[] = [];
       for (
         let itemPlanIndex = 0;
         itemPlanIndex < this.itemCount;
@@ -72,10 +74,9 @@ export class __InputListStep extends ExecutableStep {
       ) {
         const itemPlan = this.getDep(itemPlanIndex);
         assertInputStep(itemPlan);
-        const value = itemPlan.eval();
-        list[itemPlanIndex] = value;
+        arr[itemPlanIndex] = itemPlan;
       }
-      return constant(list);
+      return list(arr);
     }
   }
 

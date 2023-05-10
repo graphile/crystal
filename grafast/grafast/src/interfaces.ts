@@ -17,6 +17,8 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  ValueNode,
+  VariableNode,
 } from "graphql";
 
 import type { Bucket, RequestTools } from "./bucket.js";
@@ -823,3 +825,5 @@ export type UnwrapPlanTuple</* const */ TIn extends readonly ExecutableStep[]> =
       ? U
       : never;
   } & { length: number };
+
+export type NotVariableValueNode = Exclude<ValueNode, VariableNode>;
