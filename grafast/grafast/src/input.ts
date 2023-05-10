@@ -98,6 +98,9 @@ export function inputPlan(
   let seenTypes = inSeenTypes;
   if (inSeenTypes.includes(inputType)) {
     // FIXME: Stop recursion if no data
+    throw new Error(
+      "GrafastInternalError<441c4f9f-d3d2-41ec-b7bc-e0b96885affe>: Grafast doesn't currently support planning through recursive input values; please raise an issue and explain how this affects you!",
+    );
   } else {
     seenTypes = [...inSeenTypes, inputType];
   }
