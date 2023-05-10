@@ -206,29 +206,29 @@ export function graphqlCollectFields(
   const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
-    if (
-      selection.directives &&
-      evalDirectiveArg<boolean | null>(
-        selection,
-        "skip",
-        "if",
-        trackedVariableValuesStep,
-        true,
-      ) === true
-    ) {
-      continue;
-    }
-    if (
-      selection.directives &&
-      evalDirectiveArg<boolean | null>(
-        selection,
-        "include",
-        "if",
-        trackedVariableValuesStep,
-        true,
-      ) === false
-    ) {
-      continue;
+    if (selection.directives) {
+      if (
+        evalDirectiveArg<boolean | null>(
+          selection,
+          "skip",
+          "if",
+          trackedVariableValuesStep,
+          true,
+        ) === true
+      ) {
+        continue;
+      }
+      if (
+        evalDirectiveArg<boolean | null>(
+          selection,
+          "include",
+          "if",
+          trackedVariableValuesStep,
+          true,
+        ) === false
+      ) {
+        continue;
+      }
     }
 
     switch (selection.kind) {
