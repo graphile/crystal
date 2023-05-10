@@ -1231,7 +1231,7 @@ ${te.join(
               path: {
                 typename: objectType.name,
                 key: fieldName,
-                // TODO if we decide to properly support path, we will need to
+                // TODO: if we decide to properly support path, we will need to
                 // build this at run-time.
                 prev: undefined,
               },
