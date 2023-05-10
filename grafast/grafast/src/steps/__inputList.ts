@@ -4,11 +4,11 @@ import { GraphQLList, Kind } from "graphql";
 import * as assert from "../assert.js";
 import type { InputStep } from "../input.js";
 import { assertInputStep, inputPlan } from "../input.js";
+import type { NotVariableValueNode } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { ConstantStep } from "./constant.js";
 import { constant } from "./constant.js";
 import { list } from "./list.js";
-import { NotVariableValueNode } from "../interfaces.js";
 
 /**
  * Implements `__InputListStep`.

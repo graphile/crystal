@@ -9,9 +9,6 @@ import {
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLUnionType,
-  isInterfaceType,
-  isObjectType,
-  isUnionType,
 } from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";

@@ -15,7 +15,6 @@ import type {
   GraphQLObjectTypeConfig,
   GraphQLOutputType,
   GraphQLSchema,
-  ObjectFieldNode,
   SelectionNode,
   ValueNode,
 } from "graphql";
@@ -48,7 +47,6 @@ import type {
   BaseGraphQLArguments,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
-  NotVariableValueNode,
   OutputPlanForType,
 } from "./interfaces.js";
 import type { ExecutableStep, ModifierStep } from "./step.js";

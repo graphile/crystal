@@ -2,7 +2,6 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import type { ExecutableStep } from "../step";
 import type { LayerPlan, LayerPlanReasonsWithParentStep } from "./LayerPlan";
-import type { OperationPlanPhase } from "./OperationPlan.js";
 import type { OutputPlan } from "./OutputPlan";
 
 /**
