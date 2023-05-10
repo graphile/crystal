@@ -1,4 +1,12 @@
-import type { GraphQLLeafType, ValueNode } from "graphql";
+import type {
+  BooleanValueNode,
+  EnumValueNode,
+  FloatValueNode,
+  GraphQLLeafType,
+  IntValueNode,
+  NullValueNode,
+  StringValueNode,
+} from "graphql";
 import { valueFromAST } from "graphql";
 
 import { UnbatchedExecutableStep } from "../step.js";
@@ -19,7 +27,17 @@ export class __InputStaticLeafStep<
   isSyncAndSafe = true;
 
   private readonly coercedValue: any;
-  constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
+  constructor(
+    inputType: GraphQLLeafType,
+    value:
+      | IntValueNode
+      | FloatValueNode
+      | StringValueNode
+      | BooleanValueNode
+      | NullValueNode
+      | EnumValueNode
+      | undefined,
+  ) {
     super();
     // `coerceInputValue` throws on coercion failure. NOTE: it's only safe for
     // us to call coerceInputValue because we already know this is a scalar,
