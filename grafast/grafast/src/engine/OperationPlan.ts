@@ -1437,42 +1437,44 @@ ${te.join(
         locationDetails,
       });
     } else if (isObjectType(nullableFieldType)) {
-      // Check that the plan we're dealing with is the one the user declared
-      /** Either an assertion function or a step class */
-      const stepAssertion = nullableFieldType.extensions?.grafast?.Step;
-      if (stepAssertion) {
-        try {
-          if (
-            stepAssertion === ExecutableStep ||
-            stepAssertion.prototype instanceof ExecutableStep
-          ) {
-            if (!($step instanceof stepAssertion)) {
-              throw new Error(
-                `Step mis-match: expected ${
-                  stepAssertion.name
-                }, but instead found ${
-                  ($step as ExecutableStep).constructor.name
-                } (${$step})`,
-              );
+      if (isDev) {
+        // Check that the plan we're dealing with is the one the user declared
+        /** Either an assertion function or a step class */
+        const stepAssertion = nullableFieldType.extensions?.grafast?.Step;
+        if (stepAssertion) {
+          try {
+            if (
+              stepAssertion === ExecutableStep ||
+              stepAssertion.prototype instanceof ExecutableStep
+            ) {
+              if (!($step instanceof stepAssertion)) {
+                throw new Error(
+                  `Step mis-match: expected ${
+                    stepAssertion.name
+                  }, but instead found ${
+                    ($step as ExecutableStep).constructor.name
+                  } (${$step})`,
+                );
+              }
+            } else {
+              (stepAssertion as ($step: ExecutableStep) => void)($step);
             }
-          } else {
-            (stepAssertion as ($step: ExecutableStep) => void)($step);
+          } catch (e) {
+            throw new Error(
+              `The step returned by '${path.join(
+                ".",
+              )}' is not compatible with the GraphQL object type '${
+                nullableFieldType.name
+              }': ${e.message}`,
+              { cause: e },
+            );
           }
-        } catch (e) {
+        }
+        if (!selections) {
           throw new Error(
-            `The step returned by '${path.join(
-              ".",
-            )}' is not compatible with the GraphQL object type '${
-              nullableFieldType.name
-            }': ${e.message}`,
-            { cause: e },
+            `GrafastInternalError<7fe4f7d1-01d2-4f1e-add6-5aa6936938c9>: no selections on a GraphQLObjectType?!`,
           );
         }
-      }
-      if (!selections) {
-        throw new Error(
-          `GrafastInternalError<7fe4f7d1-01d2-4f1e-add6-5aa6936938c9>: no selections on a GraphQLObjectType?!`,
-        );
       }
 
       let objectLayerPlan: LayerPlan;
