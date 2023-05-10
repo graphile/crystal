@@ -1190,14 +1190,6 @@ ${te.join(
             parentType: objectType,
             returnType: fieldType,
             schema: this.schema,
-            // @ts-ignore
-            path: {
-              typename: objectType.name,
-              key: fieldName,
-              // TODO: if we decide to properly support path, we will need to
-              // build this at run-time.
-              prev: undefined,
-            },
           });
         });
       }

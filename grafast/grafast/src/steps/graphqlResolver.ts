@@ -123,9 +123,14 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     const resolveInfo: GraphQLResolveInfo = Object.assign(
       Object.create(this.resolveInfoBase),
       {
-        // TODO: add support for path
         variableValues,
         rootValue,
+        path: {
+          typename: this.resolveInfoBase.parentType.name,
+          key: this.resolveInfoBase.fieldName,
+          // TODO: add full support for path (requires runtime indexes)
+          prev: undefined,
+        },
       },
     );
     const data = this.resolver?.(source, args, context, resolveInfo);
