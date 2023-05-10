@@ -2,6 +2,7 @@ import LRU from "@graphile/lru";
 import type {
   FieldNode,
   FragmentDefinitionNode,
+  GraphQLArgument,
   GraphQLField,
   GraphQLFieldMap,
   GraphQLFieldResolver,
@@ -714,12 +715,13 @@ ${te.join(
 
     const subscriptionPlanResolver = rawSubscriptionPlanResolver;
 
+    const fieldArgsSpec = fieldSpec.args;
     const trackedArguments = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       this.getTrackedArguments,
       this,
-      fieldSpec,
+      fieldArgsSpec,
       field,
     );
     if (subscriptionPlanResolver) {
@@ -1134,12 +1136,13 @@ ${te.join(
             mutationIndex: ++mutationIndex,
           })
         : outputPlan.layerPlan;
+      const objectFieldArgs = objectField.args;
       const trackedArguments = withGlobalLayerPlan(
         fieldLayerPlan,
         polymorphicPaths,
         this.getTrackedArguments,
         this,
-        objectField,
+        objectFieldArgs,
         fieldNodes[0],
       );
       if (typeof planResolver === "function") {
@@ -1807,57 +1810,40 @@ ${te.join(
    * @see https://spec.graphql.org/draft/#CoerceArgumentValues()
    */
   private getTrackedArguments(
-    fieldSpec: GraphQLField<any, any>,
+    argumentDefinitions: ReadonlyArray<GraphQLArgument>,
     field: FieldNode,
   ): TrackedArguments {
-    if (field.arguments) {
-      const argumentValues = field.arguments;
-      const trackedArgumentValues = Object.create(null);
+    const argumentValues = field.arguments;
+    const trackedArgumentValues = Object.create(null);
 
-      withGlobalLayerPlan(this.rootLayerPlan, POLYMORPHIC_ROOT_PATHS, () => {
-        const argumentDefinitions = fieldSpec.args;
-
-        const seenNames = isDev ? new Set() : null;
-
-        for (const argumentDefinition of argumentDefinitions) {
-          const argumentName = argumentDefinition.name;
-          if (seenNames !== null) {
-            if (seenNames.has(argumentName)) {
-              throw new SafeError(
-                `Argument name '${argumentName}' seen twice; aborting.`,
-              );
-            }
-            seenNames.add(argumentName);
-          }
-          const argumentType = argumentDefinition.type;
-          const defaultValue = defaultValueToValueNode(
-            argumentType,
-            argumentDefinition.defaultValue,
-          );
-          const argumentValue = argumentValues.find(
-            (v) => v.name.value === argumentName,
-          );
-          const argumentPlan = inputPlan(
-            this,
-            argumentType,
-            argumentValue?.value,
-            defaultValue,
-          );
-          trackedArgumentValues[argumentName] = argumentPlan;
-        }
-      });
-      return {
-        get(name) {
-          return trackedArgumentValues[name];
-        },
-      };
-    } else {
-      return {
-        get() {
-          return undefined as any;
-        },
-      };
+    for (const argumentDefinition of argumentDefinitions) {
+      const argumentName = argumentDefinition.name;
+      if (isDev && trackedArgumentValues[argumentName]) {
+        throw new SafeError(
+          `Argument name '${argumentName}' seen twice; aborting.`,
+        );
+      }
+      const argumentType = argumentDefinition.type;
+      const defaultValue = defaultValueToValueNode(
+        argumentType,
+        argumentDefinition.defaultValue,
+      );
+      const argumentValue = argumentValues?.find(
+        (v) => v.name.value === argumentName,
+      );
+      const argumentPlan = inputPlan(
+        this,
+        argumentType,
+        argumentValue?.value,
+        defaultValue,
+      );
+      trackedArgumentValues[argumentName] = argumentPlan;
     }
+    return {
+      get(name) {
+        return trackedArgumentValues[name];
+      },
+    };
   }
 
   public withModifiers<T>(cb: () => T): T {
