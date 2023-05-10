@@ -612,6 +612,7 @@ ${te.join(
       outputPlan,
       [],
       POLYMORPHIC_ROOT_PATH,
+      POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
       rootType,
       this.operation.selectionSet.selections,
@@ -651,6 +652,7 @@ ${te.join(
       outputPlan,
       [],
       POLYMORPHIC_ROOT_PATH,
+      POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
       rootType,
       this.operation.selectionSet.selections,
@@ -795,6 +797,7 @@ ${te.join(
         outputPlan,
         [],
         POLYMORPHIC_ROOT_PATH,
+        POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
         rootType,
         selectionSet.selections,
@@ -897,6 +900,7 @@ ${te.join(
         outputPlan,
         [],
         POLYMORPHIC_ROOT_PATH,
+        POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
         rootType,
         selectionSet.selections,
@@ -1206,6 +1210,7 @@ ${te.join(
           fieldLayerPlan,
           [...path, responseKey],
           polymorphicPath,
+          polymorphicPaths,
           fieldNodes[0].selectionSet
             ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
             : undefined,
@@ -1264,6 +1269,7 @@ ${te.join(
     outputPlan: OutputPlan,
     path: readonly string[],
     polymorphicPath: string,
+    polymorphicPaths: ReadonlySet<string>,
     parentStep: ExecutableStep,
     objectType: GraphQLObjectType,
     selections: readonly SelectionNode[],
@@ -1282,7 +1288,7 @@ ${te.join(
     }
     const groupedFieldSet = withGlobalLayerPlan(
       outputPlan.layerPlan,
-      new Set([polymorphicPath]),
+      polymorphicPaths,
       graphqlCollectFields,
       null,
       this,
@@ -1292,7 +1298,6 @@ ${te.join(
       isMutation,
     );
     const objectTypeFields = objectType.getFields();
-    const polymorphicPaths: ReadonlySet<string> = new Set([polymorphicPath]);
     this.processGroupedFieldSet(
       outputPlan,
       path,
@@ -1316,6 +1321,7 @@ ${te.join(
     // This is the LAYER-RELATIVE path, not the absolute path! It resets!
     path: readonly string[],
     polymorphicPath: string,
+    polymorphicPaths: ReadonlySet<string>,
     selections: readonly SelectionNode[] | undefined,
     parentObjectType: GraphQLObjectType | null,
     responseKey: string | null,
@@ -1324,7 +1330,6 @@ ${te.join(
     locationDetails: LocationDetails,
     listDepth = 0,
   ) {
-    const polymorphicPaths = new Set([polymorphicPath]);
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
 
@@ -1363,6 +1368,7 @@ ${te.join(
         $item.layerPlan,
         [],
         polymorphicPath,
+        polymorphicPaths,
         selections,
         null,
         null,
@@ -1502,6 +1508,7 @@ ${te.join(
         objectOutputPlan,
         path,
         polymorphicPath,
+        polymorphicPaths,
         $step,
         nullableFieldType,
         selections!,
@@ -1582,10 +1589,11 @@ ${te.join(
         // Bit of a hack, but saves passing it around through all the arguments
         const newPolymorphicPath = `${polymorphicPath}>${type.name}`;
         polymorphicLayerPlan.reason.polymorphicPaths.add(newPolymorphicPath);
+        const newPolymorphicPaths = new Set([newPolymorphicPath]);
 
         const $root = withGlobalLayerPlan(
           polymorphicLayerPlan,
-          new Set([newPolymorphicPath]),
+          newPolymorphicPaths,
           $step.planForType,
           $step,
           type,
@@ -1606,6 +1614,7 @@ ${te.join(
           objectOutputPlan,
           path,
           newPolymorphicPath,
+          newPolymorphicPaths,
           $root,
           type,
           fieldNodes,
