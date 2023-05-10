@@ -52,6 +52,20 @@ export function evalDirectiveArg<T = unknown>(
 ): T | undefined {
   const directive = getDirective(selection, directiveName);
   if (!directive) return undefined;
+  return evalDirectiveArgDirect(
+    directive,
+    argumentName,
+    variableValuesStep,
+    defaultValue,
+  );
+}
+
+export function evalDirectiveArgDirect<T = unknown>(
+  directive: DirectiveNode,
+  argumentName: string,
+  variableValuesStep: __TrackedValueStep,
+  defaultValue: T,
+): T | undefined {
   if (!directive.arguments) return defaultValue;
   const argument = directive.arguments.find(
     (a) => a.name.value === argumentName,
@@ -73,7 +87,7 @@ export function evalDirectiveArg<T = unknown>(
       }
       default: {
         throw new SafeError(
-          `Unsupported @${directiveName}(${argumentName}:) argument; expected Variable, Boolean or null; but received '${value.kind}'`,
+          `Unsupported @${directive.name}(${argumentName}:) argument; expected Variable, Boolean or null; but received '${value.kind}'`,
         );
       }
     }
@@ -116,6 +130,56 @@ export interface SelectionSetDigest {
   deferred: SelectionSetDigest[];
 }
 
+const processFragment = (
+  operationPlan: OperationPlan,
+  parentStepId: number,
+  objectType: GraphQLObjectType,
+  isMutation: boolean,
+  selectionSetDigest: SelectionSetDigest,
+  selection: SelectionNode,
+  fragmentSelectionSet: SelectionSetNode,
+  visitedFragments: ReadonlyArray<string>,
+) => {
+  const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
+  const defer = selection.directives?.find((d) => d.name.value === "defer");
+  const deferIf = defer
+    ? evalDirectiveArgDirect<boolean | null>(
+        defer,
+        "if",
+        trackedVariableValuesStep,
+        true,
+      ) ?? true
+    : undefined;
+  const label = defer
+    ? evalDirectiveArgDirect<string | null>(
+        defer,
+        "label",
+        trackedVariableValuesStep,
+        null,
+      ) ?? undefined
+    : undefined;
+  const deferredDigest: SelectionSetDigest | null =
+    deferIf === true
+      ? {
+          label,
+          fields: new Map(),
+          deferred: [],
+        }
+      : null;
+  if (deferredDigest) {
+    selectionSetDigest.deferred.push(deferredDigest);
+  }
+  graphqlCollectFields(
+    operationPlan,
+    parentStepId,
+    objectType,
+    fragmentSelectionSet.selections,
+    isMutation,
+    visitedFragments,
+    deferredDigest ?? selectionSetDigest,
+  );
+};
+
 /**
  * Implements the `GraphQLCollectFields` algorithm - like `CollectFields` the
  * GraphQL spec, but modified such that access to variables is tracked.
@@ -130,7 +194,7 @@ export function graphqlCollectFields(
   objectType: GraphQLObjectType,
   selections: readonly SelectionNode[],
   isMutation = false,
-  visitedFragments = new Set<string>(),
+  visitedFragments: ReadonlyArray<string> = [],
   selectionSetDigest: SelectionSetDigest = {
     label: undefined,
     fields: new Map(),
@@ -142,6 +206,7 @@ export function graphqlCollectFields(
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
     if (
+      selection.directives &&
       evalDirectiveArg<boolean | null>(
         selection,
         "skip",
@@ -153,6 +218,7 @@ export function graphqlCollectFields(
       continue;
     }
     if (
+      selection.directives &&
       evalDirectiveArg<boolean | null>(
         selection,
         "include",
@@ -164,87 +230,59 @@ export function graphqlCollectFields(
       continue;
     }
 
-    const processFragment = (
-      selection: SelectionNode,
-      fragmentSelectionSet: SelectionSetNode,
-    ) => {
-      const defer = getDirective(selection, "defer");
-      const deferIf = evalDirectiveArg<boolean | null>(
-        selection,
-        "defer",
-        "if",
-        trackedVariableValuesStep,
-        true,
-      );
-      const label =
-        evalDirectiveArg<string | null>(
-          selection,
-          "defer",
-          "label",
-          trackedVariableValuesStep,
-          null,
-        ) ?? undefined;
-      const deferredDigest: SelectionSetDigest | null =
-        !defer || deferIf === false
-          ? null
-          : {
-              label,
-              fields: new Map(),
-              deferred: [],
-            };
-      if (deferredDigest) {
-        selectionSetDigest.deferred.push(deferredDigest);
-      }
-      graphqlCollectFields(
-        operationPlan,
-        parentStepId,
-        objectType,
-        fragmentSelectionSet.selections,
-        isMutation,
-        visitedFragments,
-        deferredDigest ?? selectionSetDigest,
-      );
-    };
-
     switch (selection.kind) {
       case "Field": {
         const field = selection;
         const responseKey = field.alias?.value ?? field.name.value;
-        let groupForResponseKey: FieldNode[] | undefined =
-          selectionSetDigest.fields.get(responseKey);
-        if (!groupForResponseKey) {
-          groupForResponseKey = [];
+        let groupForResponseKey = selectionSetDigest.fields.get(responseKey);
+        if (groupForResponseKey !== undefined) {
+          groupForResponseKey.push(field);
+        } else {
+          groupForResponseKey = [field];
           selectionSetDigest.fields.set(responseKey, groupForResponseKey);
         }
-        groupForResponseKey.push(field);
         break;
       }
 
       case "FragmentSpread": {
         const fragmentSpreadName = selection.name.value;
-        if (visitedFragments.has(fragmentSpreadName)) {
+        if (visitedFragments.includes(fragmentSpreadName)) {
           continue;
         }
-        visitedFragments.add(fragmentSpreadName);
         const fragment = operationPlan.fragments[fragmentSpreadName];
         if (fragment == null) {
           continue;
         }
         const fragmentTypeName = fragment.typeCondition.name.value;
         const fragmentType = operationPlan.schema.getType(fragmentTypeName);
+
+        // This is forbidden by Validation
+        if (!fragmentType) continue;
+
         if (
-          !fragmentType ||
-          !(
-            isObjectType(fragmentType) ||
-            isInterfaceType(fragmentType) ||
-            isUnionType(fragmentType)
-          ) ||
-          !graphqlDoesFragmentTypeApply(objectType, fragmentType)
+          fragmentType !== objectType &&
+          (fragmentType.constructor === GraphQLObjectType ||
+            /* According to validation, this must be the case */
+            // !(isInterfaceType(fragmentType) || isUnionType(fragmentType)) ||
+            !graphqlDoesFragmentTypeApply(
+              objectType,
+              fragmentType as GraphQLUnionType | GraphQLInterfaceType,
+            ))
         ) {
           continue;
         }
+
         const fragmentSelectionSet = fragment.selectionSet;
-        processFragment(selection, fragmentSelectionSet);
+        processFragment(
+          operationPlan,
+          parentStepId,
+          objectType,
+          isMutation,
+          selectionSetDigest,
+          selection,
+          fragmentSelectionSet,
+          [...visitedFragments, fragmentSpreadName],
+        );
         break;
       }
 
@@ -259,18 +297,29 @@ export function graphqlCollectFields(
             );
           }
           if (
-            !(
-              isObjectType(fragmentType) ||
-              isInterfaceType(fragmentType) ||
-              isUnionType(fragmentType)
-            ) ||
-            !graphqlDoesFragmentTypeApply(objectType, fragmentType)
+            fragmentType !== objectType &&
+            (fragmentType.constructor === GraphQLObjectType ||
+              /* According to validation, this must be the case */
+              // !(isInterfaceType(fragmentType) || isUnionType(fragmentType)) ||
+              !graphqlDoesFragmentTypeApply(
+                objectType,
+                fragmentType as GraphQLUnionType | GraphQLInterfaceType,
+              ))
           ) {
             continue;
           }
         }
         const fragmentSelectionSet = selection.selectionSet;
-        processFragment(selection, fragmentSelectionSet);
+        processFragment(
+          operationPlan,
+          parentStepId,
+          objectType,
+          isMutation,
+          selectionSetDigest,
+          selection,
+          fragmentSelectionSet,
+          visitedFragments,
+        );
         break;
       }
     }
