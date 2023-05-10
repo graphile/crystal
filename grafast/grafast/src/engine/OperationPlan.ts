@@ -719,7 +719,7 @@ ${te.join(
       POLYMORPHIC_ROOT_PATHS,
       this.getTrackedArguments,
       this,
-      rootTypeFields,
+      fieldSpec,
       field,
     );
     if (subscriptionPlanResolver) {
@@ -1139,7 +1139,7 @@ ${te.join(
         polymorphicPaths,
         this.getTrackedArguments,
         this,
-        objectTypeFields,
+        objectField,
         fieldNodes[0],
       );
       if (typeof planResolver === "function") {
@@ -1807,7 +1807,7 @@ ${te.join(
    * @see https://spec.graphql.org/draft/#CoerceArgumentValues()
    */
   private getTrackedArguments(
-    objectTypeFields: GraphQLFieldMap<any, any>,
+    fieldSpec: GraphQLField<any, any>,
     field: FieldNode,
   ): TrackedArguments {
     if (field.arguments) {
@@ -1815,8 +1815,6 @@ ${te.join(
       const trackedArgumentValues = Object.create(null);
 
       withGlobalLayerPlan(this.rootLayerPlan, POLYMORPHIC_ROOT_PATHS, () => {
-        const fieldName = field.name.value;
-        const fieldSpec = objectTypeFields[fieldName];
         const argumentDefinitions = fieldSpec.args;
 
         const seenNames = isDev ? new Set() : null;
