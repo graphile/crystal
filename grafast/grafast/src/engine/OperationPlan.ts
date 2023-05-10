@@ -49,7 +49,6 @@ import {
 import { inputPlan } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
-  FieldArgs,
   FieldPlanResolver,
   LocationDetails,
   StepOptions,
@@ -1709,8 +1708,6 @@ ${te.join(
 
     if (this.loc) this.loc.push(`planField(${path.join(".")})`);
     try {
-      let _fieldArgs!: FieldArgs;
-
       let step = withGlobalLayerPlan(
         layerPlan,
         polymorphicPaths,
@@ -1720,13 +1717,11 @@ ${te.join(
         parentStep,
         trackedArguments,
         field,
-        (fieldArgs) => {
-          _fieldArgs = fieldArgs;
-          return planResolver(parentStep, fieldArgs, {
+        (fieldArgs) =>
+          planResolver(parentStep, fieldArgs, {
             field,
             schema: this.schema,
-          });
-        },
+          }),
       );
       let haltTree = false;
       if (step === null || (step instanceof ConstantStep && step.isNull())) {
