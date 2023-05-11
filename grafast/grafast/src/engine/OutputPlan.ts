@@ -781,6 +781,7 @@ const te_handleDeferred = te`
 const te_string = te.cache`string`;
 const te_object = te.cache`object`;
 const te_obj = te.cache`obj`;
+const te_commonErrorHandler = te.ref(commonErrorHandler, "handleError");
 
 function makeExecutor<TAsString extends boolean>(
   inner: TE,
@@ -879,16 +880,26 @@ function makeExecuteChildPlanCode(
       asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
   } catch (e) {
-    const error = ${ref_coerceError}(e, ${locationDetails}, mutablePath.slice(1));
-    const pathLengthTarget = mutablePathIndex + 1;
-    const overSize = mutablePath.length - pathLengthTarget;
-    if (overSize > 0) {
-      mutablePath.splice(pathLengthTarget, overSize);
-    }
-    root.errors.push(error);
+    ${te_commonErrorHandler}(e, ${locationDetails}, mutablePath, mutablePathIndex, root);
     ${setTargetOrReturn} ${asString ? te_nullString : te_null};
   }`;
   }
+}
+
+function commonErrorHandler(
+  e: Error,
+  locationDetails: LocationDetails,
+  mutablePath: Array<string | number>,
+  mutablePathIndex: number,
+  root: PayloadRoot,
+) {
+  const error = coerceError(e, locationDetails, mutablePath.slice(1));
+  const pathLengthTarget = mutablePathIndex + 1;
+  const overSize = mutablePath.length - pathLengthTarget;
+  if (overSize > 0) {
+    mutablePath.splice(pathLengthTarget, overSize);
+  }
+  root.errors.push(error);
 }
 
 /*
