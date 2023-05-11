@@ -749,7 +749,7 @@ export function getChildBucketAndIndex(
 const te_String = te.cache`String`;
 const te_else = te.cache` else `;
 const te_newline_indent = te.cache`\n  `;
-const te_nullIsFineComment = te.cache`// root/introspection, null is fine\n`;
+const te_nullIsFineComment = te.cache`// root/introspection, null is fine`;
 const te_nullString = te.cache`"null"`;
 const te_null = te.cache`null`;
 const te_childBucket = te.cache`childBucket`;
@@ -821,13 +821,16 @@ function makeExecutor(
 ) {
   const bucketRootValue = this.processRoot !== null ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
 ${preamble}\
-  if (bucketRootValue == null) {
-    ${
-      skipNullHandling
-        ? te_nullIsFineComment
-        : te`return ${asString ? te_nullString : te_null};\n`
-    }\
-  }${
+   ${
+     skipNullHandling
+       ? isDev
+         ? te_nullIsFineComment
+         : te.blank
+       : te`if (bucketRootValue == null) return ${
+           asString ? te_nullString : te_null
+         };`
+   }
+  ${
     skipNullHandling ? te_else : te_newline_indent
   }if (typeof bucketRootValue === 'object' && bucketRootValue[${ref_$$error}]) {
     throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
@@ -1325,8 +1328,7 @@ function makeObjectExecutor<TAsString extends boolean>(
   const inner = te`\
   ${asString ? te_letStringLbrace : te_constObjEqualsObjectCreateNull}
   const { keys } = this;
-  const { children } = bucket;
-  const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
+  const mutablePathIndex = mutablePath.push("!") - 1;
   let spec, childBucket, childBucketIndex, directChild, fieldResult;
 
 ${te.join(
@@ -1375,7 +1377,7 @@ ${makeExecuteChildPlanCode(
   te_bucketIndex,
 )}`
     : te`\
-  directChild = children[spec.outputPlan.layerPlanId];
+  directChild = bucket.children[spec.outputPlan.layerPlanId];
   if (directChild) {
     childBucket = directChild.bucket;
     childBucketIndex = directChild.map.get(bucketIndex);
