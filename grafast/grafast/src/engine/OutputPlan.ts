@@ -842,23 +842,23 @@ function makeExecuteChildPlanCode(
   } else {
     // Need to catch error and set null
     return te`
-      try {
-        const fieldResult = ${childBucket} == null ? ${
+    try {
+      const fieldResult = ${childBucket} == null ? ${
       asString ? te_nullString : te_null
     } : ${childOutputPlan}.${
       asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
-        ${setTargetOrReturn} fieldResult;
-      } catch (e) {
-        const error = ${ref_coerceError}(e, ${locationDetails}, mutablePath.slice(1));
-        const pathLengthTarget = mutablePathIndex + 1;
-        const overSize = mutablePath.length - pathLengthTarget;
-        if (overSize > 0) {
-          mutablePath.splice(pathLengthTarget, overSize);
-        }
-        root.errors.push(error);
-        ${setTargetOrReturn} ${asString ? te_nullString : te_null};
-      }`;
+      ${setTargetOrReturn} fieldResult;
+    } catch (e) {
+      const error = ${ref_coerceError}(e, ${locationDetails}, mutablePath.slice(1));
+      const pathLengthTarget = mutablePathIndex + 1;
+      const overSize = mutablePath.length - pathLengthTarget;
+      if (overSize > 0) {
+        mutablePath.splice(pathLengthTarget, overSize);
+      }
+      root.errors.push(error);
+      ${setTargetOrReturn} ${asString ? te_nullString : te_null};
+    }`;
   }
 }
 
@@ -1324,22 +1324,22 @@ ${te.join(
             // NOTE: this code relies on the fact that fieldName and typeName do
             // not require any quoting in JSON/JS - they must conform to GraphQL
             // `Name`.
-            return te`    string += \`${
+            return te`  string += \`${
               i === 0 ? te.blank : te_comma
             }"${te.substring(fieldName, "`")}":"${te.substring(
               typeName,
               "`",
             )}"\`;`;
           } else {
-            return te`    obj${te.set(fieldName, true)} = ${te.lit(typeName)};`;
+            return te`  obj${te.set(fieldName, true)} = ${te.lit(typeName)};`;
           }
         }
         case "outputPlan!":
         case "outputPlan?": {
           return te`\
-    {
-      mutablePath[mutablePathIndex] = ${te.lit(fieldName)};
-      const spec = keys${te.get(fieldName)};
+  {
+    mutablePath[mutablePathIndex] = ${te.lit(fieldName)};
+    const spec = keys${te.get(fieldName)};
 ${
   sameBucket
     ? te`\
@@ -1358,24 +1358,24 @@ ${makeExecuteChildPlanCode(
   te_bucketIndex,
 )}`
     : te`\
-      let childBucket, childBucketIndex;
-      const directChild = children[spec.outputPlan.layerPlanId];
-      if (directChild) {
-        childBucket = directChild.bucket;
-        childBucketIndex = directChild.map.get(bucketIndex);
+    let childBucket, childBucketIndex;
+    const directChild = children[spec.outputPlan.layerPlanId];
+    if (directChild) {
+      childBucket = directChild.bucket;
+      childBucketIndex = directChild.map.get(bucketIndex);
+    } else {
+      const c = ${ref_getChildBucketAndIndex}(
+        spec.outputPlan,
+        this,
+        bucket,
+        bucketIndex,
+      );
+      if (c) {
+        ([childBucket, childBucketIndex] = c);
       } else {
-        const c = ${ref_getChildBucketAndIndex}(
-          spec.outputPlan,
-          this,
-          bucket,
-          bucketIndex,
-        );
-        if (c) {
-          ([childBucket, childBucketIndex] = c);
-        } else {
-          childBucket = childBucketIndex = null;
-        }
+        childBucket = childBucketIndex = null;
       }
+    }
 ${makeExecuteChildPlanCode(
   asString
     ? te`string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
@@ -1389,7 +1389,7 @@ ${makeExecuteChildPlanCode(
   asString,
 )}`
 }
-    }`;
+  }`;
         }
         default: {
           const never: never = fieldType;
