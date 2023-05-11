@@ -860,7 +860,7 @@ function makeExecuteChildPlanCode(
     throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
   }
   `
-  }const fieldResult = ${childOutputPlan}.${
+  }fieldResult = ${childOutputPlan}.${
       asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
   if (fieldResult == ${asString ? te_nullString : te_null}) {
@@ -1076,6 +1076,7 @@ function makeArrayExecutor<TAsString extends boolean>(
 
   const childOutputPlan = this.child;
   const l = bucketRootValue.length;
+  let fieldResult;
   ${asString ? te.cache`let string;` : te.cache`const data = [];`}
   if (l === 0) {
 ${asString ? te.cache`    string = "[]";` : te.cache`    /* noop */`}
@@ -1315,7 +1316,7 @@ function makeObjectExecutor<TAsString extends boolean>(
   const { keys } = this;
   const { children } = bucket;
   const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
-  let spec, childBucket, childBucketIndex, directChild;
+  let spec, childBucket, childBucketIndex, directChild, fieldResult;
 
 ${te.join(
   Object.entries(fieldTypes).map(
