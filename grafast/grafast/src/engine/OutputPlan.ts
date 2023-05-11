@@ -747,8 +747,6 @@ export function getChildBucketAndIndex(
 }
 
 const te_String = te.cache`String`;
-const te_else = te.cache` else `;
-const te_newline_indent = te.cache`\n  `;
 const te_nullIsFineComment = te.cache`// root/introspection, null is fine`;
 const te_nullString = te.cache`"null"`;
 const te_null = te.cache`null`;
@@ -1377,7 +1375,9 @@ type Factory<TAsString extends boolean> = (
   ? typeof OutputPlan.prototype.executeString
   : typeof OutputPlan.prototype.execute;
 
-const makeObjectExecutorCache = new Map<string, Factory<boolean>>();
+const makeObjectExecutorCache = new LRU<string, Factory<boolean>>({
+  maxLength: 1000,
+});
 const makingObjectExecutorCallbacks = new Map<
   string,
   Array<(factory: Factory<boolean>) => void>
@@ -1392,7 +1392,7 @@ function withObjectExecutorFactory<TAsString extends boolean>(
   hasChildBucketReference: boolean,
   callback: (factory: Factory<TAsString>) => void,
 ) {
-  let fn = makeObjectExecutorCache.get(signature);
+  const fn = makeObjectExecutorCache.get(signature);
   if (fn) {
     return callback(fn);
   }
