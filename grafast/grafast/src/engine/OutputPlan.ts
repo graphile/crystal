@@ -853,41 +853,41 @@ function makeExecuteChildPlanCode(
   if (isNonNull) {
     // No need to catch error
     return te`
-      ${
-        childBucket === te_bucket
-          ? te.blank
-          : te`if (${childBucket} == null) {
-        throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
-      }
-      `
-      }const fieldResult = ${childOutputPlan}.${
+  ${
+    childBucket === te_bucket
+      ? te.blank
+      : te`if (${childBucket} == null) {
+    throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
+  }
+  `
+  }const fieldResult = ${childOutputPlan}.${
       asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
-      if (fieldResult == ${asString ? te_nullString : te_null}) {
-        throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
-      }
-      ${setTargetOrReturn} fieldResult;`;
+  if (fieldResult == ${asString ? te_nullString : te_null}) {
+    throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
+  }
+  ${setTargetOrReturn} fieldResult;`;
   } else {
     // Need to catch error and set null
     return te`
-    try {
-      ${setTargetOrReturn} ${
+  try {
+    ${setTargetOrReturn} ${
       childBucket === te_bucket
         ? te.blank
         : te`${childBucket} == null ? ${asString ? te_nullString : te_null} : `
     }${childOutputPlan}.${
       asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
-    } catch (e) {
-      const error = ${ref_coerceError}(e, ${locationDetails}, mutablePath.slice(1));
-      const pathLengthTarget = mutablePathIndex + 1;
-      const overSize = mutablePath.length - pathLengthTarget;
-      if (overSize > 0) {
-        mutablePath.splice(pathLengthTarget, overSize);
-      }
-      root.errors.push(error);
-      ${setTargetOrReturn} ${asString ? te_nullString : te_null};
-    }`;
+  } catch (e) {
+    const error = ${ref_coerceError}(e, ${locationDetails}, mutablePath.slice(1));
+    const pathLengthTarget = mutablePathIndex + 1;
+    const overSize = mutablePath.length - pathLengthTarget;
+    if (overSize > 0) {
+      mutablePath.splice(pathLengthTarget, overSize);
+    }
+    root.errors.push(error);
+    ${setTargetOrReturn} ${asString ? te_nullString : te_null};
+  }`;
   }
 }
 
@@ -1339,12 +1339,11 @@ ${te.join(
         case "outputPlan!":
         case "outputPlan?": {
           return te`\
-  // ---
-    mutablePath[mutablePathIndex] = ${te.lit(fieldName)};
-    spec = keys${te.get(fieldName)};
+  mutablePath[mutablePathIndex] = ${te.lit(fieldName)};
+  spec = keys${te.get(fieldName)};
 ${
   asString
-    ? te`    string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
+    ? te`  string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
         fieldName,
         "`",
       )}":\`;
@@ -1364,23 +1363,23 @@ ${makeExecuteChildPlanCode(
   te_bucketIndex,
 )}`
     : te`\
-    directChild = children[spec.outputPlan.layerPlanId];
-    if (directChild) {
-      childBucket = directChild.bucket;
-      childBucketIndex = directChild.map.get(bucketIndex);
+  directChild = children[spec.outputPlan.layerPlanId];
+  if (directChild) {
+    childBucket = directChild.bucket;
+    childBucketIndex = directChild.map.get(bucketIndex);
+  } else {
+    const c = ${ref_getChildBucketAndIndex}(
+      spec.outputPlan,
+      this,
+      bucket,
+      bucketIndex,
+    );
+    if (c) {
+      ([childBucket, childBucketIndex] = c);
     } else {
-      const c = ${ref_getChildBucketAndIndex}(
-        spec.outputPlan,
-        this,
-        bucket,
-        bucketIndex,
-      );
-      if (c) {
-        ([childBucket, childBucketIndex] = c);
-      } else {
-        childBucket = childBucketIndex = null;
-      }
+      childBucket = childBucketIndex = null;
     }
+  }
 ${makeExecuteChildPlanCode(
   asString ? te`string +=` : te`obj${te.set(fieldName, true)} =`,
   te_specDotLocationDetails,
@@ -1389,7 +1388,7 @@ ${makeExecuteChildPlanCode(
   asString,
 )}`
 }
-  //---\n`;
+`;
         }
         default: {
           const never: never = fieldType;
