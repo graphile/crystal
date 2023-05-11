@@ -1322,35 +1322,42 @@ function makeObjectExecutor<TAsString extends boolean>(
       )}; these don't conform to 'Name' in the GraphQL spec`,
     );
   }
+  const entries = Object.entries(fieldTypes);
+  let hasChildBucketReference = entries.some(
+    ([, { sameBucket }]) => !sameBucket,
+  );
 
   const inner = te`\
   ${asString ? te_letStringLbrace : te_constObjEqualsObjectCreateNull}
   const { keys } = this;
   const mutablePathIndex = mutablePath.push("!") - 1;
-  let spec, childBucket, childBucketIndex, directChild, fieldResult;
+  let spec${
+    hasChildBucketReference
+      ? te`, childBucket, childBucketIndex, directChild`
+      : te.blank
+  }, fieldResult;
 
 ${te.join(
-  Object.entries(fieldTypes).map(
-    ([fieldName, { fieldType, sameBucket }], i) => {
-      switch (fieldType) {
-        case "__typename": {
-          if (asString) {
-            // NOTE: this code relies on the fact that fieldName and typeName do
-            // not require any quoting in JSON/JS - they must conform to GraphQL
-            // `Name`.
-            return te`  string += \`${
-              i === 0 ? te.blank : te_comma
-            }"${te.substring(fieldName, "`")}":"${te.substring(
-              typeName,
-              "`",
-            )}"\`;\n`;
-          } else {
-            return te`  obj${te.set(fieldName, true)} = ${te.lit(typeName)};\n`;
-          }
+  entries.map(([fieldName, { fieldType, sameBucket }], i) => {
+    switch (fieldType) {
+      case "__typename": {
+        if (asString) {
+          // NOTE: this code relies on the fact that fieldName and typeName do
+          // not require any quoting in JSON/JS - they must conform to GraphQL
+          // `Name`.
+          return te`  string += \`${
+            i === 0 ? te.blank : te_comma
+          }"${te.substring(fieldName, "`")}":"${te.substring(
+            typeName,
+            "`",
+          )}"\`;\n`;
+        } else {
+          return te`  obj${te.set(fieldName, true)} = ${te.lit(typeName)};\n`;
         }
-        case "outputPlan!":
-        case "outputPlan?": {
-          return te`\
+      }
+      case "outputPlan!":
+      case "outputPlan?": {
+        return te`\
   mutablePath[mutablePathIndex] = ${te.lit(fieldName)};
   spec = keys${te.get(fieldName)};
 ${
@@ -1401,16 +1408,15 @@ ${makeExecuteChildPlanCode(
 )}`
 }
 `;
-        }
-        default: {
-          const never: never = fieldType;
-          throw new Error(
-            `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
-          );
-        }
       }
-    },
-  ),
+      default: {
+        const never: never = fieldType;
+        throw new Error(
+          `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+        );
+      }
+    }
+  }),
   "\n",
 )}
 
