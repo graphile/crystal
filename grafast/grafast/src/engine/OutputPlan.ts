@@ -750,6 +750,37 @@ const te_String = te.cache`String`;
 const te_else = te.cache` else `;
 const te_newline_indent = te.cache`\n  `;
 const te_nullIsFineComment = te.cache`// root/introspection, null is fine\n`;
+const te_nullString = te.cache`"null"`;
+const te_null = te.cache`null`;
+const te_childBucket = te.cache`childBucket`;
+const te_childBucketIndex = te.cache`childBucketIndex`;
+const te_executeString = te.cache`executeString`;
+const te_execute = te.cache`execute`;
+const te_polymorphic = te.cache`polymorphic`;
+const te_letStringLbrace = te.cache`let string = "{";`;
+const te_stringPlusEqualsRbrace = te.cache`  string += "}";\n`;
+const te_constObjEqualsObjectCreateNull = te.cache`const obj = Object.create(null);`;
+const te_comma = te.cache`,`;
+const te_specDotLocationDetails = te.cache`spec.locationDetails`;
+const te_specDotOutputPlan = te.cache`spec.outputPlan`;
+const te_bucket = te.cache`bucket`;
+const te_bucketIndex = te.cache`bucketIndex`;
+const te_handleDeferred = te`
+  // Everything seems okay; queue any deferred payloads
+  for (const defer of this.deferredOutputPlans) {
+    root.queue.push({
+      root,
+      path: mutablePath.slice(1),
+      bucket,
+      bucketIndex,
+      outputPlan: defer,
+      label: defer.type.deferLabel,
+    });
+  }
+`;
+const te_string = te.cache`string`;
+const te_object = te.cache`object`;
+const te_obj = te.cache`obj`;
 
 function makeExecutor<TAsString extends boolean>(
   inner: TE,
@@ -808,13 +839,6 @@ ${inner}
     return te.run(te`return ${expression}`);
   }
 }
-
-const te_nullString = te.cache`"null"`;
-const te_null = te.cache`null`;
-const te_childBucket = te.cache`childBucket`;
-const te_childBucketIndex = te.cache`childBucketIndex`;
-const te_executeString = te.cache`executeString`;
-const te_execute = te.cache`execute`;
 
 function makeExecuteChildPlanCode(
   setTargetOrReturn: TE,
@@ -966,8 +990,6 @@ const stringLeafExecutorString = makeExecutor(
 // should be `resolveType(bucketRootValue)` but it's not worth the function
 // call overhead. Longer term it should just be read directly from a different
 // store.
-
-const te_polymorphic = te.cache`polymorphic`;
 
 function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
@@ -1244,32 +1266,6 @@ const introspectionExecutorString = makeExecutor(
   true,
   true,
 );
-
-const te_letStringLbrace = te.cache`let string = "{";`;
-const te_stringPlusEqualsRbrace = te.cache`  string += "}";\n`;
-const te_constObjEqualsObjectCreateNull = te.cache`const obj = Object.create(null);`;
-const te_comma = te.cache`,`;
-const te_specDotLocationDetails = te.cache`spec.locationDetails`;
-const te_specDotOutputPlan = te.cache`spec.outputPlan`;
-const te_bucket = te.cache`bucket`;
-const te_bucketIndex = te.cache`bucketIndex`;
-const te_handleDeferred = te`
-  // Everything seems okay; queue any deferred payloads
-  for (const defer of this.deferredOutputPlans) {
-    root.queue.push({
-      root,
-      path: mutablePath.slice(1),
-      bucket,
-      bucketIndex,
-      outputPlan: defer,
-      label: defer.type.deferLabel,
-    });
-  }
-`;
-
-const te_string = te.cache`string`;
-const te_object = te.cache`object`;
-const te_obj = te.cache`obj`;
 
 function makeObjectExecutor<TAsString extends boolean>(
   typeName: string,
