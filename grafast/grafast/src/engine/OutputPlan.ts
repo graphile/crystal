@@ -1197,7 +1197,7 @@ const introspect = (
   mutablePath: ReadonlyArray<string | number>,
   asString: boolean,
 ) => {
-  const locationDetails = outputPlan.locationDetails;
+  const { locationDetails } = outputPlan;
   const {
     field: rawField,
     introspectionCacheByVariableValues,
@@ -1254,7 +1254,7 @@ const introspect = (
 
     console.error("INTROSPECTION FAILED!");
     console.error(graphqlResult);
-    const node = locationDetails.node;
+    const { node } = locationDetails;
     throw new GraphQLError(
       "INTROSPECTION FAILED!",
       node,
@@ -1325,7 +1325,7 @@ function makeObjectExecutor<TAsString extends boolean>(
 
   const inner = te`\
   ${asString ? te_letStringLbrace : te_constObjEqualsObjectCreateNull}
-  const keys = this.keys;
+  const { keys } = this;
   const mutablePathIndex = mutablePath.push("!") - 1;
   let spec, childBucket, childBucketIndex, directChild, fieldResult;
 
