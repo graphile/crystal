@@ -821,18 +821,16 @@ function makeExecutor(
 ) {
   const bucketRootValue = this.processRoot !== null ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
 ${preamble}\
-   ${
-     skipNullHandling
-       ? isDev
-         ? te_nullIsFineComment
-         : te.blank
-       : te`if (bucketRootValue == null) return ${
-           asString ? te_nullString : te_null
-         };`
-   }
   ${
-    skipNullHandling ? te_else : te_newline_indent
-  }if (typeof bucketRootValue === 'object' && bucketRootValue[${ref_$$error}]) {
+    skipNullHandling
+      ? isDev
+        ? te_nullIsFineComment
+        : te.blank
+      : te`if (bucketRootValue == null) return ${
+          asString ? te_nullString : te_null
+        };`
+  }
+  if (bucketRootValue${skipNullHandling ? te`?.` : te.blank}[${ref_$$error}]) {
     throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
