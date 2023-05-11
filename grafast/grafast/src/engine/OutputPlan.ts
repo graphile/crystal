@@ -818,7 +818,7 @@ function makeExecutor(
   bucketIndex,
   rawBucketRootValue = bucket.store.get(this.rootStep.id)[bucketIndex]
 ) {
-  const bucketRootValue = this.processRoot ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
+  const bucketRootValue = this.processRoot !== null ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
 ${preamble}\
   if (bucketRootValue == null) {
     ${
@@ -828,7 +828,7 @@ ${preamble}\
     }\
   }${
     skipNullHandling ? te_else : te_newline_indent
-  }if (typeof bucketRootValue === 'object' && ${ref_$$error} in bucketRootValue) {
+  }if (typeof bucketRootValue === 'object' && bucketRootValue[${ref_$$error}] ) {
     throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
@@ -853,10 +853,14 @@ function makeExecuteChildPlanCode(
   if (isNonNull) {
     // No need to catch error
     return te`
-      if (${childBucket} == null) {
+      ${
+        childBucket === te_bucket
+          ? te.blank
+          : te`if (${childBucket} == null) {
         throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
       }
-      const fieldResult = ${childOutputPlan}.${
+      `
+      }const fieldResult = ${childOutputPlan}.${
       asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
       if (fieldResult == ${asString ? te_nullString : te_null}) {
@@ -867,12 +871,13 @@ function makeExecuteChildPlanCode(
     // Need to catch error and set null
     return te`
     try {
-      const fieldResult = ${childBucket} == null ? ${
-      asString ? te_nullString : te_null
-    } : ${childOutputPlan}.${
+      ${setTargetOrReturn} ${
+      childBucket === te_bucket
+        ? te.blank
+        : te`${childBucket} == null ? ${asString ? te_nullString : te_null} : `
+    }${childOutputPlan}.${
       asString ? te_executeString : te_execute
     }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
-      ${setTargetOrReturn} fieldResult;
     } catch (e) {
       const error = ${ref_coerceError}(e, ${locationDetails}, mutablePath.slice(1));
       const pathLengthTarget = mutablePathIndex + 1;
@@ -1310,6 +1315,7 @@ function makeObjectExecutor<TAsString extends boolean>(
   const { keys } = this;
   const { children } = bucket;
   const mutablePathIndex = mutablePath.push("SOMETHING_WENT_WRONG_WITH_MUTABLE_PATH") - 1;
+  let spec, childBucket, childBucketIndex, directChild;
 
 ${te.join(
   Object.entries(fieldTypes).map(
@@ -1333,19 +1339,23 @@ ${te.join(
         case "outputPlan!":
         case "outputPlan?": {
           return te`\
-  {
+  // ---
     mutablePath[mutablePathIndex] = ${te.lit(fieldName)};
-    const spec = keys${te.get(fieldName)};
+    spec = keys${te.get(fieldName)};
+${
+  asString
+    ? te`    string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
+        fieldName,
+        "`",
+      )}":\`;
+`
+    : te.blank
+}\
 ${
   sameBucket
     ? te`\
 ${makeExecuteChildPlanCode(
-  asString
-    ? te`string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
-        fieldName,
-        "`",
-      )}":\` +`
-    : te`obj${te.set(fieldName, true)} =`,
+  asString ? te`string +=` : te`obj${te.set(fieldName, true)} =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
@@ -1354,8 +1364,7 @@ ${makeExecuteChildPlanCode(
   te_bucketIndex,
 )}`
     : te`\
-    let childBucket, childBucketIndex;
-    const directChild = children[spec.outputPlan.layerPlanId];
+    directChild = children[spec.outputPlan.layerPlanId];
     if (directChild) {
       childBucket = directChild.bucket;
       childBucketIndex = directChild.map.get(bucketIndex);
@@ -1373,19 +1382,14 @@ ${makeExecuteChildPlanCode(
       }
     }
 ${makeExecuteChildPlanCode(
-  asString
-    ? te`string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
-        fieldName,
-        "`",
-      )}":\` +`
-    : te`obj${te.set(fieldName, true)} =`,
+  asString ? te`string +=` : te`obj${te.set(fieldName, true)} =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
   asString,
 )}`
 }
-  }`;
+  //---\n`;
         }
         default: {
           const never: never = fieldType;
