@@ -261,16 +261,15 @@ function makePlaceholderNode(
   });
 }
 
-const CHARCODE_A = "A".charCodeAt(0);
-
 function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
   let checksum = 0;
   for (const node of nodes) {
     switch (node[$$type]) {
       case "RAW": {
         const { t } = node;
-        for (let i = 0, l = Math.min(t.length, 10000); i < l; i++) {
-          checksum += Math.min(t.charCodeAt(i) - CHARCODE_A, 100);
+        // Max value of charCodeAt is 65535. 65535 * 10000 < 2^30.
+        for (let i = 0, l = t.length, l2 = l > 10000 ? 10000 : l; i < l2; i++) {
+          checksum += t.charCodeAt(i);
         }
         break;
       }

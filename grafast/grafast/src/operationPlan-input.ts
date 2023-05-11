@@ -78,7 +78,7 @@ function withFieldArgsForArgumentsOrInputObject<
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
   const schema = operationPlan.schema;
-  const analyzedCoordinates: string[] = [];
+  const analyzedCoordinates: { [key: string]: true } = Object.create(null);
 
   const getArgOnceOnly = (inPath: string | string[]) => {
     if (operationPlan.loc)
@@ -93,8 +93,8 @@ function withFieldArgsForArgumentsOrInputObject<
     }
 
     const id = path.join(".");
-    if (!analyzedCoordinates.includes(id)) {
-      analyzedCoordinates.push(id);
+    if (!analyzedCoordinates[id]) {
+      analyzedCoordinates[id] = true;
     }
 
     const $currentObject = $current as
@@ -406,7 +406,7 @@ function withFieldArgsForArgumentsOrInputObject<
   const fieldArgs: FieldArgs = {
     get(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates.push("");
+        analyzedCoordinates[""] = true;
         if (!typeContainingFields) {
           if (fields) {
             return object(
@@ -432,7 +432,7 @@ function withFieldArgsForArgumentsOrInputObject<
     },
     getRaw(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates.push("");
+        analyzedCoordinates[""] = true;
         if ($current instanceof ExecutableStep) {
           return $current;
         } else {
@@ -444,7 +444,7 @@ function withFieldArgsForArgumentsOrInputObject<
     },
     apply(targetStepOrCallback, path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates.push("");
+        analyzedCoordinates[""] = true;
         if (typeContainingFields && ($current as InputStep).evalIs(undefined)) {
           return;
         }
@@ -500,13 +500,14 @@ function withFieldArgsForArgumentsOrInputObject<
   // Now handled all the remaining coordinates
   if (operationPlan.loc) operationPlan.loc.push("handle_remaining");
   if (
-    !analyzedCoordinates.includes("") &&
+    !analyzedCoordinates[""] &&
     step != null &&
     !(step instanceof ConstantStep && step.isNull())
   ) {
     if (!fields) {
       fieldArgs.apply(step);
     } else {
+      const allKeys = Object.keys(analyzedCoordinates);
       const process = (
         layerFields: typeof fields,
         parentPath: readonly string[] = [],
@@ -516,9 +517,9 @@ function withFieldArgsForArgumentsOrInputObject<
           const newPath = [...parentPath, fieldName];
           const pathStr = newPath.join(".");
           const prefix = `${pathStr}.`;
-          if (analyzedCoordinates.includes(pathStr)) {
+          if (analyzedCoordinates[pathStr]) {
             continue;
-          } else if (analyzedCoordinates.some((c) => c.startsWith(prefix))) {
+          } else if (allKeys.some((c) => c.startsWith(prefix))) {
             const inputObjectType = getNullableType(field.type);
             if (!isInputObjectType(inputObjectType)) {
               throw new Error(
