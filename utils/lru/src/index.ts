@@ -37,6 +37,11 @@ export interface LRUOptions<KeyType, ValueType> {
   dispose?: (key: KeyType, value: ValueType) => void;
 }
 
+/** An optimized get to use before the LRU saturates */
+function quickGet(this: any, key: any): any {
+  return this.c.get(key)?.v;
+}
+
 /**
  * An tiny LRU cache with maximum count, identical weighting and no expiration.
  */
@@ -67,6 +72,7 @@ export class LRU<KeyType = any, ValueType = any> {
     this.t = null;
     this.c = new Map();
     this.d = dispose || null;
+    this.get = quickGet;
 
     this.reset();
   }
@@ -154,6 +160,9 @@ export class LRU<KeyType = any, ValueType = any> {
         this.t = newHead;
       }
       this.length++;
+      if (this.length === this.m) {
+        this.get = LRU.prototype.get;
+      }
     }
   }
 }
