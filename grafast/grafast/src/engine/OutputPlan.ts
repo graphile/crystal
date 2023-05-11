@@ -1323,6 +1323,27 @@ function makeObjectExecutor<TAsString extends boolean>(
     );
   }
   const entries = Object.entries(fieldTypes);
+  const signature =
+    (asString ? "s" : "o") +
+    (isRoot ? "r" : "") +
+    (hasDeferredOutputPlans ? "d" : "") +
+    entries
+      .map(
+        ([, { fieldType, sameBucket }]) =>
+          `${
+            fieldType === "__typename"
+              ? "_"
+              : fieldType === "outputPlan?"
+              ? "?"
+              : fieldType === "outputPlan!"
+              ? "!"
+              : (() => {
+                  const never: never = fieldType;
+                  throw new Error(`Unsupported field type '${never}'`);
+                })()
+          }${sameBucket ? "" : "~"}`,
+      )
+      .join("");
   let hasChildBucketReference = entries.some(
     ([, { sameBucket }]) => !sameBucket,
   );
