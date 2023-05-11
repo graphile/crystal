@@ -34,7 +34,10 @@ import type { ExecutableStep } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
-
+interface FieldTypeDigest {
+  fieldType: "__typename" | "outputPlan!" | "outputPlan?";
+  sameBucket: boolean;
+}
 export type OutputPlanTypeIntrospection = {
   mode: "introspection";
   /**
@@ -542,10 +545,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       case "object": {
         const type = this.type as OutputPlanTypeRoot | OutputPlanTypeObject;
         const digestFieldTypes: {
-          [responseKey: string]: {
-            fieldType: "__typename" | "outputPlan!" | "outputPlan?";
-            sameBucket: boolean;
-          };
+          [responseKey: string]: FieldTypeDigest;
         } = Object.create(null);
         for (const [responseKey, spec] of Object.entries(this.keys)) {
           digestFieldTypes[responseKey] = {
@@ -792,19 +792,9 @@ interface MakeExecutorOptions<TAsString extends boolean> {
   preamble?: TE;
 }
 
-function makeExecutor<TAsString extends boolean>(
+function makeExecutorExpression<TAsString extends boolean>(
   options: MakeExecutorOptions<TAsString>,
-): TAsString extends true
-  ? typeof OutputPlan.prototype.executeString
-  : typeof OutputPlan.prototype.execute;
-function makeExecutor<TAsString extends boolean>(
-  options: MakeExecutorOptions<TAsString>,
-  callback: (fn: any) => void,
-): void;
-function makeExecutor(
-  options: MakeExecutorOptions<boolean>,
-  callback?: (fn: any) => void,
-): any {
+): TE {
   const {
     inner,
     nameExtra,
@@ -812,7 +802,7 @@ function makeExecutor(
     skipNullHandling = false,
     preamble = te.blank,
   } = options;
-  const expression = te`\
+  return te`\
 (function compiledOutputPlan${asString ? te_String : te.blank}_${nameExtra}(
   root,
   mutablePath,
@@ -836,6 +826,22 @@ ${preamble}\
   }
 ${inner}
 })`;
+}
+
+function makeExecutor<TAsString extends boolean>(
+  options: MakeExecutorOptions<TAsString>,
+): TAsString extends true
+  ? typeof OutputPlan.prototype.executeString
+  : typeof OutputPlan.prototype.execute;
+function makeExecutor<TAsString extends boolean>(
+  options: MakeExecutorOptions<TAsString>,
+  callback: (fn: any) => void,
+): void;
+function makeExecutor(
+  options: MakeExecutorOptions<boolean>,
+  callback?: (fn: any) => void,
+): any {
+  const expression = makeExecutorExpression(options);
   if (callback) {
     te.runInBatch(expression, callback);
   } else {
@@ -1288,10 +1294,7 @@ const introspectionExecutorString = makeExecutor({
 function makeObjectExecutor<TAsString extends boolean>(
   typeName: string,
   fieldTypes: {
-    [key: string]: {
-      fieldType: "__typename" | "outputPlan!" | "outputPlan?";
-      sameBucket: boolean;
-    };
+    [key: string]: FieldTypeDigest;
   },
   hasDeferredOutputPlans: boolean,
   // this.type.mode === "root",
