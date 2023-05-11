@@ -828,7 +828,7 @@ ${preamble}\
     }\
   }${
     skipNullHandling ? te_else : te_newline_indent
-  }if (typeof bucketRootValue === 'object' && bucketRootValue[${ref_$$error}] ) {
+  }if (typeof bucketRootValue === 'object' && bucketRootValue[${ref_$$error}]) {
     throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
@@ -852,7 +852,7 @@ function makeExecuteChildPlanCode(
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
     // No need to catch error
-    return te`
+    return te`\
   ${
     childBucket === te_bucket
       ? te.blank
@@ -869,7 +869,7 @@ function makeExecuteChildPlanCode(
   ${setTargetOrReturn} fieldResult;`;
   } else {
     // Need to catch error and set null
-    return te`
+    return te`\
   try {
     ${setTargetOrReturn} ${
       childBucket === te_bucket
@@ -1110,7 +1110,7 @@ ${asString ? te.cache`    string = "[";\n` : te.blank}\
       }
 
       mutablePath[mutablePathIndex] = i;
-${asString ? te.cache`\n      if (i > 0) { string += ","; }` : te.blank}
+${asString ? te.cache`\n      if (i > 0) { string += ","; }\n` : te.blank}
 ${makeExecuteChildPlanCode(
   asString ? te.cache`string +=` : te.cache`data[i] =`,
   te.cache`this.locationDetails`,
@@ -1120,7 +1120,7 @@ ${makeExecuteChildPlanCode(
 )}
     }
 
-    mutablePath.pop();
+    mutablePath.length = mutablePathIndex;
 ${asString ? te.cache`    string += "]";\n` : te.blank}
   }
 ${
@@ -1332,9 +1332,9 @@ ${te.join(
             }"${te.substring(fieldName, "`")}":"${te.substring(
               typeName,
               "`",
-            )}"\`;`;
+            )}"\`;\n`;
           } else {
-            return te`  obj${te.set(fieldName, true)} = ${te.lit(typeName)};`;
+            return te`  obj${te.set(fieldName, true)} = ${te.lit(typeName)};\n`;
           }
         }
         case "outputPlan!":
@@ -1403,7 +1403,7 @@ ${makeExecuteChildPlanCode(
   "\n",
 )}
 
-  mutablePath.pop();
+  mutablePath.length = mutablePathIndex;
 ${asString ? te_stringPlusEqualsRbrace : te.blank}\
 ${hasDeferredOutputPlans ? te_handleDeferred : te.blank}
   return ${asString ? te_string : te_obj};`;
