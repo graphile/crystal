@@ -851,6 +851,9 @@ function makeExecuteChildPlanCode(
   childBucket: TE = te_childBucket,
   childBucketIndex: TE = te_childBucketIndex,
 ) {
+  const te_childOutputPlanExecute = te`${childOutputPlan}.${
+    asString ? te_executeString : te_execute
+  }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined)`;
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
     // No need to catch error
@@ -862,9 +865,7 @@ function makeExecuteChildPlanCode(
     throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
   }
   `
-  }fieldResult = ${childOutputPlan}.${
-      asString ? te_executeString : te_execute
-    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
+  }fieldResult = ${te_childOutputPlanExecute};
   if (fieldResult == ${asString ? te_nullString : te_null}) {
     throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
   }
@@ -877,9 +878,7 @@ function makeExecuteChildPlanCode(
       childBucket === te_bucket
         ? te.blank
         : te`${childBucket} == null ? ${asString ? te_nullString : te_null} : `
-    }${childOutputPlan}.${
-      asString ? te_executeString : te_execute
-    }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined);
+    }${te_childOutputPlanExecute};
   } catch (e) {
     ${te_commonErrorHandler}(e, ${locationDetails}, mutablePath, mutablePathIndex, root);
     ${setTargetOrReturn} ${asString ? te_nullString : te_null};
