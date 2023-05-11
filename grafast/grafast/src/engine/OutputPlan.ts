@@ -1,4 +1,4 @@
-import type LRU from "@graphile/lru";
+import LRU from "@graphile/lru";
 import type {
   DocumentNode,
   FieldNode,
@@ -1291,6 +1291,8 @@ const introspectionExecutorString = makeExecutor({
   skipNullHandling: true,
 });
 
+const SAFE_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
 function makeObjectExecutor<TAsString extends boolean>(
   typeName: string,
   fieldTypes: {
@@ -1306,50 +1308,102 @@ function makeObjectExecutor<TAsString extends boolean>(
       : typeof OutputPlan.prototype.execute,
   ) => void,
 ): void {
-  // PERF: figure out how to memoize this (without introducing memory leaks)
-
-  const keys = Object.keys(fieldTypes);
-  /*
-   * NOTE: because we use `Object.create(verbatimPrototype)` (and
-   * `verbatimPrototype` is based on Object.create(null)) it's safe for us to
-   * set keys such as `__proto__`. This would not be safe if we were to use
-   * `{}` instead.
-   */
-  const unsafeKeys = keys.filter(
-    (key) => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(key),
-  );
-  if (unsafeKeys.length > 0) {
+  if (!SAFE_NAME.test(typeName)) {
     throw new Error(
-      `Unsafe keys: ${unsafeKeys.join(
-        ",",
-      )}; these don't conform to 'Name' in the GraphQL spec`,
+      `Unsafe type name: ${typeName}; doesn't conform to 'Name' in the GraphQL spec`,
     );
   }
-  const entries = Object.entries(fieldTypes);
-  const signature =
+  const keys: string[] = [];
+  const fieldSpecs: FieldTypeDigest[] = [];
+  let signature =
     (asString ? "s" : "o") +
     (isRoot ? "r" : "") +
-    (hasDeferredOutputPlans ? "d" : "") +
-    entries
-      .map(
-        ([, { fieldType, sameBucket }]) =>
-          `${
-            fieldType === "__typename"
-              ? "_"
-              : fieldType === "outputPlan?"
-              ? "?"
-              : fieldType === "outputPlan!"
-              ? "!"
-              : (() => {
-                  const never: never = fieldType;
-                  throw new Error(`Unsupported field type '${never}'`);
-                })()
-          }${sameBucket ? "" : "~"}`,
-      )
-      .join("");
-  let hasChildBucketReference = entries.some(
-    ([, { sameBucket }]) => !sameBucket,
+    (hasDeferredOutputPlans ? "d" : "");
+  let hasChildBucketReference = false;
+
+  for (const [key, fieldSpec] of Object.entries(fieldTypes)) {
+    if (!SAFE_NAME.test(key)) {
+      // This should not be able to happen if the GraphQL operation is valid
+      throw new Error(
+        `Unsafe key: ${key}; doesn't conform to 'Name' in the GraphQL spec`,
+      );
+    }
+
+    keys.push(key);
+    fieldSpecs.push(fieldSpec);
+
+    const { fieldType, sameBucket } = fieldSpec;
+    switch (fieldType) {
+      case "__typename": {
+        signature += "_";
+        break;
+      }
+      case "outputPlan?": {
+        signature += "?";
+        break;
+      }
+      case "outputPlan!": {
+        signature += "!";
+        break;
+      }
+      default: {
+        const never: never = fieldType;
+        throw new Error(`Unsupported field type '${never}'`);
+      }
+    }
+    if (!sameBucket) {
+      hasChildBucketReference = true;
+      signature += "~";
+    }
+  }
+  withObjectExecutorFactory(
+    signature,
+    fieldSpecs,
+    hasDeferredOutputPlans,
+    isRoot,
+    asString,
+    hasChildBucketReference,
+    (factory) => {
+      const fn = factory(typeName, ...keys);
+      callback(fn);
+    },
   );
+}
+
+type Factory<TAsString extends boolean> = (
+  typeName: string,
+  ...keys: string[]
+) => TAsString extends true
+  ? typeof OutputPlan.prototype.executeString
+  : typeof OutputPlan.prototype.execute;
+
+const makeObjectExecutorCache = new Map<string, Factory<boolean>>();
+const makingObjectExecutorCallbacks = new Map<
+  string,
+  Array<(factory: Factory<boolean>) => void>
+>();
+
+function withObjectExecutorFactory<TAsString extends boolean>(
+  signature: string,
+  fieldSpecs: ReadonlyArray<FieldTypeDigest>,
+  hasDeferredOutputPlans: boolean,
+  isRoot: boolean,
+  asString: TAsString,
+  hasChildBucketReference: boolean,
+  callback: (factory: Factory<TAsString>) => void,
+) {
+  let fn = makeObjectExecutorCache.get(signature);
+  if (fn) {
+    return callback(fn);
+  }
+  const building = makingObjectExecutorCallbacks.get(signature);
+  if (building) {
+    building.push(callback as (factory: Factory<boolean>) => void);
+    return;
+  }
+
+  const callbacks = [callback as (factory: Factory<boolean>) => void];
+  makingObjectExecutorCallbacks.set(signature, callbacks);
 
   const inner = te`\
   ${asString ? te_letStringLbrace : te_constObjEqualsObjectCreateNull}
@@ -1362,7 +1416,7 @@ function makeObjectExecutor<TAsString extends boolean>(
   }, fieldResult;
 
 ${te.join(
-  entries.map(([fieldName, { fieldType, sameBucket }], i) => {
+  fieldSpecs.map(({ fieldType, sameBucket }, i) => {
     switch (fieldType) {
       case "__typename": {
         if (asString) {
@@ -1371,25 +1425,21 @@ ${te.join(
           // `Name`.
           return te`  string += \`${
             i === 0 ? te.blank : te_comma
-          }"${te.substring(fieldName, "`")}":"${te.substring(
-            typeName,
-            "`",
-          )}"\`;\n`;
+          }"\${fieldName_${te.lit(i)}}":"\${typeName}"\`;\n`;
         } else {
-          return te`  obj${te.set(fieldName, true)} = ${te.lit(typeName)};\n`;
+          return te`  obj[fieldName_${te.lit(i)}] = typeName;\n`;
         }
       }
       case "outputPlan!":
       case "outputPlan?": {
         return te`\
-  mutablePath[mutablePathIndex] = ${te.lit(fieldName)};
-  spec = keys${te.get(fieldName)};
+  mutablePath[mutablePathIndex] = fieldName_${te.lit(i)};
+  spec = keys[fieldName_${te.lit(i)}];
 ${
   asString
-    ? te`  string += \`${i === 0 ? te.blank : te_comma}"${te.substring(
-        fieldName,
-        "`",
-      )}":\`;
+    ? te`  string += \`${i === 0 ? te.blank : te_comma}"\${fieldName_${te.lit(
+        i,
+      )}}":\`;
 `
     : te.blank
 }\
@@ -1397,7 +1447,7 @@ ${
   sameBucket
     ? te`\
 ${makeExecuteChildPlanCode(
-  asString ? te`string +=` : te`obj${te.set(fieldName, true)} =`,
+  asString ? te`string +=` : te`obj[fieldName_${te.lit(i)}] =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
@@ -1424,7 +1474,7 @@ ${makeExecuteChildPlanCode(
     }
   }
 ${makeExecuteChildPlanCode(
-  asString ? te`string +=` : te`obj${te.set(fieldName, true)} =`,
+  asString ? te`string +=` : te`obj[fieldName_${te.lit(i)}] =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
@@ -1449,17 +1499,26 @@ ${asString ? te_stringPlusEqualsRbrace : te.blank}\
 ${hasDeferredOutputPlans ? te_handleDeferred : te.blank}
   return ${asString ? te_string : te_obj};`;
 
-  // PERF: figure out how to memoize this. Should be able to key it on:
-  // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
-  // - existence of deferredOutputPlans
-  makeExecutor(
-    {
-      inner: inner,
-      nameExtra: te_object,
-      asString,
-      skipNullHandling: isRoot,
-      preamble: te.blank,
-    },
-    callback,
-  );
+  const executorExpression = makeExecutorExpression({
+    inner: inner,
+    nameExtra: te_object,
+    asString,
+    skipNullHandling: isRoot,
+    preamble: te.blank,
+  });
+
+  const factoryExpression = te`\
+function objectExecutorFactory(typeName${te.join(
+    fieldSpecs.map((_, i) => te`, fieldName_${te.lit(i)}`),
+    "",
+  )}) {
+  return ${executorExpression};
+}`;
+  te.runInBatch<Factory<boolean>>(factoryExpression, (factory) => {
+    makeObjectExecutorCache.set(signature, factory);
+    makingObjectExecutorCallbacks.delete(signature);
+    for (const callback of callbacks) {
+      callback(factory);
+    }
+  });
 }
