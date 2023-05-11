@@ -783,34 +783,35 @@ const te_object = te.cache`object`;
 const te_obj = te.cache`obj`;
 const te_commonErrorHandler = te.ref(commonErrorHandler, "handleError");
 
-function makeExecutor<TAsString extends boolean>(
-  inner: TE,
-  nameExtra: TE,
-  asString: TAsString,
+interface MakeExecutorOptions<TAsString extends boolean> {
+  inner: TE;
+  nameExtra: TE;
+  asString: TAsString;
   // this.type.mode === "introspection" || this.type.mode === "root"
-  skipNullHandling?: boolean,
-  preamble?: TE,
+  skipNullHandling?: boolean;
+  preamble?: TE;
+}
+
+function makeExecutor<TAsString extends boolean>(
+  options: MakeExecutorOptions<TAsString>,
 ): TAsString extends true
   ? typeof OutputPlan.prototype.executeString
   : typeof OutputPlan.prototype.execute;
 function makeExecutor<TAsString extends boolean>(
-  inner: TE,
-  nameExtra: TE,
-  asString: TAsString,
-  // this.type.mode === "introspection" || this.type.mode === "root"
-  skipNullHandling: boolean,
-  preamble: TE,
+  options: MakeExecutorOptions<TAsString>,
   callback: (fn: any) => void,
 ): void;
 function makeExecutor(
-  inner: TE,
-  nameExtra: TE,
-  asString: boolean,
-  // this.type.mode === "introspection" || this.type.mode === "root"
-  skipNullHandling = false,
-  preamble: TE = te.blank,
+  options: MakeExecutorOptions<boolean>,
   callback?: (fn: any) => void,
 ): any {
+  const {
+    inner,
+    nameExtra,
+    asString,
+    skipNullHandling = false,
+    preamble = te.blank,
+  } = options;
   const expression = te`\
 (function compiledOutputPlan${asString ? te_String : te.blank}_${nameExtra}(
   root,
@@ -908,16 +909,16 @@ function commonErrorHandler(
  * and increasing the probability of optimization).
  */
 
-const nullExecutor = makeExecutor(
-  te.cache`  return null;`,
-  te.cache`null`,
-  false,
-);
-const nullExecutorString = makeExecutor(
-  te.cache`  return "null";`,
-  te.cache`null`,
-  true,
-);
+const nullExecutor = makeExecutor({
+  inner: te.cache`  return null;`,
+  nameExtra: te.cache`null`,
+  asString: false,
+});
+const nullExecutorString = makeExecutor({
+  inner: te.cache`  return "null";`,
+  nameExtra: te.cache`null`,
+  asString: true,
+});
 
 /* This is what leafExecutor should use if insideGraphQL (which isn't currently
  * supported)
@@ -929,78 +930,78 @@ const nullExecutorString = makeExecutor(
     return this.type.graphqlType.serialize(bucketRootValue);
   }
 ` */
-const leafExecutor = makeExecutor(
-  te`\
+const leafExecutor = makeExecutor({
+  inner: te`\
   return this.type.graphqlType.serialize(bucketRootValue);
 `,
-  te.cache`leaf`,
-  false,
-);
+  nameExtra: te.cache`leaf`,
+  asString: false,
+});
 
-const leafExecutorString = makeExecutor(
-  te`\
+const leafExecutorString = makeExecutor({
+  inner: te`\
   return ${ref_toJSON}(this.type.graphqlType.serialize(bucketRootValue));
 `,
-  te.cache`leaf`,
-  true,
-);
+  nameExtra: te.cache`leaf`,
+  asString: true,
+});
 
-const booleanLeafExecutorString = makeExecutor(
-  te`\
+const booleanLeafExecutorString = makeExecutor({
+  inner: te`\
   const val = this.type.graphqlType.serialize(bucketRootValue);
   return val === true ? 'true' : 'false';
 `,
-  te.cache`booleanLeaf`,
-  true,
-  false,
-  te`\
+  nameExtra: te.cache`booleanLeaf`,
+  asString: true,
+  skipNullHandling: false,
+  preamble: te`\
   if (bucketRootValue === true) return 'true';
   if (bucketRootValue === false) return 'false';
 `,
-);
+});
 
-const intLeafExecutorString = makeExecutor(
-  te`\
+const intLeafExecutorString = makeExecutor({
+  inner: te`\
   return '' + this.type.graphqlType.serialize(bucketRootValue);
 `,
-  te.cache`intLeaf`,
-  true,
-  false,
+  nameExtra: te.cache`intLeaf`,
+  asString: true,
+  skipNullHandling: false,
   // Fast check to see if number is 32 bit integer
-  te`\
+  preamble: te`\
   if ((bucketRootValue | 0) === bucketRootValue) {
     return '' + bucketRootValue;
   }
 `,
-);
+});
 
-const floatLeafExecutorString = makeExecutor(
-  te`\
+const floatLeafExecutorString = makeExecutor({
+  inner: te`\
   return String(this.type.graphqlType.serialize(bucketRootValue));
 `,
-  te.cache`floatLeaf`,
-  true,
-  false,
-  te`\
+  nameExtra: te.cache`floatLeaf`,
+  asString: true,
+  skipNullHandling: false,
+  preamble: te`\
   if (Number.isFinite(bucketRootValue)) {
     return '' + bucketRootValue;
   }
 `,
-);
+});
 
-const stringLeafExecutorString = makeExecutor(
-  te`\
+const stringLeafExecutorString = makeExecutor({
+  inner: te`\
   return ${ref_stringifyString}(this.type.graphqlType.serialize(bucketRootValue));
 `,
-  te.cache`stringLeaf`,
-  true,
-  false,
-  te`\
+  nameExtra: te.cache`stringLeaf`,
+  asString: true,
+  skipNullHandling: false,
+  preamble: te`\
   if (typeof bucketRootValue === 'string') {
     return ${ref_stringifyString}(bucketRootValue);
   }
 `,
-);
+});
 
 // NOTE: the reference to $$concreteType here is a (temporary) optimization; it
 // should be `resolveType(bucketRootValue)` but it's not worth the function
@@ -1010,8 +1011,8 @@ const stringLeafExecutorString = makeExecutor(
 function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
-  return makeExecutor(
-    te`\
+  return makeExecutor({
+    inner: te`\
 ${
   isDev
     ? te`\
@@ -1065,9 +1066,9 @@ ${
     }(root, mutablePath, childBucket, childBucketIndex);
   }
 `,
-    te_polymorphic,
+    nameExtra: te_polymorphic,
     asString,
-  );
+  });
 }
 
 const polymorphicExecutor = makePolymorphicExecutor(false);
@@ -1078,8 +1079,8 @@ function makeArrayExecutor<TAsString extends boolean>(
   canStream: boolean,
   asString: TAsString,
 ) {
-  return makeExecutor(
-    te`\
+  return makeExecutor({
+    inner: te`\
   if (!Array.isArray(bucketRootValue)) {
     console.warn(\`Hit fallback for value \${${ref_inspect}(bucketRootValue)} coercion to mode 'array'\`);
     return ${asString ? te_nullString : te_null};
@@ -1155,11 +1156,11 @@ ${
 
   return ${asString ? te.cache`string` : te.cache`data`};
 `,
-    te`array${childIsNonNull ? te.cache`_nonNull` : te.blank}${
+    nameExtra: te`array${childIsNonNull ? te.cache`_nonNull` : te.blank}${
       canStream ? te.cache`_stream` : te.blank
     }`,
     asString,
-  );
+  });
 }
 const arrayExecutor_nullable = makeArrayExecutor(false, false, false);
 const arrayExecutor_nullable_streaming = makeArrayExecutor(false, true, false);
@@ -1271,18 +1272,18 @@ const introspect = (
 
 const ref_introspect = te.ref(introspect, "introspect");
 
-const introspectionExecutor = makeExecutor(
-  te`  return ${ref_introspect}(root, this, mutablePath, false)`,
-  te.cache`introspection`,
-  false,
-  true,
-);
-const introspectionExecutorString = makeExecutor(
-  te`  return ${ref_introspect}(root, this, mutablePath, true)`,
-  te.cache`introspection`,
-  true,
-  true,
-);
+const introspectionExecutor = makeExecutor({
+  inner: te`  return ${ref_introspect}(root, this, mutablePath, false)`,
+  nameExtra: te.cache`introspection`,
+  asString: false,
+  skipNullHandling: true,
+});
+const introspectionExecutorString = makeExecutor({
+  inner: te`  return ${ref_introspect}(root, this, mutablePath, true)`,
+  nameExtra: te.cache`introspection`,
+  asString: true,
+  skipNullHandling: true,
+});
 
 function makeObjectExecutor<TAsString extends boolean>(
   typeName: string,
@@ -1421,5 +1422,14 @@ ${hasDeferredOutputPlans ? te_handleDeferred : te.blank}
   // PERF: figure out how to memoize this. Should be able to key it on:
   // - key name and type: `Object.entries(this.keys).map(([n, v]) => n.name + "|" + n.type)`
   // - existence of deferredOutputPlans
-  makeExecutor(inner, te_object, asString, isRoot, te.blank, callback);
+  makeExecutor(
+    {
+      inner: inner,
+      nameExtra: te_object,
+      asString,
+      skipNullHandling: isRoot,
+      preamble: te.blank,
+    },
+    callback,
+  );
 }
