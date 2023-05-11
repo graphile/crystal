@@ -57,6 +57,8 @@ export class LRU<KeyType = any, ValueType = any> {
   private c: Map<KeyType, Node<KeyType, ValueType>>;
   /** dispose */
   private d: ((key: KeyType, value: ValueType) => void) | null;
+  /** saturated (length === max length) */
+  private s: boolean;
 
   constructor({ maxLength, dispose }: LRUOptions<KeyType, ValueType>) {
     if (maxLength < 2) {
@@ -72,6 +74,7 @@ export class LRU<KeyType = any, ValueType = any> {
     this.t = null;
     this.c = new Map();
     this.d = dispose || null;
+    this.s = false;
     this.get = quickGet;
 
     this.reset();
@@ -146,7 +149,7 @@ export class LRU<KeyType = any, ValueType = any> {
     this.h.p = newHead;
     newHead.n = this.h;
     this.h = newHead;
-    if (this.length === this.m) {
+    if (this.s) {
       // Remove the t
       const oldTail = this.t!;
       this.c.delete(oldTail.k);
@@ -161,6 +164,7 @@ export class LRU<KeyType = any, ValueType = any> {
       }
       this.length++;
       if (this.length === this.m) {
+        this.s = true;
         this.get = LRU.prototype.get;
       }
     }
