@@ -7,10 +7,12 @@ import type {
   NullValueNode,
   StringValueNode,
 } from "graphql";
-import { valueFromAST } from "graphql";
+import * as graphql from "graphql";
 
 import { UnbatchedExecutableStep } from "../step.js";
 import { constant } from "./constant.js";
+
+const { valueFromAST } = graphql;
 
 /**
  * Implements `InputStaticLeafStep`

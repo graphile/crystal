@@ -5,13 +5,7 @@ import type {
   GraphQLOutputType,
   GraphQLResolveInfo,
 } from "graphql";
-import {
-  defaultTypeResolver,
-  getNamedType,
-  getNullableType,
-  isAbstractType,
-  isListType,
-} from "graphql";
+import * as graphql from "graphql";
 
 import type { __ItemStep, ObjectStep } from "../index.js";
 import { context, SafeError } from "../index.js";
@@ -25,6 +19,14 @@ import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
 import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
+
+const {
+  defaultTypeResolver,
+  getNamedType,
+  getNullableType,
+  isAbstractType,
+  isListType,
+} = graphql;
 
 type ResolveInfoBase = Omit<
   GraphQLResolveInfo,

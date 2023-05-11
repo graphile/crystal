@@ -1,5 +1,5 @@
 import type { GraphQLInputType } from "graphql";
-import { GraphQLList, Kind } from "graphql";
+import * as graphql from "graphql";
 
 import * as assert from "../assert.js";
 import type { InputStep } from "../input.js";
@@ -9,6 +9,8 @@ import { ExecutableStep } from "../step.js";
 import type { ConstantStep } from "./constant.js";
 import { constant } from "./constant.js";
 import { list } from "./list.js";
+
+const { GraphQLList, Kind } = graphql;
 
 /**
  * Implements `__InputListStep`.
@@ -23,7 +25,7 @@ export class __InputListStep extends ExecutableStep {
   private itemCount = 0;
 
   constructor(
-    inputType: GraphQLList<GraphQLInputType>,
+    inputType: graphql.GraphQLList<GraphQLInputType>,
     seenTypes: ReadonlyArray<GraphQLInputType>,
     private readonly inputValues: NotVariableValueNode | undefined,
   ) {

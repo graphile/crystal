@@ -7,16 +7,7 @@ import type {
   NonNullTypeNode,
   ValueNode,
 } from "graphql";
-import {
-  assertScalarType,
-  GraphQLError,
-  GraphQLInputObjectType,
-  GraphQLList,
-  GraphQLNonNull,
-  isInputType,
-  isLeafType,
-  Kind,
-} from "graphql";
+import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
@@ -29,6 +20,17 @@ import {
   __TrackedValueStep,
   constant,
 } from "./steps/index.js";
+
+const {
+  assertScalarType,
+  GraphQLError,
+  GraphQLInputObjectType,
+  GraphQLList,
+  GraphQLNonNull,
+  isInputType,
+  isLeafType,
+  Kind,
+} = graphql;
 
 export type InputStep =
   | __TrackedValueStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()

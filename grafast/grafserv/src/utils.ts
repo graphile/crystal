@@ -6,7 +6,7 @@ import type {
   ExecutionResult,
   GraphQLSchema,
 } from "graphql";
-import { GraphQLError } from "graphql";
+import * as graphql from "graphql";
 import type { ServerOptions } from "graphql-ws";
 import type { Extra } from "graphql-ws/lib/use/ws";
 import type { Readable } from "node:stream";
@@ -25,6 +25,8 @@ import {
   makeParseAndValidateFunction,
   validateGraphQLBody,
 } from "./middleware/graphql.js";
+
+const { GraphQLError } = graphql;
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));

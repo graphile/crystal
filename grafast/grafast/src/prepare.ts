@@ -1,5 +1,5 @@
 import type { ExecutionArgs } from "graphql";
-import { GraphQLError } from "graphql";
+import * as graphql from "graphql";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
@@ -29,6 +29,8 @@ import type { OperationPlan } from "./index.js";
 import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
+
+const { GraphQLError } = graphql;
 
 const isTest =
   typeof process !== "undefined" && process.env.NODE_ENV === "test";

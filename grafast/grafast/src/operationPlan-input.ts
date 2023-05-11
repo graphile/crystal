@@ -4,14 +4,7 @@ import type {
   GraphQLInputField,
   GraphQLInputType,
 } from "graphql";
-import {
-  getNullableType,
-  isEnumType,
-  isInputObjectType,
-  isListType,
-  isNonNullType,
-  isScalarType,
-} from "graphql";
+import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { __InputObjectStep, __TrackedValueStep } from "./index.js";
@@ -29,6 +22,15 @@ import type { __ItemStep } from "./steps/__item.js";
 import { constant, ConstantStep } from "./steps/constant.js";
 import { list } from "./steps/list.js";
 import { object } from "./steps/object.js";
+
+const {
+  getNullableType,
+  isEnumType,
+  isInputObjectType,
+  isListType,
+  isNonNullType,
+  isScalarType,
+} = graphql;
 
 export function withFieldArgsForArguments<
   T extends ExecutableStep,

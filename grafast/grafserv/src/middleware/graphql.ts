@@ -10,13 +10,7 @@ import {
   SafeError,
 } from "grafast";
 import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
-import {
-  getOperationAST,
-  GraphQLError,
-  parse,
-  Source,
-  validate,
-} from "graphql";
+import * as graphql from "graphql";
 import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { makeAcceptMatcher } from "../accept.js";
@@ -34,6 +28,8 @@ import { $$normalizedHeaders } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 import { httpError } from "../utils.js";
 
+const { getOperationAST, GraphQLError, parse, Source, validate } = graphql;
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let lastString: string;
@@ -49,7 +45,7 @@ const calculateQueryHash = (queryString: string): string => {
 export function makeParseAndValidateFunction(schema: GraphQLSchema) {
   type ParseAndValidateResult =
     | { document: DocumentNode; errors?: undefined }
-    | { document?: undefined; errors: readonly GraphQLError[] };
+    | { document?: undefined; errors: readonly graphql.GraphQLError[] };
   const parseAndValidationCache = new LRU<string, ParseAndValidateResult>({
     maxLength: 500,
   });

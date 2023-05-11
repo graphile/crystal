@@ -1,7 +1,8 @@
 import { isAsyncIterable, isSafeError } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
-import { GraphQLError } from "graphql";
+import * as graphql from "graphql";
 
+const { GraphQLError } = graphql;
 // Only the non-ambiguous characters
 const RANDOM_STRING_LETTERS = "ABCDEFGHJKLMNPQRTUVWXYZ2346789";
 const RANDOM_STRING_LETTERS_LENGTH = RANDOM_STRING_LETTERS.length;
@@ -17,7 +18,9 @@ const randomString = (length = 10) => {
   return str;
 };
 
-export function defaultMaskError(error: GraphQLError): GraphQLError {
+export function defaultMaskError(
+  error: graphql.GraphQLError,
+): graphql.GraphQLError {
   if (error.originalError instanceof GraphQLError) {
     return error;
   } else if (error.originalError != null && isSafeError(error.originalError)) {
@@ -51,8 +54,8 @@ export function defaultMaskError(error: GraphQLError): GraphQLError {
 }
 
 export function makeMaskError(
-  callback: (error: GraphQLError) => GraphQLError,
-): (error: GraphQLError) => GraphQLError {
+  callback: (error: graphql.GraphQLError) => graphql.GraphQLError,
+): (error: graphql.GraphQLError) => graphql.GraphQLError {
   let warnedAboutMaskErrorCallback = false;
   return (error) => {
     const path = error.path;

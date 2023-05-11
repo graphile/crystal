@@ -6,18 +6,7 @@ import type {
   GraphQLObjectType,
   GraphQLScalarType,
 } from "graphql";
-import {
-  executeSync,
-  GraphQLBoolean,
-  GraphQLError,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLString,
-  isObjectType,
-  Kind,
-  OperationTypeNode,
-} from "graphql";
+import * as graphql from "graphql";
 import type { TE } from "tamedevil";
 import te, { stringifyString, toJSON } from "tamedevil";
 
@@ -34,6 +23,20 @@ import type { ExecutableStep } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan } from "./LayerPlan.js";
+
+const {
+  executeSync,
+  GraphQLBoolean,
+  GraphQLError,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLString,
+  isObjectType,
+  Kind,
+  OperationTypeNode,
+} = graphql;
+
 interface FieldTypeDigest {
   fieldType: "__typename" | "outputPlan!" | "outputPlan?";
   sameBucket: boolean;
@@ -598,7 +601,7 @@ export function coerceError(
   error: Error,
   locationDetails: LocationDetails,
   path: ReadonlyArray<string | number>,
-): GraphQLError {
+): graphql.GraphQLError {
   // Ensure it's a GraphQL error
   if (error instanceof GraphQLError) {
     if (error.path) {
@@ -630,7 +633,7 @@ export function coerceError(
 export function nonNullError(
   locationDetails: LocationDetails,
   path: readonly (string | number)[],
-): GraphQLError {
+): graphql.GraphQLError {
   const { parentTypeName, fieldName, node } = locationDetails;
   if (!parentTypeName || !fieldName) {
     return new GraphQLError(

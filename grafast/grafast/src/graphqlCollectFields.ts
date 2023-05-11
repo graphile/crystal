@@ -4,16 +4,18 @@ import type {
   SelectionNode,
   SelectionSetNode,
 } from "graphql";
-import {
-  GraphQLError,
-  GraphQLInterfaceType,
-  GraphQLObjectType,
-  GraphQLUnionType,
-} from "graphql";
+import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { SafeError } from "./error.js";
 import type { __TrackedValueStep } from "./steps/index.js";
+
+const {
+  GraphQLError,
+  GraphQLInterfaceType,
+  GraphQLObjectType,
+  GraphQLUnionType,
+} = graphql;
 
 /**
  * Given a selection, finds the first directive named `directiveName`.
@@ -102,8 +104,11 @@ export function evalDirectiveArgDirect<T = unknown>(
  * @internal
  */
 function graphqlDoesFragmentTypeApply(
-  objectType: GraphQLObjectType,
-  fragmentType: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType,
+  objectType: graphql.GraphQLObjectType,
+  fragmentType:
+    | graphql.GraphQLObjectType
+    | graphql.GraphQLInterfaceType
+    | graphql.GraphQLUnionType,
 ): boolean {
   if (fragmentType instanceof GraphQLObjectType) {
     return objectType === fragmentType;
@@ -130,7 +135,7 @@ export interface SelectionSetDigest {
 const processFragment = (
   operationPlan: OperationPlan,
   parentStepId: number,
-  objectType: GraphQLObjectType,
+  objectType: graphql.GraphQLObjectType,
   isMutation: boolean,
   selectionSetDigest: SelectionSetDigest,
   selection: SelectionNode,
@@ -188,7 +193,7 @@ const processFragment = (
 export function graphqlCollectFields(
   operationPlan: OperationPlan,
   parentStepId: number,
-  objectType: GraphQLObjectType,
+  objectType: graphql.GraphQLObjectType,
   selections: readonly SelectionNode[],
   isMutation = false,
   // This is significantly faster than an array or a Set
@@ -267,7 +272,9 @@ export function graphqlCollectFields(
             // !(isInterfaceType(fragmentType) || isUnionType(fragmentType)) ||
             !graphqlDoesFragmentTypeApply(
               objectType,
-              fragmentType as GraphQLUnionType | GraphQLInterfaceType,
+              fragmentType as
+                | graphql.GraphQLUnionType
+                | graphql.GraphQLInterfaceType,
             )
           ) {
             continue;
@@ -317,7 +324,9 @@ export function graphqlCollectFields(
               // !(isInterfaceType(fragmentType) || isUnionType(fragmentType)) ||
               !graphqlDoesFragmentTypeApply(
                 objectType,
-                fragmentType as GraphQLUnionType | GraphQLInterfaceType,
+                fragmentType as
+                  | graphql.GraphQLUnionType
+                  | graphql.GraphQLInterfaceType,
               )
             ) {
               continue;

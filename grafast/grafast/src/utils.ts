@@ -18,22 +18,7 @@ import type {
   SelectionNode,
   ValueNode,
 } from "graphql";
-import {
-  GraphQLBoolean,
-  GraphQLEnumType,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInputObjectType,
-  GraphQLInt,
-  GraphQLInterfaceType,
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLScalarType,
-  GraphQLString,
-  GraphQLUnionType,
-  Kind,
-} from "graphql";
+import * as graphql from "graphql";
 
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
@@ -50,6 +35,23 @@ import type {
   OutputPlanForType,
 } from "./interfaces.js";
 import type { ExecutableStep, ModifierStep } from "./step.js";
+
+const {
+  GraphQLBoolean,
+  GraphQLEnumType,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInputObjectType,
+  GraphQLInt,
+  GraphQLInterfaceType,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLScalarType,
+  GraphQLString,
+  GraphQLUnionType,
+  Kind,
+} = graphql;
 
 /**
  * The parent object is used as the key in `GetValueStepId()`; for root level
@@ -400,7 +402,7 @@ export type GrafastObjectType<
   TContext extends Grafast.Context,
   TParentStep extends ExecutableStep,
   TFields extends ObjectTypeFields<TContext, TParentStep>,
-> = GraphQLObjectType<
+> = graphql.GraphQLObjectType<
   TParentStep extends ExecutableStep<infer U> ? U : never,
   TContext
 > & { TParentStep: TParentStep; TFields: TFields };
@@ -555,7 +557,7 @@ export type GrafastInputObjectType<
   TContext extends Grafast.Context,
   TParentStep extends ModifierStep<any>,
   TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
-> = GraphQLInputObjectType & {
+> = graphql.GraphQLInputObjectType & {
   TContext: TContext;
   TParentStep: TParentStep;
   TFields: TFields;
@@ -623,7 +625,7 @@ const $$valueConfigByValue = Symbol("valueConfigByValue");
  * will go away so we use a weakmap.
  */
 export function getEnumValueConfig(
-  enumType: GraphQLEnumType,
+  enumType: graphql.GraphQLEnumType,
   outputValue: string,
 ): GraphQLEnumValueConfig | undefined {
   // We cache onto the enumType directly so that garbage collection can clear up after us easily.

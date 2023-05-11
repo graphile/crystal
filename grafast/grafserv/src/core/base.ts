@@ -3,7 +3,7 @@ import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import { isPromiseLike, SafeError, stringifyPayload } from "grafast";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
-import { GraphQLError, isSchema, validateSchema } from "graphql";
+import * as graphql from "graphql";
 
 import type {
   BufferResult,
@@ -24,6 +24,8 @@ import { APPLICATION_JSON, makeGraphQLHandler } from "../middleware/graphql.js";
 import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest } from "../utils.js";
+
+const { GraphQLError, isSchema, validateSchema } = graphql;
 
 function handleGraphQLHandlerError(
   request: NormalizedRequestDigest,

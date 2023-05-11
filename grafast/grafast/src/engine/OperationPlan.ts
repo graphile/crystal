@@ -13,19 +13,7 @@ import type {
   OperationDefinitionNode,
   SelectionNode,
 } from "graphql";
-import {
-  assertObjectType,
-  defaultFieldResolver,
-  getNamedType,
-  getNullableType,
-  isEnumType,
-  isInterfaceType,
-  isListType,
-  isNonNullType,
-  isObjectType,
-  isScalarType,
-  isUnionType,
-} from "graphql";
+import * as graphql from "graphql";
 import te from "tamedevil";
 
 import * as assert from "../assert.js";
@@ -86,6 +74,21 @@ import { LayerPlan } from "./LayerPlan.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
+
+// Work around TypeScript CommonJS `graphql_1.isListType` unoptimal access.
+const {
+  assertObjectType,
+  defaultFieldResolver,
+  getNamedType,
+  getNullableType,
+  isEnumType,
+  isInterfaceType,
+  isListType,
+  isNonNullType,
+  isObjectType,
+  isScalarType,
+  isUnionType,
+} = graphql;
 
 export const POLYMORPHIC_ROOT_PATH = "";
 export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([

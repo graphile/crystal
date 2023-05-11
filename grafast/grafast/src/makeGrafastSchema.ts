@@ -6,16 +6,7 @@ import type {
   GraphQLScalarValueParser,
   GraphQLSchema,
 } from "graphql";
-import {
-  buildASTSchema,
-  isEnumType,
-  isInputObjectType,
-  isInterfaceType,
-  isObjectType,
-  isScalarType,
-  isUnionType,
-  parse,
-} from "graphql";
+import * as graphql from "graphql";
 
 import type {
   ArgumentApplyPlanResolver,
@@ -27,6 +18,17 @@ import type {
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { ExecutableStep } from "./step.js";
+
+const {
+  buildASTSchema,
+  isEnumType,
+  isInputObjectType,
+  isInterfaceType,
+  isObjectType,
+  isScalarType,
+  isUnionType,
+  parse,
+} = graphql;
 
 // TODO:TS: improve the types here!
 /**
