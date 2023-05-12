@@ -1948,6 +1948,97 @@ ${te.join(
     this.stepTracker.replaceStep($original, $replacement);
   }
 
+  public processSteps(
+    actionDescription: string,
+    order: "dependents-first" | "dependencies-first",
+    callback: (plan: ExecutableStep) => ExecutableStep,
+  ): void {
+    const { stepTracker } = this;
+    const previousStepCount = stepTracker.stepCount;
+
+    const orderedSteps = sortStepsDependenciesFirst([
+      ...stepTracker.activeSteps,
+    ]);
+
+    const processStep = (step: ExecutableStep) => {
+      let replacementStep: ExecutableStep = step;
+      try {
+        replacementStep = withGlobalLayerPlan(
+          step.layerPlan,
+          step.polymorphicPaths,
+          callback,
+          this,
+          step,
+        );
+        if (!replacementStep) {
+          throw new Error(
+            `The callback did not return a step during ${actionDescription}`,
+          );
+        }
+      } catch (e) {
+        console.error(
+          `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
+          e,
+        );
+        throw e;
+      }
+
+      if (replacementStep != step) {
+        this.replaceStep(step, replacementStep);
+      }
+
+      this.deduplicateSteps();
+
+      return replacementStep;
+    };
+
+    if (order === "dependents-first") {
+      // used for: pushDown, optimize
+      // NOTE: optimize can create new steps
+
+      // Reverse loop
+      for (let i = orderedSteps.length - 1; i >= 0; i--) {
+        const preprocessStepCount = stepTracker.stepCount;
+        const step = orderedSteps[i];
+        if (!stepTracker.activeSteps.has(step)) continue;
+        processStep(step);
+        if (stepTracker.stepCount > preprocessStepCount) {
+          // There's new steps. Trim the other steps, push these new steps to the end (in sorted order), reset `i`
+
+          const sortedNewSteps = sortStepsDependenciesFirst(
+            stepTracker.newStepsSince(preprocessStepCount),
+          );
+          for (let i = 0, l = sortedNewSteps.length; i < l; i++) {
+            orderedSteps[i++] = sortedNewSteps[i];
+          }
+        }
+      }
+    } else {
+      // used for: hoist
+      // NOTE: hoist cannot create new steps
+
+      // Forward loop
+      for (let i = 0, l = orderedSteps.length; i < l; i++) {
+        const step = orderedSteps[i];
+        if (!stepTracker.activeSteps.has(step)) continue;
+        processStep(step);
+      }
+
+      if (stepTracker.stepCount > previousStepCount) {
+        throw new Error(
+          `GrafastInternalError<69efa098-7817-4a8d-9c84-711cd7123d9e>: new step(s) created during processSteps[${order}]; this is unexpected.`,
+        );
+      }
+    }
+
+    if (this.phase !== "plan" && stepTracker.stepCount > previousStepCount) {
+      // Any time new steps are added we should validate them. All plans are
+      // validated once "plan" is finished, so no need to do it here for that
+      // phase.
+      this.validateSteps(previousStepCount);
+    }
+  }
+
   // PERF: optimize
   /**
    * Process the given steps, either dependencies first (root to leaf) or
@@ -1955,7 +2046,7 @@ ${te.join(
    *
    * @internal
    */
-  public processSteps(
+  public processSteps_old(
     actionDescription: string,
     order: "dependents-first" | "dependencies-first",
     callback: (plan: ExecutableStep) => ExecutableStep,
@@ -3196,4 +3287,116 @@ ${te.join(
 
 function makeDefaultPlan(fieldName: string) {
   return ($step: ExecutableStep) => access($step, [fieldName]);
+}
+
+let depthCache: { [stepId: number]: number } = Object.create(null);
+
+function inLayerPlanDepth(a: ExecutableStep): number {
+  const l = a.dependencies.length;
+  if (l === 0) return 0;
+  if (depthCache[a.id] !== undefined) {
+    return depthCache[a.id];
+  }
+  let max = 0;
+  const layerPlan = a.layerPlan;
+  for (let i = 0; i < l; i++) {
+    const dep = a.dependencies[i];
+    if (dep.layerPlan === layerPlan) {
+      const depDepth = inLayerPlanDepth(dep);
+      if (depDepth >= max) {
+        max = depDepth + 1;
+      }
+    }
+  }
+  depthCache[a.id] = max;
+  return max;
+}
+
+function compareStepsDependenciesFirst(a: ExecutableStep, z: ExecutableStep) {
+  // First sort by layer plan depth
+  const layerPlanDepthDiff = a.layerPlan.depth - z.layerPlan.depth;
+  if (layerPlanDepthDiff !== 0) {
+    return layerPlanDepthDiff;
+  }
+
+  // Then sort by layer plan id
+  const layerPlanIdDiff = a.layerPlan.id - z.layerPlan.id;
+  if (layerPlanIdDiff !== 0) {
+    return layerPlanIdDiff;
+  }
+
+  // Then return the higher in the dep tree (if any)
+  return inLayerPlanDepth(a) - inLayerPlanDepth(z);
+}
+
+function sortStepsDependenciesFirst(steps: ExecutableStep[]) {
+  depthCache = Object.create(null);
+  return steps.sort(compareStepsDependenciesFirst);
+}
+
+function _sortStepsDependenciesFirst(steps: ExecutableStep[]) {
+  return steps.sort(compareStepsDependenciesFirst);
+  function compareStepsDependenciesFirst(a: ExecutableStep, z: ExecutableStep) {
+    // First sort by layer plan depth
+    const layerPlanDepthDiff = a.layerPlan.depth - z.layerPlan.depth;
+    if (layerPlanDepthDiff !== 0) {
+      return layerPlanDepthDiff;
+    }
+
+    // Then sort by layer plan id
+    const layerPlanIdDiff = a.layerPlan.id - z.layerPlan.id;
+    if (layerPlanIdDiff !== 0) {
+      return layerPlanIdDiff;
+    }
+
+    // Same layer plan for a and z
+    const layerPlan = a.layerPlan;
+
+    // Then return the higher in the dep tree (if any)
+    let sameLayerDepsA: ExecutableStep[] = [];
+    let sameLayerDepsZ: ExecutableStep[] = [];
+    for (const dep of a.dependencies) {
+      if (dep.layerPlan === layerPlan) {
+        sameLayerDepsA.push(dep);
+      }
+    }
+    for (const dep of z.dependencies) {
+      if (dep.layerPlan === layerPlan) {
+        sameLayerDepsZ.push(dep);
+      }
+    }
+    for (let safety = 0; safety < SAFETY_LIMIT; safety++) {
+      const countA = sameLayerDepsA.length;
+      const countZ = sameLayerDepsZ.length;
+      if (countA === 0 && countZ === 0) {
+        return 0;
+      } else if (countA === 0) {
+        // -1 means A comes before Z
+        // A comes before Z if A has 0 deps and Z has > 0 deps
+        return -1;
+      } else if (countZ === 0) {
+        return 1;
+      } else {
+        const prevA = sameLayerDepsA;
+        const prevZ = sameLayerDepsZ;
+        sameLayerDepsA = [];
+        sameLayerDepsZ = [];
+        for (const step of prevA) {
+          for (const dep of step.dependencies) {
+            if (dep.layerPlan === layerPlan) {
+              sameLayerDepsA.push(dep);
+            }
+          }
+        }
+        for (const step of prevZ) {
+          for (const dep of step.dependencies) {
+            if (dep.layerPlan === layerPlan) {
+              sameLayerDepsZ.push(dep);
+            }
+          }
+        }
+      }
+    }
+    throw new Error(`Plan graph is too deep within layer plan '${layerPlan}'`);
+  }
 }

@@ -69,6 +69,10 @@ export class StepTracker {
 
   constructor(private readonly operationPlan: OperationPlan) {}
 
+  public newStepsSince(oldStepCount: number) {
+    return (this.stepById as ExecutableStep[]).slice(oldStepCount);
+  }
+
   /** Called when OperationPlan enters finalize phase. */
   public finalize() {
     const forbidden = () => {
