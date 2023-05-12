@@ -3446,6 +3446,7 @@ function _sortStepsDependenciesFirst(steps: ExecutableStep[]) {
         sameLayerDepsZ.push(dep);
       }
     }
+    const SAFETY_LIMIT = 100_000;
     for (let safety = 0; safety < SAFETY_LIMIT; safety++) {
       const countA = sameLayerDepsA.length;
       const countZ = sameLayerDepsZ.length;
