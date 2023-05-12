@@ -77,6 +77,16 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
     );
   }
 
+  optimize() {
+    for (const [key, val] of Object.entries(this.actualKeyByDesiredKey)) {
+      if (String(key) !== String(val)) {
+        return this;
+      }
+    }
+    // If we're not actually remapping, just return the parent
+    return this.getDep(0);
+  }
+
   finalize(): void {
     makeMapper(this.actualKeyByDesiredKey, (fn) => {
       this.mapper = fn;
