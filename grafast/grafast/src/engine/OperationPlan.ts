@@ -3329,9 +3329,84 @@ function compareStepsDependenciesFirst(a: ExecutableStep, z: ExecutableStep) {
   return inLayerPlanDepth(a) - inLayerPlanDepth(z);
 }
 
+const LAYER_PLAN_DEPTH_MULTIPLIER = 2 ** 40;
+const LAYER_PLAN_ID_MULTIPLIER = 2 ** 20;
+function weighStepDependenciesFirst(a: ExecutableStep) {
+  return (
+    // First sort by layer plan depth
+    a.layerPlan.depth * LAYER_PLAN_DEPTH_MULTIPLIER +
+    // Then sort by layer plan id
+    a.layerPlan.id * LAYER_PLAN_ID_MULTIPLIER +
+    // Then return the higher in the dep tree (if any)
+    inLayerPlanDepth(a)
+  );
+}
+
+function sortStepsInplaceQuicksortPivot(
+  steps: ExecutableStep[],
+  weights: number[],
+  initialLeft: number,
+  initialRight: number,
+  pivotWeight: number,
+) {
+  let left = initialLeft;
+  let right = initialRight;
+
+  while (true) {
+    while (weights[left] < pivotWeight) {
+      left++;
+    }
+    while (weights[right] > pivotWeight) {
+      right--;
+    }
+
+    if (left <= right) {
+      const tmpWeight = weights[left];
+      const tmpStep = steps[left];
+      weights[left] = weights[right];
+      steps[left] = steps[right];
+      weights[right] = tmpWeight;
+      steps[right] = tmpStep;
+
+      left++;
+      right--;
+    } else {
+      return left;
+    }
+  }
+}
+
+function sortStepsInplaceQuicksort(
+  steps: ExecutableStep[],
+  weights: number[],
+  left: number,
+  right: number,
+): void {
+  const pivotWeight = weights[Math.floor((left + right) / 2)];
+  const pivotIdx = sortStepsInplaceQuicksortPivot(
+    steps,
+    weights,
+    left,
+    right,
+    pivotWeight,
+  );
+
+  if (left < pivotIdx - 1) {
+    sortStepsInplaceQuicksort(steps, weights, left, pivotIdx - 1);
+  }
+  if (right > pivotIdx) {
+    sortStepsInplaceQuicksort(steps, weights, pivotIdx, right);
+  }
+}
+
 function sortStepsDependenciesFirst(steps: ExecutableStep[]) {
+  if (steps.length < 2) {
+    return steps;
+  }
   depthCache = Object.create(null);
-  return steps.sort(compareStepsDependenciesFirst);
+  const weights = steps.map(weighStepDependenciesFirst);
+  sortStepsInplaceQuicksort(steps, weights, 0, steps.length - 1);
+  return steps;
 }
 
 function _sortStepsDependenciesFirst(steps: ExecutableStep[]) {
