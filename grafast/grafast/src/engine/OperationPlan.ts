@@ -419,18 +419,7 @@ export class OperationPlan {
     }
     const allMetaKeysList = [...allMetaKeys];
 
-    // A JIT'd object constructor
-    this.makeMetaByMetaKey = te.run`
-return () => {
-  const metaByMetaKey = Object.create(null);
-${te.join(
-  allMetaKeysList.map(
-    (key) => te`  metaByMetaKey${te.set(key)} = Object.create(null);`,
-  ),
-  "\n",
-)}
-  return metaByMetaKey;
-};`;
+    this.makeMetaByMetaKey = makeMetaByMetaKeysFactory(allMetaKeysList);
 
     this.lap("ready");
 
@@ -3228,4 +3217,17 @@ ${te.join(
 
 function makeDefaultPlan(fieldName: string) {
   return ($step: ExecutableStep) => access($step, [fieldName]);
+}
+
+function makeMetaByMetaKeysFactory(
+  allMetaKeysList: ReadonlyArray<string | number | symbol>,
+) {
+  const l = allMetaKeysList.length;
+  return function makeMetaByMetaKey() {
+    const metaByMetaKey = Object.create(null);
+    for (let i = 0; i < l; i++) {
+      metaByMetaKey[allMetaKeysList[i]] = Object.create(null);
+    }
+    return metaByMetaKey;
+  };
 }
