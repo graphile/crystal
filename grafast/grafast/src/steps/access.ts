@@ -46,17 +46,9 @@ function access2(
   }
 }
 
-const makeDestructureHyperCache = new LRU<
-  string,
-  (_extra: ExecutionExtra, value: any) => any
->({ maxLength: 1000 });
-const makingDestructureHyperCache = new Map<
-  string,
-  Array<(fn: (_extra: ExecutionExtra, value: any) => any) => void>
->();
-
 // We could use an LRU here, but there's no need - there's only 100 possible values;
 type Factory = (
+  fallback: any,
   ...path: Array<string | number | symbol>
 ) => (_extra: ExecutionExtra, value: any) => any;
 const makeDestructureCache: { [signature: string]: Factory } =
@@ -79,6 +71,7 @@ function constructDestructureFunction(
   const n = path.length;
   /** 0 - slow mode; 1 - middle mode; 2 - turbo mode */
   let mode: 0 | 1 | 2 = n > 50 ? 0 : n > 5 ? 1 : 2;
+  const jitParts: TE[] = [];
 
   for (let i = 0; i < n; i++) {
     const pathItem = path[i];
@@ -103,6 +96,9 @@ function constructDestructureFunction(
         )}'`,
       );
     }
+    if (mode === 2) {
+      jitParts.push(te.get(pathItem));
+    }
   }
 
   if (mode === 0) {
@@ -115,22 +111,32 @@ function constructDestructureFunction(
       }
       return current ?? fallback;
     });
-  } else if (mode === 1) {
+  } else {
     const signature = (fallback !== undefined ? "f" : "n") + n;
-    // PERF: we could add jitParts here if we wanted to
+
+    const done =
+      mode === 2
+        ? (factory: Factory) => {
+            const fn = factory(fallback, ...path);
+            // ?.blah?.bog?.["!!!"]?.[0]
+            const expression = te.join(jitParts, "");
+            const expressionDetail = [expression, fallback];
+            (fn as any)[expressionSymbol] = expressionDetail;
+            callback(fn);
+          }
+        : (factory: Factory) => callback(factory(fallback, ...path));
+
     const fn = makeDestructureCache[signature];
     if (fn) {
-      callback(fn(...path));
+      done(fn);
       return;
     }
     if (makingDestructureCache[signature]) {
-      makingDestructureCache[signature].push((fn) => callback(fn(...path)));
+      makingDestructureCache[signature].push(done);
       return;
     }
-    const callbacks: Array<(fn: Factory) => void> = [
-      (fn) => callback(fn(...path)),
-    ];
-    makingDestructureCache[signature] = callbacks;
+    const doneHandlers: Array<(fn: Factory) => void> = [done];
+    makingDestructureCache[signature] = doneHandlers;
 
     // DO NOT REFERENCE 'path' BELOW HERE!
 
@@ -142,81 +148,19 @@ function constructDestructureFunction(
       access.push(te`[${te_name}]`);
     }
     te.runInBatch<Factory>(
-      te`function (${te.join(names, ", ")}) {
-return (_meta, value) => value${te.join(access, "")};
+      te`function (fallback, ${te.join(names, ", ")}) {
+return (_meta, value) => value${te.join(access, "")}${
+        fallback === undefined ? te.blank : te` ?? fallback`
+      };
 }`,
       (factory) => {
         makeDestructureCache[signature] = factory;
         delete makingDestructureCache[signature];
-        for (const callback of callbacks) {
-          callback(factory);
+        for (const doneHandler of doneHandlers) {
+          doneHandler(factory);
         }
       },
     );
-  } else {
-    // Super fast mode! This stores jitParts for OutputPlan to use.
-    // NOTE: path has already been validated as safe.
-    const signature = path.join("|");
-    const fn = makeDestructureHyperCache.get(signature);
-    if (fn) {
-      callback(fn);
-      return;
-    }
-    const making = makingDestructureHyperCache.get(signature);
-    if (making) {
-      making.push(callback);
-      return;
-    }
-    const callbacks: Array<typeof callback> = [callback];
-    makingDestructureHyperCache.set(signature, callbacks);
-
-    const done = (fn: Parameters<typeof callback>[0]) => {
-      makeDestructureHyperCache.set(signature, fn);
-      makingDestructureHyperCache.delete(signature);
-      for (const callback of callbacks) {
-        callback(fn);
-      }
-    };
-
-    const jitParts: TE[] = [];
-
-    for (let i = 0, l = path.length; i < l; i++) {
-      const pathItem = path[i];
-      jitParts.push(te.get(pathItem));
-    }
-
-    // ?.blah?.bog?.["!!!"]?.[0]
-    const expression = te.join(jitParts, "");
-    const expressionDetail = [expression, fallback];
-
-    if (path.length === 1) {
-      const quicklyExtractValueAtPath = access1(path[0], fallback) as any;
-      quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
-      done(quicklyExtractValueAtPath);
-    } else if (path.length === 2) {
-      const quicklyExtractValueAtPath = access2(
-        path[0],
-        path[1],
-        fallback,
-      ) as any;
-      quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
-      done(quicklyExtractValueAtPath);
-    } else {
-      // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
-      te.runInBatch<any>(
-        te`\
-(function quicklyExtractValueAtPath(extra, value) {
-  return (value${expression})${
-          fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
-        };
-})`,
-        (quicklyExtractValueAtPath) => {
-          // JIT this for great performance.
-          quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
-          done(quicklyExtractValueAtPath);
-        },
-      );
-    }
   }
 }
 
