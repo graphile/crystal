@@ -1950,6 +1950,104 @@ ${te.join(
     this.stepTracker.replaceStep($original, $replacement);
   }
 
+  private processStep(
+    actionDescription: string,
+    order: "dependents-first" | "dependencies-first",
+    callback: (plan: ExecutableStep) => ExecutableStep,
+    processed: Set<ExecutableStep>,
+    step: ExecutableStep,
+  ) {
+    // MUST come before anything else, otherwise infinite loops may occur
+    processed.add(step);
+
+    if (!this.stepTracker.activeSteps.has(step)) {
+      return step;
+    }
+
+    if (order === "dependents-first") {
+      // used for: pushDown, optimize
+
+      for (let i = 0; i < step.dependents.length; i++) {
+        const entry = step.dependents[i];
+        const { step: $processFirst } = entry;
+        if (!processed.has($processFirst)) {
+          this.processStep(
+            actionDescription,
+            order,
+            callback,
+            processed,
+            $processFirst,
+          );
+          if (step.dependents[i] !== entry) {
+            // The world has change; go back to the start
+            i = -1;
+          }
+        }
+      }
+      const subroutineLayerPlan = step[$$subroutine];
+      if (subroutineLayerPlan) {
+        const $root = subroutineLayerPlan.rootStep;
+        if ($root) {
+          this.processStep(
+            actionDescription,
+            order,
+            callback,
+            processed,
+            $root,
+          );
+        }
+      }
+    } else {
+      // used for: hoist
+
+      for (const $processFirst of step.dependencies) {
+        if (!processed.has($processFirst)) {
+          this.processStep(
+            actionDescription,
+            order,
+            callback,
+            processed,
+            $processFirst,
+          );
+        }
+      }
+    }
+
+    // Check again, processing another step may have invalidated this one.
+    if (!this.stepTracker.activeSteps.has(step)) {
+      return step;
+    }
+
+    let replacementStep: ExecutableStep = step;
+    try {
+      replacementStep = withGlobalLayerPlan(
+        step.layerPlan,
+        step.polymorphicPaths,
+        callback,
+        this,
+        step,
+      );
+    } catch (e) {
+      console.error(
+        `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
+        e,
+      );
+      throw e;
+    }
+    if (!replacementStep) {
+      throw new Error(
+        `The callback did not return a step during ${actionDescription}`,
+      );
+    }
+
+    if (replacementStep != step) {
+      this.replaceStep(step, replacementStep);
+    }
+    this.deduplicateSteps();
+
+    return replacementStep;
+  }
+
   // PERF: optimize
   /**
    * Process the given steps, either dependencies first (root to leaf) or
@@ -1966,85 +2064,17 @@ ${te.join(
 
     const processed = new Set<ExecutableStep>();
 
-    const processStep = (step: ExecutableStep) => {
-      // MUST come before anything else, otherwise infinite loops may occur
-      processed.add(step);
-
-      if (!this.stepTracker.activeSteps.has(step)) {
-        return step;
-      }
-
-      if (order === "dependents-first") {
-        // used for: pushDown, optimize
-
-        for (let i = 0; i < step.dependents.length; i++) {
-          const entry = step.dependents[i];
-          const { step: $processFirst } = entry;
-          if (!processed.has($processFirst)) {
-            processStep($processFirst);
-            if (step.dependents[i] !== entry) {
-              // The world has change; go back to the start
-              i = -1;
-            }
-          }
-        }
-        const subroutineLayerPlan = step[$$subroutine];
-        if (subroutineLayerPlan) {
-          const $root = subroutineLayerPlan.rootStep;
-          if ($root) {
-            processStep($root);
-          }
-        }
-      } else {
-        // used for: hoist
-
-        for (const $processFirst of step.dependencies) {
-          if (!processed.has($processFirst)) {
-            processStep($processFirst);
-          }
-        }
-      }
-
-      // Check again, processing another step may have invalidated this one.
-      if (!this.stepTracker.activeSteps.has(step)) {
-        return step;
-      }
-
-      let replacementStep: ExecutableStep = step;
-      try {
-        replacementStep = withGlobalLayerPlan(
-          step.layerPlan,
-          step.polymorphicPaths,
-          callback,
-          this,
-          step,
-        );
-      } catch (e) {
-        console.error(
-          `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
-          e,
-        );
-        throw e;
-      }
-      if (!replacementStep) {
-        throw new Error(
-          `The callback did not return a step during ${actionDescription}`,
-        );
-      }
-
-      if (replacementStep != step) {
-        this.replaceStep(step, replacementStep);
-      }
-      this.deduplicateSteps();
-
-      return replacementStep;
-    };
-
     for (let i = 0; i < this.stepTracker.stepCount; i++) {
       const step = this.stepTracker.getStepById(i, true);
       // Check it hasn't been tree-shaken away, or already processed
       if (!step || step.id !== i || processed.has(step)) continue;
-      const resultStep = processStep(step);
+      const resultStep = this.processStep(
+        actionDescription,
+        order,
+        callback,
+        processed,
+        step,
+      );
       if (isDev) {
         const plansAdded = this.stepTracker.stepCount - previousStepCount;
 
