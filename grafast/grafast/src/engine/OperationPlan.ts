@@ -1950,6 +1950,50 @@ ${te.join(
     this.stepTracker.replaceStep($original, $replacement);
   }
 
+  private processStep(
+    step: ExecutableStep,
+    callback: (plan: ExecutableStep) => ExecutableStep,
+    actionDescription: string,
+    order: string,
+  ) {
+    let replacementStep: ExecutableStep = step;
+    try {
+      replacementStep = withGlobalLayerPlan(
+        step.layerPlan,
+        step.polymorphicPaths,
+        callback,
+        this,
+        step,
+      );
+      if (!replacementStep) {
+        throw new Error(
+          `The callback did not return a step during ${actionDescription}`,
+        );
+      }
+    } catch (e) {
+      console.error(
+        `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
+        e,
+      );
+      throw e;
+    }
+
+    if (replacementStep != step) {
+      this.replaceStep(step, replacementStep);
+    }
+
+    this.deduplicateSteps();
+
+    return replacementStep;
+  }
+
+  // PERF: optimize
+  /**
+   * Process the given steps, either dependencies first (root to leaf) or
+   * dependents first (leaves to root).
+   *
+   * @internal
+   */
   public processSteps(
     actionDescription: string,
     order: "dependents-first" | "dependencies-first",
@@ -1962,38 +2006,6 @@ ${te.join(
       ...stepTracker.activeSteps,
     ]);
 
-    const processStep = (step: ExecutableStep) => {
-      let replacementStep: ExecutableStep = step;
-      try {
-        replacementStep = withGlobalLayerPlan(
-          step.layerPlan,
-          step.polymorphicPaths,
-          callback,
-          this,
-          step,
-        );
-        if (!replacementStep) {
-          throw new Error(
-            `The callback did not return a step during ${actionDescription}`,
-          );
-        }
-      } catch (e) {
-        console.error(
-          `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
-          e,
-        );
-        throw e;
-      }
-
-      if (replacementStep != step) {
-        this.replaceStep(step, replacementStep);
-      }
-
-      this.deduplicateSteps();
-
-      return replacementStep;
-    };
-
     if (order === "dependents-first") {
       // used for: pushDown, optimize
       // NOTE: optimize can create new steps
@@ -2003,7 +2015,7 @@ ${te.join(
         const preprocessStepCount = stepTracker.stepCount;
         const step = orderedSteps[i];
         if (!stepTracker.activeSteps.has(step)) continue;
-        processStep(step);
+        this.processStep(step, callback, actionDescription, order);
         if (stepTracker.stepCount > preprocessStepCount) {
           // There's new steps. Trim the other steps, push these new steps to the end (in sorted order), reset `i`
 
@@ -2023,7 +2035,7 @@ ${te.join(
       for (let i = 0, l = orderedSteps.length; i < l; i++) {
         const step = orderedSteps[i];
         if (!stepTracker.activeSteps.has(step)) continue;
-        processStep(step);
+        this.processStep(step, callback, actionDescription, order);
       }
 
       if (stepTracker.stepCount > previousStepCount) {
@@ -2034,126 +2046,6 @@ ${te.join(
     }
 
     if (this.phase !== "plan" && stepTracker.stepCount > previousStepCount) {
-      // Any time new steps are added we should validate them. All plans are
-      // validated once "plan" is finished, so no need to do it here for that
-      // phase.
-      this.validateSteps(previousStepCount);
-    }
-  }
-
-  // PERF: optimize
-  /**
-   * Process the given steps, either dependencies first (root to leaf) or
-   * dependents first (leaves to root).
-   *
-   * @internal
-   */
-  public processSteps_old(
-    actionDescription: string,
-    order: "dependents-first" | "dependencies-first",
-    callback: (plan: ExecutableStep) => ExecutableStep,
-  ): void {
-    const previousStepCount = this.stepTracker.stepCount;
-
-    const processed = new Set<ExecutableStep>();
-
-    const processStep = (step: ExecutableStep) => {
-      // MUST come before anything else, otherwise infinite loops may occur
-      processed.add(step);
-
-      if (!this.stepTracker.activeSteps.has(step)) {
-        return step;
-      }
-
-      if (order === "dependents-first") {
-        // used for: pushDown, optimize
-
-        for (let i = 0; i < step.dependents.length; i++) {
-          const entry = step.dependents[i];
-          const { step: $processFirst } = entry;
-          if (!processed.has($processFirst)) {
-            processStep($processFirst);
-            if (step.dependents[i] !== entry) {
-              // The world has change; go back to the start
-              i = -1;
-            }
-          }
-        }
-        const subroutineLayerPlan = step[$$subroutine];
-        if (subroutineLayerPlan) {
-          const $root = subroutineLayerPlan.rootStep;
-          if ($root) {
-            processStep($root);
-          }
-        }
-      } else {
-        // used for: hoist
-
-        for (const $processFirst of step.dependencies) {
-          if (!processed.has($processFirst)) {
-            processStep($processFirst);
-          }
-        }
-      }
-
-      // Check again, processing another step may have invalidated this one.
-      if (!this.stepTracker.activeSteps.has(step)) {
-        return step;
-      }
-
-      let replacementStep: ExecutableStep = step;
-      try {
-        replacementStep = withGlobalLayerPlan(
-          step.layerPlan,
-          step.polymorphicPaths,
-          callback,
-          this,
-          step,
-        );
-      } catch (e) {
-        console.error(
-          `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
-          e,
-        );
-        throw e;
-      }
-      if (!replacementStep) {
-        throw new Error(
-          `The callback did not return a step during ${actionDescription}`,
-        );
-      }
-
-      if (replacementStep != step) {
-        this.replaceStep(step, replacementStep);
-      }
-      this.deduplicateSteps();
-
-      return replacementStep;
-    };
-
-    for (let i = 0; i < this.stepTracker.stepCount; i++) {
-      const step = this.stepTracker.getStepById(i, true);
-      // Check it hasn't been tree-shaken away, or already processed
-      if (!step || step.id !== i || processed.has(step)) continue;
-      const resultStep = processStep(step);
-      if (isDev) {
-        const plansAdded = this.stepTracker.stepCount - previousStepCount;
-
-        // NOTE: whilst processing steps new steps may be added, thus we must loop
-        // ascending and we must re-evaluate this.stepTracker.stepCount on each loop
-        // iteration.
-        if (plansAdded > 100000) {
-          throw new Error(
-            `Whilst processing steps as part of ${actionDescription}Plans, ${plansAdded} new steps have been created... That seems like it's likely a bug in the relevant method of one of your steps. The last plan processed was ${resultStep}`,
-          );
-        }
-      }
-    }
-
-    if (
-      this.phase !== "plan" &&
-      this.stepTracker.stepCount > previousStepCount
-    ) {
       // Any time new steps are added we should validate them. All plans are
       // validated once "plan" is finished, so no need to do it here for that
       // phase.
@@ -3314,35 +3206,8 @@ function inLayerPlanDepth(a: ExecutableStep): number {
   return max;
 }
 
-function compareStepsDependenciesFirst(a: ExecutableStep, z: ExecutableStep) {
-  // First sort by layer plan depth
-  const layerPlanDepthDiff = a.layerPlan.depth - z.layerPlan.depth;
-  if (layerPlanDepthDiff !== 0) {
-    return layerPlanDepthDiff;
-  }
-
-  // Then sort by layer plan id
-  const layerPlanIdDiff = a.layerPlan.id - z.layerPlan.id;
-  if (layerPlanIdDiff !== 0) {
-    return layerPlanIdDiff;
-  }
-
-  // Then return the higher in the dep tree (if any)
-  return inLayerPlanDepth(a) - inLayerPlanDepth(z);
-}
-
 const LAYER_PLAN_DEPTH_MULTIPLIER = 2 ** 40;
 const LAYER_PLAN_ID_MULTIPLIER = 2 ** 20;
-function weighStepDependenciesFirst(a: ExecutableStep) {
-  return (
-    // First sort by layer plan depth
-    a.layerPlan.depth * LAYER_PLAN_DEPTH_MULTIPLIER +
-    // Then sort by layer plan id
-    a.layerPlan.id * LAYER_PLAN_ID_MULTIPLIER +
-    // Then return the higher in the dep tree (if any)
-    inLayerPlanDepth(a)
-  );
-}
 
 function sortStepsInplaceQuicksortPivot(
   steps: ExecutableStep[],
@@ -3378,10 +3243,18 @@ function sortStepsInplaceQuicksortPivot(
   }
 }
 
-function sortStepsInplaceQuicksort(
-  steps: ExecutableStep[],
-  weights: number[],
-): void {
+function sortStepsInplaceQuicksort(steps: ExecutableStep[]): void {
+  const weights: number[] = [];
+  for (let i = 0, l = steps.length; i < l; i++) {
+    const step = steps[i];
+    weights[i] =
+      // First sort by layer plan depth
+      step.layerPlan.depth * LAYER_PLAN_DEPTH_MULTIPLIER +
+      // Then sort by layer plan id
+      step.layerPlan.id * LAYER_PLAN_ID_MULTIPLIER +
+      // Then return the higher in the dep tree (if any)
+      inLayerPlanDepth(step);
+  }
   const lefts = [0];
   const rights = [steps.length - 1];
   while (lefts.length > 0) {
@@ -3412,75 +3285,6 @@ function sortStepsDependenciesFirst(steps: ExecutableStep[]) {
     return steps;
   }
   depthCache = Object.create(null);
-  const weights = steps.map(weighStepDependenciesFirst);
-  sortStepsInplaceQuicksort(steps, weights);
+  sortStepsInplaceQuicksort(steps);
   return steps;
-}
-
-function _sortStepsDependenciesFirst(steps: ExecutableStep[]) {
-  return steps.sort(compareStepsDependenciesFirst);
-  function compareStepsDependenciesFirst(a: ExecutableStep, z: ExecutableStep) {
-    // First sort by layer plan depth
-    const layerPlanDepthDiff = a.layerPlan.depth - z.layerPlan.depth;
-    if (layerPlanDepthDiff !== 0) {
-      return layerPlanDepthDiff;
-    }
-
-    // Then sort by layer plan id
-    const layerPlanIdDiff = a.layerPlan.id - z.layerPlan.id;
-    if (layerPlanIdDiff !== 0) {
-      return layerPlanIdDiff;
-    }
-
-    // Same layer plan for a and z
-    const layerPlan = a.layerPlan;
-
-    // Then return the higher in the dep tree (if any)
-    let sameLayerDepsA: ExecutableStep[] = [];
-    let sameLayerDepsZ: ExecutableStep[] = [];
-    for (const dep of a.dependencies) {
-      if (dep.layerPlan === layerPlan) {
-        sameLayerDepsA.push(dep);
-      }
-    }
-    for (const dep of z.dependencies) {
-      if (dep.layerPlan === layerPlan) {
-        sameLayerDepsZ.push(dep);
-      }
-    }
-    const SAFETY_LIMIT = 100_000;
-    for (let safety = 0; safety < SAFETY_LIMIT; safety++) {
-      const countA = sameLayerDepsA.length;
-      const countZ = sameLayerDepsZ.length;
-      if (countA === 0 && countZ === 0) {
-        return 0;
-      } else if (countA === 0) {
-        // -1 means A comes before Z
-        // A comes before Z if A has 0 deps and Z has > 0 deps
-        return -1;
-      } else if (countZ === 0) {
-        return 1;
-      } else {
-        const prevA = sameLayerDepsA;
-        const prevZ = sameLayerDepsZ;
-        sameLayerDepsA = [];
-        sameLayerDepsZ = [];
-        for (const step of prevA) {
-          for (const dep of step.dependencies) {
-            if (dep.layerPlan === layerPlan) {
-              sameLayerDepsA.push(dep);
-            }
-          }
-        }
-        for (const step of prevZ) {
-          for (const dep of step.dependencies) {
-            if (dep.layerPlan === layerPlan) {
-              sameLayerDepsZ.push(dep);
-            }
-          }
-        }
-      }
-    }
-    throw new Error(`Plan graph is too deep within layer plan '${layerPlan}'`);
-  }
 }
