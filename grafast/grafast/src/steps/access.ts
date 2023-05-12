@@ -7,6 +7,7 @@ import { inspect } from "../inspect.js";
 import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import LRU from "@graphile/lru";
 
 /** @internal */
 export const expressionSymbol = Symbol("expression");
@@ -45,6 +46,25 @@ function access2(
   }
 }
 
+const makeDestructureHyperCache = new LRU<
+  string,
+  (_extra: ExecutionExtra, value: any) => any
+>({ maxLength: 1000 });
+const makingDestructureHyperCache = new Map<
+  string,
+  Array<(fn: (_extra: ExecutionExtra, value: any) => any) => void>
+>();
+
+// We could use an LRU here, but there's no need - there's only 100 possible values;
+type Factory = (
+  ...path: Array<string | number | symbol>
+) => (_extra: ExecutionExtra, value: any) => any;
+const makeDestructureCache: { [signature: string]: Factory } =
+  Object.create(null);
+const makingDestructureCache: {
+  [signature: string]: Array<(factory: Factory) => void>;
+} = Object.create(null);
+
 /**
  * Returns a function that will extract the value at the given path from an
  * incoming object. If possible it will return a dynamically constructed
@@ -56,21 +76,26 @@ function constructDestructureFunction(
   fallback: any,
   callback: (fn: (_extra: ExecutionExtra, value: any) => any) => void,
 ): void {
-  const jitParts: TE[] = [];
+  const n = path.length;
+  /** 0 - slow mode; 1 - middle mode; 2 - turbo mode */
+  let mode: 0 | 1 | 2 = n > 50 ? 0 : n > 5 ? 1 : 2;
 
-  let slowMode = false;
-
-  for (let i = 0, l = path.length; i < l; i++) {
+  for (let i = 0; i < n; i++) {
     const pathItem = path[i];
     const t = typeof pathItem;
-    if (
-      t === "symbol" ||
-      t === "string" ||
-      (t === "number" && Number.isFinite(pathItem))
-    ) {
-      jitParts.push(te.get(pathItem));
+    if (t === "symbol") {
+      // Cannot use in superfast mode (because cannot create signature)
+      if (mode === 2) mode = 1;
+    } else if (t === "string") {
+      // Cannot use in superfast mode (because signature becomes ambiguous)
+      if (t.includes("|") && mode === 2) mode = 1;
+    } else if (t === "number") {
+      if (!Number.isFinite(pathItem)) {
+        mode = 0;
+      }
     } else if (pathItem == null) {
-      slowMode = true;
+      // Slow mode required
+      mode = 0;
     } else {
       throw new Error(
         `Invalid path item: ${inspect(pathItem)} in path '${JSON.stringify(
@@ -80,18 +105,86 @@ function constructDestructureFunction(
     }
   }
 
-  // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
-  // a JIT-d function.
-  if (slowMode) {
+  if (mode === 0) {
+    // Slow mode
     callback(function slowlyExtractValueAtPath(_meta: any, value: any): any {
       let current = value;
       for (let i = 0, l = path.length; i < l && current != null; i++) {
         const pathItem = path[i];
         current = current[pathItem];
       }
-      return fallback !== undefined ? current ?? fallback : current;
+      return current ?? fallback;
     });
+  } else if (mode === 1) {
+    const signature = (fallback !== undefined ? "f" : "n") + n;
+    // PERF: we could add jitParts here if we wanted to
+    const fn = makeDestructureCache[signature];
+    if (fn) {
+      callback(fn(...path));
+      return;
+    }
+    if (makingDestructureCache[signature]) {
+      makingDestructureCache[signature].push((fn) => callback(fn(...path)));
+      return;
+    }
+    const callbacks: Array<(fn: Factory) => void> = [
+      (fn) => callback(fn(...path)),
+    ];
+    makingDestructureCache[signature] = callbacks;
+
+    // DO NOT REFERENCE 'path' BELOW HERE!
+
+    const names: TE[] = [];
+    const access: TE[] = [];
+    for (let i = 0; i < n; i++) {
+      const te_name = te.identifier(`p${i}`);
+      names.push(te_name);
+      access.push(te`[${te_name}]`);
+    }
+    te.runInBatch<Factory>(
+      te`function (${te.join(names, ", ")}) {
+return (_meta, value) => value${te.join(access, "")};
+}`,
+      (factory) => {
+        makeDestructureCache[signature] = factory;
+        delete makingDestructureCache[signature];
+        for (const callback of callbacks) {
+          callback(factory);
+        }
+      },
+    );
   } else {
+    // Super fast mode! This stores jitParts for OutputPlan to use.
+    // NOTE: path has already been validated as safe.
+    const signature = path.join("|");
+    const fn = makeDestructureHyperCache.get(signature);
+    if (fn) {
+      callback(fn);
+      return;
+    }
+    const making = makingDestructureHyperCache.get(signature);
+    if (making) {
+      making.push(callback);
+      return;
+    }
+    const callbacks: Array<typeof callback> = [callback];
+    makingDestructureHyperCache.set(signature, callbacks);
+
+    const done = (fn: Parameters<typeof callback>[0]) => {
+      makeDestructureHyperCache.set(signature, fn);
+      makingDestructureHyperCache.delete(signature);
+      for (const callback of callbacks) {
+        callback(fn);
+      }
+    };
+
+    const jitParts: TE[] = [];
+
+    for (let i = 0, l = path.length; i < l; i++) {
+      const pathItem = path[i];
+      jitParts.push(te.get(pathItem));
+    }
+
     // ?.blah?.bog?.["!!!"]?.[0]
     const expression = te.join(jitParts, "");
     const expressionDetail = [expression, fallback];
@@ -99,7 +192,7 @@ function constructDestructureFunction(
     if (path.length === 1) {
       const quicklyExtractValueAtPath = access1(path[0], fallback) as any;
       quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
-      callback(quicklyExtractValueAtPath);
+      done(quicklyExtractValueAtPath);
     } else if (path.length === 2) {
       const quicklyExtractValueAtPath = access2(
         path[0],
@@ -107,7 +200,7 @@ function constructDestructureFunction(
         fallback,
       ) as any;
       quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
-      callback(quicklyExtractValueAtPath);
+      done(quicklyExtractValueAtPath);
     } else {
       // (extra, value) => value?.blah?.bog?.["!!!"]?.[0]
       te.runInBatch<any>(
@@ -120,7 +213,7 @@ function constructDestructureFunction(
         (quicklyExtractValueAtPath) => {
           // JIT this for great performance.
           quicklyExtractValueAtPath[expressionSymbol] = expressionDetail;
-          callback(quicklyExtractValueAtPath);
+          done(quicklyExtractValueAtPath);
         },
       );
     }
