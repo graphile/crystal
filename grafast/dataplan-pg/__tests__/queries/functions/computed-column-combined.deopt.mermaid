@@ -50,10 +50,8 @@ graph TD
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__users_mo...nt_forum__ᐳ"}}:::plan
     Object11 & PgClassExpression31 --> PgSelect40
     PgSelectSingle29 --> PgClassExpression31
-    RemapKeys47{{"RemapKeys[47∈3]<br />ᐸ29:{”0”:0}ᐳ"}}:::plan
-    PgSelectSingle29 --> RemapKeys47
     PgSelectSingle37{{"PgSelectSingle[37∈3]<br />ᐸforums_unique_author_countᐳ"}}:::plan
-    RemapKeys47 --> PgSelectSingle37
+    PgSelectSingle29 --> PgSelectSingle37
     PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle37 --> PgClassExpression38
     __Item44[/"__Item[44∈4]<br />ᐸ40ᐳ"\]:::itemplan
@@ -75,9 +73,9 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 11, 30<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[20]<br />1: <br />ᐳ: 21, 22, 23<br />2: PgSelect[24]<br />ᐳ: First[28], PgSelectSingle[29]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgSelect24,First28,PgSelectSingle29 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29, 11<br /><br />ROOT PgSelectSingle{2}ᐸusers_most_recent_forumᐳ[29]<br />1: <br />ᐳ: 31, 47, 37, 38<br />2: PgSelect[40]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29, 11<br /><br />ROOT PgSelectSingle{2}ᐸusers_most_recent_forumᐳ[29]<br />1: <br />ᐳ: 31, 37, 38<br />2: PgSelect[40]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression31,PgSelectSingle37,PgClassExpression38,PgSelect40,RemapKeys47 bucket3
+    class Bucket3,PgClassExpression31,PgSelectSingle37,PgClassExpression38,PgSelect40 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ40ᐳ[44]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item44,PgSelectSingle45 bucket4

@@ -37,10 +37,8 @@ graph TD
     PgSelectSingle22 --> PgClassExpression27
     PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression29
-    RemapKeys81{{"RemapKeys[81∈3]<br />ᐸ22:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys81
     PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸleftArmᐳ"}}:::plan
-    RemapKeys81 --> PgSelectSingle36
+    PgSelectSingle22 --> PgSelectSingle36
     RemapKeys85{{"RemapKeys[85∈3]<br />ᐸ22:{”0”:6,”1”:7,”2”:8,”3”:9,”4”:10}ᐳ"}}:::plan
     PgSelectSingle22 --> RemapKeys85
     PgSelectSingle61{{"PgSelectSingle[61∈3]<br />ᐸpersonSecretᐳ"}}:::plan
@@ -51,10 +49,8 @@ graph TD
     PgSelectSingle61 --> PgClassExpression63
     Lambda65{{"Lambda[65∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List64 --> Lambda65
-    RemapKeys83{{"RemapKeys[83∈6]<br />ᐸ61:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
-    PgSelectSingle61 --> RemapKeys83
     PgSelectSingle73{{"PgSelectSingle[73∈6]<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys83 --> PgSelectSingle73
+    PgSelectSingle61 --> PgSelectSingle73
     PgClassExpression78{{"PgClassExpression[78∈6]<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
     PgSelectSingle61 --> PgClassExpression78
     List39{{"List[39∈4]<br />ᐸ37,38ᐳ"}}:::plan
@@ -98,7 +94,7 @@ graph TD
     class Bucket2,__Item21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 37, 62<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgCursor23,PgClassExpression24,List25,PgClassExpression27,PgClassExpression29,PgSelectSingle36,PgSelectSingle61,RemapKeys81,RemapKeys85 bucket3
+    class Bucket3,PgCursor23,PgClassExpression24,List25,PgClassExpression27,PgClassExpression29,PgSelectSingle36,PgSelectSingle61,RemapKeys85 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 36, 37<br /><br />ROOT PgSelectSingle{3}ᐸleftArmᐳ[36]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression38,List39,Lambda40,PgClassExpression42,PgSelectSingle49,PgClassExpression54,RemapKeys79 bucket4
@@ -107,7 +103,7 @@ graph TD
     class Bucket5,PgClassExpression50,PgClassExpression51,PgClassExpression53 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 61, 62<br /><br />ROOT PgSelectSingle{3}ᐸpersonSecretᐳ[61]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression63,List64,Lambda65,PgSelectSingle73,PgClassExpression78,RemapKeys83 bucket6
+    class Bucket6,PgClassExpression63,List64,Lambda65,PgSelectSingle73,PgClassExpression78 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 73<br /><br />ROOT PgSelectSingle{6}ᐸpersonᐳ[73]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression74,PgClassExpression75,PgClassExpression77 bucket7

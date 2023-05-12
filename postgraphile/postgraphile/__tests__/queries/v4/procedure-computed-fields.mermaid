@@ -59,10 +59,8 @@ graph TD
     PgSelect185[["PgSelect[185∈12]<br />ᐸpost_computed_compound_type_arrayᐳ"]]:::plan
     PgClassExpression184{{"PgClassExpression[184∈12]<br />ᐸ__post__ᐳ"}}:::plan
     Object18 & PgClassExpression184 & Constant387 --> PgSelect185
-    RemapKeys344{{"RemapKeys[344∈3]<br />ᐸ22:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys344
     PgSelectSingle29{{"PgSelectSingle[29∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
-    RemapKeys344 --> PgSelectSingle29
+    PgSelectSingle22 --> PgSelectSingle29
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__frmcdc_c...pe_1__.”a”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression30
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
@@ -73,10 +71,8 @@ graph TD
     PgSelectSingle22 --> RemapKeys350
     PgSelectSingle40{{"PgSelectSingle[40∈3]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"}}:::plan
     RemapKeys350 --> PgSelectSingle40
-    RemapKeys346{{"RemapKeys[346∈3]<br />ᐸ40:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
-    PgSelectSingle40 --> RemapKeys346
     PgSelectSingle47{{"PgSelectSingle[47∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
-    RemapKeys346 --> PgSelectSingle47
+    PgSelectSingle40 --> PgSelectSingle47
     RemapKeys348{{"RemapKeys[348∈3]<br />ᐸ40:{”0”:4,”1”:5,”2”:6,”3”:7}ᐳ"}}:::plan
     PgSelectSingle40 --> RemapKeys348
     PgSelectSingle58{{"PgSelectSingle[58∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
@@ -170,10 +166,8 @@ graph TD
     __Item230 --> PgSelectSingle231
     PgClassExpression232{{"PgClassExpression[232∈20]<br />ᐸ__post_com...al_set__.vᐳ"}}:::plan
     PgSelectSingle231 --> PgClassExpression232
-    RemapKeys354{{"RemapKeys[354∈7]<br />ᐸ80:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
-    PgSelectSingle80 --> RemapKeys354
     PgSelectSingle87{{"PgSelectSingle[87∈7]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
-    RemapKeys354 --> PgSelectSingle87
+    PgSelectSingle80 --> PgSelectSingle87
     RemapKeys356{{"RemapKeys[356∈7]<br />ᐸ80:{”0”:4,”1”:5,”2”:6,”3”:7}ᐳ"}}:::plan
     PgSelectSingle80 --> RemapKeys356
     PgSelectSingle98{{"PgSelectSingle[98∈7]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
@@ -285,7 +279,7 @@ graph TD
     class Bucket2,__Item21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸtypesᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelectSingle29,PgClassExpression30,PgClassExpression31,PgClassExpression33,PgSelectSingle40,PgSelectSingle47,PgSelectSingle58,PgSelectSingle69,PgSelectSingle80,RemapKeys344,RemapKeys346,RemapKeys348,RemapKeys350,RemapKeys352,RemapKeys358 bucket3
+    class Bucket3,PgSelectSingle29,PgClassExpression30,PgClassExpression31,PgClassExpression33,PgSelectSingle40,PgSelectSingle47,PgSelectSingle58,PgSelectSingle69,PgSelectSingle80,RemapKeys348,RemapKeys350,RemapKeys352,RemapKeys358 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 47<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_compoundType_1ᐳ[47]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression48,PgClassExpression49,PgClassExpression51 bucket4
@@ -297,7 +291,7 @@ graph TD
     class Bucket6,PgClassExpression70,PgClassExpression71,PgClassExpression73 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 80<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_nestedCompoundType_1ᐳ[80]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgSelectSingle87,PgSelectSingle98,RemapKeys354,RemapKeys356 bucket7
+    class Bucket7,PgSelectSingle87,PgSelectSingle98,RemapKeys356 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 87<br /><br />ROOT PgSelectSingle{7}ᐸfrmcdc_compoundType_1ᐳ[87]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression88,PgClassExpression89,PgClassExpression91 bucket8

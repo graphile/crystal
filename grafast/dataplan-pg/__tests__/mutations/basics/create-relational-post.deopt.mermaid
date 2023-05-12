@@ -56,10 +56,8 @@ graph TD
     RemapKeys69 --> PgSelectSingle41
     PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__relation..._lower__.vᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression42
-    RemapKeys67{{"RemapKeys[67∈3]<br />ᐸ30:{”0”:0,”1”:1}ᐳ"}}:::plan
-    PgSelectSingle30 --> RemapKeys67
     PgSelectSingle49{{"PgSelectSingle[49∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
-    RemapKeys67 --> PgSelectSingle49
+    PgSelectSingle30 --> PgSelectSingle49
     PgClassExpression50{{"PgClassExpression[50∈3]<br />ᐸ__relation..._archived”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression50
     PgSelectSingle49 --> PgClassExpression58
@@ -84,9 +82,9 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 16, 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]<br />1: <br />ᐳ: PgClassExpression[23]<br />2: PgSelect[25]<br />ᐳ: First[29], PgSelectSingle[30]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression23,PgSelect25,First29,PgSelectSingle30 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30, 16<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[30]<br />1: <br />ᐳ: 31, 32, 33, 34, 67, 69, 41, 42, 49, 50, 58<br />2: PgSelect[59]<br />ᐳ: First[63], PgSelectSingle[64]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30, 16<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[30]<br />1: <br />ᐳ: 31, 32, 33, 34, 49, 69, 41, 42, 50, 58<br />2: PgSelect[59]<br />ᐳ: First[63], PgSelectSingle[64]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgClassExpression58,PgSelect59,First63,PgSelectSingle64,RemapKeys67,RemapKeys69 bucket3
+    class Bucket3,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelectSingle41,PgClassExpression42,PgSelectSingle49,PgClassExpression50,PgClassExpression58,PgSelect59,First63,PgSelectSingle64,RemapKeys69 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 64<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[64]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression65,PgClassExpression66 bucket4

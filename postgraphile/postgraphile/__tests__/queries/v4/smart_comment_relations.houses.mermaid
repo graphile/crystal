@@ -100,10 +100,8 @@ graph TD
     PgSelectSingle22 --> PgClassExpression30
     PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__houses__...ilding_id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression32
-    RemapKeys353{{"RemapKeys[353∈3]<br />ᐸ22:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys353
     PgSelectSingle40{{"PgSelectSingle[40∈3]<br />ᐸstreetsᐳ"}}:::plan
-    RemapKeys353 --> PgSelectSingle40
+    PgSelectSingle22 --> PgSelectSingle40
     RemapKeys378{{"RemapKeys[378∈3]<br />ᐸ22:{”0”:26,”1”:27,”2”:28,”3”:29,”4”:30,”5”:31,”6”:32,”7”:33,”8”:34,”9”:35,”10”:36,”11”:37,”12”:38}ᐳ"}}:::plan
     PgSelectSingle22 --> RemapKeys378
     PgSelectSingle76{{"PgSelectSingle[76∈3]<br />ᐸbuildingsᐳ"}}:::plan
@@ -122,10 +120,8 @@ graph TD
     PgSelectSingle228 --> PgClassExpression230
     PgClassExpression231{{"PgClassExpression[231∈19]<br />ᐸ__street_p...ent_owner”ᐳ"}}:::plan
     PgSelectSingle228 --> PgClassExpression231
-    RemapKeys356{{"RemapKeys[356∈19]<br />ᐸ228:{”0”:0,”1”:1,”2”:2}ᐳ"}}:::plan
-    PgSelectSingle228 --> RemapKeys356
     PgSelectSingle238{{"PgSelectSingle[238∈19]<br />ᐸstreetsᐳ"}}:::plan
-    RemapKeys356 --> PgSelectSingle238
+    PgSelectSingle228 --> PgSelectSingle238
     RemapKeys361{{"RemapKeys[361∈19]<br />ᐸ228:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9}ᐳ"}}:::plan
     PgSelectSingle228 --> RemapKeys361
     PgSelectSingle274{{"PgSelectSingle[274∈19]<br />ᐸpropertiesᐳ"}}:::plan
@@ -172,8 +168,8 @@ graph TD
     List43 --> Lambda44
     PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__streets__.”name”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression46
-    Access352{{"Access[352∈4]<br />ᐸ353.1ᐳ"}}:::plan
-    RemapKeys353 --> Access352
+    Access352{{"Access[352∈4]<br />ᐸ22.1ᐳ"}}:::plan
+    PgSelectSingle22 --> Access352
     List130{{"List[130∈11]<br />ᐸ128,129ᐳ"}}:::plan
     PgClassExpression129{{"PgClassExpression[129∈11]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
     Constant128 & PgClassExpression129 --> List130
@@ -234,8 +230,8 @@ graph TD
     List241 --> Lambda242
     PgClassExpression244{{"PgClassExpression[244∈20]<br />ᐸ__streets__.”name”ᐳ"}}:::plan
     PgSelectSingle238 --> PgClassExpression244
-    Access355{{"Access[355∈20]<br />ᐸ356.1ᐳ"}}:::plan
-    RemapKeys356 --> Access355
+    Access355{{"Access[355∈20]<br />ᐸ228.1ᐳ"}}:::plan
+    PgSelectSingle228 --> Access355
     List66{{"List[66∈6]<br />ᐸ64,65ᐳ"}}:::plan
     PgClassExpression65{{"PgClassExpression[65∈6]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
     Constant64 & PgClassExpression65 --> List66
@@ -339,8 +335,8 @@ graph TD
     class Bucket2,__Item21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 23, 41, 64, 128, 60, 111, 161, 211, 258, 308<br /><br />ROOT PgSelectSingle{2}ᐸhousesᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression24,PgClassExpression25,List26,Lambda27,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgClassExpression32,PgSelectSingle40,PgSelectSingle76,PgSelectSingle177,PgSelectSingle228,RemapKeys353,RemapKeys363,RemapKeys368,RemapKeys378 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 40, 41, 353, 64, 60<br /><br />ROOT PgSelectSingle{3}ᐸstreetsᐳ[40]"):::bucket
+    class Bucket3,PgClassExpression24,PgClassExpression25,List26,Lambda27,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgClassExpression32,PgSelectSingle40,PgSelectSingle76,PgSelectSingle177,PgSelectSingle228,RemapKeys363,RemapKeys368,RemapKeys378 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 40, 41, 22, 64, 60<br /><br />ROOT PgSelectSingle{3}ᐸstreetsᐳ[40]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression42,List43,Lambda44,PgClassExpression46,Access352 bucket4
     Bucket5("Bucket 5 (listItem)<br />Deps: 64<br /><br />ROOT __Item{5}ᐸ352ᐳ[62]"):::bucket
@@ -387,8 +383,8 @@ graph TD
     class Bucket18,PgClassExpression216,List217,Lambda218,PgClassExpression220 bucket18
     Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 228, 41, 64, 128, 258, 308<br /><br />ROOT PgSelectSingle{3}ᐸstreetPropertyᐳ[228]"):::bucket
     classDef bucket19 stroke:#7f007f
-    class Bucket19,PgClassExpression229,PgClassExpression230,PgClassExpression231,PgSelectSingle238,PgSelectSingle274,RemapKeys356,RemapKeys361 bucket19
-    Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 238, 41, 356, 64, 258<br /><br />ROOT PgSelectSingle{19}ᐸstreetsᐳ[238]"):::bucket
+    class Bucket19,PgClassExpression229,PgClassExpression230,PgClassExpression231,PgSelectSingle238,PgSelectSingle274,RemapKeys361 bucket19
+    Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 238, 41, 228, 64, 258<br /><br />ROOT PgSelectSingle{19}ᐸstreetsᐳ[238]"):::bucket
     classDef bucket20 stroke:#ffa500
     class Bucket20,PgClassExpression240,List241,Lambda242,PgClassExpression244,Access355 bucket20
     Bucket21("Bucket 21 (listItem)<br />Deps: 64<br /><br />ROOT __Item{21}ᐸ355ᐳ[260]"):::bucket

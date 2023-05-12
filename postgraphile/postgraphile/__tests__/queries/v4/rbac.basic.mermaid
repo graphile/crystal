@@ -105,10 +105,8 @@ graph TD
     PgSelectSingle111 --> PgClassExpression113
     Lambda115{{"Lambda[115∈11]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List114 --> Lambda115
-    RemapKeys216{{"RemapKeys[216∈11]<br />ᐸ111:{”0”:0,”1”:1,”2”:2,”3”:3}ᐳ"}}:::plan
-    PgSelectSingle111 --> RemapKeys216
     PgSelectSingle122{{"PgSelectSingle[122∈11]<br />ᐸleftArmᐳ"}}:::plan
-    RemapKeys216 --> PgSelectSingle122
+    PgSelectSingle111 --> PgSelectSingle122
     PgSelect94[["PgSelect[94∈8]<br />ᐸleftArmᐳ"]]:::plan
     Object11 & Connection93 --> PgSelect94
     List75{{"List[75∈7]<br />ᐸ73,74ᐳ"}}:::plan
@@ -129,10 +127,8 @@ graph TD
     PgSelectSingle48 --> PgClassExpression50
     Lambda52{{"Lambda[52∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List51 --> Lambda52
-    RemapKeys214{{"RemapKeys[214∈5]<br />ᐸ48:{”0”:0,”1”:1}ᐳ"}}:::plan
-    PgSelectSingle48 --> RemapKeys214
     PgSelectSingle59{{"PgSelectSingle[59∈5]<br />ᐸpersonSecretᐳ"}}:::plan
-    RemapKeys214 --> PgSelectSingle59
+    PgSelectSingle48 --> PgSelectSingle59
     PgSelect33[["PgSelect[33∈2]<br />ᐸpersonSecretᐳ"]]:::plan
     Object11 & Connection32 --> PgSelect33
     List16{{"List[16∈1]<br />ᐸ14,15ᐳ"}}:::plan
@@ -244,7 +240,7 @@ graph TD
     class Bucket4,PgClassExpression37,List38,Lambda39,PgClassExpression41 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 48, 49, 14<br /><br />ROOT PgSelectSingleᐸpersonᐳ[48]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression50,List51,Lambda52,PgSelectSingle59,RemapKeys214 bucket5
+    class Bucket5,PgClassExpression50,List51,Lambda52,PgSelectSingle59 bucket5
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 59, 14<br /><br />ROOT PgSelectSingle{5}ᐸpersonSecretᐳ[59]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression61,List62,Lambda63,PgClassExpression65 bucket6
@@ -262,7 +258,7 @@ graph TD
     class Bucket10,PgClassExpression98,List99,Lambda100,PgClassExpression102,PgClassExpression103,PgClassExpression104 bucket10
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 111, 49, 73<br /><br />ROOT PgSelectSingleᐸpersonᐳ[111]"):::bucket
     classDef bucket11 stroke:#00ffff
-    class Bucket11,PgClassExpression113,List114,Lambda115,PgSelectSingle122,RemapKeys216 bucket11
+    class Bucket11,PgClassExpression113,List114,Lambda115,PgSelectSingle122 bucket11
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 122, 73<br /><br />ROOT PgSelectSingle{11}ᐸleftArmᐳ[122]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgClassExpression124,List125,Lambda126,PgClassExpression128,PgClassExpression129,PgClassExpression130 bucket12
