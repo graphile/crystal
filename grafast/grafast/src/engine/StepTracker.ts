@@ -298,6 +298,7 @@ export class StepTracker {
       }
       layerPlansBy$existing.delete(layerPlan);
       if (layerPlansBy$existing.size === 0) {
+        this.layerPlansByRootStep.delete($existing);
         // TODO: Cleanup, tree shake, etc
       }
     }
