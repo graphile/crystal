@@ -90,6 +90,8 @@ const {
   isUnionType,
 } = graphql;
 
+const EMPTY_ARRAY = Object.freeze([]);
+
 export const POLYMORPHIC_ROOT_PATH = "";
 export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
   POLYMORPHIC_ROOT_PATH,
@@ -1377,7 +1379,7 @@ ${te.join(
       this.planIntoOutputPlan(
         listOutputPlan,
         $item.layerPlan,
-        [],
+        EMPTY_ARRAY,
         polymorphicPath,
         polymorphicPaths,
         selections,
