@@ -1,9 +1,9 @@
+import LRU from "@graphile/lru";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
-import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
@@ -15,8 +15,6 @@ import type {
 } from "../step";
 import { newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
-import LRU from "@graphile/lru";
-import { arrayOfLength } from "../index.js";
 
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
@@ -352,7 +350,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       this.reason.type === "listItem"
     ) {
       const n = this.copyStepIds.length;
-      let signature = this.reason.type[0] + n;
+      const signature = this.reason.type[0] + n;
       withNewBucketFactory(signature, n, this.reason.type, (fn) => {
         this.newBucket = fn(this.copyStepIds);
       });

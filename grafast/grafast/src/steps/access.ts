@@ -7,44 +7,9 @@ import { inspect } from "../inspect.js";
 import type { ExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import LRU from "@graphile/lru";
 
 /** @internal */
 export const expressionSymbol = Symbol("expression");
-
-function access1(key1: number | string | symbol, fallback: any) {
-  if (fallback !== undefined) {
-    return function quicklyAccessKey1WithFallback(
-      _extra: ExecutionExtra,
-      value: any,
-    ) {
-      return value?.[key1] ?? fallback;
-    };
-  } else {
-    return function quicklyAccessKey1(_extra: ExecutionExtra, value: any) {
-      return value?.[key1];
-    };
-  }
-}
-
-function access2(
-  key1: number | string | symbol,
-  key2: number | string | symbol,
-  fallback: any,
-) {
-  if (fallback !== undefined) {
-    return function quicklyAccessKey2WithFallback(
-      _extra: ExecutionExtra,
-      value: any,
-    ) {
-      return value?.[key1]?.[key2] ?? fallback;
-    };
-  } else {
-    return function quicklyAccessKey2(_extra: ExecutionExtra, value: any) {
-      return value?.[key1]?.[key2];
-    };
-  }
-}
 
 // We could use an LRU here, but there's no need - there's only 100 possible values;
 type Factory = (
