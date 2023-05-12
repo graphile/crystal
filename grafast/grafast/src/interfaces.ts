@@ -240,6 +240,9 @@ export const $$proxy = Symbol("proxy");
  */
 export const $$safeError = Symbol("safeError");
 
+/** The layerPlan used as a subroutine for this step */
+export const $$subroutine = Symbol("subroutine");
+
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
  * the concrete type of it is, we use the $$concreteType property for that.

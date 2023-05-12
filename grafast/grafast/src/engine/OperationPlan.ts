@@ -42,7 +42,7 @@ import type {
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
-import { $$proxy } from "../interfaces.js";
+import { $$proxy, $$subroutine } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
@@ -1973,6 +1973,8 @@ ${te.join(
       }
 
       if (order === "dependents-first") {
+        // used for: pushDown, optimize
+
         for (let i = 0; i < step.dependents.length; i++) {
           const entry = step.dependents[i];
           const { step: $processFirst } = entry;
@@ -1984,22 +1986,16 @@ ${te.join(
             }
           }
         }
-        // PERF: we should calculate this _once only_ rather than for every step!
-        const childLayerPlans =
-          this.stepTracker.layerPlansByParentStep.get(step);
-        const subroutineLayerPlans =
-          childLayerPlans && childLayerPlans.size > 0
-            ? [...childLayerPlans].filter((l) => l.reason.type === "subroutine")
-            : null;
-        if (subroutineLayerPlans !== null && subroutineLayerPlans.length > 0) {
-          for (const subroutineLayerPlan of subroutineLayerPlans) {
-            const $root = subroutineLayerPlan.rootStep;
-            if ($root) {
-              processStep($root);
-            }
+        const subroutineLayerPlan = step[$$subroutine];
+        if (subroutineLayerPlan) {
+          const $root = subroutineLayerPlan.rootStep;
+          if ($root) {
+            processStep($root);
           }
         }
       } else {
+        // used for: hoist
+
         for (const $processFirst of step.dependencies) {
           if (!processed.has($processFirst)) {
             processStep($processFirst);
@@ -2212,15 +2208,8 @@ ${te.join(
     if (step instanceof __ItemStep || step instanceof __ValueStep) {
       return true;
     }
-    // PERF: we should calculate this _once only_ rather than for every step!
-    const layerPlansWithParentStep =
-      this.stepTracker.layerPlansByParentStep.get(step);
-    const hasSubroutinesWithParentStep =
-      layerPlansWithParentStep &&
-      layerPlansWithParentStep.size > 0 &&
-      [...layerPlansWithParentStep].some((l) => l.reason.type === "subroutine");
-    if (hasSubroutinesWithParentStep) {
-      // Don't hoist steps that are the root of a subroutine
+    if (step[$$subroutine]) {
+      // Don't hoist steps that are the parent of a subroutine
       // PERF: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
       return true;
     }

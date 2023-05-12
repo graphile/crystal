@@ -65,7 +65,6 @@ export function each<
         rootStep.dependencies[0].layerPlan !== layerPlan
       ) {
         // We don't do anything; replace ourself with our parent
-        this.operationPlan.deleteLayerPlan(layerPlan);
         return this.getListStep();
       }
       return this;

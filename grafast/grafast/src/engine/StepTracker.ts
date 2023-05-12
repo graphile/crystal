@@ -1,7 +1,12 @@
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
+import { $$subroutine } from "../interfaces.js";
 import type { ExecutableStep } from "../step";
-import type { LayerPlan, LayerPlanReasonsWithParentStep } from "./LayerPlan";
+import type {
+  LayerPlan,
+  LayerPlanReasonSubroutine,
+  LayerPlanReasonsWithParentStep,
+} from "./LayerPlan";
 import type { OutputPlan } from "./OutputPlan";
 
 /**
@@ -103,8 +108,7 @@ export class StepTracker {
       }
       case "nullableBoundary":
       case "listItem":
-      case "polymorphic":
-      case "subroutine": {
+      case "polymorphic": {
         const store = this.layerPlansByParentStep.get(
           layerPlan.reason.parentStep,
         )!;
@@ -116,6 +120,17 @@ export class StepTracker {
             new Set([layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>]),
           );
         }
+        break;
+      }
+      case "subroutine": {
+        const parent = layerPlan.reason.parentStep;
+        if (parent[$$subroutine]) {
+          throw new Error(
+            `Steps may currently only have one subroutine. If you have need for a step with multiple subroutines, please get in touch.`,
+          );
+        }
+        parent[$$subroutine] =
+          layerPlan as LayerPlan<LayerPlanReasonSubroutine>;
         break;
       }
       default: {
@@ -175,12 +190,14 @@ export class StepTracker {
     if ($root) {
       this.layerPlansByRootStep.get($root)!.delete(layerPlan);
     }
-    const $parent =
-      "parentStep" in layerPlan.reason ? layerPlan.reason.parentStep : null;
-    if ($parent) {
-      this.layerPlansByParentStep
-        .get($parent)!
-        .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
+    if (layerPlan.reason.type !== "subroutine") {
+      const $parent =
+        "parentStep" in layerPlan.reason ? layerPlan.reason.parentStep : null;
+      if ($parent) {
+        this.layerPlansByParentStep
+          .get($parent)!
+          .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
+      }
     }
     // Remove all plans in this layer
     for (const step of this.activeSteps) {
@@ -359,7 +376,7 @@ export class StepTracker {
 
     {
       // Convert root step of layer plans from $original to $replacement
-      const layerPlans = this.layerPlansByRootStep.get($original)!;
+      const layerPlans = this.layerPlansByRootStep.get($original);
       if (layerPlans?.size) {
         let layerPlansByReplacementRootStep =
           this.layerPlansByRootStep.get($replacement);
@@ -442,6 +459,10 @@ export class StepTracker {
    * then they can also be eradicated _except_ during the 'plan' phase.
    */
   private eradicate($original: ExecutableStep) {
+    if ($original[$$subroutine]) {
+      this.deleteLayerPlan($original[$$subroutine]);
+    }
+
     this.removeStepFromItsLayerPlan($original);
     const oldAliases = this.aliasesById[$original.id];
     if (oldAliases) {

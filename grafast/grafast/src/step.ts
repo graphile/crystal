@@ -4,7 +4,10 @@ import type { TE } from "tamedevil";
 import te from "tamedevil";
 
 import { isDev, noop } from "./dev.js";
-import type { LayerPlan } from "./engine/LayerPlan.js";
+import type {
+  LayerPlan,
+  LayerPlanReasonSubroutine,
+} from "./engine/LayerPlan.js";
 import {
   currentLayerPlan,
   currentPolymorphicPaths,
@@ -22,6 +25,7 @@ import type {
   StepOptimizeOptions,
   StepOptions,
 } from "./interfaces.js";
+import { $$subroutine } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
 
@@ -119,6 +123,7 @@ export abstract class BaseStep {
    */
   public readonly layerPlan: LayerPlan;
   public readonly operationPlan: OperationPlan;
+  public [$$subroutine]: LayerPlan<LayerPlanReasonSubroutine> | null = null;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   public debug: boolean;
