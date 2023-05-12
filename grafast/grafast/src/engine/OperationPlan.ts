@@ -3379,23 +3379,29 @@ function sortStepsInplaceQuicksortPivot(
 function sortStepsInplaceQuicksort(
   steps: ExecutableStep[],
   weights: number[],
-  left: number,
-  right: number,
 ): void {
-  const pivotWeight = weights[Math.floor((left + right) / 2)];
-  const pivotIdx = sortStepsInplaceQuicksortPivot(
-    steps,
-    weights,
-    left,
-    right,
-    pivotWeight,
-  );
+  const lefts = [0];
+  const rights = [steps.length - 1];
+  while (lefts.length > 0) {
+    const left = lefts.pop()!;
+    const right = rights.pop()!;
+    const pivotWeight = weights[Math.floor((left + right) / 2)];
+    const pivotIdx = sortStepsInplaceQuicksortPivot(
+      steps,
+      weights,
+      left,
+      right,
+      pivotWeight,
+    );
 
-  if (left < pivotIdx - 1) {
-    sortStepsInplaceQuicksort(steps, weights, left, pivotIdx - 1);
-  }
-  if (right > pivotIdx) {
-    sortStepsInplaceQuicksort(steps, weights, pivotIdx, right);
+    if (left < pivotIdx - 1) {
+      lefts.push(left);
+      rights.push(pivotIdx - 1);
+    }
+    if (right > pivotIdx) {
+      lefts.push(pivotIdx);
+      rights.push(right);
+    }
   }
 }
 
@@ -3405,7 +3411,7 @@ function sortStepsDependenciesFirst(steps: ExecutableStep[]) {
   }
   depthCache = Object.create(null);
   const weights = steps.map(weighStepDependenciesFirst);
-  sortStepsInplaceQuicksort(steps, weights, 0, steps.length - 1);
+  sortStepsInplaceQuicksort(steps, weights);
   return steps;
 }
 
