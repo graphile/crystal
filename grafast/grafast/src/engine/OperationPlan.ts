@@ -1950,43 +1950,6 @@ ${te.join(
     this.stepTracker.replaceStep($original, $replacement);
   }
 
-  private processStep(
-    step: ExecutableStep,
-    callback: (plan: ExecutableStep) => ExecutableStep,
-    actionDescription: string,
-    order: string,
-  ) {
-    let replacementStep: ExecutableStep = step;
-    try {
-      replacementStep = withGlobalLayerPlan(
-        step.layerPlan,
-        step.polymorphicPaths,
-        callback,
-        this,
-        step,
-      );
-      if (!replacementStep) {
-        throw new Error(
-          `The callback did not return a step during ${actionDescription}`,
-        );
-      }
-    } catch (e) {
-      console.error(
-        `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
-        e,
-      );
-      throw e;
-    }
-
-    if (replacementStep != step) {
-      this.replaceStep(step, replacementStep);
-    }
-
-    this.deduplicateSteps();
-
-    return replacementStep;
-  }
-
   // PERF: optimize
   /**
    * Process the given steps, either dependencies first (root to leaf) or
@@ -1999,53 +1962,107 @@ ${te.join(
     order: "dependents-first" | "dependencies-first",
     callback: (plan: ExecutableStep) => ExecutableStep,
   ): void {
-    const { stepTracker } = this;
-    const previousStepCount = stepTracker.stepCount;
+    const previousStepCount = this.stepTracker.stepCount;
 
-    const orderedSteps = sortStepsDependenciesFirst([
-      ...stepTracker.activeSteps,
-    ]);
+    const processed = new Set<ExecutableStep>();
 
-    if (order === "dependents-first") {
-      // used for: pushDown, optimize
-      // NOTE: optimize can create new steps
+    const processStep = (step: ExecutableStep) => {
+      // MUST come before anything else, otherwise infinite loops may occur
+      processed.add(step);
 
-      // Reverse loop
-      for (let i = orderedSteps.length - 1; i >= 0; i--) {
-        const preprocessStepCount = stepTracker.stepCount;
-        const step = orderedSteps[i];
-        if (!stepTracker.activeSteps.has(step)) continue;
-        this.processStep(step, callback, actionDescription, order);
-        if (stepTracker.stepCount > preprocessStepCount) {
-          // There's new steps. Trim the other steps, push these new steps to the end (in sorted order), reset `i`
+      if (!this.stepTracker.activeSteps.has(step)) {
+        return step;
+      }
 
-          const sortedNewSteps = sortStepsDependenciesFirst(
-            stepTracker.newStepsSince(preprocessStepCount),
-          );
-          for (let i = 0, l = sortedNewSteps.length; i < l; i++) {
-            orderedSteps[i++] = sortedNewSteps[i];
+      if (order === "dependents-first") {
+        // used for: pushDown, optimize
+
+        for (let i = 0; i < step.dependents.length; i++) {
+          const entry = step.dependents[i];
+          const { step: $processFirst } = entry;
+          if (!processed.has($processFirst)) {
+            processStep($processFirst);
+            if (step.dependents[i] !== entry) {
+              // The world has change; go back to the start
+              i = -1;
+            }
+          }
+        }
+        const subroutineLayerPlan = step[$$subroutine];
+        if (subroutineLayerPlan) {
+          const $root = subroutineLayerPlan.rootStep;
+          if ($root) {
+            processStep($root);
+          }
+        }
+      } else {
+        // used for: hoist
+
+        for (const $processFirst of step.dependencies) {
+          if (!processed.has($processFirst)) {
+            processStep($processFirst);
           }
         }
       }
-    } else {
-      // used for: hoist
-      // NOTE: hoist cannot create new steps
 
-      // Forward loop
-      for (let i = 0, l = orderedSteps.length; i < l; i++) {
-        const step = orderedSteps[i];
-        if (!stepTracker.activeSteps.has(step)) continue;
-        this.processStep(step, callback, actionDescription, order);
+      // Check again, processing another step may have invalidated this one.
+      if (!this.stepTracker.activeSteps.has(step)) {
+        return step;
       }
 
-      if (stepTracker.stepCount > previousStepCount) {
-        throw new Error(
-          `GrafastInternalError<69efa098-7817-4a8d-9c84-711cd7123d9e>: new step(s) created during processSteps[${order}]; this is unexpected.`,
+      let replacementStep: ExecutableStep = step;
+      try {
+        replacementStep = withGlobalLayerPlan(
+          step.layerPlan,
+          step.polymorphicPaths,
+          callback,
+          this,
+          step,
         );
+      } catch (e) {
+        console.error(
+          `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
+          e,
+        );
+        throw e;
+      }
+      if (!replacementStep) {
+        throw new Error(
+          `The callback did not return a step during ${actionDescription}`,
+        );
+      }
+
+      if (replacementStep != step) {
+        this.replaceStep(step, replacementStep);
+      }
+      this.deduplicateSteps();
+
+      return replacementStep;
+    };
+
+    for (let i = 0; i < this.stepTracker.stepCount; i++) {
+      const step = this.stepTracker.getStepById(i, true);
+      // Check it hasn't been tree-shaken away, or already processed
+      if (!step || step.id !== i || processed.has(step)) continue;
+      const resultStep = processStep(step);
+      if (isDev) {
+        const plansAdded = this.stepTracker.stepCount - previousStepCount;
+
+        // NOTE: whilst processing steps new steps may be added, thus we must loop
+        // ascending and we must re-evaluate this.stepTracker.stepCount on each loop
+        // iteration.
+        if (plansAdded > 100000) {
+          throw new Error(
+            `Whilst processing steps as part of ${actionDescription}Plans, ${plansAdded} new steps have been created... That seems like it's likely a bug in the relevant method of one of your steps. The last plan processed was ${resultStep}`,
+          );
+        }
       }
     }
 
-    if (this.phase !== "plan" && stepTracker.stepCount > previousStepCount) {
+    if (
+      this.phase !== "plan" &&
+      this.stepTracker.stepCount > previousStepCount
+    ) {
       // Any time new steps are added we should validate them. All plans are
       // validated once "plan" is finished, so no need to do it here for that
       // phase.
@@ -3181,110 +3198,4 @@ ${te.join(
 
 function makeDefaultPlan(fieldName: string) {
   return ($step: ExecutableStep) => access($step, [fieldName]);
-}
-
-let depthCache: { [stepId: number]: number } = Object.create(null);
-
-function inLayerPlanDepth(a: ExecutableStep): number {
-  const l = a.dependencies.length;
-  if (l === 0) return 0;
-  if (depthCache[a.id] !== undefined) {
-    return depthCache[a.id];
-  }
-  let max = 0;
-  const layerPlan = a.layerPlan;
-  for (let i = 0; i < l; i++) {
-    const dep = a.dependencies[i];
-    if (dep.layerPlan === layerPlan) {
-      const depDepth = inLayerPlanDepth(dep);
-      if (depDepth >= max) {
-        max = depDepth + 1;
-      }
-    }
-  }
-  depthCache[a.id] = max;
-  return max;
-}
-
-const LAYER_PLAN_DEPTH_MULTIPLIER = 2 ** 40;
-const LAYER_PLAN_ID_MULTIPLIER = 2 ** 20;
-
-function sortStepsInplaceQuicksortPivot(
-  steps: ExecutableStep[],
-  weights: number[],
-  initialLeft: number,
-  initialRight: number,
-  pivotWeight: number,
-) {
-  let left = initialLeft;
-  let right = initialRight;
-
-  while (true) {
-    while (weights[left] < pivotWeight) {
-      left++;
-    }
-    while (weights[right] > pivotWeight) {
-      right--;
-    }
-
-    if (left <= right) {
-      const tmpWeight = weights[left];
-      const tmpStep = steps[left];
-      weights[left] = weights[right];
-      steps[left] = steps[right];
-      weights[right] = tmpWeight;
-      steps[right] = tmpStep;
-
-      left++;
-      right--;
-    } else {
-      return left;
-    }
-  }
-}
-
-function sortStepsInplaceQuicksort(steps: ExecutableStep[]): void {
-  const weights: number[] = [];
-  for (let i = 0, l = steps.length; i < l; i++) {
-    const step = steps[i];
-    weights[i] =
-      // First sort by layer plan depth
-      step.layerPlan.depth * LAYER_PLAN_DEPTH_MULTIPLIER +
-      // Then sort by layer plan id
-      step.layerPlan.id * LAYER_PLAN_ID_MULTIPLIER +
-      // Then return the higher in the dep tree (if any)
-      inLayerPlanDepth(step);
-  }
-  const lefts = [0];
-  const rights = [steps.length - 1];
-  while (lefts.length > 0) {
-    const left = lefts.pop()!;
-    const right = rights.pop()!;
-    const pivotWeight = weights[Math.floor((left + right) / 2)];
-    const pivotIdx = sortStepsInplaceQuicksortPivot(
-      steps,
-      weights,
-      left,
-      right,
-      pivotWeight,
-    );
-
-    if (left < pivotIdx - 1) {
-      lefts.push(left);
-      rights.push(pivotIdx - 1);
-    }
-    if (right > pivotIdx) {
-      lefts.push(pivotIdx);
-      rights.push(right);
-    }
-  }
-}
-
-function sortStepsDependenciesFirst(steps: ExecutableStep[]) {
-  if (steps.length < 2) {
-    return steps;
-  }
-  depthCache = Object.create(null);
-  sortStepsInplaceQuicksort(steps);
-  return steps;
 }
