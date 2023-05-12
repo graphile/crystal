@@ -71,7 +71,6 @@ function constructDestructureFunction(
   const n = path.length;
   /** 0 - slow mode; 1 - middle mode; 2 - turbo mode */
   let mode: 0 | 1 | 2 = n > 50 ? 0 : n > 5 ? 1 : 2;
-  const jitParts: TE[] = [];
 
   for (let i = 0; i < n; i++) {
     const pathItem = path[i];
@@ -96,9 +95,6 @@ function constructDestructureFunction(
         )}'`,
       );
     }
-    if (mode === 2) {
-      jitParts.push(te.get(pathItem));
-    }
   }
 
   if (mode === 0) {
@@ -119,8 +115,7 @@ function constructDestructureFunction(
         ? (factory: Factory) => {
             const fn = factory(fallback, ...path);
             // ?.blah?.bog?.["!!!"]?.[0]
-            const expression = te.join(jitParts, "");
-            const expressionDetail = [expression, fallback];
+            const expressionDetail = [path, fallback];
             (fn as any)[expressionSymbol] = expressionDetail;
             callback(fn);
           }

@@ -440,9 +440,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       this.rootStep.id,
     );
     if ($root instanceof AccessStep && $root.fallback === undefined) {
-      const expressionDetails: [TE, any] | undefined = (
-        $root.unbatchedExecute! as any
-      )[expressionSymbol];
+      const expressionDetails:
+        | [ReadonlyArray<string | number>, any]
+        | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
       if (expressionDetails) {
         // @ts-ignore
         const $parent: ExecutableStep = $root.getDep(0);
@@ -450,15 +450,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           this,
           $parent,
         );
-        const [expression, fallback] = expressionDetails;
-        te.runInBatch<(value: any) => any>(
-          te`(value => (value${expression})${
-            fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
-          })`,
-          (fn) => {
-            this.processRoot = fn;
-          },
-        );
+        const [path, fallback] = expressionDetails;
+        withFastExpression(path, fallback, (fn) => {
+          this.processRoot = fn;
+        });
       }
     }
   }
@@ -1524,4 +1519,49 @@ function objectExecutorFactory(typeName${te.join(
       callback(factory);
     }
   });
+}
+
+const makeCache = new LRU<string, (value: any) => any>({
+  maxLength: 1000,
+});
+const makingCache = new Map<string, Array<(fn: (value: any) => any) => void>>();
+
+function withFastExpression(
+  path: ReadonlyArray<string | number>,
+  fallback: any,
+  callback: (fn: (value: any) => any) => void,
+) {
+  const signature = (fallback === undefined ? "d" : "f") + "_" + path.join("|");
+  const existing = makeCache.get(signature);
+  if (existing) {
+    callback(existing);
+    return;
+  }
+  const existingCallbacks = makingCache.get(signature);
+  if (existingCallbacks) {
+    existingCallbacks.push(callback);
+    return;
+  }
+  const callbacks = [callback];
+  makingCache.set(signature, callbacks);
+
+  const jitParts: TE[] = [];
+
+  for (let i = 0, l = path.length; i < l; i++) {
+    const part = path[i];
+    jitParts.push(te.get(part));
+  }
+  const expression = te.join(jitParts, "");
+  te.runInBatch<(value: any) => any>(
+    te`(value => (value${expression})${
+      fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
+    })`,
+    (fn) => {
+      makeCache.set(signature, fn);
+      makingCache.delete(signature);
+      for (const callback of callbacks) {
+        callback(fn);
+      }
+    },
+  );
 }
