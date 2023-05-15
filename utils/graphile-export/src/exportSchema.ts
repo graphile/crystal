@@ -1388,7 +1388,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               field.extensions?.grafast?.plan,
-              `${type.name}.${fieldName}Step`,
+              `${type.name}.${fieldName}Plan`,
               `${type.name}.fields[${fieldName}].extensions.grafast.plan`,
             )
           : null;
@@ -1396,7 +1396,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               field.extensions?.grafast?.subscribePlan,
-              `${type.name}.${fieldName}SubscribeStep`,
+              `${type.name}.${fieldName}SubscribePlan`,
               `${type.name}.fields[${fieldName}].extensions.grafast.subscribePlan`,
             )
           : null;
@@ -1429,7 +1429,7 @@ function exportSchemaTypeDefs({
                       ? convertToIdentifierViaAST(
                           file,
                           arg.extensions.grafast.inputPlan,
-                          `${type.name}.${fieldName}.${argName}InputStep`,
+                          `${type.name}.${fieldName}.${argName}InputPlan`,
                           `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast.inputPlan`,
                         )
                       : null,
@@ -1437,7 +1437,7 @@ function exportSchemaTypeDefs({
                       ? convertToIdentifierViaAST(
                           file,
                           arg.extensions.grafast.applyPlan,
-                          `${type.name}.${fieldName}.${argName}ApplyStep`,
+                          `${type.name}.${fieldName}.${argName}ApplyPlan`,
                           `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast.applyPlan`,
                         )
                       : null,
@@ -1494,7 +1494,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               field.extensions?.grafast?.inputPlan,
-              `${type.name}.${fieldName}InputStep`,
+              `${type.name}.${fieldName}InputPlan`,
               `${type.name}.fields[${fieldName}].extensions.grafast.inputPlan`,
             )
           : null;
@@ -1503,7 +1503,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               field.extensions?.grafast?.applyPlan,
-              `${type.name}.${fieldName}ApplyStep`,
+              `${type.name}.${fieldName}ApplyPlan`,
               `${type.name}.fields[${fieldName}].extensions.grafast.applyPlan`,
             )
           : null;
@@ -1555,7 +1555,7 @@ function exportSchemaTypeDefs({
         ? convertToIdentifierViaAST(
             file,
             config.extensions?.grafast?.plan,
-            `${type.name}Step`,
+            `${type.name}Plan`,
             `${type.name}.extensions.grafast.plan`,
           )
         : null;
@@ -1609,7 +1609,7 @@ function exportSchemaTypeDefs({
           ? convertToIdentifierViaAST(
               file,
               enumValueConfig.extensions.grafast.applyPlan,
-              `${type.name}_${enumValueName}ApplyStep`,
+              `${type.name}_${enumValueName}ApplyPlan`,
               `${type.name}.values[${enumValueName}].extensions.grafast.applyPlan`,
             )
           : null;
