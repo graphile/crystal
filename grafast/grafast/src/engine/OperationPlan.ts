@@ -2107,9 +2107,9 @@ export class OperationPlan {
    * compatible layers and have the same dependencies. Peers must not have side
    * effects. A step is not its own peer.
    */
-  private getPeers(step: ExecutableStep): ExecutableStep[] {
+  private getPeers(step: ExecutableStep): ReadonlyArray<ExecutableStep> {
     if (step.hasSideEffects) {
-      return [];
+      return EMPTY_ARRAY;
     }
 
     const {
@@ -2142,7 +2142,7 @@ export class OperationPlan {
       if (dl === 1) {
         // We're the only dependent; therefore we have no peers (since peers
         // share dependencies)
-        return [];
+        return EMPTY_ARRAY;
       }
 
       const minDepth = Math.max(deferBoundaryDepth, dep.layerPlan.depth);
@@ -2189,7 +2189,7 @@ export class OperationPlan {
         if (dl === 1) {
           // We're the only dependent; therefore we have no peers (since peers
           // share dependencies)
-          return [];
+          return EMPTY_ARRAY;
         }
         if (dependencyIndex === dependencyCount - 1) {
           // Check the final dependency - this is likely to have the fewest
