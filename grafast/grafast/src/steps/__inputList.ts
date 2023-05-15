@@ -26,7 +26,7 @@ export class __InputListStep extends ExecutableStep {
 
   constructor(
     inputType: graphql.GraphQLList<GraphQLInputType>,
-    seenTypes: ReadonlyArray<GraphQLInputType>,
+    seenTypes: ReadonlyArray<GraphQLInputType> | undefined,
     private readonly inputValues: NotVariableValueNode | undefined,
   ) {
     super();

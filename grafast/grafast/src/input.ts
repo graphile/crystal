@@ -24,11 +24,11 @@ import {
 const {
   assertScalarType,
   GraphQLError,
-  GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
   isInputType,
   isLeafType,
+  isInputObjectType,
   Kind,
 } = graphql;
 
@@ -92,21 +92,24 @@ export function inputPlan(
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
   defaultValue: ConstValueNode | undefined = undefined,
-  inSeenTypes: ReadonlyArray<GraphQLInputType> = [],
+  inSeenTypes?: ReadonlyArray<GraphQLInputType>,
 ): InputStep {
   if (rawInputValue === undefined && defaultValue === undefined) {
     return constant(undefined);
   }
 
-  let seenTypes = inSeenTypes;
-  if (inSeenTypes.includes(inputType)) {
+  if (inSeenTypes?.includes(inputType)) {
     // FIXME: Stop recursion if no data
     throw new Error(
       "GrafastInternalError<441c4f9f-d3d2-41ec-b7bc-e0b96885affe>: Grafast doesn't currently support planning through recursive input values; please raise an issue and explain how this affects you!",
     );
-  } else {
-    seenTypes = [...inSeenTypes, inputType];
   }
+  const isObj = isInputObjectType(inputType);
+  const seenTypes = isObj
+    ? inSeenTypes === undefined
+      ? [inputType]
+      : [...inSeenTypes, inputType]
+    : inSeenTypes;
 
   let inputValue = rawInputValue;
   if (inputValue?.kind === "Variable") {
@@ -162,8 +165,8 @@ export function inputPlan(
       // none of which can contain a variable:
       return new __InputStaticLeafStep(inputType, inputValue);
     }
-  } else if (inputType instanceof GraphQLInputObjectType) {
-    return new __InputObjectStep(inputType, seenTypes, inputValue);
+  } else if (isObj) {
+    return new __InputObjectStep(inputType, seenTypes!, inputValue);
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
@@ -184,7 +187,7 @@ function inputVariablePlan(
   operationPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
-  seenTypes: ReadonlyArray<GraphQLInputType>,
+  seenTypes: ReadonlyArray<GraphQLInputType> | undefined,
   inputType: GraphQLInputType,
   defaultValue: ConstValueNode | undefined = undefined,
 ): InputStep {
