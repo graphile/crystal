@@ -145,6 +145,7 @@ export function executeBucket(
             results[normalStepIndex] = r;
           }
         } catch (e) {
+          results[normalStepIndex] = undefined;
           const r = newGrafastError(e, step.id);
           bucket.store.set(step.id, arrayOfLength(bucket.size, r));
           bucket.hasErrors = true;
