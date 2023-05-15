@@ -119,9 +119,15 @@ export class StepTracker {
         if (store) {
           store.add(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
         } else {
+          const layerPlans = new Set<
+            LayerPlan<LayerPlanReasonsWithParentStep>
+          >();
+          layerPlans.add(
+            layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>,
+          );
           this.layerPlansByParentStep.set(
             layerPlan.reason.parentStep,
-            new Set([layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>]),
+            layerPlans,
           );
         }
         break;
@@ -154,10 +160,9 @@ export class StepTracker {
     if (store) {
       store.add(outputPlan);
     } else {
-      this.outputPlansByRootStep.set(
-        outputPlan.rootStep,
-        new Set([outputPlan]),
-      );
+      const outputPlans = new Set<OutputPlan>();
+      outputPlans.add(outputPlan);
+      this.outputPlansByRootStep.set(outputPlan.rootStep, outputPlans);
     }
   }
 
@@ -279,7 +284,9 @@ export class StepTracker {
     if (store) {
       store.add(outputPlan);
     } else {
-      this.outputPlansByRootStep.set($dependency, new Set([outputPlan]));
+      const outputPlans = new Set<OutputPlan>();
+      outputPlans.add(outputPlan);
+      this.outputPlansByRootStep.set($dependency, outputPlans);
     }
   }
 
@@ -311,7 +318,9 @@ export class StepTracker {
     if (store) {
       store.add(layerPlan);
     } else {
-      this.layerPlansByRootStep.set($dependency, new Set([layerPlan]));
+      const layerPlans = new Set<LayerPlan>();
+      layerPlans.add(layerPlan);
+      this.layerPlansByRootStep.set($dependency, layerPlans);
     }
   }
 

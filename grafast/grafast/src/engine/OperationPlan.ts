@@ -1609,7 +1609,8 @@ export class OperationPlan {
         // Bit of a hack, but saves passing it around through all the arguments
         const newPolymorphicPath = `${polyBase}>${type.name}`;
         polymorphicLayerPlan.reason.polymorphicPaths.add(newPolymorphicPath);
-        const newPolymorphicPaths = new Set([newPolymorphicPath]);
+        const newPolymorphicPaths = new Set<string>();
+        newPolymorphicPaths.add(newPolymorphicPath);
 
         const $root = withGlobalLayerPlan(
           polymorphicLayerPlan,
