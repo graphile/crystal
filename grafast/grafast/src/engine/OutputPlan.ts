@@ -1435,6 +1435,7 @@ function withObjectExecutorFactory<TAsString extends boolean>(
 
 ${te.join(
   fieldSpecs.map(({ fieldType, sameBucket }, i) => {
+    const te_fieldNameI = te.identifier(`fieldName_${i}`);
     switch (fieldType) {
       case "__typename": {
         if (asString) {
@@ -1443,21 +1444,21 @@ ${te.join(
           // `Name`.
           return te`  string += \`${
             i === 0 ? te.blank : te_comma
-          }"\${${te.identifier(`fieldName_${i}`)}}":"\${typeName}"\`;\n`;
+          }"\${${te_fieldNameI}}":"\${typeName}"\`;\n`;
         } else {
-          return te`  obj[${te.identifier(`fieldName_${i}`)}] = typeName;\n`;
+          return te`  obj[${te_fieldNameI}] = typeName;\n`;
         }
       }
       case "outputPlan!":
       case "outputPlan?": {
         return te`\
-  mutablePath[mutablePathIndex] = ${te.identifier(`fieldName_${i}`)};
-  spec = keys[${te.identifier(`fieldName_${i}`)}];
+  mutablePath[mutablePathIndex] = ${te_fieldNameI};
+  spec = keys[${te_fieldNameI}];
 ${
   asString
-    ? te`  string += \`${i === 0 ? te.blank : te_comma}"\${${te.identifier(
-        `fieldName_${i}`,
-      )}}":\`;
+    ? te`  string += \`${
+        i === 0 ? te.blank : te_comma
+      }"\${${te_fieldNameI}}":\`;
 `
     : te.blank
 }\
@@ -1465,9 +1466,7 @@ ${
   sameBucket
     ? te`\
 ${makeExecuteChildPlanCode(
-  asString
-    ? te_stringPlusEquals
-    : te`obj[${te.identifier(`fieldName_${i}`)}] =`,
+  asString ? te_stringPlusEquals : te`obj[${te_fieldNameI}] =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
@@ -1494,9 +1493,7 @@ ${makeExecuteChildPlanCode(
     }
   }
 ${makeExecuteChildPlanCode(
-  asString
-    ? te_stringPlusEquals
-    : te`obj[${te.identifier(`fieldName_${i}`)}] =`,
+  asString ? te_stringPlusEquals : te`obj[${te_fieldNameI}] =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
