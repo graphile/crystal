@@ -129,7 +129,7 @@ function graphqlDoesFragmentTypeApply(
 export interface SelectionSetDigest {
   label: string | undefined;
   fields: Map<string, FieldNode[]>;
-  deferred: SelectionSetDigest[];
+  deferred: SelectionSetDigest[] | undefined;
 }
 
 const processFragment = (
@@ -165,11 +165,15 @@ const processFragment = (
       ? {
           label,
           fields: new Map(),
-          deferred: [],
+          deferred: undefined,
         }
       : null;
   if (deferredDigest !== null) {
-    selectionSetDigest.deferred.push(deferredDigest);
+    if (selectionSetDigest.deferred === undefined) {
+      selectionSetDigest.deferred = [deferredDigest];
+    } else {
+      selectionSetDigest.deferred.push(deferredDigest);
+    }
   }
   graphqlCollectFields(
     operationPlan,
@@ -201,7 +205,7 @@ export function graphqlCollectFields(
   selectionSetDigest: SelectionSetDigest = {
     label: undefined,
     fields: new Map(),
-    deferred: [],
+    deferred: undefined,
   },
 ): SelectionSetDigest {
   // const objectTypeFields = objectType.getFields();

@@ -697,7 +697,7 @@ export class OperationPlan {
       rootType,
       selectionSet.selections,
     );
-    if (groupedFieldSet.deferred.length > 0) {
+    if (groupedFieldSet.deferred !== undefined) {
       throw new SafeError(
         "@defer forbidden on subscription root selection set",
       );
@@ -1237,7 +1237,7 @@ export class OperationPlan {
         );
       }
     }
-    if (groupedFieldSet.deferred) {
+    if (groupedFieldSet.deferred !== undefined) {
       for (const deferred of groupedFieldSet.deferred) {
         const deferredLayerPlan = new LayerPlan(this, outputPlan.layerPlan, {
           type: "defer",
