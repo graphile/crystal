@@ -195,7 +195,7 @@ export class PgClassExpressionStep<
     return this;
   }
 
-  public unbatchedExecute(extra: ExecutionExtra, v: any): any {
+  public unbatchedExecute(_extra: ExecutionExtra, v: any): any {
     if (v == null) {
       return null;
     }

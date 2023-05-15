@@ -419,7 +419,9 @@ export class OperationPlan {
 
     const allMetaKeys = new Set<string | number | symbol>();
     for (const step of this.stepTracker.activeSteps) {
-      allMetaKeys.add(step.metaKey);
+      if (step.metaKey !== undefined) {
+        allMetaKeys.add(step.metaKey);
+      }
     }
     const allMetaKeysList = [...allMetaKeys];
 
@@ -2839,10 +2841,13 @@ export class OperationPlan {
 
     // We know if it's streaming or not based on the LayerPlan it's contained within.
     const stepOptions = this.getStepOptionsForStep(step);
-    let meta = this.optimizeMeta.get(step.optimizeMetaKey);
-    if (!meta) {
-      meta = Object.create(null) as Record<string, any>;
-      this.optimizeMeta.set(step.optimizeMetaKey, meta);
+    let meta;
+    if (step.optimizeMetaKey !== undefined) {
+      meta = this.optimizeMeta.get(step.optimizeMetaKey);
+      if (!meta) {
+        meta = Object.create(null) as Record<string, any>;
+        this.optimizeMeta.set(step.optimizeMetaKey, meta);
+      }
     }
     const replacementStep = step.optimize({
       ...stepOptions,

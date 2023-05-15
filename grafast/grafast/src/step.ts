@@ -264,14 +264,17 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public store: boolean;
 
   /**
-   * Override the metaKey to be able to share execution meta between multiple
-   * steps of the same class (or even a family of step classes).
+   * Set the metaKey so `execute` will be passed a meta object to use.
+   * Depending on what you set it to, you can share execution meta between
+   * multiple steps of the same class (or even a family of step classes).
+   *
+   * A sensible value for it is `this.metaKey = this.id;`.
    */
-  public metaKey: number | string | symbol;
+  public metaKey: number | string | symbol | undefined;
   /**
    * Like `metaKey` but for the optimize phase
    */
-  public optimizeMetaKey: number | string | symbol;
+  public optimizeMetaKey: number | string | symbol | undefined;
 
   constructor() {
     super();
@@ -283,14 +286,6 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
     this.id = this.layerPlan._addStep(this);
-    // @ts-ignore
-    if (this.metaKey === undefined) {
-      this.metaKey = this.id;
-    }
-    // @ts-ignore
-    if (this.optimizeMetaKey === undefined) {
-      this.optimizeMetaKey = this.id;
-    }
   }
 
   protected withMyLayerPlan<T>(callback: () => T): T {

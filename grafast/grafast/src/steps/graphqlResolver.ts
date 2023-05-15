@@ -112,7 +112,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   unbatchedExecute(
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     source: any,
     args: any,
     context: any,
@@ -148,7 +148,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   unbatchedStream(
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     source: any,
     args: any,
     context: any,

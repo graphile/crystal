@@ -90,7 +90,7 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   }
 
   unbatchedExecute = (
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     specifier: any,
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {
     const typeName = specifier

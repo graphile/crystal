@@ -122,7 +122,7 @@ export class __InputDynamicScalarStep<
   }
 
   unbatchedExecute = (
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     ...variableValues: any[]
   ): TLeaf => {
     const converted = this.valueFromValues(variableValues);

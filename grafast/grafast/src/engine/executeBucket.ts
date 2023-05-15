@@ -329,7 +329,10 @@ export function executeBucket(
           allStepsIndex++
         ) {
           const step = _allSteps[allStepsIndex];
-          const meta = metaByMetaKey[step.metaKey];
+          const meta =
+            step.metaKey !== undefined
+              ? metaByMetaKey[step.metaKey]
+              : undefined;
           extras[allStepsIndex] = {
             meta,
             eventEmitter: requestContext.eventEmitter,
@@ -623,7 +626,8 @@ export function executeBucket(
     step: ExecutableStep,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     try {
-      const meta = metaByMetaKey[step.metaKey];
+      const meta =
+        step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
       const extra: ExecutionExtra = {
         meta,
         eventEmitter: requestContext.eventEmitter,

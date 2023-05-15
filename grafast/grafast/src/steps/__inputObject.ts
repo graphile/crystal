@@ -96,7 +96,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     super.finalize();
   }
 
-  unbatchedExecute(extra: ExecutionExtra, ...values: any[]) {
+  unbatchedExecute(_extra: ExecutionExtra, ...values: any[]) {
     const resultValues = Object.create(null);
     for (const inputFieldName in this.inputFields) {
       const dependencyIndex = this.inputFields[inputFieldName].dependencyIndex;

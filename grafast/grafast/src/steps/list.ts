@@ -41,7 +41,7 @@ export class ListStep<
   }
 
   unbatchedExecute(
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     ...values: any[] //UnwrapPlanTuple<TPlanTuple>,
   ): UnwrapPlanTuple<TPlanTuple> {
     return values as any;

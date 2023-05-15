@@ -656,7 +656,7 @@ export interface StepOptions {
  */
 export interface StepOptimizeOptions {
   stream: StepStreamOptions | null;
-  meta: Record<string, unknown>;
+  meta: Record<string, unknown> | undefined;
 }
 
 /**
@@ -791,7 +791,7 @@ export type ExecutionEventMap = {
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
 export interface ExecutionExtra {
-  meta: Record<string, unknown>;
+  meta: Record<string, unknown> | undefined;
   eventEmitter: ExecutionEventEmitter | undefined;
 
   // These are only needed for subroutine plans, don't use them as we may

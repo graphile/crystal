@@ -32,7 +32,7 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
     return result;
   }
 
-  unbatchedExecute(extra: ExecutionExtra, list: any[]) {
+  unbatchedExecute(_extra: ExecutionExtra, list: any[]) {
     return list?.[0];
   }
 

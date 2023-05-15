@@ -404,7 +404,7 @@ export class EdgeStep<
     }
   }
 
-  unbatchedExecute(extra: ExecutionExtra, record: any, cursor: any): any {
+  unbatchedExecute(_extra: ExecutionExtra, record: any, cursor: any): any {
     // Handle nulls; everything else comes from the child plans
     return record == null && (this.cursorDepId == null || cursor == null)
       ? null

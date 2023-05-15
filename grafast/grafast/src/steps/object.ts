@@ -57,6 +57,7 @@ export class ObjectStep<
 
   constructor(obj: TPlans) {
     super();
+    this.metaKey = this.id;
     this.keys = Object.keys(obj);
     for (let i = 0, l = this.keys.length; i < l; i++) {
       this.addDependency(obj[this.keys[i]]);

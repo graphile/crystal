@@ -48,7 +48,7 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
     return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
   }
 
-  unbatchedExecute(extra: ExecutionExtra, arr: TData[]): TData[] {
+  unbatchedExecute(_extra: ExecutionExtra, arr: TData[]): TData[] {
     return arr == null ? arr : reverseArray(arr);
   }
 

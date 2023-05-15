@@ -101,7 +101,7 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
     return values[0].map(this.mapper);
   }
 
-  unbatchedExecute(extra: ExecutionExtra, value: any): any {
+  unbatchedExecute(_extra: ExecutionExtra, value: any): any {
     return this.mapper(value);
   }
 
