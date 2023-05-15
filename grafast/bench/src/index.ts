@@ -52,7 +52,7 @@ export async function bench(
       for (const operation of operations) {
         const document = parse(operation.source);
         const errors = validate(schema, document);
-        if (errors.length) {
+        if (errors.length !== 0) {
           throw errors[0];
         }
         const errorsAllowed = !/expect\(errors\)\.toBeFalsy\(\)/.test(

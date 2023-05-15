@@ -603,7 +603,7 @@ export class OperationPlan {
    * Plans a GraphQL query operation.
    */
   private planQuery(): void {
-    if (this.loc) this.loc.push("planQuery()");
+    if (this.loc !== null) this.loc.push("planQuery()");
     const rootType = this.queryType;
     if (!rootType) {
       throw new SafeError("No query type found in schema");
@@ -633,14 +633,14 @@ export class OperationPlan {
       rootType,
       this.operation.selectionSet.selections,
     );
-    if (this.loc) this.loc.pop();
+    if (this.loc !== null) this.loc.pop();
   }
 
   /**
    * Implements the `PlanOpPlanMutation` algorithm.
    */
   private planMutation(): void {
-    if (this.loc) this.loc.push("planMutation()");
+    if (this.loc !== null) this.loc.push("planMutation()");
     const rootType = this.mutationType;
     if (!rootType) {
       throw new SafeError("No mutation type found in schema");
@@ -674,14 +674,14 @@ export class OperationPlan {
       this.operation.selectionSet.selections,
       true,
     );
-    if (this.loc) this.loc.pop();
+    if (this.loc !== null) this.loc.pop();
   }
 
   /**
    * Implements the `PlanOpPlanSubscription` algorithm.
    */
   private planSubscription(): void {
-    if (this.loc) this.loc.push("planSubscription");
+    if (this.loc !== null) this.loc.push("planSubscription");
     const rootType = this.subscriptionType;
     if (!rootType) {
       throw new SafeError("No subscription type found in schema");
@@ -742,7 +742,7 @@ export class OperationPlan {
             field,
           )
         : NO_ARGS;
-    if (subscriptionPlanResolver) {
+    if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
       const { haltTree, step: subscribeStep } = this.planField(
         this.rootLayerPlan,
@@ -925,7 +925,7 @@ export class OperationPlan {
         selectionSet.selections,
       );
     }
-    if (this.loc) this.loc.pop();
+    if (this.loc !== null) this.loc.pop();
   }
 
   /**
@@ -1325,7 +1325,7 @@ export class OperationPlan {
       groupedFieldSet,
     );
 
-    if (this.loc) this.loc.pop();
+    if (this.loc !== null) this.loc.pop();
   }
 
   // Similar to the old 'planFieldReturnType'
@@ -1726,7 +1726,7 @@ export class OperationPlan {
     // PERF: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
 
-    if (this.loc) this.loc.push(`planField(${path.join(".")})`);
+    if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
     try {
       let step = withGlobalLayerPlan(
         layerPlan,
@@ -1818,7 +1818,7 @@ export class OperationPlan {
       // now we'll just rely on tree-shaking.
       return { step, haltTree };
     } finally {
-      if (this.loc) this.loc.pop();
+      if (this.loc !== null) this.loc.pop();
     }
   }
 
@@ -1990,7 +1990,7 @@ export class OperationPlan {
         }
       }
       const subroutineLayerPlan = step[$$subroutine];
-      if (subroutineLayerPlan) {
+      if (subroutineLayerPlan !== null) {
         const $root = subroutineLayerPlan.rootStep;
         if ($root) {
           this.processStep(
@@ -3089,7 +3089,7 @@ export class OperationPlan {
         } while (foundOne);
 
         const _allSteps: ExecutableStep[] = [];
-        if (phase.normalSteps) {
+        if (phase.normalSteps !== undefined) {
           for (const { step } of phase.normalSteps) {
             _allSteps.push(step);
           }

@@ -231,7 +231,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       const { query, operationName, variableValues } =
         validateGraphQLBody(parsedBody);
       const { errors, document } = parseAndValidate(query);
-      if (errors) {
+      if (errors !== undefined) {
         return errors;
       }
       const args: ExecutionArgs = {

@@ -188,7 +188,7 @@ export class StepTracker {
     }
     this.layerPlans[layerPlan.id] = null;
     // Remove layerPlan from its parent
-    if (layerPlan.parentLayerPlan) {
+    if (layerPlan.parentLayerPlan !== null) {
       const idx = layerPlan.parentLayerPlan.children.indexOf(layerPlan);
       if (idx >= 0) {
         layerPlan.parentLayerPlan.children.splice(idx, 1);

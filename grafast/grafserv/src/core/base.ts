@@ -279,7 +279,7 @@ export class GrafservBase {
     let finished = false;
     const bump = () => {
       const next = queue.shift();
-      if (next) {
+      if (next !== undefined) {
         next.resolve({
           done: false,
           value: { event: "change", data: "schema" },
@@ -289,7 +289,7 @@ export class GrafservBase {
     const flushQueue = (e?: Error) => {
       const entries = queue.splice(0, queue.length);
       for (const entry of entries) {
-        if (e) {
+        if (e != null) {
           entry.reject(e);
         } else {
           entry.resolve({ done: true } as IteratorResult<SchemaChangeEvent>);

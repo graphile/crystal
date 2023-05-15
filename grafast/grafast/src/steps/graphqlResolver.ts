@@ -261,7 +261,7 @@ export class GraphQLItemHandler
         "GrafastInternalError<5ea0892a-e9f6-479c-9b0b-2b09e46eecb6>: No abstract type? How can this be?",
       );
     }
-    if (abstractType.resolveType) {
+    if (abstractType.resolveType != null) {
       return abstractType.resolveType(data, context, resolveInfo, abstractType);
     } else {
       return defaultTypeResolver(data, context, resolveInfo, abstractType);

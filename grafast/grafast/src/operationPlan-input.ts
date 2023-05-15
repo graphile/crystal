@@ -59,7 +59,7 @@ export function withFieldArgsForArguments<
     fields,
     callback,
   );
-  if (operationPlan.loc) operationPlan.loc.pop();
+  if (operationPlan.loc !== null) operationPlan.loc.pop();
 
   return result;
 }
@@ -156,7 +156,7 @@ function withFieldArgsForArgumentsOrInputObject<
       type = getNullableType(argOrField.type);
     }
 
-    if (operationPlan.loc) operationPlan.loc.pop();
+    if (operationPlan.loc !== null) operationPlan.loc.pop();
     return { $value, argOrField, type, parentType };
   };
 
@@ -221,7 +221,7 @@ function withFieldArgsForArgumentsOrInputObject<
               }
             } else {
               const fieldResolver = field.extensions.grafast?.inputPlan;
-              if (fieldResolver) {
+              if (fieldResolver !== undefined) {
                 return fieldResolver(fieldArgs, {
                   schema,
                   entity: argOrField as GraphQLInputField,
@@ -234,7 +234,7 @@ function withFieldArgsForArgumentsOrInputObject<
         },
       );
     });
-    if (operationPlan.loc) operationPlan.loc.pop();
+    if (operationPlan.loc !== null) operationPlan.loc.pop();
     return plan;
   }
 
@@ -249,7 +249,7 @@ function withFieldArgsForArgumentsOrInputObject<
         })`,
       );
     const result = getPlannedValue_($value, currentType);
-    if (operationPlan.loc) operationPlan.loc.pop();
+    if (operationPlan.loc !== null) operationPlan.loc.pop();
     return result;
   }
 
@@ -498,7 +498,7 @@ function withFieldArgsForArgumentsOrInputObject<
     | ModifierStep;
 
   // Now handled all the remaining coordinates
-  if (operationPlan.loc) operationPlan.loc.push("handle_remaining");
+  if (operationPlan.loc !== null) operationPlan.loc.push("handle_remaining");
   if (
     !analyzedCoordinates[""] &&
     step != null &&
@@ -536,7 +536,7 @@ function withFieldArgsForArgumentsOrInputObject<
       process(fields);
     }
   }
-  if (operationPlan.loc) operationPlan.loc.pop();
+  if (operationPlan.loc !== null) operationPlan.loc.pop();
 
   return step as any;
 }
