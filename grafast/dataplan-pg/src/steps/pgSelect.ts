@@ -524,7 +524,7 @@ export class PgSelectStep<
       cloneFrom?.mode === this.mode ? cloneFrom : null;
 
     this.resource = resource;
-    if (cloneFrom) {
+    if (cloneFrom !== null) {
       // Prevent any changes to our original to help avoid programming
       // errors.
       cloneFrom.lock();
@@ -570,7 +570,7 @@ export class PgSelectStep<
     this.joinAsLateral =
       (cloneFrom ? cloneFrom.joinAsLateral : inJoinAsLateral) ??
       !!this.resource.parameters;
-    if (cloneFrom) {
+    if (cloneFrom !== null) {
       this.queryValues = [...cloneFrom.queryValues]; // References indexes cloned above
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
       this.arguments = Object.freeze(cloneFrom.arguments);
@@ -596,7 +596,7 @@ export class PgSelectStep<
         });
         identifierMatches.push(matches(this.alias));
       });
-      if (inArgs) {
+      if (inArgs != null) {
         const { digests: newArgs, argIndex: newArgIndex } =
           digestsFromArgumentSpecs(this, inArgs, args, argIndex);
         args = newArgs;
@@ -2846,7 +2846,7 @@ function joinMatches(
  */
 function ensureOrderIsUnique(step: PgSelectStep<any>) {
   const unique = (step.resource.uniques as PgResourceUnique[])[0];
-  if (unique) {
+  if (unique !== undefined) {
     const ordersIsUnique = step.orderIsUnique();
     if (!ordersIsUnique) {
       unique.attributes.forEach((c) => {
@@ -2923,7 +2923,7 @@ export function digestsFromArgumentSpecs(
     const codec =
       "pgCodec" in identifier ? identifier.pgCodec : identifier.step.pgCodec;
     const placeholder = $placeholderable.placeholder(step, codec);
-    if (name) {
+    if (name !== undefined) {
       argIndex = null;
       digests.push({
         name,

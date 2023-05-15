@@ -313,7 +313,7 @@ export class GrafservBase {
       },
       return() {
         finished = true;
-        if (queue.length) {
+        if (queue.length !== 0) {
           flushQueue();
         }
         return Promise.resolve({
@@ -321,7 +321,7 @@ export class GrafservBase {
         } as IteratorResult<SchemaChangeEvent>);
       },
       throw(e) {
-        if (queue.length) {
+        if (queue.length !== 0) {
           flushQueue(e);
         }
         return Promise.reject(e);
@@ -467,13 +467,13 @@ export function convertHandlerResultToResult(
       // Creates a stream for the response
       const event2buffer = (event: EventStreamEvent): Buffer => {
         let payload = "";
-        if (event.event) {
+        if (event.event !== undefined) {
           payload += `event: ${event.event}\n`;
         }
-        if (event.id) {
+        if (event.id !== undefined) {
           payload += `id: ${event.id}\n`;
         }
-        if (event.retry) {
+        if (event.retry !== undefined) {
           payload += `retry: ${event.retry}\n`;
         }
         if (event.data != null) {

@@ -3044,7 +3044,7 @@ export class OperationPlan {
           processed.add(step);
           pending.delete(step);
           if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
-            if (phase.unbatchedSyncAndSafeSteps) {
+            if (phase.unbatchedSyncAndSafeSteps !== undefined) {
               phase.unbatchedSyncAndSafeSteps.push({
                 step,
                 scratchpad: undefined,
@@ -3055,7 +3055,7 @@ export class OperationPlan {
               ];
             }
           } else {
-            if (phase.normalSteps) {
+            if (phase.normalSteps !== undefined) {
               phase.normalSteps.push({ step });
             } else {
               phase.normalSteps = [{ step }];
@@ -3073,7 +3073,7 @@ export class OperationPlan {
                 processed.add(step);
                 pending.delete(step);
                 foundOne = true;
-                if (phase.unbatchedSyncAndSafeSteps) {
+                if (phase.unbatchedSyncAndSafeSteps !== undefined) {
                   phase.unbatchedSyncAndSafeSteps.push({
                     step,
                     scratchpad: undefined,
@@ -3094,7 +3094,7 @@ export class OperationPlan {
             _allSteps.push(step);
           }
         }
-        if (phase.unbatchedSyncAndSafeSteps) {
+        if (phase.unbatchedSyncAndSafeSteps !== undefined) {
           for (const { step } of phase.unbatchedSyncAndSafeSteps) {
             _allSteps.push(step);
           }

@@ -89,7 +89,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     ? makeMaskError(rawMaskError)
     : defaultMaskError;
   const maskPayload = (payload: any) => {
-    if (payload.errors) {
+    if (payload.errors !== undefined) {
       payload.errors = payload.errors.map(maskError);
     }
     return payload;

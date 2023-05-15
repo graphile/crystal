@@ -332,7 +332,7 @@ export class GraphQLItemHandler
           );
         }
       });
-    } else if (this.nullableInnerType) {
+    } else if (this.nullableInnerType != null) {
       return values[0].map((d) => {
         if (d == null) {
           return null;

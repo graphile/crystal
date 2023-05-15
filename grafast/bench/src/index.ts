@@ -61,7 +61,7 @@ export async function bench(
         const checkForErrors = (
           result: ExecutionResult | ExecutionPatchResult,
         ) => {
-          if (result.errors) {
+          if (result.errors !== undefined) {
             throw new Error(result.errors[0].message);
           }
         };

@@ -58,7 +58,7 @@ export function makeParseAndValidateFunction(schema: GraphQLSchema) {
     const hash = query.length > 500 ? calculateQueryHash(query) : query;
 
     const cached = parseAndValidationCache.get(hash);
-    if (cached) {
+    if (cached !== undefined) {
       lastParseAndValidateQuery = query;
       lastParseAndValidateResult = cached;
       return cached;
@@ -437,7 +437,7 @@ export const makeGraphQLHandler = (
     // If we get here, we're handling a GraphQL request
     const isLegacy = chosenContentType === APPLICATION_JSON;
 
-    if (wait) {
+    if (wait !== null) {
       await Promise.race([wait, sleep(dynamicOptions.schemaWaitTime)]);
       if (!latestSchema) {
         // Handle missing schema
@@ -492,7 +492,7 @@ export const makeGraphQLHandler = (
     const { query, operationName, variableValues } = body;
     const { errors, document } = parseAndValidate(query);
 
-    if (errors) {
+    if (errors !== undefined) {
       return {
         type: "graphql",
         request,

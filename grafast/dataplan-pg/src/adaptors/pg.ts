@@ -201,7 +201,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
 ) {
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
   const pgSettingsEntries: Array<[string, string]> = [];
-  if (pgSettings) {
+  if (pgSettings !== null) {
     for (const [key, value] of Object.entries(pgSettings)) {
       if (value == null) continue;
       pgSettingsEntries.push([key, "" + value]);
@@ -388,7 +388,7 @@ export function createWithPgClient(
     }
     // Otherwise, fall through to default handling
   }
-  if (options.pool) {
+  if (options.pool != null) {
     return makePgAdaptorWithPgClient(options.pool);
   } else if (options.poolClient) {
     return makeWithPgClientViaPgClientAlreadyInTransaction(
@@ -553,7 +553,7 @@ export class PgSubscriber<
         return;
       }
       const client = this.listeningClient;
-      if (client) {
+      if (client !== null) {
         client.off("notification", this.recordNotification);
         client.release();
         this.listeningClient = null;
