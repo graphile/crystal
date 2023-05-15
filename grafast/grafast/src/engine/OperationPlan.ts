@@ -2666,7 +2666,7 @@ export class OperationPlan {
 
   private deduplicateStep(step: ExecutableStep): ExecutableStep {
     step.isArgumentsFinalized = true;
-    if (!step.deduplicate) return step;
+    if (step.deduplicate == null) return step;
     const result = this._deduplicateInnerLogic(step);
     if (result == null) {
       return step;
