@@ -201,7 +201,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
 ) {
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
   const pgSettingsEntries: Array<[string, string]> = [];
-  if (pgSettings !== null) {
+  if (pgSettings != null) {
     for (const [key, value] of Object.entries(pgSettings)) {
       if (value == null) continue;
       pgSettingsEntries.push([key, "" + value]);
