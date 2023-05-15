@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/graphile/heart/issues"
   },
-  "homepage": "https://github.com/graphile/heart/tree/main/grafast/grafserv-persisted",
+  "homepage": "https://github.com/graphile/heart/tree/main/grafast/bench",
   "dependencies": {
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
