@@ -90,6 +90,12 @@ const {
   isUnionType,
 } = graphql;
 
+/**
+ * This value allows the first few plans to take more time whilst the JIT warms
+ * up - planning can easily go from 400ms down to 80ms after just a few
+ * executions thanks to V8's JIT.
+ */
+let planningTimeoutWarmupMultiplier = 5;
 const EMPTY_ARRAY = Object.freeze([]);
 
 export const POLYMORPHIC_ROOT_PATH = "";
@@ -446,6 +452,13 @@ export class OperationPlan {
       elapsed,
       laps: this.laps,
     });
+
+    if (planningTimeoutWarmupMultiplier > 1) {
+      planningTimeoutWarmupMultiplier = Math.max(
+        1,
+        planningTimeoutWarmupMultiplier - 0.5,
+      );
+    }
   }
 
   private lap(category: string, subcategory?: string): void {
@@ -458,7 +471,7 @@ export class OperationPlan {
   private checkTimeout() {
     if (this.planningTimeout === null) return;
     const elapsed = timeSource.now() - this.startTime;
-    if (elapsed > this.planningTimeout) {
+    if (elapsed > this.planningTimeout * planningTimeoutWarmupMultiplier) {
       throw new Error("Operation took too long to plan; aborted");
     }
   }
