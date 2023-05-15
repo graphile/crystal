@@ -254,8 +254,8 @@ itself) will be passed in to the deduplicate method, and this method should
 return the list of the peers that are equivalent (or could cheaply be made
 equivalent) to the current step.
 
-To cause your step class to never be deduplicated, you can simply
-`return [this];`.
+To cause your step class to never be deduplicated, either don't implement this
+method or simply `return [];`.
 
 You should not mutate your peers or yourself during this method, instead use
 the `deduplicatedWith` method to apply side-effects.
