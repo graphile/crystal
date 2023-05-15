@@ -111,7 +111,7 @@ function constructDestructureFunction(
     te.runInBatch<Factory>(
       te`function (fallback, ${te.join(names, ", ")}) {
 return (_meta, value) => value${te.join(access, "")}${
-        fallback === undefined ? te.blank : te` ?? fallback`
+        fallback === undefined ? te.blank : te.cache` ?? fallback`
       };
 }`,
       (factory) => {

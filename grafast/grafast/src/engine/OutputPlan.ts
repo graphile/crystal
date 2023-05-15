@@ -161,6 +161,56 @@ const ref_getChildBucketAndIndex = te.ref(
 );
 const ref_inspect = te.ref(inspect, "inspect");
 const ref_$$streamMore = te.ref($$streamMore, "$$streamMore");
+const te_String = te`String`;
+const te_nullIsFineComment = te`// root/introspection, null is fine`;
+const te_nullString = te`"null"`;
+const te_null = te`null`;
+const te_childBucket = te`childBucket`;
+const te_childBucketIndex = te`childBucketIndex`;
+const te_executeString = te`executeString`;
+const te_execute = te`execute`;
+const te_polymorphic = te`polymorphic`;
+const te_letStringLbrace = te`let string = "{";`;
+const te_stringPlusEquals = te`string +=`;
+const te_stringPlusEqualsRbrace = te`  string += "}";\n`;
+const te_stringPlusEqualsRbracket = te`    string += "]";\n`;
+const te_constObjEqualsObjectCreateNull = te`const obj = Object.create(null);`;
+const te_comma = te`,`;
+const te_specDotLocationDetails = te`spec.locationDetails`;
+const te_thisDotLocationDetails = te`this.locationDetails`;
+const te_specDotOutputPlan = te`spec.outputPlan`;
+const te_bucket = te`bucket`;
+const te_bucketIndex = te`bucketIndex`;
+const te_handleDeferred = te`
+  // Everything seems okay; queue any deferred payloads
+  for (const defer of this.deferredOutputPlans) {
+    root.queue.push({
+      root,
+      path: mutablePath.slice(1),
+      bucket,
+      bucketIndex,
+      outputPlan: defer,
+      label: defer.type.deferLabel,
+    });
+  }
+`;
+const te_string = te`string`;
+const te_object = te`object`;
+const te_obj = te`obj`;
+const te_data = te`data`;
+const te_commonErrorHandler = te.ref(commonErrorHandler, "handleError");
+const te_questionDot = te`?.`;
+const te_childBucketCBIDC = te`, childBucket, childBucketIndex, directChild`;
+const te_letString = te`let string;`;
+const te_constDataEqualsEmptyArray = te`const data = [];`;
+const te_stringEqualsEmptyArrayString = te`    string = "[]";`;
+const te_stringEqualsLeftSquareBraceString = te`    string = "[";\n`;
+const te_noopComment = te`    /* noop */`;
+const te_ifIGt0StrPlusEqualComma = te`\n      if (i > 0) { string += ","; }\n`;
+const te_dataIEquals = te`data[i] =`;
+const te_childOutputPlan = te`childOutputPlan`;
+const te_underscoreNonNull = te`_nonNull`;
+const te_underscoreStream = te`_stream`;
 
 /**
  * Defines a way of taking a layerPlan and converting it into an output value.
@@ -749,41 +799,6 @@ export function getChildBucketAndIndex(
   return [currentBucket, currentIndex];
 }
 
-const te_String = te.cache`String`;
-const te_nullIsFineComment = te.cache`// root/introspection, null is fine`;
-const te_nullString = te.cache`"null"`;
-const te_null = te.cache`null`;
-const te_childBucket = te.cache`childBucket`;
-const te_childBucketIndex = te.cache`childBucketIndex`;
-const te_executeString = te.cache`executeString`;
-const te_execute = te.cache`execute`;
-const te_polymorphic = te.cache`polymorphic`;
-const te_letStringLbrace = te.cache`let string = "{";`;
-const te_stringPlusEqualsRbrace = te.cache`  string += "}";\n`;
-const te_constObjEqualsObjectCreateNull = te.cache`const obj = Object.create(null);`;
-const te_comma = te.cache`,`;
-const te_specDotLocationDetails = te.cache`spec.locationDetails`;
-const te_specDotOutputPlan = te.cache`spec.outputPlan`;
-const te_bucket = te.cache`bucket`;
-const te_bucketIndex = te.cache`bucketIndex`;
-const te_handleDeferred = te`
-  // Everything seems okay; queue any deferred payloads
-  for (const defer of this.deferredOutputPlans) {
-    root.queue.push({
-      root,
-      path: mutablePath.slice(1),
-      bucket,
-      bucketIndex,
-      outputPlan: defer,
-      label: defer.type.deferLabel,
-    });
-  }
-`;
-const te_string = te.cache`string`;
-const te_object = te.cache`object`;
-const te_obj = te.cache`obj`;
-const te_commonErrorHandler = te.ref(commonErrorHandler, "handleError");
-
 interface MakeExecutorOptions<TAsString extends boolean> {
   inner: TE;
   nameExtra: TE;
@@ -822,7 +837,9 @@ ${preamble}\
           asString ? te_nullString : te_null
         };`
   }
-  if (bucketRootValue${skipNullHandling ? te`?.` : te.blank}[${ref_$$error}]) {
+  if (bucketRootValue${
+    skipNullHandling ? te_questionDot : te.blank
+  }[${ref_$$error}]) {
     throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
@@ -1096,11 +1113,11 @@ function makeArrayExecutor<TAsString extends boolean>(
   const childOutputPlan = this.child;
   const l = bucketRootValue.length;
   let fieldResult;
-  ${asString ? te.cache`let string;` : te.cache`const data = [];`}
+  ${asString ? te_letString : te_constDataEqualsEmptyArray}
   if (l === 0) {
-${asString ? te.cache`    string = "[]";` : te.cache`    /* noop */`}
+${asString ? te_stringEqualsEmptyArrayString : te_noopComment}
   } else {
-${asString ? te.cache`    string = "[";\n` : te.blank}\
+${asString ? te_stringEqualsLeftSquareBraceString : te.blank}\
     const mutablePathIndex = mutablePath.push(-1) - 1;
 
     // Now to populate the children...
@@ -1129,18 +1146,18 @@ ${asString ? te.cache`    string = "[";\n` : te.blank}\
       }
 
       mutablePath[mutablePathIndex] = i;
-${asString ? te.cache`\n      if (i > 0) { string += ","; }\n` : te.blank}
+${asString ? te_ifIGt0StrPlusEqualComma : te.blank}
 ${makeExecuteChildPlanCode(
-  asString ? te.cache`string +=` : te.cache`data[i] =`,
-  te.cache`this.locationDetails`,
-  te.cache`childOutputPlan`,
+  asString ? te_stringPlusEquals : te_dataIEquals,
+  te_thisDotLocationDetails,
+  te_childOutputPlan,
   childIsNonNull,
   asString,
 )}
     }
 
     mutablePath.length = mutablePathIndex;
-${asString ? te.cache`    string += "]";\n` : te.blank}
+${asString ? te_stringPlusEqualsRbracket : te.blank}
   }
 ${
   canStream
@@ -1161,10 +1178,10 @@ ${
     : te.blank
 }
 
-  return ${asString ? te.cache`string` : te.cache`data`};
+  return ${asString ? te_string : te_data};
 `,
-    nameExtra: te`array${childIsNonNull ? te.cache`_nonNull` : te.blank}${
-      canStream ? te.cache`_stream` : te.blank
+    nameExtra: te`array${childIsNonNull ? te_underscoreNonNull : te.blank}${
+      canStream ? te_underscoreStream : te.blank
     }`,
     asString,
   });
@@ -1413,9 +1430,7 @@ function withObjectExecutorFactory<TAsString extends boolean>(
   const { keys } = this;
   const mutablePathIndex = mutablePath.push("!") - 1;
   let spec${
-    hasChildBucketReference
-      ? te`, childBucket, childBucketIndex, directChild`
-      : te.blank
+    hasChildBucketReference ? te_childBucketCBIDC : te.blank
   }, fieldResult;
 
 ${te.join(
@@ -1450,7 +1465,7 @@ ${
   sameBucket
     ? te`\
 ${makeExecuteChildPlanCode(
-  asString ? te`string +=` : te`obj[fieldName_${te.lit(i)}] =`,
+  asString ? te_stringPlusEquals : te`obj[fieldName_${te.lit(i)}] =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
@@ -1477,7 +1492,7 @@ ${makeExecuteChildPlanCode(
     }
   }
 ${makeExecuteChildPlanCode(
-  asString ? te`string +=` : te`obj[fieldName_${te.lit(i)}] =`,
+  asString ? te_stringPlusEquals : te`obj[fieldName_${te.lit(i)}] =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",

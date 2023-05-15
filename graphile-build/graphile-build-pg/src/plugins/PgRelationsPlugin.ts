@@ -1081,7 +1081,7 @@ function addRelations(
                   : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
                 functionLines.push(
                   te`  const ${newIdentifier} = ${ref_resource}.${
-                    isUnique ? te`get` : te`find`
+                    isUnique ? te.cache`get` : te.cache`find`
                   }(${specString});`,
                 );
                 previousIdentifier = newIdentifier;
@@ -1134,7 +1134,7 @@ function addRelations(
             } else {
               functionLines.push(te`  return ${previousIdentifier};`);
             }
-            functionLines.push(te`}`);
+            functionLines.push(te.cache`}`);
             return te.run`${te.join(prefixLines, "\n")}${te.join(
               functionLines,
               "\n",
