@@ -2369,6 +2369,7 @@ export class OperationPlan {
 
     // 1: adjust polymorphicPaths to fit new layerPlan
     if (step.layerPlan.reason.type === "polymorphic") {
+      // PERF: this is cacheable
       /** The closest ancestor layer plan that is polymorphic */
       let ancestor: LayerPlan | null = step.layerPlan;
       while ((ancestor = ancestor.parentLayerPlan)) {
