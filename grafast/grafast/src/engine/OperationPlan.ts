@@ -2120,7 +2120,7 @@ export class OperationPlan {
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
-      const allPeers: ExecutableStep[] = [];
+      let allPeers: ExecutableStep[] | null = null;
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
         if (
           possiblyPeer !== step &&
@@ -2128,10 +2128,14 @@ export class OperationPlan {
           possiblyPeer.layerPlan === layerPlan &&
           possiblyPeer.constructor === stepConstructor
         ) {
-          allPeers.push(possiblyPeer);
+          if (allPeers === null) {
+            allPeers = [possiblyPeer];
+          } else {
+            allPeers.push(possiblyPeer);
+          }
         }
       }
-      return allPeers;
+      return allPeers === null ? EMPTY_ARRAY : allPeers;
     } else if (dependencyCount === 1) {
       // Optimized form for steps that have one dependency (extremely common!)
 
@@ -2146,7 +2150,7 @@ export class OperationPlan {
       }
 
       const minDepth = Math.max(deferBoundaryDepth, dep.layerPlan.depth);
-      const allPeers: ExecutableStep[] = [];
+      let allPeers: ExecutableStep[] | null = null;
 
       for (const {
         dependencyIndex: peerDependencyIndex,
@@ -2162,10 +2166,14 @@ export class OperationPlan {
           possiblyPeer.dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth]
         ) {
-          allPeers.push(possiblyPeer);
+          if (allPeers === null) {
+            allPeers = [possiblyPeer];
+          } else {
+            allPeers.push(possiblyPeer);
+          }
         }
       }
-      return allPeers;
+      return allPeers === null ? EMPTY_ARRAY : allPeers;
     } else {
       const { ancestry, deferBoundaryDepth } = layerPlan;
       /**
@@ -2216,10 +2224,10 @@ export class OperationPlan {
           minDepth = d;
         }
       }
-      const allPeers: ExecutableStep[] = [];
       if (possiblePeers.length === 0) {
-        return allPeers;
+        return EMPTY_ARRAY;
       }
+      let allPeers: ExecutableStep[] | null = null;
       outerloop: for (const possiblyPeer of possiblePeers) {
         if (possiblyPeer.layerPlan.depth < minDepth) continue;
         // We know the final dependency matches and the dependency count
@@ -2229,9 +2237,13 @@ export class OperationPlan {
             continue outerloop;
           }
         }
-        allPeers.push(possiblyPeer);
+        if (allPeers === null) {
+          allPeers = [possiblyPeer];
+        } else {
+          allPeers.push(possiblyPeer);
+        }
       }
-      return allPeers;
+      return allPeers === null ? EMPTY_ARRAY : allPeers;
     }
   }
 
