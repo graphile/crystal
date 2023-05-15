@@ -208,9 +208,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   /**
    * For polymorphic output plans, the Object output plan for each specific type.
    */
-  public childByTypeName: {
-    [typeName: string]: OutputPlan<OutputPlanTypeObject>;
-  } = Object.create(null);
+  public childByTypeName:
+    | {
+        [typeName: string]: OutputPlan<OutputPlanTypeObject>;
+      }
+    | undefined;
 
   /**
    * For object output plan types only.
@@ -241,6 +243,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     this.locationDetails = locationDetails;
     this.rootStep = rootStep;
     layerPlan.operationPlan.stepTracker.addOutputPlan(this);
+    this.childByTypeName =
+      this.type.mode === "polymorphic" ? Object.create(null) : undefined;
   }
 
   public print(): string {
@@ -260,7 +264,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           .join("\n")}`;
       }
       case "polymorphic": {
-        return `${this.toString()}\n${Object.entries(this.childByTypeName)
+        return `${this.toString()}\n${Object.entries(this.childByTypeName!)
           .map(([typeName, outputPlan]) => {
             return `? ${typeName}: ${outputPlan
               .print()
@@ -365,8 +369,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           "GrafastInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
         );
       }
-      this.childByTypeName[type!.name] = (child as OutputPlanKeyValueOutputPlan)
-        .outputPlan as OutputPlan<OutputPlanTypeObject>;
+      this.childByTypeName![type!.name] = (
+        child as OutputPlanKeyValueOutputPlan
+      ).outputPlan as OutputPlan<OutputPlanTypeObject>;
     } else {
       throw new Error(
         `GrafastInternalError<5667df5f-30b7-48d3-be3f-a0065ed9c05c>: Doesn't make sense to set a child in mode '${this.type.mode}'`,
