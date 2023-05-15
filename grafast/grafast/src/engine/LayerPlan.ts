@@ -360,7 +360,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   public newBucket(parentBucket: Bucket): Bucket | null {
     const copyStepIds = this.copyStepIds;
     const store: Bucket["store"] = new Map();
-    const polymorphicPathList: string[] =
+    const polymorphicPathList: (string | null)[] =
       this.reason.type === "mutationField"
         ? (parentBucket.polymorphicPathList as string[])
         : [];
@@ -552,7 +552,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
           // PERF: might be faster if we look this up as a constant rather than using concatenation here
           const newPolymorphicPath =
-            parentBucket.polymorphicPathList[originalIndex] + ">" + typeName;
+            (parentBucket.polymorphicPathList[originalIndex] ?? "") +
+            ">" +
+            typeName;
 
           polymorphicPathList[newIndex] = newPolymorphicPath;
           for (const planId of copyStepIds) {

@@ -349,8 +349,8 @@ export function printPlanGraph(
   return graphString;
 }
 
-function pp(polymorphicPaths: ReadonlySet<string>) {
-  if (polymorphicPaths.size === 1 && polymorphicPaths.has("")) {
+function pp(polymorphicPaths: ReadonlySet<string> | null) {
+  if (!polymorphicPaths) {
     return "";
   }
   return [...polymorphicPaths].map((p) => `${p}`).join("\n");

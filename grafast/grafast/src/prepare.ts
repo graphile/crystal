@@ -661,7 +661,7 @@ async function processStream(
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
     const store: Bucket["store"] = new Map();
-    const polymorphicPathList: string[] = [];
+    const polymorphicPathList: (string | null)[] = [];
 
     let directLayerPlanChild = spec.outputPlan.layerPlan;
     while (directLayerPlanChild.parentLayerPlan !== spec.bucket.layerPlan) {
@@ -841,7 +841,7 @@ function processSingleDeferred(
 ) {
   const size = specs.length;
   const store: Bucket["store"] = new Map();
-  const polymorphicPathList: string[] = [];
+  const polymorphicPathList: (string | null)[] = [];
 
   for (const copyPlanId of outputPlan.layerPlan.copyStepIds) {
     store.set(copyPlanId, []);

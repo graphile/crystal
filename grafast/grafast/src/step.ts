@@ -251,7 +251,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public _stepOptions: StepOptions;
 
   /** @internal */
-  public polymorphicPaths: ReadonlySet<string>;
+  public polymorphicPaths: ReadonlySet<string> | null;
 
   /**
    * True if this needs to be permanently stored; for example:

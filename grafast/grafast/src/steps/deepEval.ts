@@ -85,7 +85,7 @@ export class DeepEvalStep extends ExecutableStep {
     const copyStepIds = childLayerPlan.copyStepIds;
 
     const store: Bucket["store"] = new Map();
-    const polymorphicPathList: string[] = [];
+    const polymorphicPathList: (string | null)[] = [];
     const map: Map<number, number[]> = new Map();
     let size = 0;
 

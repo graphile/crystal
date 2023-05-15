@@ -57,7 +57,7 @@ export interface Bucket {
    * travelled. This influences the steps that will be executed using the
    * related inputs.
    */
-  polymorphicPathList: readonly string[];
+  polymorphicPathList: readonly (string | null)[];
 
   /**
    * Every entry in the store is a list with the same length as the bucket has

@@ -98,10 +98,8 @@ const {
 let planningTimeoutWarmupMultiplier = 5;
 const EMPTY_ARRAY = Object.freeze([]);
 
-export const POLYMORPHIC_ROOT_PATH = "";
-export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> = new Set([
-  POLYMORPHIC_ROOT_PATH,
-]);
+export const POLYMORPHIC_ROOT_PATH = null;
+export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> | null = null;
 Object.freeze(POLYMORPHIC_ROOT_PATHS);
 
 /** In development we might run additional checks */
@@ -963,8 +961,8 @@ export class OperationPlan {
     // Deliberately shadows
     outputPlan: OutputPlan,
     path: readonly string[],
-    polymorphicPath: string,
-    polymorphicPaths: ReadonlySet<string>,
+    polymorphicPath: string | null,
+    polymorphicPaths: ReadonlySet<string> | null,
     parentStep: ExecutableStep,
     objectType: GraphQLObjectType,
     objectTypeFields: GraphQLFieldMap<any, any>,
@@ -1285,8 +1283,8 @@ export class OperationPlan {
   private planSelectionSet(
     outputPlan: OutputPlan,
     path: readonly string[],
-    polymorphicPath: string,
-    polymorphicPaths: ReadonlySet<string>,
+    polymorphicPath: string | null,
+    polymorphicPaths: ReadonlySet<string> | null,
     parentStep: ExecutableStep,
     objectType: GraphQLObjectType,
     selections: readonly SelectionNode[],
@@ -1296,7 +1294,7 @@ export class OperationPlan {
       this.loc.push(
         `planSelectionSet(${objectType.name} @ ${
           outputPlan.layerPlan.id
-        } @ ${path.join(".")} @ ${polymorphicPath})`,
+        } @ ${path.join(".")} @ ${polymorphicPath ?? ""})`,
       );
     }
 
@@ -1337,8 +1335,8 @@ export class OperationPlan {
     parentLayerPlan: LayerPlan,
     // This is the LAYER-RELATIVE path, not the absolute path! It resets!
     path: readonly string[],
-    polymorphicPath: string,
-    polymorphicPaths: ReadonlySet<string>,
+    polymorphicPath: string | null,
+    polymorphicPaths: ReadonlySet<string> | null,
     selections: readonly SelectionNode[] | undefined,
     parentObjectType: GraphQLObjectType | null,
     responseKey: string | null,
@@ -1606,9 +1604,10 @@ export class OperationPlan {
       /*
        * Now we need to loop through each type and plan it.
        */
+      const polyBase = polymorphicPath ?? "";
       for (const type of allPossibleObjectTypes) {
         // Bit of a hack, but saves passing it around through all the arguments
-        const newPolymorphicPath = `${polymorphicPath}>${type.name}`;
+        const newPolymorphicPath = `${polyBase}>${type.name}`;
         polymorphicLayerPlan.reason.polymorphicPaths.add(newPolymorphicPath);
         const newPolymorphicPaths = new Set([newPolymorphicPath]);
 
@@ -1711,7 +1710,7 @@ export class OperationPlan {
   private planField(
     layerPlan: LayerPlan,
     path: readonly string[],
-    polymorphicPaths: ReadonlySet<string>,
+    polymorphicPaths: ReadonlySet<string> | null,
     fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
     rawParentStep: ExecutableStep,
@@ -2295,7 +2294,7 @@ export class OperationPlan {
         // May only need to be evaluated for certain types, so avoid hoisting anything expensive.
         if (
           step.isSyncAndSafe &&
-          step.polymorphicPaths.size ===
+          step.polymorphicPaths!.size ===
             step.layerPlan.reason.polymorphicPaths.size
         ) {
           // It's cheap and covers all types, try and hoist it.
@@ -2382,9 +2381,11 @@ export class OperationPlan {
             .polymorphicPaths
         : POLYMORPHIC_ROOT_PATHS;
 
-      const myPaths = [...step.polymorphicPaths];
-      if (parentPolymorphicPaths.has(myPaths[0])) {
+      const myPaths = [...step.polymorphicPaths!];
+      if (parentPolymorphicPaths?.has(myPaths[0])) {
         // All the others must be valid too
+      } else if (parentPolymorphicPaths === null) {
+        step.polymorphicPaths = null;
       } else {
         const layerPaths = [...step.layerPlan.reason.polymorphicPaths];
         const newPaths = new Set<string>();
@@ -2660,10 +2661,10 @@ export class OperationPlan {
     // Hooray, one winning layer! Find the first one by id.
     const winner = stepsAtMinDepth[0];
 
-    if (winner.polymorphicPaths.size > 1 || !winner.polymorphicPaths.has("")) {
+    if (winner.polymorphicPaths !== null) {
       const polymorphicPaths = new Set<string>();
       for (const s of stepsAtMinDepth) {
-        for (const p of s.polymorphicPaths) {
+        for (const p of s.polymorphicPaths!) {
           polymorphicPaths.add(p);
         }
       }

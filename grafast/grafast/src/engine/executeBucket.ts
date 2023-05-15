@@ -527,7 +527,7 @@ export function executeBucket(
   function reallyExecuteStepWithErrorsOrSelective(
     step: ExecutableStep,
     dependenciesIncludingSideEffects: ReadonlyArray<any>[],
-    polymorphicPathList: readonly string[],
+    polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     const errors: { [index: number]: GrafastError } = Object.create(null);
@@ -537,10 +537,14 @@ export function executeBucket(
 
     /** If all we see is errors, there's no need to execute! */
     let needsNoExecution = true;
+    const stepPolymorphicPaths = step.polymorphicPaths;
 
     for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
       const polymorphicPath = polymorphicPathList[index];
-      if (!step.polymorphicPaths.has(polymorphicPath)) {
+      if (
+        stepPolymorphicPaths !== null &&
+        !stepPolymorphicPaths.has(polymorphicPath as string)
+      ) {
         foundErrors = true;
         const e =
           isDev && DEBUG_POLYMORPHISM
@@ -549,7 +553,7 @@ export function executeBucket(
                   `GrafastInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: step ${
                     step.id
                   } (polymorphicPaths ${[
-                    ...step.polymorphicPaths,
+                    ...stepPolymorphicPaths,
                   ]}) has no match for '${polymorphicPath}'`,
                 ),
                 step.id,
@@ -641,9 +645,18 @@ export function executeBucket(
           }
         }
       }
+      if (
+        isDev &&
+        step.layerPlan.reason.type === "polymorphic" &&
+        step.polymorphicPaths === null
+      ) {
+        throw new Error(
+          `GrafastInternalError<c33328fe-6758-4699-8ac6-7be41ce58bfb>: a step without polymorphic paths cannot belong to a polymorphic bucket`,
+        );
+      }
       const isSelectiveStep =
         step.layerPlan.reason.type === "polymorphic" &&
-        step.polymorphicPaths.size !==
+        step.polymorphicPaths!.size !==
           step.layerPlan.reason.polymorphicPaths.size;
       const result =
         bucket.hasErrors || isSelectiveStep
@@ -765,6 +778,7 @@ export function newBucket(
       spec.size,
       "polymorphicPathList length must match bucket size",
     );
+    /*
     for (let i = 0, l = spec.size; i < l; i++) {
       const p = spec.polymorphicPathList[i];
       assert.strictEqual(
@@ -773,6 +787,7 @@ export function newBucket(
         `Entry ${i} in polymorphicPathList for bucket for ${spec.layerPlan} was not a string`,
       );
     }
+    */
     for (const [key, list] of spec.store.entries()) {
       assert.ok(
         Array.isArray(list),
