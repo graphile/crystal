@@ -3259,11 +3259,61 @@ function makeMetaByMetaKeysFactory(
   allMetaKeysList: ReadonlyArray<string | number | symbol>,
 ) {
   const l = allMetaKeysList.length;
+  // Optimize the common cases
+  if (l === 0) {
+    return makeMetaByMetaKeys0;
+  } else if (l === 1) {
+    return makeMetaByMetaKeys1Factory(allMetaKeysList[0]);
+  } else if (l === 2) {
+    return makeMetaByMetaKeys2Factory(allMetaKeysList[0], allMetaKeysList[1]);
+  } else if (l === 3) {
+    return makeMetaByMetaKeys3Factory(
+      allMetaKeysList[0],
+      allMetaKeysList[1],
+      allMetaKeysList[2],
+    );
+  }
   return function makeMetaByMetaKey() {
     const metaByMetaKey = Object.create(null);
     for (let i = 0; i < l; i++) {
       metaByMetaKey[allMetaKeysList[i]] = Object.create(null);
     }
     return metaByMetaKey;
+  };
+}
+
+const EMPTY_OBJECT = Object.freeze(Object.create(null));
+function makeMetaByMetaKeys0() {
+  return EMPTY_OBJECT;
+}
+function makeMetaByMetaKeys1Factory(key1: string | number | symbol) {
+  return function makeMetaByMetaKeys1() {
+    const obj = Object.create(null);
+    obj[key1] = Object.create(null);
+    return obj;
+  };
+}
+function makeMetaByMetaKeys2Factory(
+  key1: string | number | symbol,
+  key2: string | number | symbol,
+) {
+  return function makeMetaByMetaKeys2() {
+    const obj = Object.create(null);
+    obj[key1] = Object.create(null);
+    obj[key2] = Object.create(null);
+    return obj;
+  };
+}
+function makeMetaByMetaKeys3Factory(
+  key1: string | number | symbol,
+  key2: string | number | symbol,
+  key3: string | number | symbol,
+) {
+  return function makeMetaByMetaKeys3() {
+    const obj = Object.create(null);
+    obj[key1] = Object.create(null);
+    obj[key2] = Object.create(null);
+    obj[key3] = Object.create(null);
+    return obj;
   };
 }
