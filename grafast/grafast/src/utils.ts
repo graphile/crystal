@@ -318,7 +318,7 @@ export function arraysMatch<T>(
   if (l !== array2.length) {
     return false;
   }
-  if (comparator) {
+  if (comparator !== undefined) {
     for (let i = 0; i < l; i++) {
       if (!comparator(array1[i], array2[i])) {
         return false;
@@ -750,9 +750,9 @@ function findVariableNamesUsedInDirectives(
   directives: readonly DirectiveNode[] | undefined,
   variableNames: Set<string>,
 ) {
-  if (directives) {
+  if (directives !== undefined) {
     for (const dir of directives) {
-      if (dir.arguments) {
+      if (dir.arguments !== undefined) {
         for (const arg of dir.arguments) {
           findVariableNamesUsedInValueNode(arg.value, variableNames);
         }
@@ -765,7 +765,7 @@ function findVariableNamesUsedInArguments(
   args: readonly ArgumentNode[] | undefined,
   variableNames: Set<string>,
 ) {
-  if (args) {
+  if (args !== undefined) {
     for (const arg of args) {
       findVariableNamesUsedInValueNode(arg.value, variableNames);
     }
@@ -826,7 +826,7 @@ function findVariableNamesUsedInFieldNode(
 ) {
   findVariableNamesUsedInArguments(field.arguments, variableNames);
   findVariableNamesUsedInDirectives(field.directives, variableNames);
-  if (field.selectionSet) {
+  if (field.selectionSet !== undefined) {
     for (const selection of field.selectionSet.selections) {
       findVariableNamesUsedInSelectionNode(
         operationPlan,

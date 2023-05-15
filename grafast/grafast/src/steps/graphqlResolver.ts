@@ -269,7 +269,7 @@ export class GraphQLItemHandler
   }
 
   private actuallyWrapData(typeName: string | undefined, data: unknown) {
-    if (typeName) {
+    if (typeName !== undefined) {
       return polymorphicWrap(typeName, data);
     } else {
       return new Error("Could not determine type of data");

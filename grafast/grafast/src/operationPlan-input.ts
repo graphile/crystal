@@ -42,7 +42,7 @@ export function withFieldArgsForArguments<
   field: GraphQLField<any, any, any>,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null | void> | TParentStep {
-  if (operationPlan.loc)
+  if (operationPlan.loc !== null)
     operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
   const fields: {
     [key: string]: GraphQLArgument;
@@ -346,7 +346,7 @@ function withFieldArgsForArgumentsOrInputObject<
       for (const fieldName in fields) {
         const field = fields[fieldName];
         const resolver = field.extensions.grafast?.applyPlan;
-        if (resolver) {
+        if (typeof resolver === "function") {
           const fieldType = field.type;
           if (!("get" in $value)) {
             throw new Error(
@@ -448,7 +448,7 @@ function withFieldArgsForArgumentsOrInputObject<
         if (typeContainingFields && ($current as InputStep).evalIs(undefined)) {
           return;
         }
-        if (fields) {
+        if (fields !== null) {
           for (const fieldName of Object.keys(fields)) {
             const target =
               typeof targetStepOrCallback === "function"

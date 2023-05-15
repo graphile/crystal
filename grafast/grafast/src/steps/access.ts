@@ -16,10 +16,10 @@ type Factory = (
   fallback: any,
   ...path: Array<string | number | symbol>
 ) => (_extra: ExecutionExtra, value: any) => any;
-const makeDestructureCache: { [signature: string]: Factory } =
+const makeDestructureCache: { [signature: string]: Factory | undefined } =
   Object.create(null);
 const makingDestructureCache: {
-  [signature: string]: Array<(factory: Factory) => void>;
+  [signature: string]: Array<(factory: Factory) => void> | undefined;
 } = Object.create(null);
 
 /**
@@ -87,12 +87,13 @@ function constructDestructureFunction(
         : (factory: Factory) => callback(factory(fallback, ...path));
 
     const fn = makeDestructureCache[signature];
-    if (fn) {
+    if (fn !== undefined) {
       done(fn);
       return;
     }
-    if (makingDestructureCache[signature]) {
-      makingDestructureCache[signature].push(done);
+    const making = makingDestructureCache[signature];
+    if (making !== undefined) {
+      making.push(done);
       return;
     }
     const doneHandlers: Array<(fn: Factory) => void> = [done];

@@ -43,7 +43,7 @@ function noop() {
  */
 function mergeErrorsBackIn(
   results: ReadonlyArray<any>,
-  errors: { [index: number]: GrafastError },
+  errors: { [index: number]: GrafastError | undefined },
   resultCount: number,
 ): any[] {
   const finalResults: any[] = [];
@@ -51,7 +51,7 @@ function mergeErrorsBackIn(
 
   for (let i = 0; i < resultCount; i++) {
     const error = errors[i];
-    if (error) {
+    if (error !== undefined) {
       finalResults[i] = error;
     } else {
       finalResults[i] = results[resultIndex++];
@@ -107,7 +107,7 @@ export function executeBucket(
       return;
     }
     const phase = phases[phaseIndex];
-    const normalSteps = phase.normalSteps?.map((s) => s.step) ?? [];
+    const normalSteps = phase.normalSteps?.map((s) => s.step);
     let executePromises:
       | PromiseLike<GrafastResultsList<any> | GrafastResultStreamList<any>>[]
       | null = null;
@@ -530,7 +530,8 @@ export function executeBucket(
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
-    const errors: { [index: number]: GrafastError } = Object.create(null);
+    const errors: { [index: number]: GrafastError | undefined } =
+      Object.create(null);
 
     /** If there's errors, we must manipulate the arrays being passed into the step execution */
     let foundErrors = false;

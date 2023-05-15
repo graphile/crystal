@@ -116,7 +116,7 @@ export class StepTracker {
         const store = this.layerPlansByParentStep.get(
           layerPlan.reason.parentStep,
         )!;
-        if (store) {
+        if (store !== undefined) {
           store.add(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
         } else {
           const layerPlans = new Set<
@@ -134,7 +134,7 @@ export class StepTracker {
       }
       case "subroutine": {
         const parent = layerPlan.reason.parentStep;
-        if (parent[$$subroutine]) {
+        if (parent[$$subroutine] !== null) {
           throw new Error(
             `Steps may currently only have one subroutine. If you have need for a step with multiple subroutines, please get in touch.`,
           );
@@ -157,7 +157,7 @@ export class StepTracker {
   public addOutputPlan(outputPlan: OutputPlan): void {
     this.allOutputPlans.push(outputPlan);
     const store = this.outputPlansByRootStep.get(outputPlan.rootStep);
-    if (store) {
+    if (store !== undefined) {
       store.add(outputPlan);
     } else {
       const outputPlans = new Set<OutputPlan>();
@@ -281,7 +281,7 @@ export class StepTracker {
     }
     (outputPlan.rootStep as any) = $dependency;
     const store = this.outputPlansByRootStep.get($dependency);
-    if (store) {
+    if (store !== undefined) {
       store.add(outputPlan);
     } else {
       const outputPlans = new Set<OutputPlan>();
@@ -315,7 +315,7 @@ export class StepTracker {
     }
     (layerPlan.rootStep as any) = $dependency;
     const store = this.layerPlansByRootStep.get($dependency);
-    if (store) {
+    if (store !== undefined) {
       store.add(layerPlan);
     } else {
       const layerPlans = new Set<LayerPlan>();
@@ -341,7 +341,7 @@ export class StepTracker {
     const oldAliases = this.aliasesById[$original.id];
     const newAliases = this.aliasesById[$replacement.id] ?? [$replacement.id];
     this.aliasesById[$replacement.id] = newAliases;
-    if (oldAliases) {
+    if (oldAliases !== undefined) {
       for (const id of oldAliases) {
         this.stepById[id] = $replacement;
         newAliases.push(id);
@@ -473,13 +473,13 @@ export class StepTracker {
    * then they can also be eradicated _except_ during the 'plan' phase.
    */
   private eradicate($original: ExecutableStep) {
-    if ($original[$$subroutine]) {
+    if ($original[$$subroutine] !== null) {
       this.deleteLayerPlan($original[$$subroutine]);
     }
 
     this.removeStepFromItsLayerPlan($original);
     const oldAliases = this.aliasesById[$original.id];
-    if (oldAliases) {
+    if (oldAliases !== undefined) {
       for (const id of oldAliases) {
         // Nothing needs us, so set ourself null (DELIBERATELY BYPASSES TYPESCRIPT!)
         this.stepById[id] = null as any;

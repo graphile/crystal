@@ -186,7 +186,7 @@ export function printPlanGraph(
   const layerPlanDepth = (step: ExecutableStep) => {
     let depth = 0;
     let lp: LayerPlan | null = step.layerPlan;
-    if (lp.parentLayerPlan) {
+    if (lp.parentLayerPlan !== null) {
       depth -= lp.parentLayerPlan.children.indexOf(lp);
     }
     while ((lp = lp.parentLayerPlan)) {

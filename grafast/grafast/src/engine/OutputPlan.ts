@@ -377,7 +377,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   getLayerPlans(layerPlans = new Set<LayerPlan>()): Set<LayerPlan> {
     // Find all the layerPlans referenced
     layerPlans.add(this.layerPlan);
-    if (this.child) {
+    if (this.child !== null) {
       if (this.child.layerPlan != this.layerPlan) {
         this.child.getLayerPlans(layerPlans);
       } else {
@@ -599,7 +599,7 @@ export function coerceError(
 ): graphql.GraphQLError {
   // Ensure it's a GraphQL error
   if (error instanceof GraphQLError) {
-    if (error.path) {
+    if (error.path !== undefined) {
       return error;
     } else {
       return new GraphQLError(
@@ -838,7 +838,7 @@ function makeExecutor(
   callback?: (fn: any) => void,
 ): any {
   const expression = makeExecutorExpression(options);
-  if (callback) {
+  if (callback !== undefined) {
     te.runInBatch(expression, callback);
   } else {
     return te.run(te`return ${expression}`);
@@ -1048,7 +1048,7 @@ ${
   }
 
   const directChild = bucket.children[childOutputPlan.layerPlan.id];
-  if (directChild) {
+  if (directChild !== undefined) {
     return childOutputPlan.${
       asString ? te_executeString : te_execute
     }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
@@ -1101,7 +1101,7 @@ ${asString ? te.cache`    string = "[";\n` : te.blank}\
     // Now to populate the children...
     const directChild = bucket.children[childOutputPlan.layerPlan.id];
     let childBucket, childBucketIndex, lookup;
-    if (directChild) {
+    if (directChild !== undefined) {
       childBucket = directChild.bucket;
       lookup = directChild.map.get(bucketIndex)
     }
@@ -1116,7 +1116,7 @@ ${asString ? te.cache`    string = "[";\n` : te.blank}\
           bucketIndex,
           i,
         );
-        if (c) {
+        if (c !== null) {
           ([childBucket, childBucketIndex] = c);
         } else {
           childBucket = childBucketIndex = null;
@@ -1141,7 +1141,7 @@ ${
   canStream
     ? te`\
   const stream = bucketRootValue[${ref_$$streamMore}] /* as | AsyncIterableIterator<any> | undefined*/;
-  if (stream) {
+  if (stream !== undefined) {
     root.streams.push({
       root,
       path: mutablePath.slice(1),
@@ -1238,7 +1238,7 @@ const introspect = (
   // level.
   const canonical = JSON.stringify(variableValues);
   const cached = introspectionCacheByVariableValues.get(canonical);
-  if (cached) {
+  if (cached !== undefined) {
     return asString ? JSON.stringify(cached) : cached;
   }
   const graphqlResult = executeSync({
@@ -1391,11 +1391,11 @@ function withObjectExecutorFactory<TAsString extends boolean>(
   callback: (factory: Factory<TAsString>) => void,
 ) {
   const fn = makeObjectExecutorCache.get(signature);
-  if (fn) {
+  if (fn !== undefined) {
     return callback(fn);
   }
   const building = makingObjectExecutorCallbacks.get(signature);
-  if (building) {
+  if (building !== undefined) {
     building.push(callback as (factory: Factory<boolean>) => void);
     return;
   }
@@ -1455,7 +1455,7 @@ ${makeExecuteChildPlanCode(
 )}`
     : te`\
   directChild = bucket.children[spec.outputPlan.layerPlanId];
-  if (directChild) {
+  if (directChild !== undefined) {
     childBucket = directChild.bucket;
     childBucketIndex = directChild.map.get(bucketIndex);
   } else {
@@ -1465,7 +1465,7 @@ ${makeExecuteChildPlanCode(
       bucket,
       bucketIndex,
     );
-    if (c) {
+    if (c !== null) {
       ([childBucket, childBucketIndex] = c);
     } else {
       childBucket = childBucketIndex = null;
@@ -1533,7 +1533,7 @@ function withFastExpression(
 ) {
   const signature = (fallback === undefined ? "d" : "f") + "_" + path.join("|");
   const existing = makeCache.get(signature);
-  if (existing) {
+  if (existing !== undefined) {
     callback(existing);
     return;
   }

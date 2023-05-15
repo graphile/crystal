@@ -794,11 +794,11 @@ function withNewBucketFactory(
   callback: (factory: Factory) => void,
 ) {
   const fn = makeNewBucketCache.get(signature);
-  if (fn) {
+  if (fn !== undefined) {
     return callback(fn);
   }
   const building = makingNewBucketCallbacks.get(signature);
-  if (building) {
+  if (building !== undefined) {
     building.push(callback as (factory: Factory) => void);
     return;
   }

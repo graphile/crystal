@@ -36,14 +36,15 @@ export class __InputListStep extends ExecutableStep {
     );
     const innerType = inputType.ofType;
     const values =
-      inputValues?.kind === Kind.LIST
+      inputValues === undefined
+        ? undefined
+        : inputValues.kind === Kind.LIST
         ? inputValues.values
-        : inputValues?.kind === Kind.NULL
-        ? null
-        : inputValues
-        ? [inputValues]
-        : inputValues;
-    if (values) {
+        : inputValues.kind === Kind.NULL
+        ? undefined // Really it's `null` but we don't care here
+        : // Coerce to list
+          [inputValues];
+    if (values !== undefined) {
       for (
         let inputValueIndex = 0, inputValuesLength = values.length;
         inputValueIndex < inputValuesLength;

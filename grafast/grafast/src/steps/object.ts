@@ -248,7 +248,7 @@ ${inner}
             (this.dependencies[i] as ConstantStep<any>).data,
         ),
       );
-      if (existing) {
+      if (existing !== undefined) {
         return constant(existing);
       } else {
         const obj = Object.create(null);

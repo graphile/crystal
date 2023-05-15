@@ -81,7 +81,7 @@ export function withHooks<TResult>(
   }
   const plugins = resolvedPreset.plugins;
   return withGraphileConfig((gc) => {
-    if (gc) {
+    if (gc !== null) {
       const hooks = new gc.AsyncHooks<GraphileConfig.GrafastHooks>();
       gc.applyHooks(
         plugins,
@@ -112,7 +112,7 @@ export function hook<THookName extends keyof GraphileConfig.GrafastHooks>(
     return;
   }
   return withHooks(resolvedPreset, (hooks) => {
-    if (hooks) {
+    if (hooks !== null) {
       if (hooks.callbacks[hookName]) {
         return hooks.process(hookName, ...args);
       } else {

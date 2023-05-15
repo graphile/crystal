@@ -584,7 +584,7 @@ export class OperationPlan {
       }
     } catch (e) {
       // TODO: raise this somewhere critical
-      if (this.loc) {
+      if (this.loc != null) {
         console.error(
           `Error occurred during query planning (at ${this.loc.join(
             " > ",
@@ -1290,7 +1290,7 @@ export class OperationPlan {
     selections: readonly SelectionNode[],
     isMutation = false,
   ) {
-    if (this.loc) {
+    if (this.loc !== null) {
       this.loc.push(
         `planSelectionSet(${objectType.name} @ ${
           outputPlan.layerPlan.id
@@ -1496,7 +1496,7 @@ export class OperationPlan {
             clp.reason.type === "nullableBoundary" &&
             clp.reason.parentStep === $step,
         );
-        if (match) {
+        if (match !== undefined) {
           objectLayerPlan = match;
         } else {
           objectLayerPlan = new LayerPlan(this, parentLayerPlan, {
@@ -1669,7 +1669,10 @@ export class OperationPlan {
     const pathString = `${path.join("|")}!${$step.id}`;
     const polymorphicLayerPlanByPath =
       this.polymorphicLayerPlanByPathByLayerPlan.get(parentLayerPlan) ??
-      new Map();
+      new Map<
+        string,
+        { stepId: number; layerPlan: LayerPlan<LayerPlanReasonPolymorphic> }
+      >();
     if (polymorphicLayerPlanByPath.size === 0) {
       this.polymorphicLayerPlanByPathByLayerPlan.set(
         parentLayerPlan,
@@ -1677,7 +1680,7 @@ export class OperationPlan {
       );
     }
     const prev = polymorphicLayerPlanByPath.get(pathString);
-    if (prev) {
+    if (prev !== undefined) {
       const { stepId, layerPlan } = prev;
       const stepByStepId = this.stepTracker.getStepById(stepId);
       const stepBy$stepId = this.stepTracker.getStepById($step.id);
@@ -2254,7 +2257,7 @@ export class OperationPlan {
     if (step instanceof __ItemStep || step instanceof __ValueStep) {
       return true;
     }
-    if (step[$$subroutine]) {
+    if (step[$$subroutine] !== null) {
       // Don't hoist steps that are the parent of a subroutine
       // PERF: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
       return true;

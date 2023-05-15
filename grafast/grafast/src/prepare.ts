@@ -102,7 +102,7 @@ function processRoot(
   }
 
   // Terminate the iterator when we're done
-  if (promises.length) {
+  if (promises.length !== 0) {
     return Promise.all(promises).then(noop);
   }
 }
@@ -138,7 +138,7 @@ const finalize = (
       if (errors.length > 0) {
         payload.errors = errors;
       }
-      if (extensions) {
+      if (extensions != null) {
         payload.extensions = extensions;
       }
       payload.hasNext = true;
@@ -372,7 +372,7 @@ export function executePreemptive(
       const payload = Object.create(null) as ExecutionResult;
       payload.errors = errors;
       const extensions = bucketRootValue[$$extensions];
-      if (extensions) {
+      if (extensions != null) {
         payload.extensions = extensions;
       }
       return payload;
@@ -393,7 +393,7 @@ export function executePreemptive(
       const iterator = newIterator((e) => {
         stopped = true;
         abort.resolve(undefined);
-        if (e) {
+        if (e != null) {
           stream.throw?.(e);
         } else {
           stream.return?.();
@@ -571,7 +571,7 @@ function newIterator<T = any>(
         return;
       }
       const cbs = pullQueue.shift();
-      if (cbs) {
+      if (cbs !== undefined) {
         if (isPromiseLike(v)) {
           v.then(
             (v) => cbs[0]({ done, value: v }),
@@ -754,7 +754,7 @@ async function processStream(
           promises.push(promise);
         }
       }
-      if (promises.length) {
+      if (promises.length !== 0) {
         return Promise.all(promises).then(noop);
       }
     };
@@ -799,7 +799,7 @@ async function processStream(
   };
 
   const processResult = (result: any, payloadIndex: number) => {
-    if (queue) {
+    if (queue !== null) {
       queue.push([result, payloadIndex]);
     } else {
       pendingQueues++;
@@ -909,7 +909,7 @@ function processSingleDeferred(
         promises.push(promise);
       }
     }
-    if (promises.length) {
+    if (promises.length !== 0) {
       return Promise.all(promises).then(noop);
     }
   };
@@ -996,7 +996,7 @@ function processDeferred(
     deferredBatchesByRequestTools.set(requestContext, deferredBatches);
   }
   const list = deferredBatches.get(spec.outputPlan);
-  if (list) {
+  if (list !== undefined) {
     list.push([iterator, spec]);
   } else {
     deferredBatches.set(spec.outputPlan, [[iterator, spec]]);

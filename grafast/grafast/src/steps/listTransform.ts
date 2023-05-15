@@ -115,7 +115,7 @@ export class __ListTransformStep<
     this.finalizeCallback = finalizeCallback;
     this.listItem = listItem;
     this.meta = meta ?? null;
-    if (optimize) {
+    if (optimize !== undefined) {
       this.optimize = optimize;
     }
 

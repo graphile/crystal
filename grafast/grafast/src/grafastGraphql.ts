@@ -26,7 +26,10 @@ const queryCacheMaxSize = 50 * MEGABYTE;
 
 const cacheSize = Math.max(2, Math.ceil(queryCacheMaxSize / CACHE_MULTIPLIER));
 
-const queryCache = new LRU({ maxLength: cacheSize });
+const queryCache = new LRU<
+  string,
+  DocumentNode | ReadonlyArray<graphql.GraphQLError>
+>({ maxLength: cacheSize });
 
 // If we can use crypto to create a hash, great. Otherwise just use the string.
 let calculateQueryHash: (queryString: string) => string;
@@ -54,9 +57,7 @@ const parseAndValidate = (
   stringOrSource: string | graphql.Source,
 ): DocumentNode | ReadonlyArray<graphql.GraphQLError> => {
   if (gqlSchema !== lastGqlSchema) {
-    if (queryCache) {
-      queryCache.reset();
-    }
+    queryCache.reset();
     lastGqlSchema = gqlSchema;
   }
 
@@ -67,7 +68,7 @@ const parseAndValidate = (
     typeof stringOrSource === "string" ? stringOrSource : stringOrSource.body,
   );
   const result = queryCache.get(hash);
-  if (result) {
+  if (result !== undefined) {
     return result;
   } else {
     const source =

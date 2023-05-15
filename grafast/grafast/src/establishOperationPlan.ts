@@ -159,7 +159,7 @@ export function establishOperationPlan<
   let count = 0;
   let lastButOneItem: LinkedList<OperationPlan> | null = null;
 
-  if (cache) {
+  if (cache !== undefined) {
     // Dev-only validation
     assertFragmentsMatch(cache.fragments, fragments);
 

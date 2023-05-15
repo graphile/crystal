@@ -69,7 +69,7 @@ export function evalDirectiveArgDirect<T = unknown>(
   const argument = directive.arguments.find(
     (a) => a.name.value === argumentName,
   );
-  if (argument) {
+  if (argument !== undefined) {
     const value = argument.value;
     switch (value.kind) {
       case "Variable": {
