@@ -1,0 +1,35 @@
+.tertiarySection {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: var(--ifm-color-primary-darkest);
+}
+
+[data-theme="dark"] .tertiarySection {
+  color: var(--ifm-color-primary-lightest);
+}
+
+.tertiaryRow {
+  align-items: center;
+}
+
+.header {
+  composes: header from "@site/src/css/common.module.css";
+}
+
+.tagline {
+  composes: tagline from "@site/src/css/common.module.css";
+}
+
+.button {
+  font-size: 0.8rem;
+  border-radius: 7px;
+  border: 1px solid var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+
+.tertiarySvg {
+  max-width: 75%;
+}

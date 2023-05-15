@@ -4,20 +4,67 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 2rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
+  display: flex;
 }
 
 @media screen and (max-width: 996px) {
   .heroBanner {
-    padding: 2rem;
+    padding: 1rem;
   }
+}
+
+.heroRow {
+  align-items: center;
 }
 
 .buttons {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-transform: uppercase;
+}
+
+.buttonHero {
+  font-size: 0.8rem;
+  border-radius: 7px;
+  border: 1px solid var(--ifm-color-primary);
+  letter-spacing: 0.1rem;
+}
+
+.buttonHero:hover {
+  border: 1px solid var(--ifm-color-primary-dark);
+}
+
+.buttonHeroOutline {
+  color: var(--ifm-color-primary);
+}
+
+.buttonHeroOutline:hover {
+  color: var(--ifm-color-primary-dark);
+}
+
+.hero {
+  color: var(--ifm-color-primary-darkest);
+  font-size: 2.5rem;
+  text-align: left;
+}
+
+[data-theme="dark"] .hero {
+  color: var(--ifm-color-primary-lightest);
+}
+
+.heroImage {
+  max-width: 70%;
+}
+
+.github {
+  text-align: left;
+}
+
+.githubButton {
+  width: 8rem;
 }

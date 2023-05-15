@@ -150,4 +150,4 @@ things you might want to try:
   `DEBUG=graphile-build-pg:sql postgraphile -c postgres:///mydb`
 
 If you need help optimising your PostgreSQL database or PostGraphile API, please
-[get in touch](/support/).
+[get in touch](https://graphile.org/support/).

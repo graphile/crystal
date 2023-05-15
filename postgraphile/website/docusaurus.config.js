@@ -16,8 +16,7 @@ const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${ma
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "PostGraphile",
-  tagline:
-    "Craft your ideal GraphQL API backed primarily by your PostgreSQL database in very little time",
+  tagline: "Extensible high-performance automatic GraphQL API for PostgresSQL",
   url: "https://postgraphile.org",
   baseUrl: "/",
   onBrokenLinks: "throw",
@@ -107,6 +106,13 @@ const config = {
     ],
   ],
 
+  stylesheets: [
+    {
+      href: "https://fonts.googleapis.com/css2?family=Sarabun",
+      type: "text/css",
+    },
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -119,7 +125,7 @@ const config = {
         isCloseable: false,
       },
       navbar: {
-        title: "Home",
+        title: "PostGraphile",
         logo: {
           alt: "PostGraphile Logo",
           src: "img/logo.svg",
@@ -130,16 +136,26 @@ const config = {
             docId: "index",
             docsPluginId: "default",
             position: "left",
-            label: "PostGraphile",
+            label: "Documentation",
           },
           {
             to: "news",
             label: "News",
-            position: "left",
+            position: "right",
+          },
+          {
+            to: "https://www.graphile.org/support/",
+            label: "Support",
+            position: "right",
+          },
+          {
+            to: "https://www.graphile.org/sponsor/",
+            label: "Sponsor",
+            position: "right",
           },
           {
             type: "docsVersionDropdown",
-            position: "right",
+            position: "left",
             // dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
             dropdownActiveClassDisabled: true,
           },
@@ -151,14 +167,19 @@ const config = {
         ],
       },
       footer: {
-        style: "dark",
+        logo: {
+          alt: "PostGraphile Logo",
+          src: "img/logo.svg",
+          width: 64,
+          height: 64,
+        },
         links: [
           {
             title: "Docs",
             items: [
               {
                 label: "PostGraphile",
-                to: "https://grafast.org",
+                to: "https://postgraphile.org",
               },
               {
                 label: "Grafast",
@@ -185,6 +206,10 @@ const config = {
                 label: "Twitter",
                 href: "https://twitter.com/GraphileHQ",
               },
+              {
+                label: "Mastodon",
+                href: "https://fosstodon.org/@graphile",
+              },
             ],
           },
           {
@@ -193,6 +218,10 @@ const config = {
               {
                 label: "GitHub",
                 href: `https://github.com/${organizationName}/${projectName}`,
+              },
+              {
+                label: "Sponsor",
+                href: `https://graphile.org/sponsor/`,
               },
             ],
           },

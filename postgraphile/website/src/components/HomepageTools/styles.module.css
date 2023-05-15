@@ -1,0 +1,52 @@
+.tools {
+  display: flex;
+  width: 100%;
+  color: var(--ifm-color-primary-darkest);
+}
+
+[data-theme="dark"] .tools {
+  color: var(--ifm-color-primary-lightest);
+}
+
+.header {
+  composes: header from "@site/src/css/common.module.css";
+  text-align: center;
+}
+
+.tagline {
+  composes: tagline from "@site/src/css/common.module.css";
+}
+
+.toolRow {
+  justify-content: center;
+  gap: 2rem;
+}
+
+.tool {
+  border: 1px solid var(--ifm-color-primary-lighter);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1 !important;
+  max-width: 42rem;
+}
+.githubButton,
+.tool .button {
+  height: 2.5rem;
+  line-height: 2.5rem;
+}
+.tool .button {
+  font-size: 0.8rem;
+  border-radius: 7px;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+  padding-top: 0;
+  padding-bottom: 0;
+  border: none;
+}
+
+.buttons {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}

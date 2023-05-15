@@ -1,0 +1,47 @@
+.calloutSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  width: 100%;
+  background-color: var(--ifm-color-primary-darker);
+  color: var(--ifm-color-primary-lightest);
+}
+
+.calloutRow {
+  align-items: center;
+  background-color: var(--ifm-color-primary-darker);
+  color: var(--ifm-color-primary-lightest);
+}
+
+.inner {
+  display: grid;
+  justify-content: center;
+  text-align: center;
+}
+
+[data-theme="dark"] .calloutRow {
+  background-color: var(--ifm-color-primary);
+  color: var(--ifm-background-color);
+}
+
+.header {
+  composes: header from "@site/src/css/common.module.css";
+}
+
+.calloutSection h3 {
+  font-weight: normal;
+}
+
+.button {
+  font-size: 0.8rem;
+  border-radius: 7px;
+  border: 1px solid var(--ifm-color-primary);
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+
+[data-theme="dark"] .button {
+  border: 1px solid var(--ifm-color-primary);
+  background-color: var(--ifm-color-primary);
+}

@@ -1,11 +1,39 @@
 .features {
+  composes: contents from "../../css/common.module.css";
+  background-color: var(--ifm-hero-background-color);
+  /*background-color: var(--ifm-color-primary-lightest);*/
+}
+
+.row {
+  composes: row from "@site/src/css/common.module.css";
+}
+
+.feature {
+  composes: content from "@site/src/css/common.module.css";
+  flex-direction: row;
+}
+
+.svgContainer {
   display: flex;
   align-items: center;
-  padding: 2rem 0;
-  width: 100%;
+  justify-content: center;
+  max-width: 25%;
 }
 
 .featureSvg {
-  height: 200px;
-  width: 200px;
+  height: 8rem;
+  width: 8rem;
+}
+
+.featureDetails {
+  display: flex;
+  flex-direction: column;
+  max-width: 75%;
+}
+
+.featureTitle {
+}
+
+.featureInfo {
+  composes: tagline from "@site/src/css/common.module.css";
 }
