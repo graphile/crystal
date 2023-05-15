@@ -3272,6 +3272,30 @@ function makeMetaByMetaKeysFactory(
       allMetaKeysList[1],
       allMetaKeysList[2],
     );
+  } else if (l === 4) {
+    return makeMetaByMetaKeys4Factory(
+      allMetaKeysList[0],
+      allMetaKeysList[1],
+      allMetaKeysList[2],
+      allMetaKeysList[3],
+    );
+  } else if (l === 5) {
+    return makeMetaByMetaKeys5Factory(
+      allMetaKeysList[0],
+      allMetaKeysList[1],
+      allMetaKeysList[2],
+      allMetaKeysList[3],
+      allMetaKeysList[4],
+    );
+  } else if (l === 6) {
+    return makeMetaByMetaKeys6Factory(
+      allMetaKeysList[0],
+      allMetaKeysList[1],
+      allMetaKeysList[2],
+      allMetaKeysList[3],
+      allMetaKeysList[4],
+      allMetaKeysList[5],
+    );
   }
   return function makeMetaByMetaKey() {
     const metaByMetaKey = Object.create(null);
@@ -3314,6 +3338,57 @@ function makeMetaByMetaKeys3Factory(
     obj[key1] = Object.create(null);
     obj[key2] = Object.create(null);
     obj[key3] = Object.create(null);
+    return obj;
+  };
+}
+function makeMetaByMetaKeys4Factory(
+  key1: string | number | symbol,
+  key2: string | number | symbol,
+  key3: string | number | symbol,
+  key4: string | number | symbol,
+) {
+  return function makeMetaByMetaKeys4() {
+    const obj = Object.create(null);
+    obj[key1] = Object.create(null);
+    obj[key2] = Object.create(null);
+    obj[key3] = Object.create(null);
+    obj[key4] = Object.create(null);
+    return obj;
+  };
+}
+function makeMetaByMetaKeys5Factory(
+  key1: string | number | symbol,
+  key2: string | number | symbol,
+  key3: string | number | symbol,
+  key4: string | number | symbol,
+  key5: string | number | symbol,
+) {
+  return function makeMetaByMetaKeys5() {
+    const obj = Object.create(null);
+    obj[key1] = Object.create(null);
+    obj[key2] = Object.create(null);
+    obj[key3] = Object.create(null);
+    obj[key4] = Object.create(null);
+    obj[key5] = Object.create(null);
+    return obj;
+  };
+}
+function makeMetaByMetaKeys6Factory(
+  key1: string | number | symbol,
+  key2: string | number | symbol,
+  key3: string | number | symbol,
+  key4: string | number | symbol,
+  key5: string | number | symbol,
+  key6: string | number | symbol,
+) {
+  return function makeMetaByMetaKeys6() {
+    const obj = Object.create(null);
+    obj[key1] = Object.create(null);
+    obj[key2] = Object.create(null);
+    obj[key3] = Object.create(null);
+    obj[key4] = Object.create(null);
+    obj[key5] = Object.create(null);
+    obj[key6] = Object.create(null);
     return obj;
   };
 }
