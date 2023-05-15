@@ -170,16 +170,16 @@ export function makeGrafastSchema(details: {
           const grafastExtensions: GraphQLFieldExtensions<any, any>["grafast"] =
             Object.create(null);
           (field.extensions as any).grafast = grafastExtensions;
-          if (fieldSpec.resolve) {
+          if (typeof fieldSpec.resolve === "function") {
             field.resolve = fieldSpec.resolve;
           }
-          if (fieldSpec.subscribe) {
+          if (typeof fieldSpec.subscribe === "function") {
             field.subscribe = fieldSpec.subscribe;
           }
-          if (fieldSpec.plan) {
+          if (typeof fieldSpec.plan === "function") {
             grafastExtensions!.plan = fieldSpec.plan;
           }
-          if (fieldSpec.subscribePlan) {
+          if (typeof fieldSpec.subscribePlan === "function") {
             grafastExtensions!.subscribePlan = fieldSpec.subscribePlan;
           }
 
@@ -244,16 +244,16 @@ export function makeGrafastSchema(details: {
         throw new Error(`Invalid scalar config for '${typeName}'`);
       }
       const scalarSpec = spec as ScalarPlans;
-      if (scalarSpec.serialize) {
+      if (typeof scalarSpec.serialize === "function") {
         type.serialize = scalarSpec.serialize;
       }
-      if (scalarSpec.parseValue) {
+      if (typeof scalarSpec.parseValue === "function") {
         type.parseValue = scalarSpec.parseValue;
       }
-      if (scalarSpec.parseLiteral) {
+      if (typeof scalarSpec.parseLiteral === "function") {
         type.parseLiteral = scalarSpec.parseLiteral;
       }
-      if (scalarSpec.plan) {
+      if (typeof scalarSpec.plan === "function") {
         (type.extensions as any).grafast = { plan: scalarSpec.plan };
       }
     } else if (isEnumType(type)) {

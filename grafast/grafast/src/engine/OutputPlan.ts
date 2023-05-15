@@ -310,7 +310,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           ["root", "object"].includes(this.type.mode),
           "Can only addChild on root/object output plans",
         );
-        if (this.keys[key]) {
+        if (this.keys[key] !== undefined) {
           throw new Error(
             `GrafastInternalError<5ceecb19-8c2c-4797-9be5-9be1b207fa45>: child already set for key '${key}'`,
           );
@@ -331,7 +331,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           );
         }
         assert.ok(type == null, "Array should not specify type");
-        if (this.child) {
+        if (this.child !== null) {
           throw new Error(
             `GrafastInternalError<07059d9d-a47d-441f-b834-683cca1d856a>: child already set`,
           );
@@ -443,7 +443,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       const expressionDetails:
         | [ReadonlyArray<string | number>, any]
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
-      if (expressionDetails) {
+      if (expressionDetails !== undefined) {
         // @ts-ignore
         const $parent: ExecutableStep = $root.getDep(0);
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
@@ -1106,7 +1106,7 @@ ${asString ? te.cache`    string = "[";\n` : te.blank}\
       lookup = directChild.map.get(bucketIndex)
     }
     for (let i = 0; i < l; i++) {
-      if (directChild) {
+      if (directChild !== undefined) {
         childBucketIndex = lookup[i];
       } else {
         const c = ${ref_getChildBucketAndIndex}(
@@ -1246,7 +1246,7 @@ const introspect = (
     document,
     variableValues,
   });
-  if (graphqlResult.errors) {
+  if (graphqlResult.errors !== undefined) {
     // NOTE: we should map the introspection path, however that might require
     // us to be able to raise multiple errors. Theoretically if the query
     // validates we shouldn't be able to get errors out of the introspection
@@ -1538,7 +1538,7 @@ function withFastExpression(
     return;
   }
   const existingCallbacks = makingCache.get(signature);
-  if (existingCallbacks) {
+  if (existingCallbacks !== undefined) {
     existingCallbacks.push(callback);
     return;
   }

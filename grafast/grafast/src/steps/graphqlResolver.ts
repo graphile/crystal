@@ -311,7 +311,7 @@ export class GraphQLItemHandler
     _count: number,
     values: [GrafastValuesList<any>],
   ): GrafastResultsList<any> {
-    if (this.abstractType) {
+    if (this.abstractType !== undefined) {
       return values[0].map((data) => {
         if (data == null) {
           return data;
@@ -386,7 +386,7 @@ export function graphqlResolver(
     isAbstract,
   );
   if (isAbstract) {
-    if (subscriber) {
+    if (subscriber != null) {
       throw new SafeError(
         `GraphQL subscribe function emulation currently doesn't support polymorphism`,
       );

@@ -1100,7 +1100,7 @@ export class OperationPlan {
        *        directly.)
        */
 
-      if (resolver) {
+      if (resolver !== null) {
         this.pure = false;
       }
 
@@ -1183,7 +1183,7 @@ export class OperationPlan {
         step = parentStep;
       }
 
-      if (resolver) {
+      if (resolver !== null) {
         step = withGlobalLayerPlan(fieldLayerPlan, polymorphicPaths, () => {
           const $args = object(
             field.arguments?.reduce((memo, arg) => {
@@ -1446,7 +1446,7 @@ export class OperationPlan {
         // Check that the plan we're dealing with is the one the user declared
         /** Either an assertion function or a step class */
         const stepAssertion = nullableFieldType.extensions?.grafast?.Step;
-        if (stepAssertion) {
+        if (stepAssertion !== undefined) {
           try {
             if (
               stepAssertion === ExecutableStep ||
@@ -2482,7 +2482,7 @@ export class OperationPlan {
     const dependentLayerPlans = new Set<LayerPlan>();
 
     const outputPlans = this.stepTracker.outputPlansByRootStep.get(step);
-    if (outputPlans) {
+    if (outputPlans !== undefined) {
       for (const outputPlan of outputPlans) {
         if (outputPlan.layerPlan === step.layerPlan) {
           return step;
@@ -2502,7 +2502,7 @@ export class OperationPlan {
 
     const layerPlansByParent =
       this.stepTracker.layerPlansByParentStep.get(step);
-    if (layerPlansByParent) {
+    if (layerPlansByParent !== undefined) {
       for (const layerPlan of layerPlansByParent) {
         if (layerPlan.parentLayerPlan === step.layerPlan) {
           return step;
@@ -2513,7 +2513,7 @@ export class OperationPlan {
     }
 
     const layerPlansByRoot = this.stepTracker.layerPlansByRootStep.get(step);
-    if (layerPlansByRoot) {
+    if (layerPlansByRoot !== undefined) {
       for (const layerPlan of layerPlansByRoot) {
         if (layerPlan === step.layerPlan) {
           return step;
@@ -3138,7 +3138,7 @@ export class OperationPlan {
     });
 
     for (const layerPlan of this.stepTracker.layerPlans) {
-      if (layerPlan) {
+      if (layerPlan !== null) {
         layerPlan.finalize();
       }
     }
@@ -3163,10 +3163,10 @@ export class OperationPlan {
     callback: (outputPlan: OutputPlan) => void,
   ): void {
     callback(outputPlan);
-    if (outputPlan.child) {
+    if (outputPlan.child !== null) {
       this.walkOutputPlans(outputPlan.child, callback);
     }
-    if (outputPlan.childByTypeName) {
+    if (outputPlan.childByTypeName !== undefined) {
       Object.values(outputPlan.childByTypeName).forEach((childOutputPlan) => {
         this.walkOutputPlans(childOutputPlan, callback);
       });

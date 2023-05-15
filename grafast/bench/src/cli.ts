@@ -43,7 +43,7 @@ async function configFromArgs(args: ArgsFromOptions<typeof options>) {
   if (schema) {
     preset.bench.schema = schema;
   }
-  if (operations) {
+  if (operations !== undefined) {
     preset.bench.operations = operations;
   }
 

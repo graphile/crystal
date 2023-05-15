@@ -208,7 +208,7 @@ export function graphqlCollectFields(
   const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
-    if (selection.directives) {
+    if (selection.directives !== undefined) {
       if (
         evalDirectiveArg<boolean | null>(
           selection,

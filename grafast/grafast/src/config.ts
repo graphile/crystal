@@ -113,7 +113,7 @@ export function hook<THookName extends keyof GraphileConfig.GrafastHooks>(
   }
   return withHooks(resolvedPreset, (hooks) => {
     if (hooks !== null) {
-      if (hooks.callbacks[hookName]) {
+      if (hooks.callbacks[hookName] !== undefined) {
         return hooks.process(hookName, ...args);
       } else {
         if (!resolvedPreset[$$skipHooks]) {

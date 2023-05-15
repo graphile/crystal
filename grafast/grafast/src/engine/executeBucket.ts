@@ -116,7 +116,7 @@ export function executeBucket(
     const results: Array<
       GrafastResultsList<any> | GrafastResultStreamList<any> | undefined
     > = [];
-    if (normalSteps) {
+    if (normalSteps !== undefined) {
       for (
         let normalStepIndex = 0, l = normalSteps.length;
         normalStepIndex < l;
@@ -418,7 +418,7 @@ export function executeBucket(
         }
       }
 
-      if (pendingPromises) {
+      if (pendingPromises !== undefined) {
         return Promise.allSettled(pendingPromises)
           .then((resultSettledResult) => {
             for (
@@ -704,7 +704,7 @@ export function executeBucket(
         case "listItem":
         case "polymorphic": {
           const childBucket = childLayerPlan.newBucket(bucket);
-          if (childBucket) {
+          if (childBucket !== null) {
             // Execute
             const result = executeBucket(childBucket, requestContext);
             if (isPromiseLike(result)) {
@@ -715,7 +715,7 @@ export function executeBucket(
         }
         case "mutationField": {
           const childBucket = childLayerPlan.newBucket(bucket);
-          if (childBucket) {
+          if (childBucket !== null) {
             // Enqueue for execution (mutations must run in order)
             const promise = enqueue(() =>
               executeBucket(childBucket, requestContext),

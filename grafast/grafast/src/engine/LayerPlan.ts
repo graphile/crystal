@@ -271,7 +271,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
   ) {
     this.stepsByConstructor = new Map();
-    if (parentLayerPlan) {
+    if (parentLayerPlan !== null) {
       this.depth = parentLayerPlan.depth + 1;
       this.ancestry = [...parentLayerPlan.ancestry, this];
       if (isDeferredLayerPlan(this)) {

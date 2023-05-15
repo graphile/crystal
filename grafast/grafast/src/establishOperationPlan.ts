@@ -176,7 +176,7 @@ export function establishOperationPlan<
         )
       ) {
         // Hoist to top of linked list
-        if (previousItem) {
+        if (previousItem !== null) {
           // Remove linkedItem from existing chain
           previousItem.next = linkedItem.next;
           // Add rest of chain after linkedItem
