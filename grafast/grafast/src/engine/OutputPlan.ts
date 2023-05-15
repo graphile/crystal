@@ -1443,20 +1443,20 @@ ${te.join(
           // `Name`.
           return te`  string += \`${
             i === 0 ? te.blank : te_comma
-          }"\${fieldName_${te.lit(i)}}":"\${typeName}"\`;\n`;
+          }"\${${te.identifier(`fieldName_${i}`)}}":"\${typeName}"\`;\n`;
         } else {
-          return te`  obj[fieldName_${te.lit(i)}] = typeName;\n`;
+          return te`  obj[${te.identifier(`fieldName_${i}`)}] = typeName;\n`;
         }
       }
       case "outputPlan!":
       case "outputPlan?": {
         return te`\
-  mutablePath[mutablePathIndex] = fieldName_${te.lit(i)};
-  spec = keys[fieldName_${te.lit(i)}];
+  mutablePath[mutablePathIndex] = ${te.identifier(`fieldName_${i}`)};
+  spec = keys[${te.identifier(`fieldName_${i}`)}];
 ${
   asString
-    ? te`  string += \`${i === 0 ? te.blank : te_comma}"\${fieldName_${te.lit(
-        i,
+    ? te`  string += \`${i === 0 ? te.blank : te_comma}"\${${te.identifier(
+        `fieldName_${i}`,
       )}}":\`;
 `
     : te.blank
@@ -1465,7 +1465,9 @@ ${
   sameBucket
     ? te`\
 ${makeExecuteChildPlanCode(
-  asString ? te_stringPlusEquals : te`obj[fieldName_${te.lit(i)}] =`,
+  asString
+    ? te_stringPlusEquals
+    : te`obj[${te.identifier(`fieldName_${i}`)}] =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
@@ -1492,7 +1494,9 @@ ${makeExecuteChildPlanCode(
     }
   }
 ${makeExecuteChildPlanCode(
-  asString ? te_stringPlusEquals : te`obj[fieldName_${te.lit(i)}] =`,
+  asString
+    ? te_stringPlusEquals
+    : te`obj[${te.identifier(`fieldName_${i}`)}] =`,
   te_specDotLocationDetails,
   te_specDotOutputPlan,
   fieldType === "outputPlan!",
@@ -1527,7 +1531,7 @@ ${hasDeferredOutputPlans ? te_handleDeferred : te.blank}
 
   const factoryExpression = te`\
 function objectExecutorFactory(typeName${te.join(
-    fieldSpecs.map((_, i) => te`, fieldName_${te.lit(i)}`),
+    fieldSpecs.map((_, i) => te`, ${te.identifier(`fieldName_${i}`)}`),
     "",
   )}) {
   return ${executorExpression};
