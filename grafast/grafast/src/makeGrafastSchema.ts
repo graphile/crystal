@@ -261,7 +261,9 @@ export function makeGrafastSchema(details: {
         throw new Error(`Invalid enum config for '${typeName}'`);
       }
       const enumValues = type.getValues();
-      for (const [enumValueName, enumValueSpec] of Object.entries(spec)) {
+      for (const [enumValueName, enumValueSpec] of Object.entries(
+        spec as EnumPlans,
+      )) {
         const enumValue = enumValues.find((val) => val.name === enumValueName);
         if (!enumValue) {
           console.warn(
@@ -276,9 +278,9 @@ export function makeGrafastSchema(details: {
           };
         } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
           // It's a full spec
-          if (enumValueSpec.plan) {
+          if (enumValueSpec.apply) {
             (enumValue.extensions as any).grafast = {
-              plan: enumValueSpec.plan,
+              applyPlan: enumValueSpec.apply,
             };
           }
           if ("value" in enumValueSpec) {
