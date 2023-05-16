@@ -37,6 +37,11 @@ export interface LRUOptions<KeyType, ValueType> {
   dispose?: (key: KeyType, value: ValueType) => void;
 }
 
+/** An optimized get to use before the LRU saturates */
+function quickGet(this: any, key: any): any {
+  return this.c.get(key)?.v;
+}
+
 /**
  * An tiny LRU cache with maximum count, identical weighting and no expiration.
  */
@@ -52,6 +57,8 @@ export class LRU<KeyType = any, ValueType = any> {
   private c: Map<KeyType, Node<KeyType, ValueType>>;
   /** dispose */
   private d: ((key: KeyType, value: ValueType) => void) | null;
+  /** saturated (length === max length) */
+  private s: boolean;
 
   constructor({ maxLength, dispose }: LRUOptions<KeyType, ValueType>) {
     if (maxLength < 2) {
@@ -67,6 +74,8 @@ export class LRU<KeyType = any, ValueType = any> {
     this.t = null;
     this.c = new Map();
     this.d = dispose || null;
+    this.s = false;
+    this.get = quickGet;
 
     this.reset();
   }
@@ -77,7 +86,7 @@ export class LRU<KeyType = any, ValueType = any> {
     this.h = null;
     this.t = null;
     this.length = 0;
-    if (this.d) {
+    if (this.d !== null) {
       for (const hit of values) {
         this.d(hit.k, hit.v);
       }
@@ -86,16 +95,36 @@ export class LRU<KeyType = any, ValueType = any> {
 
   public get(key: KeyType): ValueType | undefined {
     const hit = this.c.get(key);
-    if (hit) {
-      this.r(hit);
-      return hit.v;
+    if (hit === undefined) {
+      return undefined;
     }
-    return undefined;
+
+    // HOIST
+    if (this.h === null) {
+      this.h = this.t = hit;
+    } else if (hit !== this.h) {
+      // Remove newHead from old position
+      hit.p!.n = hit.n;
+      if (hit.n !== null) {
+        hit.n.p = hit.p;
+      } else {
+        // It was the t, now hit.prev is the t
+        this.t = hit.p;
+      }
+      // Add hit at top
+      hit.n = this.h;
+      this.h!.p = hit;
+      this.h = hit;
+      hit.p = null;
+    }
+
+    // RETURN
+    return hit.v;
   }
 
   public set(key: KeyType, value: ValueType): void {
     const hit = this.c.get(key);
-    if (hit) {
+    if (hit !== undefined) {
       hit.v = value;
     } else {
       const newHead: Node<KeyType, ValueType> = {
@@ -109,33 +138,9 @@ export class LRU<KeyType = any, ValueType = any> {
     }
   }
 
-  /** hoist (aka "raise") */
-  private r(newHead: Node<KeyType, ValueType>) {
-    if (newHead === this.h) {
-      return;
-    }
-    if (!this.h) {
-      this.h = this.t = newHead;
-      return;
-    }
-    // Remove newHead from old position
-    newHead.p!.n = newHead.n;
-    if (newHead.n) {
-      newHead.n.p = newHead.p;
-    } else {
-      // It was the t, now newHead.prev is the t
-      this.t = newHead.p;
-    }
-    // Add newHead at top
-    newHead.n = this.h;
-    this.h.p = newHead;
-    this.h = newHead;
-    newHead.p = null;
-  }
-
   /** add */
   private a(newHead: Node<KeyType, ValueType>) {
-    if (!this.h) {
+    if (this.h === null) {
       this.h = this.t = newHead;
       this.length = 1;
       return;
@@ -143,13 +148,13 @@ export class LRU<KeyType = any, ValueType = any> {
     this.h.p = newHead;
     newHead.n = this.h;
     this.h = newHead;
-    if (this.length === this.m) {
+    if (this.s) {
       // Remove the t
       const oldTail = this.t!;
       this.c.delete(oldTail.k);
       this.t = oldTail.p;
       this.t!.n = null;
-      if (this.d) {
+      if (this.d !== null) {
         this.d(oldTail.k, oldTail.v);
       }
     } else {
@@ -157,7 +162,12 @@ export class LRU<KeyType = any, ValueType = any> {
         this.t = newHead;
       }
       this.length++;
+      if (this.length === this.m) {
+        this.s = true;
+        this.get = LRU.prototype.get;
+      }
     }
   }
 }
+
 export default LRU;

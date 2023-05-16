@@ -42,10 +42,8 @@ graph TD
     Connection45{{"Connection[45∈3]<br />ᐸ41ᐳ"}}:::plan
     PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__machine_...nstructor”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
-    RemapKeys91{{"RemapKeys[91∈1]<br />ᐸ13:{”0”:0,”1”:1}ᐳ"}}:::plan
-    PgSelectSingle13 --> RemapKeys91
     PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸbuildingᐳ"}}:::plan
-    RemapKeys91 --> PgSelectSingle20
+    PgSelectSingle13 --> PgSelectSingle20
     PgClassExpression24{{"PgClassExpression[24∈1]<br />ᐸ__machine__.”input”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression24
     PgClassExpression21{{"PgClassExpression[21∈2]<br />ᐸ__building__.”id”ᐳ"}}:::plan
@@ -97,7 +95,7 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgSelect26,First30,PgSelectSingle31,Connection65,Constant94,Constant95 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸmachineᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression14,PgSelectSingle20,PgClassExpression24,RemapKeys91 bucket1
+    class Bucket1,PgClassExpression14,PgSelectSingle20,PgClassExpression24 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{1}ᐸbuildingᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression21,PgClassExpression22 bucket2

@@ -4,7 +4,10 @@ import type { TE } from "tamedevil";
 import te from "tamedevil";
 
 import { isDev, noop } from "./dev.js";
-import type { LayerPlan } from "./engine/LayerPlan.js";
+import type {
+  LayerPlan,
+  LayerPlanReasonSubroutine,
+} from "./engine/LayerPlan.js";
 import {
   currentLayerPlan,
   currentPolymorphicPaths,
@@ -22,6 +25,7 @@ import type {
   StepOptimizeOptions,
   StepOptions,
 } from "./interfaces.js";
+import { $$subroutine } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
 
@@ -119,6 +123,7 @@ export abstract class BaseStep {
    */
   public readonly layerPlan: LayerPlan;
   public readonly operationPlan: OperationPlan;
+  public [$$subroutine]: LayerPlan<LayerPlanReasonSubroutine> | null = null;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   public debug: boolean;
@@ -246,7 +251,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public _stepOptions: StepOptions;
 
   /** @internal */
-  public polymorphicPaths: ReadonlySet<string>;
+  public polymorphicPaths: ReadonlySet<string> | null;
 
   /**
    * True if this needs to be permanently stored; for example:
@@ -259,14 +264,17 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public store: boolean;
 
   /**
-   * Override the metaKey to be able to share execution meta between multiple
-   * steps of the same class (or even a family of step classes).
+   * Set the metaKey so `execute` will be passed a meta object to use.
+   * Depending on what you set it to, you can share execution meta between
+   * multiple steps of the same class (or even a family of step classes).
+   *
+   * A sensible value for it is `this.metaKey = this.id;`.
    */
-  public metaKey: number | string | symbol;
+  public metaKey: number | string | symbol | undefined;
   /**
    * Like `metaKey` but for the optimize phase
    */
-  public optimizeMetaKey: number | string | symbol;
+  public optimizeMetaKey: number | string | symbol | undefined;
 
   constructor() {
     super();
@@ -278,14 +286,6 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
     this.id = this.layerPlan._addStep(this);
-    // @ts-ignore
-    if (this.metaKey === undefined) {
-      this.metaKey = this.id;
-    }
-    // @ts-ignore
-    if (this.optimizeMetaKey === undefined) {
-      this.optimizeMetaKey = this.id;
-    }
   }
 
   protected withMyLayerPlan<T>(callback: () => T): T {
@@ -381,26 +381,22 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * If you need to transform the peer to be equivalent you should do so via
    * the `deduplicatedWith` callback later.
    */
-  public deduplicate(
+  public deduplicate?(
     _peers: readonly ExecutableStep[],
-  ): readonly ExecutableStep[] {
-    return [];
-  }
+  ): readonly ExecutableStep[];
 
   /**
    * If this plan is replaced via deduplication, this method gives it a chance
    * to hand over its responsibilities to its replacement.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public deduplicatedWith(replacement: ExecutableStep): void {}
+  public deduplicatedWith?(replacement: ExecutableStep): void;
 
   /**
    * Our chance to optimise the plan (which could go as far as to inline the
    * plan into the parent plan).
    */
-  public optimize(_options: StepOptimizeOptions): ExecutableStep {
-    return this;
-  }
+  public optimize?(_options: StepOptimizeOptions): ExecutableStep;
 
   public finalize() {
     if (typeof (this as any).isSyncAndSafe !== "boolean") {
@@ -472,33 +468,29 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 }
 
-export abstract class UnbatchedExecutableStep<
-  TData = any,
-> extends ExecutableStep<TData> {
-  static $$export = {
-    moduleName: "grafast",
-    exportName: "UnbatchedExecutableStep",
-  };
-
-  finalize() {
-    // If they've not replaced 'execute', use our optimized form
-    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
-      const depIndexes = this.dependencies.map((_, i) => i);
-      const tryOrNot = (inFrag: TE): TE => {
-        if (this.isSyncAndSafe) {
-          return inFrag;
-        } else {
-          return te`\
-      try {
-${te.indent(inFrag)}
-      } catch (e) {
-        results[i] = e instanceof Error ? e : Promise.reject(e);
-      }
+function _buildOptimizedExecuteExpression(
+  depCount: number,
+  isSyncAndSafe: boolean,
+) {
+  const depIndexes = [];
+  for (let i = 0; i < depCount; i++) {
+    depIndexes.push(i);
+  }
+  const tryOrNot = (inFrag: TE): TE => {
+    if (isSyncAndSafe) {
+      return inFrag;
+    } else {
+      return te`\
+    try {
+  ${te.indent(inFrag)}
+    } catch (e) {
+      results[i] = e instanceof Error ? e : Promise.reject(e);
+    }\
 `;
-        }
-      };
-      this.execute = te.run`
-return function execute(count, values, extra) {
+    }
+  };
+  return te`\
+(function execute(count, values, extra) {
   const [
 ${te.join(
   depIndexes.map((i) => te`    ${te.identifier(`list${i}`)},\n`),
@@ -511,12 +503,67 @@ ${tryOrNot(te`\
     results[i] = this.unbatchedExecute(extra, ${te.join(
       depIndexes.map((depIndex) => te`${te.identifier(`list${depIndex}`)}[i]`),
       ", ",
-    )});
-`)}\
+    )});\
+`)}
   }
   return results;
+})`;
 }
-` as any;
+
+const MAX_DEPENDENCIES_TO_CACHE = 10;
+const unsafeCache: any[] = [];
+const safeCache: any[] = [];
+te.batch(() => {
+  for (let i = 0; i <= MAX_DEPENDENCIES_TO_CACHE; i++) {
+    const depCount = i;
+    const unsafeExpression = _buildOptimizedExecuteExpression(depCount, false);
+    te.runInBatch(unsafeExpression, (fn) => {
+      unsafeCache[depCount] = fn;
+    });
+    const safeExpression = _buildOptimizedExecuteExpression(depCount, true);
+    te.runInBatch(safeExpression, (fn) => {
+      safeCache[depCount] = fn;
+    });
+  }
+});
+
+function buildOptimizedExecute(
+  depCount: number,
+  isSyncAndSafe: boolean,
+  callback: (fn: any) => void,
+) {
+  // Try and satisfy from cache
+  const cache = isSyncAndSafe ? safeCache : unsafeCache;
+  if (depCount <= MAX_DEPENDENCIES_TO_CACHE) {
+    callback(cache[depCount]);
+    return;
+  }
+
+  // Build it
+  const expression = _buildOptimizedExecuteExpression(depCount, isSyncAndSafe);
+  te.runInBatch<any>(expression, (fn) => {
+    callback(fn);
+  });
+}
+
+export abstract class UnbatchedExecutableStep<
+  TData = any,
+> extends ExecutableStep<TData> {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "UnbatchedExecutableStep",
+  };
+
+  finalize() {
+    // If they've not replaced 'execute', use our optimized form
+    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
+      buildOptimizedExecute(
+        this.dependencies.length,
+        this.isSyncAndSafe,
+        (fn) => {
+          this.execute = fn;
+        },
+      );
     }
     super.finalize();
   }

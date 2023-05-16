@@ -1,0 +1,49 @@
+{
+  "name": "@localrepo/grafast-bench",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Grafast benchmarks",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "bin": "dist/cli-run.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "test": "true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/heart.git"
+  },
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/heart/issues"
+  },
+  "homepage": "https://github.com/graphile/heart/tree/main/grafast/bench",
+  "dependencies": {
+    "grafast": "workspace:^",
+    "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "tslib": "^2.5.0"
+  },
+  "engines": {
+    "node": ">=16.10"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "glob": "^10.2.2",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "files": [
+    "dist",
+    "index.js"
+  ]
+}

@@ -4,12 +4,14 @@ import type {
   ObjectValueNode,
   ValueNode,
 } from "graphql";
-import { Kind } from "graphql";
+import * as graphql from "graphql";
 
 import { SafeError } from "../error.js";
 import type { ExecutionExtra } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __TrackedValueStep } from "./__trackedValue.js";
+
+const { Kind } = graphql;
 
 /**
  * Handles "leaves" (scalars)
@@ -120,7 +122,7 @@ export class __InputDynamicScalarStep<
   }
 
   unbatchedExecute = (
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     ...variableValues: any[]
   ): TLeaf => {
     const converted = this.valueFromValues(variableValues);

@@ -1,5 +1,7 @@
 import type {
   ArgumentNode,
+  ConstObjectFieldNode,
+  ConstValueNode,
   DirectiveNode,
   FieldNode,
   GraphQLEnumValueConfig,
@@ -13,26 +15,10 @@ import type {
   GraphQLObjectTypeConfig,
   GraphQLOutputType,
   GraphQLSchema,
-  ObjectFieldNode,
   SelectionNode,
   ValueNode,
 } from "graphql";
-import {
-  GraphQLBoolean,
-  GraphQLEnumType,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInputObjectType,
-  GraphQLInt,
-  GraphQLInterfaceType,
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLScalarType,
-  GraphQLString,
-  GraphQLUnionType,
-  Kind,
-} from "graphql";
+import * as graphql from "graphql";
 
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
@@ -49,6 +35,23 @@ import type {
   OutputPlanForType,
 } from "./interfaces.js";
 import type { ExecutableStep, ModifierStep } from "./step.js";
+
+const {
+  GraphQLBoolean,
+  GraphQLEnumType,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInputObjectType,
+  GraphQLInt,
+  GraphQLInterfaceType,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLScalarType,
+  GraphQLString,
+  GraphQLUnionType,
+  Kind,
+} = graphql;
 
 /**
  * The parent object is used as the key in `GetValueStepId()`; for root level
@@ -80,7 +83,7 @@ export function assertNullPrototype(
  * (since they can use any ValueNode) - other parts of the GraphQL schema
  * should use explicitly compatible ValueNodes.
  */
-function dangerousRawValueToValueNode(value: JSON): ValueNode {
+function dangerousRawValueToValueNode(value: JSON): ConstValueNode {
   if (value == null) {
     return { kind: Kind.NULL };
   }
@@ -131,7 +134,7 @@ function dangerousRawValueToValueNode(value: JSON): ValueNode {
 function rawValueToValueNode(
   type: GraphQLInputType,
   value: any,
-): ValueNode | undefined {
+): ConstValueNode | undefined {
   // TODO: move this to input object section
   if (type instanceof GraphQLNonNull) {
     if (value == null) {
@@ -222,7 +225,7 @@ function rawValueToValueNode(
       );
     }
     const fieldDefs = type.getFields();
-    const fields: ObjectFieldNode[] = [];
+    const fields: ConstObjectFieldNode[] = [];
     for (const fieldName in fieldDefs) {
       const fieldDef = fieldDefs[fieldName];
       const fieldType = fieldDef.type;
@@ -260,7 +263,7 @@ function rawValueToValueNode(
 export function defaultValueToValueNode(
   type: GraphQLInputType,
   defaultValue: unknown,
-): ValueNode | undefined {
+): ConstValueNode | undefined {
   // NOTE: even if `type` is non-null it's okay for `defaultValue` to be
   // undefined. However it is not okay for defaultValue to be null if type is
   // non-null.
@@ -308,16 +311,24 @@ export function isDeferred<T>(
 export function arraysMatch<T>(
   array1: ReadonlyArray<T>,
   array2: ReadonlyArray<T>,
-  comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
+  comparator?: (val1: T, val2: T) => boolean,
 ): boolean {
   if (array1 === array2) return true;
   const l = array1.length;
   if (l !== array2.length) {
     return false;
   }
-  for (let i = 0; i < l; i++) {
-    if (!comparator(array1[i], array2[i])) {
-      return false;
+  if (comparator !== undefined) {
+    for (let i = 0; i < l; i++) {
+      if (!comparator(array1[i], array2[i])) {
+        return false;
+      }
+    }
+  } else {
+    for (let i = 0; i < l; i++) {
+      if (array1[i] !== array2[i]) {
+        return false;
+      }
     }
   }
   return true;
@@ -391,7 +402,7 @@ export type GrafastObjectType<
   TContext extends Grafast.Context,
   TParentStep extends ExecutableStep,
   TFields extends ObjectTypeFields<TContext, TParentStep>,
-> = GraphQLObjectType<
+> = graphql.GraphQLObjectType<
   TParentStep extends ExecutableStep<infer U> ? U : never,
   TContext
 > & { TParentStep: TParentStep; TFields: TFields };
@@ -546,7 +557,7 @@ export type GrafastInputObjectType<
   TContext extends Grafast.Context,
   TParentStep extends ModifierStep<any>,
   TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
-> = GraphQLInputObjectType & {
+> = graphql.GraphQLInputObjectType & {
   TContext: TContext;
   TParentStep: TParentStep;
   TFields: TFields;
@@ -614,7 +625,7 @@ const $$valueConfigByValue = Symbol("valueConfigByValue");
  * will go away so we use a weakmap.
  */
 export function getEnumValueConfig(
-  enumType: GraphQLEnumType,
+  enumType: graphql.GraphQLEnumType,
   outputValue: string,
 ): GraphQLEnumValueConfig | undefined {
   // We cache onto the enumType directly so that garbage collection can clear up after us easily.
@@ -739,9 +750,9 @@ function findVariableNamesUsedInDirectives(
   directives: readonly DirectiveNode[] | undefined,
   variableNames: Set<string>,
 ) {
-  if (directives) {
+  if (directives !== undefined) {
     for (const dir of directives) {
-      if (dir.arguments) {
+      if (dir.arguments !== undefined) {
         for (const arg of dir.arguments) {
           findVariableNamesUsedInValueNode(arg.value, variableNames);
         }
@@ -754,7 +765,7 @@ function findVariableNamesUsedInArguments(
   args: readonly ArgumentNode[] | undefined,
   variableNames: Set<string>,
 ) {
-  if (args) {
+  if (args !== undefined) {
     for (const arg of args) {
       findVariableNamesUsedInValueNode(arg.value, variableNames);
     }
@@ -815,7 +826,7 @@ function findVariableNamesUsedInFieldNode(
 ) {
   findVariableNamesUsedInArguments(field.arguments, variableNames);
   findVariableNamesUsedInDirectives(field.directives, variableNames);
-  if (field.selectionSet) {
+  if (field.selectionSet !== undefined) {
     for (const selection of field.selectionSet.selections) {
       findVariableNamesUsedInSelectionNode(
         operationPlan,

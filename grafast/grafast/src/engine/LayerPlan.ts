@@ -1,9 +1,9 @@
+import LRU from "@graphile/lru";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
-import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
@@ -86,6 +86,7 @@ export interface LayerPlanReasonPolymorphic {
    * Needed for execution (see `executeBucket`).
    */
   parentStep: ExecutableStep;
+  polymorphicPaths: Set<string>;
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonSubroutine {
@@ -242,21 +243,46 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   /**
    * The list of layerPlans that steps added to this LayerPlan may depend upon.
+   * Note this includes self, so it has one more entry than `depth`.
+   *
+   * ```
+   * this.ancestry[this.depth] === this;
+   * ```
    *
    * @internal
    */
   ancestry: LayerPlan[];
 
+  /** How "deep" this layer plan is (how many ancestors it has). The root layer plan has a depth of 0. */
+  depth: number;
+  /** The depth at which a "defer boundary" occurs (OperationPlan.getPeers cannot pass a defer boundary), or 0. */
+  deferBoundaryDepth: number;
+
+  /**
+   * An optimization for OperationPlan.getPeers; this tracks the steps in this
+   * layer plan, grouped by their step class.
+   */
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  stepsByConstructor: Map<Function, Set<ExecutableStep>>;
+
   constructor(
     public readonly operationPlan: OperationPlan,
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
-    public polymorphicPaths: ReadonlySet<string>,
   ) {
-    if (parentLayerPlan) {
+    this.stepsByConstructor = new Map();
+    if (parentLayerPlan !== null) {
+      this.depth = parentLayerPlan.depth + 1;
       this.ancestry = [...parentLayerPlan.ancestry, this];
+      if (isDeferredLayerPlan(this)) {
+        this.deferBoundaryDepth = this.depth;
+      } else {
+        this.deferBoundaryDepth = parentLayerPlan.deferBoundaryDepth;
+      }
     } else {
+      this.depth = 0;
       this.ancestry = [this];
+      this.deferBoundaryDepth = 0;
     }
     this.id = operationPlan.addLayerPlan(this);
     if (!parentLayerPlan) {
@@ -318,178 +344,23 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return this.operationPlan._addModifierStep(step);
   }
 
-  public makeNewBucketCallback(
-    this: LayerPlan<TReason>,
-    inner: TE,
-  ): typeof this.newBucket {
-    return te.run`\
-const that = ${te.ref(this)};
-const newBucket = ${te.ref(newBucket)};
-return function ${te.identifier(`newBucket${this.id}`)}(parentBucket) {
-  const store = new Map();
-  const polymorphicPathList = ${
-    this.reason.type === "mutationField"
-      ? te`parentBucket.polymorphicPathList`
-      : te`[]`
-  };
-  const map = new Map();
-  let size = 0;
-
-${inner}
-
-  if (size > 0) {
-    // Reference
-    const childBucket = newBucket({
-      layerPlan: that,
-      size,
-      store,
-      // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-      hasErrors: parentBucket.hasErrors,
-      polymorphicPathList,
-    });
-    // PERF: set ourselves in more places so that we never have to call 'getChildBucketAndIndex'.
-    parentBucket.children[${te.lit(this.id)}] = {
-      bucket: childBucket,
-      map,
-    };
-
-    return childBucket;
-  } else {
-    return null;
-  }
-}
-`;
-  }
-
   public finalize(): void {
-    const copyStepIds = [...this.copyStepIds];
-    if (this.reason.type === "nullableBoundary") {
-      // PERF: if parent bucket has no nulls/errors in itemStepId
-      // then we can just copy everything wholesale rather than building
-      // new arrays and looping.
-
-      this.newBucket = this.makeNewBucketCallback(te`\
-${
-  isDev
-    ? te`/*
-makeNewBucketCallback called for LayerPlan with id: ${te.subcomment(this.id)}.
-Reason type: ${te.subcomment(this.reason.type)}
-Root step: ${te.subcomment(this.rootStep?.id)}
-Copy step ids: ${te.subcomment(copyStepIds.join(","))}
-*/
-`
-    : te.blank
-}\
-  const itemStepId = ${te.lit(this.rootStep!.id)};
-  const nullableStepStore = parentBucket.store.get(itemStepId);
-
-  const itemStepIdList = [];
-  store.set(itemStepId, itemStepIdList);
-
-  // Prepare store with an empty list for each copyPlanId
-${te.join(
-  copyStepIds.map(
-    (planId) => te`\
-  const ${te.identifier(`source${planId}`)} = parentBucket.store.get(${te.lit(
-      planId,
-    )});
-  const ${te.identifier(`target${planId}`)} = [];
-  store.set(${te.lit(planId)}, ${te.identifier(`target${planId}`)});
-`,
-  ),
-  "",
-)}
-
-  // We'll typically be creating fewer nullableBoundary bucket entries
-  // than we have parent bucket entries (because we exclude nulls), so
-  // we must "multiply up" (down) the store entries.
-  for (
-    let originalIndex = 0;
-    originalIndex < parentBucket.size;
-    originalIndex++
-  ) {
-    const fieldValue = nullableStepStore[originalIndex];
-    if (fieldValue != null) {
-      const newIndex = size++;
-      map.set(originalIndex, newIndex);
-      itemStepIdList[newIndex] = fieldValue;
-
-      polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
-${te.join(
-  copyStepIds.map(
-    (planId) => te`\
-      ${te.identifier(`target${planId}`)}[newIndex] = ${te.identifier(
-      `source${planId}`,
-    )}[originalIndex];
-`,
-  ),
-  "",
-)}
-    }
-  }
-`);
-    } else if (this.reason.type === "listItem") {
-      this.newBucket = this.makeNewBucketCallback(te`\
-  const listStepStore = parentBucket.store.get(${te.lit(
-    this.reason.parentStep.id,
-  )});
-
-  const itemStepIdList = [];
-  store.set(${te.lit(this.rootStep!.id)}, itemStepIdList);
-
-  // Prepare store with an empty list for each copyPlanId
-  ${te.join(
-    copyStepIds.map(
-      (planId) => te`\
-  const ${te.identifier(`source${planId}`)} = parentBucket.store.get(${te.lit(
-        planId,
-      )});
-  const ${te.identifier(`target${planId}`)} = [];
-  store.set(${te.lit(planId)}, ${te.identifier(`target${planId}`)});
-  `,
-    ),
-    "",
-  )}
-
-  // We'll typically be creating more listItem bucket entries than we
-  // have parent buckets, so we must "multiply up" the store entries.
-  for (
-    let originalIndex = 0;
-    originalIndex < parentBucket.size;
-    originalIndex++
-  ) {
-    const list = listStepStore[originalIndex];
-    if (Array.isArray(list)) {
-      const newIndexes = [];
-      map.set(originalIndex, newIndexes);
-      for (let j = 0, l = list.length; j < l; j++) {
-        const newIndex = size++;
-        newIndexes.push(newIndex);
-        itemStepIdList[newIndex] = list[j];
-
-        polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
-        ${te.join(
-          copyStepIds.map(
-            (planId) => te`\
-        ${te.identifier(`target${planId}`)}[newIndex] = ${te.identifier(
-              `source${planId}`,
-            )}[originalIndex];
-        `,
-          ),
-          "",
-        )}
-      }
-    }
-  }
-
-`);
+    if (
+      this.reason.type === "nullableBoundary" ||
+      this.reason.type === "listItem"
+    ) {
+      const n = this.copyStepIds.length;
+      const signature = this.reason.type[0] + n;
+      withNewBucketFactory(signature, n, this.reason.type, (fn) => {
+        this.newBucket = fn(this.copyStepIds);
+      });
     }
   }
 
   public newBucket(parentBucket: Bucket): Bucket | null {
     const copyStepIds = this.copyStepIds;
     const store: Bucket["store"] = new Map();
-    const polymorphicPathList: string[] =
+    const polymorphicPathList: (string | null)[] =
       this.reason.type === "mutationField"
         ? (parentBucket.polymorphicPathList as string[])
         : [];
@@ -681,7 +552,9 @@ ${te.join(
 
           // PERF: might be faster if we look this up as a constant rather than using concatenation here
           const newPolymorphicPath =
-            parentBucket.polymorphicPathList[originalIndex] + ">" + typeName;
+            (parentBucket.polymorphicPathList[originalIndex] ?? "") +
+            ">" +
+            typeName;
 
           polymorphicPathList[newIndex] = newPolymorphicPath;
           for (const planId of copyStepIds) {
@@ -738,4 +611,218 @@ ${te.join(
       return null;
     }
   }
+}
+
+type Factory = (copyPlanIds: number[]) => typeof LayerPlan.prototype.newBucket;
+
+const makeNewBucketCache = new LRU<string, Factory>({
+  maxLength: 1000,
+});
+const makingNewBucketCallbacks = new Map<
+  string,
+  Array<(factory: Factory) => void>
+>();
+const te_parentBucketDotPolymorphicPathList = te`parentBucket.polymorphicPathList`;
+const te_emptyArray = te`[]`;
+const ref_newBucket = te.ref(newBucket, "newBucket");
+
+function makeNewBucketExpression(
+  signature: string,
+  reasonType: "nullableBoundary" | "listItem" | "mutationField",
+  inner: TE,
+): TE {
+  return te`\
+(function ${te.identifier(`newBucket_${signature}`)}(parentBucket) {
+  const store = new Map();
+  const polymorphicPathList = ${
+    reasonType === "mutationField"
+      ? te_parentBucketDotPolymorphicPathList
+      : te_emptyArray
+  };
+  const map = new Map();
+  let size = 0;
+
+${inner}
+
+  if (size > 0) {
+    // Reference
+    const childBucket = ${ref_newBucket}({
+      layerPlan: this,
+      size,
+      store,
+      // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
+      hasErrors: parentBucket.hasErrors,
+      polymorphicPathList,
+    });
+    // PERF: set ourselves in more places so that we never have to call 'getChildBucketAndIndex'.
+    parentBucket.children[this.id] = { bucket: childBucket, map };
+
+    return childBucket;
+  } else {
+    return null;
+  }
+})`;
+}
+
+function newBucketFactoryInnerExpression(
+  signature: string,
+  copyCount: number,
+  reasonType: "nullableBoundary" | "listItem",
+) {
+  if (reasonType === "nullableBoundary") {
+    // PERF: if parent bucket has no nulls/errors in itemStepId
+    // then we can just copy everything wholesale rather than building
+    // new arrays and looping.
+
+    const blocks: TE[] = [];
+    const copyBlocks: TE[] = [];
+    for (let i = 0; i < copyCount; i++) {
+      const te_source = te.identifier(`source${i}`);
+      const te_target = te.identifier(`target${i}`);
+      const te_i = te.lit(i);
+      blocks.push(
+        te`\
+  const ${te_source} = parentBucket.store.get(copyPlanIds[${te_i}]);
+  const ${te_target} = [];
+  store.set(copyPlanIds[${te_i}], ${te_target});
+`,
+      );
+      copyBlocks.push(
+        te`\
+      ${te_target}[newIndex] = ${te_source}[originalIndex];
+`,
+      );
+    }
+
+    return makeNewBucketExpression(
+      signature,
+      reasonType,
+      te`\
+  const itemStepId = this.rootStep.id;
+  const nullableStepStore = parentBucket.store.get(itemStepId);
+
+  const itemStepIdList = [];
+  store.set(itemStepId, itemStepIdList);
+
+  // Prepare store with an empty list for each copyPlanId
+${te.join(blocks, "")}
+
+  // We'll typically be creating fewer nullableBoundary bucket entries
+  // than we have parent bucket entries (because we exclude nulls), so
+  // we must "multiply up" (down) the store entries.
+  for (
+    let originalIndex = 0;
+    originalIndex < parentBucket.size;
+    originalIndex++
+  ) {
+    const fieldValue = nullableStepStore[originalIndex];
+    if (fieldValue != null) {
+      const newIndex = size++;
+      map.set(originalIndex, newIndex);
+      itemStepIdList[newIndex] = fieldValue;
+
+      polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
+${te.join(copyBlocks, "")}
+    }
+  }
+`,
+    );
+  } else if (reasonType === "listItem") {
+    const blocks: TE[] = [];
+    const copyBlocks: TE[] = [];
+    for (let i = 0; i < copyCount; i++) {
+      const te_source = te.identifier(`source${i}`);
+      const te_target = te.identifier(`target${i}`);
+      const te_i = te.lit(i);
+      blocks.push(
+        te`\
+  const ${te_source} = parentBucket.store.get(copyPlanIds[${te_i}]);
+  const ${te_target} = [];
+  store.set(copyPlanIds[${te_i}], ${te_target});
+  `,
+      );
+      copyBlocks.push(te`\
+        ${te_target}[newIndex] = ${te_source}[originalIndex];
+        `);
+    }
+    return makeNewBucketExpression(
+      signature,
+      reasonType,
+      te`\
+  const listStepStore = parentBucket.store.get(this.reason.parentStep.id);
+
+  const itemStepIdList = [];
+  store.set(this.rootStep.id, itemStepIdList);
+
+  // Prepare store with an empty list for each copyPlanId
+  ${te.join(blocks, "")}
+
+  // We'll typically be creating more listItem bucket entries than we
+  // have parent buckets, so we must "multiply up" the store entries.
+  for (
+    let originalIndex = 0;
+    originalIndex < parentBucket.size;
+    originalIndex++
+  ) {
+    const list = listStepStore[originalIndex];
+    if (Array.isArray(list)) {
+      const newIndexes = [];
+      map.set(originalIndex, newIndexes);
+      for (let j = 0, l = list.length; j < l; j++) {
+        const newIndex = size++;
+        newIndexes.push(newIndex);
+        itemStepIdList[newIndex] = list[j];
+
+        polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
+        ${te.join(copyBlocks, "")}
+      }
+    }
+  }
+
+`,
+    );
+  } else {
+    const never: never = reasonType;
+    return never;
+  }
+}
+
+function withNewBucketFactory(
+  signature: string,
+  copyCount: number,
+  reasonType: "nullableBoundary" | "listItem",
+  callback: (factory: Factory) => void,
+) {
+  const fn = makeNewBucketCache.get(signature);
+  if (fn !== undefined) {
+    return callback(fn);
+  }
+  const building = makingNewBucketCallbacks.get(signature);
+  if (building !== undefined) {
+    building.push(callback as (factory: Factory) => void);
+    return;
+  }
+
+  const callbacks = [callback as (factory: Factory) => void];
+  makingNewBucketCallbacks.set(signature, callbacks);
+
+  const executorExpression = newBucketFactoryInnerExpression(
+    signature,
+    copyCount,
+    reasonType,
+  );
+
+  const factoryExpression = te`\
+function ${te.identifier(
+    `layerPlanNewBucketFactory_${signature}`,
+  )}(copyPlanIds) {
+  return ${executorExpression};
+}`;
+  te.runInBatch<Factory>(factoryExpression, (factory) => {
+    makeNewBucketCache.set(signature, factory);
+    makingNewBucketCallbacks.delete(signature);
+    for (const callback of callbacks) {
+      callback(factory);
+    }
+  });
 }

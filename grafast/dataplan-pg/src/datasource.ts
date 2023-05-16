@@ -326,7 +326,7 @@ export class PgResource<
     }
 
     let counter = codec[$$codecCounter];
-    if (counter) {
+    if (counter !== undefined) {
       counter++;
     } else {
       counter = 1;
@@ -606,6 +606,7 @@ export class PgResource<
     }
   }
 
+  // PERF: this needs optimization.
   public getReciprocal<
     TOtherCodec extends GetPgRegistryCodecs<TRegistry>,
     TOtherRelationName extends keyof GetPgRegistryCodecRelations<
@@ -1159,7 +1160,7 @@ function validateRelations(registry: PgRegistry<any, any, any>): void {
     if (codec.attributes) {
       Object.entries(codec.attributes).forEach(([attributeName, col]) => {
         const { via, identicalVia } = col;
-        if (via) {
+        if (via != null) {
           if (typeof via === "string") {
             if (!relationKeys.includes(via)) {
               throw new Error(

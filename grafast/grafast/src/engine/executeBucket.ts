@@ -43,7 +43,7 @@ function noop() {
  */
 function mergeErrorsBackIn(
   results: ReadonlyArray<any>,
-  errors: { [index: number]: GrafastError },
+  errors: { [index: number]: GrafastError | undefined },
   resultCount: number,
 ): any[] {
   const finalResults: any[] = [];
@@ -51,7 +51,7 @@ function mergeErrorsBackIn(
 
   for (let i = 0; i < resultCount; i++) {
     const error = errors[i];
-    if (error) {
+    if (error !== undefined) {
       finalResults[i] = error;
     } else {
       finalResults[i] = results[resultIndex++];
@@ -107,7 +107,7 @@ export function executeBucket(
       return;
     }
     const phase = phases[phaseIndex];
-    const normalSteps = phase.normalSteps?.map((s) => s.step) ?? [];
+    const normalSteps = phase.normalSteps?.map((s) => s.step);
     let executePromises:
       | PromiseLike<GrafastResultsList<any> | GrafastResultStreamList<any>>[]
       | null = null;
@@ -116,7 +116,7 @@ export function executeBucket(
     const results: Array<
       GrafastResultsList<any> | GrafastResultStreamList<any> | undefined
     > = [];
-    if (normalSteps) {
+    if (normalSteps !== undefined) {
       for (
         let normalStepIndex = 0, l = normalSteps.length;
         normalStepIndex < l;
@@ -145,6 +145,7 @@ export function executeBucket(
             results[normalStepIndex] = r;
           }
         } catch (e) {
+          results[normalStepIndex] = undefined;
           const r = newGrafastError(e, step.id);
           bucket.store.set(step.id, arrayOfLength(bucket.size, r));
           bucket.hasErrors = true;
@@ -328,7 +329,10 @@ export function executeBucket(
           allStepsIndex++
         ) {
           const step = _allSteps[allStepsIndex];
-          const meta = metaByMetaKey[step.metaKey];
+          const meta =
+            step.metaKey !== undefined
+              ? metaByMetaKey[step.metaKey]
+              : undefined;
           extras[allStepsIndex] = {
             meta,
             eventEmitter: requestContext.eventEmitter,
@@ -417,7 +421,7 @@ export function executeBucket(
         }
       }
 
-      if (pendingPromises) {
+      if (pendingPromises !== undefined) {
         return Promise.allSettled(pendingPromises)
           .then((resultSettledResult) => {
             for (
@@ -526,20 +530,25 @@ export function executeBucket(
   function reallyExecuteStepWithErrorsOrSelective(
     step: ExecutableStep,
     dependenciesIncludingSideEffects: ReadonlyArray<any>[],
-    polymorphicPathList: readonly string[],
+    polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
-    const errors: { [index: number]: GrafastError } = Object.create(null);
+    const errors: { [index: number]: GrafastError | undefined } =
+      Object.create(null);
 
     /** If there's errors, we must manipulate the arrays being passed into the step execution */
     let foundErrors = false;
 
     /** If all we see is errors, there's no need to execute! */
     let needsNoExecution = true;
+    const stepPolymorphicPaths = step.polymorphicPaths;
 
     for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
       const polymorphicPath = polymorphicPathList[index];
-      if (!step.polymorphicPaths.has(polymorphicPath)) {
+      if (
+        stepPolymorphicPaths !== null &&
+        !stepPolymorphicPaths.has(polymorphicPath as string)
+      ) {
         foundErrors = true;
         const e =
           isDev && DEBUG_POLYMORPHISM
@@ -548,7 +557,7 @@ export function executeBucket(
                   `GrafastInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: step ${
                     step.id
                   } (polymorphicPaths ${[
-                    ...step.polymorphicPaths,
+                    ...stepPolymorphicPaths,
                   ]}) has no match for '${polymorphicPath}'`,
                 ),
                 step.id,
@@ -617,7 +626,8 @@ export function executeBucket(
     step: ExecutableStep,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     try {
-      const meta = metaByMetaKey[step.metaKey];
+      const meta =
+        step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
       const extra: ExecutionExtra = {
         meta,
         eventEmitter: requestContext.eventEmitter,
@@ -640,8 +650,19 @@ export function executeBucket(
           }
         }
       }
+      if (
+        isDev &&
+        step.layerPlan.reason.type === "polymorphic" &&
+        step.polymorphicPaths === null
+      ) {
+        throw new Error(
+          `GrafastInternalError<c33328fe-6758-4699-8ac6-7be41ce58bfb>: a step without polymorphic paths cannot belong to a polymorphic bucket`,
+        );
+      }
       const isSelectiveStep =
-        step.polymorphicPaths.size !== step.layerPlan.polymorphicPaths.size;
+        step.layerPlan.reason.type === "polymorphic" &&
+        step.polymorphicPaths!.size !==
+          step.layerPlan.reason.polymorphicPaths.size;
       const result =
         bucket.hasErrors || isSelectiveStep
           ? reallyExecuteStepWithErrorsOrSelective(
@@ -687,7 +708,7 @@ export function executeBucket(
         case "listItem":
         case "polymorphic": {
           const childBucket = childLayerPlan.newBucket(bucket);
-          if (childBucket) {
+          if (childBucket !== null) {
             // Execute
             const result = executeBucket(childBucket, requestContext);
             if (isPromiseLike(result)) {
@@ -698,7 +719,7 @@ export function executeBucket(
         }
         case "mutationField": {
           const childBucket = childLayerPlan.newBucket(bucket);
-          if (childBucket) {
+          if (childBucket !== null) {
             // Enqueue for execution (mutations must run in order)
             const promise = enqueue(() =>
               executeBucket(childBucket, requestContext),
@@ -762,6 +783,7 @@ export function newBucket(
       spec.size,
       "polymorphicPathList length must match bucket size",
     );
+    /*
     for (let i = 0, l = spec.size; i < l; i++) {
       const p = spec.polymorphicPathList[i];
       assert.strictEqual(
@@ -770,6 +792,7 @@ export function newBucket(
         `Entry ${i} in polymorphicPathList for bucket for ${spec.layerPlan} was not a string`,
       );
     }
+    */
     for (const [key, list] of spec.store.entries()) {
       assert.ok(
         Array.isArray(list),

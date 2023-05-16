@@ -5,13 +5,7 @@ import type {
   GraphQLOutputType,
   GraphQLResolveInfo,
 } from "graphql";
-import {
-  defaultTypeResolver,
-  getNamedType,
-  getNullableType,
-  isAbstractType,
-  isListType,
-} from "graphql";
+import * as graphql from "graphql";
 
 import type { __ItemStep, ObjectStep } from "../index.js";
 import { context, SafeError } from "../index.js";
@@ -25,6 +19,14 @@ import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
 import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
+
+const {
+  defaultTypeResolver,
+  getNamedType,
+  getNullableType,
+  isAbstractType,
+  isListType,
+} = graphql;
 
 type ResolveInfoBase = Omit<
   GraphQLResolveInfo,
@@ -110,7 +112,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   unbatchedExecute(
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     source: any,
     args: any,
     context: any,
@@ -123,9 +125,14 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     const resolveInfo: GraphQLResolveInfo = Object.assign(
       Object.create(this.resolveInfoBase),
       {
-        // TODO: add support for path
         variableValues,
         rootValue,
+        path: {
+          typename: this.resolveInfoBase.parentType.name,
+          key: this.resolveInfoBase.fieldName,
+          // TODO: add full support for path (requires runtime indexes)
+          prev: undefined,
+        },
       },
     );
     const data = this.resolver?.(source, args, context, resolveInfo);
@@ -141,7 +148,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   unbatchedStream(
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     source: any,
     args: any,
     context: any,
@@ -254,7 +261,7 @@ export class GraphQLItemHandler
         "GrafastInternalError<5ea0892a-e9f6-479c-9b0b-2b09e46eecb6>: No abstract type? How can this be?",
       );
     }
-    if (abstractType.resolveType) {
+    if (abstractType.resolveType != null) {
       return abstractType.resolveType(data, context, resolveInfo, abstractType);
     } else {
       return defaultTypeResolver(data, context, resolveInfo, abstractType);
@@ -262,7 +269,7 @@ export class GraphQLItemHandler
   }
 
   private actuallyWrapData(typeName: string | undefined, data: unknown) {
-    if (typeName) {
+    if (typeName !== undefined) {
       return polymorphicWrap(typeName, data);
     } else {
       return new Error("Could not determine type of data");
@@ -304,7 +311,7 @@ export class GraphQLItemHandler
     _count: number,
     values: [GrafastValuesList<any>],
   ): GrafastResultsList<any> {
-    if (this.abstractType) {
+    if (this.abstractType !== undefined) {
       return values[0].map((data) => {
         if (data == null) {
           return data;
@@ -325,7 +332,7 @@ export class GraphQLItemHandler
           );
         }
       });
-    } else if (this.nullableInnerType) {
+    } else if (this.nullableInnerType != null) {
       return values[0].map((d) => {
         if (d == null) {
           return null;
@@ -379,7 +386,7 @@ export function graphqlResolver(
     isAbstract,
   );
   if (isAbstract) {
-    if (subscriber) {
+    if (subscriber != null) {
       throw new SafeError(
         `GraphQL subscribe function emulation currently doesn't support polymorphism`,
       );

@@ -258,7 +258,7 @@ ${duration}
           `(Use 'DEBUG="@dataplan/pg:PgExecutor:explain"' to enable explain)`,
       );
     }
-    if (publish) {
+    if (publish !== undefined) {
       publish(text, name, explain);
     }
     if (error) {
@@ -523,9 +523,7 @@ ${duration}
             // rejected - we don't want defers hanging around!
             remainingDeferreds.forEach((d) => {
               try {
-                if (d) {
-                  d.reject(e);
-                }
+                d.reject(e);
               } catch (e2) {
                 // Ignore error when rejecting
                 console.error(
@@ -599,7 +597,7 @@ ${duration}
           const { queryValues } = batch[batchIndex];
           const identifiersJSON = JSON.stringify(queryValues); // Perf: Canonical? Manual for perf?
           const existing = batchIndexesByIdentifiersJSON.get(identifiersJSON);
-          if (existing) {
+          if (existing !== undefined) {
             existing.push(batchIndex);
             if (debugVerbose.enabled) {
               debugVerbose(
@@ -692,7 +690,7 @@ ${duration}
         // eslint-disable-next-line no-inner-declarations
         function supplyValue(batchIndex: number, value: any | Wrapped): void {
           const deferred = waiting[batchIndex];
-          if (deferred) {
+          if (deferred !== null) {
             _deferredStreams--;
             if (value instanceof Wrapped) {
               deferred.reject(value.originalValue);

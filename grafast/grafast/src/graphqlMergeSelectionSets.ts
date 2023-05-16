@@ -4,10 +4,12 @@ import type {
   NamedTypeNode,
   SelectionNode,
 } from "graphql";
-import { Kind } from "graphql";
+import * as graphql from "graphql";
 
 import type { OperationPlan } from "./index.js";
 import { inspect } from "./inspect.js";
+
+const { Kind } = graphql;
 
 // PERF: this is incredibly inefficient
 function typeMatchesCondition(

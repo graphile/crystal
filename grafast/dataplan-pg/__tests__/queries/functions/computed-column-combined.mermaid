@@ -26,10 +26,8 @@ graph TD
     First12 --> PgSelectSingle13
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    RemapKeys52{{"RemapKeys[52∈1]<br />ᐸ13:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4}ᐳ"}}:::plan
-    PgSelectSingle13 --> RemapKeys52
     PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸusersᐳ"}}:::plan
-    RemapKeys52 --> PgSelectSingle20
+    PgSelectSingle13 --> PgSelectSingle20
     PgClassExpression21{{"PgClassExpression[21∈2]<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
@@ -38,10 +36,8 @@ graph TD
     PgSelectSingle20 --> RemapKeys50
     PgSelectSingle29{{"PgSelectSingle[29∈2]<br />ᐸusers_most_recent_forumᐳ"}}:::plan
     RemapKeys50 --> PgSelectSingle29
-    RemapKeys47{{"RemapKeys[47∈3]<br />ᐸ29:{”0”:0}ᐳ"}}:::plan
-    PgSelectSingle29 --> RemapKeys47
     PgSelectSingle37{{"PgSelectSingle[37∈3]<br />ᐸforums_unique_author_countᐳ"}}:::plan
-    RemapKeys47 --> PgSelectSingle37
+    PgSelectSingle29 --> PgSelectSingle37
     PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle37 --> PgClassExpression38
     Access49{{"Access[49∈3]<br />ᐸ50.1ᐳ"}}:::plan
@@ -61,13 +57,13 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant30,Constant54 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelectSingle20,RemapKeys52 bucket1
+    class Bucket1,PgSelectSingle20 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression21,PgClassExpression22,PgSelectSingle29,RemapKeys50 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29, 50<br /><br />ROOT PgSelectSingle{2}ᐸusers_most_recent_forumᐳ[29]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelectSingle37,PgClassExpression38,RemapKeys47,Access49 bucket3
+    class Bucket3,PgSelectSingle37,PgClassExpression38,Access49 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ49ᐳ[44]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item44,PgSelectSingle45 bucket4

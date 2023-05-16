@@ -121,8 +121,8 @@ export class PgPolymorphicStep<
   }
 
   unbatchedExecute(
-    extra: ExecutionExtra,
-    item: any,
+    _extra: ExecutionExtra,
+    _item: any,
     specifier: any,
   ): PolymorphicData<string> | null {
     if (specifier) {

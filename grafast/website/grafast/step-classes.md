@@ -254,8 +254,8 @@ itself) will be passed in to the deduplicate method, and this method should
 return the list of the peers that are equivalent (or could cheaply be made
 equivalent) to the current step.
 
-To cause your step class to never be deduplicated, you can simply
-`return [this];`.
+To cause your step class to never be deduplicated, either don't implement this
+method or simply `return [];`.
 
 You should not mutate your peers or yourself during this method, instead use
 the `deduplicatedWith` method to apply side-effects.
@@ -462,12 +462,14 @@ that it's rarely needed, is why it's not enabled by default.
 
 _EXPERIMENTAL_
 
-You may optionally override this to indicate a key to use for which `meta`
-object to be passed in to `execute` and typically used for caching. For example,
-if you want to share the same `meta` object between all steps of a given class,
-that class may set `metaKey` to be the name of the class. You can even set it to
-a shared value between multiple step classes should that make sense. By default,
-each step has a unique `metaKey`.
+You may optionally set this to indicate a key to use for which `meta` object to
+be passed in to `execute` (typically used for caching). To make it unique to
+the instance of your step, in the constructor after calling `super()`, set it
+as `this.metaKey = this.id;`. If you want to share the same `meta` object
+between all steps of a given class, that class may set `metaKey` to be the name
+of the class. You can even set it to a shared value between multiple step
+classes (a "family" of step classes) should that make sense. By default no
+`metaKey` is set, and your class will therefore have no `meta` object.
 
 :::tip
 

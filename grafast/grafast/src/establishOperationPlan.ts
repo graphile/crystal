@@ -13,6 +13,7 @@ import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
 } from "./interfaces.js";
+import type { GrafastPrepareOptions } from "./prepare.js";
 
 const debug = debugFactory("grafast:establishOperationPlan");
 
@@ -148,6 +149,7 @@ export function establishOperationPlan<
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
+  options: GrafastPrepareOptions,
 ): OperationPlan {
   let cacheByOperation = schema[$$cacheByOperation];
 
@@ -157,7 +159,7 @@ export function establishOperationPlan<
   let count = 0;
   let lastButOneItem: LinkedList<OperationPlan> | null = null;
 
-  if (cache) {
+  if (cache !== undefined) {
     // Dev-only validation
     assertFragmentsMatch(cache.fragments, fragments);
 
@@ -174,7 +176,7 @@ export function establishOperationPlan<
         )
       ) {
         // Hoist to top of linked list
-        if (previousItem) {
+        if (previousItem !== null) {
           // Remove linkedItem from existing chain
           previousItem.next = linkedItem.next;
           // Add rest of chain after linkedItem
@@ -202,6 +204,7 @@ export function establishOperationPlan<
     variableValues,
     context,
     rootValue,
+    options,
   );
 
   // Store it to the cache

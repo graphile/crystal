@@ -3,7 +3,7 @@ import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import { isPromiseLike, SafeError, stringifyPayload } from "grafast";
 import { resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
-import { GraphQLError, isSchema, validateSchema } from "graphql";
+import * as graphql from "graphql";
 
 import type {
   BufferResult,
@@ -24,6 +24,8 @@ import { APPLICATION_JSON, makeGraphQLHandler } from "../middleware/graphql.js";
 import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest } from "../utils.js";
+
+const { GraphQLError, isSchema, validateSchema } = graphql;
 
 function handleGraphQLHandlerError(
   request: NormalizedRequestDigest,
@@ -277,7 +279,7 @@ export class GrafservBase {
     let finished = false;
     const bump = () => {
       const next = queue.shift();
-      if (next) {
+      if (next !== undefined) {
         next.resolve({
           done: false,
           value: { event: "change", data: "schema" },
@@ -287,7 +289,7 @@ export class GrafservBase {
     const flushQueue = (e?: Error) => {
       const entries = queue.splice(0, queue.length);
       for (const entry of entries) {
-        if (e) {
+        if (e != null) {
           entry.reject(e);
         } else {
           entry.resolve({ done: true } as IteratorResult<SchemaChangeEvent>);
@@ -311,7 +313,7 @@ export class GrafservBase {
       },
       return() {
         finished = true;
-        if (queue.length) {
+        if (queue.length !== 0) {
           flushQueue();
         }
         return Promise.resolve({
@@ -319,7 +321,7 @@ export class GrafservBase {
         } as IteratorResult<SchemaChangeEvent>);
       },
       throw(e) {
-        if (queue.length) {
+        if (queue.length !== 0) {
           flushQueue(e);
         }
         return Promise.reject(e);
@@ -465,13 +467,13 @@ export function convertHandlerResultToResult(
       // Creates a stream for the response
       const event2buffer = (event: EventStreamEvent): Buffer => {
         let payload = "";
-        if (event.event) {
+        if (event.event !== undefined) {
           payload += `event: ${event.event}\n`;
         }
-        if (event.id) {
+        if (event.id !== undefined) {
           payload += `id: ${event.id}\n`;
         }
-        if (event.retry) {
+        if (event.retry !== undefined) {
           payload += `retry: ${event.retry}\n`;
         }
         if (event.data != null) {

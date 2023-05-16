@@ -41,7 +41,7 @@ export class ListStep<
   }
 
   unbatchedExecute(
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     ...values: any[] //UnwrapPlanTuple<TPlanTuple>,
   ): UnwrapPlanTuple<TPlanTuple> {
     return values as any;
@@ -62,7 +62,7 @@ export class ListStep<
           (v, i) => v === (this.dependencies[i] as ConstantStep<any>).data,
         ),
       );
-      if (existing) {
+      if (existing !== undefined) {
         return constant(existing);
       } else {
         // Replace self with constant

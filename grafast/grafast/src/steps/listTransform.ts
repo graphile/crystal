@@ -115,20 +115,15 @@ export class __ListTransformStep<
     this.finalizeCallback = finalizeCallback;
     this.listItem = listItem;
     this.meta = meta ?? null;
-    if (optimize) {
+    if (optimize !== undefined) {
       this.optimize = optimize;
     }
 
     // Plan this subroutine
-    this.subroutineLayer = new LayerPlan(
-      this.operationPlan,
-      this.layerPlan,
-      {
-        type: "subroutine",
-        parentStep: this,
-      },
-      listStep.polymorphicPaths,
-    );
+    this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
+      type: "subroutine",
+      parentStep: this,
+    });
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listStep.polymorphicPaths,
@@ -205,7 +200,7 @@ export class __ListTransformStep<
     const copyStepIds = childLayerPlan.copyStepIds;
 
     const store: Bucket["store"] = new Map();
-    const polymorphicPathList: string[] = [];
+    const polymorphicPathList: (string | null)[] = [];
     const map: Map<number, number[]> = new Map();
     let size = 0;
 

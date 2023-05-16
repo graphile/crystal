@@ -1,4 +1,5 @@
 import type {
+  ConstValueNode,
   GraphQLInputType,
   GraphQLType,
   ListTypeNode,
@@ -6,18 +7,8 @@ import type {
   NonNullTypeNode,
   ValueNode,
 } from "graphql";
-import {
-  assertScalarType,
-  GraphQLError,
-  GraphQLInputObjectType,
-  GraphQLList,
-  GraphQLNonNull,
-  isInputType,
-  isLeafType,
-  Kind,
-} from "graphql";
+import * as graphql from "graphql";
 
-import { withGlobalLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
@@ -29,6 +20,17 @@ import {
   __TrackedValueStep,
   constant,
 } from "./steps/index.js";
+
+const {
+  assertScalarType,
+  GraphQLError,
+  GraphQLList,
+  GraphQLNonNull,
+  isInputType,
+  isLeafType,
+  isInputObjectType,
+  Kind,
+} = graphql;
 
 export type InputStep =
   | __TrackedValueStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
@@ -88,88 +90,87 @@ export function graphqlGetTypeForNode(
 export function inputPlan(
   operationPlan: OperationPlan,
   inputType: GraphQLInputType,
-  seenTypes: Set<GraphQLInputType>,
   rawInputValue: ValueNode | undefined,
-  defaultValue: ValueNode | undefined = undefined,
+  defaultValue: ConstValueNode | undefined = undefined,
+  inSeenTypes?: ReadonlyArray<GraphQLInputType>,
 ): InputStep {
   if (rawInputValue === undefined && defaultValue === undefined) {
     return constant(undefined);
   }
 
-  if (seenTypes.has(inputType)) {
-    // TODO: Stop recursion if no data
-  } else {
-    seenTypes.add(inputType);
+  if (inSeenTypes?.includes(inputType)) {
+    // FIXME: Stop recursion if no data
+    throw new Error(
+      "GrafastInternalError<441c4f9f-d3d2-41ec-b7bc-e0b96885affe>: Grafast doesn't currently support planning through recursive input values; please raise an issue and explain how this affects you!",
+    );
   }
+  const isObj = isInputObjectType(inputType);
+  const seenTypes = isObj
+    ? inSeenTypes === undefined
+      ? [inputType]
+      : [...inSeenTypes, inputType]
+    : inSeenTypes;
 
-  return withGlobalLayerPlan(
-    operationPlan.rootLayerPlan,
-    operationPlan.rootLayerPlan.polymorphicPaths,
-    () => {
-      let inputValue = rawInputValue;
-      if (inputValue?.kind === "Variable") {
-        const variableName = inputValue.name.value;
-        const variableDefinition =
-          operationPlan.operation.variableDefinitions?.find(
-            (def) => def.variable.name.value === variableName,
-          );
-        if (!variableDefinition) {
-          // Should not happen since the GraphQL operation has already been
-          // validated.
-          throw new Error(`No definition for variable '${variableName}' found`);
-        }
-        const variableType = graphqlGetTypeForNode(
-          operationPlan,
-          variableDefinition.type,
-        );
-        if (!isInputType(variableType)) {
-          throw new Error(`Expected varible type to be an input type`);
-        }
-        return inputVariablePlan(
-          operationPlan,
-          variableName,
-          variableType,
-          seenTypes,
-          inputType,
-          defaultValue,
-        );
-      }
-      // Note: past here we know whether `defaultValue` will be used or not because
-      // we know `inputValue` is not a variable.
-      inputValue = inputValue ?? defaultValue;
-      if (inputType instanceof GraphQLNonNull) {
-        const innerType = inputType.ofType;
-        const valuePlan = inputPlan(
-          operationPlan,
-          innerType,
-          seenTypes,
-          inputValue,
-        );
-        return inputNonNullPlan(operationPlan, valuePlan);
-      } else if (inputType instanceof GraphQLList) {
-        return new __InputListStep(inputType, seenTypes, inputValue);
-      } else if (isLeafType(inputType)) {
-        if (
-          inputValue?.kind === Kind.OBJECT ||
-          inputValue?.kind === Kind.LIST
-        ) {
-          const scalarType = assertScalarType(inputType);
-          // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
-          // scalars that have variables in subfields.)
-          return new __InputDynamicScalarStep(scalarType, inputValue);
-        } else {
-          // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
-          // none of which can contain a variable:
-          return new __InputStaticLeafStep(inputType, inputValue);
-        }
-      } else if (inputType instanceof GraphQLInputObjectType) {
-        return new __InputObjectStep(inputType, seenTypes, inputValue);
-      } else {
-        const never: never = inputType;
-        throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
-      }
-    },
-  );
+  let inputValue = rawInputValue;
+  if (inputValue?.kind === "Variable") {
+    const variableName = inputValue.name.value;
+    const variableDefinition =
+      operationPlan.operation.variableDefinitions?.find(
+        (def) => def.variable.name.value === variableName,
+      );
+    if (!variableDefinition) {
+      // Should not happen since the GraphQL operation has already been
+      // validated.
+      throw new Error(`No definition for variable '${variableName}' found`);
+    }
+    const variableType = graphqlGetTypeForNode(
+      operationPlan,
+      variableDefinition.type,
+    );
+    if (!isInputType(variableType)) {
+      throw new Error(`Expected varible type to be an input type`);
+    }
+    return inputVariablePlan(
+      operationPlan,
+      variableName,
+      variableType,
+      seenTypes,
+      inputType,
+      defaultValue,
+    );
+  }
+  // Note: past here we know whether `defaultValue` will be used or not because
+  // we know `inputValue` is not a variable.
+  inputValue = inputValue ?? defaultValue;
+  if (inputType instanceof GraphQLNonNull) {
+    const innerType = inputType.ofType;
+    const valuePlan = inputPlan(
+      operationPlan,
+      innerType,
+      inputValue,
+      undefined,
+      seenTypes,
+    );
+    return inputNonNullPlan(operationPlan, valuePlan);
+  } else if (inputType instanceof GraphQLList) {
+    return new __InputListStep(inputType, seenTypes, inputValue);
+  } else if (isLeafType(inputType)) {
+    if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
+      const scalarType = assertScalarType(inputType);
+      // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
+      // scalars that have variables in subfields.)
+      return new __InputDynamicScalarStep(scalarType, inputValue);
+    } else {
+      // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
+      // none of which can contain a variable:
+      return new __InputStaticLeafStep(inputType, inputValue);
+    }
+  } else if (isObj) {
+    return new __InputObjectStep(inputType, seenTypes!, inputValue);
+  } else {
+    const never: never = inputType;
+    throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
+  }
 }
 
 function doTypesMatch(a: GraphQLInputType, b: GraphQLInputType): boolean {
@@ -186,9 +187,9 @@ function inputVariablePlan(
   operationPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
-  seenTypes: Set<GraphQLInputType>,
+  seenTypes: ReadonlyArray<GraphQLInputType> | undefined,
   inputType: GraphQLInputType,
-  defaultValue: ValueNode | undefined = undefined,
+  defaultValue: ConstValueNode | undefined = undefined,
 ): InputStep {
   if (
     variableType instanceof GraphQLNonNull &&
@@ -242,9 +243,9 @@ function inputVariablePlan(
     return inputPlan(
       operationPlan,
       inputType,
-      seenTypes,
       undefined,
       defaultValue,
+      seenTypes,
     );
   }
 }

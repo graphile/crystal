@@ -1,5 +1,5 @@
 import type { ExecutionArgs } from "graphql";
-import { GraphQLError } from "graphql";
+import * as graphql from "graphql";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
@@ -30,6 +30,8 @@ import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
 import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
+const { GraphQLError } = graphql;
+
 const isTest =
   typeof process !== "undefined" && process.env.NODE_ENV === "test";
 const $$contextPlanCache = Symbol("contextPlanCache");
@@ -52,6 +54,14 @@ export interface GrafastPrepareOptions {
    * similar.
    */
   outputDataAsString?: boolean;
+
+  timeouts?: {
+    /**
+     * How many milliseconds should we allow for planning. Remember: planning is
+     * synchronous, so whilst it is happening the event loop is blocked.
+     */
+    planning?: number;
+  };
 }
 
 const bypassGraphQLObj = Object.assign(Object.create(null), {
@@ -92,7 +102,7 @@ function processRoot(
   }
 
   // Terminate the iterator when we're done
-  if (promises.length) {
+  if (promises.length !== 0) {
     return Promise.all(promises).then(noop);
   }
 }
@@ -128,7 +138,7 @@ const finalize = (
       if (errors.length > 0) {
         payload.errors = errors;
       }
-      if (extensions) {
+      if (extensions != null) {
         payload.extensions = extensions;
       }
       payload.hasNext = true;
@@ -362,7 +372,7 @@ export function executePreemptive(
       const payload = Object.create(null) as ExecutionResult;
       payload.errors = errors;
       const extensions = bucketRootValue[$$extensions];
-      if (extensions) {
+      if (extensions != null) {
         payload.extensions = extensions;
       }
       return payload;
@@ -383,7 +393,7 @@ export function executePreemptive(
       const iterator = newIterator((e) => {
         stopped = true;
         abort.resolve(undefined);
-        if (e) {
+        if (e != null) {
           stream.throw?.(e);
         } else {
           stream.return?.();
@@ -498,6 +508,7 @@ export function grafastPrepare(
     variableValues,
     context as any,
     rootValue,
+    options,
   );
 
   if (
@@ -560,7 +571,7 @@ function newIterator<T = any>(
         return;
       }
       const cbs = pullQueue.shift();
-      if (cbs) {
+      if (cbs !== undefined) {
         if (isPromiseLike(v)) {
           v.then(
             (v) => cbs[0]({ done, value: v }),
@@ -650,7 +661,7 @@ async function processStream(
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
     const store: Bucket["store"] = new Map();
-    const polymorphicPathList: string[] = [];
+    const polymorphicPathList: (string | null)[] = [];
 
     let directLayerPlanChild = spec.outputPlan.layerPlan;
     while (directLayerPlanChild.parentLayerPlan !== spec.bucket.layerPlan) {
@@ -743,7 +754,7 @@ async function processStream(
           promises.push(promise);
         }
       }
-      if (promises.length) {
+      if (promises.length !== 0) {
         return Promise.all(promises).then(noop);
       }
     };
@@ -788,7 +799,7 @@ async function processStream(
   };
 
   const processResult = (result: any, payloadIndex: number) => {
-    if (queue) {
+    if (queue !== null) {
       queue.push([result, payloadIndex]);
     } else {
       pendingQueues++;
@@ -830,7 +841,7 @@ function processSingleDeferred(
 ) {
   const size = specs.length;
   const store: Bucket["store"] = new Map();
-  const polymorphicPathList: string[] = [];
+  const polymorphicPathList: (string | null)[] = [];
 
   for (const copyPlanId of outputPlan.layerPlan.copyStepIds) {
     store.set(copyPlanId, []);
@@ -898,7 +909,7 @@ function processSingleDeferred(
         promises.push(promise);
       }
     }
-    if (promises.length) {
+    if (promises.length !== 0) {
       return Promise.all(promises).then(noop);
     }
   };
@@ -985,7 +996,7 @@ function processDeferred(
     deferredBatchesByRequestTools.set(requestContext, deferredBatches);
   }
   const list = deferredBatches.get(spec.outputPlan);
-  if (list) {
+  if (list !== undefined) {
     list.push([iterator, spec]);
   } else {
     deferredBatches.set(spec.outputPlan, [[iterator, spec]]);

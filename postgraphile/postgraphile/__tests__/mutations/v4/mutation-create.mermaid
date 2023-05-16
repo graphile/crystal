@@ -798,10 +798,8 @@ graph TD
     PgSelect244 --> First248
     PgSelectSingle249{{"PgSelectSingle[249∈3]<br />ᐸfrmcdc_nestedCompoundType_1ᐳ"}}:::plan
     First248 --> PgSelectSingle249
-    RemapKeys1171{{"RemapKeys[1171∈3]<br />ᐸ249:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6,”7”:7}ᐳ"}}:::plan
-    PgSelectSingle249 --> RemapKeys1171
     PgSelectSingle256{{"PgSelectSingle[256∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
-    RemapKeys1171 --> PgSelectSingle256
+    PgSelectSingle249 --> PgSelectSingle256
     RemapKeys1173{{"RemapKeys[1173∈3]<br />ᐸ249:{”0”:8,”1”:9,”2”:10,”3”:11,”4”:12,”5”:13,”6”:14,”7”:15}ᐳ"}}:::plan
     PgSelectSingle249 --> RemapKeys1173
     PgSelectSingle270{{"PgSelectSingle[270∈3]<br />ᐸfrmcdc_compoundType_1ᐳ"}}:::plan
@@ -1107,9 +1105,9 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 139, 135, 138, 5<br /><br />ROOT Object{1}ᐸ{result}ᐳ[139]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,Constant166 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 135, 138<br /><br />ROOT PgInsertSingle{1}[135]<br />1: <br />ᐳ: 167, 168, 172, 173, 174, 175, 176, 177, 178, 179, 181, 182, 183, 185, 186, 187, 194, 201, 208, 209, 210, 211, 212, 213, 220, 228, 229, 243, 279, 282, 285, 286, 287, 288, 290, 169, 170, 188, 191, 195, 198, 202, 205<br />2: PgSelect[230], PgSelect[244]<br />ᐳ: 234, 235, 236, 237, 238, 239, 240, 241, 242, 248, 249, 278, 1171, 1173, 256, 270"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 135, 138<br /><br />ROOT PgInsertSingle{1}[135]<br />1: <br />ᐳ: 167, 168, 172, 173, 174, 175, 176, 177, 178, 179, 181, 182, 183, 185, 186, 187, 194, 201, 208, 209, 210, 211, 212, 213, 220, 228, 229, 243, 279, 282, 285, 286, 287, 288, 290, 169, 170, 188, 191, 195, 198, 202, 205<br />2: PgSelect[230], PgSelect[244]<br />ᐳ: 234, 235, 236, 237, 238, 239, 240, 241, 242, 248, 249, 256, 278, 1173, 270"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,Constant167,PgClassExpression168,List169,Lambda170,PgClassExpression172,PgClassExpression173,PgClassExpression174,PgClassExpression175,PgClassExpression176,PgClassExpression177,PgClassExpression178,PgClassExpression179,PgClassExpression181,PgClassExpression182,PgClassExpression183,PgClassExpression185,PgClassExpression186,PgClassExpression187,Access188,Access191,PgClassExpression194,Access195,Access198,PgClassExpression201,Access202,Access205,PgClassExpression208,PgClassExpression209,PgClassExpression210,PgClassExpression211,PgClassExpression212,PgClassExpression213,PgClassExpression220,PgClassExpression228,PgClassExpression229,PgSelect230,First234,PgSelectSingle235,PgClassExpression236,PgClassExpression237,PgClassExpression238,PgClassExpression239,PgClassExpression240,PgClassExpression241,PgClassExpression242,PgClassExpression243,PgSelect244,First248,PgSelectSingle249,PgSelectSingle256,PgSelectSingle270,PgClassExpression278,PgClassExpression279,PgClassExpression282,PgClassExpression285,PgClassExpression286,PgClassExpression287,PgClassExpression288,PgClassExpression290,RemapKeys1171,RemapKeys1173 bucket3
+    class Bucket3,Constant167,PgClassExpression168,List169,Lambda170,PgClassExpression172,PgClassExpression173,PgClassExpression174,PgClassExpression175,PgClassExpression176,PgClassExpression177,PgClassExpression178,PgClassExpression179,PgClassExpression181,PgClassExpression182,PgClassExpression183,PgClassExpression185,PgClassExpression186,PgClassExpression187,Access188,Access191,PgClassExpression194,Access195,Access198,PgClassExpression201,Access202,Access205,PgClassExpression208,PgClassExpression209,PgClassExpression210,PgClassExpression211,PgClassExpression212,PgClassExpression213,PgClassExpression220,PgClassExpression228,PgClassExpression229,PgSelect230,First234,PgSelectSingle235,PgClassExpression236,PgClassExpression237,PgClassExpression238,PgClassExpression239,PgClassExpression240,PgClassExpression241,PgClassExpression242,PgClassExpression243,PgSelect244,First248,PgSelectSingle249,PgSelectSingle256,PgSelectSingle270,PgClassExpression278,PgClassExpression279,PgClassExpression282,PgClassExpression285,PgClassExpression286,PgClassExpression287,PgClassExpression288,PgClassExpression290,RemapKeys1173 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ179ᐳ[180]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item180 bucket4

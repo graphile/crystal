@@ -17,7 +17,7 @@ export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   unbatchedExecute = (
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     list: ReadonlyArray<TData>,
   ): TData => {
     return list?.[list?.length - 1];

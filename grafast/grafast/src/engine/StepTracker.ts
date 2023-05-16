@@ -1,8 +1,12 @@
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
+import { $$subroutine } from "../interfaces.js";
 import type { ExecutableStep } from "../step";
-import type { LayerPlan, LayerPlanReasonsWithParentStep } from "./LayerPlan";
-import type { OperationPlanPhase } from "./OperationPlan.js";
+import type {
+  LayerPlan,
+  LayerPlanReasonSubroutine,
+  LayerPlanReasonsWithParentStep,
+} from "./LayerPlan";
 import type { OutputPlan } from "./OutputPlan";
 
 /**
@@ -36,7 +40,7 @@ export class StepTracker {
   } = [];
   /** @internal */
   private aliasesById: {
-    [stepId: number]: Set<number> | undefined;
+    [stepId: number]: Array<number> | undefined;
   } = [];
   /** @internal */
   public stepsWithNoDependencies = new Set<ExecutableStep>();
@@ -61,21 +65,36 @@ export class StepTracker {
    */
   public allOutputPlans: OutputPlan[] = [];
 
+  public nextStepIdToDeduplicate = 0;
+
   constructor(private readonly operationPlan: OperationPlan) {}
 
-  private assertPhaseNot(phase: OperationPlanPhase) {
-    if (this.operationPlan.phase === phase) {
-      throw new Error(`Forbidden in '${phase}' phase`);
-    }
+  public newStepsSince(oldStepCount: number) {
+    return (this.stepById as ExecutableStep[]).slice(oldStepCount);
+  }
+
+  /** Called when OperationPlan enters finalize phase. */
+  public finalize() {
+    const forbidden = () => {
+      throw new Error(`Forbidden after 'finalize' phase`);
+    };
+    this.addStep = forbidden;
+    this.addLayerPlan = forbidden;
+    this.addOutputPlan = forbidden;
+    this.deleteLayerPlan = forbidden;
+    this.addStepDependency = forbidden;
+    this.setOutputPlanRootStep = forbidden;
+    this.setLayerPlanRootStep = forbidden;
+    this.replaceStep = forbidden;
   }
 
   public addStep($step: ExecutableStep): number {
-    this.assertPhaseNot("finalize");
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
     this.stepsWithNoDependencies.add($step);
     this.stepById[stepId] = $step;
     this.aliasesById[stepId] = undefined;
+    this.addStepToItsLayerPlan($step);
     return stepId;
   }
 
@@ -83,7 +102,6 @@ export class StepTracker {
    * @internal
    */
   public addLayerPlan(layerPlan: LayerPlan) {
-    this.assertPhaseNot("finalize");
     const id = this.layerPlans.push(layerPlan) - 1;
     switch (layerPlan.reason.type) {
       case "root":
@@ -94,19 +112,35 @@ export class StepTracker {
       }
       case "nullableBoundary":
       case "listItem":
-      case "polymorphic":
-      case "subroutine": {
+      case "polymorphic": {
         const store = this.layerPlansByParentStep.get(
           layerPlan.reason.parentStep,
         )!;
-        if (store) {
+        if (store !== undefined) {
           store.add(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
         } else {
+          const layerPlans = new Set<
+            LayerPlan<LayerPlanReasonsWithParentStep>
+          >();
+          layerPlans.add(
+            layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>,
+          );
           this.layerPlansByParentStep.set(
             layerPlan.reason.parentStep,
-            new Set([layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>]),
+            layerPlans,
           );
         }
+        break;
+      }
+      case "subroutine": {
+        const parent = layerPlan.reason.parentStep;
+        if (parent[$$subroutine] !== null) {
+          throw new Error(
+            `Steps may currently only have one subroutine. If you have need for a step with multiple subroutines, please get in touch.`,
+          );
+        }
+        parent[$$subroutine] =
+          layerPlan as LayerPlan<LayerPlanReasonSubroutine>;
         break;
       }
       default: {
@@ -121,16 +155,14 @@ export class StepTracker {
    * @internal
    */
   public addOutputPlan(outputPlan: OutputPlan): void {
-    this.assertPhaseNot("finalize");
     this.allOutputPlans.push(outputPlan);
     const store = this.outputPlansByRootStep.get(outputPlan.rootStep);
-    if (store) {
+    if (store !== undefined) {
       store.add(outputPlan);
     } else {
-      this.outputPlansByRootStep.set(
-        outputPlan.rootStep,
-        new Set([outputPlan]),
-      );
+      const outputPlans = new Set<OutputPlan>();
+      outputPlans.add(outputPlan);
+      this.outputPlansByRootStep.set(outputPlan.rootStep, outputPlans);
     }
   }
 
@@ -140,7 +172,6 @@ export class StepTracker {
    * @internal
    */
   public deleteLayerPlan(layerPlan: LayerPlan) {
-    this.assertPhaseNot("finalize");
     if (isDev) {
       if (layerPlan.children.length > 0) {
         throw new Error(
@@ -157,7 +188,7 @@ export class StepTracker {
     }
     this.layerPlans[layerPlan.id] = null;
     // Remove layerPlan from its parent
-    if (layerPlan.parentLayerPlan) {
+    if (layerPlan.parentLayerPlan !== null) {
       const idx = layerPlan.parentLayerPlan.children.indexOf(layerPlan);
       if (idx >= 0) {
         layerPlan.parentLayerPlan.children.splice(idx, 1);
@@ -168,12 +199,14 @@ export class StepTracker {
     if ($root) {
       this.layerPlansByRootStep.get($root)!.delete(layerPlan);
     }
-    const $parent =
-      "parentStep" in layerPlan.reason ? layerPlan.reason.parentStep : null;
-    if ($parent) {
-      this.layerPlansByParentStep
-        .get($parent)!
-        .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
+    if (layerPlan.reason.type !== "subroutine") {
+      const $parent =
+        "parentStep" in layerPlan.reason ? layerPlan.reason.parentStep : null;
+      if ($parent) {
+        this.layerPlansByParentStep
+          .get($parent)!
+          .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
+      }
     }
     // Remove all plans in this layer
     for (const step of this.activeSteps) {
@@ -204,7 +237,6 @@ export class StepTracker {
     $dependent: ExecutableStep,
     $dependency: ExecutableStep,
   ): number {
-    this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
@@ -229,7 +261,6 @@ export class StepTracker {
     outputPlan: OutputPlan,
     $dependency: ExecutableStep,
   ) {
-    this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($dependency)) {
       throw new Error(
         `Cannot add ${$dependency} to ${outputPlan} because it's deleted`,
@@ -250,10 +281,12 @@ export class StepTracker {
     }
     (outputPlan.rootStep as any) = $dependency;
     const store = this.outputPlansByRootStep.get($dependency);
-    if (store) {
+    if (store !== undefined) {
       store.add(outputPlan);
     } else {
-      this.outputPlansByRootStep.set($dependency, new Set([outputPlan]));
+      const outputPlans = new Set<OutputPlan>();
+      outputPlans.add(outputPlan);
+      this.outputPlansByRootStep.set($dependency, outputPlans);
     }
   }
 
@@ -261,7 +294,6 @@ export class StepTracker {
     layerPlan: LayerPlan,
     $dependency: ExecutableStep,
   ) {
-    this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($dependency)) {
       throw new Error(
         `Cannot add ${$dependency} to ${layerPlan} because it's deleted`,
@@ -277,15 +309,18 @@ export class StepTracker {
       }
       layerPlansBy$existing.delete(layerPlan);
       if (layerPlansBy$existing.size === 0) {
+        this.layerPlansByRootStep.delete($existing);
         // TODO: Cleanup, tree shake, etc
       }
     }
     (layerPlan.rootStep as any) = $dependency;
     const store = this.layerPlansByRootStep.get($dependency);
-    if (store) {
+    if (store !== undefined) {
       store.add(layerPlan);
     } else {
-      this.layerPlansByRootStep.set($dependency, new Set([layerPlan]));
+      const layerPlans = new Set<LayerPlan>();
+      layerPlans.add(layerPlan);
+      this.layerPlansByRootStep.set($dependency, layerPlans);
     }
   }
 
@@ -294,10 +329,9 @@ export class StepTracker {
     $original: ExecutableStep,
     $replacement: ExecutableStep,
   ): void {
-    this.assertPhaseNot("finalize");
     if (!this.activeSteps.has($original)) {
       // OPTIMIZE: seems like there's unnecessary work being done here.
-      // console.warn(`${$original} should be replaced with ${$replacement} but it's no longer alive`);
+      // console.trace(`${$original} should be replaced with ${$replacement} but it's no longer alive`);
 
       // Already handled
       return;
@@ -305,35 +339,38 @@ export class StepTracker {
 
     // Replace all references to $original with $replacement
     const oldAliases = this.aliasesById[$original.id];
-    const newAliases =
-      this.aliasesById[$replacement.id] ?? new Set([$replacement.id]);
+    const newAliases = this.aliasesById[$replacement.id] ?? [$replacement.id];
     this.aliasesById[$replacement.id] = newAliases;
-    if (oldAliases) {
+    if (oldAliases !== undefined) {
       for (const id of oldAliases) {
         this.stepById[id] = $replacement;
-        newAliases.add(id);
+        newAliases.push(id);
       }
       this.aliasesById[$original.id] = undefined;
     } else {
       this.stepById[$original.id] = $replacement;
-      newAliases.add($original.id);
+      newAliases.push($original.id);
     }
 
     {
       // Transfer step dependents of $original to $replacement
       const dependents = $original.dependents;
-      const replacementDependents = writeableArray($replacement.dependents);
-      for (const { step: $dependent, dependencyIndex } of dependents) {
-        writeableArray($dependent.dependencies)[dependencyIndex] = $replacement;
-        replacementDependents.push({ step: $dependent, dependencyIndex });
+      if (dependents.length > 0) {
+        const replacementDependents = writeableArray($replacement.dependents);
+        for (const dependent of dependents) {
+          writeableArray(dependent.step.dependencies)[
+            dependent.dependencyIndex
+          ] = $replacement;
+          replacementDependents.push(dependent);
+        }
+        ($original.dependents as any) = [];
       }
-      ($original.dependents as any) = [];
     }
 
     {
       // Convert root step of output plans from $original to $replacement
       const outputPlans = this.outputPlansByRootStep.get($original);
-      if (outputPlans) {
+      if (outputPlans?.size) {
         let outputPlansByReplacementStep =
           this.outputPlansByRootStep.get($replacement);
         if (!outputPlansByReplacementStep) {
@@ -353,8 +390,8 @@ export class StepTracker {
 
     {
       // Convert root step of layer plans from $original to $replacement
-      const layerPlans = this.layerPlansByRootStep.get($original)!;
-      if (layerPlans) {
+      const layerPlans = this.layerPlansByRootStep.get($original);
+      if (layerPlans?.size) {
         let layerPlansByReplacementRootStep =
           this.layerPlansByRootStep.get($replacement);
         if (!layerPlansByReplacementRootStep) {
@@ -378,7 +415,7 @@ export class StepTracker {
     {
       // Convert parent step of layer plans from $original to $replacement
       const layerPlans = this.layerPlansByParentStep.get($original);
-      if (layerPlans) {
+      if (layerPlans?.size) {
         let layerPlansByReplacementParentStep =
           this.layerPlansByParentStep.get($replacement);
         if (!layerPlansByReplacementParentStep) {
@@ -415,16 +452,15 @@ export class StepTracker {
    * Return true if this step can be tree-shaken.
    */
   private isNotNeeded($step: ExecutableStep): boolean {
+    if ($step.dependents.length !== 0) return false;
+    if ($step.hasSideEffects) return false;
     const s1 = this.outputPlansByRootStep.get($step);
+    if (s1 && s1.size !== 0) return false;
     const s2 = this.layerPlansByRootStep.get($step);
+    if (s2 && s2.size !== 0) return false;
     const s3 = this.layerPlansByParentStep.get($step);
-    return (
-      $step.dependents.length === 0 &&
-      !$step.hasSideEffects &&
-      (!s1 || s1.size === 0) &&
-      (!s2 || s2.size === 0) &&
-      (!s3 || s3.size === 0)
-    );
+    if (s3 && s3.size !== 0) return false;
+    return true;
   }
 
   /**
@@ -437,8 +473,13 @@ export class StepTracker {
    * then they can also be eradicated _except_ during the 'plan' phase.
    */
   private eradicate($original: ExecutableStep) {
+    if ($original[$$subroutine] !== null) {
+      this.deleteLayerPlan($original[$$subroutine]);
+    }
+
+    this.removeStepFromItsLayerPlan($original);
     const oldAliases = this.aliasesById[$original.id];
-    if (oldAliases) {
+    if (oldAliases !== undefined) {
       for (const id of oldAliases) {
         // Nothing needs us, so set ourself null (DELIBERATELY BYPASSES TYPESCRIPT!)
         this.stepById[id] = null as any;
@@ -512,5 +553,28 @@ export class StepTracker {
 
     // Referencing $original after this will likely cause errors.
     $original.destroy();
+  }
+
+  moveStepToLayerPlan(step: ExecutableStep, targetLayerPlan: LayerPlan) {
+    this.removeStepFromItsLayerPlan(step);
+    (step.layerPlan as any) = targetLayerPlan;
+    this.addStepToItsLayerPlan(step);
+  }
+
+  addStepToItsLayerPlan(step: ExecutableStep) {
+    const {
+      layerPlan: { stepsByConstructor },
+      constructor,
+    } = step;
+    let set = stepsByConstructor.get(constructor);
+    if (!set) {
+      set = new Set();
+      stepsByConstructor.set(constructor, set);
+    }
+    set.add(step);
+  }
+
+  removeStepFromItsLayerPlan(step: ExecutableStep) {
+    step.layerPlan.stepsByConstructor.get(step.constructor)!.delete(step);
   }
 }

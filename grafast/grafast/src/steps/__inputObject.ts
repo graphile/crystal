@@ -1,13 +1,9 @@
-import type {
-  GraphQLInputObjectType,
-  GraphQLInputType,
-  ValueNode,
-} from "graphql";
+import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 import te from "tamedevil";
 
 import type { InputStep } from "../input.js";
 import { inputPlan } from "../input.js";
-import type { ExecutionExtra } from "../interfaces.js";
+import type { ExecutionExtra, NotVariableValueNode } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { defaultValueToValueNode } from "../utils.js";
 import { constant } from "./constant.js";
@@ -27,8 +23,8 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   } = Object.create(null);
   constructor(
     private inputObjectType: GraphQLInputObjectType,
-    seenTypes: Set<GraphQLInputType>,
-    private inputValues: ValueNode | undefined,
+    seenTypes: ReadonlyArray<GraphQLInputType>,
+    private inputValues: NotVariableValueNode | undefined,
   ) {
     super();
     const inputFieldDefinitions = inputObjectType.getFields();
@@ -37,19 +33,22 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     for (const inputFieldName in inputFieldDefinitions) {
       const inputFieldDefinition = inputFieldDefinitions[inputFieldName];
       const inputFieldType = inputFieldDefinition.type;
-      const defaultValue = defaultValueToValueNode(
-        inputFieldType,
-        inputFieldDefinition.defaultValue,
-      );
+      const defaultValue =
+        inputFieldDefinition.defaultValue !== undefined
+          ? defaultValueToValueNode(
+              inputFieldType,
+              inputFieldDefinition.defaultValue,
+            )
+          : undefined;
       const inputFieldValue = inputFields?.find(
         (val) => val.name.value === inputFieldName,
       );
       const step = inputPlan(
         this.operationPlan,
         inputFieldType,
-        seenTypes,
         inputFieldValue?.value,
         defaultValue,
+        seenTypes,
       );
       this.inputFields[inputFieldName] = {
         step,
@@ -66,12 +65,13 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   }
 
   finalize() {
-    this.unbatchedExecute = te.run`return function (extra, ${te.join(
-      this.dependencies.map((_, dependencyIndex) =>
-        te.identifier(`val${dependencyIndex}`),
-      ),
-      ", ",
-    )}) {
+    te.runInBatch<typeof this.unbatchedExecute>(
+      te`(function (extra, ${te.join(
+        this.dependencies.map((_, dependencyIndex) =>
+          te.identifier(`val${dependencyIndex}`),
+        ),
+        ", ",
+      )}) {
   const resultValues = Object.create(null);
   ${te.join(
     Object.entries(this.inputFields).map(
@@ -88,11 +88,15 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     "\n",
   )}
   return resultValues;
-}` as any;
+})`,
+      (fn) => {
+        this.unbatchedExecute = fn;
+      },
+    );
     super.finalize();
   }
 
-  unbatchedExecute(extra: ExecutionExtra, ...values: any[]) {
+  unbatchedExecute(_extra: ExecutionExtra, ...values: any[]) {
     const resultValues = Object.create(null);
     for (const inputFieldName in this.inputFields) {
       const dependencyIndex = this.inputFields[inputFieldName].dependencyIndex;

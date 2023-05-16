@@ -1,5 +1,3 @@
-import LRU from "@graphile/lru";
-
 import { reservedWords } from "./reservedWords.js";
 
 type Primitive = null | boolean | number | string;
@@ -95,45 +93,19 @@ export interface TEQuery {
  */
 export type TE = TENode | TEQuery;
 
-/**
- * This helps us to avoid GC overhead of allocating new raw nodes all the time
- * when they're likely to be the same values over and over. The average raw
- * string is likely to be around 20 bytes; allowing for 50 bytes once this has
- * been turned into an object, 10000 would mean 500kB which seems an acceptable
- * amount of memory to consume for this.
- */
-const CACHE_RAW_NODES = new LRU<string, TERawNode>({ maxLength: 10000 });
-const CACHE_MAX_ENTRY_LENGTH = 50;
+function makeRawNode(text: string): TERawNode {
+  return {
+    [$$type]: "RAW" as const,
+    t: text,
+  } as TERawNode;
+}
 
-function makeRawNode(text: string, exportName?: string): TERawNode {
-  // Don't use the cache for longer texts
-  if (text.length > CACHE_MAX_ENTRY_LENGTH && exportName === undefined) {
-    return Object.freeze({
-      [$$type]: "RAW" as const,
-      t: text,
-    });
-  }
-
-  const n = CACHE_RAW_NODES.get(text);
-  if (n) {
-    return n;
-  }
-  if (typeof text !== "string") {
-    throw new Error(
-      `[tamedevil] Invalid argument to makeRawNode - expected string, but received '${String(
-        text,
-      )}'`,
-    );
-  }
+function makeExportedRawNode(text: string, exportName: string): TERawNode {
   const newNode: TERawNode = {
     [$$type]: "RAW" as const,
     t: text,
   };
-  if (exportName) {
-    exportAs(newNode, exportName);
-  }
-  Object.freeze(newNode);
-  CACHE_RAW_NODES.set(text, newNode);
+  exportAs(newNode, exportName);
   return newNode;
 }
 
@@ -203,6 +175,115 @@ function enforceValidNode(node: unknown, where?: string): TE {
   );
 }
 
+function findAvailableName(
+  refs: { [key: string]: any },
+  suggestedName: string,
+) {
+  if (!(suggestedName in refs)) {
+    return suggestedName;
+  }
+  for (let i = 0; i < 1000000; i++) {
+    const name = suggestedName + i;
+    if (!(name in refs)) {
+      return name;
+    }
+  }
+  throw new Error("Failed to find an available variable name to use");
+}
+
+const makeRef = (
+  refs: { [key: string]: any },
+  refMap: Map<any, string>,
+  value: any,
+  suggestedName?: string,
+): string => {
+  const existingIdentifier = refMap.get(value);
+  if (existingIdentifier) {
+    return existingIdentifier;
+  }
+  const refCount = refMap.size + 1;
+  // Arbitrary
+  if (refCount > 65535) {
+    throw new Error(
+      "[tamedevil] This TE statement would contain too many placeholders; tamedevil supports at most 65535 placeholders. To solve this, consider passing multiple values in using a single array or object.",
+    );
+  }
+  const identifier = suggestedName
+    ? findAvailableName(refs, suggestedName)
+    : `_$$_ref_${refCount}`;
+  refMap.set(value, identifier);
+  refs[identifier] = value;
+  return identifier;
+};
+
+const getVar = (varMap: Map<symbol, string>, sym: symbol) => {
+  const existing = varMap.get(sym);
+  if (existing) {
+    return existing;
+  }
+  const tmpCounter = varMap.size + 1;
+  const varName = `_$_tmp${tmpCounter}`;
+  varMap.set(sym, varName);
+  return varName;
+};
+
+function serialize(
+  item: TE,
+  refs: { [key: string]: any },
+  refMap: Map<any, string>,
+  varMap: Map<symbol, string>,
+  indent = 0,
+): string {
+  let str = "";
+  if (item == null) {
+    enforceValidNode(item);
+  }
+  switch (item[$$type]) {
+    case "QUERY": {
+      for (const listItem of item.n) {
+        str += serialize(listItem, refs, refMap, varMap, indent);
+      }
+      break;
+    }
+    case "RAW": {
+      if (item.t === "") {
+        // No need to add blank raw text!
+        break;
+      }
+      // IMPORTANT: this **must not** mangle primitives. Fortunately they're all single line so it should be fine.
+      str += isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t;
+      break;
+    }
+    case "REF": {
+      const identifier = makeRef(refs, refMap, item.v, item.n);
+      str += identifier;
+      break;
+    }
+    case "VARIABLE": {
+      const identifier = getVar(varMap, item.s);
+      str += identifier;
+      break;
+    }
+    case "INDENT": {
+      if (!isDev) {
+        throw new Error("INDENT nodes only allowed in development mode");
+      }
+      str += "\n" + "  ".repeat(indent + 1);
+      str += serialize(item.c, refs, refMap, varMap, indent + 1);
+      str += "\n" + "  ".repeat(indent);
+      break;
+    }
+    default: {
+      const never: never = item;
+      // This cannot happen
+      throw new Error(
+        `Unsupported node found in TE: ${String(enforceValidNode(never))}`,
+      );
+    }
+  }
+  return str;
+}
+
 /**
  * Accepts an te`...` expression and compiles it out to the function body
  * `string` and the `refs` that need to be passed via the closure.
@@ -219,108 +300,19 @@ function compile(fragment: TE): {
    * time.
    */
   const refs: { [key: string]: any } = Object.create(null);
-  let refCount = 0;
   const refMap = new Map<any, string>();
-  const makeRef = (value: any, suggestedName?: string): string => {
-    const existingIdentifier = refMap.get(value);
-    if (existingIdentifier) {
-      return existingIdentifier;
-    }
-    refCount++;
-    // Arbitrary
-    if (refCount > 65535) {
-      throw new Error(
-        "[tamedevil] This TE statement would contain too many placeholders; tamedevil supports at most 65535 placeholders. To solve this, consider passing multiple values in using a single array or object.",
-      );
-    }
-    const identifier = suggestedName ?? `_$$_ref_${refCount}`;
-    refMap.set(value, identifier);
-    refs[identifier] = value;
-    return identifier;
-  };
-
   const varMap = new Map<symbol, string>();
-  let tmpCounter = 0;
-  const getVar = (sym: symbol) => {
-    const existing = varMap.get(sym);
-    if (existing) {
-      return existing;
-    }
-    const varName = `_$_tmp${tmpCounter++}`;
-    varMap.set(sym, varName);
-    return varName;
-  };
 
-  const variables: string[] = [];
-
-  function print(untrustedInput: TE, indent = 0) {
-    /**
-     * Join this to generate the TE string
-     */
-    const teFragments: string[] = [];
-
-    const trustedInput = enforceValidNode(untrustedInput, ``);
-    const items: ReadonlyArray<TENode> =
-      trustedInput[$$type] === "QUERY"
-        ? expandQueryNodes(trustedInput)
-        : [trustedInput];
-    const itemCount = items.length;
-
-    for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-      const item = enforceValidNode(items[itemIndex], `item ${itemIndex}`);
-      switch (item[$$type]) {
-        case "RAW": {
-          if (item.t === "") {
-            // No need to add blank raw text!
-            break;
-          }
-          // IMPORTANT: this **must not** mangle primitives. Fortunately they're all single line so it should be fine.
-          teFragments.push(
-            isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
-          );
-          break;
-        }
-        case "REF": {
-          const identifier = makeRef(item.v, item.n);
-          teFragments.push(identifier);
-          if (item.n != null && identifier !== item.n) {
-            variables.push(`const ${item.n} = ${identifier};`);
-          }
-          break;
-        }
-        case "VARIABLE": {
-          const identifier = getVar(item.s);
-          teFragments.push(identifier);
-          break;
-        }
-        case "INDENT": {
-          if (!isDev) {
-            throw new Error("INDENT nodes only allowed in development mode");
-          }
-          teFragments.push(
-            "\n" +
-              "  ".repeat(indent + 1) +
-              print(item.c, indent + 1) +
-              "\n" +
-              "  ".repeat(indent),
-          );
-          break;
-        }
-        default: {
-          const never: never = item;
-          // This cannot happen
-          throw new Error(`Unsupported node found in TE: ${String(never)}`);
-        }
-      }
-    }
-    return teFragments.join("");
-  }
-  let str = print(fragment);
+  /**
+   * Join this to generate the TE string
+   */
+  let str = serialize(fragment, refs, refMap, varMap);
+  let variables = "";
   for (const varName of varMap.values()) {
-    variables.push(`let ${varName};`);
+    variables = variables + `let ${varName};\n`;
   }
   if (variables.length > 0) {
-    str = variables.join("\n") + "\n" + str;
+    str = variables + "\n" + str;
   }
   const string = isDev ? str.replace(/\n\s*\n/g, "\n") : str;
 
@@ -329,9 +321,6 @@ function compile(fragment: TE): {
     refs,
   };
 }
-
-// LRU not necessary
-const CACHE_SIMPLE_FRAGMENTS = new Map<string, TERawNode>();
 
 /**
  * A template string tag function that creates a `TE` query out of some strings and
@@ -356,74 +345,90 @@ const teBase = function te(
     );
   }
   const stringsLength = strings.length;
-  const first = strings[0];
   // Reduce memory churn with a cache
   if (stringsLength === 1) {
+    const first = strings[0];
     if (first === "") {
       return blankNode;
+    } else if (first === "undefined") {
+      return undefinedNode;
     }
-    let node = CACHE_SIMPLE_FRAGMENTS.get(first);
-    if (!node) {
-      node = makeRawNode(first);
-      CACHE_SIMPLE_FRAGMENTS.set(first, node);
-    }
-    return node;
+    return makeRawNode(first);
   }
 
   // Special case te`${...}` - just return the node directly
   if (stringsLength === 2 && strings[0] === "" && strings[1] === "") {
-    return enforceValidNode(values[0]);
+    const v = values[0];
+    return v[$$type] !== undefined ? v : enforceValidNode(v);
   }
 
   const items: Array<TENode> = [];
+  let lastRawNode: TERawNode | null = null;
   let currentText = "";
+
+  const addText = () => {
+    if (lastRawNode === null || lastRawNode.t !== currentText) {
+      lastRawNode = makeRawNode(currentText);
+    }
+    items.push(lastRawNode);
+    currentText = "";
+  };
+
   const finalStringIndex = stringsLength - 1;
   for (let i = 0; i < stringsLength; i++) {
     const text = strings[i];
-    if (typeof text !== "string") {
-      throw new Error(
-        "[tamedevil] te must be invoked as a template literal, not a function call.",
-      );
-    }
     currentText += text;
-    if (i < finalStringIndex) {
-      const valid: TE = enforceValidNode(
-        values[i],
-        `template literal placeholder ${i}`,
-      );
+    if (i !== finalStringIndex) {
+      const v = values[i];
+      const valid: TE =
+        v[$$type] !== undefined
+          ? v
+          : enforceValidNode(v, `literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
+        lastRawNode = valid;
         currentText += valid.t;
       } else if (valid[$$type] === "QUERY") {
-        const nodes = expandQueryNodes(valid);
+        const nodes = valid.n;
         const nodeCount = nodes.length;
 
         for (let nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++) {
           const node = nodes[nodeIndex];
           if (node[$$type] === "RAW") {
+            lastRawNode = node;
             currentText += node.t;
           } else {
             if (currentText !== "") {
-              items.push(makeRawNode(currentText));
-              currentText = "";
+              /*#__INLINE__*/ addText();
             }
             items.push(node);
           }
         }
       } else {
         if (currentText !== "") {
-          items.push(makeRawNode(currentText));
-          currentText = "";
+          /*#__INLINE__*/ addText();
         }
         items.push(valid);
       }
     }
   }
   if (currentText !== "") {
-    items.push(makeRawNode(currentText));
-    currentText = "";
+    /*#__INLINE__*/ addText();
   }
   return items.length === 1 ? items[0] : makeQueryNode(items);
 };
+
+const teCacheCache = Object.create(null);
+function cache(strings: TemplateStringsArray): TE {
+  if (strings.length !== 1) {
+    throw new Error(`te.cache can currently only be used with a static string`);
+  }
+  const str = strings[0];
+  const existing = teCacheCache[str];
+  if (existing) return existing;
+  const node = makeRawNode(str);
+  teCacheCache[str] = node;
+  return node;
+}
 
 let rawWarningOutput = false;
 /**
@@ -473,8 +478,8 @@ function ref(val: any, name?: string): TE {
   }
 }
 
-const blankNode = makeRawNode(``, "blank");
-const undefinedNode = makeRawNode(`undefined`, "undefined");
+const blankNode = makeExportedRawNode(``, "blank");
+const undefinedNode = makeExportedRawNode(`undefined`, "undefined");
 
 /**
  * A regexp that matches the first character that might need escaping in a JSON
@@ -744,9 +749,11 @@ function canAccessViaDot(str: string): boolean {
 function get(key: string | symbol | number): TE {
   return typeof key === "string" && canAccessViaDot(key)
     ? // ._mySimpleProperty
-      te`.${makeRawNode(key)}`
+      makeRawNode(`.${key}`)
     : // ["@@meaning"]
-      te`[${te.lit(key)}]`;
+    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
+    ? makeRawNode(`[${toJSON(key)}]`)
+    : te`[${te.lit(key)}]`;
 }
 
 /**
@@ -759,9 +766,11 @@ function get(key: string | symbol | number): TE {
 function optionalGet(key: string | symbol | number): TE {
   return typeof key === "string" && canAccessViaDot(key)
     ? // ?._mySimpleProperty
-      te`?.${makeRawNode(key)}`
+      makeRawNode(`?.${key}`)
     : // ?.["@@meaning"]
-      te`?.[${te.lit(key)}]`;
+    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
+    ? makeRawNode(`?.[${toJSON(key)}]`)
+    : te`?.[${te.lit(key)}]`;
 }
 
 // TODO: rename this. 'leftSet'? 'leftAccess'? 'safeAccess'?
@@ -786,9 +795,11 @@ function set(key: string | symbol | number, hasNullPrototype = false): TE {
   }
   return typeof key === "string" && canAccessViaDot(key)
     ? // ._mySimpleProperty
-      te`.${makeRawNode(key)}`
+      makeRawNode(`.${key}`)
     : // ["@@meaning"]
-      te`[${te.lit(key)}]`;
+    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
+    ? makeRawNode(`[${toJSON(key)}]`)
+    : te`[${te.lit(key)}]`;
 }
 
 /**
@@ -805,7 +816,7 @@ function tempVar(symbol = Symbol()): TE {
  * @experimental
  */
 function tmp(obj: TE, callback: (tmp: TE) => TE): TE {
-  const trustedObj = enforceValidNode(obj);
+  const trustedObj = obj[$$type] !== undefined ? obj : enforceValidNode(obj);
   // ENHANCEMENT: we should be able to reuse these tempvars between tmp calls
   // that aren't nested (or are nested at the same level).
   const varName = te.tempVar();
@@ -829,10 +840,18 @@ function run<TResult>(
   if (values.length > 0) {
     throw new Error("Invalid call to `te.run`");
   }
-  const fragment = enforceValidNode(fragmentOrStrings);
+  const fragment =
+    fragmentOrStrings[$$type] !== undefined
+      ? fragmentOrStrings
+      : enforceValidNode(fragmentOrStrings);
   const compiled = compile(fragment);
   const argNames = Object.keys(compiled.refs);
   const argValues = Object.values(compiled.refs);
+  if (isDev && activeBatch) {
+    throw new Error(
+      `te.run called, but batch is active - recommend you use runInBatch`,
+    );
+  }
   try {
     return newFunction(...argNames, compiled.string)(...argValues) as TResult;
   } catch (e) {
@@ -842,6 +861,47 @@ function run<TResult>(
     console.error("Function definition:");
     console.error(compiled.string);
     throw new Error(`Error occurred during code generation.`);
+  }
+}
+
+interface Batch {
+  fragment: TE;
+  callback: (r: any) => void;
+}
+let activeBatch: Array<Batch> | null = null;
+
+function runInBatch<TResult>(
+  fragment: TE,
+  callback: (r: TResult) => void,
+): void {
+  if (!activeBatch) {
+    throw new Error(`te.runInBatch failed - there's no active batch`);
+  }
+  activeBatch.push({ fragment, callback });
+}
+
+function batch(callback: () => void): void {
+  if (activeBatch) {
+    throw new Error(`te.batch failed - there's already a batch in progress`);
+  }
+  let batch: Array<Batch>;
+  try {
+    activeBatch = [];
+    callback();
+    batch = activeBatch;
+  } finally {
+    activeBatch = null;
+  }
+  if (batch.length === 0) {
+    return;
+  }
+  const finalCode = te`return [\n${te.join(
+    batch.map((entry) => entry.fragment),
+    ",\n",
+  )}\n];`;
+  const result = te.run<any[]>(finalCode);
+  for (let i = 0, l = batch.length; i < l; i++) {
+    batch[i].callback(result[i]);
   }
 }
 
@@ -876,7 +936,10 @@ function join(items: Array<TE>, separator = ""): TE {
     return blankNode;
   } else if (items.length === 1) {
     const rawNode = items[0];
-    const node: TE = enforceValidNode(rawNode, `join item ${0}`);
+    const node: TE =
+      rawNode[$$type] !== undefined
+        ? rawNode
+        : enforceValidNode(rawNode, `join item ${0}`);
     return node;
   }
 
@@ -885,13 +948,16 @@ function join(items: Array<TE>, separator = ""): TE {
   const currentItems: Array<TENode> = [];
   for (let i = 0, l = items.length; i < l; i++) {
     const rawNode = items[i];
-    const node: TE = enforceValidNode(rawNode, `join item ${i}`);
+    const node: TE =
+      rawNode[$$type] !== undefined
+        ? rawNode
+        : enforceValidNode(rawNode, `join item ${i}`);
     const addSeparator = i > 0 && hasSeparator;
     if (addSeparator) {
       currentText += separator;
     }
     if (node[$$type] === "QUERY") {
-      for (const innerNode of expandQueryNodes(node)) {
+      for (const innerNode of node.n) {
         if (innerNode[$$type] === "RAW") {
           currentText += innerNode.t;
         } else {
@@ -921,11 +987,6 @@ function join(items: Array<TE>, separator = ""): TE {
     : makeQueryNode(currentItems);
 }
 
-/** @internal */
-function expandQueryNodes(node: TEQuery): ReadonlyArray<TENode> {
-  return node.n;
-}
-
 /**
  * Indicates that the given fragment should be indented when output in debug
  * mode. (Has no effect in production mode.)
@@ -943,6 +1004,8 @@ function indent(
   const fragment =
     "raw" in fragmentOrStrings
       ? te(fragmentOrStrings, ...values)
+      : fragmentOrStrings[$$type] !== undefined
+      ? fragmentOrStrings
       : enforceValidNode(fragmentOrStrings);
   if (!isDev) {
     return fragment;
@@ -955,7 +1018,8 @@ function indent(
  * node, otherwise it will be returned verbatim.
  */
 function indentIf(condition: boolean, fragment: TE): TE {
-  const trusted = enforceValidNode(fragment);
+  const trusted =
+    fragment[$$type] !== undefined ? fragment : enforceValidNode(fragment);
   return isDev && condition ? makeIndentNode(trusted) : trusted;
 }
 
@@ -978,9 +1042,10 @@ export class Idents {
     }
   }
 
+  // TODO: we need a proper understanding of lexical scope so we can generate truly safe identifiers
   makeSafeIdentifier(str: string): string {
     const { idents } = this;
-    const safe = str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
+    const safe = "i_" + str.replace(/[^a-zA-Z0-9_$]+/g, "").replace(/_+/, "_");
     let ident: string | undefined = undefined;
     for (let i = 1; i < 10000; i++) {
       const val = safe + (i > 1 ? String(i) : "");
@@ -1001,6 +1066,8 @@ const te = teBase as TamedEvil;
 export default te;
 
 export {
+  batch,
+  cache,
   compile,
   dangerousKey,
   dangerouslyIncludeRawCode,
@@ -1014,6 +1081,7 @@ export {
   optionalGet,
   ref,
   run,
+  runInBatch,
   set,
   subcomment,
   substring,
@@ -1026,6 +1094,7 @@ export {
 export interface TamedEvil {
   (strings: TemplateStringsArray, ...values: Array<TE>): TE;
   te: TamedEvil;
+  cache: typeof cache;
   ref: typeof ref;
   reference: typeof ref;
   lit: typeof lit;
@@ -1048,6 +1117,8 @@ export interface TamedEvil {
     <TResult>(fragment: TE): TResult;
     <TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
   };
+  runInBatch: typeof runInBatch;
+  batch: typeof batch;
   compile: typeof compile;
   indent: typeof indent;
   indentIf: typeof indentIf;
@@ -1059,6 +1130,7 @@ export interface TamedEvil {
 
 const attributes = {
   te,
+  cache,
   ref,
   reference: ref,
   lit,
@@ -1075,6 +1147,8 @@ const attributes = {
   tempVar,
   run,
   eval: run,
+  runInBatch,
+  batch,
   compile,
   indent,
   indentIf,

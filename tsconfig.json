@@ -13,6 +13,9 @@
     "moduleResolution": "nodenext",
     "target": "ES2022",
     "lib": ["ES2022"],
+    // This has runtime performance overhead! Specifically it means a lot of
+    // time is spent in 'instance_members_initializer' in V8. Disable.
+    "useDefineForClassFields": false,
 
     "sourceMap": true,
     "pretty": true,
@@ -53,6 +56,7 @@
     { "path": "grafast/ruru-components" },
     { "path": "grafast/ruru/tsconfig.build.json" },
     { "path": "grafast/grafserv-persisted" },
-    { "path": "postgraphile/postgraphile/tsconfig.build.json" }
+    { "path": "postgraphile/postgraphile/tsconfig.build.json" },
+    { "path": "grafast/bench/tsconfig.build.json" }
   ]
 }

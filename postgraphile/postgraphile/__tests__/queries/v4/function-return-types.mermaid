@@ -127,20 +127,16 @@ graph TD
     PgSelect589 ==> __Item593
     PgSelectSingle594{{"PgSelectSingle[594∈63]<br />ᐸsearch_test_summariesᐳ"}}:::plan
     __Item593 --> PgSelectSingle594
-    RemapKeys644{{"RemapKeys[644∈56]<br />ᐸ525:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"}}:::plan
-    PgSelectSingle525 --> RemapKeys644
     PgSelectSingle532{{"PgSelectSingle[532∈56]<br />ᐸleftArmᐳ"}}:::plan
-    RemapKeys644 --> PgSelectSingle532
+    PgSelectSingle525 --> PgSelectSingle532
     RemapKeys650{{"RemapKeys[650∈56]<br />ᐸ525:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"}}:::plan
     PgSelectSingle525 --> RemapKeys650
     PgSelectSingle566{{"PgSelectSingle[566∈56]<br />ᐸpostᐳ"}}:::plan
     RemapKeys650 --> PgSelectSingle566
     PgClassExpression586{{"PgClassExpression[586∈56]<br />ᐸ__query_ou...ws__.”txt”ᐳ"}}:::plan
     PgSelectSingle525 --> PgClassExpression586
-    RemapKeys632{{"RemapKeys[632∈49]<br />ᐸ455:{”0”:0,”1”:1,”2”:2,”3”:3,”4”:4,”5”:5,”6”:6}ᐳ"}}:::plan
-    PgSelectSingle455 --> RemapKeys632
     PgSelectSingle462{{"PgSelectSingle[462∈49]<br />ᐸleftArmᐳ"}}:::plan
-    RemapKeys632 --> PgSelectSingle462
+    PgSelectSingle455 --> PgSelectSingle462
     RemapKeys638{{"RemapKeys[638∈49]<br />ᐸ455:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"}}:::plan
     PgSelectSingle455 --> RemapKeys638
     PgSelectSingle496{{"PgSelectSingle[496∈49]<br />ᐸpostᐳ"}}:::plan
@@ -298,10 +294,8 @@ graph TD
     PgSelectSingle433 --> PgClassExpression434
     PgClassExpression435{{"PgClassExpression[435∈47]<br />ᐸ__person_c..._out__.”o”ᐳ"}}:::plan
     PgSelectSingle433 --> PgClassExpression435
-    RemapKeys620{{"RemapKeys[620∈45]<br />ᐸ412:{”0”:0,”1”:1}ᐳ"}}:::plan
-    PgSelectSingle412 --> RemapKeys620
     PgSelectSingle419{{"PgSelectSingle[419∈45]<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys620 --> PgSelectSingle419
+    PgSelectSingle412 --> PgSelectSingle419
     PgClassExpression422{{"PgClassExpression[422∈45]<br />ᐸ__person_c..._out__.”o”ᐳ"}}:::plan
     PgSelectSingle412 --> PgClassExpression422
     List59{{"List[59∈3]<br />ᐸ57,58ᐳ"}}:::plan
@@ -707,7 +701,7 @@ graph TD
     class Bucket44,PgClassExpression404,PgClassExpression405 bucket44
     Bucket45("Bucket 45 (nullableBoundary)<br />Deps: 412<br /><br />ROOT PgSelectSingle{38}ᐸperson_computed_first_arg_inout_outᐳ[412]"):::bucket
     classDef bucket45 stroke:#00ffff
-    class Bucket45,PgSelectSingle419,PgClassExpression422,RemapKeys620 bucket45
+    class Bucket45,PgSelectSingle419,PgClassExpression422 bucket45
     Bucket46("Bucket 46 (nullableBoundary)<br />Deps: 419<br /><br />ROOT PgSelectSingle{45}ᐸpersonᐳ[419]"):::bucket
     classDef bucket46 stroke:#4169e1
     class Bucket46,PgClassExpression420,PgClassExpression421 bucket46
@@ -719,7 +713,7 @@ graph TD
     class Bucket48,PgClassExpression445,PgClassExpression446 bucket48
     Bucket49("Bucket 49 (nullableBoundary)<br />Deps: 455<br /><br />ROOT PgSelectSingleᐸquery_output_two_rowsᐳ[455]"):::bucket
     classDef bucket49 stroke:#ff00ff
-    class Bucket49,PgSelectSingle462,PgSelectSingle496,PgClassExpression516,RemapKeys632,RemapKeys638 bucket49
+    class Bucket49,PgSelectSingle462,PgSelectSingle496,PgClassExpression516,RemapKeys638 bucket49
     Bucket50("Bucket 50 (nullableBoundary)<br />Deps: 462<br /><br />ROOT PgSelectSingle{49}ᐸleftArmᐳ[462]"):::bucket
     classDef bucket50 stroke:#f5deb3
     class Bucket50,PgClassExpression463,PgClassExpression464,PgClassExpression465,PgClassExpression466,PgSelectSingle472,RemapKeys630 bucket50
@@ -740,7 +734,7 @@ graph TD
     class Bucket55,PgClassExpression515 bucket55
     Bucket56("Bucket 56 (nullableBoundary)<br />Deps: 525<br /><br />ROOT PgSelectSingleᐸquery_output_two_rowsᐳ[525]"):::bucket
     classDef bucket56 stroke:#7fff00
-    class Bucket56,PgSelectSingle532,PgSelectSingle566,PgClassExpression586,RemapKeys644,RemapKeys650 bucket56
+    class Bucket56,PgSelectSingle532,PgSelectSingle566,PgClassExpression586,RemapKeys650 bucket56
     Bucket57("Bucket 57 (nullableBoundary)<br />Deps: 532<br /><br />ROOT PgSelectSingle{56}ᐸleftArmᐳ[532]"):::bucket
     classDef bucket57 stroke:#ff1493
     class Bucket57,PgClassExpression533,PgClassExpression534,PgClassExpression535,PgClassExpression536,PgSelectSingle542,RemapKeys642 bucket57

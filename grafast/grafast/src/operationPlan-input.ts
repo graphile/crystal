@@ -4,14 +4,7 @@ import type {
   GraphQLInputField,
   GraphQLInputType,
 } from "graphql";
-import {
-  getNullableType,
-  isEnumType,
-  isInputObjectType,
-  isListType,
-  isNonNullType,
-  isScalarType,
-} from "graphql";
+import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { __InputObjectStep, __TrackedValueStep } from "./index.js";
@@ -30,6 +23,15 @@ import { constant, ConstantStep } from "./steps/constant.js";
 import { list } from "./steps/list.js";
 import { object } from "./steps/object.js";
 
+const {
+  getNullableType,
+  isEnumType,
+  isInputObjectType,
+  isListType,
+  isNonNullType,
+  isScalarType,
+} = graphql;
+
 export function withFieldArgsForArguments<
   T extends ExecutableStep,
   TParentStep extends ExecutableStep = ExecutableStep,
@@ -40,7 +42,7 @@ export function withFieldArgsForArguments<
   field: GraphQLField<any, any, any>,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null | void> | TParentStep {
-  if (operationPlan.loc)
+  if (operationPlan.loc !== null)
     operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
   const fields: {
     [key: string]: GraphQLArgument;
@@ -57,7 +59,7 @@ export function withFieldArgsForArguments<
     fields,
     callback,
   );
-  if (operationPlan.loc) operationPlan.loc.pop();
+  if (operationPlan.loc !== null) operationPlan.loc.pop();
 
   return result;
 }
@@ -76,10 +78,10 @@ function withFieldArgsForArgumentsOrInputObject<
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
   const schema = operationPlan.schema;
-  const analyzedCoordinates: string[] = [];
+  const analyzedCoordinates: { [key: string]: true } = Object.create(null);
 
   const getArgOnceOnly = (inPath: string | string[]) => {
-    if (operationPlan.loc)
+    if (operationPlan.loc !== null)
       operationPlan.loc.push(`getArgOnceOnly('${inPath}')`);
     const path = Array.isArray(inPath) ? [...inPath] : [inPath];
     if (path.length < 1) {
@@ -91,8 +93,8 @@ function withFieldArgsForArgumentsOrInputObject<
     }
 
     const id = path.join(".");
-    if (!analyzedCoordinates.includes(id)) {
-      analyzedCoordinates.push(id);
+    if (!analyzedCoordinates[id]) {
+      analyzedCoordinates[id] = true;
     }
 
     const $currentObject = $current as
@@ -116,7 +118,7 @@ function withFieldArgsForArgumentsOrInputObject<
     let parentType = typeContainingFields;
     let argOrField: GraphQLArgument | GraphQLInputField = fields[argName];
     if (!argOrField) {
-      if (operationPlan.loc) {
+      if (operationPlan.loc !== null) {
         throw new Error(
           `Attempted to access non-existant arg '${argName}' (known args: ${Object.keys(
             fields,
@@ -154,7 +156,7 @@ function withFieldArgsForArgumentsOrInputObject<
       type = getNullableType(argOrField.type);
     }
 
-    if (operationPlan.loc) operationPlan.loc.pop();
+    if (operationPlan.loc !== null) operationPlan.loc.pop();
     return { $value, argOrField, type, parentType };
   };
 
@@ -169,7 +171,7 @@ function withFieldArgsForArgumentsOrInputObject<
     details: ReturnType<typeof getArgOnceOnly>,
     $toStep: ExecutableStep | ModifierStep | null,
   ) {
-    if (operationPlan.loc)
+    if (operationPlan.loc !== null)
       operationPlan.loc.push(
         `planArgumentOrInputField(${details.argOrField.name})`,
       );
@@ -196,7 +198,7 @@ function withFieldArgsForArgumentsOrInputObject<
               }
             } else {
               const argResolver = arg.extensions.grafast?.inputPlan;
-              if (argResolver) {
+              if (argResolver !== undefined) {
                 return argResolver(parentPlan, fieldArgs, {
                   schema,
                   entity: argOrField as GraphQLArgument,
@@ -219,7 +221,7 @@ function withFieldArgsForArgumentsOrInputObject<
               }
             } else {
               const fieldResolver = field.extensions.grafast?.inputPlan;
-              if (fieldResolver) {
+              if (fieldResolver !== undefined) {
                 return fieldResolver(fieldArgs, {
                   schema,
                   entity: argOrField as GraphQLInputField,
@@ -232,7 +234,7 @@ function withFieldArgsForArgumentsOrInputObject<
         },
       );
     });
-    if (operationPlan.loc) operationPlan.loc.pop();
+    if (operationPlan.loc !== null) operationPlan.loc.pop();
     return plan;
   }
 
@@ -240,14 +242,14 @@ function withFieldArgsForArgumentsOrInputObject<
     $value: InputStep,
     currentType: GraphQLInputType,
   ): ExecutableStep {
-    if (operationPlan.loc)
+    if (operationPlan.loc !== null)
       operationPlan.loc.push(
         `getPlannedValue(${$value.id},${
           "name" in currentType ? currentType.name : "?"
         })`,
       );
     const result = getPlannedValue_($value, currentType);
-    if (operationPlan.loc) operationPlan.loc.pop();
+    if (operationPlan.loc !== null) operationPlan.loc.pop();
     return result;
   }
 
@@ -291,7 +293,7 @@ function withFieldArgsForArgumentsOrInputObject<
       );
     } else if (isScalarType(currentType)) {
       const scalarResolver = currentType.extensions.grafast?.inputPlan;
-      if (scalarResolver) {
+      if (scalarResolver !== undefined) {
         return scalarResolver($value, { schema, type: currentType });
       } else {
         return $value;
@@ -344,7 +346,7 @@ function withFieldArgsForArgumentsOrInputObject<
       for (const fieldName in fields) {
         const field = fields[fieldName];
         const resolver = field.extensions.grafast?.applyPlan;
-        if (resolver) {
+        if (typeof resolver === "function") {
           const fieldType = field.type;
           if (!("get" in $value)) {
             throw new Error(
@@ -385,7 +387,7 @@ function withFieldArgsForArgumentsOrInputObject<
       const value = $value.eval();
       const enumValue = currentType.getValues().find((v) => v.value === value);
       const enumResolver = enumValue?.extensions.grafast?.applyPlan;
-      if (enumResolver) {
+      if (enumResolver !== undefined) {
         const $toStep = toStepOrCallback;
         if (!($toStep instanceof BaseStep)) {
           throw new Error(
@@ -404,9 +406,9 @@ function withFieldArgsForArgumentsOrInputObject<
   const fieldArgs: FieldArgs = {
     get(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates.push("");
+        analyzedCoordinates[""] = true;
         if (!typeContainingFields) {
-          if (fields) {
+          if (fields !== null) {
             return object(
               Object.values(fields).reduce((memo, arg) => {
                 memo[arg.name] = fieldArgs.get(arg.name);
@@ -430,7 +432,7 @@ function withFieldArgsForArgumentsOrInputObject<
     },
     getRaw(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates.push("");
+        analyzedCoordinates[""] = true;
         if ($current instanceof ExecutableStep) {
           return $current;
         } else {
@@ -442,11 +444,11 @@ function withFieldArgsForArgumentsOrInputObject<
     },
     apply(targetStepOrCallback, path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates.push("");
+        analyzedCoordinates[""] = true;
         if (typeContainingFields && ($current as InputStep).evalIs(undefined)) {
           return;
         }
-        if (fields) {
+        if (fields !== null) {
           for (const fieldName of Object.keys(fields)) {
             const target =
               typeof targetStepOrCallback === "function"
@@ -496,15 +498,16 @@ function withFieldArgsForArgumentsOrInputObject<
     | ModifierStep;
 
   // Now handled all the remaining coordinates
-  if (operationPlan.loc) operationPlan.loc.push("handle_remaining");
+  if (operationPlan.loc !== null) operationPlan.loc.push("handle_remaining");
   if (
-    !analyzedCoordinates.includes("") &&
+    !analyzedCoordinates[""] &&
     step != null &&
     !(step instanceof ConstantStep && step.isNull())
   ) {
     if (!fields) {
       fieldArgs.apply(step);
     } else {
+      const allKeys = Object.keys(analyzedCoordinates);
       const process = (
         layerFields: typeof fields,
         parentPath: readonly string[] = [],
@@ -514,9 +517,9 @@ function withFieldArgsForArgumentsOrInputObject<
           const newPath = [...parentPath, fieldName];
           const pathStr = newPath.join(".");
           const prefix = `${pathStr}.`;
-          if (analyzedCoordinates.includes(pathStr)) {
+          if (analyzedCoordinates[pathStr]) {
             continue;
-          } else if (analyzedCoordinates.some((c) => c.startsWith(prefix))) {
+          } else if (allKeys.some((c) => c.startsWith(prefix))) {
             const inputObjectType = getNullableType(field.type);
             if (!isInputObjectType(inputObjectType)) {
               throw new Error(
@@ -533,7 +536,7 @@ function withFieldArgsForArgumentsOrInputObject<
       process(fields);
     }
   }
-  if (operationPlan.loc) operationPlan.loc.pop();
+  if (operationPlan.loc !== null) operationPlan.loc.pop();
 
   return step as any;
 }

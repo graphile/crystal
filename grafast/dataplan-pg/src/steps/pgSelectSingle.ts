@@ -574,7 +574,7 @@ export class PgSelectSingleStep<
   handlePolymorphism?: (result: any) => any;
 
   unbatchedExecute(
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     result: ObjectFromPgCodecAttributes<GetPgResourceAttributes<TResource>>,
   ): unknown[] {
     if (result == null) {

@@ -220,31 +220,31 @@ export class ConnectionStep<
 
     {
       const plan = this.getBefore();
-      if (plan) {
+      if (plan !== null) {
         clonedPlan.setBefore(plan);
       }
     }
     {
       const plan = this.getAfter();
-      if (plan) {
+      if (plan !== null) {
         clonedPlan.setAfter(plan);
       }
     }
     {
       const plan = this.getFirst();
-      if (plan) {
+      if (plan !== null) {
         clonedPlan.setFirst(plan);
       }
     }
     {
       const plan = this.getLast();
-      if (plan) {
+      if (plan !== null) {
         clonedPlan.setLast(plan);
       }
     }
     {
       const plan = this.getOffset();
-      if (plan) {
+      if (plan !== null) {
         clonedPlan.setOffset(plan);
       }
     }
@@ -252,7 +252,7 @@ export class ConnectionStep<
     return clonedPlan;
   }
 
-  public edges() {
+  public edges(): ExecutableStep {
     if (this.cursorPlan || this.itemPlan) {
       return each(this.cloneSubplanWithPagination(), ($intermediate) =>
         this.wrapEdge($intermediate as any),
@@ -264,7 +264,7 @@ export class ConnectionStep<
   }
 
   public nodes() {
-    if (this.itemPlan) {
+    if (this.itemPlan !== undefined) {
       return each(this.cloneSubplanWithPagination(), ($intermediate) =>
         this.itemPlan!($intermediate as any),
       );
@@ -404,7 +404,7 @@ export class EdgeStep<
     }
   }
 
-  unbatchedExecute(extra: ExecutionExtra, record: any, cursor: any): any {
+  unbatchedExecute(_extra: ExecutionExtra, record: any, cursor: any): any {
     // Handle nulls; everything else comes from the child plans
     return record == null && (this.cursorDepId == null || cursor == null)
       ? null

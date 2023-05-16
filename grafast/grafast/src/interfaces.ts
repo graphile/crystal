@@ -17,6 +17,8 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  ValueNode,
+  VariableNode,
 } from "graphql";
 
 import type { Bucket, RequestTools } from "./bucket.js";
@@ -237,6 +239,9 @@ export const $$proxy = Symbol("proxy");
  * without being masked.
  */
 export const $$safeError = Symbol("safeError");
+
+/** The layerPlan used as a subroutine for this step */
+export const $$subroutine = Symbol("subroutine");
 
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
@@ -651,7 +656,7 @@ export interface StepOptions {
  */
 export interface StepOptimizeOptions {
   stream: StepStreamOptions | null;
-  meta: Record<string, unknown>;
+  meta: Record<string, unknown> | undefined;
 }
 
 /**
@@ -786,7 +791,7 @@ export type ExecutionEventMap = {
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
 export interface ExecutionExtra {
-  meta: Record<string, unknown>;
+  meta: Record<string, unknown> | undefined;
   eventEmitter: ExecutionEventEmitter | undefined;
 
   // These are only needed for subroutine plans, don't use them as we may
@@ -823,3 +828,5 @@ export type UnwrapPlanTuple</* const */ TIn extends readonly ExecutableStep[]> =
       ? U
       : never;
   } & { length: number };
+
+export type NotVariableValueNode = Exclude<ValueNode, VariableNode>;

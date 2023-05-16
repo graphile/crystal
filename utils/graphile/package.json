@@ -34,8 +34,8 @@
     "@typescript/vfs": "^1.4.0",
     "chalk": "^4.1.2",
     "graphile-config": "workspace:^",
-    "tslib": "^2.4.0",
-    "typescript": "^5.0.0-beta"
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.4"
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",

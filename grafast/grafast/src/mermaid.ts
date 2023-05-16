@@ -176,7 +176,6 @@ export function printPlanGraph(
   const sortedSteps: ExecutableStep[] = [];
   operationPlan.processSteps(
     "printingPlanDeps",
-    0,
     "dependencies-first",
     (plan) => {
       sortedSteps.push(plan);
@@ -187,7 +186,7 @@ export function printPlanGraph(
   const layerPlanDepth = (step: ExecutableStep) => {
     let depth = 0;
     let lp: LayerPlan | null = step.layerPlan;
-    if (lp.parentLayerPlan) {
+    if (lp.parentLayerPlan !== null) {
       depth -= lp.parentLayerPlan.children.indexOf(lp);
     }
     while ((lp = lp.parentLayerPlan)) {
@@ -273,7 +272,7 @@ export function printPlanGraph(
 
   graph.push("");
   graph.push("    %% define steps");
-  operationPlan.processSteps("printingPlans", 0, "dependents-first", (plan) => {
+  operationPlan.processSteps("printingPlans", "dependents-first", (plan) => {
     planId(plan);
     return plan;
   });
@@ -304,7 +303,11 @@ export function printPlanGraph(
                   .map((pId) => steps[pId].id)
                   .join(", ")}\n`
               : ""
-          }${pp(layerPlan.polymorphicPaths)}${
+          }${
+            layerPlan.reason.type === "polymorphic"
+              ? pp(layerPlan.reason.polymorphicPaths)
+              : ""
+          }${
             layerPlan.rootStep != null && layerPlan.reason.type !== "root"
               ? `\nROOT ${operationPlan.dangerouslyGetStep(
                   layerPlan.rootStep.id,
@@ -346,8 +349,8 @@ export function printPlanGraph(
   return graphString;
 }
 
-function pp(polymorphicPaths: ReadonlySet<string>) {
-  if (polymorphicPaths.size === 1 && polymorphicPaths.has("")) {
+function pp(polymorphicPaths: ReadonlySet<string> | null) {
+  if (!polymorphicPaths) {
     return "";
   }
   return [...polymorphicPaths].map((p) => `${p}`).join("\n");

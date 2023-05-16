@@ -7,13 +7,15 @@ import type {
   GraphQLArgs,
   GraphQLSchema,
 } from "graphql";
-import { GraphQLError, parse, Source, validate, validateSchema } from "graphql";
+import * as graphql from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
 import { isPromiseLike } from "./utils.js";
+
+const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
 
 /** Rough average size per query */
 const CACHE_MULTIPLIER = 100000;
@@ -24,7 +26,10 @@ const queryCacheMaxSize = 50 * MEGABYTE;
 
 const cacheSize = Math.max(2, Math.ceil(queryCacheMaxSize / CACHE_MULTIPLIER));
 
-const queryCache = new LRU({ maxLength: cacheSize });
+const queryCache = new LRU<
+  string,
+  DocumentNode | ReadonlyArray<graphql.GraphQLError>
+>({ maxLength: cacheSize });
 
 // If we can use crypto to create a hash, great. Otherwise just use the string.
 let calculateQueryHash: (queryString: string) => string;
@@ -49,12 +54,10 @@ try {
 let lastGqlSchema: GraphQLSchema;
 const parseAndValidate = (
   gqlSchema: GraphQLSchema,
-  stringOrSource: string | Source,
-): DocumentNode | ReadonlyArray<GraphQLError> => {
+  stringOrSource: string | graphql.Source,
+): DocumentNode | ReadonlyArray<graphql.GraphQLError> => {
   if (gqlSchema !== lastGqlSchema) {
-    if (queryCache) {
-      queryCache.reset();
-    }
+    queryCache.reset();
     lastGqlSchema = gqlSchema;
   }
 
@@ -65,7 +68,7 @@ const parseAndValidate = (
     typeof stringOrSource === "string" ? stringOrSource : stringOrSource.body,
   );
   const result = queryCache.get(hash);
-  if (result) {
+  if (result !== undefined) {
     return result;
   } else {
     const source =

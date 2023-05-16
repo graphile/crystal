@@ -70,10 +70,8 @@ graph TD
     RemapKeys93 --> PgSelectSingle31
     PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__relation..._lower__.vᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression32
-    RemapKeys91{{"RemapKeys[91∈3]<br />ᐸ20:{”0”:0}ᐳ"}}:::plan
-    PgSelectSingle20 --> RemapKeys91
     PgSelectSingle39{{"PgSelectSingle[39∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
-    RemapKeys91 --> PgSelectSingle39
+    PgSelectSingle20 --> PgSelectSingle39
     PgSelectSingle39 --> PgClassExpression40
     First45{{"First[45∈3]"}}:::plan
     PgSelect41 --> First45
@@ -93,10 +91,8 @@ graph TD
     RemapKeys97 --> PgSelectSingle73
     PgClassExpression74{{"PgClassExpression[74∈7]<br />ᐸ__relation..._lower__.vᐳ"}}:::plan
     PgSelectSingle73 --> PgClassExpression74
-    RemapKeys95{{"RemapKeys[95∈7]<br />ᐸ62:{”0”:0}ᐳ"}}:::plan
-    PgSelectSingle62 --> RemapKeys95
     PgSelectSingle81{{"PgSelectSingle[81∈7]<br />ᐸrelational_itemsᐳ"}}:::plan
-    RemapKeys95 --> PgSelectSingle81
+    PgSelectSingle62 --> PgSelectSingle81
     PgSelectSingle81 --> PgClassExpression82
     First87{{"First[87∈7]"}}:::plan
     PgSelect83 --> First87
@@ -123,9 +119,9 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 12<br /><br />ROOT PgDeleteSingle{1}[9]<br />1: <br />ᐳ: 13, 14<br />2: PgSelect[15]<br />ᐳ: First[19], PgSelectSingle[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression13,PgClassExpression14,PgSelect15,First19,PgSelectSingle20 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 12<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[20]<br />1: <br />ᐳ: 21, 22, 23, 24, 91, 93, 31, 32, 39, 40<br />2: PgSelect[41]<br />ᐳ: First[45], PgSelectSingle[46]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 12<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[20]<br />1: <br />ᐳ: 21, 22, 23, 24, 39, 93, 31, 32, 40<br />2: PgSelect[41]<br />ᐳ: First[45], PgSelectSingle[46]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgSelectSingle31,PgClassExpression32,PgSelectSingle39,PgClassExpression40,PgSelect41,First45,PgSelectSingle46,RemapKeys91,RemapKeys93 bucket3
+    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgSelectSingle31,PgClassExpression32,PgSelectSingle39,PgClassExpression40,PgSelect41,First45,PgSelectSingle46,RemapKeys93 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 46<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[46]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression47,PgClassExpression48 bucket4
@@ -135,9 +131,9 @@ graph TD
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 54<br /><br />ROOT PgDeleteSingle{5}[51]<br />1: <br />ᐳ: 55, 56<br />2: PgSelect[57]<br />ᐳ: First[61], PgSelectSingle[62]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression55,PgClassExpression56,PgSelect57,First61,PgSelectSingle62 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 62, 54<br /><br />ROOT PgSelectSingle{6}ᐸrelational_postsᐳ[62]<br />1: <br />ᐳ: 63, 64, 65, 66, 95, 97, 73, 74, 81, 82<br />2: PgSelect[83]<br />ᐳ: First[87], PgSelectSingle[88]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 62, 54<br /><br />ROOT PgSelectSingle{6}ᐸrelational_postsᐳ[62]<br />1: <br />ᐳ: 63, 64, 65, 66, 81, 97, 73, 74, 82<br />2: PgSelect[83]<br />ᐳ: First[87], PgSelectSingle[88]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgSelectSingle73,PgClassExpression74,PgSelectSingle81,PgClassExpression82,PgSelect83,First87,PgSelectSingle88,RemapKeys95,RemapKeys97 bucket7
+    class Bucket7,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgSelectSingle73,PgClassExpression74,PgSelectSingle81,PgClassExpression82,PgSelect83,First87,PgSelectSingle88,RemapKeys97 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 88<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[88]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression89,PgClassExpression90 bucket8

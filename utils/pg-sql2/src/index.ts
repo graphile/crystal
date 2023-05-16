@@ -261,16 +261,15 @@ function makePlaceholderNode(
   });
 }
 
-const CHARCODE_A = "A".charCodeAt(0);
-
 function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
   let checksum = 0;
   for (const node of nodes) {
     switch (node[$$type]) {
       case "RAW": {
         const { t } = node;
-        for (let i = 0, l = Math.min(t.length, 10000); i < l; i++) {
-          checksum += Math.min(t.charCodeAt(i) - CHARCODE_A, 100);
+        // Max value of charCodeAt is 65535. 65535 * 10000 < 2^30.
+        for (let i = 0, l = t.length, l2 = l > 10000 ? 10000 : l; i < l2; i++) {
+          checksum += t.charCodeAt(i);
         }
         break;
       }
@@ -396,7 +395,10 @@ export function compile(
      */
     const sqlFragments: string[] = [];
 
-    const trustedInput = enforceValidNode(untrustedInput, ``);
+    const trustedInput =
+      untrustedInput[$$type] !== undefined
+        ? untrustedInput
+        : enforceValidNode(untrustedInput, ``);
     const items: ReadonlyArray<SQLNode> =
       trustedInput[$$type] === "QUERY"
         ? expandQueryNodes(trustedInput)
@@ -404,7 +406,11 @@ export function compile(
     const itemCount = items.length;
 
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-      const item = enforceValidNode(items[itemIndex], `item ${itemIndex}`);
+      const itemAtIndex = items[itemIndex];
+      const item =
+        itemAtIndex[$$type] !== undefined
+          ? itemAtIndex
+          : enforceValidNode(itemAtIndex as SQLNode, `item ${itemIndex}`);
       switch (item[$$type]) {
         case "RAW": {
           if (item.t === "") {
@@ -547,11 +553,10 @@ const sqlBase = function sql(
     if (first === "") {
       return blank;
     }
-    let node = CACHE_SIMPLE_FRAGMENTS.get(first);
-    if (!node) {
-      node = makeRawNode(first);
-      CACHE_SIMPLE_FRAGMENTS.set(first, node);
-    }
+    const existing = CACHE_SIMPLE_FRAGMENTS.get(first);
+    if (existing) return existing;
+    const node = makeRawNode(first);
+    CACHE_SIMPLE_FRAGMENTS.set(first, node);
     return node;
   }
 
@@ -564,18 +569,13 @@ const sqlBase = function sql(
   let currentText = "";
   for (let i = 0, l = stringsLength; i < l; i++) {
     const text = strings[i];
-    if (typeof text !== "string") {
-      throw new Error(
-        "[pg-sql2] sql.query must be invoked as a template literal, not a function call.",
-      );
-    }
     currentText += text;
     if (i < l - 1) {
       const rawVal = values[i];
-      const valid: SQL = enforceValidNode(
-        rawVal,
-        `template literal placeholder ${i}`,
-      );
+      const valid: SQL =
+        rawVal[$$type] !== undefined
+          ? rawVal
+          : enforceValidNode(rawVal, `template literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
         currentText += valid.t;
       } else if (valid[$$type] === "QUERY") {
@@ -760,7 +760,10 @@ export function join(items: Array<SQL>, separator = ""): SQL {
     return blank;
   } else if (items.length === 1) {
     const rawNode = items[0];
-    const node: SQL = enforceValidNode(rawNode, `join item ${0}`);
+    const node: SQL =
+      rawNode[$$type] !== undefined
+        ? rawNode
+        : enforceValidNode(rawNode, `join item ${0}`);
     return node;
   }
 
@@ -770,7 +773,10 @@ export function join(items: Array<SQL>, separator = ""): SQL {
   for (let i = 0, l = items.length; i < l; i++) {
     const rawNode = items[i];
     const addSeparator = i > 0 && hasSeparator;
-    const node: SQL = enforceValidNode(rawNode, `join item ${i}`);
+    const node: SQL =
+      rawNode[$$type] !== undefined
+        ? rawNode
+        : enforceValidNode(rawNode, `join item ${i}`);
     if (addSeparator) {
       currentText += separator;
     }

@@ -63,7 +63,7 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
 
   planForType(type: GraphQLObjectType): ExecutableStep {
     const spec = this.possibleTypes[type.name];
-    if (spec) {
+    if (spec !== undefined) {
       return spec.get(
         spec.getSpec(access(this.getDep(this.specPlanDep), [spec.codecName])),
       );
@@ -90,7 +90,7 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   }
 
   unbatchedExecute = (
-    extra: ExecutionExtra,
+    _extra: ExecutionExtra,
     specifier: any,
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {
     const typeName = specifier

@@ -40,7 +40,7 @@ export class PgCursorStep<
     return plan as TStep;
   }
 
-  unbatchedExecute(extra: ExecutionExtra, v: any[] | null): string | null {
+  unbatchedExecute(_extra: ExecutionExtra, v: any[] | null): string | null {
     return v == null || v!.every((v) => v == null)
       ? null
       : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(

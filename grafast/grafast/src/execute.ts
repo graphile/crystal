@@ -79,7 +79,7 @@ export function withGrafastArgs(
     explain: options?.explain,
     outputDataAsString,
   });
-  if (unlisten) {
+  if (unlisten !== null) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
   }
   // Convert from PromiseOrDirect to PromiseOrValue

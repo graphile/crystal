@@ -25,10 +25,8 @@ graph TD
     First12 --> PgSelectSingle13
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    RemapKeys23{{"RemapKeys[23∈1]<br />ᐸ13:{”0”:0,”1”:1}ᐳ"}}:::plan
-    PgSelectSingle13 --> RemapKeys23
     PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸusersᐳ"}}:::plan
-    RemapKeys23 --> PgSelectSingle20
+    PgSelectSingle13 --> PgSelectSingle20
     PgClassExpression21{{"PgClassExpression[21∈2]<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
@@ -42,7 +40,7 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant25 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelectSingle20,RemapKeys23 bucket1
+    class Bucket1,PgSelectSingle20 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression21,PgClassExpression22 bucket2

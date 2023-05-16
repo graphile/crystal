@@ -19,7 +19,7 @@ import type {
 } from "@dataplan/pg";
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
-import { arraysMatch, connection, list, object } from "grafast";
+import { arraysMatch, connection, each, list, object } from "grafast";
 import { EXPORTABLE } from "graphile-export";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
@@ -30,6 +30,12 @@ import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
+
+const ref_list = te.ref(list, "list");
+const ref_object = te.ref(object, "object");
+const ref_connection = te.ref(connection, "connection");
+const ref_sql = te.ref(sql, "sql");
+const ref_each = te.ref(each, "each");
 
 declare global {
   namespace GraphileBuild {
@@ -1017,11 +1023,13 @@ function addRelations(
 
             // ENHANCEMENT: these ensure that the variables are defined in
             // the closure, but they also output noise
-            // (`list;object;connection;sql;`) which could be eliminated.
-            prefixLines.push(te`${te.ref(list, "list")};`);
-            prefixLines.push(te`${te.ref(object, "object")};`);
-            prefixLines.push(te`${te.ref(connection, "connection")};`);
-            prefixLines.push(te`${te.ref(sql, "sql")};`);
+            // (`list;object;connection;sql;each;`) which could be eliminated.
+
+            prefixLines.push(te`${ref_list};`);
+            prefixLines.push(te`${ref_object};`);
+            prefixLines.push(te`${ref_connection};`);
+            prefixLines.push(te`${ref_sql};`);
+            prefixLines.push(te`${ref_each};`);
 
             let isStillSingular = true;
             for (let i = 0, l = path.layers.length; i < l; i++) {
@@ -1034,9 +1042,8 @@ function addRelations(
               const resourceName = idents.makeSafeIdentifier(
                 `${resource.name}Resource`,
               );
-              prefixLines.push(
-                te`const ${te.identifier(resourceName)} = ${te.ref(resource)};`,
-              );
+              const ref_resource = te.ref(resource, resourceName);
+              prefixLines.push(te`${ref_resource};`);
               if (isStillSingular) {
                 if (!isUnique) {
                   isStillSingular = false;
@@ -1074,9 +1081,9 @@ function addRelations(
                     )
                   : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
                 functionLines.push(
-                  te`  const ${newIdentifier} = ${te.identifier(
-                    resourceName,
-                  )}.${isUnique ? te`get` : te`find`}(${specString});`,
+                  te`  const ${newIdentifier} = ${ref_resource}.${
+                    isUnique ? te.cache`get` : te.cache`find`
+                  }(${specString});`,
                 );
                 previousIdentifier = newIdentifier;
               } else {
@@ -1107,9 +1114,7 @@ function addRelations(
                   remoteAttributes,
                 );
                 functionLines.push(
-                  te`  const ${newIdentifier} = each(${previousIdentifier}, (${$entry}) => ${te.identifier(
-                    resourceName,
-                  )}.get(${specString}));`,
+                  te`  const ${newIdentifier} = ${ref_each}(${previousIdentifier}, (${$entry}) => ${ref_resource}.get(${specString}));`,
                 );
                 previousIdentifier = newIdentifier;
               }
@@ -1118,19 +1123,19 @@ function addRelations(
             if (isStillSingular && !single) {
               const newIdentifier = te.identifier("$list");
               functionLines.push(
-                te`  const ${newIdentifier} = list([${previousIdentifier}]);`,
+                te`  const ${newIdentifier} = ${ref_list}([${previousIdentifier}]);`,
               );
               previousIdentifier = newIdentifier;
             }
 
             if (isConnection) {
               functionLines.push(
-                te`  return connection(${previousIdentifier});`,
+                te`  return ${ref_connection}(${previousIdentifier});`,
               );
             } else {
               functionLines.push(te`  return ${previousIdentifier};`);
             }
-            functionLines.push(te`}`);
+            functionLines.push(te.cache`}`);
             return te.run`${te.join(prefixLines, "\n")}${te.join(
               functionLines,
               "\n",

@@ -1,12 +1,16 @@
-import type { GraphQLInputType, ValueNode } from "graphql";
-import { GraphQLList, Kind } from "graphql";
+import type { GraphQLInputType } from "graphql";
+import * as graphql from "graphql";
 
 import * as assert from "../assert.js";
 import type { InputStep } from "../input.js";
 import { assertInputStep, inputPlan } from "../input.js";
+import type { NotVariableValueNode } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { ConstantStep } from "./constant.js";
 import { constant } from "./constant.js";
+import { list } from "./list.js";
+
+const { GraphQLList, Kind } = graphql;
 
 /**
  * Implements `__InputListStep`.
@@ -21,9 +25,9 @@ export class __InputListStep extends ExecutableStep {
   private itemCount = 0;
 
   constructor(
-    inputType: GraphQLList<GraphQLInputType>,
-    seenTypes: Set<GraphQLInputType>,
-    private readonly inputValues: ValueNode | undefined,
+    inputType: graphql.GraphQLList<GraphQLInputType>,
+    seenTypes: ReadonlyArray<GraphQLInputType> | undefined,
+    private readonly inputValues: NotVariableValueNode | undefined,
   ) {
     super();
     assert.ok(
@@ -32,14 +36,15 @@ export class __InputListStep extends ExecutableStep {
     );
     const innerType = inputType.ofType;
     const values =
-      inputValues?.kind === Kind.LIST
+      inputValues === undefined
+        ? undefined
+        : inputValues.kind === Kind.LIST
         ? inputValues.values
-        : inputValues?.kind === Kind.NULL
-        ? null
-        : inputValues
-        ? [inputValues]
-        : inputValues;
-    if (values) {
+        : inputValues.kind === Kind.NULL
+        ? undefined // Really it's `null` but we don't care here
+        : // Coerce to list
+          [inputValues];
+    if (values !== undefined) {
       for (
         let inputValueIndex = 0, inputValuesLength = values.length;
         inputValueIndex < inputValuesLength;
@@ -49,8 +54,9 @@ export class __InputListStep extends ExecutableStep {
         const innerPlan = inputPlan(
           this.operationPlan,
           innerType,
-          seenTypes,
           inputValue,
+          undefined,
+          seenTypes,
         );
         this.addDependency(innerPlan);
         this.itemCount++;
@@ -58,23 +64,17 @@ export class __InputListStep extends ExecutableStep {
     }
   }
 
-  optimize() {
+  optimize(): ExecutableStep {
     const { inputValues } = this;
     if (inputValues?.kind === "NullValue") {
       return constant(null);
     } else {
-      const list: any[] = [];
-      for (
-        let itemPlanIndex = 0;
-        itemPlanIndex < this.itemCount;
-        itemPlanIndex++
-      ) {
-        const itemPlan = this.getDep(itemPlanIndex);
-        assertInputStep(itemPlan);
-        const value = itemPlan.eval();
-        list[itemPlanIndex] = value;
+      const arr: ExecutableStep[] = [];
+      for (let idx = 0; idx < this.itemCount; idx++) {
+        const itemPlan = this.getDep(idx);
+        arr[idx] = itemPlan;
       }
-      return constant(list);
+      return list(arr);
     }
   }
 

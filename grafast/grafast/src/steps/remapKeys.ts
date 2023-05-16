@@ -12,7 +12,10 @@ import { UnbatchedExecutableStep } from "../step.js";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
-function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
+function makeMapper(
+  actualKeyByDesiredKey: ActualKeyByDesiredKey,
+  callback: (fn: (obj: object | null) => object | null) => void,
+) {
   const entries = Object.entries(actualKeyByDesiredKey);
   if (
     entries.every(
@@ -21,23 +24,28 @@ function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     )
   ) {
     // We can do a fast custom conversion
-    return te.run`return function(obj) {
+    return te.runInBatch<any>(
+      te`(function(obj) {
   return (obj == null ? obj : { ${te.join(
     entries.map(([key, val]) => te`${te.dangerousKey(key)}: obj${te.get(val)}`),
     ", ",
   )} });
-}` as any;
+})`,
+      callback,
+    );
   }
   // Fallback to slow conversion
-  return (obj: Record<string, any> | null): Record<string, any> | null => {
-    if (obj == null) {
-      return obj;
-    }
-    return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
-      memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
-      return memo;
-    }, Object.create(null) as Record<string, any>);
-  };
+  return callback(
+    (obj: Record<string, any> | null): Record<string, any> | null => {
+      if (obj == null) {
+        return obj;
+      }
+      return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
+        memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
+        return memo;
+      }, Object.create(null) as Record<string, any>);
+    },
+  );
 }
 
 /**
@@ -52,14 +60,13 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
-  private mapper: (obj: object) => object;
+  private mapper!: (obj: object | null) => object | null;
   constructor(
     $plan: ExecutableStep,
     private actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
     this.addDependency($plan);
-    this.mapper = makeMapper(actualKeyByDesiredKey);
   }
 
   toStringMeta(): string {
@@ -70,6 +77,23 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
     );
   }
 
+  optimize() {
+    for (const [key, val] of Object.entries(this.actualKeyByDesiredKey)) {
+      if (String(key) !== String(val)) {
+        return this;
+      }
+    }
+    // If we're not actually remapping, just return the parent
+    return this.getDep(0);
+  }
+
+  finalize(): void {
+    makeMapper(this.actualKeyByDesiredKey, (fn) => {
+      this.mapper = fn;
+    });
+    super.finalize();
+  }
+
   execute(
     _count: number,
     values: GrafastValuesList<any[]>,
@@ -77,7 +101,7 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
     return values[0].map(this.mapper);
   }
 
-  unbatchedExecute(extra: ExecutionExtra, value: any): any {
+  unbatchedExecute(_extra: ExecutionExtra, value: any): any {
     return this.mapper(value);
   }
 
