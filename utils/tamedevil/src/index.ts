@@ -363,7 +363,17 @@ const teBase = function te(
   }
 
   const items: Array<TENode> = [];
+  let lastRawNode: TERawNode | null = null;
   let currentText = "";
+
+  const addText = () => {
+    if (lastRawNode === null || lastRawNode.t !== currentText) {
+      lastRawNode = makeRawNode(currentText);
+    }
+    items.push(lastRawNode);
+    currentText = "";
+  };
+
   const finalStringIndex = stringsLength - 1;
   for (let i = 0; i < stringsLength; i++) {
     const text = strings[i];
@@ -375,6 +385,7 @@ const teBase = function te(
           ? v
           : enforceValidNode(v, `literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
+        lastRawNode = valid;
         currentText += valid.t;
       } else if (valid[$$type] === "QUERY") {
         const nodes = valid.n;
@@ -383,27 +394,25 @@ const teBase = function te(
         for (let nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++) {
           const node = nodes[nodeIndex];
           if (node[$$type] === "RAW") {
+            lastRawNode = node;
             currentText += node.t;
           } else {
             if (currentText !== "") {
-              items.push(makeRawNode(currentText));
-              currentText = "";
+              /*#__INLINE__*/ addText();
             }
             items.push(node);
           }
         }
       } else {
         if (currentText !== "") {
-          items.push(makeRawNode(currentText));
-          currentText = "";
+          /*#__INLINE__*/ addText();
         }
         items.push(valid);
       }
     }
   }
   if (currentText !== "") {
-    items.push(makeRawNode(currentText));
-    currentText = "";
+    /*#__INLINE__*/ addText();
   }
   return items.length === 1 ? items[0] : makeQueryNode(items);
 };
