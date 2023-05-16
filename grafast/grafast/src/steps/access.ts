@@ -45,7 +45,7 @@ function constructDestructureFunction(
       if (mode === 2) mode = 1;
     } else if (t === "string") {
       // Cannot use in superfast mode (because signature becomes ambiguous)
-      if (t.includes("|") && mode === 2) mode = 1;
+      if (mode === 2 && (pathItem as string).includes("|")) mode = 1;
     } else if (t === "number") {
       if (!Number.isFinite(pathItem)) {
         mode = 0;
