@@ -31,6 +31,12 @@ import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
+const ref_list = te.ref(list, "list");
+const ref_object = te.ref(object, "object");
+const ref_connection = te.ref(connection, "connection");
+const ref_sql = te.ref(sql, "sql");
+const ref_each = te.ref(each, "each");
+
 declare global {
   namespace GraphileBuild {
     interface PgRelationsPluginRelationDetails {
@@ -1019,11 +1025,6 @@ function addRelations(
             // the closure, but they also output noise
             // (`list;object;connection;sql;each;`) which could be eliminated.
 
-            const ref_list = te.ref(list, "list");
-            const ref_object = te.ref(object, "object");
-            const ref_connection = te.ref(connection, "connection");
-            const ref_sql = te.ref(sql, "sql");
-            const ref_each = te.ref(each, "each");
             prefixLines.push(te`${ref_list};`);
             prefixLines.push(te`${ref_object};`);
             prefixLines.push(te`${ref_connection};`);
