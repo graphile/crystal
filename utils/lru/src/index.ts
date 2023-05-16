@@ -86,7 +86,7 @@ export class LRU<KeyType = any, ValueType = any> {
     this.h = null;
     this.t = null;
     this.length = 0;
-    if (this.d) {
+    if (this.d !== null) {
       for (const hit of values) {
         this.d(hit.k, hit.v);
       }
@@ -95,37 +95,36 @@ export class LRU<KeyType = any, ValueType = any> {
 
   public get(key: KeyType): ValueType | undefined {
     const hit = this.c.get(key);
-    if (hit) {
-      // HOIST
-      if (hit !== this.h) {
-        if (!this.h) {
-          this.h = this.t = hit;
-        } else {
-          // Remove newHead from old position
-          hit.p!.n = hit.n;
-          if (hit.n) {
-            hit.n.p = hit.p;
-          } else {
-            // It was the t, now hit.prev is the t
-            this.t = hit.p;
-          }
-          // Add hit at top
-          hit.n = this.h;
-          this.h!.p = hit;
-          this.h = hit;
-          hit.p = null;
-        }
-      }
-
-      // RETURN
-      return hit.v;
+    if (hit === undefined) {
+      return undefined;
     }
-    return undefined;
+
+    // HOIST
+    if (this.h === null) {
+      this.h = this.t = hit;
+    } else if (hit !== this.h) {
+      // Remove newHead from old position
+      hit.p!.n = hit.n;
+      if (hit.n !== null) {
+        hit.n.p = hit.p;
+      } else {
+        // It was the t, now hit.prev is the t
+        this.t = hit.p;
+      }
+      // Add hit at top
+      hit.n = this.h;
+      this.h!.p = hit;
+      this.h = hit;
+      hit.p = null;
+    }
+
+    // RETURN
+    return hit.v;
   }
 
   public set(key: KeyType, value: ValueType): void {
     const hit = this.c.get(key);
-    if (hit) {
+    if (hit !== undefined) {
       hit.v = value;
     } else {
       const newHead: Node<KeyType, ValueType> = {
@@ -141,7 +140,7 @@ export class LRU<KeyType = any, ValueType = any> {
 
   /** add */
   private a(newHead: Node<KeyType, ValueType>) {
-    if (!this.h) {
+    if (this.h === null) {
       this.h = this.t = newHead;
       this.length = 1;
       return;
@@ -155,7 +154,7 @@ export class LRU<KeyType = any, ValueType = any> {
       this.c.delete(oldTail.k);
       this.t = oldTail.p;
       this.t!.n = null;
-      if (this.d) {
+      if (this.d !== null) {
         this.d(oldTail.k, oldTail.v);
       }
     } else {
@@ -170,4 +169,5 @@ export class LRU<KeyType = any, ValueType = any> {
     }
   }
 }
+
 export default LRU;
