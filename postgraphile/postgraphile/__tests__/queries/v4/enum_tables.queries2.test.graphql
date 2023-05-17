@@ -8,6 +8,7 @@
       enum1
       enum2
       enum3
+      simpleEnum
     }
   }
 }

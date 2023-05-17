@@ -31,6 +31,7 @@ grant execute on function c.return_table_without_grants() to postgraphile_test_v
 grant execute on function a.post_with_suffix(a.post, text) to postgraphile_test_visitor;
 
 grant usage on schema enum_tables to postgraphile_test_authenticator;
+grant select on enum_tables.simple_enum to postgraphile_test_authenticator;
 grant select on enum_tables.abcd to postgraphile_test_authenticator;
 grant select on enum_tables.abcd_view to postgraphile_test_authenticator;
 grant select on enum_tables.lots_of_enums to postgraphile_test_authenticator;

@@ -359,10 +359,10 @@ insert into enum_tables.letter_descriptions(letter, letter_via_view, description
   ('D', 'D', 'The first letter omitted from the ''ABC'' phrase');
 
 alter sequence enum_tables.referencing_table_id_seq restart with 432;
-insert into enum_tables.referencing_table(enum_1, enum_2, enum_3) values
-  ('a1', null, null),
-  ('a3', 'b2', 'c1'),
-  (null, null, 'c3');
+insert into enum_tables.referencing_table(enum_1, enum_2, enum_3, simple_enum) values
+  ('a1', null, null, null),
+  ('a3', 'b2', 'c1', 'Baz'),
+  (null, null, 'c3', 'Qux');
 
 --------------------------------------------------------------------------------
 
