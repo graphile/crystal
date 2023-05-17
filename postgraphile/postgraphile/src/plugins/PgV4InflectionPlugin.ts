@@ -98,6 +98,30 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
           return this.edgeType(this.pluralize(this.tableType(codec)));
         }
       },
+
+      // Remove the 'singularize'
+      enumTableEnum(_previous, _preset, { serviceName, pgConstraint }) {
+        const pgClass = pgConstraint.getClass()!;
+        const constraintTags = pgConstraint.getTags();
+        if (typeof constraintTags.enumName === "string") {
+          return constraintTags.enumName;
+        }
+        if (pgConstraint.contype === "p") {
+          const classTags = pgClass.getTags();
+          if (typeof classTags.enumName === "string") {
+            return classTags.enumName;
+          }
+          return this.upperCamelCase(
+            this.tableResourceName({ serviceName, pgClass }),
+          );
+        } else {
+          const tableName = this.tableResourceName({ serviceName, pgClass });
+          const pgAttribute = pgClass
+            .getAttributes()!
+            .find((att) => att.attnum === pgConstraint.conkey![0])!;
+          return this.upperCamelCase(`${tableName}-${pgAttribute.attname}`);
+        }
+      },
     },
   },
 };

@@ -614,6 +614,7 @@ type ReferencingTable implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+  simpleEnum: SimpleEnum
 }
 
 """
@@ -632,6 +633,9 @@ input ReferencingTableCondition {
 
   """Checks for equality with the object’s `id` field."""
   id: Int
+
+  """Checks for equality with the object’s `simpleEnum` field."""
+  simpleEnum: SimpleEnum
 }
 
 """An input for mutations affecting `ReferencingTable`"""
@@ -640,6 +644,7 @@ input ReferencingTableInput {
   enum2: EnumTheSecond
   enum3: LotsOfEnumsEnum3
   id: Int
+  simpleEnum: SimpleEnum
 }
 
 """All input for the `referencingTableMutation` mutation."""
@@ -675,6 +680,7 @@ input ReferencingTablePatch {
   enum2: EnumTheSecond
   enum3: LotsOfEnumsEnum3
   id: Int
+  simpleEnum: SimpleEnum
 }
 
 """A connection to a list of `ReferencingTable` values."""
@@ -718,6 +724,19 @@ enum ReferencingTablesOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  SIMPLE_ENUM_ASC
+  SIMPLE_ENUM_DESC
+}
+
+enum SimpleEnum {
+  BAR
+
+  """The third metasyntactic variable, very similar to its predecessor"""
+  BAZ
+
+  """The first metasyntactic variable"""
+  FOO
+  QUX
 }
 
 """All input for the `updateLetterDescriptionById` mutation."""

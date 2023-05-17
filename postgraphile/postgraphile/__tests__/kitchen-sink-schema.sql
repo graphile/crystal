@@ -1165,6 +1165,9 @@ create table named_query_builder.toy_categories (
 --------------------------------------------------------------------------------
 
 create schema enum_tables;
+create table enum_tables.simple_enum (value text primary key, description text);
+comment on table enum_tables.simple_enum is E'@enum';
+
 create table enum_tables.abcd (letter text primary key, description text);
 comment on column enum_tables.abcd.description is E'@enumDescription';
 comment on table enum_tables.abcd is E'@enum\n@enumName LetterAToD';
@@ -1202,6 +1205,11 @@ comment on constraint enum_4 on enum_tables.lots_of_enums is E'@enum';
 
 -- Enum table needs values added as part of the migration, not as part of the
 -- data.
+insert into enum_tables.simple_enum (value, description) values
+  ('Foo', 'The first metasyntactic variable'),
+  ('Bar', null),
+  ('Baz', 'The third metasyntactic variable, very similar to its predecessor'),
+  ('Qux', null);
 insert into enum_tables.abcd (letter, description) values
   ('A', 'The letter A'),
   ('B', 'The letter B'),
@@ -1232,7 +1240,8 @@ create table enum_tables.referencing_table(
   id serial primary key,
   enum_1 text references enum_tables.lots_of_enums(enum_1),
   enum_2 varchar(3) references enum_tables.lots_of_enums(enum_2),
-  enum_3 char(2) references enum_tables.lots_of_enums(enum_3)
+  enum_3 char(2) references enum_tables.lots_of_enums(enum_3),
+  simple_enum text references enum_tables.simple_enum
 );
 
 -- Relates to https://github.com/graphile/postgraphile/issues/1365
@@ -1241,7 +1250,7 @@ returns int as $$
 declare
   v_out int;
 begin
-  insert into enum_tables.referencing_table (enum_1, enum_2, enum_3) values (t.enum_1, t.enum_2, t.enum_3)
+  insert into enum_tables.referencing_table (enum_1, enum_2, enum_3, simple_enum) values (t.enum_1, t.enum_2, t.enum_3, t.simple_enum)
     returning id into v_out;
   return v_out;
 end;
