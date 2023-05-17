@@ -154,7 +154,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       baseNameMatches(_preset, baseName, otherName) {
         const singularizedName = this.singularize(otherName);
-        return baseName === singularizedName;
+        return this.camelCase(baseName) === this.camelCase(singularizedName);
       },
 
       /* This is a good method to override. */
