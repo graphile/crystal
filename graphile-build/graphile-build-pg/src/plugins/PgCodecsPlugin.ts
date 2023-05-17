@@ -179,7 +179,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         return this.camelCase(`${schemaPrefix}${pgType.typname}`);
       },
       scalarCodecTypeName(options, codec) {
-        return this.upperCamelCase(this.coerceToGraphQLName(codec.name));
+        return this.upperCamelCase(
+          this.coerceToGraphQLName(codec.extensions?.tags?.name ?? codec.name),
+        );
       },
       enumType(options, codec) {
         return this.scalarCodecTypeName(codec);

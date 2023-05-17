@@ -1,4 +1,4 @@
-import type { PgEnumCodec, PgEnumValue } from "@dataplan/pg";
+import type { PgEnumCodec, PgEnumValue, PgCodecExtensions } from "@dataplan/pg";
 import { enumCodec } from "@dataplan/pg";
 import type {
   Introspection,
@@ -31,6 +31,23 @@ declare global {
 
   namespace GraphileBuild {
     interface Inflection {
+      /**
+       * Name of the _GraphQL enum_ used to represent an enum table in the
+       * schema.
+       */
+      enumTableEnum(
+        this: Inflection,
+        details: {
+          serviceName: string;
+          pgClass: PgClass;
+          pgConstraint: PgConstraint;
+        },
+      ): string;
+
+      /**
+       * Name of the _codec_ used to represent an enum table as an enum. You
+       * probably want `enumTableEnum` instead.
+       */
       enumTableCodec(
         this: Inflection,
         details: {
@@ -63,11 +80,11 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
   name: "PgEnumTablesPlugin",
   description: "Converts columns that reference `@enum` tables into enums",
   version,
-  after: ["PgFakeConstraintsPlugin"],
+  after: ["PgFakeConstraintsPlugin", "smart-tags"],
 
   inflection: {
     add: {
-      enumTableCodec(preset, { serviceName, pgConstraint }) {
+      enumTableEnum(preset, { serviceName, pgConstraint }) {
         const pgClass = pgConstraint.getClass()!;
         const constraintTags = pgConstraint.getTags();
         if (typeof constraintTags.enumName === "string") {
@@ -78,14 +95,23 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           if (typeof classTags.enumName === "string") {
             return classTags.enumName;
           }
-          return this.tableResourceName({ serviceName, pgClass });
+          return this.upperCamelCase(
+            this.singularize(this.tableResourceName({ serviceName, pgClass })),
+          );
         } else {
-          const tableName = this.tableResourceName({ serviceName, pgClass });
+          const tableName = this.singularize(
+            this.tableResourceName({ serviceName, pgClass }),
+          );
           const pgAttribute = pgClass
             .getAttributes()!
             .find((att) => att.attnum === pgConstraint.conkey![0])!;
           return this.upperCamelCase(`${tableName}-${pgAttribute.attname}`);
         }
+      },
+      enumTableCodec(_preset, { serviceName, pgConstraint, pgClass }) {
+        return this.upperCamelCase(
+          this.enumTableEnum({ serviceName, pgConstraint, pgClass }) + "-enum",
+        );
       },
     },
   },
@@ -246,6 +272,17 @@ Original error: ${e.message}
                 }),
               );
 
+              const extensions: PgCodecExtensions = {
+                // TODO: more extensions/tags?
+                tags: {
+                  name: info.inflection.enumTableEnum({
+                    serviceName,
+                    pgClass,
+                    pgConstraint,
+                  }),
+                },
+              };
+
               // Build the codec
               const codec = enumCodec({
                 name: info.inflection.enumTableCodec({
@@ -255,7 +292,7 @@ Original error: ${e.message}
                 }),
                 identifier: originalCodec.sqlType,
                 values,
-                // TODO: extensions?
+                extensions,
               });
 
               // Associate this constraint with our new codec
