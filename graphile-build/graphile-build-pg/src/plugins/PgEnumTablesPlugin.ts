@@ -1,4 +1,4 @@
-import type { PgEnumCodec, PgEnumValue, PgCodecExtensions } from "@dataplan/pg";
+import type { PgCodecExtensions, PgEnumCodec, PgEnumValue } from "@dataplan/pg";
 import { enumCodec } from "@dataplan/pg";
 import type {
   Introspection,
