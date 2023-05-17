@@ -42,11 +42,10 @@ import type {
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
-import { $$proxy, $$subroutine } from "../interfaces.js";
+import { $$proxy, $$subroutine, $$timeout } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
-import type { GrafastPrepareOptions } from "../prepare.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
 import {
   $$noExec,
@@ -143,6 +142,9 @@ const NO_ARGS: TrackedArguments = {
 };
 
 export class OperationPlan {
+  /* This only exists to make establishOperationPlan easier for TypeScript */
+  public readonly [$$timeout]: undefined;
+
   public readonly queryType: GraphQLObjectType;
   public readonly mutationType: GraphQLObjectType | null;
   public readonly subscriptionType: GraphQLObjectType | null;
@@ -236,7 +238,6 @@ export class OperationPlan {
 
   private startTime = timeSource.now();
   private previousLap = this.startTime;
-  private planningTimeout: number | null = null;
   private laps: Array<{
     category: string;
     subcategory: string | undefined;
@@ -259,10 +260,9 @@ export class OperationPlan {
     public readonly variableValues: { [key: string]: any },
     public readonly context: { [key: string]: any },
     public readonly rootValue: any,
-    options: GrafastPrepareOptions,
+    private readonly planningTimeout: number | null = null,
   ) {
     this.scalarPlanInfo = { schema: this.schema };
-    this.planningTimeout = options.timeouts?.planning ?? null;
     const queryType = schema.getQueryType();
     assert.ok(queryType, "Schema must have a query type");
     this.queryType = queryType;
@@ -472,7 +472,12 @@ export class OperationPlan {
     if (this.planningTimeout === null) return;
     const elapsed = timeSource.now() - this.startTime;
     if (elapsed > this.planningTimeout * planningTimeoutWarmupMultiplier) {
-      throw new Error("Operation took too long to plan; aborted");
+      throw Object.assign(
+        new Error("Operation took too long to plan; aborted"),
+        {
+          [$$timeout]: this.planningTimeout,
+        },
+      );
     }
   }
 

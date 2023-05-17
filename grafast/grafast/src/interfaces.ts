@@ -35,6 +35,31 @@ import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
+export interface GrafastTimeouts {
+  /**
+   * How many milliseconds should we allow for planning. Remember: planning is
+   * synchronous, so whilst it is happening the event loop is blocked.
+   */
+  planning?: number;
+
+  /**
+   * How many milliseconds should we allow for execution. We will only check
+   * this immediately before triggering the execution of an asynchronous step,
+   * and if it is exceeded it will only prevent the execution of asynchronous
+   * steps, not synchronous ones.
+   *
+   * IMPORTANT: since we only check this _before_ an asynchronous step
+   * executes, there's nothing to stop an asynchronous step from continuing to
+   * execute long after the timeout has expired - therefore it's the
+   * responsibility of each step to abort itself if it goes over the allocated
+   * time budget (which is detailed in `ExecutionExtra`).
+   */
+  execution?: number;
+
+  // We do not currently have an "output" timeout limit; though output is
+  // synchronous it's typically so fast that no timeout is required.
+}
+
 export interface GrafastOptions {
   // TODO: context should be a generic
   /**
@@ -58,6 +83,8 @@ export interface GrafastOptions {
    * If set to `true` then all possible explain types will be exposed.
    */
   explain?: boolean | string[];
+
+  timeouts?: GrafastTimeouts;
 }
 
 declare global {
@@ -242,6 +269,12 @@ export const $$safeError = Symbol("safeError");
 
 /** The layerPlan used as a subroutine for this step */
 export const $$subroutine = Symbol("subroutine");
+
+/** For tracking the timeout a TimeoutError happened from */
+export const $$timeout = Symbol("timeout");
+
+/** For tracking _when_ the timeout happened (because once the JIT has warmed it might not need so long) */
+export const $$ts = Symbol("timestamp");
 
 /**
  * When dealing with a polymorphic thing we need to be able to determine what

@@ -26,7 +26,11 @@ import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
 import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
-import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
+import type {
+  GrafastTimeouts,
+  JSONValue,
+  PromiseOrDirect,
+} from "./interfaces.js";
 import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -55,13 +59,7 @@ export interface GrafastPrepareOptions {
    */
   outputDataAsString?: boolean;
 
-  timeouts?: {
-    /**
-     * How many milliseconds should we allow for planning. Remember: planning is
-     * synchronous, so whilst it is happening the event loop is blocked.
-     */
-    planning?: number;
-  };
+  timeouts?: GrafastTimeouts;
 }
 
 const bypassGraphQLObj = Object.assign(Object.create(null), {
