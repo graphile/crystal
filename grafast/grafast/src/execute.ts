@@ -78,6 +78,7 @@ export function withGrafastArgs(
   const rootValue = grafastPrepare(args, {
     explain: options?.explain,
     outputDataAsString,
+    timeouts: options?.timeouts,
   });
   if (unlisten !== null) {
     Promise.resolve(rootValue).then(unlisten, unlisten);

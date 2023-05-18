@@ -33,6 +33,7 @@ import type {
 } from "./interfaces.js";
 import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
+import { timeSource } from "./timeSource.js";
 
 const { GraphQLError } = graphql;
 
@@ -251,12 +252,13 @@ export function executePreemptive(
   context: any,
   rootValue: any,
   outputDataAsString: boolean,
+  executionTimeout: number | null,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
   // PERF: batch this method so it can process multiple GraphQL requests in parallel
 
-  // TODO: when we batch, we need to change `bucketIndex` and `size`!
+  // TODO: when we batch, we need to change `bucketIndex` and `size`, and make sure that we only batch where `executionTimeout` is the same.
   const bucketIndex = 0;
   const size = 1;
 
@@ -280,7 +282,12 @@ export function executePreemptive(
     hasErrors: false,
     polymorphicPathList,
   });
+  const startTime = timeSource.now();
+  const stopTime =
+    executionTimeout !== null ? startTime + executionTimeout : null;
   const requestContext: RequestTools = {
+    startTime,
+    stopTime,
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
     metaByMetaKey:
@@ -499,15 +506,33 @@ export function grafastPrepare(
   }
 
   const { operation, fragments, variableValues } = exeContext;
-  const operationPlan = establishOperationPlan(
-    schema,
-    operation,
-    fragments,
-    variableValues,
-    context as any,
-    rootValue,
-    options,
-  );
+  const planningTimeout = options.timeouts?.planning;
+  let operationPlan!: OperationPlan;
+  try {
+    operationPlan = establishOperationPlan(
+      schema,
+      operation,
+      fragments,
+      variableValues,
+      context as any,
+      rootValue,
+      planningTimeout,
+    );
+  } catch (error) {
+    const graphqlError =
+      error instanceof GraphQLError
+        ? error
+        : new GraphQLError(
+            error.message,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            error,
+            error.extensions ?? null,
+          );
+    return { errors: [graphqlError] };
+  }
 
   if (
     options.explain === true ||
@@ -528,12 +553,14 @@ export function grafastPrepare(
     });
   }
 
+  const executionTimeout = options.timeouts?.execution ?? null;
   return executePreemptive(
     operationPlan,
     variableValues,
     context,
     rootValue,
     options.outputDataAsString ?? false,
+    executionTimeout,
   );
 }
 

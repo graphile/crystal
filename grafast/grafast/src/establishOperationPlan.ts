@@ -8,15 +8,18 @@ import type {
 
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
-import { OperationPlan } from "./index.js";
+import { OperationPlan, SafeError } from "./index.js";
 import { BaseGraphQLRootValue, BaseGraphQLVariables } from "./interfaces.js";
 import { $$timeout, $$ts } from "./interfaces.js";
-import type { GrafastPrepareOptions } from "./prepare.js";
+import { timeSource } from "./timeSource.js";
 
 const debug = debugFactory("grafast:establishOperationPlan");
 
 // How long is a timeout valid for? Here I've set it to 60 seconds.
 const TIMEOUT_TIMEOUT = 60_000;
+// TODO: we should consider increasing the timeout once the process has been
+// running a while (since the JIT should have kicked in) - we could even use
+// `setTimeout` to trigger it after certain amount of time elapsed.
 
 type Fragments = {
   [key: string]: FragmentDefinitionNode;
@@ -24,8 +27,12 @@ type Fragments = {
 
 type OperationPlanOrError =
   | OperationPlan
-  | (Error & { [$$timeout]?: undefined; [$$ts]?: undefined })
-  | (Error & { [$$timeout]: number; [$$ts]: number });
+  | Error
+  | SafeError<
+      | { [$$timeout]: number; [$$ts]: number }
+      | { [$$timeout]?: undefined; [$$ts]?: undefined }
+      | undefined
+    >;
 
 interface LinkedList<T> {
   value: T;
@@ -155,9 +162,8 @@ export function establishOperationPlan<
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
-  options: GrafastPrepareOptions,
+  planningTimeout: number | null = null,
 ): OperationPlan {
-  const planningTimeout = options.timeouts?.planning;
   let cacheByOperation = schema[$$cacheByOperation];
 
   let cache = cacheByOperation?.get(operation);
@@ -175,9 +181,9 @@ export function establishOperationPlan<
       cache.possibleOperationPlans;
     while (linkedItem) {
       const value = linkedItem.value;
-      if (value instanceof Error) {
-        if (value[$$timeout] != null) {
-          if (value[$$ts] < performance.now() - TIMEOUT_TIMEOUT) {
+      if (value instanceof SafeError) {
+        if (value.extensions?.[$$timeout] != null) {
+          if (value.extensions[$$ts] < timeSource.now() - TIMEOUT_TIMEOUT) {
             // Remove this out of date timeout
             linkedItem = linkedItem.next;
             if (previousItem !== null) {
@@ -187,7 +193,10 @@ export function establishOperationPlan<
             }
             continue;
           }
-          if (planningTimeout != null && value[$$timeout] >= planningTimeout) {
+          if (
+            planningTimeout !== null &&
+            value.extensions[$$timeout] >= planningTimeout
+          ) {
             // It was a timeout error - do not retry
             throw value;
           } else {
@@ -197,6 +206,9 @@ export function establishOperationPlan<
           // Not a timeout error - this will always fail in the same way?
           throw value;
         }
+      } else if (value instanceof Error) {
+        // Not a timeout error - this will always fail in the same way?
+        throw value;
       } else if (
         isOperationPlanCompatible(value, variableValues, context, rootValue)
       ) {

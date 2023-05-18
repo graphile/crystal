@@ -59,14 +59,19 @@ export function isGrafastError(value: any): value is GrafastError {
   return typeof value === "object" && value !== null && $$error in value;
 }
 
-export class SafeError extends Error {
+export class SafeError<
+  TExtensions extends Record<string, any> | undefined =
+    | Record<string, any>
+    | undefined,
+> extends Error {
   [$$safeError] = true;
   constructor(
     message: string,
-    public extensions?: Record<string, any>,
+    public extensions: TExtensions = undefined as TExtensions,
     errorOptions?: ErrorOptions,
   ) {
     super(message, errorOptions);
+    Object.setPrototypeOf(this, SafeError.prototype);
   }
 }
 

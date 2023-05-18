@@ -135,13 +135,17 @@ export type LayerPlanReasonsWithParentStep = HasParent<LayerPlanReason>;
 
 /** @internal */
 export interface LayerPlanPhase {
+  checkTimeout: boolean;
+
   /**
    * A list of steps that can be ran in parallel at this point, since all
    * their previous dependencies have already been satisfied.
    */
-  normalSteps?: Array<{
-    step: ExecutableStep;
-  }>;
+  normalSteps:
+    | Array<{
+        step: ExecutableStep;
+      }>
+    | undefined;
 
   /**
    * A list of 'isSyncAndSafe' steps with unbatchedExecute methods that can be
@@ -149,15 +153,17 @@ export interface LayerPlanPhase {
    * that have already been executed before them (including previous
    * unbatchedSyncAndSafeSteps in the same list).
    */
-  unbatchedSyncAndSafeSteps?: Array<{
-    step: UnbatchedExecutableStep;
+  unbatchedSyncAndSafeSteps:
+    | Array<{
+        step: UnbatchedExecutableStep;
 
-    /**
-     * Store the result of the step here if you want - useful to avoid lookups
-     * and when there's no storage. HIGHLY VOLATILE, will not survive a tick!
-     */
-    scratchpad: any;
-  }>;
+        /**
+         * Store the result of the step here if you want - useful to avoid lookups
+         * and when there's no storage. HIGHLY VOLATILE, will not survive a tick!
+         */
+        scratchpad: any;
+      }>
+    | undefined;
 
   /**
    * Optimization - a digest of all steps in normalSteps and unbatchedSyncAndSafeSteps

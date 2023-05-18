@@ -13,10 +13,11 @@ import type {
   GrafastResultStreamList,
   PromiseOrDirect,
 } from "../interfaces.js";
-import { $$streamMore } from "../interfaces.js";
+import { $$streamMore, $$timeout } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { __ValueStep } from "../steps/__value.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
+import { timeSource } from "../timeSource.js";
 
 const DEBUG_POLYMORPHISM = false;
 
@@ -107,7 +108,7 @@ export function executeBucket(
       return;
     }
     const phase = phases[phaseIndex];
-    const normalSteps = phase.normalSteps?.map((s) => s.step);
+
     let executePromises:
       | PromiseLike<GrafastResultsList<any> | GrafastResultStreamList<any>>[]
       | null = null;
@@ -116,13 +117,36 @@ export function executeBucket(
     const results: Array<
       GrafastResultsList<any> | GrafastResultStreamList<any> | undefined
     > = [];
-    if (normalSteps !== undefined) {
+    if (
+      phase.checkTimeout &&
+      requestContext.stopTime !== null &&
+      timeSource.now() >= requestContext.stopTime
+    ) {
+      // ABORT!
+      const timeoutError = Object.assign(new Error(), { [$$timeout]: true });
+      if (phase.normalSteps !== undefined) {
+        const normalSteps = phase.normalSteps;
+        for (
+          let normalStepIndex = 0, l = normalSteps.length;
+          normalStepIndex < l;
+          normalStepIndex++
+        ) {
+          const step = normalSteps[normalStepIndex].step;
+          const r = newGrafastError(timeoutError, step.id);
+          const result = arrayOfLength(bucket.size, r);
+          results[normalStepIndex] = result;
+          bucket.store.set(step.id, result);
+          bucket.hasErrors = true;
+        }
+      }
+    } else if (phase.normalSteps !== undefined) {
+      const normalSteps = phase.normalSteps;
       for (
         let normalStepIndex = 0, l = normalSteps.length;
         normalStepIndex < l;
         normalStepIndex++
       ) {
-        const step = normalSteps[normalStepIndex];
+        const step = normalSteps[normalStepIndex].step;
         if (step.hasSideEffects) {
           if (sideEffectPlanIds === null) {
             sideEffectPlanIds = [step.id];
@@ -145,9 +169,11 @@ export function executeBucket(
             results[normalStepIndex] = r;
           }
         } catch (e) {
-          results[normalStepIndex] = undefined;
           const r = newGrafastError(e, step.id);
-          bucket.store.set(step.id, arrayOfLength(bucket.size, r));
+          const result = arrayOfLength(bucket.size, r);
+          bucket.store.set(step.id, result);
+          results[normalStepIndex] = undefined;
+          // TODO: shouldn't this ^ be `results[normalStepIndex] = result;` ?
           bucket.hasErrors = true;
         }
       }

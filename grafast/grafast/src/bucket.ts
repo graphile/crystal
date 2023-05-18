@@ -8,6 +8,9 @@ import type { ExecutionEventEmitter } from "./interfaces.js";
  * @internal
  */
 export interface RequestTools {
+  startTime: number;
+  stopTime: number | null;
+
   // readonly toSerialize: Array<{
   //   /** object (or array) */
   //   o: object;
