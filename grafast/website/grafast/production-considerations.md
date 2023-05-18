@@ -191,8 +191,8 @@ request.
 
 A simple protection is to require authentication to use your API. This is not
 suitable for all APIs, but if it works for you it could significantly decrease
-your attack surface - particularly protecting you from untargetted automated
-attacks. Another approach to protect against untargetted attacks is to check
+your attack surface - particularly protecting you from untargeted automated
+attacks. Another approach to protect against untargeted attacks is to check
 the origin of requests, or to require the inclusion of a randomly generated
 value such as a CSRF token.
 
