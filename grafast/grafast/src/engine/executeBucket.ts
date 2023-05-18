@@ -89,7 +89,7 @@ export function executeBucket(
     requestContext.metaByMetaKey = layerPlan.operationPlan.makeMetaByMetaKey();
   }
 
-  const { metaByMetaKey } = requestContext;
+  const { metaByMetaKey, stopTime, eventEmitter } = requestContext;
   const {
     size,
     store,
@@ -119,8 +119,8 @@ export function executeBucket(
     > = [];
     if (
       phase.checkTimeout &&
-      requestContext.stopTime !== null &&
-      timeSource.now() >= requestContext.stopTime
+      stopTime !== null &&
+      timeSource.now() >= stopTime
     ) {
       // ABORT!
       const timeoutError = new SafeError(
@@ -360,8 +360,9 @@ export function executeBucket(
               ? metaByMetaKey[step.metaKey]
               : undefined;
           extras[allStepsIndex] = {
+            stopTime,
             meta,
-            eventEmitter: requestContext.eventEmitter,
+            eventEmitter,
             _bucket: bucket,
             _requestContext: requestContext,
           };
@@ -655,8 +656,9 @@ export function executeBucket(
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
       const extra: ExecutionExtra = {
+        stopTime,
         meta,
-        eventEmitter: requestContext.eventEmitter,
+        eventEmitter,
         _bucket: bucket,
         _requestContext: requestContext,
       };

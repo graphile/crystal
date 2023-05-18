@@ -824,6 +824,7 @@ export type ExecutionEventMap = {
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
 export interface ExecutionExtra {
+  stopTime: number | null;
   meta: Record<string, unknown> | undefined;
   eventEmitter: ExecutionEventEmitter | undefined;
 
