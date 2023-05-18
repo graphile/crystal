@@ -24,23 +24,26 @@ export const $$error = Symbol("isGrafastError");
  *
  * @internal
  */
-export class _GrafastError extends Error implements GrafastError {
+export const _GrafastError = class GrafastError
+  extends Error
+  implements GrafastError
+{
   public readonly originalError: Error;
   extensions: Record<string, any>;
   [$$error] = true;
   constructor(originalError: Error, planId: number | null) {
-    if (originalError instanceof _GrafastError) {
+    if (originalError instanceof GrafastError) {
       throw new Error(
         "GrafastInternalError<62505509-8b21-4ef7-80f5-d0f99873174b>: attempted to wrap a GrafastError with a GrafastError.",
       );
     }
     const message = originalError?.message;
-    // TODO: remove `GrafastError:` prefix
-    super(message ? `GrafastError: ${message}` : `GrafastError`);
+    super(message);
+    Object.setPrototypeOf(this, GrafastError.prototype);
     this.originalError = originalError;
     this.extensions = { grafast: { planId } };
   }
-}
+};
 
 /**
  * DO NOT ALLOW CONSTRUCTION OF ERRORS OUTSIDE OF THIS MODULE!
