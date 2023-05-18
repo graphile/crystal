@@ -470,7 +470,7 @@ export class OperationPlan {
     const elapsed = now - this.startTime;
     if (elapsed > this.planningTimeout * planningTimeoutWarmupMultiplier) {
       throw new SafeError(
-        "Operation took too long to plan and was aborted. Please simplify your query and try again.",
+        "Operation took too long to plan and was aborted. Please simplify the request and try again.",
         {
           [$$timeout]: this.planningTimeout,
           [$$ts]: now,

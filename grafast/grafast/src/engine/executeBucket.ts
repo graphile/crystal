@@ -5,7 +5,7 @@ import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { $$error, isGrafastError, newGrafastError } from "../error.js";
-import { __ItemStep, isStreamableStep } from "../index.js";
+import { SafeError, __ItemStep, isStreamableStep } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
@@ -123,7 +123,10 @@ export function executeBucket(
       timeSource.now() >= requestContext.stopTime
     ) {
       // ABORT!
-      const timeoutError = Object.assign(new Error(), { [$$timeout]: true });
+      const timeoutError = new SafeError(
+        "Execution timeout exceeded, please simplify or add limits to your request.",
+        { [$$timeout]: true },
+      );
       if (phase.normalSteps !== undefined) {
         const normalSteps = phase.normalSteps;
         for (
