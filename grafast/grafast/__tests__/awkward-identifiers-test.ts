@@ -70,7 +70,6 @@ it("ok", () => {
     schema,
     source,
   });
-  console.dir(result);
   expect(result.errors).to.equal(undefined);
   const expected = `\
 {
