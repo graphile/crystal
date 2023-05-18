@@ -173,9 +173,7 @@ export function executeBucket(
         } catch (e) {
           const r = newGrafastError(e, step.id);
           const result = arrayOfLength(bucket.size, r);
-          bucket.store.set(step.id, result);
-          results[normalStepIndex] = undefined;
-          // TODO: shouldn't this ^ be `results[normalStepIndex] = result;` ?
+          results[normalStepIndex] = result;
           bucket.hasErrors = true;
         }
       }
