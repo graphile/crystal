@@ -1,12 +1,19 @@
 import { expect } from "chai";
 import { ExecutionResult } from "graphql";
 import { it } from "mocha";
-import { constant, grafast, lambda, makeGrafastSchema } from "../dist";
+import {
+  ExecutableStep,
+  constant,
+  grafast,
+  lambda,
+  makeGrafastSchema,
+} from "../dist";
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
     type Delayed {
       meaningOfLife: Int
+      delayed: Delayed
     }
     type Query {
       delayed: Delayed
@@ -17,13 +24,25 @@ const schema = makeGrafastSchema({
       delayed() {
         return lambda(
           null,
-          () => new Promise((resolve) => setTimeout(resolve, 20)),
+          () =>
+            new Promise((resolve) =>
+              setTimeout(() => resolve({ name: "Query.delayed" }), 2),
+            ),
         );
       },
     },
     Delayed: {
       meaningOfLife() {
         return constant(42);
+      },
+      delayed($o: ExecutableStep) {
+        return lambda(
+          $o,
+          () =>
+            new Promise((resolve) =>
+              setTimeout(() => resolve({ name: "Delayed.delayed" }), 2),
+            ),
+        );
       },
     },
   },
@@ -99,6 +118,75 @@ it("execution timeout works", async () => {
     ],
     "path": [
       "delayed"
+    ]
+  }
+]`,
+  );
+});
+
+it("execution timeout works 2", async () => {
+  const source = /* GraphQL */ `
+    {
+      delayed {
+        meaningOfLife
+        delayed {
+          meaningOfLife
+        }
+        delayed2: delayed {
+          meaningOfLife
+        }
+      }
+    }
+  `;
+  const result = (await grafast(
+    {
+      schema,
+      source,
+    },
+    {
+      grafast: {
+        timeouts: {
+          execution: 1,
+        },
+        explain: true,
+      },
+    },
+  )) as ExecutionResult;
+  expect(JSON.stringify(result.data, null, 2)).to.equal(`\
+{
+  "delayed": {
+    "meaningOfLife": 42,
+    "delayed": null,
+    "delayed2": null
+  }
+}`);
+  expect(JSON.stringify(result.errors, null, 2)).to.equal(
+    `\
+[
+  {
+    "message": "Execution timeout exceeded, please simplify or add limits to your request.",
+    "locations": [
+      {
+        "line": 5,
+        "column": 9
+      }
+    ],
+    "path": [
+      "delayed",
+      "delayed"
+    ]
+  },
+  {
+    "message": "Execution timeout exceeded, please simplify or add limits to your request.",
+    "locations": [
+      {
+        "line": 8,
+        "column": 9
+      }
+    ],
+    "path": [
+      "delayed",
+      "delayed2"
     ]
   }
 ]`,
