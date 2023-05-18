@@ -15,9 +15,9 @@ actors sending malicious queries trying to instigate a [Denial of
 Service](#denial-of-service) attack.
 
 If you choose not to use persisted operations, or if you want to be extra safe
-(especially if your team are not disciplined about adding pagination limits or
-careful about placement of variables), then you should also consider setting
-planning and execution timeouts:
+(especially if your team are not extremely disciplined about adding pagination
+limits or careful about placement of variables), then you should also consider
+setting planning and execution timeouts:
 
 ```js
 const preset = {
@@ -244,8 +244,8 @@ started and V8 hasn't had a chance to warm up the JIT caches yet. Therefore, we
 increase the allowed timeout for the first few operations planned.
 
 The planning timeout is only checked at certain stages whilst planning the
-query, so it can be exceeded though generally only by a few tens of
-milliseconds. Should you find this problematic, please get in touch and we can
+query, so it can be exceeded (generally only by a few tens of
+milliseconds). Should you find this problematic, please get in touch and we can
 discuss adding timeout checks in more locations.
 
 Most importantly, note that the planning time required for an operation will
