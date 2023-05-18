@@ -138,7 +138,6 @@ export function executeBucket(
           const r = newGrafastError(timeoutError, step.id);
           const result = arrayOfLength(bucket.size, r);
           results[normalStepIndex] = result;
-          bucket.store.set(step.id, result);
           bucket.hasErrors = true;
         }
       }
