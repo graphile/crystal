@@ -32,8 +32,8 @@ import type {
   PromiseOrDirect,
 } from "./interfaces.js";
 import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
-import { isPromiseLike } from "./utils.js";
 import { timeSource } from "./timeSource.js";
+import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError } = graphql;
 

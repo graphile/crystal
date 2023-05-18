@@ -59,6 +59,7 @@ import {
 import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
+import { timeSource } from "../timeSource.js";
 import {
   defaultValueToValueNode,
   findVariableNamesUsed,
@@ -73,7 +74,6 @@ import { LayerPlan } from "./LayerPlan.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
-import { timeSource } from "../timeSource.js";
 
 // Work around TypeScript CommonJS `graphql_1.isListType` unoptimal access.
 const {

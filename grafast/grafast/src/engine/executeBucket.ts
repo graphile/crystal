@@ -5,7 +5,7 @@ import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { $$error, isGrafastError, newGrafastError } from "../error.js";
-import { SafeError, __ItemStep, isStreamableStep } from "../index.js";
+import { __ItemStep, isStreamableStep, SafeError } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
@@ -16,8 +16,8 @@ import type {
 import { $$streamMore, $$timeout } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { __ValueStep } from "../steps/__value.js";
-import { arrayOfLength, isPromiseLike } from "../utils.js";
 import { timeSource } from "../timeSource.js";
+import { arrayOfLength, isPromiseLike } from "../utils.js";
 
 const DEBUG_POLYMORPHISM = false;
 

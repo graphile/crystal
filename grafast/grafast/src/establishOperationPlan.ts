@@ -9,7 +9,10 @@ import type {
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
 import { OperationPlan, SafeError } from "./index.js";
-import { BaseGraphQLRootValue, BaseGraphQLVariables } from "./interfaces.js";
+import type {
+  BaseGraphQLRootValue,
+  BaseGraphQLVariables,
+} from "./interfaces.js";
 import { $$timeout, $$ts } from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
 
