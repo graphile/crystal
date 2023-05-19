@@ -32,7 +32,7 @@ export const _GrafastError = class GrafastError
   extensions: Record<string, any>;
   [$$error] = true;
   constructor(originalError: Error, planId: number | null) {
-    if (originalError instanceof GrafastError) {
+    if (originalError instanceof _GrafastError) {
       throw new Error(
         "GrafastInternalError<62505509-8b21-4ef7-80f5-d0f99873174b>: attempted to wrap a GrafastError with a GrafastError.",
       );
