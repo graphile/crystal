@@ -28,6 +28,13 @@ const POLY_SKIPPED = newGrafastError(
   null,
 );
 
+const timeoutError = Object.freeze(
+  new SafeError(
+    "Execution timeout exceeded, please simplify or add limits to your request.",
+    Object.freeze({ [$$timeout]: true }),
+  ),
+);
+
 function noop() {
   /*noop*/
 }
@@ -123,10 +130,6 @@ export function executeBucket(
       timeSource.now() >= stopTime
     ) {
       // ABORT!
-      const timeoutError = new SafeError(
-        "Execution timeout exceeded, please simplify or add limits to your request.",
-        { [$$timeout]: true },
-      );
       if (phase.normalSteps !== undefined) {
         const normalSteps = phase.normalSteps;
         for (
