@@ -19,7 +19,10 @@ import { timeSource } from "./timeSource.js";
 const debug = debugFactory("grafast:establishOperationPlan");
 
 // How long is a timeout valid for? Here I've set it to 60 seconds.
-const TIMEOUT_TIMEOUT = 60_000;
+const TIMEOUT_TIMEOUT =
+  (typeof process.env.GRAFAST_TIMEOUT_VALIDITY_MS === "string"
+    ? parseInt(process.env.GRAFAST_TIMEOUT_VALIDITY_MS, 10)
+    : null) || 60_000;
 // TODO: we should consider increasing the timeout once the process has been
 // running a while (since the JIT should have kicked in) - we could even use
 // `setTimeout` to trigger it after certain amount of time elapsed.
