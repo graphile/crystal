@@ -135,6 +135,12 @@ export type LayerPlanReasonsWithParentStep = HasParent<LayerPlanReason>;
 
 /** @internal */
 export interface LayerPlanPhase {
+  /**
+   * If true, we should check before the layer plan executes to see if the
+   * execution has already timed out.
+   *
+   * @see {RequestTools.stopTime}
+   */
   checkTimeout: boolean;
 
   /**
