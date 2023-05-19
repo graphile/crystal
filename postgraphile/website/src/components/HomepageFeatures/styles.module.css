@@ -15,14 +15,14 @@
 
 .svgContainer {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   max-width: 25%;
 }
 
 .featureSvg {
-  height: 8rem;
-  width: 8rem;
+  height: 6rem;
+  width: 6rem;
 }
 
 .featureDetails {

@@ -32,4 +32,6 @@
 
 .tertiarySvg {
   max-width: 75%;
+  height: auto;
+  margin-bottom: 2rem;
 }
