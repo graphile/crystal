@@ -10,8 +10,6 @@ import {
   newGrafastError,
   SafeError,
 } from "../error.js";
-import { isStreamableStep } from "../step.js";
-import { __ItemStep } from "../steps/__item.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
@@ -21,6 +19,8 @@ import type {
 } from "../interfaces.js";
 import { $$streamMore, $$timeout } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import { isStreamableStep } from "../step.js";
+import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
