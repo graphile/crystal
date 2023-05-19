@@ -4,8 +4,12 @@ import * as assert from "../assert.js";
 import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
-import { $$error, isGrafastError, newGrafastError } from "../error.js";
-import { __ItemStep, isStreamableStep } from "../index.js";
+import {
+  $$error,
+  isGrafastError,
+  newGrafastError,
+  SafeError,
+} from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
@@ -13,9 +17,12 @@ import type {
   GrafastResultStreamList,
   PromiseOrDirect,
 } from "../interfaces.js";
-import { $$streamMore } from "../interfaces.js";
+import { $$streamMore, $$timeout } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import { isStreamableStep } from "../step.js";
+import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
+import { timeSource } from "../timeSource.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
 
 const DEBUG_POLYMORPHISM = false;
@@ -25,6 +32,13 @@ const DEBUG_POLYMORPHISM = false;
 const POLY_SKIPPED = newGrafastError(
   new Error("Polymorphic skipped; you should never see this"),
   null,
+);
+
+const timeoutError = Object.freeze(
+  new SafeError(
+    "Execution timeout exceeded, please simplify or add limits to your request.",
+    Object.freeze({ [$$timeout]: true }),
+  ),
 );
 
 function noop() {
@@ -88,7 +102,7 @@ export function executeBucket(
     requestContext.metaByMetaKey = layerPlan.operationPlan.makeMetaByMetaKey();
   }
 
-  const { metaByMetaKey } = requestContext;
+  const { metaByMetaKey, stopTime, eventEmitter } = requestContext;
   const {
     size,
     store,
@@ -107,7 +121,7 @@ export function executeBucket(
       return;
     }
     const phase = phases[phaseIndex];
-    const normalSteps = phase.normalSteps?.map((s) => s.step);
+
     let executePromises:
       | PromiseLike<GrafastResultsList<any> | GrafastResultStreamList<any>>[]
       | null = null;
@@ -116,13 +130,34 @@ export function executeBucket(
     const results: Array<
       GrafastResultsList<any> | GrafastResultStreamList<any> | undefined
     > = [];
-    if (normalSteps !== undefined) {
+    if (
+      phase.checkTimeout &&
+      stopTime !== null &&
+      timeSource.now() >= stopTime
+    ) {
+      // ABORT!
+      if (phase.normalSteps !== undefined) {
+        const normalSteps = phase.normalSteps;
+        for (
+          let normalStepIndex = 0, l = normalSteps.length;
+          normalStepIndex < l;
+          normalStepIndex++
+        ) {
+          const step = normalSteps[normalStepIndex].step;
+          const r = newGrafastError(timeoutError, step.id);
+          const result = arrayOfLength(bucket.size, r);
+          results[normalStepIndex] = result;
+          bucket.hasErrors = true;
+        }
+      }
+    } else if (phase.normalSteps !== undefined) {
+      const normalSteps = phase.normalSteps;
       for (
         let normalStepIndex = 0, l = normalSteps.length;
         normalStepIndex < l;
         normalStepIndex++
       ) {
-        const step = normalSteps[normalStepIndex];
+        const step = normalSteps[normalStepIndex].step;
         if (step.hasSideEffects) {
           if (sideEffectPlanIds === null) {
             sideEffectPlanIds = [step.id];
@@ -145,9 +180,9 @@ export function executeBucket(
             results[normalStepIndex] = r;
           }
         } catch (e) {
-          results[normalStepIndex] = undefined;
           const r = newGrafastError(e, step.id);
-          bucket.store.set(step.id, arrayOfLength(bucket.size, r));
+          const result = arrayOfLength(bucket.size, r);
+          results[normalStepIndex] = result;
           bucket.hasErrors = true;
         }
       }
@@ -334,8 +369,9 @@ export function executeBucket(
               ? metaByMetaKey[step.metaKey]
               : undefined;
           extras[allStepsIndex] = {
+            stopTime,
             meta,
-            eventEmitter: requestContext.eventEmitter,
+            eventEmitter,
             _bucket: bucket,
             _requestContext: requestContext,
           };
@@ -629,8 +665,9 @@ export function executeBucket(
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
       const extra: ExecutionExtra = {
+        stopTime,
         meta,
-        eventEmitter: requestContext.eventEmitter,
+        eventEmitter,
         _bucket: bucket,
         _requestContext: requestContext,
       };

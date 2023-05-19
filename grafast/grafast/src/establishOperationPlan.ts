@@ -8,18 +8,37 @@ import type {
 
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
-import { OperationPlan } from "./index.js";
+import { OperationPlan, SafeError } from "./index.js";
 import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
 } from "./interfaces.js";
-import type { GrafastPrepareOptions } from "./prepare.js";
+import { $$timeout, $$ts } from "./interfaces.js";
+import { timeSource } from "./timeSource.js";
 
 const debug = debugFactory("grafast:establishOperationPlan");
+
+// How long is a timeout valid for? Here I've set it to 60 seconds.
+const TIMEOUT_TIMEOUT =
+  (typeof process.env.GRAFAST_TIMEOUT_VALIDITY_MS === "string"
+    ? parseInt(process.env.GRAFAST_TIMEOUT_VALIDITY_MS, 10)
+    : null) || 60_000;
+// TODO: we should consider increasing the timeout once the process has been
+// running a while (since the JIT should have kicked in) - we could even use
+// `setTimeout` to trigger it after certain amount of time elapsed.
 
 type Fragments = {
   [key: string]: FragmentDefinitionNode;
 };
+
+type OperationPlanOrError =
+  | OperationPlan
+  | Error
+  | SafeError<
+      | { [$$timeout]: number; [$$ts]: number }
+      | { [$$timeout]?: undefined; [$$ts]?: undefined }
+      | undefined
+    >;
 
 interface LinkedList<T> {
   value: T;
@@ -40,7 +59,7 @@ interface Cache {
    * list, and if the list grows beyond a maximum size we can drop the last
    * element.
    */
-  possibleOperationPlans: LinkedList<OperationPlan>;
+  possibleOperationPlans: LinkedList<OperationPlanOrError> | null;
   fragments: Fragments;
 }
 
@@ -149,7 +168,7 @@ export function establishOperationPlan<
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
-  options: GrafastPrepareOptions,
+  planningTimeout: number | null = null,
 ): OperationPlan {
   let cacheByOperation = schema[$$cacheByOperation];
 
@@ -157,23 +176,47 @@ export function establishOperationPlan<
 
   // These two variables to make it easy to trim the linked list later.
   let count = 0;
-  let lastButOneItem: LinkedList<OperationPlan> | null = null;
+  let lastButOneItem: LinkedList<OperationPlanOrError> | null = null;
 
   if (cache !== undefined) {
     // Dev-only validation
     assertFragmentsMatch(cache.fragments, fragments);
 
-    let previousItem: LinkedList<OperationPlan> | null = null;
-    let linkedItem: LinkedList<OperationPlan> | null =
+    let previousItem: LinkedList<OperationPlanOrError> | null = null;
+    let linkedItem: LinkedList<OperationPlanOrError> | null =
       cache.possibleOperationPlans;
     while (linkedItem) {
-      if (
-        isOperationPlanCompatible(
-          linkedItem.value,
-          variableValues,
-          context,
-          rootValue,
-        )
+      const value = linkedItem.value;
+      if (value instanceof SafeError) {
+        if (value.extensions?.[$$timeout] != null) {
+          if (value.extensions[$$ts] < timeSource.now() - TIMEOUT_TIMEOUT) {
+            // Remove this out of date timeout
+            linkedItem = linkedItem.next;
+            if (previousItem !== null) {
+              previousItem.next = linkedItem;
+            } else {
+              cache.possibleOperationPlans = linkedItem;
+            }
+            continue;
+          }
+          if (
+            planningTimeout !== null &&
+            value.extensions[$$timeout] >= planningTimeout
+          ) {
+            // It was a timeout error - do not retry
+            throw value;
+          } else {
+            // That's Not My Timeout, let's try again.
+          }
+        } else {
+          // Not a timeout error - this will always fail in the same way?
+          throw value;
+        }
+      } else if (value instanceof Error) {
+        // Not a timeout error - this will always fail in the same way?
+        throw value;
+      } else if (
+        isOperationPlanCompatible(value, variableValues, context, rootValue)
       ) {
         // Hoist to top of linked list
         if (previousItem !== null) {
@@ -186,7 +229,7 @@ export function establishOperationPlan<
         }
 
         // We found a suitable OperationPlan - use that!
-        return linkedItem.value;
+        return value;
       }
 
       count++;
@@ -197,15 +240,21 @@ export function establishOperationPlan<
   }
 
   // No suitable OperationPlan found, time to make one.
-  const operationPlan = new OperationPlan(
-    schema,
-    operation,
-    fragments,
-    variableValues,
-    context,
-    rootValue,
-    options,
-  );
+  let operationPlan: OperationPlan | undefined;
+  let error: Exclude<OperationPlanOrError, OperationPlan> | undefined;
+  try {
+    operationPlan = new OperationPlan(
+      schema,
+      operation,
+      fragments,
+      variableValues,
+      context,
+      rootValue,
+      planningTimeout,
+    );
+  } catch (e) {
+    error = e;
+  }
 
   // Store it to the cache
   if (!cacheByOperation) {
@@ -213,10 +262,11 @@ export function establishOperationPlan<
     cacheByOperation = new LRU({ maxLength: 500 });
     schema[$$cacheByOperation] = cacheByOperation;
   }
+  const operationPlanOrError = operationPlan ?? error!;
   if (!cache) {
     cache = {
       fragments,
-      possibleOperationPlans: { value: operationPlan, next: null },
+      possibleOperationPlans: { value: operationPlanOrError, next: null },
     };
     cacheByOperation.set(operation, cache);
   } else {
@@ -230,10 +280,13 @@ export function establishOperationPlan<
 
     // Add new operationPlan to top of the linked list.
     cache.possibleOperationPlans = {
-      value: operationPlan,
+      value: operationPlanOrError,
       next: cache.possibleOperationPlans,
     };
   }
-
-  return operationPlan;
+  if (error !== undefined) {
+    throw error;
+  } else {
+    return operationPlan!;
+  }
 }

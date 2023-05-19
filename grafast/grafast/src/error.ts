@@ -24,7 +24,10 @@ export const $$error = Symbol("isGrafastError");
  *
  * @internal
  */
-export class _GrafastError extends Error implements GrafastError {
+export const _GrafastError = class GrafastError
+  extends Error
+  implements GrafastError
+{
   public readonly originalError: Error;
   extensions: Record<string, any>;
   [$$error] = true;
@@ -35,12 +38,12 @@ export class _GrafastError extends Error implements GrafastError {
       );
     }
     const message = originalError?.message;
-    // TODO: remove `GrafastError:` prefix
-    super(message ? `GrafastError: ${message}` : `GrafastError`);
+    super(message);
+    Object.setPrototypeOf(this, GrafastError.prototype);
     this.originalError = originalError;
     this.extensions = { grafast: { planId } };
   }
-}
+};
 
 /**
  * DO NOT ALLOW CONSTRUCTION OF ERRORS OUTSIDE OF THIS MODULE!
@@ -59,14 +62,19 @@ export function isGrafastError(value: any): value is GrafastError {
   return typeof value === "object" && value !== null && $$error in value;
 }
 
-export class SafeError extends Error {
+export class SafeError<
+  TExtensions extends Record<string, any> | undefined =
+    | Record<string, any>
+    | undefined,
+> extends Error {
   [$$safeError] = true;
   constructor(
     message: string,
-    public extensions?: Record<string, any>,
+    public extensions: TExtensions = undefined as TExtensions,
     errorOptions?: ErrorOptions,
   ) {
     super(message, errorOptions);
+    Object.setPrototypeOf(this, SafeError.prototype);
   }
 }
 

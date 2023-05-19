@@ -8,6 +8,11 @@ import type { ExecutionEventEmitter } from "./interfaces.js";
  * @internal
  */
 export interface RequestTools {
+  /** The `timeSource.now()` at which the request started executing */
+  startTime: number;
+  /** The `timeSource.now()` at which the request should stop executing (if a timeout was configured) */
+  stopTime: number | null;
+
   // readonly toSerialize: Array<{
   //   /** object (or array) */
   //   o: object;

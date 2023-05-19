@@ -42,11 +42,10 @@ import type {
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
-import { $$proxy, $$subroutine } from "../interfaces.js";
+import { $$proxy, $$subroutine, $$timeout, $$ts } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
-import type { GrafastPrepareOptions } from "../prepare.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
 import {
   $$noExec,
@@ -60,6 +59,7 @@ import {
 import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
+import { timeSource } from "../timeSource.js";
 import {
   defaultValueToValueNode,
   findVariableNamesUsed,
@@ -125,12 +125,6 @@ export interface MetaByMetaKey {
   [metaKey: string | number | symbol]: Record<string, any>;
 }
 
-// performance.now() is supported in most modern browsers, plus node.
-const timeSource =
-  typeof performance !== "undefined" && typeof performance.now === "function"
-    ? performance
-    : Date;
-
 const REASON_ROOT = Object.freeze({ type: "root" });
 const OUTPUT_PLAN_TYPE_NULL = Object.freeze({ mode: "null" });
 const OUTPUT_PLAN_TYPE_ARRAY = Object.freeze({ mode: "array" });
@@ -143,6 +137,10 @@ const NO_ARGS: TrackedArguments = {
 };
 
 export class OperationPlan {
+  /* This only exists to make establishOperationPlan easier for TypeScript */
+  public readonly [$$timeout]: undefined;
+  public readonly [$$ts]: undefined;
+
   public readonly queryType: GraphQLObjectType;
   public readonly mutationType: GraphQLObjectType | null;
   public readonly subscriptionType: GraphQLObjectType | null;
@@ -236,7 +234,6 @@ export class OperationPlan {
 
   private startTime = timeSource.now();
   private previousLap = this.startTime;
-  private planningTimeout: number | null = null;
   private laps: Array<{
     category: string;
     subcategory: string | undefined;
@@ -259,10 +256,9 @@ export class OperationPlan {
     public readonly variableValues: { [key: string]: any },
     public readonly context: { [key: string]: any },
     public readonly rootValue: any,
-    options: GrafastPrepareOptions,
+    private readonly planningTimeout: number | null,
   ) {
     this.scalarPlanInfo = { schema: this.schema };
-    this.planningTimeout = options.timeouts?.planning ?? null;
     const queryType = schema.getQueryType();
     assert.ok(queryType, "Schema must have a query type");
     this.queryType = queryType;
@@ -470,9 +466,16 @@ export class OperationPlan {
 
   private checkTimeout() {
     if (this.planningTimeout === null) return;
-    const elapsed = timeSource.now() - this.startTime;
+    const now = timeSource.now();
+    const elapsed = now - this.startTime;
     if (elapsed > this.planningTimeout * planningTimeoutWarmupMultiplier) {
-      throw new Error("Operation took too long to plan; aborted");
+      throw new SafeError(
+        "Operation took too long to plan and was aborted. Please simplify the request and try again.",
+        {
+          [$$timeout]: this.planningTimeout,
+          [$$ts]: now,
+        },
+      );
     }
   }
 
@@ -3011,7 +3014,12 @@ export class OperationPlan {
           processSideEffectPlan(dep);
         }
 
-        layerPlan.phases.push({ normalSteps: [{ step }], _allSteps: [step] });
+        const phase = /*#__INLINE__*/ newLayerPlanPhase();
+        phase.checkTimeout = true;
+        phase.normalSteps = [{ step }];
+        phase._allSteps.push(step);
+
+        layerPlan.phases.push(phase);
       };
 
       for (const sideEffectStep of sideEffectSteps) {
@@ -3044,7 +3052,7 @@ export class OperationPlan {
         }
 
         // Do not add to processed until whole layer is known
-        const phase: Omit<LayerPlanPhase, "_allSteps"> = Object.create(null);
+        const phase = /*#__INLINE__*/ newLayerPlanPhase();
         for (const step of nextSteps) {
           processed.add(step);
           pending.delete(step);
@@ -3060,6 +3068,9 @@ export class OperationPlan {
               ];
             }
           } else {
+            if (!step.isSyncAndSafe || step.hasSideEffects) {
+              phase.checkTimeout = true;
+            }
             if (phase.normalSteps !== undefined) {
               phase.normalSteps.push({ step });
             } else {
@@ -3093,18 +3104,17 @@ export class OperationPlan {
           }
         } while (foundOne);
 
-        const _allSteps: ExecutableStep[] = [];
         if (phase.normalSteps !== undefined) {
           for (const { step } of phase.normalSteps) {
-            _allSteps.push(step);
+            phase._allSteps.push(step);
           }
         }
         if (phase.unbatchedSyncAndSafeSteps !== undefined) {
           for (const { step } of phase.unbatchedSyncAndSafeSteps) {
-            _allSteps.push(step);
+            phase._allSteps.push(step);
           }
         }
-        layerPlan.phases.push(Object.assign(phase, { _allSteps }));
+        layerPlan.phases.push(phase);
       }
 
       // PERF: this could probably be faster.
@@ -3390,5 +3400,14 @@ function makeMetaByMetaKeys6Factory(
     obj[key5] = Object.create(null);
     obj[key6] = Object.create(null);
     return obj;
+  };
+}
+
+function newLayerPlanPhase(): LayerPlanPhase {
+  return {
+    checkTimeout: false,
+    normalSteps: undefined,
+    unbatchedSyncAndSafeSteps: undefined,
+    _allSteps: [],
   };
 }

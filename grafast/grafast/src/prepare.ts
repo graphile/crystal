@@ -26,8 +26,13 @@ import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
 import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { OperationPlan } from "./index.js";
-import type { JSONValue, PromiseOrDirect } from "./interfaces.js";
+import type {
+  GrafastTimeouts,
+  JSONValue,
+  PromiseOrDirect,
+} from "./interfaces.js";
 import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
+import { timeSource } from "./timeSource.js";
 import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError } = graphql;
@@ -55,13 +60,7 @@ export interface GrafastPrepareOptions {
    */
   outputDataAsString?: boolean;
 
-  timeouts?: {
-    /**
-     * How many milliseconds should we allow for planning. Remember: planning is
-     * synchronous, so whilst it is happening the event loop is blocked.
-     */
-    planning?: number;
-  };
+  timeouts?: GrafastTimeouts;
 }
 
 const bypassGraphQLObj = Object.assign(Object.create(null), {
@@ -253,12 +252,13 @@ export function executePreemptive(
   context: any,
   rootValue: any,
   outputDataAsString: boolean,
+  executionTimeout: number | null,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
   // PERF: batch this method so it can process multiple GraphQL requests in parallel
 
-  // TODO: when we batch, we need to change `bucketIndex` and `size`!
+  // TODO: when we batch, we need to change `bucketIndex` and `size`, and make sure that we only batch where `executionTimeout` is the same.
   const bucketIndex = 0;
   const size = 1;
 
@@ -282,7 +282,12 @@ export function executePreemptive(
     hasErrors: false,
     polymorphicPathList,
   });
+  const startTime = timeSource.now();
+  const stopTime =
+    executionTimeout !== null ? startTime + executionTimeout : null;
   const requestContext: RequestTools = {
+    startTime,
+    stopTime,
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
     metaByMetaKey:
@@ -501,15 +506,33 @@ export function grafastPrepare(
   }
 
   const { operation, fragments, variableValues } = exeContext;
-  const operationPlan = establishOperationPlan(
-    schema,
-    operation,
-    fragments,
-    variableValues,
-    context as any,
-    rootValue,
-    options,
-  );
+  const planningTimeout = options.timeouts?.planning;
+  let operationPlan!: OperationPlan;
+  try {
+    operationPlan = establishOperationPlan(
+      schema,
+      operation,
+      fragments,
+      variableValues,
+      context as any,
+      rootValue,
+      planningTimeout,
+    );
+  } catch (error) {
+    const graphqlError =
+      error instanceof GraphQLError
+        ? error
+        : new GraphQLError(
+            error.message,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            error,
+            error.extensions ?? null,
+          );
+    return { errors: [graphqlError] };
+  }
 
   if (
     options.explain === true ||
@@ -530,12 +553,14 @@ export function grafastPrepare(
     });
   }
 
+  const executionTimeout = options.timeouts?.execution ?? null;
   return executePreemptive(
     operationPlan,
     variableValues,
     context,
     rootValue,
     options.outputDataAsString ?? false,
+    executionTimeout,
   );
 }
 
