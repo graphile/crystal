@@ -7,11 +7,11 @@ sponsor](https://graphile.org/sponsor/).
 ## Featured
 
 - Surge
-- Netflix
 - The Guild
-- Qwick
-- Chad Furman
 - Dovetail
+- Qwick
+- Netflix
+- Chad Furman
 - Enzuzo
 - Stellate
 - Politics Rewired
@@ -21,21 +21,20 @@ sponsor](https://graphile.org/sponsor/).
 - Joe Dennis
 - Robert Claypool
 - domonda
-- nigelrmtaylor
 - DocIQ
-- Principia Mentis
-- Ian Stewart
+- nigelrmtaylor
 - Luxor Labs
+- Ian Stewart
 - HR-ON
 - Axinom
-- Taiste
 - PostHog
-- Notably
 - Nathanael Beisiegel
+- Notably
+- Taiste
 - latch.bio
-- nullachtvierzehn
 - Ayog Healthcare
 - Severin Ibarluzea
+- BairesDev
 
 ## Supporters
 
@@ -49,22 +48,22 @@ sponsor](https://graphile.org/sponsor/).
 - Simon Elliott
 - CJ Lazell
 - Daniel Einspanjer
-- Mark
-- Philipp Litzenberger
 - Mansoor Razzaq
+- Mark
 - Alvin Ali Khaled
 - Keith Layne
-- Olli Selamaa
 - Paul Melnikow
 - Jimmy Liu
-- Kadi Kraman
-- Stéphane Klein
 - Splitgraph
+- Kadi Kraman
 - Benjamin Berman
 - Zymego
-- ARK
 - CartoLab
 - IFCHOR GROUP
 - Nicolas Penot
 - Gamma Peak
-- liteflow-labs
+- Boo
+- JYC
+- Ben Periton
+- SpaceFill
+- Nate Smith
