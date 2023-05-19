@@ -52,7 +52,7 @@ export interface GrafastTimeouts {
    * executes, there's nothing to stop an asynchronous step from continuing to
    * execute long after the timeout has expired - therefore it's the
    * responsibility of each step to abort itself if it goes over the allocated
-   * time budget (which is detailed in `ExecutionExtra`).
+   * time budget (which is detailed in `ExecutionExtra.stopTime`).
    */
   execution?: number;
 
@@ -824,7 +824,9 @@ export type ExecutionEventMap = {
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
 export interface ExecutionExtra {
+  /** The `performance.now()` at which your step should stop executing */
   stopTime: number | null;
+  /** If you have set a `metaKey` on your step, the relevant meta object which you can write into (e.g. for caching) */
   meta: Record<string, unknown> | undefined;
   eventEmitter: ExecutionEventEmitter | undefined;
 

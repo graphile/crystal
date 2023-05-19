@@ -284,7 +284,7 @@ export function establishOperationPlan<
       next: cache.possibleOperationPlans,
     };
   }
-  if (error) {
+  if (error !== undefined) {
     throw error;
   } else {
     return operationPlan!;
