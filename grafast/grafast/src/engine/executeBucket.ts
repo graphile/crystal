@@ -4,8 +4,14 @@ import * as assert from "../assert.js";
 import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
-import { $$error, isGrafastError, newGrafastError } from "../error.js";
-import { __ItemStep, isStreamableStep, SafeError } from "../index.js";
+import {
+  $$error,
+  isGrafastError,
+  newGrafastError,
+  SafeError,
+} from "../error.js";
+import { isStreamableStep } from "../step.js";
+import { __ItemStep } from "../steps/__item.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
