@@ -1,5 +1,22 @@
 # tamedevil
 
+## 0.0.0-alpha.2
+
+### Patch Changes
+
+- [`87e6c65a7`](https://github.com/benjie/postgraphile-private/commit/87e6c65a7a687044895b3b6c9f131384984e7674)
+  Thanks [@benjie](https://github.com/benjie)! - Performance overhaul and new
+  caching functionality.
+
+- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
+  TypeScript/tslib
+
+- Updated dependencies
+  [[`98ae00f59`](https://github.com/benjie/postgraphile-private/commit/98ae00f59a8ab3edc5718ad8437a0dab734a7d69),
+  [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)]:
+  - @graphile/lru@5.0.0-alpha.2
+
 ## 0.0.0-alpha.1
 
 ### Patch Changes

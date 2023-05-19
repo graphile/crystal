@@ -1,5 +1,17 @@
 # @graphile/lru
 
+## 5.0.0-alpha.2
+
+### Patch Changes
+
+- [`98ae00f59`](https://github.com/benjie/postgraphile-private/commit/98ae00f59a8ab3edc5718ad8437a0dab734a7d69)
+  Thanks [@benjie](https://github.com/benjie)! - Performance overhaul and faster
+  access for unsaturated LRUs.
+
+- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
+  TypeScript/tslib
+
 ## 5.0.0-alpha.1
 
 ### Patch Changes

@@ -1,5 +1,77 @@
 # grafast
 
+## 0.0.1-alpha.3
+
+### Patch Changes
+
+- [`2389f47ec`](https://github.com/benjie/postgraphile-private/commit/2389f47ecf3b708f1085fdeb818eacaaeb257a2d)
+  Thanks [@benjie](https://github.com/benjie)! - Massive overhaul of planning,
+  now up to 2x faster!
+
+  - 🚨 `metaKey` and `optimizeMetaKey` now default to `undefined` - if you need
+    the `meta` object in your step class, be sure to set them (e.g.
+    `this.metaKey = this.id`)
+  - `RemapKeys` can optimize itself away if it doesn't really do anything
+  - Simpler plan diagrams - non-polymorphic buckets no longer have "polymorphic
+    paths"
+  - `deduplicate()` will now no-longer receive the step itself as a peer
+
+- [`e91ee201d`](https://github.com/benjie/postgraphile-private/commit/e91ee201d80d3b32e4e632b101f4c25362a1a05b)
+  Thanks [@benjie](https://github.com/benjie)! - Various optimizations of the
+  Gra*fast* plan by converting things to constants where possible.
+
+  - `Step.optimize()` is now passed a `meta` object if the step sets
+    `optimizeMetaKey`; this object can store planning-only values and share
+    across a step family.
+  - `__InputStaticLeafStep` now optimizes down to a constant
+  - `ListStep` where every entry in the list is a constant is now automatically
+    replaced with a `ConstantStep` representing the final list
+  - `ObjectStep` where all the values are `ConstantStep` is now replaced with a
+    `ConstantStep`
+  - `ConstantStep` can now deduplicate with other constant steps with the exact
+    same value
+  - `OperationPlan.optimizeStep()` now also re-deduplicates the step if it
+    supports multiple optimizations
+  - `ConstantStep` now has `toStringMeta` to represent the constant value in the
+    plan diagram
+  - When each step is processed (but not by deduplicate) we'll automatically try
+    and deduplicate any new steps created
+
+- [`865bec590`](https://github.com/benjie/postgraphile-private/commit/865bec5901f666e147f5d4088152d1f0d2584827)
+  Thanks [@benjie](https://github.com/benjie)! - The order in which steps are
+  added to the plan diagram has changed, resulting in more optimal rendering.
+
+- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
+  TypeScript/tslib
+
+- [`d39a5d409`](https://github.com/benjie/postgraphile-private/commit/d39a5d409ffe1a5855740ecbff1ad11ec0bf6660)
+  Thanks [@benjie](https://github.com/benjie)! - Implement planning and
+  execution timeouts; add the following to your preset (the second argument to
+  `grafast()` or `execute()`):
+
+  ```ts
+  const preset = {
+    grafast: {
+      timeouts: {
+        /** Planning timeout in ms */
+        planning: 500,
+
+        /** Execution timeout in ms */
+        execution: 30_000,
+      },
+    },
+  };
+  ```
+
+- Updated dependencies
+  [[`87e6c65a7`](https://github.com/benjie/postgraphile-private/commit/87e6c65a7a687044895b3b6c9f131384984e7674),
+  [`98ae00f59`](https://github.com/benjie/postgraphile-private/commit/98ae00f59a8ab3edc5718ad8437a0dab734a7d69),
+  [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)]:
+  - tamedevil@0.0.0-alpha.2
+  - @graphile/lru@5.0.0-alpha.2
+  - graphile-config@0.0.1-alpha.2
+
 ## 0.0.1-alpha.2
 
 ### Patch Changes

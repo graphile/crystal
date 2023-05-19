@@ -1,5 +1,22 @@
 # pg-sql2
 
+## 5.0.0-alpha.2
+
+### Patch Changes
+
+- [`82cc01152`](https://github.com/benjie/postgraphile-private/commit/82cc01152ee06dafce45299661afd77ad943d785)
+  Thanks [@benjie](https://github.com/benjie)! - Performance overhaul and new
+  cache method.
+
+- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
+  TypeScript/tslib
+
+- Updated dependencies
+  [[`98ae00f59`](https://github.com/benjie/postgraphile-private/commit/98ae00f59a8ab3edc5718ad8437a0dab734a7d69),
+  [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)]:
+  - @graphile/lru@5.0.0-alpha.2
+
 ## 5.0.0-alpha.1
 
 ### Patch Changes

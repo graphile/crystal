@@ -1,6 +1,6 @@
 {
   "name": "pg-sql2",
-  "version": "5.0.0-alpha.1",
+  "version": "5.0.0-alpha.2",
   "description": "Generate safe Postgres-compliant SQL with tagged template literals",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

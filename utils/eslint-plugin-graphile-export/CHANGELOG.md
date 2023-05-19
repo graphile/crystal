@@ -1,5 +1,13 @@
 # eslint-plugin-graphile-export
 
+## 0.0.2-alpha.2
+
+### Patch Changes
+
+- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
+  TypeScript/tslib
+
 ## 0.0.2-alpha.1
 
 ### Patch Changes

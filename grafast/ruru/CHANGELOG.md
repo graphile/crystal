@@ -1,5 +1,21 @@
 # ruru
 
+## 2.0.0-alpha.3
+
+### Patch Changes
+
+- [`2fe247f75`](https://github.com/benjie/postgraphile-private/commit/2fe247f751377e18b3d6809cba39a01aa1602dbc)
+  Thanks [@benjie](https://github.com/benjie)! - Added ability to download
+  mermaid plan diagram as SVG.
+
+- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
+  TypeScript/tslib
+
+- Updated dependencies
+  [[`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)]:
+  - graphile-config@0.0.1-alpha.2
+
 ## 2.0.0-alpha.2
 
 ### Patch Changes

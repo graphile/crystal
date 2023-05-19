@@ -1,5 +1,38 @@
 # postgraphile
 
+## 5.0.0-alpha.3
+
+### Patch Changes
+
+- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
+  TypeScript/tslib
+
+- [`9605165d5`](https://github.com/benjie/postgraphile-private/commit/9605165d5857c97053778275836b95bf19c0b1c9)
+  Thanks [@benjie](https://github.com/benjie)! - Fix naming conflict that occurs
+  with `@enum` smart tag when not using `@enumName`. New `enumTableEnum`
+  inflector.
+- Updated dependencies
+  [[`21e95326d`](https://github.com/benjie/postgraphile-private/commit/21e95326d72eaad7a8860c4c21a11736191f169b),
+  [`98ae00f59`](https://github.com/benjie/postgraphile-private/commit/98ae00f59a8ab3edc5718ad8437a0dab734a7d69),
+  [`2389f47ec`](https://github.com/benjie/postgraphile-private/commit/2389f47ecf3b708f1085fdeb818eacaaeb257a2d),
+  [`2fe247f75`](https://github.com/benjie/postgraphile-private/commit/2fe247f751377e18b3d6809cba39a01aa1602dbc),
+  [`e91ee201d`](https://github.com/benjie/postgraphile-private/commit/e91ee201d80d3b32e4e632b101f4c25362a1a05b),
+  [`865bec590`](https://github.com/benjie/postgraphile-private/commit/865bec5901f666e147f5d4088152d1f0d2584827),
+  [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71),
+  [`9605165d5`](https://github.com/benjie/postgraphile-private/commit/9605165d5857c97053778275836b95bf19c0b1c9),
+  [`d39a5d409`](https://github.com/benjie/postgraphile-private/commit/d39a5d409ffe1a5855740ecbff1ad11ec0bf6660)]:
+  - graphile-export@0.0.2-alpha.2
+  - @graphile/lru@5.0.0-alpha.2
+  - grafast@0.0.1-alpha.3
+  - ruru@2.0.0-alpha.3
+  - @dataplan/pg@0.0.1-alpha.3
+  - grafserv@0.0.1-alpha.3
+  - graphile-build@5.0.0-alpha.3
+  - graphile-build-pg@5.0.0-alpha.3
+  - graphile-config@0.0.1-alpha.2
+  - pg-introspection@0.0.1-alpha.2
+
 ## 5.0.0-alpha.2
 
 ### Patch Changes

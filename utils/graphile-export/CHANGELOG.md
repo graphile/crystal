@@ -1,5 +1,27 @@
 # graphile-export
 
+## 0.0.2-alpha.2
+
+### Patch Changes
+
+- [`21e95326d`](https://github.com/benjie/postgraphile-private/commit/21e95326d72eaad7a8860c4c21a11736191f169b)
+  Thanks [@benjie](https://github.com/benjie)! - Fix the name of some exported
+  variables (Step -> Plan)
+
+- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
+  TypeScript/tslib
+
+- Updated dependencies
+  [[`2389f47ec`](https://github.com/benjie/postgraphile-private/commit/2389f47ecf3b708f1085fdeb818eacaaeb257a2d),
+  [`82cc01152`](https://github.com/benjie/postgraphile-private/commit/82cc01152ee06dafce45299661afd77ad943d785),
+  [`e91ee201d`](https://github.com/benjie/postgraphile-private/commit/e91ee201d80d3b32e4e632b101f4c25362a1a05b),
+  [`865bec590`](https://github.com/benjie/postgraphile-private/commit/865bec5901f666e147f5d4088152d1f0d2584827),
+  [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71),
+  [`d39a5d409`](https://github.com/benjie/postgraphile-private/commit/d39a5d409ffe1a5855740ecbff1ad11ec0bf6660)]:
+  - grafast@0.0.1-alpha.3
+  - pg-sql2@5.0.0-alpha.2
+
 ## 0.0.2-alpha.1
 
 ### Patch Changes
