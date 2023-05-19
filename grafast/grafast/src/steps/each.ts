@@ -57,7 +57,7 @@ export function each<
     meta: `each:${chalk.yellow(listStep.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,
-    optimize(this) {
+    optimize() {
       const layerPlan = this.subroutineLayer;
       const rootStep = layerPlan.rootStep;
       if (
