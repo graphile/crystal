@@ -8,7 +8,10 @@ import { basename } from "node:path";
 
 const NODE_MODULES = ["fs", "path", "url", "util", "crypto", "events"];
 
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(
+  /\/+$/,
+  "",
+);
 
 const pack = await fs.readFile(`${__dirname}/../pack.sh`, "utf8");
 const packages = pack
@@ -20,7 +23,7 @@ const packages = pack
       !t.includes(".") &&
       !t.startsWith("cd /"),
   )
-  .map((str) => str.slice(3));
+  .map((str) => str.slice(3).replace(/\/+$/, ""));
 
 const fails = [];
 for (const packagePath of packages) {
@@ -70,6 +73,21 @@ for (const packagePath of packages) {
       plugins: [walkerPlugin],
     });
   }
+
+  const webpackConfig = `${dir}/webpack.config.js`;
+  try {
+    const config = (await import(webpackConfig)).default;
+    const externals = Object.keys(config.externals);
+    for (const moduleName of requires) {
+      if (
+        !externals.includes(moduleName) &&
+        !externals.some((e) => e.startsWith(`${moduleName}/`))
+      ) {
+        requires.delete(moduleName);
+      }
+    }
+  } catch (e) {}
+
   for (const moduleName of requires) {
     if (NODE_MODULES.includes(moduleName)) {
       continue;
