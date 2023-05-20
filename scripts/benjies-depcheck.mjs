@@ -33,6 +33,16 @@ const packages = pack
   )
   .map((str) => str.slice(3).replace(/\/+$/, ""));
 
+function resolveExternals(externals) {
+  if (Array.isArray(externals)) {
+    return externals.flatMap(resolveExternals);
+  } else if (typeof externals === "object" && externals !== null) {
+    return Object.keys(externals);
+  } else {
+    throw new Error(`Unsupported externals`);
+  }
+}
+
 const fails = [];
 for (const packagePath of packages) {
   const dir = `${__dirname}/../${packagePath}`;
@@ -85,7 +95,7 @@ for (const packagePath of packages) {
   const webpackConfig = `${dir}/webpack.config.js`;
   try {
     const config = (await import(webpackConfig)).default;
-    const externals = Object.keys(config.externals);
+    const externals = resolveExternals(config.externals);
     for (const moduleName of requires) {
       if (
         !externals.includes(moduleName) &&
