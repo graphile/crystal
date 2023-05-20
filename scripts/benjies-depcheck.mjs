@@ -6,7 +6,15 @@ import { fileURLToPath } from "node:url";
 import babel from "@babel/core";
 import { basename } from "node:path";
 
-const NODE_MODULES = ["fs", "path", "url", "util", "crypto", "events"];
+const NODE_MODULES = [
+  "assert",
+  "crypto",
+  "events",
+  "fs",
+  "path",
+  "url",
+  "util",
+];
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(
   /\/+$/,
