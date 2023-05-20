@@ -1,8 +1,8 @@
 import "graphile-config";
 
 import type { PageInfoCapableStep } from "grafast";
-import { EXPORTABLE } from "../utils.js";
 
+import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {

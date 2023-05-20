@@ -5,7 +5,7 @@ import { resolvePresets } from "graphile-config";
 import { exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
 
-import { EXPORTABLE, buildSchema, defaultPreset } from "../index.js";
+import { buildSchema, defaultPreset, EXPORTABLE } from "../index.js";
 
 /*
  * This example shows how to write a graphile-build plugin that adds a field

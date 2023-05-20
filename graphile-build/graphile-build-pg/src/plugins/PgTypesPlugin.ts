@@ -1,4 +1,3 @@
-import "graphile-build";
 import "./PgBasicsPlugin.js";
 import "../interfaces.js";
 import "graphile-config";

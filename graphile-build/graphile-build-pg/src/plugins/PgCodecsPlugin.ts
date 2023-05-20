@@ -1,5 +1,3 @@
-import "graphile-build";
-
 import type {
   PgCodec,
   PgCodecAnyScalar,

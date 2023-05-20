@@ -2,9 +2,9 @@ import "graphile-config";
 
 import type { ExecutableStep } from "grafast";
 import { lambda } from "grafast";
-import { EXPORTABLE } from "../utils.js";
 import type { GraphQLInterfaceType } from "graphql";
 
+import { EXPORTABLE } from "../utils.js";
 import { NODE_ID_CODECS, NODE_ID_HANDLER_BY_TYPE_NAME } from "./NodePlugin.js";
 
 export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {

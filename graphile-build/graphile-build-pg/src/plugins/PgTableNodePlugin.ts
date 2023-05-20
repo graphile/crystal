@@ -1,4 +1,3 @@
-import "graphile-build";
 import "graphile-config";
 
 import type {
