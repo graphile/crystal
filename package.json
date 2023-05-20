@@ -6,7 +6,7 @@
     "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --topological run pretest",
     "pretest:data": "psql -X1v ON_ERROR_STOP=1 -f postgraphile/postgraphile/__tests__/kitchen-sink-data.sql \"$TEST_DATABASE_URL\"",
     "test": "yarn workspaces foreach --topological run test",
-    "posttest": "yarn workspaces foreach --topological run posttest",
+    "posttest": "yarn workspaces foreach --topological run posttest && node scripts/benjies-depcheck.mjs",
     "prepack:all": "scripts/prepack-all",
     "build": "tsc -b && yarn && yarn workspace ruru prepack",
     "watch": "yarn build && tsc -b --watch",
