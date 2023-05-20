@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "../utils.js";
 import type {
   GraphQLScalarLiteralParser,
   GraphQLScalarValueParser,
