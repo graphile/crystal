@@ -25,7 +25,7 @@
   "scripts": {
     "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\"",
     "watch": "yarn webpack --watch --mode=development",
-    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && tsc -b tsconfig.build.json && yarn webpack --mode=production"
+    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && yarn webpack --mode=production"
   },
   "repository": {
     "type": "git",
