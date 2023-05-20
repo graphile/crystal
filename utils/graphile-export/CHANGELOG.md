@@ -1,5 +1,14 @@
 # graphile-export
 
+## 0.0.2-alpha.3
+
+### Patch Changes
+
+- [#332](https://github.com/benjie/postgraphile-private/pull/332)
+  [`faa1c9eaa`](https://github.com/benjie/postgraphile-private/commit/faa1c9eaa25cbd6f0e25635f6a100d0dc9be6106)
+  Thanks [@benjie](https://github.com/benjie)! - Adjust dependencies and
+  peerDependencies and peerDependenciesMeta.
+
 ## 0.0.2-alpha.2
 
 ### Patch Changes

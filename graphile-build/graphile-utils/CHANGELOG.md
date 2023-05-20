@@ -1,5 +1,14 @@
 # graphile-utils
 
+## 5.0.0-alpha.4
+
+### Patch Changes
+
+- Updated dependencies
+  [[`faa1c9eaa`](https://github.com/benjie/postgraphile-private/commit/faa1c9eaa25cbd6f0e25635f6a100d0dc9be6106)]:
+  - graphile-build-pg@5.0.0-alpha.4
+  - graphile-build@5.0.0-alpha.4
+
 ## 5.0.0-alpha.3
 
 ### Patch Changes
