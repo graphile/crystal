@@ -52,6 +52,9 @@
     "tamedevil": "workspace:^",
     "tslib": "^2.5.0"
   },
+  "peerDependencies": {
+    "graphql": "^16.1.0-experimental-stream-defer.6"
+  },
   "engines": {
     "node": ">=16"
   },

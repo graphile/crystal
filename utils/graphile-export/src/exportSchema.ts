@@ -40,13 +40,41 @@ import {
   printSchema,
 } from "graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
-import { sql } from "pg-sql2";
+import type { PgSQL, SQL } from "pg-sql2";
 import type { URL } from "url";
 import { inspect } from "util";
 
 import type { ExportOptions } from "./interfaces.js";
 import { optimize } from "./optimize/index.js";
 import { wellKnown } from "./wellKnown.js";
+
+// Cannot import sql because it's optional
+//     import { sql } from "pg-sql2";
+// Instead:
+let sql: PgSQL | undefined;
+import("pg-sql2").then(
+  (pgSql2) => {
+    sql = pgSql2.sql;
+  },
+  (_e) => {
+    // no pg-sql2 module; no matter
+  },
+);
+
+function isSQL(thing: unknown): thing is SQL {
+  if (sql !== undefined) {
+    return sql.isSQL(thing);
+  } else {
+    // An approximation
+    if (typeof sql === "object" && sql !== null) {
+      return Object.getOwnPropertySymbols(thing).some(
+        (s) => s.description === "pg-sql2-type",
+      );
+    } else {
+      return false;
+    }
+  }
+}
 
 // Do **NOT** allow variables that start with `__`!
 export const canRepresentAsIdentifier = (key: string) =>
@@ -938,10 +966,10 @@ function _convertToAST(
       `_convertToAST: potentially infinite recursion at ${locationHint}. TODO: allow exporting recursive structures.`,
     );
   }
-  if (sql.isSQL(thing)) {
+  if (isSQL(thing)) {
     throw new Error(
       `Exporting of 'sql' values is not supported (at ${locationHint}), please wrap in EXPORTABLE: ${
-        sql.compile(thing).text
+        sql ? sql.compile(thing).text : inspect(thing)
       }`,
     );
   } else if (Array.isArray(thing)) {
