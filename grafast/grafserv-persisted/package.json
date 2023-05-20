@@ -47,7 +47,8 @@
   },
   "peerDependencies": {
     "grafast": "workspace:^",
-    "grafserv": "workspace:^"
+    "grafserv": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
   },
   "devDependencies": {
     "grafast": "workspace:^",
