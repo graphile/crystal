@@ -1,11 +1,10 @@
-import "graphile-build";
 import "./PgBasicsPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
 import { access, ExecutableStep } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 import { version } from "../version.js";

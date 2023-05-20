@@ -1,4 +1,3 @@
-import "graphile-build";
 import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
@@ -19,7 +18,7 @@ import {
   pgSelectSingleFromRecord,
 } from "@dataplan/pg";
 import type { GrafastFieldConfig, SetterStep } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";

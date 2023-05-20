@@ -1,11 +1,27 @@
 import { $$idempotent, SafeError } from "grafast";
-import { EXPORTABLE } from "graphile-export";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLError, GraphQLObjectType, Kind } from "graphql";
 // TODO: remove 'lodash' dependency
 import camelCaseAll from "lodash/camelCase.js";
 import upperFirstAll from "lodash/upperFirst.js";
 import plz from "pluralize";
+
+export function EXPORTABLE<T, TScope extends any[]>(
+  factory: (...args: TScope) => T,
+  args: [...TScope],
+): T {
+  const fn: T = factory(...args);
+  if (
+    (typeof fn === "function" || (typeof fn === "object" && fn !== null)) &&
+    !("$exporter$factory" in fn)
+  ) {
+    Object.defineProperties(fn, {
+      $exporter$args: { value: args },
+      $exporter$factory: { value: factory },
+    });
+  }
+  return fn;
+}
 
 /**
  * Loops over all the given `keys` and binds the method of that name on `obj`

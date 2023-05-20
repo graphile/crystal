@@ -7,7 +7,7 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";

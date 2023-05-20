@@ -57,6 +57,11 @@
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg-sql2": "workspace:^5.0.0-alpha.2"
   },
+  "peerDependenciesMeta": {
+    "pg-sql2": {
+      "optional": true
+    }
+  },
   "files": [
     "dist"
   ],

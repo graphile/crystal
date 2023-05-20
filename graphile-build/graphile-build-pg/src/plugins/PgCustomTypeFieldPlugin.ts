@@ -41,7 +41,7 @@ import {
   ObjectStep,
   stepAMayDependOnStepB,
 } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type {
   GraphQLInputFieldConfigMap,
   GraphQLInputType,

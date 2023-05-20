@@ -1,10 +1,9 @@
-import "graphile-build";
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type { PgResource } from "@dataplan/pg";
 import { connection } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";

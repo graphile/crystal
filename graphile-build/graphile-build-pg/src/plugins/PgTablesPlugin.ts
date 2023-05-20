@@ -1,5 +1,3 @@
-import "graphile-build";
-
 import type {
   PgCodec,
   PgCodecAttribute,
@@ -9,7 +7,7 @@ import type {
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
 import { getBehavior } from "../behavior.js";

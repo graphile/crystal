@@ -6,7 +6,7 @@ import type {
   PgResourceParameter,
   PgSelectStep,
 } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";

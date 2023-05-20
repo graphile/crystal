@@ -1,4 +1,3 @@
-import "graphile-build";
 import "graphile-config";
 
 import type {
@@ -9,7 +8,7 @@ import type {
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";

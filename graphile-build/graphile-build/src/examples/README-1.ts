@@ -2,10 +2,10 @@ import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { lambda } from "grafast";
 import { resolvePresets } from "graphile-config";
-import { EXPORTABLE, exportSchema } from "graphile-export";
+import { exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
 
-import { buildSchema, defaultPreset } from "../index.js";
+import { buildSchema, defaultPreset, EXPORTABLE } from "../index.js";
 
 /*
  * This example shows how to write a graphile-build plugin that adds a field

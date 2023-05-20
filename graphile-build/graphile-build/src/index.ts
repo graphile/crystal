@@ -38,6 +38,7 @@ export {
   camelCase,
   constantCase,
   constantCaseAll,
+  EXPORTABLE,
   formatInsideUnderscores,
   pluralize,
   singularize,

@@ -2854,6 +2854,7 @@ __metadata:
   peerDependencies:
     grafast: "workspace:^"
     grafserv: "workspace:^"
+    graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
   linkType: soft
 
@@ -11805,6 +11806,8 @@ __metadata:
     tslib: "npm:^2.5.0"
     typescript: "npm:^5.0.4"
     ws: "npm:^8.4.0"
+  peerDependencies:
+    graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
   linkType: soft
 
@@ -11880,6 +11883,9 @@ __metadata:
     grafast: "workspace:^0.0.1-alpha.3"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg-sql2: "workspace:^5.0.0-alpha.2"
+  peerDependenciesMeta:
+    pg-sql2:
+      optional: true
   languageName: unknown
   linkType: soft
 

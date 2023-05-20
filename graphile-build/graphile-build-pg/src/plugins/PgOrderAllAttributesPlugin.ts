@@ -8,7 +8,7 @@ import type {
 } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumValueConfigMap } from "graphql";
 
 import { getBehavior } from "../behavior.js";

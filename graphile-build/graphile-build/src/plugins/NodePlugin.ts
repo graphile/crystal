@@ -2,8 +2,9 @@ import "graphile-config";
 
 import type { NodeIdCodec, NodeIdHandler } from "grafast";
 import { node } from "grafast";
-import { EXPORTABLE } from "graphile-export";
 import type { GraphQLObjectType } from "graphql";
+
+import { EXPORTABLE } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
