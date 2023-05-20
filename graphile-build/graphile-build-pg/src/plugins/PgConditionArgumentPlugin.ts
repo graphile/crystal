@@ -9,7 +9,7 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";

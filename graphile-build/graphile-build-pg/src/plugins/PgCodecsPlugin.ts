@@ -20,7 +20,7 @@ import {
   recordCodec,
   TYPES,
 } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 

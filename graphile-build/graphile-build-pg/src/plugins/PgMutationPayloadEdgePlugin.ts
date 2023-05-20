@@ -10,7 +10,7 @@ import type {
 import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
 import { connection, constant, EdgeStep } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";

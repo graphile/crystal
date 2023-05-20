@@ -4,7 +4,7 @@ import type { PgInsertSingleStep, PgResource } from "@dataplan/pg";
 import { pgInsertSingle } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
 import { constant, ExecutableStep, object } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior.js";

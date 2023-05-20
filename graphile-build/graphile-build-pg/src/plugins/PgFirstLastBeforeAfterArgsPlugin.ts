@@ -7,7 +7,7 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
 
