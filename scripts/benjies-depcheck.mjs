@@ -54,7 +54,6 @@ for (const packagePath of packages) {
         nodir: true,
       },
     );
-    console.log(negativeMatches);
   } catch {}
   const allFiles = negativeMatches
     ? positiveMatches.filter((m) => !negativeMatches.includes(m))
