@@ -55,6 +55,7 @@
     "@types/node": "^18.15.5",
     "chalk": "^4.1.2",
     "debug": "^4.3.3",
+    "eventemitter3": "^4.0.7",
     "grafast": "workspace:^",
     "pg-sql2": "workspace:^",
     "postgres-array": "~2.0.0",
