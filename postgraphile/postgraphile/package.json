@@ -72,7 +72,8 @@
     "pg": "^8.7.1",
     "pg-introspection": "workspace:^",
     "ruru": "workspace:^",
-    "tslib": "^2.5.0"
+    "tslib": "^2.5.0",
+    "ws": "^8.12.1"
   },
   "engines": {
     "node": ">=16"
