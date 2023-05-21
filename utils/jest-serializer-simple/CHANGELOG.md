@@ -1,5 +1,12 @@
 # jest-serializer-simple
 
+## 5.0.0-alpha.3
+
+### Patch Changes
+
+- [`f34bd5a3c`](https://github.com/benjie/postgraphile-private/commit/f34bd5a3c353693b86a0307357a3620110700e1c)
+  Thanks [@benjie](https://github.com/benjie)! - Address dependency issues.
+
 ## 5.0.0-alpha.2
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # grafast
 
+## 0.0.1-alpha.4
+
+### Patch Changes
+
+- [`45dcf3a8f`](https://github.com/benjie/postgraphile-private/commit/45dcf3a8fd8bad5c8b82a7cbff2db4dacb916950)
+  Thanks [@benjie](https://github.com/benjie)! - Fix error message when
+  detecting duplicate grafast modules
+
 ## 0.0.1-alpha.3
 
 ### Patch Changes

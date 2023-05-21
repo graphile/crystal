@@ -1,5 +1,17 @@
 # @dataplan/pg
 
+## 0.0.1-alpha.4
+
+### Patch Changes
+
+- [`f34bd5a3c`](https://github.com/benjie/postgraphile-private/commit/f34bd5a3c353693b86a0307357a3620110700e1c)
+  Thanks [@benjie](https://github.com/benjie)! - Address dependency issues.
+
+- Updated dependencies
+  [[`45dcf3a8f`](https://github.com/benjie/postgraphile-private/commit/45dcf3a8fd8bad5c8b82a7cbff2db4dacb916950)]:
+  - grafast@0.0.1-alpha.4
+  - @dataplan/json@0.0.1-alpha.4
+
 ## 0.0.1-alpha.3
 
 ### Patch Changes
