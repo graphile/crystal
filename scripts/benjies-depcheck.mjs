@@ -44,6 +44,8 @@ function resolveExternals(externals) {
 }
 
 const fails = [];
+const warnings = [];
+const all = {};
 for (const packagePath of packages) {
   const dir = `${__dirname}/../${packagePath}`;
   const packageJson = JSON.parse(
@@ -116,18 +118,73 @@ for (const packagePath of packages) {
       !packageJson.peerDependencies?.[moduleName] &&
       !packageJson.optionalDependencies?.[moduleName]
     ) {
-      fails.push([packageJson.name, moduleName]);
+      fails.push(`${packageJson.name} should depend on ${moduleName}`);
+    }
+  }
+  all[packageJson.name] = {
+    name: packageJson.name,
+    packagePath,
+    packageJson,
+    requires,
+  };
+}
+
+// Now check peerDependencies.
+// For each package A that depends or peerDepends on another package B, A must provide B's peerDependencies
+for (const module of Object.values(all)) {
+  const {
+    name,
+    packageJson: { dependencies, peerDependencies },
+  } = module;
+  if (dependencies) {
+    for (const depModuleName in dependencies) {
+      const dep = all[depModuleName];
+      if (dep) {
+        const depPeerDeps = dep.packageJson.peerDependencies;
+        if (depPeerDeps) {
+          for (const peerDepName in depPeerDeps) {
+            if (
+              !dependencies?.[peerDepName] &&
+              !peerDependencies?.[peerDepName]
+            ) {
+              // Check if it's optional
+              if (
+                !dep.packageJson.peerDependenciesMeta?.[peerDepName]?.optional
+              ) {
+                fails.push(
+                  `${dep.name} has a peer dependency on ${peerDepName}; ${name} depends on ${dep.name} but does not provide ${peerDepName} (range: "${depPeerDeps[peerDepName]}")`,
+                );
+              } else {
+                warnings.push(
+                  `${dep.name} has an optional peer dependency on ${peerDepName}; ${name} depends on ${dep.name} but does not provide ${peerDepName} (range: "${depPeerDeps[peerDepName]}")`,
+                );
+              }
+            }
+          }
+        }
+      } else {
+        // Out of scope
+      }
     }
   }
 }
 
+if (warnings.length) {
+  console.log();
+  console.log();
+  console.log();
+  console.log("# WARNINGS");
+  for (const message of warnings) {
+    console.log(message);
+  }
+}
 if (fails.length) {
   console.log();
   console.log();
   console.log();
   console.log("# MISSING DEPENDENCIES FOUND!");
-  for (const [packageName, moduleName] of fails) {
-    console.log(`${packageName} should depend on ${moduleName}`);
+  for (const message of fails) {
+    console.log(message);
   }
   process.exit(1);
 }

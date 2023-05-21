@@ -66,10 +66,14 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
+    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg": "^8.7.1"
   },
   "peerDependenciesMeta": {
+    "graphile-config": {
+      "optional": true
+    },
     "pg": {
       "optional": true
     }
