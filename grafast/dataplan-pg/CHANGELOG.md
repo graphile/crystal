@@ -1,5 +1,13 @@
 # @dataplan/pg
 
+## 0.0.1-alpha.5
+
+### Patch Changes
+
+- [#334](https://github.com/benjie/postgraphile-private/pull/334)
+  [`1ea7acdf5`](https://github.com/benjie/postgraphile-private/commit/1ea7acdf5cbf39c876d5a7990ff456eb0803ac0b)
+  Thanks [@benjie](https://github.com/benjie)! - Tweak peerDependencies
+
 ## 0.0.1-alpha.4
 
 ### Patch Changes
