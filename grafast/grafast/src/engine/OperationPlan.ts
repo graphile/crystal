@@ -2098,7 +2098,7 @@ export class OperationPlan {
         processed,
         step,
       );
-      if (!isReadonly && isDev) {
+      if (isDev) {
         const plansAdded = this.stepTracker.stepCount - previousStepCount;
 
         // NOTE: whilst processing steps new steps may be added, thus we must loop
