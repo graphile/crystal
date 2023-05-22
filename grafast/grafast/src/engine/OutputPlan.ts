@@ -304,9 +304,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       case "object": {
         return `${this.toString()}\n${Object.entries(this.keys)
           .map(([fieldName, val]) => {
-            return `.${fieldName}${
+            return `.${fieldName}: ${
               val.type === "__typename" ? "" : val.isNonNull ? "!" : "?"
-            }: ${
+            }${
               val.type === "__typename"
                 ? `__typename(${type.typeName})`
                 : val.outputPlan.print().replace(/\n/g, "\n  ")
@@ -324,10 +324,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           .join("\n")}`;
       }
       case "array": {
-        return `${this.toString()}\n  ${this.child!.print().replace(
-          /\n/g,
-          "\n  ",
-        )}${this.childIsNonNull ? "!" : "?"}`;
+        return `${this.toString()}\n  ${
+          this.childIsNonNull ? "!" : "?"
+        }${this.child!.print().replace(/\n/g, "\n  ")}`;
       }
       default: {
         return this.toString();
