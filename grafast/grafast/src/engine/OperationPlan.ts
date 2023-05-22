@@ -1171,10 +1171,11 @@ export class OperationPlan {
               field,
             )
           : NO_ARGS;
+      const fieldPath = [...path, responseKey];
       if (typeof planResolver === "function") {
         ({ step, haltTree } = this.planField(
           fieldLayerPlan,
-          path,
+          fieldPath,
           polymorphicPaths,
           fieldNodes,
           planResolver,
@@ -1227,7 +1228,7 @@ export class OperationPlan {
         this.planIntoOutputPlan(
           outputPlan,
           fieldLayerPlan,
-          [...path, responseKey],
+          fieldPath,
           polymorphicPath,
           polymorphicPaths,
           // If one field has a selection set, they all have a selection set (guaranteed by validation).
@@ -1384,7 +1385,7 @@ export class OperationPlan {
       this.planIntoOutputPlan(
         listOutputPlan,
         $item.layerPlan,
-        EMPTY_ARRAY,
+        path,
         polymorphicPath,
         polymorphicPaths,
         selections,
