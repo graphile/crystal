@@ -438,8 +438,9 @@ context keys with your initials, company name, or similar.
 It's _not_ a good idea to give direct access to the `req` or `res` objects
 via `context` as it binds the context too tightly to the HTTP request
 lifecycle — this will cause you issues if you try and use the GraphQL schema in
-other contexts (e.g. directly or over alternative transports such as websockets
-for realtime). Instead, add helpers to get/set the data you need.
+other contexts (e.g. directly from the application, in integration tests,
+or over alternative transports such as websockets for realtime).
+Instead, add helpers to get/set the data you need.
 
 :::
 
@@ -533,7 +534,7 @@ $$ language sql stable;
 By default, everything in `pgSettings` is applied to the current transaction
 with `set_config($key, $value, true)`; note that `set_config` only supports
 string values so it is best to only feed `pgSettings` string values (we'll
-convert other values using the `String` constructor function, which may not
+[convert other values using the `String()` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#string_coercion), which may not
 have the effect you intend). All settings are automatically reset when the
 transaction completes.
 
