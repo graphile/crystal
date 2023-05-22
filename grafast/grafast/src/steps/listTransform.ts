@@ -6,7 +6,7 @@ import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import type { GrafastError } from "../error.js";
-import { ConnectionCapableStep } from "../index.js";
+import type { ConnectionCapableStep } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
