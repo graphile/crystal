@@ -1,4 +1,4 @@
-import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
+import type { GraphQLInputObjectType } from "graphql";
 import te from "tamedevil";
 
 import type { InputStep } from "../input.js";
