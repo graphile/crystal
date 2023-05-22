@@ -1020,6 +1020,16 @@ function addRelations(
 
             let previousIdentifier = te.identifier(`$record`);
 
+            // ENHANCEMENT: these ensure that the variables are defined in
+            // the closure, but they also output noise
+            // (`list;object;connection;sql;each;`) which could be eliminated.
+
+            prefixLines.push(te`${ref_list};`);
+            prefixLines.push(te`${ref_object};`);
+            prefixLines.push(te`${ref_connection};`);
+            prefixLines.push(te`${ref_sql};`);
+            prefixLines.push(te`${ref_each};`);
+
             let isStillSingular = true;
             for (let i = 0, l = path.layers.length; i < l; i++) {
               const layer = path.layers[i];
