@@ -1,5 +1,30 @@
 # postgraphile
 
+## 5.0.0-alpha.7
+
+### Patch Changes
+
+- [#335](https://github.com/benjie/postgraphile-private/pull/335)
+  [`ef8432511`](https://github.com/benjie/postgraphile-private/commit/ef84325111416a9663417bb58ec664998040cf7c)
+  Thanks [@benjie](https://github.com/benjie)! - Have ref fields support
+  ordering and filtering.
+
+- [#336](https://github.com/benjie/postgraphile-private/pull/336)
+  [`24822d0dc`](https://github.com/benjie/postgraphile-private/commit/24822d0dc87d41f0b0737d6e00cf4022de4bab5e)
+  Thanks [@benjie](https://github.com/benjie)! - Fix over-cautious throw when
+  dealing with recursive inputs.
+
+- Updated dependencies
+  [[`ef8432511`](https://github.com/benjie/postgraphile-private/commit/ef84325111416a9663417bb58ec664998040cf7c),
+  [`86e503d78`](https://github.com/benjie/postgraphile-private/commit/86e503d785626ad9a2e91ec2e70b272dd632d425),
+  [`2850e4732`](https://github.com/benjie/postgraphile-private/commit/2850e4732ff173347357dba048eaf3c1ef775497),
+  [`24822d0dc`](https://github.com/benjie/postgraphile-private/commit/24822d0dc87d41f0b0737d6e00cf4022de4bab5e)]:
+  - graphile-build-pg@5.0.0-alpha.7
+  - grafast@0.0.1-alpha.5
+  - graphile-build@5.0.0-alpha.6
+  - @dataplan/pg@0.0.1-alpha.6
+  - grafserv@0.0.1-alpha.5
+
 ## 5.0.0-alpha.6
 
 ### Patch Changes

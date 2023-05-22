@@ -1,6 +1,6 @@
 {
   "name": "postgraphile",
-  "version": "5.0.0-alpha.6",
+  "version": "5.0.0-alpha.7",
   "description": "Automatic, high performance, and highly customizable GraphQL API for PostgreSQL",
   "type": "commonjs",
   "main": "./dist/index.js",

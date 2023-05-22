@@ -1,5 +1,18 @@
 # graphile-build
 
+## 5.0.0-alpha.6
+
+### Patch Changes
+
+- [`2850e4732`](https://github.com/benjie/postgraphile-private/commit/2850e4732ff173347357dba048eaf3c1ef775497)
+  Thanks [@benjie](https://github.com/benjie)! - Improve the error output when
+  the schema fails to build.
+
+- Updated dependencies
+  [[`86e503d78`](https://github.com/benjie/postgraphile-private/commit/86e503d785626ad9a2e91ec2e70b272dd632d425),
+  [`24822d0dc`](https://github.com/benjie/postgraphile-private/commit/24822d0dc87d41f0b0737d6e00cf4022de4bab5e)]:
+  - grafast@0.0.1-alpha.5
+
 ## 5.0.0-alpha.5
 
 ### Patch Changes

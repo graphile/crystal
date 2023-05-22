@@ -1,5 +1,24 @@
 # grafast
 
+## 0.0.1-alpha.5
+
+### Patch Changes
+
+- [#335](https://github.com/benjie/postgraphile-private/pull/335)
+  [`86e503d78`](https://github.com/benjie/postgraphile-private/commit/86e503d785626ad9a2e91ec2e70b272dd632d425)
+  Thanks [@benjie](https://github.com/benjie)! - - Adjust OutputPlan printing
+
+  - Fix `path` used to track planning errors
+  - Fix tree shaking when eradicating all steps in a LayerPlan
+  - Don't `deduplicateSteps()` when printing the plan graph 🤣
+  - `each()` can now be as connection capable as the list plan was (via
+    delegation)
+
+- [#336](https://github.com/benjie/postgraphile-private/pull/336)
+  [`24822d0dc`](https://github.com/benjie/postgraphile-private/commit/24822d0dc87d41f0b0737d6e00cf4022de4bab5e)
+  Thanks [@benjie](https://github.com/benjie)! - Fix over-cautious throw when
+  dealing with recursive inputs.
+
 ## 0.0.1-alpha.4
 
 ### Patch Changes
