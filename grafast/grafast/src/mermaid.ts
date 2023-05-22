@@ -177,6 +177,7 @@ export function printPlanGraph(
   operationPlan.processSteps(
     "printingPlanDeps",
     "dependencies-first",
+    true,
     (plan) => {
       sortedSteps.push(plan);
       return plan;
@@ -272,10 +273,15 @@ export function printPlanGraph(
 
   graph.push("");
   graph.push("    %% define steps");
-  operationPlan.processSteps("printingPlans", "dependents-first", (plan) => {
-    planId(plan);
-    return plan;
-  });
+  operationPlan.processSteps(
+    "printingPlans",
+    "dependents-first",
+    true,
+    (plan) => {
+      planId(plan);
+      return plan;
+    },
+  );
 
   graph.push("");
   if (!concise) graph.push("    subgraph Buckets");
