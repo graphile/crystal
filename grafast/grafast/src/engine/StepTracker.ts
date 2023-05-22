@@ -209,9 +209,21 @@ export class StepTracker {
       }
     }
     // Remove all plans in this layer
+    const handled = new Set<ExecutableStep>();
+    const handle = (step: ExecutableStep) => {
+      if (handled.has(step)) return;
+      handled.add(step);
+      // Handle dependents first
+      for (const dependent of step.dependents) {
+        if (dependent.step.layerPlan === layerPlan) {
+          handle(dependent.step);
+        }
+      }
+      this.eradicate(step);
+    };
     for (const step of this.activeSteps) {
       if (step.layerPlan === layerPlan) {
-        this.eradicate(step);
+        handle(step);
       }
     }
   }

@@ -1171,10 +1171,11 @@ export class OperationPlan {
               field,
             )
           : NO_ARGS;
+      const fieldPath = [...path, responseKey];
       if (typeof planResolver === "function") {
         ({ step, haltTree } = this.planField(
           fieldLayerPlan,
-          path,
+          fieldPath,
           polymorphicPaths,
           fieldNodes,
           planResolver,
@@ -1227,7 +1228,7 @@ export class OperationPlan {
         this.planIntoOutputPlan(
           outputPlan,
           fieldLayerPlan,
-          [...path, responseKey],
+          fieldPath,
           polymorphicPath,
           polymorphicPaths,
           // If one field has a selection set, they all have a selection set (guaranteed by validation).
@@ -1384,7 +1385,7 @@ export class OperationPlan {
       this.planIntoOutputPlan(
         listOutputPlan,
         $item.layerPlan,
-        EMPTY_ARRAY,
+        path,
         polymorphicPath,
         polymorphicPaths,
         selections,
@@ -1963,6 +1964,7 @@ export class OperationPlan {
   private processStep(
     actionDescription: string,
     order: "dependents-first" | "dependencies-first",
+    isReadonly: boolean,
     callback: (plan: ExecutableStep) => ExecutableStep,
     processed: Set<ExecutableStep>,
     step: ExecutableStep,
@@ -1984,6 +1986,7 @@ export class OperationPlan {
           this.processStep(
             actionDescription,
             order,
+            isReadonly,
             callback,
             processed,
             $processFirst,
@@ -2001,6 +2004,7 @@ export class OperationPlan {
           this.processStep(
             actionDescription,
             order,
+            isReadonly,
             callback,
             processed,
             $root,
@@ -2015,6 +2019,7 @@ export class OperationPlan {
           this.processStep(
             actionDescription,
             order,
+            isReadonly,
             callback,
             processed,
             $processFirst,
@@ -2050,10 +2055,16 @@ export class OperationPlan {
       );
     }
 
-    if (replacementStep != step) {
-      this.replaceStep(step, replacementStep);
+    if (isReadonly) {
+      if (replacementStep !== step) {
+        throw new Error(`Replacing step in readonly mode is not permitted!`);
+      }
+    } else {
+      if (replacementStep !== step) {
+        this.replaceStep(step, replacementStep);
+      }
+      this.deduplicateSteps();
     }
-    this.deduplicateSteps();
 
     return replacementStep;
   }
@@ -2068,6 +2079,7 @@ export class OperationPlan {
   public processSteps(
     actionDescription: string,
     order: "dependents-first" | "dependencies-first",
+    isReadonly: boolean,
     callback: (plan: ExecutableStep) => ExecutableStep,
   ): void {
     const previousStepCount = this.stepTracker.stepCount;
@@ -2081,6 +2093,7 @@ export class OperationPlan {
       const resultStep = this.processStep(
         actionDescription,
         order,
+        isReadonly,
         callback,
         processed,
         step,
@@ -2099,7 +2112,11 @@ export class OperationPlan {
       }
     }
 
-    if (
+    if (isReadonly) {
+      if (this.stepTracker.stepCount > previousStepCount) {
+        throw new Error(`Creating steps in isReadonly mode is forbidden`);
+      }
+    } else if (
       this.phase !== "plan" &&
       this.stepTracker.stepCount > previousStepCount
     ) {
@@ -2795,11 +2812,16 @@ export class OperationPlan {
   }
 
   private hoistSteps() {
-    this.processSteps("hoist", "dependencies-first", this.hoistAndDeduplicate);
+    this.processSteps(
+      "hoist",
+      "dependencies-first",
+      false,
+      this.hoistAndDeduplicate,
+    );
   }
 
   private pushDownSteps() {
-    this.processSteps("pushDown", "dependents-first", this.pushDown);
+    this.processSteps("pushDown", "dependents-first", false, this.pushDown);
   }
 
   private getStepOptionsForStep(step: ExecutableStep): StepOptions {
@@ -2876,6 +2898,7 @@ export class OperationPlan {
       this.processSteps(
         "optimize",
         "dependents-first",
+        false,
         loops === 0
           ? (step) => {
               const newStep = this.optimizeStep(step);

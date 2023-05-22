@@ -569,7 +569,7 @@ async function sleepFromRetryOnInitFail(
   console.warn(
     `Error occurred whilst building the schema (phase = ${phase}; attempt ${attempts}). We'll try again ${
       retryOrPromise === true ? `in ${delay}ms` : `shortly`
-    }.\n  ${String(error).replace(/\n/g, "\n  ")}`,
+    }.\n  ${String(error.stack ?? error).replace(/\n/g, "\n  ")}`,
   );
 
   if (retryOrPromise === true) {

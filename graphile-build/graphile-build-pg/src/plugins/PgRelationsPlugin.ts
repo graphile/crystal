@@ -18,7 +18,7 @@ import type {
 } from "@dataplan/pg";
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
-import { arraysMatch, connection, each, list, object } from "grafast";
+import { arraysMatch, connection, first } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
@@ -30,11 +30,9 @@ import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
-const ref_list = te.ref(list, "list");
-const ref_object = te.ref(object, "object");
+const ref_first = te.ref(first, "first");
 const ref_connection = te.ref(connection, "connection");
 const ref_sql = te.ref(sql, "sql");
-const ref_each = te.ref(each, "each");
 
 declare global {
   namespace GraphileBuild {
@@ -1018,122 +1016,84 @@ function addRelations(
               functionLines.push(te`return ($record) => {`);
             }
 
-            let previousIdentifier = te.identifier(`$record`);
-
-            // ENHANCEMENT: these ensure that the variables are defined in
-            // the closure, but they also output noise
-            // (`list;object;connection;sql;each;`) which could be eliminated.
-
-            prefixLines.push(te`${ref_list};`);
-            prefixLines.push(te`${ref_object};`);
-            prefixLines.push(te`${ref_connection};`);
-            prefixLines.push(te`${ref_sql};`);
-            prefixLines.push(te`${ref_each};`);
-
-            let isStillSingular = true;
-            for (let i = 0, l = path.layers.length; i < l; i++) {
-              const layer = path.layers[i];
-              const { localAttributes, remoteAttributes, resource, isUnique } =
-                layer;
-              const clean =
-                localAttributes.every(isSafeObjectPropertyName) &&
-                remoteAttributes.every(isSafeObjectPropertyName);
-              const resourceName = idents.makeSafeIdentifier(
-                `${resource.name}Resource`,
-              );
-              const ref_resource = te.ref(resource, resourceName);
-              prefixLines.push(te`${ref_resource};`);
-              if (isStillSingular) {
-                if (!isUnique) {
-                  isStillSingular = false;
-                }
-                const newIdentifier = te.identifier(
-                  idents.makeSafeIdentifier(
-                    `$${
-                      isUnique
-                        ? build.inflection.singularize(resource.name)
-                        : build.inflection.pluralize(resource.name)
-                    }`,
-                  ),
-                );
-                const specFromRecord = EXPORTABLE(
-                  (localAttributes, remoteAttributes) =>
-                    ($record: PgSelectSingleStep) => {
-                      return remoteAttributes.reduce(
-                        (memo, remoteAttributeName, i) => {
-                          memo[remoteAttributeName] = $record.get(
-                            localAttributes[i] as string,
-                          );
-                          return memo;
-                        },
-                        Object.create(null),
-                      );
-                    },
-                  [localAttributes, remoteAttributes],
-                );
-
-                const specString = clean
-                  ? makeSpecString(
-                      previousIdentifier,
-                      localAttributes,
-                      remoteAttributes,
-                    )
-                  : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
-                functionLines.push(
-                  te`  const ${newIdentifier} = ${ref_resource}.${
-                    isUnique ? te.cache`get` : te.cache`find`
-                  }(${specString});`,
-                );
-                previousIdentifier = newIdentifier;
-              } else {
-                const newIdentifier = te.identifier(
-                  idents.makeSafeIdentifier(
-                    `$${build.inflection.pluralize(resource.name)}`,
-                  ),
-                );
-                /*
-            const tupleIdentifier = makeSafeIdentifier(
-              `${previousIdentifier}Tuples`,
+            const finalLayer = path.layers[path.layers.length - 1];
+            const ref_finalLayerResource = te.ref(
+              finalLayer.resource,
+              finalLayer.resource.name,
+            );
+            const collectionIdentifier = te.identifier(
+              build.inflection.pluralize(finalLayer.resource.name),
             );
             functionLines.push(
-              `  const ${tupleIdentifier} = each(${previousIdentifier}, ($entry) => object({ ${localAttributes
-                .map(
-                  (c) =>
-                    `${evalSafeProperty(c)}: $entry.get(${JSON.stringify(c)})`,
-                )
-                .join(", ")} }));`,
+              te`  const ${collectionIdentifier} = ${ref_finalLayerResource}.find();`,
             );
-            functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
-            */
-                // ENHANCEMENT: we could rename this to be the singular of the resource name or something
-                const $entry = te`$entry`;
-                const specString = makeSpecString(
-                  $entry,
-                  localAttributes,
-                  remoteAttributes,
-                );
-                functionLines.push(
-                  te`  const ${newIdentifier} = ${ref_each}(${previousIdentifier}, (${$entry}) => ${ref_resource}.get(${specString}));`,
-                );
-                previousIdentifier = newIdentifier;
-              }
-            }
+            // FIXME: if required, make the above `DISTINCT ON (primary key)`.
+            // FIXME: make `previousAlias` a safe identifier
+            functionLines.push(
+              te`  let previousAlias = ${collectionIdentifier}.alias;`,
+            );
 
-            if (isStillSingular && !single) {
-              const newIdentifier = te.identifier("$list");
+            // Process each layer
+            for (let i = path.layers.length - 1; i >= 1; i--) {
+              const layer = path.layers[i];
+              const resource = path.layers[i - 1].resource;
+              const { localAttributes, remoteAttributes } = layer;
+              const ref_resource = te.ref(resource, resource.name);
+              const layerAlias = te.identifier(resource.name + "Alias");
               functionLines.push(
-                te`  const ${newIdentifier} = ${ref_list}([${previousIdentifier}]);`,
+                te`  const ${layerAlias} = ${ref_sql}.identifier(Symbol(${te.lit(
+                  resource.name,
+                )}));`,
               );
-              previousIdentifier = newIdentifier;
+              functionLines.push(
+                te`  ${collectionIdentifier}.join({
+    type: "inner",
+    from: ${ref_resource}.from,
+    alias: ${layerAlias},
+    conditions: [
+      ${te.join(
+        remoteAttributes.map((remoteAttrName, i) => {
+          return te`${ref_sql}\`\${previousAlias}.\${${ref_sql}.identifier(${te.lit(
+            remoteAttrName,
+          )})} = \${${layerAlias}}.\${${ref_sql}.identifier(${te.lit(
+            localAttributes[i],
+          )})}\``;
+        }),
+        ",\n      ",
+      )}
+    ]
+  });`,
+              );
+              functionLines.push(te`  previousAlias = ${layerAlias};`);
             }
 
-            if (isConnection) {
+            // Now apply `$record`
+            {
+              const firstLayer = path.layers[0];
+              const { localAttributes, remoteAttributes } = firstLayer;
+              remoteAttributes.forEach((remoteAttrName, i) => {
+                functionLines.push(
+                  te`  ${collectionIdentifier}.where(${ref_sql}\`\${previousAlias}.\${${ref_sql}.identifier(${te.lit(
+                    remoteAttrName,
+                  )})} = \${${collectionIdentifier}.placeholder($record.get(${te.lit(
+                    localAttributes[i],
+                  )}))}\`);`,
+                );
+              });
+            }
+
+            if (single) {
               functionLines.push(
-                te`  return ${ref_connection}(${previousIdentifier});`,
+                te`  return ${ref_first}(${collectionIdentifier});`,
+              );
+            } else if (isConnection) {
+              functionLines.push(
+                te`  return ${ref_connection}(${collectionIdentifier});`,
               );
             } else {
-              functionLines.push(te`  return ${previousIdentifier};`);
+              functionLines.push(te`  return ${collectionIdentifier};`);
             }
+
             functionLines.push(te.cache`}`);
             return te.run`${te.join(prefixLines, "\n")}${te.join(
               functionLines,

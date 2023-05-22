@@ -5,7 +5,7 @@ import PersistedPlugin from "@grafserv/persisted";
 import { context, listen, object } from "grafast";
 import type {} from "grafserv/node";
 import { StreamDeferPlugin } from "graphile-build";
-import { EXPORTABLE } from "graphile-export";
+import { EXPORTABLE, exportSchema } from "graphile-export";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import type {} from "postgraphile";
 import { postgraphilePresetAmber } from "postgraphile/presets/amber";
@@ -84,6 +84,24 @@ function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
   };
 }
 
+const ExportSchemaPlugin: GraphileConfig.Plugin = {
+  name: "ExportSchemaPlugin",
+  version: "0.0.0",
+
+  schema: {
+    hooks: {
+      finalize(schema) {
+        exportSchema(schema, `${__dirname}/exported-schema.mjs`, {
+          mode: "typeDefs",
+        }).catch((e) => {
+          console.error(e);
+        });
+        return schema;
+      },
+    },
+  },
+};
+
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
@@ -137,6 +155,7 @@ const preset: GraphileConfig.Preset = {
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
     makeRuruTitlePlugin("<New title text here!>"),
+    ExportSchemaPlugin,
   ],
   extends: [
     postgraphilePresetAmber,
