@@ -1032,7 +1032,7 @@ function addRelations(
                 `${resource.name}Resource`,
               );
               const ref_resource = te.ref(resource, resourceName);
-              prefixLines.push(te`${ref_resource};`);
+              //prefixLines.push(te`${ref_resource};`);
               if (isStillSingular) {
                 if (!isUnique) {
                   isStillSingular = false;
@@ -1046,6 +1046,31 @@ function addRelations(
                     }`,
                   ),
                 );
+                const newCollection = isUnique
+                  ? te.identifier(
+                      idents.makeSafeIdentifier(
+                        `$${build.inflection.pluralize(resource.name)}`,
+                      ),
+                    )
+                  : newIdentifier;
+                functionLines.push(
+                  te`  const ${newCollection} = ${ref_resource}.find();`,
+                );
+                if (isUnique) {
+                  functionLines.push(
+                    te`  const ${newIdentifier} = first(${newCollection});`,
+                  );
+                }
+                remoteAttributes.forEach((remoteAttributeName, i) => {
+                  functionLines.push(
+                    te`  ${newCollection}.where(${ref_sql}\`\${${newCollection}.alias}.\${${ref_sql}.identifier(${te.lit(
+                      remoteAttributeName,
+                    )})} = \${${newCollection}.placeholder(${previousIdentifier}.get(${te.lit(
+                      localAttributes[i],
+                    )}))}\`);`,
+                  );
+                });
+                /*
                 const specFromRecord = EXPORTABLE(
                   (localAttributes, remoteAttributes) =>
                     ($record: PgSelectSingleStep) => {
@@ -1069,11 +1094,7 @@ function addRelations(
                       remoteAttributes,
                     )
                   : te`${te.ref(specFromRecord)}(${previousIdentifier})`;
-                functionLines.push(
-                  te`  const ${newIdentifier} = ${ref_resource}.${
-                    isUnique ? te.cache`get` : te.cache`find`
-                  }(${specString});`,
-                );
+                */
                 previousIdentifier = newIdentifier;
               } else {
                 const newIdentifier = te.identifier(
@@ -1081,29 +1102,37 @@ function addRelations(
                     `$${build.inflection.pluralize(resource.name)}`,
                   ),
                 );
-                /*
-            const tupleIdentifier = makeSafeIdentifier(
-              `${previousIdentifier}Tuples`,
-            );
-            functionLines.push(
-              `  const ${tupleIdentifier} = each(${previousIdentifier}, ($entry) => object({ ${localAttributes
-                .map(
-                  (c) =>
-                    `${evalSafeProperty(c)}: $entry.get(${JSON.stringify(c)})`,
-                )
-                .join(", ")} }));`,
-            );
-            functionLines.push(`  ${newIdentifier}.where(sql\`\${}\`);`);
-            */
-                // ENHANCEMENT: we could rename this to be the singular of the resource name or something
-                const $entry = te`$entry`;
-                const specString = makeSpecString(
-                  $entry,
-                  localAttributes,
-                  remoteAttributes,
+                functionLines.push(
+                  te`  const ${newIdentifier} = ${ref_resource}.find();`,
+                );
+                const joinAlias = te.identifier(
+                  idents.makeSafeIdentifier(
+                    `${build.inflection.pluralize(resource.name)}Join`,
+                  ),
                 );
                 functionLines.push(
-                  te`  const ${newIdentifier} = ${ref_each}(${previousIdentifier}, (${$entry}) => ${ref_resource}.get(${specString}));`,
+                  te`  const ${joinAlias} = ${ref_sql}.identifier(Symbol(${te.lit(
+                    resource.name + "-join",
+                  )}));`,
+                );
+                functionLines.push(
+                  te`  ${newIdentifier}.join({
+    type: "inner",
+    from: ${previousIdentifier}.alias,
+    alias: ${joinAlias},
+    conditions: [
+      ${te.join(
+        remoteAttributes.map((attName, i) => {
+          return te`${ref_sql}\`\${${newIdentifier}.alias}.\${${ref_sql}.identifier(${te.lit(
+            attName,
+          )})} = \${${joinAlias}}.\${${ref_sql}.identifier(${te.lit(
+            localAttributes[i],
+          )})}\``;
+        }),
+        ",\n      ",
+      )}
+    ]
+  });`,
                 );
                 previousIdentifier = newIdentifier;
               }
