@@ -3,6 +3,7 @@ import chalk from "chalk";
 import type { ExecutableStep, ListCapableStep } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
+import type { ConnectionCapableStep, ConnectionStep } from "./connection.js";
 import type { __ListTransformStep } from "./listTransform.js";
 import { listTransform } from "./listTransform.js";
 
@@ -36,7 +37,8 @@ const eachCallbackForListPlan = (
  * Transforms a list by wrapping each element in the list with the given mapper.
  */
 export function each<
-  TListStep extends ExecutableStep<readonly any[]>,
+  TListStep extends ExecutableStep<readonly any[]> &
+    Partial<ConnectionCapableStep<any, any>>,
   TResultItemStep extends ExecutableStep,
 >(
   listStep: TListStep,
@@ -69,5 +71,23 @@ export function each<
       }
       return this;
     },
+    ...(listStep.connectionClone != null
+      ? {
+          connectionClone(
+            this: __ListTransformStep<TListStep>,
+            $connection: ConnectionStep<any, any, any, any>,
+            ...args: any[]
+          ): ConnectionCapableStep<any, any> {
+            const $list = this.getListStep() as TListStep &
+              ConnectionCapableStep<any, any>;
+            const $clonedList = $list.connectionClone(
+              $connection,
+              ...args,
+            ) as TListStep & ConnectionCapableStep<any, any>;
+            return each($clonedList, mapper) as __ListTransformStep<TListStep> &
+              ConnectionCapableStep<any, any>;
+          },
+        }
+      : null),
   });
 }

@@ -6,6 +6,7 @@ import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import type { GrafastError } from "../error.js";
+import { ConnectionCapableStep } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
@@ -49,6 +50,7 @@ export interface ListTransformOptions<
   optimize?: (
     this: __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep>,
   ) => ExecutableStep;
+  connectionClone?: ConnectionCapableStep<TListStep, any>["connectionClone"];
 }
 
 /**
@@ -85,6 +87,10 @@ export class __ListTransformStep<
   public finalizeCallback?: (data: TMemo) => TMemo;
   public listItem?: (itemPlan: __ItemStep<this>) => TItemStep;
   private meta: string | null;
+  public connectionClone?: ConnectionCapableStep<
+    TListStep,
+    any
+  >["connectionClone"];
 
   /** Set during query planning.  */
   public itemStepId!: number;
@@ -107,6 +113,7 @@ export class __ListTransformStep<
       listItem,
       meta,
       optimize,
+      connectionClone,
     } = options;
     this.listStepDepId = this.addDependency(listStep);
     this.itemPlanCallback = itemPlanCallback;
@@ -118,6 +125,7 @@ export class __ListTransformStep<
     if (optimize !== undefined) {
       this.optimize = optimize;
     }
+    this.connectionClone = connectionClone;
 
     // Plan this subroutine
     this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
