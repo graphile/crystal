@@ -31,6 +31,7 @@
     "@localrepo/grafast-bench": "0.0.0"
   },
   "changesets": [
+    "afraid-candles-cover",
     "afraid-ghosts-sin",
     "afraid-guests-help",
     "afraid-llamas-sin",
@@ -45,6 +46,7 @@
     "clean-falcons-sell",
     "clean-poets-relax",
     "cool-pets-pull",
+    "curly-poems-know",
     "curly-wombats-sit",
     "cyan-queens-admire",
     "dry-turtles-hope",
@@ -82,6 +84,7 @@
     "good-ducks-tickle",
     "gorgeous-ducks-behave",
     "gorgeous-mails-hammer",
+    "gorgeous-pugs-visit",
     "green-dragons-sing",
     "healthy-owls-fail",
     "heavy-tools-glow",
@@ -98,6 +101,7 @@
     "little-brooms-rush",
     "little-humans-smoke",
     "lovely-zebras-visit",
+    "lucky-phones-perform",
     "lucky-poets-know",
     "many-kids-wait",
     "many-pears-try",
