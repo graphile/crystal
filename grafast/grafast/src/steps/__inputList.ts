@@ -26,7 +26,6 @@ export class __InputListStep extends ExecutableStep {
 
   constructor(
     inputType: graphql.GraphQLList<GraphQLInputType>,
-    seenTypes: ReadonlyArray<GraphQLInputType> | undefined,
     private readonly inputValues: NotVariableValueNode | undefined,
   ) {
     super();
@@ -56,7 +55,6 @@ export class __InputListStep extends ExecutableStep {
           innerType,
           inputValue,
           undefined,
-          seenTypes,
         );
         this.addDependency(innerPlan);
         this.itemCount++;

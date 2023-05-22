@@ -23,7 +23,6 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
   } = Object.create(null);
   constructor(
     private inputObjectType: GraphQLInputObjectType,
-    seenTypes: ReadonlyArray<GraphQLInputType>,
     private inputValues: NotVariableValueNode | undefined,
   ) {
     super();
@@ -48,7 +47,6 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
         inputFieldType,
         inputFieldValue?.value,
         defaultValue,
-        seenTypes,
       );
       this.inputFields[inputFieldName] = {
         step,
