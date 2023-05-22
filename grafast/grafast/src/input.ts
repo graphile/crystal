@@ -92,24 +92,13 @@ export function inputPlan(
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
   defaultValue: ConstValueNode | undefined = undefined,
-  inSeenTypes?: ReadonlyArray<GraphQLInputType>,
 ): InputStep {
+  // This prevents recursion
   if (rawInputValue === undefined && defaultValue === undefined) {
     return constant(undefined);
   }
 
-  if (inSeenTypes?.includes(inputType)) {
-    // FIXME: Stop recursion if no data
-    throw new Error(
-      "GrafastInternalError<441c4f9f-d3d2-41ec-b7bc-e0b96885affe>: Grafast doesn't currently support planning through recursive input values; please raise an issue and explain how this affects you!",
-    );
-  }
   const isObj = isInputObjectType(inputType);
-  const seenTypes = isObj
-    ? inSeenTypes === undefined
-      ? [inputType]
-      : [...inSeenTypes, inputType]
-    : inSeenTypes;
 
   let inputValue = rawInputValue;
   if (inputValue?.kind === "Variable") {
@@ -134,7 +123,6 @@ export function inputPlan(
       operationPlan,
       variableName,
       variableType,
-      seenTypes,
       inputType,
       defaultValue,
     );
@@ -149,11 +137,10 @@ export function inputPlan(
       innerType,
       inputValue,
       undefined,
-      seenTypes,
     );
     return inputNonNullPlan(operationPlan, valuePlan);
   } else if (inputType instanceof GraphQLList) {
-    return new __InputListStep(inputType, seenTypes, inputValue);
+    return new __InputListStep(inputType, inputValue);
   } else if (isLeafType(inputType)) {
     if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
       const scalarType = assertScalarType(inputType);
@@ -166,7 +153,7 @@ export function inputPlan(
       return new __InputStaticLeafStep(inputType, inputValue);
     }
   } else if (isObj) {
-    return new __InputObjectStep(inputType, seenTypes!, inputValue);
+    return new __InputObjectStep(inputType, inputValue);
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
@@ -187,7 +174,6 @@ function inputVariablePlan(
   operationPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
-  seenTypes: ReadonlyArray<GraphQLInputType> | undefined,
   inputType: GraphQLInputType,
   defaultValue: ConstValueNode | undefined = undefined,
 ): InputStep {
@@ -200,7 +186,6 @@ function inputVariablePlan(
       operationPlan,
       variableName,
       unwrappedVariableType,
-      seenTypes,
       inputType,
       defaultValue,
     );
@@ -216,7 +201,6 @@ function inputVariablePlan(
         operationPlan,
         variableName,
         variableType,
-        seenTypes,
         inputType.ofType,
         defaultValue,
       );
@@ -240,13 +224,7 @@ function inputVariablePlan(
     // `defaultValue` is NOT undefined, and we know variableValue is
     // `undefined` (and always will be); we're going to loop back and pretend
     // that no value was passed in the first place (instead of the variable):
-    return inputPlan(
-      operationPlan,
-      inputType,
-      undefined,
-      defaultValue,
-      seenTypes,
-    );
+    return inputPlan(operationPlan, inputType, undefined, defaultValue);
   }
 }
 
