@@ -47,12 +47,13 @@ jobs:
           - 13
           - 14
           - 15
-          - 16
+          - 16 # Beta
         node-version:
           - 12.x
           - 14.x
           - 16.x
           - 18.x
+          - 19.x
           - 20.x
 
     services:
@@ -76,6 +77,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Unset NODE_OPTIONS for pre-18.x versions
+        if: startsWith(matrix.node-version, '12') || startsWith(matrix.node-version, '14') || startsWith(matrix.node-version, '16')
+        run: |
+          unset NODE_OPTIONS
       - name: Configure PostgreSQL
         run: |
           cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -i postgres bash
