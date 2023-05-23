@@ -137,6 +137,8 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `connection` - connection (GraphQL Cursor Pagination Spec)
 - `query:resource:list` - "list" field for a resource at the root Query level
 - `query:resource:connection` - "connection" field for a resource at the root Query level
+- `query:interface:list` - "list" field for a interface at the root Query level
+- `query:interface:connection` - "connection" field for a interface at the root Query level
 - `queryField` - for procedures: should it become a field on the `Query` type?
 - `typeField` - for procedures: should it become a field on a non-operation
   type?

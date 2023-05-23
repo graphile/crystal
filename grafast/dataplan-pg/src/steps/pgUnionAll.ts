@@ -58,6 +58,8 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
 
+const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgUnionAll placeholder! */`;
+
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
 }
@@ -77,6 +79,12 @@ const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
+
+// Constant functions so lambdas can be optimized
+function listHasMore(list: any | null | undefined) {
+  return list?.hasMore || false;
+}
+listHasMore.isSyncAndSafe = true; // Optimization
 
 function parseCursor(cursor: string | null) {
   if (cursor == null) {
@@ -353,6 +361,26 @@ interface MemberDigest<TTypeNames extends string> {
 
 export type PgUnionAllMode = "normal" | "aggregate";
 
+function cloneDigest<TTypeNames extends string = string>(
+  digest: MemberDigest<TTypeNames>,
+): MemberDigest<TTypeNames> {
+  return {
+    member: digest.member,
+    finalResource: digest.finalResource,
+    sqlSource: digest.sqlSource,
+    symbol: digest.symbol,
+    alias: digest.alias,
+    conditions: [...digest.conditions],
+    orders: [...digest.orders],
+  };
+}
+
+function cloneDigests<TTypeNames extends string = string>(
+  digests: ReadonlyArray<MemberDigest<TTypeNames>>,
+): Array<MemberDigest<TTypeNames>> {
+  return digests.map(cloneDigest);
+}
+
 /**
  * Represents a `UNION ALL` statement, which can have multiple table-like
  * resources, but must return a consistent data shape.
@@ -506,7 +534,7 @@ export class PgUnionAllStep<
       const cloneFromMatchingMode =
         cloneFrom.mode === this.mode ? cloneFrom : null;
       this.spec = cloneFrom.spec;
-      this.memberDigests = cloneFrom.memberDigests;
+      this.memberDigests = cloneDigests(cloneFrom.memberDigests);
 
       cloneFrom.dependencies.forEach((planId, idx) => {
         const myIdx = this.addDependency(cloneFrom.getDep(idx), true);
@@ -840,6 +868,10 @@ on (${sql.indent(
     return this.singleAsRecord();
   }
 
+  row($row: ExecutableStep) {
+    return new PgUnionAllSingleStep(this, $row);
+  }
+
   listItem(itemPlan: ExecutableStep) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
@@ -965,6 +997,17 @@ on (${sql.indent(
     }
   }
 
+  /**
+   * Someone (probably pageInfo) wants to know if there's more records. To
+   * determine this we fetch one extra record and then throw it away.
+   */
+  public hasMore(): ExecutableStep<boolean> {
+    this.fetchOneExtra = true;
+    // HACK: This is a truly hideous hack. We should solve this by having this
+    // plan resolve to an object with rows and metadata.
+    return lambda(this, listHasMore);
+  }
+
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   public placeholder(
@@ -990,10 +1033,7 @@ on (${sql.indent(
 
     const dependencyIndex = this.addDependency($step);
     const symbol = Symbol(`step-${$step.id}`);
-    const sqlPlaceholder = sql.placeholder(
-      symbol,
-      sql`(1/0) /* ERROR! Unhandled placeholder! */`,
-    );
+    const sqlPlaceholder = sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
     const p: PgUnionAllPlaceholder = {
       dependencyIndex,
       codec,
@@ -1426,6 +1466,11 @@ and ${condition(i + 1)}`}
 
   optimize() {
     this.planLimitAndOffset();
+
+    // We must lock here otherwise we might try and create cursor validation
+    // plans during `finalize`
+    this.locker.lock();
+
     return this;
   }
 

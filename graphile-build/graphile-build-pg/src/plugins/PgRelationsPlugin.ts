@@ -1105,6 +1105,7 @@ function addRelations(
           const connectionPlan = makePlanResolver("connection");
           return { singleRecordPlan, listPlan, connectionPlan };
         } else {
+          // Needs pgUnionAll
           const makePlanResolver = (
             mode: "singleRecord" | "list" | "connection",
           ) => {

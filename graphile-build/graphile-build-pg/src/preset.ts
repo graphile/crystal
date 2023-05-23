@@ -17,6 +17,7 @@ import { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.js";
 import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 import { PgFirstLastBeforeAfterArgsPlugin } from "./plugins/PgFirstLastBeforeAfterArgsPlugin.js";
 import { PgIndexBehaviorsPlugin } from "./plugins/PgIndexBehaviorsPlugin.js";
+import { PgInterfaceModeUnionAllRowsPlugin } from "./plugins/PgInterfaceModeUnionAllRowsPlugin.js";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
@@ -71,6 +72,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgRemoveExtensionResourcesPlugin,
     PgEnumTablesPlugin,
     PgPolymorphismPlugin,
+    PgInterfaceModeUnionAllRowsPlugin,
     PgRBACPlugin,
     PgIndexBehaviorsPlugin,
     PgRegistryPlugin,

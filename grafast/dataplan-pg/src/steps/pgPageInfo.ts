@@ -13,8 +13,8 @@ import {
 
 import type { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectParsedCursorStep, PgSelectStep } from "./pgSelect.js";
-import { PgSelectSingleStep } from "./pgSelectSingle.js";
-import type { PgUnionAllStep } from "./pgUnionAll.js";
+import type { PgSelectSingleStep } from "./pgSelectSingle.js";
+import type { PgUnionAllSingleStep, PgUnionAllStep } from "./pgUnionAll.js";
 
 /*
  * **IMPORTANT**: see pgPageInfo.md for reasoning behind decisions made in this file
@@ -94,14 +94,7 @@ export class PgPageInfoStep<
       first && !first.evalIs(null) && !first.evalIs(undefined);
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
     if (firstExists && !lastExists) {
-      const nodePlan = (
-        $connection as ConnectionStep<
-          any,
-          PgSelectParsedCursorStep,
-          PgSelectStep<any>,
-          any
-        >
-      ).cloneSubplanWithPagination();
+      const nodePlan = $connection.cloneSubplanWithPagination();
       return nodePlan.hasMore();
     } else {
       return constant(false);
@@ -131,14 +124,7 @@ export class PgPageInfoStep<
       first && !first.evalIs(null) && !first.evalIs(undefined);
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
     if (lastExists && !firstExists) {
-      const nodePlan = (
-        $connection as ConnectionStep<
-          PgSelectSingleStep<any>,
-          PgSelectParsedCursorStep,
-          PgSelectStep<any>,
-          PgSelectSingleStep<any>
-        >
-      ).cloneSubplanWithPagination();
+      const nodePlan = $connection.cloneSubplanWithPagination();
       return nodePlan.hasMore();
     } else if (
       offset &&
@@ -152,26 +138,16 @@ export class PgPageInfoStep<
     }
   }
 
-  startCursor(): PgCursorStep<PgSelectSingleStep<any>> {
-    const $connection = this.getConnectionStep() as ConnectionStep<
-      PgSelectSingleStep<any>,
-      PgSelectParsedCursorStep,
-      PgSelectStep<any>,
-      PgSelectSingleStep<any>
-    >;
+  startCursor(): PgCursorStep<PgSelectSingleStep<any> | PgUnionAllSingleStep> {
+    const $connection = this.getConnectionStep();
     const $rows = $connection.cloneSubplanWithPagination();
-    return new PgSelectSingleStep($rows, first($rows)).cursor();
+    return $rows.row(first($rows)).cursor();
   }
 
-  endCursor(): PgCursorStep<PgSelectSingleStep<any>> {
-    const $connection = this.getConnectionStep() as ConnectionStep<
-      PgSelectSingleStep<any>,
-      PgSelectParsedCursorStep,
-      PgSelectStep<any>,
-      PgSelectSingleStep<any>
-    >;
+  endCursor(): PgCursorStep<PgSelectSingleStep<any> | PgUnionAllSingleStep> {
+    const $connection = this.getConnectionStep();
     const $rows = $connection.cloneSubplanWithPagination();
-    return new PgSelectSingleStep($rows, last($rows)).cursor();
+    return $rows.row(last($rows)).cursor();
   }
 
   execute(count: number): GrafastResultsList<object> {

@@ -1,0 +1,41 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allVulnerabilities(
+    orderBy: [CVSS_SCORE_DESC]
+    first: 3
+    # CVSS: 10, typeName: ThirdPartyVulnerability, identifiers: [3]
+    after: "WyJlOTAxMDBkNmIzIiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIsIltcIjNcIl0iXQ=="
+  ) {
+    edges {
+      cursor
+      node {
+        __typename
+        id
+        name
+        cvssScore
+        ... on ThirdPartyVulnerability {
+          vendorName
+        }
+      }
+    }
+    totalCount
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+  allVulnerabilitiesList(orderBy: [CVSS_SCORE_DESC], first: 3, offset: 1) {
+    __typename
+    id
+    name
+    cvssScore
+    ... on ThirdPartyVulnerability {
+      vendorName
+    }
+  }
+}

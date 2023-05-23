@@ -275,6 +275,34 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           }
         });
       },
+      allInterfaceModeUnionRowsConnection(previous, options, codec) {
+        const listSuffix = codec.extensions?.tags?.listSuffix;
+        return overrideListSuffix(listSuffix, () => {
+          if (options.schema?.pgSimplifyAllRows) {
+            return this.connectionField(
+              this.camelCase(
+                `${this.distinctPluralize(this._singularizedCodecName(codec))}`,
+              ),
+            );
+          } else {
+            return previous!.call(this, codec);
+          }
+        });
+      },
+      allInterfaceModeUnionRowsList(previous, options, codec) {
+        const listSuffix = codec.extensions?.tags?.listSuffix;
+        return overrideListSuffix(listSuffix, () => {
+          if (options.schema?.pgSimplifyAllRows) {
+            return this.listField(
+              this.camelCase(
+                this.distinctPluralize(this._singularizedCodecName(codec)),
+              ),
+            );
+          } else {
+            return previous!.call(this, codec);
+          }
+        });
+      },
 
       singleRelation(previous, _options, details) {
         const { registry, codec, relationName } = details;
