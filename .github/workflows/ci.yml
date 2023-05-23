@@ -47,7 +47,6 @@ jobs:
           - 13
           - 14
           - 15
-          - 16 # Beta
         node-version:
           - 12.x
           - 14.x
