@@ -89,8 +89,9 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
           if (resource.parameters) continue;
           if (typeof resource.from === "function") continue;
           if (!resource.codec.extensions?.tags) continue;
-          const { unionMember, implements: implementsTag } =
-            resource.codec.extensions.tags;
+          const { implements: implementsTag } = resource.codec.extensions.tags;
+          /*
+          const { unionMember } = resource.codec.extensions.tags;
           if (unionMember) {
             const unions = Array.isArray(unionMember)
               ? unionMember
@@ -111,6 +112,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
               }
             }
           }
+          */
           if (implementsTag) {
             const interfaces = Array.isArray(implementsTag)
               ? implementsTag
@@ -140,20 +142,17 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
           Object.create(null);
         for (const codec of Object.values(pgRegistry.pgCodecs)) {
           if (!codec.polymorphism) continue;
-          switch (codec.polymorphism.mode) {
-            case "single":
-            case "relational":
-            case "union": {
-              const interfaceTypeName = inflection.tableType(codec);
-              interfaceCodecs[interfaceTypeName] = codec;
-              break;
-            }
-            default: {
-              const never: never = codec.polymorphism;
-              console.warn(
-                `Polymorphism mode ${(never as any).mode} not understood`,
-              );
-            }
+          if (codec.polymorphism.mode !== "union") continue;
+
+          const interfaceTypeName = inflection.tableType(codec);
+          interfaceCodecs[interfaceTypeName] = codec;
+
+          // Explicitly allow zero implementations.
+          if (!resourcesByPolymorphicTypeName[interfaceTypeName]) {
+            resourcesByPolymorphicTypeName[interfaceTypeName] = {
+              resources: [],
+              type: "interface",
+            };
           }
         }
 

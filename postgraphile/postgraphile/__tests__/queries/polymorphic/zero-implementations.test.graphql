@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allZeroImplementations {
+    nodes {
+      __typename
+      id
+      name
+    }
+  }
+}
