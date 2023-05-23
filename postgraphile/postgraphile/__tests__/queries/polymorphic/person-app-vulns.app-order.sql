@@ -9,7 +9,7 @@ select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    to_char(__union__."0", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+    to_char(__union__."0", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
     __union__."1"::text as "1",
     __union__."2" as "2",
     __union__."3"::text as "3",
@@ -80,7 +80,7 @@ lateral (
   select
     __aws_applications__."id"::text as "0",
     __aws_applications__."name" as "1",
-    to_char(__aws_applications__."last_deployed", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "2",
+    to_char(__aws_applications__."last_deployed", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "2",
     __aws_applications_identifiers__.idx as "3"
   from "polymorphic"."aws_applications" as __aws_applications__
   where (
@@ -95,7 +95,7 @@ lateral (
   select
     __gcp_applications__."id"::text as "0",
     __gcp_applications__."name" as "1",
-    to_char(__gcp_applications__."last_deployed", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "2",
+    to_char(__gcp_applications__."last_deployed", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "2",
     __gcp_applications_identifiers__.idx as "3"
   from "polymorphic"."gcp_applications" as __gcp_applications__
   where (

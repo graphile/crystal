@@ -22,10 +22,10 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
   )::text as "15",
   __types__."an_int_range"::text as "16",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "17",
-  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "18",
+  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "18",
   to_char(__types__."date", 'YYYY-MM-DD'::text) as "19",
   to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "20",
-  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZHTZM'::text) as "21",
+  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "21",
   to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "22",
   (
     select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
@@ -451,7 +451,7 @@ select __frmcdc_comptype_1_result__.*
 from (select 0 as idx, $1::"a"."comptype"[] as "id0") as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
-    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
     __frmcdc_comptype_1__."is_optimised"::text as "1",
     (not (__frmcdc_comptype_1__ is null))::text as "2",
     __frmcdc_comptype_1_identifiers__.idx as "3"
@@ -487,7 +487,7 @@ lateral (
     __post__."headline" as "1",
     (select json_agg(s) from (
       select
-        to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+        to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
         __frmcdc_comptype_1__."is_optimised"::text as "1",
         (not (__frmcdc_comptype_1__ is null))::text as "2"
       from unnest(__post__."comptypes") as __frmcdc_comptype_1__
@@ -507,7 +507,7 @@ select __frmcdc_comptype_1_result__.*
 from (select 0 as idx, $1::"a"."comptype"[] as "id0") as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
-    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
     __frmcdc_comptype_1__."is_optimised"::text as "1",
     (not (__frmcdc_comptype_1__ is null))::text as "2",
     __frmcdc_comptype_1_identifiers__.idx as "3"

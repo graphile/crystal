@@ -26,10 +26,10 @@ lateral (
     )::text as "16",
     __type_function_mutation__."an_int_range"::text as "17",
     to_char(__type_function_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
-    to_char(__type_function_mutation__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "19",
+    to_char(__type_function_mutation__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
     to_char(__type_function_mutation__."date", 'YYYY-MM-DD'::text) as "20",
     to_char(date '1970-01-01' + __type_function_mutation__."time", 'HH24:MI:SS.US'::text) as "21",
-    to_char(date '1970-01-01' + __type_function_mutation__."timetz", 'HH24:MI:SS.USTZHTZM'::text) as "22",
+    to_char(date '1970-01-01' + __type_function_mutation__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
     to_char(__type_function_mutation__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
     (
       select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
@@ -204,10 +204,10 @@ select
   )::text as "16",
   __type_function_list_mutation__."an_int_range"::text as "17",
   to_char(__type_function_list_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
-  to_char(__type_function_list_mutation__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "19",
+  to_char(__type_function_list_mutation__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
   to_char(__type_function_list_mutation__."date", 'YYYY-MM-DD'::text) as "20",
   to_char(date '1970-01-01' + __type_function_list_mutation__."time", 'HH24:MI:SS.US'::text) as "21",
-  to_char(date '1970-01-01' + __type_function_list_mutation__."timetz", 'HH24:MI:SS.USTZHTZM'::text) as "22",
+  to_char(date '1970-01-01' + __type_function_list_mutation__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
   to_char(__type_function_list_mutation__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
   (
     select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
@@ -380,10 +380,10 @@ select
   )::text as "16",
   __type_function_connection_mutation__."an_int_range"::text as "17",
   to_char(__type_function_connection_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
-  to_char(__type_function_connection_mutation__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "19",
+  to_char(__type_function_connection_mutation__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
   to_char(__type_function_connection_mutation__."date", 'YYYY-MM-DD'::text) as "20",
   to_char(date '1970-01-01' + __type_function_connection_mutation__."time", 'HH24:MI:SS.US'::text) as "21",
-  to_char(date '1970-01-01' + __type_function_connection_mutation__."timetz", 'HH24:MI:SS.USTZHTZM'::text) as "22",
+  to_char(date '1970-01-01' + __type_function_connection_mutation__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
   to_char(__type_function_connection_mutation__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
   (
     select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
@@ -556,10 +556,10 @@ update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int
   )::text as "16",
   __types__."an_int_range"::text as "17",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
-  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "19",
+  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
   to_char(__types__."date", 'YYYY-MM-DD'::text) as "20",
   to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
-  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZHTZM'::text) as "22",
+  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
   to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
   (
     select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
@@ -731,10 +731,10 @@ insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal"
   )::text as "16",
   __types__."an_int_range"::text as "17",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
-  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "19",
+  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
   to_char(__types__."date", 'YYYY-MM-DD'::text) as "20",
   to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
-  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZHTZM'::text) as "22",
+  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
   to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
   (
     select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))

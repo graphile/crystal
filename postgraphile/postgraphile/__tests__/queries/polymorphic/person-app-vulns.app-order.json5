@@ -69,21 +69,21 @@
               },
             },
             {
-              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMi0wNy0wNlQwMTowNDowMy4wMjAwMDAtMDQwMCIsIjgiLCJBd3NBcHBsaWNhdGlvbiIsIltcIjhcIl0iXQ==",
+              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMi0wNy0wNlQwMTowNDowMy4wMjAwMDAtMDQ6MDAiLCI4IiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 8,
                 name: "AWfulS",
-                lastDeployed: "2022-07-06T01:04:03.020000-0400",
+                lastDeployed: "2022-07-06T01:04:03.020000-04:00",
               },
             },
             {
-              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMS0wNi0wNVQwMDowMzowMi4wMTAwMDAtMDQwMCIsIjIiLCJBd3NBcHBsaWNhdGlvbiIsIltcIjJcIl0iXQ==",
+              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMS0wNi0wNVQwMDowMzowMi4wMTAwMDAtMDQ6MDAiLCIyIiwiQXdzQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 2,
                 name: "AWeSome",
-                lastDeployed: "2021-06-05T00:03:02.010000-0400",
+                lastDeployed: "2021-06-05T00:03:02.010000-04:00",
               },
             },
           ],
@@ -95,12 +95,12 @@
         applications: {
           edges: [
             {
-              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMi0xMC0xMFQwNjoxMDoxMC4xMDEwMDAtMDQwMCIsIjIiLCJHY3BBcHBsaWNhdGlvbiIsIltcIjJcIl0iXQ==",
+              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMi0xMC0xMFQwNjoxMDoxMC4xMDEwMDAtMDQ6MDAiLCIyIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 2,
                 name: "Grand Crayon Pasta",
-                lastDeployed: "2022-10-10T06:10:10.101000-0400",
+                lastDeployed: "2022-10-10T06:10:10.101000-04:00",
               },
             },
           ],

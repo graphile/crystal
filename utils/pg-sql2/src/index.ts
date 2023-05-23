@@ -717,7 +717,7 @@ export function literal(val: string | number | boolean | null): SQL {
     // - myFieldName
     // - @@myFieldName
     // - $myField$
-    // - YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM
+    // - YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM
     return makeRawNode(`'${val}'`);
   } else if (typeof val === "number" && Number.isFinite(val)) {
     if (Number.isInteger(val)) {
