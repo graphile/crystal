@@ -115,38 +115,38 @@ is narrower than `update`; `constraint:resource:update` is narrower still).
 The following are behaviors that the core
 PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 
-- `select` - can select this source/column/etc. Note this does not necessarily
+- `select` - can select this resource/column/etc. Note this does not necessarily
   mean you can do `select * from users` but it might mean that it's possible to
   see details about a `users` when it's returned by a function or similar. (In
-  this case the `codec` has `select` but the `source` has `-select`.)
-- `resource:select` - can select rows from this source
-- `resource:insert` - can insert into this source
-- `resource:update` - can update a record in this source
-- `resource:delete` - can delete a record in this source
-- `resource:list` - "list" field for a source at any level
-- `resource:connection` - "connection" field for a source at any level
+  this case the `codec` has `select` but the `resource` has `-select`.)
+- `resource:select` - can select rows from this resource
+- `resource:insert` - can insert into this resource
+- `resource:update` - can update a record in this resource
+- `resource:delete` - can delete a record in this resource
+- `resource:list` - "list" field for a resource at any level
+- `resource:connection` - "connection" field for a resource at any level
 - `constraint:resource:update` - can update a record by this constraint
 - `constraint:resource:delete` - can delete a record by this constraint
 - `attribute:select` - can this attribute be selected?
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
 - `attribute:base` - should we add this attribute to the "base" input type?
-- `node` - should this source implement the GraphQL Global Object Identification
+- `node` - should this resource implement the GraphQL Global Object Identification
   specification
 - `list` - list (simple collection)
 - `connection` - connection (GraphQL Cursor Pagination Spec)
-- `query:resource:list` - "list" field for a source at the root Query level
-- `query:resource:connection` - "connection" field for a source at the root Query level
+- `query:resource:list` - "list" field for a resource at the root Query level
+- `query:resource:connection` - "connection" field for a resource at the root Query level
 - `queryField` - for procedures: should it become a field on the `Query` type?
 - `typeField` - for procedures: should it become a field on a non-operation
   type?
-- `queryField:resource:connection` - should we represent this source with a connection on the `Query` type?
-- `queryField:resource:list` - should we represent this source with a list on the `Query` type?
-- `typeField:resource:connection` - should we represent this source with a connection on a non-operation type
-- `typeField:resource:list` - should we represent this source with a list on a non-operation type
+- `queryField:resource:connection` - should we represent this resource with a connection on the `Query` type?
+- `queryField:resource:list` - should we represent this resource with a list on the `Query` type?
+- `typeField:resource:connection` - should we represent this resource with a connection on a non-operation type
+- `typeField:resource:list` - should we represent this resource with a list on a non-operation type
 - `mutationField` - for procedures: should it become a mutation (field on
   `Mutation`)?
-- `order` - can we sort this thing? (source)
+- `order` - can we sort this thing? (resource)
 - `query:resource:list:order`
 - `query:resource:connection:order`
 - `orderBy` - can we order by this thing (e.g. column)?
@@ -156,11 +156,11 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `attribute:orderBy:array`
 - `attribute:orderBy:range`
 - `filterBy` - can we filter by this thing (e.g. column, table, etc)?
-- `proc:filterBy` - can we filter by this proc (source)
+- `proc:filterBy` - can we filter by this proc (resource)
 - `attribute:filterBy` - can we filter by this attribute (column, property)
 - `single` - can we get just one?
-- `query:resource:single` - can we get a single one of these (source) at the root?
-- `singularRelation:resource:single` - can we get a single one of these (source) from a
+- `query:resource:single` - can we get a single one of these (resource) at the root?
+- `singularRelation:resource:single` - can we get a single one of these (resource) from a
   type?
 - `singularRelation:resource:list` - should we add a list field to navigate this singular
   relationship (when we know there can be at most one)?
