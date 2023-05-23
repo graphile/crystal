@@ -53,11 +53,13 @@ export class ListStep<
 
   optimize(opts: StepOptimizeOptions) {
     if (this.dependencies.every((dep) => dep instanceof ConstantStep)) {
-      const meta = opts.meta as { lists?: any[][] };
-      if (!meta.lists) {
-        meta.lists = [];
+      const meta = opts.meta as Record<number, any[][]>;
+      // Used to validate the lists have the same length
+      const cardinality = this.dependencies.length;
+      if (!meta[cardinality]) {
+        meta[cardinality] = [];
       }
-      const existing = meta.lists.find((l) =>
+      const existing = meta[cardinality].find((l) =>
         l.every(
           (v, i) => v === (this.dependencies[i] as ConstantStep<any>).data,
         ),
@@ -69,7 +71,7 @@ export class ListStep<
         const arr = this.dependencies.map(
           (dep) => (dep as ConstantStep<any>).data,
         );
-        meta.lists.push(arr);
+        meta[cardinality].push(arr);
         return constant(arr);
       }
     }
