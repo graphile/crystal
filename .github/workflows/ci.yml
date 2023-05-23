@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres-version: 
+        postgres-version:
           - 12
           - 13
           - 14
@@ -84,7 +84,7 @@ jobs:
           sudo bash -c "echo deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main >> /etc/apt/sources.list.d/pgdg.list"
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update
-          sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }}
+          sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }} postgresql-${{ matrix.postgres-version }}-wal2json
       - run: yarn --immutable --ignore-engines
 
       - name: "Build Code"
