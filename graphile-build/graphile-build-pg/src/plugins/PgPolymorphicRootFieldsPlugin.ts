@@ -182,11 +182,10 @@ export const PgPolymorphicRootFieldsPlugin: GraphileConfig.Plugin = {
               );
               continue;
             }
-            console.log(
-              `${polymorphicTypeName} (${interfaceCodec.name}[${
-                interfaceCodec.polymorphism!.mode
-              }]): ${spec.resources.map((r) => r.name)}`,
-            );
+            if (interfaceCodec.polymorphism?.mode !== "union") {
+              // 'single' and 'relational' are already handled by PgAllRowsPlugin
+              continue;
+            }
 
             const makeField = (useConnection: boolean): void => {
               if (!interfaceCodec.polymorphism) return;
@@ -212,65 +211,49 @@ export const PgPolymorphicRootFieldsPlugin: GraphileConfig.Plugin = {
                     codec: interfaceCodec,
                   });
 
-              switch (interfaceCodec.polymorphism.mode) {
-                case "single":
-                case "relational": {
-                  // TODO: Select the underlying (or root) table
-                  break;
-                }
-                case "union": {
-                  if (!interfaceCodec.attributes) break;
-                  const attributes: PgUnionAllStepConfigAttributes<string> =
-                    interfaceCodec.attributes;
-                  const resourceByTypeName: Record<string, PgResource> =
-                    Object.create(null);
-                  const members: PgUnionAllStepMember<string>[] = [];
-                  for (const resource of spec.resources) {
-                    const typeName = inflection.tableType(resource.codec);
-                    resourceByTypeName[typeName] = resource;
-                    members.push({
-                      resource,
-                      typeName,
-                    });
-                  }
-                  build.extend(
-                    fields,
-                    {
-                      [fieldName]: fieldWithHooks(
-                        {
-                          fieldName,
-                          isPgFieldConnection: useConnection,
-                          isPgFieldSimpleCollection: !useConnection,
-                          pgFieldCodec: interfaceCodec,
-                        },
-                        {
-                          type: fieldType,
-                          plan: EXPORTABLE(() => {
-                            return function plan() {
-                              const $list = pgUnionAll({
-                                attributes,
-                                resourceByTypeName,
-                                members,
-                              });
-                              return useConnection ? connection($list) : $list;
-                            };
-                          }, []),
-                        },
-                      ),
-                    },
-                    `Adding polymorphic "all rows" ${
-                      useConnection ? "connection" : "list"
-                    } field for ${interfaceCodec.name} to the root query`,
-                  );
-                  break;
-                }
-                default: {
-                  const never: never = interfaceCodec.polymorphism;
-                  console.warn(
-                    `Polymorphism mode ${(never as any)?.mode} not understood`,
-                  );
-                }
+              if (!interfaceCodec.attributes) return;
+              const attributes: PgUnionAllStepConfigAttributes<string> =
+                interfaceCodec.attributes;
+              const resourceByTypeName: Record<string, PgResource> =
+                Object.create(null);
+              const members: PgUnionAllStepMember<string>[] = [];
+              for (const resource of spec.resources) {
+                const typeName = inflection.tableType(resource.codec);
+                resourceByTypeName[typeName] = resource;
+                members.push({
+                  resource,
+                  typeName,
+                });
               }
+              build.extend(
+                fields,
+                {
+                  [fieldName]: fieldWithHooks(
+                    {
+                      fieldName,
+                      isPgFieldConnection: useConnection,
+                      isPgFieldSimpleCollection: !useConnection,
+                      pgFieldCodec: interfaceCodec,
+                    },
+                    {
+                      type: fieldType,
+                      plan: EXPORTABLE(() => {
+                        return function plan() {
+                          const $list = pgUnionAll({
+                            attributes,
+                            resourceByTypeName,
+                            members,
+                          });
+                          return useConnection ? connection($list) : $list;
+                        };
+                      }, []),
+                    },
+                  ),
+                },
+                `Adding polymorphic "all rows" ${
+                  useConnection ? "connection" : "list"
+                } field for ${interfaceCodec.name} to the root query`,
+              );
             };
             const behavior = getBehavior([interfaceCodec.extensions]);
             const defaultBehavior = "connection -list";
