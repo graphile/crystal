@@ -361,6 +361,26 @@ interface MemberDigest<TTypeNames extends string> {
 
 export type PgUnionAllMode = "normal" | "aggregate";
 
+function cloneDigest<TTypeNames extends string = string>(
+  digest: MemberDigest<TTypeNames>,
+): MemberDigest<TTypeNames> {
+  return {
+    member: digest.member,
+    finalResource: digest.finalResource,
+    sqlSource: digest.sqlSource,
+    symbol: digest.symbol,
+    alias: digest.alias,
+    conditions: [...digest.conditions],
+    orders: [...digest.orders],
+  };
+}
+
+function cloneDigests<TTypeNames extends string = string>(
+  digests: ReadonlyArray<MemberDigest<TTypeNames>>,
+): Array<MemberDigest<TTypeNames>> {
+  return digests.map(cloneDigest);
+}
+
 /**
  * Represents a `UNION ALL` statement, which can have multiple table-like
  * resources, but must return a consistent data shape.
@@ -514,7 +534,7 @@ export class PgUnionAllStep<
       const cloneFromMatchingMode =
         cloneFrom.mode === this.mode ? cloneFrom : null;
       this.spec = cloneFrom.spec;
-      this.memberDigests = cloneFrom.memberDigests;
+      this.memberDigests = cloneDigests(cloneFrom.memberDigests);
 
       cloneFrom.dependencies.forEach((planId, idx) => {
         const myIdx = this.addDependency(cloneFrom.getDep(idx), true);
