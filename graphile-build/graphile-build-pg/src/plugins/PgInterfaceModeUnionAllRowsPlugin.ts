@@ -136,9 +136,6 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
           }
         }
 
-        // const polymorphicCodecs = Object.values(pgRegistry.pgCodecs).filter(
-        //   (c) => c.polymorphism,
-        // );
         const interfaceCodecs: { [polymorphicTypeName: string]: PgCodec } =
           Object.create(null);
         for (const codec of Object.values(pgRegistry.pgCodecs)) {
