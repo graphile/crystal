@@ -23,7 +23,7 @@ const schema = makeGrafastSchema({
   },
 });
 
-it("planning timeout works", async () => {
+it("can run a query that queries an interface with no implementations", async () => {
   const source = /* GraphQL */ `
     {
       interface {
