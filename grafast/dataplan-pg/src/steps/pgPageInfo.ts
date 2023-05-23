@@ -12,9 +12,10 @@ import {
 } from "grafast";
 
 import type { PgCursorStep } from "./pgCursor.js";
-import type { PgSelectParsedCursorStep, PgSelectStep } from "./pgSelect.js";
+import type { PgSelectParsedCursorStep } from "./pgSelect.js";
+import { PgSelectStep } from "./pgSelect.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
-import type { PgUnionAllSingleStep, PgUnionAllStep } from "./pgUnionAll.js";
+import { PgUnionAllSingleStep, PgUnionAllStep } from "./pgUnionAll.js";
 
 /*
  * **IMPORTANT**: see pgPageInfo.md for reasoning behind decisions made in this file
@@ -94,16 +95,7 @@ export class PgPageInfoStep<
       first && !first.evalIs(null) && !first.evalIs(undefined);
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
     if (firstExists && !lastExists) {
-      const nodePlan = (
-        $connection as
-          | ConnectionStep<
-              any,
-              PgSelectParsedCursorStep,
-              PgSelectStep<any>,
-              any
-            >
-          | ConnectionStep<any, PgSelectParsedCursorStep, PgUnionAllStep, any>
-      ).cloneSubplanWithPagination();
+      const nodePlan = $connection.cloneSubplanWithPagination();
       return nodePlan.hasMore();
     } else {
       return constant(false);
@@ -133,21 +125,7 @@ export class PgPageInfoStep<
       first && !first.evalIs(null) && !first.evalIs(undefined);
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
     if (lastExists && !firstExists) {
-      const nodePlan = (
-        $connection as
-          | ConnectionStep<
-              PgSelectSingleStep<any>,
-              PgSelectParsedCursorStep,
-              PgSelectStep<any>,
-              PgSelectSingleStep<any>
-            >
-          | ConnectionStep<
-              PgUnionAllSingleStep,
-              PgSelectParsedCursorStep,
-              PgUnionAllStep,
-              PgUnionAllSingleStep
-            >
-      ).cloneSubplanWithPagination();
+      const nodePlan = $connection.cloneSubplanWithPagination();
       return nodePlan.hasMore();
     } else if (
       offset &&
@@ -161,26 +139,34 @@ export class PgPageInfoStep<
     }
   }
 
-  startCursor(): PgCursorStep<PgSelectSingleStep<any>> {
-    const $connection = this.getConnectionStep() as ConnectionStep<
-      PgSelectSingleStep<any>,
-      PgSelectParsedCursorStep,
-      PgSelectStep<any>,
-      PgSelectSingleStep<any>
-    >;
+  startCursor(): PgCursorStep<PgSelectSingleStep<any> | PgUnionAllSingleStep> {
+    const $connection = this.getConnectionStep();
     const $rows = $connection.cloneSubplanWithPagination();
-    return new PgSelectSingleStep($rows, first($rows)).cursor();
+    const $row = first($rows);
+    if ($rows instanceof PgSelectStep) {
+      return new PgSelectSingleStep($rows, $row).cursor();
+    } else if ($rows instanceof PgUnionAllStep) {
+      return new PgUnionAllSingleStep($rows, $row).cursor();
+    } else {
+      throw new Error(
+        `Unknown step class, only PgSelectStep and PgUnionAllStep are supported here. Step: ${$rows}`,
+      );
+    }
   }
 
-  endCursor(): PgCursorStep<PgSelectSingleStep<any>> {
-    const $connection = this.getConnectionStep() as ConnectionStep<
-      PgSelectSingleStep<any>,
-      PgSelectParsedCursorStep,
-      PgSelectStep<any>,
-      PgSelectSingleStep<any>
-    >;
+  endCursor(): PgCursorStep<PgSelectSingleStep<any> | PgUnionAllSingleStep> {
+    const $connection = this.getConnectionStep();
     const $rows = $connection.cloneSubplanWithPagination();
-    return new PgSelectSingleStep($rows, last($rows)).cursor();
+    const $row = last($rows);
+    if ($rows instanceof PgSelectStep) {
+      return new PgSelectSingleStep($rows, $row).cursor();
+    } else if ($rows instanceof PgUnionAllStep) {
+      return new PgUnionAllSingleStep($rows, $row).cursor();
+    } else {
+      throw new Error(
+        `Unknown step class, only PgSelectStep and PgUnionAllStep are supported here. Step: ${$rows}`,
+      );
+    }
   }
 
   execute(count: number): GrafastResultsList<object> {
