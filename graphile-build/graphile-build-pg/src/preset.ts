@@ -25,7 +25,7 @@ import { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePl
 import { PgOrderAllAttributesPlugin } from "./plugins/PgOrderAllAttributesPlugin.js";
 import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
-import { PgPolymorphicRootFieldsPlugin } from "./plugins/PgPolymorphicRootFieldsPlugin.js";
+import { PgInterfaceModeUnionAllRowsPlugin } from "./plugins/PgInterfaceModeUnionAllRowsPlugin.js";
 import { PgPolymorphismPlugin } from "./plugins/PgPolymorphismPlugin.js";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
 import { PgRefsPlugin } from "./plugins/PgRefsPlugin.js";
@@ -72,7 +72,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgRemoveExtensionResourcesPlugin,
     PgEnumTablesPlugin,
     PgPolymorphismPlugin,
-    PgPolymorphicRootFieldsPlugin,
+    PgInterfaceModeUnionAllRowsPlugin,
     PgRBACPlugin,
     PgIndexBehaviorsPlugin,
     PgRegistryPlugin,

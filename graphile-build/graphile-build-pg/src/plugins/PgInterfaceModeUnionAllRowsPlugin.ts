@@ -17,48 +17,41 @@ import {
 import { EXPORTABLE } from "graphile-build";
 import { connection } from "grafast";
 
-interface AllPolymorphicRowsDetails {
-  codec: PgCodec;
-}
-
 declare global {
   namespace GraphileBuild {
     interface Inflection {
       /**
        * The field name for a Cursor Connection field that returns all rows
-       * from the given resource.
+       * from the given '@interface mode:union' codec.
        */
-      allPolymorphicRowsConnection(
+      allInterfaceModeUnionRowsConnection(
         this: Inflection,
-        details: AllPolymorphicRowsDetails,
+        codec: PgCodec,
       ): string;
 
       /**
        * The field name for a List field that returns all rows from the given
-       * resource.
+       * '@interface mode:union' codec.
        */
-      allPolymorphicRowsList(
-        this: Inflection,
-        details: AllPolymorphicRowsDetails,
-      ): string;
+      allInterfaceModeUnionRowsList(this: Inflection, codec: PgCodec): string;
     }
   }
 }
 
-export const PgPolymorphicRootFieldsPlugin: GraphileConfig.Plugin = {
-  name: "PgPolymorphicRootFieldsPlugin",
+export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
+  name: "PgInterfaceModeUnionAllRowsPlugin",
   version,
 
   inflection: {
     add: {
-      allPolymorphicRowsConnection(options, { codec }) {
+      allInterfaceModeUnionRowsConnection(options, codec) {
         return this.connectionField(
           this.camelCase(
             `all-${this.pluralize(this._singularizedCodecName(codec))}`,
           ),
         );
       },
-      allPolymorphicRowsList(options, { codec }) {
+      allInterfaceModeUnionRowsList(options, codec) {
         return this.listField(
           this.camelCase(
             `all-${this.pluralize(this._singularizedCodecName(codec))}`,
@@ -204,12 +197,8 @@ export const PgPolymorphicRootFieldsPlugin: GraphileConfig.Plugin = {
               if (!fieldType) return;
 
               const fieldName = useConnection
-                ? inflection.allPolymorphicRowsConnection({
-                    codec: interfaceCodec,
-                  })
-                : inflection.allPolymorphicRowsList({
-                    codec: interfaceCodec,
-                  });
+                ? inflection.allInterfaceModeUnionRowsConnection(interfaceCodec)
+                : inflection.allInterfaceModeUnionRowsList(interfaceCodec);
 
               if (!interfaceCodec.attributes) return;
               const attributes: PgUnionAllStepConfigAttributes<string> =
