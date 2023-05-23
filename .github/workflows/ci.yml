@@ -31,6 +31,7 @@ jobs:
 
     env:
       CI: true
+      NODE_OPTIONS: "--openssl-legacy-provider"
       PGVERSION: ${{ matrix.postgres-version}}
       TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/graphileengine_test
       TEST_PG_URL: postgres://postgres:postgres@localhost:5432/postgraphile_test
