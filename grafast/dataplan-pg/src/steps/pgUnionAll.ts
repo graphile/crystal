@@ -1443,6 +1443,11 @@ and ${condition(i + 1)}`}
 
   optimize() {
     this.planLimitAndOffset();
+
+    // We must lock here otherwise we might try and create cursor validation
+    // plans during `finalize`
+    this.locker.lock();
+
     return this;
   }
 
