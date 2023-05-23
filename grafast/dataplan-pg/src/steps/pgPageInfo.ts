@@ -14,7 +14,7 @@ import {
 import type { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectParsedCursorStep, PgSelectStep } from "./pgSelect.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
-import type { PgUnionAllStep } from "./pgUnionAll.js";
+import type { PgUnionAllSingleStep, PgUnionAllStep } from "./pgUnionAll.js";
 
 /*
  * **IMPORTANT**: see pgPageInfo.md for reasoning behind decisions made in this file
@@ -95,12 +95,14 @@ export class PgPageInfoStep<
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
     if (firstExists && !lastExists) {
       const nodePlan = (
-        $connection as ConnectionStep<
-          any,
-          PgSelectParsedCursorStep,
-          PgSelectStep<any>,
-          any
-        >
+        $connection as
+          | ConnectionStep<
+              any,
+              PgSelectParsedCursorStep,
+              PgSelectStep<any>,
+              any
+            >
+          | ConnectionStep<any, PgSelectParsedCursorStep, PgUnionAllStep, any>
       ).cloneSubplanWithPagination();
       return nodePlan.hasMore();
     } else {
@@ -132,12 +134,19 @@ export class PgPageInfoStep<
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
     if (lastExists && !firstExists) {
       const nodePlan = (
-        $connection as ConnectionStep<
-          PgSelectSingleStep<any>,
-          PgSelectParsedCursorStep,
-          PgSelectStep<any>,
-          PgSelectSingleStep<any>
-        >
+        $connection as
+          | ConnectionStep<
+              PgSelectSingleStep<any>,
+              PgSelectParsedCursorStep,
+              PgSelectStep<any>,
+              PgSelectSingleStep<any>
+            >
+          | ConnectionStep<
+              PgUnionAllSingleStep,
+              PgSelectParsedCursorStep,
+              PgUnionAllStep,
+              PgUnionAllSingleStep
+            >
       ).cloneSubplanWithPagination();
       return nodePlan.hasMore();
     } else if (

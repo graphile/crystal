@@ -78,6 +78,12 @@ const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
 
+// Constant functions so lambdas can be optimized
+function listHasMore(list: any | null | undefined) {
+  return list?.hasMore || false;
+}
+listHasMore.isSyncAndSafe = true; // Optimization
+
 function parseCursor(cursor: string | null) {
   if (cursor == null) {
     // This throw should never happen, so we can still be isSyncAndSafe.
@@ -963,6 +969,17 @@ on (${sql.indent(
         "Cannot use cursor pagination on an aggregate PgSelectStep",
       );
     }
+  }
+
+  /**
+   * Someone (probably pageInfo) wants to know if there's more records. To
+   * determine this we fetch one extra record and then throw it away.
+   */
+  public hasMore(): ExecutableStep<boolean> {
+    this.fetchOneExtra = true;
+    // HACK: This is a truly hideous hack. We should solve this by having this
+    // plan resolve to an object with rows and metadata.
+    return lambda(this, listHasMore);
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
