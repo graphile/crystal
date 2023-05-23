@@ -12,7 +12,7 @@ select
       )
   ) s) as "1",
   __forums__."id" as "2",
-  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "3"
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "3"
 from app_public.forums as __forums__
 where
   (

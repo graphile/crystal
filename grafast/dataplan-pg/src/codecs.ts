@@ -959,7 +959,7 @@ export const TYPES = {
   timestamptz: t<string>()(
     "1184",
     "timestamptz",
-    viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
+    viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'),
   ),
   date: t<string>()("1082", "date", viaDateFormat("YYYY-MM-DD")),
   time: t<string>()(
@@ -970,7 +970,7 @@ export const TYPES = {
   timetz: t<string>()(
     "1266",
     "timetz",
-    viaDateFormat("HH24:MI:SS.USTZHTZM", sql`date '1970-01-01' + `),
+    viaDateFormat("HH24:MI:SS.USTZH:TZM", sql`date '1970-01-01' + `),
   ),
   inet: t<string>()("869", "inet", stripSubnet32),
   regproc: t<string>()("24", "regproc"),

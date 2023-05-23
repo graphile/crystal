@@ -1,6 +1,6 @@
 select
   __forums__."id" as "0",
-  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1"
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "1"
 from app_public.forums as __forums__
 where
   (

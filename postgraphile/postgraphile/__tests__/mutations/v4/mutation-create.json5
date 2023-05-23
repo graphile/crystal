@@ -55,10 +55,10 @@
         },
       },
       timestamp: "2016-10-07T16:12:21.747269",
-      timestamptz: "2016-10-09T16:12:45.218676-0400",
+      timestamptz: "2016-10-09T16:12:45.218676-04:00",
       date: "2016-10-15",
       time: "19:13:18.625699",
-      timetz: "13:13:29.585176-0400",
+      timetz: "13:13:29.585176-04:00",
       interval: {
         seconds: 1,
         minutes: 2,
@@ -433,15 +433,15 @@
       headline: "super headline",
       comptypes: [
         {
-          schedule: "2009-10-24T04:23:54.000000-0400",
+          schedule: "2009-10-24T04:23:54.000000-04:00",
           isOptimised: true,
         },
         {
-          schedule: "2008-10-24T04:23:54.000000-0400",
+          schedule: "2008-10-24T04:23:54.000000-04:00",
           isOptimised: false,
         },
         {
-          schedule: "2007-10-24T04:23:54.000000-0400",
+          schedule: "2007-10-24T04:23:54.000000-04:00",
           isOptimised: null,
         },
       ],
@@ -453,15 +453,15 @@
       headline: "super headline 2",
       comptypes: [
         {
-          schedule: "2008-10-24T04:17:54.000000-0400",
+          schedule: "2008-10-24T04:17:54.000000-04:00",
           isOptimised: true,
         },
         {
-          schedule: "2007-10-24T04:17:54.000000-0400",
+          schedule: "2007-10-24T04:17:54.000000-04:00",
           isOptimised: false,
         },
         {
-          schedule: "2006-10-24T04:17:54.000000-0400",
+          schedule: "2006-10-24T04:17:54.000000-04:00",
           isOptimised: null,
         },
       ],
@@ -480,15 +480,15 @@
         headline: "super headline 2",
         comptypes: [
           {
-            schedule: "2008-10-24T04:17:54.000000-0400",
+            schedule: "2008-10-24T04:17:54.000000-04:00",
             isOptimised: true,
           },
           {
-            schedule: "2007-10-24T04:17:54.000000-0400",
+            schedule: "2007-10-24T04:17:54.000000-04:00",
             isOptimised: false,
           },
           {
-            schedule: "2006-10-24T04:17:54.000000-0400",
+            schedule: "2006-10-24T04:17:54.000000-04:00",
             isOptimised: null,
           },
         ],

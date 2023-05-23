@@ -367,7 +367,7 @@ select __frmcdc_comptype_1_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."comptype"[] as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_comptype_1_identifiers__,
 lateral (
   select
-    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "0",
+    to_char(__frmcdc_comptype_1__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
     __frmcdc_comptype_1__."is_optimised"::text as "1",
     (not (__frmcdc_comptype_1__ is null))::text as "2",
     __frmcdc_comptype_1_identifiers__.idx as "3"
@@ -389,12 +389,12 @@ lateral (
 
 select
   __issue756_mutation__."id"::text as "0",
-  to_char(__issue756_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1"
+  to_char(__issue756_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "1"
 from "c"."issue756_mutation"() as __issue756_mutation__;
 
 select
   __issue756_set_mutation__."id"::text as "0",
-  to_char(__issue756_set_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'::text) as "1"
+  to_char(__issue756_set_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "1"
 from "c"."issue756_set_mutation"() as __issue756_set_mutation__;
 
 select __mutation_compound_type_array_result__.*
