@@ -9,7 +9,7 @@
     "graphql": "^15.4.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^3.0.0"
   },
   "browserslist": [
     ">0.2%",
