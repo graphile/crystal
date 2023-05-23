@@ -3263,6 +3263,33 @@ type Query implements Node {
     """The method to use when ordering `Vulnerability`."""
     orderBy: [VulnerabilitiesOrderBy!]
   ): VulnerabilitiesConnection
+  allZeroImplementations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ZeroImplementationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ZeroImplementation`."""
+    orderBy: [ZeroImplementationsOrderBy!]
+  ): ZeroImplementationsConnection
 
   """Reads a single `AwsApplication` using its globally unique `ID`."""
   awsApplication(
@@ -6134,4 +6161,58 @@ input VulnerabilityCondition {
 
   """Checks for equality with the object’s `name` field."""
   name: String
+}
+
+interface ZeroImplementation {
+  id: Int
+  name: String
+}
+
+"""
+A condition to be used against `ZeroImplementation` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ZeroImplementationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""A connection to a list of `ZeroImplementation` values."""
+type ZeroImplementationsConnection {
+  """
+  A list of edges which contains the `ZeroImplementation` and cursor to aid in pagination.
+  """
+  edges: [ZeroImplementationsEdge]!
+
+  """A list of `ZeroImplementation` objects."""
+  nodes: [ZeroImplementation]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ZeroImplementation` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ZeroImplementation` edge in the connection."""
+type ZeroImplementationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ZeroImplementation` at the end of the edge."""
+  node: ZeroImplementation
+}
+
+"""Methods to use when ordering `ZeroImplementation`."""
+enum ZeroImplementationsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
 }
