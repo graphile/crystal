@@ -12,12 +12,16 @@ const schema = makeGrafastSchema({
     }
     type Query {
       interface: ZeroImplementations
+      interfaces: [ZeroImplementations!]
     }
   `,
   plans: {
     Query: {
       interface() {
         return constant(null);
+      },
+      interfaces() {
+        return constant([]);
       },
     },
   },
@@ -30,6 +34,10 @@ it("can run a query that queries an interface with no implementations", async ()
         nobody
         implements
       }
+      interfaces {
+        nobody
+        implements
+      }
     }
   `;
   const result = (await grafast({
@@ -39,6 +47,7 @@ it("can run a query that queries an interface with no implementations", async ()
   expect(result.errors).to.equal(undefined);
   expect(JSON.stringify(result.data, null, 2)).to.equal(`\
 {
-  "interface": null
+  "interface": null,
+  "interfaces": []
 }`);
 });
