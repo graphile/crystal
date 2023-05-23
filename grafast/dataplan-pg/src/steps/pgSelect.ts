@@ -70,6 +70,8 @@ import { toPg } from "./toPg.js";
 
 export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
 
+const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgSelect placeholder! */`;
+
 // Maximum identifier length in Postgres is 63 chars, so trim one off. (We
 // could do base64... but meh.)
 const hash = (text: string): string =>
@@ -792,10 +794,7 @@ export class PgSelectStep<
 
     const dependencyIndex = this.addDependency($evalledStep);
     const symbol = Symbol(`step-${$step.id}`);
-    const sqlPlaceholder = sql.placeholder(
-      symbol,
-      sql`(1/0) /* ERROR! Unhandled placeholder! */`,
-    );
+    const sqlPlaceholder = sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
     const p: PgSelectPlaceholder = {
       dependencyIndex,
       codec,

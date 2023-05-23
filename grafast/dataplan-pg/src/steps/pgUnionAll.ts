@@ -58,6 +58,8 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
 
+const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgUnionAll placeholder! */`;
+
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
 }
@@ -1007,10 +1009,7 @@ on (${sql.indent(
 
     const dependencyIndex = this.addDependency($step);
     const symbol = Symbol(`step-${$step.id}`);
-    const sqlPlaceholder = sql.placeholder(
-      symbol,
-      sql`(1/0) /* ERROR! Unhandled placeholder! */`,
-    );
+    const sqlPlaceholder = sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
     const p: PgUnionAllPlaceholder = {
       dependencyIndex,
       codec,
