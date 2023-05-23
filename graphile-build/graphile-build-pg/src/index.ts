@@ -10,7 +10,6 @@ export {
   withPgClientFromPgService,
 } from "./pgServices.js";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
-export { PgInterfaceModeUnionAllRowsPlugin } from "./plugins/PgInterfaceModeUnionAllRowsPlugin.js";
 export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
 export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
 export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.js";
@@ -24,6 +23,7 @@ export { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
 export { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.js";
 export { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 export { PgFirstLastBeforeAfterArgsPlugin } from "./plugins/PgFirstLastBeforeAfterArgsPlugin.js";
+export { PgInterfaceModeUnionAllRowsPlugin } from "./plugins/PgInterfaceModeUnionAllRowsPlugin.js";
 export { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 export { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 export { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
@@ -32,6 +32,7 @@ export { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePl
 export { PgOrderAllAttributesPlugin } from "./plugins/PgOrderAllAttributesPlugin.js";
 export { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 export { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
+export { PgPolymorphismPlugin } from "./plugins/PgPolymorphismPlugin.js";
 export { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
 export { PgRBACPlugin } from "./plugins/PgRBACPlugin.js";
 export { PgRegistryPlugin } from "./plugins/PgRegistryPlugin.js";
@@ -40,6 +41,5 @@ export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
 export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
-export { PgPolymorphismPlugin } from "./plugins/PgPolymorphismPlugin.js";
 export { defaultPreset } from "./preset.js";
 export { addBehaviorToTags } from "./utils.js";

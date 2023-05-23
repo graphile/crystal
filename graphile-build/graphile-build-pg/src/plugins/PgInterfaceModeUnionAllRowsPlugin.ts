@@ -1,28 +1,25 @@
 import "graphile-config";
-import { version } from "../version.js";
-import {
+
+import type {
   PgCodec,
   PgRegistry,
   PgResource,
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
-  pgUnionAll,
 } from "@dataplan/pg";
-import {
-  GraphQLInterfaceType,
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLObjectType,
-} from "graphql";
-import { EXPORTABLE } from "graphile-build";
+import { pgUnionAll } from "@dataplan/pg";
 import { connection } from "grafast";
+import { EXPORTABLE } from "graphile-build";
+import type { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
+
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
     interface Inflection {
       /**
        * The field name for a Cursor Connection field that returns all rows
-       * from the given '@interface mode:union' codec.
+       * from the given `@interface mode:union` codec.
        */
       allInterfaceModeUnionRowsConnection(
         this: Inflection,
@@ -31,7 +28,7 @@ declare global {
 
       /**
        * The field name for a List field that returns all rows from the given
-       * '@interface mode:union' codec.
+       * `@interface mode:union` codec.
        */
       allInterfaceModeUnionRowsList(this: Inflection, codec: PgCodec): string;
     }
@@ -64,7 +61,12 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
-        const { inflection, input, pgGetBehavior: getBehavior } = build;
+        const {
+          inflection,
+          input,
+          pgGetBehavior: getBehavior,
+          graphql: { GraphQLList, GraphQLNonNull },
+        } = build;
         const {
           scope: { isRootQuery },
           fieldWithHooks,
@@ -226,16 +228,33 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                     },
                     {
                       type: fieldType,
-                      plan: EXPORTABLE(() => {
-                        return function plan() {
-                          const $list = pgUnionAll({
-                            attributes,
-                            resourceByTypeName,
-                            members,
-                          });
-                          return useConnection ? connection($list) : $list;
-                        };
-                      }, []),
+                      plan: EXPORTABLE(
+                        (
+                          attributes,
+                          connection,
+                          members,
+                          pgUnionAll,
+                          resourceByTypeName,
+                          useConnection,
+                        ) => {
+                          return function plan() {
+                            const $list = pgUnionAll({
+                              attributes,
+                              resourceByTypeName,
+                              members,
+                            });
+                            return useConnection ? connection($list) : $list;
+                          };
+                        },
+                        [
+                          attributes,
+                          connection,
+                          members,
+                          pgUnionAll,
+                          resourceByTypeName,
+                          useConnection,
+                        ],
+                      ),
                     },
                   ),
                 },
