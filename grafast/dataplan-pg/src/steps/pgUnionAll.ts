@@ -1096,7 +1096,7 @@ on (${sql.indent(
           toPg(access($parsedCursorPlan, [i + 1]), TYPES.text),
           TYPES.text,
         );
-      } else {
+      } else if (this.memberDigests.length > 0) {
         // HACK: this is bad. We're getting the codec from just one of the
         // members and assuming the type for the given attribute will match for
         // all of them. We should either validate that this is the same, change
@@ -1113,6 +1113,8 @@ on (${sql.indent(
           toPg(access($parsedCursorPlan, [i + 1]), codec),
           codec as PgCodec,
         );
+      } else {
+        // No implementations?!
       }
     }
 
@@ -1421,7 +1423,7 @@ and ${condition(i + 1)}`}
    */
   public getOrderByDigest() {
     this.locker.lockParameter("orderBy");
-    if (this.ordersForCursor.length === 0) {
+    if (this.ordersForCursor.length === 0 || this.memberDigests.length === 0) {
       return "natural";
     }
     // The security of this hash is unimportant; the main aim is to protect the
@@ -1465,6 +1467,11 @@ and ${condition(i + 1)}`}
   }
 
   optimize() {
+    if (this.memberDigests.length === 0) {
+      // We have no implementations, we'll never return anything
+      return constant([]);
+    }
+
     this.planLimitAndOffset();
 
     // We must lock here otherwise we might try and create cursor validation

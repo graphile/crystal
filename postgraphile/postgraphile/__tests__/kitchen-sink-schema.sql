@@ -1547,6 +1547,17 @@ comment on table polymorphic.third_party_vulnerabilities is $$
 @refVia applications via:gcp_application_third_party_vulnerabilities;gcp_applications
 $$;
 
+create type polymorphic.zero_implementation as (
+  id int,
+  name text
+);
+
+
+comment on type polymorphic.zero_implementation is $$
+@interface mode:union
+@name ZeroImplementation
+$$;
+
 --------------------------------------------------------------------------------
 
 create schema js_reserved;

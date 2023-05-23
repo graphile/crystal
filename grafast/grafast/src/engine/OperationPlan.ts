@@ -1556,16 +1556,7 @@ export class OperationPlan {
        * Planning for polymorphic types is somewhat more complicated than for
        * other types.
        *
-       * First we ensure we're dealing with a polymorphic step.
-       */
-      if (!isPolymorphicStep($step)) {
-        throw new Error(
-          `${$step} is not a polymorphic capable step, it must have a planForType method`,
-        );
-      }
-
-      /*
-       * Next, we figure out the list of `possibleTypes` based on the
+       * First, we figure out the list of `possibleTypes` based on the
        * union/interface and any other constraints that we know. NOTE: we can't
        * discount a type just because it doesn't have any fragments that apply
        * to it - instead we must still plan an empty selection set (or one just
@@ -1576,83 +1567,109 @@ export class OperationPlan {
         ? nullableFieldType.getTypes()
         : this.schema.getImplementations(nullableFieldType).objects;
 
-      /*
-       * An output plan for it (knows how to branch the different object
-       * output plans).
-       */
-      const polymorphicOutputPlan = new OutputPlan(
-        parentLayerPlan,
-        $step,
-        {
-          mode: "polymorphic",
-          deferLabel: undefined,
-          typeNames: allPossibleObjectTypes.map((t) => t.name),
-        },
-        locationDetails,
-      );
-      parentOutputPlan.addChild(parentObjectType, responseKey, {
-        type: "outputPlan",
-        outputPlan: polymorphicOutputPlan,
-        isNonNull,
-        locationDetails,
-      });
+      if (allPossibleObjectTypes.length === 0) {
+        /* If there are no implementations, simply stop via a null output plan */
 
-      /*
-       * Now a polymorphic layer plan for all the plans to live in
-       */
-      const polymorphicLayerPlan = this.getPolymorphicLayerPlan(
-        parentLayerPlan,
-        path,
-        $step,
-        allPossibleObjectTypes,
-      );
-
-      /*
-       * Now we need to loop through each type and plan it.
-       */
-      const polyBase = polymorphicPath ?? "";
-      for (const type of allPossibleObjectTypes) {
-        // Bit of a hack, but saves passing it around through all the arguments
-        const newPolymorphicPath = `${polyBase}>${type.name}`;
-        polymorphicLayerPlan.reason.polymorphicPaths.add(newPolymorphicPath);
-        const newPolymorphicPaths = new Set<string>();
-        newPolymorphicPaths.add(newPolymorphicPath);
-
-        const $root = withGlobalLayerPlan(
-          polymorphicLayerPlan,
-          newPolymorphicPaths,
-          $step.planForType,
+        const nullOutputPlan = new OutputPlan(
+          parentLayerPlan,
           $step,
-          type,
+          OUTPUT_PLAN_TYPE_NULL,
+          locationDetails,
         );
-        const objectOutputPlan = new OutputPlan(
-          polymorphicLayerPlan,
-          $root,
+        parentOutputPlan.addChild(parentObjectType, responseKey, {
+          type: "outputPlan",
+          outputPlan: nullOutputPlan,
+          isNonNull,
+          locationDetails,
+        });
+      } else {
+        /*
+         * Next, we ensure we're dealing with a polymorphic step.
+         */
+        if (!isPolymorphicStep($step)) {
+          throw new Error(
+            `${$step} is not a polymorphic capable step, it must have a planForType method`,
+          );
+        }
+
+        /*
+         * An output plan for it (knows how to branch the different object
+         * output plans).
+         */
+        const polymorphicOutputPlan = new OutputPlan(
+          parentLayerPlan,
+          $step,
           {
-            mode: "object",
+            mode: "polymorphic",
             deferLabel: undefined,
-            typeName: type.name,
+            typeNames: allPossibleObjectTypes.map((t) => t.name),
           },
           locationDetails,
         );
-        // find all selections compatible with `type`
-        const fieldNodes = fieldSelectionsForType(this, type, selections);
-        this.planSelectionSet(
-          objectOutputPlan,
-          path,
-          newPolymorphicPath,
-          newPolymorphicPaths,
-          $root,
-          type,
-          fieldNodes,
-          false,
-        );
-        polymorphicOutputPlan.addChild(type, null, {
+        parentOutputPlan.addChild(parentObjectType, responseKey, {
           type: "outputPlan",
+          outputPlan: polymorphicOutputPlan,
           isNonNull,
-          outputPlan: objectOutputPlan,
           locationDetails,
         });
+
+        /*
+         * Now a polymorphic layer plan for all the plans to live in
+         */
+        const polymorphicLayerPlan = this.getPolymorphicLayerPlan(
+          parentLayerPlan,
+          path,
+          $step,
+          allPossibleObjectTypes,
+        );
+
+        /*
+         * Now we need to loop through each type and plan it.
+         */
+        const polyBase = polymorphicPath ?? "";
+        for (const type of allPossibleObjectTypes) {
+          // Bit of a hack, but saves passing it around through all the arguments
+          const newPolymorphicPath = `${polyBase}>${type.name}`;
+          polymorphicLayerPlan.reason.polymorphicPaths.add(newPolymorphicPath);
+          const newPolymorphicPaths = new Set<string>();
+          newPolymorphicPaths.add(newPolymorphicPath);
+
+          const $root = withGlobalLayerPlan(
+            polymorphicLayerPlan,
+            newPolymorphicPaths,
+            $step.planForType,
+            $step,
+            type,
+          );
+          const objectOutputPlan = new OutputPlan(
+            polymorphicLayerPlan,
+            $root,
+            {
+              mode: "object",
+              deferLabel: undefined,
+              typeName: type.name,
+            },
+            locationDetails,
+          );
+          // find all selections compatible with `type`
+          const fieldNodes = fieldSelectionsForType(this, type, selections);
+          this.planSelectionSet(
+            objectOutputPlan,
+            path,
+            newPolymorphicPath,
+            newPolymorphicPaths,
+            $root,
+            type,
+            fieldNodes,
+            false,
+          );
+          polymorphicOutputPlan.addChild(type, null, {
+            type: "outputPlan",
+            isNonNull,
+            outputPlan: objectOutputPlan,
+            locationDetails,
+          });
+        }
       }
     }
   }
