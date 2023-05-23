@@ -1553,7 +1553,10 @@ export class OperationPlan {
       );
 
       /*
-       * Next, we figure out the list of `possibleTypes` based on the
+       * Planning for polymorphic types is somewhat more complicated than for
+       * other types.
+       *
+       * First, we figure out the list of `possibleTypes` based on the
        * union/interface and any other constraints that we know. NOTE: we can't
        * discount a type just because it doesn't have any fragments that apply
        * to it - instead we must still plan an empty selection set (or one just
@@ -1565,7 +1568,7 @@ export class OperationPlan {
         : this.schema.getImplementations(nullableFieldType).objects;
 
       if (allPossibleObjectTypes.length === 0) {
-        // No implementations
+        /* If there are no implementations, simply stop via a null output plan */
 
         const nullOutputPlan = new OutputPlan(
           parentLayerPlan,
@@ -1581,10 +1584,7 @@ export class OperationPlan {
         });
       } else {
         /*
-         * Planning for polymorphic types is somewhat more complicated than for
-         * other types.
-         *
-         * First we ensure we're dealing with a polymorphic step.
+         * Next, we ensure we're dealing with a polymorphic step.
          */
         if (!isPolymorphicStep($step)) {
           throw new Error(
