@@ -2770,6 +2770,10 @@ ${lateralText};`;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
+  row($row: ExecutableStep, options?: PgSelectSinglePlanOptions) {
+    return new PgSelectSingleStep(this, $row, options);
+  }
+
   /**
    * When you return a plan in a situation where GraphQL is expecting a
    * GraphQLList, it must implement the `.listItem()` method to return a plan

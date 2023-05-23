@@ -868,6 +868,10 @@ on (${sql.indent(
     return this.singleAsRecord();
   }
 
+  row($row: ExecutableStep) {
+    return new PgUnionAllSingleStep(this, $row);
+  }
+
   listItem(itemPlan: ExecutableStep) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
