@@ -265,20 +265,20 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
             if (
               build.behavior.matches(
                 behavior,
-                "query:interface:list",
-                defaultBehavior,
-              )
-            ) {
-              makeField(false);
-            }
-            if (
-              build.behavior.matches(
-                behavior,
                 "query:interface:connection",
                 defaultBehavior,
               )
             ) {
               makeField(true);
+            }
+            if (
+              build.behavior.matches(
+                behavior,
+                "query:interface:list",
+                defaultBehavior,
+              )
+            ) {
+              makeField(false);
             }
           } else {
             const never: never = spec.type;
