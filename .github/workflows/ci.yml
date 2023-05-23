@@ -32,7 +32,6 @@ jobs:
     env:
       CI: true
       PGVERSION: ${{ matrix.postgres-version}}
-      NODE_OPTIONS: ${{ matrix.node-version >= '17.x' && '--openssl-legacy-provider' || '' }}
       TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/graphileengine_test
       TEST_PG_URL: postgres://postgres:postgres@localhost:5432/postgraphile_test
       LDS_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/lds_test
@@ -71,7 +70,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - name: Configure PostgreSQL
