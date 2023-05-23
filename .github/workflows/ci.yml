@@ -80,9 +80,9 @@ jobs:
           docker restart postgres
       - name: Install pg_dump
         run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
           sudo apt-get update
-          sudo apt install postgresql-common
-          sudo sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }} postgresql-${{ matrix.postgres-version }}-wal2json
       - run: yarn --immutable --ignore-engines
 
