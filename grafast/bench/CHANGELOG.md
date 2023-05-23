@@ -1,5 +1,13 @@
 # @localrepo/grafast-bench
 
+## 0.0.1-alpha.3
+
+### Patch Changes
+
+- Updated dependencies
+  [[`f75926f4b`](https://github.com/benjie/postgraphile-private/commit/f75926f4b9aee33adff8bdf6b1a4137582cb47ba)]:
+  - grafast@0.0.1-alpha.6
+
 ## 0.0.1-alpha.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "graphile-utils",
-  "version": "5.0.0-alpha.7",
+  "version": "5.0.0-alpha.8",
   "description": "Utilities to help with building graphile-build plugins",
   "type": "commonjs",
   "main": "dist/index.js",

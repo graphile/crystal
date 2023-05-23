@@ -1,5 +1,14 @@
 # v8.0.0
 
+## 8.0.0-alpha.3
+
+### Patch Changes
+
+- [#338](https://github.com/benjie/postgraphile-private/pull/338)
+  [`dcc3d0355`](https://github.com/benjie/postgraphile-private/commit/dcc3d03558d28506260dcfc79e1a797b60ec1773)
+  Thanks [@benjie](https://github.com/benjie)! - `@interface mode:union`
+  interfaces now also gain root fields.
+
 ## 8.0.0-alpha.2
 
 ### Patch Changes

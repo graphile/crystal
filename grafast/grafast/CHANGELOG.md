@@ -1,5 +1,14 @@
 # grafast
 
+## 0.0.1-alpha.6
+
+### Patch Changes
+
+- [#339](https://github.com/benjie/postgraphile-private/pull/339)
+  [`f75926f4b`](https://github.com/benjie/postgraphile-private/commit/f75926f4b9aee33adff8bdf6b1a4137582cb47ba)
+  Thanks [@benjie](https://github.com/benjie)! - CRITICAL BUGFIX: mistake in
+  optimization of list() can lead to arrays being truncated
+
 ## 0.0.1-alpha.5
 
 ### Patch Changes

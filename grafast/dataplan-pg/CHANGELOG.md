@@ -1,5 +1,24 @@
 # @dataplan/pg
 
+## 0.0.1-alpha.7
+
+### Patch Changes
+
+- [#338](https://github.com/benjie/postgraphile-private/pull/338)
+  [`ca1526b70`](https://github.com/benjie/postgraphile-private/commit/ca1526b7028b0b9d506b6ccda7da046b64af1ab6)
+  Thanks [@benjie](https://github.com/benjie)! - Fix startCursor/endCursor for
+  connections using pgUnionAll steps.
+
+- [#338](https://github.com/benjie/postgraphile-private/pull/338)
+  [`3426b0f4a`](https://github.com/benjie/postgraphile-private/commit/3426b0f4adb0c5d80c66e51c203214f06f364d3a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bugs in pgUnionAll
+  connections relating to PageInfo
+
+- Updated dependencies
+  [[`f75926f4b`](https://github.com/benjie/postgraphile-private/commit/f75926f4b9aee33adff8bdf6b1a4137582cb47ba)]:
+  - grafast@0.0.1-alpha.6
+  - @dataplan/json@0.0.1-alpha.6
+
 ## 0.0.1-alpha.6
 
 ### Patch Changes
