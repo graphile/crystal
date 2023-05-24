@@ -12,7 +12,7 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection15{{"Connection[15∈0]<br />ᐸ14ᐳ"}}:::plan
-    Constant19{{"Constant[19∈0]<br />ᐸ[]ᐳ"}}:::plan
+    Constant19{{"Constant[19∈1]<br />ᐸ[]ᐳ"}}:::plan
     __Item17[/"__Item[17∈2]<br />ᐸ19ᐳ"\]:::itemplan
     Constant19 ==> __Item17
     PgUnionAllSingle18["PgUnionAllSingle[18∈2]"]:::plan
@@ -23,10 +23,10 @@ graph TD
     subgraph "Buckets for queries/polymorphic/zero-implementations"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value5,Connection15,Constant19 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 15, 19<br /><br />ROOT Connectionᐸ14ᐳ[15]"):::bucket
+    class Bucket0,__Value0,__Value5,Connection15 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 15<br /><br />ROOT Connectionᐸ14ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1 bucket1
+    class Bucket1,Constant19 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ19ᐳ[17]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item17,PgUnionAllSingle18 bucket2

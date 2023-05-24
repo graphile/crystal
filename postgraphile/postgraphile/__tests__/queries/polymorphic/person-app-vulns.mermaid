@@ -30,11 +30,11 @@ graph TD
     __Item21 --> PgSelectSingle22
     PgUnionAll39[["PgUnionAll[39∈3]"]]:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object18 & PgClassExpression23 & PgClassExpression23 --> PgUnionAll39
+    Object18 & PgClassExpression23 & PgClassExpression23 & Connection38 --> PgUnionAll39
     PgUnionAll43[["PgUnionAll[43∈3]"]]:::plan
-    Object18 & PgClassExpression23 & PgClassExpression23 --> PgUnionAll43
+    Object18 & PgClassExpression23 & PgClassExpression23 & Connection38 --> PgUnionAll43
     PgUnionAll70[["PgUnionAll[70∈3]"]]:::plan
-    Object18 & PgClassExpression23 & PgClassExpression23 --> PgUnionAll70
+    Object18 & PgClassExpression23 & PgClassExpression23 & Connection38 --> PgUnionAll70
     PgSelectSingle22 --> PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
@@ -54,28 +54,30 @@ graph TD
     PgUnionAll43 ==> __Item44
     PgUnionAllSingle45["PgUnionAllSingle[45∈4]"]:::plan
     __Item44 --> PgUnionAllSingle45
+    PgUnionAll167[["PgUnionAll[167∈8]<br />ᐳAwsApplication"]]:::plan
+    PgClassExpression83{{"PgClassExpression[83∈8]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
+    Connection166{{"Connection[166∈8]<br />ᐸ162ᐳ<br />ᐳAwsApplication"}}:::plan
+    Object18 & PgClassExpression83 & PgClassExpression83 & Connection166 --> PgUnionAll167
+    PgUnionAll171[["PgUnionAll[171∈8]<br />ᐳAwsApplication"]]:::plan
+    Object18 & PgClassExpression83 & PgClassExpression83 & Connection166 --> PgUnionAll171
+    PgUnionAll296[["PgUnionAll[296∈8]<br />ᐳGcpApplication"]]:::plan
+    PgClassExpression212{{"PgClassExpression[212∈8]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
+    Connection295{{"Connection[295∈8]<br />ᐸ291ᐳ<br />ᐳGcpApplication"}}:::plan
+    Object18 & PgClassExpression212 & PgClassExpression212 & Connection295 --> PgUnionAll296
+    PgUnionAll300[["PgUnionAll[300∈8]<br />ᐳGcpApplication"]]:::plan
+    Object18 & PgClassExpression212 & PgClassExpression212 & Connection295 --> PgUnionAll300
     PgUnionAll87[["PgUnionAll[87∈8]<br />ᐳAwsApplication"]]:::plan
     PgClassExpression85{{"PgClassExpression[85∈8]<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression86{{"PgClassExpression[86∈8]<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
     Object18 & PgClassExpression85 & PgClassExpression86 --> PgUnionAll87
     PgUnionAll121[["PgUnionAll[121∈8]<br />ᐳAwsApplication"]]:::plan
-    PgClassExpression83{{"PgClassExpression[83∈8]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     Object18 & PgClassExpression83 & PgClassExpression83 --> PgUnionAll121
-    PgUnionAll167[["PgUnionAll[167∈8]<br />ᐳAwsApplication"]]:::plan
-    Object18 & PgClassExpression83 & PgClassExpression83 --> PgUnionAll167
-    PgUnionAll171[["PgUnionAll[171∈8]<br />ᐳAwsApplication"]]:::plan
-    Object18 & PgClassExpression83 & PgClassExpression83 --> PgUnionAll171
     PgUnionAll216[["PgUnionAll[216∈8]<br />ᐳGcpApplication"]]:::plan
     PgClassExpression214{{"PgClassExpression[214∈8]<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression215{{"PgClassExpression[215∈8]<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
     Object18 & PgClassExpression214 & PgClassExpression215 --> PgUnionAll216
     PgUnionAll250[["PgUnionAll[250∈8]<br />ᐳGcpApplication"]]:::plan
-    PgClassExpression212{{"PgClassExpression[212∈8]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     Object18 & PgClassExpression212 & PgClassExpression212 --> PgUnionAll250
-    PgUnionAll296[["PgUnionAll[296∈8]<br />ᐳGcpApplication"]]:::plan
-    Object18 & PgClassExpression212 & PgClassExpression212 --> PgUnionAll296
-    PgUnionAll300[["PgUnionAll[300∈8]<br />ᐳGcpApplication"]]:::plan
-    Object18 & PgClassExpression212 & PgClassExpression212 --> PgUnionAll300
     List49{{"List[49∈5]<br />ᐸ47,48ᐳ"}}:::plan
     Access47{{"Access[47∈5]<br />ᐸ45.0ᐳ"}}:::plan
     Access48{{"Access[48∈5]<br />ᐸ45.1ᐳ"}}:::plan
@@ -142,8 +144,6 @@ graph TD
     First297 --> PgUnionAllSingle298
     PgClassExpression299{{"PgClassExpression[299∈8]<br />ᐸcount(*)ᐳ"}}:::plan
     PgUnionAllSingle298 --> PgClassExpression299
-    Connection166{{"Connection[166∈8]<br />ᐸ162ᐳ<br />ᐳAwsApplication"}}:::plan
-    Connection295{{"Connection[295∈8]<br />ᐸ291ᐳ<br />ᐳGcpApplication"}}:::plan
     __Item301[/"__Item[301∈18]<br />ᐸ300ᐳ"\]:::itemplan
     PgUnionAll300 ==> __Item301
     PgUnionAllSingle302["PgUnionAllSingle[302∈18]"]:::plan

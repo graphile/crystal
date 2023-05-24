@@ -30,7 +30,7 @@ graph TD
     __Item21 --> PgSelectSingle22
     PgUnionAll39[["PgUnionAll[39∈3]"]]:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object18 & PgClassExpression23 & PgClassExpression23 --> PgUnionAll39
+    Object18 & PgClassExpression23 & PgClassExpression23 & Connection38 --> PgUnionAll39
     PgSelectSingle22 --> PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
@@ -42,10 +42,12 @@ graph TD
     PgUnionAllSingle41 --> Access42
     PgUnionAll65[["PgUnionAll[65∈5]<br />ᐳAwsApplication"]]:::plan
     PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
-    Object18 & PgClassExpression58 & PgClassExpression58 --> PgUnionAll65
+    Connection64{{"Connection[64∈5]<br />ᐸ60ᐳ<br />ᐳAwsApplication"}}:::plan
+    Object18 & PgClassExpression58 & PgClassExpression58 & Connection64 --> PgUnionAll65
     PgUnionAll92[["PgUnionAll[92∈5]<br />ᐳGcpApplication"]]:::plan
     PgClassExpression85{{"PgClassExpression[85∈5]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
-    Object18 & PgClassExpression85 & PgClassExpression85 --> PgUnionAll92
+    Connection91{{"Connection[91∈5]<br />ᐸ87ᐳ<br />ᐳGcpApplication"}}:::plan
+    Object18 & PgClassExpression85 & PgClassExpression85 & Connection91 --> PgUnionAll92
     PgSelect45[["PgSelect[45∈5]<br />ᐸawsApplicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Access44{{"Access[44∈5]<br />ᐸ43.0ᐳ"}}:::plan
     Object18 & Access44 --> PgSelect45
@@ -80,8 +82,6 @@ graph TD
     First93 --> PgUnionAllSingle94
     PgClassExpression95{{"PgClassExpression[95∈5]<br />ᐸcount(*)ᐳ"}}:::plan
     PgUnionAllSingle94 --> PgClassExpression95
-    Connection64{{"Connection[64∈5]<br />ᐸ60ᐳ<br />ᐳAwsApplication"}}:::plan
-    Connection91{{"Connection[91∈5]<br />ᐸ87ᐳ<br />ᐳGcpApplication"}}:::plan
 
     %% define steps
 
