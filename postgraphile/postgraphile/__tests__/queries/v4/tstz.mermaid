@@ -14,8 +14,8 @@ graph TD
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     PgSelect8[["PgSelect[8∈0]<br />ᐸrangeTestᐳ"]]:::plan
-    Constant20{{"Constant[20∈0]<br />ᐸ934ᐳ"}}:::plan
-    Object11 & Constant20 --> PgSelect8
+    Constant18{{"Constant[18∈0]<br />ᐸ934ᐳ"}}:::plan
+    Object11 & Constant18 --> PgSelect8
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
@@ -33,9 +33,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/tstz"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 20, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 18, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant20 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant18 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸrangeTestᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14 bucket1
