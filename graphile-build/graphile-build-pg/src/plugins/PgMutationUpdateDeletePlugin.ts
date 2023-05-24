@@ -13,6 +13,7 @@ import type { ExecutableStep, FieldArgs } from "grafast";
 import {
   __InputObjectStep,
   __TrackedValueStep,
+  constant,
   lambda,
   object,
   ObjectStep,
@@ -306,6 +307,18 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         "field",
                       ),
                       type: GraphQLString,
+                      plan: EXPORTABLE(
+                        (constant) =>
+                          function plan($mutation: ObjectStep<any>) {
+                            return (
+                              $mutation.getStepForKey(
+                                "clientMutationId",
+                                true,
+                              ) ?? constant(null)
+                            );
+                          },
+                        [constant],
+                      ),
                     },
                     // TODO: default to `...(mode === "resource:update" && TableType`; we only want the record on delete for v4 compatibility
                     ...(TableType

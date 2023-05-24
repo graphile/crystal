@@ -1,5 +1,5 @@
 import type { ExecutionExtra } from "grafast";
-import { exportAs, UnbatchedExecutableStep } from "grafast";
+import { access, exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -126,6 +126,40 @@ export class PgClassExpressionStep<
     }
   }
 
+  /* Here's the proper type of this function, but that makes using it painful.
+    ```ts
+    public get<
+      TAttr extends TExpressionCodec extends PgCodec<
+        any,
+        undefined,
+        infer U,
+        any,
+        any,
+        any,
+        any
+      >
+        ? keyof U
+        : keyof GetPgCodecAttributes<TExpressionCodec>,
+    >(
+      attributeName: TAttr,
+    ): TExpressionCodec extends PgCodec<
+      any,
+      undefined,
+      infer U,
+      any,
+      any,
+      any,
+      any
+    >
+      ? AccessStep<U>
+      : PgClassExpressionStep<
+          GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
+          TResource
+        > {
+    ```
+
+    Instead, we'll lie and ignore the `AccessStep` case
+  */
   public get<TAttr extends keyof GetPgCodecAttributes<TExpressionCodec>>(
     attributeName: TAttr,
   ): PgClassExpressionStep<
@@ -133,12 +167,9 @@ export class PgClassExpressionStep<
     TResource
   > {
     const attributes = this.pgCodec.attributes;
-    if (!attributes) {
-      throw new Error(
-        `Cannot call ${this}.get('${String(
-          attributeName,
-        )}') because this does not represent a composite type (check your pgCodec).`,
-      );
+    if (attributes === undefined) {
+      // Fall back to access, since this could be a 'point' or similar type that doesn't have attributes in Postgres but does in JS.
+      return access(this, attributeName) as any;
     }
     const attribute = attributes[attributeName as string];
     if (!attribute) {

@@ -3302,7 +3302,12 @@ export class OperationPlan {
 }
 
 function makeDefaultPlan(fieldName: string) {
-  return ($step: ExecutableStep) => access($step, [fieldName]);
+  return (
+    $step: ExecutableStep & { get?: (field: string) => ExecutableStep },
+  ) =>
+    typeof $step.get === "function"
+      ? $step.get(fieldName)
+      : access($step, [fieldName]);
 }
 
 function makeMetaByMetaKeysFactory(

@@ -1874,7 +1874,11 @@ export function makeExampleSchema(
   )({
     name: "User",
     fields: () => ({
-      username: attrField("username", GraphQLString),
+      // Here we don't use `attrField` because we want to explicitly test the default plan resolver
+      // username: attrField("username", GraphQLString),
+      username: {
+        type: GraphQLString,
+      },
       gravatarUrl: attrField("gravatar_url", GraphQLString),
       mostRecentForum: {
         type: Forum,
