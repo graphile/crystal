@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { it } from "mocha";
+
 import { resolvePresets } from "../dist/index.js";
 
 const SomePreset: GraphileConfig.Preset = {};
