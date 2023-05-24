@@ -16,6 +16,7 @@ drop schema if exists
   enum_tables,
   geometry,
   polymorphic,
+  partitions,
   js_reserved
 cascade;
 drop extension if exists tablefunc;
@@ -1687,3 +1688,24 @@ $$ language sql stable;
 create function js_reserved.__proto__(yield int, constructor int) returns int as $$
   select yield + constructor;
 $$ language sql stable;
+
+--------------------------------------------------------------------------------
+
+create schema partitions;
+
+create table partitions.users (
+  id serial primary key,
+  name text not null
+);
+
+create table partitions.measurements (
+  timestamp timestamptz not null,
+  key text,
+  value float,
+  user_id int not null references partitions.users,
+  primary key (timestamp, key)
+) partition by range (timestamp);
+create index on partitions.measurements (timestamp);
+create table measurements_y2022 partition of partitions.measurements for values from ('2022-01-01T00:00:00Z') to ('2023-01-01T00:00:00Z');
+create table measurements_y2023 partition of partitions.measurements for values from ('2023-01-01T00:00:00Z') to ('2024-01-01T00:00:00Z');
+create table measurements_y2024 partition of partitions.measurements for values from ('2024-01-01T00:00:00Z') to ('2025-01-01T00:00:00Z');

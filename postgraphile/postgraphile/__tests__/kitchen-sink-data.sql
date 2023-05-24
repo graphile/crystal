@@ -68,6 +68,9 @@ delete from js_reserved.__proto__ cascade;
 delete from js_reserved.null cascade;
 delete from js_reserved.reserved cascade;
 
+delete from partitions.measurements cascade;
+delete from partitions.users cascade;
+
 alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
@@ -749,4 +752,21 @@ insert into js_reserved.reserved
   ('No Limit',                       '2 Unlimited',    '1993'),
   ('No More Mr Nice Guy',            'Alice Cooper',   '1973'),
   ('No Woman No Cry',                'Bob Marley',     '1974'),
-  ('(I Can''t Get No) Satisfaction', 'Rolling Stones', '1965')
+  ('(I Can''t Get No) Satisfaction', 'Rolling Stones', '1965');
+
+alter sequence partitions.users_id_seq restart with 1;
+insert into partitions.users
+  (name) values
+  ('Alice'),
+  ('Bob'),
+  ('Caroline'),
+  ('Dave');
+
+
+insert into partitions.measurements
+  (timestamp, key, value, user_id) values
+  ('2022-03-04T01:02:03Z', 'temp', '22.5', 1),
+  ('2022-03-04T01:02:03Z', 'humidity', '70', 2),
+  ('2023-02-04T11:02:03Z', 'temp', '18.3', 1),
+  ('2023-08-04T11:02:03Z', 'temp', '39.2', 3),
+  ('2023-08-04T11:02:03Z', 'humidity', '100', 2);

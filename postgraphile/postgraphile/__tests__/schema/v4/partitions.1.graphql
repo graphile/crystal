@@ -1,0 +1,701 @@
+"""All input for the create `Measurement` mutation."""
+input CreateMeasurementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Measurement` to be created by this mutation."""
+  measurement: MeasurementInput!
+}
+
+"""The output of our create `Measurement` mutation."""
+type CreateMeasurementPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Measurement` that was created by this mutation."""
+  measurement: Measurement
+
+  """An edge for our `Measurement`. May be used by Relay 1."""
+  measurementEdge(
+    """The method to use when ordering `Measurement`."""
+    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MeasurementsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `User` that is related to this `Measurement`."""
+  userByUserId: User
+}
+
+"""All input for the create `User` mutation."""
+input CreateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `User` to be created by this mutation."""
+  user: UserInput!
+}
+
+"""The output of our create `User` mutation."""
+type CreateUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `User` that was created by this mutation."""
+  user: User
+
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""All input for the `deleteMeasurementByTimestampAndKey` mutation."""
+input DeleteMeasurementByTimestampAndKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  key: String!
+  timestamp: Datetime!
+}
+
+"""All input for the `deleteMeasurement` mutation."""
+input DeleteMeasurementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Measurement` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Measurement` mutation."""
+type DeleteMeasurementPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedMeasurementId: ID
+
+  """The `Measurement` that was deleted by this mutation."""
+  measurement: Measurement
+
+  """An edge for our `Measurement`. May be used by Relay 1."""
+  measurementEdge(
+    """The method to use when ordering `Measurement`."""
+    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MeasurementsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `User` that is related to this `Measurement`."""
+  userByUserId: User
+}
+
+"""All input for the `deleteUserById` mutation."""
+input DeleteUserByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteUser` mutation."""
+input DeleteUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `User` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `User` mutation."""
+type DeleteUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedUserId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `User` that was deleted by this mutation."""
+  user: User
+
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+type Measurement implements Node {
+  key: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  timestamp: Datetime!
+
+  """Reads a single `User` that is related to this `Measurement`."""
+  userByUserId: User
+  userId: Int!
+  value: Float
+}
+
+"""
+A condition to be used against `Measurement` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input MeasurementCondition {
+  """Checks for equality with the object’s `key` field."""
+  key: String
+
+  """Checks for equality with the object’s `timestamp` field."""
+  timestamp: Datetime
+
+  """Checks for equality with the object’s `userId` field."""
+  userId: Int
+
+  """Checks for equality with the object’s `value` field."""
+  value: Float
+}
+
+"""An input for mutations affecting `Measurement`"""
+input MeasurementInput {
+  key: String!
+  timestamp: Datetime!
+  userId: Int!
+  value: Float
+}
+
+"""
+Represents an update to a `Measurement`. Fields that are set will be updated.
+"""
+input MeasurementPatch {
+  key: String
+  timestamp: Datetime
+  userId: Int
+  value: Float
+}
+
+"""A connection to a list of `Measurement` values."""
+type MeasurementsConnection {
+  """
+  A list of edges which contains the `Measurement` and cursor to aid in pagination.
+  """
+  edges: [MeasurementsEdge]!
+
+  """A list of `Measurement` objects."""
+  nodes: [Measurement]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Measurement` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Measurement` edge in the connection."""
+type MeasurementsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Measurement` at the end of the edge."""
+  node: Measurement
+}
+
+"""Methods to use when ordering `Measurement`."""
+enum MeasurementsOrderBy {
+  KEY_ASC
+  KEY_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TIMESTAMP_ASC
+  TIMESTAMP_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  VALUE_ASC
+  VALUE_DESC
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Measurement`."""
+  createMeasurement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMeasurementInput!
+  ): CreateMeasurementPayload
+
+  """Creates a single `User`."""
+  createUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserInput!
+  ): CreateUserPayload
+
+  """Deletes a single `Measurement` using its globally unique id."""
+  deleteMeasurement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMeasurementInput!
+  ): DeleteMeasurementPayload
+
+  """Deletes a single `Measurement` using a unique key."""
+  deleteMeasurementByTimestampAndKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMeasurementByTimestampAndKeyInput!
+  ): DeleteMeasurementPayload
+
+  """Deletes a single `User` using its globally unique id."""
+  deleteUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserInput!
+  ): DeleteUserPayload
+
+  """Deletes a single `User` using a unique key."""
+  deleteUserById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserByIdInput!
+  ): DeleteUserPayload
+
+  """
+  Updates a single `Measurement` using its globally unique id and a patch.
+  """
+  updateMeasurement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMeasurementInput!
+  ): UpdateMeasurementPayload
+
+  """Updates a single `Measurement` using a unique key and a patch."""
+  updateMeasurementByTimestampAndKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMeasurementByTimestampAndKeyInput!
+  ): UpdateMeasurementPayload
+
+  """Updates a single `User` using its globally unique id and a patch."""
+  updateUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserInput!
+  ): UpdateUserPayload
+
+  """Updates a single `User` using a unique key and a patch."""
+  updateUserById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserByIdInput!
+  ): UpdateUserPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `Measurement`."""
+  allMeasurements(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MeasurementCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Measurement`."""
+    orderBy: [MeasurementsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MeasurementsConnection
+
+  """Reads and enables pagination through a set of `User`."""
+  allUsers(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UserCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UsersConnection
+
+  """Reads a single `Measurement` using its globally unique `ID`."""
+  measurement(
+    """
+    The globally unique `ID` to be used in selecting a single `Measurement`.
+    """
+    nodeId: ID!
+  ): Measurement
+
+  """Get a single `Measurement`."""
+  measurementByTimestampAndKey(key: String!, timestamp: Datetime!): Measurement
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Reads a single `User` using its globally unique `ID`."""
+  user(
+    """The globally unique `ID` to be used in selecting a single `User`."""
+    nodeId: ID!
+  ): User
+
+  """Get a single `User`."""
+  userById(id: Int!): User
+}
+
+"""All input for the `updateMeasurementByTimestampAndKey` mutation."""
+input UpdateMeasurementByTimestampAndKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  key: String!
+
+  """
+  An object where the defined keys will be set on the `Measurement` being updated.
+  """
+  measurementPatch: MeasurementPatch!
+  timestamp: Datetime!
+}
+
+"""All input for the `updateMeasurement` mutation."""
+input UpdateMeasurementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Measurement` being updated.
+  """
+  measurementPatch: MeasurementPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Measurement` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Measurement` mutation."""
+type UpdateMeasurementPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Measurement` that was updated by this mutation."""
+  measurement: Measurement
+
+  """An edge for our `Measurement`. May be used by Relay 1."""
+  measurementEdge(
+    """The method to use when ordering `Measurement`."""
+    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MeasurementsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `User` that is related to this `Measurement`."""
+  userByUserId: User
+}
+
+"""All input for the `updateUserById` mutation."""
+input UpdateUserByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `User` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""All input for the `updateUser` mutation."""
+input UpdateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `User` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `User` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""The output of our update `User` mutation."""
+type UpdateUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `User` that was updated by this mutation."""
+  user: User
+
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+type User implements Node {
+  id: Int!
+
+  """Reads and enables pagination through a set of `Measurement`."""
+  measurementsByUserId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MeasurementCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Measurement`."""
+    orderBy: [MeasurementsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MeasurementsConnection!
+  name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `User` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input UserCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""An input for mutations affecting `User`"""
+input UserInput {
+  id: Int
+  name: String!
+}
+
+"""Represents an update to a `User`. Fields that are set will be updated."""
+input UserPatch {
+  id: Int
+  name: String
+}
+
+"""A connection to a list of `User` values."""
+type UsersConnection {
+  """
+  A list of edges which contains the `User` and cursor to aid in pagination.
+  """
+  edges: [UsersEdge]!
+
+  """A list of `User` objects."""
+  nodes: [User]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `User` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `User` edge in the connection."""
+type UsersEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `User` at the end of the edge."""
+  node: User
+}
+
+"""Methods to use when ordering `User`."""
+enum UsersOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}

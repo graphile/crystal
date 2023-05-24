@@ -1,0 +1,73 @@
+{
+  allMeasurements: {
+    edges: [
+      {
+        cursor: "WyJiNjgyNWQ2ZWVhIiwiMjAyMi0wMy0wM1QyMTowMjowMy4wMDAwMDAtMDQ6MDAiLCJodW1pZGl0eSJd",
+        node: {
+          timestamp: "2022-03-03T21:02:03.000000-04:00",
+          key: "humidity",
+          value: 70,
+          userByUserId: {
+            id: 2,
+            name: "Bob",
+          },
+        },
+      },
+      {
+        cursor: "WyJiNjgyNWQ2ZWVhIiwiMjAyMi0wMy0wM1QyMTowMjowMy4wMDAwMDAtMDQ6MDAiLCJ0ZW1wIl0=",
+        node: {
+          timestamp: "2022-03-03T21:02:03.000000-04:00",
+          key: "temp",
+          value: 22.5,
+          userByUserId: {
+            id: 1,
+            name: "Alice",
+          },
+        },
+      },
+      {
+        cursor: "WyJiNjgyNWQ2ZWVhIiwiMjAyMy0wMi0wNFQwNzowMjowMy4wMDAwMDAtMDQ6MDAiLCJ0ZW1wIl0=",
+        node: {
+          timestamp: "2023-02-04T07:02:03.000000-04:00",
+          key: "temp",
+          value: 18.3,
+          userByUserId: {
+            id: 1,
+            name: "Alice",
+          },
+        },
+      },
+      {
+        cursor: "WyJiNjgyNWQ2ZWVhIiwiMjAyMy0wOC0wNFQwNzowMjowMy4wMDAwMDAtMDQ6MDAiLCJodW1pZGl0eSJd",
+        node: {
+          timestamp: "2023-08-04T07:02:03.000000-04:00",
+          key: "humidity",
+          value: 100,
+          userByUserId: {
+            id: 2,
+            name: "Bob",
+          },
+        },
+      },
+      {
+        cursor: "WyJiNjgyNWQ2ZWVhIiwiMjAyMy0wOC0wNFQwNzowMjowMy4wMDAwMDAtMDQ6MDAiLCJ0ZW1wIl0=",
+        node: {
+          timestamp: "2023-08-04T07:02:03.000000-04:00",
+          key: "temp",
+          value: 39.2,
+          userByUserId: {
+            id: 3,
+            name: "Caroline",
+          },
+        },
+      },
+    ],
+    totalCount: 5,
+    pageInfo: {
+      startCursor: "WyJiNjgyNWQ2ZWVhIiwiMjAyMi0wMy0wM1QyMTowMjowMy4wMDAwMDAtMDQ6MDAiLCJodW1pZGl0eSJd",
+      endCursor: "WyJiNjgyNWQ2ZWVhIiwiMjAyMy0wOC0wNFQwNzowMjowMy4wMDAwMDAtMDQ6MDAiLCJ0ZW1wIl0=",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  },
+}
