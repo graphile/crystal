@@ -10,6 +10,11 @@ const SomePreset: GraphileConfig.Preset = {
   plugins: [SomePlugin],
 };
 
+const PresetWithName: GraphileConfig.Preset = {
+  plugins: [SomePlugin],
+  // @ts-ignore
+  name: "PresetWithName",
+};
 const PresetWithProvides: GraphileConfig.Preset = {
   plugins: [SomePlugin],
   // @ts-ignore
@@ -40,6 +45,21 @@ it("is fine with reasonable looking preset", () => {
   expect(error).not.to.exist;
 });
 
+it("throws an error if a preset looks like a plugin (has name)", () => {
+  let error: Error | undefined;
+  try {
+    resolvePresets([
+      {
+        extends: [PresetWithName],
+      },
+    ]);
+  } catch (e) {
+    error = e;
+  }
+  expect(error).to.exist;
+  expect(error!.message).to.match(/'name'/);
+});
+
 it("throws an error if a preset looks like a plugin (has provides)", () => {
   let error: Error | undefined;
   try {
@@ -52,7 +72,7 @@ it("throws an error if a preset looks like a plugin (has provides)", () => {
     error = e;
   }
   expect(error).to.exist;
-  expect(error!.message).to.match(/provides/);
+  expect(error!.message).to.match(/'provides'/);
 });
 
 it("throws an error if a preset looks like a plugin (has before)", () => {
@@ -67,7 +87,7 @@ it("throws an error if a preset looks like a plugin (has before)", () => {
     error = e;
   }
   expect(error).to.exist;
-  expect(error!.message).to.match(/before/);
+  expect(error!.message).to.match(/'before'/);
 });
 
 it("throws an error if a preset looks like a plugin (has after)", () => {
@@ -82,5 +102,5 @@ it("throws an error if a preset looks like a plugin (has after)", () => {
     error = e;
   }
   expect(error).to.exist;
-  expect(error!.message).to.match(/after/);
+  expect(error!.message).to.match(/'after'/);
 });

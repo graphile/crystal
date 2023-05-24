@@ -2,7 +2,13 @@ import "./interfaces.js";
 
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
-const PRESET_FORBIDDEN_KEYS = ["provides", "before", "after"];
+const PRESET_FORBIDDEN_KEYS = [
+  "name", // If we want to give presets a name, we should use 'id', 'label', 'title' or similar.
+  "experimental",
+  "provides",
+  "before",
+  "after",
+];
 const PLUGIN_FORBIDDEN_KEYS = ["plugins", "disablePlugins", "extends"];
 
 function inspect(a: any): string {

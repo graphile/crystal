@@ -50,7 +50,7 @@ it("throws an error if a plugin looks like a preset (has plugins)", () => {
     error = e;
   }
   expect(error).to.exist;
-  expect(error!.message).to.match(/plugins/);
+  expect(error!.message).to.match(/'plugins'/);
 });
 
 it("throws an error if a plugin looks like a preset (has disablePlugins)", () => {
@@ -65,7 +65,7 @@ it("throws an error if a plugin looks like a preset (has disablePlugins)", () =>
     error = e;
   }
   expect(error).to.exist;
-  expect(error!.message).to.match(/disablePlugins/);
+  expect(error!.message).to.match(/'disablePlugins'/);
 });
 
 it("throws an error if a plugin looks like a preset (has extends)", () => {
@@ -80,5 +80,5 @@ it("throws an error if a plugin looks like a preset (has extends)", () => {
     error = e;
   }
   expect(error).to.exist;
-  expect(error!.message).to.match(/extends/);
+  expect(error!.message).to.match(/'extends'/);
 });
