@@ -252,6 +252,17 @@ export class ConnectionStep<
     return clonedPlan;
   }
 
+  /**
+   * Subplans may call this from their `setBefore`/`setAfter`/etc plans in order
+   * to add a dependency to us, which is typically useful for adding validation
+   * functions so that they are thrown "earlier", avoiding error bubbling.
+   */
+  public addValidation(callback: () => ExecutableStep) {
+    this.withMyLayerPlan(() => {
+      this.addDependency(callback());
+    });
+  }
+
   public edges(): ExecutableStep {
     if (this.cursorPlan || this.itemPlan) {
       return each(this.cloneSubplanWithPagination(), ($intermediate) =>
