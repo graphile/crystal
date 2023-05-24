@@ -2,6 +2,15 @@ import "./interfaces.js";
 
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
+const PRESET_FORBIDDEN_KEYS = [
+  "name", // If we want to give presets a name, we should use 'id', 'label', 'title' or similar.
+  "experimental",
+  "provides",
+  "before",
+  "after",
+];
+const PLUGIN_FORBIDDEN_KEYS = ["plugins", "disablePlugins", "extends"];
+
 function inspect(a: any): string {
   // TODO: if node, use util.inspect
   return Array.isArray(a) ||
@@ -89,6 +98,13 @@ function assertPlugin(plugin: any): asserts plugin is GraphileConfig.Plugin {
       }' to have a string 'version'; found ${inspect(plugin.version)}`,
     );
   }
+  for (const forbiddenKey of PLUGIN_FORBIDDEN_KEYS) {
+    if (plugin[forbiddenKey]) {
+      throw new Error(
+        `Plugin '${plugin.name}' has '${forbiddenKey}' property which suggests it is a preset rather than a plugin. If it is indeed a preset you should add it to your preset via 'extends' rather than 'plugins'.`,
+      );
+    }
+  }
 }
 
 /**
@@ -106,7 +122,15 @@ function resolvePreset(
       )}'`,
     );
   }
+
   try {
+    for (const forbiddenKey of PRESET_FORBIDDEN_KEYS) {
+      if ((preset as any)[forbiddenKey]) {
+        throw new Error(
+          `Preset has '${forbiddenKey}' property which suggests it is a plugin rather than a preset. If it is indeed a plugin you should add it to your preset via 'plugins' rather than 'extends'.`,
+        );
+      }
+    }
     const { extends: presets = [] } = preset;
     const basePreset = resolvePresets(presets);
     mergePreset(basePreset, preset);
