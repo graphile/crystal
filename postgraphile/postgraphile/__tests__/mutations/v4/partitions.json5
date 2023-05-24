@@ -1,0 +1,24 @@
+{
+  createMeasurement: {
+    measurement: {
+      timestamp: "2023-05-24T03:43:00.000000-04:00",
+      key: "temp",
+      value: 12.7,
+      userByUserId: {
+        id: 4,
+        name: "Dave",
+      },
+    },
+  },
+  updateMeasurementByTimestampAndKey: {
+    measurement: {
+      timestamp: "2023-05-24T03:43:00.000000-04:00",
+      key: "temp",
+      value: 13,
+      userByUserId: {
+        id: 4,
+        name: "Dave",
+      },
+    },
+  },
+}

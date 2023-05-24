@@ -1,0 +1,30 @@
+## expect(errors).toBeFalsy();
+#> schema: ["partitions"]
+#> subscriptions: true
+query {
+  allMeasurements {
+    edges {
+      cursor
+      node {
+        ...Measurement
+      }
+    }
+    totalCount
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+
+fragment Measurement on Measurement {
+  timestamp
+  key
+  value
+  userByUserId {
+    id
+    name
+  }
+}
