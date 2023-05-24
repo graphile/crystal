@@ -473,6 +473,9 @@ export class PgUnionAllStep<
   private beforeStepId: number | null = null;
   private afterStepId: number | null = null;
 
+  // Connection
+  private connectionDepId: number | null = null;
+
   /**
    * When finalized, we build the SQL query, queryValues, and note where to feed in
    * the relevant queryValues. This saves repeating this work at execution time.
@@ -768,7 +771,10 @@ on (${sql.indent(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgUnionAllMode,
   ): PgUnionAllStep<TAttributes, TTypeNames> {
-    return new PgUnionAllStep(this, mode);
+    const $plan = new PgUnionAllStep(this, mode);
+    // In case any errors are raised
+    $plan.connectionDepId = $plan.addDependency($connection);
+    return $plan;
   }
 
   select<TAttribute extends TAttributes>(key: TAttribute): number {
@@ -1055,14 +1061,31 @@ on (${sql.indent(
 
     // Cursor validity check; if we get inlined then this will be passed up
     // to the parent so we can trust it.
-    this.addDependency(
-      pgValidateParsedCursor(
-        $parsedCursorPlan,
-        digest,
-        orderCount,
-        beforeOrAfter,
-      ),
-    );
+    if (this.connectionDepId === null) {
+      this.addDependency(
+        pgValidateParsedCursor(
+          $parsedCursorPlan,
+          digest,
+          orderCount,
+          beforeOrAfter,
+        ),
+      );
+    } else {
+      // To make the error be thrown in the right place, we should also add this error to our parent connection
+      const $connection = this.getDep(this.connectionDepId) as ConnectionStep<
+        any,
+        any,
+        any
+      >;
+      $connection.addValidation(() => {
+        return pgValidateParsedCursor(
+          $parsedCursorPlan,
+          digest,
+          orderCount,
+          beforeOrAfter,
+        );
+      });
+    }
 
     if (orderCount === 0) {
       // Natural pagination `['natural', N]`

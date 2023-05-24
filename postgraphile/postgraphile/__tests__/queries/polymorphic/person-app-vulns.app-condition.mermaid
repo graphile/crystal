@@ -24,12 +24,12 @@ graph TD
     Constant78 --> Lambda42
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgSelect20[["PgSelect[20∈1]<br />ᐸpeopleᐳ"]]:::plan
-    Object18 & Connection19 --> PgSelect20
     Connection41{{"Connection[41∈1]<br />ᐸ37ᐳ"}}:::plan
     Constant77{{"Constant[77∈1]<br />ᐸ1ᐳ"}}:::plan
-    Constant77 & Lambda42 --> Connection41
     PgValidateParsedCursor47["PgValidateParsedCursor[47∈1]"]:::plan
+    Constant77 & Lambda42 & PgValidateParsedCursor47 --> Connection41
+    PgSelect20[["PgSelect[20∈1]<br />ᐸpeopleᐳ"]]:::plan
+    Object18 & Connection19 --> PgSelect20
     Lambda42 --> PgValidateParsedCursor47
     Access48{{"Access[48∈1]<br />ᐸ42.1ᐳ"}}:::plan
     Lambda42 --> Access48
@@ -44,7 +44,7 @@ graph TD
     __Item21 --> PgSelectSingle22
     PgUnionAll43[["PgUnionAll[43∈3]"]]:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object18 & PgClassExpression23 & PgClassExpression23 & Constant79 & Lambda42 & PgValidateParsedCursor47 & ToPg49 & Access50 --> PgUnionAll43
+    Object18 & PgClassExpression23 & PgClassExpression23 & Constant79 & Connection41 & Lambda42 & ToPg49 & Access50 --> PgUnionAll43
     PgSelectSingle22 --> PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
@@ -98,10 +98,10 @@ graph TD
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 42<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,Connection41,PgValidateParsedCursor47,Access48,ToPg49,Access50,Constant77,Constant79 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 18, 79, 42, 47, 49, 50, 41<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 18, 79, 41, 42, 49, 50<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item21,PgSelectSingle22 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 18, 79, 42, 47, 49, 50, 41<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[22]<br />1: <br />ᐳ: 23, 24<br />2: PgUnionAll[43]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 18, 79, 41, 42, 49, 50<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[22]<br />1: <br />ᐳ: 23, 24<br />2: PgUnionAll[43]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,PgClassExpression24,PgUnionAll43 bucket3
     Bucket4("Bucket 4 (listItem)<br />Deps: 18<br /><br />ROOT __Item{4}ᐸ43ᐳ[44]"):::bucket

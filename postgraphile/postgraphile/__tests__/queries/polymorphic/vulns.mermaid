@@ -9,33 +9,21 @@ graph TD
 
 
     %% plan dependencies
-    PgUnionAll21[["PgUnionAll[21∈0]"]]:::plan
-    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
+    Constant138{{"Constant[138∈0]<br />ᐸ3ᐳ"}}:::plan
     Lambda20{{"Lambda[20∈0]<br />ᐸparseCursorᐳ"}}:::plan
     PgValidateParsedCursor25["PgValidateParsedCursor[25∈0]"]:::plan
-    ToPg27{{"ToPg[27∈0]"}}:::plan
-    ToPg29{{"ToPg[29∈0]"}}:::plan
-    Access30{{"Access[30∈0]<br />ᐸ20.3ᐳ"}}:::plan
-    Object18 & Lambda20 & PgValidateParsedCursor25 & ToPg27 & ToPg29 & Access30 --> PgUnionAll21
+    Constant138 & Lambda20 & PgValidateParsedCursor25 & PgValidateParsedCursor25 & PgValidateParsedCursor25 & PgValidateParsedCursor25 --> Connection19
+    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
-    Constant138{{"Constant[138∈0]<br />ᐸ3ᐳ"}}:::plan
-    Constant138 & Lambda20 --> Connection19
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access16
     __Value3 --> Access17
     Constant139{{"Constant[139∈0]<br />ᐸ'WyJlOTAxMDBkNmIzIiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIᐳ"}}:::plan
     Constant139 --> Lambda20
     Lambda20 --> PgValidateParsedCursor25
-    Access26{{"Access[26∈0]<br />ᐸ20.1ᐳ"}}:::plan
-    Lambda20 --> Access26
-    Access26 --> ToPg27
-    Access28{{"Access[28∈0]<br />ᐸ20.2ᐳ"}}:::plan
-    Lambda20 --> Access28
-    Access28 --> ToPg29
-    Lambda20 --> Access30
     PgUnionAll101[["PgUnionAll[101∈0]"]]:::plan
     Object18 --> PgUnionAll101
     __Value0["__Value[0∈0]"]:::plan
@@ -46,12 +34,17 @@ graph TD
     __Item105 --> PgUnionAllSingle106
     Access107{{"Access[107∈5]<br />ᐸ106.2ᐳ"}}:::plan
     PgUnionAllSingle106 --> Access107
+    PgUnionAll21[["PgUnionAll[21∈1]"]]:::plan
+    ToPg27{{"ToPg[27∈1]"}}:::plan
+    ToPg29{{"ToPg[29∈1]"}}:::plan
+    Access30{{"Access[30∈1]<br />ᐸ20.3ᐳ"}}:::plan
+    Object18 & Connection19 & Lambda20 & ToPg27 & ToPg29 & Access30 --> PgUnionAll21
     PgUnionAll65[["PgUnionAll[65∈1]"]]:::plan
-    Object18 & Lambda20 & PgValidateParsedCursor25 & ToPg27 & ToPg29 & Access30 --> PgUnionAll65
+    Object18 & Connection19 & Lambda20 & ToPg27 & ToPg29 & Access30 --> PgUnionAll65
     PgUnionAll79[["PgUnionAll[79∈1]"]]:::plan
-    Object18 & Lambda20 & PgValidateParsedCursor25 & ToPg27 & ToPg29 & Access30 --> PgUnionAll79
+    Object18 & Connection19 & Lambda20 & ToPg27 & ToPg29 & Access30 --> PgUnionAll79
     PgUnionAll93[["PgUnionAll[93∈1]"]]:::plan
-    Object18 & Lambda20 & PgValidateParsedCursor25 & ToPg27 & ToPg29 & Access30 --> PgUnionAll93
+    Object18 & Connection19 & Lambda20 & ToPg27 & ToPg29 & Access30 --> PgUnionAll93
     List78{{"List[78∈1]<br />ᐸ75,76,77ᐳ"}}:::plan
     Access75{{"Access[75∈1]<br />ᐸ67.0ᐳ"}}:::plan
     Access76{{"Access[76∈1]<br />ᐸ67.1ᐳ"}}:::plan
@@ -63,7 +56,14 @@ graph TD
     Access91{{"Access[91∈1]<br />ᐸ81.2ᐳ"}}:::plan
     Access89 & Access90 & Access91 --> List92
     PgUnionAll60[["PgUnionAll[60∈1]"]]:::plan
-    Object18 --> PgUnionAll60
+    Object18 & Connection19 --> PgUnionAll60
+    Access26{{"Access[26∈1]<br />ᐸ20.1ᐳ"}}:::plan
+    Lambda20 --> Access26
+    Access26 --> ToPg27
+    Access28{{"Access[28∈1]<br />ᐸ20.2ᐳ"}}:::plan
+    Lambda20 --> Access28
+    Access28 --> ToPg29
+    Lambda20 --> Access30
     First61{{"First[61∈1]"}}:::plan
     PgUnionAll60 --> First61
     PgUnionAllSingle62["PgUnionAllSingle[62∈1]"]:::plan
@@ -179,12 +179,12 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/vulns"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 138, 139, 18, 20, 26, 27, 28, 29, 30, 19<br />2: 25, 101<br />3: PgUnionAll[21]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 138, 139, 18, 20<br />2: 25, 101<br />ᐳ: Connection[19]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda20,PgUnionAll21,PgValidateParsedCursor25,Access26,ToPg27,Access28,ToPg29,Access30,PgUnionAll101,Constant138,Constant139 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 20, 25, 27, 29, 30, 21<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: 60, 65, 79, 93<br />ᐳ: 64, 95, 61, 66, 80, 94<br />2: 62, 67, 81<br />ᐳ: 63, 75, 76, 77, 78, 89, 90, 91, 92, 68, 82"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda20,PgValidateParsedCursor25,PgUnionAll101,Constant138,Constant139 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 20<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: PgUnionAll[60]<br />ᐳ: 26, 28, 30, 64, 95, 27, 29, 61<br />2: 21, 62, 65, 79, 93<br />ᐳ: 63, 66, 80, 94<br />3: 67, 81<br />ᐳ: 75, 76, 77, 78, 89, 90, 91, 92, 68, 82"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUnionAll60,First61,PgUnionAllSingle62,PgClassExpression63,PgPageInfo64,PgUnionAll65,First66,PgUnionAllSingle67,PgCursor68,Access75,Access76,Access77,List78,PgUnionAll79,Last80,PgUnionAllSingle81,PgCursor82,Access89,Access90,Access91,List92,PgUnionAll93,Lambda94,Constant95 bucket1
+    class Bucket1,PgUnionAll21,Access26,ToPg27,Access28,ToPg29,Access30,PgUnionAll60,First61,PgUnionAllSingle62,PgClassExpression63,PgPageInfo64,PgUnionAll65,First66,PgUnionAllSingle67,PgCursor68,Access75,Access76,Access77,List78,PgUnionAll79,Last80,PgUnionAllSingle81,PgCursor82,Access89,Access90,Access91,List92,PgUnionAll93,Lambda94,Constant95 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 18<br /><br />ROOT __Item{2}ᐸ21ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item22,PgUnionAllSingle23 bucket2

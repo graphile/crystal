@@ -368,6 +368,9 @@ export class PgSelectStep<
   private beforeStepId: number | null;
   private afterStepId: number | null;
 
+  // Connection
+  private connectionDepId: number | null = null;
+
   // --------------------
 
   /**
@@ -925,7 +928,7 @@ export class PgSelectStep<
   ): PgSelectStep<TResource> {
     const $plan = this.clone(mode);
     // In case any errors are raised
-    $plan.addDependency($connection);
+    $plan.connectionDepId = $plan.addDependency($connection);
     return $plan;
   }
 
@@ -1050,14 +1053,30 @@ export class PgSelectStep<
 
     // Cursor validity check; if we get inlined then this will be passed up
     // to the parent so we can trust it.
-    this.addDependency(
-      pgValidateParsedCursor(
+    if (this.connectionDepId === null) {
+      const $validate = pgValidateParsedCursor(
         $parsedCursorPlan,
         digest,
         orderCount,
         beforeOrAfter,
-      ),
-    );
+      );
+      this.addDependency($validate);
+    } else {
+      // To make the error be thrown in the right place, we should also add this error to our parent connection
+      const $connection = this.getDep(this.connectionDepId) as ConnectionStep<
+        any,
+        any,
+        any
+      >;
+      $connection.addValidation(() => {
+        return pgValidateParsedCursor(
+          $parsedCursorPlan,
+          digest,
+          orderCount,
+          beforeOrAfter,
+        );
+      });
+    }
 
     if (orderCount === 0) {
       // Natural pagination `['natural', N]`
