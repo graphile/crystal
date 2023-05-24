@@ -1,0 +1,40 @@
+## expect(errors).toBeFalsy();
+#> schema: ["partitions"]
+#> subscriptions: true
+mutation {
+  createMeasurement(
+    input: {
+      measurement: {
+        timestamp: "2023-05-24T07:43:00Z"
+        key: "temp"
+        value: 12.7
+        userId: 4
+      }
+    }
+  ) {
+    measurement {
+      ...Measurement
+    }
+  }
+  updateMeasurementByTimestampAndKey(
+    input: {
+      timestamp: "2023-05-24T07:43:00Z"
+      key: "temp"
+      measurementPatch: { value: 13 }
+    }
+  ) {
+    measurement {
+      ...Measurement
+    }
+  }
+}
+
+fragment Measurement on Measurement {
+  timestamp
+  key
+  value
+  userByUserId {
+    id
+    name
+  }
+}
