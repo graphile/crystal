@@ -89,6 +89,13 @@ function assertPlugin(plugin: any): asserts plugin is GraphileConfig.Plugin {
       }' to have a string 'version'; found ${inspect(plugin.version)}`,
     );
   }
+  for (const forbiddenKey of ["plugins", "disablePlugins", "extends"]) {
+    if (plugin[forbiddenKey]) {
+      throw new Error(
+        `Plugin '${plugin.name}' has '${forbiddenKey}' property which suggests it is a preset rather than a plugin. If it is indeed a preset you should add it to your preset via 'extends' rather than 'plugins'.`,
+      );
+    }
+  }
 }
 
 /**
