@@ -7,7 +7,7 @@ import type {
   GraphQLSchema,
 } from "graphql";
 import * as graphql from "graphql";
-import type { ServerOptions } from "graphql-ws";
+import type { ServerOptions, SubscribePayload } from "graphql-ws";
 import type { Extra } from "graphql-ws/lib/use/ws";
 import type { Readable } from "node:stream";
 
@@ -222,7 +222,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       const schema = latestSchema;
       const parseAndValidate = latestParseAndValidate;
 
-      const parsedBody = { ...message.payload } as ParsedGraphQLBody;
+      const parsedBody = parseGraphQLJSONBody(message.payload);
       await hooks.process("processGraphQLRequestBody", {
         body: parsedBody,
         graphqlWsContext: ctx,
@@ -259,5 +259,30 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
     async subscribe(args: ExecutionArgs) {
       return maskExecutionResult(await subscribe(args, resolvedPreset));
     },
+  };
+}
+
+export function parseGraphQLJSONBody(
+  params: JSONValue | (SubscribePayload & { id?: string; documentId?: string }),
+): ParsedGraphQLBody {
+  if (!params) {
+    throw httpError(400, "No body");
+  }
+  if (typeof params !== "object" || Array.isArray(params)) {
+    throw httpError(400, "Invalid body; expected object");
+  }
+  const id = params.id;
+  const documentId = params.documentId;
+  const query = params.query;
+  const operationName = params.operationName ?? undefined;
+  const variableValues = params.variables ?? undefined;
+  const extensions = params.extensions ?? undefined;
+  return {
+    id,
+    documentId,
+    query,
+    operationName,
+    variableValues,
+    extensions,
   };
 }
