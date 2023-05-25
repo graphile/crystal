@@ -405,8 +405,10 @@ export const getBuilder = (
           plugin.schema.globalBehavior(resolvedPreset),
         );
       }
-      if (plugin.schema?.behavior) {
-        for (const [name, spec] of Object.entries(plugin.schema.behavior)) {
+      if (plugin.schema?.entityBehavior) {
+        for (const [name, spec] of Object.entries(
+          plugin.schema.entityBehavior,
+        )) {
           const entityType = name as keyof GraphileBuild.BehaviorEntities;
           if (!builder.behaviorEntities[entityType]) {
             builder.behaviorEntities[entityType] = {

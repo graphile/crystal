@@ -217,7 +217,7 @@ declare global {
       schema?: {
         globalBehavior?: (preset: GraphileConfig.ResolvedPreset) => string;
 
-        behavior?: {
+        entityBehavior?: {
           [entityType in keyof GraphileBuild.BehaviorEntities]?: GraphileBuild.PluginBehaviorEntitySpec<entityType>;
         };
 
