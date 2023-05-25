@@ -1,5 +1,23 @@
 # grafserv
 
+## 0.0.1-alpha.7
+
+### Patch Changes
+
+- [#346](https://github.com/benjie/postgraphile-private/pull/346)
+  [`9ddaaaa96`](https://github.com/benjie/postgraphile-private/commit/9ddaaaa9617874cb44946acfcd252517ae427446)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug in subscriptions
+  where variables were not recognized
+
+- Updated dependencies
+  [[`5c9d32264`](https://github.com/benjie/postgraphile-private/commit/5c9d322644028e33f5273fb9bcaaf6a80f1f7360),
+  [`2fcbe688c`](https://github.com/benjie/postgraphile-private/commit/2fcbe688c11b355f0688b96e99012a829cf8b7cb),
+  [`3a984718a`](https://github.com/benjie/postgraphile-private/commit/3a984718a322685304777dec7cd48a1efa15539d),
+  [`adc7ae5e0`](https://github.com/benjie/postgraphile-private/commit/adc7ae5e002961c8b8286500527752f21139ab9e)]:
+  - grafast@0.0.1-alpha.7
+  - graphile-config@0.0.1-alpha.3
+  - ruru@2.0.0-alpha.5
+
 ## 0.0.1-alpha.6
 
 ### Patch Changes

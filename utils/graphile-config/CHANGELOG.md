@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-alpha.3
+
+### Patch Changes
+
+- [#344](https://github.com/benjie/postgraphile-private/pull/344)
+  [`adc7ae5e0`](https://github.com/benjie/postgraphile-private/commit/adc7ae5e002961c8b8286500527752f21139ab9e)
+  Thanks [@benjie](https://github.com/benjie)! - Detect presets that look like
+  plugins and vice versa and throw error.
+
 ## 0.0.1-alpha.2
 
 ### Patch Changes

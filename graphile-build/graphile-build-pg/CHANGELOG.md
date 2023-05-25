@@ -1,5 +1,25 @@
 # graphile-build-pg
 
+## 5.0.0-alpha.9
+
+### Patch Changes
+
+- [#341](https://github.com/benjie/postgraphile-private/pull/341)
+  [`2fcbe688c`](https://github.com/benjie/postgraphile-private/commit/2fcbe688c11b355f0688b96e99012a829cf8b7cb)
+  Thanks [@benjie](https://github.com/benjie)! - Ensure interfaces with zero
+  implementations don't cause a crash.
+
+- Updated dependencies
+  [[`5c9d32264`](https://github.com/benjie/postgraphile-private/commit/5c9d322644028e33f5273fb9bcaaf6a80f1f7360),
+  [`2fcbe688c`](https://github.com/benjie/postgraphile-private/commit/2fcbe688c11b355f0688b96e99012a829cf8b7cb),
+  [`3a984718a`](https://github.com/benjie/postgraphile-private/commit/3a984718a322685304777dec7cd48a1efa15539d),
+  [`fe9154b23`](https://github.com/benjie/postgraphile-private/commit/fe9154b23f6e45c56ff5827dfe758bdf4974e215),
+  [`adc7ae5e0`](https://github.com/benjie/postgraphile-private/commit/adc7ae5e002961c8b8286500527752f21139ab9e)]:
+  - grafast@0.0.1-alpha.7
+  - @dataplan/pg@0.0.1-alpha.8
+  - graphile-build@5.0.0-alpha.8
+  - graphile-config@0.0.1-alpha.3
+
 ## 5.0.0-alpha.8
 
 ### Patch Changes
