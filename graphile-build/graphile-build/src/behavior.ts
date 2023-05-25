@@ -14,6 +14,7 @@ export class Behavior {
       getEntityConfiguredBehavior: (
         entity: GraphileBuild.BehaviorEntities[entityType],
       ) => string;
+      cache: Map<GraphileBuild.BehaviorEntities[entityType], string>;
     };
   };
   constructor(private globalBehaviorDefaults = "") {
@@ -42,6 +43,7 @@ export class Behavior {
       defaultBehavior: defaultBehavior ?? "",
       getEntityDefaultBehaviorCallbacks: [],
       getEntityConfiguredBehavior,
+      cache: new Map(),
     };
   }
 
@@ -95,7 +97,23 @@ export class Behavior {
     entity: GraphileBuild.BehaviorEntities[TEntityType],
     filter: string,
   ): boolean | undefined {
+    const finalString = this.getBehaviorForEntity(entityType, entity);
+    return this.stringMatches(finalString, filter);
+  }
+
+  // This is expensive to compute, so we cache it
+  public getBehaviorForEntity<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(
+    entityType: TEntityType,
+    entity: GraphileBuild.BehaviorEntities[TEntityType],
+  ) {
     this.assertEntity(entityType);
+    const cache = this.behaviorEntities[entityType].cache;
+    const existing = cache.get(entity);
+    if (existing !== undefined) {
+      return existing;
+    }
     const behaviorEntity = this.behaviorEntities[entityType];
     const finalString = this.join([
       this.globalBehaviorDefaults,
@@ -105,7 +123,8 @@ export class Behavior {
       ),
       behaviorEntity.getEntityConfiguredBehavior(entity),
     ]);
-    return this.stringMatches(finalString, filter);
+    cache.set(entity, finalString);
+    return finalString;
   }
 
   public join(strings: ReadonlyArray<string | null | undefined>): string {
