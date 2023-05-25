@@ -222,6 +222,7 @@ class SchemaBuilder<
         behavior.addEntityDefaultBehavior(entityType, getEntityDefaultBehavior);
       }
     }
+    behavior.freeze();
     const initialBuild = makeNewBuild(
       this,
       input,

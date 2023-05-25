@@ -5,7 +5,7 @@ interface BehaviorSpec {
 }
 
 export class Behavior {
-  behaviorEntities: {
+  private behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
       defaultBehavior: string;
       getEntityDefaultBehaviorCallbacks: Array<
@@ -17,8 +17,22 @@ export class Behavior {
       cache: Map<GraphileBuild.BehaviorEntities[entityType], string>;
     };
   };
+
   constructor(private globalBehaviorDefaults = "") {
     this.behaviorEntities = Object.create(null);
+  }
+
+  /**
+   * Forbid registration of more global behavior defaults, behavior entity types, etc.
+   */
+  public freeze() {
+    Object.freeze(this);
+    Object.freeze(this.behaviorEntities);
+    for (const key of Object.keys(this.behaviorEntities)) {
+      Object.freeze(
+        this.behaviorEntities[key as keyof typeof this.behaviorEntities],
+      );
+    }
   }
 
   // Should only be called during 'build' phase.
