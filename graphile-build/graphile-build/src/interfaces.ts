@@ -217,13 +217,23 @@ declare global {
       schema?: {
         globalBehavior?: (preset: GraphileConfig.ResolvedPreset) => string;
 
+        /**
+         * You should use `before`, `after` and `provides` to ensure that the entity
+         * behaviors apply in order. The order should be roughly:
+         *
+         * - `default` - default global behaviors like "update"
+         * - `inferred` - behaviors that are inferred based on the entity, e.g. a plugin might disable filtering _by default_ on a relation if it's unindexed
+         * - `override` - overrides set explicitly by the user
+         */
         entityBehavior?: {
-          [entityType in keyof GraphileBuild.BehaviorEntities]?: PluginHook<
-            (
-              entity: GraphileBuild.BehaviorEntities[entityType],
-              resolvedPreset: GraphileConfig.ResolvedPreset,
-            ) => string
-          >;
+          [entityType in keyof GraphileBuild.BehaviorEntities]?:
+            | string
+            | PluginHook<
+                (
+                  entity: GraphileBuild.BehaviorEntities[entityType],
+                  resolvedPreset: GraphileConfig.ResolvedPreset,
+                ) => string
+              >;
         };
 
         hooks?: {

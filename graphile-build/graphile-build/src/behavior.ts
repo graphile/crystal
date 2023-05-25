@@ -6,8 +6,36 @@ interface BehaviorSpec {
   scope: BehaviorScope;
 }
 
-const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) =>
-  plugin.schema?.entityBehavior;
+const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
+  const val = plugin.schema?.entityBehavior;
+  if (val) {
+    const entries = Object.entries(val);
+    let changed = false;
+    for (const entry of entries) {
+      const rhs = entry[1];
+      if (typeof rhs === "string") {
+        const hook: Exclude<
+          NonNullable<
+            NonNullable<GraphileConfig.Plugin["schema"]>["entityBehavior"]
+          >[keyof GraphileBuild.BehaviorEntities],
+          string
+        > = {
+          provides: ["default"],
+          before: ["inferred"],
+          callback: () => rhs,
+        };
+        entry[1] = hook;
+        changed = true;
+      }
+    }
+    if (changed) {
+      return Object.fromEntries(entries) as any;
+    } else {
+      return val;
+    }
+  }
+  return val;
+};
 
 export class Behavior {
   private behaviorEntities: {
