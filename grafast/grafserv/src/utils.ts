@@ -261,3 +261,26 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
     },
   };
 }
+
+export function parseGraphQLJSONBody(params: JSONValue): ParsedGraphQLBody {
+  if (!params) {
+    throw httpError(400, "No body");
+  }
+  if (typeof params !== "object" || Array.isArray(params)) {
+    throw httpError(400, "Invalid body; expected object");
+  }
+  const id = params.id;
+  const documentId = params.documentId;
+  const query = params.query;
+  const operationName = params.operationName ?? undefined;
+  const variableValues = params.variables ?? undefined;
+  const extensions = params.extensions ?? undefined;
+  return {
+    id,
+    documentId,
+    query,
+    operationName,
+    variableValues,
+    extensions,
+  };
+}

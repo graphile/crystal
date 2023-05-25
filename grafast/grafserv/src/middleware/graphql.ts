@@ -26,7 +26,7 @@ import type {
 } from "../interfaces.js";
 import { $$normalizedHeaders } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
-import { httpError } from "../utils.js";
+import { httpError, parseGraphQLJSONBody } from "../utils.js";
 
 const { getOperationAST, GraphQLError, parse, Source, validate } = graphql;
 
@@ -116,29 +116,6 @@ function parseGraphQLQueryParams(
     typeof extensionsString === "string"
       ? JSON.parse(extensionsString)
       : undefined;
-  return {
-    id,
-    documentId,
-    query,
-    operationName,
-    variableValues,
-    extensions,
-  };
-}
-
-function parseGraphQLJSONBody(params: JSONValue): ParsedGraphQLBody {
-  if (!params) {
-    throw httpError(400, "No body");
-  }
-  if (typeof params !== "object" || Array.isArray(params)) {
-    throw httpError(400, "Invalid body; expected object");
-  }
-  const id = params.id;
-  const documentId = params.documentId;
-  const query = params.query;
-  const operationName = params.operationName ?? undefined;
-  const variableValues = params.variables ?? undefined;
-  const extensions = params.extensions ?? undefined;
   return {
     id,
     documentId,
