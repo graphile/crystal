@@ -215,6 +215,8 @@ declare global {
       gather?: PluginGatherConfig<keyof GatherHelpers, any, any>;
 
       schema?: {
+        globalBehavior?: (preset: GraphileConfig.ResolvedPreset) => string;
+
         behavior?: {
           [entityType in keyof GraphileBuild.BehaviorEntities]?: GraphileBuild.PluginBehaviorEntitySpec<entityType>;
         };

@@ -78,20 +78,17 @@ yourself in too hard.
 
 If you're authoring a preset that is not the final configuration for a schema
 then this kind of default behavior is likely to be overridden by the user's
-configuration. Instead, preset authors should add a plugin that uses the
-`build.behavior.addDefaultBehavior("...")` API during the `build` phase. A
-similar "lists by default" plugin might look like this:
+configuration. Instead, preset authors should add a plugin that registers a
+`schema.globalBehavior` callback. All these callbacks will be called and
+merged. A similar "lists by default" plugin might look like this:
 
 ```js
 const FavourListsPlugin = {
   name: "FavourListsPlugin",
   version: "0.0.0",
   schema: {
-    hooks: {
-      build(build) {
-        build.behavior.addDefaultBehavior("-connection +list");
-        return build;
-      },
+    globalBehavior(resolvedPreset) {
+      return "-connection +list";
     },
   },
 };

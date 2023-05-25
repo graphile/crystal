@@ -35,15 +35,6 @@ export class Behavior {
     }
   }
 
-  // Should only be called during 'build' phase.
-  public addDefaultBehavior(behavior: string) {
-    if (this.globalBehaviorDefaults) {
-      this.globalBehaviorDefaults += " " + behavior;
-    } else {
-      this.globalBehaviorDefaults = behavior;
-    }
-  }
-
   public registerEntity<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(
@@ -129,7 +120,7 @@ export class Behavior {
       return existing;
     }
     const behaviorEntity = this.behaviorEntities[entityType];
-    const finalString = this.join([
+    const finalString = joinBehaviors([
       this.globalBehaviorDefaults,
       behaviorEntity.defaultBehavior,
       ...behaviorEntity.getEntityDefaultBehaviorCallbacks.map((cb) =>
@@ -139,20 +130,6 @@ export class Behavior {
     ]);
     cache.set(entity, finalString);
     return finalString;
-  }
-
-  public join(strings: ReadonlyArray<string | null | undefined>): string {
-    let str = "";
-    for (const string of strings) {
-      if (string != null && string !== "") {
-        if (str === "") {
-          str = string;
-        } else {
-          str += " " + string;
-        }
-      }
-    }
-    return str;
   }
 
   private stringMatches(
@@ -268,4 +245,20 @@ function scopeMatches(
     }
   }
   return true;
+}
+
+export function joinBehaviors(
+  strings: ReadonlyArray<string | null | undefined>,
+): string {
+  let str = "";
+  for (const string of strings) {
+    if (string != null && string !== "") {
+      if (str === "") {
+        str = string;
+      } else {
+        str += " " + string;
+      }
+    }
+  }
+  return str;
 }

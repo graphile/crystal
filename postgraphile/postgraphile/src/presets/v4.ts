@@ -118,32 +118,31 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
       },
     },
     schema: {
-      hooks: {
-        build: {
-          callback(build) {
-            switch (options.simpleCollections) {
-              case "both": {
-                build.behavior.addDefaultBehavior("+connection +list");
-                break;
-              }
-              case "only": {
-                build.behavior.addDefaultBehavior("-connection +list");
-                break;
-              }
-              case "omit": {
-                build.behavior.addDefaultBehavior("+connection -list");
-                break;
-              }
-            }
+      globalBehavior() {
+        let str: string;
+        switch (options.simpleCollections) {
+          case "both": {
+            str = "+connection +list";
+            break;
+          }
+          case "only": {
+            str = "-connection +list";
+            break;
+          }
+          case "omit": {
+            str = "+connection -list";
+            break;
+          }
+          default: {
+            str = "";
+          }
+        }
 
-            // We could base this on the legacy relations setting; but how to set deprecated?
-            build.behavior.addDefaultBehavior(
-              "-singularRelation:resource:connection -singularRelation:resource:list",
-            );
-
-            return build;
-          },
-        },
+        // We could base this on the legacy relations setting; but how to set deprecated?
+        str =
+          str +
+          " -singularRelation:resource:connection -singularRelation:resource:list";
+        return str;
       },
     },
   };

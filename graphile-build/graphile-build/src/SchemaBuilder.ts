@@ -10,7 +10,7 @@ import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { makeNewWithHooks } from "./newWithHooks/index.js";
 import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
 import { bindAll } from "./utils.js";
-import { Behavior } from "./behavior.js";
+import { Behavior, joinBehaviors } from "./behavior.js";
 
 const debug = debugFactory("graphile-build:SchemaBuilder");
 
@@ -39,6 +39,7 @@ class SchemaBuilder<
    */
   newWithHooks: NewWithHooksFunction;
 
+  globalBehaviors: string[] = [];
   behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]?: Partial<
       Omit<
@@ -204,7 +205,11 @@ class SchemaBuilder<
    * Create the 'Build' object.
    */
   createBuild(input: GraphileBuild.BuildInput): TBuild {
-    const behavior = new Behavior(this.options.defaultBehavior);
+    const globalDefaultBehavior = joinBehaviors([
+      ...this.globalBehaviors,
+      this.options.defaultBehavior,
+    ]);
+    const behavior = new Behavior(globalDefaultBehavior);
     for (const entry of Object.entries(this.behaviorEntities)) {
       const entityType = entry[0] as keyof GraphileBuild.BehaviorEntities;
       const spec = entry[1];
