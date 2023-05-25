@@ -215,6 +215,10 @@ declare global {
       gather?: PluginGatherConfig<keyof GatherHelpers, any, any>;
 
       schema?: {
+        behavior?: {
+          [entityType in keyof GraphileBuild.BehaviorEntities]?: GraphileBuild.PluginBehaviorEntitySpec<entityType>;
+        };
+
         hooks?: {
           /**
            * The build object represents the current schema build and is passed to all

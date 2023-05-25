@@ -1,7 +1,12 @@
 import "./global.js";
 import "./interfaces.js";
 
-import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
+import {
+  applyHooks,
+  AsyncHooks,
+  resolvePresets,
+  sortedPlugins,
+} from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 import {
   getIntrospectionQuery,
@@ -394,6 +399,19 @@ export const getBuilder = (
   const { plugins, schema: options } = resolvedPreset;
   const builder = new SchemaBuilder(options || {}, inflection);
   if (plugins) {
+    for (const plugin of sortedPlugins(plugins)) {
+      if (plugin.schema?.behavior) {
+        for (const [name, spec] of Object.entries(plugin.schema.behavior)) {
+          const entityType = name as keyof GraphileBuild.BehaviorEntities;
+          if (builder.behaviorEntities[entityType]) {
+            throw new Error(
+              `Plugin '${plugin.name}' attempted to register entity type '${entityType}', but that entity type is already registered`,
+            );
+          }
+          builder.behaviorEntities[entityType] = spec;
+        }
+      }
+    }
     applyHooks(plugins, getSchemaHooks, (hookName, hookFn, plugin) => {
       builder._setPluginName(plugin.name);
       builder.hook(hookName, hookFn);

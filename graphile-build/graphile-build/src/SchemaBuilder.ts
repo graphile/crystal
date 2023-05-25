@@ -10,6 +10,7 @@ import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { makeNewWithHooks } from "./newWithHooks/index.js";
 import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
 import { bindAll } from "./utils.js";
+import { Behavior } from "./behavior.js";
 
 const debug = debugFactory("graphile-build:SchemaBuilder");
 
@@ -37,6 +38,10 @@ class SchemaBuilder<
    * hooks to the spec and then constructs the type, returning the result.
    */
   newWithHooks: NewWithHooksFunction;
+
+  behaviorEntities: {
+    [entityType in keyof GraphileBuild.BehaviorEntities]: GraphileBuild.PluginBehaviorEntitySpec<entityType>;
+  } = Object.create(null);
 
   constructor(
     options: GraphileBuild.SchemaOptions,
@@ -190,10 +195,21 @@ class SchemaBuilder<
    * Create the 'Build' object.
    */
   createBuild(input: GraphileBuild.BuildInput): TBuild {
+    const behavior = new Behavior(this.options.defaultBehavior);
+    for (const entry of Object.entries(this.behaviorEntities)) {
+      const entityType = entry[0] as keyof GraphileBuild.BehaviorEntities;
+      const spec = entry[1];
+      behavior.registerEntity(
+        entityType,
+        spec.getBehavior,
+        spec.defaultBehavior,
+      );
+    }
     const initialBuild = makeNewBuild(
       this,
       input,
       this.inflection,
+      behavior,
     ) as Partial<TBuild> & GraphileBuild.BuildBase;
 
     const build = this.applyHooks("build", initialBuild, initialBuild, {

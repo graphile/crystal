@@ -44,6 +44,7 @@ export default function makeNewBuild(
   builder: SchemaBuilder<any>,
   input: GraphileBuild.BuildInput,
   inflection: GraphileBuild.Inflection,
+  behavior: Behavior,
 ): GraphileBuild.BuildBase {
   const building = new Set<string>();
   const allTypes = {
@@ -187,7 +188,7 @@ export default function makeNewBuild(
     wrapDescription,
     stringTypeSpec,
 
-    behavior: new Behavior(builder.options.defaultBehavior),
+    behavior,
 
     registerObjectType(typeName, scope, Step, specGenerator, origin) {
       register.call(

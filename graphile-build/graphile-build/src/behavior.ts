@@ -5,7 +5,20 @@ interface BehaviorSpec {
 }
 
 export class Behavior {
-  constructor(private globalBehaviorDefaults = "") {}
+  scopes: {
+    [entityType in keyof GraphileBuild.BehaviorEntities]: {
+      defaultBehavior: string;
+      getBehavior: (
+        entity: GraphileBuild.BehaviorEntities[entityType],
+      ) => string;
+      entityBehaviorCallbacks: Array<
+        (entity: GraphileBuild.BehaviorEntities[entityType]) => string
+      >;
+    };
+  };
+  constructor(private globalBehaviorDefaults = "") {
+    this.scopes = Object.create(null);
+  }
 
   // Should only be called during 'build' phase.
   public addDefaultBehavior(behavior: string) {
@@ -14,6 +27,60 @@ export class Behavior {
     } else {
       this.globalBehaviorDefaults = behavior;
     }
+  }
+
+  public registerEntity<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(
+    entityType: TEntityType,
+    getBehavior: (
+      entity: GraphileBuild.BehaviorEntities[TEntityType],
+    ) => string,
+    defaultBehavior?: string,
+  ) {
+    this.scopes[entityType] = {
+      defaultBehavior: defaultBehavior ?? "",
+      getBehavior,
+      entityBehaviorCallbacks: [],
+    };
+  }
+
+  private assertEntity<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(entityType: TEntityType) {
+    if (!this.scopes[entityType]) {
+      throw new Error(
+        `Behavior scope '${entityType}' is not registered; known scopes: ${Object.keys(
+          this.scopes,
+        ).join(", ")}`,
+      );
+    }
+  }
+
+  public addEntityTypeDefaultBehavior<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(entityType: TEntityType, behavior: string) {
+    this.assertEntity(entityType);
+    const scope = this.scopes[entityType];
+    if (scope.defaultBehavior) {
+      scope.defaultBehavior += " " + behavior;
+    } else {
+      scope.defaultBehavior = behavior;
+    }
+  }
+
+  public addEntityBehavior<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(
+    entityType: TEntityType,
+    defaultBehaviorExtractor: (
+      entity: GraphileBuild.BehaviorEntities[TEntityType],
+    ) => string,
+  ) {
+    this.assertEntity(entityType);
+    this.scopes[entityType].entityBehaviorCallbacks.push(
+      defaultBehaviorExtractor,
+    );
   }
 
   // TODO: would be great if this could return `{deprecationReason: string}` too...

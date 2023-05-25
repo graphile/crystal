@@ -65,6 +65,20 @@ declare global {
       // Expand this interface with declaration merging
     }
 
+    interface BehaviorEntities {
+      example: { type: "example" };
+      // Expand me through declaration merging
+    }
+
+    interface PluginBehaviorEntitySpec<
+      TEntityType extends keyof GraphileBuild.BehaviorEntities,
+    > {
+      defaultBehavior?: string;
+      getBehavior: (
+        entity: GraphileBuild.BehaviorEntities[TEntityType],
+      ) => string;
+    }
+
     /**
      * Details of a single directive application. We typically store a list of
      * these into an array. Note that we don't use a map for this because:
