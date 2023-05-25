@@ -63,8 +63,6 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
-
 /**
  * Generate 'build.inflection' from the given preset.
  */
@@ -396,57 +394,7 @@ export const getBuilder = (
   inflection: GraphileBuild.Inflection = buildInflection(preset),
 ): SchemaBuilder => {
   const resolvedPreset = resolvePresets([preset]);
-  const { plugins, schema: options } = resolvedPreset;
-  const builder = new SchemaBuilder(options || {}, inflection);
-  if (plugins) {
-    for (const plugin of sortedPlugins(plugins)) {
-      if (plugin.schema?.globalBehavior) {
-        builder.globalBehaviors.push(
-          plugin.schema.globalBehavior(resolvedPreset),
-        );
-      }
-      if (plugin.schema?.entityBehavior) {
-        for (const [name, spec] of Object.entries(
-          plugin.schema.entityBehavior,
-        )) {
-          const entityType = name as keyof GraphileBuild.BehaviorEntities;
-          if (!builder.behaviorEntities[entityType]) {
-            builder.behaviorEntities[entityType] = {
-              defaultBehavior: "",
-              getEntityDefaultBehaviorCallbacks: [],
-              getEntityConfiguredBehavior: undefined,
-            };
-          }
-          const t = builder.behaviorEntities[entityType];
-          if (spec.getEntityConfiguredBehavior) {
-            if (t.getEntityConfiguredBehavior) {
-              throw new Error(
-                `Plugin '${plugin.name}' attempted to register entity type '${entityType}', but that entity type is already registered`,
-              );
-            }
-            t.getEntityConfiguredBehavior = spec.getEntityConfiguredBehavior;
-          }
-          if (spec.defaultBehavior) {
-            if (t.defaultBehavior === "") {
-              t.defaultBehavior = spec.defaultBehavior;
-            } else {
-              t.defaultBehavior += " " + spec.defaultBehavior;
-            }
-          }
-          if (spec.getEntityDefaultBehavior) {
-            t.getEntityDefaultBehaviorCallbacks.push(
-              spec.getEntityDefaultBehavior,
-            );
-          }
-        }
-      }
-    }
-    applyHooks(plugins, getSchemaHooks, (hookName, hookFn, plugin) => {
-      builder._setPluginName(plugin.name);
-      builder.hook(hookName, hookFn);
-      builder._setPluginName(null);
-    });
-  }
+  const builder = new SchemaBuilder(resolvedPreset, inflection);
   return builder;
 };
 

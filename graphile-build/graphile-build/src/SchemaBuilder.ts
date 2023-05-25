@@ -10,7 +10,8 @@ import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { makeNewWithHooks } from "./newWithHooks/index.js";
 import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
 import { bindAll } from "./utils.js";
-import { Behavior, joinBehaviors } from "./behavior.js";
+import { Behavior } from "./behavior.js";
+import { applyHooks } from "graphile-config";
 
 const debug = debugFactory("graphile-build:SchemaBuilder");
 
@@ -19,6 +20,8 @@ const INIT_OBJECT: GraphileBuild.InitObject = Object.freeze(
 );
 
 const INDENT = "  ";
+
+const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
 
 /**
  * The class responsible for building a GraphQL schema from graphile-build
@@ -54,15 +57,12 @@ class SchemaBuilder<
   } = Object.create(null);
 
   constructor(
-    options: GraphileBuild.SchemaOptions,
+    private resolvedPreset: GraphileConfig.ResolvedPreset,
     private inflection: GraphileBuild.Inflection,
   ) {
     super();
 
-    if (!options) {
-      throw new Error("Please pass options to SchemaBuilder");
-    }
-    this.options = options;
+    this.options = resolvedPreset.schema ?? {};
 
     // Because hooks can nest, this keeps track of how deep we are.
     this.depth = -1;
@@ -70,6 +70,16 @@ class SchemaBuilder<
     this.hooks = makeSchemaBuilderHooks();
 
     this.newWithHooks = makeNewWithHooks({ builder: this }).newWithHooks;
+
+    applyHooks(
+      resolvedPreset.plugins,
+      getSchemaHooks,
+      (hookName, hookFn, plugin) => {
+        this._setPluginName(plugin.name);
+        this.hook(hookName, hookFn);
+        this._setPluginName(null);
+      },
+    );
   }
 
   /**
@@ -205,29 +215,7 @@ class SchemaBuilder<
    * Create the 'Build' object.
    */
   createBuild(input: GraphileBuild.BuildInput): TBuild {
-    const globalDefaultBehavior = joinBehaviors([
-      ...this.globalBehaviors,
-      this.options.defaultBehavior,
-    ]);
-    const behavior = new Behavior(globalDefaultBehavior);
-    for (const entry of Object.entries(this.behaviorEntities)) {
-      const entityType = entry[0] as keyof GraphileBuild.BehaviorEntities;
-      const spec = entry[1];
-      if (!spec.getEntityConfiguredBehavior) {
-        throw new Error(
-          `Behavior entity type '${entityType}' was registered without a 'getEntityConfiguredBehavior' callback.`,
-        );
-      }
-      behavior.registerEntity(
-        entityType,
-        spec.getEntityConfiguredBehavior,
-        spec.defaultBehavior,
-      );
-      for (const getEntityDefaultBehavior of spec.getEntityDefaultBehaviorCallbacks) {
-        behavior.addEntityDefaultBehavior(entityType, getEntityDefaultBehavior);
-      }
-    }
-    behavior.freeze();
+    const behavior = new Behavior(this.resolvedPreset);
     const initialBuild = makeNewBuild(
       this,
       input,

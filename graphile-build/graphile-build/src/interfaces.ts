@@ -218,7 +218,12 @@ declare global {
         globalBehavior?: (preset: GraphileConfig.ResolvedPreset) => string;
 
         entityBehavior?: {
-          [entityType in keyof GraphileBuild.BehaviorEntities]?: GraphileBuild.PluginBehaviorEntitySpec<entityType>;
+          [entityType in keyof GraphileBuild.BehaviorEntities]?: PluginHook<
+            (
+              entity: GraphileBuild.BehaviorEntities[entityType],
+              resolvedPreset: GraphileConfig.ResolvedPreset,
+            ) => string
+          >;
         };
 
         hooks?: {

@@ -1,25 +1,56 @@
+import { applyHooks, sortedPlugins } from "graphile-config";
+
 type BehaviorScope = string[];
 interface BehaviorSpec {
   positive: boolean;
   scope: BehaviorScope;
 }
 
+const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) =>
+  plugin.schema?.entityBehavior;
+
 export class Behavior {
   private behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
       defaultBehavior: string;
-      getEntityDefaultBehaviorCallbacks: Array<
-        (entity: GraphileBuild.BehaviorEntities[entityType]) => string
+      behaviorCallbacks: Array<
+        (
+          entity: GraphileBuild.BehaviorEntities[entityType],
+          resolvedPreset: GraphileConfig.ResolvedPreset,
+        ) => string
       >;
-      getEntityConfiguredBehavior: (
-        entity: GraphileBuild.BehaviorEntities[entityType],
-      ) => string;
       cache: Map<GraphileBuild.BehaviorEntities[entityType], string>;
     };
   };
 
-  constructor(private globalBehaviorDefaults = "") {
+  private globalDefaultBehavior: string;
+  constructor(private resolvedPreset: GraphileConfig.ResolvedPreset) {
     this.behaviorEntities = Object.create(null);
+    const globalBehaviors: string[] = [];
+
+    for (const plugin of sortedPlugins(resolvedPreset.plugins)) {
+      if (plugin.schema?.globalBehavior) {
+        globalBehaviors.push(plugin.schema.globalBehavior(resolvedPreset));
+      }
+    }
+
+    applyHooks(
+      resolvedPreset.plugins,
+      getEntityBehaviorHooks,
+      (hookName, hookFn, _plugin) => {
+        const entityType = hookName as keyof GraphileBuild.BehaviorEntities;
+        if (!this.behaviorEntities[entityType]) {
+          this.registerEntity(entityType);
+        }
+        const t = this.behaviorEntities[entityType];
+        t.behaviorCallbacks.push(hookFn);
+      },
+    );
+    this.globalDefaultBehavior = joinBehaviors([
+      ...globalBehaviors,
+      this.resolvedPreset.schema?.defaultBehavior,
+    ]);
+    this.freeze();
   }
 
   /**
@@ -35,19 +66,12 @@ export class Behavior {
     }
   }
 
-  public registerEntity<
+  private registerEntity<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
-  >(
-    entityType: TEntityType,
-    getEntityConfiguredBehavior: (
-      entity: GraphileBuild.BehaviorEntities[TEntityType],
-    ) => string,
-    defaultBehavior?: string,
-  ) {
+  >(entityType: TEntityType) {
     this.behaviorEntities[entityType] = {
-      defaultBehavior: defaultBehavior ?? "",
-      getEntityDefaultBehaviorCallbacks: [],
-      getEntityConfiguredBehavior,
+      defaultBehavior: "",
+      behaviorCallbacks: [],
       cache: new Map(),
     };
   }
@@ -64,7 +88,8 @@ export class Behavior {
     }
   }
 
-  public addEntityTypeDefaultBehavior<
+  /*
+  private addEntityTypeDefaultBehavior<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(entityType: TEntityType, behavior: string) {
     this.assertEntity(entityType);
@@ -76,19 +101,19 @@ export class Behavior {
     }
   }
 
-  public addEntityDefaultBehavior<
+  private addEntityBehavior<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(
     entityType: TEntityType,
-    getEntityDefaultBehavior: (
+    getBehavior: (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
+      resolvedPreset: GraphileConfig.ResolvedPreset,
     ) => string,
   ) {
     this.assertEntity(entityType);
-    this.behaviorEntities[entityType].getEntityDefaultBehaviorCallbacks.push(
-      getEntityDefaultBehavior,
-    );
+    this.behaviorEntities[entityType].behaviorCallbacks.push(getBehavior);
   }
+  */
 
   // TODO: would be great if this could return `{deprecationReason: string}` too...
   /**
@@ -121,12 +146,11 @@ export class Behavior {
     }
     const behaviorEntity = this.behaviorEntities[entityType];
     const finalString = joinBehaviors([
-      this.globalBehaviorDefaults,
+      this.globalDefaultBehavior,
       behaviorEntity.defaultBehavior,
-      ...behaviorEntity.getEntityDefaultBehaviorCallbacks.map((cb) =>
-        cb(entity),
+      ...behaviorEntity.behaviorCallbacks.map((cb) =>
+        cb(entity, this.resolvedPreset),
       ),
-      behaviorEntity.getEntityConfiguredBehavior(entity),
     ]);
     cache.set(entity, finalString);
     return finalString;
@@ -163,7 +187,7 @@ export class Behavior {
       ? localBehaviorSpecsString.join(" ")
       : localBehaviorSpecsString;
     const finalBehaviorSpecsString = `${defaultBehavior} ${
-      this.globalBehaviorDefaults
+      this.globalDefaultBehavior
     } ${specString ?? ""}`;
     return this.stringMatches(finalBehaviorSpecsString, filter);
   }
