@@ -88,6 +88,22 @@ function isNotNullish<T>(arg: T | undefined | null): arg is T {
 
 const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
   const { classicIds = false } = options;
+  const simpleCollectionsBehavior = (() => {
+    switch (options.simpleCollections) {
+      case "both": {
+        return "+connection +list";
+      }
+      case "only": {
+        return "-connection +list";
+      }
+      case "omit": {
+        return "+connection -list";
+      }
+      default: {
+        return "";
+      }
+    }
+  })();
   return {
     name: "PostGraphileV4CompatibilityPlugin",
     version: "0.0.0",
@@ -118,32 +134,8 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
       },
     },
     schema: {
-      globalBehavior() {
-        let str: string;
-        switch (options.simpleCollections) {
-          case "both": {
-            str = "+connection +list";
-            break;
-          }
-          case "only": {
-            str = "-connection +list";
-            break;
-          }
-          case "omit": {
-            str = "+connection -list";
-            break;
-          }
-          default: {
-            str = "";
-          }
-        }
-
-        // We could base this on the legacy relations setting; but how to set deprecated?
-        str =
-          str +
-          " -singularRelation:resource:connection -singularRelation:resource:list";
-        return str;
-      },
+      // We could base this on the legacy relations setting; but how to set deprecated?
+      globalBehavior: `${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list`,
     },
   };
 };

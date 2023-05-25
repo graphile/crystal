@@ -42,20 +42,6 @@ class SchemaBuilder<
    */
   newWithHooks: NewWithHooksFunction;
 
-  globalBehaviors: string[] = [];
-  behaviorEntities: {
-    [entityType in keyof GraphileBuild.BehaviorEntities]?: Partial<
-      Omit<
-        GraphileBuild.PluginBehaviorEntitySpec<entityType>,
-        "getEntityDefaultBehavior"
-      >
-    > & {
-      getEntityDefaultBehaviorCallbacks: Array<
-        (entity: GraphileBuild.BehaviorEntities[entityType]) => string
-      >;
-    };
-  } = Object.create(null);
-
   constructor(
     private resolvedPreset: GraphileConfig.ResolvedPreset,
     private inflection: GraphileBuild.Inflection,

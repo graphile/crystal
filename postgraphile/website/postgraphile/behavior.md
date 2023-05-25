@@ -79,16 +79,33 @@ yourself in too hard.
 If you're authoring a preset that is not the final configuration for a schema
 then this kind of default behavior is likely to be overridden by the user's
 configuration. Instead, preset authors should add a plugin that registers a
-`schema.globalBehavior` callback. All these callbacks will be called and
-merged. A similar "lists by default" plugin might look like this:
+`schema.globalBehavior`. If this is a string, the behavior will be prepended.
+If it's a callback, then it should return an array of behavior strings to be
+joined, one of which should be the current (passed in) behavior. Typically you
+want a tuple where the first entry is your new behaviors and the second entry
+is the current behavior.
+
+A similar "lists by default" plugin might look like this:
 
 ```js
 const FavourListsPlugin = {
   name: "FavourListsPlugin",
   version: "0.0.0",
   schema: {
-    globalBehavior(resolvedPreset) {
-      return "-connection +list";
+    globalBehavior: "-connection +list",
+  },
+};
+```
+
+or, equivalently, like this:
+
+```js
+const FavourListsPlugin = {
+  name: "FavourListsPlugin",
+  version: "0.0.0",
+  schema: {
+    globalBehavior(currentBehavior, resolvedPreset) {
+      return ["-connection +list", currentBehavior];
     },
   },
 };

@@ -215,7 +215,12 @@ declare global {
       gather?: PluginGatherConfig<keyof GatherHelpers, any, any>;
 
       schema?: {
-        globalBehavior?: (preset: GraphileConfig.ResolvedPreset) => string;
+        globalBehavior?:
+          | string
+          | ((
+              behavior: string,
+              resolvedPreset: GraphileConfig.ResolvedPreset,
+            ) => string | string[]);
 
         /**
          * You should use `before`, `after` and `provides` to ensure that the entity
@@ -230,9 +235,10 @@ declare global {
             | string
             | PluginHook<
                 (
+                  behavior: string,
                   entity: GraphileBuild.BehaviorEntities[entityType],
                   resolvedPreset: GraphileConfig.ResolvedPreset,
-                ) => string
+                ) => string | string[]
               >;
         };
 

@@ -8,44 +8,43 @@ interface BehaviorSpec {
 
 const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
   const val = plugin.schema?.entityBehavior;
-  if (val) {
-    const entries = Object.entries(val);
-    let changed = false;
-    for (const entry of entries) {
-      const rhs = entry[1];
-      if (typeof rhs === "string") {
-        const hook: Exclude<
-          NonNullable<
-            NonNullable<GraphileConfig.Plugin["schema"]>["entityBehavior"]
-          >[keyof GraphileBuild.BehaviorEntities],
-          string
-        > = {
-          provides: ["default"],
-          before: ["inferred"],
-          callback: () => rhs,
-        };
-        entry[1] = hook;
-        changed = true;
-      }
-    }
-    if (changed) {
-      return Object.fromEntries(entries) as any;
-    } else {
-      return val;
+  if (!val) return val;
+  // These might not all be hooks, some might be strings. We need to convert the strings into hooks.
+  const entries = Object.entries(val);
+  let changed = false;
+  for (const entry of entries) {
+    const rhs = entry[1];
+    if (typeof rhs === "string") {
+      const hook: Exclude<
+        NonNullable<
+          NonNullable<GraphileConfig.Plugin["schema"]>["entityBehavior"]
+        >[keyof GraphileBuild.BehaviorEntities],
+        string
+      > = {
+        provides: ["default"],
+        before: ["inferred"],
+        callback: (behavior) => [behavior, rhs],
+      };
+      entry[1] = hook;
+      changed = true;
     }
   }
-  return val;
+  if (changed) {
+    return Object.fromEntries(entries) as any;
+  } else {
+    return val;
+  }
 };
 
 export class Behavior {
   private behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
-      defaultBehavior: string;
       behaviorCallbacks: Array<
         (
+          behavior: string,
           entity: GraphileBuild.BehaviorEntities[entityType],
           resolvedPreset: GraphileConfig.ResolvedPreset,
-        ) => string
+        ) => string | string[]
       >;
       cache: Map<GraphileBuild.BehaviorEntities[entityType], string>;
     };
@@ -54,13 +53,14 @@ export class Behavior {
   private globalDefaultBehavior: string;
   constructor(private resolvedPreset: GraphileConfig.ResolvedPreset) {
     this.behaviorEntities = Object.create(null);
-    const globalBehaviors: string[] = [];
 
-    for (const plugin of sortedPlugins(resolvedPreset.plugins)) {
-      if (plugin.schema?.globalBehavior) {
-        globalBehaviors.push(plugin.schema.globalBehavior(resolvedPreset));
-      }
-    }
+    this.globalDefaultBehavior = resolveBehavior(
+      resolvedPreset.schema?.defaultBehavior ?? "",
+      sortedPlugins(resolvedPreset.plugins).map(
+        (p) => p.schema?.globalBehavior,
+      ),
+      resolvedPreset,
+    );
 
     applyHooks(
       resolvedPreset.plugins,
@@ -74,10 +74,7 @@ export class Behavior {
         t.behaviorCallbacks.push(hookFn);
       },
     );
-    this.globalDefaultBehavior = joinBehaviors([
-      ...globalBehaviors,
-      this.resolvedPreset.schema?.defaultBehavior,
-    ]);
+
     this.freeze();
   }
 
@@ -98,7 +95,6 @@ export class Behavior {
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(entityType: TEntityType) {
     this.behaviorEntities[entityType] = {
-      defaultBehavior: "",
       behaviorCallbacks: [],
       cache: new Map(),
     };
@@ -173,15 +169,14 @@ export class Behavior {
       return existing;
     }
     const behaviorEntity = this.behaviorEntities[entityType];
-    const finalString = joinBehaviors([
+    const behaviorString = resolveBehavior(
       this.globalDefaultBehavior,
-      behaviorEntity.defaultBehavior,
-      ...behaviorEntity.behaviorCallbacks.map((cb) =>
-        cb(entity, this.resolvedPreset),
-      ),
-    ]);
-    cache.set(entity, finalString);
-    return finalString;
+      behaviorEntity.behaviorCallbacks,
+      entity,
+      this.resolvedPreset,
+    );
+    cache.set(entity, behaviorString);
+    return behaviorString;
   }
 
   private stringMatches(
@@ -313,4 +308,43 @@ export function joinBehaviors(
     }
   }
   return str;
+}
+
+function resolveBehavior<TArgs extends [...any[]]>(
+  initialBehavior: string,
+  // Misnomer; also allows strings or nothings
+  callbacks: ReadonlyArray<
+    | string
+    | null
+    | undefined
+    | ((behavior: string, ...args: TArgs) => string | string[])
+  >,
+  ...args: TArgs
+): string {
+  let behaviorString = initialBehavior;
+
+  for (const g of callbacks) {
+    if (typeof g === "string") {
+      if (g === "") {
+        continue;
+      } else if (behaviorString === "") {
+        behaviorString = g;
+      } else {
+        behaviorString = g + " " + behaviorString;
+      }
+    } else if (typeof g === "function") {
+      const newBehavior = g(behaviorString, ...args);
+      if (!newBehavior.includes(behaviorString)) {
+        throw new Error(
+          `callback must either append to or prepend to the existing behavior`,
+        );
+      }
+      if (Array.isArray(newBehavior)) {
+        behaviorString = joinBehaviors(newBehavior);
+      } else {
+        behaviorString = newBehavior;
+      }
+    }
+  }
+  return behaviorString;
 }
