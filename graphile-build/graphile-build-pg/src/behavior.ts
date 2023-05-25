@@ -16,8 +16,7 @@ type ArrayOrDirect<T> = Array<T> | T;
 
 /**
  * Takes a smart tags object and extracts the 'behavior' (or 'behaviour')
- * property and coerces it to be a string. Returns null if no behavior was
- * specified (in which case the default behavior should be used).
+ * property and coerces it to be a string.
  */
 export function getBehavior(
   extensions: ArrayOrDirect<
@@ -29,7 +28,7 @@ export function getBehavior(
       >
     | undefined
   >,
-): string | null {
+): string {
   const allExtensions = Array.isArray(extensions) ? extensions : [extensions];
   const behaviors: string[] = [];
   for (const extensions of allExtensions) {

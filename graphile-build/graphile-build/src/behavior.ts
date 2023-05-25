@@ -105,13 +105,13 @@ export class Behavior {
       ),
       behaviorEntity.getEntityConfiguredBehavior(entity),
     ]);
-    return this.matches(finalString, filter);
+    return this.stringMatches(finalString, filter);
   }
 
-  public join(strings: string[]) {
+  public join(strings: ReadonlyArray<string | null | undefined>): string {
     let str = "";
     for (const string of strings) {
-      if (string !== "") {
+      if (string != null && string !== "") {
         if (str === "") {
           str = string;
         } else {
@@ -122,19 +122,11 @@ export class Behavior {
     return str;
   }
 
-  /** @deprecated Please use entityMatches instead */
-  public matches(
-    localBehaviorSpecsString: string | string[] | null | undefined,
+  private stringMatches(
+    behaviorString: string,
     filter: string,
-    defaultBehavior = "",
   ): boolean | undefined {
-    const specString = Array.isArray(localBehaviorSpecsString)
-      ? localBehaviorSpecsString.join(" ")
-      : localBehaviorSpecsString;
-    const finalBehaviorSpecsString = `${defaultBehavior} ${
-      this.globalBehaviorDefaults
-    } ${specString ?? ""}`;
-    const specs = parseSpecs(finalBehaviorSpecsString);
+    const specs = parseSpecs(behaviorString);
     const filterScope = parseScope(filter);
     if (filterScope[filterScope.length - 1] === "create") {
       throw new Error(
@@ -149,6 +141,21 @@ export class Behavior {
       }
     }
     return undefined;
+  }
+
+  /** @deprecated Please use entityMatches instead */
+  public matches(
+    localBehaviorSpecsString: string | string[] | null | undefined,
+    filter: string,
+    defaultBehavior = "",
+  ): boolean | undefined {
+    const specString = Array.isArray(localBehaviorSpecsString)
+      ? localBehaviorSpecsString.join(" ")
+      : localBehaviorSpecsString;
+    const finalBehaviorSpecsString = `${defaultBehavior} ${
+      this.globalBehaviorDefaults
+    } ${specString ?? ""}`;
+    return this.stringMatches(finalBehaviorSpecsString, filter);
   }
 }
 
