@@ -74,7 +74,10 @@ declare global {
       TEntityType extends keyof GraphileBuild.BehaviorEntities,
     > {
       defaultBehavior?: string;
-      getBehavior: (
+      getEntityDefaultBehavior?: (
+        entity: GraphileBuild.BehaviorEntities[TEntityType],
+      ) => string;
+      getEntityConfiguredBehavior?: (
         entity: GraphileBuild.BehaviorEntities[TEntityType],
       ) => string;
     }

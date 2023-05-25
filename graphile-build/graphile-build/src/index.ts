@@ -403,12 +403,34 @@ export const getBuilder = (
       if (plugin.schema?.behavior) {
         for (const [name, spec] of Object.entries(plugin.schema.behavior)) {
           const entityType = name as keyof GraphileBuild.BehaviorEntities;
-          if (builder.behaviorEntities[entityType]) {
-            throw new Error(
-              `Plugin '${plugin.name}' attempted to register entity type '${entityType}', but that entity type is already registered`,
+          if (!builder.behaviorEntities[entityType]) {
+            builder.behaviorEntities[entityType] = {
+              defaultBehavior: "",
+              getEntityDefaultBehaviorCallbacks: [],
+              getEntityConfiguredBehavior: undefined,
+            };
+          }
+          const t = builder.behaviorEntities[entityType];
+          if (spec.getEntityConfiguredBehavior) {
+            if (t.getEntityConfiguredBehavior) {
+              throw new Error(
+                `Plugin '${plugin.name}' attempted to register entity type '${entityType}', but that entity type is already registered`,
+              );
+            }
+            t.getEntityConfiguredBehavior = spec.getEntityConfiguredBehavior;
+          }
+          if (spec.defaultBehavior) {
+            if (t.defaultBehavior === "") {
+              t.defaultBehavior = spec.defaultBehavior;
+            } else {
+              t.defaultBehavior += " " + spec.defaultBehavior;
+            }
+          }
+          if (spec.getEntityDefaultBehavior) {
+            t.getEntityDefaultBehaviorCallbacks.push(
+              spec.getEntityDefaultBehavior,
             );
           }
-          builder.behaviorEntities[entityType] = spec;
         }
       }
     }

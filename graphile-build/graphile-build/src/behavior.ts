@@ -5,19 +5,19 @@ interface BehaviorSpec {
 }
 
 export class Behavior {
-  scopes: {
+  behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
       defaultBehavior: string;
-      getBehavior: (
-        entity: GraphileBuild.BehaviorEntities[entityType],
-      ) => string;
-      entityBehaviorCallbacks: Array<
+      getEntityDefaultBehaviorCallbacks: Array<
         (entity: GraphileBuild.BehaviorEntities[entityType]) => string
       >;
+      getEntityConfiguredBehavior: (
+        entity: GraphileBuild.BehaviorEntities[entityType],
+      ) => string;
     };
   };
   constructor(private globalBehaviorDefaults = "") {
-    this.scopes = Object.create(null);
+    this.behaviorEntities = Object.create(null);
   }
 
   // Should only be called during 'build' phase.
@@ -33,25 +33,25 @@ export class Behavior {
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(
     entityType: TEntityType,
-    getBehavior: (
+    getEntityConfiguredBehavior: (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
     ) => string,
     defaultBehavior?: string,
   ) {
-    this.scopes[entityType] = {
+    this.behaviorEntities[entityType] = {
       defaultBehavior: defaultBehavior ?? "",
-      getBehavior,
-      entityBehaviorCallbacks: [],
+      getEntityDefaultBehaviorCallbacks: [],
+      getEntityConfiguredBehavior,
     };
   }
 
   private assertEntity<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(entityType: TEntityType) {
-    if (!this.scopes[entityType]) {
+    if (!this.behaviorEntities[entityType]) {
       throw new Error(
-        `Behavior scope '${entityType}' is not registered; known scopes: ${Object.keys(
-          this.scopes,
+        `Behavior entity type '${entityType}' is not registered; known entity types: ${Object.keys(
+          this.behaviorEntities,
         ).join(", ")}`,
       );
     }
@@ -61,7 +61,7 @@ export class Behavior {
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(entityType: TEntityType, behavior: string) {
     this.assertEntity(entityType);
-    const scope = this.scopes[entityType];
+    const scope = this.behaviorEntities[entityType];
     if (scope.defaultBehavior) {
       scope.defaultBehavior += " " + behavior;
     } else {
@@ -69,17 +69,17 @@ export class Behavior {
     }
   }
 
-  public addEntityBehavior<
+  public addEntityDefaultBehavior<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(
     entityType: TEntityType,
-    defaultBehaviorExtractor: (
+    getEntityDefaultBehavior: (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
     ) => string,
   ) {
     this.assertEntity(entityType);
-    this.scopes[entityType].entityBehaviorCallbacks.push(
-      defaultBehaviorExtractor,
+    this.behaviorEntities[entityType].getEntityDefaultBehaviorCallbacks.push(
+      getEntityDefaultBehavior,
     );
   }
 
@@ -87,8 +87,42 @@ export class Behavior {
   /**
    * @param localBehaviorSpecsString - the behavior of the entity as determined by details on the entity itself and any applicable ancestors
    * @param filter - the behavior the plugin specifies
-   * @param defaultBehavior - allows the plugin to specify a default behavior for this in the event that it's not defined elsewhere (lowest priority)
    */
+  public entityMatches<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(
+    entityType: TEntityType,
+    entity: GraphileBuild.BehaviorEntities[TEntityType],
+    filter: string,
+  ): boolean | undefined {
+    this.assertEntity(entityType);
+    const behaviorEntity = this.behaviorEntities[entityType];
+    const finalString = this.join([
+      this.globalBehaviorDefaults,
+      behaviorEntity.defaultBehavior,
+      ...behaviorEntity.getEntityDefaultBehaviorCallbacks.map((cb) =>
+        cb(entity),
+      ),
+      behaviorEntity.getEntityConfiguredBehavior(entity),
+    ]);
+    return this.matches(finalString, filter);
+  }
+
+  public join(strings: string[]) {
+    let str = "";
+    for (const string of strings) {
+      if (string !== "") {
+        if (str === "") {
+          str = string;
+        } else {
+          str += " " + string;
+        }
+      }
+    }
+    return str;
+  }
+
+  /** @deprecated Please use entityMatches instead */
   public matches(
     localBehaviorSpecsString: string | string[] | null | undefined,
     filter: string,

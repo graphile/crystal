@@ -40,7 +40,16 @@ class SchemaBuilder<
   newWithHooks: NewWithHooksFunction;
 
   behaviorEntities: {
-    [entityType in keyof GraphileBuild.BehaviorEntities]: GraphileBuild.PluginBehaviorEntitySpec<entityType>;
+    [entityType in keyof GraphileBuild.BehaviorEntities]?: Partial<
+      Omit<
+        GraphileBuild.PluginBehaviorEntitySpec<entityType>,
+        "getEntityDefaultBehavior"
+      >
+    > & {
+      getEntityDefaultBehaviorCallbacks: Array<
+        (entity: GraphileBuild.BehaviorEntities[entityType]) => string
+      >;
+    };
   } = Object.create(null);
 
   constructor(
@@ -199,11 +208,19 @@ class SchemaBuilder<
     for (const entry of Object.entries(this.behaviorEntities)) {
       const entityType = entry[0] as keyof GraphileBuild.BehaviorEntities;
       const spec = entry[1];
+      if (!spec.getEntityConfiguredBehavior) {
+        throw new Error(
+          `Behavior entity type '${entityType}' was registered without a 'getEntityConfiguredBehavior' callback.`,
+        );
+      }
       behavior.registerEntity(
         entityType,
-        spec.getBehavior,
+        spec.getEntityConfiguredBehavior,
         spec.defaultBehavior,
       );
+      for (const getEntityDefaultBehavior of spec.getEntityDefaultBehaviorCallbacks) {
+        behavior.addEntityDefaultBehavior(entityType, getEntityDefaultBehavior);
+      }
     }
     const initialBuild = makeNewBuild(
       this,
