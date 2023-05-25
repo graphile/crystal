@@ -18,7 +18,6 @@ import { getGrafservHooks } from "../hooks.js";
 import type {
   GrafservBody,
   HandlerResult,
-  JSONValue,
   NormalizedRequestDigest,
   ParsedGraphQLBody,
   RequestContentType,
