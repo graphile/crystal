@@ -14,8 +14,8 @@ const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
   const entries = Object.entries(val);
   let changed = false;
   for (const entry of entries) {
-    const rhs = entry[1];
-    if (typeof rhs === "string") {
+    const lhs = entry[1];
+    if (typeof lhs === "string") {
       const hook: Exclude<
         NonNullable<
           NonNullable<GraphileConfig.Plugin["schema"]>["entityBehavior"]
@@ -24,7 +24,7 @@ const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
       > = {
         provides: ["default"],
         before: ["inferred"],
-        callback: (behavior) => [behavior, rhs],
+        callback: (behavior) => [lhs, behavior],
       };
       entry[1] = hook;
       changed = true;
