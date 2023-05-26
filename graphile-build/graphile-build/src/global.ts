@@ -125,6 +125,7 @@ declare global {
        */
       dontSwallowErrors?: boolean;
 
+      // TODO: replace this with default behavior, and remove it?
       /**
        * - 'only': connections will be avoided, preferring lists
        * - 'omit': lists will be avoided, preferring connections
