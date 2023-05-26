@@ -1,3 +1,4 @@
+import { arraysMatch } from "grafast";
 import { applyHooks, sortedPlugins } from "graphile-config";
 
 type BehaviorScope = string[];
@@ -40,12 +41,16 @@ export class Behavior {
   private behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
       behaviorCallbacks: Array<
-        (
-          behavior: string,
-          entity: GraphileBuild.BehaviorEntities[entityType],
-          resolvedPreset: GraphileConfig.ResolvedPreset,
-        ) => string | string[]
+        [
+          description: string,
+          callback: (
+            behavior: string,
+            entity: GraphileBuild.BehaviorEntities[entityType],
+            resolvedPreset: GraphileConfig.ResolvedPreset,
+          ) => string | string[],
+        ]
       >;
+      listCache: Map<number, any[][]>;
       cache: Map<GraphileBuild.BehaviorEntities[entityType], string>;
     };
   };
@@ -54,24 +59,30 @@ export class Behavior {
   constructor(private resolvedPreset: GraphileConfig.ResolvedPreset) {
     this.behaviorEntities = Object.create(null);
 
+    const plugins = sortedPlugins(resolvedPreset.plugins);
+
     this.globalDefaultBehavior = resolveBehavior(
       resolvedPreset.schema?.defaultBehavior ?? "",
-      sortedPlugins(resolvedPreset.plugins).map(
-        (p) => p.schema?.globalBehavior,
-      ),
+      plugins.map((p) => [
+        `${p.name}.schema.globalBehavior`,
+        p.schema?.globalBehavior,
+      ]),
       resolvedPreset,
     );
 
     applyHooks(
       resolvedPreset.plugins,
       getEntityBehaviorHooks,
-      (hookName, hookFn, _plugin) => {
+      (hookName, hookFn, plugin) => {
         const entityType = hookName as keyof GraphileBuild.BehaviorEntities;
         if (!this.behaviorEntities[entityType]) {
           this.registerEntity(entityType);
         }
         const t = this.behaviorEntities[entityType];
-        t.behaviorCallbacks.push(hookFn);
+        t.behaviorCallbacks.push([
+          `${plugin.name}.schema.entityBehavior.${entityType}`,
+          hookFn,
+        ]);
       },
     );
 
@@ -96,6 +107,7 @@ export class Behavior {
   >(entityType: TEntityType) {
     this.behaviorEntities[entityType] = {
       behaviorCallbacks: [],
+      listCache: new Map(),
       cache: new Map(),
     };
   }
@@ -155,15 +167,29 @@ export class Behavior {
     return this.stringMatches(finalString, filter);
   }
 
-  // This is expensive to compute, so we cache it
+  /**
+   * Given the entity `rawEntity` of type `entityType`, this function will
+   * return the final behavior string for this entity, respecting all the
+   * global and entity-specific behaviors.
+   *
+   * This is expensive to compute, so we cache it.
+   *
+   * **IMPORTANT**: `rawEntity` should be a fixed value so that the cache can be
+   * reused. If it is a dynamic value (e.g. it's a combination of multiple
+   * entities) then you should represent it as a tuple and we'll automatically
+   * cache that.
+   */
   public getBehaviorForEntity<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(
     entityType: TEntityType,
-    entity: GraphileBuild.BehaviorEntities[TEntityType],
+    rawEntity: GraphileBuild.BehaviorEntities[TEntityType],
   ) {
     this.assertEntity(entityType);
-    const cache = this.behaviorEntities[entityType].cache;
+    const { cache, listCache } = this.behaviorEntities[entityType];
+    const entity = Array.isArray(rawEntity)
+      ? getCachedEntity(listCache, rawEntity)
+      : rawEntity;
     const existing = cache.get(entity);
     if (existing !== undefined) {
       return existing;
@@ -314,16 +340,20 @@ function resolveBehavior<TArgs extends [...any[]]>(
   initialBehavior: string,
   // Misnomer; also allows strings or nothings
   callbacks: ReadonlyArray<
-    | string
-    | null
-    | undefined
-    | ((behavior: string, ...args: TArgs) => string | string[])
+    [
+      description: string,
+      callback:
+        | string
+        | null
+        | undefined
+        | ((behavior: string, ...args: TArgs) => string | string[]),
+    ]
   >,
   ...args: TArgs
 ): string {
   let behaviorString = initialBehavior;
 
-  for (const g of callbacks) {
+  for (const [description, g] of callbacks) {
     if (typeof g === "string") {
       if (g === "") {
         continue;
@@ -336,7 +366,7 @@ function resolveBehavior<TArgs extends [...any[]]>(
       const newBehavior = g(behaviorString, ...args);
       if (!newBehavior.includes(behaviorString)) {
         throw new Error(
-          `callback must either append to or prepend to the existing behavior`,
+          `${description} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
         );
       }
       if (Array.isArray(newBehavior)) {
@@ -347,4 +377,23 @@ function resolveBehavior<TArgs extends [...any[]]>(
     }
   }
   return behaviorString;
+}
+
+function getCachedEntity<T extends any[]>(
+  listCache: Map<number, any[][]>,
+  entity: T,
+): T {
+  const nList = listCache.get(entity.length);
+  if (!nList) {
+    const list = [entity];
+    listCache.set(entity.length, list);
+    return entity;
+  }
+  for (const entry of nList) {
+    if (arraysMatch(entry, entity)) {
+      return entry as T;
+    }
+  }
+  nList.push(entity);
+  return entity;
 }
