@@ -12,7 +12,6 @@ import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
 
 declare global {
@@ -43,6 +42,13 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgCodec: "select filter",
+      pgAttribute: "filterBy",
+      pgResource(behavior, resource) {
+        return [resource.parameters ? "" : "filter", behavior];
+      },
+    },
     hooks: {
       init(_, build) {
         const { inflection, sql } = build;
@@ -54,9 +60,10 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
             }
             const codec = rawCodec as PgCodecWithAttributes;
 
-            const behavior = getBehavior(codec.extensions);
-            // TODO: do we want this filter here? E.g. we might want to enable a bulk delete mutation without allowing any selects?
-            if (!build.behavior.matches(behavior, "select", "select")) {
+            // TODO: do we want this filter here? E.g. we might want to enable
+            // a bulk delete mutation without allowing any selects? Maybe this
+            // is actually a 'filter' behavior instead?
+            if (!build.behavior.entityMatches("pgCodec", codec, "select")) {
               return;
             }
 
@@ -107,15 +114,11 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                   // TODO: move this to a separate plugin
                   return Object.entries(attributes).reduce(
                     (memo, [attributeName, attribute]) => {
-                      const behavior = getBehavior([
-                        codec.extensions,
-                        attribute.extensions,
-                      ]);
                       if (
-                        !build.behavior.matches(
-                          behavior,
+                        !build.behavior.entityMatches(
+                          "pgAttribute",
+                          [codec, attribute],
                           "attribute:filterBy",
-                          "filterBy",
                         )
                       ) {
                         return memo;
@@ -231,17 +234,20 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
           return args;
         }
 
-        const behavior = getBehavior([
-          scope,
-          codec?.extensions,
-          pgResource?.extensions,
-        ]);
         if (
-          !build.behavior.matches(
-            behavior,
-            fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
-            pgResource?.parameters ? "" : "filter",
-          )
+          pgResource
+            ? !build.behavior.entityMatches(
+                "pgResource",
+                pgResource,
+                fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
+              )
+            : codec
+            ? !build.behavior.entityMatches(
+                "pgCodec",
+                codec,
+                fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
+              )
+            : true
         ) {
           return args;
         }

@@ -22,7 +22,7 @@ import * as graphql from "graphql";
 import * as semver from "semver";
 import { inspect } from "util";
 
-import { Behavior } from "./behavior.js";
+import type { Behavior } from "./behavior.js";
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import { stringTypeSpec, wrapDescription } from "./utils.js";

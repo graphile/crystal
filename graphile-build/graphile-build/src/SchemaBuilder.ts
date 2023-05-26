@@ -2,16 +2,16 @@ import "./global.js";
 
 import debugFactory from "debug";
 import { EventEmitter } from "events";
+import { applyHooks } from "graphile-config";
 import type { GraphQLSchemaConfig } from "graphql";
 import { GraphQLSchema, validateSchema } from "graphql";
 
+import { Behavior } from "./behavior.js";
 import makeNewBuild from "./makeNewBuild.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { makeNewWithHooks } from "./newWithHooks/index.js";
 import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
 import { bindAll } from "./utils.js";
-import { Behavior } from "./behavior.js";
-import { applyHooks } from "graphile-config";
 
 const debug = debugFactory("graphile-build:SchemaBuilder");
 

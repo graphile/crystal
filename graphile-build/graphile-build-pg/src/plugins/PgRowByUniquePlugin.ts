@@ -10,7 +10,6 @@ import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
@@ -56,6 +55,9 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgUnique: "single",
+    },
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
@@ -168,17 +170,12 @@ return function (resource) {
                         [detailsByAttributeName, resource],
                       );
 
-                  const behavior = getBehavior([
-                    resource.codec.extensions,
-                    resource.extensions,
-                    unique.extensions,
-                  ]);
                   const fieldBehaviorScope = "query:resource:single";
                   if (
-                    !build.behavior.matches(
-                      behavior,
+                    !build.behavior.entityMatches(
+                      "pgUnique",
+                      [resource, unique],
                       fieldBehaviorScope,
-                      "single",
                     )
                   ) {
                     return memo;

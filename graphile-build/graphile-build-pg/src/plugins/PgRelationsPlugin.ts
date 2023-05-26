@@ -647,7 +647,6 @@ function addRelations(
       GraphQLUnionType,
       GraphQLInterfaceType,
     },
-    options: { simpleCollections },
   } = build;
   const { Self, scope, fieldWithHooks } = context;
 
@@ -799,7 +798,6 @@ function addRelations(
         localAttributes,
         remoteAttributes,
         remoteResource,
-        extensions,
         isReferencee,
       } = relation;
       if (isMutationPayload && isReferencee) {
@@ -828,13 +826,11 @@ function addRelations(
         }
       }
 
-      // The behavior is the relation behavior PLUS the remote table
-      // behavior. But the relation settings win.
       const behavior =
         getBehavior([
-          remoteResource.codec.extensions,
-          remoteResource.extensions,
-          extensions,
+          relation.remoteResource.codec.extensions,
+          relation.remoteResource.extensions,
+          relation.extensions,
         ]) ?? "";
       const otherCodec = remoteResource.codec;
       const typeName = build.inflection.tableType(otherCodec);
@@ -1319,9 +1315,9 @@ function addRelations(
     let fields = memo;
     const defaultBehavior = isUnique
       ? "single -singularRelation:resource:list -singularRelation:resource:connection"
-      : simpleCollections === "both"
+      : (build.options as any).simpleCollections === "both"
       ? "connection list"
-      : simpleCollections === "only"
+      : (build.options as any).simpleCollections === "only"
       ? "list"
       : "connection";
 

@@ -10,7 +10,6 @@ import { object } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
-import { getBehavior } from "../behavior.js";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
@@ -572,11 +571,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   } as GraphileConfig.PluginGatherConfig<"pgTables", State, Cache>,
 
   schema: {
+    entityBehavior: {
+      pgCodec(behavior, codec) {
+        return [
+          "resource:select",
+          "table",
+          ...(!codec.isAnonymous ? ["resource:insert", "resource:update"] : []),
+          behavior,
+        ];
+      },
+    },
     hooks: {
       init(_, build, _context) {
         const {
           inflection,
-          options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
+          options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
         } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
@@ -591,33 +600,20 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             const tableTypeName = inflection.tableType(codec);
-            const behavior = getBehavior(codec.extensions);
-            const defaultBehavior = [
-              "resource:select",
-              "table",
-              ...(!codec.isAnonymous
-                ? ["resource:insert", "resource:update"]
-                : []),
-              ...(simpleCollections === "both"
-                ? ["resource:connection", "resource:list"]
-                : simpleCollections === "only"
-                ? ["resource:list"]
-                : ["resource:connection"]),
-            ].join(" ");
 
-            const isTable = build.behavior.matches(
-              behavior,
+            const isTable = build.behavior.entityMatches(
+              "pgCodec",
+              codec,
               "table",
-              defaultBehavior,
             );
             if (!isTable) {
               return;
             }
 
-            const selectable = build.behavior.matches(
-              behavior,
+            const selectable = build.behavior.entityMatches(
+              "pgCodec",
+              codec,
               "resource:select",
-              defaultBehavior,
             );
 
             if (selectable) {

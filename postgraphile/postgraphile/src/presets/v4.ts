@@ -23,7 +23,12 @@ export interface V4Options<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse,
 > {
-  simpleCollections?: "both" | "only" | "omit";
+  /**
+   * - 'only': connections will be avoided, preferring lists
+   * - 'omit': lists will be avoided, preferring connections
+   * - 'both': both lists and connections will be generated
+   */
+  simpleCollections?: "only" | "both" | "omit";
   classicIds?: boolean;
   setofFunctionsContainNulls?: boolean;
   dynamicJson?: boolean;
@@ -91,13 +96,13 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
   const simpleCollectionsBehavior = (() => {
     switch (options.simpleCollections) {
       case "both": {
-        return "+connection +list";
+        return "+connection +resource:connection +list +resource:list";
       }
       case "only": {
-        return "-connection +list";
+        return "-connection -resource:connection +list +resource:list";
       }
       case "omit": {
-        return "+connection -list";
+        return "+connection +resource:connection -list -resource:list";
       }
       default: {
         return "";
@@ -135,7 +140,9 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     },
     schema: {
       // We could base this on the legacy relations setting; but how to set deprecated?
-      globalBehavior: `${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list`,
+      globalBehavior(behavior) {
+        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list`;
+      },
     },
   };
 };
@@ -195,6 +202,7 @@ export const makeV4Preset = (
     ],
     schema: {
       ...otherGraphileBuildOptions,
+      ...({ simpleCollections: options.simpleCollections } as any),
       pgUseCustomNetworkScalars: pgUseCustomNetworkScalars ?? false,
       pgOrderByNullsLast: orderByNullsLast,
       pgV4UseTableNameForNodeIdentifier: true,

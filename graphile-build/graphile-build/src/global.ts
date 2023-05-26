@@ -125,14 +125,6 @@ declare global {
        */
       dontSwallowErrors?: boolean;
 
-      // TODO: replace this with default behavior, and remove it?
-      /**
-       * - 'only': connections will be avoided, preferring lists
-       * - 'omit': lists will be avoided, preferring connections
-       * - 'both': both lists and connections will be generated
-       */
-      simpleCollections?: "only" | "both" | "omit";
-
       /**
        * When false (default), Grafserv will exit if it fails to build the
        * initial schema (for example if it cannot connect to the database, or if

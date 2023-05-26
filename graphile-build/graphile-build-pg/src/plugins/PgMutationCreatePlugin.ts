@@ -7,7 +7,6 @@ import { constant, ExecutableStep, object } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLOutputType } from "graphql";
 
-import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
@@ -42,11 +41,10 @@ const isInsertable = (
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
-  const behavior = getBehavior([
-    resource.codec.extensions,
-    resource.extensions,
-  ]);
-  return build.behavior.matches(behavior, "resource:insert", "insert") === true;
+  return (
+    build.behavior.entityMatches("pgResource", resource, "resource:insert") ===
+    true
+  );
 };
 
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
@@ -73,6 +71,21 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgResource(behavior, resource) {
+        const newBehavior = [behavior];
+        if (
+          !resource.parameters &&
+          !!resource.codec.attributes &&
+          !resource.codec.polymorphism &&
+          !resource.codec.isAnonymous
+        ) {
+          newBehavior.unshift("insert");
+          newBehavior.unshift("record");
+        }
+        return newBehavior;
+      },
+    },
     hooks: {
       init(_, build) {
         const {
@@ -146,10 +159,6 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             );
 
             const payloadTypeName = inflection.createPayloadType(resource);
-            const behavior = getBehavior([
-              resource.codec.extensions,
-              resource.extensions,
-            ]);
             build.registerObjectType(
               payloadTypeName,
               {
@@ -182,10 +191,10 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       ),
                     },
                     ...(TableType &&
-                    build.behavior.matches(
-                      behavior,
+                    build.behavior.entityMatches(
+                      "pgResource",
+                      resource,
                       "insert:payload:record",
-                      "record",
                     )
                       ? {
                           [tableFieldName]: fieldWithHooks(

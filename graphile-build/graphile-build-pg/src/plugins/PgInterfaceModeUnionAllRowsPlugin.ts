@@ -59,12 +59,20 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgCodec(behavior, entity) {
+        if (entity.polymorphism?.mode === "union") {
+          return ["connection -list", behavior];
+        } else {
+          return behavior;
+        }
+      },
+    },
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           inflection,
           input,
-          pgGetBehavior: getBehavior,
           graphql: { GraphQLList, GraphQLNonNull },
         } = build;
         const {
@@ -259,22 +267,20 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                 } field for ${interfaceCodec.name} to the root query`,
               );
             };
-            const behavior = getBehavior([interfaceCodec.extensions]);
-            const defaultBehavior = "connection -list";
             if (
-              build.behavior.matches(
-                behavior,
+              build.behavior.entityMatches(
+                "pgCodec",
+                interfaceCodec,
                 "query:interface:connection",
-                defaultBehavior,
               )
             ) {
               makeField(true);
             }
             if (
-              build.behavior.matches(
-                behavior,
+              build.behavior.entityMatches(
+                "pgCodec",
+                interfaceCodec,
                 "query:interface:list",
-                defaultBehavior,
               )
             ) {
               makeField(false);

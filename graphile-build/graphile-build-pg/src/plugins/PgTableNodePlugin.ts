@@ -11,7 +11,6 @@ import { access, constant, list } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
@@ -22,6 +21,16 @@ declare global {
     }
   }
 }
+function canSupportNode(resource: PgResource): boolean {
+  return (
+    !resource.codec.isAnonymous &&
+    !!resource.codec.attributes &&
+    !resource.codec.polymorphism &&
+    !resource.parameters &&
+    !!resource.uniques &&
+    !!resource.uniques[0]
+  );
+}
 
 export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",
@@ -29,6 +38,15 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
   version: version,
 
   schema: {
+    entityBehavior: {
+      pgResource(behavior, resource) {
+        if (canSupportNode(resource)) {
+          return ["node", "select", behavior];
+        } else {
+          return behavior;
+        }
+      },
+    },
     hooks: {
       init(_, build) {
         if (!build.registerNodeIdHandler) {
@@ -37,20 +55,11 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         const tableResources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (resource.codec.isAnonymous) return false;
-          if (!resource.codec.attributes) return false;
-          if (resource.codec.polymorphism) return false;
-          if (resource.parameters) return false;
-          if (!resource.uniques) return false;
-          if (!resource.uniques[0]) return false;
-          const behavior = getBehavior([
-            resource.codec.extensions,
-            resource.extensions,
-          ]);
+          if (!canSupportNode(resource)) return false;
           // Needs the 'select' and 'node' behaviours for compatibility
           return (
-            !!build.behavior.matches(behavior, "node", "node") &&
-            !!build.behavior.matches(behavior, "select", "select")
+            !!build.behavior.entityMatches("pgResource", resource, "node") &&
+            !!build.behavior.entityMatches("pgResource", resource, "select")
           );
         });
 
