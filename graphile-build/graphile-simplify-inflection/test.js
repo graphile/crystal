@@ -183,7 +183,8 @@ async function snapshot(actual, filePath) {
 }
 
 async function main() {
-  const dirs = await fsp.readdir(ROOT);
+  const specified = process.argv[2];
+  const dirs = specified ? [specified] : await fsp.readdir(ROOT);
   for (const dir of dirs) {
     const stat = await fsp.stat(`${ROOT}/${dir}`);
     if (stat.isDirectory()) {
