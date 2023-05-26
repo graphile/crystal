@@ -42,7 +42,7 @@ export class Behavior {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
       behaviorCallbacks: Array<
         [
-          description: string,
+          source: string,
           callback: (
             behavior: string,
             entity: GraphileBuild.BehaviorEntities[entityType],
@@ -51,18 +51,30 @@ export class Behavior {
         ]
       >;
       listCache: Map<number, any[][]>;
-      cache: Map<GraphileBuild.BehaviorEntities[entityType], string>;
+      cache: Map<GraphileBuild.BehaviorEntities[entityType], ResolvedBehavior>;
     };
   };
 
-  private globalDefaultBehavior: string;
+  private globalDefaultBehavior: ResolvedBehavior;
   constructor(private resolvedPreset: GraphileConfig.ResolvedPreset) {
     this.behaviorEntities = Object.create(null);
 
     const plugins = sortedPlugins(resolvedPreset.plugins);
 
+    const initialBehavior = resolvedPreset.schema?.defaultBehavior ?? "";
     this.globalDefaultBehavior = resolveBehavior(
-      resolvedPreset.schema?.defaultBehavior ?? "",
+      initialBehavior
+        ? {
+            behaviorString: initialBehavior,
+            stack: [
+              {
+                source: "preset.schema.defaultBehavior",
+                prefix: initialBehavior,
+                suffix: "",
+              },
+            ],
+          }
+        : { behaviorString: "", stack: [] },
       plugins.map((p) => [
         `${p.name}.schema.globalBehavior`,
         p.schema?.globalBehavior,
@@ -163,7 +175,10 @@ export class Behavior {
     entity: GraphileBuild.BehaviorEntities[TEntityType],
     filter: string,
   ): boolean | undefined {
-    const finalString = this.getBehaviorForEntity(entityType, entity);
+    const finalString = this.getBehaviorForEntity(
+      entityType,
+      entity,
+    ).behaviorString;
     return this.stringMatches(finalString, filter);
   }
 
@@ -195,14 +210,14 @@ export class Behavior {
       return existing;
     }
     const behaviorEntity = this.behaviorEntities[entityType];
-    const behaviorString = resolveBehavior(
+    const behavior = resolveBehavior(
       this.globalDefaultBehavior,
       behaviorEntity.behaviorCallbacks,
       entity,
       this.resolvedPreset,
     );
-    cache.set(entity, behaviorString);
-    return behaviorString;
+    cache.set(entity, behavior);
+    return behavior;
   }
 
   private stringMatches(
@@ -336,12 +351,23 @@ export function joinBehaviors(
   return str;
 }
 
+interface StackItem {
+  source: string;
+  prefix: string;
+  suffix: string;
+}
+
+interface ResolvedBehavior {
+  stack: ReadonlyArray<StackItem>;
+  behaviorString: string;
+}
+
 function resolveBehavior<TArgs extends [...any[]]>(
-  initialBehavior: string,
+  initialBehavior: ResolvedBehavior,
   // Misnomer; also allows strings or nothings
   callbacks: ReadonlyArray<
     [
-      description: string,
+      source: string,
       callback:
         | string
         | null
@@ -350,10 +376,12 @@ function resolveBehavior<TArgs extends [...any[]]>(
     ]
   >,
   ...args: TArgs
-): string {
-  let behaviorString = initialBehavior;
+) {
+  let behaviorString = initialBehavior.behaviorString;
+  const stack: Array<StackItem> = [...initialBehavior.stack];
 
-  for (const [description, g] of callbacks) {
+  for (const [source, g] of callbacks) {
+    const oldBehavior = behaviorString;
     if (typeof g === "string") {
       if (g === "") {
         continue;
@@ -363,10 +391,10 @@ function resolveBehavior<TArgs extends [...any[]]>(
         behaviorString = g + " " + behaviorString;
       }
     } else if (typeof g === "function") {
-      const newBehavior = g(behaviorString, ...args);
-      if (!newBehavior.includes(behaviorString)) {
+      const newBehavior = g(oldBehavior, ...args);
+      if (!newBehavior.includes(oldBehavior)) {
         throw new Error(
-          `${description} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
+          `${source} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
         );
       }
       if (Array.isArray(newBehavior)) {
@@ -375,8 +403,14 @@ function resolveBehavior<TArgs extends [...any[]]>(
         behaviorString = newBehavior;
       }
     }
+    const i = behaviorString.indexOf(oldBehavior);
+    const prefix = behaviorString.substring(0, i);
+    const suffix = behaviorString.substring(i + oldBehavior.length);
+    if (prefix !== "" || suffix !== "") {
+      stack.push({ source, prefix, suffix });
+    }
   }
-  return behaviorString;
+  return { stack, behaviorString };
 }
 
 function getCachedEntity<T extends any[]>(
