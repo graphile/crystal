@@ -20,6 +20,19 @@ declare global {
   }
 }
 
+function isComputedColumnLike(resource: PgResource) {
+  if (resource.codec.attributes) return false;
+  if (resource.codec.arrayOfCodec) return false;
+  if (resource.codec.rangeOfCodec) return false;
+  const parameters: readonly PgResourceParameter[] | undefined =
+    resource.parameters;
+  if (!parameters || parameters.length < 1) return false;
+  if (parameters.some((p, i) => i > 0 && p.required)) return false;
+  if (!parameters[0].codec.attributes) return false;
+  if (!resource.isUnique) return false;
+  return true;
+}
+
 export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
   name: "PgConditionCustomFieldsPlugin",
   description:
@@ -27,6 +40,15 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
   version: version,
 
   schema: {
+    entityBehavior: {
+      pgResource(behavior, entity) {
+        if (isComputedColumnLike(entity)) {
+          return ["-proc:filterBy", behavior];
+        } else {
+          return behavior;
+        }
+      },
+    },
     hooks: {
       GraphQLInputObjectType_fields(fields, build, context) {
         const { inflection, sql } = build;
@@ -46,24 +68,9 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (resource.codec.attributes) return false;
-          if (resource.codec.arrayOfCodec) return false;
-          if (resource.codec.rangeOfCodec) return false;
-          const parameters: readonly PgResourceParameter[] | undefined =
-            resource.parameters;
-          if (!parameters || parameters.length < 1) return false;
-          if (parameters.some((p, i) => i > 0 && p.required)) return false;
-          if (parameters[0].codec !== pgCodec) return false;
-          if (!resource.isUnique) return false;
-          const behavior = getBehavior([
-            resource.codec.extensions,
-            resource.extensions,
-          ]);
-          return build.behavior.matches(
-            behavior,
-            "proc:filterBy",
-            "-proc:filterBy",
-          );
+          if (!isComputedColumnLike(resource)) return false;
+          if (resource.parameters![0].codec !== pgCodec) return false;
+          return build.behavior.pgResourceMatches(resource, "proc:filterBy");
         });
 
         return build.extend(

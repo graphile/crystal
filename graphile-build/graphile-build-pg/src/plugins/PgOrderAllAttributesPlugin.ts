@@ -11,7 +11,6 @@ import type { ExecutableStep, ModifierStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumValueConfigMap } from "graphql";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
 
 declare global {
@@ -45,6 +44,10 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      // Enable ordering, but don't order by array or range types
+      pgAttribute: "orderBy orderBy:* -orderBy:array -orderBy:range",
+    },
     hooks: {
       GraphQLEnumType_values(values, build, context) {
         const { extend, inflection, options } = build;
@@ -96,28 +99,19 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
           values,
           Object.entries(attributes).reduce(
             (memo, [attributeName, attribute]) => {
-              const behavior = getBehavior([
-                pgCodec.extensions,
-                attribute.extensions,
-              ]);
-              // Enable ordering, but don't order by array or range types
-              const defaultBehavior =
-                "orderBy orderBy:* -orderBy:array -orderBy:range";
               if (
-                !build.behavior.matches(
-                  behavior,
+                !build.behavior.pgAttributeMatches(
+                  [pgCodec, attribute],
                   "attribute:orderBy",
-                  defaultBehavior,
                 )
               ) {
                 return memo;
               }
               if (attribute.codec.arrayOfCodec) {
                 if (
-                  !build.behavior.matches(
-                    behavior,
+                  !build.behavior.pgAttributeMatches(
+                    [pgCodec, attribute],
                     "attribute:orderBy:array",
-                    defaultBehavior,
                   )
                 ) {
                   return memo;
@@ -125,10 +119,9 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               }
               if (attribute.codec.rangeOfCodec) {
                 if (
-                  !build.behavior.matches(
-                    behavior,
+                  !build.behavior.pgAttributeMatches(
+                    [pgCodec, attribute],
                     "attribute:orderBy:range",
-                    defaultBehavior,
                   )
                 ) {
                   return memo;
