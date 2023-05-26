@@ -61,7 +61,7 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        if (!build.behavior.entityMatches("pgCodec", codec!, "totalCount")) {
+        if (!build.behavior.pgCodecMatches(codec!, "totalCount")) {
           return fields;
         }
 

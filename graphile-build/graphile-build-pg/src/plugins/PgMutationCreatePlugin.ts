@@ -41,10 +41,7 @@ const isInsertable = (
   if (!resource.codec.attributes) return false;
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
-  return (
-    build.behavior.entityMatches("pgResource", resource, "resource:insert") ===
-    true
-  );
+  return build.behavior.pgResourceMatches(resource, "resource:insert") === true;
 };
 
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
@@ -191,8 +188,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       ),
                     },
                     ...(TableType &&
-                    build.behavior.entityMatches(
-                      "pgResource",
+                    build.behavior.pgResourceMatches(
                       resource,
                       "insert:payload:record",
                     )

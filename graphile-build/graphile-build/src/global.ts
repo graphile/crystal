@@ -37,7 +37,7 @@ import type {
   GraphQLUnionTypeConfig,
 } from "graphql";
 
-import type { Behavior } from "./behavior.js";
+import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
 import type { InflectionBase } from "./inflection.js";
 import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
@@ -310,7 +310,7 @@ declare global {
        * (typically a field, argument, enum value, input field, or similar)
        * goes into the schema.
        */
-      behavior: Behavior;
+      behavior: Behavior & BehaviorDynamicMethods;
 
       /**
        * Register a type by name with the system; names must be unique. It's

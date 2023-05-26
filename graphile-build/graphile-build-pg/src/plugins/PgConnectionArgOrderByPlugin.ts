@@ -62,7 +62,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
         pgCodecMetaLookup.forEach((meta, codec) => {
           if (!codec.attributes || codec.isAnonymous) return;
           // TODO: should this be `type:order` or similar?
-          if (!build.behavior.entityMatches("pgCodec", codec, "order")) {
+          if (!build.behavior.pgCodecMatches(codec, "order")) {
             return;
           }
 
@@ -141,9 +141,9 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
         }
         if (
           pgResource
-            ? !build.behavior.entityMatches("pgResource", pgResource, "order")
+            ? !build.behavior.pgResourceMatches(pgResource, "order")
             : codec
-            ? !build.behavior.entityMatches("pgCodec", codec, "order")
+            ? !build.behavior.pgCodecMatches(codec, "order")
             : false
         ) {
           return args;

@@ -268,8 +268,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
               );
             };
             if (
-              build.behavior.entityMatches(
-                "pgCodec",
+              build.behavior.pgCodecMatches(
                 interfaceCodec,
                 "query:interface:connection",
               )
@@ -277,8 +276,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
               makeField(true);
             }
             if (
-              build.behavior.entityMatches(
-                "pgCodec",
+              build.behavior.pgCodecMatches(
                 interfaceCodec,
                 "query:interface:list",
               )

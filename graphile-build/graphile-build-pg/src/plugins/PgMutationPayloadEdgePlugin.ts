@@ -75,7 +75,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
 
         // TODO: this is a rule on the codec; we must ensure that everywhere
         // that uses 'list'/'connection' respects the codec behaviors
-        if (!build.behavior.entityMatches("pgCodec", pgCodec, "*:connection")) {
+        if (!build.behavior.pgCodecMatches(pgCodec, "*:connection")) {
           return fields;
         }
 

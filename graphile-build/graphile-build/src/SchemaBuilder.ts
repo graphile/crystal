@@ -201,7 +201,7 @@ class SchemaBuilder<
    * Create the 'Build' object.
    */
   createBuild(input: GraphileBuild.BuildInput): TBuild {
-    const behavior = new Behavior(this.resolvedPreset);
+    const behavior = new Behavior(this.resolvedPreset).freeze();
     const initialBuild = makeNewBuild(
       this,
       input,

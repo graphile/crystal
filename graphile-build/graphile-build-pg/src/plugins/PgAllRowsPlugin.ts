@@ -86,11 +86,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           }
 
           if (
-            build.behavior.entityMatches(
-              "pgResource",
-              resource,
-              "query:resource:list",
-            )
+            build.behavior.pgResourceMatches(resource, "query:resource:list")
           ) {
             const fieldName = build.inflection.allRowsList(resource);
             fields = build.extend(
@@ -128,8 +124,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           }
 
           if (
-            build.behavior.entityMatches(
-              "pgResource",
+            build.behavior.pgResourceMatches(
               resource,
               "query:resource:connection",
             )

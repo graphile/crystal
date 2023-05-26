@@ -606,20 +606,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               return;
             }
 
-            const isTable = build.behavior.entityMatches(
-              "pgCodec",
-              codec,
-              "table",
-            );
+            const isTable = build.behavior.pgCodecMatches(codec, "table");
             if (!isTable || codec.isAnonymous) {
               return;
             }
 
-            const selectable = build.behavior.entityMatches(
-              "pgCodec",
-              codec,
-              "select",
-            );
+            const selectable = build.behavior.pgCodecMatches(codec, "select");
 
             if (selectable) {
               if (

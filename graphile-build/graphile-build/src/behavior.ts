@@ -37,6 +37,13 @@ const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
   }
 };
 
+export type BehaviorDynamicMethods = {
+  [entityType in keyof GraphileBuild.BehaviorEntities as `${entityType}Matches`]: (
+    entity: GraphileBuild.BehaviorEntities[entityType],
+    filter: string,
+  ) => boolean | undefined;
+};
+
 export class Behavior {
   private behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
@@ -97,14 +104,12 @@ export class Behavior {
         ]);
       },
     );
-
-    this.freeze();
   }
 
   /**
    * Forbid registration of more global behavior defaults, behavior entity types, etc.
    */
-  public freeze() {
+  public freeze(): Behavior & BehaviorDynamicMethods {
     Object.freeze(this);
     Object.freeze(this.behaviorEntities);
     for (const key of Object.keys(this.behaviorEntities)) {
@@ -112,6 +117,7 @@ export class Behavior {
         this.behaviorEntities[key as keyof typeof this.behaviorEntities],
       );
     }
+    return this as this & BehaviorDynamicMethods;
   }
 
   private registerEntity<
@@ -122,6 +128,10 @@ export class Behavior {
       listCache: new Map(),
       cache: new Map(),
     };
+    (this as any)[`${entityType}Matches`] = (
+      entity: GraphileBuild.BehaviorEntities[TEntityType],
+      behavior: string,
+    ) => this.entityMatches(entityType, entity, behavior);
   }
 
   private assertEntity<

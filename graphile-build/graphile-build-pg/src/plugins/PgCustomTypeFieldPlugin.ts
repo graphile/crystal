@@ -599,11 +599,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               // as the first argument
               const isQuerySource =
                 someSource.parameters &&
-                build.behavior.entityMatches(
-                  "pgResource",
-                  someSource,
-                  "queryField",
-                );
+                build.behavior.pgResourceMatches(someSource, "queryField");
               if (isQuerySource) {
                 build.recoverable(null, () => {
                   build[$$rootQuery].push(someSource);
@@ -615,11 +611,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               const isMutationProcSource =
                 // someSource.isMutation &&
                 someSource.parameters &&
-                build.behavior.entityMatches(
-                  "pgResource",
-                  someSource,
-                  "mutationField",
-                );
+                build.behavior.pgResourceMatches(someSource, "mutationField");
               // Add payload type for mutation functions
               if (isMutationProcSource) {
                 const resource = someSource as PgResource<
@@ -784,11 +776,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               // matching codec as the first argument
               const isComputedSource =
                 someSource.parameters &&
-                build.behavior.entityMatches(
-                  "pgResource",
-                  someSource,
-                  "typeField",
-                );
+                build.behavior.pgResourceMatches(someSource, "typeField");
               if (isComputedSource) {
                 // TODO: should we allow other forms of computed attributes here,
                 // e.g. accepting the row id rather than the row itself.
@@ -1061,8 +1049,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 const listFieldBehaviorScope = `${baseScope}:resource:list`;
                 if (
                   canUseConnection &&
-                  build.behavior.entityMatches(
-                    "pgResource",
+                  build.behavior.pgResourceMatches(
                     resource,
                     connectionFieldBehaviorScope,
                   )
@@ -1154,8 +1141,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 }
 
                 if (
-                  build.behavior.entityMatches(
-                    "pgResource",
+                  build.behavior.pgResourceMatches(
                     resource,
                     listFieldBehaviorScope,
                   )

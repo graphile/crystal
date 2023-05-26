@@ -144,11 +144,7 @@ const isUpdatable = (
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   if (!resource.uniques || resource.uniques.length < 1) return false;
-  return !!build.behavior.entityMatches(
-    "pgResource",
-    resource,
-    "resource:update",
-  );
+  return !!build.behavior.pgResourceMatches(resource, "resource:update");
 };
 
 const isDeletable = (
@@ -160,11 +156,7 @@ const isDeletable = (
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   if (!resource.uniques || resource.uniques.length < 1) return false;
-  return !!build.behavior.entityMatches(
-    "pgResource",
-    resource,
-    "resource:delete",
-  );
+  return !!build.behavior.pgResourceMatches(resource, "resource:delete");
 };
 
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
@@ -355,7 +347,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     deletedNodeIdFieldName &&
                     handler &&
                     nodeIdCodec &&
-                    build.behavior.entityMatches("pgResource", resource, "node")
+                    build.behavior.pgResourceMatches(resource, "node")
                       ? {
                           [deletedNodeIdFieldName]: fieldWithHooks(
                             {
@@ -642,8 +634,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               })),
             ].filter((spec) => {
               const unique = spec.unique as PgResourceUnique;
-              return !!build.behavior.entityMatches(
-                "pgUnique",
+              return !!build.behavior.pgUniqueMatches(
                 [resource, unique],
                 constraintMode,
               );

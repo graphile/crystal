@@ -58,8 +58,8 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           if (!canSupportNode(resource)) return false;
           // Needs the 'select' and 'node' behaviours for compatibility
           return (
-            !!build.behavior.entityMatches("pgResource", resource, "node") &&
-            !!build.behavior.entityMatches("pgResource", resource, "select")
+            !!build.behavior.pgResourceMatches(resource, "node") &&
+            !!build.behavior.pgResourceMatches(resource, "select")
           );
         });
 

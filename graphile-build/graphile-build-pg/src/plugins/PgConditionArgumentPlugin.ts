@@ -63,7 +63,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
             // TODO: do we want this filter here? E.g. we might want to enable
             // a bulk delete mutation without allowing any selects? Maybe this
             // is actually a 'filter' behavior instead?
-            if (!build.behavior.entityMatches("pgCodec", codec, "select")) {
+            if (!build.behavior.pgCodecMatches(codec, "select")) {
               return;
             }
 
@@ -115,8 +115,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                   return Object.entries(attributes).reduce(
                     (memo, [attributeName, attribute]) => {
                       if (
-                        !build.behavior.entityMatches(
-                          "pgAttribute",
+                        !build.behavior.pgAttributeMatches(
                           [codec, attribute],
                           "attribute:filterBy",
                         )
@@ -234,19 +233,14 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
           return args;
         }
 
+        const desiredBehavior = fieldBehaviorScope
+          ? `${fieldBehaviorScope}:filter`
+          : `filter`;
         if (
           pgResource
-            ? !build.behavior.entityMatches(
-                "pgResource",
-                pgResource,
-                fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
-              )
+            ? !build.behavior.pgResourceMatches(pgResource, desiredBehavior)
             : codec
-            ? !build.behavior.entityMatches(
-                "pgCodec",
-                codec,
-                fieldBehaviorScope ? `${fieldBehaviorScope}:filter` : `filter`,
-              )
+            ? !build.behavior.pgCodecMatches(codec, desiredBehavior)
             : true
         ) {
           return args;

@@ -601,17 +601,12 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
             const tableTypeName = inflection.tableType(codec);
 
-            const isTable = build.behavior.entityMatches(
-              "pgCodec",
-              codec,
-              "table",
-            );
+            const isTable = build.behavior.pgCodecMatches(codec, "table");
             if (!isTable) {
               return;
             }
 
-            const selectable = build.behavior.entityMatches(
-              "pgCodec",
+            const selectable = build.behavior.pgCodecMatches(
               codec,
               "resource:select",
             );

@@ -77,7 +77,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
         } = build;
         const jwtCodec = [...build.pgCodecMetaLookup.keys()].find((codec) =>
           // TODO: why is b.jwt_token not found here?
-          build.behavior.entityMatches("pgCodec", codec, "jwt"),
+          build.behavior.pgCodecMatches(codec, "jwt"),
         );
 
         if (!jwtCodec) {

@@ -172,8 +172,7 @@ return function (resource) {
 
                   const fieldBehaviorScope = "query:resource:single";
                   if (
-                    !build.behavior.entityMatches(
-                      "pgUnique",
+                    !build.behavior.pgUniqueMatches(
                       [resource, unique],
                       fieldBehaviorScope,
                     )
