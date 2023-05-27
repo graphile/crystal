@@ -785,6 +785,7 @@ function addRelations(
           relation.remoteResource.extensions,
           relation.extensions,
         ]) ?? "";
+      const isUnique = relation.isUnique;
       const otherCodec = remoteResource.codec;
       const typeName = build.inflection.tableType(otherCodec);
       const connectionTypeName =
@@ -816,7 +817,7 @@ function addRelations(
         identifier: relationName,
         isReferencee: relation.isReferencee ?? false,
         behavior,
-        isUnique: relation.isUnique,
+        isUnique,
         typeName,
         connectionTypeName,
         deprecationReason,
@@ -842,11 +843,12 @@ function addRelations(
     refDefinition: refSpec,
     ref,
   } of refDefinitionList) {
+    const isUnique = !!refSpec.singular;
     let hasReferencee;
     let sharedCodec: PgCodec | undefined = undefined;
     let sharedSource: PgResource | undefined = undefined;
-    let behavior;
-    let typeName;
+    let behavior: string;
+    let typeName: string | null | undefined;
     let singleRecordPlan;
     let listPlan;
     let connectionPlan;
@@ -1219,7 +1221,7 @@ function addRelations(
       isReferencee: hasReferencee,
       pgCodec: sharedCodec,
       pgResource: sharedSource,
-      isUnique: !!refSpec.singular,
+      isUnique,
       behavior: behavior ?? "",
       typeName,
       connectionTypeName,
