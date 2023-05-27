@@ -8,7 +8,6 @@ import type {
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
 
 declare global {
