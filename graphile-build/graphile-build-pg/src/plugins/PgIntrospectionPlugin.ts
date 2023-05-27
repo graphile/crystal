@@ -138,6 +138,11 @@ declare global {
           namespaceName: string,
           tableName: string,
         ): Promise<PgClass | undefined>;
+        getTypeByName(
+          serviceName: string,
+          namespaceName: string,
+          typeName: string,
+        ): Promise<PgType | undefined>;
         getTypeByArray(
           serviceName: string,
           arrayId: string,
@@ -444,6 +449,16 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           (rel) =>
             rel.getNamespace()!.nspname === schemaName &&
             rel.relname === tableName,
+        );
+      },
+
+      async getTypeByName(info, serviceName, schemaName, typeName) {
+        const relevant = await getDb(info, serviceName);
+        const list = relevant.introspection.types;
+        return list.find(
+          (typ) =>
+            typ.getNamespace()!.nspname === schemaName &&
+            typ.typname === typeName,
         );
       },
 
