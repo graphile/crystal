@@ -1276,27 +1276,17 @@ function addRelations(
     }
 
     const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
-    const defaultBehavior = isUnique
-      ? "single -singularRelation:resource:list -singularRelation:resource:connection"
-      : (build.options as any).simpleCollections === "both"
-      ? "connection list"
-      : (build.options as any).simpleCollections === "only"
-      ? "list"
-      : "connection";
     const shouldAddSingleField = build.behavior.matches(
       behavior,
       `${relationTypeScope}:resource:single`,
-      defaultBehavior,
     );
     const shouldAddConnectionField = build.behavior.matches(
       behavior,
       `${relationTypeScope}:resource:connection`,
-      defaultBehavior,
     );
     const shouldAddListField = build.behavior.matches(
       behavior,
       `${relationTypeScope}:resource:list`,
-      defaultBehavior,
     );
 
     const digest: Digest = {

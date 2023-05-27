@@ -162,7 +162,10 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         after: ["default", "inferred"],
         provides: ["override"],
         callback(behavior, ref) {
-          return [behavior, getBehavior(ref.extensions)];
+          return [
+            behavior,
+            getBehavior([ref.definition.extensions, ref.extensions]),
+          ];
         },
       },
       pgRefDefinition: {
