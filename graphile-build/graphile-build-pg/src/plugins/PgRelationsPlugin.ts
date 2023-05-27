@@ -26,7 +26,6 @@ import sql from "pg-sql2";
 import type { TE } from "tamedevil";
 import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 
-import { getBehavior } from "../behavior.js";
 import { resolveResourceRefPath, tagToString } from "../utils.js";
 import { version } from "../version.js";
 
@@ -504,6 +503,21 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         after: ["default"],
         callback(behavior, entity) {
           if (entity.definition.singular) {
+            return [
+              behavior,
+              "single -singularRelation:resource:list -singularRelation:resource:connection",
+            ];
+          } else {
+            return behavior;
+          }
+        },
+      },
+      pgRefDefinition: {
+        provides: ["inferred"],
+        before: ["override"],
+        after: ["default"],
+        callback(behavior, entity) {
+          if (entity.singular) {
             return [
               behavior,
               "single -singularRelation:resource:list -singularRelation:resource:connection",
@@ -1204,7 +1218,7 @@ function addRelations(
       })());
     } else {
       hasReferencee = true;
-      behavior = getBehavior(refSpec.extensions);
+      behavior = build.behavior.pgRefDefinitionBehavior(refSpec);
       typeName = refSpec.graphqlType;
       if (!typeName) {
         // TODO: remove this restriction

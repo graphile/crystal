@@ -8,6 +8,7 @@ import type {
   PgCodecAttribute,
   PgCodecRef,
   PgCodecRelation,
+  PgRefDefinition,
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
@@ -86,6 +87,7 @@ declare global {
       ];
       pgRelation: PgCodecRelation;
       pgRef: PgCodecRef;
+      pgRefDefinition: PgRefDefinition;
     }
   }
 }
@@ -161,6 +163,13 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         provides: ["override"],
         callback(behavior, ref) {
           return [behavior, getBehavior(ref.extensions)];
+        },
+      },
+      pgRefDefinition: {
+        after: ["default", "inferred"],
+        provides: ["override"],
+        callback(behavior, refSpec) {
+          return [behavior, getBehavior(refSpec.extensions)];
         },
       },
     },
