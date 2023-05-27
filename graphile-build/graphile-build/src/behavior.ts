@@ -237,7 +237,7 @@ export class Behavior {
     return behavior;
   }
 
-  private stringMatches(
+  public stringMatches(
     behaviorString: string,
     filter: string,
   ): boolean | undefined {
@@ -258,12 +258,25 @@ export class Behavior {
     return undefined;
   }
 
-  /** @deprecated Please use entityMatches instead */
+  /** @deprecated Please use entityMatches or stringMatches instead */
   public matches(
     localBehaviorSpecsString: string | string[] | null | undefined,
     filter: string,
     defaultBehavior = "",
   ): boolean | undefined {
+    let err: Error;
+    try {
+      throw new Error("Deprecated call happened here");
+    } catch (e) {
+      err = e;
+    }
+    const stackText = err.stack!;
+    if (!warned.has(stackText)) {
+      warned.add(stackText);
+      console.error(
+        `[DEPRECATION WARNING] Something in your application is using build.behavior.matches; it should be using build.behavior.pgCodecMatches / etc instead. This API will be removed before the v5.0.0 release. ${stackText}`,
+      );
+    }
     const specString = Array.isArray(localBehaviorSpecsString)
       ? localBehaviorSpecsString.join(" ")
       : localBehaviorSpecsString;
@@ -454,3 +467,5 @@ function getCachedEntity<T extends any[]>(
   nList.push(entity);
   return entity;
 }
+
+const warned = new Set<string>();

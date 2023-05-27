@@ -977,7 +977,6 @@ function addRelations(
 
       // const isUnique = paths.every((p) => p.isUnique);
 
-      // TODO: shouldn't the ref behavior override the resource behavior?
       const refBehavior = build.behavior.pgRefBehavior(ref);
       behavior = hasExactlyOneSource
         ? `${build.behavior.pgResourceBehavior(firstSource)} ${refBehavior}`
@@ -1276,15 +1275,15 @@ function addRelations(
     }
 
     const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
-    const shouldAddSingleField = build.behavior.matches(
+    const shouldAddSingleField = build.behavior.stringMatches(
       behavior,
       `${relationTypeScope}:resource:single`,
     );
-    const shouldAddConnectionField = build.behavior.matches(
+    const shouldAddConnectionField = build.behavior.stringMatches(
       behavior,
       `${relationTypeScope}:resource:connection`,
     );
-    const shouldAddListField = build.behavior.matches(
+    const shouldAddListField = build.behavior.stringMatches(
       behavior,
       `${relationTypeScope}:resource:list`,
     );
