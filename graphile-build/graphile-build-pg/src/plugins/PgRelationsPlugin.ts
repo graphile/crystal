@@ -482,6 +482,23 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgRelation: {
+        provides: ["inferred"],
+        before: ["override"],
+        after: ["default"],
+        callback(behavior, entity) {
+          if (entity.isUnique) {
+            return [
+              behavior,
+              "single -singularRelation:resource:list -singularRelation:resource:connection",
+            ];
+          } else {
+            return behavior;
+          }
+        },
+      },
+    },
     hooks: {
       GraphQLInterfaceType_fields: addRelations,
       GraphQLObjectType_fields: addRelations,
@@ -781,12 +798,6 @@ function addRelations(
         }
       }
 
-      const behavior =
-        getBehavior([
-          relation.remoteResource.codec.extensions,
-          relation.remoteResource.extensions,
-          relation.extensions,
-        ]) ?? "";
       const isUnique = relation.isUnique;
       const otherCodec = remoteResource.codec;
       const typeName = build.inflection.tableType(otherCodec);
@@ -817,27 +828,17 @@ function addRelations(
       const listFieldName = build.inflection.manyRelationList(relationDetails);
 
       const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
-      const defaultBehavior = isUnique
-        ? "single -singularRelation:resource:list -singularRelation:resource:connection"
-        : (build.options as any).simpleCollections === "both"
-        ? "connection list"
-        : (build.options as any).simpleCollections === "only"
-        ? "list"
-        : "connection";
-      const shouldAddSingleField = build.behavior.matches(
-        behavior,
+      const shouldAddSingleField = build.behavior.pgRelationMatches(
+        relation,
         `${relationTypeScope}:resource:single`,
-        defaultBehavior,
       );
-      const shouldAddConnectionField = build.behavior.matches(
-        behavior,
+      const shouldAddConnectionField = build.behavior.pgRelationMatches(
+        relation,
         `${relationTypeScope}:resource:connection`,
-        defaultBehavior,
       );
-      const shouldAddListField = build.behavior.matches(
-        behavior,
+      const shouldAddListField = build.behavior.pgRelationMatches(
+        relation,
         `${relationTypeScope}:resource:list`,
-        defaultBehavior,
       );
 
       const digest: Digest = {
