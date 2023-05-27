@@ -977,12 +977,15 @@ function addRelations(
 
       // const isUnique = paths.every((p) => p.isUnique);
 
-      const refBehavior = build.behavior.pgRefBehavior(ref);
       behavior = hasExactlyOneSource
-        ? `${build.behavior.pgResourceBehavior(firstSource)} ${refBehavior}`
+        ? `${build.behavior.pgResourceBehavior(
+            firstSource,
+          )} ${build.behavior.pgRefBehavior(ref, false)}`
         : sharedCodec
-        ? `${build.behavior.pgCodecBehavior(sharedCodec)} ${refBehavior}`
-        : refBehavior;
+        ? `${build.behavior.pgCodecBehavior(
+            sharedCodec,
+          )} ${build.behavior.pgRefBehavior(ref, false)}`
+        : build.behavior.pgRefBehavior(ref);
 
       // Shortcut simple relation alias
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {

@@ -7,6 +7,11 @@ interface BehaviorSpec {
   scope: BehaviorScope;
 }
 
+const NULL_BEHAVIOR: ResolvedBehavior = Object.freeze({
+  behaviorString: "",
+  stack: Object.freeze([]),
+});
+
 const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
   const val = plugin.schema?.entityBehavior;
   if (!val) return val;
@@ -45,6 +50,7 @@ export type BehaviorDynamicMethods = {
 } & {
   [entityType in keyof GraphileBuild.BehaviorEntities as `${entityType}Behavior`]: (
     entity: GraphileBuild.BehaviorEntities[entityType],
+    applyDefaultBehavior?: boolean,
   ) => string;
 };
 
@@ -62,7 +68,14 @@ export class Behavior {
         ]
       >;
       listCache: Map<number, any[][]>;
-      cache: Map<GraphileBuild.BehaviorEntities[entityType], ResolvedBehavior>;
+      cacheWithDefault: Map<
+        GraphileBuild.BehaviorEntities[entityType],
+        ResolvedBehavior
+      >;
+      cacheWithoutDefault: Map<
+        GraphileBuild.BehaviorEntities[entityType],
+        ResolvedBehavior
+      >;
     };
   };
 
@@ -130,7 +143,8 @@ export class Behavior {
     this.behaviorEntities[entityType] = {
       behaviorCallbacks: [],
       listCache: new Map(),
-      cache: new Map(),
+      cacheWithDefault: new Map(),
+      cacheWithoutDefault: new Map(),
     };
     (this as this & BehaviorDynamicMethods)[`${entityType}Matches`] = (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
@@ -138,7 +152,10 @@ export class Behavior {
     ): boolean | undefined => this.entityMatches(entityType, entity, behavior);
     (this as this & BehaviorDynamicMethods)[`${entityType}Behavior`] = (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
-    ): string => this.getBehaviorForEntity(entityType, entity).behaviorString;
+      applyDefaultBehavior = true,
+    ): string =>
+      this.getBehaviorForEntity(entityType, entity, applyDefaultBehavior)
+        .behaviorString;
   }
 
   private assertEntity<
@@ -216,9 +233,12 @@ export class Behavior {
   >(
     entityType: TEntityType,
     rawEntity: GraphileBuild.BehaviorEntities[TEntityType],
+    applyDefaultBehavior = true,
   ) {
     this.assertEntity(entityType);
-    const { cache, listCache } = this.behaviorEntities[entityType];
+    const { cacheWithDefault, cacheWithoutDefault, listCache } =
+      this.behaviorEntities[entityType];
+    const cache = applyDefaultBehavior ? cacheWithDefault : cacheWithoutDefault;
     const entity = Array.isArray(rawEntity)
       ? getCachedEntity(listCache, rawEntity)
       : rawEntity;
@@ -228,7 +248,7 @@ export class Behavior {
     }
     const behaviorEntity = this.behaviorEntities[entityType];
     const behavior = resolveBehavior(
-      this.globalDefaultBehavior,
+      applyDefaultBehavior ? this.globalDefaultBehavior : NULL_BEHAVIOR,
       behaviorEntity.behaviorCallbacks,
       entity,
       this.resolvedPreset,
