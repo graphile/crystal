@@ -420,7 +420,13 @@ function resolveBehavior<TArgs extends [...any[]]>(
       stack.push({ source, prefix, suffix });
     }
   }
-  return { stack, behaviorString };
+  return {
+    stack,
+    behaviorString,
+    toString() {
+      return behaviorString;
+    },
+  };
 }
 
 function getCachedEntity<T extends any[]>(

@@ -498,6 +498,21 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           }
         },
       },
+      pgRef: {
+        provides: ["inferred"],
+        before: ["override"],
+        after: ["default"],
+        callback(behavior, entity) {
+          if (entity.definition.singular) {
+            return [
+              behavior,
+              "single -singularRelation:resource:list -singularRelation:resource:connection",
+            ];
+          } else {
+            return behavior;
+          }
+        },
+      },
     },
     hooks: {
       GraphQLInterfaceType_fields: addRelations,
@@ -949,13 +964,21 @@ function addRelations(
       // const isUnique = paths.every((p) => p.isUnique);
 
       // TODO: shouldn't the ref behavior override the resource behavior?
+      const refBehavior = build.behavior.getBehaviorForEntity(
+        "pgRef",
+        ref,
+      ).behaviorString;
       behavior = hasExactlyOneSource
-        ? getBehavior([
-            firstSource.codec.extensions,
-            firstSource.extensions,
-            refSpec.extensions,
-          ])
-        : getBehavior([sharedCodec?.extensions, refSpec.extensions]);
+        ? `${build.behavior.getBehaviorForEntity(
+            "pgResource",
+            firstSource,
+          )} ${refBehavior}`
+        : sharedCodec
+        ? `${build.behavior.getBehaviorForEntity(
+            "pgCodec",
+            sharedCodec,
+          )} ${refBehavior}`
+        : refBehavior;
 
       // Shortcut simple relation alias
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {
