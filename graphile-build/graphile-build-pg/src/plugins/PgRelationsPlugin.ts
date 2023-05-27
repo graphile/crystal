@@ -723,7 +723,10 @@ function addRelations(
     identifier: string;
     isReferencee: boolean;
     isUnique: boolean;
-    behavior: string;
+    relationTypeScope: string;
+    shouldAddSingleField: boolean | undefined;
+    shouldAddConnectionField: boolean | undefined;
+    shouldAddListField: boolean | undefined;
     typeName: string;
     connectionTypeName: string;
     deprecationReason?: string;
@@ -812,10 +815,38 @@ function addRelations(
       const connectionFieldName =
         build.inflection.manyRelationConnection(relationDetails);
       const listFieldName = build.inflection.manyRelationList(relationDetails);
+
+      const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
+      const defaultBehavior = isUnique
+        ? "single -singularRelation:resource:list -singularRelation:resource:connection"
+        : (build.options as any).simpleCollections === "both"
+        ? "connection list"
+        : (build.options as any).simpleCollections === "only"
+        ? "list"
+        : "connection";
+      const shouldAddSingleField = build.behavior.matches(
+        behavior,
+        `${relationTypeScope}:resource:single`,
+        defaultBehavior,
+      );
+      const shouldAddConnectionField = build.behavior.matches(
+        behavior,
+        `${relationTypeScope}:resource:connection`,
+        defaultBehavior,
+      );
+      const shouldAddListField = build.behavior.matches(
+        behavior,
+        `${relationTypeScope}:resource:list`,
+        defaultBehavior,
+      );
+
       const digest: Digest = {
         identifier: relationName,
         isReferencee: relation.isReferencee ?? false,
-        behavior,
+        relationTypeScope,
+        shouldAddSingleField,
+        shouldAddConnectionField,
+        shouldAddListField,
         isUnique,
         typeName,
         connectionTypeName,
@@ -1215,13 +1246,40 @@ function addRelations(
       );
     }
 
+    const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
+    const defaultBehavior = isUnique
+      ? "single -singularRelation:resource:list -singularRelation:resource:connection"
+      : (build.options as any).simpleCollections === "both"
+      ? "connection list"
+      : (build.options as any).simpleCollections === "only"
+      ? "list"
+      : "connection";
+    const shouldAddSingleField = build.behavior.matches(
+      behavior,
+      `${relationTypeScope}:resource:single`,
+      defaultBehavior,
+    );
+    const shouldAddConnectionField = build.behavior.matches(
+      behavior,
+      `${relationTypeScope}:resource:connection`,
+      defaultBehavior,
+    );
+    const shouldAddListField = build.behavior.matches(
+      behavior,
+      `${relationTypeScope}:resource:list`,
+      defaultBehavior,
+    );
+
     const digest: Digest = {
       identifier,
       isReferencee: hasReferencee,
       pgCodec: sharedCodec,
       pgResource: sharedSource,
       isUnique,
-      behavior: behavior ?? "",
+      relationTypeScope,
+      shouldAddSingleField,
+      shouldAddConnectionField,
+      shouldAddListField,
       typeName,
       connectionTypeName,
       singleRecordFieldName,
@@ -1238,7 +1296,10 @@ function addRelations(
   return digests.reduce((memo, digest) => {
     const {
       isUnique,
-      behavior,
+      relationTypeScope,
+      shouldAddSingleField,
+      shouldAddConnectionField,
+      shouldAddListField,
       typeName,
       connectionTypeName,
       deprecationReason,
@@ -1256,7 +1317,6 @@ function addRelations(
       pgRelationDetails,
       relatedTypeName,
     } = digest;
-    const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
     const OtherType = build.getTypeByName(typeName);
     if (
       !OtherType ||
@@ -1269,22 +1329,8 @@ function addRelations(
       return memo;
     }
     let fields = memo;
-    const defaultBehavior = isUnique
-      ? "single -singularRelation:resource:list -singularRelation:resource:connection"
-      : (build.options as any).simpleCollections === "both"
-      ? "connection list"
-      : (build.options as any).simpleCollections === "only"
-      ? "list"
-      : "connection";
 
-    if (
-      isUnique &&
-      build.behavior.matches(
-        behavior,
-        `${relationTypeScope}:resource:single`,
-        defaultBehavior,
-      )
-    ) {
+    if (isUnique && shouldAddSingleField) {
       const fieldName = singleRecordFieldName;
       fields = extend(
         fields,
@@ -1312,14 +1358,7 @@ function addRelations(
       );
     }
 
-    if (
-      isReferencee &&
-      build.behavior.matches(
-        behavior,
-        `${relationTypeScope}:resource:connection`,
-        defaultBehavior,
-      )
-    ) {
+    if (isReferencee && shouldAddConnectionField) {
       const ConnectionType = build.getTypeByName(connectionTypeName);
       if (ConnectionType) {
         const fieldName = connectionFieldName;
@@ -1355,14 +1394,7 @@ function addRelations(
       }
     }
 
-    if (
-      isReferencee &&
-      build.behavior.matches(
-        behavior,
-        `${relationTypeScope}:resource:list`,
-        defaultBehavior,
-      )
-    ) {
+    if (isReferencee && shouldAddListField) {
       const fieldName = listFieldName;
       fields = extend(
         fields,
