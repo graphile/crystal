@@ -1,3 +1,4 @@
+import { PgCodecRefPath, PgCodecRelation, PgResource } from "@dataplan/pg";
 import type { PgSmartTagsDict } from "pg-introspection";
 
 export function tagToString(
@@ -250,3 +251,53 @@ export function parseDatabaseIdentifierFromSmartTag<
     return bits as any;
   }
 }
+
+type Layer = {
+  relationName: string;
+  localAttributes: string[];
+  resource: PgResource<any, any, any, any, any>;
+  remoteAttributes: string[];
+  isUnique: boolean;
+};
+
+export const resolveResourceRefPath = (
+  resource: PgResource<any, any, any, any, any>,
+  path: PgCodecRefPath,
+) => {
+  if (!resource) {
+    throw new Error(`Cannot call resolvePath unless there's a resource`);
+  }
+  const result = {
+    resource,
+    hasReferencee: false,
+    isUnique: true,
+    layers: [] as Layer[],
+  };
+  for (const pathEntry of path) {
+    const relation = result.resource.getRelation(
+      pathEntry.relationName,
+    ) as PgCodecRelation;
+    const {
+      isReferencee,
+      localAttributes,
+      remoteAttributes,
+      remoteResource: resource,
+      isUnique,
+    } = relation;
+    if (isReferencee) {
+      result.hasReferencee = true;
+    }
+    if (!isUnique) {
+      result.isUnique = false;
+    }
+    result.layers.push({
+      relationName: pathEntry.relationName,
+      localAttributes: localAttributes as string[],
+      remoteAttributes: remoteAttributes as string[],
+      resource,
+      isUnique,
+    });
+    result.resource = relation.remoteResource;
+  }
+  return result;
+};

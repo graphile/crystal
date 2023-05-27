@@ -27,7 +27,7 @@ import type { TE } from "tamedevil";
 import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
-import { tagToString } from "../utils.js";
+import { resolveResourceRefPath, tagToString } from "../utils.js";
 import { version } from "../version.js";
 
 const ref_first = te.ref(first, "first");
@@ -720,53 +720,6 @@ function addRelations(
         codec,
       }));
 
-  type Layer = {
-    relationName: string;
-    localAttributes: string[];
-    resource: PgResource;
-    remoteAttributes: string[];
-    isUnique: boolean;
-  };
-
-  const resolvePath = (path: PgCodecRefPath) => {
-    if (!resource) {
-      throw new Error(`Cannot call resolvePath unless there's a resource`);
-    }
-    const result = {
-      resource,
-      hasReferencee: false,
-      isUnique: true,
-      layers: [] as Layer[],
-    };
-    for (const pathEntry of path) {
-      const relation = result.resource.getRelation(
-        pathEntry.relationName,
-      ) as PgCodecRelation;
-      const {
-        isReferencee,
-        localAttributes,
-        remoteAttributes,
-        remoteResource: resource,
-        isUnique,
-      } = relation;
-      if (isReferencee) {
-        result.hasReferencee = true;
-      }
-      if (!isUnique) {
-        result.isUnique = false;
-      }
-      result.layers.push({
-        relationName: pathEntry.relationName,
-        localAttributes: localAttributes as string[],
-        remoteAttributes: remoteAttributes as string[],
-        resource,
-        isUnique,
-      });
-      result.resource = relation.remoteResource;
-    }
-    return result;
-  };
-
   type Digest = {
     identifier: string;
     isReferencee: boolean;
@@ -898,7 +851,9 @@ function addRelations(
     let listPlan;
     let connectionPlan;
     if (ref && resource) {
-      const paths = ref.paths.map(resolvePath);
+      const paths = ref.paths.map((path) =>
+        resolveResourceRefPath(resource, path),
+      );
       if (paths.length === 0) continue;
       const firstSource = paths[0].resource;
       const hasExactlyOneSource = paths.every(
