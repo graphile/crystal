@@ -42,6 +42,10 @@ export type BehaviorDynamicMethods = {
     entity: GraphileBuild.BehaviorEntities[entityType],
     filter: string,
   ) => boolean | undefined;
+} & {
+  [entityType in keyof GraphileBuild.BehaviorEntities as `${entityType}Behavior`]: (
+    entity: GraphileBuild.BehaviorEntities[entityType],
+  ) => string;
 };
 
 export class Behavior {
@@ -128,10 +132,13 @@ export class Behavior {
       listCache: new Map(),
       cache: new Map(),
     };
-    (this as any)[`${entityType}Matches`] = (
+    (this as this & BehaviorDynamicMethods)[`${entityType}Matches`] = (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
       behavior: string,
-    ) => this.entityMatches(entityType, entity, behavior);
+    ): boolean | undefined => this.entityMatches(entityType, entity, behavior);
+    (this as this & BehaviorDynamicMethods)[`${entityType}Behavior`] = (
+      entity: GraphileBuild.BehaviorEntities[TEntityType],
+    ): string => this.getBehaviorForEntity(entityType, entity).behaviorString;
   }
 
   private assertEntity<

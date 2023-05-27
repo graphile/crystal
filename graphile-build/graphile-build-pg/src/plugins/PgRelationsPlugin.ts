@@ -964,20 +964,11 @@ function addRelations(
       // const isUnique = paths.every((p) => p.isUnique);
 
       // TODO: shouldn't the ref behavior override the resource behavior?
-      const refBehavior = build.behavior.getBehaviorForEntity(
-        "pgRef",
-        ref,
-      ).behaviorString;
+      const refBehavior = build.behavior.pgRefBehavior(ref);
       behavior = hasExactlyOneSource
-        ? `${build.behavior.getBehaviorForEntity(
-            "pgResource",
-            firstSource,
-          )} ${refBehavior}`
+        ? `${build.behavior.pgResourceBehavior(firstSource)} ${refBehavior}`
         : sharedCodec
-        ? `${build.behavior.getBehaviorForEntity(
-            "pgCodec",
-            sharedCodec,
-          )} ${refBehavior}`
+        ? `${build.behavior.pgCodecBehavior(sharedCodec)} ${refBehavior}`
         : refBehavior;
 
       // Shortcut simple relation alias
