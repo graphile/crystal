@@ -47,7 +47,6 @@ declare global {
       isPgManyRelationConnectionField?: boolean;
       isPgManyRelationListField?: boolean;
       pgRelationDetails?: PgRelationsPluginRelationDetails;
-      fieldBehavior?: string;
     }
     interface Inflection {
       resourceRelationName(
@@ -1295,7 +1294,6 @@ function addRelations(
               fieldName,
               fieldBehaviorScope: `${relationTypeScope}:resource:single`,
               isPgSingleRelationField: true,
-              fieldBehavior: behavior,
               pgRelationDetails,
             },
             {
@@ -1337,7 +1335,6 @@ function addRelations(
                 isPgFieldConnection: true,
                 isPgManyRelationConnectionField: true,
                 pgRelationDetails,
-                fieldBehavior: behavior,
               },
               {
                 description:
@@ -1379,7 +1376,6 @@ function addRelations(
               isPgFieldSimpleCollection: true,
               isPgManyRelationListField: true,
               pgRelationDetails,
-              fieldBehavior: behavior,
             },
             {
               description:
