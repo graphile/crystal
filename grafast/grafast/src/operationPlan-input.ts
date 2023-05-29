@@ -40,6 +40,10 @@ export function withFieldArgsForArguments<
   parentPlan: TParentStep,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
+  applyAfter:
+    | boolean
+    | ReadonlyArray<string | ReadonlyArray<string>>
+    | undefined,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null | void> | TParentStep {
   if (operationPlan.loc !== null)
@@ -57,6 +61,7 @@ export function withFieldArgsForArguments<
     parentPlan,
     $all,
     fields,
+    applyAfter,
     callback,
   );
   if (operationPlan.loc !== null) operationPlan.loc.pop();
@@ -75,12 +80,15 @@ function withFieldArgsForArgumentsOrInputObject<
   fields: {
     [key: string]: GraphQLArgument | GraphQLInputField;
   } | null,
+  applyAfter:
+    | boolean
+    | ReadonlyArray<string | ReadonlyArray<string>>
+    | undefined,
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
   const schema = operationPlan.schema;
-  const analyzedCoordinates: { [key: string]: true } = Object.create(null);
 
-  const getArgOnceOnly = (inPath: string | string[]) => {
+  const getArgOnceOnly = (inPath: string | readonly string[]) => {
     if (operationPlan.loc !== null)
       operationPlan.loc.push(`getArgOnceOnly('${inPath}')`);
     const path = Array.isArray(inPath) ? [...inPath] : [inPath];
@@ -93,9 +101,6 @@ function withFieldArgsForArgumentsOrInputObject<
     }
 
     const id = path.join(".");
-    if (!analyzedCoordinates[id]) {
-      analyzedCoordinates[id] = true;
-    }
 
     const $currentObject = $current as
       | TrackedArguments
@@ -178,11 +183,15 @@ function withFieldArgsForArgumentsOrInputObject<
     const plan = operationPlan.withModifiers(() => {
       const { argOrField, $value, parentType } = details;
 
+      const applyAfter = $toStep
+        ? argOrField.extensions.grafast?.applyAfterApplyPlan
+        : argOrField.extensions.grafast?.applyAfterInputPlan;
       return withFieldArgsForArgOrField(
         operationPlan,
         parentPlan,
         argOrField,
         $value,
+        applyAfter,
         (fieldArgs) => {
           if (!parentType) {
             const arg = argOrField as GraphQLArgument;
@@ -285,6 +294,7 @@ function withFieldArgsForArgumentsOrInputObject<
         parentPlan,
         $value as any,
         currentType.getFields(),
+        applyAfter,
         (fieldArgs) =>
           typeResolver(fieldArgs, {
             schema,
@@ -370,6 +380,7 @@ function withFieldArgsForArgumentsOrInputObject<
               parentPlan,
               $field,
               isInputObjectType(fieldType) ? fieldType.getFields() : null,
+              field.extensions.grafast?.applyAfterApplyPlan,
               (fieldArgs) =>
                 resolver($toStep, fieldArgs, {
                   schema,
@@ -406,7 +417,6 @@ function withFieldArgsForArgumentsOrInputObject<
   const fieldArgs: FieldArgs = {
     get(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates[""] = true;
         if (!typeContainingFields) {
           if (fields !== null) {
             return object(
@@ -432,7 +442,6 @@ function withFieldArgsForArgumentsOrInputObject<
     },
     getRaw(path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates[""] = true;
         if ($current instanceof ExecutableStep) {
           return $current;
         } else {
@@ -444,7 +453,6 @@ function withFieldArgsForArgumentsOrInputObject<
     },
     apply(targetStepOrCallback, path) {
       if (!path || (Array.isArray(path) && path.length === 0)) {
-        analyzedCoordinates[""] = true;
         if (typeContainingFields && ($current as InputStep).evalIs(undefined)) {
           return;
         }
@@ -493,50 +501,30 @@ function withFieldArgsForArgumentsOrInputObject<
       return step;
     },
   };
-  const step = (callback(fieldArgs) ?? parentPlan) as
-    | ExecutableStep
-    | ModifierStep;
+  const callbackResult = callback(fieldArgs);
+  const step = (callbackResult ?? parentPlan) as ExecutableStep | ModifierStep;
 
-  // Now handled all the remaining coordinates
-  if (operationPlan.loc !== null) operationPlan.loc.push("handle_remaining");
+  // Now process 'applyAfter'
   if (
-    !analyzedCoordinates[""] &&
+    applyAfter &&
+    fields &&
     step != null &&
     !(step instanceof ConstantStep && step.isNull())
   ) {
-    if (!fields) {
-      fieldArgs.apply(step);
-    } else {
-      const allKeys = Object.keys(analyzedCoordinates);
-      const process = (
-        layerFields: typeof fields,
-        parentPath: readonly string[] = [],
-      ) => {
-        for (const fieldName in layerFields) {
-          const field = layerFields[fieldName];
-          const newPath = [...parentPath, fieldName];
-          const pathStr = newPath.join(".");
-          const prefix = `${pathStr}.`;
-          if (analyzedCoordinates[pathStr]) {
-            continue;
-          } else if (allKeys.some((c) => c.startsWith(prefix))) {
-            const inputObjectType = getNullableType(field.type);
-            if (!isInputObjectType(inputObjectType)) {
-              throw new Error(
-                `GrafastInternalError<1ac45a76-a21e-4f25-841c-59c73ddcf70c>: How could this not be an input object type given we have a path that uses it?!`,
-              );
-            }
-            process(inputObjectType.getFields(), newPath);
-            // recurse
-          } else {
-            fieldArgs.apply(step, newPath);
-          }
-        }
-      };
-      process(fields);
+    if (operationPlan.loc !== null) operationPlan.loc.push("handle_after");
+    if (applyAfter === true) {
+      // Apply all fields to the result of the callback
+      if (callbackResult) {
+        fieldArgs.apply(callbackResult);
+      }
+      // TODO: else: warn user?
+    } else if (applyAfter) {
+      for (const path of applyAfter) {
+        fieldArgs.apply(step, path);
+      }
     }
+    if (operationPlan.loc !== null) operationPlan.loc.pop();
   }
-  if (operationPlan.loc !== null) operationPlan.loc.pop();
 
   return step as any;
 }
@@ -549,6 +537,10 @@ function withFieldArgsForArgOrField<
   parentPlan: TParentStep,
   argOrField: GraphQLArgument | GraphQLInputField,
   $value: InputStep,
+  applyAfter:
+    | boolean
+    | ReadonlyArray<string | ReadonlyArray<string>>
+    | undefined,
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
   const type = argOrField.type;
@@ -562,6 +554,7 @@ function withFieldArgsForArgOrField<
     parentPlan,
     $value,
     fields,
+    applyAfter,
     callback,
   );
 }

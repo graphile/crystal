@@ -2250,6 +2250,11 @@ export function makeExampleSchema(
               if ($value.evalIs(null)) {
                 // Ignore
               } else {
+                if (!$parent.placeholder) {
+                  console.error(
+                    `in BooleanFilter.equalTo, ${$parent} does not have placeholder method`,
+                  );
+                }
                 $parent.where(
                   sql`${$parent.expression} = ${$parent.placeholder(
                     $value,
@@ -2349,6 +2354,7 @@ export function makeExampleSchema(
     fields: {
       some: {
         type: MessageFilter,
+        applyAfterApplyPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
@@ -2457,6 +2463,7 @@ export function makeExampleSchema(
           },
           condition: {
             type: MessageCondition,
+            applyAfterApplyPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -2470,6 +2477,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
+            applyAfterApplyPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
                 function plan(
@@ -2488,6 +2496,7 @@ export function makeExampleSchema(
             PgSelectStep<typeof messageResource>
           >(($messages) => $messages),
         },
+        applyAfterPlan: ["first", "condition", "filter", "includeArchived"],
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, messageResource) =>
             function plan($forum) {
@@ -2540,6 +2549,7 @@ export function makeExampleSchema(
           },
           condition: {
             type: MessageCondition,
+            applyAfterApplyPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -2554,6 +2564,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
+            applyAfterApplyPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
                 function plan(
@@ -2573,6 +2584,13 @@ export function makeExampleSchema(
             ResourceConnectionPlan<typeof messageResource>
           >(($connection) => $connection.getSubplan()),
         },
+        applyAfterPlan: [
+          "first",
+          "last",
+          "condition",
+          "filter",
+          "includeArchived",
+        ],
         plan: EXPORTABLE(
           (connection, deoptimizeIfAppropriate, messageResource) =>
             function plan($forum) {
@@ -3650,6 +3668,7 @@ export function makeExampleSchema(
             },
           [deoptimizeIfAppropriate, forumResource],
         ),
+        applyAfterPlan: ["first", "includeArchived", "condition", "filter"],
         args: {
           first: {
             type: GraphQLInt,
@@ -3684,6 +3703,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: ForumFilter,
+            applyAfterApplyPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
                 function plan(
@@ -3739,6 +3759,7 @@ export function makeExampleSchema(
         args: {
           condition: {
             type: MessageCondition,
+            applyAfterApplyPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -3753,6 +3774,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
+            applyAfterApplyPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
                 function plan(
@@ -3868,6 +3890,16 @@ export function makeExampleSchema(
             ),
           },
         },
+        applyAfterPlan: [
+          "condition",
+          "filter",
+          "includeArchived",
+          "first",
+          "last",
+          "after",
+          "before",
+          "orderBy",
+        ],
         plan: EXPORTABLE(
           (connection, deoptimizeIfAppropriate, messageResource) =>
             function plan() {
@@ -4154,6 +4186,7 @@ export function makeExampleSchema(
             ),
           },
         },
+        applyAfterPlan: true,
         plan: EXPORTABLE(
           (
             TYPES,
@@ -4568,6 +4601,15 @@ export function makeExampleSchema(
             ),
           },
         },
+        applyAfterPlan: [
+          "condition",
+          "first",
+          "last",
+          "offset",
+          "after",
+          "before",
+          "orderBy",
+        ],
         plan: EXPORTABLE(
           (
             TYPES,

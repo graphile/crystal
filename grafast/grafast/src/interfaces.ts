@@ -134,12 +134,21 @@ declare global {
 export interface GrafastFieldExtensions {
   plan?: FieldPlanResolver<any, any, any>;
   subscribePlan?: FieldPlanResolver<any, any, any>;
+  /* List of arg names or input paths to apply once the field has been planned */
+  applyAfterPlan?: boolean | ReadonlyArray<string | ReadonlyArray<string>>;
+  applyAfterSubscribePlan?:
+    | boolean
+    | ReadonlyArray<string | ReadonlyArray<string>>;
 }
 
 export interface GrafastArgumentExtensions {
   // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
   inputPlan?: ArgumentInputPlanResolver;
   applyPlan?: ArgumentApplyPlanResolver;
+  /* List of arg names or input paths to apply after 'inputPlan' has been called */
+  applyAfterInputPlan?: boolean | ReadonlyArray<string | ReadonlyArray<string>>;
+  /* List of arg names or input paths to apply after 'applyPlan' has been called */
+  applyAfterApplyPlan?: boolean | ReadonlyArray<string | ReadonlyArray<string>>;
 }
 
 export interface GrafastInputObjectTypeExtensions {
@@ -150,6 +159,10 @@ export interface GrafastInputFieldExtensions {
   // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
   inputPlan?: InputObjectFieldInputPlanResolver;
   applyPlan?: InputObjectFieldApplyPlanResolver;
+  /* List of arg names or input paths to apply after 'inputPlan' has been called */
+  applyAfterInputPlan?: boolean | ReadonlyArray<string | ReadonlyArray<string>>;
+  /* List of arg names or input paths to apply after 'applyPlan' has been called */
+  applyAfterApplyPlan?: boolean | ReadonlyArray<string | ReadonlyArray<string>>;
 }
 
 export interface GrafastObjectTypeExtensions {
@@ -316,11 +329,11 @@ export type TargetStepOrCallback =
 // TODO: rename
 export interface FieldArgs {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
-  get(path?: string | string[]): ExecutableStep;
+  get(path?: string | readonly string[]): ExecutableStep;
   /** Gets the value *without* calling any `inputPlan`s */
-  getRaw(path?: string | string[]): InputStep;
+  getRaw(path?: string | readonly string[]): InputStep;
   /** This also works (without path) to apply each list entry against $target */
-  apply($target: TargetStepOrCallback, path?: string | string[]): void;
+  apply($target: TargetStepOrCallback, path?: string | readonly string[]): void;
 }
 
 export interface FieldInfo {
@@ -595,7 +608,11 @@ export type GrafastFieldConfig<
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
   plan?: FieldPlanResolver<TArgs, TParentStep, TFieldStep>;
+  applyAfterPlan?: boolean | ReadonlyArray<string | ReadonlyArray<string>>;
   subscribePlan?: FieldPlanResolver<TArgs, TParentStep, TFieldStep>;
+  applyAfterSubscribePlan?:
+    | boolean
+    | ReadonlyArray<string | ReadonlyArray<string>>;
   args?: GrafastFieldConfigArgumentMap<
     TType,
     TContext,
@@ -640,7 +657,9 @@ export type GrafastArgumentConfig<
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
   inputPlan?: ArgumentInputPlanResolver<any>;
+  applyAfterInputPlan?: boolean | ReadonlyArray<string | ReadonlyArray<string>>;
   applyPlan?: ArgumentApplyPlanResolver<any, any>;
+  applyAfterApplyPlan?: boolean | ReadonlyArray<string | ReadonlyArray<string>>;
 };
 
 /**

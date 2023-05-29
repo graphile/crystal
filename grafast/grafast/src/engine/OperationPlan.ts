@@ -758,6 +758,7 @@ export class OperationPlan {
         POLYMORPHIC_ROOT_PATHS,
         fields,
         subscriptionPlanResolver,
+        fieldSpec.extensions?.grafast?.applyAfterSubscribePlan,
         this.trackedRootValueStep,
         fieldSpec,
         trackedArguments,
@@ -1182,6 +1183,7 @@ export class OperationPlan {
           polymorphicPaths,
           fieldNodes,
           planResolver,
+          objectField.extensions.grafast?.applyAfterPlan,
           parentStep,
           objectField,
           trackedArguments,
@@ -1743,6 +1745,10 @@ export class OperationPlan {
     polymorphicPaths: ReadonlySet<string> | null,
     fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
+    applyAfter:
+      | boolean
+      | ReadonlyArray<string | ReadonlyArray<string>>
+      | undefined,
     rawParentStep: ExecutableStep,
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
@@ -1763,6 +1769,7 @@ export class OperationPlan {
         parentStep,
         trackedArguments,
         field,
+        applyAfter,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
             field,
