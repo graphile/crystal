@@ -572,13 +572,19 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgCodec(behavior, codec) {
-        return [
-          "resource:select",
-          "table",
-          ...(!codec.isAnonymous ? ["resource:insert", "resource:update"] : []),
-          behavior,
-        ];
+      pgCodec: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, codec) {
+          return [
+            "resource:select",
+            "table",
+            ...(!codec.isAnonymous
+              ? ["resource:insert", "resource:update"]
+              : []),
+            behavior,
+          ];
+        },
       },
     },
     hooks: {

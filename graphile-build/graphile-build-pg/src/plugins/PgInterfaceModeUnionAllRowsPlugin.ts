@@ -60,12 +60,16 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgCodec(behavior, entity) {
-        if (entity.polymorphism?.mode === "union") {
-          return ["connection -list", behavior];
-        } else {
-          return behavior;
-        }
+      pgCodec: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, entity) {
+          if (entity.polymorphism?.mode === "union") {
+            return ["connection -list", behavior];
+          } else {
+            return behavior;
+          }
+        },
       },
     },
     hooks: {

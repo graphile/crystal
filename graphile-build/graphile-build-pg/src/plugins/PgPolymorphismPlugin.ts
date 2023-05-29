@@ -571,13 +571,17 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
   },
   schema: {
     entityBehavior: {
-      pgCodec(behavior, codec) {
-        return [
-          "select",
-          "table",
-          ...(!codec.isAnonymous ? ["insert", "update"] : []),
-          behavior,
-        ];
+      pgCodec: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, codec) {
+          return [
+            "select",
+            "table",
+            ...(!codec.isAnonymous ? ["insert", "update"] : []),
+            behavior,
+          ];
+        },
       },
     },
     hooks: {

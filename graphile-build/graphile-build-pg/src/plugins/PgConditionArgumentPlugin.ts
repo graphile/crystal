@@ -45,8 +45,12 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
     entityBehavior: {
       pgCodec: "select filter",
       pgCodecAttribute: "filterBy",
-      pgResource(behavior, resource) {
-        return [resource.parameters ? "" : "filter", behavior];
+      pgResource: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, resource) {
+          return [resource.parameters ? "" : "filter", behavior];
+        },
       },
     },
     hooks: {

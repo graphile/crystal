@@ -40,12 +40,17 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgResource(behavior, entity) {
-        if (isComputedColumnLike(entity)) {
-          return ["-proc:filterBy", behavior];
-        } else {
-          return behavior;
-        }
+      pgResource: {
+        provides: ["inferred"],
+        after: ["default"],
+        before: ["override"],
+        callback(behavior, entity) {
+          if (isComputedColumnLike(entity)) {
+            return ["-proc:filterBy", behavior];
+          } else {
+            return behavior;
+          }
+        },
       },
     },
     hooks: {

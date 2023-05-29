@@ -39,12 +39,16 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgResource(behavior, resource) {
-        if (canSupportNode(resource)) {
-          return ["node", "select", behavior];
-        } else {
-          return behavior;
-        }
+      pgResource: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, resource) {
+          if (canSupportNode(resource)) {
+            return ["node", "select", behavior];
+          } else {
+            return behavior;
+          }
+        },
       },
     },
     hooks: {

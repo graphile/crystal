@@ -48,12 +48,16 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgCodec: "order",
-      pgResource(behavior, resource) {
-        if (resource.parameters) {
-          return behavior;
-        } else {
-          return ["order", behavior];
-        }
+      pgResource: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, resource) {
+          if (resource.parameters) {
+            return behavior;
+          } else {
+            return ["order", behavior];
+          }
+        },
       },
     },
     hooks: {

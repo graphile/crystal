@@ -69,18 +69,22 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgResource(behavior, resource) {
-        const newBehavior = [behavior];
-        if (
-          !resource.parameters &&
-          !!resource.codec.attributes &&
-          !resource.codec.polymorphism &&
-          !resource.codec.isAnonymous
-        ) {
-          newBehavior.unshift("insert");
-          newBehavior.unshift("record");
-        }
-        return newBehavior;
+      pgResource: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, resource) {
+          const newBehavior = [behavior];
+          if (
+            !resource.parameters &&
+            !!resource.codec.attributes &&
+            !resource.codec.polymorphism &&
+            !resource.codec.isAnonymous
+          ) {
+            newBehavior.unshift("insert");
+            newBehavior.unshift("record");
+          }
+          return newBehavior;
+        },
       },
     },
     hooks: {
