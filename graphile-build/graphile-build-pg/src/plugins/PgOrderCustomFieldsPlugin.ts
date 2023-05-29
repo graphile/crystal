@@ -9,6 +9,7 @@ import type {
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
+import { isSimpleScalarComputedColumnLike } from "./PgConditionCustomFieldsPlugin.js";
 
 declare global {
   namespace GraphileBuild {
@@ -53,16 +54,11 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
         after: ["default"],
         before: ["override"],
         callback(behavior, resource) {
-          if (resource.codec.attributes) return behavior;
-          if (resource.codec.arrayOfCodec) return behavior;
-          if (resource.codec.rangeOfCodec) return behavior;
-          const parameters: readonly PgResourceParameter[] | undefined =
-            resource.parameters;
-          if (!parameters || parameters.length < 1) return behavior;
-          if (parameters.some((p, i) => i > 0 && p.required)) return behavior;
-          if (!parameters[0].codec.attributes) return behavior;
-          if (!resource.isUnique) return behavior;
-          return ["-orderBy", behavior];
+          if (isSimpleScalarComputedColumnLike(resource)) {
+            return [behavior, "-orderBy"];
+          } else {
+            return behavior;
+          }
         },
       },
     },
@@ -84,15 +80,8 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (resource.codec.attributes) return false;
-          if (resource.codec.arrayOfCodec) return false;
-          if (resource.codec.rangeOfCodec) return false;
-          const parameters: readonly PgResourceParameter[] | undefined =
-            resource.parameters;
-          if (!parameters || parameters.length < 1) return false;
-          if (parameters.some((p, i) => i > 0 && p.required)) return false;
-          if (parameters[0].codec !== pgCodec) return false;
-          if (!resource.isUnique) return false;
+          if (!isSimpleScalarComputedColumnLike(resource)) return false;
+          if (resource.parameters![0].codec !== pgCodec) return false;
           // TODO: should this be `proc:orderBy`? If so, should we make it so `getBehavior` accepts a prefix to prepend, so `"orderBy"` in a smart tag on a proc becomes `proc:orderBy`?
           return !!build.behavior.pgResourceMatches(resource, "orderBy");
         });

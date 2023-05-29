@@ -19,7 +19,12 @@ declare global {
   }
 }
 
-function isComputedColumnLike(resource: PgResource) {
+/**
+ * Returns true for function sources that have at least one argument, all
+ * arguments except the first are nullable, the first argument is a composite
+ * type, and the result is a simple scalar type.
+ */
+export function isSimpleScalarComputedColumnLike(resource: PgResource) {
   if (resource.codec.attributes) return false;
   if (resource.codec.arrayOfCodec) return false;
   if (resource.codec.rangeOfCodec) return false;
@@ -45,8 +50,8 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         after: ["default"],
         before: ["override"],
         callback(behavior, entity) {
-          if (isComputedColumnLike(entity)) {
-            return ["-proc:filterBy", behavior];
+          if (isSimpleScalarComputedColumnLike(entity)) {
+            return [behavior, "-proc:filterBy"];
           } else {
             return behavior;
           }
@@ -72,7 +77,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (!isComputedColumnLike(resource)) return false;
+          if (!isSimpleScalarComputedColumnLike(resource)) return false;
           if (resource.parameters![0].codec !== pgCodec) return false;
           return build.behavior.pgResourceMatches(resource, "proc:filterBy");
         });
