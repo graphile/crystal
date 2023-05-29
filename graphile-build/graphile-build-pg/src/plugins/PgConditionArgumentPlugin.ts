@@ -44,7 +44,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgCodec: "select filter",
-      pgAttribute: "filterBy",
+      pgCodecAttribute: "filterBy",
       pgResource(behavior, resource) {
         return [resource.parameters ? "" : "filter", behavior];
       },
@@ -115,7 +115,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                   return Object.entries(attributes).reduce(
                     (memo, [attributeName, attribute]) => {
                       if (
-                        !build.behavior.pgAttributeMatches(
+                        !build.behavior.pgCodecAttributeMatches(
                           [codec, attribute],
                           "attribute:filterBy",
                         )

@@ -79,14 +79,14 @@ declare global {
 
     interface BehaviorEntities {
       pgCodec: PgCodec;
-      pgAttribute: [codec: PgCodec, attribute: PgCodecAttribute];
+      pgCodecAttribute: [codec: PgCodec, attribute: PgCodecAttribute];
       pgResource: PgResource<any, any, any, any, any>;
-      pgUnique: [
+      pgResourceUnique: [
         resource: PgResource<any, any, any, any, any>,
         unique: PgResourceUnique,
       ];
-      pgRelation: PgCodecRelation;
-      pgRef: PgCodecRef;
+      pgCodecRelation: PgCodecRelation;
+      pgCodecRef: PgCodecRef;
       pgRefDefinition: PgRefDefinition;
     }
   }
@@ -108,7 +108,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           return [behavior, getBehavior(codec.extensions)];
         },
       },
-      pgAttribute: {
+      pgCodecAttribute: {
         after: ["default", "inferred"],
         provides: ["override"],
         callback(behavior, [codec, attribute]) {
@@ -128,7 +128,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           ];
         },
       },
-      pgUnique: {
+      pgResourceUnique: {
         after: ["default", "inferred"],
         provides: ["override"],
         callback(behavior, [resource, unique]) {
@@ -142,7 +142,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           ];
         },
       },
-      pgRelation: {
+      pgCodecRelation: {
         after: ["default", "inferred"],
         provides: ["override"],
         callback(behavior, relationSpec) {
@@ -158,7 +158,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           ];
         },
       },
-      pgRef: {
+      pgCodecRef: {
         after: ["default", "inferred"],
         provides: ["override"],
         callback(behavior, ref) {

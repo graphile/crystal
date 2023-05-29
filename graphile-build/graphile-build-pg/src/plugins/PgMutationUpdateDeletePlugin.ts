@@ -235,7 +235,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgResource: "update delete",
-      pgUnique: "update delete",
+      pgResourceUnique: "update delete",
     },
 
     hooks: {
@@ -634,7 +634,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               })),
             ].filter((spec) => {
               const unique = spec.unique as PgResourceUnique;
-              return !!build.behavior.pgUniqueMatches(
+              return !!build.behavior.pgResourceUniqueMatches(
                 [resource, unique],
                 constraintMode,
               );

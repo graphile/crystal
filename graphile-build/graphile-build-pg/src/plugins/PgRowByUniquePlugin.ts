@@ -56,7 +56,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgUnique: "single",
+      pgResourceUnique: "single",
     },
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
@@ -172,7 +172,7 @@ return function (resource) {
 
                   const fieldBehaviorScope = "query:resource:single";
                   if (
-                    !build.behavior.pgUniqueMatches(
+                    !build.behavior.pgResourceUniqueMatches(
                       [resource, unique],
                       fieldBehaviorScope,
                     )

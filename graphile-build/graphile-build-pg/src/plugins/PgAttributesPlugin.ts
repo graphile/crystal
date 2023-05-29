@@ -144,7 +144,10 @@ function processAttribute(
   const attribute = pgCodec.attributes[attributeName];
 
   if (
-    !build.behavior.pgAttributeMatches([pgCodec, attribute], "attribute:select")
+    !build.behavior.pgCodecAttributeMatches(
+      [pgCodec, attribute],
+      "attribute:select",
+    )
   ) {
     // Don't allow selecting this attribute.
     return;
@@ -340,7 +343,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgAttribute: "select base update insert",
+      pgCodecAttribute: "select base update insert",
     },
     hooks: {
       GraphQLInterfaceType_fields(fields, build, context) {
@@ -462,7 +465,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
               const fieldBehaviorScope = `attribute:${action}`;
               if (
-                !build.behavior.pgAttributeMatches(
+                !build.behavior.pgCodecAttributeMatches(
                   [pgCodec, attribute],
                   fieldBehaviorScope,
                 )

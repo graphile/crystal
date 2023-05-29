@@ -482,7 +482,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgRelation: {
+      pgCodecRelation: {
         provides: ["inferred"],
         before: ["override"],
         after: ["default"],
@@ -497,7 +497,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           }
         },
       },
-      pgRef: {
+      pgCodecRef: {
         provides: ["inferred"],
         before: ["override"],
         after: ["default"],
@@ -857,15 +857,15 @@ function addRelations(
       const listFieldName = build.inflection.manyRelationList(relationDetails);
 
       const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
-      const shouldAddSingleField = build.behavior.pgRelationMatches(
+      const shouldAddSingleField = build.behavior.pgCodecRelationMatches(
         relation,
         `${relationTypeScope}:resource:single`,
       );
-      const shouldAddConnectionField = build.behavior.pgRelationMatches(
+      const shouldAddConnectionField = build.behavior.pgCodecRelationMatches(
         relation,
         `${relationTypeScope}:resource:connection`,
       );
-      const shouldAddListField = build.behavior.pgRelationMatches(
+      const shouldAddListField = build.behavior.pgCodecRelationMatches(
         relation,
         `${relationTypeScope}:resource:list`,
       );
@@ -980,12 +980,12 @@ function addRelations(
       behavior = hasExactlyOneSource
         ? `${build.behavior.pgResourceBehavior(
             firstSource,
-          )} ${build.behavior.pgRefBehavior(ref, false)}`
+          )} ${build.behavior.pgCodecRefBehavior(ref, false)}`
         : sharedCodec
         ? `${build.behavior.pgCodecBehavior(
             sharedCodec,
-          )} ${build.behavior.pgRefBehavior(ref, false)}`
-        : build.behavior.pgRefBehavior(ref);
+          )} ${build.behavior.pgCodecRefBehavior(ref, false)}`
+        : build.behavior.pgCodecRefBehavior(ref);
 
       // Shortcut simple relation alias
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {
