@@ -66,7 +66,7 @@ declare global {
     }
 
     interface BehaviorEntities {
-      example: { type: "example" };
+      string: string;
       // Expand me through declaration merging
     }
 

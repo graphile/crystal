@@ -82,6 +82,11 @@ export class Behavior {
   private globalDefaultBehavior: ResolvedBehavior;
   constructor(private resolvedPreset: GraphileConfig.ResolvedPreset) {
     this.behaviorEntities = Object.create(null);
+    this.registerEntity("string");
+    this.behaviorEntities.string.behaviorCallbacks.push([
+      "builtin.string",
+      (str) => str,
+    ]);
 
     const plugins = sortedPlugins(resolvedPreset.plugins);
 
@@ -213,7 +218,7 @@ export class Behavior {
       entityType,
       entity,
     ).behaviorString;
-    return this.stringMatches(finalString, filter);
+    return stringMatches(finalString, filter);
   }
 
   /**
@@ -257,27 +262,6 @@ export class Behavior {
     return behavior;
   }
 
-  public stringMatches(
-    behaviorString: string,
-    filter: string,
-  ): boolean | undefined {
-    const specs = parseSpecs(behaviorString);
-    const filterScope = parseScope(filter);
-    if (filterScope[filterScope.length - 1] === "create") {
-      throw new Error(
-        `'create' filter scope is forbidden; did you mean 'insert'?`,
-      );
-    }
-    // Loop backwards through the specs
-    for (let i = specs.length - 1; i >= 0; i--) {
-      const { positive, scope } = specs[i];
-      if (scopeMatches(scope, filterScope, positive)) {
-        return positive;
-      }
-    }
-    return undefined;
-  }
-
   /** @deprecated Please use entityMatches or stringMatches instead */
   public matches(
     localBehaviorSpecsString: string | string[] | null | undefined,
@@ -303,7 +287,7 @@ export class Behavior {
     const finalBehaviorSpecsString = `${defaultBehavior} ${
       this.globalDefaultBehavior
     } ${specString ?? ""}`;
-    return this.stringMatches(finalBehaviorSpecsString, filter);
+    return stringMatches(finalBehaviorSpecsString, filter);
   }
 }
 
@@ -489,3 +473,24 @@ function getCachedEntity<T extends any[]>(
 }
 
 const warned = new Set<string>();
+
+function stringMatches(
+  behaviorString: string,
+  filter: string,
+): boolean | undefined {
+  const specs = parseSpecs(behaviorString);
+  const filterScope = parseScope(filter);
+  if (filterScope[filterScope.length - 1] === "create") {
+    throw new Error(
+      `'create' filter scope is forbidden; did you mean 'insert'?`,
+    );
+  }
+  // Loop backwards through the specs
+  for (let i = specs.length - 1; i >= 0; i--) {
+    const { positive, scope } = specs[i];
+    if (scopeMatches(scope, filterScope, positive)) {
+      return positive;
+    }
+  }
+  return undefined;
+}
