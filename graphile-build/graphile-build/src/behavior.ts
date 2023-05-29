@@ -83,10 +83,6 @@ export class Behavior {
   constructor(private resolvedPreset: GraphileConfig.ResolvedPreset) {
     this.behaviorEntities = Object.create(null);
     this.registerEntity("string");
-    this.behaviorEntities.string.behaviorCallbacks.push([
-      "builtin.string",
-      (str) => str,
-    ]);
 
     const plugins = sortedPlugins(resolvedPreset.plugins);
 
@@ -145,6 +141,11 @@ export class Behavior {
   private registerEntity<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(entityType: TEntityType) {
+    if (entityType === ("string" as any)) {
+      (this as this & BehaviorDynamicMethods).stringMatches = stringMatches;
+      (this as this & BehaviorDynamicMethods).stringBehavior = (str) => str;
+      return;
+    }
     this.behaviorEntities[entityType] = {
       behaviorCallbacks: [],
       listCache: new Map(),
@@ -166,6 +167,11 @@ export class Behavior {
   private assertEntity<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
   >(entityType: TEntityType) {
+    if (entityType === "string") {
+      throw new Error(
+        `Runtime behaviors cannot be attached to strings, please use 'behavior.stringMatches' directly.`,
+      );
+    }
     if (!this.behaviorEntities[entityType]) {
       throw new Error(
         `Behavior entity type '${entityType}' is not registered; known entity types: ${Object.keys(
