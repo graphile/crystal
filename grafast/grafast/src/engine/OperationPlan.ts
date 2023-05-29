@@ -45,7 +45,10 @@ import type {
 import { $$proxy, $$subroutine, $$timeout, $$ts } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
-import { withFieldArgsForArguments } from "../operationPlan-input.js";
+import {
+  ApplyAfterModeArg,
+  withFieldArgsForArguments,
+} from "../operationPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
 import {
   $$noExec,
@@ -758,7 +761,7 @@ export class OperationPlan {
         POLYMORPHIC_ROOT_PATHS,
         fields,
         subscriptionPlanResolver,
-        fieldSpec.extensions?.grafast?.applyAfterSubscribePlan,
+        "autoApplyAfterParentSubscribePlan",
         this.trackedRootValueStep,
         fieldSpec,
         trackedArguments,
@@ -1183,7 +1186,7 @@ export class OperationPlan {
           polymorphicPaths,
           fieldNodes,
           planResolver,
-          objectField.extensions.grafast?.applyAfterPlan,
+          "autoApplyAfterParentPlan",
           parentStep,
           objectField,
           trackedArguments,
@@ -1745,10 +1748,7 @@ export class OperationPlan {
     polymorphicPaths: ReadonlySet<string> | null,
     fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
-    applyAfter:
-      | boolean
-      | ReadonlyArray<string | ReadonlyArray<string>>
-      | undefined,
+    applyAfterMode: ApplyAfterModeArg,
     rawParentStep: ExecutableStep,
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
@@ -1769,7 +1769,7 @@ export class OperationPlan {
         parentStep,
         trackedArguments,
         field,
-        applyAfter,
+        applyAfterMode,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
             field,

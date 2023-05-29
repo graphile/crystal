@@ -32,6 +32,14 @@ const {
   isScalarType,
 } = graphql;
 
+export type ApplyAfterModeArg =
+  | "autoApplyAfterParentPlan"
+  | "autoApplyAfterParentSubscribePlan";
+type ApplyAfterModeInput =
+  | "autoApplyAfterParentApplyPlan"
+  | "autoApplyAfterParentInputPlan";
+type ApplyAfterMode = ApplyAfterModeArg | ApplyAfterModeInput;
+
 export function withFieldArgsForArguments<
   T extends ExecutableStep,
   TParentStep extends ExecutableStep = ExecutableStep,
@@ -40,10 +48,7 @@ export function withFieldArgsForArguments<
   parentPlan: TParentStep,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
-  applyAfter:
-    | boolean
-    | ReadonlyArray<string | ReadonlyArray<string>>
-    | undefined,
+  applyAfterMode: ApplyAfterModeArg,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null | void> | TParentStep {
   if (operationPlan.loc !== null)
@@ -61,7 +66,7 @@ export function withFieldArgsForArguments<
     parentPlan,
     $all,
     fields,
-    applyAfter,
+    applyAfterMode,
     callback,
   );
   if (operationPlan.loc !== null) operationPlan.loc.pop();
@@ -80,10 +85,7 @@ function withFieldArgsForArgumentsOrInputObject<
   fields: {
     [key: string]: GraphQLArgument | GraphQLInputField;
   } | null,
-  applyAfter:
-    | boolean
-    | ReadonlyArray<string | ReadonlyArray<string>>
-    | undefined,
+  applyAfterMode: ApplyAfterMode,
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
   const schema = operationPlan.schema;
@@ -183,15 +185,15 @@ function withFieldArgsForArgumentsOrInputObject<
     const plan = operationPlan.withModifiers(() => {
       const { argOrField, $value, parentType } = details;
 
-      const applyAfter = $toStep
-        ? argOrField.extensions.grafast?.applyAfterApplyPlan
-        : argOrField.extensions.grafast?.applyAfterInputPlan;
+      const applyAfterMode: ApplyAfterMode = $toStep
+        ? "autoApplyAfterParentApplyPlan"
+        : "autoApplyAfterParentInputPlan";
       return withFieldArgsForArgOrField(
         operationPlan,
         parentPlan,
         argOrField,
         $value,
-        applyAfter,
+        applyAfterMode,
         (fieldArgs) => {
           if (!parentType) {
             const arg = argOrField as GraphQLArgument;
@@ -294,7 +296,7 @@ function withFieldArgsForArgumentsOrInputObject<
         parentPlan,
         $value as any,
         currentType.getFields(),
-        applyAfter,
+        applyAfterMode,
         (fieldArgs) =>
           typeResolver(fieldArgs, {
             schema,
@@ -380,7 +382,7 @@ function withFieldArgsForArgumentsOrInputObject<
               parentPlan,
               $field,
               isInputObjectType(fieldType) ? fieldType.getFields() : null,
-              field.extensions.grafast?.applyAfterApplyPlan,
+              "autoApplyAfterParentApplyPlan",
               (fieldArgs) =>
                 resolver($toStep, fieldArgs, {
                   schema,
@@ -504,14 +506,41 @@ function withFieldArgsForArgumentsOrInputObject<
   const callbackResult = callback(fieldArgs);
   const step = (callbackResult ?? parentPlan) as ExecutableStep | ModifierStep;
 
-  // Now process 'applyAfter'
+  // Now process 'applyAfterMode'
   if (
-    applyAfter &&
     fields &&
     step != null &&
     !(step instanceof ConstantStep && step.isNull())
   ) {
     if (operationPlan.loc !== null) operationPlan.loc.push("handle_after");
+    if (applyAfterMode === "autoApplyAfterParentApplyPlan" && callbackResult) {
+      fieldArgs.apply(callbackResult);
+    } else {
+      for (const fieldName in fields) {
+        const field = fields[fieldName];
+        switch (applyAfterMode) {
+          case "autoApplyAfterParentPlan":
+          case "autoApplyAfterParentSubscribePlan": {
+            const arg = field as GraphQLArgument;
+            const t = arg.extensions.grafast?.[applyAfterMode];
+            if (t) {
+              fieldArgs.apply(step, fieldName);
+            }
+            break;
+          }
+          case "autoApplyAfterParentApplyPlan":
+          case "autoApplyAfterParentInputPlan": {
+            const fld = field as GraphQLInputField;
+            const t = fld.extensions.grafast?.[applyAfterMode];
+            if (t) {
+              fieldArgs.apply(step, fieldName);
+            }
+            break;
+          }
+        }
+      }
+    }
+    /*
     if (applyAfter === true) {
       // Apply all fields to the result of the callback
       if (callbackResult) {
@@ -523,6 +552,7 @@ function withFieldArgsForArgumentsOrInputObject<
         fieldArgs.apply(step, path);
       }
     }
+    */
     if (operationPlan.loc !== null) operationPlan.loc.pop();
   }
 
@@ -537,10 +567,7 @@ function withFieldArgsForArgOrField<
   parentPlan: TParentStep,
   argOrField: GraphQLArgument | GraphQLInputField,
   $value: InputStep,
-  applyAfter:
-    | boolean
-    | ReadonlyArray<string | ReadonlyArray<string>>
-    | undefined,
+  applyAfterMode: ApplyAfterMode,
   callback: (fieldArgs: FieldArgs) => T,
 ): Exclude<T, undefined | null | void> | TParentStep {
   const type = argOrField.type;
@@ -554,7 +581,7 @@ function withFieldArgsForArgOrField<
     parentPlan,
     $value,
     fields,
-    applyAfter,
+    applyAfterMode,
     callback,
   );
 }

@@ -444,14 +444,7 @@ export function objectFieldSpec<
   >,
   path: string,
 ): GraphQLFieldConfig<any, TContext, TArgs> {
-  const {
-    plan,
-    subscribePlan,
-    applyAfterPlan,
-    applyAfterSubscribePlan,
-    args,
-    ...spec
-  } = grafastSpec;
+  const { plan, subscribePlan, args, ...spec } = grafastSpec;
 
   assertNotAsync(plan, `${path ?? "?"}.plan`);
   assertNotAsync(subscribePlan, `${path ?? "?"}.subscribePlan`);
@@ -461,8 +454,8 @@ export function objectFieldSpec<
         const {
           inputPlan,
           applyPlan,
-          applyAfterInputPlan,
-          applyAfterApplyPlan,
+          autoApplyAfterParentPlan,
+          autoApplyAfterParentSubscribePlan,
           ...argSpec
         } = args[argName];
         assertNotAsync(inputPlan, `${path ?? "?"}(${argName}:).inputPlan`);
@@ -474,9 +467,13 @@ export function objectFieldSpec<
                 extensions: {
                   grafast: {
                     ...(inputPlan ? { inputPlan } : null),
-                    ...(applyAfterInputPlan ? { applyAfterInputPlan } : null),
+                    ...(autoApplyAfterParentPlan
+                      ? { autoApplyAfterParentPlan }
+                      : null),
                     ...(applyPlan ? { applyPlan } : null),
-                    ...(applyAfterApplyPlan ? { applyAfterApplyPlan } : null),
+                    ...(autoApplyAfterParentSubscribePlan
+                      ? { autoApplyAfterParentSubscribePlan }
+                      : null),
                   },
                 },
               }
@@ -496,9 +493,7 @@ export function objectFieldSpec<
             grafast: {
               ...spec.extensions?.grafast,
               ...(plan ? { plan } : null),
-              ...(applyAfterPlan ? { applyAfterPlan } : null),
               ...(subscribePlan ? { subscribePlan } : null),
-              ...(applyAfterSubscribePlan ? { applyAfterSubscribePlan } : null),
             },
           },
         }

@@ -2171,6 +2171,7 @@ export function makeExampleSchema(
   ): GrafastArgumentConfig {
     return {
       type: IncludeArchived,
+      autoApplyAfterParentPlan: true,
       applyPlan: EXPORTABLE(
         (PgSelectSingleStep, TYPES, getClassStep, sql) =>
           function plan($parent: ExecutableStep, $field: TFieldStep, val) {
@@ -2354,7 +2355,7 @@ export function makeExampleSchema(
     fields: {
       some: {
         type: MessageFilter,
-        applyAfterApplyPlan: true,
+        autoApplyAfterParentApplyPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
@@ -2448,6 +2449,7 @@ export function makeExampleSchema(
         args: {
           first: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -2463,7 +2465,7 @@ export function makeExampleSchema(
           },
           condition: {
             type: MessageCondition,
-            applyAfterApplyPlan: true,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -2477,7 +2479,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
-            applyAfterApplyPlan: true,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
                 function plan(
@@ -2496,7 +2498,6 @@ export function makeExampleSchema(
             PgSelectStep<typeof messageResource>
           >(($messages) => $messages),
         },
-        applyAfterPlan: ["first", "condition", "filter", "includeArchived"],
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, messageResource) =>
             function plan($forum) {
@@ -2519,6 +2520,7 @@ export function makeExampleSchema(
         args: {
           first: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -2534,6 +2536,7 @@ export function makeExampleSchema(
           },
           last: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -2549,7 +2552,7 @@ export function makeExampleSchema(
           },
           condition: {
             type: MessageCondition,
-            applyAfterApplyPlan: true,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -2564,7 +2567,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
-            applyAfterApplyPlan: true,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
                 function plan(
@@ -2584,13 +2587,6 @@ export function makeExampleSchema(
             ResourceConnectionPlan<typeof messageResource>
           >(($connection) => $connection.getSubplan()),
         },
-        applyAfterPlan: [
-          "first",
-          "last",
-          "condition",
-          "filter",
-          "includeArchived",
-        ],
         plan: EXPORTABLE(
           (connection, deoptimizeIfAppropriate, messageResource) =>
             function plan($forum) {
@@ -3659,19 +3655,10 @@ export function makeExampleSchema(
     fields: {
       forums: {
         type: new GraphQLList(Forum),
-        plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, forumResource) =>
-            function plan(_$root) {
-              const $forums = forumResource.find();
-              deoptimizeIfAppropriate($forums);
-              return $forums;
-            },
-          [deoptimizeIfAppropriate, forumResource],
-        ),
-        applyAfterPlan: ["first", "includeArchived", "condition", "filter"],
         args: {
           first: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -3690,6 +3677,7 @@ export function makeExampleSchema(
           >(($forums) => $forums),
           condition: {
             type: ForumCondition,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -3704,6 +3692,7 @@ export function makeExampleSchema(
           filter: {
             type: ForumFilter,
             applyAfterApplyPlan: true,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
                 function plan(
@@ -3719,6 +3708,15 @@ export function makeExampleSchema(
             ),
           },
         },
+        plan: EXPORTABLE(
+          (deoptimizeIfAppropriate, forumResource) =>
+            function plan(_$root) {
+              const $forums = forumResource.find();
+              deoptimizeIfAppropriate($forums);
+              return $forums;
+            },
+          [deoptimizeIfAppropriate, forumResource],
+        ),
       },
       forum: {
         type: Forum,
@@ -3759,7 +3757,7 @@ export function makeExampleSchema(
         args: {
           condition: {
             type: MessageCondition,
-            applyAfterApplyPlan: true,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -3774,7 +3772,7 @@ export function makeExampleSchema(
           },
           filter: {
             type: MessageFilter,
-            applyAfterApplyPlan: true,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
                 function plan(
@@ -3795,6 +3793,7 @@ export function makeExampleSchema(
           >(($connection) => $connection.getSubplan()),
           first: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -3810,6 +3809,7 @@ export function makeExampleSchema(
           },
           last: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -3825,6 +3825,7 @@ export function makeExampleSchema(
           },
           after: {
             type: GraphQLString,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -3840,6 +3841,7 @@ export function makeExampleSchema(
           },
           before: {
             type: GraphQLString,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -3855,6 +3857,7 @@ export function makeExampleSchema(
           },
           orderBy: {
             type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               (GraphQLError, MessagesOrderBy, getEnumValueConfig, inspect) =>
                 function plan(
@@ -3890,16 +3893,6 @@ export function makeExampleSchema(
             ),
           },
         },
-        applyAfterPlan: [
-          "condition",
-          "filter",
-          "includeArchived",
-          "first",
-          "last",
-          "after",
-          "before",
-          "orderBy",
-        ],
         plan: EXPORTABLE(
           (connection, deoptimizeIfAppropriate, messageResource) =>
             function plan() {
@@ -4174,6 +4167,7 @@ export function makeExampleSchema(
         args: {
           first: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(_$root: any, $each: __ListTransformStep, val) {
@@ -4466,6 +4460,7 @@ export function makeExampleSchema(
         args: {
           condition: {
             type: VulnerabilityCondition,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -4480,6 +4475,7 @@ export function makeExampleSchema(
           },
           first: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -4495,6 +4491,7 @@ export function makeExampleSchema(
           },
           last: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -4510,6 +4507,7 @@ export function makeExampleSchema(
           },
           offset: {
             type: GraphQLInt,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -4525,6 +4523,7 @@ export function makeExampleSchema(
           },
           after: {
             type: GraphQLString,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -4540,6 +4539,7 @@ export function makeExampleSchema(
           },
           before: {
             type: GraphQLString,
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               () =>
                 function plan(
@@ -4555,6 +4555,7 @@ export function makeExampleSchema(
           },
           orderBy: {
             type: new GraphQLList(new GraphQLNonNull(VulnerabilitiesOrderBy)),
+            autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               (
                 GraphQLError,
@@ -4601,15 +4602,6 @@ export function makeExampleSchema(
             ),
           },
         },
-        applyAfterPlan: [
-          "condition",
-          "first",
-          "last",
-          "offset",
-          "after",
-          "before",
-          "orderBy",
-        ],
         plan: EXPORTABLE(
           (
             TYPES,
