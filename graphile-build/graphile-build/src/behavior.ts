@@ -181,33 +181,6 @@ export class Behavior {
     }
   }
 
-  /*
-  private addEntityTypeDefaultBehavior<
-    TEntityType extends keyof GraphileBuild.BehaviorEntities,
-  >(entityType: TEntityType, behavior: string) {
-    this.assertEntity(entityType);
-    const scope = this.behaviorEntities[entityType];
-    if (scope.defaultBehavior) {
-      scope.defaultBehavior += " " + behavior;
-    } else {
-      scope.defaultBehavior = behavior;
-    }
-  }
-
-  private addEntityBehavior<
-    TEntityType extends keyof GraphileBuild.BehaviorEntities,
-  >(
-    entityType: TEntityType,
-    getBehavior: (
-      entity: GraphileBuild.BehaviorEntities[TEntityType],
-      resolvedPreset: GraphileConfig.ResolvedPreset,
-    ) => string,
-  ) {
-    this.assertEntity(entityType);
-    this.behaviorEntities[entityType].behaviorCallbacks.push(getBehavior);
-  }
-  */
-
   // TODO: would be great if this could return `{deprecationReason: string}` too...
   /**
    * @param localBehaviorSpecsString - the behavior of the entity as determined by details on the entity itself and any applicable ancestors
