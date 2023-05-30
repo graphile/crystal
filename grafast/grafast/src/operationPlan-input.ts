@@ -386,11 +386,21 @@ export function withFieldArgsForArguments<
             for (let i = 0; i < l; i++) {
               fieldArgs.apply($target, [...path, i]);
             }
-            return;
+          } else if (isScalarType(nullableEntityType)) {
+            // noop
+          } else if (isEnumType(nullableEntityType)) {
+            // PERF: only do this if this enum type has values that have side effects
+            const value = $input.eval();
+            const enumValue = nullableEntityType
+              .getValues()
+              .find((v) => v.value === value);
+            const enumResolver = enumValue?.extensions.grafast?.applyPlan;
+            if (enumResolver !== undefined) {
+              enumResolver($target);
+            }
           } else {
-            throw new Error(
-              "Currently calling '.apply($step)' without a path is only supported on object and list types",
-            );
+            const never: never = nullableEntityType;
+            throw new Error(`Unhandled input type ${never}`);
           }
         } else {
           fieldArgs.apply($target, concatPath(path, subpath));
