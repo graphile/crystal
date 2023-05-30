@@ -1832,6 +1832,12 @@ export class OperationPlan {
       return { step, haltTree };
     } catch (e) {
       if (ALWAYS_THROW_PLANNING_ERRORS) throw e;
+
+      // FIXME: need to roll-back side-effect steps since they won't be
+      // tree-shaken away. In the mean time, let's just blow up the entire
+      // request.
+      if (Math.random() < 2) throw e;
+
       const step = withGlobalLayerPlan(
         layerPlan,
         polymorphicPaths,
