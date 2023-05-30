@@ -176,6 +176,12 @@ export class PgUpdateSingleStep<
     }
   }
 
+  public toStringMeta(): string | null {
+    return `${this.resource.name}(${this.getBys.map(
+      (g) => g.name,
+    )};${this.attributes.map((a) => a.name)})`;
+  }
+
   set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
     value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>

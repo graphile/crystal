@@ -155,6 +155,10 @@ export class PgDeleteSingleStep<
     });
   }
 
+  public toStringMeta(): string | null {
+    return `${this.resource.name}(${this.getBys.map((g) => g.name)})`;
+  }
+
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * deleteed row.
