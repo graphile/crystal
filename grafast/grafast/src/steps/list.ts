@@ -21,7 +21,7 @@ export class ListStep<
   constructor(list: TPlanTuple) {
     super();
     for (let i = 0, l = list.length; i < l; i++) {
-      this.addDependency(list[i]);
+      this.addDependency(list[i], true);
     }
   }
 
