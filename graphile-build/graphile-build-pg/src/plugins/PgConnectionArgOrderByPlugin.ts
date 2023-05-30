@@ -171,6 +171,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                 "arg",
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
+              autoApplyAfterParentPlan: true,
               applyPlan: isPgFieldConnection
                 ? EXPORTABLE(
                     (applyOrderToPlan, tableOrderByTypeName) =>

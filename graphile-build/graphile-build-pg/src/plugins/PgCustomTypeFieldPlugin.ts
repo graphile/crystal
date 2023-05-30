@@ -32,6 +32,7 @@ import type {
   FieldInfo,
   FieldPlanResolver,
   GrafastFieldConfig,
+  GrafastInputFieldConfigMap,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -643,12 +644,16 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         (memo, { inputType, graphqlArgName }) => {
                           memo[graphqlArgName] = {
                             type: inputType,
+                            applyPlan($parent, fieldArgs) {
+                              return fieldArgs.apply($parent);
+                            },
                           };
                           return memo;
                         },
                         Object.assign(Object.create(null), {
                           clientMutationId: {
                             type: GraphQLString,
+                            autoApplyAfterParentApplyPlan: true,
                             applyPlan: EXPORTABLE(
                               () =>
                                 function plan(
@@ -660,7 +665,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               [],
                             ),
                           },
-                        }) as GraphQLInputFieldConfigMap,
+                        }) as GrafastInputFieldConfigMap<any, any>,
                       );
 
                       return {
@@ -980,6 +985,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     args: {
                       input: {
                         type: new GraphQLNonNull(inputType),
+                        autoApplyAfterParentPlan: true,
                         applyPlan: EXPORTABLE(
                           () =>
                             function plan(_: any, $object: ObjectStep<any>) {

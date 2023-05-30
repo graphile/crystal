@@ -87,6 +87,7 @@ function commonFn(
           "arg",
         ),
         type: GraphQLInt,
+        autoApplyAfterParentPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
@@ -111,6 +112,7 @@ function commonFn(
                 "arg",
               ),
               type: GraphQLInt,
+              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
@@ -137,6 +139,7 @@ function commonFn(
           "arg",
         ),
         type: GraphQLInt,
+        autoApplyAfterParentPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
@@ -161,6 +164,7 @@ function commonFn(
                 "arg",
               ),
               type: Cursor,
+              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
@@ -183,6 +187,7 @@ function commonFn(
                 "arg",
               ),
               type: Cursor,
+              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
