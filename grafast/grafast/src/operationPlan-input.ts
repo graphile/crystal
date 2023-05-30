@@ -105,7 +105,11 @@ export function withFieldArgsForArguments<
         return $existing;
       }
       if (path.length === 0) {
-        throw new Error(`get() must be called with a non-empty path`);
+        const values = Object.create(null);
+        for (const argName of Object.keys(args)) {
+          values[argName] = fieldArgs.get([argName]);
+        }
+        return object(values);
       } else {
         const [argName, ...rest] = path;
         if (typeof argName !== "string") {
