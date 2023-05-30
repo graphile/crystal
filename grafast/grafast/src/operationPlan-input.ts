@@ -65,6 +65,7 @@ export function withFieldArgsForArguments<
 
   const got = new Map<string, ExecutableStep>();
   const applied = new Map<string, ExecutableStep>();
+  let explicitlyApplied = false;
 
   const fieldArgs: FieldArgs = {
     getRaw(path) {
@@ -73,7 +74,7 @@ export function withFieldArgsForArguments<
       } else if (Array.isArray(path)) {
         const [first, ...rest] = path;
         if (!first) {
-          throw new Error(`getRaw must be called with a non-empty path`);
+          throw new Error(`getRaw() must be called with a non-empty path`);
         }
         let $entry = $all.get(first);
         for (const pathSegment of rest) {
@@ -208,7 +209,11 @@ export function withFieldArgsForArguments<
         );
       }
       if (path.length === 0) {
-        throw new Error(`apply() must be called with a non-empty path`);
+        explicitlyApplied = true;
+        // Auto-apply all the arguments
+        for (const argName of Object.keys(args)) {
+          fieldArgs.apply($target, [argName]);
+        }
       } else {
         const [argName, ...rest] = path;
         let entity: GraphQLArgument | GraphQLInputField = args[argName];
@@ -430,7 +435,9 @@ export function withFieldArgsForArguments<
 
   const result = callback(fieldArgs);
 
-  processAfter(fieldArgs, [], result, args, applyAfterMode);
+  if (!explicitlyApplied) {
+    processAfter(fieldArgs, [], result, args, applyAfterMode);
+  }
 
   if (operationPlan.loc !== null) operationPlan.loc.pop();
 
