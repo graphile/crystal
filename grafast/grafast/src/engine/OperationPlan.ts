@@ -75,6 +75,9 @@ import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
+const ALWAYS_THROW_PLANNING_ERRORS =
+  process.env.ALWAYS_THROW_PLANNING_ERRORS === "1";
+
 // Work around TypeScript CommonJS `graphql_1.isListType` unoptimal access.
 const {
   assertObjectType,
@@ -1828,6 +1831,7 @@ export class OperationPlan {
 
       return { step, haltTree };
     } catch (e) {
+      if (ALWAYS_THROW_PLANNING_ERRORS) throw e;
       const step = withGlobalLayerPlan(
         layerPlan,
         polymorphicPaths,
