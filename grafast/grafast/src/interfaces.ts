@@ -324,7 +324,10 @@ export interface FieldArgs {
   /** Gets the value *without* calling any `inputPlan`s */
   getRaw(path?: string | readonly string[]): InputStep;
   /** This also works (without path) to apply each list entry against $target */
-  apply($target: TargetStepOrCallback, path?: string | readonly string[]): void;
+  apply(
+    $target: ExecutableStep | ModifierStep,
+    path?: string | readonly string[],
+  ): void;
 }
 
 export interface FieldInfo {
@@ -662,6 +665,8 @@ export type GrafastInputFieldConfig<
   type: TInputType;
   inputPlan?: InputObjectFieldInputPlanResolver;
   applyPlan?: InputObjectFieldApplyPlanResolver<any>;
+  autoApplyAfterParentInputPlan?: boolean;
+  autoApplyAfterParentApplyPlan?: boolean;
 };
 
 /**

@@ -607,7 +607,13 @@ export function inputObjectFieldSpec<
   >,
   path: string,
 ): GraphQLInputFieldConfig {
-  const { inputPlan, applyPlan, ...spec } = grafastSpec;
+  const {
+    inputPlan,
+    applyPlan,
+    autoApplyAfterParentInputPlan,
+    autoApplyAfterParentApplyPlan,
+    ...spec
+  } = grafastSpec;
   assertNotAsync(inputPlan, `${path ?? "?"}.inputPlan`);
   assertNotAsync(applyPlan, `${path ?? "?"}.applyPlan`);
   return inputPlan || applyPlan
@@ -617,6 +623,12 @@ export function inputObjectFieldSpec<
           grafast: {
             ...(inputPlan ? { inputPlan } : null),
             ...(applyPlan ? { applyPlan } : null),
+            ...(autoApplyAfterParentInputPlan
+              ? { autoApplyAfterParentInputPlan }
+              : null),
+            ...(autoApplyAfterParentApplyPlan
+              ? { autoApplyAfterParentApplyPlan }
+              : null),
           },
         },
       }
