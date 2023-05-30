@@ -339,7 +339,7 @@ export function withFieldArgsForArguments<
         return fieldArgs.getRaw(concatPath(path, subpath));
       },
       get(subpath) {
-        if (!subpath || (Array.isArray(subpath) && subpath.length === 1)) {
+        if (!subpath || (Array.isArray(subpath) && subpath.length === 0)) {
           if (isListType(nullableEntityType)) {
             if (!("evalLength" in $input)) {
               throw new Error(
@@ -402,7 +402,7 @@ export function withFieldArgsForArguments<
       apply($target, subpath) {
         if (
           mode === "apply" &&
-          (!subpath || (Array.isArray(subpath) && subpath.length === 1))
+          (!subpath || (Array.isArray(subpath) && subpath.length === 0))
         ) {
           if (isInputObjectType(nullableEntityType)) {
             for (const fieldName of Object.keys(
