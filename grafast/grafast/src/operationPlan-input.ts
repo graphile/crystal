@@ -129,6 +129,8 @@ export function withFieldArgsForArguments<
             entityType = entity.type;
             if ("get" in $val) {
               $val = $val.get(pathSegment);
+            } else if ($val instanceof ConstantStep && $val.isUndefined()) {
+              $val = constant(undefined);
             } else {
               throw new Error(
                 `GrafastInternalError<b9e9a57a-bbdd-486c-bdcf-25cf99bf0243>: Processing input object type, but '${$val}' has no .get() method.`,
@@ -144,7 +146,7 @@ export function withFieldArgsForArguments<
               $val = $val.at(pathSegment);
             } else {
               throw new Error(
-                `GrafastInternalError<b9e9a57a-bbdd-486c-bdcf-25cf99bf0243>: Processing input object type, but '${$val}' has no .get() method.`,
+                `GrafastInternalError<0abe76fa-c87a-4477-aebd-feffef848c2b>: Processing input object type, but '${$val}' has no .get() method.`,
               );
             }
           } else {
@@ -166,7 +168,7 @@ export function withFieldArgsForArguments<
                 schema,
                 entity: arg,
               })
-            : $val;
+            : getFieldArgsForPath(path, entityType, $val, "input").get();
         } else {
           // input field or similar
           if (entity) {
@@ -177,7 +179,7 @@ export function withFieldArgsForArguments<
                   schema,
                   entity: inputField,
                 })
-              : $val;
+              : getFieldArgsForPath(path, entityType, $val, "input").get();
           } else {
             // TODO: is this correct?
             result = $val;
@@ -300,12 +302,62 @@ export function withFieldArgsForArguments<
       },
       get(subpath) {
         if (!subpath || (Array.isArray(subpath) && subpath.length === 1)) {
-          // TODO: handle list inputs here!
-          throw new Error(
-            `Call to fieldArgs.get() at input path '${path.join(
-              ".",
-            )}' must pass a non-empty subpath`,
-          );
+          if (isListType(nullableEntityType)) {
+            if (!("evalLength" in $input)) {
+              throw new Error(
+                `GrafastInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$input} to be a __InputListStep or __TrackedValueStep (i.e. to have 'evalLength')`,
+              );
+            }
+            const l = $input.evalLength();
+            if (l == null) {
+              return constant(null);
+            }
+            const entries: ExecutableStep[] = [];
+            for (let i = 0; i < l; i++) {
+              const entry = fieldArgs.get([...path, i]);
+              entries.push(entry);
+            }
+            return list(entries);
+          } else if (isInputObjectType(nullableEntityType)) {
+            const typeResolver =
+              nullableEntityType.extensions.grafast?.inputPlan ||
+              defaultInputObjectTypeInputPlanResolver;
+            const resolvedResult = typeResolver(
+              getFieldArgsForPath(path, nullableEntityType, $input, "input"),
+              {
+                schema,
+                type: nullableEntityType,
+              },
+            );
+            return resolvedResult;
+          } else if (isScalarType(nullableEntityType)) {
+            const scalarResolver =
+              nullableEntityType.extensions.grafast?.inputPlan;
+            if (scalarResolver !== undefined) {
+              return scalarResolver($input, {
+                schema,
+                type: nullableEntityType,
+              });
+            } else {
+              return $input;
+            }
+          } else if (isEnumType(nullableEntityType)) {
+            /*
+            const enumResolver = nullableEntityType.extensions.grafast?.inputPlan;
+            if (enumResolver) {
+              return enumResolver($input, { schema, type: nullableEntityType });
+            } else {
+              return $input;
+            }
+            */
+            return $input;
+          } else {
+            throw new Error(
+              `Call to fieldArgs.get() at input path '${path.join(
+                ".",
+              )}' must pass a non-empty subpath`,
+            );
+          }
         }
         return fieldArgs.get(concatPath(path, subpath));
       },
@@ -330,12 +382,15 @@ export function withFieldArgsForArguments<
             if (l == null) {
               return;
             }
+            // const innerType = nullableEntityType.ofType;
             for (let i = 0; i < l; i++) {
               fieldArgs.apply($target, [...path, i]);
             }
+            return;
           } else {
-            // FIXME: TODO!
-            throw new Error("TODO");
+            throw new Error(
+              "Currently calling '.apply($step)' without a path is only supported on object and list types",
+            );
           }
         } else {
           fieldArgs.apply($target, concatPath(path, subpath));
@@ -349,6 +404,9 @@ export function withFieldArgsForArguments<
         if ("get" in $input) {
           // TODO: remove the 'any'
           (localFieldArgs as any)[`$${fieldName}`] = $input.get(fieldName);
+        } else if ($input instanceof ConstantStep && $input.isUndefined()) {
+          // TODO: remove the 'any'
+          (localFieldArgs as any)[`$${fieldName}`] = constant(undefined);
         } else {
           throw new Error(
             `GrafastInternalError<9b70d5c0-c45f-4acd-8b94-eaa02f87ad41>: expected '${$input}' to have a .get() method`,
@@ -420,3 +478,12 @@ function notUndefined($value: InputStep) {
   // matches against those as a single operation.
   return !("evalIs" in $value && $value.evalIs(undefined));
 }
+const defaultInputObjectTypeInputPlanResolver: InputObjectTypeInputPlanResolver =
+  (input, info) => {
+    const fields = info.type.getFields();
+    const obj: { [key: string]: ExecutableStep } = Object.create(null);
+    for (const fieldName in fields) {
+      obj[fieldName] = input.get(fieldName);
+    }
+    return object(obj);
+  };
