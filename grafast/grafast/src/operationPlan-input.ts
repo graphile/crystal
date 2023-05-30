@@ -177,20 +177,14 @@ export function withFieldArgsForArguments<
               })
             : getFieldArgsForPath(path, entityType, $val, "input").get();
         } else {
-          // input field or similar
-          if (entity) {
-            // Input field
-            const inputField = entity as GraphQLInputField;
-            result = inputField.extensions.grafast?.inputPlan
-              ? inputField.extensions.grafast.inputPlan(childFieldArgs, {
-                  schema,
-                  entity: inputField,
-                })
-              : getFieldArgsForPath(path, entityType, $val, "input").get();
-          } else {
-            // TODO: is this correct?
-            result = $val;
-          }
+          // Input field
+          const inputField = entity as GraphQLInputField | undefined;
+          result = inputField?.extensions.grafast?.inputPlan
+            ? inputField.extensions.grafast.inputPlan(childFieldArgs, {
+                schema,
+                entity: inputField,
+              })
+            : getFieldArgsForPath(path, entityType, $val, "input").get();
         }
         const nullableType = getNullableType(entityType);
         if (isInputObjectType(nullableType)) {
@@ -288,24 +282,18 @@ export function withFieldArgsForArguments<
                   )
                 : undefined;
             } else {
-              // input field or similar
-              if (entity) {
-                // input field
-                const inputField = entity as GraphQLInputField;
-                result = inputField.extensions.grafast?.applyPlan
-                  ? inputField.extensions.grafast.applyPlan(
-                      $target,
-                      childFieldArgs,
-                      {
-                        schema,
-                        entity: inputField,
-                      },
-                    )
-                  : undefined;
-              } else {
-                // TODO: is this correct?
-                result = undefined;
-              }
+              // input field
+              const inputField = entity as GraphQLInputField | undefined;
+              result = inputField?.extensions.grafast?.applyPlan
+                ? inputField.extensions.grafast.applyPlan(
+                    $target,
+                    childFieldArgs,
+                    {
+                      schema,
+                      entity: inputField,
+                    },
+                  )
+                : undefined;
             }
             const nullableType = getNullableType(entityType);
             if (isInputObjectType(nullableType)) {
