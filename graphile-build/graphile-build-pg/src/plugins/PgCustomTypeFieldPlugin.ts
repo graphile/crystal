@@ -43,11 +43,7 @@ import {
   stepAMayDependOnStepB,
 } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type {
-  GraphQLInputFieldConfigMap,
-  GraphQLInputType,
-  GraphQLOutputType,
-} from "graphql";
+import type { GraphQLInputType, GraphQLOutputType } from "graphql";
 import type { SQL } from "pg-sql2";
 
 import { tagToString } from "../utils.js";

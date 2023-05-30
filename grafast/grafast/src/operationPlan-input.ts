@@ -8,16 +8,13 @@ import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { __InputObjectStep, __TrackedValueStep } from "./index.js";
-import { BaseStep } from "./index.js";
 import type { InputStep } from "./input.js";
 import type {
   FieldArgs,
   InputObjectTypeInputPlanResolver,
-  TargetStepOrCallback,
   TrackedArguments,
 } from "./interfaces.js";
-import type { ModifierStep } from "./step.js";
-import { assertExecutableStep, ExecutableStep } from "./step.js";
+import type { ExecutableStep, ModifierStep } from "./step.js";
 import type { __ItemStep } from "./steps/__item.js";
 import { constant, ConstantStep } from "./steps/constant.js";
 import { list } from "./steps/list.js";
@@ -28,7 +25,6 @@ const {
   isEnumType,
   isInputObjectType,
   isListType,
-  isNonNullType,
   isScalarType,
 } = graphql;
 

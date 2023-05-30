@@ -45,10 +45,8 @@ import type {
 import { $$proxy, $$subroutine, $$timeout, $$ts } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
 import { printPlanGraph } from "../mermaid.js";
-import {
-  ApplyAfterModeArg,
-  withFieldArgsForArguments,
-} from "../operationPlan-input.js";
+import type { ApplyAfterModeArg } from "../operationPlan-input.js";
+import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
 import {
   $$noExec,
