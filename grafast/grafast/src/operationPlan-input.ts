@@ -286,20 +286,26 @@ export function withFieldArgsForArguments<
                       entity: arg,
                     },
                   )
-                : $val;
+                : undefined;
             } else {
-              // input field
-              const inputField = entity as GraphQLInputField;
-              result = inputField.extensions.grafast?.applyPlan
-                ? inputField.extensions.grafast.applyPlan(
-                    $target,
-                    childFieldArgs,
-                    {
-                      schema,
-                      entity: inputField,
-                    },
-                  )
-                : $val;
+              // input field or similar
+              if (entity) {
+                // input field
+                const inputField = entity as GraphQLInputField;
+                result = inputField.extensions.grafast?.applyPlan
+                  ? inputField.extensions.grafast.applyPlan(
+                      $target,
+                      childFieldArgs,
+                      {
+                        schema,
+                        entity: inputField,
+                      },
+                    )
+                  : undefined;
+              } else {
+                // TODO: is this correct?
+                result = undefined;
+              }
             }
             const nullableType = getNullableType(entityType);
             if (isInputObjectType(nullableType)) {
