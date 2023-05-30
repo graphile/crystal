@@ -1907,39 +1907,36 @@ export class OperationPlan {
   public withModifiers<T>(cb: () => T): T {
     // Stash previous modifiers
     const previousModifierDepthCount = this.modifierDepthCount++;
+    const previousCount = this.modifierStepCount;
+    const previousStack = this.modifierSteps.splice(
+      0,
+      this.modifierSteps.length,
+    );
+    this.modifierStepCount = 0;
+    let result;
+    let plansToApply;
     try {
-      const previousCount = this.modifierStepCount;
-      const previousStack = this.modifierSteps.splice(
-        0,
-        this.modifierSteps.length,
-      );
-      this.modifierStepCount = 0;
-      let result;
-      let plansToApply;
-      try {
-        result = cb();
-      } finally {
-        // Remove the modifier plans from operationPlan and sort them ready for application.
-        plansToApply = this.modifierSteps
-          .splice(0, this.modifierSteps.length)
-          .reverse();
-        // Restore previous modifiers
-        this.modifierStepCount = previousCount;
-        for (const mod of previousStack) {
-          this.modifierSteps.push(mod);
-        }
-      }
-
-      // Apply the plans.
-      for (let i = 0, l = plansToApply.length; i < l; i++) {
-        plansToApply[i].apply();
-      }
-
-      return result;
+      result = cb();
     } finally {
+      // Remove the modifier plans from operationPlan and sort them ready for application.
+      plansToApply = this.modifierSteps
+        .splice(0, this.modifierSteps.length)
+        .reverse();
+      // Restore previous modifiers
+      this.modifierStepCount = previousCount;
+      for (const mod of previousStack) {
+        this.modifierSteps.push(mod);
+      }
       // Restore previous depth
       this.modifierDepthCount = previousModifierDepthCount;
     }
+
+    // Apply the plans.
+    for (let i = 0, l = plansToApply.length; i < l; i++) {
+      plansToApply[i].apply();
+    }
+
+    return result;
   }
 
   /**
