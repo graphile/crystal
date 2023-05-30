@@ -1,5 +1,14 @@
 # grafast
 
+## 0.0.1-alpha.8
+
+### Patch Changes
+
+- [#354](https://github.com/benjie/postgraphile-private/pull/354)
+  [`dd3ef599c`](https://github.com/benjie/postgraphile-private/commit/dd3ef599c7f2530fd1a19a852d334b7349e49e70)
+  Thanks [@benjie](https://github.com/benjie)! - HOTFIX: fix bugs in object()
+  and list() and blow up entire request if planning error occurs.
+
 ## 0.0.1-alpha.7
 
 ### Patch Changes

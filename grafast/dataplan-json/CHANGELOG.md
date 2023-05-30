@@ -1,5 +1,13 @@
 # @dataplan/json
 
+## 0.0.1-alpha.8
+
+### Patch Changes
+
+- Updated dependencies
+  [[`dd3ef599c`](https://github.com/benjie/postgraphile-private/commit/dd3ef599c7f2530fd1a19a852d334b7349e49e70)]:
+  - grafast@0.0.1-alpha.8
+
 ## 0.0.1-alpha.7
 
 ### Patch Changes
