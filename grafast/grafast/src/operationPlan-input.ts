@@ -114,10 +114,10 @@ export function withFieldArgsForArguments<
           );
         }
         let entity: GraphQLArgument | GraphQLInputField | null = args[argName];
-        let entityType: GraphQLInputType = entity.type;
         if (!entity) {
           throw new Error(`Invalid path; argument '${argName}' does not exist`);
         }
+        let entityType: GraphQLInputType = entity.type;
         let $val = $all.get(argName);
         for (const pathSegment of rest) {
           const nullableType: graphql.GraphQLNullableType & GraphQLInputType =
@@ -151,7 +151,13 @@ export function withFieldArgsForArguments<
               );
             }
           } else {
-            throw new Error(`Can't pass non-object boundary`);
+            throw new Error(
+              `Asked to navigate ('get' mode) to position '${pathSegment}' (${typeof pathSegment}) (in path '${path.join(
+                ".",
+              )}') for incompatible type '${nullableType}' (${
+                nullableType.constructor.name
+              })`,
+            );
           }
         }
         let result;
@@ -216,16 +222,18 @@ export function withFieldArgsForArguments<
         }
       } else {
         const [argName, ...rest] = path;
-        let entity: GraphQLArgument | GraphQLInputField = args[argName];
+        let entity: GraphQLArgument | GraphQLInputField | null = args[argName];
         if (!entity) {
           throw new Error(`Invalid path; argument '${argName}' does not exist`);
         }
+        let entityType: GraphQLInputType = entity.type;
         let $val = $all.get(argName);
         for (const pathSegment of rest) {
           const nullableType: graphql.GraphQLNullableType & GraphQLInputType =
-            getNullableType(entity.type);
+            getNullableType(entityType);
           if (isInputObjectType(nullableType)) {
             entity = nullableType.getFields()[pathSegment];
+            entityType = entity.type;
             if ("get" in $val) {
               $val = $val.get(pathSegment);
             } else {
@@ -233,14 +241,33 @@ export function withFieldArgsForArguments<
                 `GrafastInternalError<b9e9a57a-bbdd-486c-bdcf-25cf99bf0243>: Processing input object type, but '${$val}' has no .get() method.`,
               );
             }
+          } else if (
+            typeof pathSegment === "number" &&
+            isListType(nullableType)
+          ) {
+            entity = null;
+            entityType = nullableType.ofType;
+            if ("at" in $val) {
+              $val = $val.at(pathSegment);
+            } else {
+              throw new Error(
+                `GrafastInternalError<a097a130-f68f-4a5c-bd0c-24fcd26127a9>: Processing list type, but '${$val}' has no .at() method.`,
+              );
+            }
           } else {
-            throw new Error(`Can't pass non-object boundary`);
+            throw new Error(
+              `Asked to navigate ('apply' mode) to position '${pathSegment}' (${typeof pathSegment}) (in path '${path.join(
+                ".",
+              )}') for incompatible type '${nullableType}' (${
+                nullableType.constructor.name
+              })`,
+            );
           }
         }
         if (notUndefined($val)) {
           const childFieldArgs = getFieldArgsForPath(
             path,
-            entity.type,
+            entityType,
             $val,
             "apply",
           );
@@ -274,7 +301,7 @@ export function withFieldArgsForArguments<
                   )
                 : $val;
             }
-            const nullableType = getNullableType(entity.type);
+            const nullableType = getNullableType(entityType);
             if (isInputObjectType(nullableType)) {
               processAfter(
                 fieldArgs,
