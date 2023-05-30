@@ -320,13 +320,13 @@ export type TargetStepOrCallback =
 // TODO: rename
 export interface FieldArgs {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
-  get(path?: string | readonly string[]): ExecutableStep;
+  get(path?: string | ReadonlyArray<string | number>): ExecutableStep;
   /** Gets the value *without* calling any `inputPlan`s */
-  getRaw(path?: string | readonly string[]): InputStep;
+  getRaw(path?: string | ReadonlyArray<string | number>): InputStep;
   /** This also works (without path) to apply each list entry against $target */
   apply(
     $target: ExecutableStep | ModifierStep,
-    path?: string | readonly string[],
+    path?: string | ReadonlyArray<string | number>,
   ): void;
 }
 

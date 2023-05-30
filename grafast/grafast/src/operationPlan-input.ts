@@ -77,7 +77,9 @@ export function withFieldArgsForArguments<
         }
         let $entry = $all.get(first);
         for (const pathSegment of rest) {
-          if ("get" in $entry) {
+          if (typeof pathSegment === "number" && "at" in $entry) {
+            $entry = $entry.at(pathSegment);
+          } else if ("get" in $entry) {
             $entry = $entry.get(pathSegment);
           } else {
             throw new Error(
@@ -91,7 +93,11 @@ export function withFieldArgsForArguments<
       }
     },
     get(inPath) {
-      const path = Array.isArray(inPath) ? inPath : inPath ? [inPath] : [];
+      const path = Array.isArray(inPath)
+        ? (inPath as ReadonlyArray<string | number>)
+        : inPath
+        ? [inPath as string]
+        : [];
       const pathString = path.join(".");
       const $existing = got.get(pathString);
       if ($existing) {
@@ -101,18 +107,41 @@ export function withFieldArgsForArguments<
         throw new Error(`get() must be called with a non-empty path`);
       } else {
         const [argName, ...rest] = path;
-        let entity: GraphQLArgument | GraphQLInputField = args[argName];
+        if (typeof argName !== "string") {
+          throw new Error(
+            `Invalid path; argument '${argName}' is an invalid argument name`,
+          );
+        }
+        let entity: GraphQLArgument | GraphQLInputField | null = args[argName];
+        let entityType: GraphQLInputType = entity.type;
         if (!entity) {
           throw new Error(`Invalid path; argument '${argName}' does not exist`);
         }
         let $val = $all.get(argName);
         for (const pathSegment of rest) {
           const nullableType: graphql.GraphQLNullableType & GraphQLInputType =
-            getNullableType(entity.type);
-          if (isInputObjectType(nullableType)) {
+            getNullableType(entityType);
+          if (
+            typeof pathSegment === "string" &&
+            isInputObjectType(nullableType)
+          ) {
             entity = nullableType.getFields()[pathSegment];
+            entityType = entity.type;
             if ("get" in $val) {
               $val = $val.get(pathSegment);
+            } else {
+              throw new Error(
+                `GrafastInternalError<b9e9a57a-bbdd-486c-bdcf-25cf99bf0243>: Processing input object type, but '${$val}' has no .get() method.`,
+              );
+            }
+          } else if (
+            typeof pathSegment === "number" &&
+            isListType(nullableType)
+          ) {
+            entity = null;
+            entityType = nullableType.ofType;
+            if ("at" in $val) {
+              $val = $val.at(pathSegment);
             } else {
               throw new Error(
                 `GrafastInternalError<b9e9a57a-bbdd-486c-bdcf-25cf99bf0243>: Processing input object type, but '${$val}' has no .get() method.`,
@@ -123,7 +152,12 @@ export function withFieldArgsForArguments<
           }
         }
         let result;
-        const childFieldArgs = getFieldArgsForPath(path, entity, $val, "input");
+        const childFieldArgs = getFieldArgsForPath(
+          path,
+          entityType,
+          $val,
+          "input",
+        );
         if (rest.length === 0) {
           // Argument
           const arg = entity as GraphQLArgument;
@@ -134,16 +168,22 @@ export function withFieldArgsForArguments<
               })
             : $val;
         } else {
-          // input field
-          const inputField = entity as GraphQLInputField;
-          result = inputField.extensions.grafast?.inputPlan
-            ? inputField.extensions.grafast.inputPlan(childFieldArgs, {
-                schema,
-                entity: inputField,
-              })
-            : $val;
+          // input field or similar
+          if (entity) {
+            // Input field
+            const inputField = entity as GraphQLInputField;
+            result = inputField.extensions.grafast?.inputPlan
+              ? inputField.extensions.grafast.inputPlan(childFieldArgs, {
+                  schema,
+                  entity: inputField,
+                })
+              : $val;
+          } else {
+            // TODO: is this correct?
+            result = $val;
+          }
         }
-        const nullableType = getNullableType(entity.type);
+        const nullableType = getNullableType(entityType);
         if (isInputObjectType(nullableType)) {
           processAfter(
             fieldArgs,
@@ -193,7 +233,7 @@ export function withFieldArgsForArguments<
         if (notUndefined($val)) {
           const childFieldArgs = getFieldArgsForPath(
             path,
-            entity,
+            entity.type,
             $val,
             "apply",
           );
@@ -232,7 +272,7 @@ export function withFieldArgsForArguments<
               processAfter(
                 fieldArgs,
                 path,
-                result ?? $target,
+                result,
                 nullableType.getFields(),
                 "autoApplyAfterParentApplyPlan",
               );
@@ -248,11 +288,12 @@ export function withFieldArgsForArguments<
   }
 
   function getFieldArgsForPath(
-    path: string[],
-    entity: GraphQLArgument | GraphQLInputField,
+    path: ReadonlyArray<string | number>,
+    entityType: GraphQLInputType,
     $input: InputStep,
     mode: "input" | "apply",
   ): FieldArgs {
+    const nullableEntityType = getNullableType(entityType);
     const localFieldArgs: FieldArgs = {
       getRaw(subpath) {
         return fieldArgs.getRaw(concatPath(path, subpath));
@@ -261,9 +302,9 @@ export function withFieldArgsForArguments<
         if (!subpath || (Array.isArray(subpath) && subpath.length === 1)) {
           // TODO: handle list inputs here!
           throw new Error(
-            `Call to fieldArgs.get() at input path ${path.join(
+            `Call to fieldArgs.get() at input path '${path.join(
               ".",
-            )} must pass a non-empty subpath`,
+            )}' must pass a non-empty subpath`,
           );
         }
         return fieldArgs.get(concatPath(path, subpath));
@@ -273,18 +314,35 @@ export function withFieldArgsForArguments<
           mode === "apply" &&
           (!subpath || (Array.isArray(subpath) && subpath.length === 1))
         ) {
-          // TODO: handle list inputs here!
-          throw new Error(
-            `Call to fieldArgs.apply() from 'applyPlan' at input path ${path.join(
-              ".",
-            )} must pass a non-empty subpath`,
-          );
+          if (isInputObjectType(nullableEntityType)) {
+            for (const fieldName of Object.keys(
+              nullableEntityType.getFields(),
+            )) {
+              fieldArgs.apply($target, [...path, fieldName]);
+            }
+          } else if (isListType(nullableEntityType)) {
+            if (!("evalLength" in $input)) {
+              throw new Error(
+                `GrafastInternalError<6ef74af7-7be0-4117-870f-2ebabcf5161c>: Expected ${$input} to be a __InputListStep or __TrackedValueStep (i.e. to have 'evalLength')`,
+              );
+            }
+            const l = $input.evalLength();
+            if (l == null) {
+              return;
+            }
+            for (let i = 0; i < l; i++) {
+              fieldArgs.apply($target, [...path, i]);
+            }
+          } else {
+            // FIXME: TODO!
+            throw new Error("TODO");
+          }
+        } else {
+          fieldArgs.apply($target, concatPath(path, subpath));
         }
-        return fieldArgs.apply($target, concatPath(path, subpath));
       },
     };
 
-    const nullableEntityType = getNullableType(entity.type);
     if (isInputObjectType(nullableEntityType)) {
       const inputFields = nullableEntityType.getFields();
       for (const fieldName of Object.keys(inputFields)) {
@@ -313,8 +371,8 @@ export function withFieldArgsForArguments<
 
 function processAfter(
   rootFieldArgs: FieldArgs,
-  path: readonly string[],
-  result: ExecutableStep | ModifierStep | null | undefined,
+  path: ReadonlyArray<string | number>,
+  result: ExecutableStep | ModifierStep | null | undefined | void,
   fields: Record<string, GraphQLArgument | GraphQLInputField>,
   applyAfterMode: ApplyAfterMode,
 ) {
@@ -349,8 +407,8 @@ function processAfter(
 }
 
 function concatPath(
-  path: readonly string[],
-  subpath: readonly string[] | string | undefined,
+  path: ReadonlyArray<string | number>,
+  subpath: ReadonlyArray<string | number> | string | undefined,
 ) {
   const localPath = Array.isArray(subpath) ? subpath : subpath ? [subpath] : [];
   return [...path, ...localPath];

@@ -2251,11 +2251,6 @@ export function makeExampleSchema(
               if ($value.evalIs(null)) {
                 // Ignore
               } else {
-                if (!$parent.placeholder) {
-                  console.error(
-                    `in BooleanFilter.equalTo, ${$parent} does not have placeholder method`,
-                  );
-                }
                 $parent.where(
                   sql`${$parent.expression} = ${$parent.placeholder(
                     $value,
@@ -2355,7 +2350,6 @@ export function makeExampleSchema(
     fields: {
       some: {
         type: MessageFilter,
-        autoApplyAfterParentApplyPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
