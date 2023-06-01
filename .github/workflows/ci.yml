@@ -57,8 +57,6 @@ jobs:
           - 12.x
           - 14.x
           - 16.x
-          - 18.x
-          - 20.x
 
     services:
       postgres:
