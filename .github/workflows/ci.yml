@@ -1,6 +1,8 @@
 name: Node CI
 
-on: [ push, pull_request ]
+on:
+  push:
+  pull_request:
 
 jobs:
   lint:
@@ -20,10 +22,10 @@ jobs:
           node-version: 16.x
       - run: yarn --immutable --ignore-engines
 
-      - name: "Check Code Format"
+      - name: Check Code Format
         run: yarn prettier:check
 
-      - name: "Lint Code"
+      - name: Lint Code
         run: yarn lint
 
   test:
@@ -31,7 +33,7 @@ jobs:
 
     env:
       CI: true
-      PGVERSION: ${{ matrix.postgres-version}}
+      PGVERSION: ${{ matrix.postgres-version }}
       NODE_OPTIONS: ${{ matrix.node-version >= '17.x' && '--openssl-legacy-provider' || '' }}
       TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/graphileengine_test
       TEST_PG_URL: postgres://postgres:postgres@localhost:5432/postgraphile_test
@@ -48,7 +50,6 @@ jobs:
           - 14
           - 15
         node-version:
-          - 10.x
           - 12.x
           - 14.x
           - 16.x
@@ -90,9 +91,8 @@ jobs:
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }} postgresql-${{ matrix.postgres-version }}-wal2json
       - run: yarn --immutable --ignore-engines
 
-
-      - name: "Build Code"
+      - name: Build Code
         run: scripts/build
 
-      - name: "Test Project"
+      - name: Test Project
         run: scripts/test
