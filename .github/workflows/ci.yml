@@ -83,6 +83,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
+      - name: Configure PostgreSQL
+        run: |
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -i postgres bash
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/020-setup.sh | docker exec -i postgres bash
+          docker restart postgres
       - name: Install pg_dump
         run: |
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
