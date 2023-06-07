@@ -510,6 +510,8 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                           Boolean(attribute.extensions?.tags?.hasDefault),
                         attributeType,
                       ),
+                      autoApplyAfterParentInputPlan: true,
+                      autoApplyAfterParentApplyPlan: true,
                       applyPlan: EXPORTABLE(
                         (attributeName) =>
                           function plan($insert: SetterStep<any, any>, val) {

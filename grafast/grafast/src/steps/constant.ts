@@ -55,6 +55,9 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
   isNull() {
     return this.data === null;
   }
+  isUndefined() {
+    return this.data === undefined;
+  }
 }
 
 function isTemplateStringsArray(data: any): data is TemplateStringsArray {

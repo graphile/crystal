@@ -140,6 +140,8 @@ export interface GrafastArgumentExtensions {
   // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
   inputPlan?: ArgumentInputPlanResolver;
   applyPlan?: ArgumentApplyPlanResolver;
+  autoApplyAfterParentPlan?: boolean;
+  autoApplyAfterParentSubscribePlan?: boolean;
 }
 
 export interface GrafastInputObjectTypeExtensions {
@@ -150,6 +152,8 @@ export interface GrafastInputFieldExtensions {
   // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
   inputPlan?: InputObjectFieldInputPlanResolver;
   applyPlan?: InputObjectFieldApplyPlanResolver;
+  autoApplyAfterParentInputPlan?: boolean;
+  autoApplyAfterParentApplyPlan?: boolean;
 }
 
 export interface GrafastObjectTypeExtensions {
@@ -316,11 +320,14 @@ export type TargetStepOrCallback =
 // TODO: rename
 export interface FieldArgs {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
-  get(path?: string | string[]): ExecutableStep;
+  get(path?: string | ReadonlyArray<string | number>): ExecutableStep;
   /** Gets the value *without* calling any `inputPlan`s */
-  getRaw(path?: string | string[]): InputStep;
+  getRaw(path?: string | ReadonlyArray<string | number>): InputStep;
   /** This also works (without path) to apply each list entry against $target */
-  apply($target: TargetStepOrCallback, path?: string | string[]): void;
+  apply(
+    $target: ExecutableStep | ModifierStep | (() => ModifierStep),
+    path?: string | ReadonlyArray<string | number>,
+  ): void;
 }
 
 export interface FieldInfo {
@@ -641,6 +648,8 @@ export type GrafastArgumentConfig<
   type: TInputType;
   inputPlan?: ArgumentInputPlanResolver<any>;
   applyPlan?: ArgumentApplyPlanResolver<any, any>;
+  autoApplyAfterParentPlan?: boolean;
+  autoApplyAfterParentSubscribePlan?: boolean;
 };
 
 /**
@@ -656,6 +665,8 @@ export type GrafastInputFieldConfig<
   type: TInputType;
   inputPlan?: InputObjectFieldInputPlanResolver;
   applyPlan?: InputObjectFieldApplyPlanResolver<any>;
+  autoApplyAfterParentInputPlan?: boolean;
+  autoApplyAfterParentApplyPlan?: boolean;
 };
 
 /**

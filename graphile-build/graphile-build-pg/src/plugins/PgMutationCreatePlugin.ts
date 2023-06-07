@@ -115,6 +115,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                   return {
                     clientMutationId: {
                       type: GraphQLString,
+                      autoApplyAfterParentApplyPlan: true,
                       applyPlan: EXPORTABLE(
                         () =>
                           function plan($input: ObjectStep<any>, val) {
@@ -136,6 +137,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 "field",
                               ),
                               type: new GraphQLNonNull(TableInput),
+                              autoApplyAfterParentApplyPlan: true,
                               applyPlan: EXPORTABLE(
                                 () =>
                                   function plan(
@@ -271,6 +273,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     args: {
                       input: {
                         type: new GraphQLNonNull(mutationInputType),
+                        autoApplyAfterParentPlan: true,
                         applyPlan: EXPORTABLE(
                           () =>
                             function plan(

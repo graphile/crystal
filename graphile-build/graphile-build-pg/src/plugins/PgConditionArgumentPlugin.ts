@@ -269,6 +269,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 "arg",
               ),
               type: tableConditionType,
+              autoApplyAfterParentPlan: true,
               applyPlan: isPgFieldConnection
                 ? (
                     _condition,
