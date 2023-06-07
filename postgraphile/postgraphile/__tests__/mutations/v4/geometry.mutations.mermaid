@@ -26,7 +26,7 @@ graph TD
     Constant228{{"Constant[228∈0]<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
     Constant229{{"Constant[229∈0]<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
     Constant226{{"Constant[226∈0]<br />ᐸ[Object: null prototype] {   center: [Object: null prototypeᐳ"}}:::plan
-    PgInsertSingle84[["PgInsertSingle[84∈1]"]]:::sideeffectplan
+    PgInsertSingle84[["PgInsertSingle[84∈1]<br />ᐸgeom(point,line,lseg,box,open_path,closed_path,polygon,circle)ᐳ"]]:::sideeffectplan
     Object87 & Constant209 & Constant222 & Constant223 & Constant224 & Constant227 & Constant228 & Constant229 & Constant226 --> PgInsertSingle84
     Object88{{"Object[88∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle84 --> Object88
@@ -73,7 +73,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 88, 84<br /><br />ROOT Object{1}ᐸ{result}ᐳ[88]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 84<br /><br />ROOT PgInsertSingle{1}[84]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 84<br /><br />ROOT PgInsertSingle{1}ᐸgeom(point,line,lseg,box,open_path,closed_path,polygon,circle)ᐳ[84]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression119,PgClassExpression120,PgClassExpression123,PgClassExpression130,PgClassExpression137,PgClassExpression144,PgClassExpression150,PgClassExpression156,PgClassExpression161 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 120<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”point”ᐳ[120]"):::bucket

@@ -23,7 +23,7 @@ graph TD
     Constant59{{"Constant[59∈0]<br />ᐸ12.7ᐳ"}}:::plan
     Constant60{{"Constant[60∈0]<br />ᐸ4ᐳ"}}:::plan
     Constant63{{"Constant[63∈0]<br />ᐸ13ᐳ"}}:::plan
-    PgUpdateSingle40[["PgUpdateSingle[40∈5]"]]:::sideeffectplan
+    PgUpdateSingle40[["PgUpdateSingle[40∈5]<br />ᐸmeasurements(timestamp,key;value)ᐳ"]]:::sideeffectplan
     Object43{{"Object[43∈5]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object43 & Constant57 & Constant58 & Constant63 --> PgUpdateSingle40
     Access41{{"Access[41∈5]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -33,7 +33,7 @@ graph TD
     __Value3 --> Access42
     Object44{{"Object[44∈5]<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle40 --> Object44
-    PgInsertSingle14[["PgInsertSingle[14∈1]"]]:::sideeffectplan
+    PgInsertSingle14[["PgInsertSingle[14∈1]<br />ᐸmeasurements(timestamp,key,value,user_id)ᐳ"]]:::sideeffectplan
     Object17 & Constant57 & Constant58 & Constant59 & Constant60 --> PgInsertSingle14
     Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle14 --> Object18
@@ -86,7 +86,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 14, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 14, 17<br /><br />ROOT PgInsertSingle{1}[14]<br />1: <br />ᐳ: 19, 20, 21, 22<br />2: PgSelect[23]<br />ᐳ: First[27], PgSelectSingle[28]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 14, 17<br /><br />ROOT PgInsertSingle{1}ᐸmeasurements(timestamp,key,value,user_id)ᐳ[14]<br />1: <br />ᐳ: 19, 20, 21, 22<br />2: PgSelect[23]<br />ᐳ: First[27], PgSelectSingle[28]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgSelect23,First27,PgSelectSingle28 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 28<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[28]"):::bucket
@@ -98,7 +98,7 @@ graph TD
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 44, 40, 43<br /><br />ROOT Object{5}ᐸ{result}ᐳ[44]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 40, 43<br /><br />ROOT PgUpdateSingle{5}[40]<br />1: <br />ᐳ: 45, 46, 47, 48<br />2: PgSelect[49]<br />ᐳ: First[53], PgSelectSingle[54]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 40, 43<br /><br />ROOT PgUpdateSingle{5}ᐸmeasurements(timestamp,key;value)ᐳ[40]<br />1: <br />ᐳ: 45, 46, 47, 48<br />2: PgSelect[49]<br />ᐳ: First[53], PgSelectSingle[54]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression45,PgClassExpression46,PgClassExpression47,PgClassExpression48,PgSelect49,First53,PgSelectSingle54 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgSelectSingle{7}ᐸusersᐳ[54]"):::bucket

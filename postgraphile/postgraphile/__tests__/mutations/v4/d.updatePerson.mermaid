@@ -23,7 +23,7 @@ graph TD
     Constant33{{"Constant[33∈0]<br />ᐸ'update2'ᐳ"}}:::plan
     Constant34{{"Constant[34∈0]<br />ᐸ'update1'ᐳ"}}:::plan
     Constant35{{"Constant[35∈0]<br />ᐸ'update3'ᐳ"}}:::plan
-    PgUpdateSingle17[["PgUpdateSingle[17∈1]"]]:::sideeffectplan
+    PgUpdateSingle17[["PgUpdateSingle[17∈1]<br />ᐸperson(id;last_name,col_no_create,col_no_order,col_no_filter)ᐳ"]]:::sideeffectplan
     Object20 & Constant31 & Constant32 & Constant33 & Constant34 & Constant35 --> PgUpdateSingle17
     Object21{{"Object[21∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle17 --> Object21
@@ -58,7 +58,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17<br /><br />ROOT PgUpdateSingle{1}[17]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17<br /><br />ROOT PgUpdateSingle{1}ᐸperson(id;last_name,col_no_create,col_no_order,col_no_filter)ᐳ[17]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29,PgClassExpression30 bucket3
     Bucket0 --> Bucket1

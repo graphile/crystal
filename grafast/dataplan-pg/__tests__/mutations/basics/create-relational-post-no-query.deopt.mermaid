@@ -32,11 +32,11 @@ graph TD
     Constant376{{"Constant[376∈0]<br />ᐸ'My Relational Post 3'ᐳ"}}:::plan
     Constant377{{"Constant[377∈0]<br />ᐸ'A post, innit? 3'ᐳ"}}:::plan
     Constant378{{"Constant[378∈0]<br />ᐸ'Such a great post. 3'ᐳ"}}:::plan
-    PgInsertSingle206[["PgInsertSingle[206∈9]"]]:::sideeffectplan
+    PgInsertSingle206[["PgInsertSingle[206∈9]<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     Object204{{"Object[204∈9]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgClassExpression205{{"PgClassExpression[205∈9]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object204 & PgClassExpression205 & Constant376 & Constant377 & Constant378 --> PgInsertSingle206
-    PgInsertSingle201[["PgInsertSingle[201∈9]"]]:::sideeffectplan
+    PgInsertSingle201[["PgInsertSingle[201∈9]<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Constant199{{"Constant[199∈9]<br />ᐸ'POST'ᐳ"}}:::plan
     Constant200{{"Constant[200∈9]<br />ᐸ2ᐳ"}}:::plan
     Object204 & Constant199 & Constant200 --> PgInsertSingle201
@@ -48,11 +48,11 @@ graph TD
     PgInsertSingle201 --> PgClassExpression205
     PgClassExpression210{{"PgClassExpression[210∈9]<br />ᐸ__relational_posts__ᐳ"}}:::plan
     PgInsertSingle206 --> PgClassExpression210
-    PgInsertSingle34[["PgInsertSingle[34∈3]"]]:::sideeffectplan
+    PgInsertSingle34[["PgInsertSingle[34∈3]<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     Object32{{"Object[32∈3]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object32 & PgClassExpression33 & Constant370 & Constant371 & Constant372 --> PgInsertSingle34
-    PgInsertSingle29[["PgInsertSingle[29∈3]"]]:::sideeffectplan
+    PgInsertSingle29[["PgInsertSingle[29∈3]<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Constant27{{"Constant[27∈3]<br />ᐸ'POST'ᐳ"}}:::plan
     Constant28{{"Constant[28∈3]<br />ᐸ2ᐳ"}}:::plan
     Object32 & Constant27 & Constant28 --> PgInsertSingle29
@@ -64,10 +64,10 @@ graph TD
     PgInsertSingle29 --> PgClassExpression33
     PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__relational_posts__ᐳ"}}:::plan
     PgInsertSingle34 --> PgClassExpression38
-    PgInsertSingle18[["PgInsertSingle[18∈1]"]]:::sideeffectplan
+    PgInsertSingle18[["PgInsertSingle[18∈1]<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression17{{"PgClassExpression[17∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object16 & PgClassExpression17 & Constant367 & Constant368 & Constant369 --> PgInsertSingle18
-    PgInsertSingle13[["PgInsertSingle[13∈1]"]]:::sideeffectplan
+    PgInsertSingle13[["PgInsertSingle[13∈1]<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object16 & Constant11 & Constant12 --> PgInsertSingle13
     PgInsertSingle13 --> PgClassExpression17
     PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸ__relational_posts__ᐳ"}}:::plan

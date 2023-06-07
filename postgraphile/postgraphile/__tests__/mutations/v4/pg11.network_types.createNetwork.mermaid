@@ -22,7 +22,7 @@ graph TD
     Constant30{{"Constant[30∈0]<br />ᐸ'10.0.0.0/8'ᐳ"}}:::plan
     Constant31{{"Constant[31∈0]<br />ᐸ'000000000000'ᐳ"}}:::plan
     Constant32{{"Constant[32∈0]<br />ᐸ'0000000000000000'ᐳ"}}:::plan
-    PgInsertSingle15[["PgInsertSingle[15∈1]"]]:::sideeffectplan
+    PgInsertSingle15[["PgInsertSingle[15∈1]<br />ᐸnetwork(inet,cidr,macaddr,macaddr8)ᐳ"]]:::sideeffectplan
     Object18 & Constant29 & Constant30 & Constant31 & Constant32 --> PgInsertSingle15
     Object19{{"Object[19∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle15 --> Object19
@@ -54,7 +54,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 19, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15<br /><br />ROOT PgInsertSingle{1}[15]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15<br /><br />ROOT PgInsertSingle{1}ᐸnetwork(inet,cidr,macaddr,macaddr8)ᐳ[15]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,Constant20,PgClassExpression21,List22,Lambda23,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28 bucket3
     Bucket0 --> Bucket1

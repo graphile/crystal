@@ -43,7 +43,7 @@ graph TD
     Access348{{"Access[348∈54]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access349{{"Access[349∈54]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access348 & Access349 --> Object350
-    PgDeleteSingle347[["PgDeleteSingle[347∈54]"]]:::sideeffectplan
+    PgDeleteSingle347[["PgDeleteSingle[347∈54]<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
     Object350 & Constant402 --> PgDeleteSingle347
     __Value3 --> Access348
     __Value3 --> Access349
@@ -53,7 +53,7 @@ graph TD
     Access316{{"Access[316∈50]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access317{{"Access[317∈50]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access316 & Access317 --> Object318
-    PgDeleteSingle315[["PgDeleteSingle[315∈50]"]]:::sideeffectplan
+    PgDeleteSingle315[["PgDeleteSingle[315∈50]<br />ᐸperson(email)ᐳ"]]:::sideeffectplan
     Object318 & Constant400 --> PgDeleteSingle315
     __Value3 --> Access316
     __Value3 --> Access317
@@ -63,13 +63,13 @@ graph TD
     Access301{{"Access[301∈47]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access302{{"Access[302∈47]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access301 & Access302 --> Object303
-    PgDeleteSingle300[["PgDeleteSingle[300∈47]"]]:::sideeffectplan
+    PgDeleteSingle300[["PgDeleteSingle[300∈47]<br />ᐸperson(email)ᐳ"]]:::sideeffectplan
     Object303 & Constant399 --> PgDeleteSingle300
     __Value3 --> Access301
     __Value3 --> Access302
     Object304{{"Object[304∈47]<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle300 --> Object304
-    PgDeleteSingle253[["PgDeleteSingle[253∈41]"]]:::sideeffectplan
+    PgDeleteSingle253[["PgDeleteSingle[253∈41]<br />ᐸcompoundKey(person_id_1,person_id_2)ᐳ"]]:::sideeffectplan
     Object256{{"Object[256∈41]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object256 & Constant397 & Constant398 --> PgDeleteSingle253
     Access254{{"Access[254∈41]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -79,7 +79,7 @@ graph TD
     __Value3 --> Access255
     Object257{{"Object[257∈41]<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle253 --> Object257
-    PgDeleteSingle205[["PgDeleteSingle[205∈35]"]]:::sideeffectplan
+    PgDeleteSingle205[["PgDeleteSingle[205∈35]<br />ᐸcompoundKey(person_id_1,person_id_2)ᐳ"]]:::sideeffectplan
     Object208{{"Object[208∈35]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access203{{"Access[203∈35]<br />ᐸ202.1ᐳ"}}:::plan
     Access204{{"Access[204∈35]<br />ᐸ202.2ᐳ"}}:::plan
@@ -99,7 +99,7 @@ graph TD
     Access182{{"Access[182∈31]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access183{{"Access[183∈31]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access182 & Access183 --> Object184
-    PgDeleteSingle181[["PgDeleteSingle[181∈31]"]]:::sideeffectplan
+    PgDeleteSingle181[["PgDeleteSingle[181∈31]<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Object184 & Constant389 --> PgDeleteSingle181
     Object185{{"Object[185∈31]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
     PgDeleteSingle181 & Constant386 --> Object185
@@ -109,7 +109,7 @@ graph TD
     Access160{{"Access[160∈27]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access161{{"Access[161∈27]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access160 & Access161 --> Object162
-    PgDeleteSingle159[["PgDeleteSingle[159∈27]"]]:::sideeffectplan
+    PgDeleteSingle159[["PgDeleteSingle[159∈27]<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Object162 & Constant393 --> PgDeleteSingle159
     __Value3 --> Access160
     __Value3 --> Access161
@@ -119,7 +119,7 @@ graph TD
     Access139{{"Access[139∈23]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access140{{"Access[140∈23]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access139 & Access140 --> Object141
-    PgDeleteSingle138[["PgDeleteSingle[138∈23]"]]:::sideeffectplan
+    PgDeleteSingle138[["PgDeleteSingle[138∈23]<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Object141 & Constant392 --> PgDeleteSingle138
     Object142{{"Object[142∈23]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
     PgDeleteSingle138 & Constant383 --> Object142
@@ -129,7 +129,7 @@ graph TD
     Access117{{"Access[117∈19]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access118{{"Access[118∈19]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access117 & Access118 --> Object119
-    PgDeleteSingle116[["PgDeleteSingle[116∈19]"]]:::sideeffectplan
+    PgDeleteSingle116[["PgDeleteSingle[116∈19]<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Object119 & Constant390 --> PgDeleteSingle116
     __Value3 --> Access117
     __Value3 --> Access118
@@ -139,7 +139,7 @@ graph TD
     Access105{{"Access[105∈17]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access106{{"Access[106∈17]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access105 & Access106 --> Object107
-    PgDeleteSingle104[["PgDeleteSingle[104∈17]"]]:::sideeffectplan
+    PgDeleteSingle104[["PgDeleteSingle[104∈17]<br />ᐸtypes(id)ᐳ"]]:::sideeffectplan
     Object107 & Constant389 --> PgDeleteSingle104
     Object108{{"Object[108∈17]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
     PgDeleteSingle104 & Constant388 --> Object108
@@ -149,7 +149,7 @@ graph TD
     Access84{{"Access[84∈13]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access85{{"Access[85∈13]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access84 & Access85 --> Object86
-    PgDeleteSingle83[["PgDeleteSingle[83∈13]"]]:::sideeffectplan
+    PgDeleteSingle83[["PgDeleteSingle[83∈13]<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Access82{{"Access[82∈13]<br />ᐸ81.1ᐳ"}}:::plan
     Object86 & Access82 --> PgDeleteSingle83
     Object87{{"Object[87∈13]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
@@ -163,7 +163,7 @@ graph TD
     Access60{{"Access[60∈9]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access61{{"Access[61∈9]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access60 & Access61 --> Object62
-    PgDeleteSingle59[["PgDeleteSingle[59∈9]"]]:::sideeffectplan
+    PgDeleteSingle59[["PgDeleteSingle[59∈9]<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Access58{{"Access[58∈9]<br />ᐸ57.1ᐳ"}}:::plan
     Object62 & Access58 --> PgDeleteSingle59
     Lambda57{{"Lambda[57∈9]<br />ᐸdecode_Post_base64JSONᐳ"}}:::plan
@@ -177,7 +177,7 @@ graph TD
     Access37{{"Access[37∈5]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access38{{"Access[38∈5]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access37 & Access38 --> Object39
-    PgDeleteSingle36[["PgDeleteSingle[36∈5]"]]:::sideeffectplan
+    PgDeleteSingle36[["PgDeleteSingle[36∈5]<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Access35{{"Access[35∈5]<br />ᐸ34.1ᐳ"}}:::plan
     Object39 & Access35 --> PgDeleteSingle36
     Object40{{"Object[40∈5]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
@@ -187,7 +187,7 @@ graph TD
     Lambda34 --> Access35
     __Value3 --> Access37
     __Value3 --> Access38
-    PgDeleteSingle12[["PgDeleteSingle[12∈1]"]]:::sideeffectplan
+    PgDeleteSingle12[["PgDeleteSingle[12∈1]<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Object15 & Access11 --> PgDeleteSingle12
     Object16{{"Object[16∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle12 --> Object16
@@ -483,7 +483,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 16, 5<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,Constant17,Constant18,PgClassExpression19,List20,Lambda21 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 21, 19<br /><br />ROOT PgDeleteSingle{1}[12]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 21, 19<br /><br />ROOT PgDeleteSingle{1}ᐸpost(id)ᐳ[12]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression27,PgClassExpression28 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -495,7 +495,7 @@ graph TD
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 36, 40, 5, 383<br /><br />ROOT Object{5}ᐸ{result,clientMutationId}ᐳ[40]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,Constant41,PgClassExpression42,List43,Lambda44 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 36, 44, 42<br /><br />ROOT PgDeleteSingle{5}[36]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 36, 44, 42<br /><br />ROOT PgDeleteSingle{5}ᐸpost(id)ᐳ[36]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression50,PgClassExpression51 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -507,7 +507,7 @@ graph TD
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 59, 63, 5<br /><br />ROOT Object{9}ᐸ{result}ᐳ[63]"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,Constant64,Constant65,PgClassExpression66,List67,Lambda68 bucket10
-    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 59, 68, 66<br /><br />ROOT PgDeleteSingle{9}[59]"):::bucket
+    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 59, 68, 66<br /><br />ROOT PgDeleteSingle{9}ᐸpost(id)ᐳ[59]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11,PgClassExpression74,PgClassExpression75 bucket11
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -519,7 +519,7 @@ graph TD
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 83, 87, 5, 386<br /><br />ROOT Object{13}ᐸ{result,clientMutationId}ᐳ[87]"):::bucket
     classDef bucket14 stroke:#a52a2a
     class Bucket14,Constant88,PgClassExpression89,List90,Lambda91 bucket14
-    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 83, 91, 89<br /><br />ROOT PgDeleteSingle{13}[83]"):::bucket
+    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 83, 91, 89<br /><br />ROOT PgDeleteSingle{13}ᐸpost(id)ᐳ[83]"):::bucket
     classDef bucket15 stroke:#ff00ff
     class Bucket15,PgClassExpression97,PgClassExpression98 bucket15
     Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -537,7 +537,7 @@ graph TD
     Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 116, 120, 5<br /><br />ROOT Object{19}ᐸ{result}ᐳ[120]"):::bucket
     classDef bucket20 stroke:#ffa500
     class Bucket20,Constant121,Constant122,PgClassExpression123,List124,Lambda125 bucket20
-    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 116, 125, 123<br /><br />ROOT PgDeleteSingle{19}[116]"):::bucket
+    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 116, 125, 123<br /><br />ROOT PgDeleteSingle{19}ᐸpost(id)ᐳ[116]"):::bucket
     classDef bucket21 stroke:#0000ff
     class Bucket21,PgClassExpression131,PgClassExpression132 bucket21
     Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -549,7 +549,7 @@ graph TD
     Bucket24("Bucket 24 (nullableBoundary)<br />Deps: 138, 142, 5, 383<br /><br />ROOT Object{23}ᐸ{result,clientMutationId}ᐳ[142]"):::bucket
     classDef bucket24 stroke:#808000
     class Bucket24,Constant143,PgClassExpression144,List145,Lambda146 bucket24
-    Bucket25("Bucket 25 (nullableBoundary)<br />Deps: 138, 146, 144<br /><br />ROOT PgDeleteSingle{23}[138]"):::bucket
+    Bucket25("Bucket 25 (nullableBoundary)<br />Deps: 138, 146, 144<br /><br />ROOT PgDeleteSingle{23}ᐸpost(id)ᐳ[138]"):::bucket
     classDef bucket25 stroke:#dda0dd
     class Bucket25,PgClassExpression152,PgClassExpression153 bucket25
     Bucket26("Bucket 26 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -561,7 +561,7 @@ graph TD
     Bucket28("Bucket 28 (nullableBoundary)<br />Deps: 159, 163, 5<br /><br />ROOT Object{27}ᐸ{result}ᐳ[163]"):::bucket
     classDef bucket28 stroke:#00ffff
     class Bucket28,Constant164,Constant165,PgClassExpression166,List167,Lambda168 bucket28
-    Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 159, 168, 166<br /><br />ROOT PgDeleteSingle{27}[159]"):::bucket
+    Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 159, 168, 166<br /><br />ROOT PgDeleteSingle{27}ᐸpost(id)ᐳ[159]"):::bucket
     classDef bucket29 stroke:#4169e1
     class Bucket29,PgClassExpression174,PgClassExpression175 bucket29
     Bucket30("Bucket 30 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -573,7 +573,7 @@ graph TD
     Bucket32("Bucket 32 (nullableBoundary)<br />Deps: 181, 185, 5, 386<br /><br />ROOT Object{31}ᐸ{result,clientMutationId}ᐳ[185]"):::bucket
     classDef bucket32 stroke:#ff00ff
     class Bucket32,Constant186,PgClassExpression187,List188,Lambda189 bucket32
-    Bucket33("Bucket 33 (nullableBoundary)<br />Deps: 181, 189, 187<br /><br />ROOT PgDeleteSingle{31}[181]"):::bucket
+    Bucket33("Bucket 33 (nullableBoundary)<br />Deps: 181, 189, 187<br /><br />ROOT PgDeleteSingle{31}ᐸpost(id)ᐳ[181]"):::bucket
     classDef bucket33 stroke:#f5deb3
     class Bucket33,PgClassExpression195,PgClassExpression196 bucket33
     Bucket34("Bucket 34 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -585,7 +585,7 @@ graph TD
     Bucket36("Bucket 36 (nullableBoundary)<br />Deps: 205, 208, 209, 5<br /><br />ROOT Object{35}ᐸ{result}ᐳ[209]<br />1: <br />ᐳ: 210, 211, 212, 213, 230, 214, 215<br />2: PgSelect[224], PgSelect[236]<br />ᐳ: 228, 229, 240, 241"):::bucket
     classDef bucket36 stroke:#7f007f
     class Bucket36,Constant210,Constant211,PgClassExpression212,PgClassExpression213,List214,Lambda215,PgSelect224,First228,PgSelectSingle229,Constant230,PgSelect236,First240,PgSelectSingle241 bucket36
-    Bucket37("Bucket 37 (nullableBoundary)<br />Deps: 205, 229, 230, 241, 215, 212, 213<br /><br />ROOT PgDeleteSingle{35}[205]"):::bucket
+    Bucket37("Bucket 37 (nullableBoundary)<br />Deps: 205, 229, 230, 241, 215, 212, 213<br /><br />ROOT PgDeleteSingle{35}ᐸcompoundKey(person_id_1,person_id_2)ᐳ[205]"):::bucket
     classDef bucket37 stroke:#ffa500
     class Bucket37 bucket37
     Bucket38("Bucket 38 (nullableBoundary)<br />Deps: 229, 230<br /><br />ROOT PgSelectSingle{36}ᐸpersonᐳ[229]"):::bucket
@@ -603,7 +603,7 @@ graph TD
     Bucket42("Bucket 42 (nullableBoundary)<br />Deps: 253, 256, 257, 5<br /><br />ROOT Object{41}ᐸ{result}ᐳ[257]<br />1: <br />ᐳ: 258, 259, 260, 261, 278, 262, 263<br />2: PgSelect[272], PgSelect[284]<br />ᐳ: 276, 277, 288, 289"):::bucket
     classDef bucket42 stroke:#dda0dd
     class Bucket42,Constant258,Constant259,PgClassExpression260,PgClassExpression261,List262,Lambda263,PgSelect272,First276,PgSelectSingle277,Constant278,PgSelect284,First288,PgSelectSingle289 bucket42
-    Bucket43("Bucket 43 (nullableBoundary)<br />Deps: 253, 277, 278, 289, 263, 260, 261<br /><br />ROOT PgDeleteSingle{41}[253]"):::bucket
+    Bucket43("Bucket 43 (nullableBoundary)<br />Deps: 253, 277, 278, 289, 263, 260, 261<br /><br />ROOT PgDeleteSingle{41}ᐸcompoundKey(person_id_1,person_id_2)ᐳ[253]"):::bucket
     classDef bucket43 stroke:#ff0000
     class Bucket43 bucket43
     Bucket44("Bucket 44 (nullableBoundary)<br />Deps: 277, 278<br /><br />ROOT PgSelectSingle{42}ᐸpersonᐳ[277]"):::bucket
@@ -630,7 +630,7 @@ graph TD
     Bucket51("Bucket 51 (nullableBoundary)<br />Deps: 315, 319, 318, 400, 5<br /><br />ROOT Object{50}ᐸ{result}ᐳ[319]"):::bucket
     classDef bucket51 stroke:#696969
     class Bucket51,Constant320,Constant321,PgClassExpression322,List323,Lambda324 bucket51
-    Bucket52("Bucket 52 (nullableBoundary)<br />Deps: 315, 318, 400, 324, 322<br /><br />ROOT PgDeleteSingle{50}[315]<br />1: <br />ᐳ: 330, 331, 333<br />2: PgSelect[334]<br />ᐳ: 338, 339, 341"):::bucket
+    Bucket52("Bucket 52 (nullableBoundary)<br />Deps: 315, 318, 400, 324, 322<br /><br />ROOT PgDeleteSingle{50}ᐸperson(email)ᐳ[315]<br />1: <br />ᐳ: 330, 331, 333<br />2: PgSelect[334]<br />ᐳ: 338, 339, 341"):::bucket
     classDef bucket52 stroke:#00bfff
     class Bucket52,PgClassExpression330,PgClassExpression331,PgClassExpression333,PgSelect334,First338,PgSelectSingle339,PgClassExpression341 bucket52
     Bucket53("Bucket 53 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket

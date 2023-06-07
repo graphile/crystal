@@ -25,7 +25,7 @@ graph TD
     Constant112{{"Constant[112∈0]<br />ᐸ[Object: null prototype] { a: 1 }ᐳ"}}:::plan
     Constant105{{"Constant[105∈0]<br />ᐸ'postgraphile_test_visitor'ᐳ"}}:::plan
     Constant106{{"Constant[106∈0]<br />ᐸ'c'ᐳ"}}:::plan
-    PgInsertSingle72[["PgInsertSingle[72∈6]"]]:::sideeffectplan
+    PgInsertSingle72[["PgInsertSingle[72∈6]<br />ᐸtypes(regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ"]]:::sideeffectplan
     Object75{{"Object[75∈6]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Constant113{{"Constant[113∈6]<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
     Constant114{{"Constant[114∈6]<br />ᐸ[Object: null prototype] { a: 1 }ᐳ"}}:::plan
@@ -37,7 +37,7 @@ graph TD
     __Value3 --> Access74
     Object76{{"Object[76∈6]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle72 --> Object76
-    PgUpdateSingle27[["PgUpdateSingle[27∈1]"]]:::sideeffectplan
+    PgUpdateSingle27[["PgUpdateSingle[27∈1]<br />ᐸtypes(id;regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ"]]:::sideeffectplan
     Object30 & Constant98 & Constant99 & Constant100 & Constant111 & Constant112 --> PgUpdateSingle27
     Object31{{"Object[31∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle27 --> Object31
@@ -118,7 +118,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 31, 27, 30<br /><br />ROOT Object{1}ᐸ{result}ᐳ[31]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 27, 30<br /><br />ROOT PgUpdateSingle{1}[27]<br />1: <br />ᐳ: 34, 35, 36, 37, 39<br />2: PgSelect[40]<br />ᐳ: First[44], PgSelectSingle[45]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 27, 30<br /><br />ROOT PgUpdateSingle{1}ᐸtypes(id;regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ[27]<br />1: <br />ᐳ: 34, 35, 36, 37, 39<br />2: PgSelect[40]<br />ᐳ: First[44], PgSelectSingle[45]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression34,PgClassExpression35,PgClassExpression36,PgClassExpression37,PgClassExpression39,PgSelect40,First44,PgSelectSingle45 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ37ᐳ[38]"):::bucket
@@ -133,7 +133,7 @@ graph TD
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 76, 72, 75<br /><br />ROOT Object{6}ᐸ{result}ᐳ[76]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 72, 75<br /><br />ROOT PgInsertSingle{6}[72]<br />1: <br />ᐳ: 79, 80, 81, 82, 84<br />2: PgSelect[85]<br />ᐳ: First[89], PgSelectSingle[90]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 72, 75<br /><br />ROOT PgInsertSingle{6}ᐸtypes(regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ[72]<br />1: <br />ᐳ: 79, 80, 81, 82, 84<br />2: PgSelect[85]<br />ᐳ: First[89], PgSelectSingle[90]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression79,PgClassExpression80,PgClassExpression81,PgClassExpression82,PgClassExpression84,PgSelect85,First89,PgSelectSingle90 bucket8
     Bucket9("Bucket 9 (listItem)<br />ROOT __Item{9}ᐸ82ᐳ[83]"):::bucket
