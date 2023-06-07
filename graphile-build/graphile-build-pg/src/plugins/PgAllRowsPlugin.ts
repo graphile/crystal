@@ -6,7 +6,6 @@ import { connection } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
-import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
@@ -86,18 +85,8 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const behavior = getBehavior([
-            resource.codec.extensions,
-            resource.extensions,
-          ]);
-          const defaultBehavior = "connection -list";
-
           if (
-            build.behavior.matches(
-              behavior,
-              "query:resource:list",
-              defaultBehavior,
-            )
+            build.behavior.pgResourceMatches(resource, "query:resource:list")
           ) {
             const fieldName = build.inflection.allRowsList(resource);
             fields = build.extend(
@@ -135,10 +124,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
           }
 
           if (
-            build.behavior.matches(
-              behavior,
+            build.behavior.pgResourceMatches(
+              resource,
               "query:resource:connection",
-              defaultBehavior,
             )
           ) {
             const fieldName = build.inflection.allRowsConnection(resource);

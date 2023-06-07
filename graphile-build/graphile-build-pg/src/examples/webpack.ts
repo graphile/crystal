@@ -65,7 +65,7 @@ async function main() {
       ],
       gather: {},
       schema: {
-        simpleCollections: "only",
+        defaultBehavior: "+list -connection",
       },
     },
   ]);

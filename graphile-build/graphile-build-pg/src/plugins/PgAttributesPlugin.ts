@@ -21,7 +21,6 @@ import type { GrafastFieldConfig, SetterStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "graphql";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
 
 declare global {
@@ -144,8 +143,12 @@ function processAttribute(
 
   const attribute = pgCodec.attributes[attributeName];
 
-  const behavior = getBehavior([pgCodec.extensions, attribute.extensions]);
-  if (!build.behavior.matches(behavior, "attribute:select", "select")) {
+  if (
+    !build.behavior.pgCodecAttributeMatches(
+      [pgCodec, attribute],
+      "attribute:select",
+    )
+  ) {
     // Don't allow selecting this attribute.
     return;
   }
@@ -339,6 +342,9 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgCodecAttribute: "select base update insert",
+    },
     hooks: {
       GraphQLInterfaceType_fields(fields, build, context) {
         const {
@@ -451,11 +457,6 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         return Object.entries(pgCodec.attributes as PgCodecAttributes).reduce(
           (memo, [attributeName, attribute]) =>
             build.recoverable(memo, () => {
-              const behavior = getBehavior([
-                pgCodec.extensions,
-                attribute.extensions,
-              ]);
-
               const action = isPgBaseInput
                 ? "base"
                 : isPgPatch
@@ -464,7 +465,10 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
               const fieldBehaviorScope = `attribute:${action}`;
               if (
-                !build.behavior.matches(behavior, fieldBehaviorScope, action)
+                !build.behavior.pgCodecAttributeMatches(
+                  [pgCodec, attribute],
+                  fieldBehaviorScope,
+                )
               ) {
                 return memo;
               }

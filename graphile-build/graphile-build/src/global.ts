@@ -37,7 +37,7 @@ import type {
   GraphQLUnionTypeConfig,
 } from "graphql";
 
-import type { Behavior } from "./behavior.js";
+import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
 import type { InflectionBase } from "./inflection.js";
 import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
@@ -63,6 +63,23 @@ declare global {
      */
     interface BuildInput {
       // Expand this interface with declaration merging
+    }
+
+    interface BehaviorEntities {
+      string: string;
+      // Expand me through declaration merging
+    }
+
+    interface PluginBehaviorEntitySpec<
+      TEntityType extends keyof GraphileBuild.BehaviorEntities,
+    > {
+      defaultBehavior?: string;
+      getEntityDefaultBehavior?: (
+        entity: GraphileBuild.BehaviorEntities[TEntityType],
+      ) => string;
+      getEntityConfiguredBehavior?: (
+        entity: GraphileBuild.BehaviorEntities[TEntityType],
+      ) => string;
     }
 
     /**
@@ -107,13 +124,6 @@ declare global {
        * `true` in your production configuration to disable this behavior.
        */
       dontSwallowErrors?: boolean;
-
-      /**
-       * - 'only': connections will be avoided, preferring lists
-       * - 'omit': lists will be avoided, preferring connections
-       * - 'both': both lists and connections will be generated
-       */
-      simpleCollections?: "only" | "both" | "omit";
 
       /**
        * When false (default), Grafserv will exit if it fails to build the
@@ -300,7 +310,7 @@ declare global {
        * (typically a field, argument, enum value, input field, or similar)
        * goes into the schema.
        */
-      behavior: Behavior;
+      behavior: Behavior & BehaviorDynamicMethods;
 
       /**
        * Register a type by name with the system; names must be unique. It's

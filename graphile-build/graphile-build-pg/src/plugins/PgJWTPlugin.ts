@@ -4,7 +4,6 @@ import type { PgCodec, PgSelectSingleStep } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 import { sign as signJwt } from "jsonwebtoken";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
 
 declare global {
@@ -76,11 +75,10 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
         const {
           options: { pgJwtSecret, pgJwtSignOptions },
         } = build;
-        const jwtCodec = [...build.pgCodecMetaLookup.keys()].find((codec) => {
-          const behavior = getBehavior(codec.extensions);
+        const jwtCodec = [...build.pgCodecMetaLookup.keys()].find((codec) =>
           // TODO: why is b.jwt_token not found here?
-          return build.behavior.matches(behavior, "jwt");
-        });
+          build.behavior.pgCodecMatches(codec, "jwt"),
+        );
 
         if (!jwtCodec) {
           return _;

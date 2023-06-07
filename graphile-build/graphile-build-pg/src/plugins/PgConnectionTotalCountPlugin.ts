@@ -12,7 +12,6 @@ import { TYPES } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
 
 declare global {
@@ -32,6 +31,9 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
   description: "Add 'totalCount' field to connections",
   version,
   schema: {
+    entityBehavior: {
+      pgCodec: "totalCount",
+    },
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
@@ -59,8 +61,7 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const behavior = getBehavior(codec!.extensions);
-        if (!build.behavior.matches(behavior, "totalCount", "totalCount")) {
+        if (!build.behavior.pgCodecMatches(codec!, "totalCount")) {
           return fields;
         }
 

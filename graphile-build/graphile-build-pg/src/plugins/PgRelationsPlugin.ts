@@ -26,8 +26,7 @@ import sql from "pg-sql2";
 import type { TE } from "tamedevil";
 import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 
-import { getBehavior } from "../behavior.js";
-import { tagToString } from "../utils.js";
+import { resolveResourceRefPath, tagToString } from "../utils.js";
 import { version } from "../version.js";
 
 const ref_first = te.ref(first, "first");
@@ -47,7 +46,6 @@ declare global {
       isPgManyRelationConnectionField?: boolean;
       isPgManyRelationListField?: boolean;
       pgRelationDetails?: PgRelationsPluginRelationDetails;
-      fieldBehavior?: string;
     }
     interface Inflection {
       resourceRelationName(
@@ -483,6 +481,53 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgCodecRelation: {
+        provides: ["inferred"],
+        before: ["override"],
+        after: ["default"],
+        callback(behavior, entity) {
+          if (entity.isUnique) {
+            return [
+              behavior,
+              "single -singularRelation:resource:list -singularRelation:resource:connection",
+            ];
+          } else {
+            return behavior;
+          }
+        },
+      },
+      pgCodecRef: {
+        provides: ["inferred"],
+        before: ["override"],
+        after: ["default"],
+        callback(behavior, entity) {
+          if (entity.definition.singular) {
+            return [
+              behavior,
+              "single -singularRelation:resource:list -singularRelation:resource:connection",
+            ];
+          } else {
+            return behavior;
+          }
+        },
+      },
+      pgRefDefinition: {
+        provides: ["inferred"],
+        before: ["override"],
+        after: ["default"],
+        callback(behavior, entity) {
+          if (entity.singular) {
+            return [
+              behavior,
+              "single -singularRelation:resource:list -singularRelation:resource:connection",
+            ];
+          } else {
+            return behavior;
+          }
+        },
+      },
+    },
     hooks: {
       GraphQLInterfaceType_fields: addRelations,
       GraphQLObjectType_fields: addRelations,
@@ -647,7 +692,6 @@ function addRelations(
       GraphQLUnionType,
       GraphQLInterfaceType,
     },
-    options: { simpleCollections },
   } = build;
   const { Self, scope, fieldWithHooks } = context;
 
@@ -721,58 +765,14 @@ function addRelations(
         codec,
       }));
 
-  type Layer = {
-    relationName: string;
-    localAttributes: string[];
-    resource: PgResource;
-    remoteAttributes: string[];
-    isUnique: boolean;
-  };
-
-  const resolvePath = (path: PgCodecRefPath) => {
-    if (!resource) {
-      throw new Error(`Cannot call resolvePath unless there's a resource`);
-    }
-    const result = {
-      resource,
-      hasReferencee: false,
-      isUnique: true,
-      layers: [] as Layer[],
-    };
-    for (const pathEntry of path) {
-      const relation = result.resource.getRelation(
-        pathEntry.relationName,
-      ) as PgCodecRelation;
-      const {
-        isReferencee,
-        localAttributes,
-        remoteAttributes,
-        remoteResource: resource,
-        isUnique,
-      } = relation;
-      if (isReferencee) {
-        result.hasReferencee = true;
-      }
-      if (!isUnique) {
-        result.isUnique = false;
-      }
-      result.layers.push({
-        relationName: pathEntry.relationName,
-        localAttributes: localAttributes as string[],
-        remoteAttributes: remoteAttributes as string[],
-        resource,
-        isUnique,
-      });
-      result.resource = relation.remoteResource;
-    }
-    return result;
-  };
-
   type Digest = {
     identifier: string;
     isReferencee: boolean;
     isUnique: boolean;
-    behavior: string;
+    relationTypeScope: string;
+    shouldAddSingleField: boolean | undefined;
+    shouldAddConnectionField: boolean | undefined;
+    shouldAddListField: boolean | undefined;
     typeName: string;
     connectionTypeName: string;
     deprecationReason?: string;
@@ -799,7 +799,6 @@ function addRelations(
         localAttributes,
         remoteAttributes,
         remoteResource,
-        extensions,
         isReferencee,
       } = relation;
       if (isMutationPayload && isReferencee) {
@@ -828,14 +827,7 @@ function addRelations(
         }
       }
 
-      // The behavior is the relation behavior PLUS the remote table
-      // behavior. But the relation settings win.
-      const behavior =
-        getBehavior([
-          remoteResource.codec.extensions,
-          remoteResource.extensions,
-          extensions,
-        ]) ?? "";
+      const isUnique = relation.isUnique;
       const otherCodec = remoteResource.codec;
       const typeName = build.inflection.tableType(otherCodec);
       const connectionTypeName =
@@ -863,11 +855,29 @@ function addRelations(
       const connectionFieldName =
         build.inflection.manyRelationConnection(relationDetails);
       const listFieldName = build.inflection.manyRelationList(relationDetails);
+
+      const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
+      const shouldAddSingleField = build.behavior.pgCodecRelationMatches(
+        relation,
+        `${relationTypeScope}:resource:single`,
+      );
+      const shouldAddConnectionField = build.behavior.pgCodecRelationMatches(
+        relation,
+        `${relationTypeScope}:resource:connection`,
+      );
+      const shouldAddListField = build.behavior.pgCodecRelationMatches(
+        relation,
+        `${relationTypeScope}:resource:list`,
+      );
+
       const digest: Digest = {
         identifier: relationName,
         isReferencee: relation.isReferencee ?? false,
-        behavior,
-        isUnique: relation.isUnique,
+        relationTypeScope,
+        shouldAddSingleField,
+        shouldAddConnectionField,
+        shouldAddListField,
+        isUnique,
         typeName,
         connectionTypeName,
         deprecationReason,
@@ -893,16 +903,19 @@ function addRelations(
     refDefinition: refSpec,
     ref,
   } of refDefinitionList) {
+    const isUnique = !!refSpec.singular;
     let hasReferencee;
     let sharedCodec: PgCodec | undefined = undefined;
     let sharedSource: PgResource | undefined = undefined;
-    let behavior;
-    let typeName;
+    let behavior: string;
+    let typeName: string | null | undefined;
     let singleRecordPlan;
     let listPlan;
     let connectionPlan;
     if (ref && resource) {
-      const paths = ref.paths.map(resolvePath);
+      const paths = ref.paths.map((path) =>
+        resolveResourceRefPath(resource, path),
+      );
       if (paths.length === 0) continue;
       const firstSource = paths[0].resource;
       const hasExactlyOneSource = paths.every(
@@ -964,14 +977,15 @@ function addRelations(
 
       // const isUnique = paths.every((p) => p.isUnique);
 
-      // TODO: shouldn't the ref behavior override the resource behavior?
       behavior = hasExactlyOneSource
-        ? getBehavior([
-            firstSource.codec.extensions,
-            firstSource.extensions,
-            refSpec.extensions,
-          ])
-        : getBehavior([sharedCodec?.extensions, refSpec.extensions]);
+        ? `${build.behavior.pgResourceBehavior(
+            firstSource,
+          )} ${build.behavior.pgCodecRefBehavior(ref, false)}`
+        : sharedCodec
+        ? `${build.behavior.pgCodecBehavior(
+            sharedCodec,
+          )} ${build.behavior.pgCodecRefBehavior(ref, false)}`
+        : build.behavior.pgCodecRefBehavior(ref);
 
       // Shortcut simple relation alias
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {
@@ -1206,7 +1220,7 @@ function addRelations(
       })());
     } else {
       hasReferencee = true;
-      behavior = getBehavior(refSpec.extensions);
+      behavior = build.behavior.pgRefDefinitionBehavior(refSpec);
       typeName = refSpec.graphqlType;
       if (!typeName) {
         // TODO: remove this restriction
@@ -1263,13 +1277,30 @@ function addRelations(
       );
     }
 
+    const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
+    const shouldAddSingleField = build.behavior.stringMatches(
+      behavior,
+      `${relationTypeScope}:resource:single`,
+    );
+    const shouldAddConnectionField = build.behavior.stringMatches(
+      behavior,
+      `${relationTypeScope}:resource:connection`,
+    );
+    const shouldAddListField = build.behavior.stringMatches(
+      behavior,
+      `${relationTypeScope}:resource:list`,
+    );
+
     const digest: Digest = {
       identifier,
       isReferencee: hasReferencee,
       pgCodec: sharedCodec,
       pgResource: sharedSource,
-      isUnique: !!refSpec.singular,
-      behavior: behavior ?? "",
+      isUnique,
+      relationTypeScope,
+      shouldAddSingleField,
+      shouldAddConnectionField,
+      shouldAddListField,
       typeName,
       connectionTypeName,
       singleRecordFieldName,
@@ -1286,7 +1317,10 @@ function addRelations(
   return digests.reduce((memo, digest) => {
     const {
       isUnique,
-      behavior,
+      relationTypeScope,
+      shouldAddSingleField,
+      shouldAddConnectionField,
+      shouldAddListField,
       typeName,
       connectionTypeName,
       deprecationReason,
@@ -1304,7 +1338,6 @@ function addRelations(
       pgRelationDetails,
       relatedTypeName,
     } = digest;
-    const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
     const OtherType = build.getTypeByName(typeName);
     if (
       !OtherType ||
@@ -1317,22 +1350,8 @@ function addRelations(
       return memo;
     }
     let fields = memo;
-    const defaultBehavior = isUnique
-      ? "single -singularRelation:resource:list -singularRelation:resource:connection"
-      : simpleCollections === "both"
-      ? "connection list"
-      : simpleCollections === "only"
-      ? "list"
-      : "connection";
 
-    if (
-      isUnique &&
-      build.behavior.matches(
-        behavior,
-        `${relationTypeScope}:resource:single`,
-        defaultBehavior,
-      )
-    ) {
+    if (isUnique && shouldAddSingleField) {
       const fieldName = singleRecordFieldName;
       fields = extend(
         fields,
@@ -1342,7 +1361,6 @@ function addRelations(
               fieldName,
               fieldBehaviorScope: `${relationTypeScope}:resource:single`,
               isPgSingleRelationField: true,
-              fieldBehavior: behavior,
               pgRelationDetails,
             },
             {
@@ -1361,14 +1379,7 @@ function addRelations(
       );
     }
 
-    if (
-      isReferencee &&
-      build.behavior.matches(
-        behavior,
-        `${relationTypeScope}:resource:connection`,
-        defaultBehavior,
-      )
-    ) {
+    if (isReferencee && shouldAddConnectionField) {
       const ConnectionType = build.getTypeByName(connectionTypeName);
       if (ConnectionType) {
         const fieldName = connectionFieldName;
@@ -1384,7 +1395,6 @@ function addRelations(
                 isPgFieldConnection: true,
                 isPgManyRelationConnectionField: true,
                 pgRelationDetails,
-                fieldBehavior: behavior,
               },
               {
                 description:
@@ -1405,14 +1415,7 @@ function addRelations(
       }
     }
 
-    if (
-      isReferencee &&
-      build.behavior.matches(
-        behavior,
-        `${relationTypeScope}:resource:list`,
-        defaultBehavior,
-      )
-    ) {
+    if (isReferencee && shouldAddListField) {
       const fieldName = listFieldName;
       fields = extend(
         fields,
@@ -1426,7 +1429,6 @@ function addRelations(
               isPgFieldSimpleCollection: true,
               isPgManyRelationListField: true,
               pgRelationDetails,
-              fieldBehavior: behavior,
             },
             {
               description:

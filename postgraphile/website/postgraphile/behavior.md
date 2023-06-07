@@ -26,19 +26,20 @@ tables, columns, functions, types, etc.) have associated behaviors which
 influence whether and how that entity is exposed. You may influence their
 resulting behaviors by adding your own behavior strings to the entity, either
 directly or via smart tags/smart comments. For example, if you don't want users
-to be able to modify the `forums` table, you might add a database comment such
-as `comment on table forums is '@behavior -create -update -delete';` (this is
-just one of many ways of attaching behaviors).
+to be able to modify entries in the `forums` table, you might add a database
+comment such as `comment on table forums is '@behavior -create -update
+-delete';` (this is just one of many ways of attaching behaviors).
 
 The final behavior string of an entity is made by concatenating the behavior
 strings from various sources; typically this follows the following pattern:
 
-- Default behavior from the relevant plugin
+- Default behaviors from plugins
 - Global default behavior
+- Inferred behaviors from plugins
 - (Secondary entity behaviors)
   - E.g. if the entity is a column, then secondary entity behaviors may include
-    the behavior of the data type of the column
-- Entity behavior
+    the behavior of the data type of the column (codec)
+- Entity behavior (from smart tags/smart comments)
 
 The highest precedence behaviors are at the end the behavior string, and the
 lowest priority behaviors are at the start.
@@ -53,8 +54,9 @@ earlier in the behavior string) otherwise it does.
 
 If you want to make wide-sweeping changes to behaviors, you can add "default
 behaviors" via the `preset.schema.defaultBehavior` setting. For example if you
-want your schema to use lists by default, eschewing the superior connections
-pattern, you might have a configuration something like this:
+want your schema to use lists by default, eschewing the more verbose (but
+typically superior) connections pattern, you might have a configuration
+something like this:
 
 ```js
 // graphile.config.mjs
@@ -71,27 +73,42 @@ export default preset;
 ```
 
 These global defaults can still be overridden by each entity, so they're a
-really good way of making wide ranging "default" behaviors without locking
-yourself in too hard.
+good way of making wide ranging "default" behaviors without locking yourself in
+too hard.
 
 :::info
 
 If you're authoring a preset that is not the final configuration for a schema
-then this kind of default behavior is likely to be overridden by the user's
-configuration. Instead, preset authors should add a plugin that uses the
-`build.behavior.addDefaultBehavior("...")` API during the `build` phase. A
-similar "lists by default" plugin might look like this:
+then this default behavior setting is likely to be overridden (replaced) by the
+user's configuration. Instead, preset authors should add a plugin that has a
+`schema.globalBehavior` entry. If this entry is a string, the behavior will be
+prepended. If it's a callback, then it should return an array of behavior
+strings to be joined, one of which should be the current (passed in) behavior.
+Typically you want a tuple where the first entry is your new behaviors and the
+second entry is the current (passed-in) behavior (this way the user's
+`defaultBehavior` will have higher precedence to your `globalBehavior`).
+
+A similar "lists by default" plugin might look like this:
 
 ```js
 const FavourListsPlugin = {
   name: "FavourListsPlugin",
   version: "0.0.0",
   schema: {
-    hooks: {
-      build(build) {
-        build.behavior.addDefaultBehavior("-connection +list");
-        return build;
-      },
+    globalBehavior: "-connection +list",
+  },
+};
+```
+
+or, equivalently, like this:
+
+```js
+const FavourListsPlugin = {
+  name: "FavourListsPlugin",
+  version: "0.0.0",
+  schema: {
+    globalBehavior(currentBehavior, resolvedPreset) {
+      return ["-connection +list", currentBehavior];
     },
   },
 };
@@ -171,11 +188,9 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `manyRelation:resource:list`
 - `manyRelation:resource:connection`
 - `jwt` - should the given codec behave as if it were a JWT?
-
 - `insert:input:record` - input to the 'insert' mutation
 - `insert:payload:record` - the record added to the insert mutation payload
 - `update:payload:record`
-
 - `totalCount` - on a codec, should we add the `totalCount` field?
 
 ## Fragment matching algorithm
@@ -199,37 +214,6 @@ ScopeMatches(fragment, filter):
     equal, return false.
 - Return true.
 
-Here's an annotated example of how `PgOrderAllAttributesPlugin` determines whether
-it should allow ordering by a given attribute (eg. column) of a codec:
-
-```js
-// Get the behaviors from the attribute type and the attribute itself
-const behavior = getBehavior([pgCodec.extensions, attribute.extensions]);
-
-// By default we want to enable orderBy, except when dealing with `array` and
-// `range` types
-const defaultBehavior = "orderBy orderBy:* -orderBy:array -orderBy:range";
-
-// If the attribute behavior isn't a match then abort
-if (!build.behavior.matches(behavior, "attribute:orderBy", defaultBehavior)) {
-  return memo;
-}
-// If the attribute is an array and the behavior isn't a match then abort
-if (
-  attribute.codec.arrayOfCodec &&
-  !build.behavior.matches(behavior, "attribute:orderBy:array", defaultBehavior)
-) {
-  return memo;
-}
-// If the attribute is a range and the behavior isn't a match then abort
-if (
-  attribute.codec.rangeOfCodec &&
-  !build.behavior.matches(behavior, "attribute:orderBy:range", defaultBehavior)
-) {
-  return memo;
-}
-```
-
 ## Future expansions
 
 Would be good to add additional data, e.g. `query:resource:single[pk]`,
@@ -243,3 +227,48 @@ In order to avoid ambiguities, do not use:
 
 - `create` - use `insert` instead
 - `root:` - use `query:`, `mutation:` or `subscription:` instead
+
+## Setting and consuming behaviors in a plugin
+
+TODO: document this.
+
+```ts
+const MyPlugin = {
+  name: "MyPlugin",
+  version: "0.0.0",
+
+  schema: {
+    // Register default behaviors (optional)
+    entityBehaviors: {
+      // Apply 'myCodecBehavior' by default to _all_ codecs
+      pgCodec: "myCodecBehavior",
+
+      // Apply 'myResourceBehavior' to resources with truthy `isUnique` (overrides defaults)
+      pgResource(behavior, resource) {
+        if (resource.isUnique) {
+          return [behavior, "myResourceBehavior"];
+        } else {
+          return behavior;
+        }
+      },
+    },
+
+    // Do something with behaviors (optional)
+    hooks: {
+      GraphQLObjectType_fields_field(field, build, context) {
+        const codec = context.scope.pgFieldCodec;
+        if (
+          !codec ||
+          !build.behavior.pgCodecMatches(codec, "myCodecBehavior")
+        ) {
+          return field;
+        }
+
+        // Behavior matches! Do stuff here...
+
+        return field;
+      },
+    },
+  },
+};
+```

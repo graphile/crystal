@@ -12,7 +12,6 @@ import { connection, constant, EdgeStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 
-import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
@@ -52,7 +51,6 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           getTypeByName,
           graphql: { GraphQLList, GraphQLNonNull },
           inflection,
-          options: { simpleCollections },
         } = build;
         const {
           scope: { isMutationPayload, pgTypeResource, pgCodec: _pgCodec },
@@ -75,19 +73,9 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const behavior = getBehavior(pgCodec.extensions);
-        const defaultBehavior =
-          simpleCollections === "both"
-            ? "connection list"
-            : simpleCollections === "only"
-            ? "list"
-            : "connection";
-
         // TODO: this is a rule on the codec; we must ensure that everywhere
         // that uses 'list'/'connection' respects the codec behaviors
-        if (
-          !build.behavior.matches(behavior, "*:connection", defaultBehavior)
-        ) {
+        if (!build.behavior.pgCodecMatches(pgCodec, "*:connection")) {
           return fields;
         }
 

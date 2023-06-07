@@ -513,12 +513,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               for (const [relationName, relationSpec] of Object.entries(
                 relations,
               )) {
-                const behavior =
-                  getBehavior([
-                    relationSpec.remoteResource.codec.extensions,
-                    relationSpec.remoteResource.extensions,
-                    relationSpec.extensions,
-                  ]) ?? "";
+                // TODO: normally we wouldn't call `getBehavior` anywhere
+                // except in an entityBehavior definition... Should this be
+                // solved a different way?
+                const behavior = getBehavior([
+                  relationSpec.remoteResource.codec.extensions,
+                  relationSpec.remoteResource.extensions,
+                  relationSpec.extensions,
+                ]);
                 const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
                   {
                     registry: resource.registry,
@@ -568,11 +570,25 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     },
   },
   schema: {
+    entityBehavior: {
+      pgCodec: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, codec) {
+          return [
+            "select",
+            "table",
+            ...(!codec.isAnonymous ? ["insert", "update"] : []),
+            behavior,
+          ];
+        },
+      },
+    },
     hooks: {
       init(_, build, _context) {
         const {
           inflection,
-          options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
+          options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
         } = build;
         const unionsToRegister = new Map<string, PgCodec[]>();
@@ -594,32 +610,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               return;
             }
 
-            const behavior = getBehavior(codec.extensions);
-            const defaultBehavior = [
-              "select",
-              "table",
-              ...(!codec.isAnonymous ? ["insert", "update"] : []),
-              ...(simpleCollections === "both"
-                ? ["connection", "list"]
-                : simpleCollections === "only"
-                ? ["list"]
-                : ["connection"]),
-            ].join(" ");
-
-            const isTable = build.behavior.matches(
-              behavior,
-              "table",
-              defaultBehavior,
-            );
+            const isTable = build.behavior.pgCodecMatches(codec, "table");
             if (!isTable || codec.isAnonymous) {
               return;
             }
 
-            const selectable = build.behavior.matches(
-              behavior,
-              "select",
-              defaultBehavior,
-            );
+            const selectable = build.behavior.pgCodecMatches(codec, "select");
 
             if (selectable) {
               if (

@@ -2,9 +2,11 @@ import "./global.js";
 
 import debugFactory from "debug";
 import { EventEmitter } from "events";
+import { applyHooks } from "graphile-config";
 import type { GraphQLSchemaConfig } from "graphql";
 import { GraphQLSchema, validateSchema } from "graphql";
 
+import { Behavior } from "./behavior.js";
 import makeNewBuild from "./makeNewBuild.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { makeNewWithHooks } from "./newWithHooks/index.js";
@@ -18,6 +20,8 @@ const INIT_OBJECT: GraphileBuild.InitObject = Object.freeze(
 );
 
 const INDENT = "  ";
+
+const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
 
 /**
  * The class responsible for building a GraphQL schema from graphile-build
@@ -39,15 +43,12 @@ class SchemaBuilder<
   newWithHooks: NewWithHooksFunction;
 
   constructor(
-    options: GraphileBuild.SchemaOptions,
+    private resolvedPreset: GraphileConfig.ResolvedPreset,
     private inflection: GraphileBuild.Inflection,
   ) {
     super();
 
-    if (!options) {
-      throw new Error("Please pass options to SchemaBuilder");
-    }
-    this.options = options;
+    this.options = resolvedPreset.schema ?? {};
 
     // Because hooks can nest, this keeps track of how deep we are.
     this.depth = -1;
@@ -55,6 +56,16 @@ class SchemaBuilder<
     this.hooks = makeSchemaBuilderHooks();
 
     this.newWithHooks = makeNewWithHooks({ builder: this }).newWithHooks;
+
+    applyHooks(
+      resolvedPreset.plugins,
+      getSchemaHooks,
+      (hookName, hookFn, plugin) => {
+        this._setPluginName(plugin.name);
+        this.hook(hookName, hookFn);
+        this._setPluginName(null);
+      },
+    );
   }
 
   /**
@@ -190,10 +201,12 @@ class SchemaBuilder<
    * Create the 'Build' object.
    */
   createBuild(input: GraphileBuild.BuildInput): TBuild {
+    const behavior = new Behavior(this.resolvedPreset).freeze();
     const initialBuild = makeNewBuild(
       this,
       input,
       this.inflection,
+      behavior,
     ) as Partial<TBuild> & GraphileBuild.BuildBase;
 
     const build = this.applyHooks("build", initialBuild, initialBuild, {

@@ -3,7 +3,15 @@ import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
 
-import type { PgCodec } from "@dataplan/pg";
+import type {
+  PgCodec,
+  PgCodecAttribute,
+  PgCodecRef,
+  PgCodecRelation,
+  PgRefDefinition,
+  PgResource,
+  PgResourceUnique,
+} from "@dataplan/pg";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
@@ -68,6 +76,19 @@ declare global {
 
       pgGetBehavior: typeof getBehavior;
     }
+
+    interface BehaviorEntities {
+      pgCodec: PgCodec;
+      pgCodecAttribute: [codec: PgCodec, attribute: PgCodecAttribute];
+      pgResource: PgResource<any, any, any, any, any>;
+      pgResourceUnique: [
+        resource: PgResource<any, any, any, any, any>,
+        unique: PgResourceUnique,
+      ];
+      pgCodecRelation: PgCodecRelation;
+      pgCodecRef: PgCodecRef;
+      pgRefDefinition: PgRefDefinition;
+    }
   }
 }
 
@@ -78,6 +99,84 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
   version: version,
 
   schema: {
+    globalBehavior: "connection -list",
+    entityBehavior: {
+      pgCodec: {
+        after: ["default", "inferred"],
+        provides: ["override"],
+        callback(behavior, codec) {
+          return [behavior, getBehavior(codec.extensions)];
+        },
+      },
+      pgCodecAttribute: {
+        after: ["default", "inferred"],
+        provides: ["override"],
+        callback(behavior, [codec, attribute]) {
+          return [
+            behavior,
+            getBehavior([codec.extensions, attribute.extensions]),
+          ];
+        },
+      },
+      pgResource: {
+        after: ["default", "inferred"],
+        provides: ["override"],
+        callback(behavior, resource) {
+          return [
+            behavior,
+            getBehavior([resource.codec.extensions, resource.extensions]),
+          ];
+        },
+      },
+      pgResourceUnique: {
+        after: ["default", "inferred"],
+        provides: ["override"],
+        callback(behavior, [resource, unique]) {
+          return [
+            behavior,
+            getBehavior([
+              resource.codec.extensions,
+              resource.extensions,
+              unique.extensions,
+            ]),
+          ];
+        },
+      },
+      pgCodecRelation: {
+        after: ["default", "inferred"],
+        provides: ["override"],
+        callback(behavior, relationSpec) {
+          return [
+            behavior,
+            // The behavior is the relation behavior PLUS the remote table
+            // behavior. But the relation settings win.
+            getBehavior([
+              relationSpec.remoteResource.codec.extensions,
+              relationSpec.remoteResource.extensions,
+              relationSpec.extensions,
+            ]),
+          ];
+        },
+      },
+      pgCodecRef: {
+        after: ["default", "inferred"],
+        provides: ["override"],
+        callback(behavior, ref) {
+          return [
+            behavior,
+            getBehavior([ref.definition.extensions, ref.extensions]),
+          ];
+        },
+      },
+      pgRefDefinition: {
+        after: ["default", "inferred"],
+        provides: ["override"],
+        callback(behavior, refSpec) {
+          return [behavior, getBehavior(refSpec.extensions)];
+        },
+      },
+    },
+
     hooks: {
       build(build) {
         const {

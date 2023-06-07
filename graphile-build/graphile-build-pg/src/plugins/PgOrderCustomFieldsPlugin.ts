@@ -8,8 +8,8 @@ import type {
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
+import { isSimpleScalarComputedColumnLike } from "./PgConditionCustomFieldsPlugin.js";
 
 declare global {
   namespace GraphileBuild {
@@ -48,6 +48,20 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgResource: {
+        provides: ["inferred"],
+        after: ["default"],
+        before: ["override"],
+        callback(behavior, resource) {
+          if (isSimpleScalarComputedColumnLike(resource)) {
+            return [behavior, "-orderBy"];
+          } else {
+            return behavior;
+          }
+        },
+      },
+    },
     hooks: {
       GraphQLEnumType_values(values, build, context) {
         const { inflection, sql } = build;
@@ -66,21 +80,10 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (resource.codec.attributes) return false;
-          if (resource.codec.arrayOfCodec) return false;
-          if (resource.codec.rangeOfCodec) return false;
-          const parameters: readonly PgResourceParameter[] | undefined =
-            resource.parameters;
-          if (!parameters || parameters.length < 1) return false;
-          if (parameters.some((p, i) => i > 0 && p.required)) return false;
-          if (parameters[0].codec !== pgCodec) return false;
-          if (!resource.isUnique) return false;
-          const behavior = getBehavior([
-            resource.codec.extensions,
-            resource.extensions,
-          ]);
+          if (!isSimpleScalarComputedColumnLike(resource)) return false;
+          if (resource.parameters![0].codec !== pgCodec) return false;
           // TODO: should this be `proc:orderBy`? If so, should we make it so `getBehavior` accepts a prefix to prepend, so `"orderBy"` in a smart tag on a proc becomes `proc:orderBy`?
-          return !!build.behavior.matches(behavior, "orderBy", "-orderBy");
+          return !!build.behavior.pgResourceMatches(resource, "orderBy");
         });
 
         return build.extend(

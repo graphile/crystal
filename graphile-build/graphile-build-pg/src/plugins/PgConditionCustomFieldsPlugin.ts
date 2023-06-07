@@ -8,7 +8,6 @@ import type {
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
 
 declare global {
@@ -20,6 +19,24 @@ declare global {
   }
 }
 
+/**
+ * Returns true for function sources that have at least one argument, all
+ * arguments except the first are nullable, the first argument is a composite
+ * type, and the result is a simple scalar type.
+ */
+export function isSimpleScalarComputedColumnLike(resource: PgResource) {
+  if (resource.codec.attributes) return false;
+  if (resource.codec.arrayOfCodec) return false;
+  if (resource.codec.rangeOfCodec) return false;
+  const parameters: readonly PgResourceParameter[] | undefined =
+    resource.parameters;
+  if (!parameters || parameters.length < 1) return false;
+  if (parameters.some((p, i) => i > 0 && p.required)) return false;
+  if (!parameters[0].codec.attributes) return false;
+  if (!resource.isUnique) return false;
+  return true;
+}
+
 export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
   name: "PgConditionCustomFieldsPlugin",
   description:
@@ -27,6 +44,20 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
   version: version,
 
   schema: {
+    entityBehavior: {
+      pgResource: {
+        provides: ["inferred"],
+        after: ["default"],
+        before: ["override"],
+        callback(behavior, entity) {
+          if (isSimpleScalarComputedColumnLike(entity)) {
+            return [behavior, "-proc:filterBy"];
+          } else {
+            return behavior;
+          }
+        },
+      },
+    },
     hooks: {
       GraphQLInputObjectType_fields(fields, build, context) {
         const { inflection, sql } = build;
@@ -46,24 +77,9 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         const functionSources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (resource.codec.attributes) return false;
-          if (resource.codec.arrayOfCodec) return false;
-          if (resource.codec.rangeOfCodec) return false;
-          const parameters: readonly PgResourceParameter[] | undefined =
-            resource.parameters;
-          if (!parameters || parameters.length < 1) return false;
-          if (parameters.some((p, i) => i > 0 && p.required)) return false;
-          if (parameters[0].codec !== pgCodec) return false;
-          if (!resource.isUnique) return false;
-          const behavior = getBehavior([
-            resource.codec.extensions,
-            resource.extensions,
-          ]);
-          return build.behavior.matches(
-            behavior,
-            "proc:filterBy",
-            "-proc:filterBy",
-          );
+          if (!isSimpleScalarComputedColumnLike(resource)) return false;
+          if (resource.parameters![0].codec !== pgCodec) return false;
+          return build.behavior.pgResourceMatches(resource, "proc:filterBy");
         });
 
         return build.extend(

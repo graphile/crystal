@@ -10,7 +10,6 @@ import { object } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
-import { getBehavior } from "../behavior.js";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
@@ -572,11 +571,27 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   } as GraphileConfig.PluginGatherConfig<"pgTables", State, Cache>,
 
   schema: {
+    entityBehavior: {
+      pgCodec: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, codec) {
+          return [
+            "resource:select",
+            "table",
+            ...(!codec.isAnonymous
+              ? ["resource:insert", "resource:update"]
+              : []),
+            behavior,
+          ];
+        },
+      },
+    },
     hooks: {
       init(_, build, _context) {
         const {
           inflection,
-          options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
+          options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
         } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
@@ -591,33 +606,15 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             const tableTypeName = inflection.tableType(codec);
-            const behavior = getBehavior(codec.extensions);
-            const defaultBehavior = [
-              "resource:select",
-              "table",
-              ...(!codec.isAnonymous
-                ? ["resource:insert", "resource:update"]
-                : []),
-              ...(simpleCollections === "both"
-                ? ["resource:connection", "resource:list"]
-                : simpleCollections === "only"
-                ? ["resource:list"]
-                : ["resource:connection"]),
-            ].join(" ");
 
-            const isTable = build.behavior.matches(
-              behavior,
-              "table",
-              defaultBehavior,
-            );
+            const isTable = build.behavior.pgCodecMatches(codec, "table");
             if (!isTable) {
               return;
             }
 
-            const selectable = build.behavior.matches(
-              behavior,
+            const selectable = build.behavior.pgCodecMatches(
+              codec,
               "resource:select",
-              defaultBehavior,
             );
 
             if (selectable) {
@@ -639,7 +636,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             if (
               !codec.isAnonymous
               // Even without the 'insert' behavior we may still need the input type
-              // && build.behavior.matches(behavior, "insert", defaultBehavior)
+              // && build.behavior.pgCodecMatches(codec, "insert")
             ) {
               const inputTypeName = inflection.inputType(tableTypeName);
               build.registerInputObjectType(
@@ -668,7 +665,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             if (
               !codec.isAnonymous
               // Even without the 'update' behavior we may still need the input type
-              // && build.behavior.matches(behavior, "update", defaultBehavior)
+              // && build.behavior.pgCodecMatches(codec, "update")
             ) {
               const patchTypeName = inflection.patchType(tableTypeName);
               build.registerInputObjectType(
@@ -722,7 +719,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             if (
               !codec.isAnonymous
               // Even without the 'connection' behavior we may still need the connection type in specific circumstances
-              // && build.behavior.matches(behavior, "*:connection", defaultBehavior)
+              // && build.behavior.pgCodecMatches(codec, "*:connection")
             ) {
               // Register edges
               build.registerCursorConnection({

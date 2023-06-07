@@ -17,7 +17,6 @@ import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 
-import { getBehavior } from "../behavior.js";
 import { version } from "../version.js";
 
 declare global {
@@ -47,14 +46,27 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgCodec: "order",
+      pgResource: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, resource) {
+          if (resource.parameters) {
+            return behavior;
+          } else {
+            return ["order", behavior];
+          }
+        },
+      },
+    },
     hooks: {
       init(_, build) {
         const { inflection, pgCodecMetaLookup } = build;
         pgCodecMetaLookup.forEach((meta, codec) => {
           if (!codec.attributes || codec.isAnonymous) return;
-          const behavior = getBehavior(codec.extensions);
           // TODO: should this be `type:order` or similar?
-          if (!build.behavior.matches(behavior, "order", "order")) {
+          if (!build.behavior.pgCodecMatches(codec, "order")) {
             return;
           }
 
@@ -131,17 +143,12 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
         if (!isSuitableCodec) {
           return args;
         }
-        const behavior = getBehavior([
-          scope,
-          codec?.extensions,
-          pgResource?.extensions,
-        ]);
         if (
-          !build.behavior.matches(
-            behavior,
-            "order",
-            pgResource?.parameters ? "" : "order",
-          )
+          pgResource
+            ? !build.behavior.pgResourceMatches(pgResource, "order")
+            : codec
+            ? !build.behavior.pgCodecMatches(codec, "order")
+            : false
         ) {
           return args;
         }

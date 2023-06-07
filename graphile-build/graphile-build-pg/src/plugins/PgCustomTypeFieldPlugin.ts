@@ -49,7 +49,6 @@ import type {
 } from "graphql";
 import type { SQL } from "pg-sql2";
 
-import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
@@ -184,9 +183,7 @@ function shouldUseCustomConnection(
 
 function defaultProcSourceBehavior(
   s: PgResource<any, any, any, any, any>,
-  options: GraphileBuild.SchemaOptions,
 ): string {
-  const { simpleCollections } = options;
   const behavior = [];
   const firstParameter = (
     s as PgResource<any, any, any, readonly PgResourceParameter[], any>
@@ -218,14 +215,9 @@ function defaultProcSourceBehavior(
   if (s.parameters && !s.isUnique) {
     const canUseConnection =
       !s.sqlPartitionByIndex && !s.isList && !s.codec.arrayOfCodec;
-    const defaultBehavior = canUseConnection
-      ? simpleCollections === "both"
-        ? "connection list"
-        : simpleCollections === "only"
-        ? "list"
-        : "connection"
-      : "list";
-    behavior.push(defaultBehavior);
+    if (!canUseConnection) {
+      behavior.push("-connection +list");
+    }
   }
 
   return behavior.join(" ");
@@ -332,6 +324,20 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgResource: {
+        provides: ["inferred"],
+        after: ["defaults"],
+        before: ["overrides"],
+        callback(behavior, entity) {
+          if (entity.parameters) {
+            return [behavior, defaultProcSourceBehavior(entity)];
+          } else {
+            return behavior;
+          }
+        },
+      },
+    },
     hooks: {
       build: {
         callback(build) {
@@ -593,14 +599,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               // as the first argument
               const isQuerySource =
                 someSource.parameters &&
-                build.behavior.matches(
-                  getBehavior([
-                    someSource.codec.extensions,
-                    someSource.extensions,
-                  ]),
-                  "queryField",
-                  defaultProcSourceBehavior(someSource, options),
-                );
+                build.behavior.pgResourceMatches(someSource, "queryField");
               if (isQuerySource) {
                 build.recoverable(null, () => {
                   build[$$rootQuery].push(someSource);
@@ -612,14 +611,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               const isMutationProcSource =
                 // someSource.isMutation &&
                 someSource.parameters &&
-                build.behavior.matches(
-                  getBehavior([
-                    someSource.codec.extensions,
-                    someSource.extensions,
-                  ]),
-                  "mutationField",
-                  defaultProcSourceBehavior(someSource, options),
-                );
+                build.behavior.pgResourceMatches(someSource, "mutationField");
               // Add payload type for mutation functions
               if (isMutationProcSource) {
                 const resource = someSource as PgResource<
@@ -784,14 +776,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               // matching codec as the first argument
               const isComputedSource =
                 someSource.parameters &&
-                build.behavior.matches(
-                  getBehavior([
-                    someSource.codec.extensions,
-                    someSource.extensions,
-                  ]),
-                  "typeField",
-                  defaultProcSourceBehavior(someSource, options),
-                );
+                build.behavior.pgResourceMatches(someSource, "typeField");
               if (isComputedSource) {
                 // TODO: should we allow other forms of computed attributes here,
                 // e.g. accepting the row id rather than the row itself.
@@ -1059,20 +1044,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 const canUseConnection =
                   !resource.sqlPartitionByIndex && !resource.isList;
 
-                const behavior = getBehavior([
-                  resource.codec.extensions,
-                  resource.extensions,
-                ]);
-
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
                 const connectionFieldBehaviorScope = `${baseScope}:resource:connection`;
                 const listFieldBehaviorScope = `${baseScope}:resource:list`;
                 if (
                   canUseConnection &&
-                  build.behavior.matches(
-                    behavior,
+                  build.behavior.pgResourceMatches(
+                    resource,
                     connectionFieldBehaviorScope,
-                    defaultProcSourceBehavior(resource, options),
                   )
                 ) {
                   const fieldName = isRootQuery
@@ -1162,10 +1141,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 }
 
                 if (
-                  build.behavior.matches(
-                    behavior,
+                  build.behavior.pgResourceMatches(
+                    resource,
                     listFieldBehaviorScope,
-                    defaultProcSourceBehavior(resource, options),
                   )
                 ) {
                   const fieldName = isRootQuery

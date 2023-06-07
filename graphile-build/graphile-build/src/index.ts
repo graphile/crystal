@@ -58,8 +58,6 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
-
 /**
  * Generate 'build.inflection' from the given preset.
  */
@@ -391,15 +389,7 @@ export const getBuilder = (
   inflection: GraphileBuild.Inflection = buildInflection(preset),
 ): SchemaBuilder => {
   const resolvedPreset = resolvePresets([preset]);
-  const { plugins, schema: options } = resolvedPreset;
-  const builder = new SchemaBuilder(options || {}, inflection);
-  if (plugins) {
-    applyHooks(plugins, getSchemaHooks, (hookName, hookFn, plugin) => {
-      builder._setPluginName(plugin.name);
-      builder.hook(hookName, hookFn);
-      builder._setPluginName(null);
-    });
-  }
+  const builder = new SchemaBuilder(resolvedPreset, inflection);
   return builder;
 };
 

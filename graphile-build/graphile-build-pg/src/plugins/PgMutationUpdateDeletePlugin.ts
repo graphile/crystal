@@ -23,7 +23,6 @@ import { EXPORTABLE } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import { getBehavior } from "../behavior.js";
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
@@ -145,11 +144,7 @@ const isUpdatable = (
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   if (!resource.uniques || resource.uniques.length < 1) return false;
-  const behavior = getBehavior([
-    resource.codec.extensions,
-    resource.extensions,
-  ]);
-  return !!build.behavior.matches(behavior, "resource:update", "update");
+  return !!build.behavior.pgResourceMatches(resource, "resource:update");
 };
 
 const isDeletable = (
@@ -161,11 +156,7 @@ const isDeletable = (
   if (resource.codec.polymorphism) return false;
   if (resource.codec.isAnonymous) return false;
   if (!resource.uniques || resource.uniques.length < 1) return false;
-  const behavior = getBehavior([
-    resource.codec.extensions,
-    resource.extensions,
-  ]);
-  return !!build.behavior.matches(behavior, "resource:delete", "delete");
+  return !!build.behavior.pgResourceMatches(resource, "resource:delete");
 };
 
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
@@ -242,6 +233,11 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    entityBehavior: {
+      pgResource: "update delete",
+      pgResourceUnique: "update delete",
+    },
+
     hooks: {
       init(_, build) {
         const {
@@ -279,10 +275,6 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                 ),
                 fields: ({ fieldWithHooks }) => {
                   const tableName = inflection.tableFieldName(resource);
-                  const behavior = getBehavior([
-                    resource.codec.extensions,
-                    resource.extensions,
-                  ]);
                   const deletedNodeIdFieldName =
                     build.getNodeIdHandler !== undefined
                       ? inflection.deletedNodeId({
@@ -355,7 +347,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     deletedNodeIdFieldName &&
                     handler &&
                     nodeIdCodec &&
-                    build.behavior.matches(behavior, "node", "node")
+                    build.behavior.pgResourceMatches(resource, "node")
                       ? {
                           [deletedNodeIdFieldName]: fieldWithHooks(
                             {
@@ -623,7 +615,6 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           resources: PgResource<any, any, any, any, any>[],
           mode: "resource:update" | "resource:delete",
         ) => {
-          const modeShort = mode === "resource:update" ? "update" : "delete";
           for (const resource of resources) {
             const payloadTypeName =
               mode === "resource:update"
@@ -643,15 +634,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               })),
             ].filter((spec) => {
               const unique = spec.unique as PgResourceUnique;
-              const behavior = getBehavior([
-                resource.codec.extensions,
-                resource.extensions,
-                unique.extensions,
-              ]);
-              return !!build.behavior.matches(
-                behavior,
+              return !!build.behavior.pgResourceUniqueMatches(
+                [resource, unique],
                 constraintMode,
-                modeShort,
               );
             });
             for (const spec of specs) {
