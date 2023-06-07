@@ -23,7 +23,7 @@ graph TD
     Constant42{{"Constant[42∈0]<br />ᐸ'Unknown'ᐳ"}}:::plan
     Constant43{{"Constant[43∈0]<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
     Constant46{{"Constant[46∈0]<br />ᐸ[Object: null prototype] { url: 'http://example.com' }ᐳ"}}:::plan
-    PgInsertSingle18[["PgInsertSingle[18∈1]"]]:::sideeffectplan
+    PgInsertSingle18[["PgInsertSingle[18∈1]<br />ᐸperson(person_full_name,aliases,about,email,site)ᐳ"]]:::sideeffectplan
     Object21 & Constant39 & Constant45 & Constant42 & Constant43 & Constant46 --> PgInsertSingle18
     Object22{{"Object[22∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle18 --> Object22
@@ -62,7 +62,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 18, 21<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 21<br /><br />ROOT PgInsertSingle{1}[18]<br />1: <br />ᐳ: 25, 26, 27, 29, 30, 31<br />2: PgSelect[32]<br />ᐳ: First[36], PgSelectSingle[37]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 21<br /><br />ROOT PgInsertSingle{1}ᐸperson(person_full_name,aliases,about,email,site)ᐳ[18]<br />1: <br />ᐳ: 25, 26, 27, 29, 30, 31<br />2: PgSelect[32]<br />ᐳ: First[36], PgSelectSingle[37]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgSelect32,First36,PgSelectSingle37 bucket3
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ27ᐳ[28]"):::bucket

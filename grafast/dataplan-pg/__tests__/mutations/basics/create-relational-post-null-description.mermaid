@@ -23,10 +23,10 @@ graph TD
     Constant35{{"Constant[35∈0]<br />ᐸ'My Relational Post'ᐳ"}}:::plan
     Constant36{{"Constant[36∈0]<br />ᐸnullᐳ"}}:::plan
     Constant37{{"Constant[37∈0]<br />ᐸ'Such a great post.'ᐳ"}}:::plan
-    PgInsertSingle18[["PgInsertSingle[18∈1]"]]:::sideeffectplan
+    PgInsertSingle18[["PgInsertSingle[18∈1]<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression17{{"PgClassExpression[17∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object16 & PgClassExpression17 & Constant35 & Constant36 & Constant37 --> PgInsertSingle18
-    PgInsertSingle13[["PgInsertSingle[13∈1]"]]:::sideeffectplan
+    PgInsertSingle13[["PgInsertSingle[13∈1]<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object16 & Constant11 & Constant12 --> PgInsertSingle13
     PgInsertSingle13 --> PgClassExpression17
     PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸ__relational_posts__ᐳ"}}:::plan

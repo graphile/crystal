@@ -27,20 +27,20 @@ graph TD
     Constant29{{"Constant[29∈0]<br />ᐸ'Desc 2'ᐳ"}}:::plan
     Constant42{{"Constant[42∈0]<br />ᐸ'Post ꖛ3'ᐳ"}}:::plan
     Constant43{{"Constant[43∈0]<br />ᐸ'Desc 3'ᐳ"}}:::plan
-    PgInsertSingle17[["PgInsertSingle[17∈1]"]]:::sideeffectplan
+    PgInsertSingle17[["PgInsertSingle[17∈1]<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression13{{"PgClassExpression[13∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object12 & PgClassExpression13 & Constant14 & Constant15 & Constant16 --> PgInsertSingle17
-    PgInsertSingle31[["PgInsertSingle[31∈1]"]]:::sideeffectplan
+    PgInsertSingle31[["PgInsertSingle[31∈1]<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression27{{"PgClassExpression[27∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object12 & PgClassExpression27 & Constant28 & Constant29 & Constant16 --> PgInsertSingle31
-    PgInsertSingle45[["PgInsertSingle[45∈1]"]]:::sideeffectplan
+    PgInsertSingle45[["PgInsertSingle[45∈1]<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression41{{"PgClassExpression[41∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object12 & PgClassExpression41 & Constant42 & Constant43 & Constant16 --> PgInsertSingle45
-    PgInsertSingle9[["PgInsertSingle[9∈1]"]]:::sideeffectplan
+    PgInsertSingle9[["PgInsertSingle[9∈1]<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object12 & Constant7 & Constant8 --> PgInsertSingle9
-    PgInsertSingle23[["PgInsertSingle[23∈1]"]]:::sideeffectplan
+    PgInsertSingle23[["PgInsertSingle[23∈1]<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object12 & Constant7 & Constant8 --> PgInsertSingle23
-    PgInsertSingle37[["PgInsertSingle[37∈1]"]]:::sideeffectplan
+    PgInsertSingle37[["PgInsertSingle[37∈1]<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object12 & Constant7 & Constant8 --> PgInsertSingle37
     PgInsertSingle9 --> PgClassExpression13
     PgInsertSingle23 --> PgClassExpression27
