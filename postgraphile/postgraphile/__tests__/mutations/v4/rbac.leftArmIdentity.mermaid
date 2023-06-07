@@ -19,18 +19,14 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant34{{"Constant[34∈0]<br />ᐸ[Object: null prototype] {   id: 9001,   person_id: 99,   leᐳ"}}:::plan
-    Constant30{{"Constant[30∈0]<br />ᐸ9001ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0]<br />ᐸ99ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0]<br />ᐸ77ᐳ"}}:::plan
-    Constant33{{"Constant[33∈0]<br />ᐸ'jubilant'ᐳ"}}:::plan
-    Object21{{"Object[21∈1]<br />ᐸ{result,id,person_id,length_in_metres,mood}ᐳ"}}:::plan
-    PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸleft_arm_identityᐳ"}}:::plan
-    PgSelectSingle20 & Constant30 & Constant31 & Constant32 & Constant33 --> Object21
     PgSelect15[["PgSelect[15∈1]<br />ᐸleft_arm_identity(mutation)ᐳ"]]:::sideeffectplan
     Object18 & Constant34 --> PgSelect15
     First19{{"First[19∈1]"}}:::plan
     PgSelect15 --> First19
+    PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸleft_arm_identityᐳ"}}:::plan
     First19 --> PgSelectSingle20
+    Object21{{"Object[21∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle20 --> Object21
     List24{{"List[24∈3]<br />ᐸ22,23ᐳ"}}:::plan
     Constant22{{"Constant[22∈3]<br />ᐸ'left_arms'ᐳ"}}:::plan
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__left_arm...ity__.”id”ᐳ"}}:::plan
@@ -50,11 +46,11 @@ graph TD
     subgraph "Buckets for mutations/v4/rbac.leftArmIdentity"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Constant30,Constant31,Constant32,Constant33,Constant34 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 18, 34, 30, 31, 32, 33<br /><br />1: PgSelect[15]<br />2: <br />ᐳ: 19, 20, 21"):::bucket
+    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Constant34 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 18, 34<br /><br />1: PgSelect[15]<br />2: <br />ᐳ: 19, 20, 21"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,First19,PgSelectSingle20,Object21 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 20<br /><br />ROOT Object{1}ᐸ{result,id,person_id,length_in_metres,mood}ᐳ[21]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 20<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{1}ᐸleft_arm_identityᐳ[20]"):::bucket
