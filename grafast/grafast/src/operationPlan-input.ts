@@ -355,18 +355,18 @@ export function withFieldArgsForArguments<
                 type: nullableEntityType,
               },
             );
-            // TODO: this fixes the composite attribute issue we were having in
-            // `mutations/v4/rbac.createPerson.test.graphql`, but it doesn't
-            // feel right to me. I'm not sure it should be here, it feels like
-            // it might end up calling the child plans more than once?
-            // Investigate.
-            processAfter(
-              fieldArgs,
-              path,
-              resolvedResult,
-              nullableEntityType.getFields(),
-              "autoApplyAfterParentInputPlan",
-            );
+            if (mode === "apply") {
+              // NOTE: if mode === 'input' then `.get()` won't need a
+              // `processAfter` since that will already have been handled in
+              // the parent fieldArgs.
+              processAfter(
+                fieldArgs,
+                path,
+                resolvedResult,
+                nullableEntityType.getFields(),
+                "autoApplyAfterParentInputPlan",
+              );
+            }
             return resolvedResult;
           } else if (isScalarType(nullableEntityType)) {
             const scalarResolver =

@@ -640,9 +640,6 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         (memo, { inputType, graphqlArgName }) => {
                           memo[graphqlArgName] = {
                             type: inputType,
-                            applyPlan($parent, fieldArgs) {
-                              return fieldArgs.apply($parent);
-                            },
                           };
                           return memo;
                         },
