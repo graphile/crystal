@@ -199,19 +199,23 @@ export function withFieldArgsForArguments<
         return result;
       }
     },
-    apply($target, inPath) {
+    apply(targetStepOrCallback, inPath) {
       const path = Array.isArray(inPath) ? inPath : inPath ? [inPath] : [];
       const pathString = path.join(".");
       const $existing = applied.get(pathString);
       if ($existing) {
         throw new Error(
-          `Attempted to apply 'applyPlan' at input path ${pathString} more than once - first time to ${$existing}, second time to ${$target}. Multiple applications are not currently supported.`,
+          `Attempted to apply 'applyPlan' at input path ${pathString} more than once - first time to ${$existing}, second time to ${targetStepOrCallback}. Multiple applications are not currently supported.`,
         );
       }
       if (path.length === 0) {
         explicitlyApplied = true;
         // Auto-apply all the arguments
         for (const argName of Object.keys(args)) {
+          const $target =
+            typeof targetStepOrCallback === "function"
+              ? targetStepOrCallback()
+              : targetStepOrCallback;
           fieldArgs.apply($target, [argName]);
         }
       } else {
@@ -267,6 +271,10 @@ export function withFieldArgsForArguments<
           );
           operationPlan.withModifiers(() => {
             let result;
+            const $target =
+              typeof targetStepOrCallback === "function"
+                ? targetStepOrCallback()
+                : targetStepOrCallback;
             if (rest.length === 0) {
               // Argument
               const arg = entity as GraphQLArgument;
@@ -395,7 +403,7 @@ export function withFieldArgsForArguments<
         }
         return fieldArgs.get(concatPath(path, subpath));
       },
-      apply($target, subpath) {
+      apply(targetStepOrCallback, subpath) {
         if (
           mode === "apply" &&
           (!subpath || (Array.isArray(subpath) && subpath.length === 0))
@@ -404,6 +412,10 @@ export function withFieldArgsForArguments<
             for (const fieldName of Object.keys(
               nullableEntityType.getFields(),
             )) {
+              const $target =
+                typeof targetStepOrCallback === "function"
+                  ? targetStepOrCallback()
+                  : targetStepOrCallback;
               fieldArgs.apply($target, [...path, fieldName]);
             }
           } else if (isListType(nullableEntityType)) {
@@ -418,6 +430,10 @@ export function withFieldArgsForArguments<
             }
             // const innerType = nullableEntityType.ofType;
             for (let i = 0; i < l; i++) {
+              const $target =
+                typeof targetStepOrCallback === "function"
+                  ? targetStepOrCallback()
+                  : targetStepOrCallback;
               fieldArgs.apply($target, [...path, i]);
             }
           } else if (isScalarType(nullableEntityType)) {
@@ -430,6 +446,10 @@ export function withFieldArgsForArguments<
               .find((v) => v.value === value);
             const enumResolver = enumValue?.extensions.grafast?.applyPlan;
             if (enumResolver !== undefined) {
+              const $target =
+                typeof targetStepOrCallback === "function"
+                  ? targetStepOrCallback()
+                  : targetStepOrCallback;
               enumResolver($target);
             }
           } else {
@@ -437,6 +457,10 @@ export function withFieldArgsForArguments<
             throw new Error(`Unhandled input type ${never}`);
           }
         } else {
+          const $target =
+            typeof targetStepOrCallback === "function"
+              ? targetStepOrCallback()
+              : targetStepOrCallback;
           fieldArgs.apply($target, concatPath(path, subpath));
         }
       },

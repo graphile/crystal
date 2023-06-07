@@ -325,7 +325,7 @@ export interface FieldArgs {
   getRaw(path?: string | ReadonlyArray<string | number>): InputStep;
   /** This also works (without path) to apply each list entry against $target */
   apply(
-    $target: ExecutableStep | ModifierStep,
+    $target: ExecutableStep | ModifierStep | (() => ModifierStep),
     path?: string | ReadonlyArray<string | number>,
   ): void;
 }
