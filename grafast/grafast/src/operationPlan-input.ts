@@ -175,7 +175,7 @@ export function withFieldArgsForArguments<
                 schema,
                 entity: arg,
               })
-            : getFieldArgsForPath(path, entityType, $val, "input").get();
+            : childFieldArgs.get();
         } else {
           // Input field
           const inputField = entity as GraphQLInputField | undefined;
@@ -184,7 +184,7 @@ export function withFieldArgsForArguments<
                 schema,
                 entity: inputField,
               })
-            : getFieldArgsForPath(path, entityType, $val, "input").get();
+            : childFieldArgs.get();
         }
         const nullableType = getNullableType(entityType);
         if (isInputObjectType(nullableType)) {
