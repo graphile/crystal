@@ -3685,7 +3685,6 @@ export function makeExampleSchema(
           },
           filter: {
             type: ForumFilter,
-            applyAfterApplyPlan: true,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
               (ClassFilterStep) =>
@@ -4174,7 +4173,6 @@ export function makeExampleSchema(
             ),
           },
         },
-        applyAfterPlan: true,
         plan: EXPORTABLE(
           (
             TYPES,
