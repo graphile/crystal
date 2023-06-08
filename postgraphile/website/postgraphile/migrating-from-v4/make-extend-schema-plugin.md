@@ -105,7 +105,7 @@ In V5, this concern should be handled via a plan. You have a number of choices
 of what plan you need, depending on what you're trying to achieve.
 
 For leaf fields, if you need to do the calculation in the database rather than
-in JS, you might use the `pgClassExpression` step.
+in JS, you might use an SQL expression:
 
 ```diff
  module.exports = makeExtendSchemaPlugin(build => {
@@ -127,17 +127,18 @@ in JS, you might use the `pgClassExpression` step.
 +    plans: {
 +      User: {
 +        nameWithSuffix($user, { $suffix }) {
-+          const $name = $user.get('name');
-+          return pgClassExpression(
-+            $user,
++          return $user.expression(
++            sql`${$user.alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
 +            TYPES.text,
-+          )`${$name} || ' ' || ${$suffix}::text`;
++          );
 +        }
 +      }
 +    }
    };
  });
 ```
+
+<!-- TODO: test this example actually works! -->
 
 :::note
 
@@ -149,7 +150,7 @@ ensures that all parameters are correctly escaped in the generated SQL query.
 
 :::tip
 
-A more performant (and simpler) solution to this would have been:
+A more performant (and simpler) solution to this would have been to do it in JS:
 
 ```diff
 +    plans: {
@@ -379,8 +380,7 @@ const codec = build.getNodeIdCodec(handler.codecName);
 const plans = {
   Mutation: {
     updateUser(parent, fieldArgs) {
-      const { $id } = fieldArgs;
-      const spec = specFromNodeId(codec, handler, $id);
+      const spec = specFromNodeId(codec, handler, fieldArgs.$id);
       const plan = object({ result: pgUpdateSingle(userSource, spec) });
       fieldArgs.apply(plan);
       return plan;

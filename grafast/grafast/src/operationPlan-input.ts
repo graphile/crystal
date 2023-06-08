@@ -75,7 +75,7 @@ export function withFieldArgsForArguments<
         let $entry = $all.get(first);
         for (const pathSegment of rest) {
           if (typeof pathSegment === "number" && "at" in $entry) {
-            $entry = $entry.at(pathSegment) as any;
+            $entry = $entry.at(pathSegment);
           } else if ("get" in $entry) {
             $entry = $entry.get(pathSegment);
           } else {
