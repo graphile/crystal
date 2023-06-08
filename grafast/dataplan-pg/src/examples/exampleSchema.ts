@@ -16,9 +16,9 @@ import { writeFileSync } from "fs";
 import type {
   __InputObjectStep,
   __InputObjectStepWithDollars,
-  __TrackedValueStepWithDollars,
   __InputStaticLeafStep,
   __TrackedValueStep,
+  __TrackedValueStepWithDollars,
   AccessStep,
   BaseGraphQLRootValue,
   GrafastArgumentConfig,
@@ -48,7 +48,7 @@ import {
   object,
   operationPlan,
 } from "grafast";
-import type { GraphQLInputObjectType, GraphQLOutputType } from "graphql";
+import type { GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,

@@ -11,19 +11,17 @@ import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
+import type { AnyInputStep } from "./interfaces.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
-import {
-  __InputObjectStep,
-  __InputObjectStepWithDollars,
-} from "./steps/__inputObject.js";
+import type { __InputObjectStepWithDollars } from "./steps/__inputObject.js";
+import { __InputObjectStep } from "./steps/__inputObject.js";
+import { __TrackedValueStepWithDollars } from "./steps/__trackedValue.js";
 import {
   __InputListStep,
   __InputStaticLeafStep,
   __TrackedValueStep,
   constant,
 } from "./steps/index.js";
-import { __TrackedValueStepWithDollars } from "./steps/__trackedValue.js";
-import { AnyInputStep } from "./interfaces.js";
 
 const {
   assertScalarType,

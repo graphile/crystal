@@ -1,15 +1,18 @@
-import {
+import type {
   GraphQLInputObjectType,
   GraphQLInputType,
-  GraphQLList,
-  GraphQLNonNull,
-  Kind,
   TypeNode,
   VariableDefinitionNode,
+} from "graphql";
+import {
   getNullableType,
+  GraphQLList,
+  GraphQLNonNull,
   isInputObjectType,
   isListType,
+  Kind,
 } from "graphql";
+
 import type { Constraint } from "../constraints.js";
 import { __ListTransformStep } from "../index.js";
 import type {

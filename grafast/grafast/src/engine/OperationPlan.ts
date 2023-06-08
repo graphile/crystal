@@ -57,6 +57,7 @@ import {
   isStreamableStep,
   isUnbatchedExecutableStep,
 } from "../step.js";
+import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
@@ -75,7 +76,6 @@ import { LayerPlan } from "./LayerPlan.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
-import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 
 const ALWAYS_THROW_PLANNING_ERRORS =
   process.env.ALWAYS_THROW_PLANNING_ERRORS === "1";
