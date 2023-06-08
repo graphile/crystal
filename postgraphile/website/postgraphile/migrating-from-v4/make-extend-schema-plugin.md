@@ -213,9 +213,7 @@ function, passing through the `searchText` argument.
 +    plans: {
 +      Query: {
 +        matchingUser($parent, { $searchText }) {
-+          return matchUser.execute({
-+            step: $searchText,
-+          });
++          return matchUser.execute({ step: $searchText });
 +        },
 +      },
 +    },
