@@ -93,7 +93,7 @@ export function printPlanGraph(
   {
     steps,
   }: {
-    steps: { [stepId: number]: ExecutableStep };
+    steps: { [stepId: number]: ExecutableStep | null };
   },
 ): string {
   const color = (i: number) => {
@@ -306,7 +306,7 @@ export function printPlanGraph(
           `Bucket ${layerPlan.id}${raisonDEtre}${
             layerPlan.copyStepIds.length > 0
               ? `\nDeps: ${layerPlan.copyStepIds
-                  .map((pId) => steps[pId].id)
+                  .map((pId) => steps[pId]!.id)
                   .join(", ")}\n`
               : ""
           }${
@@ -329,7 +329,7 @@ export function printPlanGraph(
     graph.push(
       `    class ${[
         `Bucket${layerPlan.id}`,
-        ...plansAndIds.map(([, plan]) => planId(plan)),
+        ...plansAndIds.map(([, plan]) => planId(plan!)),
       ].join(",")} bucket${layerPlan.id}`,
     );
   }

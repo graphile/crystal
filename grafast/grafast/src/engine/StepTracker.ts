@@ -36,7 +36,7 @@ export class StepTracker {
   public activeSteps = new Set<ExecutableStep>();
   /** @internal */
   public stepById: {
-    [stepId: number]: ExecutableStep;
+    [stepId: number]: ExecutableStep | null;
   } = [];
   /** @internal */
   private aliasesById: {
@@ -476,6 +476,37 @@ export class StepTracker {
   }
 
   /**
+   * Only for use during planField.
+   */
+  public purgeBackTo(count: number): void {
+    const upper = this.stepCount;
+    const toRemove = new Set<ExecutableStep>();
+    for (let i = count; i < upper; i++) {
+      const step = this.stepById[i];
+      if (step) {
+        toRemove.add(step);
+      }
+    }
+    const remove = (step: ExecutableStep): void => {
+      if (this.stepById[step.id] !== step) {
+        return;
+      }
+      if (toRemove.has(step)) {
+        for (const dependent of step.dependents) {
+          if (dependent.step.id >= count) {
+            remove(dependent.step);
+          }
+        }
+        this.eradicate(step);
+        toRemove.delete(step);
+      }
+    };
+    for (const step of toRemove) {
+      remove(step);
+    }
+  }
+
+  /**
    * ONLY CALL THIS IF NOTHING DEPENDS ON $original! It's intended to be called
    * from `replaceStep` or from itself.
    *
@@ -494,11 +525,11 @@ export class StepTracker {
     if (oldAliases !== undefined) {
       for (const id of oldAliases) {
         // Nothing needs us, so set ourself null (DELIBERATELY BYPASSES TYPESCRIPT!)
-        this.stepById[id] = null as any;
+        this.stepById[id] = null;
       }
       this.aliasesById[$original.id] = undefined;
     } else if (this.stepById[$original.id] === $original) {
-      this.stepById[$original.id] = null as any;
+      this.stepById[$original.id] = null;
     }
 
     // Since this step is being removed, it doesn't need its dependencies any more
