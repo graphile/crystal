@@ -126,9 +126,8 @@ in JS, you might use the `pgClassExpression` step.
      `,
 +    plans: {
 +      User: {
-+        nameWithSuffix($user, fieldArgs) {
++        nameWithSuffix($user, { $suffix }) {
 +          const $name = $user.get('name');
-+          const $suffix = fieldArgs.get('suffix');
 +          return pgClassExpression(
 +            $user,
 +            TYPES.text,
@@ -155,9 +154,9 @@ A more performant (and simpler) solution to this would have been:
 ```diff
 +    plans: {
 +      User: {
-+        nameWithSuffix($user, fieldArgs) {
++        nameWithSuffix($user, { $suffix }) {
 +          return lambda(
-+            [$user.get("name"), fieldArgs.get("suffix")],
++            [$user.get("name"), $suffix],
 +            ([name, suffix]) => `${name} ${suffix}`,
 +          );
 +        },
@@ -212,9 +211,9 @@ function, passing through the `searchText` argument.
 -    },
 +    plans: {
 +      Query: {
-+        matchingUser($parent, fieldArgs) {
++        matchingUser($parent, { $searchText }) {
 +          return matchUser.execute({
-+            step: fieldArgs.get("searchText"),
++            step: $searchText,
 +          });
 +        },
 +      },
@@ -287,10 +286,7 @@ export default makeExtendSchemaPlugin((build) => {
 
     plans: {
       Mutation: {
-        myCustomMutation(_$root, fieldArgs) {
-          // A step that represents the `input.count` property from the arguments.
-          const $count = fieldArgs.get(["input", "count"]);
-
+        myCustomMutation(_$root, { $input: { $count } }) {
           /**
            * This step dictates the data that will be passed as the second argument
            * to the `withPgClientTransaction` callback. This is typically
@@ -383,8 +379,8 @@ const codec = build.getNodeIdCodec(handler.codecName);
 const plans = {
   Mutation: {
     updateUser(parent, fieldArgs) {
-      const $nodeId = fieldArgs.get("id");
-      const spec = specFromNodeId(codec, handler, $nodeId);
+      const { $id } = fieldArgs;
+      const spec = specFromNodeId(codec, handler, $id);
       const plan = object({ result: pgUpdateSingle(userSource, spec) });
       fieldArgs.apply(plan);
       return plan;

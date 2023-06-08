@@ -318,6 +318,17 @@ export function withFieldArgsForArguments<
       }
     },
   };
+  for (const argName of Object.keys(args)) {
+    let val: ExecutableStep;
+    Object.defineProperty(fieldArgs, `$${argName}`, {
+      get() {
+        if (!val) {
+          val = fieldArgs.getRaw(argName);
+        }
+        return val;
+      },
+    });
+  }
 
   function getFieldArgsForPath(
     path: ReadonlyArray<string | number>,
@@ -465,6 +476,33 @@ export function withFieldArgsForArguments<
         }
       },
     };
+
+    if (isInputObjectType(nullableEntityType)) {
+      const inputFields = nullableEntityType.getFields();
+      for (const fieldName of Object.keys(inputFields)) {
+        let val: ExecutableStep;
+        Object.defineProperty(localFieldArgs, `$${fieldName}`, {
+          enumerable: true,
+          get() {
+            if (!val) {
+              if ("get" in $input) {
+                val = $input.get(fieldName);
+              } else if (
+                $input instanceof ConstantStep &&
+                $input.isUndefined()
+              ) {
+                val = constant(undefined);
+              } else {
+                throw new Error(
+                  `GrafastInternalError<9b70d5c0-c45f-4acd-8b94-eaa02f87ad41>: expected '${$input}' to have a .get() method`,
+                );
+              }
+            }
+            return val;
+          },
+        });
+      }
+    }
 
     return localFieldArgs;
   }

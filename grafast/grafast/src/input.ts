@@ -12,7 +12,10 @@ import * as graphql from "graphql";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
-import { __InputObjectStep } from "./steps/__inputObject.js";
+import {
+  __InputObjectStep,
+  __InputObjectStepWithDollars,
+} from "./steps/__inputObject.js";
 import type { ConstantStep } from "./steps/index.js";
 import {
   __InputListStep,
@@ -20,6 +23,7 @@ import {
   __TrackedValueStep,
   constant,
 } from "./steps/index.js";
+import { __TrackedValueStepWithDollars } from "./steps/__trackedValue.js";
 
 const {
   assertScalarType,
@@ -32,17 +36,35 @@ const {
   Kind,
 } = graphql;
 
-export type InputStep =
-  | __TrackedValueStep // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
+export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
+  GraphQLInputType extends TInputType
+    ? AnyInputStep
+    : TInputType extends graphql.GraphQLNonNull<infer U>
+    ? Exclude<InputStep<U & GraphQLInputType>, ConstantStep<undefined>>
+    : TInputType extends graphql.GraphQLList<GraphQLInputType>
+    ?
+        | __InputListStep<TInputType> // .at(), .eval(), .evalLength(), .evalIs(null)
+        | __TrackedValueStep<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
+        | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
+    : TInputType extends graphql.GraphQLInputObjectType
+    ?
+        | __TrackedValueStepWithDollars<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
+        | __InputObjectStepWithDollars<TInputType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
+        | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
+    : // TODO: handle the other types
+      AnyInputStep;
+
+export type AnyInputStep =
+  | __TrackedValueStepWithDollars<any, GraphQLInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
   | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
   | __InputStaticLeafStep // .eval(), .evalIs()
   | __InputDynamicScalarStep // .eval(), .evalIs()
-  | __InputObjectStep // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
+  | __InputObjectStepWithDollars<graphql.GraphQLInputObjectType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
   | ConstantStep<undefined>; // .eval(), .evalIs(), .evalIsEmpty()
 
 export function assertInputStep(
   itemPlan: unknown,
-): asserts itemPlan is InputStep {
+): asserts itemPlan is AnyInputStep {
   if (itemPlan instanceof __TrackedValueStep) return;
   if (itemPlan instanceof __InputListStep) return;
   if (itemPlan instanceof __InputStaticLeafStep) return;
@@ -92,7 +114,7 @@ export function inputPlan(
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
   defaultValue: ConstValueNode | undefined = undefined,
-): InputStep {
+): AnyInputStep {
   // This prevents recursion
   if (rawInputValue === undefined && defaultValue === undefined) {
     return constant(undefined);
@@ -153,7 +175,10 @@ export function inputPlan(
       return new __InputStaticLeafStep(inputType, inputValue);
     }
   } else if (isObj) {
-    return new __InputObjectStep(inputType, inputValue);
+    return new __InputObjectStep(
+      inputType,
+      inputValue,
+    ) as __InputObjectStepWithDollars<any>;
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
@@ -176,7 +201,7 @@ function inputVariablePlan(
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
   defaultValue: ConstValueNode | undefined = undefined,
-): InputStep {
+): AnyInputStep {
   if (
     variableType instanceof GraphQLNonNull &&
     !(inputType instanceof GraphQLNonNull)
@@ -233,7 +258,7 @@ function inputVariablePlan(
  */
 function inputNonNullPlan(
   _operationPlan: OperationPlan,
-  innerPlan: InputStep,
-): InputStep {
+  innerPlan: AnyInputStep,
+): AnyInputStep {
   return innerPlan;
 }

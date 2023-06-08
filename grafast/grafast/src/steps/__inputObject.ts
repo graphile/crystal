@@ -11,7 +11,9 @@ import { constant } from "./constant.js";
 /**
  * Implements `InputObjectStep`
  */
-export class __InputObjectStep extends UnbatchedExecutableStep {
+export class __InputObjectStep<
+  TInputType extends GraphQLInputObjectType = GraphQLInputObjectType,
+> extends UnbatchedExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputObjectStep",
@@ -22,7 +24,7 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     [fieldName: string]: { dependencyIndex: number; step: InputStep };
   } = Object.create(null);
   constructor(
-    private inputObjectType: GraphQLInputObjectType,
+    private inputObjectType: TInputType,
     private inputValues: NotVariableValueNode | undefined,
   ) {
     super();
@@ -52,6 +54,9 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
         step,
         dependencyIndex: this.addDependency(step),
       };
+      Object.defineProperty(this, `$${inputFieldName}`, {
+        value: step,
+      });
     }
   }
 
@@ -166,3 +171,12 @@ export class __InputObjectStep extends UnbatchedExecutableStep {
     return !this.inputFields[attrName].step.evalIs(undefined);
   }
 }
+
+export type __InputObjectStepWithDollars<
+  TInputType extends GraphQLInputObjectType,
+> = __InputObjectStep<TInputType> & {
+  [key in keyof ReturnType<TInputType["getFields"]> &
+    string as `$${key}`]: InputStep<
+    ReturnType<TInputType["getFields"]>[key]["type"]
+  >;
+};

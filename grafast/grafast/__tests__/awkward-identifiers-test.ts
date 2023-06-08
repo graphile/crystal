@@ -39,11 +39,11 @@ const schema = makeGrafastSchema({
       b($o) {
         return access($o, "b");
       },
-      echoNumber(_, fieldArgs) {
-        return fieldArgs.get("nr");
+      echoNumber(_, { $nr }) {
+        return $nr;
       },
-      echoString(_, fieldArgs) {
-        return fieldArgs.get("str");
+      echoString(_, { $str }) {
+        return $str;
       },
     },
   },

@@ -22,7 +22,7 @@ import type {
 } from "graphql";
 
 import type { Bucket, RequestTools } from "./bucket.js";
-import type { InputStep } from "./input.js";
+import type { AnyInputStep, InputStep } from "./input.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -318,17 +318,21 @@ export type TargetStepOrCallback =
   | ((indexOrFieldName: number | string) => TargetStepOrCallback);
 
 // TODO: rename
-export interface FieldArgs {
+export type FieldArgs = {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
   get(path?: string | ReadonlyArray<string | number>): ExecutableStep;
   /** Gets the value *without* calling any `inputPlan`s */
-  getRaw(path?: string | ReadonlyArray<string | number>): InputStep;
+  getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
   /** This also works (without path) to apply each list entry against $target */
   apply(
     $target: ExecutableStep | ModifierStep | (() => ModifierStep),
     path?: string | ReadonlyArray<string | number>,
   ): void;
-}
+} & InputStepDollarMap;
+
+export type InputStepDollarMap = {
+  [key in string as `$${key}`]?: InputStep | undefined;
+};
 
 export interface FieldInfo {
   field: GraphQLField<any, any, any>;
@@ -675,7 +679,7 @@ export type GrafastInputFieldConfig<
 export type TrackedArguments<
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 > = {
-  get<TKey extends keyof TArgs>(key: TKey): InputStep;
+  get<TKey extends keyof TArgs>(key: TKey): AnyInputStep;
 };
 
 /**

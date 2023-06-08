@@ -15,7 +15,9 @@ const { GraphQLList, Kind } = graphql;
 /**
  * Implements `__InputListStep`.
  */
-export class __InputListStep extends ExecutableStep {
+export class __InputListStep<
+  TInputType extends graphql.GraphQLList<GraphQLInputType> = graphql.GraphQLList<GraphQLInputType>,
+> extends ExecutableStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputListStep",
@@ -25,7 +27,7 @@ export class __InputListStep extends ExecutableStep {
   private itemCount = 0;
 
   constructor(
-    inputType: graphql.GraphQLList<GraphQLInputType>,
+    inputType: TInputType,
     private readonly inputValues: NotVariableValueNode | undefined,
   ) {
     super();

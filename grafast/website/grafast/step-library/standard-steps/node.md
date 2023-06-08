@@ -159,12 +159,9 @@ const typeDefs = /* GraphQL */ `
 
 const plans = {
   Mutation: {
-    updateUser(parent, fieldArgs) {
-      // Get the "id" from args:
-      const $nodeId = fieldArgs.get("id");
-
-      // Turn the $nodeId into a specifier:
-      const spec = specFromNodeId(base64JSONCodec, userHandler, $nodeId);
+    updateUser(parent, { $id }) {
+      // Turn the $id into a specifier:
+      const spec = specFromNodeId(base64JSONCodec, userHandler, $id);
 
       // Now use this specifier to plan an update for this user:
       const $result = pgUpdateSingle(userSource, spec);

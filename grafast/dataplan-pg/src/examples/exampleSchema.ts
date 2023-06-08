@@ -15,6 +15,8 @@ import * as crypto from "crypto";
 import { writeFileSync } from "fs";
 import type {
   __InputObjectStep,
+  __InputObjectStepWithDollars,
+  __TrackedValueStepWithDollars,
   __InputStaticLeafStep,
   __TrackedValueStep,
   AccessStep,
@@ -46,7 +48,7 @@ import {
   object,
   operationPlan,
 } from "grafast";
-import type { GraphQLOutputType } from "graphql";
+import type { GraphQLInputObjectType, GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -2611,14 +2613,13 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (TYPES, forumsUniqueAuthorCountResource) =>
-            function plan($forum, args) {
-              const $featured = args.get("featured");
+            function plan($forum, { $featured }) {
               return forumsUniqueAuthorCountResource.execute([
                 {
                   step: $forum.record(),
                 },
                 {
-                  step: $featured,
+                  step: $featured!,
                   pgCodec: TYPES.boolean,
                 },
               ]);
@@ -3715,8 +3716,10 @@ export function makeExampleSchema(
         type: Forum,
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, forumResource) =>
-            function plan(_$root, args) {
-              const $forum = forumResource.get({ id: args.get("id") });
+            function plan(_$root, { $id }) {
+              const $forum = forumResource.get({
+                id: $id as ExecutableStep<string>,
+              });
               deoptimizeIfAppropriate($forum);
               return $forum;
             },
@@ -3732,8 +3735,10 @@ export function makeExampleSchema(
         type: Message,
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, messageResource) =>
-            function plan(_$root, args) {
-              const $message = messageResource.get({ id: args.get("id") });
+            function plan(_$root, { $id }) {
+              const $message = messageResource.get({
+                id: $id as ExecutableStep<string>,
+              });
               deoptimizeIfAppropriate($message);
               return $message;
             },
@@ -3914,11 +3919,10 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (TYPES, deoptimizeIfAppropriate, uniqueAuthorCountResource) =>
-            function plan(_$root, args) {
-              const $featured = args.get("featured");
+            function plan(_$root, { $featured }) {
               const $plan = uniqueAuthorCountResource.execute([
                 {
-                  step: $featured,
+                  step: $featured!,
                   pgCodec: TYPES.boolean,
                   name: "featured",
                 },
@@ -4088,9 +4092,9 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (singleTableItemInterface, singleTableItemsResource) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $id }) {
               const $item: SingleTableItemStep = singleTableItemsResource.get({
-                id: args.get("id"),
+                id: $id as ExecutableStep<number>,
               });
               return singleTableItemInterface($item);
             },
@@ -4107,9 +4111,9 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (constant, singleTableItemsResource) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $id }) {
               const $item: SingleTableItemStep = singleTableItemsResource.get({
-                id: args.get("id"),
+                id: $id as ExecutableStep<number>,
                 type: constant("TOPIC"),
               });
               return $item;
@@ -4127,9 +4131,9 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (relationalItemInterface, relationalItemsResource) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $id }) {
               const $item: RelationalItemStep = relationalItemsResource.get({
-                id: args.get("id"),
+                id: $id as ExecutableStep<number>,
               });
               return relationalItemInterface($item);
             },
@@ -4146,9 +4150,9 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (relationalTopicsResource) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $id }) {
               return relationalTopicsResource.get({
-                id: args.get("id"),
+                id: $id as ExecutableStep<number>,
               });
             },
           [relationalTopicsResource],
@@ -4212,9 +4216,9 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (unionItemUnion, unionItemsResource) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $id }) {
               const $item: UnionItemStep = unionItemsResource.get({
-                id: args.get("id"),
+                id: $id as ExecutableStep<number>,
               });
               return unionItemUnion($item);
             },
@@ -4231,9 +4235,9 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (unionTopicsResource) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $id }) {
               return unionTopicsResource.get({
-                id: args.get("id"),
+                id: $id as ExecutableStep<number>,
               });
             },
           [unionTopicsResource],
@@ -4272,10 +4276,10 @@ export function makeExampleSchema(
             entitySearchResource,
             entityUnion,
           ) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $query }) {
               const $step = entitySearchResource.execute([
                 {
-                  step: args.get("query"),
+                  step: $query!,
                   pgCodec: TYPES.text,
                   name: "query",
                 },
@@ -4302,8 +4306,10 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (personResource) =>
-            function plan(_$root, args) {
-              return personResource.get({ person_id: args.get("personId") });
+            function plan(_$root, { $personId }) {
+              return personResource.get({
+                person_id: $personId as ExecutableStep<number>,
+              });
             },
           [personResource],
         ),
@@ -4405,9 +4411,7 @@ export function makeExampleSchema(
             sql,
             thirdPartyVulnerabilitiesResource,
           ) =>
-            function plan(_, fieldArgs) {
-              const $first = fieldArgs.getRaw("first");
-              const $offset = fieldArgs.getRaw("offset");
+            function plan(_, { $first, $offset }) {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
                 attributes: {
@@ -4433,8 +4437,8 @@ export function makeExampleSchema(
                     TYPES.float,
                   )}`,
               });
-              $vulnerabilities.setFirst($first);
-              $vulnerabilities.setOffset($offset);
+              $vulnerabilities.setFirst($first!);
+              $vulnerabilities.setOffset($offset!);
               return $vulnerabilities;
             },
           [
@@ -4858,7 +4862,7 @@ export function makeExampleSchema(
             relationalItemsResource,
             relationalPostsResource,
           ) =>
-            function plan(_$root, args) {
+            function plan(_$root, fieldArgs) {
               const $item = pgInsertSingle(relationalItemsResource, {
                 type: constant`POST`,
                 author_id: constant(2),
@@ -4870,9 +4874,9 @@ export function makeExampleSchema(
               for (const key of ["title", "description", "note"] as Array<
                 keyof typeof relationalPostsResource.codec.attributes
               >) {
-                const $value = args.getRaw(["input", key]);
+                const $value = fieldArgs.getRaw(["input", key]);
                 if (!$value.evalIs(undefined)) {
-                  const $value = args.get(["input", key]);
+                  const $value = fieldArgs.get(["input", key]);
                   $post.set(key, $value);
                 }
               }
@@ -4988,18 +4992,22 @@ export function makeExampleSchema(
         type: UpdateRelationalPostByIdPayload,
         plan: EXPORTABLE(
           (pgUpdateSingle, relationalPostsResource) =>
-            function plan(_$root, args) {
+            function plan(_$root, fieldArgs) {
               const $post = pgUpdateSingle(relationalPostsResource, {
-                id: args.get(["input", "id"]),
+                id: (
+                  fieldArgs.$input as
+                    | __TrackedValueStepWithDollars<any, GraphQLInputObjectType>
+                    | __InputObjectStepWithDollars<GraphQLInputObjectType>
+                ).$id as ExecutableStep<number>,
               });
               for (const key of ["title", "description", "note"] as Array<
                 keyof typeof relationalPostsResource.codec.attributes
               >) {
-                const $rawValue = args.getRaw(["input", "patch", key]);
-                const $value = args.get(["input", "patch", key]);
+                const $rawValue = fieldArgs.getRaw(["input", "patch", key]);
                 // TODO: test that we differentiate between value set to null and
                 // value not being present
                 if (!$rawValue.evalIs(undefined)) {
+                  const $value = fieldArgs.get(["input", "patch", key]);
                   $post.set(key, $value);
                 }
               }
@@ -5018,9 +5026,11 @@ export function makeExampleSchema(
         type: DeleteRelationalPostByIdPayload,
         plan: EXPORTABLE(
           (pgDeleteSingle, relationalPostsResource) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $input }) {
               const $post = pgDeleteSingle(relationalPostsResource, {
-                id: args.get(["input", "id"]),
+                id: ($input as __InputObjectStep | __TrackedValueStep).get(
+                  "id",
+                ) as ExecutableStep<number>,
               });
               return $post;
             },
@@ -5043,13 +5053,14 @@ export function makeExampleSchema(
             sql,
             withPgClientTransaction,
           ) =>
-            function plan(_$root, args) {
+            function plan(_$root, { $input }) {
+              const $a = ($input as __InputObjectStep | __TrackedValueStep).get(
+                "a",
+              );
               const $transactionResult = withPgClientTransaction(
                 relationalPostsResource.executor,
                 object({
-                  a: args.get(["input", "a"]) as ExecutableStep<
-                    number | null | undefined
-                  >,
+                  a: $a as ExecutableStep<number | null | undefined>,
                 }),
                 async (client, { a }) => {
                   // Set a transaction variable to reference later

@@ -1,8 +1,23 @@
+import {
+  GraphQLInputObjectType,
+  GraphQLInputType,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLNullableType,
+  Kind,
+  TypeNode,
+  VariableDefinitionNode,
+  getNullableType,
+  isInputObjectType,
+  isListType,
+} from "graphql";
 import type { Constraint } from "../constraints.js";
+import { InputStep, __ListTransformStep } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
+  InputStepDollarMap,
 } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
@@ -29,6 +44,10 @@ import type { AccessStep } from "./access.js";
  */
 export class __TrackedValueStep<
   TData = any,
+  TInputType extends
+    | GraphQLInputType
+    | ReadonlyArray<VariableDefinitionNode>
+    | undefined = undefined,
 > extends UnbatchedExecutableStep<TData> {
   static $$export = {
     moduleName: "grafast",
@@ -56,6 +75,26 @@ export class __TrackedValueStep<
    */
   private readonly path: Array<string | number>;
 
+  static withGraphQLType<TInputType extends GraphQLInputType, TData = any>(
+    value: TData | undefined,
+    valuePlan: __ValueStep<TData> | AccessStep<TData>,
+    constraints: Constraint[],
+    path: Array<string | number> = [],
+    graphqlType: TInputType,
+  ) {
+    return new __TrackedValueStep<TData, TInputType>(
+      value,
+      valuePlan,
+      constraints,
+      path,
+      graphqlType,
+    ) as __TrackedValueStepWithDollars<TData, TInputType>;
+  }
+
+  private nullableGraphQLType: GraphQLInputType | undefined;
+  private variableDefinitions:
+    | ReadonlyArray<VariableDefinitionNode>
+    | undefined;
   /**
    * @internal
    */
@@ -64,12 +103,51 @@ export class __TrackedValueStep<
     valuePlan: __ValueStep<TData> | AccessStep<TData>,
     constraints: Constraint[],
     path: Array<string | number> = [],
+    graphqlTypeOrVariableDefinitions?: TInputType,
   ) {
     super();
     this.addDependency(valuePlan);
     this.value = value;
     this.constraints = constraints;
     this.path = path;
+    this.nullableGraphQLType =
+      graphqlTypeOrVariableDefinitions &&
+      !isArray(graphqlTypeOrVariableDefinitions)
+        ? getNullableType(graphqlTypeOrVariableDefinitions)
+        : undefined;
+    this.variableDefinitions =
+      graphqlTypeOrVariableDefinitions &&
+      isArray(graphqlTypeOrVariableDefinitions)
+        ? graphqlTypeOrVariableDefinitions
+        : undefined;
+
+    if (isInputObjectType(this.nullableGraphQLType)) {
+      const fields = this.nullableGraphQLType.getFields();
+      for (const fieldName of Object.keys(fields)) {
+        let step: __TrackedValueStepWithDollars<any, any>;
+        Object.defineProperty(this, `$${fieldName}`, {
+          get: () => {
+            if (!step) {
+              step = this.get(fieldName as keyof TData & string) as any;
+            }
+            return step;
+          },
+        });
+      }
+    } else if (this.variableDefinitions) {
+      for (const def of this.variableDefinitions) {
+        const varName = def.variable.name.value;
+        let step: __TrackedValueStepWithDollars<any, any>;
+        Object.defineProperty(this, `$${varName}`, {
+          get: () => {
+            if (!step) {
+              step = this.get(varName as keyof TData & string) as any;
+            }
+            return step;
+          },
+        });
+      }
+    }
   }
 
   execute(
@@ -93,12 +171,73 @@ export class __TrackedValueStep<
    */
   get<TAttribute extends keyof TData & string>(
     attrName: TAttribute,
-  ): __TrackedValueStep<TData[TAttribute]> {
+  ): __TrackedValueStepWithDollars<
+    TData[TAttribute],
+    TInputType extends GraphQLInputObjectType
+      ? ReturnType<TInputType["getFields"]>[TAttribute]["type"]
+      : undefined
+  > {
     const { value, path, constraints } = this;
     const newValue = value?.[attrName];
     const newValuePlan = this.getValuePlan().get(attrName);
     const newPath = [...path, attrName];
-    return new __TrackedValueStep(newValue, newValuePlan, constraints, newPath);
+
+    if (this.nullableGraphQLType) {
+      if (isInputObjectType(this.nullableGraphQLType)) {
+        const fields = this.nullableGraphQLType.getFields();
+        const field = fields[attrName];
+        if (!field) {
+          throw new Error(
+            `'${this.nullableGraphQLType}' has no attribute '${attrName}'`,
+          );
+        }
+        return __TrackedValueStep.withGraphQLType(
+          newValue,
+          newValuePlan,
+          constraints,
+          newPath,
+          field.type,
+        ) as any;
+      } else {
+        throw new Error(
+          `Cannot get field '${attrName}' on non-input-object type '${this.nullableGraphQLType}'`,
+        );
+      }
+    } else if (this.variableDefinitions) {
+      const def = this.variableDefinitions.find(
+        (d) => d.variable.name.value === attrName,
+      );
+      if (!def) {
+        throw new Error(
+          `No variable named '$${attrName}' exists in this operation`,
+        );
+      }
+      const getType = (t: TypeNode): GraphQLInputType => {
+        if (t.kind === Kind.NON_NULL_TYPE) {
+          return new GraphQLNonNull(getType(t.type));
+        } else if (t.kind === Kind.LIST_TYPE) {
+          return new GraphQLList(getType(t.type));
+        } else {
+          const name = t.name.value;
+          return this.operationPlan.schema.getType(name) as GraphQLInputType;
+        }
+      };
+      const type = getType(def.type);
+      return __TrackedValueStep.withGraphQLType(
+        newValue,
+        newValuePlan,
+        constraints,
+        newPath,
+        type,
+      ) as any;
+    } else {
+      return new __TrackedValueStep(
+        newValue,
+        newValuePlan,
+        constraints,
+        newPath,
+      ) as any;
+    }
   }
 
   /**
@@ -106,12 +245,40 @@ export class __TrackedValueStep<
    */
   at<TIndex extends keyof TData & number>(
     index: TIndex,
-  ): __TrackedValueStep<TData[TIndex]> {
+  ): __TrackedValueStepWithDollars<
+    TData[TIndex],
+    TInputType extends GraphQLList<infer U>
+      ? U & GraphQLInputType
+      : TInputType extends GraphQLNonNull<GraphQLList<infer U>>
+      ? U & GraphQLInputType
+      : undefined
+  > {
     const { value, path, constraints } = this;
     const newValue = value?.[index];
     const newValuePlan = this.getValuePlan().at(index);
     const newPath = [...path, index];
-    return new __TrackedValueStep(newValue, newValuePlan, constraints, newPath);
+    if (this.nullableGraphQLType) {
+      if (isListType(this.nullableGraphQLType)) {
+        return __TrackedValueStep.withGraphQLType(
+          newValue,
+          newValuePlan,
+          constraints,
+          newPath,
+          this.nullableGraphQLType.ofType,
+        ) as any;
+      } else {
+        throw new Error(
+          `'${this.nullableGraphQLType}' is not a list type, cannot access array index '${index}' on it`,
+        );
+      }
+    } else {
+      return new __TrackedValueStep(
+        newValue,
+        newValuePlan,
+        constraints,
+        newPath,
+      ) as any;
+    }
   }
 
   /**
@@ -218,4 +385,24 @@ export class __TrackedValueStep<
   optimize() {
     return this.getDep(0);
   }
+}
+
+export type __TrackedValueStepWithDollars<
+  TData = any,
+  TInputType extends GraphQLInputType | undefined = undefined,
+> = __TrackedValueStep<TData, TInputType> &
+  (TInputType extends GraphQLInputObjectType
+    ? {
+        [key in keyof ReturnType<TInputType["getFields"]> &
+          string as `$${key}`]: __TrackedValueStepWithDollars<
+          TData extends { [k in key]: infer U } ? U : any,
+          ReturnType<TInputType["getFields"]>[key]["type"]
+        >;
+      }
+    : Record<string, never>);
+
+function isArray(t: ReadonlyArray<any> | any): t is ReadonlyArray<any>;
+function isArray(t: any): t is Array<any>;
+function isArray(t: any): boolean {
+  return Array.isArray(t);
 }
