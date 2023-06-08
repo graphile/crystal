@@ -1758,6 +1758,8 @@ export class OperationPlan {
     // PERF: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
 
+    const previousStepCount = this.stepTracker.stepCount;
+
     if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
     try {
       let step = withGlobalLayerPlan(
@@ -1842,8 +1844,13 @@ export class OperationPlan {
 
       // FIXME: need to roll-back side-effect steps since they won't be
       // tree-shaken away. In the mean time, let's just blow up the entire
-      // request.
-      if (Math.random() < 2) throw e;
+      // request if there were any side effect steps
+      for (let i = previousStepCount; i < this.stepTracker.stepCount; i++) {
+        const step = this.stepTracker.stepById[i];
+        if (step.hasSideEffects) {
+          throw e;
+        }
+      }
 
       const step = withGlobalLayerPlan(
         layerPlan,
