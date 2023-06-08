@@ -2619,7 +2619,7 @@ export function makeExampleSchema(
                   step: $forum.record(),
                 },
                 {
-                  step: $featured!,
+                  step: $featured,
                   pgCodec: TYPES.boolean,
                 },
               ]);
@@ -3922,7 +3922,7 @@ export function makeExampleSchema(
             function plan(_$root, { $featured }) {
               const $plan = uniqueAuthorCountResource.execute([
                 {
-                  step: $featured!,
+                  step: $featured,
                   pgCodec: TYPES.boolean,
                   name: "featured",
                 },
@@ -4279,7 +4279,7 @@ export function makeExampleSchema(
             function plan(_$root, { $query }) {
               const $step = entitySearchResource.execute([
                 {
-                  step: $query!,
+                  step: $query,
                   pgCodec: TYPES.text,
                   name: "query",
                 },
@@ -4437,8 +4437,8 @@ export function makeExampleSchema(
                     TYPES.float,
                   )}`,
               });
-              $vulnerabilities.setFirst($first!);
-              $vulnerabilities.setOffset($offset!);
+              $vulnerabilities.setFirst($first);
+              $vulnerabilities.setOffset($offset);
               return $vulnerabilities;
             },
           [
