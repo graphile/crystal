@@ -289,10 +289,10 @@ export function withFieldArgsForArguments<
                     },
                   )
                 : undefined;
-            } else {
+            } else if (entity) {
               // input field
-              const inputField = entity as GraphQLInputField | undefined;
-              result = inputField?.extensions.grafast?.applyPlan
+              const inputField = entity as GraphQLInputField;
+              result = inputField.extensions.grafast?.applyPlan
                 ? inputField.extensions.grafast.applyPlan(
                     $target,
                     childFieldArgs,
@@ -302,6 +302,17 @@ export function withFieldArgsForArguments<
                     },
                   )
                 : undefined;
+            } else {
+              // Something inside a list
+              const nullableType = getNullableType(entityType);
+              if (isInputObjectType(nullableType)) {
+                const fields = nullableType.getFields();
+                for (const fieldName of Object.keys(fields)) {
+                  fieldArgs.apply($target, [...path, fieldName]);
+                }
+                // Shortcut 'processAfter'
+                return;
+              }
             }
             const nullableType = getNullableType(entityType);
             if (isInputObjectType(nullableType)) {
