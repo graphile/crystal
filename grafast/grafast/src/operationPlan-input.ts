@@ -303,16 +303,9 @@ export function withFieldArgsForArguments<
                   )
                 : undefined;
             } else {
-              // Something inside a list
-              const nullableType = getNullableType(entityType);
-              if (isInputObjectType(nullableType)) {
-                const fields = nullableType.getFields();
-                for (const fieldName of Object.keys(fields)) {
-                  fieldArgs.apply($target, [...path, fieldName]);
-                }
-                // Shortcut 'processAfter'
-                return;
-              }
+              childFieldArgs.apply($target);
+              // Shortcut 'processAfter'
+              return;
             }
             const nullableType = getNullableType(entityType);
             if (isInputObjectType(nullableType)) {
