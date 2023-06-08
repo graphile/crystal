@@ -77,8 +77,19 @@ import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
-const ALWAYS_THROW_PLANNING_ERRORS =
-  process.env.ALWAYS_THROW_PLANNING_ERRORS === "1";
+const atpe = process.env.ALWAYS_THROW_PLANNING_ERRORS;
+const ALWAYS_THROW_PLANNING_ERRORS = atpe === "1";
+const THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS = atpe === "2";
+
+if (
+  atpe &&
+  atpe !== "0" &&
+  !(ALWAYS_THROW_PLANNING_ERRORS || THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS)
+) {
+  throw new Error(
+    `Invalid value for envvar 'ALWAYS_THROW_PLANNING_ERRORS' - expected '1' or '2', but received '${atpe}'`,
+  );
+}
 
 // Work around TypeScript CommonJS `graphql_1.isListType` unoptimal access.
 const {
@@ -1840,16 +1851,26 @@ export class OperationPlan {
 
       return { step, haltTree };
     } catch (e) {
-      if (ALWAYS_THROW_PLANNING_ERRORS) throw e;
+      if (ALWAYS_THROW_PLANNING_ERRORS) {
+        throw e;
+      }
 
-      // FIXME: need to roll-back side-effect steps since they won't be
-      // tree-shaken away. In the mean time, let's just blow up the entire
-      // request if there were any side effect steps
-      for (let i = previousStepCount; i < this.stepTracker.stepCount; i++) {
-        const step = this.stepTracker.stepById[i];
-        if (step.hasSideEffects) {
-          throw e;
+      if (THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS) {
+        for (let i = previousStepCount; i < this.stepTracker.stepCount; i++) {
+          const step = this.stepTracker.stepById[i];
+          if (step && step.hasSideEffects) {
+            throw e;
+          }
         }
+      }
+
+      try {
+        this.stepTracker.purgeBackTo(previousStepCount);
+      } catch (e2) {
+        console.error(
+          `Cleanup error occurred whilst trying to recover from field planning error: ${e2.stack}`,
+        );
+        throw e;
       }
 
       const step = withGlobalLayerPlan(
@@ -2842,7 +2863,7 @@ export class OperationPlan {
     const processed = new Set<ExecutableStep>();
     for (let i = start; i < end; i++) {
       const step = this.stepTracker.stepById[i];
-      if (step.id !== i || processed.has(step)) continue;
+      if (!step || step.id !== i || processed.has(step)) continue;
       this.deduplicateStepsProcess(processed, start, step);
     }
 
