@@ -46,7 +46,7 @@ export function evalDirectiveArg<T = unknown>(
   selection: SelectionNode,
   directiveName: string,
   argumentName: string,
-  variableValuesStep: __TrackedValueStep<any, any>,
+  variableValuesStep: __TrackedValueStep,
   defaultValue: T,
 ): T | undefined {
   const directive = getDirective(selection, directiveName);
@@ -62,7 +62,7 @@ export function evalDirectiveArg<T = unknown>(
 export function evalDirectiveArgDirect<T = unknown>(
   directive: DirectiveNode,
   argumentName: string,
-  variableValuesStep: __TrackedValueStep<any, any>,
+  variableValuesStep: __TrackedValueStep,
   defaultValue: T,
 ): T | undefined {
   if (!directive.arguments) return defaultValue;

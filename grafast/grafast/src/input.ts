@@ -89,7 +89,7 @@ export function inputPlan(
 ): AnyInputStep {
   // This prevents recursion
   if (rawInputValue === undefined && defaultValue === undefined) {
-    return constant(undefined) as any;
+    return constant(undefined);
   }
 
   const isObj = isInputObjectType(inputType);
@@ -134,17 +134,17 @@ export function inputPlan(
     );
     return inputNonNullPlan(operationPlan, valuePlan);
   } else if (inputType instanceof GraphQLList) {
-    return new __InputListStep(inputType, inputValue) as any;
+    return new __InputListStep(inputType, inputValue);
   } else if (isLeafType(inputType)) {
     if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
       const scalarType = assertScalarType(inputType);
       // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
       // scalars that have variables in subfields.)
-      return new __InputDynamicScalarStep(scalarType, inputValue) as any;
+      return new __InputDynamicScalarStep(scalarType, inputValue);
     } else {
       // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
       // none of which can contain a variable:
-      return new __InputStaticLeafStep(inputType, inputValue) as any;
+      return new __InputStaticLeafStep(inputType, inputValue);
     }
   } else if (isObj) {
     return new __InputObjectStep(
