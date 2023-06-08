@@ -2,9 +2,8 @@ import type { GraphQLInputType } from "graphql";
 import * as graphql from "graphql";
 
 import * as assert from "../assert.js";
-import type { InputStep } from "../input.js";
 import { assertInputStep, inputPlan } from "../input.js";
-import type { NotVariableValueNode } from "../interfaces.js";
+import type { InputStep, NotVariableValueNode } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { ConstantStep } from "./constant.js";
 import { constant } from "./constant.js";

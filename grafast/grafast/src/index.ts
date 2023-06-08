@@ -31,7 +31,6 @@ import {
 } from "./error.js";
 import { execute } from "./execute.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
-import { InputStep } from "./input.js";
 import {
   $$bypassGraphQL,
   $$eventEmitter,
@@ -69,6 +68,7 @@ import {
   InputObjectFieldApplyPlanResolver,
   InputObjectFieldInputPlanResolver,
   InputObjectTypeInputPlanResolver,
+  InputStep,
   JSONArray,
   JSONObject,
   JSONValue,

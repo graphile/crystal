@@ -26,12 +26,12 @@ import { isDev } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { SafeError } from "./error.js";
-import type { InputStep } from "./input.js";
 import { inspect } from "./inspect.js";
 import type {
   BaseGraphQLArguments,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
+  InputStep,
   OutputPlanForType,
 } from "./interfaces.js";
 import type { ExecutableStep, ModifierStep } from "./step.js";

@@ -16,7 +16,6 @@ import {
   __InputObjectStep,
   __InputObjectStepWithDollars,
 } from "./steps/__inputObject.js";
-import type { ConstantStep } from "./steps/index.js";
 import {
   __InputListStep,
   __InputStaticLeafStep,
@@ -24,6 +23,7 @@ import {
   constant,
 } from "./steps/index.js";
 import { __TrackedValueStepWithDollars } from "./steps/__trackedValue.js";
+import { AnyInputStep } from "./interfaces.js";
 
 const {
   assertScalarType,
@@ -35,32 +35,6 @@ const {
   isInputObjectType,
   Kind,
 } = graphql;
-
-export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
-  GraphQLInputType extends TInputType
-    ? AnyInputStep
-    : TInputType extends graphql.GraphQLNonNull<infer U>
-    ? Exclude<InputStep<U & GraphQLInputType>, ConstantStep<undefined>>
-    : TInputType extends graphql.GraphQLList<GraphQLInputType>
-    ?
-        | __InputListStep<TInputType> // .at(), .eval(), .evalLength(), .evalIs(null)
-        | __TrackedValueStep<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
-        | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
-    : TInputType extends graphql.GraphQLInputObjectType
-    ?
-        | __TrackedValueStepWithDollars<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
-        | __InputObjectStepWithDollars<TInputType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
-        | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
-    : // TODO: handle the other types
-      AnyInputStep;
-
-export type AnyInputStep =
-  | __TrackedValueStepWithDollars<any, GraphQLInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
-  | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
-  | __InputStaticLeafStep // .eval(), .evalIs()
-  | __InputDynamicScalarStep // .eval(), .evalIs()
-  | __InputObjectStepWithDollars<graphql.GraphQLInputObjectType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
-  | ConstantStep<undefined>; // .eval(), .evalIs(), .evalIsEmpty()
 
 export function assertInputStep(
   itemPlan: unknown,
@@ -117,7 +91,7 @@ export function inputPlan(
 ): AnyInputStep {
   // This prevents recursion
   if (rawInputValue === undefined && defaultValue === undefined) {
-    return constant(undefined);
+    return constant(undefined) as any;
   }
 
   const isObj = isInputObjectType(inputType);
@@ -162,17 +136,17 @@ export function inputPlan(
     );
     return inputNonNullPlan(operationPlan, valuePlan);
   } else if (inputType instanceof GraphQLList) {
-    return new __InputListStep(inputType, inputValue);
+    return new __InputListStep(inputType, inputValue) as any;
   } else if (isLeafType(inputType)) {
     if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
       const scalarType = assertScalarType(inputType);
       // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
       // scalars that have variables in subfields.)
-      return new __InputDynamicScalarStep(scalarType, inputValue);
+      return new __InputDynamicScalarStep(scalarType, inputValue) as any;
     } else {
       // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
       // none of which can contain a variable:
-      return new __InputStaticLeafStep(inputType, inputValue);
+      return new __InputStaticLeafStep(inputType, inputValue) as any;
     }
   } else if (isObj) {
     return new __InputObjectStep(

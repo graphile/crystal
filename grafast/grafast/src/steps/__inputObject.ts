@@ -1,9 +1,12 @@
 import type { GraphQLInputObjectType } from "graphql";
 import te from "tamedevil";
 
-import type { InputStep } from "../input.js";
 import { inputPlan } from "../input.js";
-import type { ExecutionExtra, NotVariableValueNode } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  InputStep,
+  NotVariableValueNode,
+} from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { defaultValueToValueNode } from "../utils.js";
 import { constant } from "./constant.js";

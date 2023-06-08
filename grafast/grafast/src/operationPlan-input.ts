@@ -8,10 +8,10 @@ import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { __InputObjectStep, __TrackedValueStep } from "./index.js";
-import type { InputStep } from "./input.js";
 import type {
   FieldArgs,
   InputObjectTypeInputPlanResolver,
+  InputStep,
   TrackedArguments,
 } from "./interfaces.js";
 import type { ExecutableStep, ModifierStep } from "./step.js";
@@ -75,7 +75,7 @@ export function withFieldArgsForArguments<
         let $entry = $all.get(first);
         for (const pathSegment of rest) {
           if (typeof pathSegment === "number" && "at" in $entry) {
-            $entry = $entry.at(pathSegment);
+            $entry = $entry.at(pathSegment) as any;
           } else if ("get" in $entry) {
             $entry = $entry.get(pathSegment);
           } else {

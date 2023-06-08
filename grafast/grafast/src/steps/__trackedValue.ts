@@ -3,7 +3,6 @@ import {
   GraphQLInputType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLNullableType,
   Kind,
   TypeNode,
   VariableDefinitionNode,
@@ -12,12 +11,11 @@ import {
   isListType,
 } from "graphql";
 import type { Constraint } from "../constraints.js";
-import { InputStep, __ListTransformStep } from "../index.js";
+import { __ListTransformStep } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
-  InputStepDollarMap,
 } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";

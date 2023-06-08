@@ -1,6 +1,9 @@
 import * as assert from "../assert.js";
-import type { InputStep } from "../input.js";
-import type { ExecutionExtra, GrafastResultsList } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  GrafastResultsList,
+  InputStep,
+} from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";

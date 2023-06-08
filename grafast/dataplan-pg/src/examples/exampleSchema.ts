@@ -4994,11 +4994,7 @@ export function makeExampleSchema(
           (pgUpdateSingle, relationalPostsResource) =>
             function plan(_$root, fieldArgs) {
               const $post = pgUpdateSingle(relationalPostsResource, {
-                id: (
-                  fieldArgs.$input as
-                    | __TrackedValueStepWithDollars<any, GraphQLInputObjectType>
-                    | __InputObjectStepWithDollars<GraphQLInputObjectType>
-                ).$id as ExecutableStep<number>,
+                id: fieldArgs.$input.$id as ExecutableStep<number>,
               });
               for (const key of ["title", "description", "note"] as Array<
                 keyof typeof relationalPostsResource.codec.attributes
@@ -5026,10 +5022,7 @@ export function makeExampleSchema(
         type: DeleteRelationalPostByIdPayload,
         plan: EXPORTABLE(
           (pgDeleteSingle, relationalPostsResource) =>
-            function plan(_$root, { $input }) {
-              const { $id } = $input as
-                | __InputObjectStepWithDollars
-                | __TrackedValueStepWithDollars<any, GraphQLInputObjectType>;
+            function plan(_$root, { $input: { $id } }) {
               const $post = pgDeleteSingle(relationalPostsResource, {
                 id: $id as ExecutableStep<number>,
               });
@@ -5054,10 +5047,7 @@ export function makeExampleSchema(
             sql,
             withPgClientTransaction,
           ) =>
-            function plan(_$root, { $input }) {
-              const { $a } = $input as
-                | __InputObjectStepWithDollars
-                | __TrackedValueStepWithDollars<any, GraphQLInputObjectType>;
+            function plan(_$root, { $input: { $a } }) {
               const $transactionResult = withPgClientTransaction(
                 relationalPostsResource.executor,
                 object({
