@@ -173,7 +173,7 @@ export class __InputObjectStep<
 }
 
 export type __InputObjectStepWithDollars<
-  TInputType extends GraphQLInputObjectType,
+  TInputType extends GraphQLInputObjectType = GraphQLInputObjectType,
 > = __InputObjectStep<TInputType> & {
   [key in keyof ReturnType<TInputType["getFields"]> &
     string as `$${key}`]: InputStep<

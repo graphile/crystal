@@ -5027,10 +5027,11 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (pgDeleteSingle, relationalPostsResource) =>
             function plan(_$root, { $input }) {
+              const { $id } = $input as
+                | __InputObjectStepWithDollars
+                | __TrackedValueStepWithDollars<any, GraphQLInputObjectType>;
               const $post = pgDeleteSingle(relationalPostsResource, {
-                id: ($input as __InputObjectStep | __TrackedValueStep).get(
-                  "id",
-                ) as ExecutableStep<number>,
+                id: $id as ExecutableStep<number>,
               });
               return $post;
             },
@@ -5054,9 +5055,9 @@ export function makeExampleSchema(
             withPgClientTransaction,
           ) =>
             function plan(_$root, { $input }) {
-              const $a = ($input as __InputObjectStep | __TrackedValueStep).get(
-                "a",
-              );
+              const { $a } = $input as
+                | __InputObjectStepWithDollars
+                | __TrackedValueStepWithDollars<any, GraphQLInputObjectType>;
               const $transactionResult = withPgClientTransaction(
                 relationalPostsResource.executor,
                 object({
