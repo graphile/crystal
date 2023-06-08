@@ -57,6 +57,7 @@ import {
   isStreamableStep,
   isUnbatchedExecutableStep,
 } from "../step.js";
+import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
@@ -314,6 +315,7 @@ export class OperationPlan {
     [this.variableValuesStep, this.trackedVariableValuesStep] = this.track(
       variableValues,
       this.variableValuesConstraints,
+      this.operation.variableDefinitions,
     );
     [this.contextStep, this.trackedContextStep] = this.track(
       context,
@@ -1943,7 +1945,8 @@ export class OperationPlan {
   private track(
     value: any,
     constraints: Constraint[],
-  ): [__ValueStep<any>, __TrackedValueStep] {
+    variableDefinitions?: ReadonlyArray<graphql.VariableDefinitionNode>,
+  ): [__ValueStep<any>, __TrackedValueStep<any, any>] {
     const valueStep = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
@@ -1952,7 +1955,14 @@ export class OperationPlan {
     const trackedObjectStep = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
-      () => new __TrackedValueStep(value, valueStep, constraints),
+      () =>
+        new __TrackedValueStep(
+          value,
+          valueStep,
+          constraints,
+          [],
+          variableDefinitions,
+        ),
     );
     return [valueStep, trackedObjectStep];
   }

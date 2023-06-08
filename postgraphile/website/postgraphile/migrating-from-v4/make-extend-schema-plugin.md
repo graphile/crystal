@@ -105,7 +105,7 @@ In V5, this concern should be handled via a plan. You have a number of choices
 of what plan you need, depending on what you're trying to achieve.
 
 For leaf fields, if you need to do the calculation in the database rather than
-in JS, you might use the `pgClassExpression` step.
+in JS, you might use an SQL expression:
 
 ```diff
  module.exports = makeExtendSchemaPlugin(build => {
@@ -126,19 +126,19 @@ in JS, you might use the `pgClassExpression` step.
      `,
 +    plans: {
 +      User: {
-+        nameWithSuffix($user, fieldArgs) {
-+          const $name = $user.get('name');
-+          const $suffix = fieldArgs.get('suffix');
-+          return pgClassExpression(
-+            $user,
++        nameWithSuffix($user, { $suffix }) {
++          return $user.expression(
++            sql`${$user.alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
 +            TYPES.text,
-+          )`${$name} || ' ' || ${$suffix}::text`;
++          );
 +        }
 +      }
 +    }
    };
  });
 ```
+
+<!-- TODO: test this example actually works! -->
 
 :::note
 
@@ -150,14 +150,14 @@ ensures that all parameters are correctly escaped in the generated SQL query.
 
 :::tip
 
-A more performant (and simpler) solution to this would have been:
+A more performant (and simpler) solution to this would have been to do it in JS:
 
 ```diff
 +    plans: {
 +      User: {
-+        nameWithSuffix($user, fieldArgs) {
++        nameWithSuffix($user, { $suffix }) {
 +          return lambda(
-+            [$user.get("name"), fieldArgs.get("suffix")],
++            [$user.get("name"), $suffix],
 +            ([name, suffix]) => `${name} ${suffix}`,
 +          );
 +        },
@@ -212,10 +212,8 @@ function, passing through the `searchText` argument.
 -    },
 +    plans: {
 +      Query: {
-+        matchingUser($parent, fieldArgs) {
-+          return matchUser.execute({
-+            step: fieldArgs.get("searchText"),
-+          });
++        matchingUser($parent, { $searchText }) {
++          return matchUser.execute({ step: $searchText });
 +        },
 +      },
 +    },
@@ -287,10 +285,7 @@ export default makeExtendSchemaPlugin((build) => {
 
     plans: {
       Mutation: {
-        myCustomMutation(_$root, fieldArgs) {
-          // A step that represents the `input.count` property from the arguments.
-          const $count = fieldArgs.get(["input", "count"]);
-
+        myCustomMutation(_$root, { $input: { $count } }) {
           /**
            * This step dictates the data that will be passed as the second argument
            * to the `withPgClientTransaction` callback. This is typically
@@ -383,8 +378,7 @@ const codec = build.getNodeIdCodec(handler.codecName);
 const plans = {
   Mutation: {
     updateUser(parent, fieldArgs) {
-      const $nodeId = fieldArgs.get("id");
-      const spec = specFromNodeId(codec, handler, $nodeId);
+      const spec = specFromNodeId(codec, handler, fieldArgs.$id);
       const plan = object({ result: pgUpdateSingle(userSource, spec) });
       fieldArgs.apply(plan);
       return plan;

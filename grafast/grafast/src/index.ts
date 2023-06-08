@@ -31,7 +31,6 @@ import {
 } from "./error.js";
 import { execute } from "./execute.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
-import { InputStep } from "./input.js";
 import {
   $$bypassGraphQL,
   $$eventEmitter,
@@ -69,6 +68,7 @@ import {
   InputObjectFieldApplyPlanResolver,
   InputObjectFieldInputPlanResolver,
   InputObjectTypeInputPlanResolver,
+  InputStep,
   JSONArray,
   JSONObject,
   JSONValue,
@@ -102,10 +102,12 @@ import {
 import {
   __InputListStep,
   __InputObjectStep,
+  __InputObjectStepWithDollars,
   __InputStaticLeafStep,
   __ItemStep,
   __ListTransformStep,
   __TrackedValueStep,
+  __TrackedValueStepWithDollars,
   __ValueStep,
   access,
   AccessStep,
@@ -204,10 +206,12 @@ export { isAsyncIterable } from "iterall";
 export {
   __InputListStep,
   __InputObjectStep,
+  __InputObjectStepWithDollars,
   __InputStaticLeafStep,
   __ItemStep,
   __ListTransformStep,
   __TrackedValueStep,
+  __TrackedValueStepWithDollars,
   __ValueStep,
   $$bypassGraphQL,
   $$eventEmitter,

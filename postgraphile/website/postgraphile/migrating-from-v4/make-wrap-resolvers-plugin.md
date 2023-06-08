@@ -37,7 +37,7 @@ even have to have the column in your GraphQL schema in order to set it any more!
 makeWrapPlansPlugin({
   Mutation: {
     // This same pattern works for 'update' mutations too
-    createPost(plan, $source, fieldArgs) {
+    createPost(plan, $source, { $firstName, $lastName }) {
       // Call the original plan
       const $planResult = plan();
 
@@ -49,7 +49,7 @@ makeWrapPlansPlugin({
       // We have a legacy 'name' field that needs populating; build it from
       // each tuple of firstName/lastName fields:
       const $name = lambda(
-        [fieldArgs.get("firstName"), fieldArgs.get("lastName")],
+        [$firstName, $lastName],
         ([firstName, lastName]) => `${firstName} ${lastName}`,
         // Our callback is synchronous and won't throw
         true,

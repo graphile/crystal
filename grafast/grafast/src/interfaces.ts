@@ -22,14 +22,16 @@ import type {
 } from "graphql";
 
 import type { Bucket, RequestTools } from "./bucket.js";
-import type { InputStep } from "./input.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
   __InputListStep,
   __InputObjectStep,
+  __InputObjectStepWithDollars,
   __InputStaticLeafStep,
   __TrackedValueStep,
+  __TrackedValueStepWithDollars,
+  ConstantStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
 
@@ -318,17 +320,55 @@ export type TargetStepOrCallback =
   | ((indexOrFieldName: number | string) => TargetStepOrCallback);
 
 // TODO: rename
-export interface FieldArgs {
+export type FieldArgs = {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
   get(path?: string | ReadonlyArray<string | number>): ExecutableStep;
   /** Gets the value *without* calling any `inputPlan`s */
-  getRaw(path?: string | ReadonlyArray<string | number>): InputStep;
+  getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
   /** This also works (without path) to apply each list entry against $target */
   apply(
     $target: ExecutableStep | ModifierStep | (() => ModifierStep),
     path?: string | ReadonlyArray<string | number>,
   ): void;
-}
+} & AnyInputStepDollars;
+
+export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
+  GraphQLInputType extends TInputType
+    ? AnyInputStep
+    : TInputType extends GraphQLNonNull<infer U>
+    ? Exclude<InputStep<U & GraphQLInputType>, ConstantStep<undefined>>
+    : TInputType extends GraphQLList<GraphQLInputType>
+    ?
+        | __InputListStep<TInputType> // .at(), .eval(), .evalLength(), .evalIs(null)
+        | __TrackedValueStep<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
+        | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
+    : TInputType extends GraphQLInputObjectType
+    ?
+        | __TrackedValueStepWithDollars<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
+        | __InputObjectStepWithDollars<TInputType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
+        | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
+    : // TODO: handle the other types
+      AnyInputStep;
+
+export type AnyInputStep =
+  | __TrackedValueStepWithDollars<any, GraphQLInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
+  | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
+  | __InputStaticLeafStep // .eval(), .evalIs()
+  | __InputDynamicScalarStep // .eval(), .evalIs()
+  | __InputObjectStepWithDollars<GraphQLInputObjectType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
+  | ConstantStep<undefined>; // .eval(), .evalIs(), .evalIsEmpty()
+
+export type AnyInputStepWithDollars = AnyInputStep & AnyInputStepDollars;
+
+// TODO: solve these lies
+/**
+ * Lies to make it easier to write TypeScript code like
+ * `{ $input: { $user: { $username } } }` without having to pass loads of
+ * generics.
+ */
+export type AnyInputStepDollars = {
+  [key in string as `$${key}`]: AnyInputStepWithDollars;
+};
 
 export interface FieldInfo {
   field: GraphQLField<any, any, any>;
@@ -675,7 +715,7 @@ export type GrafastInputFieldConfig<
 export type TrackedArguments<
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 > = {
-  get<TKey extends keyof TArgs>(key: TKey): InputStep;
+  get<TKey extends keyof TArgs>(key: TKey): AnyInputStep;
 };
 
 /**
