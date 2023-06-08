@@ -289,10 +289,10 @@ export function withFieldArgsForArguments<
                     },
                   )
                 : undefined;
-            } else {
+            } else if (entity) {
               // input field
-              const inputField = entity as GraphQLInputField | undefined;
-              result = inputField?.extensions.grafast?.applyPlan
+              const inputField = entity as GraphQLInputField;
+              result = inputField.extensions.grafast?.applyPlan
                 ? inputField.extensions.grafast.applyPlan(
                     $target,
                     childFieldArgs,
@@ -302,6 +302,10 @@ export function withFieldArgsForArguments<
                     },
                   )
                 : undefined;
+            } else {
+              childFieldArgs.apply($target);
+              // Shortcut 'processAfter'
+              return;
             }
             const nullableType = getNullableType(entityType);
             if (isInputObjectType(nullableType)) {
