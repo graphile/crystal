@@ -105,7 +105,7 @@ graph TD
     __Value3 --> Access1046
     Object1048{{"Object[1048∈102]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle1044 --> Object1048
-    PgInsertSingle1019[["PgInsertSingle[1019∈99]<br />ᐸdefaultValue(id,null_value)ᐳ"]]:::sideeffectplan
+    PgInsertSingle1019[["PgInsertSingle[1019∈99]<br />ᐸdefault_value(id,null_value)ᐳ"]]:::sideeffectplan
     Object1022{{"Object[1022∈99]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object1022 & Constant1291 & Constant1268 --> PgInsertSingle1019
     Access1020{{"Access[1020∈99]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -141,7 +141,7 @@ graph TD
     Access780 & Access781 --> Object782
     __Value3 --> Access780
     __Value3 --> Access781
-    PgInsertSingle779[["PgInsertSingle[779∈72]<br />ᐸedgeCase()ᐳ"]]:::sideeffectplan
+    PgInsertSingle779[["PgInsertSingle[779∈72]<br />ᐸedge_case()ᐳ"]]:::sideeffectplan
     Object782 --> PgInsertSingle779
     Object783{{"Object[783∈72]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle779 --> Object783
@@ -149,13 +149,13 @@ graph TD
     Access766{{"Access[766∈68]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access767{{"Access[767∈68]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access766 & Access767 --> Object768
-    PgInsertSingle765[["PgInsertSingle[765∈68]<br />ᐸedgeCase(not_null_has_default)ᐳ"]]:::sideeffectplan
+    PgInsertSingle765[["PgInsertSingle[765∈68]<br />ᐸedge_case(not_null_has_default)ᐳ"]]:::sideeffectplan
     Object768 & Constant1192 --> PgInsertSingle765
     __Value3 --> Access766
     __Value3 --> Access767
     Object769{{"Object[769∈68]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle765 --> Object769
-    PgInsertSingle696[["PgInsertSingle[696∈60]<br />ᐸcompoundKey(person_id_2,person_id_1,extra)ᐳ"]]:::sideeffectplan
+    PgInsertSingle696[["PgInsertSingle[696∈60]<br />ᐸcompound_key(person_id_2,person_id_1,extra)ᐳ"]]:::sideeffectplan
     Object699{{"Object[699∈60]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object699 & Constant1229 & Constant1255 & Constant1173 --> PgInsertSingle696
     Access697{{"Access[697∈60]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -1282,7 +1282,7 @@ graph TD
     Bucket61("Bucket 61 (nullableBoundary)<br />Deps: 699, 696, 700, 5, 1273<br /><br />ROOT Object{60}ᐸ{result,clientMutationId}ᐳ[700]<br />1: <br />ᐳ: 716, 733, 745<br />2: PgSelect[710], PgSelect[722]<br />ᐳ: 714, 715, 726, 727"):::bucket
     classDef bucket61 stroke:#ffff00
     class Bucket61,PgSelect710,First714,PgSelectSingle715,Constant716,PgSelect722,First726,PgSelectSingle727,PgClassExpression733,PgClassExpression745 bucket61
-    Bucket62("Bucket 62 (nullableBoundary)<br />Deps: 733, 745, 696, 715, 716, 727<br /><br />ROOT PgInsertSingle{60}ᐸcompoundKey(person_id_2,person_id_1,extra)ᐳ[696]"):::bucket
+    Bucket62("Bucket 62 (nullableBoundary)<br />Deps: 733, 745, 696, 715, 716, 727<br /><br />ROOT PgInsertSingle{60}ᐸcompound_key(person_id_2,person_id_1,extra)ᐳ[696]"):::bucket
     classDef bucket62 stroke:#00ffff
     class Bucket62,Constant701,List704,Lambda705,PgClassExpression708 bucket62
     Bucket63("Bucket 63 (nullableBoundary)<br />Deps: 715, 716<br /><br />ROOT PgSelectSingle{61}ᐸpersonᐳ[715]"):::bucket
@@ -1306,7 +1306,7 @@ graph TD
     Bucket69("Bucket 69 (nullableBoundary)<br />Deps: 769, 765, 5<br /><br />ROOT Object{68}ᐸ{result}ᐳ[769]"):::bucket
     classDef bucket69 stroke:#00bfff
     class Bucket69 bucket69
-    Bucket70("Bucket 70 (nullableBoundary)<br />Deps: 765<br /><br />ROOT PgInsertSingle{68}ᐸedgeCase(not_null_has_default)ᐳ[765]"):::bucket
+    Bucket70("Bucket 70 (nullableBoundary)<br />Deps: 765<br /><br />ROOT PgInsertSingle{68}ᐸedge_case(not_null_has_default)ᐳ[765]"):::bucket
     classDef bucket70 stroke:#7f007f
     class Bucket70,PgClassExpression770 bucket70
     Bucket71("Bucket 71 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -1318,7 +1318,7 @@ graph TD
     Bucket73("Bucket 73 (nullableBoundary)<br />Deps: 783, 779, 5<br /><br />ROOT Object{72}ᐸ{result}ᐳ[783]"):::bucket
     classDef bucket73 stroke:#7fff00
     class Bucket73 bucket73
-    Bucket74("Bucket 74 (nullableBoundary)<br />Deps: 779<br /><br />ROOT PgInsertSingle{72}ᐸedgeCase()ᐳ[779]"):::bucket
+    Bucket74("Bucket 74 (nullableBoundary)<br />Deps: 779<br /><br />ROOT PgInsertSingle{72}ᐸedge_case()ᐳ[779]"):::bucket
     classDef bucket74 stroke:#ff1493
     class Bucket74,PgClassExpression784 bucket74
     Bucket75("Bucket 75 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
@@ -1399,7 +1399,7 @@ graph TD
     Bucket100("Bucket 100 (nullableBoundary)<br />Deps: 1023, 1019<br /><br />ROOT Object{99}ᐸ{result}ᐳ[1023]"):::bucket
     classDef bucket100 stroke:#ff00ff
     class Bucket100 bucket100
-    Bucket101("Bucket 101 (nullableBoundary)<br />Deps: 1019<br /><br />ROOT PgInsertSingle{99}ᐸdefaultValue(id,null_value)ᐳ[1019]"):::bucket
+    Bucket101("Bucket 101 (nullableBoundary)<br />Deps: 1019<br /><br />ROOT PgInsertSingle{99}ᐸdefault_value(id,null_value)ᐳ[1019]"):::bucket
     classDef bucket101 stroke:#f5deb3
     class Bucket101,PgClassExpression1024,PgClassExpression1025 bucket101
     Bucket102("Bucket 102 (mutationField)<br />Deps: 1293, 3<br /><br />1: Access[1045]<br />2: Access[1046]<br />3: Object[1047]<br />4: Constant[1334]<br />5: PgInsertSingle[1044]<br />6: <br />ᐳ: Object[1048]"):::bucket

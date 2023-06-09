@@ -592,7 +592,7 @@ export function makeExampleSchema(
       });
 
       const enumTableItemTypeEnumCodec = enumCodec({
-        name: "text",
+        name: "enum_table_item_type_enum",
         identifier: sql`text`,
         values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
       });

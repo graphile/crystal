@@ -324,7 +324,7 @@ graph TD
     RemapKeys3989 --> PgSelectSingle1642
     PgSelectSingle1651{{"PgSelectSingle[1651∈153]<br />ᐸpostᐳ"}}:::plan
     PgSelectSingle1449 --> PgSelectSingle1651
-    PgSelect1145[["PgSelect[1145∈128]<br />ᐸcompoundKeyᐳ<br />ᐳCompoundKey"]]:::plan
+    PgSelect1145[["PgSelect[1145∈128]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access4220{{"Access[4220∈128]<br />ᐸ1092.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access4221{{"Access[4221∈128]<br />ᐸ1092.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
     Object18 & Access4220 & Access4221 --> PgSelect1145
@@ -336,9 +336,9 @@ graph TD
     Object18 & Access4220 --> PgSelect1112
     PgSelect1120[["PgSelect[1120∈128]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
     Object18 & Access4220 --> PgSelect1120
-    PgSelect1128[["PgSelect[1128∈128]<br />ᐸreservedInputᐳ<br />ᐳReservedInputRecord"]]:::plan
+    PgSelect1128[["PgSelect[1128∈128]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
     Object18 & Access4220 --> PgSelect1128
-    PgSelect1136[["PgSelect[1136∈128]<br />ᐸdefaultValueᐳ<br />ᐳDefaultValue"]]:::plan
+    PgSelect1136[["PgSelect[1136∈128]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
     Object18 & Access4220 --> PgSelect1136
     PgSelect1153[["PgSelect[1153∈128]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
     Object18 & Access4220 --> PgSelect1153
@@ -346,19 +346,19 @@ graph TD
     Object18 & Access4220 --> PgSelect1161
     PgSelect1169[["PgSelect[1169∈128]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
     Object18 & Access4220 --> PgSelect1169
-    PgSelect1381[["PgSelect[1381∈128]<br />ᐸpersonSecretᐳ<br />ᐳPersonSecret"]]:::plan
+    PgSelect1381[["PgSelect[1381∈128]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
     Object18 & Access4220 --> PgSelect1381
-    PgSelect1389[["PgSelect[1389∈128]<br />ᐸleftArmᐳ<br />ᐳLeftArm"]]:::plan
+    PgSelect1389[["PgSelect[1389∈128]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
     Object18 & Access4220 --> PgSelect1389
-    PgSelect1397[["PgSelect[1397∈128]<br />ᐸmyTableᐳ<br />ᐳMyTable"]]:::plan
+    PgSelect1397[["PgSelect[1397∈128]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
     Object18 & Access4220 --> PgSelect1397
-    PgSelect1405[["PgSelect[1405∈128]<br />ᐸviewTableᐳ<br />ᐳViewTable"]]:::plan
+    PgSelect1405[["PgSelect[1405∈128]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
     Object18 & Access4220 --> PgSelect1405
-    PgSelect1413[["PgSelect[1413∈128]<br />ᐸsimilarTable1ᐳ<br />ᐳSimilarTable1"]]:::plan
+    PgSelect1413[["PgSelect[1413∈128]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
     Object18 & Access4220 --> PgSelect1413
-    PgSelect1421[["PgSelect[1421∈128]<br />ᐸsimilarTable2ᐳ<br />ᐳSimilarTable2"]]:::plan
+    PgSelect1421[["PgSelect[1421∈128]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
     Object18 & Access4220 --> PgSelect1421
-    PgSelect1429[["PgSelect[1429∈128]<br />ᐸnullTestRecordᐳ<br />ᐳNullTestRecord"]]:::plan
+    PgSelect1429[["PgSelect[1429∈128]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
     Object18 & Access4220 --> PgSelect1429
     PgSelect1437[["PgSelect[1437∈128]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
     Object18 & Access4220 --> PgSelect1437
@@ -381,16 +381,16 @@ graph TD
     First1124 --> PgSelectSingle1125
     First1132{{"First[1132∈128]"}}:::plan
     PgSelect1128 --> First1132
-    PgSelectSingle1133{{"PgSelectSingle[1133∈128]<br />ᐸreservedInputᐳ"}}:::plan
+    PgSelectSingle1133{{"PgSelectSingle[1133∈128]<br />ᐸreserved_inputᐳ"}}:::plan
     First1132 --> PgSelectSingle1133
     First1140{{"First[1140∈128]"}}:::plan
     PgSelect1136 --> First1140
-    PgSelectSingle1141{{"PgSelectSingle[1141∈128]<br />ᐸdefaultValueᐳ"}}:::plan
+    PgSelectSingle1141{{"PgSelectSingle[1141∈128]<br />ᐸdefault_valueᐳ"}}:::plan
     First1140 --> PgSelectSingle1141
     Lambda1092 --> Access4221
     First1149{{"First[1149∈128]"}}:::plan
     PgSelect1145 --> First1149
-    PgSelectSingle1150{{"PgSelectSingle[1150∈128]<br />ᐸcompoundKeyᐳ"}}:::plan
+    PgSelectSingle1150{{"PgSelectSingle[1150∈128]<br />ᐸcompound_keyᐳ"}}:::plan
     First1149 --> PgSelectSingle1150
     First1157{{"First[1157∈128]"}}:::plan
     PgSelect1153 --> First1157
@@ -544,31 +544,31 @@ graph TD
     PgSelectSingle1174 --> PgSelectSingle1376
     First1385{{"First[1385∈128]"}}:::plan
     PgSelect1381 --> First1385
-    PgSelectSingle1386{{"PgSelectSingle[1386∈128]<br />ᐸpersonSecretᐳ"}}:::plan
+    PgSelectSingle1386{{"PgSelectSingle[1386∈128]<br />ᐸperson_secretᐳ"}}:::plan
     First1385 --> PgSelectSingle1386
     First1393{{"First[1393∈128]"}}:::plan
     PgSelect1389 --> First1393
-    PgSelectSingle1394{{"PgSelectSingle[1394∈128]<br />ᐸleftArmᐳ"}}:::plan
+    PgSelectSingle1394{{"PgSelectSingle[1394∈128]<br />ᐸleft_armᐳ"}}:::plan
     First1393 --> PgSelectSingle1394
     First1401{{"First[1401∈128]"}}:::plan
     PgSelect1397 --> First1401
-    PgSelectSingle1402{{"PgSelectSingle[1402∈128]<br />ᐸmyTableᐳ"}}:::plan
+    PgSelectSingle1402{{"PgSelectSingle[1402∈128]<br />ᐸmy_tableᐳ"}}:::plan
     First1401 --> PgSelectSingle1402
     First1409{{"First[1409∈128]"}}:::plan
     PgSelect1405 --> First1409
-    PgSelectSingle1410{{"PgSelectSingle[1410∈128]<br />ᐸviewTableᐳ"}}:::plan
+    PgSelectSingle1410{{"PgSelectSingle[1410∈128]<br />ᐸview_tableᐳ"}}:::plan
     First1409 --> PgSelectSingle1410
     First1417{{"First[1417∈128]"}}:::plan
     PgSelect1413 --> First1417
-    PgSelectSingle1418{{"PgSelectSingle[1418∈128]<br />ᐸsimilarTable1ᐳ"}}:::plan
+    PgSelectSingle1418{{"PgSelectSingle[1418∈128]<br />ᐸsimilar_table_1ᐳ"}}:::plan
     First1417 --> PgSelectSingle1418
     First1425{{"First[1425∈128]"}}:::plan
     PgSelect1421 --> First1425
-    PgSelectSingle1426{{"PgSelectSingle[1426∈128]<br />ᐸsimilarTable2ᐳ"}}:::plan
+    PgSelectSingle1426{{"PgSelectSingle[1426∈128]<br />ᐸsimilar_table_2ᐳ"}}:::plan
     First1425 --> PgSelectSingle1426
     First1433{{"First[1433∈128]"}}:::plan
     PgSelect1429 --> First1433
-    PgSelectSingle1434{{"PgSelectSingle[1434∈128]<br />ᐸnullTestRecordᐳ"}}:::plan
+    PgSelectSingle1434{{"PgSelectSingle[1434∈128]<br />ᐸnull_test_recordᐳ"}}:::plan
     First1433 --> PgSelectSingle1434
     First1441{{"First[1441∈128]"}}:::plan
     PgSelect1437 --> First1441

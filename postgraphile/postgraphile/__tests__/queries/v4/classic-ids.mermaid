@@ -20,7 +20,7 @@ graph TD
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection26{{"Connection[26∈0]<br />ᐸ22ᐳ"}}:::plan
     Connection51{{"Connection[51∈0]<br />ᐸ47ᐳ"}}:::plan
-    PgSelect52[["PgSelect[52∈4]<br />ᐸedgeCaseᐳ"]]:::plan
+    PgSelect52[["PgSelect[52∈4]<br />ᐸedge_caseᐳ"]]:::plan
     Constant57{{"Constant[57∈4]<br />ᐸ2ᐳ"}}:::plan
     Object25 & Constant57 & Connection51 --> PgSelect52
     PgSelect27[["PgSelect[27∈1]<br />ᐸpostᐳ"]]:::plan
@@ -33,7 +33,7 @@ graph TD
     __Item28 --> PgSelectSingle29
     __Item53[/"__Item[53∈5]<br />ᐸ52ᐳ"\]:::itemplan
     PgSelect52 ==> __Item53
-    PgSelectSingle54{{"PgSelectSingle[54∈5]<br />ᐸedgeCaseᐳ"}}:::plan
+    PgSelectSingle54{{"PgSelectSingle[54∈5]<br />ᐸedge_caseᐳ"}}:::plan
     __Item53 --> PgSelectSingle54
     List32{{"List[32∈3]<br />ᐸ30,31ᐳ"}}:::plan
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__post__.”id”ᐳ"}}:::plan
@@ -67,7 +67,7 @@ graph TD
     Bucket5("Bucket 5 (listItem)<br />ROOT __Item{5}ᐸ52ᐳ[53]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item53,PgSelectSingle54 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgSelectSingle{5}ᐸedgeCaseᐳ[54]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgSelectSingle{5}ᐸedge_caseᐳ[54]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression55 bucket6
     Bucket0 --> Bucket1 & Bucket4

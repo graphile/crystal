@@ -33,7 +33,7 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection65{{"Connection[65∈0]<br />ᐸ61ᐳ"}}:::plan
-    PgSelect66[["PgSelect[66∈6]<br />ᐸrelationalItemsᐳ"]]:::plan
+    PgSelect66[["PgSelect[66∈6]<br />ᐸrelational_itemsᐳ"]]:::plan
     Object11 & Connection65 --> PgSelect66
     Access93{{"Access[93∈3]<br />ᐸ30.0ᐳ"}}:::plan
     First30 --> Access93
@@ -56,7 +56,7 @@ graph TD
     __Item47 --> PgSelectSingle48
     __Item67[/"__Item[67∈7]<br />ᐸ66ᐳ"\]:::itemplan
     PgSelect66 ==> __Item67
-    PgSelectSingle68{{"PgSelectSingle[68∈7]<br />ᐸrelationalItemsᐳ"}}:::plan
+    PgSelectSingle68{{"PgSelectSingle[68∈7]<br />ᐸrelational_itemsᐳ"}}:::plan
     __Item67 --> PgSelectSingle68
     PgClassExpression69{{"PgClassExpression[69∈7]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle68 --> PgClassExpression69
@@ -64,9 +64,9 @@ graph TD
     PgSelectSingle68 --> PgClassExpression77
     PgClassExpression78{{"PgClassExpression[78∈7]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle68 --> PgClassExpression78
-    PgSelect70[["PgSelect[70∈8]<br />ᐸrelationalTopicsᐳ<br />ᐳRelationalTopic"]]:::plan
+    PgSelect70[["PgSelect[70∈8]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object11 & PgClassExpression69 --> PgSelect70
-    PgSelect81[["PgSelect[81∈8]<br />ᐸrelationalStatusᐳ<br />ᐳRelationalStatus"]]:::plan
+    PgSelect81[["PgSelect[81∈8]<br />ᐸrelational_statusᐳ<br />ᐳRelationalStatus"]]:::plan
     Object11 & PgClassExpression69 --> PgSelect81
     PgClassExpression49{{"PgClassExpression[49∈5]<br />ᐸ__machine__.”id”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression49
@@ -76,13 +76,13 @@ graph TD
     PgSelectSingle48 --> PgClassExpression51
     First74{{"First[74∈8]"}}:::plan
     PgSelect70 --> First74
-    PgSelectSingle75{{"PgSelectSingle[75∈8]<br />ᐸrelationalTopicsᐳ"}}:::plan
+    PgSelectSingle75{{"PgSelectSingle[75∈8]<br />ᐸrelational_topicsᐳ"}}:::plan
     First74 --> PgSelectSingle75
     PgClassExpression79{{"PgClassExpression[79∈8]<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
     PgSelectSingle75 --> PgClassExpression79
     First85{{"First[85∈8]"}}:::plan
     PgSelect81 --> First85
-    PgSelectSingle86{{"PgSelectSingle[86∈8]<br />ᐸrelationalStatusᐳ"}}:::plan
+    PgSelectSingle86{{"PgSelectSingle[86∈8]<br />ᐸrelational_statusᐳ"}}:::plan
     First85 --> PgSelectSingle86
     PgClassExpression90{{"PgClassExpression[90∈8]<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
     PgSelectSingle86 --> PgClassExpression90

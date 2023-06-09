@@ -30,6 +30,7 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor.js";
+import { inspect } from "./inspect.js";
 import type {
   Expand,
   GetPgCodecAttributes,
@@ -1209,27 +1210,45 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     },
 
     addCodec(codec) {
-      if (!registryConfig.pgCodecs[codec.name]) {
-        registryConfig.pgCodecs[codec.name] = codec;
-        if (codec.arrayOfCodec) {
-          this.addCodec(codec.arrayOfCodec);
+      const existing = registryConfig.pgCodecs[codec.name];
+      if (existing) {
+        if (existing !== codec) {
+          throw new Error(
+            `Attempted to add a second codec named '${
+              codec.name
+            }' (existing: ${inspect(existing)}, new: ${inspect(codec)})`,
+          );
         }
-        if (codec.domainOfCodec) {
-          this.addCodec(codec.domainOfCodec);
-        }
-        if (codec.rangeOfCodec) {
-          this.addCodec(codec.rangeOfCodec);
-        }
-        if (codec.attributes) {
-          for (const col of Object.values(codec.attributes)) {
-            this.addCodec(col.codec);
-          }
+        return builder;
+      }
+      registryConfig.pgCodecs[codec.name] = codec;
+      if (codec.arrayOfCodec) {
+        this.addCodec(codec.arrayOfCodec);
+      }
+      if (codec.domainOfCodec) {
+        this.addCodec(codec.domainOfCodec);
+      }
+      if (codec.rangeOfCodec) {
+        this.addCodec(codec.rangeOfCodec);
+      }
+      if (codec.attributes) {
+        for (const col of Object.values(codec.attributes)) {
+          this.addCodec(col.codec);
         }
       }
       return builder;
     },
 
     addResource(resource) {
+      const existing = registryConfig.pgResources[resource.name];
+      if (existing) {
+        if (existing !== resource) {
+          throw new Error(
+            `Attempted to add a second resource named '${resource.name}' (existing: ${existing}, new: ${resource})`,
+          );
+        }
+        return builder;
+      }
       this.addCodec(resource.codec);
       registryConfig.pgResources[resource.name] = resource;
       return builder;

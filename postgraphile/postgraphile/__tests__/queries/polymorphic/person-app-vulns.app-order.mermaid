@@ -50,10 +50,10 @@ graph TD
     PgUnionAllSingle43 --> Access48
     PgCursor44{{"PgCursor[44∈5]"}}:::plan
     List49 --> PgCursor44
-    PgSelect53[["PgSelect[53∈6]<br />ᐸawsApplicationsᐳ<br />ᐳAwsApplication"]]:::plan
+    PgSelect53[["PgSelect[53∈6]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Access52{{"Access[52∈6]<br />ᐸ51.0ᐳ"}}:::plan
     Object18 & Access52 --> PgSelect53
-    PgSelect65[["PgSelect[65∈6]<br />ᐸgcpApplicationsᐳ<br />ᐳGcpApplication"]]:::plan
+    PgSelect65[["PgSelect[65∈6]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
     Access64{{"Access[64∈6]<br />ᐸ63.0ᐳ"}}:::plan
     Object18 & Access64 --> PgSelect65
     JSONParse51[["JSONParse[51∈6]<br />ᐸ48ᐳ<br />ᐳAwsApplication"]]:::plan
@@ -61,7 +61,7 @@ graph TD
     JSONParse51 --> Access52
     First57{{"First[57∈6]"}}:::plan
     PgSelect53 --> First57
-    PgSelectSingle58{{"PgSelectSingle[58∈6]<br />ᐸawsApplicationsᐳ"}}:::plan
+    PgSelectSingle58{{"PgSelectSingle[58∈6]<br />ᐸaws_applicationsᐳ"}}:::plan
     First57 --> PgSelectSingle58
     PgClassExpression59{{"PgClassExpression[59∈6]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression59
@@ -74,7 +74,7 @@ graph TD
     JSONParse63 --> Access64
     First69{{"First[69∈6]"}}:::plan
     PgSelect65 --> First69
-    PgSelectSingle70{{"PgSelectSingle[70∈6]<br />ᐸgcpApplicationsᐳ"}}:::plan
+    PgSelectSingle70{{"PgSelectSingle[70∈6]<br />ᐸgcp_applicationsᐳ"}}:::plan
     First69 --> PgSelectSingle70
     PgClassExpression71{{"PgClassExpression[71∈6]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle70 --> PgClassExpression71

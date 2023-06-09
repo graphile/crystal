@@ -317,7 +317,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                   continue outerLoop;
                 }
                 relationEntry = relationEntries.find(([, rel]) => {
-                  return rel.remoteResourceOptions.name === targetCodec.name;
+                  return rel.remoteResourceOptions.codec === targetCodec;
                 });
               }
               if (relationEntry) {

@@ -17,13 +17,13 @@ graph TD
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
-    PgSelect20[["PgSelect[20∈1]<br />ᐸreferencingTableᐳ"]]:::plan
+    PgSelect20[["PgSelect[20∈1]<br />ᐸreferencing_tableᐳ"]]:::plan
     Object18 & Connection19 --> PgSelect20
     __Value3 --> Access16
     __Value3 --> Access17
     __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelect20 ==> __Item21
-    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸreferencingTableᐳ"}}:::plan
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸreferencing_tableᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__referenc...ble__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
@@ -48,7 +48,7 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item21,PgSelectSingle22 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸreferencingTableᐳ[22]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸreferencing_tableᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27 bucket3
     Bucket0 --> Bucket1

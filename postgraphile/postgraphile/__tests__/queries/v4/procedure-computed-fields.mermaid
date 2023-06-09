@@ -23,7 +23,7 @@ graph TD
     Connection224{{"Connection[224∈0]<br />ᐸ220ᐳ"}}:::plan
     Connection266{{"Connection[266∈0]<br />ᐸ262ᐳ"}}:::plan
     Connection336{{"Connection[336∈0]<br />ᐸ332ᐳ"}}:::plan
-    PgSelect337[["PgSelect[337∈36]<br />ᐸedgeCaseᐳ"]]:::plan
+    PgSelect337[["PgSelect[337∈36]<br />ᐸedge_caseᐳ"]]:::plan
     Object18 & Connection336 --> PgSelect337
     PgSelect267[["PgSelect[267∈26]<br />ᐸpersonᐳ"]]:::plan
     Object18 & Connection266 --> PgSelect267
@@ -54,7 +54,7 @@ graph TD
     __Item268 --> PgSelectSingle269
     __Item338[/"__Item[338∈37]<br />ᐸ337ᐳ"\]:::itemplan
     PgSelect337 ==> __Item338
-    PgSelectSingle339{{"PgSelectSingle[339∈37]<br />ᐸedgeCaseᐳ"}}:::plan
+    PgSelectSingle339{{"PgSelectSingle[339∈37]<br />ᐸedge_caseᐳ"}}:::plan
     __Item338 --> PgSelectSingle339
     PgSelect185[["PgSelect[185∈12]<br />ᐸpost_computed_compound_type_arrayᐳ"]]:::plan
     PgClassExpression184{{"PgClassExpression[184∈12]<br />ᐸ__post__ᐳ"}}:::plan
@@ -382,7 +382,7 @@ graph TD
     Bucket37("Bucket 37 (listItem)<br />ROOT __Item{37}ᐸ337ᐳ[338]"):::bucket
     classDef bucket37 stroke:#ffa500
     class Bucket37,__Item338,PgSelectSingle339 bucket37
-    Bucket38("Bucket 38 (nullableBoundary)<br />Deps: 339<br /><br />ROOT PgSelectSingle{37}ᐸedgeCaseᐳ[339]"):::bucket
+    Bucket38("Bucket 38 (nullableBoundary)<br />Deps: 339<br /><br />ROOT PgSelectSingle{37}ᐸedge_caseᐳ[339]"):::bucket
     classDef bucket38 stroke:#0000ff
     class Bucket38,PgClassExpression340,PgClassExpression341,PgClassExpression343 bucket38
     Bucket0 --> Bucket1 & Bucket10 & Bucket26 & Bucket36
