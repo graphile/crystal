@@ -63,7 +63,6 @@ export class Behavior {
           callback: (
             behavior: string,
             entity: GraphileBuild.BehaviorEntities[entityType],
-            resolvedPreset: GraphileConfig.ResolvedPreset,
             build: GraphileBuild.Build,
           ) => string | string[],
         ]
@@ -116,7 +115,6 @@ export class Behavior {
         `${p.name}.schema.globalBehavior`,
         p.schema?.globalBehavior,
       ]),
-      resolvedPreset,
       build,
     );
 
@@ -243,7 +241,6 @@ export class Behavior {
       applyDefaultBehavior ? this.globalDefaultBehavior : NULL_BEHAVIOR,
       behaviorEntity.behaviorCallbacks,
       entity,
-      this.resolvedPreset,
       this.build,
     );
     cache.set(entity, behavior);
