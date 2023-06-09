@@ -539,13 +539,13 @@ type OutputPlanForNamedType<TType extends GraphQLType> =
 // TODO: this is completely wrong now; ListCapableStep is no longer required to be supported for lists.
 export type OutputPlanForType<TType extends GraphQLOutputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
     : TType extends GraphQLNonNull<GraphQLList<infer U>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
     : TType extends GraphQLList<GraphQLNonNull<infer U>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
     : TType extends GraphQLList<infer U>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
     : TType extends GraphQLNonNull<infer U>
     ? OutputPlanForNamedType<U>
     : OutputPlanForNamedType<TType>;
