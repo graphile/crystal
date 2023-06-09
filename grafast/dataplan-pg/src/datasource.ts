@@ -30,6 +30,7 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor.js";
+import { inspect } from "./inspect.js";
 import type {
   Expand,
   GetPgCodecAttributes,
@@ -57,7 +58,6 @@ import type {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
-import { inspect } from "./inspect.js";
 
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
