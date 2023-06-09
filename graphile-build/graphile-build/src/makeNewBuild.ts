@@ -22,7 +22,6 @@ import * as graphql from "graphql";
 import * as semver from "semver";
 import { inspect } from "util";
 
-import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import { stringTypeSpec, wrapDescription } from "./utils.js";
@@ -44,7 +43,6 @@ export default function makeNewBuild(
   builder: SchemaBuilder<any>,
   input: GraphileBuild.BuildInput,
   inflection: GraphileBuild.Inflection,
-  behavior: Behavior & BehaviorDynamicMethods,
 ): GraphileBuild.BuildBase {
   const building = new Set<string>();
   const allTypes = {
@@ -187,8 +185,6 @@ export default function makeNewBuild(
     },
     wrapDescription,
     stringTypeSpec,
-
-    behavior,
 
     registerObjectType(typeName, scope, Step, specGenerator, origin) {
       register.call(

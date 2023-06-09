@@ -6,6 +6,7 @@ import { applyHooks } from "graphile-config";
 import type { GraphQLSchemaConfig } from "graphql";
 import { GraphQLSchema, validateSchema } from "graphql";
 
+import type { BehaviorDynamicMethods } from "./behavior.js";
 import { Behavior } from "./behavior.js";
 import makeNewBuild from "./makeNewBuild.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
@@ -201,12 +202,10 @@ class SchemaBuilder<
    * Create the 'Build' object.
    */
   createBuild(input: GraphileBuild.BuildInput): TBuild {
-    const behavior = new Behavior(this.resolvedPreset).freeze();
     const initialBuild = makeNewBuild(
       this,
       input,
       this.inflection,
-      behavior,
     ) as Partial<TBuild> & GraphileBuild.BuildBase;
 
     const build = this.applyHooks("build", initialBuild, initialBuild, {
@@ -222,7 +221,14 @@ class SchemaBuilder<
       ),
     );
 
-    const finalBuild = Object.freeze(build) as TBuild;
+    const finalBuild = build as TBuild;
+    finalBuild.behavior = new Behavior(
+      this.resolvedPreset,
+      finalBuild,
+    ) as Behavior & BehaviorDynamicMethods;
+    Object.freeze(finalBuild);
+    finalBuild.behavior.freeze();
+
     finalBuild.status.isBuildPhaseComplete = true;
     const initContext: GraphileBuild.ContextInit = {
       scope: Object.create(null),
