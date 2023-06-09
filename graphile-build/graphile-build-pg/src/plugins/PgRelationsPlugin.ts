@@ -711,34 +711,32 @@ function addRelations(
       ? scope.pgPolymorphicSingleTableType
       : undefined;
 
-  const codec = (pgTypeResource?.codec ?? pgCodec) as PgCodec;
+  const codec = (pgTypeResource?.codec ?? pgCodec) as PgCodecWithAttributes;
   // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
-  if (!(isPgClassType || isMutationPayload || pgPolymorphism) || !codec) {
+  if (
+    !(isPgClassType || isMutationPayload || pgPolymorphism) ||
+    !codec ||
+    !codec.attributes
+  ) {
     return fields;
   }
   const allPgResources = Object.values(build.input.pgRegistry.pgResources);
-  // TODO: now that refs relate to _codecs_ rather than _sources_ a lot of this
-  // is really hacky. We should tidy it up.
   // TODO: change the default so that we don't do this on
   // isMutationPayload; only do that for V4 compat. (It's redundant vs
   // just using the object type directly)
   const resource = (pgTypeResource ??
-    allPgResources.find((s) => s.codec === codec && !s.parameters) ??
-    allPgResources.find((s) => s.codec === codec && s.isUnique)) as PgResource<
-    any,
-    PgCodecWithAttributes,
-    any,
-    any,
-    any
+    allPgResources.find((s) => s.codec === codec && !s.parameters)) as
+    | PgResource<any, PgCodecWithAttributes, any, any, any>
+    | undefined;
+  const relations: Record<string, PgCodecRelation> = (build.input.pgRegistry
+    .pgRelations[codec.name] ?? Object.create(null)) as Record<
+    string,
+    PgCodecRelation
   >;
-  if (!resource && !codec.extensions?.refDefinitions) {
-    return fields;
-  }
+
   if (resource && resource.parameters && !resource.isUnique) {
     return fields;
   }
-  const relations: Record<string, PgCodecRelation> =
-    resource?.getRelations() ?? Object.create(null);
 
   // Don't use refs on mutation payloads
   const refDefinitionList: Array<{
@@ -748,14 +746,12 @@ function addRelations(
     codec?: PgCodec;
   }> = isMutationPayload
     ? []
-    : (resource?.codec ?? codec).refs
-    ? Object.entries((resource?.codec ?? codec)!.refs!).map(
-        ([refName, spec]) => ({
-          refName,
-          refDefinition: spec.definition,
-          ref: spec,
-        }),
-      )
+    : codec.refs
+    ? Object.entries(codec.refs).map(([refName, spec]) => ({
+        refName,
+        refDefinition: spec.definition,
+        ref: spec,
+      }))
     : Object.entries(
         codec.extensions?.refDefinitions ??
           (Object.create(null) as Record<string, never>),
@@ -791,7 +787,7 @@ function addRelations(
 
   const digests: Digest[] = [];
 
-  if (resource) {
+  if (relations) {
     // Digest relations
     for (const [relationName, relation] of Object.entries(relations)) {
       const {
@@ -838,8 +834,8 @@ function addRelations(
         tagToString(relation.remoteResource.extensions?.tags?.deprecated);
 
       const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails = {
-        registry: resource.registry,
-        codec: resource.codec,
+        registry: build.input.pgRegistry,
+        codec,
         relationName,
       };
 
