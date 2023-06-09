@@ -220,6 +220,7 @@ declare global {
           | ((
               behavior: string,
               resolvedPreset: GraphileConfig.ResolvedPreset,
+              build: GraphileBuild.Build,
             ) => string | string[]);
 
         /**
@@ -238,6 +239,7 @@ declare global {
                   behavior: string,
                   entity: GraphileBuild.BehaviorEntities[entityType],
                   resolvedPreset: GraphileConfig.ResolvedPreset,
+                  build: GraphileBuild.Build,
                 ) => string | string[]
               >;
         };

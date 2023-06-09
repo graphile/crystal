@@ -64,6 +64,7 @@ export class Behavior {
             behavior: string,
             entity: GraphileBuild.BehaviorEntities[entityType],
             resolvedPreset: GraphileConfig.ResolvedPreset,
+            build: GraphileBuild.Build,
           ) => string | string[],
         ]
       >;
@@ -80,10 +81,21 @@ export class Behavior {
   };
 
   private globalDefaultBehavior: ResolvedBehavior;
-  constructor(private resolvedPreset: GraphileConfig.ResolvedPreset) {
+  constructor(
+    private resolvedPreset: GraphileConfig.ResolvedPreset,
+    private build: GraphileBuild.Build,
+  ) {
     this.behaviorEntities = Object.create(null);
     this.registerEntity("string");
+    // This will be overwritten in freeze
+    this.globalDefaultBehavior = NULL_BEHAVIOR;
+  }
 
+  /**
+   * Forbid registration of more global behavior defaults, behavior entity types, etc.
+   */
+  public freeze(): Behavior & BehaviorDynamicMethods {
+    const { resolvedPreset, build } = this;
     const plugins = sortedPlugins(resolvedPreset.plugins);
 
     const initialBehavior = resolvedPreset.schema?.defaultBehavior ?? "";
@@ -105,6 +117,7 @@ export class Behavior {
         p.schema?.globalBehavior,
       ]),
       resolvedPreset,
+      build,
     );
 
     applyHooks(
@@ -122,12 +135,7 @@ export class Behavior {
         ]);
       },
     );
-  }
 
-  /**
-   * Forbid registration of more global behavior defaults, behavior entity types, etc.
-   */
-  public freeze(): Behavior & BehaviorDynamicMethods {
     Object.freeze(this);
     Object.freeze(this.behaviorEntities);
     for (const key of Object.keys(this.behaviorEntities)) {
@@ -236,6 +244,7 @@ export class Behavior {
       behaviorEntity.behaviorCallbacks,
       entity,
       this.resolvedPreset,
+      this.build,
     );
     cache.set(entity, behavior);
     return behavior;

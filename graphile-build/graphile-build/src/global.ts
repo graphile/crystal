@@ -306,13 +306,6 @@ declare global {
       stringTypeSpec: typeof stringTypeSpec;
 
       /**
-       * Behavior logic that helps decide whether or not a certain thing
-       * (typically a field, argument, enum value, input field, or similar)
-       * goes into the schema.
-       */
-      behavior: Behavior & BehaviorDynamicMethods;
-
-      /**
        * Register a type by name with the system; names must be unique. It's
        * strongly advised that your names come from an inflector so that they
        * can be overridden. When you register a type, you should also supply a
@@ -472,6 +465,13 @@ declare global {
     interface Build extends BuildBase {
       // QueryPlugin
       $$isQuery: symbol;
+
+      /**
+       * Behavior logic that helps decide whether or not a certain thing
+       * (typically a field, argument, enum value, input field, or similar)
+       * goes into the schema.
+       */
+      behavior: Behavior & BehaviorDynamicMethods;
     }
 
     /**
