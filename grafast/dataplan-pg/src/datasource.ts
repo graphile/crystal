@@ -57,6 +57,7 @@ import type {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
+import { inspect } from "./inspect.js";
 
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
@@ -1209,27 +1210,39 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     },
 
     addCodec(codec) {
-      if (!registryConfig.pgCodecs[codec.name]) {
-        registryConfig.pgCodecs[codec.name] = codec;
-        if (codec.arrayOfCodec) {
-          this.addCodec(codec.arrayOfCodec);
-        }
-        if (codec.domainOfCodec) {
-          this.addCodec(codec.domainOfCodec);
-        }
-        if (codec.rangeOfCodec) {
-          this.addCodec(codec.rangeOfCodec);
-        }
-        if (codec.attributes) {
-          for (const col of Object.values(codec.attributes)) {
-            this.addCodec(col.codec);
-          }
+      const existing = registryConfig.pgCodecs[codec.name];
+      if (existing && existing !== codec) {
+        throw new Error(
+          `Attempted to add a second codec named '${
+            codec.name
+          }' (existing: ${inspect(existing)}, new: ${inspect(codec)})`,
+        );
+      }
+      registryConfig.pgCodecs[codec.name] = codec;
+      if (codec.arrayOfCodec) {
+        this.addCodec(codec.arrayOfCodec);
+      }
+      if (codec.domainOfCodec) {
+        this.addCodec(codec.domainOfCodec);
+      }
+      if (codec.rangeOfCodec) {
+        this.addCodec(codec.rangeOfCodec);
+      }
+      if (codec.attributes) {
+        for (const col of Object.values(codec.attributes)) {
+          this.addCodec(col.codec);
         }
       }
       return builder;
     },
 
     addResource(resource) {
+      const existing = registryConfig.pgResources[resource.name];
+      if (existing && existing !== resource) {
+        throw new Error(
+          `Attempted to add a second resource named '${resource.name}' (existing: ${existing}, new: ${resource})`,
+        );
+      }
       this.addCodec(resource.codec);
       registryConfig.pgResources[resource.name] = resource;
       return builder;
