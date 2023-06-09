@@ -21,7 +21,7 @@ graph TD
     Constant45{{"Constant[45∈0]<br />ᐸ1ᐳ"}}:::plan
     Constant46{{"Constant[46∈0]<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
     Constant47{{"Constant[47∈0]<br />ᐸ'foo.txt'ᐳ"}}:::plan
-    PgInsertSingle29[["PgInsertSingle[29∈4]<br />ᐸuserFile(filename,user_id)ᐳ"]]:::sideeffectplan
+    PgInsertSingle29[["PgInsertSingle[29∈4]<br />ᐸuser_file(filename,user_id)ᐳ"]]:::sideeffectplan
     Object32{{"Object[32∈4]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object32 & Constant47 & Constant45 --> PgInsertSingle29
     Access30{{"Access[30∈4]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -82,7 +82,7 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 33, 29, 32<br /><br />ROOT Object{4}ᐸ{result}ᐳ[33]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 29, 32<br /><br />ROOT PgInsertSingle{4}ᐸuserFile(filename,user_id)ᐳ[29]<br />1: <br />ᐳ: 34, 35, 36<br />2: PgSelect[37]<br />ᐳ: First[41], PgSelectSingle[42]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 29, 32<br /><br />ROOT PgInsertSingle{4}ᐸuser_file(filename,user_id)ᐳ[29]<br />1: <br />ᐳ: 34, 35, 36<br />2: PgSelect[37]<br />ᐳ: First[41], PgSelectSingle[42]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression34,PgClassExpression35,PgClassExpression36,PgSelect37,First41,PgSelectSingle42 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{6}ᐸuserᐳ[42]"):::bucket

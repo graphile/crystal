@@ -17,31 +17,31 @@ graph TD
     Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
-    PgSelect20[["PgSelect[20∈1]<br />ᐸcompoundKeyᐳ"]]:::plan
+    PgSelect20[["PgSelect[20∈1]<br />ᐸcompound_keyᐳ"]]:::plan
     Object18 & Connection19 --> PgSelect20
     __Value3 --> Access16
     __Value3 --> Access17
     __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelect20 ==> __Item21
-    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸcompoundKeyᐳ"}}:::plan
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸcompound_keyᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
-    PgSelectSingle32{{"PgSelectSingle[32∈3]<br />ᐸuniqueForeignKeyᐳ"}}:::plan
+    PgSelectSingle32{{"PgSelectSingle[32∈3]<br />ᐸunique_foreign_keyᐳ"}}:::plan
     PgSelectSingle22 --> PgSelectSingle32
     PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__unique_f...und_key_1”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression33
     PgClassExpression34{{"PgClassExpression[34∈4]<br />ᐸ__unique_f...und_key_2”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression34
-    PgSelectSingle42{{"PgSelectSingle[42∈4]<br />ᐸcompoundKeyᐳ"}}:::plan
+    PgSelectSingle42{{"PgSelectSingle[42∈4]<br />ᐸcompound_keyᐳ"}}:::plan
     PgSelectSingle32 --> PgSelectSingle42
     PgClassExpression43{{"PgClassExpression[43∈5]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression43
     PgClassExpression44{{"PgClassExpression[44∈5]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression44
-    PgSelectSingle52{{"PgSelectSingle[52∈5]<br />ᐸuniqueForeignKeyᐳ"}}:::plan
+    PgSelectSingle52{{"PgSelectSingle[52∈5]<br />ᐸunique_foreign_keyᐳ"}}:::plan
     PgSelectSingle42 --> PgSelectSingle52
     PgClassExpression53{{"PgClassExpression[53∈6]<br />ᐸ__unique_f...und_key_1”ᐳ"}}:::plan
     PgSelectSingle52 --> PgClassExpression53
@@ -60,16 +60,16 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item21,PgSelectSingle22 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸcompoundKeyᐳ[22]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸcompound_keyᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,PgClassExpression24,PgSelectSingle32 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 32<br /><br />ROOT PgSelectSingle{3}ᐸuniqueForeignKeyᐳ[32]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 32<br /><br />ROOT PgSelectSingle{3}ᐸunique_foreign_keyᐳ[32]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression33,PgClassExpression34,PgSelectSingle42 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{4}ᐸcompoundKeyᐳ[42]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{4}ᐸcompound_keyᐳ[42]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression43,PgClassExpression44,PgSelectSingle52 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 52<br /><br />ROOT PgSelectSingle{5}ᐸuniqueForeignKeyᐳ[52]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 52<br /><br />ROOT PgSelectSingle{5}ᐸunique_foreign_keyᐳ[52]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression53,PgClassExpression54 bucket6
     Bucket0 --> Bucket1

@@ -20,7 +20,7 @@ graph TD
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant42{{"Constant[42∈0]<br />ᐸ'test'ᐳ"}}:::plan
     Constant44{{"Constant[44∈0]<br />ᐸ100ᐳ"}}:::plan
-    PgInsertSingle35[["PgInsertSingle[35∈7]<br />ᐸbyDefaultAsIdentity(id,t)ᐳ"]]:::sideeffectplan
+    PgInsertSingle35[["PgInsertSingle[35∈7]<br />ᐸby_default_as_identity(id,t)ᐳ"]]:::sideeffectplan
     Object38{{"Object[38∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object38 & Constant44 & Constant42 --> PgInsertSingle35
     Access36{{"Access[36∈7]<br />ᐸ3.pgSettingsᐳ"}}:::plan
@@ -34,13 +34,13 @@ graph TD
     Access24{{"Access[24∈4]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access25{{"Access[25∈4]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access24 & Access25 --> Object26
-    PgInsertSingle23[["PgInsertSingle[23∈4]<br />ᐸbyDefaultAsIdentity(t)ᐳ"]]:::sideeffectplan
+    PgInsertSingle23[["PgInsertSingle[23∈4]<br />ᐸby_default_as_identity(t)ᐳ"]]:::sideeffectplan
     Object26 & Constant42 --> PgInsertSingle23
     __Value3 --> Access24
     __Value3 --> Access25
     Object27{{"Object[27∈4]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle23 --> Object27
-    PgInsertSingle11[["PgInsertSingle[11∈1]<br />ᐸalwaysAsIdentity(t)ᐳ"]]:::sideeffectplan
+    PgInsertSingle11[["PgInsertSingle[11∈1]<br />ᐸalways_as_identity(t)ᐳ"]]:::sideeffectplan
     Object14 & Constant42 --> PgInsertSingle11
     Object15{{"Object[15∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle11 --> Object15
@@ -69,7 +69,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 11<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11<br /><br />ROOT PgInsertSingle{1}ᐸalwaysAsIdentity(t)ᐳ[11]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11<br /><br />ROOT PgInsertSingle{1}ᐸalways_as_identity(t)ᐳ[11]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression16,PgClassExpression17 bucket3
     Bucket4("Bucket 4 (mutationField)<br />Deps: 42, 3<br /><br />1: Access[24]<br />2: Access[25]<br />3: Object[26]<br />4: PgInsertSingle[23]<br />5: <br />ᐳ: Object[27]"):::bucket
@@ -78,7 +78,7 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 27, 23<br /><br />ROOT Object{4}ᐸ{result}ᐳ[27]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 23<br /><br />ROOT PgInsertSingle{4}ᐸbyDefaultAsIdentity(t)ᐳ[23]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 23<br /><br />ROOT PgInsertSingle{4}ᐸby_default_as_identity(t)ᐳ[23]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression28,PgClassExpression29 bucket6
     Bucket7("Bucket 7 (mutationField)<br />Deps: 44, 42, 3<br /><br />1: Access[36]<br />2: Access[37]<br />3: Object[38]<br />4: PgInsertSingle[35]<br />5: <br />ᐳ: Object[39]"):::bucket
@@ -87,7 +87,7 @@ graph TD
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 39, 35<br /><br />ROOT Object{7}ᐸ{result}ᐳ[39]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgInsertSingle{7}ᐸbyDefaultAsIdentity(id,t)ᐳ[35]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgInsertSingle{7}ᐸby_default_as_identity(id,t)ᐳ[35]"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9,PgClassExpression40,PgClassExpression41 bucket9
     Bucket0 --> Bucket1 & Bucket4 & Bucket7
