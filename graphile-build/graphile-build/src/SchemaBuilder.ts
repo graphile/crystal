@@ -6,7 +6,8 @@ import { applyHooks } from "graphile-config";
 import type { GraphQLSchemaConfig } from "graphql";
 import { GraphQLSchema, validateSchema } from "graphql";
 
-import { Behavior, BehaviorDynamicMethods } from "./behavior.js";
+import type { BehaviorDynamicMethods } from "./behavior.js";
+import { Behavior } from "./behavior.js";
 import makeNewBuild from "./makeNewBuild.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { makeNewWithHooks } from "./newWithHooks/index.js";
