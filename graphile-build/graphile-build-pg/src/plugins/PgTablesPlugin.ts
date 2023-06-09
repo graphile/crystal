@@ -247,7 +247,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         }
         const pgNamespace = pgClass.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ pgNamespace, serviceName });
-        return this.camelCase(`${schemaPrefix}${pgClass.relname}`);
+        return `${schemaPrefix}${pgClass.relname}`;
       },
 
       _codecName(options, codec) {
