@@ -16,20 +16,25 @@ this feature:
 Here's a simple example:
 
 ```ts
+import { exportSchema } from "graphile-export";
 import { makeSchema } from "postgraphile";
 import config from "./graphile.config.js";
 import * as jsonwebtoken from "jsonwebtoken";
 
-const { schema, resolvedPreset } = makeSchema(config);
-const exportFileLocation = `${__dirname}/exported-schema.mjs`;
-exportSchema(schema, exportFileLocation, {
-  mode: "graphql-js",
-  // or:
-  // mode: "typeDefs",
-  modules: {
-    jsonwebtoken: jsonwebtoken,
-  },
-}).catch((e) => {
+async function main() {
+  const { schema, resolvedPreset } = await makeSchema(config);
+  const exportFileLocation = `${__dirname}/exported-schema.mjs`;
+  await exportSchema(schema, exportFileLocation, {
+    mode: "graphql-js",
+    // or:
+    // mode: "typeDefs",
+    modules: {
+      jsonwebtoken: jsonwebtoken,
+    },
+  });
+}
+
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
