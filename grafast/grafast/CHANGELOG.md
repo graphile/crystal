@@ -1,5 +1,81 @@
 # grafast
 
+## 0.0.1-alpha.9
+
+### Patch Changes
+
+- [#359](https://github.com/benjie/postgraphile-private/pull/359)
+  [`56237691b`](https://github.com/benjie/postgraphile-private/commit/56237691bf3eed321b7159e17f36e3651356946f)
+  Thanks [@benjie](https://github.com/benjie)! - Restore field-local handling of
+  planning errors safely, eradicating all steps created while planning an
+  errored field (and falling back to blowing up the request on error).
+
+- [#358](https://github.com/benjie/postgraphile-private/pull/358)
+  [`ed1982f31`](https://github.com/benjie/postgraphile-private/commit/ed1982f31a845ceb3aafd4b48d667649f06778f5)
+  Thanks [@benjie](https://github.com/benjie)! - Allow destructuring steps
+  directly from FieldArgs for more convenient plan resolvers.
+
+  Example:
+
+  ```diff
+   const plans = {
+     Mutation: {
+  -    updateUser(_, fieldArgs) {
+  -      const $id = fieldArgs.getRaw(['input', 'id']);
+  -      const $username = fieldArgs.getRaw(['input', 'patch', 'username']);
+  -      const $bio = fieldArgs.getRaw(['input', 'patch', 'bio']);
+  +    updateUser(_, { $input: { $id, $patch: { $username, $bio } } }) {
+         return pgUpdateSingle(
+           usersResource,
+           { id: $id },
+           { username: $username, bio: $bio }
+         );
+       }
+  ```
+
+- [#355](https://github.com/benjie/postgraphile-private/pull/355)
+  [`1fe47a2b0`](https://github.com/benjie/postgraphile-private/commit/1fe47a2b08d6e7153a22dde3a99b7a9bf50c4f84)
+  Thanks [@benjie](https://github.com/benjie)! - **MAJOR BREAKING CHANGE**:
+  implicit application of args/input fields has been removed.
+
+  Previously we would track the fieldArgs that you accessed (via `.get()`,
+  `.getRaw()` or `.apply()`) and those that you _did not access_ would
+  automatically have their `applyPlan` called, if they had one. This isn't
+  likely to be particularly useful for pure Gra*fast* users (unless they want to
+  adopt this pattern) but it's extremely useful for plugin-based schemas as it
+  allows plugins to add arguments that can influence their field's plan _without
+  having to wrap the field's plan resolver function_. This is fairly critical,
+  otherwise each behavior added (`first:`, `condition:`, `orderBy:`, `filter:`,
+  `ignoreArchived:`, etc etc) would wrap the plan resolver with another function
+  layer, and they would get _messy_.
+
+  However, implicit is rarely good. And it turns out that it severely limited
+  what I wanted to do for improving the `fieldArgs` APIs.
+
+  I decided to remove this implicit functionality by making it more explicit, so
+  now args/input fields can specify the relevant
+  `autoApplyAfterParent{Plan,SubscribePlan,InputPlan,ApplyPlan}: true` property
+  and we'll only apply them at a single level.
+
+  From a user perspective, little has changed. From a plugin author perspective,
+  if you were relying on the implicit `applyPlan` then you should now add the
+  relevant `autoApply*` property next to your `applyPlan` method.
+
+- [#366](https://github.com/benjie/postgraphile-private/pull/366)
+  [`6878c589c`](https://github.com/benjie/postgraphile-private/commit/6878c589cc9fc8f05a6efd377e1272ae24fbf256)
+  Thanks [@benjie](https://github.com/benjie)! - Fix typeDefs export, and
+  makeGrafastSchema support for arg and input field plans.
+
+- [#361](https://github.com/benjie/postgraphile-private/pull/361)
+  [`2ac706f18`](https://github.com/benjie/postgraphile-private/commit/2ac706f18660c855fe20f460b50694fdd04a7768)
+  Thanks [@benjie](https://github.com/benjie)! - Loosen up some TypeScript types
+
+- Updated dependencies
+  [[`339fe20d0`](https://github.com/benjie/postgraphile-private/commit/339fe20d0c6e8600d263ce8093cd85a6ea8adbbf),
+  [`198ac74d5`](https://github.com/benjie/postgraphile-private/commit/198ac74d52fe1e47d602fe2b7c52f216d5216b25)]:
+  - tamedevil@0.0.0-alpha.3
+  - graphile-config@0.0.1-alpha.4
+
 ## 0.0.1-alpha.8
 
 ### Patch Changes

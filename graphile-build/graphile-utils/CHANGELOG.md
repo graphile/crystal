@@ -1,5 +1,25 @@
 # graphile-utils
 
+## 5.0.0-alpha.11
+
+### Patch Changes
+
+- Updated dependencies
+  [[`56237691b`](https://github.com/benjie/postgraphile-private/commit/56237691bf3eed321b7159e17f36e3651356946f),
+  [`ed1982f31`](https://github.com/benjie/postgraphile-private/commit/ed1982f31a845ceb3aafd4b48d667649f06778f5),
+  [`a94f11091`](https://github.com/benjie/postgraphile-private/commit/a94f11091520b52d90fd007986760848ed20017b),
+  [`1fe47a2b0`](https://github.com/benjie/postgraphile-private/commit/1fe47a2b08d6e7153a22dde3a99b7a9bf50c4f84),
+  [`198ac74d5`](https://github.com/benjie/postgraphile-private/commit/198ac74d52fe1e47d602fe2b7c52f216d5216b25),
+  [`6878c589c`](https://github.com/benjie/postgraphile-private/commit/6878c589cc9fc8f05a6efd377e1272ae24fbf256),
+  [`2ac706f18`](https://github.com/benjie/postgraphile-private/commit/2ac706f18660c855fe20f460b50694fdd04a7768),
+  [`bcfffd5fe`](https://github.com/benjie/postgraphile-private/commit/bcfffd5fe14d5bbc3517c62041da585a3bf1bab1),
+  [`dad4d4aae`](https://github.com/benjie/postgraphile-private/commit/dad4d4aaee499098104841740c9049b1deb6ac5f),
+  [`e443db39b`](https://github.com/benjie/postgraphile-private/commit/e443db39b07f9d71f7a1ce402475004e072a2d1d)]:
+  - grafast@0.0.1-alpha.9
+  - graphile-build-pg@5.0.0-alpha.11
+  - graphile-build@5.0.0-alpha.10
+  - graphile-config@0.0.1-alpha.4
+
 ## 5.0.0-alpha.10
 
 ### Patch Changes

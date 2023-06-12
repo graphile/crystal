@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-alpha.4
+
+### Patch Changes
+
+- [#349](https://github.com/benjie/postgraphile-private/pull/349)
+  [`198ac74d5`](https://github.com/benjie/postgraphile-private/commit/198ac74d52fe1e47d602fe2b7c52f216d5216b25)
+  Thanks [@benjie](https://github.com/benjie)! - Add 'sortedPlugins' export to
+  graphile-config.
+
 ## 0.0.1-alpha.3
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # graphile-export
 
+## 0.0.2-alpha.4
+
+### Patch Changes
+
+- [#366](https://github.com/benjie/postgraphile-private/pull/366)
+  [`6878c589c`](https://github.com/benjie/postgraphile-private/commit/6878c589cc9fc8f05a6efd377e1272ae24fbf256)
+  Thanks [@benjie](https://github.com/benjie)! - Fix typeDefs export, and
+  makeGrafastSchema support for arg and input field plans.
+- Updated dependencies
+  [[`339fe20d0`](https://github.com/benjie/postgraphile-private/commit/339fe20d0c6e8600d263ce8093cd85a6ea8adbbf),
+  [`56237691b`](https://github.com/benjie/postgraphile-private/commit/56237691bf3eed321b7159e17f36e3651356946f),
+  [`ed1982f31`](https://github.com/benjie/postgraphile-private/commit/ed1982f31a845ceb3aafd4b48d667649f06778f5),
+  [`1fe47a2b0`](https://github.com/benjie/postgraphile-private/commit/1fe47a2b08d6e7153a22dde3a99b7a9bf50c4f84),
+  [`6878c589c`](https://github.com/benjie/postgraphile-private/commit/6878c589cc9fc8f05a6efd377e1272ae24fbf256),
+  [`2ac706f18`](https://github.com/benjie/postgraphile-private/commit/2ac706f18660c855fe20f460b50694fdd04a7768)]:
+  - pg-sql2@5.0.0-alpha.3
+  - grafast@0.0.1-alpha.9
+
 ## 0.0.2-alpha.3
 
 ### Patch Changes

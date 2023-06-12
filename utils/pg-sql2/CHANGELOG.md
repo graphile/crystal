@@ -1,5 +1,14 @@
 # pg-sql2
 
+## 5.0.0-alpha.3
+
+### Patch Changes
+
+- [#370](https://github.com/benjie/postgraphile-private/pull/370)
+  [`339fe20d0`](https://github.com/benjie/postgraphile-private/commit/339fe20d0c6e8600d263ce8093cd85a6ea8adbbf)
+  Thanks [@benjie](https://github.com/benjie)! - Allow multiple instances of
+  pg-sql2 and tamedevil to help handle package manager shenanigans.
+
 ## 5.0.0-alpha.2
 
 ### Patch Changes
