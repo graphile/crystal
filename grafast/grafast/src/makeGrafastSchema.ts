@@ -9,12 +9,11 @@ import type {
 import * as graphql from "graphql";
 
 import type {
-  ArgumentApplyPlanResolver,
-  ArgumentInputPlanResolver,
   EnumValueApplyPlanResolver,
   FieldPlanResolver,
-  InputObjectFieldApplyPlanResolver,
-  InputObjectFieldInputPlanResolver,
+  GrafastArgumentExtensions,
+  GrafastEnumValueExtensions,
+  GrafastInputFieldExtensions,
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { ExecutableStep } from "./step.js";
@@ -44,10 +43,7 @@ export type FieldPlans =
       resolve?: GraphQLFieldResolver<any, any>;
       subscribe?: GraphQLFieldResolver<any, any>;
       args?: {
-        [argName: string]: {
-          input?: ArgumentInputPlanResolver;
-          apply?: ArgumentApplyPlanResolver;
-        };
+        [argName: string]: GrafastArgumentExtensions;
       };
     };
 
@@ -64,10 +60,7 @@ export type ObjectPlans = {
  * The plans for each field of a GraphQL input object type.
  */
 export type InputObjectPlans = {
-  [fieldName: string]: {
-    input: InputObjectFieldInputPlanResolver;
-    apply: InputObjectFieldApplyPlanResolver;
-  };
+  [fieldName: string]: GrafastInputFieldExtensions;
 };
 
 /**
@@ -99,7 +92,7 @@ export type EnumPlans = {
     | boolean
     | {
         value?: unknown;
-        apply?: EnumValueApplyPlanResolver;
+        applyPlan?: EnumValueApplyPlanResolver;
       };
 };
 
@@ -193,14 +186,15 @@ export function makeGrafastSchema(details: {
                 continue;
               }
               if (typeof argSpec === "function") {
-                (arg.extensions as any).grafast = {
-                  plan: argSpec,
-                };
-              } else {
-                console.warn(
-                  `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName}`,
-                );
                 // Invalid
+                throw new Error(
+                  `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an object with 'inputPlan' (optional) and 'applyPlan' (optional) plans`,
+                );
+              } else {
+                const grafastExtensions: GrafastArgumentExtensions =
+                  Object.create(null);
+                (arg.extensions as any).grafast = grafastExtensions;
+                Object.assign(grafastExtensions, argSpec);
               }
             }
           }
@@ -224,11 +218,15 @@ export function makeGrafastSchema(details: {
           continue;
         }
         if (typeof fieldSpec === "function") {
-          (field.extensions as any).grafast = { plan: fieldSpec };
-        } else {
           throw new Error(
-            `Expected function input object type '${typeName}' field '${fieldName}', but an invalid value was received`,
+            `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'inputPlan' or 'applyPlan' - please supply an object.`,
           );
+        } else {
+          // it's a spec
+          const grafastExtensions: GrafastInputFieldExtensions =
+            Object.create(null);
+          (field.extensions as any).grafast = grafastExtensions;
+          Object.assign(grafastExtensions, fieldSpec);
         }
       }
     } else if (isInterfaceType(type) || isUnionType(type)) {
@@ -274,14 +272,14 @@ export function makeGrafastSchema(details: {
         if (typeof enumValueSpec === "function") {
           // It's a plan
           (enumValue.extensions as any).grafast = {
-            plan: enumValueSpec,
-          };
+            applyPlan: enumValueSpec,
+          } as GrafastEnumValueExtensions;
         } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
           // It's a full spec
-          if (enumValueSpec.apply) {
+          if (enumValueSpec.applyPlan) {
             (enumValue.extensions as any).grafast = {
-              applyPlan: enumValueSpec.apply,
-            };
+              applyPlan: enumValueSpec.applyPlan,
+            } as GrafastEnumValueExtensions;
           }
           if ("value" in enumValueSpec) {
             enumValue.value = enumValueSpec.value;

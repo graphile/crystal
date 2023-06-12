@@ -20,6 +20,28 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
 
 export const optimize = (ast: t.Node, runs = 1): t.Node => {
   traverse(ast, {
+    VariableDeclaration: {
+      enter(path) {
+        const node = path.node;
+        if (node.declarations.length === 1) {
+          const declaration = node.declarations[0];
+          const name = declaration.id;
+          if (name.type === "Identifier") {
+            const fn = declaration.init;
+            if (fn && fn.type === "FunctionExpression") {
+              const functionDecl = t.functionDeclaration(
+                name,
+                fn.params,
+                fn.body,
+                fn.generator,
+                fn.async,
+              );
+              path.replaceWith(functionDecl);
+            }
+          }
+        }
+      },
+    },
     CallExpression: {
       enter(path) {
         const node = path.node;
@@ -67,7 +89,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
             // const binding = calleePath.scope.bindings[param.name];
 
             // TODO: how do we correctly determine if this is safe?
-            if (!calleePath.scope.hasBinding(arg.name)) {
+            if (!calleePath.scope.hasOwnBinding(arg.name)) {
               // Rename the references to this arg to match the arg.
               calleePath.scope.rename(param.name, arg.name);
 
@@ -117,13 +139,26 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
         for (const [_bindingName, binding] of Object.entries(
           path.scope.bindings,
         )) {
-          if (!t.isVariableDeclarator(binding.path.node)) {
+          if (
+            !t.isVariableDeclarator(binding.path.node) &&
+            !t.isFunctionDeclaration(binding.path.node)
+          ) {
             continue;
           }
           if (!t.isIdentifier(binding.path.node.id)) {
             continue;
           }
-          if (!binding.path.node.init) {
+          const expr = t.isFunctionDeclaration(binding.path.node)
+            ? // Convert function to expression
+              t.functionExpression(
+                binding.path.node.id,
+                binding.path.node.params,
+                binding.path.node.body,
+                binding.path.node.generator,
+                binding.path.node.async,
+              )
+            : binding.path.node.init;
+          if (!expr) {
             continue;
           }
 
@@ -149,8 +184,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
             parent &&
             t.isCallExpression(parent) &&
             parent.callee === targetPath.node &&
-            (!t.isArrowFunctionExpression(binding.path.node.init) ||
-              t.isBlock(binding.path.node.init.body))
+            (!t.isArrowFunctionExpression(expr) || t.isBlock(expr.body))
           ) {
             continue;
           }
@@ -164,7 +198,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
             continue;
           }
 
-          targetPath.replaceWith(binding.path.node.init);
+          targetPath.replaceWith(expr);
           binding.path.remove();
         }
       },
