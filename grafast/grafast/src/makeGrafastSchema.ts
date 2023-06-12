@@ -12,6 +12,7 @@ import type {
   EnumValueApplyPlanResolver,
   FieldPlanResolver,
   GrafastArgumentExtensions,
+  GrafastEnumValueExtensions,
   GrafastInputFieldExtensions,
   ScalarPlanResolver,
 } from "./interfaces.js";
@@ -91,7 +92,7 @@ export type EnumPlans = {
     | boolean
     | {
         value?: unknown;
-        apply?: EnumValueApplyPlanResolver;
+        applyPlan?: EnumValueApplyPlanResolver;
       };
 };
 
@@ -271,14 +272,14 @@ export function makeGrafastSchema(details: {
         if (typeof enumValueSpec === "function") {
           // It's a plan
           (enumValue.extensions as any).grafast = {
-            plan: enumValueSpec,
-          };
+            applyPlan: enumValueSpec,
+          } as GrafastEnumValueExtensions;
         } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
           // It's a full spec
-          if (enumValueSpec.apply) {
+          if (enumValueSpec.applyPlan) {
             (enumValue.extensions as any).grafast = {
-              applyPlan: enumValueSpec.apply,
-            };
+              applyPlan: enumValueSpec.applyPlan,
+            } as GrafastEnumValueExtensions;
           }
           if ("value" in enumValueSpec) {
             enumValue.value = enumValueSpec.value;

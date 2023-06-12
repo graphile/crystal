@@ -1618,7 +1618,7 @@ function exportSchemaTypeDefs({
               t.objectExpression(
                 objectToObjectProperties({
                   value: valueAST,
-                  apply: applyPlanAST,
+                  applyPlan: applyPlanAST,
                 }),
               ),
             ),
