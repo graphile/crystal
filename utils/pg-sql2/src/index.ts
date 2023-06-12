@@ -1,8 +1,8 @@
-import { $$type } from "./thereCanBeOnlyOne.js";
-
 import LRU from "@graphile/lru";
 import * as assert from "assert";
 import { inspect } from "util";
+
+import { $$type } from "./thereCanBeOnlyOne.js";
 
 function exportAs<T>(thing: T, exportName: string) {
   const existingExport = (thing as any).$$export;
