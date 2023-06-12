@@ -1,8 +1,8 @@
-import "./thereCanBeOnlyOne.js";
-
 import LRU from "@graphile/lru";
 import * as assert from "assert";
 import { inspect } from "util";
+
+import { $$type } from "./thereCanBeOnlyOne.js";
 
 function exportAs<T>(thing: T, exportName: string) {
   const existingExport = (thing as any).$$export;
@@ -25,13 +25,6 @@ export const $$symbolToIdentifier = Symbol("symbolToIdentifier");
 
 const isDev =
   typeof process !== "undefined" && process.env.GRAPHILE_ENV === "development";
-
-/**
- * This is the secret to our safety; since this is a symbol it cannot be faked
- * in a JSON payload and it cannot be constructed with a new Symbol (even with
- * the same argument), so external data cannot make itself trusted.
- */
-const $$type = Symbol("pg-sql2-type");
 
 /**
  * Represents raw SQL, the text will be output verbatim into the compiled query.
