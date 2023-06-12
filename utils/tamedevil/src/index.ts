@@ -1,3 +1,4 @@
+import { $$type } from "./thereCanBeOnlyOne.js";
 import { reservedWords } from "./reservedWords.js";
 
 type Primitive = null | boolean | number | string;
@@ -23,15 +24,6 @@ function exportAs<T>(thing: T, exportName: string) {
 
 const isDev =
   typeof process !== "undefined" && process.env.GRAPHILE_ENV === "development";
-
-/**
- * This is the secret to our safety; since this is a symbol it cannot be faked
- * in a JSON payload and it cannot be constructed with a new Symbol (even with
- * the same argument), so external data cannot make itself trusted.
- *
- * @internal
- */
-const $$type = Symbol("tamedevil-type");
 
 /**
  * Represents raw TE, the text will be output verbatim into the compiled code.

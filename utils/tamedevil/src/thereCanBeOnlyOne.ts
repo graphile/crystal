@@ -8,4 +8,4 @@ const revision = 1;
  *
  * @internal
  */
-export const $$type: unique symbol = Symbol.for(`pg-sql2-type-${revision}`);
+export const $$type: unique symbol = Symbol.for(`tamedevil-type-${revision}`);
