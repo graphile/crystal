@@ -1469,6 +1469,14 @@ function exportSchemaTypeDefs({
                           `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast.applyPlan`,
                         )
                       : null,
+                    autoApplyAfterParentPlan: arg.extensions?.grafast
+                      ?.autoApplyAfterParentPlan
+                      ? t.booleanLiteral(true)
+                      : null,
+                    autoApplyAfterParentSubscribePlan: arg.extensions?.grafast
+                      ?.autoApplyAfterParentSubscribePlan
+                      ? t.booleanLiteral(true)
+                      : null,
                   }),
                 );
               })
@@ -1543,6 +1551,14 @@ function exportSchemaTypeDefs({
               configToAST({
                 input: inputPlanAST,
                 apply: applyPlanAST,
+                autoApplyAfterParentInputPlan: field.extensions?.grafast
+                  ?.autoApplyAfterParentInputPlan
+                  ? t.booleanLiteral(true)
+                  : null,
+                autoApplyAfterParentApplyPlan: field.extensions?.grafast
+                  ?.autoApplyAfterParentApplyPlan
+                  ? t.booleanLiteral(true)
+                  : null,
               }),
             ),
           );

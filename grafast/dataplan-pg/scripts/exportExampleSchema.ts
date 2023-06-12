@@ -4,4 +4,6 @@ import { exportSchema } from "graphile-export";
 
 import { makeExampleSchema } from "../src/examples/exampleSchema.js";
 
-exportSchema(makeExampleSchema(), `${__dirname}/exampleSchemaExport.mjs`);
+exportSchema(makeExampleSchema(), `${__dirname}/exampleSchemaExport.mjs`, {
+  mode: process.argv[2] as "graphql-js" | "typeDefs" | undefined,
+});

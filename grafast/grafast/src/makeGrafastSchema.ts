@@ -47,6 +47,8 @@ export type FieldPlans =
         [argName: string]: {
           input?: ArgumentInputPlanResolver;
           apply?: ArgumentApplyPlanResolver;
+          autoApplyAfterParentPlan?: boolean;
+          autoApplyAfterParentSubscribePlan?: boolean;
         };
       };
     };
@@ -67,6 +69,8 @@ export type InputObjectPlans = {
   [fieldName: string]: {
     input: InputObjectFieldInputPlanResolver;
     apply: InputObjectFieldApplyPlanResolver;
+    autoApplyAfterParentInputPlan?: boolean;
+    autoApplyAfterParentApplyPlan?: boolean;
   };
 };
 
@@ -193,14 +197,30 @@ export function makeGrafastSchema(details: {
                 continue;
               }
               if (typeof argSpec === "function") {
-                (arg.extensions as any).grafast = {
-                  plan: argSpec,
-                };
-              } else {
-                console.warn(
-                  `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName}`,
-                );
                 // Invalid
+                throw new Error(
+                  `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an object with 'input' (optional) and 'apply' (optional) plans`,
+                );
+              } else {
+                const grafastExtensions: graphql.GraphQLArgumentExtensions["grafast"] =
+                  Object.create(null);
+                (arg.extensions as any).grafast = grafastExtensions;
+                if (typeof argSpec.apply === "function") {
+                  grafastExtensions!.applyPlan = argSpec.apply;
+                }
+                if (typeof argSpec.input === "function") {
+                  grafastExtensions!.inputPlan = argSpec.input;
+                }
+                if (typeof argSpec.autoApplyAfterParentPlan === "boolean") {
+                  grafastExtensions!.autoApplyAfterParentPlan =
+                    argSpec.autoApplyAfterParentPlan;
+                }
+                if (
+                  typeof argSpec.autoApplyAfterParentSubscribePlan === "boolean"
+                ) {
+                  grafastExtensions!.autoApplyAfterParentSubscribePlan =
+                    argSpec.autoApplyAfterParentSubscribePlan;
+                }
               }
             }
           }
@@ -224,11 +244,28 @@ export function makeGrafastSchema(details: {
           continue;
         }
         if (typeof fieldSpec === "function") {
-          (field.extensions as any).grafast = { plan: fieldSpec };
-        } else {
           throw new Error(
-            `Expected function input object type '${typeName}' field '${fieldName}', but an invalid value was received`,
+            `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'input' or 'apply' plan - please supply an object.`,
           );
+        } else {
+          // it's a spec
+          const grafastExtensions: graphql.GraphQLInputFieldExtensions["grafast"] =
+            Object.create(null);
+          (field.extensions as any).grafast = grafastExtensions;
+          if (typeof fieldSpec.apply === "function") {
+            grafastExtensions!.applyPlan = fieldSpec.apply;
+          }
+          if (typeof fieldSpec.input === "function") {
+            grafastExtensions!.inputPlan = fieldSpec.input;
+          }
+          if (typeof fieldSpec.autoApplyAfterParentApplyPlan === "boolean") {
+            grafastExtensions!.autoApplyAfterParentApplyPlan =
+              fieldSpec.autoApplyAfterParentApplyPlan;
+          }
+          if (typeof fieldSpec.autoApplyAfterParentInputPlan === "boolean") {
+            grafastExtensions!.autoApplyAfterParentInputPlan =
+              fieldSpec.autoApplyAfterParentInputPlan;
+          }
         }
       }
     } else if (isInterfaceType(type) || isUnionType(type)) {
