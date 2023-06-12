@@ -1453,7 +1453,7 @@ function exportSchemaTypeDefs({
                 return t.objectProperty(
                   identifierOrLiteral(argName),
                   configToAST({
-                    input: arg.extensions?.grafast?.inputPlan
+                    inputPlan: arg.extensions?.grafast?.inputPlan
                       ? convertToIdentifierViaAST(
                           file,
                           arg.extensions.grafast.inputPlan,
@@ -1461,7 +1461,7 @@ function exportSchemaTypeDefs({
                           `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast.inputPlan`,
                         )
                       : null,
-                    apply: arg.extensions?.grafast?.applyPlan
+                    applyPlan: arg.extensions?.grafast?.applyPlan
                       ? convertToIdentifierViaAST(
                           file,
                           arg.extensions.grafast.applyPlan,
@@ -1549,8 +1549,8 @@ function exportSchemaTypeDefs({
             t.objectProperty(
               identifierOrLiteral(fieldName),
               configToAST({
-                input: inputPlanAST,
-                apply: applyPlanAST,
+                inputPlan: inputPlanAST,
+                applyPlan: applyPlanAST,
                 autoApplyAfterParentInputPlan: field.extensions?.grafast
                   ?.autoApplyAfterParentInputPlan
                   ? t.booleanLiteral(true)
