@@ -1452,32 +1452,12 @@ function exportSchemaTypeDefs({
               .map(([argName, arg]) => {
                 return t.objectProperty(
                   identifierOrLiteral(argName),
-                  configToAST({
-                    inputPlan: arg.extensions?.grafast?.inputPlan
-                      ? convertToIdentifierViaAST(
-                          file,
-                          arg.extensions.grafast.inputPlan,
-                          `${type.name}.${fieldName}.${argName}InputPlan`,
-                          `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast.inputPlan`,
-                        )
-                      : null,
-                    applyPlan: arg.extensions?.grafast?.applyPlan
-                      ? convertToIdentifierViaAST(
-                          file,
-                          arg.extensions.grafast.applyPlan,
-                          `${type.name}.${fieldName}.${argName}ApplyPlan`,
-                          `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast.applyPlan`,
-                        )
-                      : null,
-                    autoApplyAfterParentPlan: arg.extensions?.grafast
-                      ?.autoApplyAfterParentPlan
-                      ? t.booleanLiteral(true)
-                      : null,
-                    autoApplyAfterParentSubscribePlan: arg.extensions?.grafast
-                      ?.autoApplyAfterParentSubscribePlan
-                      ? t.booleanLiteral(true)
-                      : null,
-                  }),
+                  convertToIdentifierViaAST(
+                    file,
+                    arg.extensions?.grafast,
+                    `${type.name}.${fieldName}.${argName}`,
+                    `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast`,
+                  ),
                 );
               })
               .filter(isNotNullish)
@@ -1525,44 +1505,17 @@ function exportSchemaTypeDefs({
       const typeProperties: t.ObjectProperty[] = [];
 
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
-        // Use shorthand if there's only a `plan` and nothing else
-        const inputPlanAST = field.extensions?.grafast?.inputPlan
-          ? convertToIdentifierViaAST(
+        typeProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(fieldName),
+            convertToIdentifierViaAST(
               file,
-              field.extensions?.grafast?.inputPlan,
-              `${type.name}.${fieldName}InputPlan`,
-              `${type.name}.fields[${fieldName}].extensions.grafast.inputPlan`,
-            )
-          : null;
-
-        const applyPlanAST = field.extensions?.grafast?.applyPlan
-          ? convertToIdentifierViaAST(
-              file,
-              field.extensions?.grafast?.applyPlan,
-              `${type.name}.${fieldName}ApplyPlan`,
-              `${type.name}.fields[${fieldName}].extensions.grafast.applyPlan`,
-            )
-          : null;
-
-        if (inputPlanAST || applyPlanAST) {
-          typeProperties.push(
-            t.objectProperty(
-              identifierOrLiteral(fieldName),
-              configToAST({
-                inputPlan: inputPlanAST,
-                applyPlan: applyPlanAST,
-                autoApplyAfterParentInputPlan: field.extensions?.grafast
-                  ?.autoApplyAfterParentInputPlan
-                  ? t.booleanLiteral(true)
-                  : null,
-                autoApplyAfterParentApplyPlan: field.extensions?.grafast
-                  ?.autoApplyAfterParentApplyPlan
-                  ? t.booleanLiteral(true)
-                  : null,
-              }),
+              field.extensions?.grafast,
+              `${type.name}.${fieldName}`,
+              `${type.name}.fields[${fieldName}].extensions.grafast`,
             ),
-          );
-        }
+          ),
+        );
       }
 
       plansProperties.push(
