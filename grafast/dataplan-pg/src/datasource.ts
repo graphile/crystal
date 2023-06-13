@@ -806,6 +806,7 @@ export class PgResource<
     return this.executor.context();
   }
 
+  /** @internal */
   public executeWithCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
@@ -813,6 +814,7 @@ export class PgResource<
     return this.executor.executeWithCache(values, options);
   }
 
+  /** @internal */
   public executeWithoutCache<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
@@ -820,6 +822,7 @@ export class PgResource<
     return this.executor.executeWithoutCache(values, options);
   }
 
+  /** @internal */
   public executeStream<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
@@ -827,6 +830,7 @@ export class PgResource<
     return this.executor.executeStream(values, options);
   }
 
+  /** @internal */
   public executeMutation<TData>(
     options: PgExecutorMutationOptions,
   ): Promise<PgClientResult<TData>> {
@@ -838,6 +842,8 @@ export class PgResource<
    * non-null and `'false'` or `null` otherwise.
    *
    * @see {@link PgCodec.notNullExpression}
+   *
+   * @internal
    */
   public getNullCheckExpression(alias: SQL): SQL | null {
     if (this.codec.notNullExpression) {
