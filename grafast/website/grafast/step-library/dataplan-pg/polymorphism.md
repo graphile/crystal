@@ -152,7 +152,7 @@ must have the `polymorphic` configuration option set to `mode: "single"` for it
 to work. Something like:
 
 ```ts
-itemResource.codec.polymorphic = {
+itemResource.codec.polymorphism = {
   mode: "single",
   typeAttributes: ["type"],
   types: {
