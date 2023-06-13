@@ -62,11 +62,37 @@ consistent, etc.
 
 ### Node.js: use the LTS
 
-We only support LTS versions of Node.js. Once a Node.js version reaches
-end-of-life we no longer support it, and any future patch release may be
+We only support LTS versions of Node.js. **Once a Node.js version reaches
+end-of-life we no longer support it**, and any future patch release may be
 incompatible with it. We do not see this as a violation of semver - once a
 Node.js version reaches EOL **no reasonable user should use it**, and as such a
 change to drop support for it is not a breaking change for reasonable users.
+
+### TypeScript v5.0.0+ (optional)
+
+We recommend that you use TypeScript for the best experience - auto-completion,
+inline documentation, etc.
+
+You do not need to use TypeScript to use PostGraphile, but if you do then you
+must use a version from TypeScript v5.0.0 upward and configure it to support
+the `exports` property in `package.json`, you can do so by adding this to your
+TypeScript configuration:
+
+```
+    "moduleResolution": "node16", // Or "nodenext"
+```
+
+Our adherence to semver **does not cover types** - we _may_ make breaking
+changes to TypeScript types in patch-level updates. The reason for this is that
+TypeScript itself is ever-changing, and the libraries we depend on often make
+breaking type changes, forcing us to do so too. Further, improvements to types
+are generally a good thing for developer experience, even if it might mean you
+have to spend a couple minutes after updating to address any issues.
+
+However, we try and keep the TypeScript types as stable as possible, only
+making breaking changes when their benefits outweigh the costs (as determined
+by our maintainer), and we do our best to detail in the release notes how to
+deal with these changes (if any action is necessary).
 
 ### PostgreSQL: use latest
 
