@@ -1294,7 +1294,7 @@ exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
 export function makePgResourceOptions<
   const TResourceOptions extends PgResourceOptions<any, any, any, any>,
 >(options: TResourceOptions) {
-  return { ...options };
+  return options;
 }
 
 exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
