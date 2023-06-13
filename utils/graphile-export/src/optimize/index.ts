@@ -52,8 +52,20 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
         ) {
           return;
         }
+        const getExpression = (functionBody: t.BlockStatement) => {
+          if (functionBody.body.length === 1) {
+            const statement = functionBody.body[0];
+            if (statement.type === "ReturnStatement") {
+              return statement.argument;
+            }
+          }
+        };
 
-        if (!t.isExpression(node.callee.body)) {
+        const expression = t.isExpression(node.callee.body)
+          ? node.callee.body
+          : getExpression(node.callee.body);
+
+        if (!expression) {
           return;
         }
 
@@ -122,7 +134,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
 
         if (node.arguments.length === 0 && node.callee.params.length === 0) {
           // We don't need this IIFE any more
-          path.replaceWith(node.callee.body);
+          path.replaceWith(expression);
         }
 
         // console.log("REPLACED :", generate(path.node, {}).code);
