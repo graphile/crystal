@@ -46,3 +46,15 @@ const friendshipsByUserIdCallback = (ids, { attributes }) => {
 ```
 
 [dataloader]: https://github.com/graphql/dataloader
+
+## Multiple steps
+
+The [`list()`](./list) step can be used if you need to pass the value of more
+than one step into your callback:
+
+```ts
+const $result = loadMany(list([$a, $b, $c]), callback);
+```
+
+The first argument to `callback` will then be an array of all the tuples of
+values from these plans: `ReadonlyArray<[a: AValue, b: BValue, c: CValue]>`.

@@ -863,6 +863,8 @@ export class PgSelectStep<
 
   /**
    * @experimental Please use `singleRelation` or `manyRelation` instead.
+   *
+   * @internal
    */
   public join(spec: PgSelectPlanJoin) {
     this.joins.push(spec);
@@ -870,6 +872,8 @@ export class PgSelectStep<
 
   /**
    * Select an SQL fragment, returning the index the result will have.
+   *
+   * @internal
    */
   public selectAndReturnIndex(fragment: SQL): number {
     if (!this.isArgumentsFinalized) {
@@ -895,6 +899,7 @@ export class PgSelectStep<
   }
 
   private nullCheckIndex: number | null | undefined = undefined;
+  /** @internal */
   public getNullCheckIndex(): number | null {
     // PERF: if this isn't coming from a function _and_ it's not being inlined
     // via a left-join or similar then we shouldn't need this and should be
@@ -917,11 +922,14 @@ export class PgSelectStep<
    * Finalizes this instance and returns a mutable clone; useful for
    * connections/etc (e.g. copying `where` conditions but adding more, or
    * pagination, or grouping, aggregates, etc)
+   *
+   * @internal
    */
   clone(mode?: PgSelectMode): PgSelectStep<TResource> {
     return new PgSelectStep(this, mode);
   }
 
+  /** @internal */
   connectionClone(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgSelectMode,
@@ -1152,6 +1160,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
+  /** @internal */
   parseCursor(
     $cursorPlan: __InputStaticLeafStep<string>,
   ): PgSelectParsedCursorStep | null {
@@ -1174,6 +1183,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.beforeStepId = this.addDependency($parsedCursorPlan);
   }
 
+  /** @internal */
   public pageInfo(
     $connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, this, any>,
   ): PgPageInfoStep<this> {
@@ -2334,6 +2344,7 @@ ${lateralText};`;
     });
   }
 
+  /** @internal */
   public deduplicatedWith(replacement: PgSelectStep<TResource>): void {
     if (
       typeof this.symbol === "symbol" &&
