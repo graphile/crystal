@@ -8,12 +8,12 @@ This collection of steps gives incredible performance when dealing with
 Postgres directly.
 
 To operate, `@dataplan/pg` requires an understanding of your database. To do
-so, it uses the concepts of [codecs](./codecs.md) (which represent the types in
-your database - both scalar and composite), [resources](./resources.md) (which
+so, it uses the concepts of [codecs](./registry/codecs) (which represent the types in
+your database - both scalar and composite), [resources](./registry/resources) (which
 represent the sources of data inside your database - tables, views, functions,
-etc), and [relations](./relations.md) (which represent links between codecs and
+etc), and [relations](./registry/relations) (which represent links between codecs and
 the resources they relate to). These three things together combine into the
-[registry](./registry.md).
+[registry](./registry/).
 
 Once you have your registry, you can utilise it to fetch rows from tables/views
 (via `resource.get()` (one) or `resource.find()` (many)), call database
