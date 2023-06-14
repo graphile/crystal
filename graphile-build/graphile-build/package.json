@@ -43,6 +43,7 @@
     "debug": "^4.3.3",
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "lodash": "^4.17.21",
     "pluralize": "^7.0.0",
     "semver": "^7.3.5",
@@ -52,6 +53,8 @@
     "node": ">=16"
   },
   "peerDependencies": {
+    "grafast": "workspace:^",
+    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6"
   },
   "files": [

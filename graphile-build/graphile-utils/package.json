@@ -50,6 +50,7 @@
     "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
+    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg-introspection": "workspace:^"
   },

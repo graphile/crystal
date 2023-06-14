@@ -145,6 +145,16 @@
     "tslib": "^2.5.0",
     "ws": "^8.12.1"
   },
+  "peerDependencies": {
+    "@dataplan/pg": "workspace:*",
+    "grafast": "workspace:^",
+    "grafserv": "workspace:^",
+    "graphile-build": "workspace:*",
+    "graphile-build-pg": "workspace:*",
+    "graphile-config": "workspace:^",
+    "graphql": "16.1.0-experimental-stream-defer.6",
+    "pg": "^8.7.1",
+  },
   "engines": {
     "node": ">=16"
   },

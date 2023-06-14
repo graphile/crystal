@@ -59,6 +59,7 @@
     "debug": "^4.3.3",
     "eventemitter3": "^4.0.7",
     "grafast": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg-sql2": "workspace:^",
     "postgres-array": "~2.0.0",
     "postgres-range": "^1.1.1",
@@ -68,6 +69,7 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
+    "grafast": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg": "^8.7.1"

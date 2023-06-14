@@ -45,6 +45,7 @@
     "grafast": "workspace:^",
     "graphile-build": "workspace:*",
     "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "jsonwebtoken": "^8.5.1",
     "pg-introspection": "workspace:^",
     "pg-sql2": "workspace:^",
@@ -52,8 +53,12 @@
     "tslib": "^2.5.0"
   },
   "peerDependencies": {
+    "grafast": "workspace:^",
+    "graphile-build": "workspace:*",
+    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "pg-introspection": "workspace:^"
   },
   "peerDependenciesMeta": {
     "pg": {

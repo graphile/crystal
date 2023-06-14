@@ -37,6 +37,9 @@
     "tslib": "^2.5.0",
     "typescript": "^5.0.4"
   },
+  "peerDependencies": {
+    "graphile-config": "workspace:^",
+  },
   "devDependencies": {
     "@types/jest": "^27.5.1",
     "@types/node": "^18.15.5",
