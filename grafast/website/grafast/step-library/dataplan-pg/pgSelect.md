@@ -353,7 +353,7 @@ Returns a PgClassExpressionStep representing the entire table, useful for debugg
 
 ### $pgSelectSingle.cursor()
 
-Returns a PgCursorStep representing the cursor of this row, typically used for
+Returns a step representing the cursor of this row, typically used for
 the `cursor` field in a connection edge.
 
 ### $pgSelectSingle.getClassStep()
