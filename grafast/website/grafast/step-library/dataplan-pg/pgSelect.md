@@ -298,4 +298,55 @@ const plans = {
 
 ## pgSelectSingle
 
-`pgSelectSingle()` represents a single row from within a `pgSelect()` collection.
+`pgSelectSingle()` represents a single row from within a `pgSelect()`
+collection. Typically you wouldn't build an instance of this directly, instead
+you'd get it from `resource.get()`, `resource.execute()` (for isUnique
+functions), from the entries in a list from a `pgSelect`, or via
+`$pgSelect.single()`.
+
+Here are some of the more commonly used methods:
+
+### $pgSelectSingle.get(attr)
+
+The absolute most commonly used method on a `pgSelectSingle`, this gets a step
+representing the value of the given attribute from the row.
+
+:::important
+
+You must always use `$pgSelectSingle.get(attr)` rather than
+`access($pgSelectSingle, attr)` or similar for multiple reasons:
+
+1. the data a `pgSelectSingle` contains is an unpredictable tuple (see [Opaque steps](#opaque-steps) below),
+2. the `.get(attr)` tells the related `pgSelect` step to add the `attr` to the list of expressions to `SELECT`
+
+:::
+
+### $pgSelectSingle.select(fragment, codec)
+
+Returns a PgClassExpressionStep representing the value of the given expression.
+
+```ts
+const $user = usersResource.find({ id: constant(1) });
+const $usernameLength = $user.select(sql`length(username)`, TYPES.int);
+```
+
+### $pgSelectSingle.placeholder($step, codec)
+
+Identical to `$pgSelect.placeholder($step, codec)` on the underlying `pgSelect` step.
+
+### $pgSelectSingle.getClassStep()
+
+Returns the `PgSelectStep` that this `$pgSelectSingle` came from. Useful to get
+the `alias`, among other things.
+
+## Opaque steps
+
+`pgSelect` and `pgSelectSingle` are what we call "opaque steps" - that is you
+are not intended to use their underlying data directly, instead you use their
+methods to extract the data you need to use with other steps.
+
+Currently a `pgSelectSingle` doesn't use the object representation you might
+expect, instead it uses a tuple with entries for each of the selected
+attributes. The makeup of this tuple will vary depending on which attributes
+you requested, and in which order, so you must not rely on its structure. To
+get an attribute you should use `$pgSelectSingle.get(attr)` or similar

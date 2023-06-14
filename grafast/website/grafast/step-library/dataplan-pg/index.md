@@ -35,4 +35,12 @@ rather than dealing with the concrete runtime data) it has helpers for all
 the most common actions you'll need, plus APIs to allow you to add your own
 SQL expressions and sources should you need to.
 
+:::important
+
+Reference to `sql` in code examples is a reference to `import { sql } from
+"pg-sql2";` - `@dataplan/pg` makes heavy use of this performant, type-safe,
+injection-proof SQL builder.
+
+:::
+
 Lets get started by looking at building the registry.
