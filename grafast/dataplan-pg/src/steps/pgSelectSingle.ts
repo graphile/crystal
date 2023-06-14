@@ -263,6 +263,9 @@ export class PgSelectSingleStep<
     return colPlan as any;
   }
 
+  /**
+   * Returns a plan representing the result of an expression.
+   */
   public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
@@ -393,19 +396,6 @@ export class PgSelectSingleStep<
   }
 
   /**
-   * Returns a plan representing the result of an expression.
-   */
-  expression<TExpressionCodec extends PgCodec>(
-    expression: SQL,
-    codec: TExpressionCodec,
-  ): PgClassExpressionStep<TExpressionCodec, TResource> {
-    return pgClassExpression<TExpressionCodec, TResource>(
-      this,
-      codec,
-    )`${expression}`;
-  }
-
-  /**
    * @internal
    * For use by PgCursorStep
    */
@@ -421,10 +411,10 @@ export class PgSelectSingleStep<
               o,
               this.getClassStep().resource.codec,
             );
-            return this.expression(frag, codec);
+            return this.select(frag, codec);
           })
         : // No ordering; so use row number
-          [this.expression(sql`row_number() over (partition by 1)`, TYPES.int)],
+          [this.select(sql`row_number() over (partition by 1)`, TYPES.int)],
     );
     return [digest, step];
   }
