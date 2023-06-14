@@ -25,6 +25,19 @@ The `makePgResourceOptions` function is a TypeScript Identity Function (i.e. it
 just returns the input, but is used to ensure that the type conforms according
 to TypeScript) so usage of it is entirely optional.
 
+The resource options have the following properties (all are optional unless noted):
+
+- `name` (required) - the name to use for this resource, must be unique
+- `executor` (required) - the executor to use when retrieving this resource (unless you are connecting to multiple databases, you'll probably use the same executor for every resource)
+- `codec` (required) - the type that this resource will return
+- `from` (required) - either an SQL fragment (for table-like resources) or a callback function that returns an SQL fragment (for function-like resources) that gives the database `FROM` for this resource
+- `uniques` - for table-like resources, a list of the unique constraints on the table (e.g. indicating primary key/etc)
+- `parameters` - required for function-like resources, forbidden for table-like resources; a list of specifications for the parameters that the function accepts
+- `isUnique` - for function-like resources, true if this resource will return at most one row
+- `isMutation` - for function-like resources, true if calling this function may have side effects (i.e. the database function is `VOLATILE` (default))
+
+### Example
+
 ```ts
 const forumsResourceOptions = makePgResourceOptions({
   name: "forums",
