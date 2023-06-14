@@ -323,7 +323,8 @@ You must always use `$pgSelectSingle.get(attr)` rather than
 
 ### $pgSelectSingle.select(fragment, codec)
 
-Returns a PgClassExpressionStep representing the value of the given expression.
+Returns a PgClassExpressionStep representing the value of the given SQL
+expression.
 
 ```ts
 const $user = usersResource.find({ id: constant(1) });
@@ -334,10 +335,45 @@ const $usernameLength = $user.select(sql`length(username)`, TYPES.int);
 
 Identical to `$pgSelect.placeholder($step, codec)` on the underlying `pgSelect` step.
 
+### $pgSelectSingle.singleRelation(relationName)
+
+Returns a `pgSelectSingle` representing the single record related via the
+`relationName` relation.
+
+Do not confuse with `$pgSelect.singleRelation`.
+
+### $pgSelectSingle.manyRelation(relationName)
+
+Returns a `pgSelect` representing the records related via the
+`relationName` relation.
+
+### $pgSelectSingle.record()
+
+Returns a PgClassExpressionStep representing the entire table, useful for debugging or to use with `pgSelectSingleFromRecord`.
+
+### $pgSelectSingle.cursor()
+
+Returns a PgCursorStep representing the cursor of this row, typically used for
+the `cursor` field in a connection edge.
+
 ### $pgSelectSingle.getClassStep()
 
 Returns the `PgSelectStep` that this `$pgSelectSingle` came from. Useful to get
 the `alias`, among other things.
+
+## pgSelectFromRecords(resource, $records)
+
+Builds a `pgSelect` step representing the multi-row data in `$records` as if
+they had come from the `resource` resource.
+
+## pgSelectFromRecord(resource, $record)
+
+Builds a `pgSelect` step using the single-row data in `$record` as if it had
+come from the `resource` resource.
+
+## pgSelectSingleFromRecord(resource, $record)
+
+Equivalent to `pgSelectFromRecord(resource, $record).single()`.
 
 ## Opaque steps
 
