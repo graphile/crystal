@@ -393,6 +393,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const description = isReferencee
           ? tags.backwardDescription
           : tags.forwardDescription ?? constraintDescription;
+        const baseBehavior = tags.behavior;
+        const specificBehavior = isReferencee
+          ? tags.backwardBehavior
+          : tags.forwardBehavior;
+        const behavior = combineBehaviors(baseBehavior, specificBehavior);
         const newRelation: PgCodecRelationConfig = {
           localCodec: localCodec as PgCodecWithAttributes,
           localCodecPolymorphicTypes,
@@ -404,7 +409,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           description:
             typeof description === "string" ? description : undefined,
           extensions: {
-            tags,
+            tags: {
+              ...tags,
+              behavior,
+            },
           },
         };
         await info.process("pgRelations_relation", {
@@ -853,10 +861,12 @@ function addRelations(
       const listFieldName = build.inflection.manyRelationList(relationDetails);
 
       const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
-      const shouldAddSingleField = build.behavior.pgCodecRelationMatches(
-        relation,
-        `${relationTypeScope}:resource:single`,
-      );
+      const shouldAddSingleField =
+        isUnique &&
+        build.behavior.pgCodecRelationMatches(
+          relation,
+          `${relationTypeScope}:resource:single`,
+        );
       const shouldAddConnectionField = build.behavior.pgCodecRelationMatches(
         relation,
         `${relationTypeScope}:resource:connection`,
@@ -1274,10 +1284,12 @@ function addRelations(
     }
 
     const relationTypeScope = isUnique ? `singularRelation` : `manyRelation`;
-    const shouldAddSingleField = build.behavior.stringMatches(
-      behavior,
-      `${relationTypeScope}:resource:single`,
-    );
+    const shouldAddSingleField =
+      isUnique &&
+      build.behavior.stringMatches(
+        behavior,
+        `${relationTypeScope}:resource:single`,
+      );
     const shouldAddConnectionField = build.behavior.stringMatches(
       behavior,
       `${relationTypeScope}:resource:connection`,
@@ -1445,4 +1457,13 @@ function addRelations(
 
     return fields;
   }, fields);
+}
+
+function combineBehaviors(
+  a: string | string[],
+  b: string | string[],
+): string[] {
+  const aArr = Array.isArray(a) ? a : a ? [a] : [];
+  const bArr = Array.isArray(b) ? b : b ? [b] : [];
+  return [...aArr, ...bArr];
 }
