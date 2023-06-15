@@ -15,6 +15,50 @@ Function-like resources have parameters (parameters is an array); use
 `.execute()` to get the result of executing the function, passing any required
 arguments.
 
+## PgExecutor
+
+A PgExecutor ("executor") represents a PostgreSQL database connection. It is
+used by the various step classes (via their resources) in order to issue SQL
+queries to the database. It's rare that you would ever call any of its methods
+directly.
+
+Each resource has exactly one executor, and the same executor may be shared
+across multiple resources. It's very common for all of your resources to share
+a single executor, but multiple executors can co-exist in the same schema
+happily.
+
+Query inlining cannot cross executor boundaries (since each executor represents
+a separate database, it would not make sense to inline a query in one database
+into another database - the query would likely throw an error when the tables
+could not be found).
+
+PgExecutor is also responsible for things like caching.
+
+See the SQL queries that are being executed with the
+`DEBUG="@dataplan/pg:PgExecutor:verbose"` envvar. (Or replace `:verbose` with
+`:explain` if you want to see even more information.)
+
+A PgExecutor is constructed with an options object containing two properties:
+
+- `name` - a name for the executor, must be unique
+- `context` - a callback function to be called at planning time that should
+  return an object step containing the `withPgClient` and (optionally)
+  `pgSettings` entries. See [adaptors](../adaptors) for more details on these.
+
+### Example
+
+```ts
+const executor = new PgExecutor({
+  name: "default",
+  context() {
+    return object({
+      withPgClient: context().get("withPgClient"),
+      // pgSettings: context().get("pgSettings"),
+    });
+  },
+});
+```
+
 ## PgResourceOptions
 
 Resources are not constructed directly, instead a resource configuration object

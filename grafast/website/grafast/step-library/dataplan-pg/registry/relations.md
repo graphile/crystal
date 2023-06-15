@@ -4,8 +4,17 @@ sidebar_position: 3
 
 # Relations
 
-A relation is a link from a codec to a resource, detailing how to get records
-from the related resource given that you already have data for the given codec.
+In `@dataplan/pg`, a relation is a uni-directional link from a
+[codec](./codecs) to a [resource](./resources), detailing how to get records
+from the resource given that you already have data for the given codec.
+
+:::info
+
+Do not confuse this with the standard RDBMS term "relation" which effectively
+means a "table" (or table-like thing). To avoid confusion, we will not refer to
+a table as a "relation."
+
+:::
 
 ## From codec to resource
 
