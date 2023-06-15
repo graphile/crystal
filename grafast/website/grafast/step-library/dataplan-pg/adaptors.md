@@ -63,33 +63,40 @@ parameters (`pgSettings` and `callback`) and it:
 Each adaptor is capable of producing an object that conforms to `PgClient`.
 This means it will have at least the following methods:
 
-- `query(opts)` - runs the query `opts.text` using the placeholder values `opts.values` against the database, and returns the result
-- `withTransaction(callback)` - 1. starts a transaction, 2. calls and awaits the callback, 3. on error, rolls back the transaction; on success commits the transaction and returns the result
+- `query(opts)` - runs the SQL query `opts.text` (a string) using the
+  placeholder values `opts.values` (an array) against the database, and returns
+  the result
+- `withTransaction(callback)` - 1. starts a transaction, 2. calls and awaits
+  the callback (passing the client), 3. on error, rolls back the transaction;
+  on success commits the transaction and returns the result
 
 Note that `withTransaction` can be nested, in which case it's common to use
 savepoints to implement the subtransactions.
 
 Depending on the adaptor, the PgClient may have additional methods and
 properties available - this is a common way of making your ORM's capabilities
-available inside a Grafast plan.
+available inside a Gra*fast* plan.
 
 ## pgSettings
 
 `pgSettings` is an optional string-string map. If set, the values will be set
 as temporary session variables in the database connection. This is commonly
-useful when you're using PostgreSQL's row-level security.
+useful when you're using PostgreSQL's row-level security. If you do not
+use row-level security, you probably won't need this.
 
 ## PgSubscriber
 
 A PgSubscriber can be used to leverage the LISTEN/NOTIFY capabilities of a
-PostgreSQL database. Not all adaptors support PgSubscriber, and they each have
-their own way of building one.
+PostgreSQL database to give your schema realtime (pubsub) capabilities. Not all
+adaptors support PgSubscriber, and they each have their own way of building
+one.
 
 A `PgSubscriber` instance it typically referenced from the GraphQL context
-(e.g. via `context().get('pgSubscriber')`) and then used via the `listen()`
-step. PgSubscribers have the standard listening method, `subscribe(topic)`,
-which returns an async iterable yielding events from the topic. The
-subscription can be terminated by terminating the async iterable.
+(e.g. via `context().get('pgSubscriber')`) and then used via the
+[`listen()`](/grafast/step-library/standard-steps/listen) step. PgSubscribers
+have the standard listening method, `subscribe(topic)`, which returns an async
+iterable yielding events from the topic. The subscription can be terminated by
+terminating the async iterable.
 
 ## `@dataplan/pg/adaptors/pg`
 
@@ -98,17 +105,24 @@ communicate with the database.
 
 ### createWithPgClient
 
-To create a `withPgClient` function suitable for usage at runtime, `createWithPgClient` can be called, passing an object with the following properties:
+To create a `withPgClient` function suitable for usage at runtime,
+`createWithPgClient` can be called, passing an object with the following
+properties:
 
 - `pool` - a `pg.Pool` instance
-- `connectionString` - a PostgreSQL connection string (`postgres://user:pass@host/dbname`) to use to create a pool
-- `poolConfig` - configuration options for a `pg.Pool` (less the `connectionString`) to be used when creating a pool internally using `connectionString`
+- `connectionString` - a PostgreSQL connection string
+  (`postgres://user:pass@host/dbname`) to use to create a pool
+- `poolConfig` - configuration options for a `pg.Pool` (less the
+  `connectionString`) to be used when creating a pool internally using
+  `connectionString`
 
-Exactly one of `pool` or `connectionString` must be set.
+Exactly one of `pool` or `connectionString` must be set, all other options are
+optional.
 
 ### new PgSubscriber(pool)
 
-Creates a new PgSubscriber instance, ready to be stored onto the GraphQL context
+Creates a new PgSubscriber instance using the given `pg.Pool` instance, ready
+to be stored onto the GraphQL context.
 
 ### Example
 
@@ -116,9 +130,7 @@ Creates a new PgSubscriber instance, ready to be stored onto the GraphQL context
 import * as pg from "pg";
 import { createWithPgClient, PgSubscriber } from "@dataplan/pg/adaptors/pg";
 
-const pool = new pg.Pool({
-  connectionString: "postgres:///pagila",
-});
+const pool = new pg.Pool({ connectionString: "postgres:///pagila" });
 
 const withPgClient = createWithPgClient({ pool });
 const pgSubscriber = new PgSubscriber(pool);
