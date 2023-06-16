@@ -1390,9 +1390,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       break;
                     }
                     case GraphQLObjectType: {
-                      build.registerEnumType(
+                      build.registerObjectType(
                         typeName,
                         {},
+                        underlyingOutputMeta.Step as any,
                         copy(underlyingOutputTypeName),
                         "PgCodecsPlugin",
                       );

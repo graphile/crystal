@@ -13,6 +13,7 @@ import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { makeNewWithHooks } from "./newWithHooks/index.js";
 import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
 import { bindAll } from "./utils.js";
+import { inspect } from "util";
 
 const debug = debugFactory("graphile-build:SchemaBuilder");
 
@@ -124,7 +125,13 @@ class SchemaBuilder<
     GraphileBuild.SchemaBuilderHooks<TBuild>[THookName][number]
   >[0] {
     if (!input) {
-      throw new Error("applyHooks was called with falsy input");
+      throw new Error(
+        `applyHooks(${JSON.stringify(
+          hookName,
+        )}, ...) was called with falsy input ${inspect(input, {
+          colors: true,
+        })}`,
+      );
     }
     this.depth++;
     const indent = INDENT.repeat(this.depth);

@@ -553,7 +553,9 @@ export function listOfCodec<
   } = config;
   const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
   if (innerCodec.arrayOfCodec) {
-    throw new Error("Array types cannot be nested");
+    throw new Error(
+      `Error when creating listOfCodec; ${listedCodec.name} is an array type, and array types cannot be nested`,
+    );
   }
 
   if (innerCodec[$$listCodec]) {
