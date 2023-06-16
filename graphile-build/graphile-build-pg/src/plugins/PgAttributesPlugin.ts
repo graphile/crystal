@@ -119,9 +119,7 @@ function processAttribute(
 ): void {
   const {
     extend,
-    graphql: { getNullableType, GraphQLNonNull, GraphQLList },
     inflection,
-    getGraphQLTypeByPgCodec,
     input: { pgRegistry: registry },
   } = build;
 
@@ -249,6 +247,7 @@ function processAttribute(
             (
                 attributeName,
                 baseCodec,
+                each,
                 getResource,
                 pgResources,
                 pgSelectFromRecords,
@@ -270,6 +269,7 @@ function processAttribute(
             [
               attributeName,
               baseCodec,
+              each,
               getResource,
               pgResources,
               pgSelectFromRecords,

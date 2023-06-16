@@ -5,6 +5,7 @@ import { EventEmitter } from "events";
 import { applyHooks } from "graphile-config";
 import type { GraphQLSchemaConfig } from "graphql";
 import { GraphQLSchema, validateSchema } from "graphql";
+import { inspect } from "util";
 
 import type { BehaviorDynamicMethods } from "./behavior.js";
 import { Behavior } from "./behavior.js";
@@ -13,7 +14,6 @@ import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { makeNewWithHooks } from "./newWithHooks/index.js";
 import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
 import { bindAll } from "./utils.js";
-import { inspect } from "util";
 
 const debug = debugFactory("graphile-build:SchemaBuilder");
 
