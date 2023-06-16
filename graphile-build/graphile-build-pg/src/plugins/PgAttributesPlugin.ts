@@ -18,6 +18,7 @@ import {
   pgSelectSingleFromRecord,
 } from "@dataplan/pg";
 import type { GrafastFieldConfig, SetterStep } from "grafast";
+import { each } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "graphql";
 
@@ -76,13 +77,6 @@ declare global {
       pgAttribute?: PgCodecAttribute;
     }
   }
-}
-
-function unwrapCodec(codec: PgCodec): PgCodec {
-  if (codec.arrayOfCodec) {
-    return unwrapCodec(codec.arrayOfCodec);
-  }
-  return codec;
 }
 
 // TODO: get rid of this! Determine the resources at build time
@@ -159,14 +153,12 @@ function processAttribute(
       attributeName,
       codec: pgCodec,
     });
-  const baseCodec = unwrapCodec(attribute.codec);
-  const baseType = getGraphQLTypeByPgCodec(baseCodec, "output")!;
-  const arrayOrNotType = attribute.codec.arrayOfCodec
-    ? new GraphQLList(
-        baseType, // TODO: nullability
-      )
-    : baseType;
-  if (!arrayOrNotType) {
+  const resolveResult = resolveOutputType(
+    build,
+    attribute.codec,
+    attribute.notNull,
+  );
+  if (!resolveResult) {
     console.warn(
       `Couldn't find a 'output' variant for PgCodec ${
         pgCodec.name
@@ -177,9 +169,7 @@ function processAttribute(
     );
     return;
   }
-  const type = attribute.notNull
-    ? new GraphQLNonNull(getNullableType(arrayOrNotType))
-    : arrayOrNotType;
+  const [baseCodec, type] = resolveResult;
 
   if (!type) {
     // Could not determine the type, skip this field
@@ -250,14 +240,45 @@ function processAttribute(
               registry,
             ],
           );
+        } else if (attribute.codec.arrayOfCodec.arrayOfCodec?.arrayOfCodec) {
+          throw new Error(
+            "Triple nested arrays are currently unsupported... Feel free to send a PR that refactors this whole section!",
+          );
+        } else if (attribute.codec.arrayOfCodec.arrayOfCodec) {
+          return EXPORTABLE(
+            (
+                attributeName,
+                baseCodec,
+                getResource,
+                pgResources,
+                pgSelectFromRecords,
+                registry,
+              ) =>
+              ($record: PgSelectSingleStep<any>) => {
+                const $val = $record.get(
+                  attributeName,
+                ) as PgClassExpressionStep<PgCodecList<PgCodecList>, any>;
+                return each($val, ($list) => {
+                  const $select = pgSelectFromRecords(
+                    getResource(registry, baseCodec, pgResources, $record),
+                    $list,
+                  );
+                  $select.setTrusted();
+                  return $select;
+                });
+              },
+            [
+              attributeName,
+              baseCodec,
+              getResource,
+              pgResources,
+              pgSelectFromRecords,
+              registry,
+            ],
+          );
         } else {
+          // atrribute.codec.arrayOfCodec is set
           // Many records from resource
-          /*
-           * TODO: if we refactor `PgSelectSingleStep` we can probably
-           * optimise this to do inline selection and still join against
-           * the base table using e.g. `(table.column).attribute =
-           * joined_thing.column`
-           */
           return EXPORTABLE(
             (
                 attributeName,
@@ -538,3 +559,37 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
     },
   },
 };
+
+function resolveOutputType(
+  build: GraphileBuild.Build,
+  codec: PgCodec,
+  notNull?: boolean,
+): [baseCodec: PgCodec, resolvedType: GraphQLOutputType] | null {
+  const {
+    getGraphQLTypeByPgCodec,
+    graphql: { GraphQLList, GraphQLNonNull, getNullableType, isOutputType },
+  } = build;
+  if (codec.arrayOfCodec) {
+    const resolvedResult = resolveOutputType(build, codec.arrayOfCodec);
+    if (!resolvedResult) {
+      return null;
+    }
+    const [innerCodec, innerType] = resolvedResult;
+    const nullableType = new GraphQLList(innerType);
+    const type =
+      notNull || codec.notNull
+        ? new GraphQLNonNull(nullableType)
+        : nullableType;
+    return [innerCodec, type];
+  } else {
+    const baseType = getGraphQLTypeByPgCodec(codec, "output");
+    if (!baseType || !isOutputType(baseType)) {
+      return null;
+    }
+    const type =
+      notNull || codec.notNull
+        ? new GraphQLNonNull(getNullableType(baseType))
+        : baseType;
+    return [codec, type];
+  }
+}

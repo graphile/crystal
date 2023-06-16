@@ -140,10 +140,8 @@ export interface PgCodec<
   TFromPostgres = any,
   TFromJavaScript = TFromPostgres,
   TArrayItemCodec extends
-    | PgCodec<string, any, any, any, undefined, any, any>
-    | undefined =
-    | PgCodec<string, any, any, any, undefined, any, any>
-    | undefined,
+    | PgCodec<string, any, any, any, any, any, any>
+    | undefined = PgCodec<string, any, any, any, any, any, any> | undefined,
   TDomainItemCodec extends
     | PgCodec<string, any, any, any, any, any, any>
     | undefined = PgCodec<string, any, any, any, any, any, any> | undefined,
@@ -278,15 +276,15 @@ export type PgCodecAnyScalar = PgCodec<
 >;
 
 export type PgCodecList<
-  TInnerCodec extends PgCodec<
+  TInnerCodec extends PgCodec<string, any, any, any, any, any, any> = PgCodec<
     string,
     any,
     any,
     any,
-    undefined,
+    any,
     any,
     any
-  > = PgCodec<string, any, any, any, undefined, any, any>,
+  >,
 > = PgCodec<string, undefined, any, any, TInnerCodec, undefined, undefined>;
 
 export type PgEnumValue<TValue extends string = string> = {

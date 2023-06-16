@@ -1145,7 +1145,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
             // There's currently no type registered for this scalar codec; let's sort that out.
 
-            const underlyingType = codec.rangeOfCodec || codec.domainOfCodec;
             if (isEnumCodec(codec)) {
               const typeName = inflection.enumType(codec);
               const values = codec.values.reduce((memo, value) => {
@@ -1168,7 +1167,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 ["input", "output"],
                 typeName,
               );
-            } else if (underlyingType) {
+            } else if (codec.rangeOfCodec || codec.domainOfCodec) {
+              const underlyingType =
+                codec.rangeOfCodec ||
+                codec.domainOfCodec?.arrayOfCodec ||
+                codec.domainOfCodec?.rangeOfCodec ||
+                codec.domainOfCodec;
               // This type is a "domain", so we can mimic the underlying type
               const underlyingOutputTypeName =
                 build.getGraphQLTypeNameByPgCodec(underlyingType, "output");
