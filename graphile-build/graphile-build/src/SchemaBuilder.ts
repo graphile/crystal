@@ -5,6 +5,7 @@ import { EventEmitter } from "events";
 import { applyHooks } from "graphile-config";
 import type { GraphQLSchemaConfig } from "graphql";
 import { GraphQLSchema, validateSchema } from "graphql";
+import { inspect } from "util";
 
 import type { BehaviorDynamicMethods } from "./behavior.js";
 import { Behavior } from "./behavior.js";
@@ -124,7 +125,13 @@ class SchemaBuilder<
     GraphileBuild.SchemaBuilderHooks<TBuild>[THookName][number]
   >[0] {
     if (!input) {
-      throw new Error("applyHooks was called with falsy input");
+      throw new Error(
+        `applyHooks(${JSON.stringify(
+          hookName,
+        )}, ...) was called with falsy input ${inspect(input, {
+          colors: true,
+        })}`,
+      );
     }
     this.depth++;
     const indent = INDENT.repeat(this.depth);

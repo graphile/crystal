@@ -552,9 +552,6 @@ export function listOfCodec<
     typeDelim = `,`,
   } = config;
   const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
-  if (innerCodec.arrayOfCodec) {
-    throw new Error("Array types cannot be nested");
-  }
 
   if (innerCodec[$$listCodec]) {
     return innerCodec[$$listCodec];
@@ -682,7 +679,7 @@ export function domainOfCodec<
     sqlType: identifier,
     description,
     extensions,
-    domainOfCodec: innerCodec,
+    domainOfCodec: innerCodec.arrayOfCodec ? undefined : innerCodec,
     notNull: Boolean(notNull),
   };
 }

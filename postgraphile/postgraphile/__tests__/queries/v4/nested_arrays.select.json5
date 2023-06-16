@@ -1,0 +1,60 @@
+{
+  allTs: {
+    nodes: [
+      {
+        k: 1,
+        v: [
+          [
+            {
+              fromHours: 1,
+              fromMinutes: 2,
+              toHours: 3,
+              toMinutes: 4,
+            },
+          ],
+          [
+            {
+              fromHours: 5,
+              fromMinutes: 6,
+              toHours: 7,
+              toMinutes: 8,
+            },
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+        ],
+      },
+      {
+        k: 2,
+        v: [
+          [
+            {
+              fromHours: 2,
+              fromMinutes: 3,
+              toHours: 4,
+              toMinutes: 5,
+            },
+          ],
+          [
+            {
+              fromHours: 6,
+              fromMinutes: 7,
+              toHours: 8,
+              toMinutes: 9,
+            },
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+        ],
+      },
+    ],
+  },
+}

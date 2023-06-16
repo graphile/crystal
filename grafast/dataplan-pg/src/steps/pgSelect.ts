@@ -2908,10 +2908,20 @@ export function pgSelectFromRecords<
   TResource extends PgResource<any, any, any, any, any>,
 >(
   resource: TResource,
-  records: PgClassExpressionStep<
-    PgCodec<any, undefined, any, any, GetPgResourceCodec<TResource>, any, any>,
-    TResource
-  >,
+  records:
+    | PgClassExpressionStep<
+        PgCodec<
+          any,
+          undefined,
+          any,
+          any,
+          GetPgResourceCodec<TResource>,
+          any,
+          any
+        >,
+        TResource
+      >
+    | ExecutableStep<any[]>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({
     resource,
