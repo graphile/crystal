@@ -1,0 +1,348 @@
+"""All input for the create `T` mutation."""
+input CreateTInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `T` to be created by this mutation."""
+  t: TInput!
+}
+
+"""The output of our create `T` mutation."""
+type CreateTPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `T` that was created by this mutation."""
+  t: T
+
+  """An edge for our `T`. May be used by Relay 1."""
+  tEdge(
+    """The method to use when ordering `T`."""
+    orderBy: [TsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TSEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""All input for the `deleteTByK` mutation."""
+input DeleteTByKInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  k: Int!
+}
+
+"""All input for the `deleteT` mutation."""
+input DeleteTInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `T` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `T` mutation."""
+type DeleteTPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedTId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `T` that was deleted by this mutation."""
+  t: T
+
+  """An edge for our `T`. May be used by Relay 1."""
+  tEdge(
+    """The method to use when ordering `T`."""
+    orderBy: [TsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TSEdge
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `T`."""
+  createT(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTInput!
+  ): CreateTPayload
+
+  """Deletes a single `T` using its globally unique id."""
+  deleteT(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTInput!
+  ): DeleteTPayload
+
+  """Deletes a single `T` using a unique key."""
+  deleteTByK(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTByKInput!
+  ): DeleteTPayload
+
+  """Updates a single `T` using its globally unique id and a patch."""
+  updateT(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTInput!
+  ): UpdateTPayload
+
+  """Updates a single `T` using a unique key and a patch."""
+  updateTByK(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTByKInput!
+  ): UpdateTPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `T`."""
+  allTs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `T`."""
+    orderBy: [TsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TSConnection
+  checkWorkHours(wh: [WorkHourInput]!): Boolean
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Reads a single `T` using its globally unique `ID`."""
+  t(
+    """The globally unique `ID` to be used in selecting a single `T`."""
+    nodeId: ID!
+  ): T
+
+  """Get a single `T`."""
+  tByK(k: Int!): T
+}
+
+type T implements Node {
+  k: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  v: [[WorkHour!]!]
+}
+
+"""
+A condition to be used against `T` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input TCondition {
+  """Checks for equality with the object’s `k` field."""
+  k: Int
+
+  """Checks for equality with the object’s `v` field."""
+  v: [[WorkHourInput]]
+}
+
+"""An input for mutations affecting `T`"""
+input TInput {
+  k: Int
+  v: [[WorkHourInput]]
+}
+
+"""Represents an update to a `T`. Fields that are set will be updated."""
+input TPatch {
+  k: Int
+  v: [[WorkHourInput]]
+}
+
+"""A connection to a list of `T` values."""
+type TSConnection {
+  """
+  A list of edges which contains the `T` and cursor to aid in pagination.
+  """
+  edges: [TSEdge]!
+
+  """A list of `T` objects."""
+  nodes: [T]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `T` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `T` edge in the connection."""
+type TSEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `T` at the end of the edge."""
+  node: T
+}
+
+"""Methods to use when ordering `T`."""
+enum TsOrderBy {
+  K_ASC
+  K_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""All input for the `updateTByK` mutation."""
+input UpdateTByKInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  k: Int!
+
+  """An object where the defined keys will be set on the `T` being updated."""
+  tPatch: TPatch!
+}
+
+"""All input for the `updateT` mutation."""
+input UpdateTInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `T` to be updated.
+  """
+  nodeId: ID!
+
+  """An object where the defined keys will be set on the `T` being updated."""
+  tPatch: TPatch!
+}
+
+"""The output of our update `T` mutation."""
+type UpdateTPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `T` that was updated by this mutation."""
+  t: T
+
+  """An edge for our `T`. May be used by Relay 1."""
+  tEdge(
+    """The method to use when ordering `T`."""
+    orderBy: [TsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TSEdge
+}
+
+type WorkHour {
+  fromHours: Int
+  fromMinutes: Int
+  toHours: Int
+  toMinutes: Int
+}
+
+"""An input for mutations affecting `WorkHour`"""
+input WorkHourInput {
+  fromHours: Int
+  fromMinutes: Int
+  toHours: Int
+  toMinutes: Int
+}

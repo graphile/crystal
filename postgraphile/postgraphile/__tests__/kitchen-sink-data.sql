@@ -1,4 +1,5 @@
 alter table b.types disable trigger user;
+delete from nested_arrays.t cascade;
 delete from smart_comment_relations.streets cascade;
 delete from smart_comment_relations.street_property cascade;
 delete from smart_comment_relations.properties cascade;
@@ -770,3 +771,10 @@ insert into partitions.measurements
   ('2023-02-04T11:02:03Z', 'temp', '18.3', 1),
   ('2023-08-04T11:02:03Z', 'temp', '39.2', 3),
   ('2023-08-04T11:02:03Z', 'humidity', '100', 2);
+
+insert into nested_arrays.t
+  (k, v) values
+  (1, '{"{\"(1,2,3,4)\"}","{\"(5,6,7,8)\"}","{}","{}","{}","{}","{}","{}"}'),
+  (2, '{"{\"(2,3,4,5)\"}","{\"(6,7,8,9)\"}","{}","{}","{}","{}","{}","{}"}');
+
+alter sequence nested_arrays.t_k_seq restart with 3;

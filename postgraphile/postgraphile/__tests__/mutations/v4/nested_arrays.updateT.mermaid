@@ -1,0 +1,112 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+
+    %% plan dependencies
+    List233{{"List[233∈0]<br />ᐸ85,190,249,249,249,249,249,249ᐳ"}}:::plan
+    List85{{"List[85∈0]<br />ᐸ44ᐳ"}}:::plan
+    List190{{"List[190∈0]<br />ᐸ100,149ᐳ"}}:::plan
+    Constant249{{"Constant[249∈0]<br />ᐸ[]ᐳ"}}:::plan
+    List85 & List190 & Constant249 & Constant249 & Constant249 & Constant249 & Constant249 & Constant249 --> List233
+    Object44{{"Object[44∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access53{{"Access[53∈0]<br />ᐸ1.input.tPatch.v.0.0.fromHoursᐳ"}}:::plan
+    Access63{{"Access[63∈0]<br />ᐸ1.input.tPatch.v.0.0.fromMinutesᐳ"}}:::plan
+    Access73{{"Access[73∈0]<br />ᐸ1.input.tPatch.v.0.0.toHoursᐳ"}}:::plan
+    Access83{{"Access[83∈0]<br />ᐸ1.input.tPatch.v.0.0.toMinutesᐳ"}}:::plan
+    Access53 & Access63 & Access73 & Access83 --> Object44
+    Object100{{"Object[100∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access109{{"Access[109∈0]<br />ᐸ1.input.tPatch.v.1.0.fromHoursᐳ"}}:::plan
+    Access119{{"Access[119∈0]<br />ᐸ1.input.tPatch.v.1.0.fromMinutesᐳ"}}:::plan
+    Access129{{"Access[129∈0]<br />ᐸ1.input.tPatch.v.1.0.toHoursᐳ"}}:::plan
+    Access139{{"Access[139∈0]<br />ᐸ1.input.tPatch.v.1.0.toMinutesᐳ"}}:::plan
+    Access109 & Access119 & Access129 & Access139 --> Object100
+    Object149{{"Object[149∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access158{{"Access[158∈0]<br />ᐸ1.input.tPatch.v.1.1.fromHoursᐳ"}}:::plan
+    Access168{{"Access[168∈0]<br />ᐸ1.input.tPatch.v.1.1.fromMinutesᐳ"}}:::plan
+    Access178{{"Access[178∈0]<br />ᐸ1.input.tPatch.v.1.1.toHoursᐳ"}}:::plan
+    Access188{{"Access[188∈0]<br />ᐸ1.input.tPatch.v.1.1.toMinutesᐳ"}}:::plan
+    Access158 & Access168 & Access178 & Access188 --> Object149
+    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access12 & Access13 --> Object14
+    Object100 & Object149 --> List190
+    Access9{{"Access[9∈0]<br />ᐸ1.input.kᐳ"}}:::plan
+    __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
+    __Value1 --> Access9
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value3 --> Access12
+    __Value3 --> Access13
+    __Value1 --> Access53
+    __Value1 --> Access63
+    __Value1 --> Access73
+    __Value1 --> Access83
+    Object44 --> List85
+    __Value1 --> Access109
+    __Value1 --> Access119
+    __Value1 --> Access129
+    __Value1 --> Access139
+    __Value1 --> Access158
+    __Value1 --> Access168
+    __Value1 --> Access178
+    __Value1 --> Access188
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    PgUpdateSingle11[["PgUpdateSingle[11∈1]<br />ᐸt(k;v)ᐳ"]]:::sideeffectplan
+    Object14 & Access9 & List233 --> PgUpdateSingle11
+    Object15{{"Object[15∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle11 --> Object15
+    PgClassExpression234{{"PgClassExpression[234∈3]<br />ᐸ__t__.”k”ᐳ"}}:::plan
+    PgUpdateSingle11 --> PgClassExpression234
+    PgClassExpression235{{"PgClassExpression[235∈3]<br />ᐸ__t__.”v”ᐳ"}}:::plan
+    PgUpdateSingle11 --> PgClassExpression235
+    PgSelect239[["PgSelect[239∈5]<br />ᐸfrmcdc_workHour_1ᐳ"]]:::plan
+    __Item238[/"__Item[238∈5]<br />ᐸ235ᐳ"\]:::itemplan
+    Object14 & __Item238 --> PgSelect239
+    PgClassExpression235 ==> __Item238
+    __Item243[/"__Item[243∈6]<br />ᐸ239ᐳ"\]:::itemplan
+    PgSelect239 ==> __Item243
+    PgSelectSingle244{{"PgSelectSingle[244∈6]<br />ᐸfrmcdc_workHour_1ᐳ"}}:::plan
+    __Item243 --> PgSelectSingle244
+    PgClassExpression245{{"PgClassExpression[245∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
+    PgSelectSingle244 --> PgClassExpression245
+    PgClassExpression246{{"PgClassExpression[246∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
+    PgSelectSingle244 --> PgClassExpression246
+    PgClassExpression247{{"PgClassExpression[247∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
+    PgSelectSingle244 --> PgClassExpression247
+    PgClassExpression248{{"PgClassExpression[248∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
+    PgSelectSingle244 --> PgClassExpression248
+
+    %% define steps
+
+    subgraph "Buckets for mutations/v4/nested_arrays.updateT"
+    Bucket0("Bucket 0 (root)"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value1,__Value3,__Value5,Access9,Access12,Access13,Object14,Object44,Access53,Access63,Access73,Access83,List85,Object100,Access109,Access119,Access129,Access139,Object149,Access158,Access168,Access178,Access188,List190,List233,Constant249 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 9, 233<br /><br />1: PgUpdateSingle[11]<br />2: <br />ᐳ: Object[15]"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgUpdateSingle11,Object15 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 11, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 14<br /><br />ROOT PgUpdateSingle{1}ᐸt(k;v)ᐳ[11]"):::bucket
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression234,PgClassExpression235 bucket3
+    Bucket5("Bucket 5 (listItem)<br />Deps: 14<br /><br />ROOT __Item{5}ᐸ235ᐳ[238]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item238,PgSelect239 bucket5
+    Bucket6("Bucket 6 (listItem)<br />ROOT __Item{6}ᐸ239ᐳ[243]"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,__Item243,PgSelectSingle244,PgClassExpression245,PgClassExpression246,PgClassExpression247,PgClassExpression248 bucket6
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket5
+    Bucket5 --> Bucket6
+    end

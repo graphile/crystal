@@ -1,0 +1,19 @@
+## expect(errors).toBeFalsy();
+## expect(data.allTs.nodes).toHaveLength(2);
+## expect(data.allTs.nodes[0].v).toHaveLength(8);
+## expect(data.allTs.nodes[0].v[0]).toHaveLength(1);
+## expect(data.allTs.nodes[0].v[0][0].toMinutes).toEqual(4);
+#> schema: ["nested_arrays"]
+{
+  allTs {
+    nodes {
+      k
+      v {
+        fromHours
+        fromMinutes
+        toHours
+        toMinutes
+      }
+    }
+  }
+}

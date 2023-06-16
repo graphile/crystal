@@ -1,0 +1,16 @@
+## expect(errors).toBeFalsy();
+#> schema: ["nested_arrays"]
+#> variableValues: { "input": { "t": { "v": [ [{"fromHours": 1, "fromMinutes":  2, "toHours": 3, "toMinutes": 4}], [{"fromHours": 5, "fromMinutes":  6, "toHours": 7, "toMinutes": 8}, {"fromHours": 9, "fromMinutes":  10, "toHours": 11, "toMinutes": 12}], [], [], [], [], [], [] ] } } }
+mutation createT($input: CreateTInput!) {
+  createT(input: $input) {
+    t {
+      k
+      v {
+        fromHours
+        fromMinutes
+        toHours
+        toMinutes
+      }
+    }
+  }
+}

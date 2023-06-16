@@ -1,0 +1,37 @@
+{
+  updateTByK: {
+    t: {
+      k: 1,
+      v: [
+        [
+          {
+            fromHours: 1,
+            fromMinutes: 2,
+            toHours: 3,
+            toMinutes: 4,
+          },
+        ],
+        [
+          {
+            fromHours: 5,
+            fromMinutes: 6,
+            toHours: 7,
+            toMinutes: 8,
+          },
+          {
+            fromHours: 9,
+            fromMinutes: 10,
+            toHours: 11,
+            toMinutes: 12,
+          },
+        ],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+      ],
+    },
+  },
+}

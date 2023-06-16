@@ -17,7 +17,8 @@ drop schema if exists
   geometry,
   polymorphic,
   partitions,
-  js_reserved
+  js_reserved,
+  nested_arrays
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -1709,3 +1710,57 @@ create index on partitions.measurements (timestamp);
 create table measurements_y2022 partition of partitions.measurements for values from ('2022-01-01T00:00:00Z') to ('2023-01-01T00:00:00Z');
 create table measurements_y2023 partition of partitions.measurements for values from ('2023-01-01T00:00:00Z') to ('2024-01-01T00:00:00Z');
 create table measurements_y2024 partition of partitions.measurements for values from ('2024-01-01T00:00:00Z') to ('2025-01-01T00:00:00Z');
+
+--------------------------------------------------------------------------------
+
+create schema nested_arrays;
+
+-- Code based on code from https://github.com/graphile/postgraphile/issues/1722
+
+create type nested_arrays.work_hour_parts as (
+  from_hours   smallint,
+  from_minutes smallint,
+  to_hours     smallint,
+  to_minutes   smallint
+);
+
+create domain nested_arrays.work_hour as nested_arrays.work_hour_parts
+  not null check (
+    (VALUE).from_hours < 24 AND (VALUE).from_minutes < 60 AND
+    ((VALUE).to_hours < 24 AND (VALUE).to_minutes < 60 OR
+     (VALUE).to_hours = 24 AND (VALUE).to_minutes = 0) AND
+    (VALUE).from_hours >= 0 AND (VALUE).from_minutes >= 0 AND (VALUE).to_hours >= 0 AND
+    (VALUE).to_minutes >= 0 AND
+    ((VALUE).from_hours < (VALUE).to_hours OR (VALUE).from_minutes < (VALUE).to_minutes)
+  );
+
+create or replace function nested_arrays.check_work_hours(wh nested_arrays.work_hour[]) returns bool as $body$
+declare
+    prev    nested_arrays.work_hour_parts;
+    current nested_arrays.work_hour_parts;
+begin
+    foreach current in array wh
+        loop
+            if (prev is null) then
+                prev := current;
+            else
+                if current.from_hours < prev.to_hours or
+                   (current.from_hours = prev.to_hours and current.from_minutes <= prev.to_minutes) then
+                    return false;
+                end if;
+            end if;
+        end loop;
+    return true;
+end;
+$body$ language plpgsql strict immutable;
+
+create domain nested_arrays.workhours as nested_arrays.work_hour[] not null check (nested_arrays.check_work_hours(value::nested_arrays.work_hour[]));
+
+create domain nested_arrays.working_hours as nested_arrays.workhours[] check (cardinality(value) = 8);
+
+comment on domain nested_arrays.working_hours is 'Mo, Tu, We, Th, Fr, Sa, Su, Ho';
+
+create table nested_arrays.t (
+  k serial primary key,
+  v nested_arrays.working_hours
+);
