@@ -98,9 +98,11 @@ figure figcaption {
 .featureSummary details ul {
   margin-bottom: 1rem;
 }
+/*
 .featureSummary code {
   background-color: var(--docusaurus-highlighted-code-line-bg);
 }
+*/
 .ul-check li {
   background-image: url("../../static/img/check.svg");
   background-repeat: no-repeat;
