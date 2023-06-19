@@ -10,42 +10,6 @@ If you've written some PostGraphile V4 plugins by hand (not using one of the
 `make...Plugin` helpers) then this migration guide is for you. We'll step you
 through some of the key changes.
 
-## Plans, not look-ahead
-
-Graphile Build no longer has a look-ahead engine, instead it uses Gra*fast*
-plans.
-
-That means all of the APIs that related to "data generators" and the
-`QueryBuilder` and similar no longer exist:
-
-- 🚮 `QueryBuilder`
-- 🚮 `getDataFromParsedResolveInfoFragment`
-- 🚮 `addDataGenerator`
-- 🚮 `addArgDataGenerator`
-- 🚮 `queryFromResolveData`
-- 🚮 `selectGraphQLResultFromTable`
-
-Similarly you should no longer use resolvers since Gra*fast* plan resolvers
-replace both of these needs.
-
-The good news is that Gra*fast* plan resolvers are typically much (much)
-shorter and easier to read, write and understand compared to the chaotic mess
-that was V4's look-ahead system.
-
-## Type registration
-
-In V4 you could define types in an ad-hoc manner as and when you needed them,
-but this caused havoc at runtime because it meant that sometimes a type didn't
-already exist when you needed it - they were very dependent on ordering. This
-was particularly obvious when using `makeExtendSchemaPlugin` and trying to use
-auto-generated types that may or may not exist yet.
-
-In V5, all types must be registered by name during the 'init' phase. The types
-still are not created until they are needed, but their names and spec
-generation functions must be registered ahead of time. This means that when
-building fields and arguments you can always reference a type by its name
-(using `build.getTypeByName('TypeNameHere')`).
-
 ## TypeScript
 
 It is **very strongly recommended** that you write plugins in TypeScript. There
@@ -71,6 +35,95 @@ thanks to the many and varied package managers (and versions thereof) all
 having their own ideas about which modules should be installed where, we merge
 into globally scoped namespaces. The main roots for these namespaces that
 you'll work with are `GraphileConfig` and `GraphileBuild`.
+
+## No look-ahead
+
+Graphile Build no longer has a look-ahead engine, instead it uses Gra*fast*
+plans.
+
+That means all of the APIs that related to "data generators" and the
+`QueryBuilder` and similar no longer exist:
+
+- 🚮 `QueryBuilder`
+- 🚮 `getDataFromParsedResolveInfoFragment`
+- 🚮 `addDataGenerator`
+- 🚮 `addArgDataGenerator`
+- 🚮 `queryFromResolveData`
+- 🚮 `selectGraphQLResultFromTable`
+
+Similarly you should no longer use resolvers since Gra*fast* plan resolvers
+replace both of these needs.
+
+The good news is that Gra*fast* plan resolvers are typically much (much)
+shorter and easier to read, write and understand compared to the chaotic mess
+that was V4's look-ahead system. We'll look at this a bit more in
+[Plans](#plans) below.
+
+## Type registration
+
+In V4 you could define types in an ad-hoc manner as and when you needed them,
+but this caused havoc at runtime because it meant that sometimes a type didn't
+already exist when you needed it - they were very dependent on ordering. This
+was particularly obvious when using `makeExtendSchemaPlugin` and trying to use
+auto-generated types that may or may not exist yet. Worse still, I saw
+community plugins building types if that type didn't already exist &mdash; but
+there was no guarantee that the type that already existed was the one the
+plugin needed!
+
+In V5, all types must be registered by name during the `init` hook. The types
+still are not created until they are needed, but their names and spec
+generation functions must be registered ahead of time. This means that when
+building fields and arguments you can always reference a type by its name
+(using `build.getTypeByName('TypeNameHere')`).
+
+So `build.newWithHooks` no longer exists, instead you use the registration methods:
+
+- `build.registerObjectType(typeName, scope, stepValidation, specCallback, origin)`
+- `build.registerInterfaceType(typeName, scope, specCallback, reason)`
+- `build.registerUnionType(typeName, scope, specCallback, reason)`
+- `build.registerScalarType(typeName, scope, specCallback, reason)`
+- `build.registerEnumType(typeName, scope, specCallback, reason)`
+- `build.registerInputObjectType(typeName, scope, specCallback, reason)`
+
+Note that `registerObjectType` is the odd one out here since it accepts the
+additional `stepValidation` option; this can be null or to a function that
+checks that the given step is of a suitable type for the type's plan resolvers
+to support.
+
+### Example
+
+```ts
+const MyPlugin: GraphileConfig.Plugin = {
+  name: "MyPlugin",
+  version: "0.0.0",
+
+  schema: {
+    hooks: {
+      init(_, build) {
+        const typeName = inflection.myInflector("MyInflectorInput");
+
+        build.registerObjectType(
+          typeName,
+          {
+            /* add scope data here */
+          },
+          optionalStepValidationFunctionHere,
+          () => ({
+            // Here's the spec for the type
+            description: "...",
+            fields: {
+              //...
+            },
+          }),
+          `Here you'd put a helpful phrase detailing why this type is being registered; useful when two types try and register with the same name`,
+        );
+
+        return _;
+      },
+    },
+  },
+};
+```
 
 ## Plugins and presets
 
@@ -256,12 +309,9 @@ out to Benjie for additional documentation!
 
 #### plugin.schema
 
-If you were writing a schema plugin, this is where the bulk of your replacement
-will go.
+Configures the behavior system and implements the schema hooks
 
-##### .globalBehavior
-
-##### .entityBehavior
+##### .globalBehavior and .entityBehavior
 
 The '@omit' and '@simpleCollections' smart tags have been replaced with the
 behavior system in V5. Though the V4 preset adds compatibility with the V4
@@ -271,6 +321,9 @@ not_ use the data from @omit - they should use the behavior data exclusively.
 For more information on behavior, see [Behavior](../behavior).
 
 ##### .hooks
+
+If you were writing a schema plugin, this is where the bulk of your replacement
+will go.
 
 This is where your schema hooks get registered now. A simple first change is
 that we've moved from a procedural style to a declarative style. Further, we've
@@ -379,6 +432,14 @@ declare global {
   }
 }
 ```
+
+## Plans
+
+As we read earlier, there's no loog-ahead system in PostGraphile V5; instead we
+use Gra*fast*'s planning system. This is much more straightforward in most
+cases; let's take a look at some examples:
+
+[TODO]
 
 ## Examples
 
