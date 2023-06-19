@@ -162,6 +162,7 @@ const sidebars = {
         "migrating-from-v4/make-extend-schema-plugin",
         "migrating-from-v4/make-add-pg-table-condition-plugin",
         "migrating-from-v4/make-add-pg-table-order-by-plugin",
+        "migrating-from-v4/migrating-custom-plugins",
       ],
     },
     {
