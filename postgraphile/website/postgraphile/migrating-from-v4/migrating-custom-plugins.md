@@ -125,21 +125,7 @@ const MyPlugin: GraphileConfig.Plugin = {
 };
 ```
 
-## Plugins and presets
-
-In PostGraphile V4 there were two types of plugins:
-
-- schema plugins (functions) interacted with Graphile Engine (graphile-build
-  and graphile-build-pg) and were responsible to changes to your GraphQL schema
-- server plugins (objects) interacted with PostGraphile and it's server/CLI and
-  were responsible to changes to how the HTTP requests were handled and other
-  "high level" concerns (including such concerns as which additional schema
-  plugins to load!)
-
-In V5 there is only one type of plugin, a Graphile Config plugin. In addition
-to plugins, there are also presets.
-
-### Presets
+## Presets
 
 Presets are a collection of plugins, configuration options, and other presets
 that get merged together recursively to build the users ultimate configuration.
@@ -164,9 +150,19 @@ distinguish between presets and plugins.
 
 :::
 
-### Plugins
+## Plugins
 
-Graphile Config plugins are objects with the following properties:
+In PostGraphile V4 there were two types of plugins:
+
+- schema plugins (functions) interacted with Graphile Engine (graphile-build
+  and graphile-build-pg) and were responsible to changes to your GraphQL schema
+- server plugins (objects) interacted with PostGraphile and it's server/CLI and
+  were responsible to changes to how the HTTP requests were handled and other
+  "high level" concerns (including such concerns as which additional schema
+  plugins to load!)
+
+In V5 there is only one type of plugin, a Graphile Config plugin. Graphile
+Config plugins are objects with the following properties:
 
 - `name` (required) - a unique name for this plugin
 - `version` (required) a semver-formatted version string
@@ -198,7 +194,7 @@ file - so there is no plugin interface for adding CLI flags.
 
 :::
 
-#### plugin.inflection
+### plugin.inflection
 
 In V4, "inflection" was one of the hooks that were called whilst building a
 schema. In V5, inflection has been promoted to its own phase, primarily because
@@ -207,7 +203,7 @@ schema. In V5, inflection has been promoted to its own phase, primarily because
 (i.e. object properties) way, rather than an imperative (i.e. function calls)
 way - this allows the system to inspect plugins without executing them.
 
-##### .add
+#### .add
 
 Used to add inflectors; when doing so you should also add their type
 definitions. Note that the type definitions only include the arguments that you
@@ -257,7 +253,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
 };
 ```
 
-##### .replace
+#### .replace
 
 Should you wish to replace an inflector, you may use this hook instead. It
 works similarly to `add` above, with the following two differences:
@@ -267,7 +263,7 @@ works similarly to `add` above, with the following two differences:
    this is the previous implementation of the inflector, for your inflector to
    call should it need to.
 
-##### .ignoreReplaceIfNotExists
+#### .ignoreReplaceIfNotExists
 
 You can "replace" an inflector that doesn't exist, but a) you'll get a warning,
 and b) the `prev` function will be null or undefined.
@@ -293,7 +289,7 @@ export const PgAllThePeoplePlugin: GraphileConfig.Plugin = {
 };
 ```
 
-#### plugin.gather
+### plugin.gather
 
 In V5 we've broken the schema build process into two parts:
 
@@ -307,11 +303,11 @@ If your plugin did anything asynchronous (extremely unlikely) then that work
 would now be done during the `gather` phase. If this is the case, please reach
 out to Benjie for additional documentation!
 
-#### plugin.schema
+### plugin.schema
 
 Configures the behavior system and implements the schema hooks
 
-##### .globalBehavior and .entityBehavior
+#### .globalBehavior and .entityBehavior
 
 The '@omit' and '@simpleCollections' smart tags have been replaced with the
 behavior system in V5. Though the V4 preset adds compatibility with the V4
@@ -320,7 +316,7 @@ not_ use the data from @omit - they should use the behavior data exclusively.
 
 For more information on behavior, see [Behavior](../behavior).
 
-##### .hooks
+#### .hooks
 
 If you were writing a schema plugin, this is where the bulk of your replacement
 will go.
