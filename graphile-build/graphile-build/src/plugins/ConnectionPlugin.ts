@@ -1,7 +1,11 @@
 import "graphile-config";
 
-import type { EdgeCapableStep, PageInfoCapableStep } from "grafast";
-import { ConnectionStep, ExecutableStep } from "grafast";
+import type { EdgeCapableStep } from "grafast";
+import {
+  assertEdgeCapableStep,
+  assertPageInfoCapableStep,
+  ConnectionStep,
+} from "grafast";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
@@ -90,10 +94,8 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                   ...scope,
                   isConnectionEdgeType: true,
                 },
-                ExecutableStep as unknown as {
-                  new (...args: any[]): EdgeCapableStep<any>;
-                },
                 () => ({
+                  assertStep: assertEdgeCapableStep,
                   description: build.wrapDescription(
                     `A \`${typeName}\` edge in the connection.`,
                     "type",
@@ -152,7 +154,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                   ...scope,
                   isConnectionType: true,
                 },
-                ConnectionStep,
                 () => {
                   const NodeType = build.getOutputTypeByName(typeName);
                   const EdgeType = build.getOutputTypeByName(edgeTypeName);
@@ -160,6 +161,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                     build.inflection.builtin("PageInfo"),
                   );
                   return {
+                    assertStep: ConnectionStep,
                     description: build.wrapDescription(
                       `A connection to a list of \`${typeName}\` values.`,
                       "type",
@@ -259,10 +261,8 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
           registerObjectType(
             inflection.builtin("PageInfo"),
             { isPageInfo: true },
-            ExecutableStep as unknown as {
-              new (...args: any[]): PageInfoCapableStep;
-            },
             () => ({
+              assertStep: assertPageInfoCapableStep,
               description: build.wrapDescription(
                 "Information about pagination in a connection.",
                 "type",

@@ -159,9 +159,10 @@ export interface GrafastInputFieldExtensions {
 }
 
 export interface GrafastObjectTypeExtensions {
-  Step?:
+  assertStep?:
     | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): ExecutableStep; displayName?: string };
+    | { new (...args: any[]): ExecutableStep }
+    | null;
 }
 
 export interface GrafastEnumTypeExtensions {}

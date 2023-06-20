@@ -31,13 +31,11 @@ export const MutationPlugin: GraphileConfig.Plugin = {
             {
               isRootMutation: true,
             },
-            __ValueStep,
-            () => {
-              return {
-                description:
-                  "The root mutation type which contains root level fields which mutate data.",
-              };
-            },
+            () => ({
+              assertStep: __ValueStep,
+              description:
+                "The root mutation type which contains root level fields which mutate data.",
+            }),
             `graphile-build built-in (root mutation type)`,
           );
 

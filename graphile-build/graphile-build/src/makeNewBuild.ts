@@ -1,7 +1,6 @@
 import "./global.js";
 
 import chalk from "chalk";
-import type { ExecutableStep } from "grafast";
 import type { GraphQLNamedType } from "graphql";
 import {
   GraphQLBoolean,
@@ -35,6 +34,9 @@ const version: string = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf8"),
 ).version;
 */
+
+/** Have we warned the user they're using the 5-arg deprecated registerObjectType call? */
+let registerObjectType5argsDeprecatedWarned = false;
 
 /**
  * Makes a new 'Build' object suitable to be passed through the 'build' hook.
@@ -71,10 +73,6 @@ export default function makeNewBuild(
       scope: GraphileBuild.SomeScope;
       specGenerator: any;
       origin: string | null | undefined;
-      Step?:
-        | ((step: ExecutableStep) => asserts step is ExecutableStep)
-        | { new (...args: any[]): ExecutableStep }
-        | null;
     };
   } = Object.create(null);
 
@@ -86,10 +84,6 @@ export default function makeNewBuild(
     klass: { new (spec: any): GraphQLNamedType },
     typeName: string,
     scope: GraphileBuild.SomeScope,
-    Step:
-      | ((step: ExecutableStep) => asserts step is ExecutableStep)
-      | { new (...args: any[]): ExecutableStep }
-      | null,
     specGenerator: () => any,
     origin: string | null | undefined,
   ) {
@@ -125,7 +119,6 @@ export default function makeNewBuild(
       scope,
       specGenerator,
       origin,
-      Step,
     };
   }
 
@@ -186,16 +179,51 @@ export default function makeNewBuild(
     wrapDescription,
     stringTypeSpec,
 
-    registerObjectType(typeName, scope, Step, specGenerator, origin) {
-      register.call(
-        this,
-        GraphQLObjectType,
-        typeName,
-        scope,
-        Step,
-        specGenerator,
-        origin,
-      );
+    registerObjectType(
+      typeName: string,
+      scope: GraphileBuild.ScopeObject,
+      assertStepOrSpecGenerator: any,
+      specGeneratorOrOrigin: any,
+      possiblyOrigin?: string | null | undefined,
+    ) {
+      if (typeof specGeneratorOrOrigin === "function") {
+        // This is the `@deprecated` path; we'll be removing this
+        if (!registerObjectType5argsDeprecatedWarned) {
+          registerObjectType5argsDeprecatedWarned = true;
+          console.trace(
+            `[DEPRECATED] There is a call to 'registerObject(typeName, scope, assertStep, specGenerator, origin)'; this signature has been deprecated. Please move 'assertStep' into the spec returned by 'stepGenerator' and remove the third argument to give:  'registerObject(typeName, scope, specGenerator, origin)'. This compatibility shim will not be supported for long.`,
+          );
+        }
+        const assertStep = assertStepOrSpecGenerator;
+        const specGenerator = specGeneratorOrOrigin;
+        const origin = possiblyOrigin;
+        const replacementSpecGenerator = (...args: any[]) => {
+          const spec = specGenerator(...args);
+          return {
+            assertStep,
+            ...spec,
+          };
+        };
+        register.call(
+          this,
+          GraphQLObjectType,
+          typeName,
+          scope,
+          replacementSpecGenerator,
+          origin,
+        );
+      } else {
+        const specGenerator = assertStepOrSpecGenerator;
+        const origin = specGeneratorOrOrigin;
+        register.call(
+          this,
+          GraphQLObjectType,
+          typeName,
+          scope,
+          specGenerator,
+          origin,
+        );
+      }
     },
     registerUnionType(typeName, scope, specGenerator, origin) {
       register.call(
@@ -203,7 +231,6 @@ export default function makeNewBuild(
         GraphQLUnionType,
         typeName,
         scope,
-        null,
         specGenerator,
         origin,
       );
@@ -214,7 +241,6 @@ export default function makeNewBuild(
         GraphQLInterfaceType,
         typeName,
         scope,
-        null,
         specGenerator,
         origin,
       );
@@ -225,7 +251,6 @@ export default function makeNewBuild(
         GraphQLInputObjectType,
         typeName,
         scope,
-        null,
         specGenerator,
         origin,
       );
@@ -236,7 +261,6 @@ export default function makeNewBuild(
         GraphQLScalarType,
         typeName,
         scope,
-        null,
         specGenerator,
         origin,
       );
@@ -247,7 +271,6 @@ export default function makeNewBuild(
         GraphQLEnumType,
         typeName,
         scope,
-        null,
         specGenerator,
         origin,
       );
@@ -290,12 +313,11 @@ export default function makeNewBuild(
 
       const details = typeRegistry[typeName];
       if (details != null) {
-        const { klass: Constructor, scope, origin, Step } = details;
+        const { klass: Constructor, scope, origin } = details;
         return Object.assign(Object.create(null), {
           Constructor,
           scope,
           origin,
-          Step,
         });
       }
       return null;
@@ -318,7 +340,7 @@ export default function makeNewBuild(
         try {
           const details = typeRegistry[typeName];
           if (details != null) {
-            const { klass, scope, specGenerator, Step } = details;
+            const { klass, scope, specGenerator } = details;
 
             const spec = specGenerator();
             // No need to have the user specify name, and they're forbidden from
@@ -334,7 +356,6 @@ export default function makeNewBuild(
               klass,
               spec,
               scope,
-              Step,
             );
 
             allTypes[typeName] = type;

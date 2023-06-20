@@ -1219,7 +1219,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       isPgRangeBoundType: true,
                       pgCodec: codec,
                     },
-                    null, // TODO
                     () => ({
                       description: build.wrapDescription(
                         "The value at one end of a range. A range can either include this value, or not.",
@@ -1292,7 +1291,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       isPgRangeType: true,
                       pgCodec: codec,
                     },
-                    null, // TODO
                     () => ({
                       description: build.wrapDescription(
                         `A range of \`${underlyingOutputTypeName}\`.`,
@@ -1397,7 +1395,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                       build.registerObjectType(
                         typeName,
                         {},
-                        underlyingOutputMeta.Step as any,
                         copy(underlyingOutputTypeName),
                         "PgCodecsPlugin",
                       );

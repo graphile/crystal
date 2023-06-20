@@ -624,8 +624,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   pgCodec: codec,
                   isPgClassType: true,
                 },
-                assertPgClassSingleStep,
                 () => ({
+                  assertStep: assertPgClassSingleStep,
                   description: codec.description,
                 }),
                 `PgTablesPlugin table type for ${codec.name}`,

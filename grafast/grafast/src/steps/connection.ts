@@ -24,6 +24,25 @@ export interface PageInfoCapableStep extends ExecutableStep {
   endCursor(): ExecutableStep<string | null>;
 }
 
+export function assertPageInfoCapableStep(
+  $step: ExecutableStep | PageInfoCapableStep,
+): asserts $step is PageInfoCapableStep {
+  const $typed = $step as ExecutableStep & {
+    hasNextPage?: any;
+    hasPreviousPage?: any;
+    startCursor?: any;
+    endCursor?: any;
+  };
+  if (
+    typeof $typed.hasNextPage !== "function" ||
+    typeof $typed.hasPreviousPage !== "function" ||
+    typeof $typed.startCursor !== "function" ||
+    typeof $typed.endCursor !== "function"
+  ) {
+    throw new Error(`Expected a PageInfoCapableStep, but found '${$step}'`);
+  }
+}
+
 /**
  * Describes what a plan needs to implement in order to be suitable for
  * supplying what a ConnectionStep requires.
@@ -322,6 +341,21 @@ export interface EdgeCapableStep<TNodeStep extends ExecutableStep>
   extends ExecutableStep {
   node(): TNodeStep;
   cursor(): ExecutableStep<string | null>;
+}
+
+export function assertEdgeCapableStep<TNodeStep extends ExecutableStep>(
+  $step: ExecutableStep | EdgeCapableStep<TNodeStep>,
+): asserts $step is EdgeCapableStep<TNodeStep> {
+  const $typed = $step as ExecutableStep & {
+    node?: any;
+    cursor?: any;
+  };
+  if (
+    typeof $typed.node !== "function" ||
+    typeof $typed.cursor !== "function"
+  ) {
+    throw new Error(`Expected a EdgeCapableStep, but found '${$step}'`);
+  }
 }
 
 export class EdgeStep<

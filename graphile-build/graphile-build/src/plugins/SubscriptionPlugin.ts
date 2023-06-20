@@ -32,12 +32,10 @@ export const SubscriptionPlugin: GraphileConfig.Plugin = {
             {
               isRootSubscription: true,
             },
-            __ValueStep,
-            () => {
-              return {
-                description: `The root subscription type: contains realtime events you can subscribe to with the \`subscription\` operation.`,
-              };
-            },
+            () => ({
+              assertStep: __ValueStep,
+              description: `The root subscription type: contains realtime events you can subscribe to with the \`subscription\` operation.`,
+            }),
             `graphile-build built-in (root subscription type)`,
           );
 

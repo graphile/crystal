@@ -55,6 +55,44 @@ import type { stringTypeSpec, wrapDescription } from "./utils.js";
  * ```
  */
 
+interface RegisterObjectType {
+  /**
+   * Register a type by name with the system; names must be unique. It's
+   * strongly advised that your names come from an inflector so that they
+   * can be overridden. When you register a type, you should also supply a
+   * scope so that other plugins may hook it; it can also be helpful to
+   * indicate where a conflict has occurred.
+   */
+  <TStep extends ExecutableStep | null>(
+    typeName: string,
+    scope: GraphileBuild.ScopeObject,
+    specGenerator: () => Omit<
+      GraphileBuild.GrafastObjectTypeConfig<TStep, any>,
+      "name"
+    >,
+    origin: string | null | undefined,
+  ): void;
+  // TODO: remove this backwards compatibility shim and move this definition back inline (get rid of RegisterObjectType)
+  /**
+   * @deprecated Please pass 'assertStep' as part of the object spec. This
+   * compatibility signature will not be supported for long!
+   */
+  <TStep extends ExecutableStep | null>(
+    typeName: string,
+    scope: GraphileBuild.ScopeObject,
+    assertStep: TStep extends ExecutableStep
+      ?
+          | ((step: ExecutableStep) => asserts step is TStep)
+          | { new (...args: any[]): TStep }
+      : null,
+    specGenerator: () => Omit<
+      GraphileBuild.GrafastObjectTypeConfig<TStep, any>,
+      "name"
+    >,
+    origin: string | null | undefined,
+  ): void;
+}
+
 declare global {
   namespace GraphileBuild {
     /**
@@ -192,6 +230,11 @@ declare global {
       interfaces?:
         | GraphQLInterfaceType[]
         | ((context: ContextObjectInterfaces) => GraphQLInterfaceType[]);
+      assertStep?: TParentStep extends ExecutableStep
+        ?
+            | ((step: ExecutableStep) => asserts step is TParentStep)
+            | { new (...args: any[]): TParentStep }
+        : null;
     }
 
     /** Our take on GraphQLInputObjectTypeConfig that allows for plans */
@@ -312,17 +355,7 @@ declare global {
        * scope so that other plugins may hook it; it can also be helpful to
        * indicate where a conflict has occurred.
        */
-      registerObjectType<TStep extends ExecutableStep | null>(
-        typeName: string,
-        scope: ScopeObject,
-        Step: TStep extends ExecutableStep
-          ?
-              | ((step: ExecutableStep) => asserts step is TStep)
-              | { new (...args: any[]): TStep }
-          : null,
-        specGenerator: () => Omit<GrafastObjectTypeConfig<TStep, any>, "name">,
-        origin: string | null | undefined,
-      ): void;
+      registerObjectType: RegisterObjectType;
 
       /** As registerObjectType, but for interfaces */
       registerInterfaceType: (

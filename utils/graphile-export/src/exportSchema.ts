@@ -1396,15 +1396,15 @@ function exportSchemaTypeDefs({
     if (type instanceof GraphQLObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
-      if (type.extensions.grafast?.Step) {
+      if (type.extensions.grafast?.assertStep) {
         typeProperties.push(
           t.objectProperty(
-            t.identifier("__Step"),
+            t.identifier("__assertStep"),
             convertToIdentifierViaAST(
               file,
-              type.extensions.grafast.Step,
-              `${type.name}ExpectedStep`,
-              `${type.name}.extensions.Step`,
+              type.extensions.grafast.assertStep,
+              `${type.name}AssertStep`,
+              `${type.name}.extensions.assertStep`,
             ),
           ),
         );
