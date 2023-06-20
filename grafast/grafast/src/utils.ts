@@ -426,11 +426,7 @@ export function newObjectTypeBuilder<
 ) => GrafastObjectType<TContext, TParentStep, TFields> {
   return (spec) =>
     new GraphQLObjectType(
-      objectSpec<
-        TContext,
-        TParentStep,
-        ObjectTypeFields<TContext, TParentStep>
-      >({ assertStep, ...spec }),
+      objectSpec({ assertStep, ...spec }),
     ) as GrafastObjectType<TContext, TParentStep, any>;
 }
 
