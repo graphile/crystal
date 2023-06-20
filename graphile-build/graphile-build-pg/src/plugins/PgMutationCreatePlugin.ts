@@ -3,7 +3,7 @@ import "graphile-config";
 import type { PgInsertSingleStep, PgResource } from "@dataplan/pg";
 import { pgInsertSingle } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
-import { constant, ExecutableStep, object } from "grafast";
+import { assertExecutableStep, constant, object } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLOutputType } from "graphql";
 
@@ -169,8 +169,8 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                 // TODO: isPgCreatePayloadType: true,
                 pgTypeResource: resource,
               },
-              ExecutableStep as any,
               () => ({
+                assertStep: assertExecutableStep,
                 description: `The output of our create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {
                   const TableType = build.getGraphQLTypeByPgCodec(

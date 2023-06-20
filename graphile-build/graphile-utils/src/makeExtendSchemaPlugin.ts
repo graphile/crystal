@@ -389,7 +389,6 @@ export function makeExtendSchemaPlugin(
               build.registerObjectType(
                 name,
                 scope,
-                null,
                 () => ({
                   interfaces,
                   fields: (fieldsContext) =>

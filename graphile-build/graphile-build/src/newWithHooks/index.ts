@@ -55,10 +55,6 @@ export type NewWithHooksFunction = <
   klass: { new (spec: SpecForType<TType>): TType },
   spec: SpecForType<TType>,
   scope: ScopeForType<TType>,
-  Step?:
-    | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): ExecutableStep }
-    | null,
 ) => TType;
 
 /**
@@ -73,7 +69,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
     Type,
     inSpec,
     inScope,
-    Step,
   ) {
     if (!inScope) {
       // eslint-disable-next-line no-console
@@ -341,9 +336,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               return fieldsSpec;
             },
           };
-          const Self = new GraphQLObjectType(
-            objectSpec(finalSpec, Step ?? null),
-          );
+          const Self = new GraphQLObjectType(objectSpec(finalSpec));
           return Self;
         }
 

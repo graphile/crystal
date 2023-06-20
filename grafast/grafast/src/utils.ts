@@ -353,6 +353,11 @@ export type ObjectTypeSpec<
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 > = Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
   fields: TFields | (() => TFields);
+  assertStep?: TParentStep extends ExecutableStep
+    ?
+        | ((step: ExecutableStep) => asserts step is TParentStep)
+        | { new (...args: any[]): TParentStep }
+    : null;
 };
 
 /**
@@ -364,19 +369,16 @@ export function objectSpec<
   TFields extends ObjectTypeFields<TContext, TParentStep>,
 >(
   spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
-  Step:
-    | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): TParentStep }
-    | null,
 ): GraphQLObjectTypeConfig<any, TContext> {
+  const { assertStep, ...rest } = spec;
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
-    ...spec,
-    ...(Step
+    ...rest,
+    ...(assertStep
       ? {
           extensions: {
             ...spec.extensions,
             grafast: {
-              Step: Step,
+              assertStep,
               ...spec.extensions?.grafast,
             },
           },
@@ -413,17 +415,23 @@ export type GrafastObjectType<
 export function newObjectTypeBuilder<
   TContext extends Grafast.Context,
   TParentStep extends ExecutableStep,
->(Step: {
-  new (...args: any[]): TParentStep;
-}): <TFields extends ObjectTypeFields<TContext, TParentStep>>(
+>(
+  assertStep: TParentStep extends ExecutableStep
+    ?
+        | ((step: ExecutableStep) => asserts step is TParentStep)
+        | { new (...args: any[]): TParentStep }
+    : never,
+): <TFields extends ObjectTypeFields<TContext, TParentStep>>(
   spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
 ) => GrafastObjectType<TContext, TParentStep, TFields> {
   return (spec) =>
-    new GraphQLObjectType(objectSpec(spec, Step)) as GrafastObjectType<
-      TContext,
-      TParentStep,
-      any
-    >;
+    new GraphQLObjectType(
+      objectSpec<
+        TContext,
+        TParentStep,
+        ObjectTypeFields<TContext, TParentStep>
+      >({ assertStep, ...spec }),
+    ) as GrafastObjectType<TContext, TParentStep, any>;
 }
 
 /**
@@ -879,7 +887,7 @@ export function isTypePlanned(
   namedType: GraphQLNamedType,
 ): boolean {
   if (namedType instanceof GraphQLObjectType) {
-    return !!namedType.extensions?.grafast?.Step;
+    return !!namedType.extensions?.grafast?.assertStep;
   } else if (
     namedType instanceof GraphQLUnionType ||
     namedType instanceof GraphQLInterfaceType
@@ -891,7 +899,7 @@ export function isTypePlanned(
     let firstHadPlan = null;
     let i = 0;
     for (const type of types) {
-      const hasPlan = !!type.extensions?.grafast?.Step;
+      const hasPlan = !!type.extensions?.grafast?.assertStep;
       if (firstHadPlan === null) {
         firstHadPlan = hasPlan;
       } else if (hasPlan !== firstHadPlan) {

@@ -31,13 +31,11 @@ export const QueryPlugin: GraphileConfig.Plugin = {
             {
               isRootQuery: true,
             },
-            __ValueStep,
-            () => {
-              return {
-                description:
-                  "The root query type which gives access points into the data universe.",
-              };
-            },
+            () => ({
+              assertStep: __ValueStep,
+              description:
+                "The root query type which gives access points into the data universe.",
+            }),
             `graphile-build built-in (root query type)`,
           );
           return _;

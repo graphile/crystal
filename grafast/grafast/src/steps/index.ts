@@ -27,6 +27,8 @@ export function debugPlans<T>(callback: () => T): T {
 
 export { access, AccessStep } from "./access.js";
 export {
+  assertEdgeCapableStep,
+  assertPageInfoCapableStep,
   connection,
   ConnectionCapableStep,
   ConnectionStep,

@@ -266,9 +266,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               isPgDeletePayloadType: mode === "resource:delete",
               pgTypeResource: resource,
             },
-            ObjectStep,
             () => {
               return {
+                assertStep: ObjectStep,
                 description: build.wrapDescription(
                   `The output of our ${modeText} \`${tableTypeName}\` mutation.`,
                   "type",

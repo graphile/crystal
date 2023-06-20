@@ -21,7 +21,8 @@ import type {
   PgResource,
   PgResourceOptions,
 } from "@dataplan/pg";
-import { arraysMatch, ExecutableStep } from "grafast";
+import { assertPgClassSingleStep } from "@dataplan/pg";
+import { arraysMatch } from "grafast";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
@@ -673,9 +674,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           ).attributes,
                         },
                       },
-                      // TODO: we actually allow a number of different plans; should we make this an array? See: PgClassSingleStep
-                      ExecutableStep, // PgClassSingleStep
                       () => ({
+                        assertStep: assertPgClassSingleStep,
                         description: codec.description,
                         interfaces: [
                           build.getTypeByName(

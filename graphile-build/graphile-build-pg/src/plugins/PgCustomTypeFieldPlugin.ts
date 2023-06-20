@@ -697,8 +697,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       pgCodec: resource.codec,
                       pgTypeResource: resource,
                     },
-                    ObjectStep,
                     () => ({
+                      assertStep: ObjectStep,
                       description: `The output of our \`${fieldName}\` mutation.`,
                       fields: () => {
                         const fields = Object.assign(Object.create(null), {

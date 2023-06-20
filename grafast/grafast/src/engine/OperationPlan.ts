@@ -1156,7 +1156,7 @@ export class OperationPlan {
       if (
         resultIsPlanned &&
         !fieldHasPlan &&
-        !objectType.extensions?.grafast?.Step
+        !objectType.extensions?.grafast?.assertStep
       ) {
         throw new Error(
           `Field ${objectType.name}.${fieldName} returns a ${namedReturnType.name} which expects a plan to be available; however this field has no plan() method to produce such a plan; please add 'extensions.grafast.plan' to this field.`,
@@ -1470,8 +1470,8 @@ export class OperationPlan {
       if (isDev) {
         // Check that the plan we're dealing with is the one the user declared
         /** Either an assertion function or a step class */
-        const stepAssertion = nullableFieldType.extensions?.grafast?.Step;
-        if (stepAssertion !== undefined) {
+        const stepAssertion = nullableFieldType.extensions?.grafast?.assertStep;
+        if (stepAssertion != null) {
           try {
             if (
               stepAssertion === ExecutableStep ||

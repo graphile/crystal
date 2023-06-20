@@ -3,7 +3,8 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
-import { access, ExecutableStep } from "grafast";
+import type { ExecutableStep } from "grafast";
+import { access, assertExecutableStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
@@ -382,8 +383,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
           build.registerObjectType(
             inflection.builtin("Interval"),
             { isPgIntervalType: true },
-            ExecutableStep,
             () => ({
+              assertStep: assertExecutableStep,
               description: build.wrapDescription(
                 "An interval of time that has passed where the smallest distinct unit is a second.",
                 "type",
@@ -416,8 +417,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
             build.registerObjectType(
               inflection.builtin(typeName),
               { [`isPg${typeName}Type`]: true },
-              null, // TODO: does this want a plan?
               () => ({
+                assertStep: null, // TODO: does this want a plan?
                 description: build.wrapDescription(description, "type"),
                 fields: fieldGen(),
               }),
