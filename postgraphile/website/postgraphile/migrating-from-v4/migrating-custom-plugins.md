@@ -36,10 +36,17 @@ having their own ideas about which modules should be installed where, we merge
 into globally scoped namespaces. The main roots for these namespaces that
 you'll work with are `GraphileConfig` and `GraphileBuild`.
 
+Many of the types need to be converted, here's a few:
+
+- `import("graphile-build").Build` -> `GraphileBuild.Build`
+- `import("graphile-build").Plugin` -> `GraphileConfig.Plugin` (the `inflection`, `gather` and `schema` scopes therein)
+- `import("postgraphile").PostGraphilePlugin` -> `GraphileConfig.Plugin` (the `grafast` and `grafserv` scopes therein)
+- `import("postgraphile").PostGraphileOptions` -> `GraphileConfig.Preset` (split across the various scopes therein)
+
 ## No look-ahead
 
 Graphile Build no longer has a look-ahead engine, instead it uses Gra*fast*
-plans.
+plans. (You should familiarize yourself with [Gra*fast*'s documentation](https://grafast.org/grafast/).)
 
 That means all of the APIs that related to "data generators" and the
 `QueryBuilder` and similar no longer exist:
@@ -52,7 +59,10 @@ That means all of the APIs that related to "data generators" and the
 - 🚮 `selectGraphQLResultFromTable`
 
 Similarly you should no longer use resolvers since Gra*fast* plan resolvers
-replace both of these needs.
+replace both of these needs. (You _can_ use traditional resolvers with
+Gra*fast*, but they lose many of the benefits of plan resolvers. Further, a
+Gra*fast* plan that does not use any traditional resolvers is considered
+"pure", so your plugin should aim to not "taint" your users' schemas.)
 
 The good news is that Gra*fast* plan resolvers are typically much (much)
 shorter and easier to read, write and understand compared to the chaotic mess
@@ -61,20 +71,20 @@ that was V4's look-ahead system. We'll look at this a bit more in
 
 ## Type registration
 
-In V4 you could define types in an ad-hoc manner as and when you needed them,
-but this caused havoc at runtime because it meant that sometimes a type didn't
-already exist when you needed it - they were very dependent on ordering. This
-was particularly obvious when using `makeExtendSchemaPlugin` and trying to use
-auto-generated types that may or may not exist yet. Worse still, I saw
-community plugins building types if that type didn't already exist &mdash; but
-there was no guarantee that the type that already existed was the one the
-plugin needed!
+In V4 you could define types in an ad-hoc manner as and when you needed them
+using the `newWithHooks()` function, but this caused havoc at runtime because
+it meant that sometimes a type didn't already exist when you needed it &mdash; they
+were very dependent on ordering. This was particularly obvious when using
+`makeExtendSchemaPlugin` and trying to use auto-generated types that may or may
+not exist yet. Worse still, I saw community plugins building types if that type
+didn't already exist &mdash; but there was no guarantee that the type that
+already existed was the one the plugin needed!
 
 In V5, all types must be registered by name during the `init` hook. The types
-still are not created until they are needed, but their names and spec
-generation functions must be registered ahead of time. This means that when
-building fields and arguments you can always reference a type by its name
-(using `build.getTypeByName('TypeNameHere')`).
+still are not created until they are needed (and may not be created at all),
+but their names and spec generation functions must be registered ahead of time.
+This means that when building fields and arguments you can always reference a
+type by its name (using `build.getTypeByName('TypeNameHere')`).
 
 So `build.newWithHooks` no longer exists, instead you use the registration methods:
 
