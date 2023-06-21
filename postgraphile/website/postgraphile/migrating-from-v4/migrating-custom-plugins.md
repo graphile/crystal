@@ -1,7 +1,7 @@
 ---
 title: "Custom plugins"
 toc_min_heading_level: 2
-toc_max_heading_level: 5
+toc_max_heading_level: 4
 ---
 
 # Migrating custom plugins
@@ -76,9 +76,8 @@ using the `newWithHooks()` function, but this caused havoc at runtime because
 it meant that sometimes a type didn't already exist when you needed it &mdash; they
 were very dependent on ordering. This was particularly obvious when using
 `makeExtendSchemaPlugin` and trying to use auto-generated types that may or may
-not exist yet. Worse still, I saw community plugins building types if that type
-didn't already exist &mdash; but there was no guarantee that the type that
-already existed was the one the plugin needed!
+not exist yet. Worse still, plugins that built types only if a type with that
+name didn't already exist could get tricked into using an incompatible type!
 
 In V5, all types must be registered by name during the `init` hook. The types
 still are not created until they are needed (and may not be created at all),
@@ -86,19 +85,29 @@ but their names and spec generation functions must be registered ahead of time.
 This means that when building fields and arguments you can always reference a
 type by its name (using `build.getTypeByName('TypeNameHere')`).
 
-So `build.newWithHooks` no longer exists, instead you use the registration methods:
+Instead of `build.newWithHooks` you should use the registration methods (note
+that instead of passing the constructor as you did in `build.newWithHooks`, you
+choose the correctly named function):
 
-- `build.registerObjectType(typeName, scope, stepValidation, specCallback, origin)`
-- `build.registerInterfaceType(typeName, scope, specCallback, reason)`
-- `build.registerUnionType(typeName, scope, specCallback, reason)`
-- `build.registerScalarType(typeName, scope, specCallback, reason)`
-- `build.registerEnumType(typeName, scope, specCallback, reason)`
-- `build.registerInputObjectType(typeName, scope, specCallback, reason)`
+- `build.registerObjectType(typeName, scope, specCallback, origin)`
+- `build.registerInterfaceType(typeName, scope, specCallback, origin)`
+- `build.registerUnionType(typeName, scope, specCallback, origin)`
+- `build.registerScalarType(typeName, scope, specCallback, origin)`
+- `build.registerEnumType(typeName, scope, specCallback, origin)`
+- `build.registerInputObjectType(typeName, scope, specCallback, origin)`
 
-Note that `registerObjectType` is the odd one out here since it accepts the
-additional `stepValidation` option; this can be null or to a function that
-checks that the given step is of a suitable type for the type's plan resolvers
-to support.
+They each take 4 arguments:
+
+- `typeName` is the (unique) name of the type (this would typically come from
+  an inflector)
+- `scope` is an object with any `GraphileBuild.Scope` data relevant to this
+  hook, useful for other plugins to register hooks against the type
+- `specCallback` is a callback function that takes no arguments and returns the
+  spec object. Spec objects are similar to the ones that would be used with
+  GraphQL.js constructors, except they have an extra couple of optional
+  convenience properties specific to Gra*fast*.
+- `origin` is a string describing where this type came from / why it exists -
+  it's particularly handy when two types try and register the same name
 
 ### Example
 
@@ -117,13 +126,26 @@ const MyPlugin: GraphileConfig.Plugin = {
           {
             /* add scope data here */
           },
-          optionalStepValidationFunctionHere,
           () => ({
             // Here's the spec for the type
             description: "...",
             fields: {
               //...
             },
+
+            // If this type requires a particular step class, optionally
+            // specify it here:
+            //
+            //     assertStep: ObjectStep,
+            //
+            // Or if you prefer, you can make `assertStep` a callback that
+            // throws an error if the step passed is incompatible:
+            //
+            //     assertStep($step: ExecutableStep): asserts $step is ObjectStep {
+            //       if (!($step instanceof ObjectStep)) {
+            //         throw new Error(`Expected ObjectStep, instead received '${$step}'`);
+            //       }
+            //     },
           }),
           `Here you'd put a helpful phrase detailing why this type is being registered; useful when two types try and register with the same name`,
         );
@@ -134,6 +156,45 @@ const MyPlugin: GraphileConfig.Plugin = {
   },
 };
 ```
+
+## Introspection
+
+In V5 we've split the schema build process into two parts:
+
+- `gather` is where data is gathered from external sources (databases, APIs,
+  the file system, etc) and converted into an "input" to feed into the schema
+  phase. Critically, `gather` is asynchronous.
+- `schema` is where the GraphQL schema is produced from the gathered "input".
+  Critically, `schema` is synchronous.
+
+Introspection data is only available in the `gather` phase, from there it's
+converted into abstractions (resources, codecs, relations and behaviors) which
+are used during the `schema` phase. Further the introspection system has been
+replaced by a standalone module `pg-introspection` which is strongly typed - it
+actually embeds parts of the TypeScript documentation so that when you hover
+over its various properties in your editor it will tell you how Postgres
+describes those fields!
+
+As such `pgIntrospectionResultsByKind` is no more, and anything that you had
+that relied on introspection results will need to be mapped to using the
+abstractions. Typically this results in your code being a bit simpler, but there
+are somethings you should pay particular attention to:
+
+- In V4 you'd often look at the foreign key constraints on a table and go
+  "forwards" and "backwards" from them. In V5 the abstraction for these is a
+  relation, which only represents one direction. A "backwards" relation is one
+  that has the "isReferencee" property set. The backward and forward relations
+  can have different smart tags.
+- Whereas in V4 you'd think in terms of "classes" (tables, views, etc) and
+  "procs" (functions), in V5 these are all abstracted as "resources" (functions
+  are resources that accept `parameters`, table-likes are resources that
+  don't); and importantly every resource has a `codec` that describes what it
+  returns. Sometimes you should focus on `codec` (e.g. when it doesn't matter
+  if the row has come from a table or function) whereas others you should focus
+  on the resource (when you need to actually _get_ the row).
+- Changes to behaviors (@omit/etc) should be done during the `gather` phase if
+  they require fetching additional data (e.g. from files, databases, APIs,
+  etc), or using the behavior system otherwise.
 
 ## Presets
 
@@ -228,6 +289,8 @@ the schema.
 The inflectors available have changed a little, use the TypeScript
 auto-completion to see what inflectors are available.
 
+##### Example
+
 ```ts
 // Declare the type
 declare global {
@@ -283,6 +346,8 @@ Alternatively, include the name of the inflector in `ignoreReplaceIfNotExists`
 continue to not exist (and we won't warn you about it). This also means that
 the `prev` argument is guaranteed to exist at runtime.
 
+##### Example
+
 ```ts
 export const PgAllThePeoplePlugin: GraphileConfig.Plugin = {
   name: "PgAllThePeoplePlugin",
@@ -300,14 +365,6 @@ export const PgAllThePeoplePlugin: GraphileConfig.Plugin = {
 ```
 
 ### plugin.gather
-
-In V5 we've broken the schema build process into two parts:
-
-- `gather` is where data is gathered from external sources (databases, APIs,
-  the file system, etc) and converted into an "input" to feed into the schema
-  phase. Critically, `gather` is asynchronous.
-- `schema` is where the GraphQL schema is produced from the gathered "input".
-  Critically, `schema` is synchronous.
 
 If your plugin did anything asynchronous (extremely unlikely) then that work
 would now be done during the `gather` phase. If this is the case, please reach
@@ -389,6 +446,8 @@ return build.extend(
 );
 -->
 
+### Extending build
+
 If your plugin adds capabilities to `GraphileBuild.Build` then it must register
 them with TypeScript via declaration merging. For example to add a `flibble`
 property to `GraphileBuild.Build`, you might do:
@@ -422,6 +481,8 @@ export const FlibblePlugin: GraphileConfig.Plugin = {
 };
 ```
 
+### Extending scopes
+
 Similarly all of the scopes and contexts are typed within each hook by
 camelcasing the hook name and prepending `Scope` or `Context`. For example, the
 scope in the `GraphQLObjectType_fields_field` hook is now
@@ -439,13 +500,92 @@ declare global {
 }
 ```
 
+### Adding configuration options
+
+If your plugin requires the user to pass configuration options, most likely
+they should be in the `preset.schema` scope which should be retrieved via
+`build.options`. When doing so, we also need to add to the declaration-merged
+types so that TypeScript understands the presence of the new option:
+
+```ts
+declare global {
+  namespace GraphileBuild {
+    interface SchemaOptions {
+      /**
+       * The default option to use for the 'includeArchived' argument. Defaults to
+       * 'INHERIT' where feasible and 'NO' otherwise.
+       */
+      pgArchivedDefault?: "INHERIT" | "NO" | "YES" | "EXCLUSIVELY";
+    }
+  }
+}
+```
+
+Note also that tools like `graphile config options` will look at these
+TypeScript definitions and use them to provide documentation to the user - as
+such you should be sure to add a `/** ... */` comment describing the feature,
+as we have above.
+
 ## Plans
 
-As we read earlier, there's no loog-ahead system in PostGraphile V5; instead we
-use Gra*fast*'s planning system. This is much more straightforward in most
-cases; let's take a look at some examples:
+As we read earlier, there's no look-ahead system in PostGraphile V5; instead we
+use Gra*fast*'s planning system.
 
-[TODO]
+Where you used to use `addArgDataGenerator` you should now give your argument
+an `applyPlan` and set `autoApplyAfterParentPlan: true` so that the plan is
+automatically applied (without the parent field having to call
+`fieldArgs.apply($target, 'argName')`).
+
+Typically where you'd use a `QueryBuilder` (`queryBuilder`) in V4, you'll be
+dealing with a `PgSelectStep` (`$pgSelect`) in V5. Note that these are
+significantly different things, but they do have some parallels:
+
+- `QueryBuilder.getTableAlias()` -> `$pgSelect.alias`
+- `QueryBuilder.where(fragment)` -> `$pgSelect.where(fragment)`
+- `QueryBuilder.orderBy(...)` -> `$pgSelect.orderBy(...)` (arguments differ, see TypeScript for details)
+
+Note that it's common to be dealing with a `PgSelectSingleStep`
+(`$pgSelectSingle`) when you're looking at a single record rather than the
+collection. In this case should you need to get back to the collection (e.g. to
+get the alias) you can do `$pgSelectSingle.getClassStep()`.
+
+Should you have code that uses `queryBuilder.parentQueryBuilder` there's no
+direct parallel. Instead, you should use the parent step and get what you need
+from there, and then embed that value into your query using a placeholder:
+
+```ts
+// V4
+const parentAlias = queryBuilder.parentQueryBuilder.getTableAlias();
+queryBuilder.where(sql.fragment`${parentAlias}.archived_at is not true`);
+
+// V5
+const $archivedAt = $parent.get("archived_at");
+const archivedAtFrag = $pgSelect.placeholder($archivedAt);
+$pgSelect.where(sql`${archivedAtFrag} is not true`);
+```
+
+:::info
+
+`applyPlan` on an argument accepts 4 arguments, the first is the parent step
+(`$parent`), which is the step that the field itself was called on. The second
+is the target step (`$pgSelect`), which is typically the result of the fields'
+plan resolver. Note that input objects' `applyPlan`s only have the latter 3
+arguments - they do not have access to the parent step unless their parent
+input object or argument `applyPlan` explicitly pass them down.
+
+:::
+
+:::tip
+
+In general, unlike in V4, you should not assume too much about how the SQL will
+be generated. It's better to use simple methods like
+`$record.get('column_name')` to retrieve attributes and then embed these values
+using `$pgSelect.placeholder(...)` than it is to make assumptions about the
+shape of the request and try and be clever and use aliases/etc. Normally
+`@dataplan/pg` will be able to figure out the best way to address your needs,
+and will inline things as necessary/optimal.
+
+:::
 
 ## Examples
 
@@ -453,3 +593,4 @@ Here are some conversions that have taken place on some of the community plugins
 
 - [pg-many-to-many](https://github.com/graphile-contrib/pg-many-to-many/compare/1eaa63adc0eaf54a1e862b6d76540a6315787479...9989331f1a082a7f140ae28e946780fd4ba7b808)
 - [postgraphile-plugin-connection-filter](https://github.com/graphile-contrib/postgraphile-plugin-connection-filter/compare/fcd5e920c50604063c5db9bc28c557bd69bcfdcc...c222f763645446af8111825d9af8128816e30510)
+- [@graphile-contrib/pg-omit-archived](https://github.com/graphile-contrib/pg-omit-archived/compare/c3a3ac458e8cf328d67cc393dfefcc9784d1875e...a445527c18cac2497ccb53e0a1b119aee0514ca7?w=1)
