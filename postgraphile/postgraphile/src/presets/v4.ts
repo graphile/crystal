@@ -22,7 +22,7 @@ export interface V4GraphileBuildOptions {
 export interface V4Options<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse,
-> {
+> extends GraphileBuild.SchemaOptions {
   /**
    * - 'only': connections will be avoided, preferring lists
    * - 'omit': lists will be avoided, preferring connections
