@@ -1707,9 +1707,9 @@ create table partitions.measurements (
   primary key (timestamp, key)
 ) partition by range (timestamp);
 create index on partitions.measurements (timestamp);
-create table measurements_y2022 partition of partitions.measurements for values from ('2022-01-01T00:00:00Z') to ('2023-01-01T00:00:00Z');
-create table measurements_y2023 partition of partitions.measurements for values from ('2023-01-01T00:00:00Z') to ('2024-01-01T00:00:00Z');
-create table measurements_y2024 partition of partitions.measurements for values from ('2024-01-01T00:00:00Z') to ('2025-01-01T00:00:00Z');
+create table partitions.measurements_y2022 partition of partitions.measurements for values from ('2022-01-01T00:00:00Z') to ('2023-01-01T00:00:00Z');
+create table partitions.measurements_y2023 partition of partitions.measurements for values from ('2023-01-01T00:00:00Z') to ('2024-01-01T00:00:00Z');
+create table partitions.measurements_y2024 partition of partitions.measurements for values from ('2024-01-01T00:00:00Z') to ('2025-01-01T00:00:00Z');
 
 --------------------------------------------------------------------------------
 
