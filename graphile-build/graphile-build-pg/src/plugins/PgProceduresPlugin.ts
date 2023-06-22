@@ -210,6 +210,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
+          const executor =
+            info.helpers.pgIntrospection.getExecutorForService(serviceName);
+
           const name = info.inflection.functionResourceName({
             serviceName,
             pgProc,
@@ -217,6 +220,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const identifier = `${serviceName}.${namespace.nspname}.${
             pgProc.proname
           }(${pgProc.getArguments().map(argTypeName).join(",")})`;
+
           const makeCodecFromReturn = async (): Promise<PgCodec | null> => {
             // We're building a PgCodec to represent specifically the
             // return type of this function.
@@ -278,7 +282,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 serviceName,
               });
             return EXPORTABLE(
-              (attributes, recordCodec, recordCodecName, sql) =>
+              (attributes, executor, recordCodec, recordCodecName, sql) =>
                 recordCodec({
                   name: recordCodecName,
                   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
@@ -290,9 +294,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                       pgProc.provolatile === "v" ? "mutation" : "query"
                     }.`, */
                   },
+                  executor,
                   isAnonymous: true,
                 }),
-              [attributes, recordCodec, recordCodecName, sql],
+              [attributes, executor, recordCodec, recordCodecName, sql],
             );
           };
 
@@ -309,9 +314,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             );
             return null;
           }
-
-          const executor =
-            info.helpers.pgIntrospection.getExecutorForService(serviceName);
 
           const parameters: PgResourceParameter[] = [];
 

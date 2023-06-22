@@ -405,12 +405,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             },
             tags,
           };
+          const executor =
+            info.helpers.pgIntrospection.getExecutorForService(serviceName);
           const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
             (
               attributes,
               className,
               codecName,
               description,
+              executor,
               extensions,
               nspName,
               sql,
@@ -420,12 +423,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               attributes,
               description,
               extensions,
+              executor,
             }),
             [
               attributes,
               className,
               codecName,
               description,
+              executor,
               extensions,
               nspName,
               sql,

@@ -35,6 +35,7 @@ import {
   stringifyPoint,
   stringifyPolygon,
 } from "./codecUtils/index.js";
+import type { PgExecutor } from "./executor.js";
 import { inspect } from "./inspect.js";
 import type {
   PgCodec,
@@ -176,6 +177,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       extensions: { oid: oid },
       castFromPg,
       listCastFromPg,
+      executor: null,
     };
   };
 }
@@ -389,6 +391,7 @@ export type PgRecordTypeCodecSpec<
   TAttributes extends PgCodecAttributes,
 > = {
   name: TName;
+  executor: PgExecutor;
   identifier: SQL;
   attributes: TAttributes;
   polymorphism?: PgCodecPolymorphism<any>;
@@ -429,6 +432,7 @@ export function recordCodec<
     description,
     extensions,
     isAnonymous = false,
+    executor,
   } = config;
   return {
     name,
@@ -440,6 +444,7 @@ export function recordCodec<
     polymorphism,
     description,
     extensions,
+    executor,
   };
 }
 exportAs("@dataplan/pg", recordCodec, "recordCodec");
@@ -474,6 +479,7 @@ export function enumCodec<
     ),
     attributes: undefined,
     extensions,
+    executor: null,
   };
 }
 exportAs("@dataplan/pg", enumCodec, "enumCodec");
@@ -630,6 +636,7 @@ export function listOfCodec<
     extensions,
     arrayOfCodec: innerCodec,
     castFromPg: innerCodec.listCastFromPg,
+    executor: innerCodec.executor,
   };
 
   // Memoize such that every `listOfCodec(foo)` returns the same object.
@@ -834,6 +841,7 @@ export function rangeOfCodec<
       return str;
     },
     attributes: undefined,
+    executor: innerCodec.executor,
   };
 }
 exportAs("@dataplan/pg", rangeOfCodec, "rangeOfCodec");

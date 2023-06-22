@@ -10,7 +10,7 @@ import type {
   PgResourceParameter,
   PgResourceUnique,
 } from "./datasource.js";
-import type { WithPgClient } from "./executor.js";
+import type { PgExecutor, WithPgClient } from "./executor.js";
 import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
 import type { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
@@ -259,6 +259,14 @@ export interface PgCodec<
    * many-to-many.
    */
   refs?: PgCodecRefs;
+
+  /**
+   * If this codec came from a specific database, we should list the executor
+   * here. If the codec is used with multiple databases, leave this null, but
+   * note that if it has attributes then it will not be able to be used as the
+   * type of an attribute itself.
+   */
+  executor: PgExecutor | null;
 }
 
 export type PgCodecWithAttributes<
