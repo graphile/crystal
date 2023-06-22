@@ -473,7 +473,10 @@ export class PgResource<
     >,
     const TNewName extends string,
   >(
-    baseOptions: PgResourceOptions<any, TCodec, any, any>,
+    baseOptions: Pick<
+      PgResourceOptions<any, TCodec, any, any>,
+      "codec" | "executor" | "selectAuth"
+    >,
     overrideOptions: PgFunctionResourceOptions<
       TNewName,
       TCodec,

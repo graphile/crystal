@@ -84,7 +84,8 @@ declare global {
       pgProcedures_functionResourceOptions(event: {
         serviceName: string;
         pgProc: PgProc;
-        baseResourceOptions: PgResourceOptions;
+        baseResourceOptions: Pick<PgResourceOptions, "codec" | "executor"> &
+          Partial<Omit<PgResourceOptions, "codec" | "executor">>;
         functionResourceOptions: PgFunctionResourceOptions;
       }): void | Promise<void>;
 
@@ -482,7 +483,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   info.helpers.pgIntrospection.getExecutorForService(
                     serviceName,
                   );
-                return PgResource.configFromCodec(executor, codec);
+                return { codec, executor };
               }
             })();
 
