@@ -323,23 +323,59 @@ export function augmentIntrospection(
     entity.getClass = memo(() => getClass(entity.conrelid));
     entity.getAttributes = memo(() => {
       const klass = getClass(entity.conrelid);
-      if (!klass || !entity.conkey) {
-        return;
+      if (!klass) {
+        console.error(
+          `getAttributes() called on constraint '${entity.conname}' (type = '${entity.contype}'), but we could not find the constraint's table (oid = '${entity.conrelid}') in the introspection results; returning empty array`,
+        );
+        return [];
+      }
+      if (!entity.conkey) {
+        if (entity.contype === "f") {
+          console.error(
+            `getAttributes() called on constraint '${entity.conname}' (type = '${entity.contype}'), but that constraint has no 'conkey'; returning empty array`,
+          );
+          return [];
+        } else {
+          return;
+        }
       }
       const attrs = klass.getAttributes();
-      return entity.conkey!.map(
+      return entity.conkey.map(
         (key) => attrs.find((att) => att.attnum === key)!,
       );
     });
     entity.getType = memo(() => getType(entity.contypid));
     entity.getForeignClass = memo(() => getClass(entity.confrelid));
     entity.getForeignAttributes = memo(() => {
+      if (entity.confrelid == null) {
+        if (entity.contype === "f") {
+          console.error(
+            `getForeignAttributes() called on constraint '${entity.conname}' (type = '${entity.contype}'), but that constraint has no 'confrelid'; returning empty array`,
+          );
+          return [];
+        } else {
+          return;
+        }
+      }
       const klass = getClass(entity.confrelid);
-      if (!klass || !entity.confkey) {
-        return;
+      if (!klass) {
+        console.error(
+          `getForeignAttributes() called on constraint '${entity.conname}' (type = '${entity.contype}'), but we could not find the constraint's foreign table (oid = '${entity.confrelid}') in the introspection results; returning empty array`,
+        );
+        return [];
+      }
+      if (!entity.confkey) {
+        if (entity.contype === "f") {
+          console.error(
+            `getForeignAttributes() called on constraint '${entity.conname}' (type = '${entity.contype}'), but that constraint has no 'confkey'; returning empty array`,
+          );
+          return [];
+        } else {
+          return;
+        }
       }
       const attrs = klass.getAttributes();
-      return entity.confkey!.map(
+      return entity.confkey.map(
         (key) => attrs.find((att) => att.attnum === key)!,
       );
     });
