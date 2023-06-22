@@ -292,7 +292,7 @@ export function makePgAdaptorWithPgClient(
         false,
       );
     } finally {
-      // TODO: should we `RESET ALL` here? Probably not; otherwise timezone,jit,etc will reset
+      // NOTE: have decided not to `RESET ALL` here; otherwise timezone,jit,etc will reset
       pgClient.release();
     }
   };
