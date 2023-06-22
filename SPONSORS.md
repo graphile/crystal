@@ -6,13 +6,11 @@ sponsor](https://graphile.org/sponsor/).
 
 ## Featured
 
-- Surge
 - The Guild
 - Dovetail
 - Qwick
 - Netflix
 - Chad Furman
-- Enzuzo
 - Stellate
 - Politics Rewired
 
@@ -20,12 +18,11 @@ sponsor](https://graphile.org/sponsor/).
 
 - Joe Dennis
 - Robert Claypool
-- domonda
 - DocIQ
 - nigelrmtaylor
+- Principia Mentis
 - Luxor Labs
 - Ian Stewart
-- HR-ON
 - Axinom
 - PostHog
 - Nathanael Beisiegel
@@ -35,10 +32,12 @@ sponsor](https://graphile.org/sponsor/).
 - Ayog Healthcare
 - Severin Ibarluzea
 - BairesDev
+- FOLX Health
 
 ## Supporters
 
 - Postlight
+- HR-ON
 - stlbucket
 - Sam Levin
 - Matt Bretl
@@ -67,3 +66,7 @@ sponsor](https://graphile.org/sponsor/).
 - Ben Periton
 - SpaceFill
 - Nate Smith
+- The Outbound Collective
+- Charlie Hadden
+- Kiron Open Higher Education
+- Antonio Angelino
