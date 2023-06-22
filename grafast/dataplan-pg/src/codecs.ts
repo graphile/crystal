@@ -81,8 +81,6 @@ export interface PgCodecAttribute<
    */
   expression?: (alias: SQL) => SQL;
 
-  // TODO: we could make TypeScript understand the relations on the object
-  // rather than just being string.
   /**
    * If this attribute actually exists on a relation rather than locally, the name
    * of the (unique) relation this attribute belongs to.
@@ -776,7 +774,6 @@ export function rangeOfCodec<
           },
         }
       : null),
-    // FIXME: shouldn't these include `innerCodec.fromPg` calls for internal values?
     fromPg: needsCast
       ? function (value) {
           const json = JSON.parse(value);
@@ -784,14 +781,14 @@ export function rangeOfCodec<
             start:
               json[1] != null
                 ? {
-                    value: json[1],
+                    value: innerCodec.fromPg(json[1]),
                     inclusive: !!json[0],
                   }
                 : null,
             end:
               json[2] != null
                 ? {
-                    value: json[2],
+                    value: innerCodec.fromPg(json[2]),
                     inclusive: !!json[3],
                   }
                 : null,
@@ -803,14 +800,14 @@ export function rangeOfCodec<
             start:
               parsed.lower != null
                 ? {
-                    value: parsed.lower,
+                    value: innerCodec.fromPg(parsed.lower),
                     inclusive: parsed.isLowerBoundClosed(),
                   }
                 : null,
             end:
               parsed.upper != null
                 ? {
-                    value: parsed.upper,
+                    value: innerCodec.fromPg(parsed.upper),
                     inclusive: parsed.isUpperBoundClosed(),
                   }
                 : null,
