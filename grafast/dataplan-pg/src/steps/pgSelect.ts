@@ -80,12 +80,6 @@ const hash = (text: string): string =>
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
-// Constant functions so lambdas can be optimized
-function listHasMore(list: any | null | undefined) {
-  return list?.hasMore || false;
-}
-listHasMore.isSyncAndSafe = true; // Optimization
-
 function parseCursor(cursor: string | null) {
   if (cursor == null) {
     // This throw should never happen, so we can still be isSyncAndSafe.
@@ -761,9 +755,7 @@ export class PgSelectStep<
    */
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
-    // HACK: This is a truly hideous hack. We should solve this by having this
-    // plan resolve to an object with rows and metadata.
-    return lambda(this, listHasMore);
+    return access(this, "hasMore", false);
   }
 
   public unique(): boolean {
@@ -1281,10 +1273,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
-      if (this.fetchOneExtra) {
-        // HACK: this is an ugly hack; really we should consider resolving to an
-        // object that can contain metadata as well as the rows.
-        Object.defineProperty(orderedRows, "hasMore", { value: hasMore });
+      if (hasMore) {
+        (orderedRows as any).hasMore = true;
       }
       return orderedRows;
     });
@@ -2723,12 +2713,8 @@ ${lateralText};`;
                 const orderedRows = shouldReverse
                   ? reverseArray(slicedRows)
                   : slicedRows;
-                if (this.fetchOneExtra) {
-                  // HACK: this is an ugly hack; really we should consider resolving to an
-                  // object that can contain metadata as well as the rows.
-                  Object.defineProperty(orderedRows, "hasMore", {
-                    value: hasMore,
-                  });
+                if (hasMore) {
+                  (orderedRows as any).hasMore = true;
                 }
                 return orderedRows;
               },
