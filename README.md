@@ -17,6 +17,8 @@ _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL databa
 
 April 2023 marked a big milestone for PostGraphile Version 5, when it entered the alpha stage. Work preparing for the final release is ongoing, but we now have a detailed migration guide, updated docs, an enhanced developer experience and much improved compatability!
 
+In our new blog post series, **we are beginning to lift the curtain of secrecy which has surrounded Version 5** for the past few years. Each week, Benjie will dive in to a key feature of this massive new release; Find the first article [on DEV.to](https://dev.to/graphile/intro-to-postgraphile-v5-part-1-replacing-the-foundations-3lh0).
+
 With beta just around the corner, now is the perfect time to join our sponsors and test V5. **If you don't try V5 until after its public release then it may be too late to comment on things that could have been improved.** If you already sponsor us, send us an email with your sponsor details and we'll send you access to [postgraphile.org](https://postgraphile.org/)
 
 <!-- SPONSORS_BEGIN -->
