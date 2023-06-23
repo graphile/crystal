@@ -2975,11 +2975,29 @@ exportAs("@dataplan/pg", digestsFromArgumentSpecs, "digestsFromArgumentSpecs");
 export function getFragmentAndCodecFromOrder(
   alias: SQL,
   order: PgOrderSpec,
-  codec: PgCodec,
+  codecOrCodecs: PgCodec | PgCodec[],
 ): [SQL, PgCodec] {
   if (order.attribute != null) {
     const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
-    const colCodec = codec.attributes![order.attribute].codec;
+    const isArray = Array.isArray(codecOrCodecs);
+    const colCodec = (isArray ? codecOrCodecs[0] : codecOrCodecs).attributes![
+      order.attribute
+    ].codec;
+    if (isArray) {
+      for (const codec of codecOrCodecs) {
+        if (codec.attributes![order.attribute].codec !== colCodec) {
+          throw new Error(
+            `Order by attribute '${
+              order.attribute
+            }' not allowed - this attribute has different codecs (${
+              codec.attributes![order.attribute].codec.name
+            } != ${colCodec.name}) in different parents (${
+              codecOrCodecs[0].name
+            } vs ${codec.name})`,
+          );
+        }
+      }
+    }
     return order.callback
       ? order.callback(colFrag, colCodec)
       : [colFrag, colCodec];

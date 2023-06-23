@@ -1120,17 +1120,13 @@ on (${sql.indent(
           TYPES.text,
         );
       } else if (this.memberDigests.length > 0) {
-        // HACK: this is bad. We're getting the codec from just one of the
-        // members and assuming the type for the given attribute will match for
-        // all of them. We should either validate that this is the same, change
-        // the signature of `getFragmentAndCodecFromOrder` to pass all the
-        // codecs (and maybe even attribute mapping), or... I dunno... fix it
-        // some other way.
-        const mutualCodec = this.memberDigests[0].finalResource.codec;
+        const memberCodecs = this.memberDigests.map(
+          (d) => d.finalResource.codec,
+        );
         const [, codec] = getFragmentAndCodecFromOrder(
           this.alias,
           order,
-          mutualCodec,
+          memberCodecs,
         );
         identifierPlaceholders[i] = this.placeholder(
           toPg(access($parsedCursorPlan, [i + 1]), codec),
