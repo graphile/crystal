@@ -1107,27 +1107,51 @@ export class PgSelectStep<
             ),
           )}::${order.codec.sqlType}`;
           */
-      const [orderFragment, orderCodec] = getFragmentAndCodecFromOrder(
-        this.alias,
-        order,
-        this.resource.codec,
-      );
+      const [orderFragment, orderCodec, nullable] =
+        getFragmentAndCodecFromOrder(this.alias, order, this.resource.codec);
+      const { nulls, direction } = order;
       const sqlValue = this.placeholder(
         toPg(access($parsedCursorPlan, [i + 1]), orderCodec),
         orderCodec,
       );
-      // FIXME: _iff_ `orderFragment` is nullable _and_ `order.nulls` is
-      // non-null then we need to factor `NULLS LAST` / `NULLS FIRST` into
-      // this calculation.
-      const gt =
-        (order.direction === "ASC" && beforeOrAfter === "after") ||
-        (order.direction === "DESC" && beforeOrAfter === "before");
 
+      // For the truth-table of this code, have a look at this spreadsheet:
+      // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
+
+      const gt =
+        (direction === "ASC" && beforeOrAfter === "after") ||
+        (direction === "DESC" && beforeOrAfter === "before");
+
+      const nullsFirst =
+        nulls === "FIRST"
+          ? true
+          : nulls === "LAST"
+          ? false
+          : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+            // ASC = NULLS LAST
+            direction === "DESC";
+
+      // Simple less than or greater than
       let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
 
+      // Nullable, so now handle if one is null but the other isn't
+      if (nullable) {
+        const useAIsNullAndBIsNotNull =
+          (nullsFirst && beforeOrAfter === "after") ||
+          (!nullsFirst && beforeOrAfter === "before");
+        const oneIsNull = useAIsNullAndBIsNotNull
+          ? sql`${orderFragment} is null and ${sqlValue} is not null`
+          : sql`${orderFragment} is not null and ${sqlValue} is null`;
+        fragment = sql`((${fragment}) or (${oneIsNull}))`;
+      }
+
+      // Finally handle if they're equal - recurse
       if (i < orderCount - 1) {
-        fragment = sql`(${fragment}) or (
-${sql.indent`${orderFragment} = ${sqlValue}
+        const equals = nullable ? sql`is not distinct from` : sql`=`;
+        const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
+        fragment = sql`(${fragment})
+or (
+${sql.indent`${aEqualsB}
 and ${sql.indent(sql.parens(condition(i + 1)))}`}
 )`;
       }
