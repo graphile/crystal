@@ -16,7 +16,6 @@ import type {
   PoolClient,
   QueryArrayConfig,
   QueryConfig,
-  QueryResultRow,
 } from "pg";
 import * as pg from "pg";
 

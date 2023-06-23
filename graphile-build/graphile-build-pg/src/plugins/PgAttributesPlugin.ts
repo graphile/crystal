@@ -9,15 +9,9 @@ import type {
   PgCodecAttributes,
   PgCodecList,
   PgCodecWithAttributes,
-  PgExecutor,
-  PgRegistry,
   PgSelectSingleStep,
 } from "@dataplan/pg";
-import {
-  PgResource,
-  pgSelectFromRecords,
-  pgSelectSingleFromRecord,
-} from "@dataplan/pg";
+import { pgSelectFromRecords, pgSelectSingleFromRecord } from "@dataplan/pg";
 import type { GrafastFieldConfig, SetterStep } from "grafast";
 import { each } from "grafast";
 import { EXPORTABLE } from "graphile-build";
