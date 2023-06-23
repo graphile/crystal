@@ -80,12 +80,6 @@ const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
 
-// Constant functions so lambdas can be optimized
-function listHasMore(list: any | null | undefined) {
-  return list?.hasMore || false;
-}
-listHasMore.isSyncAndSafe = true; // Optimization
-
 function parseCursor(cursor: string | null) {
   if (cursor == null) {
     // This throw should never happen, so we can still be isSyncAndSafe.
@@ -605,8 +599,6 @@ export class PgUnionAllStep<
           ? cloneFromMatchingMode.limitAndOffsetId
           : null;
     } else {
-      this.symbol = Symbol("union"); // TODO: add variety
-      this.alias = sql.identifier(this.symbol);
       const spec = specOrCloneFrom;
       this.mode = overrideMode ?? spec.mode ?? "normal";
       if (this.mode === "aggregate") {
@@ -632,6 +624,10 @@ export class PgUnionAllStep<
             resource,
           }),
         );
+      this.symbol = Symbol(
+        `union_${members.map((m) => m.typeName).join("_")}`.slice(0, 63),
+      );
+      this.alias = sql.identifier(this.symbol);
 
       this.selects = [];
       this.placeholders = [];
@@ -1009,9 +1005,7 @@ on (${sql.indent(
    */
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
-    // HACK: This is a truly hideous hack. We should solve this by having this
-    // plan resolve to an object with rows and metadata.
-    return lambda(this, listHasMore);
+    return access(this, "hasMore", false);
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
@@ -1938,10 +1932,8 @@ ${lateralText};`;
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
-      if (this.fetchOneExtra) {
-        // HACK: this is an ugly hack; really we should consider resolving to an
-        // object that can contain metadata as well as the rows.
-        Object.defineProperty(orderedRows, "hasMore", { value: hasMore });
+      if (hasMore) {
+        (orderedRows as any).hasMore = true;
       }
       return orderedRows;
     });
