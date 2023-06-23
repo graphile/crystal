@@ -175,10 +175,7 @@ function newNodePostgresPgClient(
           }
         }
 
-        // TODO: fix the never
-        return pgClient.query<TData extends QueryResultRow ? TData : never>(
-          queryObj,
-        );
+        return pgClient.query(queryObj);
       }
     },
   };
