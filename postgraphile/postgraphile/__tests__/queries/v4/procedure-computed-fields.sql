@@ -1,47 +1,47 @@
 select
-  __frmcdc_compound_type_1__."a"::text as "0",
-  __frmcdc_compound_type_1__."foo_bar"::text as "1",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1__))::text as "2",
-  (not (__frmcdc_compound_type_1__ is null))::text as "3",
-  __frmcdc_compound_type_1_2."a"::text as "4",
-  __frmcdc_compound_type_1_2."foo_bar"::text as "5",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_2))::text as "6",
-  (not (__frmcdc_compound_type_1_2 is null))::text as "7",
-  __frmcdc_compound_type_1_3."a"::text as "8",
-  __frmcdc_compound_type_1_3."foo_bar"::text as "9",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_3))::text as "10",
-  (not (__frmcdc_compound_type_1_3 is null))::text as "11",
-  (not (__frmcdc_nested_compound_type_1__ is null))::text as "12",
-  __frmcdc_compound_type_1_4."a"::text as "13",
-  __frmcdc_compound_type_1_4."foo_bar"::text as "14",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_4))::text as "15",
-  (not (__frmcdc_compound_type_1_4 is null))::text as "16",
-  __frmcdc_compound_type_1_5."a"::text as "17",
-  __frmcdc_compound_type_1_5."foo_bar"::text as "18",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_5))::text as "19",
-  (not (__frmcdc_compound_type_1_5 is null))::text as "20",
-  __frmcdc_compound_type_1_6."a"::text as "21",
-  __frmcdc_compound_type_1_6."foo_bar"::text as "22",
-  ("c"."compound_type_computed_field"(__frmcdc_compound_type_1_6))::text as "23",
-  (not (__frmcdc_compound_type_1_6 is null))::text as "24",
-  (not (__frmcdc_nested_compound_type_1_2 is null))::text as "25",
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."foo_bar"::text as "1",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type__))::text as "2",
+  (not (__frmcdc_compound_type__ is null))::text as "3",
+  __frmcdc_compound_type_2."a"::text as "4",
+  __frmcdc_compound_type_2."foo_bar"::text as "5",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_2))::text as "6",
+  (not (__frmcdc_compound_type_2 is null))::text as "7",
+  __frmcdc_compound_type_3."a"::text as "8",
+  __frmcdc_compound_type_3."foo_bar"::text as "9",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_3))::text as "10",
+  (not (__frmcdc_compound_type_3 is null))::text as "11",
+  (not (__frmcdc_nested_compound_type__ is null))::text as "12",
+  __frmcdc_compound_type_4."a"::text as "13",
+  __frmcdc_compound_type_4."foo_bar"::text as "14",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_4))::text as "15",
+  (not (__frmcdc_compound_type_4 is null))::text as "16",
+  __frmcdc_compound_type_5."a"::text as "17",
+  __frmcdc_compound_type_5."foo_bar"::text as "18",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_5))::text as "19",
+  (not (__frmcdc_compound_type_5 is null))::text as "20",
+  __frmcdc_compound_type_6."a"::text as "21",
+  __frmcdc_compound_type_6."foo_bar"::text as "22",
+  ("c"."compound_type_computed_field"(__frmcdc_compound_type_6))::text as "23",
+  (not (__frmcdc_compound_type_6 is null))::text as "24",
+  (not (__frmcdc_nested_compound_type_2 is null))::text as "25",
   __types__."compound_type"::text as "26"
 from "b"."types" as __types__
-left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type_1__
+left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
-left outer join lateral (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type_1__
+left outer join lateral (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
 on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1_2
+left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
 on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_3
+left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
 on TRUE
-left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_1_4
+left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
 on TRUE
-left outer join lateral (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_1_2
+left outer join lateral (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
 on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_1_2."a").*) as __frmcdc_compound_type_1_5
+left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
 on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_1_2."b").*) as __frmcdc_compound_type_1_6
+left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
 on TRUE
 order by __types__."id" asc;
 

@@ -59,97 +59,97 @@ lateral (
   from "b"."type_function_mutation"(__type_function_mutation_identifiers__."id0") as __type_function_mutation__
 ) as __type_function_mutation_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
 select __post_result__.*
 from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
@@ -235,97 +235,97 @@ select
   __type_function_list_mutation__."int8_array_domain"::text as "44"
 from unnest("b"."type_function_list_mutation"()) as __type_function_list_mutation__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
 select __post_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
@@ -411,97 +411,97 @@ select
   __type_function_connection_mutation__."int8_array_domain"::text as "44"
 from "b"."type_function_connection_mutation"() as __type_function_connection_mutation__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
 select __post_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
@@ -586,97 +586,97 @@ update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int
   __types__."text_array_domain"::text as "43",
   __types__."int8_array_domain"::text as "44";
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
 select __post_result__.*
 from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
@@ -761,97 +761,97 @@ insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal"
   __types__."text_array_domain"::text as "43",
   __types__."int8_array_domain"::text as "44";
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
-select __frmcdc_nested_compound_type_1_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_1_identifiers__,
+select __frmcdc_nested_compound_type_result__.*
+from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    __frmcdc_compound_type_1__."d" as "3",
-    __frmcdc_compound_type_1__."e"::text as "4",
-    __frmcdc_compound_type_1__."f"::text as "5",
-    __frmcdc_compound_type_1__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type_1__ is null))::text as "7",
-    __frmcdc_compound_type_1_2."a"::text as "8",
-    __frmcdc_compound_type_1_2."b" as "9",
-    __frmcdc_compound_type_1_2."c"::text as "10",
-    __frmcdc_compound_type_1_2."d" as "11",
-    __frmcdc_compound_type_1_2."e"::text as "12",
-    __frmcdc_compound_type_1_2."f"::text as "13",
-    __frmcdc_compound_type_1_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_1_2 is null))::text as "15",
-    __frmcdc_nested_compound_type_1__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type_1__ is null))::text as "17",
-    __frmcdc_nested_compound_type_1_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_1_identifiers__."id0").*) as __frmcdc_nested_compound_type_1__
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."a").*) as __frmcdc_compound_type_1__
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_1__."b").*) as __frmcdc_compound_type_1_2
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
   on TRUE
-) as __frmcdc_nested_compound_type_1_result__;
+) as __frmcdc_nested_compound_type_result__;
 
 select __post_result__.*
 from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,

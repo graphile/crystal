@@ -28,12 +28,12 @@ lateral (
   order by __person__."id" asc
 ) as __person_result__;
 
-select __frmcdc_jwt_token_1_result__.*
-from (select 0 as idx, $1::"b"."jwt_token" as "id0") as __frmcdc_jwt_token_1_identifiers__,
+select __frmcdc_jwt_token_result__.*
+from (select 0 as idx, $1::"b"."jwt_token" as "id0") as __frmcdc_jwt_token_identifiers__,
 lateral (
   select
-    __frmcdc_jwt_token_1__::text as "0",
-    (not (__frmcdc_jwt_token_1__ is null))::text as "1",
-    __frmcdc_jwt_token_1_identifiers__.idx as "2"
-  from (select (__frmcdc_jwt_token_1_identifiers__."id0").*) as __frmcdc_jwt_token_1__
-) as __frmcdc_jwt_token_1_result__;
+    __frmcdc_jwt_token__::text as "0",
+    (not (__frmcdc_jwt_token__ is null))::text as "1",
+    __frmcdc_jwt_token_identifiers__.idx as "2"
+  from (select (__frmcdc_jwt_token_identifiers__."id0").*) as __frmcdc_jwt_token__
+) as __frmcdc_jwt_token_result__;
