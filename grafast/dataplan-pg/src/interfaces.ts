@@ -81,8 +81,7 @@ export interface PgCodecPolymorphismSingleTypeSpec<
 > {
   /** The name of the polymorphic subentry of the parent single table polymorphic codec */
   name: string;
-  // TODO: make this optional?
-  /** The attributes that are specific to this concrete type (including any modifiers) */
+  /** The attributes that are specific to this concrete type (including any modifiers); empty array is valid */
   attributes: Array<PgCodecPolymorphismSingleTypeAttributeSpec<TAttributeName>>;
 }
 export interface PgCodecPolymorphismSingle<
@@ -91,8 +90,7 @@ export interface PgCodecPolymorphismSingle<
   mode: "single";
   /** The list of attributes that is used to determine which polymorphic type the record is. Currently this should always have length 1. */
   typeAttributes: readonly TAttributeName[];
-  // TODO: make this optional?
-  /** These attributes are shared by every concrete type of this codec */
+  /** These attributes are shared by every concrete type of this codec; empty array is valid */
   commonAttributes: readonly TAttributeName[];
   /** Details the concrete types from this polymorphic single table, including what to call it, and what columns it has. */
   types: {
