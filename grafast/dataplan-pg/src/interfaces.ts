@@ -339,6 +339,8 @@ export type PgOrderFragmentSpec = {
 
   attribute?: never;
   callback?: never;
+
+  nullable?: boolean;
 } & PgOrderCommonSpec;
 
 export type PgOrderAttributeSpec = {
@@ -348,10 +350,12 @@ export type PgOrderAttributeSpec = {
   callback?: (
     attributeExpression: SQL,
     attributeCodec: PgCodec,
-  ) => [SQL, PgCodec];
+    nullable: boolean,
+  ) => [fragment: SQL, codec: PgCodec, nullable?: boolean];
 
   fragment?: never;
   codec?: never;
+  nullable?: boolean;
 } & PgOrderCommonSpec;
 
 /**

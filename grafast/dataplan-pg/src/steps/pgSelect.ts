@@ -2976,13 +2976,14 @@ export function getFragmentAndCodecFromOrder(
   alias: SQL,
   order: PgOrderSpec,
   codecOrCodecs: PgCodec | PgCodec[],
-): [SQL, PgCodec] {
+): [fragment: SQL, codec: PgCodec, isNullable?: boolean] {
   if (order.attribute != null) {
     const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
     const isArray = Array.isArray(codecOrCodecs);
-    const colCodec = (isArray ? codecOrCodecs[0] : codecOrCodecs).attributes![
+    const col = (isArray ? codecOrCodecs[0] : codecOrCodecs).attributes![
       order.attribute
-    ].codec;
+    ];
+    const colCodec = col.codec;
     if (isArray) {
       for (const codec of codecOrCodecs) {
         if (codec.attributes![order.attribute].codec !== colCodec) {
@@ -2998,10 +2999,11 @@ export function getFragmentAndCodecFromOrder(
         }
       }
     }
+    const isNullable = !col.notNull && !colCodec.notNull;
     return order.callback
-      ? order.callback(colFrag, colCodec)
-      : [colFrag, colCodec];
+      ? order.callback(colFrag, colCodec, isNullable)
+      : [colFrag, colCodec, isNullable];
   } else {
-    return [order.fragment, order.codec];
+    return [order.fragment, order.codec, order.nullable];
   }
 }
