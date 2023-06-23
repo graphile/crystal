@@ -200,8 +200,6 @@ export function makeExampleSchema(
           codec: PgCodec;
           notNull?: boolean;
           expression?: PgCodecAttribute<any>["expression"];
-          // TODO: we could make TypeScript understand the relations on the object
-          // rather than just being string.
           via?: PgCodecAttributeVia;
           identicalVia?: PgCodecAttributeVia;
         },
