@@ -168,6 +168,7 @@ export interface PgUnionAllStepConfig<
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
   mode?: PgUnionAllMode;
+  name?: string;
 }
 
 export interface PgUnionAllStepCondition<TAttributes extends string> {
@@ -624,9 +625,7 @@ export class PgUnionAllStep<
             resource,
           }),
         );
-      this.symbol = Symbol(
-        `union_${members.map((m) => m.typeName).join("_")}`.slice(0, 63),
-      );
+      this.symbol = Symbol(spec.name ?? "union");
       this.alias = sql.identifier(this.symbol);
 
       this.selects = [];

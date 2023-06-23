@@ -224,6 +224,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                   typeName,
                 });
               }
+              const interfaceCodecName = interfaceCodec.name;
               build.extend(
                 fields,
                 {
@@ -240,6 +241,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                         (
                           attributes,
                           connection,
+                          interfaceCodecName,
                           members,
                           pgUnionAll,
                           resourceByTypeName,
@@ -250,6 +252,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                               attributes,
                               resourceByTypeName,
                               members,
+                              name: interfaceCodecName,
                             });
                             return useConnection ? connection($list) : $list;
                           };
@@ -257,6 +260,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                         [
                           attributes,
                           connection,
+                          interfaceCodecName,
                           members,
                           pgUnionAll,
                           resourceByTypeName,

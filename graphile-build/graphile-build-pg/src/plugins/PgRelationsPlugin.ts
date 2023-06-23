@@ -1160,6 +1160,7 @@ function addRelations(
               (
                   attributes,
                   connection,
+                  identifier,
                   isConnection,
                   isMutationPayload,
                   members,
@@ -1192,6 +1193,7 @@ function addRelations(
                     attributes,
                     resourceByTypeName,
                     members,
+                    name: identifier,
                   });
                   if (isConnection) {
                     return connection($list);
@@ -1204,6 +1206,7 @@ function addRelations(
               [
                 attributes,
                 connection,
+                identifier,
                 isConnection,
                 isMutationPayload,
                 members,

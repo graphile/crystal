@@ -4439,6 +4439,7 @@ export function makeExampleSchema(
             function plan(_, { $first, $offset }) {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
+                name: "vulnerabilities",
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
@@ -4634,6 +4635,7 @@ export function makeExampleSchema(
             function plan() {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
+                name: "vulnerabilities",
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
