@@ -7,7 +7,7 @@
         applications: {
           edges: [
             {
-              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI2IiwiQXdzQXBwbGljYXRpb24iLCJbXCI2XCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IixudWxsLCI2IiwiQXdzQXBwbGljYXRpb24iLCJbXCI2XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 6,
@@ -16,7 +16,7 @@
               },
             },
             {
-              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI1IiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IixudWxsLCI1IiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 5,
@@ -25,7 +25,7 @@
               },
             },
             {
-              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI1IiwiR2NwQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IixudWxsLCI1IiwiR2NwQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 5,
@@ -34,7 +34,7 @@
               },
             },
             {
-              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI0IiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IixudWxsLCI0IiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 4,
@@ -51,7 +51,7 @@
         applications: {
           edges: [
             {
-              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCI0IiwiR2NwQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IixudWxsLCI0IiwiR2NwQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 4,
@@ -60,7 +60,7 @@
               },
             },
             {
-              cursor: "WyIyYWMxMmM3MmZmIixudWxsLCIzIiwiR2NwQXBwbGljYXRpb24iLCJbXCIzXCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IixudWxsLCIzIiwiR2NwQXBwbGljYXRpb24iLCJbXCIzXCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 3,
@@ -69,7 +69,7 @@
               },
             },
             {
-              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMi0wNy0wNlQwMTowNDowMy4wMjAwMDAtMDQ6MDAiLCI4IiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IiwiMjAyMi0wNy0wNlQwMTowNDowMy4wMjAwMDAtMDQ6MDAiLCI4IiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 8,
@@ -78,7 +78,7 @@
               },
             },
             {
-              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMS0wNi0wNVQwMDowMzowMi4wMTAwMDAtMDQ6MDAiLCIyIiwiQXdzQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IiwiMjAyMS0wNi0wNVQwMDowMzowMi4wMTAwMDAtMDQ6MDAiLCIyIiwiQXdzQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 2,
@@ -95,7 +95,7 @@
         applications: {
           edges: [
             {
-              cursor: "WyIyYWMxMmM3MmZmIiwiMjAyMi0xMC0xMFQwNjoxMDoxMC4xMDEwMDAtMDQ6MDAiLCIyIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
+              cursor: "WyIwM2ZmYmNjMjk3IiwiMjAyMi0xMC0xMFQwNjoxMDoxMC4xMDEwMDAtMDQ6MDAiLCIyIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 2,

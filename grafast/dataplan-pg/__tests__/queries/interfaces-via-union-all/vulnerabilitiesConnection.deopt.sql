@@ -1,7 +1,7 @@
 select
-  __union__."0"::text as "0",
-  __union__."1" as "1",
-  __union__."2"::text as "2"
+  __vulnerabilities__."0"::text as "0",
+  __vulnerabilities__."1" as "1",
+  __vulnerabilities__."2"::text as "2"
 from (
     select
       __first_party_vulnerabilities__."0",
@@ -48,7 +48,7 @@ from (
     "0" asc,
     "1" asc,
     "n" asc
-) __union__
+) __vulnerabilities__
 
 
 select __first_party_vulnerabilities_result__.*

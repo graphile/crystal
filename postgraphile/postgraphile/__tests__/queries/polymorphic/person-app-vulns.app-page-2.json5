@@ -7,14 +7,14 @@
         applications: {
           edges: [
             {
-              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              cursor: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 5,
                 vulnerabilities: {
                   edges: [
                     {
-                      cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                      cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                       node: {
                         __typename: "FirstPartyVulnerability",
                         id: 3,
@@ -33,14 +33,14 @@
         applications: {
           edges: [
             {
-              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
+              cursor: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 8,
                 vulnerabilities: {
                   edges: [
                     {
-                      cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                      cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                       node: {
                         __typename: "FirstPartyVulnerability",
                         id: 3,
@@ -59,14 +59,14 @@
         applications: {
           edges: [
             {
-              cursor: "WyJkZGQ0YTQzOWRlIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
+              cursor: "WyJjMDM4YzQzNTYwIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 2,
                 vulnerabilities: {
                   edges: [
                     {
-                      cursor: "WyJkZGQ0YTQzOWRlIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                      cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
                       node: {
                         __typename: "FirstPartyVulnerability",
                         id: 2,

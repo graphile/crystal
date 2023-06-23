@@ -7,7 +7,7 @@
     orderBy: [CVSS_SCORE_DESC]
     first: 3
     # CVSS: 10, typeName: ThirdPartyVulnerability, identifiers: [3]
-    after: "WyJlOTAxMDBkNmIzIiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIsIltcIjNcIl0iXQ=="
+    after: "WyIzMDY3N2Q5ZTIyIiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIsIltcIjNcIl0iXQ=="
   ) {
     edges {
       cursor
