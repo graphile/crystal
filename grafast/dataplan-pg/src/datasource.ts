@@ -243,15 +243,6 @@ export interface PgFunctionResourceOptions<
   description?: string;
 }
 
-const $$codecSource = Symbol("codecSource");
-const $$codecCounter = Symbol("codecCounter");
-
-// TODO: is this needed any more, now that we've moved codecs to owning relations?
-type CodecWithSource<TCodec extends PgCodec> = TCodec & {
-  [$$codecSource]?: Map<any, any>;
-  [$$codecCounter]?: number;
-};
-
 /**
  * PgResource represents any resource of SELECT-able data in Postgres: tables,
  * views, functions, etc.
@@ -307,50 +298,6 @@ export class PgResource<
   public readonly isVirtual: boolean;
 
   public extensions: Partial<PgResourceExtensions> | undefined;
-
-  // TODO: delete me?
-  static configFromCodec<TCodec extends PgCodec>(
-    executor: PgExecutor,
-    baseCodec: TCodec,
-  ): PgResourceOptions<
-    string,
-    TCodec,
-    ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
-    undefined
-  > {
-    const codec: CodecWithSource<typeof baseCodec> = baseCodec;
-    if (!codec[$$codecSource]) {
-      codec[$$codecSource] = new Map();
-    }
-    if (codec[$$codecSource].has(executor)) {
-      return codec[$$codecSource].get(executor);
-    }
-
-    let counter = codec[$$codecCounter];
-    if (counter !== undefined) {
-      counter++;
-    } else {
-      counter = 1;
-    }
-    codec[$$codecCounter] = counter;
-
-    // "From Codec"
-    const name = `frmcdc_${codec.name}_${counter}`;
-    const resource = EXPORTABLE(
-      (codec, executor, name, sql) => ({
-        executor,
-        from: sql`(select 1/0 /* codec-only resource; should not select directly */)`,
-        codec,
-        name,
-        identifier: name,
-      }),
-      [codec, executor, name, sql],
-    );
-
-    codec[$$codecSource].set(executor, resource);
-
-    return resource;
-  }
 
   /**
    * @param from - the SQL for the `FROM` clause (without any
@@ -1023,10 +970,23 @@ export function makeRegistry<
     },
   });
 
+  let addCodecForbidden = false;
   function addCodec(codec: PgCodec): PgCodec {
+    if (addCodecForbidden) {
+      throw new Error(`It's too late to call addCodec now`);
+    }
     const codecName = codec.name;
     if (registry.pgCodecs[codecName]) {
-      return registry.pgCodecs[codecName];
+      if (registry.pgCodecs[codecName] !== codec) {
+        console.dir({
+          existing: registry.pgCodecs[codecName],
+          new: codec,
+        });
+        throw new Error(
+          `Codec named '${codecName}' is already registsred; you cannot have two codecs with the same name`,
+        );
+      }
+      return codec;
     } else if ((codec as any).$$export || (codec as any).$exporter$factory) {
       registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
       return codec;
@@ -1099,6 +1059,111 @@ export function makeRegistry<
     registry.pgResources[resourceName] = resource;
   }
 
+  // Ensure all the relation codecs are also added
+  for (const codecName of Object.keys(
+    config.pgRelations,
+  ) as (keyof typeof config.pgRelations)[]) {
+    const relations = config.pgRelations[codecName];
+    if (!relations) {
+      continue;
+    }
+    for (const relationName of Object.keys(
+      relations,
+    ) as (keyof typeof relations)[]) {
+      const relationConfig = relations![
+        relationName
+      ] as unknown as PgCodecRelationConfig;
+      if (relationConfig) {
+        addCodec(relationConfig.localCodec);
+      }
+    }
+  }
+
+  // DO NOT CALL addCodec BELOW HERE
+  addCodecForbidden = true;
+
+  /**
+   * If the user uses a codec with attributes as a column type (or an array of
+   * the codec is the column type, etc) then we need to have a resource for
+   * processing this codec. So we add all table-like codecs here, then we
+   * remove the ones that already have resources, then we build resources for the
+   * remainder.
+   */
+  const tableLikeCodecsWithoutTableLikeResources = new Set<PgCodec>();
+  const walkCodec = (
+    codec: PgCodec,
+    isAccessibleViaAttribute = false,
+    seen = new Set<PgCodec>(),
+  ) => {
+    if (seen.has(codec)) {
+      return;
+    }
+    seen.add(codec);
+    if (
+      isAccessibleViaAttribute &&
+      codec.attributes &&
+      codec.executor &&
+      !codec.isAnonymous
+    ) {
+      tableLikeCodecsWithoutTableLikeResources.add(codec);
+    }
+    if (codec.attributes) {
+      for (const col of Object.values(codec.attributes)) {
+        if (isAccessibleViaAttribute) {
+          walkCodec(col.codec, isAccessibleViaAttribute, seen);
+        } else {
+          walkCodec(col.codec, true, new Set());
+        }
+      }
+    }
+    if (codec.arrayOfCodec) {
+      walkCodec(codec.arrayOfCodec, isAccessibleViaAttribute, seen);
+    }
+    if (codec.rangeOfCodec) {
+      walkCodec(codec.rangeOfCodec, isAccessibleViaAttribute, seen);
+    }
+    if (codec.domainOfCodec) {
+      walkCodec(codec.domainOfCodec, isAccessibleViaAttribute, seen);
+    }
+  };
+
+  // Add table-like codecs used within attributes
+  for (const codec of Object.values(registry.pgCodecs)) {
+    walkCodec(codec);
+  }
+
+  // Remove from these those codecs that already have resources
+  for (const resource of Object.values(registry.pgResources)) {
+    if (!resource.parameters) {
+      tableLikeCodecsWithoutTableLikeResources.delete(resource.codec);
+    }
+  }
+
+  // Now add resources for the table-like codecs that don't have them already
+  for (const codec of tableLikeCodecsWithoutTableLikeResources) {
+    if (codec.executor) {
+      const resourceName = `frmcdc_${codec.name}` as keyof TResourceOptions &
+        string;
+      const resource = new PgResource(registry, {
+        name: resourceName,
+        executor: codec.executor,
+        from: sql`(select 1/0 /* codec-only resource; should not select directly */)`,
+        codec,
+        identifier: resourceName,
+      }) as any;
+
+      Object.defineProperties(resource, {
+        $exporter$args: { value: [registry, resourceName] },
+        $exporter$factory: {
+          value: (registry: PgRegistry<any, any, any>, resourceName: string) =>
+            registry.pgResources[resourceName],
+        },
+      });
+
+      registry.pgResources[resourceName] = resource;
+    }
+  }
+
   for (const codecName of Object.keys(
     config.pgRelations,
   ) as (keyof typeof config.pgRelations)[]) {
@@ -1131,7 +1196,7 @@ export function makeRegistry<
 
       const builtRelation = {
         ...(rest as any),
-        localCodec: addCodec(localCodec),
+        localCodec,
         remoteResource: registry.pgResources[remoteResourceOptions.name],
       } as PgCodecRelation;
 

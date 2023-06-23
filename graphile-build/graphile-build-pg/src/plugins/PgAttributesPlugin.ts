@@ -80,29 +80,6 @@ declare global {
   }
 }
 
-const getResource = (
-  registry: PgRegistry<any, any, any>,
-  baseCodec: PgCodec,
-  executor: PgExecutor,
-) => {
-  const existing = Object.values(registry.pgResources).find(
-    (potentialSource) =>
-      potentialSource.codec === baseCodec &&
-      !potentialSource.parameters &&
-      potentialSource.executor === executor,
-  );
-  if (existing) {
-    return existing;
-  }
-  // TODO: ideally these should be created in the 'gather' phase rather than
-  // the 'schema' phase.
-  return EXPORTABLE(
-    (PgResource, baseCodec, executor, registry) =>
-      new PgResource(registry, PgResource.configFromCodec(executor, baseCodec)),
-    [PgResource, baseCodec, executor, registry],
-  );
-};
-
 function processAttribute(
   fields: GraphQLFieldConfigMap<any, any>,
   build: GraphileBuild.Build,
@@ -178,7 +155,15 @@ function processAttribute(
   };
 
   const executor = pgCodec.executor;
-  if (!executor && baseCodec.attributes) {
+  const resource = baseCodec.attributes
+    ? Object.values(registry.pgResources).find(
+        (potentialSource) =>
+          potentialSource.codec === baseCodec &&
+          !potentialSource.parameters &&
+          potentialSource.executor === executor,
+      )
+    : null;
+  if (baseCodec.attributes && !resource) {
     // We can't load codecs with attributes unless we know the executor.
     return;
   }
@@ -195,7 +180,10 @@ function processAttribute(
           [attributeName],
         );
       } else {
-        const resource = getResource(registry, baseCodec, executor!);
+        if (!resource) {
+          // This error only exists to satisfy TypeScript
+          throw new Error("This should be unreachable");
+        }
         // TODO: this is pretty horrible in the export; we should fix that.
         if (!attribute.codec.arrayOfCodec) {
           const notNull = attribute.notNull || attribute.codec.notNull;
