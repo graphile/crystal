@@ -1150,6 +1150,12 @@ export function makeRegistry<
         from: sql`(select 1/0 /* codec-only resource; should not select directly */)`,
         codec,
         identifier: resourceName,
+        isVirtual: true,
+        extensions: {
+          tags: {
+            behavior: "-*",
+          },
+        },
       }) as any;
 
       Object.defineProperties(resource, {
