@@ -184,6 +184,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
 interface QueryValue {
   dependencyIndex: number;
   codec: PgCodec;
+  alreadyEncoded: boolean;
 }
 
 /**
@@ -200,6 +201,7 @@ type PgUnionAllPlaceholder = {
   dependencyIndex: number;
   codec: PgCodec;
   symbol: symbol;
+  alreadyEncoded: boolean;
 };
 
 export class PgUnionAllSingleStep
@@ -1008,10 +1010,15 @@ on (${sql.indent(
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder(
+    $step: ExecutableStep,
+    codec: PgCodec,
+    alreadyEncoded?: boolean,
+  ): SQL;
   public placeholder(
     $step: ExecutableStep | PgTypedExecutableStep<any>,
     overrideCodec?: PgCodec,
+    alreadyEncoded = false,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -1037,6 +1044,7 @@ on (${sql.indent(
       dependencyIndex,
       codec,
       symbol,
+      alreadyEncoded,
     };
     this.placeholders.push(p);
     // This allows us to replace the SQL that will be compiled, for example
@@ -1097,15 +1105,14 @@ on (${sql.indent(
       if (i === orderCount - 1) {
         // PK (within that polymorphic type)
 
-        // NOTE: this is a JSON-encoded string containing all the PK values. We
-        // don't want to parse it and then re-stringify it, so we'll just feed
-        // it in as text and then cast it ourself:
-        // HACK: would be better to have the placeholder be 'json' type, not
-        // 'text' type.
-        identifierPlaceholders[i] = sql`(${this.placeholder(
+        identifierPlaceholders[i] = this.placeholder(
           access($parsedCursorPlan, [i + 1]),
-          TYPES.text,
-        )})::json`;
+          TYPES.json,
+          // NOTE: this is a JSON-encoded string containing all the PK values. We
+          // don't want to parse it and then re-stringify it, so we'll just feed
+          // it in as text and tell the system it has already been encoded:
+          true,
+        );
       } else if (i === orderCount - 2) {
         // Polymorphic type
         identifierPlaceholders[i] = this.placeholder(
@@ -1774,6 +1781,7 @@ ${unionHaving}\
               : this.queryValues.push({
                   dependencyIndex: placeholder.dependencyIndex,
                   codec: placeholder.codec,
+                  alreadyEncoded: placeholder.alreadyEncoded,
                 }) - 1;
 
           // Finally alias this symbol to a reference to this placeholder
@@ -1890,10 +1898,16 @@ ${lateralText};`;
           context,
           queryValues:
             identifierIndex != null
-              ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex][i];
-                  return val == null ? null : codec.toPg(val);
-                })
+              ? this.queryValues.map(
+                  ({ dependencyIndex, codec, alreadyEncoded }) => {
+                    const val = values[dependencyIndex][i];
+                    return val == null
+                      ? null
+                      : alreadyEncoded
+                      ? val
+                      : codec.toPg(val);
+                  },
+                )
               : EMPTY_ARRAY,
         };
       }),

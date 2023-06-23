@@ -132,7 +132,7 @@ lateral (
 ) as __third_party_vulnerabilities_result__;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"float8" as "id0", (ids.value->>1)::"text" as "id1", (ids.value->>2)::"text" as "id2" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"float8" as "id0", (ids.value->>1)::"text" as "id1", (ids.value->>2)::"json" as "id2" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __vulnerability__."0"::text as "0",
@@ -165,7 +165,7 @@ lateral (
               or (
                 'FirstPartyVulnerability' = __union_identifiers__."id1"
                 and (
-                  __first_party_vulnerabilities__."id" > ((__union_identifiers__."id2")::json->>0)::"int4"
+                  __first_party_vulnerabilities__."id" > (__union_identifiers__."id2"->>0)::"int4"
                 )
               )
             )
@@ -202,7 +202,7 @@ lateral (
               or (
                 'ThirdPartyVulnerability' = __union_identifiers__."id1"
                 and (
-                  __third_party_vulnerabilities__."id" > ((__union_identifiers__."id2")::json->>0)::"int4"
+                  __third_party_vulnerabilities__."id" > (__union_identifiers__."id2"->>0)::"int4"
                 )
               )
             )
@@ -222,7 +222,7 @@ lateral (
 ) as __union_result__;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"float8" as "id0", (ids.value->>1)::"text" as "id1", (ids.value->>2)::"text" as "id2" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"float8" as "id0", (ids.value->>1)::"text" as "id1", (ids.value->>2)::"json" as "id2" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __vulnerability__."0"::text as "0",
@@ -255,7 +255,7 @@ lateral (
               or (
                 'FirstPartyVulnerability' = __union_identifiers__."id1"
                 and (
-                  __first_party_vulnerabilities__."id" > ((__union_identifiers__."id2")::json->>0)::"int4"
+                  __first_party_vulnerabilities__."id" > (__union_identifiers__."id2"->>0)::"int4"
                 )
               )
             )
@@ -292,7 +292,7 @@ lateral (
               or (
                 'ThirdPartyVulnerability' = __union_identifiers__."id1"
                 and (
-                  __third_party_vulnerabilities__."id" > ((__union_identifiers__."id2")::json->>0)::"int4"
+                  __third_party_vulnerabilities__."id" > (__union_identifiers__."id2"->>0)::"int4"
                 )
               )
             )

@@ -158,6 +158,7 @@ type PgSelectPlaceholder = {
   dependencyIndex: number;
   codec: PgCodec;
   symbol: symbol;
+  alreadyEncoded: boolean;
 };
 
 export type PgSelectIdentifierSpec =
@@ -192,6 +193,7 @@ export interface PgSelectArgumentDigest {
 interface QueryValue {
   dependencyIndex: number;
   codec: PgCodec;
+  alreadyEncoded: boolean;
 }
 
 function assertSensible(step: ExecutableStep): void {
@@ -592,6 +594,7 @@ export class PgSelectStep<
         queryValues.push({
           dependencyIndex: this.addDependency(step),
           codec,
+          alreadyEncoded: false,
         });
         identifierMatches.push(matches(this.alias));
       });
@@ -763,10 +766,15 @@ export class PgSelectStep<
   }
 
   public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder(
+    $step: ExecutableStep,
+    codec: PgCodec,
+    alreadyEncoded?: boolean,
+  ): SQL;
   public placeholder(
     $step: ExecutableStep | PgTypedExecutableStep<PgCodec>,
     overrideCodec?: PgCodec,
+    alreadyEncoded = false,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -794,6 +802,7 @@ export class PgSelectStep<
       dependencyIndex,
       codec,
       symbol,
+      alreadyEncoded,
     };
     this.placeholders.push(p);
     // This allows us to replace the SQL that will be compiled, for example
@@ -1230,10 +1239,16 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           context,
           queryValues:
             identifierIndex != null
-              ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex][i];
-                  return val == null ? null : codec.toPg(val);
-                })
+              ? this.queryValues.map(
+                  ({ dependencyIndex, codec, alreadyEncoded }) => {
+                    const val = values[dependencyIndex][i];
+                    return val == null
+                      ? null
+                      : alreadyEncoded
+                      ? val
+                      : codec.toPg(val);
+                  },
+                )
               : EMPTY_ARRAY,
         };
       }),
@@ -1317,10 +1332,16 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
                 context,
                 queryValues:
                   identifierIndex != null
-                    ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                        const val = values[dependencyIndex][i];
-                        return val == null ? null : codec.toPg(val);
-                      })
+                    ? this.queryValues.map(
+                        ({ dependencyIndex, codec, alreadyEncoded }) => {
+                          const val = values[dependencyIndex][i];
+                          return val == null
+                            ? null
+                            : alreadyEncoded
+                            ? val
+                            : codec.toPg(val);
+                        },
+                      )
                     : EMPTY_ARRAY,
               };
             }),
@@ -1342,10 +1363,16 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             context,
             queryValues:
               identifierIndex != null
-                ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                    const val = values[dependencyIndex][i];
-                    return val == null ? val : codec.toPg(val);
-                  })
+                ? this.queryValues.map(
+                    ({ dependencyIndex, codec, alreadyEncoded }) => {
+                      const val = values[dependencyIndex][i];
+                      return val == null
+                        ? val
+                        : alreadyEncoded
+                        ? val
+                        : codec.toPg(val);
+                    },
+                  )
                 : EMPTY_ARRAY,
           };
         }),
@@ -1839,12 +1866,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       this.placeholders.forEach((placeholder) => {
         // NOTE: we're NOT adding to `this.identifierMatches`.
 
+        const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
+
         // Fine a existing match for this dependency of this type
         const existingIndex = this.queryValues.findIndex((v) => {
-          return (
-            v.dependencyIndex === placeholder.dependencyIndex &&
-            v.codec === placeholder.codec
-          );
+          return v.dependencyIndex === dependencyIndex && v.codec === codec;
         });
 
         // If none exists, add one to our query values
@@ -1852,13 +1878,14 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           existingIndex >= 0
             ? existingIndex
             : this.queryValues.push({
-                dependencyIndex: placeholder.dependencyIndex,
-                codec: placeholder.codec,
+                dependencyIndex,
+                codec,
+                alreadyEncoded,
               }) - 1;
 
         // Finally alias this symbol to a reference to this placeholder
         this.placeholderValues.set(
-          placeholder.symbol,
+          symbol,
           sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
         );
       });
@@ -2210,7 +2237,9 @@ ${lateralText};`;
       if (
         !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
           const equivalent =
-            a.codec === b.codec && a.dependencyIndex === b.dependencyIndex;
+            a.codec === b.codec &&
+            a.dependencyIndex === b.dependencyIndex &&
+            a.alreadyEncoded === b.alreadyEncoded;
           if (equivalent) {
             if (a.symbol !== b.symbol) {
               // Make symbols appear equivalent
@@ -2380,7 +2409,7 @@ ${lateralText};`;
     otherPlan: TOtherStep,
   ): void {
     for (const placeholder of this.placeholders) {
-      const { dependencyIndex, symbol, codec } = placeholder;
+      const { dependencyIndex, symbol, codec, alreadyEncoded } = placeholder;
       const dep = this.getDep(dependencyIndex);
       /*
        * We have dependency `dep`. We're attempting to merge ourself into
@@ -2405,6 +2434,7 @@ ${lateralText};`;
           dependencyIndex: newPlanIndex,
           codec,
           symbol,
+          alreadyEncoded,
         });
       } else if (dep instanceof PgClassExpressionStep) {
         // Replace with a reference.
@@ -2591,7 +2621,8 @@ ${lateralText};`;
             );
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
-                const { dependencyIndex, codec } = this.queryValues[i];
+                const { dependencyIndex, codec, alreadyEncoded } =
+                  this.queryValues[i];
                 const step = this.getDep(dependencyIndex);
                 if (step instanceof PgClassExpressionStep) {
                   return sql`${step.toSQL()}::${
@@ -2601,6 +2632,7 @@ ${lateralText};`;
                   return sql`${this.placeholder(
                     step,
                     codec,
+                    alreadyEncoded,
                   )} = ${identifierMatch}`;
                 } else {
                   throw new Error(
@@ -2662,7 +2694,8 @@ ${lateralText};`;
         ) {
           const parent2 = parent.getDep(parent.itemStepId);
           this.identifierMatches.forEach((identifierMatch, i) => {
-            const { dependencyIndex, codec } = this.queryValues[i];
+            const { dependencyIndex, codec, alreadyEncoded } =
+              this.queryValues[i];
             const step = this.getDep(dependencyIndex);
             if (step instanceof PgClassExpressionStep) {
               return this.where(
@@ -2670,7 +2703,11 @@ ${lateralText};`;
               );
             } else if (isStaticInputStep(step)) {
               return this.where(
-                sql`${this.placeholder(step, codec)} = ${identifierMatch}`,
+                sql`${this.placeholder(
+                  step,
+                  codec,
+                  alreadyEncoded,
+                )} = ${identifierMatch}`,
               );
             } else {
               throw new Error(
