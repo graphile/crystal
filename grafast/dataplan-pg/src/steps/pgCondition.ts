@@ -110,8 +110,8 @@ export class PgConditionStep<
 
   existsPlan(options: Omit<PgConditionStepModeExists, "mode">) {
     if (this.isHaving) {
-      // TODO: is this true?
-      throw new Error(`Cannot have EXISTS inside having?`);
+      // Is this true?
+      throw new Error(`EXISTS inside having is currently unsupported`);
     }
     return new PgConditionStep(this, this.isHaving, {
       ...options,
