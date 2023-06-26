@@ -1488,22 +1488,16 @@ and ${condition(i + 1)}`}
     // user from themself. If they bypass this, that's their problem (it will
     // not introduce a security issue).
     const hash = createHash("sha256");
-
-    // HACK: this is bad. We're getting the codec from just one of the
-    // members and assuming the type for the given attribute will match for
-    // all of them. We should either validate that this is the same, change
-    // the signature of `getFragmentAndCodecFromOrder` to pass all the
-    // codecs (and maybe even attribute mapping), or... I dunno... fix it
-    // some other way.
-    const mutualCodec = this.memberDigests[0].finalResource.codec;
-
+    const memberCodecs = this.memberDigests.map(
+      (digest) => digest.finalResource.codec,
+    );
     hash.update(
       JSON.stringify(
         this.ordersForCursor.map((o) => {
           const [frag] = getFragmentAndCodecFromOrder(
             this.alias,
             o,
-            mutualCodec,
+            memberCodecs,
           );
           return sql.compile(frag, {
             placeholderValues: this.placeholderValues,
@@ -1545,8 +1539,9 @@ and ${condition(i + 1)}`}
     const typeIdx = normalMode ? this.selectType() : null;
     const reverse = normalMode ? this.shouldReverseOrder() : null;
 
-    // HACK: THIS IS UNSAFE. See "HACK: this is bad" comments.
-    const mutualCodec = this.memberDigests[0].finalResource.codec;
+    const memberCodecs = this.memberDigests.map(
+      (digest) => digest.finalResource.codec,
+    );
 
     const makeQuery = () => {
       const tables: SQL[] = [];
@@ -1707,7 +1702,7 @@ from (${innerQuery}) as ${tableAlias}\
               ? getFragmentAndCodecFromOrder(
                   this.alias,
                   this.getOrderBy()[select.orderIndex],
-                  mutualCodec,
+                  memberCodecs,
                 )[1]
               : select.codec;
           return sql`${
