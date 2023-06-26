@@ -1097,16 +1097,6 @@ export class PgSelectStep<
 
     const condition = (i = 0): SQL => {
       const order = orders[i];
-      // Codec is responsible for performing validation/coercion and throwing
-      // error if value is invalid.
-      // FIXME: make sure this ^ is clear in the relevant places.
-      /*
-          const sqlValue = sql`${sql.value(
-            (void 0 /* forbid relying on `this` * /, order.codec.toPg)(
-              this.placeholder(access($parsedCursorPlan, [i + 1]), sql`text`),
-            ),
-          )}::${order.codec.sqlType}`;
-          */
       const [orderFragment, orderCodec, nullable] =
         getFragmentAndCodecFromOrder(this.alias, order, this.resource.codec);
       const { nulls, direction } = order;

@@ -14,6 +14,9 @@ reference it (you can reference codecs from the registry via
 `registry.pgCodecs[name]`). A codec also has an `identifier` which is the name
 of the type in the database.
 
+Codecs are responsible for performing coercion and validation; they should
+throw errors if the value supplied is invalid.
+
 ## `TYPES`
 
 ```ts
