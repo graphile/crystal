@@ -2467,7 +2467,7 @@ ${lateralText};`;
     this.locker.locked = false;
     this.streamOptions = stream;
 
-    // TODO: we should serialize our `SELECT` clauses and then if any are
+    // PERF: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
 
