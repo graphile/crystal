@@ -2892,6 +2892,8 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function ensureOrderIsUnique(step: PgSelectStep<any>) {
+  // No need to order a unique record
+  if (step.unique()) return;
   const unique = (step.resource.uniques as PgResourceUnique[])[0];
   if (unique !== undefined) {
     const ordersIsUnique = step.orderIsUnique();
