@@ -776,8 +776,8 @@ export class PgResource<
   public executeStream<TInput = any, TOutput = any>(
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
-  ): Promise<{ streams: GrafastResultStreamList<TOutput> }> {
-    return this.executor.executeStream(values, options);
+  ) {
+    return this.executor.executeStream<TInput, TOutput>(values, options);
   }
 
   /** @internal */

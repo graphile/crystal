@@ -8,6 +8,7 @@ import type {
   GrafastValuesList,
   InputStep,
   LambdaStep,
+  PromiseOrDirect,
   StepOptimizeOptions,
   StepStreamOptions,
   StreamableStep,
@@ -1379,39 +1380,48 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         if (!isAsyncIterable(stream)) {
           return stream;
         }
-        // FIXME: Merge the initial results and the stream together manually to
-        // avoid unstoppable async generator problem.
-        return (async function* () {
-          const l = initialFetchResult[idx].length;
-          try {
-            for (let i = 0; i < l; i++) {
-              yield initialFetchResult[idx][i];
-            }
-          } finally {
-            // This finally block because we want to release the underlying
-            // stream even if error was thrown during above `yield`s.
-            if (
-              streamInitialCount != null &&
-              streamInitialCount > 0 &&
-              l < streamInitialCount
-            ) {
-              // End the stream here, otherwise GraphQL won't know to stop
-              // waiting for the `initialCount` records.
 
-              // Since we never `for await (...of...)` we must manually release
-              // the stream:
-              const iterator = stream[Symbol.asyncIterator]();
-              iterator.return?.();
+        const innerIterator = stream[Symbol.asyncIterator]();
 
-              // Now we exit this generator, ending the iterable.
-              // eslint-disable-next-line no-unsafe-finally
-              return;
+        let i = 0;
+        let done = false;
+        const l = initialFetchResult[idx].length;
+        const mergedGenerator: AsyncGenerator<PromiseOrDirect<unknown[]>> = {
+          next() {
+            if (done) {
+              return Promise.resolve({ value: undefined, done });
+            } else if (i < l) {
+              return Promise.resolve({
+                value: initialFetchResult[idx][i++],
+                done,
+              });
+            } else if (streamInitialCount != null && l < streamInitialCount) {
+              done = true;
+              innerIterator.return?.();
+              return Promise.resolve({ value: undefined, done });
+            } else {
+              return innerIterator.next();
             }
-          }
-          for await (const result of stream) {
-            yield result;
-          }
-        })();
+          },
+          return(value) {
+            done = true;
+            return (
+              innerIterator.return?.(value) ??
+              Promise.resolve({ value: undefined, done })
+            );
+          },
+          throw(e) {
+            done = true;
+            return (
+              innerIterator.throw?.(e) ??
+              Promise.resolve({ value: undefined, done })
+            );
+          },
+          [Symbol.asyncIterator]() {
+            return this;
+          },
+        };
+        return mergedGenerator;
       });
     } else {
       return streams;
