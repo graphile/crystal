@@ -9,34 +9,33 @@ graph TD
 
 
     %% plan dependencies
-    GraphQLResolver9[["GraphQLResolver[9∈0]<br />ᐸresolveᐳ"]]:::unbatchedplan
-    Constant7{{"Constant[7∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
-    Constant17{{"Constant[17∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
+    GraphQLResolver8[["GraphQLResolver[8∈0]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Constant16{{"Constant[16∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant7 & Constant17 & __Value3 & __Value1 & __Value5 --> GraphQLResolver9
+    __Value5 & Constant16 & __Value3 & __Value1 & __Value5 --> GraphQLResolver8
     __Value0["__Value[0∈0]"]:::plan
-    Access11{{"Access[11∈1]<br />ᐸ9.numbersᐳ"}}:::plan
-    GraphQLResolver9 --> Access11
-    Access13{{"Access[13∈1]<br />ᐸ9.friendᐳ"}}:::plan
-    GraphQLResolver9 --> Access13
-    __Item12[/"__Item[12∈2]<br />ᐸ11ᐳ"\]:::itemplan
-    Access11 ==> __Item12
+    Access10{{"Access[10∈1]<br />ᐸ8.numbersᐳ"}}:::plan
+    GraphQLResolver8 --> Access10
+    Access12{{"Access[12∈1]<br />ᐸ8.friendᐳ"}}:::plan
+    GraphQLResolver8 --> Access12
+    __Item11[/"__Item[11∈2]<br />ᐸ10ᐳ"\]:::itemplan
+    Access10 ==> __Item11
 
     %% define steps
 
     subgraph "Buckets for queries/resolvers/objectDefaults"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Constant[7], Constant[17]<br />2: GraphQLResolver[9]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Constant[16]<br />2: GraphQLResolver[8]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value1,__Value3,__Value5,Constant7,GraphQLResolver9,Constant17 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 9<br /><br />ROOT GraphQLResolverᐸresolveᐳ[9]"):::bucket
+    class Bucket0,__Value0,__Value1,__Value3,__Value5,GraphQLResolver8,Constant16 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8<br /><br />ROOT GraphQLResolverᐸresolveᐳ[8]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access11,Access13 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ11ᐳ[12]"):::bucket
+    class Bucket1,Access10,Access12 bucket1
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ10ᐳ[11]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item12 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 13, 9<br /><br />ROOT Access{1}ᐸ9.friendᐳ[13]"):::bucket
+    class Bucket2,__Item11 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 8<br /><br />ROOT Access{1}ᐸ8.friendᐳ[12]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
     Bucket0 --> Bucket1

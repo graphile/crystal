@@ -4392,14 +4392,6 @@ export function makeExampleSchema(
             },
           },
         }),
-        // TODO: this should not be needed!
-        plan: EXPORTABLE(
-          (constant) =>
-            function plan() {
-              return constant(Object.create(null));
-            },
-          [constant],
-        ),
         resolve: EXPORTABLE(
           () =>
             function resolve() {
