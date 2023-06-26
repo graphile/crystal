@@ -2599,8 +2599,12 @@ ${lateralText};`;
           this.last == null &&
           this.offset == null &&
           this.mode !== "aggregate" &&
-          table.mode !== "aggregate"
-          // FIXME: && !this.order && ... */
+          table.mode !== "aggregate" &&
+          // For uniques these should all pass anyway, but pays to be cautious..
+          this.groups.length === 0 &&
+          this.havingConditions.length === 0 &&
+          this.orders.length === 0 &&
+          !this.fetchOneExtra
         ) {
           if (this.selects.length > 0) {
             debugPlanVerbose(
