@@ -2821,7 +2821,6 @@ export class OperationPlan {
    * our child plans would be expecting.
    */
   private deduplicateSteps() {
-    // TODO: Creating steps during deduplicate is forbidden, we should add code to enforce this
     const start = this.stepTracker.nextStepIdToDeduplicate;
     const end = this.stepTracker.stepCount;
     if (end === start) {
@@ -2836,6 +2835,10 @@ export class OperationPlan {
     }
 
     this.stepTracker.nextStepIdToDeduplicate = end;
+
+    if (this.stepTracker.stepCount > end) {
+      throw new Error(`Creating new steps during deduplicate is forbidden.`);
+    }
   }
 
   private hoistAndDeduplicate(step: ExecutableStep) {
