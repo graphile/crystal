@@ -117,7 +117,6 @@ type PgUnionAllStepSelect<TAttributes extends string> =
   | {
       type: "attribute";
       attribute: TAttributes;
-      codec: PgCodec;
     }
   | {
       type: "expression";
@@ -791,7 +790,6 @@ on (${sql.indent(
       this.selects.push({
         type: "attribute",
         attribute: key,
-        codec: this.spec.attributes[key].codec,
       }) - 1;
     return index;
   }
@@ -1573,7 +1571,6 @@ and ${condition(i + 1)}`}
                     );
                   }
                   const attr = this.spec.attributes[s.attribute];
-                  // TODO: check that attr.codec is compatible with the s.codec (and if not, do the necessary casting?)
                   return [
                     sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
                       digest,
@@ -1704,6 +1701,8 @@ from (${innerQuery}) as ${tableAlias}\
                   this.getOrderBy()[select.orderIndex],
                   memberCodecs,
                 )[1]
+              : select.type === "attribute"
+              ? this.spec.attributes![select.attribute].codec
               : select.codec;
           return sql`${
             codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
