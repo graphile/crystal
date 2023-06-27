@@ -1,10 +1,6 @@
 /* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
-import type {
-  GrafastResultStreamList,
-  GrafastValuesList,
-  ObjectStep,
-} from "grafast";
+import type { GrafastValuesList, ObjectStep } from "grafast";
 import {
   __ValueStep,
   arraysMatch,

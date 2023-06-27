@@ -5,7 +5,6 @@ import type {
   Deferred,
   ExecutableStep,
   ExecutionEventEmitter,
-  GrafastResultStreamList,
   GrafastValuesList,
   ObjectStep,
   PromiseOrDirect,

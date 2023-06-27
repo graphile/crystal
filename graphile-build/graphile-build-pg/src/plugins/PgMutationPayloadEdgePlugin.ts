@@ -8,8 +8,7 @@ import type {
 } from "@dataplan/pg";
 import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
-import { first } from "grafast";
-import { connection, constant, EdgeStep } from "grafast";
+import { connection, constant, EdgeStep, first } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 
@@ -177,6 +176,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     applyOrderToPlan,
                     connection,
                     constant,
+                    first,
                     pgSelectFromRecord,
                     pkAttributes,
                     resource,
@@ -235,6 +235,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     applyOrderToPlan,
                     connection,
                     constant,
+                    first,
                     pgSelectFromRecord,
                     pkAttributes,
                     resource,
