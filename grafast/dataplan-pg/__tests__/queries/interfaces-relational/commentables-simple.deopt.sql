@@ -26,5 +26,4 @@ lateral (
     ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;

@@ -9,7 +9,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __person_result__.*
@@ -23,7 +22,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __person_result__.*
@@ -37,7 +35,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __compound_key_result__.*
@@ -54,7 +51,6 @@ lateral (
     ) and (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
-  order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
 ) as __compound_key_result__;
 
 select __compound_key_result__.*
@@ -71,7 +67,6 @@ lateral (
     ) and (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
-  order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
 ) as __compound_key_result__;
 
 select __compound_key_result__.*
@@ -88,7 +83,6 @@ lateral (
     ) and (
       __compound_key__."person_id_2" = __compound_key_identifiers__."id1"
     )
-  order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
 ) as __compound_key_result__;
 
 select __similar_table_1_result__.*
@@ -104,7 +98,6 @@ lateral (
   where (
     __similar_table_1__."id" = __similar_table_1_identifiers__."id0"
   )
-  order by __similar_table_1__."id" asc
 ) as __similar_table_1_result__;
 
 select __similar_table_2_result__.*
@@ -120,7 +113,6 @@ lateral (
   where (
     __similar_table_2__."id" = __similar_table_2_identifiers__."id0"
   )
-  order by __similar_table_2__."id" asc
 ) as __similar_table_2_result__;
 
 select

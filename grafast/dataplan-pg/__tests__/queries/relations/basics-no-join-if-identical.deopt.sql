@@ -13,7 +13,6 @@ lateral (
     ) and (
       __messages__."id" = __messages_identifiers__."id0"
     )
-  order by __messages__."id" asc
 ) as __messages_result__;
 
 select __forums_result__.*
@@ -29,5 +28,4 @@ lateral (
     ) and (
       __forums__."id" = __forums_identifiers__."id0"
     )
-  order by __forums__."id" asc
 ) as __forums_result__;

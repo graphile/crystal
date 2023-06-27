@@ -11,7 +11,6 @@ lateral (
   where (
     __letter_descriptions__."letter" = __letter_descriptions_identifiers__."id0"
   )
-  order by __letter_descriptions__."id" asc
 ) as __letter_descriptions_result__;
 
 select __letter_descriptions_result__.*
@@ -27,7 +26,6 @@ lateral (
   where (
     __letter_descriptions__."letter_via_view" = __letter_descriptions_identifiers__."id0"
   )
-  order by __letter_descriptions__."id" asc
 ) as __letter_descriptions_result__;
 
 select

@@ -34,7 +34,6 @@ lateral (
     ) and (
       __relational_topics__."id" = __relational_topics_identifiers__."id0"
     )
-  order by __relational_topics__."id" asc
 ) as __relational_topics_result__;
 
 select __relational_items_result__.*
@@ -52,7 +51,6 @@ lateral (
     ) and (
       __relational_items__."id" = __relational_items_identifiers__."id0"
     )
-  order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
 select __relational_posts_result__.*
@@ -68,7 +66,6 @@ lateral (
     ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
 select __relational_dividers_result__.*
@@ -84,7 +81,6 @@ lateral (
     ) and (
       __relational_dividers__."id" = __relational_dividers_identifiers__."id0"
     )
-  order by __relational_dividers__."id" asc
 ) as __relational_dividers_result__;
 
 select __relational_checklists_result__.*
@@ -100,7 +96,6 @@ lateral (
     ) and (
       __relational_checklists__."id" = __relational_checklists_identifiers__."id0"
     )
-  order by __relational_checklists__."id" asc
 ) as __relational_checklists_result__;
 
 select __relational_checklist_items_result__.*
@@ -116,5 +111,4 @@ lateral (
     ) and (
       __relational_checklist_items__."id" = __relational_checklist_items_identifiers__."id0"
     )
-  order by __relational_checklist_items__."id" asc
 ) as __relational_checklist_items_result__;

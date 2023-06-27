@@ -58,5 +58,4 @@ lateral (
   where (
     __null__."id" = __null_identifiers__."id0"
   )
-  order by __null__."id" asc
 ) as __null_result__;

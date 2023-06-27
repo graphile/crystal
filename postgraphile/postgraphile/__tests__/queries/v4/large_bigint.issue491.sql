@@ -9,7 +9,6 @@ lateral (
   where (
     __large_node_id__."id" = __large_node_id_identifiers__."id0"
   )
-  order by __large_node_id__."id" asc
 ) as __large_node_id_result__;
 
 select __large_node_id_result__.*
@@ -23,7 +22,6 @@ lateral (
   where (
     __large_node_id__."id" = __large_node_id_identifiers__."id0"
   )
-  order by __large_node_id__."id" asc
 ) as __large_node_id_result__;
 
 select

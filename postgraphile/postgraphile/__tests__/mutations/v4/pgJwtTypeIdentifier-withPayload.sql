@@ -25,7 +25,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __frmcdc_jwt_token_result__.*

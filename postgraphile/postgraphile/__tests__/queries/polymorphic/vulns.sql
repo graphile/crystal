@@ -112,7 +112,6 @@ lateral (
   where (
     __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
   )
-  order by __first_party_vulnerabilities__."id" asc
 ) as __first_party_vulnerabilities_result__;
 
 select __third_party_vulnerabilities_result__.*
@@ -128,7 +127,6 @@ lateral (
   where (
     __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
   )
-  order by __third_party_vulnerabilities__."id" asc
 ) as __third_party_vulnerabilities_result__;
 
 select __union_result__.*

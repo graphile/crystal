@@ -27,7 +27,6 @@ lateral (
     ) and (
       __people__."person_id" = __people_identifiers__."id0"
     )
-  order by __people__."person_id" asc
 ) as __people_result__;
 
 select __posts_result__.*
@@ -45,7 +44,6 @@ lateral (
     ) and (
       __posts__."post_id" = __posts_identifiers__."id0"
     )
-  order by __posts__."post_id" asc
 ) as __posts_result__;
 
 select __comments_result__.*
@@ -64,7 +62,6 @@ lateral (
     ) and (
       __comments__."comment_id" = __comments_identifiers__."id0"
     )
-  order by __comments__."comment_id" asc
 ) as __comments_result__;
 
 select __people_result__.*
@@ -80,7 +77,6 @@ lateral (
     ) and (
       __people__."person_id" = __people_identifiers__."id0"
     )
-  order by __people__."person_id" asc
 ) as __people_result__;
 
 select __posts_result__.*
@@ -97,5 +93,4 @@ lateral (
     ) and (
       __posts__."post_id" = __posts_identifiers__."id0"
     )
-  order by __posts__."post_id" asc
 ) as __posts_result__;

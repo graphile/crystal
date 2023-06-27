@@ -15,7 +15,6 @@ lateral (
     ) and (
       __houses__."property_id" = __houses_identifiers__."id1"
     )
-  order by __houses__."street_id" asc, __houses__."property_id" asc
 ) as __houses_result__;
 
 select

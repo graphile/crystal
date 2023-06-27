@@ -88,5 +88,4 @@ lateral (
   where (
     __aws_applications__."id" = __aws_applications_identifiers__."id0"
   )
-  order by __aws_applications__."id" asc
 ) as __aws_applications_result__;

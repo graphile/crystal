@@ -12,7 +12,6 @@ lateral (
     ) and (
       __union_items__."id" = __union_items_identifiers__."id0"
     )
-  order by __union_items__."id" asc
 ) as __union_items_result__;
 
 select __union_topics_result__.*
@@ -29,5 +28,4 @@ lateral (
     ) and (
       __union_topics__."id" = __union_topics_identifiers__."id0"
     )
-  order by __union_topics__."id" asc
 ) as __union_topics_result__;

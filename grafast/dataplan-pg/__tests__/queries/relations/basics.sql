@@ -16,5 +16,4 @@ lateral (
     ) and (
       __messages__."id" = __messages_identifiers__."id0"
     )
-  order by __messages__."id" asc
 ) as __messages_result__;

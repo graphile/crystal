@@ -183,7 +183,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
@@ -281,7 +280,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 insert into "c"."compound_key" as __compound_key__ ("person_id_2", "person_id_1", "extra") values ($1::"int4", $2::"int4", $3::"bool") returning
@@ -300,7 +298,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __person_result__.*
@@ -314,7 +311,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 insert into "c"."edge_case" as __edge_case__ ("not_null_has_default") values ($1::"bool") returning
@@ -418,7 +414,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email") returning
@@ -435,7 +430,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 insert into "a"."default_value" as __default_value__ ("id", "null_value") values ($1::"int4", $2::"text") returning
@@ -476,7 +470,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __post_result__.*

@@ -67,7 +67,6 @@ lateral (
     __person__."person_full_name" as "2",
     __person_identifiers__.idx as "3"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __mutation_out_complex_setof_result__.*
@@ -114,7 +113,6 @@ lateral (
     __person__."person_full_name" as "2",
     __person_identifiers__.idx as "3"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 select

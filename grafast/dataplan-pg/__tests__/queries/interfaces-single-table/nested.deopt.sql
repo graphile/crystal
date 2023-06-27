@@ -40,5 +40,4 @@ lateral (
     ) and (
       __single_table_items__."id" = __single_table_items_identifiers__."id0"
     )
-  order by __single_table_items__."id" asc
 ) as __single_table_items_result__;

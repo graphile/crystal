@@ -8,5 +8,4 @@ lateral (
   where (
     __types__."id" = __types_identifiers__."id0"
   )
-  order by __types__."id" asc
 ) as __types_result__;

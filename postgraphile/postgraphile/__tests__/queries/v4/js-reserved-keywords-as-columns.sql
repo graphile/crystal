@@ -9,7 +9,6 @@ lateral (
   where (
     __material__."class" = __material_identifiers__."id0"
   )
-  order by __material__."id" asc
 ) as __material_result__;
 
 select __material_result__.*
@@ -23,7 +22,6 @@ lateral (
   where (
     __material__."valueOf" = __material_identifiers__."id0"
   )
-  order by __material__."id" asc
 ) as __material_result__;
 
 select
@@ -45,7 +43,6 @@ lateral (
   where (
     __crop__."id" = __crop_identifiers__."id0"
   )
-  order by __crop__."id" asc
 ) as __crop_result__;
 
 select __crop_result__.*
@@ -59,7 +56,6 @@ lateral (
   where (
     __crop__."yield" = __crop_identifiers__."id0"
   )
-  order by __crop__."id" asc
 ) as __crop_result__;
 
 select

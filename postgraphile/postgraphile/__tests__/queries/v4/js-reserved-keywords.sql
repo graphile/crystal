@@ -14,7 +14,6 @@ lateral (
   where (
     __machine__."id" = __machine_identifiers__."id0"
   )
-  order by __machine__."id" asc
 ) as __machine_result__;
 
 select __building_result__.*
@@ -39,7 +38,6 @@ lateral (
   where (
     __building__."id" = __building_identifiers__."id0"
   )
-  order by __building__."id" asc
 ) as __building_result__;
 
 select
@@ -59,7 +57,6 @@ lateral (
   where (
     __relational_topics__."id" = __relational_topics_identifiers__."id0"
   )
-  order by __relational_topics__."id" asc
 ) as __relational_topics_result__;
 
 select __relational_status_result__.*
@@ -73,5 +70,4 @@ lateral (
   where (
     __relational_status__."id" = __relational_status_identifiers__."id0"
   )
-  order by __relational_status__."id" asc
 ) as __relational_status_result__;

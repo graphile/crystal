@@ -261,7 +261,6 @@ lateral (
   where (
     __types__."id" = __types_identifiers__."id0"
   )
-  order by __types__."id" asc
 ) as __types_result__;
 
 select __type_function_result__.*
@@ -1005,7 +1004,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __post_result__.*
@@ -1363,7 +1361,6 @@ lateral (
   where (
     __post_7."id" = __post_identifiers__."id0"
   )
-  order by __post_7."id" asc
 ) as __post_result__;
 
 select

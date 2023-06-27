@@ -29,7 +29,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "email" = $2::"b"."email" where (__person__."id" = $3::"int4") returning
@@ -63,7 +62,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id" = $2::"int4") returning
@@ -97,7 +95,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id" = $2::"int4") returning
@@ -131,7 +128,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about" = $2::"text" where (__person__."id" = $3::"int4") returning
@@ -165,7 +161,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."person" as __person__ set "about" = $1::"text" where (__person__."email" = $2::"b"."email") returning
@@ -199,7 +194,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."compound_key" as __compound_key__ set "person_id_1" = $1::"int4", "extra" = $2::"bool" where ((__compound_key__."person_id_1" = $3::"int4") and (__compound_key__."person_id_2" = $4::"int4")) returning
@@ -218,7 +212,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."compound_key" as __compound_key__ set "person_id_1" = $1::"int4", "extra" = $2::"bool" where ((__compound_key__."person_id_1" = $3::"int4") and (__compound_key__."person_id_2" = $4::"int4")) returning
@@ -237,7 +230,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __person_result__.*
@@ -251,7 +243,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."compound_key" as __compound_key__ set "extra" = $1::"bool" where ((__compound_key__."person_id_1" = $2::"int4") and (__compound_key__."person_id_2" = $3::"int4")) returning
@@ -270,7 +261,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __person_result__.*
@@ -284,7 +274,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "c"."person" as __person__ set "email" = $1::"b"."email" where (__person__."email" = $2::"b"."email") returning
@@ -318,7 +307,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 update "a"."default_value" as __default_value__ set "null_value" = $1::"text" where (__default_value__."id" = $2::"int4") returning
