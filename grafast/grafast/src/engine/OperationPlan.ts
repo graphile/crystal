@@ -2144,13 +2144,19 @@ export class OperationPlan {
           );
         }
       }
+      if (isReadonly && this.stepTracker.stepCount > previousStepCount) {
+        throwNoNewStepsError(
+          this,
+          actionDescription,
+          step,
+          previousStepCount,
+          "Creating steps in isReadonly mode is forbidden",
+        );
+      }
     }
 
-    if (isReadonly) {
-      if (this.stepTracker.stepCount > previousStepCount) {
-        throw new Error(`Creating steps in isReadonly mode is forbidden`);
-      }
-    } else if (
+    if (
+      !isReadonly &&
       this.phase !== "plan" &&
       this.stepTracker.stepCount > previousStepCount
     ) {
@@ -2820,7 +2826,7 @@ export class OperationPlan {
    * former SELECT additional fields, then transform the results back to what
    * our child plans would be expecting.
    */
-  private deduplicateSteps() {
+  private deduplicateSteps(depth = 0): void {
     const start = this.stepTracker.nextStepIdToDeduplicate;
     const end = this.stepTracker.stepCount;
     if (end === start) {
@@ -2833,11 +2839,23 @@ export class OperationPlan {
       if (!step || step.id !== i || processed.has(step)) continue;
       this.deduplicateStepsProcess(processed, start, step);
     }
-
     this.stepTracker.nextStepIdToDeduplicate = end;
 
     if (this.stepTracker.stepCount > end) {
-      throw new Error(`Creating new steps during deduplicate is forbidden.`);
+      // More steps were created during deduplicate; let's deduplicate those!
+      const MAX_DEPTH = 5;
+      if (depth > MAX_DEPTH) {
+        const newSteps: (ExecutableStep | null)[] = [];
+        for (let i = end, l = this.stepTracker.stepCount; i < l; i++) {
+          newSteps.push(this.stepTracker.stepById[i]);
+        }
+        throw new Error(
+          `Whilst deduplicating steps, more steps were created; whilst deduplicating those, even more steps were created. This happened ${MAX_DEPTH} times, which suggests this might go on infinitely. Please check the deduplicate/deduplicatedWith methods on ${newSteps
+            .map((s) => String(s))
+            .join(", ")}.`,
+        );
+      }
+      return this.deduplicateSteps(depth + 1);
     }
   }
 
@@ -3475,4 +3493,26 @@ function newLayerPlanPhase(): LayerPlanPhase {
     unbatchedSyncAndSafeSteps: undefined,
     _allSteps: [],
   };
+}
+
+function throwNoNewStepsError(
+  operationPlan: OperationPlan,
+  actionDescription: string,
+  step: ExecutableStep,
+  previousStepCount: number,
+  message: string,
+) {
+  const newSteps: (ExecutableStep | null)[] = [];
+  for (
+    let i = previousStepCount, l = operationPlan.stepTracker.stepCount;
+    i < l;
+    i++
+  ) {
+    newSteps.push(operationPlan.stepTracker.stepById[i]);
+  }
+  throw new Error(
+    `${message}; whilst performing ${actionDescription} of ${step} the following new steps were created: ${newSteps
+      .map((s) => String(s))
+      .join(", ")}`,
+  );
 }
