@@ -24,6 +24,7 @@ import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
+import { MetaByMetaKey } from "./OperationPlan.js";
 
 const DEBUG_POLYMORPHISM = false;
 
@@ -89,21 +90,9 @@ export function executeBucket(
    */
   const reallyExecuteStepWithNoErrors = executeOrStream;
 
-  // TODO: metaByMetaKey might belong to the bucket (`inheritMeta: boolean`)
-  // rather than the request context? Mutations and subscriptions shouldn't
-  // re-use caches.
-  const { layerPlan } = bucket;
-  if (
-    layerPlan.reason.type === "root" ||
-    layerPlan.reason.type === "mutationField" ||
-    layerPlan.reason.type === "subscription"
-  ) {
-    // Reset the metaByMetaKey
-    requestContext.metaByMetaKey = layerPlan.operationPlan.makeMetaByMetaKey();
-  }
-
-  const { metaByMetaKey, stopTime, eventEmitter } = requestContext;
+  const { stopTime, eventEmitter } = requestContext;
   const {
+    metaByMetaKey,
     size,
     store,
     layerPlan: { phases, children: childLayerPlans },
@@ -807,6 +796,7 @@ export function newBucket(
     Bucket,
     "layerPlan" | "store" | "size" | "hasErrors" | "polymorphicPathList"
   >,
+  parentMetaByMetaKey: MetaByMetaKey | null,
 ): Bucket {
   if (isDev) {
     // Some validations
@@ -842,6 +832,15 @@ export function newBucket(
       );
     }
   }
+  const type = spec.layerPlan.reason.type;
+  const metaByMetaKey =
+    parentMetaByMetaKey === null ||
+    type === "root" ||
+    type === "mutationField" ||
+    type === "subscription"
+      ? // Reset the metaByMetaKey
+        spec.layerPlan.operationPlan.makeMetaByMetaKey()
+      : parentMetaByMetaKey;
   return {
     // Copy from spec
     layerPlan: spec.layerPlan,
@@ -849,6 +848,7 @@ export function newBucket(
     size: spec.size,
     hasErrors: spec.hasErrors,
     polymorphicPathList: spec.polymorphicPathList,
+    metaByMetaKey,
 
     isComplete: false,
     children: Object.create(null),

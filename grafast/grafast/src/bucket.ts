@@ -26,8 +26,6 @@ export interface RequestTools {
 
   readonly eventEmitter: ExecutionEventEmitter | undefined;
 
-  metaByMetaKey: MetaByMetaKey;
-
   /**
    * If we're running inside GraphQL then we should not serialize scalars,
    * otherwise we'll face the double-serialization problem.
@@ -63,6 +61,14 @@ export interface Bucket {
    * related inputs.
    */
   polymorphicPathList: readonly (string | null)[];
+
+  /**
+   * `metaByMetaKey` belongs to the bucket rather than the request context
+   * because mutations and subscriptions shouldn't re-use caches.
+   *
+   * TODO: `inheritMeta: boolean`?
+   */
+  metaByMetaKey: MetaByMetaKey;
 
   /**
    * Every entry in the store is a list with the same length as the bucket has
