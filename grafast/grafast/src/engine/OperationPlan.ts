@@ -606,7 +606,7 @@ export class OperationPlan {
         }
       }
     } catch (e) {
-      // TODO: raise this somewhere critical
+      // LOGGING: raise this somewhere critical
       if (this.loc != null) {
         console.error(
           `Error occurred during query planning (at ${this.loc.join(
