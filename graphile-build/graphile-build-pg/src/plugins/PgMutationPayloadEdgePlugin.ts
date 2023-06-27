@@ -8,6 +8,7 @@ import type {
 } from "@dataplan/pg";
 import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
+import { first } from "grafast";
 import { connection, constant, EdgeStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
@@ -222,7 +223,10 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       );
 
                       const $connection = connection($select) as any;
-                      const $single = $select.single();
+                      // NOTE: you must not use `$single = $select.single()`
+                      // here because doing so will mark the row as unique, and
+                      // then the ordering logic (and thus cursor) will differ.
+                      const $single = $select.row(first($select));
                       return new EdgeStep($connection, $single);
                     },
                   [
