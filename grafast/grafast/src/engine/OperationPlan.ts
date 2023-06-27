@@ -1230,7 +1230,7 @@ export class OperationPlan {
             deferLabel: deferred.label,
             typeName: objectType.name,
           },
-          // TODO: the location details should be tweaked to reference this
+          // LOGGING: the location details should be tweaked to reference this
           // fragment
           outputPlan.locationDetails,
         );
