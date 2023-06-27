@@ -65,6 +65,7 @@ import { timeSource } from "../timeSource.js";
 import {
   defaultValueToValueNode,
   findVariableNamesUsed,
+  hasItemPlan,
   isTypePlanned,
 } from "../utils.js";
 import type {
@@ -796,18 +797,6 @@ export class OperationPlan {
         },
       );
 
-      // TODO: move this somewhere else
-      const hasItemPlan = (
-        step: ExecutableStep,
-      ): step is ExecutableStep & {
-        itemPlan: ($item: ExecutableStep) => ExecutableStep;
-      } => {
-        return (
-          "itemPlan" in (subscribeStep as any) &&
-          typeof (subscribeStep as any).itemPlan === "function"
-        );
-      };
-
       const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
@@ -896,18 +885,6 @@ export class OperationPlan {
           type: "subscription",
         },
       );
-
-      // TODO: move this somewhere else
-      const hasItemPlan = (
-        step: ExecutableStep,
-      ): step is ExecutableStep & {
-        itemPlan: ($item: ExecutableStep) => ExecutableStep;
-      } => {
-        return (
-          "itemPlan" in (subscribeStep as any) &&
-          typeof (subscribeStep as any).itemPlan === "function"
-        );
-      };
 
       const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
