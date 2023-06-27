@@ -24,7 +24,7 @@ import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
 import { arrayOfLength, isPromiseLike } from "../utils.js";
-import { MetaByMetaKey } from "./OperationPlan.js";
+import type { MetaByMetaKey } from "./OperationPlan.js";
 
 const DEBUG_POLYMORPHISM = false;
 
