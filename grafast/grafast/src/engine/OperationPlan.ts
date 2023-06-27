@@ -136,7 +136,7 @@ export type OperationPlanPhase =
   | "finalize"
   | "ready";
 
-// TODO: overhaul the TypeScript for this, allow steps to declaration merge
+// TYPES: overhaul the TypeScript for this, allow steps to declaration merge
 // their own shapes into it.
 export interface MetaByMetaKey {
   [metaKey: string | number | symbol]: Record<string, any>;
