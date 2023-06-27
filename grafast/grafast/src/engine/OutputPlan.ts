@@ -687,7 +687,6 @@ export function nonNullError(
   const { parentTypeName, fieldName, node } = locationDetails;
   if (!parentTypeName || !fieldName) {
     return new GraphQLError(
-      // TODO: rename. Also this shouldn't happen?
       `GrafastInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
       node,
       null,
