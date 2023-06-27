@@ -1157,8 +1157,16 @@ export class OperationPlan {
           trackedArguments,
         ));
       } else {
-        // FIXME: should this use the default plan resolver?
-        // There's no step resolver; use the parent step
+        // No plan resolver (or plan resolver fallback) so there must be a
+        // `resolve` method, so we'll feed the full parent step into the
+        // resolver.
+        assert.ok(
+          resolver !== null,
+          "GraphileInternalError<81652257-617a-4d1a-8306-903d0e3d2ddf>: The field has no resolver, so planResolver should exist (either as the field.plan or as the default plan resolver).",
+        );
+        // ENHANCEMENT: should we do `step = parentStep.object()` (i.e.
+        // `$pgSelectSingle.record()`) or similar for "opaque" steps to become
+        // suitable for consumption by resolvers?
         step = parentStep;
       }
 
