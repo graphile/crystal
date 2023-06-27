@@ -1278,7 +1278,7 @@ and ${condition(i + 1)}`}
 
   public setFirst(first: InputStep | number): this {
     this.locker.assertParameterUnlocked("first");
-    // TODO: don't eval
+    // PERF: don't eval
     this.first = typeof first === "number" ? first : first.eval() ?? null;
     this.locker.lockParameter("first");
     return this;
