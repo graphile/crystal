@@ -421,7 +421,7 @@ export class StepTracker {
       }
     }
 
-    // HACK: had to add the code ensuring all the layer plan parentStepId's
+    // NOTE: had to add the code ensuring all the layer plan parentStepId's
     // existed to fix polymorphism, but it feels wrong. Should we be doing
     // something different?
     {
