@@ -288,7 +288,7 @@ export class StepTracker {
       }
       outputPlansBy$existing.delete(outputPlan);
       if (outputPlansBy$existing.size === 0) {
-        // TODO: Cleanup, tree shake, etc
+        // PERF: Cleanup, tree shake, etc
       }
     }
     (outputPlan.rootStep as any) = $dependency;
@@ -322,7 +322,7 @@ export class StepTracker {
       layerPlansBy$existing.delete(layerPlan);
       if (layerPlansBy$existing.size === 0) {
         this.layerPlansByRootStep.delete($existing);
-        // TODO: Cleanup, tree shake, etc
+        // PERF: Cleanup, tree shake, etc
       }
     }
     (layerPlan.rootStep as any) = $dependency;
