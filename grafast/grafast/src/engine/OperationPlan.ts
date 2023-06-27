@@ -1677,6 +1677,10 @@ export class OperationPlan {
     }
     const prev = polymorphicLayerPlanByPath.get(pathString);
     if (prev !== undefined) {
+      // NOTE: this is typically hit when you have a polymorphic field inside
+      // another polymorphic field - in these cases rather than having the
+      // polymorphism multiply out, we can aim for fewer polymorphic buckets
+      // keeping the plan simpler (and more efficient).
       const { stepId, layerPlan } = prev;
       const stepByStepId = this.stepTracker.getStepById(stepId);
       const stepBy$stepId = this.stepTracker.getStepById($step.id);
@@ -1687,7 +1691,9 @@ export class OperationPlan {
       }
       for (const t of allPossibleObjectTypes) {
         if (!layerPlan.reason.typeNames.includes(t.name)) {
-          // TODO: do I need to do anything extra here?
+          // TODO: do I need to do anything extra here? Since we're re-using an
+          // existing LayerPlan, we should be careful to ensure none of the
+          // previous assumptions have been broken.
           layerPlan.reason.typeNames.push(t.name);
         }
       }
