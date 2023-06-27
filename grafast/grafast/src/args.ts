@@ -3,6 +3,8 @@ import type { ExecutionArgs } from "graphql";
 import { hook, NULL_PRESET } from "./config.js";
 import { isPromiseLike } from "./utils.js";
 
+const $$hooked = Symbol("hookArgsApplied");
+
 /**
  * Applies Graphile Config hooks to your GraphQL request, e.g. to
  * populate context or similar.
@@ -10,11 +12,15 @@ import { isPromiseLike } from "./utils.js";
  * @experimental
  */
 export function hookArgs(
-  args: ExecutionArgs,
+  args: ExecutionArgs & { [$$hooked]?: boolean },
   resolvedPreset: GraphileConfig.ResolvedPreset,
   ctx: Partial<Grafast.RequestContext>,
 ): ExecutionArgs | PromiseLike<ExecutionArgs> {
-  // FIXME: assert that args haven't already been hooked
+  // Assert that args haven't already been hooked
+  if (args[$$hooked]) {
+    throw new Error("Must not call hookArgs twice!");
+  }
+  args[$$hooked] = true;
 
   // Make context mutable
   args.contextValue = Object.assign(Object.create(null), args.contextValue);
