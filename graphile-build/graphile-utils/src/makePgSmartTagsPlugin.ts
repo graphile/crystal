@@ -32,8 +32,7 @@ type PgEntityByKind = {
 type PgSmartTagSupportedKinds = keyof PgEntityByKind;
 type PgEntity = PgEntityByKind[PgSmartTagSupportedKinds];
 
-// TODO: what other parameters do we need here. 2nd arg used to be Build, but
-// that doesn't exist in Gather phase.
+// NOTE: we might add more arguments here as necessary
 export type PgSmartTagFilterFunction<TEntity extends PgEntity> = (
   input: TEntity,
 ) => boolean;
