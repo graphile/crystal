@@ -553,7 +553,6 @@ export function makeExtendSchemaPlugin(
               ) as DirectiveLocation[];
               const args = getArguments(definition.arguments, build);
               // Ignoring isRepeatable and astNode for now
-              // TODO: should we add hooks for directives?
               const directive = new GraphQLDirective({
                 name,
                 locations,
