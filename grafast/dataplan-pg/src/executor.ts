@@ -632,7 +632,7 @@ ${duration}
 
         // PERF: batchIndexesByIdentifiersJSON = null;
 
-        // TODO: implement singleMode using textForSingle
+        // PERF: implement singleMode using textForSingle
         const singleMode = false;
         const sqlValues =
           identifierIndex == null

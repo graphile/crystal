@@ -445,8 +445,12 @@ export class StepTracker {
       }
     }
 
-    // FIXME: ensure side-effect plans are handled nicely
-    // FIXME: ensure plans in 'subprocedure' layerPlans are marked active
+    // NOTE: I don't think side-effect plans need any special handling, since
+    // they cannot be deduplicated.
+
+    // NOTE: there may be more work required here for 'subprocedure' layerPlans
+    // (e.g. making sure their steps are retained), but it's not clear what
+    // work is necessary and we've not seen any issues from this yet.
 
     // Remove this step (and perform localized tree-shaking)
     this.eradicate($original);

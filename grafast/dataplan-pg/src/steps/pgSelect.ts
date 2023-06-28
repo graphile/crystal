@@ -1090,7 +1090,7 @@ export class PgSelectStep<
       return;
     }
     if (!this.isOrderUnique) {
-      // TODO: make this smarter
+      // ENHANCEMENT: make this smarter
       throw new SafeError(
         `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
       );
@@ -2030,7 +2030,7 @@ ${lateralText};`;
           (limit != null && limit >= 0) ||
           (offset != null && offset > 0)
         ) {
-          // TODO: make this nicer; combine with the `if` branch above?
+          // ENHANCEMENT: make this nicer; combine with the `if` branch above?
 
           const extraSelects: SQL[] = [];
           const rowNumberIndexOffset =
@@ -2095,7 +2095,7 @@ ${lateralText};`;
       };
 
       if (this.streamOptions) {
-        // TODO: should use the queryForSingle optimization in here too
+        // PERF: should use the queryForSingle optimization in here too
 
         // When streaming we can't reverse order in JS - we must do it in the DB.
         if (this.streamOptions.initialCount > 0) {
