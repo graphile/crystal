@@ -6,11 +6,11 @@ order by __people__."person_id" asc
 limit 4;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1", (ids.value->>2)::"text" as "id2", (ids.value->>3)::"text" as "id3", (ids.value->>4)::"text" as "id4" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1", (ids.value->>2)::"text" as "id2", (ids.value->>3)::"text" as "id3", (ids.value->>4)::"json" as "id4" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __applications__."0" as "0",
+    __applications__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -33,7 +33,7 @@ lateral (
           or (
             'AwsApplication' = __union_identifiers__."id3"
             and (
-              __aws_applications__."id" > ((__union_identifiers__."id4")::json->>0)::"int4"
+              __aws_applications__."id" > (__union_identifiers__."id4"->>0)::"int4"
             )
           )
         )
@@ -62,7 +62,7 @@ lateral (
           or (
             'GcpApplication' = __union_identifiers__."id3"
             and (
-              __gcp_applications__."id" > ((__union_identifiers__."id4")::json->>0)::"int4"
+              __gcp_applications__."id" > (__union_identifiers__."id4"->>0)::"int4"
             )
           )
         )
@@ -74,7 +74,7 @@ lateral (
       "0" asc,
       "n" asc
     limit 1
-  ) __union__
+  ) __applications__
 ) as __union_result__;
 
 select __aws_applications_result__.*
@@ -88,5 +88,4 @@ lateral (
   where (
     __aws_applications__."id" = __aws_applications_identifiers__."id0"
   )
-  order by __aws_applications__."id" asc
 ) as __aws_applications_result__;

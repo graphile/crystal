@@ -24,7 +24,6 @@ lateral (
     ) and (
       __relational_items__."id" = __relational_items_identifiers__."id0"
     )
-  order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
 select __relational_items_result__.*
@@ -41,7 +40,6 @@ lateral (
     ) and (
       __relational_items__."id" = __relational_items_identifiers__."id0"
     )
-  order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
 select __relational_items_result__.*
@@ -58,7 +56,6 @@ lateral (
     ) and (
       __relational_items__."id" = __relational_items_identifiers__."id0"
     )
-  order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
 select __relational_posts_result__.*
@@ -77,7 +74,6 @@ lateral (
     ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
 select __relational_posts_result__.*
@@ -96,7 +92,6 @@ lateral (
     ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
 insert into interfaces_and_unions.relational_items as __relational_items__ ("type", "author_id") values ($1::interfaces_and_unions.item_type, $2::"int4") returning
@@ -119,7 +114,6 @@ lateral (
     ) and (
       __relational_items__."id" = __relational_items_identifiers__."id0"
     )
-  order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
 select __relational_items_result__.*
@@ -136,7 +130,6 @@ lateral (
     ) and (
       __relational_items__."id" = __relational_items_identifiers__."id0"
     )
-  order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
 select __relational_items_result__.*
@@ -153,7 +146,6 @@ lateral (
     ) and (
       __relational_items__."id" = __relational_items_identifiers__."id0"
     )
-  order by __relational_items__."id" asc
 ) as __relational_items_result__;
 
 select __relational_posts_result__.*
@@ -172,7 +164,6 @@ lateral (
     ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
 select __relational_posts_result__.*
@@ -191,7 +182,6 @@ lateral (
     ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
 select __relational_posts_result__.*
@@ -210,5 +200,4 @@ lateral (
     ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;

@@ -102,6 +102,7 @@ async function main() {
       sqlFromArgDigests,
     ) => {
       const usersCodec = recordCodec({
+        executor,
         name: `app_public.users`,
         identifier: sql`app_public.users`,
         attributes: {
@@ -135,6 +136,7 @@ async function main() {
       });
 
       const forumsCodec = recordCodec({
+        executor,
         name: `app_public.forums`,
         identifier: sql`app_public.forums`,
         attributes: {
@@ -164,6 +166,7 @@ async function main() {
       });
 
       const messagesCodec = recordCodec({
+        executor,
         name: `app_public.messages`,
         identifier: sql`app_public.messages`,
         attributes: {

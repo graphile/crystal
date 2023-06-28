@@ -49,5 +49,5 @@ lateral (
         order by
           __gcp_applications__."id" asc
       ) as __gcp_applications__
-  ) __union__
+  ) __applications__
 ) as __union_result__;

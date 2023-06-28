@@ -2,9 +2,9 @@ select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"float8" as "id0", (ids.value->>1)::"float8" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0"::text as "0",
-    __union__."1" as "1",
-    __union__."2"::text as "2",
+    __vulnerabilities__."0"::text as "0",
+    __vulnerabilities__."1" as "1",
+    __vulnerabilities__."2"::text as "2",
     __union_identifiers__.idx as "3"
   from (
       select
@@ -58,7 +58,7 @@ lateral (
       "n" asc
     limit 3
     offset 1
-  ) __union__
+  ) __vulnerabilities__
 ) as __union_result__;
 
 select __first_party_vulnerabilities_result__.*
@@ -77,7 +77,6 @@ lateral (
     ) and (
       __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
     )
-  order by __first_party_vulnerabilities__."id" asc
 ) as __first_party_vulnerabilities_result__;
 
 select __third_party_vulnerabilities_result__.*
@@ -96,5 +95,4 @@ lateral (
     ) and (
       __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
     )
-  order by __third_party_vulnerabilities__."id" asc
 ) as __third_party_vulnerabilities_result__;

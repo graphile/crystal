@@ -263,13 +263,16 @@ export class __ListTransformStep<
     }
 
     if (size > 0) {
-      const childBucket = newBucket({
-        layerPlan: childLayerPlan,
-        size,
-        store,
-        hasErrors: bucket.hasErrors,
-        polymorphicPathList,
-      });
+      const childBucket = newBucket(
+        {
+          layerPlan: childLayerPlan,
+          size,
+          store,
+          hasErrors: bucket.hasErrors,
+          polymorphicPathList,
+        },
+        bucket.metaByMetaKey,
+      );
       await executeBucket(childBucket, extra._requestContext);
     }
 

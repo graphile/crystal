@@ -21,7 +21,6 @@ lateral (
   where (
     true /* authorization checks */
   )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
 select __people_result__.*
@@ -38,7 +37,6 @@ lateral (
     ) and (
       __people__."person_id" = __people_identifiers__."id0"
     )
-  order by __people__."person_id" asc
 ) as __people_result__;
 
 delete from interfaces_and_unions.relational_posts as __relational_posts__ where (__relational_posts__."id" = $1::"int4") returning

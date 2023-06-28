@@ -65,6 +65,7 @@ import { timeSource } from "../timeSource.js";
 import {
   defaultValueToValueNode,
   findVariableNamesUsed,
+  hasItemPlan,
   isTypePlanned,
 } from "../utils.js";
 import type {
@@ -135,7 +136,7 @@ export type OperationPlanPhase =
   | "finalize"
   | "ready";
 
-// TODO: overhaul the TypeScript for this, allow steps to declaration merge
+// TYPES: overhaul the TypeScript for this, allow steps to declaration merge
 // their own shapes into it.
 export interface MetaByMetaKey {
   [metaKey: string | number | symbol]: Record<string, any>;
@@ -605,7 +606,7 @@ export class OperationPlan {
         }
       }
     } catch (e) {
-      // TODO: raise this somewhere critical
+      // LOGGING: raise this somewhere critical
       if (this.loc != null) {
         console.error(
           `Error occurred during query planning (at ${this.loc.join(
@@ -796,18 +797,6 @@ export class OperationPlan {
         },
       );
 
-      // TODO: move this somewhere else
-      const hasItemPlan = (
-        step: ExecutableStep,
-      ): step is ExecutableStep & {
-        itemPlan: ($item: ExecutableStep) => ExecutableStep;
-      } => {
-        return (
-          "itemPlan" in (subscribeStep as any) &&
-          typeof (subscribeStep as any).itemPlan === "function"
-        );
-      };
-
       const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
@@ -896,18 +885,6 @@ export class OperationPlan {
           type: "subscription",
         },
       );
-
-      // TODO: move this somewhere else
-      const hasItemPlan = (
-        step: ExecutableStep,
-      ): step is ExecutableStep & {
-        itemPlan: ($item: ExecutableStep) => ExecutableStep;
-      } => {
-        return (
-          "itemPlan" in (subscribeStep as any) &&
-          typeof (subscribeStep as any).itemPlan === "function"
-        );
-      };
 
       const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
@@ -1130,29 +1107,6 @@ export class OperationPlan {
       const resultIsPlanned = isTypePlanned(this.schema, namedReturnType);
       const fieldHasPlan = !!planResolver;
 
-      // TODO: delete this. Or uncomment it. One or the other.
-      // Context: if the parent type has a plan then it's likely that all
-      // child fields will need a plan to extract the relevant data from the
-      // parent, a resolver alone might not receive what it expects. However,
-      // `Query` needs a plan so it can be part of `Node`, and adding
-      // resolver-only fields to `Query` makes sense... And really this is
-      // just a recommendation to the user, not a hard requirement... So we
-      // should remove it.
-      /*
-      const typePlan = objectType.extensions?.grafast?.Step;
-        if (typePlan && !fieldHasPlan) {
-          throw new Error(
-            `Every field within a planned type must have a plan; object type ${
-              objectType.name
-            } represents an instance of '${
-              typePlan.displayName || typePlan.name || "ExecutableStep"
-            }', however field ${
-              objectType.name
-            }.${fieldName} has no plan. Please add an 'extensions.grafast.plan' callback to this field.`,
-          );
-        }
-        */
-
       if (
         resultIsPlanned &&
         !fieldHasPlan &&
@@ -1203,8 +1157,16 @@ export class OperationPlan {
           trackedArguments,
         ));
       } else {
-        // FIXME: should this use the default plan resolver?
-        // There's no step resolver; use the parent step
+        // No plan resolver (or plan resolver fallback) so there must be a
+        // `resolve` method, so we'll feed the full parent step into the
+        // resolver.
+        assert.ok(
+          resolver !== null,
+          "GraphileInternalError<81652257-617a-4d1a-8306-903d0e3d2ddf>: The field has no resolver, so planResolver should exist (either as the field.plan or as the default plan resolver).",
+        );
+        // ENHANCEMENT: should we do `step = parentStep.object()` (i.e.
+        // `$pgSelectSingle.record()`) or similar for "opaque" steps to become
+        // suitable for consumption by resolvers?
         step = parentStep;
       }
 
@@ -1276,7 +1238,7 @@ export class OperationPlan {
             deferLabel: deferred.label,
             typeName: objectType.name,
           },
-          // TODO: the location details should be tweaked to reference this
+          // LOGGING: the location details should be tweaked to reference this
           // fragment
           outputPlan.locationDetails,
         );
@@ -1723,6 +1685,10 @@ export class OperationPlan {
     }
     const prev = polymorphicLayerPlanByPath.get(pathString);
     if (prev !== undefined) {
+      // NOTE: this is typically hit when you have a polymorphic field inside
+      // another polymorphic field - in these cases rather than having the
+      // polymorphism multiply out, we can aim for fewer polymorphic buckets
+      // keeping the plan simpler (and more efficient).
       const { stepId, layerPlan } = prev;
       const stepByStepId = this.stepTracker.getStepById(stepId);
       const stepBy$stepId = this.stepTracker.getStepById($step.id);
@@ -1733,7 +1699,9 @@ export class OperationPlan {
       }
       for (const t of allPossibleObjectTypes) {
         if (!layerPlan.reason.typeNames.includes(t.name)) {
-          // TODO: do I need to do anything extra here?
+          // TODO: do I need to do anything extra here? Since we're re-using an
+          // existing LayerPlan, we should be careful to ensure none of the
+          // previous assumptions have been broken.
           layerPlan.reason.typeNames.push(t.name);
         }
       }
@@ -2176,13 +2144,19 @@ export class OperationPlan {
           );
         }
       }
+      if (isReadonly && this.stepTracker.stepCount > previousStepCount) {
+        throwNoNewStepsError(
+          this,
+          actionDescription,
+          step,
+          previousStepCount,
+          "Creating steps in isReadonly mode is forbidden",
+        );
+      }
     }
 
-    if (isReadonly) {
-      if (this.stepTracker.stepCount > previousStepCount) {
-        throw new Error(`Creating steps in isReadonly mode is forbidden`);
-      }
-    } else if (
+    if (
+      !isReadonly &&
       this.phase !== "plan" &&
       this.stepTracker.stepCount > previousStepCount
     ) {
@@ -2852,8 +2826,7 @@ export class OperationPlan {
    * former SELECT additional fields, then transform the results back to what
    * our child plans would be expecting.
    */
-  private deduplicateSteps() {
-    // TODO: Creating steps during deduplicate is forbidden, we should add code to enforce this
+  private deduplicateSteps(depth = 0): void {
     const start = this.stepTracker.nextStepIdToDeduplicate;
     const end = this.stepTracker.stepCount;
     if (end === start) {
@@ -2866,8 +2839,24 @@ export class OperationPlan {
       if (!step || step.id !== i || processed.has(step)) continue;
       this.deduplicateStepsProcess(processed, start, step);
     }
-
     this.stepTracker.nextStepIdToDeduplicate = end;
+
+    if (this.stepTracker.stepCount > end) {
+      // More steps were created during deduplicate; let's deduplicate those!
+      const MAX_DEPTH = 5;
+      if (depth > MAX_DEPTH) {
+        const newSteps: (ExecutableStep | null)[] = [];
+        for (let i = end, l = this.stepTracker.stepCount; i < l; i++) {
+          newSteps.push(this.stepTracker.stepById[i]);
+        }
+        throw new Error(
+          `Whilst deduplicating steps, more steps were created; whilst deduplicating those, even more steps were created. This happened ${MAX_DEPTH} times, which suggests this might go on infinitely. Please check the deduplicate/deduplicatedWith methods on ${newSteps
+            .map((s) => String(s))
+            .join(", ")}.`,
+        );
+      }
+      return this.deduplicateSteps(depth + 1);
+    }
   }
 
   private hoistAndDeduplicate(step: ExecutableStep) {
@@ -3504,4 +3493,26 @@ function newLayerPlanPhase(): LayerPlanPhase {
     unbatchedSyncAndSafeSteps: undefined,
     _allSteps: [],
   };
+}
+
+function throwNoNewStepsError(
+  operationPlan: OperationPlan,
+  actionDescription: string,
+  step: ExecutableStep,
+  previousStepCount: number,
+  message: string,
+) {
+  const newSteps: (ExecutableStep | null)[] = [];
+  for (
+    let i = previousStepCount, l = operationPlan.stepTracker.stepCount;
+    i < l;
+    i++
+  ) {
+    newSteps.push(operationPlan.stepTracker.stepById[i]);
+  }
+  throw new Error(
+    `${message}; whilst performing ${actionDescription} of ${step} the following new steps were created: ${newSteps
+      .map((s) => String(s))
+      .join(", ")}`,
+  );
 }

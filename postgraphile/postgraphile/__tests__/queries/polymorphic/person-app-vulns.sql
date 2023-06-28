@@ -49,15 +49,15 @@ lateral (
         order by
           __gcp_applications__."id" asc
       ) as __gcp_applications__
-  ) __union__
+  ) __applications__
 ) as __union_result__;
 
 select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __applications__."0" as "0",
+    __applications__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -98,7 +98,7 @@ lateral (
     order by
       "0" asc,
       "n" asc
-  ) __union__
+  ) __applications__
 ) as __union_result__;
 
 select __aws_applications_result__.*
@@ -111,7 +111,6 @@ lateral (
   where (
     __aws_applications__."id" = __aws_applications_identifiers__."id0"
   )
-  order by __aws_applications__."id" asc
 ) as __aws_applications_result__;
 
 select __gcp_applications_result__.*
@@ -124,7 +123,6 @@ lateral (
   where (
     __gcp_applications__."id" = __gcp_applications_identifiers__."id0"
   )
-  order by __gcp_applications__."id" asc
 ) as __gcp_applications_result__;
 
 select __aws_applications_result__.*
@@ -141,7 +139,6 @@ lateral (
   where (
     __aws_applications__."id" = __aws_applications_identifiers__."id0"
   )
-  order by __aws_applications__."id" asc
 ) as __aws_applications_result__;
 
 select __gcp_applications_result__.*
@@ -158,15 +155,14 @@ lateral (
   where (
     __gcp_applications__."id" = __gcp_applications_identifiers__."id0"
   )
-  order by __gcp_applications__."id" asc
 ) as __gcp_applications_result__;
 
 select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __owner__."0" as "0",
+    __owner__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -207,15 +203,15 @@ lateral (
     order by
       "0" asc,
       "n" asc
-  ) __union__
+  ) __owner__
 ) as __union_result__;
 
 select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __vulnerabilities__."0" as "0",
+    __vulnerabilities__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -264,7 +260,7 @@ lateral (
     order by
       "0" asc,
       "n" asc
-  ) __union__
+  ) __vulnerabilities__
 ) as __union_result__;
 
 select __union_result__.*
@@ -319,15 +315,15 @@ lateral (
         order by
           __third_party_vulnerabilities__."id" asc
       ) as __third_party_vulnerabilities__
-  ) __union__
+  ) __vulnerabilities__
 ) as __union_result__;
 
 select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __owner__."0" as "0",
+    __owner__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -368,15 +364,15 @@ lateral (
     order by
       "0" asc,
       "n" asc
-  ) __union__
+  ) __owner__
 ) as __union_result__;
 
 select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __vulnerabilities__."0" as "0",
+    __vulnerabilities__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -425,7 +421,7 @@ lateral (
     order by
       "0" asc,
       "n" asc
-  ) __union__
+  ) __vulnerabilities__
 ) as __union_result__;
 
 select __union_result__.*
@@ -480,7 +476,7 @@ lateral (
         order by
           __third_party_vulnerabilities__."id" asc
       ) as __third_party_vulnerabilities__
-  ) __union__
+  ) __vulnerabilities__
 ) as __union_result__;
 
 select __people_result__.*
@@ -494,7 +490,6 @@ lateral (
   where (
     __people__."person_id" = __people_identifiers__."id0"
   )
-  order by __people__."person_id" asc
 ) as __people_result__;
 
 select __first_party_vulnerabilities_result__.*
@@ -510,7 +505,6 @@ lateral (
   where (
     __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
   )
-  order by __first_party_vulnerabilities__."id" asc
 ) as __first_party_vulnerabilities_result__;
 
 select __third_party_vulnerabilities_result__.*
@@ -526,7 +520,6 @@ lateral (
   where (
     __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
   )
-  order by __third_party_vulnerabilities__."id" asc
 ) as __third_party_vulnerabilities_result__;
 
 select __first_party_vulnerabilities_result__.*
@@ -541,7 +534,6 @@ lateral (
   where (
     __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
   )
-  order by __first_party_vulnerabilities__."id" asc
 ) as __first_party_vulnerabilities_result__;
 
 select __third_party_vulnerabilities_result__.*
@@ -556,7 +548,6 @@ lateral (
   where (
     __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
   )
-  order by __third_party_vulnerabilities__."id" asc
 ) as __third_party_vulnerabilities_result__;
 
 select __people_result__.*
@@ -570,7 +561,6 @@ lateral (
   where (
     __people__."person_id" = __people_identifiers__."id0"
   )
-  order by __people__."person_id" asc
 ) as __people_result__;
 
 select __first_party_vulnerabilities_result__.*
@@ -586,7 +576,6 @@ lateral (
   where (
     __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
   )
-  order by __first_party_vulnerabilities__."id" asc
 ) as __first_party_vulnerabilities_result__;
 
 select __third_party_vulnerabilities_result__.*
@@ -602,7 +591,6 @@ lateral (
   where (
     __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
   )
-  order by __third_party_vulnerabilities__."id" asc
 ) as __third_party_vulnerabilities_result__;
 
 select __first_party_vulnerabilities_result__.*
@@ -617,7 +605,6 @@ lateral (
   where (
     __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
   )
-  order by __first_party_vulnerabilities__."id" asc
 ) as __first_party_vulnerabilities_result__;
 
 select __third_party_vulnerabilities_result__.*
@@ -632,5 +619,4 @@ lateral (
   where (
     __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
   )
-  order by __third_party_vulnerabilities__."id" asc
 ) as __third_party_vulnerabilities_result__;

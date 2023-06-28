@@ -16,7 +16,6 @@ lateral (
   where (
     __constructor__."export" = __constructor_identifiers__."id0"
   )
-  order by __constructor__."id" asc
 ) as __constructor_result__;
 
 select __constructor_result__.*
@@ -31,7 +30,6 @@ lateral (
   where (
     __constructor__."id" = __constructor_identifiers__."id0"
   )
-  order by __constructor__."id" asc
 ) as __constructor_result__;
 
 select __constructor_result__.*
@@ -45,7 +43,6 @@ lateral (
   where (
     __constructor__."name" = __constructor_identifiers__."id0"
   )
-  order by __constructor__."id" asc
 ) as __constructor_result__;
 
 select
@@ -66,7 +63,6 @@ lateral (
   where (
     __yield__."export" = __yield_identifiers__."id0"
   )
-  order by __yield__."id" asc
 ) as __yield_result__;
 
 select __yield_result__.*
@@ -81,7 +77,6 @@ lateral (
   where (
     __yield__."id" = __yield_identifiers__."id0"
   )
-  order by __yield__."id" asc
 ) as __yield_result__;
 
 select
@@ -103,7 +98,6 @@ lateral (
   where (
     __proto__."id" = __proto_identifiers__."id0"
   )
-  order by __proto__."id" asc
 ) as __proto_result__;
 
 select __proto_result__.*
@@ -117,7 +111,6 @@ lateral (
   where (
     __proto__."name" = __proto_identifiers__."id0"
   )
-  order by __proto__."id" asc
 ) as __proto_result__;
 
 select
@@ -138,7 +131,6 @@ lateral (
   where (
     __null__."break" = __null_identifiers__."id0"
   )
-  order by __null__."id" asc
 ) as __null_result__;
 
 select __null_result__.*
@@ -152,7 +144,6 @@ lateral (
   where (
     __null__."hasOwnProperty" = __null_identifiers__."id0"
   )
-  order by __null__."id" asc
 ) as __null_result__;
 
 select __null_result__.*
@@ -167,5 +158,4 @@ lateral (
   where (
     __null__."id" = __null_identifiers__."id0"
   )
-  order by __null__."id" asc
 ) as __null_result__;

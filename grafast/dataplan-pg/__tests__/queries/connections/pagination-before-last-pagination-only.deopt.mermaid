@@ -36,8 +36,8 @@ graph TD
     Access26{{"Access[26∈1]<br />ᐸ20.1ᐳ"}}:::plan
     Lambda20 --> Access26
     Access26 --> ToPg27
-    Lambda24{{"Lambda[24∈1]<br />ᐸlistHasMoreᐳ"}}:::plan
-    PgSelect23 --> Lambda24
+    Access24{{"Access[24∈1]<br />ᐸ23.hasMoreᐳ"}}:::plan
+    PgSelect23 --> Access24
     First29{{"First[29∈1]"}}:::plan
     PgSelect28 --> First29
     PgSelectSingle30{{"PgSelectSingle[30∈1]<br />ᐸmessagesᐳ"}}:::plan
@@ -54,6 +54,6 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,Connection19,Lambda20,PgValidateParsedCursor25,Constant32,Constant33 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19, 20<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 16, 17, 21, 22, 26, 18, 27<br />2: PgSelect[23], PgSelect[28]<br />ᐳ: 24, 29, 30, 31"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access16,Access17,Object18,PgPageInfo21,Constant22,PgSelect23,Lambda24,Access26,ToPg27,PgSelect28,First29,PgSelectSingle30,PgClassExpression31 bucket1
+    class Bucket1,Access16,Access17,Object18,PgPageInfo21,Constant22,PgSelect23,Access24,Access26,ToPg27,PgSelect28,First29,PgSelectSingle30,PgClassExpression31 bucket1
     Bucket0 --> Bucket1
     end

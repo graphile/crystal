@@ -21,7 +21,7 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access16
     __Value3 --> Access17
-    Constant139{{"Constant[139∈0]<br />ᐸ'WyJlOTAxMDBkNmIzIiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIᐳ"}}:::plan
+    Constant139{{"Constant[139∈0]<br />ᐸ'WyIzMDY3N2Q5ZTIyIiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIᐳ"}}:::plan
     Constant139 --> Lambda20
     Lambda20 --> PgValidateParsedCursor25
     PgUnionAll101[["PgUnionAll[101∈0]"]]:::plan
@@ -90,8 +90,8 @@ graph TD
     PgUnionAllSingle81 --> Access91
     PgCursor82{{"PgCursor[82∈1]"}}:::plan
     List92 --> PgCursor82
-    Lambda94{{"Lambda[94∈1]<br />ᐸlistHasMoreᐳ"}}:::plan
-    PgUnionAll93 --> Lambda94
+    Access94{{"Access[94∈1]<br />ᐸ93.hasMoreᐳ"}}:::plan
+    PgUnionAll93 --> Access94
     Constant95{{"Constant[95∈1]<br />ᐸfalseᐳ"}}:::plan
     PgSelect110[["PgSelect[110∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access109{{"Access[109∈6]<br />ᐸ108.0ᐳ"}}:::plan
@@ -184,7 +184,7 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda20,PgValidateParsedCursor25,PgUnionAll101,Constant138,Constant139 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 20<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: PgUnionAll[60]<br />ᐳ: 26, 28, 30, 64, 95, 27, 29, 61<br />2: 21, 62, 65, 79, 93<br />ᐳ: 63, 66, 80, 94<br />3: 67, 81<br />ᐳ: 75, 76, 77, 78, 89, 90, 91, 92, 68, 82"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUnionAll21,Access26,ToPg27,Access28,ToPg29,Access30,PgUnionAll60,First61,PgUnionAllSingle62,PgClassExpression63,PgPageInfo64,PgUnionAll65,First66,PgUnionAllSingle67,PgCursor68,Access75,Access76,Access77,List78,PgUnionAll79,Last80,PgUnionAllSingle81,PgCursor82,Access89,Access90,Access91,List92,PgUnionAll93,Lambda94,Constant95 bucket1
+    class Bucket1,PgUnionAll21,Access26,ToPg27,Access28,ToPg29,Access30,PgUnionAll60,First61,PgUnionAllSingle62,PgClassExpression63,PgPageInfo64,PgUnionAll65,First66,PgUnionAllSingle67,PgCursor68,Access75,Access76,Access77,List78,PgUnionAll79,Last80,PgUnionAllSingle81,PgCursor82,Access89,Access90,Access91,List92,PgUnionAll93,Access94,Constant95 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 18<br /><br />ROOT __Item{2}ᐸ21ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item22,PgUnionAllSingle23 bucket2

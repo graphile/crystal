@@ -14,7 +14,7 @@
       username
       applications(
         first: 1
-        after: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=" # AwsApplication/4
+        after: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=" # AwsApplication/4
         condition: { name: "AWfulS" }
       ) {
         edges {

@@ -9,7 +9,6 @@ lateral (
   where (
     __project__."__proto__" = __project_identifiers__."id0"
   )
-  order by __project__."id" asc
 ) as __project_result__;
 
 select __project_result__.*
@@ -24,7 +23,6 @@ lateral (
   where (
     __project__."id" = __project_identifiers__."id0"
   )
-  order by __project__."id" asc
 ) as __project_result__;
 
 select

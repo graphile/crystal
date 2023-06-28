@@ -18,5 +18,4 @@ lateral (
   where (
     __user__."id" = __user_identifiers__."id0"
   )
-  order by __user__."id" asc
 ) as __user_result__;

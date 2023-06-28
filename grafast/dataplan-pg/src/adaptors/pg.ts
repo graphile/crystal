@@ -16,7 +16,6 @@ import type {
   PoolClient,
   QueryArrayConfig,
   QueryConfig,
-  QueryResultRow,
 } from "pg";
 import * as pg from "pg";
 
@@ -175,10 +174,7 @@ function newNodePostgresPgClient(
           }
         }
 
-        // TODO: fix the never
-        return pgClient.query<TData extends QueryResultRow ? TData : never>(
-          queryObj,
-        );
+        return pgClient.query(queryObj);
       }
     },
   };
@@ -292,7 +288,7 @@ export function makePgAdaptorWithPgClient(
         false,
       );
     } finally {
-      // TODO: should we `RESET ALL` here? Probably not; otherwise timezone,jit,etc will reset
+      // NOTE: have decided not to `RESET ALL` here; otherwise timezone,jit,etc will reset
       pgClient.release();
     }
   };

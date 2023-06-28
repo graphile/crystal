@@ -288,7 +288,7 @@ export class StepTracker {
       }
       outputPlansBy$existing.delete(outputPlan);
       if (outputPlansBy$existing.size === 0) {
-        // TODO: Cleanup, tree shake, etc
+        // PERF: Cleanup, tree shake, etc
       }
     }
     (outputPlan.rootStep as any) = $dependency;
@@ -322,7 +322,7 @@ export class StepTracker {
       layerPlansBy$existing.delete(layerPlan);
       if (layerPlansBy$existing.size === 0) {
         this.layerPlansByRootStep.delete($existing);
-        // TODO: Cleanup, tree shake, etc
+        // PERF: Cleanup, tree shake, etc
       }
     }
     (layerPlan.rootStep as any) = $dependency;
@@ -421,7 +421,7 @@ export class StepTracker {
       }
     }
 
-    // HACK: had to add the code ensuring all the layer plan parentStepId's
+    // NOTE: had to add the code ensuring all the layer plan parentStepId's
     // existed to fix polymorphism, but it feels wrong. Should we be doing
     // something different?
     {
@@ -445,8 +445,12 @@ export class StepTracker {
       }
     }
 
-    // FIXME: ensure side-effect plans are handled nicely
-    // FIXME: ensure plans in 'subprocedure' layerPlans are marked active
+    // NOTE: I don't think side-effect plans need any special handling, since
+    // they cannot be deduplicated.
+
+    // NOTE: there may be more work required here for 'subprocedure' layerPlans
+    // (e.g. making sure their steps are retained), but it's not clear what
+    // work is necessary and we've not seen any issues from this yet.
 
     // Remove this step (and perform localized tree-shaking)
     this.eradicate($original);

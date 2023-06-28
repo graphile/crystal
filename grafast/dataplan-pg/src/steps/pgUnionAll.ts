@@ -80,12 +80,6 @@ const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
 
-// Constant functions so lambdas can be optimized
-function listHasMore(list: any | null | undefined) {
-  return list?.hasMore || false;
-}
-listHasMore.isSyncAndSafe = true; // Optimization
-
 function parseCursor(cursor: string | null) {
   if (cursor == null) {
     // This throw should never happen, so we can still be isSyncAndSafe.
@@ -123,7 +117,6 @@ type PgUnionAllStepSelect<TAttributes extends string> =
   | {
       type: "attribute";
       attribute: TAttributes;
-      codec: PgCodec;
     }
   | {
       type: "expression";
@@ -174,6 +167,7 @@ export interface PgUnionAllStepConfig<
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
   mode?: PgUnionAllMode;
+  name?: string;
 }
 
 export interface PgUnionAllStepCondition<TAttributes extends string> {
@@ -189,6 +183,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
 interface QueryValue {
   dependencyIndex: number;
   codec: PgCodec;
+  alreadyEncoded: boolean;
 }
 
 /**
@@ -205,6 +200,7 @@ type PgUnionAllPlaceholder = {
   dependencyIndex: number;
   codec: PgCodec;
   symbol: symbol;
+  alreadyEncoded: boolean;
 };
 
 export class PgUnionAllSingleStep
@@ -605,8 +601,6 @@ export class PgUnionAllStep<
           ? cloneFromMatchingMode.limitAndOffsetId
           : null;
     } else {
-      this.symbol = Symbol("union"); // TODO: add variety
-      this.alias = sql.identifier(this.symbol);
       const spec = specOrCloneFrom;
       this.mode = overrideMode ?? spec.mode ?? "normal";
       if (this.mode === "aggregate") {
@@ -632,6 +626,8 @@ export class PgUnionAllStep<
             resource,
           }),
         );
+      this.symbol = Symbol(spec.name ?? "union");
+      this.alias = sql.identifier(this.symbol);
 
       this.selects = [];
       this.placeholders = [];
@@ -794,7 +790,6 @@ on (${sql.indent(
       this.selects.push({
         type: "attribute",
         attribute: key,
-        codec: this.spec.attributes[key].codec,
       }) - 1;
     return index;
   }
@@ -1009,16 +1004,19 @@ on (${sql.indent(
    */
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
-    // HACK: This is a truly hideous hack. We should solve this by having this
-    // plan resolve to an object with rows and metadata.
-    return lambda(this, listHasMore);
+    return access(this, "hasMore", false);
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder(
+    $step: ExecutableStep,
+    codec: PgCodec,
+    alreadyEncoded?: boolean,
+  ): SQL;
   public placeholder(
     $step: ExecutableStep | PgTypedExecutableStep<any>,
     overrideCodec?: PgCodec,
+    alreadyEncoded = false,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -1044,6 +1042,7 @@ on (${sql.indent(
       dependencyIndex,
       codec,
       symbol,
+      alreadyEncoded,
     };
     this.placeholders.push(p);
     // This allows us to replace the SQL that will be compiled, for example
@@ -1104,15 +1103,14 @@ on (${sql.indent(
       if (i === orderCount - 1) {
         // PK (within that polymorphic type)
 
-        // NOTE: this is a JSON-encoded string containing all the PK values. We
-        // don't want to parse it and then re-stringify it, so we'll just feed
-        // it in as text and then cast it ourself:
-        // HACK: would be better to have the placeholder be 'json' type, not
-        // 'text' type.
-        identifierPlaceholders[i] = sql`(${this.placeholder(
+        identifierPlaceholders[i] = this.placeholder(
           access($parsedCursorPlan, [i + 1]),
-          TYPES.text,
-        )})::json`;
+          TYPES.json,
+          // NOTE: this is a JSON-encoded string containing all the PK values. We
+          // don't want to parse it and then re-stringify it, so we'll just feed
+          // it in as text and tell the system it has already been encoded:
+          true,
+        );
       } else if (i === orderCount - 2) {
         // Polymorphic type
         identifierPlaceholders[i] = this.placeholder(
@@ -1120,17 +1118,13 @@ on (${sql.indent(
           TYPES.text,
         );
       } else if (this.memberDigests.length > 0) {
-        // HACK: this is bad. We're getting the codec from just one of the
-        // members and assuming the type for the given attribute will match for
-        // all of them. We should either validate that this is the same, change
-        // the signature of `getFragmentAndCodecFromOrder` to pass all the
-        // codecs (and maybe even attribute mapping), or... I dunno... fix it
-        // some other way.
-        const mutualCodec = this.memberDigests[0].finalResource.codec;
+        const memberCodecs = this.memberDigests.map(
+          (d) => d.finalResource.codec,
+        );
         const [, codec] = getFragmentAndCodecFromOrder(
           this.alias,
           order,
-          mutualCodec,
+          memberCodecs,
         );
         identifierPlaceholders[i] = this.placeholder(
           toPg(access($parsedCursorPlan, [i + 1]), codec),
@@ -1152,7 +1146,13 @@ on (${sql.indent(
       const pkAttributes = finalResource.codec.attributes as PgCodecAttributes;
       const condition = (i = 0): SQL => {
         const order = digest.orders[i];
-        const [orderFragment, sqlValue, direction] = (() => {
+        const [
+          orderFragment,
+          sqlValue,
+          direction,
+          nullable = false,
+          nulls = null,
+        ] = (() => {
           if (i >= orderCount - 1) {
             // PK
             const pkIndex = i - (orderCount - 1);
@@ -1163,6 +1163,7 @@ on (${sql.indent(
                 pkAttributes[pkCol].codec.sqlType
               }`,
               "ASC",
+              false,
             ];
           } else if (i === orderCount - 2) {
             // Type
@@ -1170,31 +1171,63 @@ on (${sql.indent(
               sql.literal(digest.member.typeName),
               identifierPlaceholders[i],
               "ASC",
+              false,
             ];
           } else {
-            const [frag] = getFragmentAndCodecFromOrder(
+            const [frag, _codec, isNullable] = getFragmentAndCodecFromOrder(
               this.alias,
               order,
               digest.finalResource.codec,
             );
-            return [frag, identifierPlaceholders[i], order.direction];
+            return [
+              frag,
+              identifierPlaceholders[i],
+              order.direction,
+              isNullable,
+              order.nulls,
+            ];
           }
         })();
-        // FIXME: _iff_ `orderFragment` is nullable _and_ `order.nulls` is
-        // non-null then we need to factor `NULLS LAST` / `NULLS FIRST` into
-        // this calculation.
+
+        // For the truth-table of this code, have a look at this spreadsheet:
+        // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
+
         const gt =
           (direction === "ASC" && beforeOrAfter === "after") ||
           (direction === "DESC" && beforeOrAfter === "before");
 
+        const nullsFirst =
+          nulls === "FIRST"
+            ? true
+            : nulls === "LAST"
+            ? false
+            : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+              // ASC = NULLS LAST
+              direction === "DESC";
+
+        // Simple less than or greater than
         let fragment = sql`${orderFragment} ${
           gt ? sql`>` : sql`<`
         } ${sqlValue}`;
 
+        // Nullable, so now handle if one is null but the other isn't
+        if (nullable) {
+          const useAIsNullAndBIsNotNull =
+            (nullsFirst && beforeOrAfter === "after") ||
+            (!nullsFirst && beforeOrAfter === "before");
+          const oneIsNull = useAIsNullAndBIsNotNull
+            ? sql`${orderFragment} is null and ${sqlValue} is not null`
+            : sql`${orderFragment} is not null and ${sqlValue} is null`;
+          fragment = sql`((${fragment}) or (${oneIsNull}))`;
+        }
+
+        // Finally handle if they're equal - recurse
         if (i < max - 1) {
+          const equals = nullable ? sql`is not distinct from` : sql`=`;
+          const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
           fragment = sql`(${fragment})
 or (
-${sql.indent`${orderFragment} = ${sqlValue}
+${sql.indent`${aEqualsB}
 and ${condition(i + 1)}`}
 )`;
         }
@@ -1245,7 +1278,7 @@ and ${condition(i + 1)}`}
 
   public setFirst(first: InputStep | number): this {
     this.locker.assertParameterUnlocked("first");
-    // TODO: don't eval
+    // PERF: don't eval
     this.first = typeof first === "number" ? first : first.eval() ?? null;
     this.locker.lockParameter("first");
     return this;
@@ -1453,22 +1486,16 @@ and ${condition(i + 1)}`}
     // user from themself. If they bypass this, that's their problem (it will
     // not introduce a security issue).
     const hash = createHash("sha256");
-
-    // HACK: this is bad. We're getting the codec from just one of the
-    // members and assuming the type for the given attribute will match for
-    // all of them. We should either validate that this is the same, change
-    // the signature of `getFragmentAndCodecFromOrder` to pass all the
-    // codecs (and maybe even attribute mapping), or... I dunno... fix it
-    // some other way.
-    const mutualCodec = this.memberDigests[0].finalResource.codec;
-
+    const memberCodecs = this.memberDigests.map(
+      (digest) => digest.finalResource.codec,
+    );
     hash.update(
       JSON.stringify(
         this.ordersForCursor.map((o) => {
           const [frag] = getFragmentAndCodecFromOrder(
             this.alias,
             o,
-            mutualCodec,
+            memberCodecs,
           );
           return sql.compile(frag, {
             placeholderValues: this.placeholderValues,
@@ -1510,8 +1537,9 @@ and ${condition(i + 1)}`}
     const typeIdx = normalMode ? this.selectType() : null;
     const reverse = normalMode ? this.shouldReverseOrder() : null;
 
-    // HACK: THIS IS UNSAFE. See "HACK: this is bad" comments.
-    const mutualCodec = this.memberDigests[0].finalResource.codec;
+    const memberCodecs = this.memberDigests.map(
+      (digest) => digest.finalResource.codec,
+    );
 
     const makeQuery = () => {
       const tables: SQL[] = [];
@@ -1543,7 +1571,6 @@ and ${condition(i + 1)}`}
                     );
                   }
                   const attr = this.spec.attributes[s.attribute];
-                  // TODO: check that attr.codec is compatible with the s.codec (and if not, do the necessary casting?)
                   return [
                     sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
                       digest,
@@ -1672,8 +1699,10 @@ from (${innerQuery}) as ${tableAlias}\
               ? getFragmentAndCodecFromOrder(
                   this.alias,
                   this.getOrderBy()[select.orderIndex],
-                  mutualCodec,
+                  memberCodecs,
                 )[1]
+              : select.type === "attribute"
+              ? this.spec.attributes![select.attribute].codec
               : select.codec;
           return sql`${
             codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
@@ -1781,6 +1810,7 @@ ${unionHaving}\
               : this.queryValues.push({
                   dependencyIndex: placeholder.dependencyIndex,
                   codec: placeholder.codec,
+                  alreadyEncoded: placeholder.alreadyEncoded,
                 }) - 1;
 
           // Finally alias this symbol to a reference to this placeholder
@@ -1897,10 +1927,16 @@ ${lateralText};`;
           context,
           queryValues:
             identifierIndex != null
-              ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex][i];
-                  return val == null ? null : codec.toPg(val);
-                })
+              ? this.queryValues.map(
+                  ({ dependencyIndex, codec, alreadyEncoded }) => {
+                    const val = values[dependencyIndex][i];
+                    return val == null
+                      ? null
+                      : alreadyEncoded
+                      ? val
+                      : codec.toPg(val);
+                  },
+                )
               : EMPTY_ARRAY,
         };
       }),
@@ -1938,10 +1974,8 @@ ${lateralText};`;
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
-      if (this.fetchOneExtra) {
-        // HACK: this is an ugly hack; really we should consider resolving to an
-        // object that can contain metadata as well as the rows.
-        Object.defineProperty(orderedRows, "hasMore", { value: hasMore });
+      if (hasMore) {
+        (orderedRows as any).hasMore = true;
       }
       return orderedRows;
     });

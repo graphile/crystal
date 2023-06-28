@@ -38,8 +38,8 @@ graph TD
     PgSelectSingle16 --> PgClassExpression29
     PgPageInfo30{{"PgPageInfo[30∈3]"}}:::plan
     Connection28 --> PgPageInfo30
-    Lambda32{{"Lambda[32∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
-    PgSelect31 --> Lambda32
+    Access32{{"Access[32∈3]<br />ᐸ31.hasMoreᐳ"}}:::plan
+    PgSelect31 --> Access32
     First34{{"First[34∈3]"}}:::plan
     PgSelect33 --> First34
     PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸmessagesᐳ"}}:::plan
@@ -61,7 +61,7 @@ graph TD
     class Bucket2 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 28, 14, 38<br /><br />ROOT Connectionᐸ24ᐳ[28]<br />1: <br />ᐳ: 23, 29, 30<br />2: PgSelect[31], PgSelect[33]<br />ᐳ: 32, 34, 35, 36"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,PgClassExpression29,PgPageInfo30,PgSelect31,Lambda32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36 bucket3
+    class Bucket3,PgClassExpression23,PgClassExpression29,PgPageInfo30,PgSelect31,Access32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

@@ -14,5 +14,4 @@ lateral (
   where (
     __range_test__."id" = __range_test_identifiers__."id0"
   )
-  order by __range_test__."id" asc
 ) as __range_test_result__;

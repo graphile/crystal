@@ -8,6 +8,7 @@ import type {
   GrafastValuesList,
   InputStep,
   LambdaStep,
+  PromiseOrDirect,
   StepOptimizeOptions,
   StepStreamOptions,
   StreamableStep,
@@ -79,12 +80,6 @@ const hash = (text: string): string =>
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
-
-// Constant functions so lambdas can be optimized
-function listHasMore(list: any | null | undefined) {
-  return list?.hasMore || false;
-}
-listHasMore.isSyncAndSafe = true; // Optimization
 
 function parseCursor(cursor: string | null) {
   if (cursor == null) {
@@ -761,9 +756,7 @@ export class PgSelectStep<
    */
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
-    // HACK: This is a truly hideous hack. We should solve this by having this
-    // plan resolve to an object with rows and metadata.
-    return lambda(this, listHasMore);
+    return access(this, "hasMore", false);
   }
 
   public unique(): boolean {
@@ -1097,7 +1090,7 @@ export class PgSelectStep<
       return;
     }
     if (!this.isOrderUnique) {
-      // TODO: make this smarter
+      // ENHANCEMENT: make this smarter
       throw new SafeError(
         `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
       );
@@ -1105,37 +1098,51 @@ export class PgSelectStep<
 
     const condition = (i = 0): SQL => {
       const order = orders[i];
-      // Codec is responsible for performing validation/coercion and throwing
-      // error if value is invalid.
-      // FIXME: make sure this ^ is clear in the relevant places.
-      /*
-          const sqlValue = sql`${sql.value(
-            (void 0 /* forbid relying on `this` * /, order.codec.toPg)(
-              this.placeholder(access($parsedCursorPlan, [i + 1]), sql`text`),
-            ),
-          )}::${order.codec.sqlType}`;
-          */
-      const [orderFragment, orderCodec] = getFragmentAndCodecFromOrder(
-        this.alias,
-        order,
-        this.resource.codec,
-      );
+      const [orderFragment, orderCodec, nullable] =
+        getFragmentAndCodecFromOrder(this.alias, order, this.resource.codec);
+      const { nulls, direction } = order;
       const sqlValue = this.placeholder(
         toPg(access($parsedCursorPlan, [i + 1]), orderCodec),
         orderCodec,
       );
-      // FIXME: _iff_ `orderFragment` is nullable _and_ `order.nulls` is
-      // non-null then we need to factor `NULLS LAST` / `NULLS FIRST` into
-      // this calculation.
-      const gt =
-        (order.direction === "ASC" && beforeOrAfter === "after") ||
-        (order.direction === "DESC" && beforeOrAfter === "before");
 
+      // For the truth-table of this code, have a look at this spreadsheet:
+      // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
+
+      const gt =
+        (direction === "ASC" && beforeOrAfter === "after") ||
+        (direction === "DESC" && beforeOrAfter === "before");
+
+      const nullsFirst =
+        nulls === "FIRST"
+          ? true
+          : nulls === "LAST"
+          ? false
+          : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+            // ASC = NULLS LAST
+            direction === "DESC";
+
+      // Simple less than or greater than
       let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
 
+      // Nullable, so now handle if one is null but the other isn't
+      if (nullable) {
+        const useAIsNullAndBIsNotNull =
+          (nullsFirst && beforeOrAfter === "after") ||
+          (!nullsFirst && beforeOrAfter === "before");
+        const oneIsNull = useAIsNullAndBIsNotNull
+          ? sql`${orderFragment} is null and ${sqlValue} is not null`
+          : sql`${orderFragment} is not null and ${sqlValue} is null`;
+        fragment = sql`((${fragment}) or (${oneIsNull}))`;
+      }
+
+      // Finally handle if they're equal - recurse
       if (i < orderCount - 1) {
-        fragment = sql`(${fragment}) or (
-${sql.indent`${orderFragment} = ${sqlValue}
+        const equals = nullable ? sql`is not distinct from` : sql`=`;
+        const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
+        fragment = sql`(${fragment})
+or (
+${sql.indent`${aEqualsB}
 and ${sql.indent(sql.parens(condition(i + 1)))}`}
 )`;
       }
@@ -1281,10 +1288,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
-      if (this.fetchOneExtra) {
-        // HACK: this is an ugly hack; really we should consider resolving to an
-        // object that can contain metadata as well as the rows.
-        Object.defineProperty(orderedRows, "hasMore", { value: hasMore });
+      if (hasMore) {
+        (orderedRows as any).hasMore = true;
       }
       return orderedRows;
     });
@@ -1375,39 +1380,48 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         if (!isAsyncIterable(stream)) {
           return stream;
         }
-        // FIXME: Merge the initial results and the stream together manually to
-        // avoid unstoppable async generator problem.
-        return (async function* () {
-          const l = initialFetchResult[idx].length;
-          try {
-            for (let i = 0; i < l; i++) {
-              yield initialFetchResult[idx][i];
-            }
-          } finally {
-            // This finally block because we want to release the underlying
-            // stream even if error was thrown during above `yield`s.
-            if (
-              streamInitialCount != null &&
-              streamInitialCount > 0 &&
-              l < streamInitialCount
-            ) {
-              // End the stream here, otherwise GraphQL won't know to stop
-              // waiting for the `initialCount` records.
 
-              // Since we never `for await (...of...)` we must manually release
-              // the stream:
-              const iterator = stream[Symbol.asyncIterator]();
-              iterator.return?.();
+        const innerIterator = stream[Symbol.asyncIterator]();
 
-              // Now we exit this generator, ending the iterable.
-              // eslint-disable-next-line no-unsafe-finally
-              return;
+        let i = 0;
+        let done = false;
+        const l = initialFetchResult[idx].length;
+        const mergedGenerator: AsyncGenerator<PromiseOrDirect<unknown[]>> = {
+          next() {
+            if (done) {
+              return Promise.resolve({ value: undefined, done });
+            } else if (i < l) {
+              return Promise.resolve({
+                value: initialFetchResult[idx][i++],
+                done,
+              });
+            } else if (streamInitialCount != null && l < streamInitialCount) {
+              done = true;
+              innerIterator.return?.();
+              return Promise.resolve({ value: undefined, done });
+            } else {
+              return innerIterator.next();
             }
-          }
-          for await (const result of stream) {
-            yield result;
-          }
-        })();
+          },
+          return(value) {
+            done = true;
+            return (
+              innerIterator.return?.(value) ??
+              Promise.resolve({ value: undefined, done })
+            );
+          },
+          throw(e) {
+            done = true;
+            return (
+              innerIterator.throw?.(e) ??
+              Promise.resolve({ value: undefined, done })
+            );
+          },
+          [Symbol.asyncIterator]() {
+            return this;
+          },
+        };
+        return mergedGenerator;
       });
     } else {
       return streams;
@@ -2016,7 +2030,7 @@ ${lateralText};`;
           (limit != null && limit >= 0) ||
           (offset != null && offset > 0)
         ) {
-          // TODO: make this nicer; combine with the `if` branch above?
+          // ENHANCEMENT: make this nicer; combine with the `if` branch above?
 
           const extraSelects: SQL[] = [];
           const rowNumberIndexOffset =
@@ -2081,7 +2095,7 @@ ${lateralText};`;
       };
 
       if (this.streamOptions) {
-        // TODO: should use the queryForSingle optimization in here too
+        // PERF: should use the queryForSingle optimization in here too
 
         // When streaming we can't reverse order in JS - we must do it in the DB.
         if (this.streamOptions.initialCount > 0) {
@@ -2453,7 +2467,7 @@ ${lateralText};`;
     this.locker.locked = false;
     this.streamOptions = stream;
 
-    // TODO: we should serialize our `SELECT` clauses and then if any are
+    // PERF: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
 
@@ -2585,8 +2599,12 @@ ${lateralText};`;
           this.last == null &&
           this.offset == null &&
           this.mode !== "aggregate" &&
-          table.mode !== "aggregate"
-          // FIXME: && !this.order && ... */
+          table.mode !== "aggregate" &&
+          // For uniques these should all pass anyway, but pays to be cautious..
+          this.groups.length === 0 &&
+          this.havingConditions.length === 0 &&
+          this.orders.length === 0 &&
+          !this.fetchOneExtra
         ) {
           if (this.selects.length > 0) {
             debugPlanVerbose(
@@ -2723,12 +2741,8 @@ ${lateralText};`;
                 const orderedRows = shouldReverse
                   ? reverseArray(slicedRows)
                   : slicedRows;
-                if (this.fetchOneExtra) {
-                  // HACK: this is an ugly hack; really we should consider resolving to an
-                  // object that can contain metadata as well as the rows.
-                  Object.defineProperty(orderedRows, "hasMore", {
-                    value: hasMore,
-                  });
+                if (hasMore) {
+                  (orderedRows as any).hasMore = true;
                 }
                 return orderedRows;
               },
@@ -2878,6 +2892,8 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function ensureOrderIsUnique(step: PgSelectStep<any>) {
+  // No need to order a unique record
+  if (step.unique()) return;
   const unique = (step.resource.uniques as PgResourceUnique[])[0];
   if (unique !== undefined) {
     const ordersIsUnique = step.orderIsUnique();
@@ -2989,15 +3005,35 @@ exportAs("@dataplan/pg", digestsFromArgumentSpecs, "digestsFromArgumentSpecs");
 export function getFragmentAndCodecFromOrder(
   alias: SQL,
   order: PgOrderSpec,
-  codec: PgCodec,
-): [SQL, PgCodec] {
+  codecOrCodecs: PgCodec | PgCodec[],
+): [fragment: SQL, codec: PgCodec, isNullable?: boolean] {
   if (order.attribute != null) {
     const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
-    const colCodec = codec.attributes![order.attribute].codec;
+    const isArray = Array.isArray(codecOrCodecs);
+    const col = (isArray ? codecOrCodecs[0] : codecOrCodecs).attributes![
+      order.attribute
+    ];
+    const colCodec = col.codec;
+    if (isArray) {
+      for (const codec of codecOrCodecs) {
+        if (codec.attributes![order.attribute].codec !== colCodec) {
+          throw new Error(
+            `Order by attribute '${
+              order.attribute
+            }' not allowed - this attribute has different codecs (${
+              codec.attributes![order.attribute].codec.name
+            } != ${colCodec.name}) in different parents (${
+              codecOrCodecs[0].name
+            } vs ${codec.name})`,
+          );
+        }
+      }
+    }
+    const isNullable = !col.notNull && !colCodec.notNull;
     return order.callback
-      ? order.callback(colFrag, colCodec)
-      : [colFrag, colCodec];
+      ? order.callback(colFrag, colCodec, isNullable)
+      : [colFrag, colCodec, isNullable];
   } else {
-    return [order.fragment, order.codec];
+    return [order.fragment, order.codec, order.nullable];
   }
 }

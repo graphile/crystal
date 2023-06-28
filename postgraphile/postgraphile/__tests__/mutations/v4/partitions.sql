@@ -15,7 +15,6 @@ lateral (
   where (
     __users__."id" = __users_identifiers__."id0"
   )
-  order by __users__."id" asc
 ) as __users_result__;
 
 update "partitions"."measurements" as __measurements__ set "value" = $1::"float8" where ((__measurements__."timestamp" = $2::"timestamptz") and (__measurements__."key" = $3::"text")) returning
@@ -35,5 +34,4 @@ lateral (
   where (
     __users__."id" = __users_identifiers__."id0"
   )
-  order by __users__."id" asc
 ) as __users_result__;

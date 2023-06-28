@@ -275,13 +275,16 @@ export function executePreemptive(
   store.set(operationPlan.contextStep.id, ctxs);
   store.set(operationPlan.rootValueStep.id, rvs);
 
-  const rootBucket = newBucket({
-    layerPlan: operationPlan.rootLayerPlan,
-    size,
-    store,
-    hasErrors: false,
-    polymorphicPathList,
-  });
+  const rootBucket = newBucket(
+    {
+      layerPlan: operationPlan.rootLayerPlan,
+      size,
+      store,
+      hasErrors: false,
+      polymorphicPathList,
+    },
+    null,
+  );
   const startTime = timeSource.now();
   const stopTime =
     executionTimeout !== null ? startTime + executionTimeout : null;
@@ -290,8 +293,6 @@ export function executePreemptive(
     stopTime,
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
-    metaByMetaKey:
-      null as any /* This is now set during 'root' bucket execution'; access before this is forbidden */,
     insideGraphQL: false,
   };
 
@@ -320,13 +321,16 @@ export function executePreemptive(
         rootBucket.store.get(depId)![bucketIndex];
     }
 
-    const subscriptionBucket = newBucket({
-      layerPlan,
-      store,
-      hasErrors: rootBucket.hasErrors,
-      polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
-      size: 1,
-    });
+    const subscriptionBucket = newBucket(
+      {
+        layerPlan,
+        store,
+        hasErrors: rootBucket.hasErrors,
+        polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
+        size: 1,
+      },
+      rootBucket.metaByMetaKey,
+    );
     const bucketPromise = executeBucket(subscriptionBucket, requestContext);
     function outputStreamBucket() {
       const [ctx, result] = outputBucket(
@@ -736,13 +740,16 @@ async function processStream(
 
     // const childBucket = newBucket(directLayerPlanChild, noDepsList, store);
     // const childBucketIndex = 0;
-    const rootBucket: Bucket = newBucket({
-      layerPlan: directLayerPlanChild,
-      size,
-      store,
-      hasErrors: false,
-      polymorphicPathList,
-    });
+    const rootBucket: Bucket = newBucket(
+      {
+        layerPlan: directLayerPlanChild,
+        size,
+        store,
+        hasErrors: false,
+        polymorphicPathList,
+      },
+      spec.bucket.metaByMetaKey,
+    );
 
     const bucketPromise = executeBucket(rootBucket, requestContext);
 
@@ -892,13 +899,16 @@ function processSingleDeferred(
 
   // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
   // const childBucketIndex = 0;
-  const rootBucket = newBucket({
-    layerPlan: outputPlan.layerPlan,
-    size,
-    store,
-    hasErrors: false,
-    polymorphicPathList,
-  });
+  const rootBucket = newBucket(
+    {
+      layerPlan: outputPlan.layerPlan,
+      size,
+      store,
+      hasErrors: false,
+      polymorphicPathList,
+    },
+    null,
+  );
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
 

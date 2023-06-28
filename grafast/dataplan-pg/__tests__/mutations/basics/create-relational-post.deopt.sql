@@ -28,7 +28,6 @@ lateral (
     ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
     )
-  order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
 select __people_result__.*
@@ -45,5 +44,4 @@ lateral (
     ) and (
       __people__."person_id" = __people_identifiers__."id0"
     )
-  order by __people__."person_id" asc
 ) as __people_result__;

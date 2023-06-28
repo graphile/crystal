@@ -687,7 +687,6 @@ export function nonNullError(
   const { parentTypeName, fieldName, node } = locationDetails;
   if (!parentTypeName || !fieldName) {
     return new GraphQLError(
-      // TODO: rename. Also this shouldn't happen?
       `GrafastInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
       node,
       null,
@@ -765,8 +764,14 @@ export function getChildBucketAndIndex(
     }
 
     /*
-     * HACK: this '|| i > 0' feels really really really hacky... What happens if we have
-     * nested arrays? I'm concerned there's a bug here.
+     * TEST: I think this  '|| i !== l - 1' check is saying that an array can
+     * only occur at the furthest ancestor and everything since then must be
+     * non-array. Presumably in the case of nested arrays there would be an
+     * intermediary bucket, hence why this check is allowed, but that should be
+     * tested. Also, are there any confounding factors when it comes to steps
+     * themselves using arrays for object values - for example pgSelectSingle is
+     * represented by an array (tuple), but that doesn't make it a list so it should
+     * be fine. Use tests to validate this is all fine.
      */
     if (arrayIndex == null || i !== l - 1) {
       if (Array.isArray(out)) {

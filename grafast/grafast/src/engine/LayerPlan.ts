@@ -605,14 +605,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
     if (size > 0) {
       // Reference
-      const childBucket = newBucket({
-        layerPlan: this,
-        size,
-        store,
-        // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-        hasErrors: parentBucket.hasErrors,
-        polymorphicPathList,
-      });
+      const childBucket = newBucket(
+        {
+          layerPlan: this,
+          size,
+          store,
+          // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
+          hasErrors: parentBucket.hasErrors,
+          polymorphicPathList,
+        },
+        parentBucket.metaByMetaKey,
+      );
       parentBucket.children[this.id] = {
         bucket: childBucket,
         map,
@@ -665,7 +668,7 @@ ${inner}
       // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
       hasErrors: parentBucket.hasErrors,
       polymorphicPathList,
-    });
+    }, parentBucket.metaByMetaKey);
     // PERF: set ourselves in more places so that we never have to call 'getChildBucketAndIndex'.
     parentBucket.children[this.id] = { bucket: childBucket, map };
 

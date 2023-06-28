@@ -5,7 +5,6 @@ import type {
   Deferred,
   ExecutableStep,
   ExecutionEventEmitter,
-  GrafastResultStreamList,
   GrafastValuesList,
   ObjectStep,
   PromiseOrDirect,
@@ -557,7 +556,7 @@ ${duration}
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
-    streams: GrafastResultStreamList<TOutput>;
+    streams: Array<AsyncIterable<TOutput> | PromiseLike<never> | null>;
   }> {
     const { text, rawSqlValues, identifierIndex } = common;
 
@@ -633,7 +632,7 @@ ${duration}
 
         // PERF: batchIndexesByIdentifiersJSON = null;
 
-        // TODO: implement singleMode using textForSingle
+        // PERF: implement singleMode using textForSingle
         const singleMode = false;
         const sqlValues =
           identifierIndex == null

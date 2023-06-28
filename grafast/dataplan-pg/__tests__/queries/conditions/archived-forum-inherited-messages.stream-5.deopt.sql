@@ -86,7 +86,6 @@ lateral (
     ) and (
       __users__."id" = __users_identifiers__."id0"
     )
-  order by __users__."id" asc
 ) as __users_result__;
 
 select __users_result__.*
@@ -103,5 +102,4 @@ lateral (
     ) and (
       __users__."id" = __users_identifiers__."id0"
     )
-  order by __users__."id" asc
 ) as __users_result__;

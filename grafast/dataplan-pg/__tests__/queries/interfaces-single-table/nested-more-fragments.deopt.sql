@@ -60,7 +60,6 @@ lateral (
     ) and (
       __single_table_items__."id" = __single_table_items_identifiers__."id0"
     )
-  order by __single_table_items__."id" asc
 ) as __single_table_items_result__;
 
 select __people_result__.*
@@ -76,5 +75,4 @@ lateral (
     ) and (
       __people__."person_id" = __people_identifiers__."id0"
     )
-  order by __people__."person_id" asc
 ) as __people_result__;

@@ -12,7 +12,6 @@ lateral (
     ) and (
       __forums__."id" = __forums_identifiers__."id0"
     )
-  order by __forums__."id" asc
 ) as __forums_result__;
 
 select __forums_random_user_result__.*
@@ -27,7 +26,6 @@ lateral (
   where (
     true /* authorization checks */
   )
-  order by __forums_random_user__."id" asc
 ) as __forums_random_user_result__;
 
 select __users_most_recent_forum_result__.*

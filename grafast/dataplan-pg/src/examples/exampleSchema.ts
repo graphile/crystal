@@ -200,8 +200,6 @@ export function makeExampleSchema(
           codec: PgCodec;
           notNull?: boolean;
           expression?: PgCodecAttribute<any>["expression"];
-          // TODO: we could make TypeScript understand the relations on the object
-          // rather than just being string.
           via?: PgCodecAttributeVia;
           identicalVia?: PgCodecAttributeVia;
         },
@@ -219,6 +217,7 @@ export function makeExampleSchema(
       };
 
       const forumCodec = recordCodec({
+        executor,
         name: "forums",
         identifier: sql`app_public.forums`,
         attributes: {
@@ -233,6 +232,7 @@ export function makeExampleSchema(
       });
 
       const userCodec = recordCodec({
+        executor,
         name: "users",
         identifier: sql`app_public.users`,
         attributes: {
@@ -244,6 +244,7 @@ export function makeExampleSchema(
       });
 
       const messagesCodec = recordCodec({
+        executor,
         name: "messages",
         identifier: sql`app_public.messages`,
         attributes: {
@@ -454,6 +455,7 @@ export function makeExampleSchema(
         });
 
       const unionEntityCodec = recordCodec({
+        executor,
         name: "union__entity",
         identifier: sql`interfaces_and_unions.union__entity`,
         attributes: {
@@ -464,6 +466,7 @@ export function makeExampleSchema(
       });
 
       const personBookmarksCodec = recordCodec({
+        executor,
         name: "person_bookmarks",
         identifier: sql`interfaces_and_unions.person_bookmarks`,
         attributes: {
@@ -490,6 +493,7 @@ export function makeExampleSchema(
       });
 
       const personCodec = recordCodec({
+        executor,
         name: "people",
         identifier: sql`interfaces_and_unions.people`,
         attributes: {
@@ -511,6 +515,7 @@ export function makeExampleSchema(
       });
 
       const postCodec = recordCodec({
+        executor,
         name: "posts",
         identifier: sql`interfaces_and_unions.posts`,
         attributes: {
@@ -534,6 +539,7 @@ export function makeExampleSchema(
       });
 
       const commentCodec = recordCodec({
+        executor,
         name: "comments",
         identifier: sql`interfaces_and_unions.comments`,
         attributes: {
@@ -568,6 +574,7 @@ export function makeExampleSchema(
       });
 
       const enumTableItemTypeCodec = recordCodec({
+        executor,
         name: "enum_table_item_type",
         identifier: sql`interfaces_and_unions.enum_table_item_type`,
         attributes: {
@@ -598,6 +605,7 @@ export function makeExampleSchema(
       });
 
       const singleTableItemsCodec = recordCodec({
+        executor,
         name: "single_table_items",
         identifier: sql`interfaces_and_unions.single_table_items`,
         attributes: {
@@ -647,6 +655,7 @@ export function makeExampleSchema(
       });
 
       const relationalItemsCodec = recordCodec({
+        executor,
         name: "relational_items",
         identifier: sql`interfaces_and_unions.relational_items`,
         attributes: {
@@ -691,6 +700,7 @@ export function makeExampleSchema(
       });
 
       const relationalCommentableCodec = recordCodec({
+        executor,
         name: "relational_commentables",
         identifier: sql`interfaces_and_unions.relational_commentables`,
         attributes: {
@@ -756,6 +766,7 @@ export function makeExampleSchema(
       } as const;
 
       const relationalTopicsCodec = recordCodec({
+        executor,
         name: "relational_topics",
         identifier: sql`interfaces_and_unions.relational_topics`,
         attributes: {
@@ -774,6 +785,7 @@ export function makeExampleSchema(
       });
 
       const relationalPostsCodec = recordCodec({
+        executor,
         name: "relational_posts",
         identifier: sql`interfaces_and_unions.relational_posts`,
         attributes: {
@@ -794,6 +806,7 @@ export function makeExampleSchema(
       });
 
       const relationalDividersCodec = recordCodec({
+        executor,
         name: "relational_dividers",
         identifier: sql`interfaces_and_unions.relational_dividers`,
         attributes: {
@@ -813,6 +826,7 @@ export function makeExampleSchema(
       });
 
       const relationalChecklistsCodec = recordCodec({
+        executor,
         name: "relational_checklists",
         identifier: sql`interfaces_and_unions.relational_checklists`,
         attributes: {
@@ -831,6 +845,7 @@ export function makeExampleSchema(
       });
 
       const relationalChecklistItemsCodec = recordCodec({
+        executor,
         name: "relational_checklist_items",
         identifier: sql`interfaces_and_unions.relational_checklist_items`,
         attributes: {
@@ -852,6 +867,7 @@ export function makeExampleSchema(
       ////////////////////////////////////////
 
       const unionItemsCodec = recordCodec({
+        executor,
         name: "union_items",
         identifier: sql`interfaces_and_unions.union_items`,
         attributes: {
@@ -877,6 +893,7 @@ export function makeExampleSchema(
       });
 
       const unionTopicsCodec = recordCodec({
+        executor,
         name: "union_topics",
         identifier: sql`interfaces_and_unions.union_topics`,
         attributes: {
@@ -895,6 +912,7 @@ export function makeExampleSchema(
       });
 
       const unionPostsCodec = recordCodec({
+        executor,
         name: "union_posts",
         identifier: sql`interfaces_and_unions.union_posts`,
         attributes: {
@@ -915,6 +933,7 @@ export function makeExampleSchema(
       });
 
       const unionDividersCodec = recordCodec({
+        executor,
         name: "union_dividers",
         identifier: sql`interfaces_and_unions.union_dividers`,
         attributes: {
@@ -934,6 +953,7 @@ export function makeExampleSchema(
       });
 
       const unionChecklistsCodec = recordCodec({
+        executor,
         name: "union_checklists",
         identifier: sql`interfaces_and_unions.union_checklists`,
         attributes: {
@@ -952,6 +972,7 @@ export function makeExampleSchema(
       });
 
       const unionChecklistItemsCodec = recordCodec({
+        executor,
         name: "union_checklist_items",
         identifier: sql`interfaces_and_unions.union_checklist_items`,
         attributes: {
@@ -999,6 +1020,7 @@ export function makeExampleSchema(
       ////////////////////////////////////////
 
       const awsApplicationsCodec = recordCodec({
+        executor,
         name: "aws_applications",
         identifier: sql`interfaces_and_unions.aws_applications`,
         attributes: {
@@ -1025,6 +1047,7 @@ export function makeExampleSchema(
       });
 
       const gcpApplicationsCodec = recordCodec({
+        executor,
         name: "gcp_applications",
         identifier: sql`interfaces_and_unions.gcp_applications`,
         attributes: {
@@ -1051,6 +1074,7 @@ export function makeExampleSchema(
       });
 
       const firstPartyVulnerabilitiesCodec = recordCodec({
+        executor,
         name: "first_party_vulnerabilities",
         identifier: sql`interfaces_and_unions.first_party_vulnerabilities`,
         attributes: {
@@ -1074,6 +1098,7 @@ export function makeExampleSchema(
       });
 
       const thirdPartyVulnerabilitiesCodec = recordCodec({
+        executor,
         name: "third_party_vulnerabilities",
         identifier: sql`interfaces_and_unions.third_party_vulnerabilities`,
         attributes: {
@@ -4367,14 +4392,6 @@ export function makeExampleSchema(
             },
           },
         }),
-        // TODO: this should not be needed!
-        plan: EXPORTABLE(
-          (constant) =>
-            function plan() {
-              return constant(Object.create(null));
-            },
-          [constant],
-        ),
         resolve: EXPORTABLE(
           () =>
             function resolve() {
@@ -4414,6 +4431,7 @@ export function makeExampleSchema(
             function plan(_, { $first, $offset }) {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
+                name: "vulnerabilities",
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
@@ -4609,6 +4627,7 @@ export function makeExampleSchema(
             function plan() {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
+                name: "vulnerabilities",
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
@@ -5000,7 +5019,7 @@ export function makeExampleSchema(
                 keyof typeof relationalPostsResource.codec.attributes
               >) {
                 const $rawValue = fieldArgs.getRaw(["input", "patch", key]);
-                // TODO: test that we differentiate between value set to null and
+                // TEST: test that we differentiate between value set to null and
                 // value not being present
                 if (!$rawValue.evalIs(undefined)) {
                   const $value = fieldArgs.get(["input", "patch", key]);

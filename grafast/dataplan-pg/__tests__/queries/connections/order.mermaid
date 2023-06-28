@@ -37,8 +37,8 @@ graph TD
     __Value3 --> Access19
     PgPageInfo40{{"PgPageInfo[40∈1]"}}:::plan
     Connection21 --> PgPageInfo40
-    Lambda42{{"Lambda[42∈1]<br />ᐸlistHasMoreᐳ"}}:::plan
-    PgSelect22 --> Lambda42
+    Access42{{"Access[42∈1]<br />ᐸ22.hasMoreᐳ"}}:::plan
+    PgSelect22 --> Access42
     First45{{"First[45∈1]"}}:::plan
     PgSelect22 --> First45
     PgSelectSingle46{{"PgSelectSingle[46∈1]<br />ᐸmessagesᐳ"}}:::plan
@@ -97,7 +97,7 @@ graph TD
     class Bucket0,__Value0,__Value3,__Value5,Connection21,Constant66 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 21<br /><br />ROOT Connectionᐸ17ᐳ[21]<br />1: <br />ᐳ: 18, 19, 40, 43, 20<br />2: PgSelect[22], PgSelect[60]<br />ᐳ: 42, 45, 46, 48, 49, 50, 51, 53, 54, 56, 57, 58, 59, 61, 62, 63, 47, 55"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access18,Access19,Object20,PgSelect22,PgPageInfo40,Lambda42,Constant43,First45,PgSelectSingle46,PgCursor47,PgClassExpression48,PgClassExpression49,PgClassExpression50,List51,Last53,PgSelectSingle54,PgCursor55,PgClassExpression56,PgClassExpression57,PgClassExpression58,List59,PgSelect60,First61,PgSelectSingle62,PgClassExpression63 bucket1
+    class Bucket1,Access18,Access19,Object20,PgSelect22,PgPageInfo40,Access42,Constant43,First45,PgSelectSingle46,PgCursor47,PgClassExpression48,PgClassExpression49,PgClassExpression50,List51,Last53,PgSelectSingle54,PgCursor55,PgClassExpression56,PgClassExpression57,PgClassExpression58,List59,PgSelect60,First61,PgSelectSingle62,PgClassExpression63 bucket1
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ22ᐳ[23]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item23,PgSelectSingle24 bucket2

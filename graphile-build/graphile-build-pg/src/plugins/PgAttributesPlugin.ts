@@ -9,14 +9,9 @@ import type {
   PgCodecAttributes,
   PgCodecList,
   PgCodecWithAttributes,
-  PgRegistry,
   PgSelectSingleStep,
 } from "@dataplan/pg";
-import {
-  PgResource,
-  pgSelectFromRecords,
-  pgSelectSingleFromRecord,
-} from "@dataplan/pg";
+import { pgSelectFromRecords, pgSelectSingleFromRecord } from "@dataplan/pg";
 import type { GrafastFieldConfig, SetterStep } from "grafast";
 import { each } from "grafast";
 import { EXPORTABLE } from "graphile-build";
@@ -79,35 +74,6 @@ declare global {
   }
 }
 
-// TODO: get rid of this! Determine the resources at build time
-const getResource = EXPORTABLE(
-  (PgResource) =>
-    (
-      registry: PgRegistry<any, any, any>,
-      baseCodec: PgCodec,
-      pgResources: PgResource<any, any, any, any, any>[],
-      $record: PgSelectSingleStep,
-    ) => {
-      const executor = $record.resource.executor;
-      const resource =
-        pgResources.find(
-          (potentialSource) =>
-            // These have already been filtered by codec
-            potentialSource.executor === executor,
-        ) ??
-        // HACK: yuck yuck yuck
-        // TODO: yuck; we should not be building a PgResource on demand. We
-        // should be able to detect this is necessary and add it to the
-        // registry preemptively.
-        new PgResource(
-          registry,
-          PgResource.configFromCodec(executor, baseCodec),
-        );
-      return resource;
-    },
-  [PgResource],
-);
-
 function processAttribute(
   fields: GraphQLFieldConfigMap<any, any>,
   build: GraphileBuild.Build,
@@ -129,6 +95,7 @@ function processAttribute(
   if (!rawPgCodec || !rawPgCodec.attributes) {
     return;
   }
+
   const pgCodec = rawPgCodec as PgCodecWithAttributes;
 
   const isInterface = context.type === "GraphQLInterfaceType";
@@ -180,6 +147,21 @@ function processAttribute(
     description: attribute.description,
     type: type as GraphQLOutputType,
   };
+
+  const executor = pgCodec.executor;
+  const resource = baseCodec.attributes
+    ? Object.values(registry.pgResources).find(
+        (potentialSource) =>
+          potentialSource.codec === baseCodec &&
+          !potentialSource.parameters &&
+          potentialSource.executor === executor,
+      )
+    : null;
+  if (baseCodec.attributes && !resource) {
+    // We can't load codecs with attributes unless we know the executor.
+    return;
+  }
+
   if (!isInterface) {
     const makePlan = () => {
       // See if there's a resource to pull record types from (e.g. for relations/etc)
@@ -192,10 +174,10 @@ function processAttribute(
           [attributeName],
         );
       } else {
-        const pgResources = Object.values(registry.pgResources).filter(
-          (potentialSource) =>
-            potentialSource.codec === baseCodec && !potentialSource.parameters,
-        );
+        if (!resource) {
+          // This error only exists to satisfy TypeScript
+          throw new Error("This should be unreachable");
+        }
         // TODO: this is pretty horrible in the export; we should fix that.
         if (!attribute.codec.arrayOfCodec) {
           const notNull = attribute.notNull || attribute.codec.notNull;
@@ -207,36 +189,17 @@ function processAttribute(
            * joined_thing.column`
            */
           return EXPORTABLE(
-            (
-                attributeName,
-                baseCodec,
-                getResource,
-                notNull,
-                pgResources,
-                pgSelectSingleFromRecord,
-                registry,
-              ) =>
+            (attributeName, notNull, pgSelectSingleFromRecord, resource) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $plan = $record.get(attributeName);
-                const $select = pgSelectSingleFromRecord(
-                  getResource(registry, baseCodec, pgResources, $record),
-                  $plan,
-                );
+                const $select = pgSelectSingleFromRecord(resource, $plan);
                 if (notNull) {
                   $select.coalesceToEmptyObject();
                 }
                 $select.getClassStep().setTrusted();
                 return $select;
               },
-            [
-              attributeName,
-              baseCodec,
-              getResource,
-              notNull,
-              pgResources,
-              pgSelectSingleFromRecord,
-              registry,
-            ],
+            [attributeName, notNull, pgSelectSingleFromRecord, resource],
           );
         } else if (attribute.codec.arrayOfCodec.arrayOfCodec?.arrayOfCodec) {
           throw new Error(
@@ -244,69 +207,33 @@ function processAttribute(
           );
         } else if (attribute.codec.arrayOfCodec.arrayOfCodec) {
           return EXPORTABLE(
-            (
-                attributeName,
-                baseCodec,
-                each,
-                getResource,
-                pgResources,
-                pgSelectFromRecords,
-                registry,
-              ) =>
+            (attributeName, each, pgSelectFromRecords, resource) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $val = $record.get(
                   attributeName,
                 ) as PgClassExpressionStep<PgCodecList<PgCodecList>, any>;
                 return each($val, ($list) => {
-                  const $select = pgSelectFromRecords(
-                    getResource(registry, baseCodec, pgResources, $record),
-                    $list,
-                  );
+                  const $select = pgSelectFromRecords(resource, $list);
                   $select.setTrusted();
                   return $select;
                 });
               },
-            [
-              attributeName,
-              baseCodec,
-              each,
-              getResource,
-              pgResources,
-              pgSelectFromRecords,
-              registry,
-            ],
+            [attributeName, each, pgSelectFromRecords, resource],
           );
         } else {
           // atrribute.codec.arrayOfCodec is set
           // Many records from resource
           return EXPORTABLE(
-            (
-                attributeName,
-                baseCodec,
-                getResource,
-                pgResources,
-                pgSelectFromRecords,
-                registry,
-              ) =>
+            (attributeName, pgSelectFromRecords, resource) =>
               ($record: PgSelectSingleStep<any>) => {
                 const $val = $record.get(
                   attributeName,
                 ) as PgClassExpressionStep<PgCodecList, any>;
-                const $select = pgSelectFromRecords(
-                  getResource(registry, baseCodec, pgResources, $record),
-                  $val,
-                );
+                const $select = pgSelectFromRecords(resource, $val);
                 $select.setTrusted();
                 return $select;
               },
-            [
-              attributeName,
-              baseCodec,
-              getResource,
-              pgResources,
-              pgSelectFromRecords,
-              registry,
-            ],
+            [attributeName, pgSelectFromRecords, resource],
           );
         }
       }

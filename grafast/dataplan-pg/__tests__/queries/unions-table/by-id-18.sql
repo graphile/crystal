@@ -12,7 +12,6 @@ lateral (
     ) and (
       __union_items__."id" = __union_items_identifiers__."id0"
     )
-  order by __union_items__."id" asc
 ) as __union_items_result__;
 
 select __union_checklist_items_result__.*
@@ -30,5 +29,4 @@ lateral (
     ) and (
       __union_checklist_items__."id" = __union_checklist_items_identifiers__."id0"
     )
-  order by __union_checklist_items__."id" asc
 ) as __union_checklist_items_result__;

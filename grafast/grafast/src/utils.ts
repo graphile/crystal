@@ -1014,3 +1014,12 @@ export function assertNotAsync(fn: any, name: string): void {
     );
   }
 }
+export function hasItemPlan(
+  step: ExecutableStep & {
+    itemPlan?: ($item: ExecutableStep) => ExecutableStep;
+  },
+): step is ExecutableStep & {
+  itemPlan: ($item: ExecutableStep) => ExecutableStep;
+} {
+  return "itemPlan" in step && typeof step.itemPlan === "function";
+}

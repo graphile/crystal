@@ -56,7 +56,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __person_result__.*
@@ -70,7 +69,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 delete from "c"."compound_key" as __compound_key__ where ((__compound_key__."person_id_1" = $1::"int4") and (__compound_key__."person_id_2" = $2::"int4")) returning
@@ -88,7 +86,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __person_result__.*
@@ -102,7 +99,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 delete from "c"."person" as __person__ where (__person__."email" = $1::"b"."email") returning
@@ -125,7 +121,6 @@ lateral (
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 delete from "c"."person" as __person__ where (__person__."id" = $1::"int4") returning

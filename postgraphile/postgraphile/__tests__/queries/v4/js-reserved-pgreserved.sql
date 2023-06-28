@@ -18,7 +18,6 @@ lateral (
   where (
     __reserved__."case" = __reserved_identifiers__."id0"
   )
-  order by __reserved__."id" asc
 ) as __reserved_result__;
 
 select __reserved_result__.*
@@ -33,7 +32,6 @@ lateral (
   where (
     __reserved__."do" = __reserved_identifiers__."id0"
   )
-  order by __reserved__."id" asc
 ) as __reserved_result__;
 
 select __reserved_result__.*
@@ -49,7 +47,6 @@ lateral (
   where (
     __reserved__."id" = __reserved_identifiers__."id0"
   )
-  order by __reserved__."id" asc
 ) as __reserved_result__;
 
 select __reserved_result__.*
@@ -64,5 +61,4 @@ lateral (
   where (
     __reserved__."null" = __reserved_identifiers__."id0"
   )
-  order by __reserved__."id" asc
 ) as __reserved_result__;

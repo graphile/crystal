@@ -21,5 +21,4 @@ lateral (
     ) and (
       __relational_topics__."id" = __relational_topics_identifiers__."id0"
     )
-  order by __relational_topics__."id" asc
 ) as __relational_topics_result__;

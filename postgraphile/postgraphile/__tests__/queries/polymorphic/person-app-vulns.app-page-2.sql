@@ -6,11 +6,11 @@ order by __people__."person_id" asc
 limit 4;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1", (ids.value->>2)::"text" as "id2", (ids.value->>3)::"text" as "id3" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1", (ids.value->>2)::"text" as "id2", (ids.value->>3)::"json" as "id3" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __applications__."0" as "0",
+    __applications__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -32,7 +32,7 @@ lateral (
           or (
             'AwsApplication' = __union_identifiers__."id2"
             and (
-              __aws_applications__."id" > ((__union_identifiers__."id3")::json->>0)::"int4"
+              __aws_applications__."id" > (__union_identifiers__."id3"->>0)::"int4"
             )
           )
         )
@@ -60,7 +60,7 @@ lateral (
           or (
             'GcpApplication' = __union_identifiers__."id2"
             and (
-              __gcp_applications__."id" > ((__union_identifiers__."id3")::json->>0)::"int4"
+              __gcp_applications__."id" > (__union_identifiers__."id3"->>0)::"int4"
             )
           )
         )
@@ -72,7 +72,7 @@ lateral (
       "0" asc,
       "n" asc
     limit 1
-  ) __union__
+  ) __applications__
 ) as __union_result__;
 
 select __aws_applications_result__.*
@@ -85,7 +85,6 @@ lateral (
   where (
     __aws_applications__."id" = __aws_applications_identifiers__."id0"
   )
-  order by __aws_applications__."id" asc
 ) as __aws_applications_result__;
 
 select __gcp_applications_result__.*
@@ -98,15 +97,14 @@ lateral (
   where (
     __gcp_applications__."id" = __gcp_applications_identifiers__."id0"
   )
-  order by __gcp_applications__."id" asc
 ) as __gcp_applications_result__;
 
 select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __vulnerabilities__."0" as "0",
+    __vulnerabilities__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -158,15 +156,15 @@ lateral (
       "0" asc,
       "n" asc
     limit 1
-  ) __union__
+  ) __vulnerabilities__
 ) as __union_result__;
 
 select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __vulnerabilities__."0" as "0",
+    __vulnerabilities__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -218,7 +216,7 @@ lateral (
       "0" asc,
       "n" asc
     limit 1
-  ) __union__
+  ) __vulnerabilities__
 ) as __union_result__;
 
 select __first_party_vulnerabilities_result__.*
@@ -231,7 +229,6 @@ lateral (
   where (
     __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
   )
-  order by __first_party_vulnerabilities__."id" asc
 ) as __first_party_vulnerabilities_result__;
 
 select __first_party_vulnerabilities_result__.*
@@ -244,5 +241,4 @@ lateral (
   where (
     __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
   )
-  order by __first_party_vulnerabilities__."id" asc
 ) as __first_party_vulnerabilities_result__;

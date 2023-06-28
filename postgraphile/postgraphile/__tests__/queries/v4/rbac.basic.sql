@@ -13,7 +13,6 @@ lateral (
   where (
     __person_secret__."person_id" = __person_secret_identifiers__."id0"
   )
-  order by __person_secret__."person_id" asc
 ) as __person_secret_result__;
 
 commit; /*fake*/
@@ -36,7 +35,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 commit; /*fake*/
@@ -58,7 +56,6 @@ lateral (
   where (
     __left_arm__."id" = __left_arm_identifiers__."id0"
   )
-  order by __left_arm__."id" asc
 ) as __left_arm_result__;
 
 commit; /*fake*/
@@ -83,7 +80,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 commit; /*fake*/
@@ -105,7 +101,6 @@ lateral (
   where (
     __post__."id" = __post_identifiers__."id0"
   )
-  order by __post__."id" asc
 ) as __post_result__;
 
 commit; /*fake*/
@@ -136,7 +131,6 @@ lateral (
   where (
     __person__."id" = __person_identifiers__."id0"
   )
-  order by __person__."id" asc
 ) as __person_result__;
 
 commit; /*fake*/

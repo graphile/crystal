@@ -38,17 +38,17 @@ lateral (
   ) as __mutation_out_complex__
 ) as __mutation_out_complex_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    (not (__frmcdc_compound_type_1__ is null))::text as "3",
-    __frmcdc_compound_type_1_identifiers__.idx as "4"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    (not (__frmcdc_compound_type__ is null))::text as "3",
+    __frmcdc_compound_type_identifiers__.idx as "4"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
 select __person_result__.*
 from (select 0 as idx, $1::"c"."person" as "id0") as __person_identifiers__,
@@ -67,7 +67,6 @@ lateral (
     __person__."person_full_name" as "2",
     __person_identifiers__.idx as "3"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 select __mutation_out_complex_setof_result__.*
@@ -85,17 +84,17 @@ lateral (
   ) as __mutation_out_complex_setof__
 ) as __mutation_out_complex_setof_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    (not (__frmcdc_compound_type_1__ is null))::text as "3",
-    __frmcdc_compound_type_1_identifiers__.idx as "4"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    (not (__frmcdc_compound_type__ is null))::text as "3",
+    __frmcdc_compound_type_identifiers__.idx as "4"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
 select __person_result__.*
 from (select 0 as idx, $1::"c"."person" as "id0") as __person_identifiers__,
@@ -114,7 +113,6 @@ lateral (
     __person__."person_full_name" as "2",
     __person_identifiers__.idx as "3"
   from (select (__person_identifiers__."id0").*) as __person__
-  order by __person__."id" asc
 ) as __person_result__;
 
 select
@@ -134,17 +132,17 @@ lateral (
   from "c"."mutation_out_out_compound_type"(__mutation_out_out_compound_type_identifiers__."id0") as __mutation_out_out_compound_type__
 ) as __mutation_out_out_compound_type_result__;
 
-select __frmcdc_compound_type_1_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_1_identifiers__,
+select __frmcdc_compound_type_result__.*
+from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type_1__."a"::text as "0",
-    __frmcdc_compound_type_1__."b" as "1",
-    __frmcdc_compound_type_1__."c"::text as "2",
-    (not (__frmcdc_compound_type_1__ is null))::text as "3",
-    __frmcdc_compound_type_1_identifiers__.idx as "4"
-  from (select (__frmcdc_compound_type_1_identifiers__."id0").*) as __frmcdc_compound_type_1__
-) as __frmcdc_compound_type_1_result__;
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    (not (__frmcdc_compound_type__ is null))::text as "3",
+    __frmcdc_compound_type_identifiers__.idx as "4"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
 
 select
   __mutation_out_out_setof__."o1"::text as "0",

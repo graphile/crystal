@@ -34,8 +34,8 @@ graph TD
     __Item15 --> Access37
     Lambda38{{"Lambda[38∈3]"}}:::plan
     Access37 --> Lambda38
-    Lambda32{{"Lambda[32∈3]<br />ᐸlistHasMoreᐳ"}}:::plan
-    Lambda38 --> Lambda32
+    Access32{{"Access[32∈3]<br />ᐸ38.hasMoreᐳ"}}:::plan
+    Lambda38 --> Access32
     Access39{{"Access[39∈3]<br />ᐸ15.1ᐳ"}}:::plan
     __Item15 --> Access39
     First34{{"First[34∈3]"}}:::plan
@@ -59,7 +59,7 @@ graph TD
     class Bucket2 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 28, 15<br /><br />ROOT Connectionᐸ24ᐳ[28]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgPageInfo30,Lambda32,First34,PgSelectSingle35,PgClassExpression36,Access37,Lambda38,Access39 bucket3
+    class Bucket3,PgPageInfo30,Access32,First34,PgSelectSingle35,PgClassExpression36,Access37,Lambda38,Access39 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

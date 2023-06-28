@@ -9,8 +9,8 @@ select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    __union__."0" as "0",
-    __union__."1"::text as "1",
+    __author__."0" as "0",
+    __author__."1"::text as "1",
     __union_identifiers__.idx as "2"
   from (
       select
@@ -51,7 +51,7 @@ lateral (
     order by
       "0" asc,
       "n" asc
-  ) __union__
+  ) __author__
 ) as __union_result__;
 
 select __organizations_result__.*
@@ -64,7 +64,6 @@ lateral (
   where (
     __organizations__."organization_id" = __organizations_identifiers__."id0"
   )
-  order by __organizations__."organization_id" asc
 ) as __organizations_result__;
 
 select __people_result__.*
@@ -77,5 +76,4 @@ lateral (
   where (
     __people__."person_id" = __people_identifiers__."id0"
   )
-  order by __people__."person_id" asc
 ) as __people_result__;

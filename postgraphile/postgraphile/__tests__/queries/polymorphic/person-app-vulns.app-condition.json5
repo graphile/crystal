@@ -14,7 +14,7 @@
         applications: {
           edges: [
             {
-              cursor: "WyJkZGQ0YTQzOWRlIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
+              cursor: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 8,

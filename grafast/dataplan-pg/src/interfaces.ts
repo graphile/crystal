@@ -10,7 +10,7 @@ import type {
   PgResourceParameter,
   PgResourceUnique,
 } from "./datasource.js";
-import type { WithPgClient } from "./executor.js";
+import type { PgExecutor, WithPgClient } from "./executor.js";
 import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
 import type { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
@@ -81,8 +81,7 @@ export interface PgCodecPolymorphismSingleTypeSpec<
 > {
   /** The name of the polymorphic subentry of the parent single table polymorphic codec */
   name: string;
-  // TODO: make this optional?
-  /** The attributes that are specific to this concrete type (including any modifiers) */
+  /** The attributes that are specific to this concrete type (including any modifiers); empty array is valid */
   attributes: Array<PgCodecPolymorphismSingleTypeAttributeSpec<TAttributeName>>;
 }
 export interface PgCodecPolymorphismSingle<
@@ -91,8 +90,7 @@ export interface PgCodecPolymorphismSingle<
   mode: "single";
   /** The list of attributes that is used to determine which polymorphic type the record is. Currently this should always have length 1. */
   typeAttributes: readonly TAttributeName[];
-  // TODO: make this optional?
-  /** These attributes are shared by every concrete type of this codec */
+  /** These attributes are shared by every concrete type of this codec; empty array is valid */
   commonAttributes: readonly TAttributeName[];
   /** Details the concrete types from this polymorphic single table, including what to call it, and what columns it has. */
   types: {
@@ -259,6 +257,14 @@ export interface PgCodec<
    * many-to-many.
    */
   refs?: PgCodecRefs;
+
+  /**
+   * If this codec came from a specific database, we should list the executor
+   * here. If the codec is used with multiple databases, leave this null, but
+   * note that if it has attributes then it will not be able to be used as the
+   * type of an attribute itself.
+   */
+  executor: PgExecutor | null;
 }
 
 export type PgCodecWithAttributes<
@@ -333,6 +339,8 @@ export type PgOrderFragmentSpec = {
 
   attribute?: never;
   callback?: never;
+
+  nullable?: boolean;
 } & PgOrderCommonSpec;
 
 export type PgOrderAttributeSpec = {
@@ -342,10 +350,12 @@ export type PgOrderAttributeSpec = {
   callback?: (
     attributeExpression: SQL,
     attributeCodec: PgCodec,
-  ) => [SQL, PgCodec];
+    nullable: boolean,
+  ) => [fragment: SQL, codec: PgCodec, nullable?: boolean];
 
   fragment?: never;
   codec?: never;
+  nullable?: boolean;
 } & PgOrderCommonSpec;
 
 /**
