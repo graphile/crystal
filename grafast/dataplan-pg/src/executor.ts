@@ -668,7 +668,7 @@ ${duration}
         let finished = false;
 
         // eslint-disable-next-line no-inner-declarations
-        function getNext(batchIndex: number): Promise<any> | any {
+        function getNext(batchIndex: number): PromiseLike<any> {
           if (pending[batchIndex].length > 0) {
             valuesPending--;
             if (valuesPending < batchFetchSize && !fetching) {
@@ -682,7 +682,12 @@ ${duration}
             }
           } else {
             _deferredStreams++;
-            waiting[batchIndex] = defer<any>();
+            if (isDev && waiting[batchIndex]) {
+              throw new Error(`Waiting on more than one record! Forbidden!`);
+            }
+            const deferred = defer<any>();
+            waiting[batchIndex] = deferred;
+            return deferred;
           }
         }
 
@@ -690,6 +695,7 @@ ${duration}
         function supplyValue(batchIndex: number, value: any | Wrapped): void {
           const deferred = waiting[batchIndex];
           if (deferred !== null) {
+            waiting[batchIndex] = null;
             _deferredStreams--;
             if (value instanceof Wrapped) {
               deferred.reject(value.originalValue);
