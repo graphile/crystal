@@ -170,6 +170,8 @@ export async function runTestQuery(
     setofFunctionsContainNulls?: boolean;
     viewUniqueKey?: string;
     subscriptions?: boolean;
+    setupSql?: string;
+    cleanupSql?: string;
   },
   options: {
     callback?: (
@@ -190,7 +192,7 @@ export async function runTestQuery(
   queries: PgClientQuery[];
   extensions?: any;
 }> {
-  const { variableValues, graphileBuildOptions } = config;
+  const { variableValues, graphileBuildOptions, setupSql, cleanupSql } = config;
   const { path } = options;
 
   const queries: PgClientQuery[] = [];
@@ -252,194 +254,210 @@ export async function runTestQuery(
     await testPool.query(await pg11Data());
   }
 
-  const { schema, resolvedPreset } = await makeSchema(preset);
-  return withTestWithPgClient(
-    testPool,
-    queries,
-    config.directPg,
-    async (withPgClient) => {
-      const pgSubscriber = new PgSubscriber(testPool);
-      try {
-        const document = parse(source);
-        const args: ExecutionArgs = {
-          schema,
-          document,
-          variableValues,
-        };
-
-        await hookArgs(args, resolvedPreset, {});
-
-        // We must override the context so that we can listen to the SQL queries.
-        args.contextValue = {
-          pgSettings: (args.contextValue as any).pgSettings,
-          withPgClient,
-          pgSubscriber,
-        };
-
-        const schemaValidationErrors = validateSchema(schema);
-        if (schemaValidationErrors.length > 0) {
-          throw new Error(
-            `Invalid schema: ${schemaValidationErrors
-              .map((e) => String(e))
-              .join(",")}`,
-          );
-        }
-
-        const operationAST = getOperationAST(document, undefined);
-        const operationType = operationAST.operation;
-
-        const validationErrors = validate(schema, document);
-        if (validationErrors.length > 0) {
-          throw new Error(
-            `Invalid operation document: ${validationErrors
-              .map((e) => String(e))
-              .join(",")}`,
-          );
-        }
-
-        const execute =
-          options.prepare ?? true
-            ? grafastExecute
-            : (args: ExecutionArgs) => graphqlExecute(args);
-        const subscribe =
-          options.prepare ?? true
-            ? grafastSubscribe
-            : (args: SubscriptionArgs) => graphqlSubscribe(args);
-
-        const result =
-          operationType === "subscription"
-            ? await subscribe(args, resolvedPreset)
-            : await execute(args, resolvedPreset);
-
-        if (isAsyncIterable(result)) {
-          let errors: GraphQLError[] | undefined = undefined;
-          // hasNext changes based on payload order; remove it.
-          const originalPayloads: Omit<AsyncExecutionResult, "hasNext">[] = [];
-
-          // Start collecting the payloads
-          const promise = (async () => {
-            for await (const entry of result) {
-              const { hasNext, ...rest } = entry;
-              if (Object.keys(rest).length > 0 || hasNext) {
-                // Do not add the trailing `{hasNext: false}` entry to the snapshot
-                originalPayloads.push(rest);
-              }
-              if (entry.errors) {
-                if (!errors) {
-                  errors = [];
-                }
-                errors.push(...entry.errors);
-              }
-            }
-          })();
-
-          // In parallel to collecting the payloads, run the callback
-          if (options.callback) {
-            if (!config.directPg) {
-              throw new Error("Can only use callback in directPg mode");
-            }
-            const poolClient = await testPool.connect();
-            try {
-              await options.callback(poolClient, originalPayloads);
-            } catch (e) {
-              console.error(
-                "Detected error during test callback; here's the payloads we have thus far:",
-              );
-              console.error(originalPayloads);
-              throw e;
-            } finally {
-              poolClient.release();
-            }
-          }
-
-          if (operationType === "subscription") {
-            const iterator = result[Symbol.asyncIterator]();
-            // Terminate the subscription
-            iterator.return?.();
-          }
-
-          // Now wait for all payloads to have been collected
-          await promise;
-
-          // Now we're going to reorder the payloads so that they're always in a
-          // consistent order for the snapshots.
-          const sortPayloads = (
-            payload1: ExecutionPatchResult,
-            payload2: ExecutionPatchResult,
-          ) => {
-            const ONE_AFTER_TWO = 1;
-            const ONE_BEFORE_TWO = -1;
-            if (!payload1.path) {
-              return 0;
-            }
-            if (!payload2.path) {
-              return 0;
-            }
-
-            // Make it so we can assume payload1 has the longer (or equal) path
-            if (payload2.path.length > payload1.path.length) {
-              return -sortPayloads(payload2, payload1);
-            }
-
-            for (let i = 0, l = payload1.path.length; i < l; i++) {
-              let key1 = payload1.path[i];
-              let key2 = payload2.path[i];
-              if (key2 === undefined) {
-                return ONE_AFTER_TWO;
-              }
-              if (key1 === key2) {
-                /* continue */
-              } else if (typeof key1 === "number" && typeof key2 === "number") {
-                const res = key1 - key2;
-                if (res !== 0) {
-                  return res;
-                }
-              } else if (typeof key1 === "string" && typeof key2 === "string") {
-                const res = key1.localeCompare(key2);
-                if (res !== 0) {
-                  return res;
-                }
-              } else {
-                throw new Error("Type mismatch");
-              }
-            }
-            // We should do canonical JSON... but whatever.
-            return JSON.stringify(payload1).localeCompare(
-              JSON.stringify(payload2),
-            );
+  if (setupSql) {
+    await testPool.query(setupSql);
+  }
+  try {
+    const { schema, resolvedPreset } = await makeSchema(preset);
+    return await withTestWithPgClient<any>(
+      testPool,
+      queries,
+      Boolean(config.directPg),
+      async (withPgClient) => {
+        const pgSubscriber = new PgSubscriber(testPool);
+        try {
+          const document = parse(source);
+          const args: ExecutionArgs = {
+            schema,
+            document,
+            variableValues,
           };
-          const payloads = [
-            originalPayloads[0],
-            ...originalPayloads.slice(1).sort(sortPayloads),
-          ];
 
-          return {
-            payloads,
-            errors,
-            queries,
-            extensions: payloads[0].extensions,
+          await hookArgs(args, resolvedPreset, {});
+
+          // We must override the context so that we can listen to the SQL queries.
+          args.contextValue = {
+            pgSettings: (args.contextValue as any).pgSettings,
+            withPgClient,
+            pgSubscriber,
           };
-        } else {
-          // Throw away symbol keys/etc
-          const { data, errors, extensions } = JSON.parse(
-            JSON.stringify(result),
-          );
-          if (errors) {
-            console.error(errors[0].originalError || errors[0]);
-          }
-          if (options.callback) {
+
+          const schemaValidationErrors = validateSchema(schema);
+          if (schemaValidationErrors.length > 0) {
             throw new Error(
-              "Callback is only appropriate when operation returns an async iterable" +
-                String(errors ? errors[0].originalError || errors[0] : ""),
+              `Invalid schema: ${schemaValidationErrors
+                .map((e) => String(e))
+                .join(",")}`,
             );
           }
-          return { data, errors, queries, extensions };
+
+          const operationAST = getOperationAST(document, undefined);
+          const operationType = operationAST!.operation;
+
+          const validationErrors = validate(schema, document);
+          if (validationErrors.length > 0) {
+            throw new Error(
+              `Invalid operation document: ${validationErrors
+                .map((e) => String(e))
+                .join(",")}`,
+            );
+          }
+
+          const execute =
+            options.prepare ?? true
+              ? grafastExecute
+              : (args: ExecutionArgs) => graphqlExecute(args);
+          const subscribe =
+            options.prepare ?? true
+              ? grafastSubscribe
+              : (args: SubscriptionArgs) => graphqlSubscribe(args);
+
+          const result =
+            operationType === "subscription"
+              ? await subscribe(args, resolvedPreset)
+              : await execute(args, resolvedPreset);
+
+          if (isAsyncIterable(result)) {
+            let errors: GraphQLError[] | undefined = undefined;
+            // hasNext changes based on payload order; remove it.
+            const originalPayloads: Omit<AsyncExecutionResult, "hasNext">[] =
+              [];
+
+            // Start collecting the payloads
+            const promise = (async () => {
+              for await (const entry of result) {
+                const { hasNext, ...rest } = entry;
+                if (Object.keys(rest).length > 0 || hasNext) {
+                  // Do not add the trailing `{hasNext: false}` entry to the snapshot
+                  originalPayloads.push(rest);
+                }
+                if (entry.errors) {
+                  if (!errors) {
+                    errors = [];
+                  }
+                  errors.push(...entry.errors);
+                }
+              }
+            })();
+
+            // In parallel to collecting the payloads, run the callback
+            if (options.callback) {
+              if (!config.directPg) {
+                throw new Error("Can only use callback in directPg mode");
+              }
+              const poolClient = await testPool.connect();
+              try {
+                await options.callback(poolClient, originalPayloads);
+              } catch (e) {
+                console.error(
+                  "Detected error during test callback; here's the payloads we have thus far:",
+                );
+                console.error(originalPayloads);
+                throw e;
+              } finally {
+                poolClient.release();
+              }
+            }
+
+            if (operationType === "subscription") {
+              const iterator = result[Symbol.asyncIterator]();
+              // Terminate the subscription
+              iterator.return?.();
+            }
+
+            // Now wait for all payloads to have been collected
+            await promise;
+
+            // Now we're going to reorder the payloads so that they're always in a
+            // consistent order for the snapshots.
+            const sortPayloads = (
+              payload1: ExecutionPatchResult,
+              payload2: ExecutionPatchResult,
+            ) => {
+              const ONE_AFTER_TWO = 1;
+              const ONE_BEFORE_TWO = -1;
+              if (!payload1.path) {
+                return 0;
+              }
+              if (!payload2.path) {
+                return 0;
+              }
+
+              // Make it so we can assume payload1 has the longer (or equal) path
+              if (payload2.path.length > payload1.path.length) {
+                return -sortPayloads(payload2, payload1);
+              }
+
+              for (let i = 0, l = payload1.path.length; i < l; i++) {
+                let key1 = payload1.path[i];
+                let key2 = payload2.path[i];
+                if (key2 === undefined) {
+                  return ONE_AFTER_TWO;
+                }
+                if (key1 === key2) {
+                  /* continue */
+                } else if (
+                  typeof key1 === "number" &&
+                  typeof key2 === "number"
+                ) {
+                  const res = key1 - key2;
+                  if (res !== 0) {
+                    return res;
+                  }
+                } else if (
+                  typeof key1 === "string" &&
+                  typeof key2 === "string"
+                ) {
+                  const res = key1.localeCompare(key2);
+                  if (res !== 0) {
+                    return res;
+                  }
+                } else {
+                  throw new Error("Type mismatch");
+                }
+              }
+              // We should do canonical JSON... but whatever.
+              return JSON.stringify(payload1).localeCompare(
+                JSON.stringify(payload2),
+              );
+            };
+            const payloads: AsyncExecutionResult[] = [
+              originalPayloads[0],
+              ...originalPayloads.slice(1).sort(sortPayloads),
+            ];
+
+            return {
+              payloads,
+              errors,
+              queries,
+              extensions: payloads[0].extensions,
+            };
+          } else {
+            // Throw away symbol keys/etc
+            const { data, errors, extensions } = JSON.parse(
+              JSON.stringify(result),
+            );
+            if (errors) {
+              console.error(errors[0].originalError || errors[0]);
+            }
+            if (options.callback) {
+              throw new Error(
+                "Callback is only appropriate when operation returns an async iterable" +
+                  String(errors ? errors[0].originalError || errors[0] : ""),
+              );
+            }
+            return { data, errors, queries, extensions };
+          }
+        } finally {
+          await pgSubscriber.release();
         }
-      } finally {
-        await pgSubscriber.release();
-      }
-    },
-  );
+      },
+    );
+  } finally {
+    if (cleanupSql) {
+      await testPool.query(cleanupSql);
+    }
+  }
 }
 
 /**

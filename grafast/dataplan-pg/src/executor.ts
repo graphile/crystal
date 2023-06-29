@@ -586,6 +586,7 @@ ${duration}
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
+      // ENHANCE: this is a mess, we should refactor and simplify it significantly
       const tx = defer();
       let txResolved = false;
       let cursorOpen = false;
