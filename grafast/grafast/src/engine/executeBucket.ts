@@ -260,17 +260,16 @@ export function executeBucket(
           finalResult[resultIndex] = value;
           return;
         }
-        const valueIsAsyncIterable = isAsyncIterable(value);
+        let valueIsAsyncIterable;
         if (
-          // Detects async iterables (but excludes all the basic types
-          // like arrays, Maps, Sets, etc that are also iterables) and
-          // handles them specially.
-          valueIsAsyncIterable ||
-          (finishedStep._stepOptions.stream && isIterable(value))
+          // Are we streaming this? If so, we need an iterable or async
+          // iterable.
+          finishedStep._stepOptions.stream &&
+          ((valueIsAsyncIterable = isAsyncIterable(value)) || isIterable(value))
         ) {
           const iterator = valueIsAsyncIterable
-            ? value[Symbol.asyncIterator]()
-            : value[Symbol.iterator]();
+            ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
+            : (value as Iterable<any>)[Symbol.iterator]();
 
           const streamOptions = finishedStep._stepOptions.stream;
           const initialCount: number = streamOptions
