@@ -1,9 +1,16 @@
+/* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import { ExecutableStep, PromiseOrDirect } from "../dist/index.js";
-import { constant, grafast, lambda, makeGrafastSchema } from "../dist/index.js";
+import type { PromiseOrDirect } from "../dist/index.js";
+import {
+  constant,
+  ExecutableStep,
+  grafast,
+  lambda,
+  makeGrafastSchema,
+} from "../dist/index.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -88,6 +95,7 @@ function throwOnUnhandledRejections(callback: () => Promise<void>) {
       process.off("unhandledRejection", fail);
       if (failed) {
         failed = undefined;
+        // eslint-disable-next-line no-unsafe-finally
         throw new Error(`Unhandled promise rejection occurred`);
       }
     }
