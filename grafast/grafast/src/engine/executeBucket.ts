@@ -16,6 +16,7 @@ import type {
   GrafastResultsList,
   GrafastResultStreamList,
   PromiseOrDirect,
+  StreamMaybeMoreableArray,
 } from "../interfaces.js";
 import { $$streamMore, $$timeout } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
@@ -74,10 +75,6 @@ function mergeErrorsBackIn(
   }
   return finalResults;
 }
-
-type StreamMoreableArray<T> = Array<T> & {
-  [$$streamMore]?: AsyncIterator<any, any, any> | Iterator<any, any, any>;
-};
 
 /** @internal */
 export function executeBucket(
@@ -285,7 +282,7 @@ export function executeBucket(
 
           if (initialCount === 0) {
             // Optimization - defer everything
-            const arr: StreamMoreableArray<any> = [];
+            const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
             finalResult[resultIndex] = arr;
           } else {
@@ -293,7 +290,7 @@ export function executeBucket(
             const promise = (async () => {
               try {
                 let valuesSeen = 0;
-                const arr: StreamMoreableArray<any> = [];
+                const arr: StreamMaybeMoreableArray<any> = [];
 
                 /*
                  * We need to "shift" a few entries off the top of the

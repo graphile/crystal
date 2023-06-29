@@ -30,6 +30,8 @@ import type {
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
+  StreamMaybeMoreableArray,
+  StreamMoreableArray,
 } from "./interfaces.js";
 import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
@@ -391,11 +393,10 @@ export function executePreemptive(
       bucketRootValue != null &&
       subscriptionLayerPlan != null &&
       Array.isArray(bucketRootValue) &&
-      $$streamMore in bucketRootValue
+      (bucketRootValue as StreamMaybeMoreableArray)[$$streamMore]
     ) {
-      const stream = (bucketRootValue[$$streamMore] as AsyncIterable<any>)[
-        Symbol.asyncIterator
-      ]();
+      const arr = bucketRootValue as StreamMoreableArray;
+      const stream = arr[$$streamMore];
       // Do the async iterable
       let stopped = false;
       const abort = defer<undefined>();
