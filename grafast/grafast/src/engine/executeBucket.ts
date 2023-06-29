@@ -76,7 +76,7 @@ function mergeErrorsBackIn(
 }
 
 type StreamMoreableArray<T> = Array<T> & {
-  [$$streamMore]?: AsyncIterator<any, any, any>;
+  [$$streamMore]?: AsyncIterator<any, any, any> | Iterator<any, any, any>;
 };
 
 /** @internal */
@@ -258,14 +258,19 @@ export function executeBucket(
           value === null
         ) {
           finalResult[resultIndex] = value;
-        } else if (
+          return;
+        }
+        const valueIsAsyncIterable = isAsyncIterable(value);
+        if (
           // Detects async iterables (but excludes all the basic types
           // like arrays, Maps, Sets, etc that are also iterables) and
           // handles them specially.
-          isAsyncIterable(value) &&
-          !isIterable(value)
+          valueIsAsyncIterable ||
+          (finishedStep._stepOptions.stream && isIterable(value))
         ) {
-          const iterator = value[Symbol.asyncIterator]();
+          const iterator = valueIsAsyncIterable
+            ? value[Symbol.asyncIterator]()
+            : value[Symbol.iterator]();
 
           const streamOptions = finishedStep._stepOptions.stream;
           const initialCount: number = streamOptions
@@ -298,7 +303,9 @@ export function executeBucket(
                  * looping
                  */
 
-                let resultPromise: Promise<IteratorResult<any, any>>;
+                let resultPromise:
+                  | Promise<IteratorResult<any, any>>
+                  | IteratorResult<any, any>;
                 while ((resultPromise = iterator.next())) {
                   const finalResult = await resultPromise;
                   if (finalResult.done) {

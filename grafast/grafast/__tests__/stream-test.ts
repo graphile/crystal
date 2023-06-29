@@ -129,3 +129,52 @@ it("streams with streamable step", async () => {
     hasNext: false,
   });
 });
+
+it("streams with non-streamable step", async () => {
+  const source = /* GraphQL */ `
+    {
+      list {
+        id
+        anotherList @stream(initialCount: 2) {
+          id
+        }
+      }
+    }
+  `;
+  const schema = makeSchema(false);
+  const stream = (await grafast(
+    {
+      schema,
+      source,
+    },
+    {},
+    {},
+  )) as AsyncGenerator<AsyncExecutionResult>;
+  let payloads: AsyncExecutionResult[] = [];
+  for await (const payload of stream) {
+    payloads.push(payload);
+  }
+  expect(payloads).to.have.length(4);
+  expect(payloads[0]).to.deep.equal({
+    data: {
+      list: [
+        { id: 1, anotherList: [{ id: 1 }, { id: 2 }] },
+        { id: 2, anotherList: [{ id: 2 }, { id: 3 }] },
+      ],
+    },
+    hasNext: true,
+  });
+  expect(payloads[1]).to.deep.equal({
+    path: ["list", 0, "anotherList", 2],
+    data: { id: 3 },
+    hasNext: true,
+  });
+  expect(payloads[2]).to.deep.equal({
+    path: ["list", 1, "anotherList", 2],
+    data: { id: 4 },
+    hasNext: true,
+  });
+  expect(payloads[3]).to.deep.equal({
+    hasNext: false,
+  });
+});
