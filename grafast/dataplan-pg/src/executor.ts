@@ -587,6 +587,7 @@ ${duration}
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
       const tx = defer();
+      let txResolved = false;
       const promise = (async () => {
         const batchIndexesByIdentifiersJSON = new Map<string, number[]>();
 
@@ -681,6 +682,9 @@ ${duration}
               return value;
             }
           } else {
+            if (finished) {
+              throw $$FINISHED;
+            }
             _deferredStreams++;
             if (isDev && waiting[batchIndex]) {
               throw new Error(`Waiting on more than one record! Forbidden!`);
@@ -710,8 +714,15 @@ ${duration}
 
         const executePromise = defer<ExecuteFunction>();
         const handleFetchError = (error: Error) => {
+          if (finished) {
+            console.error(
+              `GraphileInternalError<2a6a34e4-a172-4c9a-b74e-b87ccf1b6d47>: Received an error when stream was already finished: ${error}`,
+            );
+            return;
+          }
           finished = true;
           tx.resolve();
+          txResolved = true;
           executePromise.reject(error);
           console.error("Error occurred:");
           console.error(error);
@@ -741,6 +752,7 @@ ${duration}
           if (rows.length < batchFetchSize) {
             finished = true;
             tx.resolve();
+            txResolved = true;
           }
           for (let i = 0, l = rows.length; i < l; i++) {
             const result = rows[i];
@@ -775,32 +787,51 @@ ${duration}
         await execute<TOutput>(declareCursorSQL, sqlValues);
 
         // Ensure we release the cursor now we've registered it.
-        try {
-          fetchNextBatch().then(null, handleFetchError);
-          batch.forEach(({ resultIndex }, batchIndex) => {
-            streams[resultIndex] = (async function* () {
-              try {
-                for (;;) {
-                  yield await getNext(batchIndex);
-                }
-              } catch (e) {
-                if (e === $$FINISHED) {
-                  return;
-                } else {
-                  throw e;
-                }
-              }
-            })();
-          });
-        } finally {
+        fetchNextBatch().then(null, handleFetchError);
+        function releaseCursor() {
           // Release the cursor
-          await execute(releaseCursorSQL, []);
+          if (!txResolved) {
+            (async () => {
+              // This also closes the cursor
+              try {
+                await execute(releaseCursorSQL, []);
+              } finally {
+                tx.resolve();
+                txResolved = true;
+              }
+            })().catch((e) => {
+              console.error(`Error occurred whilst closing cursor: ${e}`);
+            });
+          }
         }
+        // IMPORTANT: must *NOT* throw between here and the try block in the callback below
+        let remainingBatches = batch.length;
+        batch.forEach(({ resultIndex }, batchIndex) => {
+          streams[resultIndex] = (async function* () {
+            try {
+              for (;;) {
+                yield await getNext(batchIndex);
+              }
+            } catch (e) {
+              if (e === $$FINISHED) {
+                return;
+              } else {
+                throw e;
+              }
+            } finally {
+              remainingBatches--;
+              if (remainingBatches === 0) {
+                releaseCursor();
+              }
+            }
+          })();
+        });
       })();
       promise.then(null, (e) => {
         console.error("UNEXPECTED ERROR!");
         console.error(e);
         tx.resolve();
+        txResolved = true;
         batch.forEach(({ resultIndex }) => {
           const stream = streams[resultIndex];
           if (isAsyncIterable(stream)) {
