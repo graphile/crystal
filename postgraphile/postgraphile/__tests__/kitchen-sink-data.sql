@@ -120,7 +120,7 @@ insert into a.post (id, author_id, headline) values
   (10, 2, 'What’s with you kids? Every other day it’s food, food, food.'),
   (11, 3, 'They’re not aliens, they’re Earth…liens!');
 
-insert into post(id, headline, author_id)
+insert into a.post(id, headline, author_id)
   select i, 'Post ' || i::text, 6
   from generate_series(1000, 2000) i;
 

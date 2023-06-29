@@ -429,7 +429,7 @@
   },
   j: {
     post: {
-      id: 12,
+      id: 1000000,
       headline: "super headline",
       comptypes: [
         {
@@ -449,7 +449,7 @@
   },
   k: {
     post: {
-      id: 13,
+      id: 1000001,
       headline: "super headline 2",
       comptypes: [
         {
@@ -476,7 +476,7 @@
     },
     postEdge: {
       node: {
-        id: 13,
+        id: 1000001,
         headline: "super headline 2",
         comptypes: [
           {
