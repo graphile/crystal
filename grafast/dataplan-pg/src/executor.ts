@@ -588,6 +588,7 @@ ${duration}
     for (const [context, batch] of groupMap.entries()) {
       const tx = defer();
       let txResolved = false;
+      let cursorOpen = false;
       const promise = (async () => {
         const batchIndexesByIdentifiersJSON = new Map<string, number[]>();
 
@@ -723,6 +724,7 @@ ${duration}
           finished = true;
           tx.resolve();
           txResolved = true;
+          cursorOpen = false;
           executePromise.reject(error);
           console.error("Error occurred:");
           console.error(error);
@@ -750,9 +752,7 @@ ${duration}
           const queryResult = await execute<TOutput>(pullViaCursorSQL, []);
           const { rows } = queryResult;
           if (rows.length < batchFetchSize) {
-            finished = true;
-            tx.resolve();
-            txResolved = true;
+            releaseCursor();
           }
           for (let i = 0, l = rows.length; i < l; i++) {
             const result = rows[i];
@@ -784,20 +784,26 @@ ${duration}
         };
 
         // Registers the cursor
+        cursorOpen = true;
         await execute<TOutput>(declareCursorSQL, sqlValues);
 
         // Ensure we release the cursor now we've registered it.
         fetchNextBatch().then(null, handleFetchError);
         function releaseCursor() {
-          // Release the cursor
-          if (!txResolved) {
+          finished = true;
+          if (cursorOpen) {
+            cursorOpen = false;
+            // Release the cursor
             (async () => {
               // This also closes the cursor
               try {
                 await execute(releaseCursorSQL, []);
               } finally {
-                tx.resolve();
-                txResolved = true;
+                if (!txResolved) {
+                  tx.resolve();
+                  txResolved = true;
+                  cursorOpen = false;
+                }
               }
             })().catch((e) => {
               console.error(`Error occurred whilst closing cursor: ${e}`);
@@ -832,6 +838,7 @@ ${duration}
         console.error(e);
         tx.resolve();
         txResolved = true;
+        cursorOpen = false;
         batch.forEach(({ resultIndex }) => {
           const stream = streams[resultIndex];
           if (isAsyncIterable(stream)) {
