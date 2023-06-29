@@ -89,7 +89,7 @@ export interface SubsequentStreamSpec {
   bucketIndex: number;
   outputPlan: OutputPlan;
   label: string | undefined;
-  stream: AsyncIterableIterator<any>;
+  stream: AsyncIterator<any> | Iterator<any>;
   startIndex: number;
 }
 

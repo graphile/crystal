@@ -846,7 +846,7 @@ async function processStream(
   try {
     // TODO: need to unwrap this and loop manually so it's abortable
     let payloadIndex = spec.startIndex;
-    let nextValuePromise: Promise<IteratorResult<any, any>>;
+    let nextValuePromise: PromiseOrDirect<IteratorResult<any, any>>;
     while ((nextValuePromise = spec.stream.next())) {
       const iteratorResult = await nextValuePromise;
       if (iteratorResult.done) {
