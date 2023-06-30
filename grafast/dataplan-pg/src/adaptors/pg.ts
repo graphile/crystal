@@ -438,11 +438,11 @@ export class PgSubscriber<
     const { eventEmitter, topics } = this;
     const stack: any[] = [];
     const queue: Deferred<any>[] = [];
-    let finished: IteratorReturnResult<undefined> | false = false;
+    let finished: IteratorReturnResult<any> | false = false;
 
-    function doFinally() {
+    function doFinally(value?: any) {
       if (!finished) {
-        finished = { done: true, value: undefined };
+        finished = { done: true, value };
         if (queue) {
           const promises = queue.splice(0, queue.length);
           promises.forEach((p) => p.resolve(finished));
@@ -482,7 +482,7 @@ export class PgSubscriber<
         }
       },
       async return(value) {
-        return doFinally();
+        return doFinally(value);
       },
       async throw() {
         return doFinally();

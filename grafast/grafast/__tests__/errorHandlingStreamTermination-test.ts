@@ -3,11 +3,12 @@ import { expect } from "chai";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import { isAsyncIterable, PromiseOrDirect } from "../dist/index.js";
+import type { PromiseOrDirect } from "../dist/index.js";
 import {
   constant,
   ExecutableStep,
   grafast,
+  isAsyncIterable,
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";

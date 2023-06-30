@@ -54,7 +54,6 @@ import {
   assertFinalized,
   isListCapableStep,
   isPolymorphicStep,
-  isStreamableStep,
   isUnbatchedExecutableStep,
 } from "../step.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
