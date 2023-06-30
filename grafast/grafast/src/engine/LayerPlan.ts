@@ -376,6 +376,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       this.reason.type === "mutationField"
         ? (parentBucket.polymorphicPathList as string[])
         : [];
+    const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> =
+      this.reason.type === "mutationField" ? parentBucket.iterators : [];
     const map: Map<number, number | number[]> = new Map();
     let size = 0;
     switch (this.reason.type) {
@@ -413,6 +415,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             map.set(originalIndex, newIndex);
             polymorphicPathList[newIndex] =
               parentBucket.polymorphicPathList[originalIndex];
+            iterators[newIndex] = parentBucket.iterators[originalIndex];
           }
         } else {
           const itemStepIdList: any[] = [];
@@ -440,6 +443,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
+              iterators[newIndex] = parentBucket.iterators[originalIndex];
               for (const planId of copyStepIds) {
                 store.get(planId)![newIndex] =
                   parentBucket.store.get(planId)![originalIndex];
@@ -493,6 +497,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
+              iterators[newIndex] = parentBucket.iterators[originalIndex];
               for (const planId of copyStepIds) {
                 store.get(planId)![newIndex] =
                   parentBucket.store.get(planId)![originalIndex];
@@ -569,6 +574,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             typeName;
 
           polymorphicPathList[newIndex] = newPolymorphicPath;
+          iterators[newIndex] = parentBucket.iterators[originalIndex];
           for (const planId of copyStepIds) {
             store.get(planId)![newIndex] =
               parentBucket.store.get(planId)![originalIndex];
@@ -613,6 +619,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
           hasErrors: parentBucket.hasErrors,
           polymorphicPathList,
+          iterators,
         },
         parentBucket.metaByMetaKey,
       );
@@ -638,6 +645,7 @@ const makingNewBucketCallbacks = new Map<
   Array<(factory: Factory) => void>
 >();
 const te_parentBucketDotPolymorphicPathList = te`parentBucket.polymorphicPathList`;
+const te_parentBucketDotIterators = te`parentBucket.iterators`;
 const te_emptyArray = te`[]`;
 const ref_newBucket = te.ref(newBucket, "newBucket");
 
@@ -654,6 +662,9 @@ function makeNewBucketExpression(
       ? te_parentBucketDotPolymorphicPathList
       : te_emptyArray
   };
+  const iterators = ${
+    reasonType === "mutationField" ? te_parentBucketDotIterators : te_emptyArray
+  };
   const map = new Map();
   let size = 0;
 
@@ -668,6 +679,7 @@ ${inner}
       // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
       hasErrors: parentBucket.hasErrors,
       polymorphicPathList,
+      iterators,
     }, parentBucket.metaByMetaKey);
     // PERF: set ourselves in more places so that we never have to call 'getChildBucketAndIndex'.
     parentBucket.children[this.id] = { bucket: childBucket, map };
@@ -737,6 +749,7 @@ ${te.join(blocks, "")}
       itemStepIdList[newIndex] = fieldValue;
 
       polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
+      iterators[newIndex] = parentBucket.iterators[originalIndex];
 ${te.join(copyBlocks, "")}
     }
   }
@@ -789,6 +802,7 @@ ${te.join(copyBlocks, "")}
         itemStepIdList[newIndex] = list[j];
 
         polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
+        iterators[newIndex] = parentBucket.iterators[originalIndex];
         ${te.join(copyBlocks, "")}
       }
     }

@@ -280,6 +280,11 @@ export function executeBucket(
           // payload (and all its streamed/deferred children) are complete
           // before processing the next subscription event.
 
+          if (!bucket.iterators[resultIndex]) {
+            bucket.iterators[resultIndex] = new Set();
+          }
+          bucket.iterators[resultIndex]!.add(iterator);
+
           if (initialCount === 0) {
             // Optimization - defer everything
             const arr: StreamMaybeMoreableArray<any> = [];
@@ -814,7 +819,12 @@ export function executeBucket(
 export function newBucket(
   spec: Pick<
     Bucket,
-    "layerPlan" | "store" | "size" | "hasErrors" | "polymorphicPathList"
+    | "layerPlan"
+    | "store"
+    | "size"
+    | "hasErrors"
+    | "polymorphicPathList"
+    | "iterators"
   >,
   parentMetaByMetaKey: MetaByMetaKey | null,
 ): Bucket {
@@ -851,6 +861,9 @@ export function newBucket(
         `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should have same length as bucket`,
       );
     }
+    if (!spec.iterators) {
+      throw new Error(`newBucket called but no iterators array was specified`);
+    }
   }
   const type = spec.layerPlan.reason.type;
   const metaByMetaKey =
@@ -868,6 +881,7 @@ export function newBucket(
     size: spec.size,
     hasErrors: spec.hasErrors,
     polymorphicPathList: spec.polymorphicPathList,
+    iterators: spec.iterators,
     metaByMetaKey,
 
     isComplete: false,
