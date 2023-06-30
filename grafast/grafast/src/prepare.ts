@@ -444,7 +444,8 @@ function executePreemptive(
       Array.isArray(bucketRootValue) &&
       (bucketRootValue as StreamMaybeMoreableArray)[$$streamMore]
     ) {
-      releaseUnusedIterators(rootBucket, rootBucketIndex, null);
+      // We expect exactly one streamable, we should not need to
+      // `releaseUnusedIterators(rootBucket, rootBucketIndex, null)` here.
       const arr = bucketRootValue as StreamMoreableArray;
       const stream = arr[$$streamMore];
       // Do the async iterable
