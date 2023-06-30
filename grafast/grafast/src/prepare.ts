@@ -248,7 +248,7 @@ function outputBucket(
   }
 }
 
-export function executePreemptive(
+function executePreemptive(
   operationPlan: OperationPlan,
   variableValues: any,
   context: any,
@@ -329,7 +329,7 @@ export function executePreemptive(
         store,
         hasErrors: rootBucket.hasErrors,
         polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
-        size: 1,
+        size: 1, //store.size
       },
       rootBucket.metaByMetaKey,
     );
@@ -366,7 +366,7 @@ export function executePreemptive(
       rootBucket.layerPlan.rootStep!.id != null
         ? rootBucket.store.get(rootBucket.layerPlan.rootStep!.id)
         : null;
-    const bucketRootValue = rootValueList?.[0];
+    const bucketRootValue = rootValueList?.[bucketIndex];
     if (isGrafastError(bucketRootValue)) {
       // Something major went wrong!
       const errors = [
