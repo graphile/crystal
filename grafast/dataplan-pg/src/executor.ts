@@ -673,11 +673,11 @@ ${duration}
         // eslint-disable-next-line no-inner-declarations
         function getNext(batchIndex: number): PromiseLike<any> {
           if (pending[batchIndex].length > 0) {
+            const value = pending[batchIndex].shift();
             valuesPending--;
             if (valuesPending < batchFetchSize && !fetching) {
               fetchNextBatch().then(null, handleFetchError);
             }
-            const value = pending[batchIndex].shift();
             if (value instanceof Wrapped) {
               return Promise.reject(value.originalValue);
             } else {
