@@ -438,23 +438,28 @@ export class PgSubscriber<
     const { eventEmitter, topics } = this;
     const stack: any[] = [];
     const queue: Deferred<any>[] = [];
+    let finished: IteratorReturnResult<undefined> | false = false;
 
     function doFinally() {
-      if (queue) {
-        const promises = queue.splice(0, queue.length);
-        promises.forEach((p) => p.reject(new Error("Terminated")));
-      }
-      eventEmitter.removeListener(topic as string, recv);
-      // Every code path above this has to go through a `yield` and thus
-      // `asyncIterableIterator` will definitely be defined.
-      const idx = topics[topic]?.indexOf(asyncIterableIterator);
-      if (idx != null && idx >= 0) {
-        topics[topic]!.splice(idx, 1);
-        if (topics[topic]!.length === 0) {
-          delete topics[topic];
-          that.unlisten(topic);
+      if (!finished) {
+        finished = { done: true, value: undefined };
+        if (queue) {
+          const promises = queue.splice(0, queue.length);
+          promises.forEach((p) => p.resolve(finished));
+        }
+        eventEmitter.removeListener(topic as string, recv);
+        // Every code path above this has to go through a `yield` and thus
+        // `asyncIterableIterator` will definitely be defined.
+        const idx = topics[topic]?.indexOf(asyncIterableIterator);
+        if (idx != null && idx >= 0) {
+          topics[topic]!.splice(idx, 1);
+          if (topics[topic]!.length === 0) {
+            delete topics[topic];
+            that.unlisten(topic);
+          }
         }
       }
+      return finished;
     }
 
     const asyncIterableIterator: AsyncIterableIterator<any> = {
@@ -465,6 +470,8 @@ export class PgSubscriber<
         if (stack.length > 0) {
           const value = await stack.shift();
           return { done: false, value };
+        } else if (finished) {
+          return finished;
         } else {
           // This must be done synchronously - there must be **NO AWAIT BEFORE THIS**
           const waiting = defer();
@@ -475,12 +482,10 @@ export class PgSubscriber<
         }
       },
       async return(value) {
-        doFinally();
-        return { done: true, value: value };
+        return doFinally();
       },
       async throw() {
-        doFinally();
-        return { done: true, value: undefined };
+        return doFinally();
       },
     };
 
