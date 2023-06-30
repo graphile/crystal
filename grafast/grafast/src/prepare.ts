@@ -72,7 +72,8 @@ const bypassGraphQLObj = Object.assign(Object.create(null), {
 function noop() {}
 
 function processRoot(
-  ctx: OutputPlanContext,
+  // errors should already have been handled, and this ctx isn't suitable to be reused.
+  ctx: Omit<OutputPlanContext, "errors">,
   iterator: ResultIterator,
   outputDataAsString: boolean,
 ): PromiseOrDirect<void> {
@@ -150,6 +151,7 @@ const finalize = (
       if (isPromiseLike(promise)) {
         promise.then(
           () => {
+            // FIXME: below factors in outputDataAsString, but this does not. Is that deliberate?!
             iterator.push({ hasNext: false });
             iterator.return(undefined);
           },
@@ -311,7 +313,7 @@ function executePreemptive(
     const layerPlan = subscriptionLayerPlan!;
     // PERF: we could consider batching this.
     const store: Bucket["store"] = new Map();
-    const newBucketIndex = 0;
+    const subscriptionBucketIndex = 0;
 
     for (const depId of layerPlan.copyStepIds) {
       store.set(depId, []);
@@ -319,7 +321,7 @@ function executePreemptive(
 
     store.set(layerPlan.rootStep!.id, [payload]);
     for (const depId of layerPlan.copyStepIds) {
-      store.get(depId)![newBucketIndex] =
+      store.get(depId)![subscriptionBucketIndex] =
         rootBucket.store.get(depId)![bucketIndex];
     }
 
@@ -338,7 +340,7 @@ function executePreemptive(
       const [ctx, result] = outputBucket(
         operationPlan.rootOutputPlan,
         subscriptionBucket,
-        newBucketIndex,
+        subscriptionBucketIndex,
         requestContext,
         [],
         rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
@@ -686,7 +688,6 @@ async function processStream(
 
   let queue: null | ResultTuple[] = null;
   let timeout: NodeJS.Timer | null = null;
-  timeout;
 
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
