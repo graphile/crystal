@@ -26,29 +26,54 @@
       "default": "./dist/presets/v4.js"
     },
     "./@dataplan/pg": {
-      "types": "./fwd/@dataplan/pg.d.ts",
-      "node": "./fwd/@dataplan/pg.js",
-      "default": "./fwd/@dataplan/pg.js"
+      "types": "./fwd/@dataplan/pg/index.d.ts",
+      "node": "./fwd/@dataplan/pg/index.js",
+      "default": "./fwd/@dataplan/pg/index.js"
     },
     "./adaptors/pg": {
-      "types": "./fwd/@dataplan/pg/adaptors/pg.d.ts",
-      "node": "./fwd/@dataplan/pg/adaptors/pg.js",
-      "default": "./fwd/@dataplan/pg/adaptors/pg.js"
+      "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
+      "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
+      "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
     },
     "./grafast": {
-      "types": "./fwd/grafast.d.ts",
-      "node": "./fwd/grafast.js",
-      "default": "./fwd/grafast.js"
+      "types": "./fwd/grafast/index.d.ts",
+      "node": "./fwd/grafast/index.js",
+      "default": "./fwd/grafast/index.js"
     },
     "./grafserv": {
-      "types": "./fwd/grafserv.d.ts",
-      "node": "./fwd/grafserv.js",
-      "default": "./fwd/grafserv.js"
+      "types": "./fwd/grafserv/index.d.ts",
+      "node": "./fwd/grafserv/index.js",
+      "default": "./fwd/grafserv/index.js"
     },
     "./grafserv/node": {
-      "types": "./fwd/grafserv.d.ts",
-      "node": "./fwd/grafserv.js",
-      "default": "./fwd/grafserv.js"
+      "types": "./fwd/grafserv/node/index.d.ts",
+      "node": "./fwd/grafserv/node/index.js",
+      "default": "./fwd/grafserv/node/index.js"
+    },
+    "./@dataplan/pg/adaptors/pg": {
+      "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
+      "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
+      "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
+    },
+    "./grafast/envelop": {
+      "types": "./fwd/grafast/envelop/index.d.ts",
+      "node": "./fwd/grafast/envelop/index.js",
+      "default": "./fwd/grafast/envelop/index.js"
+    },
+    "./grafserv/express/v4": {
+      "types": "./fwd/grafserv/express/v4/index.d.ts",
+      "node": "./fwd/grafserv/express/v4/index.js",
+      "default": "./fwd/grafserv/express/v4/index.js"
+    },
+    "./grafserv/koa/v2": {
+      "types": "./fwd/grafserv/koa/v2/index.d.ts",
+      "node": "./fwd/grafserv/koa/v2/index.js",
+      "default": "./fwd/grafserv/koa/v2/index.js"
+    },
+    "./grafserv/fastify/v4": {
+      "types": "./fwd/grafserv/fastify/v4/index.d.ts",
+      "node": "./fwd/grafserv/fastify/v4/index.js",
+      "default": "./fwd/grafserv/fastify/v4/index.js"
     }
   },
   "bin": "./dist/cli-run.js",

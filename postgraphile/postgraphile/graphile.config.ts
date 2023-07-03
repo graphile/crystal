@@ -1,9 +1,9 @@
 /* eslint-disable import/no-unresolved */
 import { jsonParse } from "@dataplan/json";
-import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { makePgService } from "postgraphile/adaptors/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { context, listen, object } from "grafast";
-import type {} from "grafserv/node";
+import type {} from "postgraphile/grafserv/node";
 import { StreamDeferPlugin } from "graphile-build";
 import { EXPORTABLE, exportSchema } from "graphile-export";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
