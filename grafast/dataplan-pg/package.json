@@ -67,6 +67,7 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
+    "@dataplan/json": "workspace:^",
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",

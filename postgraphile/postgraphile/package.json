@@ -126,6 +126,7 @@
   },
   "homepage": "https://graphile.org/graphile-engine/",
   "dependencies": {
+    "@dataplan/json": "workspace:*",
     "@dataplan/pg": "workspace:*",
     "@graphile/lru": "workspace:^",
     "@types/node": "^18.15.5",
