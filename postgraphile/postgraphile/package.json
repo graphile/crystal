@@ -24,6 +24,31 @@
       "types": "./dist/presets/v4.d.ts",
       "node": "./dist/presets/v4.js",
       "default": "./dist/presets/v4.js"
+    },
+    "./@dataplan/pg": {
+      "types": "./fwd/@dataplan/pg.d.ts",
+      "node": "./fwd/@dataplan/pg.js",
+      "default": "./fwd/@dataplan/pg.js"
+    },
+    "./adaptors/pg": {
+      "types": "./fwd/@dataplan/pg/adaptors/pg.d.ts",
+      "node": "./fwd/@dataplan/pg/adaptors/pg.js",
+      "default": "./fwd/@dataplan/pg/adaptors/pg.js"
+    },
+    "./grafast": {
+      "types": "./fwd/grafast.d.ts",
+      "node": "./fwd/grafast.js",
+      "default": "./fwd/grafast.js"
+    },
+    "./grafserv": {
+      "types": "./fwd/grafserv.d.ts",
+      "node": "./fwd/grafserv.js",
+      "default": "./fwd/grafserv.js"
+    },
+    "./grafserv/node": {
+      "types": "./fwd/grafserv.d.ts",
+      "node": "./fwd/grafserv.js",
+      "default": "./fwd/grafserv.js"
     }
   },
   "bin": "./dist/cli-run.js",
@@ -80,6 +105,7 @@
   },
   "files": [
     "dist",
+    "fwd",
     "index.js"
   ],
   "devDependencies": {
