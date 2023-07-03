@@ -74,6 +74,26 @@
       "types": "./fwd/grafserv/fastify/v4/index.d.ts",
       "node": "./fwd/grafserv/fastify/v4/index.js",
       "default": "./fwd/grafserv/fastify/v4/index.js"
+    },
+    "./graphile-build": {
+      "types": "./fwd/graphile-build/index.d.ts",
+      "node": "./fwd/graphile-build/index.js",
+      "default": "./fwd/graphile-build/index.js"
+    },
+    "./graphile-build-pg": {
+      "types": "./fwd/graphile-build-pg/index.d.ts",
+      "node": "./fwd/graphile-build-pg/index.js",
+      "default": "./fwd/graphile-build-pg/index.js"
+    },
+    "./@dataplan/json": {
+      "types": "./fwd/@dataplan/json/index.d.ts",
+      "node": "./fwd/@dataplan/json/index.js",
+      "default": "./fwd/@dataplan/json/index.js"
+    },
+    "./graphql": {
+      "types": "./fwd/graphql/index.d.ts",
+      "node": "./fwd/graphql/index.js",
+      "default": "./fwd/graphql/index.js"
     }
   },
   "bin": "./dist/cli-run.js",

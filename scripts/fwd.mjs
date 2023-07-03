@@ -9,10 +9,14 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(
 
 const todo = {
   postgraphile: {
+    "@dataplan/json": true,
     "@dataplan/pg": true,
     "@dataplan/pg/adaptors/pg": "./adaptors/pg",
     grafast: true,
     grafserv: true,
+    "graphile-build": true,
+    "graphile-build-pg": true,
+    graphql: true,
   },
 };
 
@@ -50,14 +54,12 @@ async function mkdirp(path) {
 
 async function makeFwd(rootPath, target) {
   const fwdDir = `${rootPath}/fwd/${target}`;
-  console.log({ fwdDir, path: `${fwdDir}/index.d.ts` });
   await mkdirp(fwdDir);
   const obj = {
     types: `./fwd/${target}/index.d.ts`,
     node: `./fwd/${target}/index.js`,
     default: `./fwd/${target}/index.js`,
   };
-  console.log({ obj });
   await fs.writeFile(
     `${fwdDir}/index.d.ts`,
     `\
@@ -77,7 +79,6 @@ async function main() {
   for (const packageName in todo) {
     const packageTodo = todo[packageName];
     const rootPath = `${__dirname}/../node_modules/${packageName}`;
-    console.log({ packageName, rootPath });
     const packageJson = await loadJSON(`${rootPath}/package.json`);
     for (const target in packageTodo) {
       const spec = packageTodo[target];
@@ -86,13 +87,19 @@ async function main() {
         const targetPackageJson = await loadJSON(
           `${__dirname}/../node_modules/${target}/package.json`,
         );
-        console.log({ packageName, rootPath, target, spec });
-        for (const targetExportName in targetPackageJson.exports) {
-          // Trim the ./
-          const subpath = targetExportName.slice(2);
-          const exportName = `./${target}${subpath ? "/" + subpath : ""}`;
-          const thisTarget = `${target}${subpath ? "/" + subpath : ""}`;
-          packageJson.exports[exportName] = await makeFwd(rootPath, thisTarget);
+        if (targetPackageJson.exports) {
+          for (const targetExportName in targetPackageJson.exports) {
+            // Trim the ./
+            const subpath = targetExportName.slice(2);
+            const exportName = `./${target}${subpath ? "/" + subpath : ""}`;
+            const thisTarget = `${target}${subpath ? "/" + subpath : ""}`;
+            packageJson.exports[exportName] = await makeFwd(
+              rootPath,
+              thisTarget,
+            );
+          }
+        } else {
+          packageJson.exports[`./${target}`] = await makeFwd(rootPath, target);
         }
       } else {
         // Direct
@@ -104,6 +111,7 @@ async function main() {
       JSON.stringify(packageJson, null, 2) + "\n",
     );
   }
+  console.log("Done");
 }
 
 main().catch((e) => {
