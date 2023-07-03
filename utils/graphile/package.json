@@ -38,7 +38,7 @@
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
-    "graphile-config": "workspace:^",
+    "graphile-config": "workspace:^"
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
