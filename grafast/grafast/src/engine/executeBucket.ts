@@ -264,22 +264,19 @@ export function executeBucket(
           finishedStep._stepOptions.stream &&
           ((valueIsAsyncIterable = isAsyncIterable(value)) || isIterable(value))
         ) {
-          const iterator = valueIsAsyncIterable
-            ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
-            : (value as Iterable<any>)[Symbol.iterator]();
-
           const streamOptions = finishedStep._stepOptions.stream;
           const initialCount: number = streamOptions
             ? streamOptions.initialCount
             : Infinity;
 
-          // FIXME: potential memory leak; need to ensure that iterator is
-          // terminated even if the stream is never consumed (e.g. if something
-          // else errors). For query/mutation we can do this when operation
-          // completes, for subscription we should do it after each individual
-          // payload (and all its streamed/deferred children) are complete
-          // before processing the next subscription event.
+          const iterator = valueIsAsyncIterable
+            ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
+            : (value as Iterable<any>)[Symbol.iterator]();
 
+          // Here we track the iterator via the bucket, this allows us to
+          // ensure that the iterator is terminated even if the stream is never
+          // consumed (e.g. if an error is thrown/caught during execution of
+          // the output plan).
           if (!bucket.iterators[resultIndex]) {
             bucket.iterators[resultIndex] = new Set();
           }
