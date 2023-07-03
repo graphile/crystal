@@ -146,6 +146,14 @@
     "tslib": "^2.5.0",
     "ws": "^8.12.1"
   },
+  "peerDependencies": {
+    "@envelop/core": "^3.0.4"
+  },
+  "peerDependenciesMeta": {
+    "@envelop/core": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": ">=16"
   },
