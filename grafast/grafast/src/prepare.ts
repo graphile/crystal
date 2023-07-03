@@ -30,6 +30,8 @@ import type {
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
+  StreamMaybeMoreableArray,
+  StreamMoreableArray,
 } from "./interfaces.js";
 import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
@@ -70,7 +72,8 @@ const bypassGraphQLObj = Object.assign(Object.create(null), {
 function noop() {}
 
 function processRoot(
-  ctx: OutputPlanContext,
+  // errors should already have been handled, and this ctx isn't suitable to be reused.
+  ctx: Omit<OutputPlanContext, "errors">,
   iterator: ResultIterator,
   outputDataAsString: boolean,
 ): PromiseOrDirect<void> {
@@ -103,6 +106,45 @@ function processRoot(
   // Terminate the iterator when we're done
   if (promises.length !== 0) {
     return Promise.all(promises).then(noop);
+  }
+}
+
+function releaseUnusedIterators(
+  bucket: Bucket,
+  bucketIndex: number,
+  streams: SubsequentStreamSpec[] | null,
+) {
+  const allStreams = bucket.iterators[bucketIndex];
+  if (!allStreams) {
+    if (streams && streams.length > 0) {
+      console.error(
+        `GrafastInternalError<c3f57a2b-159d-49a9-924b-8e753696de06>: Untracked stream detected!`,
+      );
+    }
+    return;
+  }
+  if (streams) {
+    for (const streamSpec of streams) {
+      const { stream } = streamSpec;
+      if (!allStreams.delete(stream)) {
+        console.error(
+          `GrafastInternalError<1e43efdf-f901-43dd-8a82-768246e61478>: Stream was returned from an output plan, but that stream wasn't tracked via the bucket.`,
+        );
+      }
+    }
+  }
+  if (allStreams.size > 0) {
+    for (const stream of allStreams) {
+      if (stream.return) {
+        stream.return();
+      } else if (stream.throw) {
+        stream.throw(
+          new Error(
+            `Iterator no longer needed (due to OutputPlan branch being skipped)`,
+          ),
+        );
+      }
+    }
   }
 }
 
@@ -148,6 +190,7 @@ const finalize = (
       if (isPromiseLike(promise)) {
         promise.then(
           () => {
+            // FIXME: below factors in outputDataAsString, but this does not. Is that deliberate?!
             iterator.push({ hasNext: false });
             iterator.return(undefined);
           },
@@ -243,10 +286,12 @@ function outputBucket(
     );
     ctx.root.errors.push(error);
     return [ctx, null];
+  } finally {
+    releaseUnusedIterators(rootBucket, rootBucketIndex, ctx.root.streams);
   }
 }
 
-export function executePreemptive(
+function executePreemptive(
   operationPlan: OperationPlan,
   variableValues: any,
   context: any,
@@ -258,8 +303,8 @@ export function executePreemptive(
 > {
   // PERF: batch this method so it can process multiple GraphQL requests in parallel
 
-  // TODO: when we batch, we need to change `bucketIndex` and `size`, and make sure that we only batch where `executionTimeout` is the same.
-  const bucketIndex = 0;
+  // TODO: when we batch, we need to change `rootBucketIndex` and `size`, and make sure that we only batch where `executionTimeout` is the same.
+  const rootBucketIndex = 0;
   const size = 1;
 
   const requestIndex = [0];
@@ -267,6 +312,7 @@ export function executePreemptive(
   const ctxs = [context];
   const rvs = [rootValue];
   const polymorphicPathList = [POLYMORPHIC_ROOT_PATH];
+  const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [new Set()];
 
   const store: Bucket["store"] = new Map();
   store.set(-1, requestIndex);
@@ -282,6 +328,7 @@ export function executePreemptive(
       store,
       hasErrors: false,
       polymorphicPathList,
+      iterators,
     },
     null,
   );
@@ -309,7 +356,7 @@ export function executePreemptive(
     const layerPlan = subscriptionLayerPlan!;
     // PERF: we could consider batching this.
     const store: Bucket["store"] = new Map();
-    const newBucketIndex = 0;
+    const subscriptionBucketIndex = 0;
 
     for (const depId of layerPlan.copyStepIds) {
       store.set(depId, []);
@@ -317,8 +364,8 @@ export function executePreemptive(
 
     store.set(layerPlan.rootStep!.id, [payload]);
     for (const depId of layerPlan.copyStepIds) {
-      store.get(depId)![newBucketIndex] =
-        rootBucket.store.get(depId)![bucketIndex];
+      store.get(depId)![subscriptionBucketIndex] =
+        rootBucket.store.get(depId)![rootBucketIndex];
     }
 
     const subscriptionBucket = newBucket(
@@ -327,7 +374,8 @@ export function executePreemptive(
         store,
         hasErrors: rootBucket.hasErrors,
         polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
-        size: 1,
+        iterators: [new Set()],
+        size: 1, //store.size
       },
       rootBucket.metaByMetaKey,
     );
@@ -336,10 +384,12 @@ export function executePreemptive(
       const [ctx, result] = outputBucket(
         operationPlan.rootOutputPlan,
         subscriptionBucket,
-        newBucketIndex,
+        subscriptionBucketIndex,
         requestContext,
         [],
-        rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
+        rootBucket.store.get(operationPlan.variableValuesStep.id)![
+          rootBucketIndex
+        ],
         outputDataAsString,
       );
       return finalize(
@@ -364,8 +414,9 @@ export function executePreemptive(
       rootBucket.layerPlan.rootStep!.id != null
         ? rootBucket.store.get(rootBucket.layerPlan.rootStep!.id)
         : null;
-    const bucketRootValue = rootValueList?.[0];
+    const bucketRootValue = rootValueList?.[rootBucketIndex];
     if (isGrafastError(bucketRootValue)) {
+      releaseUnusedIterators(rootBucket, rootBucketIndex, null);
       // Something major went wrong!
       const errors = [
         new GraphQLError(
@@ -391,11 +442,12 @@ export function executePreemptive(
       bucketRootValue != null &&
       subscriptionLayerPlan != null &&
       Array.isArray(bucketRootValue) &&
-      $$streamMore in bucketRootValue
+      (bucketRootValue as StreamMaybeMoreableArray)[$$streamMore]
     ) {
-      const stream = (bucketRootValue[$$streamMore] as AsyncIterable<any>)[
-        Symbol.asyncIterator
-      ]();
+      // We expect exactly one streamable, we should not need to
+      // `releaseUnusedIterators(rootBucket, rootBucketIndex, null)` here.
+      const arr = bucketRootValue as StreamMoreableArray;
+      const stream = arr[$$streamMore];
       // Do the async iterable
       let stopped = false;
       const abort = defer<undefined>();
@@ -456,10 +508,12 @@ export function executePreemptive(
     const [ctx, result] = outputBucket(
       operationPlan.rootOutputPlan,
       rootBucket,
-      bucketIndex,
+      rootBucketIndex,
       requestContext,
       [],
-      rootBucket.store.get(operationPlan.variableValuesStep.id)![bucketIndex],
+      rootBucket.store.get(operationPlan.variableValuesStep.id)![
+        rootBucketIndex
+      ],
       outputDataAsString,
     );
     return finalize(
@@ -691,6 +745,7 @@ async function processStream(
     const size = entries.length;
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: (string | null)[] = [];
+    const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
 
     let directLayerPlanChild = spec.outputPlan.layerPlan;
     while (directLayerPlanChild.parentLayerPlan !== spec.bucket.layerPlan) {
@@ -718,6 +773,7 @@ async function processStream(
 
       polymorphicPathList[bucketIndex] =
         spec.bucket.polymorphicPathList[spec.bucketIndex];
+      iterators[bucketIndex] = new Set();
       for (const copyPlanId of directLayerPlanChild.copyStepIds) {
         const list = spec.bucket.store.get(copyPlanId);
         if (!list) {
@@ -740,13 +796,14 @@ async function processStream(
 
     // const childBucket = newBucket(directLayerPlanChild, noDepsList, store);
     // const childBucketIndex = 0;
-    const rootBucket: Bucket = newBucket(
+    const rootBucket = newBucket(
       {
         layerPlan: directLayerPlanChild,
         size,
         store,
         hasErrors: false,
         polymorphicPathList,
+        iterators,
       },
       spec.bucket.metaByMetaKey,
     );
@@ -845,7 +902,7 @@ async function processStream(
   try {
     // TODO: need to unwrap this and loop manually so it's abortable
     let payloadIndex = spec.startIndex;
-    let nextValuePromise: Promise<IteratorResult<any, any>>;
+    let nextValuePromise: PromiseOrDirect<IteratorResult<any, any>>;
     while ((nextValuePromise = spec.stream.next())) {
       const iteratorResult = await nextValuePromise;
       if (iteratorResult.done) {
@@ -874,6 +931,7 @@ function processSingleDeferred(
   const size = specs.length;
   const store: Bucket["store"] = new Map();
   const polymorphicPathList: (string | null)[] = [];
+  const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
 
   for (const copyPlanId of outputPlan.layerPlan.copyStepIds) {
     store.set(copyPlanId, []);
@@ -883,6 +941,7 @@ function processSingleDeferred(
   for (const [, spec] of specs) {
     polymorphicPathList[bucketIndex] =
       spec.bucket.polymorphicPathList[spec.bucketIndex];
+    iterators[bucketIndex] = new Set();
     for (const copyPlanId of outputPlan.layerPlan.copyStepIds) {
       store.get(copyPlanId)![bucketIndex] =
         spec.bucket.store.get(copyPlanId)![spec.bucketIndex];
@@ -906,6 +965,7 @@ function processSingleDeferred(
       store,
       hasErrors: false,
       polymorphicPathList,
+      iterators,
     },
     null,
   );

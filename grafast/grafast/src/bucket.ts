@@ -62,6 +62,17 @@ export interface Bucket {
    */
   polymorphicPathList: readonly (string | null)[];
 
+  // PERF: this is only required when stream is enabled (and only for buckets
+  // that may contain streamed things, directly or indirectly) - we should only
+  // set it in those cases.
+  /**
+   * These are the iterators the bucket (or its descendents, without crossing a
+   * stream/defer boundary) have created (if any). Each of these must either be
+   * processed via `processRoot`, or must be manually released (via
+   * `releaseUnusedIterators`) otherwise a memory leak could occur.
+   */
+  iterators: Array<Set<AsyncIterator<any> | Iterator<any>>>;
+
   /**
    * `metaByMetaKey` belongs to the bucket rather than the request context
    * because mutations and subscriptions shouldn't re-use caches.

@@ -209,6 +209,7 @@ export class __ListTransformStep<
 
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: (string | null)[] = [];
+    const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
     const map: Map<number, number[]> = new Map();
     let size = 0;
 
@@ -253,6 +254,9 @@ export class __ListTransformStep<
           newIndexes.push(newIndex);
           polymorphicPathList[newIndex] =
             bucket.polymorphicPathList[originalIndex];
+          // Copying across the iterators because we do NOT call outputBucket,
+          // so we need to ensure any streams are cleaned up.
+          iterators[newIndex] = bucket.iterators[originalIndex];
           store.get(itemStepId)![newIndex] = list[j];
           for (const planId of copyStepIds) {
             store.get(planId)![newIndex] =
@@ -270,6 +274,7 @@ export class __ListTransformStep<
           store,
           hasErrors: bucket.hasErrors,
           polymorphicPathList,
+          iterators,
         },
         bucket.metaByMetaKey,
       );

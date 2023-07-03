@@ -1,0 +1,18 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> simpleCollections: "both"
+#> subscriptions: true
+#> setupSql: "insert into a.post(id, headline, author_id) select i, 'Post ' || i::text, 1 from generate_series(1000, 2000) i;"
+#> cleanupSql: "delete from a.post where id >= 1000 and id <= 2000"
+{
+  allPeople(first: 1) {
+    nodes {
+      id
+      #throw
+      postsByAuthorIdList @stream(initialCount: 2) {
+        id
+        headline
+      }
+    }
+  }
+}

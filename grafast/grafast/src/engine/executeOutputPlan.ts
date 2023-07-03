@@ -89,7 +89,7 @@ export interface SubsequentStreamSpec {
   bucketIndex: number;
   outputPlan: OutputPlan;
   label: string | undefined;
-  stream: AsyncIterableIterator<any>;
+  stream: AsyncIterator<any> | Iterator<any>;
   startIndex: number;
 }
 
@@ -110,6 +110,7 @@ export function executeOutputPlan(
       "Can only process an output plan for a completed bucket",
     );
   }
+  // PERF: feels like this path could be done more efficiently
   const mutablePath = ["SOMEONE_FORGOT_TO_SLICE_THE_PATH!", ...ctx.path];
   return outputDataAsString
     ? outputPlan.executeString(ctx.root, mutablePath, bucket, bucketIndex)

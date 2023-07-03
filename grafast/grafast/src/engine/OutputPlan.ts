@@ -903,15 +903,19 @@ function makeExecuteChildPlanCode(
   } else {
     // Need to catch error and set null
     return te`\
-  try {
-    ${setTargetOrReturn} ${
+  {
+    const streamCount = root.streams.length;
+    const queueCount = root.queue.length;
+    try {
+      ${setTargetOrReturn} ${
       childBucket === te_bucket
         ? te.blank
         : te`${childBucket} == null ? ${asString ? te_nullString : te_null} : `
     }${te_childOutputPlanExecute};
-  } catch (e) {
-    ${te_commonErrorHandler}(e, ${locationDetails}, mutablePath, mutablePathIndex, root);
-    ${setTargetOrReturn} ${asString ? te_nullString : te_null};
+    } catch (e) {
+      ${te_commonErrorHandler}(e, ${locationDetails}, mutablePath, mutablePathIndex, root, streamCount, queueCount);
+      ${setTargetOrReturn} ${asString ? te_nullString : te_null};
+    }
   }`;
   }
 }
@@ -922,7 +926,15 @@ function commonErrorHandler(
   mutablePath: Array<string | number>,
   mutablePathIndex: number,
   root: PayloadRoot,
+  streamCount: number,
+  queueCount: number,
 ) {
+  if (root.streams.length > streamCount) {
+    root.streams.splice(streamCount);
+  }
+  if (root.queue.length > queueCount) {
+    root.queue.splice(queueCount);
+  }
   const error = coerceError(e, locationDetails, mutablePath.slice(1));
   const pathLengthTarget = mutablePathIndex + 1;
   const overSize = mutablePath.length - pathLengthTarget;

@@ -918,3 +918,10 @@ export type UnwrapPlanTuple</* const */ TIn extends readonly ExecutableStep[]> =
   } & { length: number };
 
 export type NotVariableValueNode = Exclude<ValueNode, VariableNode>;
+
+export type StreamMaybeMoreableArray<T = any> = Array<T> & {
+  [$$streamMore]?: AsyncIterator<any, any, any> | Iterator<any, any, any>;
+};
+export type StreamMoreableArray<T = any> = Array<T> & {
+  [$$streamMore]: AsyncIterator<any, any, any> | Iterator<any, any, any>;
+};

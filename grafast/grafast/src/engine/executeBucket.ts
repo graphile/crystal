@@ -16,6 +16,7 @@ import type {
   GrafastResultsList,
   GrafastResultStreamList,
   PromiseOrDirect,
+  StreamMaybeMoreableArray,
 } from "../interfaces.js";
 import { $$streamMore, $$timeout } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
@@ -74,10 +75,6 @@ function mergeErrorsBackIn(
   }
   return finalResults;
 }
-
-type StreamMoreableArray<T> = Array<T> & {
-  [$$streamMore]?: AsyncIterator<any, any, any>;
-};
 
 /** @internal */
 export function executeBucket(
@@ -258,30 +255,36 @@ export function executeBucket(
           value === null
         ) {
           finalResult[resultIndex] = value;
-        } else if (
-          // Detects async iterables (but excludes all the basic types
-          // like arrays, Maps, Sets, etc that are also iterables) and
-          // handles them specially.
-          isAsyncIterable(value) &&
-          !isIterable(value)
+          return;
+        }
+        let valueIsAsyncIterable;
+        if (
+          // Are we streaming this? If so, we need an iterable or async
+          // iterable.
+          finishedStep._stepOptions.stream &&
+          ((valueIsAsyncIterable = isAsyncIterable(value)) || isIterable(value))
         ) {
-          const iterator = value[Symbol.asyncIterator]();
-
           const streamOptions = finishedStep._stepOptions.stream;
           const initialCount: number = streamOptions
             ? streamOptions.initialCount
             : Infinity;
 
-          // FIXME: potential memory leak; need to ensure that iterator is
-          // terminated even if the stream is never consumed (e.g. if something
-          // else errors). For query/mutation we can do this when operation
-          // completes, for subscription we should do it after each individual
-          // payload (and all its streamed/deferred children) are complete
-          // before processing the next subscription event.
+          const iterator = valueIsAsyncIterable
+            ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
+            : (value as Iterable<any>)[Symbol.iterator]();
+
+          // Here we track the iterator via the bucket, this allows us to
+          // ensure that the iterator is terminated even if the stream is never
+          // consumed (e.g. if an error is thrown/caught during execution of
+          // the output plan).
+          if (!bucket.iterators[resultIndex]) {
+            bucket.iterators[resultIndex] = new Set();
+          }
+          bucket.iterators[resultIndex]!.add(iterator);
 
           if (initialCount === 0) {
             // Optimization - defer everything
-            const arr: StreamMoreableArray<any> = [];
+            const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
             finalResult[resultIndex] = arr;
           } else {
@@ -289,7 +292,7 @@ export function executeBucket(
             const promise = (async () => {
               try {
                 let valuesSeen = 0;
-                const arr: StreamMoreableArray<any> = [];
+                const arr: StreamMaybeMoreableArray<any> = [];
 
                 /*
                  * We need to "shift" a few entries off the top of the
@@ -298,7 +301,9 @@ export function executeBucket(
                  * looping
                  */
 
-                let resultPromise: Promise<IteratorResult<any, any>>;
+                let resultPromise:
+                  | Promise<IteratorResult<any, any>>
+                  | IteratorResult<any, any>;
                 while ((resultPromise = iterator.next())) {
                   const finalResult = await resultPromise;
                   if (finalResult.done) {
@@ -811,7 +816,12 @@ export function executeBucket(
 export function newBucket(
   spec: Pick<
     Bucket,
-    "layerPlan" | "store" | "size" | "hasErrors" | "polymorphicPathList"
+    | "layerPlan"
+    | "store"
+    | "size"
+    | "hasErrors"
+    | "polymorphicPathList"
+    | "iterators"
   >,
   parentMetaByMetaKey: MetaByMetaKey | null,
 ): Bucket {
@@ -848,6 +858,9 @@ export function newBucket(
         `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should have same length as bucket`,
       );
     }
+    if (!spec.iterators) {
+      throw new Error(`newBucket called but no iterators array was specified`);
+    }
   }
   const type = spec.layerPlan.reason.type;
   const metaByMetaKey =
@@ -865,6 +878,7 @@ export function newBucket(
     size: spec.size,
     hasErrors: spec.hasErrors,
     polymorphicPathList: spec.polymorphicPathList,
+    iterators: spec.iterators,
     metaByMetaKey,
 
     isComplete: false,

@@ -120,7 +120,7 @@ insert into a.post (id, author_id, headline) values
   (10, 2, 'What’s with you kids? Every other day it’s food, food, food.'),
   (11, 3, 'They’re not aliens, they’re Earth…liens!');
 
-alter sequence a.post_id_seq restart with 12;
+alter sequence a.post_id_seq restart with 1000000;
 
 insert into c.compound_key (person_id_1, person_id_2, extra) values
   (1, 2, null),

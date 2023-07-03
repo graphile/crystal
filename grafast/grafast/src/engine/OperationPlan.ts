@@ -54,7 +54,6 @@ import {
   assertFinalized,
   isListCapableStep,
   isPolymorphicStep,
-  isStreamableStep,
   isUnbatchedExecutableStep,
 } from "../step.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
@@ -782,9 +781,7 @@ export class OperationPlan {
         throw new SafeError("Failed to setup subscription");
       }
       const stepOptions: StepOptions = {
-        stream: isStreamableStep(subscribeStep as ExecutableStep)
-          ? { initialCount: 0 }
-          : null,
+        stream: { initialCount: 0 },
       };
       subscribeStep._stepOptions = stepOptions;
       this.rootLayerPlan.setRootStep(subscribeStep);
@@ -870,9 +867,7 @@ export class OperationPlan {
         },
       );
       const stepOptions: StepOptions = {
-        stream: isStreamableStep(subscribeStep as ExecutableStep)
-          ? { initialCount: 0 }
-          : null,
+        stream: { initialCount: 0 },
       };
       subscribeStep._stepOptions = stepOptions;
 
@@ -1787,9 +1782,7 @@ export class OperationPlan {
 
       const stepOptions: StepOptions = {
         stream:
-          !haltTree &&
-          streamDirective &&
-          isStreamableStep(step as ExecutableStep)
+          !haltTree && streamDirective
             ? {
                 initialCount:
                   Number(
