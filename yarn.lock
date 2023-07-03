@@ -2027,7 +2027,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dataplan/pg@workspace:*, @dataplan/pg@workspace:^, @dataplan/pg@workspace:grafast/dataplan-pg":
+"@dataplan/pg@workspace:*, @dataplan/pg@workspace:grafast/dataplan-pg":
   version: 0.0.0-use.local
   resolution: "@dataplan/pg@workspace:grafast/dataplan-pg"
   dependencies:
@@ -2043,7 +2043,6 @@ __metadata:
     debug: "npm:^4.3.3"
     eventemitter3: "npm:^4.0.7"
     glob: "npm:^7.2.0"
-    grafast: "workspace:^"
     grafserv: "workspace:*"
     graphile-export: "workspace:*"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
@@ -2066,6 +2065,7 @@ __metadata:
     webpack-node-externals: "npm:^3.0.0"
     zx: "npm:^7.0.8"
   peerDependencies:
+    grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg: ^8.7.1
@@ -2857,7 +2857,11 @@ __metadata:
   peerDependencies:
     grafast: "workspace:^"
     grafserv: "workspace:^"
+    graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
+  peerDependenciesMeta:
+    graphile-config:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -11772,6 +11776,7 @@ __metadata:
     typescript: "npm:^5.0.4"
   peerDependencies:
     grafast: "workspace:^"
+    graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     ws: ^8.12.1
   peerDependenciesMeta:
@@ -11791,7 +11796,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "graphile-build-pg@workspace:graphile-build/graphile-build-pg"
   dependencies:
-    "@dataplan/pg": "workspace:^"
     "@envelop/core": "npm:^2.0.0"
     "@envelop/parser-cache": "npm:^4.0.0"
     "@envelop/validation-cache": "npm:^4.0.0"
@@ -11806,8 +11810,6 @@ __metadata:
     express-graphql: "npm:^0.12.0"
     fastify: "npm:^3.27.2"
     fastify-static: "npm:^4.5.0"
-    grafast: "workspace:^"
-    graphile-build: "workspace:*"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
@@ -11825,6 +11827,10 @@ __metadata:
     typescript: "npm:^5.0.4"
     ws: "npm:^8.4.0"
   peerDependencies:
+    "@dataplan/pg": "workspace:^"
+    grafast: "workspace:^"
+    graphile-build: "workspace:*"
+    graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg: ^8.7.1
   peerDependenciesMeta:
@@ -11844,7 +11850,6 @@ __metadata:
     "@types/semver": "npm:^7.3.9"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.3"
-    grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
@@ -11856,6 +11861,8 @@ __metadata:
     tslib: "npm:^2.5.0"
     typescript: "npm:^5.0.4"
   peerDependencies:
+    grafast: "workspace:^"
+    graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
   linkType: soft
@@ -11932,6 +11939,7 @@ __metadata:
     grafast: "workspace:^"
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
+    graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg-introspection: "workspace:^"
   languageName: unknown
@@ -11950,6 +11958,8 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.5.0"
     typescript: "npm:^5.0.4"
+  peerDependencies:
+    graphile-config: "workspace:^"
   bin:
     graphile: dist/cli-run.js
   languageName: unknown
@@ -18673,6 +18683,7 @@ __metadata:
     webpack-cli: "npm:^4.9.2"
     yargs: "npm:^17.6.2"
   peerDependencies:
+    graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
   bin:
     ruru: ./dist/cli-run.js
