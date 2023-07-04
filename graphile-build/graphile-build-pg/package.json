@@ -57,9 +57,6 @@
     "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "graphile-config": {
-      "optional": true
-    },
     "pg": {
       "optional": true
     }
