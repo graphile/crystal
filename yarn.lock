@@ -2011,7 +2011,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dataplan/json@workspace:*, @dataplan/json@workspace:^, @dataplan/json@workspace:grafast/dataplan-json":
+"@dataplan/json@workspace:*, @dataplan/json@workspace:grafast/dataplan-json":
   version: 0.0.0-use.local
   resolution: "@dataplan/json@workspace:grafast/dataplan-json"
   dependencies:
@@ -2031,7 +2031,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dataplan/pg@workspace:grafast/dataplan-pg"
   dependencies:
-    "@dataplan/json": "workspace:^"
     "@graphile/lru": "workspace:^"
     "@mermaid-js/mermaid-cli": "npm:^8.14.0"
     "@types/jest": "npm:^27.5.1"
@@ -11820,9 +11819,7 @@ __metadata:
     jsonwebtoken: "npm:^8.5.1"
     pg: "npm:^8.7.1"
     pg-introspection: "workspace:^"
-    pg-sql2: "workspace:^"
     ruru: "workspace:^"
-    tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.5.0"
     typescript: "npm:^5.0.4"
@@ -11834,7 +11831,11 @@ __metadata:
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg: ^8.7.1
+    pg-sql2: "workspace:^"
+    tamedevil: "workspace:^"
   peerDependenciesMeta:
+    graphile-config:
+      optional: true
     pg:
       optional: true
   languageName: unknown
@@ -11943,6 +11944,13 @@ __metadata:
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg-introspection: "workspace:^"
+  peerDependenciesMeta:
+    graphile-build:
+      optional: true
+    graphile-build-pg:
+      optional: true
+    pg-introspection:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -17237,16 +17245,20 @@ __metadata:
     jsonwebtoken: "npm:^8.5.1"
     nodemon: "npm:^2.0.15"
     pg: "npm:^8.7.1"
-    pg-introspection: "workspace:^"
+    pg-sql2: "workspace:^"
     ruru: "workspace:^"
+    tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.5.0"
     typescript: "npm:^5.0.4"
     ws: "npm:^8.12.1"
   peerDependencies:
     "@envelop/core": ^3.0.4
+    pg-introspection: "workspace:^"
   peerDependenciesMeta:
     "@envelop/core":
+      optional: true
+    pg-introspection:
       optional: true
   bin:
     postgraphile: ./dist/cli-run.js
