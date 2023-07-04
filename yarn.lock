@@ -2069,6 +2069,7 @@ __metadata:
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     pg: ^8.7.1
+    pg-sql2: "workspace:^"
   peerDependenciesMeta:
     graphile-config:
       optional: true
@@ -11740,6 +11741,7 @@ __metadata:
     "@envelop/core": ^3.0.4
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
+    tamedevil: "workspace:^"
   peerDependenciesMeta:
     "@envelop/core":
       optional: true
