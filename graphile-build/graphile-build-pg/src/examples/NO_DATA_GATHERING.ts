@@ -31,6 +31,7 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
+import { pathToFileURL } from "url";
 
 declare global {
   namespace Grafast {
@@ -526,7 +527,9 @@ async function main() {
   console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
 
   // run code
-  const { schema: schema2 } = await import(exportFileLocation.toString());
+  const { schema: schema2 } = await import(
+    pathToFileURL(exportFileLocation).href
+  );
   const result2 = await graphql({
     schema: schema2,
     source,

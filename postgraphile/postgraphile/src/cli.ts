@@ -7,6 +7,7 @@ import { createServer } from "node:http";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
+import { pathToFileURL } from "node:url";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";
@@ -105,13 +106,17 @@ async function loadPresets(
   const specs = presetSpecs.split(",");
   const presets: GraphileConfig.Preset[] = [];
   for (const spec of specs) {
+    // FIXME: need to handle `C:` paths on Windows
     const [moduleName, exportName = null] = spec.split(":");
     let mod;
     try {
       mod = require(moduleName);
     } catch (e) {
       if (e.code === "ERR_REQUIRE_ESM") {
-        mod = await import(moduleName);
+        const importSpecifier = moduleName.match(/^([a-z]:|\.\/|\/)/i)
+          ? pathToFileURL(moduleName).href
+          : moduleName;
+        mod = await import(importSpecifier);
       } else {
         throw e;
       }
@@ -179,7 +184,11 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     const adaptor =
       preset.pgServices?.[0]?.adaptor ?? "@dataplan/pg/adaptors/pg";
 
-    const mod = await import(adaptor);
+    const importSpecifier = adaptor.match(/^([a-z]:|\.\/|\/)/i)
+      ? pathToFileURL(adaptor).href
+      : adaptor;
+
+    const mod = await import(importSpecifier);
     const makePgService = (mod.makePgService ?? mod.default?.makePgService) as (
       options: MakePgServiceOptions,
     ) => GraphileConfig.PgServiceConfiguration;

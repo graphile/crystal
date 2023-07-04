@@ -6,6 +6,7 @@ import { exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
 
 import { buildSchema, defaultPreset, EXPORTABLE } from "../index.js";
+import { pathToFileURL } from "url";
 
 /*
  * This example shows how to write a graphile-build plugin that adds a field
@@ -131,7 +132,9 @@ const MyRandomFieldPlugin: GraphileConfig.Plugin = {
   console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
 
   // run code
-  const { schema: schema2 } = await import(exportFileLocation.toString());
+  const { schema: schema2 } = await import(
+    pathToFileURL(exportFileLocation).href
+  );
   const result2 = await graphql({
     schema: schema2,
     source: `

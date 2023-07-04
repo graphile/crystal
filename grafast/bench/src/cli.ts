@@ -8,6 +8,7 @@ import * as path from "node:path";
 
 import type { GrafastBenchConfig } from ".";
 import { bench } from ".";
+import { pathToFileURL } from "node:url";
 
 export function options(yargs: Argv) {
   return yargs
@@ -57,7 +58,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     schema: schemaFile = "schema.mjs",
     operations: operationsGlob = "queries/*.graphql",
   } = config.bench ?? {};
-  const mod = await import(schemaFile);
+  const mod = await import(pathToFileURL(schemaFile).href);
   const schema = isSchema(mod.default)
     ? mod.default
     : isSchema(mod.schema)
