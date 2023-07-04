@@ -1,6 +1,7 @@
 import "./global.js";
 
 import chalk from "chalk";
+import * as grafast from "grafast";
 import type { GraphQLNamedType } from "graphql";
 import {
   GraphQLBoolean,
@@ -18,13 +19,12 @@ import {
   isOutputType,
 } from "graphql";
 import * as graphql from "graphql";
-import * as grafast from "grafast";
 import * as semver from "semver";
 import { inspect } from "util";
 
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
-import { stringTypeSpec, wrapDescription } from "./utils.js";
+import { EXPORTABLE, stringTypeSpec, wrapDescription } from "./utils.js";
 
 // TODO: the versioning!
 const version = "TODO";
@@ -140,6 +140,8 @@ export default function makeNewBuild(
       if (!packageVersion) return false;
       return semver.satisfies(packageVersion, range, options);
     },
+
+    EXPORTABLE,
     grafast,
     graphql,
 

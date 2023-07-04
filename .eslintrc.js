@@ -96,14 +96,28 @@ module.exports = {
     "@typescript-eslint/no-duplicate-imports": ["error"],
   },
   overrides: [
-    // Rules for plugins
+    // Rules for core plugins
     {
       files: [
         "graphile-build/graphile-build/src/plugins/**/*.ts",
         "graphile-build/graphile-build-pg/src/**/*.ts",
-        "graphile-build/graphile-utils/src/**/*.ts",
-        "graphile-build/pg-pubsub/src/**/*.ts",
       ],
+      rules: {
+        "no-restricted-syntax": [
+          "error",
+          {
+            selector:
+              "ImportDeclaration[importKind!='type'][source.value='graphql']",
+            message:
+              "Please refer to `build.graphql` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues for users.)",
+          },
+        ],
+      },
+    },
+
+    // Rules for non-core plugins
+    {
+      files: ["graphile-build/graphile-utils/src/**/*.ts"],
       rules: {
         "no-restricted-syntax": [
           "error",

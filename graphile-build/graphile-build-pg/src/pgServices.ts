@@ -1,7 +1,15 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
-import { isPromiseLike } from "grafast";
 import { pathToFileURL } from "node:url";
+
+/**
+ * Is "thenable".
+ */
+export function isPromiseLike<T>(
+  t: T | Promise<T> | PromiseLike<T>,
+): t is PromiseLike<T> {
+  return t != null && typeof (t as any).then === "function";
+}
 
 import type { PgAdaptor } from "./interfaces.js";
 

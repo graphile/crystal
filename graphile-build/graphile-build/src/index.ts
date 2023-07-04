@@ -1,6 +1,7 @@
 import "./global.js";
 import "./interfaces.js";
 
+import * as grafast from "grafast";
 import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "graphql";
 import {
@@ -182,6 +183,7 @@ const gatherBase = (
         process: hooks.process.bind(hooks),
         inflection,
         resolvedPreset,
+        grafast,
       };
       pluginContext.set(plugin, context);
       if (spec.namespace != null) {
