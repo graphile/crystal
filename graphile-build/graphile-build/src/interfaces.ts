@@ -76,6 +76,7 @@ export interface GatherPluginContext<
    * A copy of `import * from "grafast"` to avoid having to add grafast as a
    * dependency.
    */
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   grafast: typeof import("grafast");
 }
 

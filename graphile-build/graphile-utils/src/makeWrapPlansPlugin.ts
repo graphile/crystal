@@ -14,6 +14,7 @@ type SmartFieldPlanResolver = (
 
 export type PlanWrapperFn = (
   plan: SmartFieldPlanResolver,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   $source: import("grafast").ExecutableStep,
   args: FieldArgs,
   info: FieldInfo,
@@ -137,6 +138,7 @@ export function makeWrapPlansPlugin<T>(
             return field;
           }
           const {
+            // eslint-disable-next-line @typescript-eslint/consistent-type-imports
             plan: oldPlan = ($obj: import("grafast").ExecutableStep) =>
               access($obj, fieldName),
           } = field;

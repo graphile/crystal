@@ -39,7 +39,7 @@ import type {
 
 import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
 import type { InflectionBase } from "./inflection.js";
-import type { EXPORTABLE, stringTypeSpec, wrapDescription } from "./utils.js";
+import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
 /*
  * To make it easier for plugins to extend our builtin types we put them all in
