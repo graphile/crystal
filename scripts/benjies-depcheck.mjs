@@ -47,86 +47,92 @@ const fails = [];
 const warnings = [];
 const all = {};
 for (const packagePath of packages) {
-  const dir = `${__dirname}/../${packagePath}`;
-  const packageJson = JSON.parse(
-    await fs.readFile(`${dir}/package.json`, "utf8"),
-  );
-  console.log(packageJson.name);
-  if (!packageJson.files) {
-    throw new Error(`${packageJson.name} has no "files" export!`);
-  }
-  const positiveMatches = await glob(
-    [...packageJson.files, ...packageJson.files.map((f) => `${f}/**`)],
-    {
-      cwd: dir,
-      nodir: true,
-    },
-  );
-  let negativeMatches;
   try {
-    const npmIgnore = await fs.readFile(`${dir}/src/.npmignore`, "utf8");
-    const ignores = npmIgnore
-      .split("\n")
-      .map((l) => l.trim())
-      .filter((l) => l.match(/^[a-zA-Z/]/))
-      .map((l) => (l.startsWith("/") ? `dist${l}` : `dist/**/${l}`));
-    negativeMatches = await glob(
-      [...ignores, ...ignores.map((f) => `${f}/**`)],
+    const dir = `${__dirname}/../${packagePath}`;
+    const packageJson = JSON.parse(
+      await fs.readFile(`${dir}/package.json`, "utf8"),
+    );
+    console.log(packageJson.name);
+    if (!packageJson.files) {
+      throw new Error(`${packageJson.name} has no "files" export!`);
+    }
+    const positiveMatches = await glob(
+      [...packageJson.files, ...packageJson.files.map((f) => `${f}/**`)],
       {
         cwd: dir,
         nodir: true,
       },
     );
-  } catch {}
-  const allFiles = negativeMatches
-    ? positiveMatches.filter((m) => !negativeMatches.includes(m))
-    : positiveMatches;
-  const jsFiles = allFiles.filter((f) => f.endsWith(".js"));
-  const requires = new Set();
-  const walkerPlugin = newWalkerPlugin(requires);
-  for (const file of jsFiles) {
-    const filePath = `${dir}/${file}`;
-    const content = await fs.readFile(filePath, "utf8");
-    console.log(`  ${file}`);
-    await babel.transformAsync(content, {
-      filename: basename(filePath),
-      plugins: [walkerPlugin],
-    });
-  }
+    let negativeMatches;
+    try {
+      const npmIgnore = await fs.readFile(`${dir}/src/.npmignore`, "utf8");
+      const ignores = npmIgnore
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.match(/^[a-zA-Z/]/))
+        .map((l) => (l.startsWith("/") ? `dist${l}` : `dist/**/${l}`));
+      negativeMatches = await glob(
+        [...ignores, ...ignores.map((f) => `${f}/**`)],
+        {
+          cwd: dir,
+          nodir: true,
+        },
+      );
+    } catch {}
+    const allFiles = negativeMatches
+      ? positiveMatches.filter((m) => !negativeMatches.includes(m))
+      : positiveMatches;
+    const jsFiles = allFiles.filter((f) => f.endsWith(".js"));
+    const requires = new Set();
+    const walkerPlugin = newWalkerPlugin(requires);
+    for (const file of jsFiles) {
+      const filePath = `${dir}/${file}`;
+      const content = await fs.readFile(filePath, "utf8");
+      console.log(`  ${file}`);
+      await babel.transformAsync(content, {
+        filename: basename(filePath),
+        plugins: [walkerPlugin],
+      });
+    }
 
-  const webpackConfig = `${dir}/webpack.config.js`;
-  try {
-    const config = (await import(webpackConfig)).default;
-    const externals = resolveExternals(config.externals);
+    const webpackConfig = `${dir}/webpack.config.js`;
+    try {
+      const config = (await import(webpackConfig)).default;
+      const externals = resolveExternals(config.externals);
+      for (const moduleName of requires) {
+        if (
+          !externals.includes(moduleName) &&
+          !externals.some((e) => e.startsWith(`${moduleName}/`))
+        ) {
+          requires.delete(moduleName);
+        }
+      }
+    } catch (e) {}
+
     for (const moduleName of requires) {
+      if (NODE_MODULES.includes(moduleName)) {
+        continue;
+      }
+      console.log(`  - ${moduleName}`);
       if (
-        !externals.includes(moduleName) &&
-        !externals.some((e) => e.startsWith(`${moduleName}/`))
+        !packageJson.dependencies?.[moduleName] &&
+        !packageJson.peerDependencies?.[moduleName] &&
+        !packageJson.optionalDependencies?.[moduleName]
       ) {
-        requires.delete(moduleName);
+        fails.push(`${packageJson.name} should depend on ${moduleName}`);
       }
     }
-  } catch (e) {}
-
-  for (const moduleName of requires) {
-    if (NODE_MODULES.includes(moduleName)) {
-      continue;
-    }
-    console.log(`  - ${moduleName}`);
-    if (
-      !packageJson.dependencies?.[moduleName] &&
-      !packageJson.peerDependencies?.[moduleName] &&
-      !packageJson.optionalDependencies?.[moduleName]
-    ) {
-      fails.push(`${packageJson.name} should depend on ${moduleName}`);
-    }
+    all[packageJson.name] = {
+      name: packageJson.name,
+      packagePath,
+      packageJson,
+      requires,
+    };
+  } catch (e) {
+    console.error(e);
+    console.error(`Above error occurred whilst processing ${packagePath}`);
+    process.exit(1);
   }
-  all[packageJson.name] = {
-    name: packageJson.name,
-    packagePath,
-    packageJson,
-    requires,
-  };
 }
 
 // Now check peerDependencies.
