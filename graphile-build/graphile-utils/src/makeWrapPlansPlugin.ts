@@ -4,7 +4,6 @@ import type {
   FieldPlanResolver,
   GrafastFieldConfig,
 } from "grafast";
-import { access, ExecutableStep } from "grafast";
 import { inspect } from "node:util";
 
 type ToOptional<T> = { [K in keyof T]+?: T[K] };
@@ -15,7 +14,7 @@ type SmartFieldPlanResolver = (
 
 export type PlanWrapperFn = (
   plan: SmartFieldPlanResolver,
-  $source: ExecutableStep,
+  $source: import("grafast").ExecutableStep,
   args: FieldArgs,
   info: FieldInfo,
 ) => any;
@@ -95,6 +94,7 @@ export function makeWrapPlansPlugin<T>(
         },
         GraphQLObjectType_fields_field(field, build, context) {
           const rules = (build as any)[symbol].rules as PlanWrapperRules | null;
+          const { access, ExecutableStep } = build.grafast;
           const filter = (build as any)[symbol]
             .filter as PlanWrapperFilter<T> | null;
           const {
@@ -137,7 +137,8 @@ export function makeWrapPlansPlugin<T>(
             return field;
           }
           const {
-            plan: oldPlan = ($obj: ExecutableStep) => access($obj, fieldName),
+            plan: oldPlan = ($obj: import("grafast").ExecutableStep) =>
+              access($obj, fieldName),
           } = field;
           return {
             ...field,

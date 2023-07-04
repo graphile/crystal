@@ -309,6 +309,13 @@ declare global {
       ): boolean;
 
       /**
+       * Use `build.grafast` rather than importing `grafast` directly to try
+       * and avoid "duplicate" grafast module woes.
+       */
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      grafast: typeof import("grafast");
+
+      /**
        * Use `build.graphql` rather than importing `graphql` directly to try
        * and avoid "duplicate" graphql module woes.
        */

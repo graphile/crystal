@@ -18,6 +18,7 @@ import {
   isOutputType,
 } from "graphql";
 import * as graphql from "graphql";
+import * as grafast from "grafast";
 import * as semver from "semver";
 import { inspect } from "util";
 
@@ -139,6 +140,7 @@ export default function makeNewBuild(
       if (!packageVersion) return false;
       return semver.satisfies(packageVersion, range, options);
     },
+    grafast,
     graphql,
 
     extend(base, extra, hint, behaviorOnConflict = "throw") {

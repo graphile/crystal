@@ -55,10 +55,16 @@
     "pg-introspection": "workspace:^"
   },
   "peerDependenciesMeta": {
+    "grafast": {
+      "optional": true
+    },
     "graphile-build": {
       "optional": true
     },
     "graphile-build-pg": {
+      "optional": true
+    },
+    "graphile-config": {
       "optional": true
     },
     "pg-introspection": {
