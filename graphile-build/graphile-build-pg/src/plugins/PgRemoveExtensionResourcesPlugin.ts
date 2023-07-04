@@ -1,4 +1,4 @@
-import "graphile-config";
+import type {} from "graphile-config";
 
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";

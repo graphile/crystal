@@ -1,5 +1,6 @@
-import "graphile-config";
 import "graphile-build-pg";
+
+import type {} from "graphile-config";
 
 declare global {
   namespace GraphileConfig {

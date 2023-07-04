@@ -1,4 +1,4 @@
-import "graphile-config";
+import type {} from "graphile-config";
 
 import { PgRBACPlugin } from "./index.js";
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";

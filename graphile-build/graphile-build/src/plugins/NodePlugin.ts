@@ -1,7 +1,6 @@
-import "graphile-config";
-
 import type { NodeIdCodec, NodeIdHandler } from "grafast";
 import { node } from "grafast";
+import type {} from "graphile-config";
 import type { GraphQLObjectType } from "graphql";
 
 import { EXPORTABLE } from "../utils.js";

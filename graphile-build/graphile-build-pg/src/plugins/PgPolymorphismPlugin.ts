@@ -1,4 +1,3 @@
-import "graphile-config";
 import "./PgCodecsPlugin.js";
 import "./PgProceduresPlugin.js";
 import "./PgRelationsPlugin.js";
@@ -23,6 +22,7 @@ import type {
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
+import type {} from "graphile-config";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,

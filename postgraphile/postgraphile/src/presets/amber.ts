@@ -1,5 +1,3 @@
-import "graphile-config";
-
 import {
   AddNodeInterfaceToSuitableTypesPlugin,
   defaultPreset as graphileBuildPreset,
@@ -28,6 +26,7 @@ import {
   PgTablesPlugin,
   PgTypesPlugin,
 } from "graphile-build-pg";
+import type {} from "graphile-config";
 
 // Shunts the plugins into an order that's more compatible with PostGraphile V4.
 export const orderedPlugins: GraphileConfig.Preset = {

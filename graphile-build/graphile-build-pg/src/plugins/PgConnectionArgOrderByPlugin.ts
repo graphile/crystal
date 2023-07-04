@@ -1,5 +1,4 @@
 import "./PgTablesPlugin.js";
-import "graphile-config";
 
 import type {
   PgCodec,
@@ -14,6 +13,7 @@ import type {
 } from "grafast";
 import { getEnumValueConfig, SafeError } from "grafast";
 import { EXPORTABLE } from "graphile-build";
+import type {} from "graphile-config";
 import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 

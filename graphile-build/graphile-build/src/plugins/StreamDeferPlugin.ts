@@ -1,4 +1,4 @@
-import "graphile-config";
+import type {} from "graphile-config";
 
 /**
  * Enables stream/defer on the schema.

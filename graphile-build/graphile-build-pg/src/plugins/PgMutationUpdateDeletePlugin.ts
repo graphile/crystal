@@ -1,5 +1,3 @@
-import "graphile-config";
-
 import type {
   PgClassSingleStep,
   PgCodecWithAttributes,
@@ -20,6 +18,7 @@ import {
   specFromNodeId,
 } from "grafast";
 import { EXPORTABLE } from "graphile-build";
+import type {} from "graphile-config";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 

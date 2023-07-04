@@ -1,5 +1,4 @@
-import "graphile-config";
-
+import type {} from "graphile-config";
 import type {
   GraphQLScalarLiteralParser,
   GraphQLScalarValueParser,

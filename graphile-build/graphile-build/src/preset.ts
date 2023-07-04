@@ -1,5 +1,6 @@
 import "./interfaces.js";
-import "graphile-config";
+
+import type {} from "graphile-config";
 
 import {
   AddNodeInterfaceToSuitableTypesPlugin,

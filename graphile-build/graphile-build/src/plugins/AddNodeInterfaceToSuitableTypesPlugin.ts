@@ -1,7 +1,6 @@
-import "graphile-config";
-
 import type { ExecutableStep } from "grafast";
 import { lambda } from "grafast";
+import type {} from "graphile-config";
 import type { GraphQLInterfaceType } from "graphql";
 
 import { EXPORTABLE } from "../utils.js";

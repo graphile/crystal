@@ -1,5 +1,4 @@
 import "./PgTablesPlugin.js";
-import "graphile-config";
 
 import type {
   PgCodecWithAttributes,
@@ -10,6 +9,7 @@ import type {
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
+import type {} from "graphile-config";
 import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 
 import { version } from "../version.js";

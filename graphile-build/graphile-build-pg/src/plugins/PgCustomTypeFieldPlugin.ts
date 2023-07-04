@@ -3,7 +3,6 @@
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import "./PgProceduresPlugin.js";
-import "graphile-config";
 
 import type {
   PgClassSingleStep,
@@ -43,6 +42,7 @@ import {
   stepAMayDependOnStepB,
 } from "grafast";
 import { EXPORTABLE } from "graphile-build";
+import type {} from "graphile-config";
 import type { GraphQLInputType, GraphQLOutputType } from "graphql";
 import type { SQL } from "pg-sql2";
 

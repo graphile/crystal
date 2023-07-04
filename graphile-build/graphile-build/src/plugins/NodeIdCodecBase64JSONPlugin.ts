@@ -1,4 +1,4 @@
-import "graphile-config";
+import type {} from "graphile-config";
 function base64JSONEncode(value: any): string | null {
   return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
 }

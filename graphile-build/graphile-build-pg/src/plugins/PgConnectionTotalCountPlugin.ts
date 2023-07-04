@@ -1,6 +1,5 @@
 import "./PgTablesPlugin.js";
 import "./PgBasicsPlugin.js";
-import "graphile-config";
 
 import type {
   PgSelectParsedCursorStep,
@@ -11,6 +10,7 @@ import type {
 import { TYPES } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
+import type {} from "graphile-config";
 
 import { version } from "../version.js";
 

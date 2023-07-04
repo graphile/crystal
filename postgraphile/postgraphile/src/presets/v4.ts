@@ -1,6 +1,5 @@
-import "graphile-config";
-
 import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
+import type {} from "graphile-config";
 import type { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 

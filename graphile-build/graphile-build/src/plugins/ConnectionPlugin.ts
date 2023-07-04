@@ -1,11 +1,10 @@
-import "graphile-config";
-
 import type { EdgeCapableStep } from "grafast";
 import {
   assertEdgeCapableStep,
   assertPageInfoCapableStep,
   ConnectionStep,
 } from "grafast";
+import type {} from "graphile-config";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";

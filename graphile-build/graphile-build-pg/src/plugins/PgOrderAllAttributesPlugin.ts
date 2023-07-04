@@ -1,5 +1,4 @@
 import "./PgTablesPlugin.js";
-import "graphile-config";
 
 import type {
   PgCodecAttribute,
@@ -9,6 +8,7 @@ import type {
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
+import type {} from "graphile-config";
 import type { GraphQLEnumValueConfigMap } from "graphql";
 
 import { version } from "../version.js";

@@ -4,9 +4,9 @@ export function makeAddInflectorsPlugin(): never {
 
 \`\`\`
 // Import types for TypeScript
-import "graphile-config";
-import "graphile-build";
-import "graphile-build-pg";
+import type {} from "graphile-config";
+import type {} from "graphile-build";
+import type {} from "graphile-build-pg";
 
 export const MyInflectorPlugin: GraphileConfig.Plugin = {
   // Unique name for your plugin:

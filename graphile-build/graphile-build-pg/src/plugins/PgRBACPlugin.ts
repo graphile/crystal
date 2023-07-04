@@ -1,5 +1,4 @@
-import "graphile-config";
-
+import type {} from "graphile-config";
 import { resolvePermissions } from "pg-introspection";
 
 import { addBehaviorToTags } from "../utils.js";
