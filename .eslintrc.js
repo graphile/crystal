@@ -113,6 +113,12 @@ module.exports = {
             message:
               "Please refer to `build.graphql` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues for users.)",
           },
+          {
+            selector:
+              "ImportDeclaration[importKind!='type'][source.value='grafast']",
+            message:
+              "Please refer to `build.grafast` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `grafast` modules in the `node_modules` tree from causing issues for users.)",
+          },
         ],
       },
     },
