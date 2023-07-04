@@ -1,9 +1,10 @@
 import "./interfaces.js";
 
-import { access } from "fs/promises";
 import type { Extension } from "interpret";
 import { jsVariants } from "interpret";
-import { resolve } from "path";
+import { access } from "node:fs/promises";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const extensions = Object.keys(jsVariants);
 
@@ -75,7 +76,7 @@ export async function loadConfig(
     }
 
     // Fallback to direct import
-    return (await import(resolvedPath)).default;
+    return (await import(pathToFileURL(resolvedPath).href)).default;
   } else {
     // There's no config path; look for a `graphile.config.*`
 
@@ -88,7 +89,7 @@ export async function loadConfig(
           return fixESMShenanigans(require(resolvedPath));
         } catch (e) {
           if (e.code === "ERR_REQUIRE_ESM") {
-            return (await import(resolvedPath)).default;
+            return (await import(pathToFileURL(resolvedPath).href)).default;
           } else {
             throw e;
           }

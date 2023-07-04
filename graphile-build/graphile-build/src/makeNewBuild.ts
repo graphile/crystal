@@ -28,8 +28,8 @@ import { stringTypeSpec, wrapDescription } from "./utils.js";
 // TODO: the versioning!
 const version = "TODO";
 /*
-import { readFileSync } from "fs";
-import { URL } from "url";
+import { readFileSync } from "node:fs";
+import { URL } from "node:url";
 const version: string = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf8"),
 ).version;

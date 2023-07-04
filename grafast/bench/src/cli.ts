@@ -5,6 +5,7 @@ import { loadConfig } from "graphile-config/load";
 import { isSchema } from "graphql";
 import * as fsp from "node:fs/promises";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import type { GrafastBenchConfig } from ".";
 import { bench } from ".";
@@ -57,7 +58,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     schema: schemaFile = "schema.mjs",
     operations: operationsGlob = "queries/*.graphql",
   } = config.bench ?? {};
-  const mod = await import(schemaFile);
+  const mod = await import(pathToFileURL(schemaFile).href);
   const schema = isSchema(mod.default)
     ? mod.default
     : isSchema(mod.schema)

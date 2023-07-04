@@ -1,9 +1,10 @@
 import chalk from "chalk";
-import { readFile } from "fs/promises";
 import { lambda } from "grafast";
 import { resolvePresets } from "graphile-config";
 import { exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
+import { readFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
 
 import { buildSchema, defaultPreset, EXPORTABLE } from "../index.js";
 
@@ -131,7 +132,9 @@ const MyRandomFieldPlugin: GraphileConfig.Plugin = {
   console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
 
   // run code
-  const { schema: schema2 } = await import(exportFileLocation.toString());
+  const { schema: schema2 } = await import(
+    pathToFileURL(exportFileLocation).href
+  );
   const result2 = await graphql({
     schema: schema2,
     source: `

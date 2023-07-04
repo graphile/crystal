@@ -34,8 +34,9 @@ import {
 } from "graphql-helix";
 import { useServer } from "graphql-ws/lib/use/ws";
 import * as jsonwebtoken from "jsonwebtoken";
+import { pathToFileURL } from "node:url";
+import { inspect } from "node:util";
 import { Pool } from "pg";
-import { inspect } from "util";
 import * as ws from "ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
@@ -163,7 +164,9 @@ pool.on("error", (e) => {
   //console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
 
   // Import this exported schema so that we can test it
-  const { schema: schema2 } = await import(exportFileLocation.toString());
+  const { schema: schema2 } = await import(
+    pathToFileURL(exportFileLocation).href
+  );
 
   // Rerun the previous operation, using the freshly imported schema
   const result2 = await graphql({

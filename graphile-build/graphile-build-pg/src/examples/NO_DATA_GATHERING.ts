@@ -16,7 +16,6 @@ import {
 } from "@dataplan/pg";
 import { makePgAdaptorWithPgClient } from "@dataplan/pg/adaptors/pg";
 import chalk from "chalk";
-import { readFile } from "fs/promises";
 import { context, object } from "grafast";
 import {
   buildSchema,
@@ -26,9 +25,11 @@ import {
 import { resolvePresets } from "graphile-config";
 import { EXPORTABLE, exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
+import { readFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
+import { inspect } from "node:util";
 import { Pool } from "pg";
 import sql from "pg-sql2";
-import { inspect } from "util";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
@@ -526,7 +527,9 @@ async function main() {
   console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
 
   // run code
-  const { schema: schema2 } = await import(exportFileLocation.toString());
+  const { schema: schema2 } = await import(
+    pathToFileURL(exportFileLocation).href
+  );
   const result2 = await graphql({
     schema: schema2,
     source,

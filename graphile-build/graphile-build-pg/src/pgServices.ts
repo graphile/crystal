@@ -1,6 +1,7 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 import { isPromiseLike } from "grafast";
+import { pathToFileURL } from "node:url";
 
 import type { PgAdaptor } from "./interfaces.js";
 
@@ -24,7 +25,10 @@ function reallyLoadAdaptor<
     return adaptor?.createWithPgClient ? adaptor : adaptor?.default;
   } catch (e) {
     if (e.code === "ERR_REQUIRE_ESM") {
-      const adaptorPromise = import(adaptorString);
+      const importSpecifier = adaptorString.match(/^([a-z]:|\.\/|\/)/i)
+        ? pathToFileURL(adaptorString).href
+        : adaptorString;
+      const adaptorPromise = import(importSpecifier);
       return adaptorPromise.then((adaptor) =>
         adaptor?.createWithPgClient ? adaptor : adaptor?.default,
       );
