@@ -52,7 +52,6 @@
   },
   "homepage": "https://grafast.org/grafast/step-library/dataplan-pg/",
   "dependencies": {
-    "@dataplan/json": "workspace:^",
     "@graphile/lru": "workspace:^",
     "@types/node": "^18.15.5",
     "chalk": "^4.1.2",

@@ -54,6 +54,17 @@
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg-introspection": "workspace:^"
   },
+  "peerDependenciesMeta": {
+    "graphile-build": {
+      "optional": true
+    },
+    "graphile-build-pg": {
+      "optional": true
+    },
+    "pg-introspection": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",

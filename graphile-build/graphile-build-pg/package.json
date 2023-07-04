@@ -44,8 +44,6 @@
     "graphile-config": "workspace:^",
     "jsonwebtoken": "^8.5.1",
     "pg-introspection": "workspace:^",
-    "pg-sql2": "workspace:^",
-    "tamedevil": "workspace:^",
     "tslib": "^2.5.0"
   },
   "peerDependencies": {
@@ -54,9 +52,14 @@
     "graphile-build": "workspace:*",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "pg-sql2": "workspace:^",
+    "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
+    "graphile-config": {
+      "optional": true
+    },
     "pg": {
       "optional": true
     }

@@ -5,7 +5,7 @@ import type {
   GrafastFieldConfig,
 } from "grafast";
 import { access, ExecutableStep } from "grafast";
-import { inspect } from "util";
+import { inspect } from "node:util";
 
 type ToOptional<T> = { [K in keyof T]+?: T[K] };
 

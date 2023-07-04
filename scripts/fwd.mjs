@@ -17,6 +17,8 @@ const todo = {
     "graphile-build": true,
     "graphile-build-pg": true,
     graphql: true,
+    "pg-sql2": true,
+    tamedevil: true,
   },
 };
 
