@@ -1,6 +1,5 @@
 import "./ConnectionPlugin.js";
-
-import type {} from "graphile-config";
+import "graphile-config";
 
 import { version } from "../version.js";
 

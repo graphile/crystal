@@ -1,5 +1,6 @@
 import "./PgTablesPlugin.js";
 import "../interfaces.js";
+import "graphile-config";
 
 import type {
   PgClassExpressionStep,
@@ -14,7 +15,6 @@ import { pgSelectFromRecords, pgSelectSingleFromRecord } from "@dataplan/pg";
 import type { GrafastFieldConfig, SetterStep } from "grafast";
 import { each } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type {} from "graphile-config";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "graphql";
 
 import { version } from "../version.js";

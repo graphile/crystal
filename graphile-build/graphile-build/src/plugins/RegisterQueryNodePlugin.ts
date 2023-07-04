@@ -1,5 +1,6 @@
+import "graphile-config";
+
 import { constant, operationPlan } from "grafast";
-import type {} from "graphile-config";
 
 import { EXPORTABLE } from "../utils.js";
 

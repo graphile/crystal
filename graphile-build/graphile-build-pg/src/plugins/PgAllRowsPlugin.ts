@@ -1,9 +1,9 @@
 import "./PgTablesPlugin.js";
+import "graphile-config";
 
 import type { PgResource } from "@dataplan/pg";
 import { connection } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type {} from "graphile-config";
 import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { tagToString } from "../utils.js";

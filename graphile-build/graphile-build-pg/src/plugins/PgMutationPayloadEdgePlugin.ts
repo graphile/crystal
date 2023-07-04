@@ -1,3 +1,5 @@
+import "graphile-config";
+
 import type {
   PgClassSingleStep,
   PgCodecWithAttributes,
@@ -8,7 +10,6 @@ import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
 import { connection, constant, EdgeStep, first } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type {} from "graphile-config";
 import type { GraphQLEnumType, GraphQLObjectType } from "graphql";
 
 import { tagToString } from "../utils.js";

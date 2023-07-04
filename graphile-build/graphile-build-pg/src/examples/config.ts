@@ -4,13 +4,14 @@
  * schema against.
  */
 
+import "graphile-config";
+
 import type { WithPgClient } from "@dataplan/pg";
 import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import type {} from "graphile-config";
 import { Pool } from "pg";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";

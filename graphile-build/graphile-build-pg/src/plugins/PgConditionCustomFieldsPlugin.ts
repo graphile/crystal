@@ -1,3 +1,5 @@
+import "graphile-config";
+
 import type {
   PgConditionStep,
   PgResource,
@@ -5,7 +7,6 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
-import type {} from "graphile-config";
 
 import { version } from "../version.js";
 

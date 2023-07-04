@@ -1,3 +1,5 @@
+import "graphile-config";
+
 import type {
   PgCodec,
   PgCodecWithAttributes,
@@ -6,7 +8,6 @@ import type {
 } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type {} from "graphile-config";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { tagToString } from "../utils.js";

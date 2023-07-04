@@ -1,3 +1,5 @@
+import "graphile-config";
+
 import type {
   PgCodec,
   PgResource,
@@ -7,7 +9,6 @@ import type {
 import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type {} from "graphile-config";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { tagToString } from "../utils.js";

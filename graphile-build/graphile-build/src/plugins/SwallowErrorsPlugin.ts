@@ -1,4 +1,4 @@
-import type {} from "graphile-config";
+import "graphile-config";
 
 import swallowError from "../swallowError.js";
 import { version } from "../version.js";

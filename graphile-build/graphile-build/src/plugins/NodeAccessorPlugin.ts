@@ -1,3 +1,5 @@
+import "graphile-config";
+
 import type {
   ExecutableStep,
   FieldArgs,
@@ -5,7 +7,6 @@ import type {
   NodeIdHandler,
 } from "grafast";
 import { lambda } from "grafast";
-import type {} from "graphile-config";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";

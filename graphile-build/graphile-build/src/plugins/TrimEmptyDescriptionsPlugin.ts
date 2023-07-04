@@ -1,5 +1,6 @@
+import "graphile-config";
+
 import type { GrafastArgumentConfig } from "grafast";
-import type {} from "graphile-config";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,

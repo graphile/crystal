@@ -1,4 +1,4 @@
-import type {} from "graphile-config";
+import "graphile-config";
 
 function pipeStringEncode(value: any): string | null {
   return Array.isArray(value) ? value.join("|") : null;

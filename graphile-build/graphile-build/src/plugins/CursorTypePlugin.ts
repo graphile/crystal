@@ -1,4 +1,4 @@
-import type {} from "graphile-config";
+import "graphile-config";
 
 import { stringScalarSpec } from "../utils.js";
 import { version } from "../version.js";

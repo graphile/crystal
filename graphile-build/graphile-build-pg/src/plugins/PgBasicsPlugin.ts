@@ -1,6 +1,7 @@
 import "graphile-build";
 import "./PgTablesPlugin.js";
 import "../interfaces.js";
+import "graphile-config";
 
 import type {
   PgCodec,
@@ -11,7 +12,6 @@ import type {
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
-import type {} from "graphile-config";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 

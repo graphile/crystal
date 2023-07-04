@@ -1,4 +1,5 @@
 import "./PgTablesPlugin.js";
+import "graphile-config";
 
 import type {
   PgCodecWithAttributes,
@@ -6,7 +7,6 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
-import type {} from "graphile-config";
 
 import { version } from "../version.js";
 
