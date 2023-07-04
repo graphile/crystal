@@ -94,6 +94,16 @@
       "types": "./fwd/graphql/index.d.ts",
       "node": "./fwd/graphql/index.js",
       "default": "./fwd/graphql/index.js"
+    },
+    "./pg-sql2": {
+      "types": "./fwd/pg-sql2/index.d.ts",
+      "node": "./fwd/pg-sql2/index.js",
+      "default": "./fwd/pg-sql2/index.js"
+    },
+    "./tamedevil": {
+      "types": "./fwd/tamedevil/index.d.ts",
+      "node": "./fwd/tamedevil/index.js",
+      "default": "./fwd/tamedevil/index.js"
     }
   },
   "bin": "./dist/cli-run.js",
