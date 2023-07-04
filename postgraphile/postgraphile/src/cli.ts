@@ -4,10 +4,10 @@ import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 import { createServer } from "node:http";
+import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
-import { pathToFileURL } from "node:url";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";

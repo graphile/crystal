@@ -35,12 +35,12 @@ import {
 import { useServer } from "graphql-ws/lib/use/ws";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
+import { pathToFileURL } from "url";
 import { inspect } from "util";
 import * as ws from "ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 import { getWithPgClientFromPgService } from "../pgServices.js";
-import { pathToFileURL } from "url";
 
 declare global {
   namespace Grafast {

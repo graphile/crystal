@@ -5,10 +5,10 @@ import { loadConfig } from "graphile-config/load";
 import { isSchema } from "graphql";
 import * as fsp from "node:fs/promises";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import type { GrafastBenchConfig } from ".";
 import { bench } from ".";
-import { pathToFileURL } from "node:url";
 
 export function options(yargs: Argv) {
   return yargs

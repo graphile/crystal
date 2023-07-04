@@ -1,9 +1,9 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 import { isPromiseLike } from "grafast";
+import { pathToFileURL } from "url";
 
 import type { PgAdaptor } from "./interfaces.js";
-import { pathToFileURL } from "url";
 
 const isTest = process.env.NODE_ENV === "test";
 

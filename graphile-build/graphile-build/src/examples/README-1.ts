@@ -4,9 +4,9 @@ import { lambda } from "grafast";
 import { resolvePresets } from "graphile-config";
 import { exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
+import { pathToFileURL } from "url";
 
 import { buildSchema, defaultPreset, EXPORTABLE } from "../index.js";
-import { pathToFileURL } from "url";
 
 /*
  * This example shows how to write a graphile-build plugin that adds a field

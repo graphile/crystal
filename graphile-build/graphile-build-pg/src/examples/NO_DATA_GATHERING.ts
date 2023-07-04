@@ -28,10 +28,10 @@ import { EXPORTABLE, exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import sql from "pg-sql2";
+import { pathToFileURL } from "url";
 import { inspect } from "util";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
-import { pathToFileURL } from "url";
 
 declare global {
   namespace Grafast {
