@@ -1,8 +1,8 @@
 import "./interfaces.js";
 
-import { access } from "node:fs/promises";
 import type { Extension } from "interpret";
 import { jsVariants } from "interpret";
+import { access } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 

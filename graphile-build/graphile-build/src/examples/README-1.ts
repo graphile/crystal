@@ -1,9 +1,9 @@
 import chalk from "chalk";
-import { readFile } from "node:fs/promises";
 import { lambda } from "grafast";
 import { resolvePresets } from "graphile-config";
 import { exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
+import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { buildSchema, defaultPreset, EXPORTABLE } from "../index.js";
