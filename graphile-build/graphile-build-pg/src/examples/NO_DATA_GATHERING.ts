@@ -16,7 +16,7 @@ import {
 } from "@dataplan/pg";
 import { makePgAdaptorWithPgClient } from "@dataplan/pg/adaptors/pg";
 import chalk from "chalk";
-import { readFile } from "fs/promises";
+import { readFile } from "node:fs/promises";
 import { context, object } from "grafast";
 import {
   buildSchema,
@@ -28,8 +28,8 @@ import { EXPORTABLE, exportSchema } from "graphile-export";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import sql from "pg-sql2";
-import { pathToFileURL } from "url";
-import { inspect } from "util";
+import { pathToFileURL } from "node:url";
+import { inspect } from "node:util";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 

@@ -3,7 +3,7 @@ import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import * as t from "@babel/types";
-import { writeFile } from "fs/promises";
+import { writeFile } from "node:fs/promises";
 import type {
   GraphQLArgumentConfig,
   GraphQLDirective,
@@ -41,8 +41,8 @@ import {
 } from "graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import type { PgSQL, SQL } from "pg-sql2";
-import type { URL } from "url";
-import { inspect } from "util";
+import type { URL } from "node:url";
+import { inspect } from "node:util";
 
 import type { ExportOptions } from "./interfaces.js";
 import { optimize } from "./optimize/index.js";

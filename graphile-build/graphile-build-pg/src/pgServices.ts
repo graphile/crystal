@@ -1,7 +1,7 @@
 import type { PgClient, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 import { isPromiseLike } from "grafast";
-import { pathToFileURL } from "url";
+import { pathToFileURL } from "node:url";
 
 import type { PgAdaptor } from "./interfaces.js";
 

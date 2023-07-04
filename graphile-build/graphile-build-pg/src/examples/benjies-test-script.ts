@@ -35,8 +35,8 @@ import {
 import { useServer } from "graphql-ws/lib/use/ws";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
-import { pathToFileURL } from "url";
-import { inspect } from "util";
+import { pathToFileURL } from "node:url";
+import { inspect } from "node:util";
 import * as ws from "ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";

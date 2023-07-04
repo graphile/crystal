@@ -1,10 +1,10 @@
 import "./interfaces.js";
 
-import { access } from "fs/promises";
+import { access } from "node:fs/promises";
 import type { Extension } from "interpret";
 import { jsVariants } from "interpret";
-import { resolve } from "path";
-import { pathToFileURL } from "url";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const extensions = Object.keys(jsVariants);
 
