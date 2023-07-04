@@ -11836,8 +11836,6 @@ __metadata:
     pg-sql2: "workspace:^"
     tamedevil: "workspace:^"
   peerDependenciesMeta:
-    graphile-config:
-      optional: true
     pg:
       optional: true
   languageName: unknown
@@ -11947,9 +11945,13 @@ __metadata:
     graphql: ^16.1.0-experimental-stream-defer.6
     pg-introspection: "workspace:^"
   peerDependenciesMeta:
+    grafast:
+      optional: true
     graphile-build:
       optional: true
     graphile-build-pg:
+      optional: true
+    graphile-config:
       optional: true
     pg-introspection:
       optional: true
