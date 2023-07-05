@@ -53,6 +53,7 @@
     "node": ">=16"
   },
   "peerDependencies": {
+    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6"
   },
   "files": [

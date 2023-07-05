@@ -69,7 +69,7 @@ import "postgraphile";
 
 import amber from "postgraphile/presets/amber";
 // Use the 'pg' module to connect to the database
-import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { makePgService } from "postgraphile/adaptors/pg";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {

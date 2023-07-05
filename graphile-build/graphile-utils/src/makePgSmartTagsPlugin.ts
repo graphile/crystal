@@ -1,10 +1,11 @@
-import type { Stats } from "fs";
-import { unwatchFile, watchFile } from "fs";
-import { readFile } from "fs/promises";
 import type {} from "graphile-build";
 import type {} from "graphile-build-pg";
 import type {} from "graphile-config";
 import JSON5 from "json5";
+import type { Stats } from "node:fs";
+import { unwatchFile, watchFile } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { inspect } from "node:util";
 import type {
   PgAttribute,
   PgClass,
@@ -13,7 +14,6 @@ import type {
   PgProc,
   PgType,
 } from "pg-introspection";
-import { inspect } from "util";
 
 import { parseIdentifierParts } from "./parseIdentifierParts.js";
 

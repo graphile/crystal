@@ -71,6 +71,13 @@ export interface GatherPluginContext<
    * gather plugins so they can make their own changes/additions).
    */
   process: AsyncHooks<GraphileConfig.GatherHooks>["process"];
+
+  /**
+   * A copy of `import * from "grafast"` to avoid having to add grafast as a
+   * dependency.
+   */
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  grafast: typeof import("grafast");
 }
 
 declare global {

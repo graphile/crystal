@@ -50,8 +50,26 @@
     "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
+    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg-introspection": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "grafast": {
+      "optional": true
+    },
+    "graphile-build": {
+      "optional": true
+    },
+    "graphile-build-pg": {
+      "optional": true
+    },
+    "graphile-config": {
+      "optional": true
+    },
+    "pg-introspection": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "graphile-build": "workspace:^",

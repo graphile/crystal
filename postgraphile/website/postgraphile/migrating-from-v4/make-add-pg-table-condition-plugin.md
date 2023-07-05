@@ -95,7 +95,7 @@ be cast correctly for the database.
 
 ```ts
 import { makeAddPgTableConditionPlugin } from "graphile-utils";
-import { TYPES } from "@dataplan/pg";
+import { TYPES } from "postgraphile/@dataplan/pg";
 
 const PetsCountPlugin = makeAddPgTableConditionPlugin(
   { schemaName: "graphile_utils", tableName: "users" },

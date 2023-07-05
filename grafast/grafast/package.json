@@ -59,7 +59,8 @@
   "peerDependencies": {
     "@envelop/core": "^3.0.4",
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6"
+    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
     "@envelop/core": {

@@ -63,6 +63,7 @@
   },
   "peerDependencies": {
     "grafast": "workspace:^",
+    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "ws": "^8.12.1"
   },
