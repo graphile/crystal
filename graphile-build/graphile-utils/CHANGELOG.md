@@ -1,5 +1,54 @@
 # graphile-utils
 
+## 5.0.0-alpha.12
+
+### Patch Changes
+
+- [#399](https://github.com/benjie/postgraphile-private/pull/399)
+  [`409581534`](https://github.com/benjie/postgraphile-private/commit/409581534f41ac2cf0ff21c77c2bcd8eaa8218fd)
+  Thanks [@benjie](https://github.com/benjie)! - Change many of the dependencies
+  to be instead (or also) peerDependencies, to avoid duplicate modules.
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`7573bf374`](https://github.com/benjie/postgraphile-private/commit/7573bf374897228b613b19f37b4e076737db3279)
+  Thanks [@benjie](https://github.com/benjie)! - Address a decent number of
+  TODO/FIXME/etc comments in the codebase.
+
+- [#383](https://github.com/benjie/postgraphile-private/pull/383)
+  [`2c8586b36`](https://github.com/benjie/postgraphile-private/commit/2c8586b367b76af91d1785cc90455c70911fdec7)
+  Thanks [@benjie](https://github.com/benjie)! - Change
+  'objectType.extensions.grafast.Step' to
+  'objectType.extensions.grafast.assertStep', accept it via object spec,
+  deprecate registerObjectType form that accepts it (pass via object spec
+  instead), improve typings around it.
+- Updated dependencies
+  [[`409581534`](https://github.com/benjie/postgraphile-private/commit/409581534f41ac2cf0ff21c77c2bcd8eaa8218fd),
+  [`17fe531d7`](https://github.com/benjie/postgraphile-private/commit/17fe531d729e88a7126b0e2e06fc1ee9ab3ac5b8),
+  [`b7533bd4d`](https://github.com/benjie/postgraphile-private/commit/b7533bd4dfc210cb8b113b8fa06f163a212aa5e4),
+  [`326aa99cd`](https://github.com/benjie/postgraphile-private/commit/326aa99cd5e6b5cc8f30e4500382738eb63b792d),
+  [`9238d3ce4`](https://github.com/benjie/postgraphile-private/commit/9238d3ce4f6f59295ba849d6325286e4847c1bac),
+  [`9feb769c2`](https://github.com/benjie/postgraphile-private/commit/9feb769c2df0c57971ed26a937be4a1bee7a7524),
+  [`b5eb7c490`](https://github.com/benjie/postgraphile-private/commit/b5eb7c490305b869e1bfc176a5a417e28f1411cd),
+  [`976958e80`](https://github.com/benjie/postgraphile-private/commit/976958e80c791819cd80e96df8209dcff1918585),
+  [`7573bf374`](https://github.com/benjie/postgraphile-private/commit/7573bf374897228b613b19f37b4e076737db3279),
+  [`95b2ab41e`](https://github.com/benjie/postgraphile-private/commit/95b2ab41e41976de852276b83f7fb5924555e7c5),
+  [`2c8586b36`](https://github.com/benjie/postgraphile-private/commit/2c8586b367b76af91d1785cc90455c70911fdec7),
+  [`8230fcaeb`](https://github.com/benjie/postgraphile-private/commit/8230fcaeb0286c905fc0dad4b7af2d94bac88a44),
+  [`6f545683c`](https://github.com/benjie/postgraphile-private/commit/6f545683c981af4ee40d51b272a053b01d535491),
+  [`c43802d74`](https://github.com/benjie/postgraphile-private/commit/c43802d7419f93d18964c654f16d0937a2e23ca0),
+  [`b118b8f6d`](https://github.com/benjie/postgraphile-private/commit/b118b8f6dc18196212cfb0a05486e1dd8d77ccf8),
+  [`b66d2503b`](https://github.com/benjie/postgraphile-private/commit/b66d2503b90eb458af709bb593e5a00d869df03f),
+  [`9008c4f87`](https://github.com/benjie/postgraphile-private/commit/9008c4f87df53be4051c49f9836358dc2baa59df),
+  [`47ff7e824`](https://github.com/benjie/postgraphile-private/commit/47ff7e824b2fc96c11f601c3814d0200208711ce),
+  [`b868aa63f`](https://github.com/benjie/postgraphile-private/commit/b868aa63f7759396b71fdd1e8eda1012352ad595),
+  [`e8c81cd20`](https://github.com/benjie/postgraphile-private/commit/e8c81cd2046390ed5b6799aa7ff3d90b28a1861a),
+  [`3caaced6c`](https://github.com/benjie/postgraphile-private/commit/3caaced6cfbac4a187a245a61eb103edcb8cd4c9),
+  [`9f2507ed9`](https://github.com/benjie/postgraphile-private/commit/9f2507ed9fe8a6abe93c9c8a1cff410446587fd6)]:
+  - graphile-build-pg@5.0.0-alpha.12
+  - graphile-build@5.0.0-alpha.11
+  - grafast@0.0.1-alpha.10
+  - pg-introspection@0.0.1-alpha.3
+
 ## 5.0.0-alpha.11
 
 ### Patch Changes

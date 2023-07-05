@@ -1,5 +1,44 @@
 # graphile-build
 
+## 5.0.0-alpha.11
+
+### Patch Changes
+
+- [#399](https://github.com/benjie/postgraphile-private/pull/399)
+  [`409581534`](https://github.com/benjie/postgraphile-private/commit/409581534f41ac2cf0ff21c77c2bcd8eaa8218fd)
+  Thanks [@benjie](https://github.com/benjie)! - Change many of the dependencies
+  to be instead (or also) peerDependencies, to avoid duplicate modules.
+
+- [#399](https://github.com/benjie/postgraphile-private/pull/399)
+  [`976958e80`](https://github.com/benjie/postgraphile-private/commit/976958e80c791819cd80e96df8209dcff1918585)
+  Thanks [@benjie](https://github.com/benjie)! - Plugins can now use
+  build.grafast rather than adding grafast as a peerDependency.
+
+- [#383](https://github.com/benjie/postgraphile-private/pull/383)
+  [`2c8586b36`](https://github.com/benjie/postgraphile-private/commit/2c8586b367b76af91d1785cc90455c70911fdec7)
+  Thanks [@benjie](https://github.com/benjie)! - Change
+  'objectType.extensions.grafast.Step' to
+  'objectType.extensions.grafast.assertStep', accept it via object spec,
+  deprecate registerObjectType form that accepts it (pass via object spec
+  instead), improve typings around it.
+
+- [#378](https://github.com/benjie/postgraphile-private/pull/378)
+  [`47ff7e824`](https://github.com/benjie/postgraphile-private/commit/47ff7e824b2fc96c11f601c3814d0200208711ce)
+  Thanks [@benjie](https://github.com/benjie)! - Add more detail to an error
+  message
+
+- Updated dependencies
+  [[`409581534`](https://github.com/benjie/postgraphile-private/commit/409581534f41ac2cf0ff21c77c2bcd8eaa8218fd),
+  [`b7533bd4d`](https://github.com/benjie/postgraphile-private/commit/b7533bd4dfc210cb8b113b8fa06f163a212aa5e4),
+  [`9feb769c2`](https://github.com/benjie/postgraphile-private/commit/9feb769c2df0c57971ed26a937be4a1bee7a7524),
+  [`7573bf374`](https://github.com/benjie/postgraphile-private/commit/7573bf374897228b613b19f37b4e076737db3279),
+  [`2c8586b36`](https://github.com/benjie/postgraphile-private/commit/2c8586b367b76af91d1785cc90455c70911fdec7),
+  [`c43802d74`](https://github.com/benjie/postgraphile-private/commit/c43802d7419f93d18964c654f16d0937a2e23ca0),
+  [`b118b8f6d`](https://github.com/benjie/postgraphile-private/commit/b118b8f6dc18196212cfb0a05486e1dd8d77ccf8),
+  [`9008c4f87`](https://github.com/benjie/postgraphile-private/commit/9008c4f87df53be4051c49f9836358dc2baa59df),
+  [`e8c81cd20`](https://github.com/benjie/postgraphile-private/commit/e8c81cd2046390ed5b6799aa7ff3d90b28a1861a)]:
+  - grafast@0.0.1-alpha.10
+
 ## 5.0.0-alpha.10
 
 ### Patch Changes

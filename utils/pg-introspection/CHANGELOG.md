@@ -1,5 +1,15 @@
 # pg-introspection
 
+## 0.0.1-alpha.3
+
+### Patch Changes
+
+- [#386](https://github.com/benjie/postgraphile-private/pull/386)
+  [`8230fcaeb`](https://github.com/benjie/postgraphile-private/commit/8230fcaeb0286c905fc0dad4b7af2d94bac88a44)
+  Thanks [@benjie](https://github.com/benjie)! - If an issue occurs whilst
+  retrieving attributes for a constraint, we now log an error and return an
+  empty array.
+
 ## 0.0.1-alpha.2
 
 ### Patch Changes

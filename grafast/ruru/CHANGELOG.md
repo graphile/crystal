@@ -1,5 +1,14 @@
 # ruru
 
+## 2.0.0-alpha.7
+
+### Patch Changes
+
+- [#399](https://github.com/benjie/postgraphile-private/pull/399)
+  [`409581534`](https://github.com/benjie/postgraphile-private/commit/409581534f41ac2cf0ff21c77c2bcd8eaa8218fd)
+  Thanks [@benjie](https://github.com/benjie)! - Change many of the dependencies
+  to be instead (or also) peerDependencies, to avoid duplicate modules.
+
 ## 2.0.0-alpha.6
 
 ### Patch Changes

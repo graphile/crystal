@@ -1,5 +1,96 @@
 # @dataplan/pg
 
+## 0.0.1-alpha.11
+
+### Patch Changes
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`659508371`](https://github.com/benjie/postgraphile-private/commit/659508371e79e76b581532978fe26d50a54e6248)
+  Thanks [@benjie](https://github.com/benjie)! - List and range codecs now use
+  the underlying codec to parse values from Postgres.
+
+- [#399](https://github.com/benjie/postgraphile-private/pull/399)
+  [`409581534`](https://github.com/benjie/postgraphile-private/commit/409581534f41ac2cf0ff21c77c2bcd8eaa8218fd)
+  Thanks [@benjie](https://github.com/benjie)! - Change many of the dependencies
+  to be instead (or also) peerDependencies, to avoid duplicate modules.
+
+- [#372](https://github.com/benjie/postgraphile-private/pull/372)
+  [`4d64ac127`](https://github.com/benjie/postgraphile-private/commit/4d64ac12799be55680448aab6906312bcbc525ab)
+  Thanks [@benjie](https://github.com/benjie)! - Remove
+  pgSelectSingle.expression; use the equivalent method pgSelectSingle.select
+  instead.
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`17fe531d7`](https://github.com/benjie/postgraphile-private/commit/17fe531d729e88a7126b0e2e06fc1ee9ab3ac5b8)
+  Thanks [@benjie](https://github.com/benjie)! - pgUnionAll uses a slightly more
+  optimal SQL (where JSON isn't cast to `::text` and then back to `::json`)
+
+- [#398](https://github.com/benjie/postgraphile-private/pull/398)
+  [`b7533bd4d`](https://github.com/benjie/postgraphile-private/commit/b7533bd4dfc210cb8b113b8fa06f163a212aa5e4)
+  Thanks [@benjie](https://github.com/benjie)! - Incremental delivery will no
+  longer deliver payloads for paths that don't exist when an error is thrown in
+  an output plan.
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`56b52295c`](https://github.com/benjie/postgraphile-private/commit/56b52295c77d1748c01754d5e71702e05c8a2dd3)
+  Thanks [@benjie](https://github.com/benjie)! - pgUnionAll can now specify a
+  name, making the SQL and query plan easier to read.
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`b5eb7c490`](https://github.com/benjie/postgraphile-private/commit/b5eb7c490305b869e1bfc176a5a417e28f1411cd)
+  Thanks [@benjie](https://github.com/benjie)! - Cursor pagination over nullable
+  columns _should_ now work, although it is untested.
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`7573bf374`](https://github.com/benjie/postgraphile-private/commit/7573bf374897228b613b19f37b4e076737db3279)
+  Thanks [@benjie](https://github.com/benjie)! - Address a decent number of
+  TODO/FIXME/etc comments in the codebase.
+
+- [#378](https://github.com/benjie/postgraphile-private/pull/378)
+  [`95b2ab41e`](https://github.com/benjie/postgraphile-private/commit/95b2ab41e41976de852276b83f7fb5924555e7c5)
+  Thanks [@benjie](https://github.com/benjie)! - Support for nested arrays via
+  PostgreSQL domains.
+
+- [#398](https://github.com/benjie/postgraphile-private/pull/398)
+  [`c43802d74`](https://github.com/benjie/postgraphile-private/commit/c43802d7419f93d18964c654f16d0937a2e23ca0)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a number of issues relating
+  to incremental delivery and iterators
+
+- [#398](https://github.com/benjie/postgraphile-private/pull/398)
+  [`b118b8f6d`](https://github.com/benjie/postgraphile-private/commit/b118b8f6dc18196212cfb0a05486e1dd8d77ccf8)
+  Thanks [@benjie](https://github.com/benjie)! - Incremental delivery `@stream`
+  now works for regular steps as well as streamable steps.
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`b66d2503b`](https://github.com/benjie/postgraphile-private/commit/b66d2503b90eb458af709bb593e5a00d869df03f)
+  Thanks [@benjie](https://github.com/benjie)! - hasNextPage (via hasMore) now
+  uses an access plan rather than a lambda plan.
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`3caaced6c`](https://github.com/benjie/postgraphile-private/commit/3caaced6cfbac4a187a245a61eb103edcb8cd4c9)
+  Thanks [@benjie](https://github.com/benjie)! - When fetching a single row, an
+  `ORDER BY` clause will no longer be added.
+
+- [#396](https://github.com/benjie/postgraphile-private/pull/396)
+  [`9f2507ed9`](https://github.com/benjie/postgraphile-private/commit/9f2507ed9fe8a6abe93c9c8a1cff410446587fd6)
+  Thanks [@benjie](https://github.com/benjie)! - Codecs can now (optionally)
+  have executors associated (typically useful for record codecs); so we've
+  eradicated runtime resource definition for columns that use composite types
+  (or lists thereof) - all composite types accessible from attributes are now
+  guaranteed to have a table-like resource generated in the registry.
+- Updated dependencies
+  [[`409581534`](https://github.com/benjie/postgraphile-private/commit/409581534f41ac2cf0ff21c77c2bcd8eaa8218fd),
+  [`b7533bd4d`](https://github.com/benjie/postgraphile-private/commit/b7533bd4dfc210cb8b113b8fa06f163a212aa5e4),
+  [`9feb769c2`](https://github.com/benjie/postgraphile-private/commit/9feb769c2df0c57971ed26a937be4a1bee7a7524),
+  [`7573bf374`](https://github.com/benjie/postgraphile-private/commit/7573bf374897228b613b19f37b4e076737db3279),
+  [`2c8586b36`](https://github.com/benjie/postgraphile-private/commit/2c8586b367b76af91d1785cc90455c70911fdec7),
+  [`c43802d74`](https://github.com/benjie/postgraphile-private/commit/c43802d7419f93d18964c654f16d0937a2e23ca0),
+  [`b118b8f6d`](https://github.com/benjie/postgraphile-private/commit/b118b8f6dc18196212cfb0a05486e1dd8d77ccf8),
+  [`9008c4f87`](https://github.com/benjie/postgraphile-private/commit/9008c4f87df53be4051c49f9836358dc2baa59df),
+  [`e8c81cd20`](https://github.com/benjie/postgraphile-private/commit/e8c81cd2046390ed5b6799aa7ff3d90b28a1861a)]:
+  - grafast@0.0.1-alpha.10
+  - @dataplan/json@0.0.1-alpha.10
+
 ## 0.0.1-alpha.10
 
 ### Patch Changes
