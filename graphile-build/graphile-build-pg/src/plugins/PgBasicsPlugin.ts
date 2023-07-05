@@ -12,6 +12,7 @@ import type {
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
+import * as dataplanPg from "@dataplan/pg";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
@@ -41,6 +42,12 @@ declare global {
     ) => void;
 
     interface Build {
+      /**
+       * A copy of `import * from "@dataplan/pg"` so that plugins don't need to
+       * import it directly.
+       */
+      dataplanPg: typeof import("@dataplan/pg");
+
       /**
        * A store of metadata for given codecs. Currently internal as this API
        * may change.
@@ -258,6 +265,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         return build.extend(
           build,
           {
+            dataplanPg,
             pgCodecMetaLookup,
             getGraphQLTypeNameByPgCodec,
             getGraphQLTypeByPgCodec,
