@@ -46,6 +46,7 @@ declare global {
        * A copy of `import * from "@dataplan/pg"` so that plugins don't need to
        * import it directly.
        */
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       dataplanPg: typeof import("@dataplan/pg");
 
       /**
