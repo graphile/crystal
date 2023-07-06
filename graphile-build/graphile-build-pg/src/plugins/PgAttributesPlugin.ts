@@ -104,7 +104,7 @@ function processAttribute(
 
   if (
     !build.behavior.pgCodecAttributeMatches(
-      [pgCodec, attribute],
+      [pgCodec, attributeName],
       "attribute:select",
     )
   ) {
@@ -414,7 +414,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
               const fieldBehaviorScope = `attribute:${action}`;
               if (
                 !build.behavior.pgCodecAttributeMatches(
-                  [pgCodec, attribute],
+                  [pgCodec, attributeName],
                   fieldBehaviorScope,
                 )
               ) {

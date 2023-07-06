@@ -120,7 +120,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                     (memo, [attributeName, attribute]) => {
                       if (
                         !build.behavior.pgCodecAttributeMatches(
-                          [codec, attribute],
+                          [codec, attributeName],
                           "attribute:filterBy",
                         )
                       ) {

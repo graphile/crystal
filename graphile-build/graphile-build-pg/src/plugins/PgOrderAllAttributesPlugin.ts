@@ -101,7 +101,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
             (memo, [attributeName, attribute]) => {
               if (
                 !build.behavior.pgCodecAttributeMatches(
-                  [pgCodec, attribute],
+                  [pgCodec, attributeName],
                   "attribute:orderBy",
                 )
               ) {
@@ -110,7 +110,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               if (attribute.codec.arrayOfCodec) {
                 if (
                   !build.behavior.pgCodecAttributeMatches(
-                    [pgCodec, attribute],
+                    [pgCodec, attributeName],
                     "attribute:orderBy:array",
                   )
                 ) {
@@ -120,7 +120,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               if (attribute.codec.rangeOfCodec) {
                 if (
                   !build.behavior.pgCodecAttributeMatches(
-                    [pgCodec, attribute],
+                    [pgCodec, attributeName],
                     "attribute:orderBy:range",
                   )
                 ) {
