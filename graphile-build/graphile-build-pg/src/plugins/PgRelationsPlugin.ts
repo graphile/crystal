@@ -35,6 +35,9 @@ const ref_sql = te.ref(sql, "sql");
 
 declare global {
   namespace GraphileBuild {
+    interface SchemaOptions {
+      pgMutationPayloadRelations?: boolean;
+    }
     interface PgRelationsPluginRelationDetails {
       registry: PgRegistry;
       codec: PgCodecWithAttributes;
@@ -720,8 +723,8 @@ function addRelations(
       : undefined;
 
   const codec = (pgTypeResource?.codec ?? pgCodec) as PgCodecWithAttributes;
-  // TODO: make it so isMutationPayload doesn't trigger this by default (only in V4 compatibility mode)
   if (
+    (isMutationPayload && !build.options.pgMutationPayloadRelations) ||
     !(isPgClassType || isMutationPayload || pgPolymorphism) ||
     !codec ||
     !codec.attributes
@@ -729,9 +732,6 @@ function addRelations(
     return fields;
   }
   const allPgResources = Object.values(build.input.pgRegistry.pgResources);
-  // TODO: change the default so that we don't do this on
-  // isMutationPayload; only do that for V4 compat. (It's redundant vs
-  // just using the object type directly)
   const resource = (pgTypeResource ??
     allPgResources.find((s) => s.codec === codec && !s.parameters)) as
     | PgResource<any, PgCodecWithAttributes, any, any, any>
