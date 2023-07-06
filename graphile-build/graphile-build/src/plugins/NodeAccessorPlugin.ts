@@ -59,24 +59,25 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
           build,
           {
             specForHandler: EXPORTABLE(
-              () => (handler, codec) => {
-                function spec(nodeId: string) {
-                  // We only want to return the specifier if it matches
-                  // this handler; otherwise return null.
-                  try {
-                    const specifier = codec.decode(nodeId);
-                    if (handler.match(specifier)) {
-                      return specifier;
+              () =>
+                function (handler, codec) {
+                  function spec(nodeId: string) {
+                    // We only want to return the specifier if it matches
+                    // this handler; otherwise return null.
+                    try {
+                      const specifier = codec.decode(nodeId);
+                      if (handler.match(specifier)) {
+                        return specifier;
+                      }
+                    } catch {
+                      // Ignore errors
                     }
-                  } catch {
-                    // Ignore errors
+                    return null;
                   }
-                  return null;
-                }
-                spec.displayName = `specifier_${handler.typeName}_${handler.codecName}`;
-                spec.isSyncAndSafe = true; // Optimization
-                return spec;
-              },
+                  spec.displayName = `specifier_${handler.typeName}_${handler.codecName}`;
+                  spec.isSyncAndSafe = true; // Optimization
+                  return spec;
+                },
               [],
             ),
             nodeFetcherByTypeName(typeName) {

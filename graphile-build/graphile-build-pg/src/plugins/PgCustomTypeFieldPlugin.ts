@@ -374,6 +374,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 finalBuild.behavior.pgCodecMatches(param.codec, "node")
                   ? "nodeId"
                   : "input");
+              if (variant === "nodeId" && !param.codec.attributes) {
+                throw new Error(
+                  `Argument is marked as nodeId, but it doesn't seem to be a record type. Lists of nodeIds are not yet supported.`,
+                );
+              }
               const baseInputType =
                 variant === "nodeId"
                   ? GraphQLID
@@ -494,7 +499,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         step = constant(null);
                       }
                     } else if (fetcher) {
-                      step = fetcher(args.get([...path, graphqlArgName]));
+                      step = (
+                        fetcher(
+                          args.get([...path, graphqlArgName]),
+                        ) as PgSelectSingleStep
+                      ).record();
                     } else {
                       step = args.get([...path, graphqlArgName]);
                     }
