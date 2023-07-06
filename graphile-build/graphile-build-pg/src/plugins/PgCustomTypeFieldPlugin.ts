@@ -165,6 +165,9 @@ declare global {
         details: InflectionCustomFieldMutationResult,
       ): string;
     }
+    interface SchemaOptions {
+      pgUseNodeIdForFunctionRecordArguments?: boolean;
+    }
   }
 }
 
@@ -190,7 +193,8 @@ function defaultProcSourceBehavior(
     s.parameters &&
     // Don't default to this being a queryField if it looks like a computed attribute function
     (!firstParameter?.codec?.attributes ||
-      firstParameter?.codec?.extensions?.isTableLike === false)
+      firstParameter?.codec?.extensions?.isTableLike === false ||
+      firstParameter?.extensions?.variant === "nodeId")
   ) {
     behavior.push("queryField");
   } else {
@@ -203,7 +207,12 @@ function defaultProcSourceBehavior(
     behavior.push("-mutationField");
   }
 
-  if (s.parameters && s.parameters?.[0]?.codec?.attributes && !s.isMutation) {
+  if (
+    s.parameters &&
+    !s.isMutation &&
+    firstParameter?.codec?.attributes &&
+    firstParameter.extensions?.variant !== "nodeId"
+  ) {
     behavior.push("typeField");
   } else {
     behavior.push("-typeField");
@@ -342,24 +351,46 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           build[$$rootMutation] = [];
           build[$$computed] = new Map();
           const {
-            graphql: { GraphQLList, GraphQLNonNull, isInputType },
+            graphql: { GraphQLID, GraphQLList, GraphQLNonNull, isInputType },
+            options: { pgUseNodeIdForFunctionRecordArguments },
           } = build;
           build.pgGetArgDetailsFromParameters = (
             resource,
             parameters = resource.parameters,
           ) => {
+            const finalBuild = build as GraphileBuild.Build;
             const argDetails = parameters.map((param, index) => {
-              const argName = build.inflection.argument({
+              const argName = finalBuild.inflection.argument({
                 param,
                 resource,
                 index,
               });
               const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
-              const variant = param.extensions?.variant ?? "input";
-              const baseInputType = build.getGraphQLTypeByPgCodec!(
-                paramBaseCodec,
-                variant,
-              );
+              const variant =
+                param.extensions?.variant ??
+                (pgUseNodeIdForFunctionRecordArguments &&
+                !resource.isMutation &&
+                param.codec.attributes &&
+                finalBuild.behavior.pgCodecMatches(param.codec, "node")
+                  ? "nodeId"
+                  : "input");
+              const baseInputType =
+                variant === "nodeId"
+                  ? GraphQLID
+                  : finalBuild.getGraphQLTypeByPgCodec!(
+                      paramBaseCodec,
+                      variant,
+                    );
+              const typeNameForFetcher =
+                variant === "nodeId"
+                  ? finalBuild.getGraphQLTypeNameByPgCodec(
+                      paramBaseCodec,
+                      "output",
+                    )
+                  : null;
+              const fetcher = typeNameForFetcher
+                ? finalBuild.nodeFetcherByTypeName(typeNameForFetcher)
+                : null;
               if (!baseInputType) {
                 const hint =
                   variant === "input"
@@ -393,6 +424,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 pgCodec: param.codec,
                 inputType,
                 required: param.required,
+                fetcher,
               };
             });
 
@@ -408,11 +440,18 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               }, Object.create(null) as { [graphqlArgName: string]: { type: GraphQLInputType } });
 
             const argDetailsSimple = argDetails.map(
-              ({ graphqlArgName, pgCodec, required, postgresArgName }) => ({
+              ({
+                graphqlArgName,
+                pgCodec,
+                required,
+                postgresArgName,
+                fetcher,
+              }) => ({
                 graphqlArgName,
                 postgresArgName,
                 pgCodec,
                 required,
+                fetcher,
               }),
             );
             let indexAfterWhichAllArgsAreNamed = 0;
@@ -440,6 +479,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       postgresArgName,
                       pgCodec,
                       required,
+                      fetcher,
                     } = argDetailsSimple[i];
                     const $raw = args.getRaw([...path, graphqlArgName]);
                     let step: ExecutableStep;
@@ -453,6 +493,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       } else {
                         step = constant(null);
                       }
+                    } else if (fetcher) {
+                      step = fetcher(args.get([...path, graphqlArgName]));
                     } else {
                       step = args.get([...path, graphqlArgName]);
                     }

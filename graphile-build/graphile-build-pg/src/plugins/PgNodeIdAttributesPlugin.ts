@@ -164,7 +164,13 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                       // (unless we want to check it exists).
                       applyPlan: isPgCondition
                         ? EXPORTABLE(
-                            (fetcher, localAttributes, remoteAttributes, sql) =>
+                            (
+                              fetcher,
+                              localAttributeCodecs,
+                              localAttributes,
+                              remoteAttributes,
+                              sql,
+                            ) =>
                               function plan(
                                 $condition: PgConditionStep<PgSelectStep<any>>,
                                 val,
@@ -207,7 +213,13 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                   }
                                 }
                               },
-                            [fetcher, localAttributes, remoteAttributes, sql],
+                            [
+                              fetcher,
+                              localAttributeCodecs,
+                              localAttributes,
+                              remoteAttributes,
+                              sql,
+                            ],
                           )
                         : EXPORTABLE(
                             (fetcher, localAttributes, remoteAttributes) =>
