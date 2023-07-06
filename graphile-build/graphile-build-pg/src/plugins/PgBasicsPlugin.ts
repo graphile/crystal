@@ -83,6 +83,11 @@ declare global {
       sql: typeof sql;
 
       pgGetBehavior: typeof getBehavior;
+
+      getPgCodecAttributeName(
+        codec: PgCodec,
+        attribute: PgCodecAttribute,
+      ): string | undefined;
     }
 
     interface BehaviorEntities {
@@ -274,6 +279,17 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             setGraphQLTypeForPgCodec,
             sql,
             pgGetBehavior: getBehavior,
+            getPgCodecAttributeName(codec, attribute) {
+              const name = Object.entries(codec.attributes!).find(
+                ([_name, attr]) => attr === attribute,
+              )?.[0];
+              if (!name) {
+                throw new Error(
+                  `Codec ${codec.name} doesn't seem to contain the attribute specified`,
+                );
+              }
+              return name;
+            },
             // For slightly better backwards compatibility with v4.
             pgSql: sql,
           },
