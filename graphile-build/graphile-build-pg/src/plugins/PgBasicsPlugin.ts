@@ -120,6 +120,11 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         after: ["default", "inferred"],
         provides: ["override"],
         callback(behavior, [codec, attributeName]) {
+          if (typeof attributeName !== "string") {
+            throw new Error(
+              `pgCodecAttribute no longer accepts (codec, attribute) - it now accepts (codec, attributeName). Please update your code. Sorry! (Changed in PostGraphile V5 alpha 13.)`,
+            );
+          }
           const attribute = codec.attributes[attributeName];
           return [
             behavior,
