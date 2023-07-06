@@ -150,6 +150,9 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
 - `attribute:base` - should we add this attribute to the "base" input type?
+- `relation:attribute:insert` - can this attribute (which is part of a foreign key) be inserted into?
+- `relation:attribute:update` - can this attribute (which is part of a foreign key) be updated?
+- `relation:attribute:base` - should we add this attribute (which is part of a foreign key) to the "base" input type?
 - `node` - should this resource implement the GraphQL Global Object Identification
   specification
 - `list` - list (simple collection)
