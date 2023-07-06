@@ -580,7 +580,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             "resource:select",
             "table",
             ...(!codec.isAnonymous
-              ? ["resource:insert", "resource:update"]
+              ? ["resource:insert", "resource:update", "resource:delete"]
               : []),
             behavior,
           ];
