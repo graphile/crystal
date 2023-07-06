@@ -5,8 +5,10 @@ import "graphile-config";
 import type {
   PgCodecRelation,
   PgCodecWithAttributes,
+  PgConditionStep,
   PgRegistry,
   PgSelectSingleStep,
+  PgSelectStep,
 } from "@dataplan/pg";
 import type { SetterStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
@@ -50,7 +52,8 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       // By default, column attributes will be present, so we don't want this to also be set
-      pgCodecRelation: "-nodeId:insert -nodeId:update -nodeId:base",
+      pgCodecRelation:
+        "-nodeId:insert -nodeId:update -nodeId:base -nodeId:filterBy",
     },
     hooks: {
       GraphQLInputObjectType_fields(fields, build, context) {
@@ -59,6 +62,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
           inflection,
           graphql: { GraphQLID },
           input: { pgRegistry },
+          sql,
         } = build;
         const {
           scope: {
@@ -67,11 +71,12 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
             isPgPatch,
             isPgBaseInput,
             pgCodec: rawPgCodec,
+            isPgCondition,
           },
           fieldWithHooks,
         } = context;
         if (
-          !(isPgRowType || isPgCompoundType) ||
+          !(isPgRowType || isPgCompoundType || isPgCondition) ||
           !rawPgCodec ||
           !rawPgCodec.attributes ||
           rawPgCodec.isAnonymous
@@ -104,6 +109,8 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                 ? "base"
                 : isPgPatch
                 ? "update"
+                : isPgCondition
+                ? "filterBy"
                 : "insert";
 
               const fieldBehaviorScope = `nodeId:${action}`;
@@ -128,6 +135,9 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                 (attr) => attr.notNull || attr.extensions?.tags?.notNull,
               );
               const { localAttributes, remoteAttributes } = relation;
+              const localAttributeCodecs = localAttributes.map(
+                (name) => pgCodec.attributes[name].codec,
+              );
               const fetcher = build.nodeFetcherByTypeName(typeName);
               return extend(
                 memo,
@@ -140,7 +150,10 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                     },
                     {
                       type: build.nullableIf(
-                        isPgBaseInput || isPgPatch || !anAttributeIsNotNull,
+                        isPgBaseInput ||
+                          isPgPatch ||
+                          isPgCondition ||
+                          !anAttributeIsNotNull,
                         GraphQLID,
                       ),
                       deprecationReason: fetcher.deprecationReason,
@@ -149,23 +162,75 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                       // ENHANCE: if the remote columns are the primary keys
                       // then there's no need to actually fetch the record
                       // (unless we want to check it exists).
-                      applyPlan: EXPORTABLE(
-                        (fetcher, localAttributes, remoteAttributes) =>
-                          function plan($insert: SetterStep<any, any>, val) {
-                            const $record = fetcher(
-                              val.get(),
-                            ) as PgSelectSingleStep;
-                            for (
-                              let i = 0, l = localAttributes.length;
-                              i < l;
-                              i++
-                            ) {
-                              const $val = $record.get(remoteAttributes[i]);
-                              $insert.set(localAttributes[i], $val);
-                            }
-                          },
-                        [fetcher, localAttributes, remoteAttributes],
-                      ),
+                      applyPlan: isPgCondition
+                        ? EXPORTABLE(
+                            (fetcher, localAttributes, remoteAttributes, sql) =>
+                              function plan(
+                                $condition: PgConditionStep<PgSelectStep<any>>,
+                                val,
+                              ) {
+                                if (val.getRaw().evalIs(null)) {
+                                  for (
+                                    let i = 0, l = localAttributes.length;
+                                    i < l;
+                                    i++
+                                  ) {
+                                    const localName = localAttributes[i];
+                                    $condition.where({
+                                      type: "attribute",
+                                      attribute: localName,
+                                      callback: (expression) =>
+                                        sql`${expression} is null`,
+                                    });
+                                  }
+                                } else {
+                                  const $record = fetcher(
+                                    val.get(),
+                                  ) as PgSelectSingleStep;
+                                  for (
+                                    let i = 0, l = localAttributes.length;
+                                    i < l;
+                                    i++
+                                  ) {
+                                    const localName = localAttributes[i];
+                                    const codec = localAttributeCodecs[i];
+                                    const remoteName = remoteAttributes[i];
+                                    $condition.where({
+                                      type: "attribute",
+                                      attribute: localName,
+                                      callback: (expression) =>
+                                        sql`${expression} = ${$condition.placeholder(
+                                          $record.get(remoteName),
+                                          codec,
+                                        )}`,
+                                    });
+                                  }
+                                }
+                              },
+                            [fetcher, localAttributes, remoteAttributes, sql],
+                          )
+                        : EXPORTABLE(
+                            (fetcher, localAttributes, remoteAttributes) =>
+                              function plan(
+                                $insert: SetterStep<any, any>,
+                                val,
+                              ) {
+                                const $record = fetcher(
+                                  val.get(),
+                                ) as PgSelectSingleStep;
+                                for (
+                                  let i = 0, l = localAttributes.length;
+                                  i < l;
+                                  i++
+                                ) {
+                                  const localName = localAttributes[i];
+                                  const remoteName = remoteAttributes[i];
+                                  const $val = $record.get(remoteName);
+                                  $insert.set(localName, $val);
+                                }
+                              },
+                            [fetcher, localAttributes, remoteAttributes],
+                          ),
                     },
                   ),
                 },

@@ -932,6 +932,8 @@ type Post implements Node {
 A condition to be used against `Post` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input PostCondition {
+  author: ID
+
   """Checks for equality with the object’s `body` field."""
   body: String
 }
@@ -1428,6 +1430,7 @@ for equality and combined with a logical ‘and.’
 input TvEpisodeCondition {
   """Checks for equality with the object’s `title` field."""
   title: String
+  tvShowByShowId: ID
 }
 
 """An input for mutations affecting `TvEpisode`"""
@@ -1524,6 +1527,8 @@ type TvShow implements Node {
 A condition to be used against `TvShow` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input TvShowCondition {
+  studioByStudioId: ID
+
   """Checks for equality with the object’s `title` field."""
   title: String
 }

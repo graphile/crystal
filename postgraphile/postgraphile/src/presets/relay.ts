@@ -38,6 +38,7 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
 +node \
 +connection -list \
 -query:resource:single \
++nodeId:filterBy \
 +nodeId:resource:update -constraint:resource:update \
 +nodeId:resource:delete -constraint:resource:delete \
 +nodeId:insert -relation:attribute:insert \
