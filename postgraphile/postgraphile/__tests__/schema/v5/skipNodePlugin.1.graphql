@@ -302,9 +302,6 @@ input BAuthenticatePayloadInput {
 
 """The output of our `bAuthenticatePayload` mutation."""
 type BAuthenticatePayloadPayload {
-  """Reads a single `CPerson` that is related to this `BAuthPayload`."""
-  cPersonByRowId: CPerson
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -893,12 +890,6 @@ type BTypeFunctionMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-
-  """Reads a single `Post` that is related to this `BType`."""
-  postByRowId: Post
-
-  """Reads a single `Post` that is related to this `BType`."""
-  postBySmallint: Post
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -1992,9 +1983,6 @@ type CLeftArmIdentityPayload {
     """The method to use when ordering `CLeftArm`."""
     orderBy: [CLeftArmOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CLeftArmEdge
-
-  """Reads a single `CPerson` that is related to this `CLeftArm`."""
-  cPersonByPersonId: CPerson
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -3142,9 +3130,6 @@ input CTableMutationInput {
 
 """The output of our `cTableMutation` mutation."""
 type CTableMutationPayload {
-  """Reads a single `CPerson` that is related to this `Post`."""
-  cPersonByAuthorId: CPerson
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -3262,12 +3247,6 @@ type CreateBTypePayload {
   """
   clientMutationId: String
 
-  """Reads a single `Post` that is related to this `BType`."""
-  postByRowId: Post
-
-  """Reads a single `Post` that is related to this `BType`."""
-  postBySmallint: Post
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
@@ -3325,12 +3304,6 @@ type CreateCCompoundKeyPayload {
     """The method to use when ordering `CCompoundKey`."""
     orderBy: [CCompoundKeyOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CCompoundKeyEdge
-
-  """Reads a single `CPerson` that is related to this `CCompoundKey`."""
-  cPersonByPersonId1: CPerson
-
-  """Reads a single `CPerson` that is related to this `CCompoundKey`."""
-  cPersonByPersonId2: CPerson
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -3430,9 +3403,6 @@ type CreateCLeftArmPayload {
     """The method to use when ordering `CLeftArm`."""
     orderBy: [CLeftArmOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CLeftArmEdge
-
-  """Reads a single `CPerson` that is related to this `CLeftArm`."""
-  cPersonByPersonId: CPerson
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -3565,9 +3535,6 @@ input CreateCPersonSecretInput {
 
 """The output of our create `CPersonSecret` mutation."""
 type CreateCPersonSecretPayload {
-  """The `Person` this `PersonSecret` belongs to."""
-  cPersonByPersonId: CPerson
-
   """The `CPersonSecret` that was created by this mutation."""
   cPersonSecret: CPersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
@@ -3638,12 +3605,6 @@ input CreateForeignKeyInput {
 
 """The output of our create `ForeignKey` mutation."""
 type CreateForeignKeyPayload {
-  """Reads a single `CCompoundKey` that is related to this `ForeignKey`."""
-  cCompoundKeyByCompoundKey1AndCompoundKey2: CCompoundKey
-
-  """Reads a single `CPerson` that is related to this `ForeignKey`."""
-  cPersonByPersonId: CPerson
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -3772,9 +3733,6 @@ input CreatePostInput {
 
 """The output of our create `Post` mutation."""
 type CreatePostPayload {
-  """Reads a single `CPerson` that is related to this `Post`."""
-  cPersonByAuthorId: CPerson
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -4015,11 +3973,6 @@ input CreateUniqueForeignKeyInput {
 """The output of our create `UniqueForeignKey` mutation."""
 type CreateUniqueForeignKeyPayload {
   """
-  Reads a single `CCompoundKey` that is related to this `UniqueForeignKey`.
-  """
-  cCompoundKeyByCompoundKey1AndCompoundKey2: CCompoundKey
-
-  """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
@@ -4219,12 +4172,6 @@ type DeleteBTypePayload {
   """
   clientMutationId: String
 
-  """Reads a single `Post` that is related to this `BType`."""
-  postByRowId: Post
-
-  """Reads a single `Post` that is related to this `BType`."""
-  postBySmallint: Post
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
@@ -4254,12 +4201,6 @@ type DeleteCCompoundKeyPayload {
     """The method to use when ordering `CCompoundKey`."""
     orderBy: [CCompoundKeyOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CCompoundKeyEdge
-
-  """Reads a single `CPerson` that is related to this `CCompoundKey`."""
-  cPersonByPersonId1: CPerson
-
-  """Reads a single `CPerson` that is related to this `CCompoundKey`."""
-  cPersonByPersonId2: CPerson
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -4336,9 +4277,6 @@ type DeleteCLeftArmPayload {
     """The method to use when ordering `CLeftArm`."""
     orderBy: [CLeftArmOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CLeftArmEdge
-
-  """Reads a single `CPerson` that is related to this `CLeftArm`."""
-  cPersonByPersonId: CPerson
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -4475,9 +4413,6 @@ input DeleteCPersonSecretByPersonIdInput {
 
 """The output of our delete `CPersonSecret` mutation."""
 type DeleteCPersonSecretPayload {
-  """The `Person` this `PersonSecret` belongs to."""
-  cPersonByPersonId: CPerson
-
   """The `CPersonSecret` that was deleted by this mutation."""
   cPersonSecret: CPersonSecret
 
@@ -4637,9 +4572,6 @@ input DeletePostByRowIdInput {
 
 """The output of our delete `Post` mutation."""
 type DeletePostPayload {
-  """Reads a single `CPerson` that is related to this `Post`."""
-  cPersonByAuthorId: CPerson
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -4841,11 +4773,6 @@ input DeleteUniqueForeignKeyByCompoundKey1AndCompoundKey2Input {
 
 """The output of our delete `UniqueForeignKey` mutation."""
 type DeleteUniqueForeignKeyPayload {
-  """
-  Reads a single `CCompoundKey` that is related to this `UniqueForeignKey`.
-  """
-  cCompoundKeyByCompoundKey1AndCompoundKey2: CCompoundKey
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -6526,9 +6453,6 @@ input PostWithSuffixInput {
 
 """The output of our `postWithSuffix` mutation."""
 type PostWithSuffixPayload {
-  """Reads a single `CPerson` that is related to this `Post`."""
-  cPersonByAuthorId: CPerson
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -8358,12 +8282,6 @@ type UpdateBTypePayload {
   """
   clientMutationId: String
 
-  """Reads a single `Post` that is related to this `BType`."""
-  postByRowId: Post
-
-  """Reads a single `Post` that is related to this `BType`."""
-  postBySmallint: Post
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
@@ -8398,12 +8316,6 @@ type UpdateCCompoundKeyPayload {
     """The method to use when ordering `CCompoundKey`."""
     orderBy: [CCompoundKeyOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CCompoundKeyEdge
-
-  """Reads a single `CPerson` that is related to this `CCompoundKey`."""
-  cPersonByPersonId1: CPerson
-
-  """Reads a single `CPerson` that is related to this `CCompoundKey`."""
-  cPersonByPersonId2: CPerson
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -8495,9 +8407,6 @@ type UpdateCLeftArmPayload {
     """The method to use when ordering `CLeftArm`."""
     orderBy: [CLeftArmOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CLeftArmEdge
-
-  """Reads a single `CPerson` that is related to this `CLeftArm`."""
-  cPersonByPersonId: CPerson
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -8659,9 +8568,6 @@ input UpdateCPersonSecretByPersonIdInput {
 
 """The output of our update `CPersonSecret` mutation."""
 type UpdateCPersonSecretPayload {
-  """The `Person` this `PersonSecret` belongs to."""
-  cPersonByPersonId: CPerson
-
   """The `CPersonSecret` that was updated by this mutation."""
   cPersonSecret: CPersonSecret
 
@@ -8846,9 +8752,6 @@ input UpdatePostByRowIdInput {
 
 """The output of our update `Post` mutation."""
 type UpdatePostPayload {
-  """Reads a single `CPerson` that is related to this `Post`."""
-  cPersonByAuthorId: CPerson
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -9080,11 +8983,6 @@ input UpdateUniqueForeignKeyByCompoundKey1AndCompoundKey2Input {
 
 """The output of our update `UniqueForeignKey` mutation."""
 type UpdateUniqueForeignKeyPayload {
-  """
-  Reads a single `CCompoundKey` that is related to this `UniqueForeignKey`.
-  """
-  cCompoundKeyByCompoundKey1AndCompoundKey2: CCompoundKey
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
