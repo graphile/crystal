@@ -58,24 +58,27 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
         return build.extend(
           build,
           {
-            specForHandler(handler, codec) {
-              function spec(nodeId: string) {
-                // We only want to return the specifier if it matches
-                // this handler; otherwise return null.
-                try {
-                  const specifier = codec.decode(nodeId);
-                  if (handler.match(specifier)) {
-                    return specifier;
+            specForHandler: EXPORTABLE(
+              () => (handler, codec) => {
+                function spec(nodeId: string) {
+                  // We only want to return the specifier if it matches
+                  // this handler; otherwise return null.
+                  try {
+                    const specifier = codec.decode(nodeId);
+                    if (handler.match(specifier)) {
+                      return specifier;
+                    }
+                  } catch {
+                    // Ignore errors
                   }
-                } catch {
-                  // Ignore errors
+                  return null;
                 }
-                return null;
-              }
-              spec.displayName = `specifier_${handler.typeName}_${handler.codecName}`;
-              spec.isSyncAndSafe = true; // Optimization
-              return spec;
-            },
+                spec.displayName = `specifier_${handler.typeName}_${handler.codecName}`;
+                spec.isSyncAndSafe = true; // Optimization
+                return spec;
+              },
+              [],
+            ),
             nodeFetcherByTypeName(typeName) {
               const existing = nodeFetcherByTypeNameCache.get(typeName);
               if (existing) return existing;
@@ -83,18 +86,20 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               const { specForHandler } = finalBuild;
               const handler = finalBuild.getNodeIdHandler(typeName)!;
               const codec = finalBuild.getNodeIdCodec(handler.codecName);
-              const fetcher: NodeFetcher = EXPORTABLE(
-                (codec, handler, lambda, specForHandler) =>
-                  ($nodeId: ExecutableStep<string>) => {
+              const fetcher = EXPORTABLE(
+                (codec, handler, lambda, specForHandler) => {
+                  const fn: NodeFetcher = ($nodeId: ExecutableStep<string>) => {
                     const $decoded = lambda(
                       $nodeId,
                       specForHandler(handler, codec),
                     );
                     return handler.get(handler.getSpec($decoded));
-                  },
+                  };
+                  fn.deprecationReason = handler.deprecationReason;
+                  return fn;
+                },
                 [codec, handler, lambda, specForHandler],
               );
-              fetcher.deprecationReason = handler.deprecationReason;
               nodeFetcherByTypeNameCache.set(typeName, fetcher);
               return fetcher;
             },
