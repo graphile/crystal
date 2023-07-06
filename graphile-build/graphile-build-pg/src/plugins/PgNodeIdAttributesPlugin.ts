@@ -146,6 +146,9 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                       deprecationReason: fetcher.deprecationReason,
                       autoApplyAfterParentInputPlan: true,
                       autoApplyAfterParentApplyPlan: true,
+                      // ENHANCE: if the remote columns are the primary keys
+                      // then there's no need to actually fetch the record
+                      // (unless we want to check it exists).
                       applyPlan: EXPORTABLE(
                         (fetcher, localAttributes, remoteAttributes) =>
                           function plan($insert: SetterStep<any, any>, val) {
