@@ -82,9 +82,6 @@ input CreatePostInput {
 
 """The output of our create `Post` mutation."""
 type CreatePostPayload {
-  """Reads a single `Person` that is related to this `Post`."""
-  author: Person
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -203,9 +200,6 @@ type CreateTvEpisodePayload {
     """The method to use when ordering `TvEpisode`."""
     orderBy: [TvEpisodesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvEpisodesEdge
-
-  """Reads a single `TvShow` that is related to this `TvEpisode`."""
-  tvShowByShowId: TvShow
 }
 
 """All input for the create `TvShow` mutation."""
@@ -233,9 +227,6 @@ type CreateTvShowPayload {
   """
   query: Query
 
-  """Reads a single `Studio` that is related to this `TvShow`."""
-  studioByStudioId: Studio
-
   """The `TvShow` that was created by this mutation."""
   tvShow: TvShow
 
@@ -249,14 +240,18 @@ type CreateTvShowPayload {
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
-"""All input for the `deleteFilmByCode` mutation."""
-input DeleteFilmByCodeInput {
+"""All input for the `deleteFilm` mutation."""
+input DeleteFilmInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  code: Int!
+
+  """
+  The globally unique `ID` which will identify a single `Film` to be deleted.
+  """
+  id: ID!
 }
 
 """The output of our delete `Film` mutation."""
@@ -283,14 +278,18 @@ type DeleteFilmPayload {
   query: Query
 }
 
-"""All input for the `deletePersonById` mutation."""
-input DeletePersonByIdInput {
+"""All input for the `deletePerson` mutation."""
+input DeletePersonInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int!
+
+  """
+  The globally unique `ID` which will identify a single `Person` to be deleted.
+  """
+  id: ID!
 }
 
 """The output of our delete `Person` mutation."""
@@ -317,21 +316,22 @@ type DeletePersonPayload {
   query: Query
 }
 
-"""All input for the `deletePostById` mutation."""
-input DeletePostByIdInput {
+"""All input for the `deletePost` mutation."""
+input DeletePostInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int!
+
+  """
+  The globally unique `ID` which will identify a single `Post` to be deleted.
+  """
+  id: ID!
 }
 
 """The output of our delete `Post` mutation."""
 type DeletePostPayload {
-  """Reads a single `Person` that is related to this `Post`."""
-  author: Person
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -354,14 +354,18 @@ type DeletePostPayload {
   query: Query
 }
 
-"""All input for the `deleteStudioById` mutation."""
-input DeleteStudioByIdInput {
+"""All input for the `deleteStudio` mutation."""
+input DeleteStudioInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int!
+
+  """
+  The globally unique `ID` which will identify a single `Studio` to be deleted.
+  """
+  id: ID!
 }
 
 """The output of our delete `Studio` mutation."""
@@ -388,14 +392,18 @@ type DeleteStudioPayload {
   ): StudiosEdge
 }
 
-"""All input for the `deleteTvEpisodeByCode` mutation."""
-input DeleteTvEpisodeByCodeInput {
+"""All input for the `deleteTvEpisode` mutation."""
+input DeleteTvEpisodeInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  code: Int!
+
+  """
+  The globally unique `ID` which will identify a single `TvEpisode` to be deleted.
+  """
+  id: ID!
 }
 
 """The output of our delete `TvEpisode` mutation."""
@@ -420,19 +428,20 @@ type DeleteTvEpisodePayload {
     """The method to use when ordering `TvEpisode`."""
     orderBy: [TvEpisodesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvEpisodesEdge
-
-  """Reads a single `TvShow` that is related to this `TvEpisode`."""
-  tvShowByShowId: TvShow
 }
 
-"""All input for the `deleteTvShowByCode` mutation."""
-input DeleteTvShowByCodeInput {
+"""All input for the `deleteTvShow` mutation."""
+input DeleteTvShowInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  code: Int!
+
+  """
+  The globally unique `ID` which will identify a single `TvShow` to be deleted.
+  """
+  id: ID!
 }
 
 """The output of our delete `TvShow` mutation."""
@@ -449,9 +458,6 @@ type DeleteTvShowPayload {
   """
   query: Query
 
-  """Reads a single `Studio` that is related to this `TvShow`."""
-  studioByStudioId: Studio
-
   """The `TvShow` that was deleted by this mutation."""
   tvShow: TvShow
 
@@ -463,12 +469,10 @@ type DeleteTvShowPayload {
 }
 
 type Film implements Node {
-  code: Int!
-
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
+  id: ID!
   title: String
 }
 
@@ -476,9 +480,6 @@ type Film implements Node {
 A condition to be used against `Film` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input FilmCondition {
-  """Checks for equality with the object’s `code` field."""
-  code: Int
-
   """Checks for equality with the object’s `title` field."""
   title: String
 }
@@ -491,7 +492,6 @@ input FilmInput {
 
 """Represents an update to a `Film`. Fields that are set will be updated."""
 input FilmPatch {
-  code: Int
   title: String
 }
 
@@ -523,8 +523,6 @@ type FilmsEdge {
 
 """Methods to use when ordering `Film`."""
 enum FilmsOrderBy {
-  CODE_ASC
-  CODE_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -652,52 +650,52 @@ type Mutation {
     input: CreateTvShowInput!
   ): CreateTvShowPayload
 
-  """Deletes a single `Film` using a unique key."""
-  deleteFilmByCode(
+  """Deletes a single `Film` using its globally unique id."""
+  deleteFilm(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteFilmByCodeInput!
+    input: DeleteFilmInput!
   ): DeleteFilmPayload
 
-  """Deletes a single `Person` using a unique key."""
-  deletePersonById(
+  """Deletes a single `Person` using its globally unique id."""
+  deletePerson(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeletePersonByIdInput!
+    input: DeletePersonInput!
   ): DeletePersonPayload
 
-  """Deletes a single `Post` using a unique key."""
-  deletePostById(
+  """Deletes a single `Post` using its globally unique id."""
+  deletePost(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeletePostByIdInput!
+    input: DeletePostInput!
   ): DeletePostPayload
 
-  """Deletes a single `Studio` using a unique key."""
-  deleteStudioById(
+  """Deletes a single `Studio` using its globally unique id."""
+  deleteStudio(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteStudioByIdInput!
+    input: DeleteStudioInput!
   ): DeleteStudioPayload
 
-  """Deletes a single `TvEpisode` using a unique key."""
-  deleteTvEpisodeByCode(
+  """Deletes a single `TvEpisode` using its globally unique id."""
+  deleteTvEpisode(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteTvEpisodeByCodeInput!
+    input: DeleteTvEpisodeInput!
   ): DeleteTvEpisodePayload
 
-  """Deletes a single `TvShow` using a unique key."""
-  deleteTvShowByCode(
+  """Deletes a single `TvShow` using its globally unique id."""
+  deleteTvShow(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteTvShowByCodeInput!
+    input: DeleteTvShowInput!
   ): DeleteTvShowPayload
   getflamble(
     """
@@ -720,28 +718,12 @@ type Mutation {
     input: UpdateFilmInput!
   ): UpdateFilmPayload
 
-  """Updates a single `Film` using a unique key and a patch."""
-  updateFilmByCode(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateFilmByCodeInput!
-  ): UpdateFilmPayload
-
   """Updates a single `Person` using its globally unique id and a patch."""
   updatePerson(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: UpdatePersonInput!
-  ): UpdatePersonPayload
-
-  """Updates a single `Person` using a unique key and a patch."""
-  updatePersonById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePersonByIdInput!
   ): UpdatePersonPayload
 
   """Updates a single `Post` using its globally unique id and a patch."""
@@ -752,28 +734,12 @@ type Mutation {
     input: UpdatePostInput!
   ): UpdatePostPayload
 
-  """Updates a single `Post` using a unique key and a patch."""
-  updatePostById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePostByIdInput!
-  ): UpdatePostPayload
-
   """Updates a single `Studio` using its globally unique id and a patch."""
   updateStudio(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: UpdateStudioInput!
-  ): UpdateStudioPayload
-
-  """Updates a single `Studio` using a unique key and a patch."""
-  updateStudioById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateStudioByIdInput!
   ): UpdateStudioPayload
 
   """Updates a single `TvEpisode` using its globally unique id and a patch."""
@@ -784,28 +750,12 @@ type Mutation {
     input: UpdateTvEpisodeInput!
   ): UpdateTvEpisodePayload
 
-  """Updates a single `TvEpisode` using a unique key and a patch."""
-  updateTvEpisodeByCode(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateTvEpisodeByCodeInput!
-  ): UpdateTvEpisodePayload
-
   """Updates a single `TvShow` using its globally unique id and a patch."""
   updateTvShow(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: UpdateTvShowInput!
-  ): UpdateTvShowPayload
-
-  """Updates a single `TvShow` using a unique key and a patch."""
-  updateTvShowByCode(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateTvShowByCodeInput!
   ): UpdateTvShowPayload
 }
 
@@ -814,7 +764,7 @@ interface Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
+  id: ID!
 }
 
 """Information about pagination in a connection."""
@@ -870,8 +820,6 @@ enum PeopleOrderBy {
   COL_NO_UPDATE_DESC
   FIRST_NAME_ASC
   FIRST_NAME_DESC
-  ID_ASC
-  ID_DESC
   LAST_NAME_ASC
   LAST_NAME_DESC
   NATURAL
@@ -887,14 +835,13 @@ type Person implements Node {
   colNoOrder: String
   colNoUpdate: String
   firstName: String
-  id: Int!
-  lastName: String
-  name: String
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
+  id: ID!
+  lastName: String
+  name: String
 
   """Reads and enables pagination through a set of `Post`."""
   posts(
@@ -945,9 +892,6 @@ input PersonCondition {
   """Checks for equality with the object’s `firstName` field."""
   firstName: String
 
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
   """Checks for equality with the object’s `lastName` field."""
   lastName: String
 }
@@ -958,8 +902,8 @@ input PersonInput {
   colNoOrder: String
   colNoUpdate: String
   firstName: String
-  id: Int
   lastName: String
+  rowId: Int
 }
 
 """
@@ -970,49 +914,38 @@ input PersonPatch {
   colNoFilter: String
   colNoOrder: String
   firstName: String
-  id: Int
   lastName: String
 }
 
 type Post implements Node {
   """Reads a single `Person` that is related to this `Post`."""
   author: Person
-  authorId: Int
   body: String
-  id: Int!
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
+  id: ID!
 }
 
 """
 A condition to be used against `Post` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input PostCondition {
-  """Checks for equality with the object’s `authorId` field."""
-  authorId: Int
-
   """Checks for equality with the object’s `body` field."""
   body: String
-
-  """Checks for equality with the object’s `id` field."""
-  id: Int
 }
 
 """An input for mutations affecting `Post`"""
 input PostInput {
   authorId: Int
   body: String
-  id: Int
+  rowId: Int
 }
 
 """Represents an update to a `Post`. Fields that are set will be updated."""
 input PostPatch {
-  authorId: Int
   body: String
-  id: Int
 }
 
 """A connection to a list of `Post` values."""
@@ -1043,12 +976,8 @@ type PostsEdge {
 
 """Methods to use when ordering `Post`."""
 enum PostsOrderBy {
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
   BODY_ASC
   BODY_DESC
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -1262,40 +1191,31 @@ type Query implements Node {
   """Reads a single `Film` using its globally unique `ID`."""
   film(
     """The globally unique `ID` to be used in selecting a single `Film`."""
-    nodeId: ID!
+    id: ID!
   ): Film
-
-  """Get a single `Film`."""
-  filmByCode(code: Int!): Film
-
-  """Get a single `Person`."""
-  findPersonById(id: Int!): Person
-
-  """Fetches an object given its globally unique `ID`."""
-  node(
-    """The globally unique `ID`."""
-    nodeId: ID!
-  ): Node
 
   """
   The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
   """
-  nodeId: ID!
+  id: ID!
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    id: ID!
+  ): Node
 
   """Reads a single `Person` using its globally unique `ID`."""
   person(
     """The globally unique `ID` to be used in selecting a single `Person`."""
-    nodeId: ID!
+    id: ID!
   ): Person
 
   """Reads a single `Post` using its globally unique `ID`."""
   post(
     """The globally unique `ID` to be used in selecting a single `Post`."""
-    nodeId: ID!
+    id: ID!
   ): Post
-
-  """Get a single `Post`."""
-  postById(id: Int!): Post
 
   """
   Exposes the root query type nested one level down. This is helpful for Relay 1
@@ -1329,29 +1249,20 @@ type Query implements Node {
   """Reads a single `Studio` using its globally unique `ID`."""
   studio(
     """The globally unique `ID` to be used in selecting a single `Studio`."""
-    nodeId: ID!
+    id: ID!
   ): Studio
-
-  """Get a single `Studio`."""
-  studioById(id: Int!): Studio
 
   """Reads a single `TvEpisode` using its globally unique `ID`."""
   tvEpisode(
     """The globally unique `ID` to be used in selecting a single `TvEpisode`."""
-    nodeId: ID!
+    id: ID!
   ): TvEpisode
-
-  """Get a single `TvEpisode`."""
-  tvEpisodeByCode(code: Int!): TvEpisode
 
   """Reads a single `TvShow` using its globally unique `ID`."""
   tvShow(
     """The globally unique `ID` to be used in selecting a single `TvShow`."""
-    nodeId: ID!
+    id: ID!
   ): TvShow
-
-  """Get a single `TvShow`."""
-  tvShowByCode(code: Int!): TvShow
 }
 
 type RenamedTable {
@@ -1406,13 +1317,11 @@ enum RenamedTablesOrderBy {
 }
 
 type Studio implements Node {
-  id: Int!
-  name: String
-
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
+  id: ID!
+  name: String
 
   """Reads and enables pagination through a set of `TvShow`."""
   tvShowsByStudioId(
@@ -1448,24 +1357,20 @@ type Studio implements Node {
 A condition to be used against `Studio` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input StudioCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
   """Checks for equality with the object’s `name` field."""
   name: String
 }
 
 """An input for mutations affecting `Studio`"""
 input StudioInput {
-  id: Int!
   name: String
+  rowId: Int!
 }
 
 """
 Represents an update to a `Studio`. Fields that are set will be updated.
 """
 input StudioPatch {
-  id: Int
   name: String
 }
 
@@ -1497,8 +1402,6 @@ type StudiosEdge {
 
 """Methods to use when ordering `Studio`."""
 enum StudiosOrderBy {
-  ID_ASC
-  ID_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -1507,13 +1410,10 @@ enum StudiosOrderBy {
 }
 
 type TvEpisode implements Node {
-  code: Int!
-
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
-  showId: Int
+  id: ID!
   title: String
 
   """Reads a single `TvShow` that is related to this `TvEpisode`."""
@@ -1525,12 +1425,6 @@ A condition to be used against `TvEpisode` object types. All fields are tested
 for equality and combined with a logical ‘and.’
 """
 input TvEpisodeCondition {
-  """Checks for equality with the object’s `code` field."""
-  code: Int
-
-  """Checks for equality with the object’s `showId` field."""
-  showId: Int
-
   """Checks for equality with the object’s `title` field."""
   title: String
 }
@@ -1546,8 +1440,6 @@ input TvEpisodeInput {
 Represents an update to a `TvEpisode`. Fields that are set will be updated.
 """
 input TvEpisodePatch {
-  code: Int
-  showId: Int
   title: String
 }
 
@@ -1579,28 +1471,21 @@ type TvEpisodesEdge {
 
 """Methods to use when ordering `TvEpisode`."""
 enum TvEpisodesOrderBy {
-  CODE_ASC
-  CODE_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  SHOW_ID_ASC
-  SHOW_ID_DESC
   TITLE_ASC
   TITLE_DESC
 }
 
 type TvShow implements Node {
-  code: Int!
-
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
+  id: ID!
 
   """Reads a single `Studio` that is related to this `TvShow`."""
   studioByStudioId: Studio
-  studioId: Int
   title: String
 
   """Reads and enables pagination through a set of `TvEpisode`."""
@@ -1637,12 +1522,6 @@ type TvShow implements Node {
 A condition to be used against `TvShow` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input TvShowCondition {
-  """Checks for equality with the object’s `code` field."""
-  code: Int
-
-  """Checks for equality with the object’s `studioId` field."""
-  studioId: Int
-
   """Checks for equality with the object’s `title` field."""
   title: String
 }
@@ -1658,8 +1537,6 @@ input TvShowInput {
 Represents an update to a `TvShow`. Fields that are set will be updated.
 """
 input TvShowPatch {
-  code: Int
-  studioId: Int
   title: String
 }
 
@@ -1691,30 +1568,11 @@ type TvShowsEdge {
 
 """Methods to use when ordering `TvShow`."""
 enum TvShowsOrderBy {
-  CODE_ASC
-  CODE_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  STUDIO_ID_ASC
-  STUDIO_ID_DESC
   TITLE_ASC
   TITLE_DESC
-}
-
-"""All input for the `updateFilmByCode` mutation."""
-input UpdateFilmByCodeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  code: Int!
-
-  """
-  An object where the defined keys will be set on the `Film` being updated.
-  """
-  filmPatch: FilmPatch!
 }
 
 """All input for the `updateFilm` mutation."""
@@ -1733,7 +1591,7 @@ input UpdateFilmInput {
   """
   The globally unique `ID` which will identify a single `Film` to be updated.
   """
-  nodeId: ID!
+  id: ID!
 }
 
 """The output of our update `Film` mutation."""
@@ -1759,21 +1617,6 @@ type UpdateFilmPayload {
   query: Query
 }
 
-"""All input for the `updatePersonById` mutation."""
-input UpdatePersonByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `Person` being updated.
-  """
-  personPatch: PersonPatch!
-}
-
 """All input for the `updatePerson` mutation."""
 input UpdatePersonInput {
   """
@@ -1785,7 +1628,7 @@ input UpdatePersonInput {
   """
   The globally unique `ID` which will identify a single `Person` to be updated.
   """
-  nodeId: ID!
+  id: ID!
 
   """
   An object where the defined keys will be set on the `Person` being updated.
@@ -1816,21 +1659,6 @@ type UpdatePersonPayload {
   query: Query
 }
 
-"""All input for the `updatePostById` mutation."""
-input UpdatePostByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `Post` being updated.
-  """
-  postPatch: PostPatch!
-}
-
 """All input for the `updatePost` mutation."""
 input UpdatePostInput {
   """
@@ -1842,7 +1670,7 @@ input UpdatePostInput {
   """
   The globally unique `ID` which will identify a single `Post` to be updated.
   """
-  nodeId: ID!
+  id: ID!
 
   """
   An object where the defined keys will be set on the `Post` being updated.
@@ -1852,9 +1680,6 @@ input UpdatePostInput {
 
 """The output of our update `Post` mutation."""
 type UpdatePostPayload {
-  """Reads a single `Person` that is related to this `Post`."""
-  author: Person
-
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -1876,21 +1701,6 @@ type UpdatePostPayload {
   query: Query
 }
 
-"""All input for the `updateStudioById` mutation."""
-input UpdateStudioByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `Studio` being updated.
-  """
-  studioPatch: StudioPatch!
-}
-
 """All input for the `updateStudio` mutation."""
 input UpdateStudioInput {
   """
@@ -1902,7 +1712,7 @@ input UpdateStudioInput {
   """
   The globally unique `ID` which will identify a single `Studio` to be updated.
   """
-  nodeId: ID!
+  id: ID!
 
   """
   An object where the defined keys will be set on the `Studio` being updated.
@@ -1933,21 +1743,6 @@ type UpdateStudioPayload {
   ): StudiosEdge
 }
 
-"""All input for the `updateTvEpisodeByCode` mutation."""
-input UpdateTvEpisodeByCodeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  code: Int!
-
-  """
-  An object where the defined keys will be set on the `TvEpisode` being updated.
-  """
-  tvEpisodePatch: TvEpisodePatch!
-}
-
 """All input for the `updateTvEpisode` mutation."""
 input UpdateTvEpisodeInput {
   """
@@ -1959,7 +1754,7 @@ input UpdateTvEpisodeInput {
   """
   The globally unique `ID` which will identify a single `TvEpisode` to be updated.
   """
-  nodeId: ID!
+  id: ID!
 
   """
   An object where the defined keys will be set on the `TvEpisode` being updated.
@@ -1988,24 +1783,6 @@ type UpdateTvEpisodePayload {
     """The method to use when ordering `TvEpisode`."""
     orderBy: [TvEpisodesOrderBy!]! = [PRIMARY_KEY_ASC]
   ): TvEpisodesEdge
-
-  """Reads a single `TvShow` that is related to this `TvEpisode`."""
-  tvShowByShowId: TvShow
-}
-
-"""All input for the `updateTvShowByCode` mutation."""
-input UpdateTvShowByCodeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  code: Int!
-
-  """
-  An object where the defined keys will be set on the `TvShow` being updated.
-  """
-  tvShowPatch: TvShowPatch!
 }
 
 """All input for the `updateTvShow` mutation."""
@@ -2019,7 +1796,7 @@ input UpdateTvShowInput {
   """
   The globally unique `ID` which will identify a single `TvShow` to be updated.
   """
-  nodeId: ID!
+  id: ID!
 
   """
   An object where the defined keys will be set on the `TvShow` being updated.
@@ -2039,9 +1816,6 @@ type UpdateTvShowPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """Reads a single `Studio` that is related to this `TvShow`."""
-  studioByStudioId: Studio
 
   """The `TvShow` that was updated by this mutation."""
   tvShow: TvShow

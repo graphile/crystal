@@ -25,6 +25,11 @@
       "node": "./dist/presets/v4.js",
       "default": "./dist/presets/v4.js"
     },
+    "./presets/relay": {
+      "types": "./dist/presets/relay.d.ts",
+      "node": "./dist/presets/relay.js",
+      "default": "./dist/presets/relay.js"
+    },
     "./@dataplan/pg": {
       "types": "./fwd/@dataplan/pg/index.d.ts",
       "node": "./fwd/@dataplan/pg/index.js",
