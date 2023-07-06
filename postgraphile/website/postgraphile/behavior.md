@@ -144,6 +144,8 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `resource:connection` - "connection" field for a resource at any level
 - `constraint:resource:update` - can update a record by this constraint
 - `constraint:resource:delete` - can delete a record by this constraint
+- `nodeId:resource:update` - can update a record by its NodeID
+- `nodeId:resource:delete` - can delete a record by its NodeID
 - `attribute:select` - can this attribute be selected?
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
