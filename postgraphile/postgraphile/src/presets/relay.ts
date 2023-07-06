@@ -1,6 +1,7 @@
-import { PgCodecRelation } from "@dataplan/pg";
 import "graphile-config";
 import "graphile-build-pg";
+
+import type { PgCodecRelation } from "@dataplan/pg";
 export const version = require("../../package.json").version;
 
 const RELAY_HIDDEN_COLUMN_BEHAVIORS = [
@@ -15,7 +16,7 @@ const RELAY_HIDDEN_COLUMN_BEHAVIORS = [
 export const PgRelayPlugin: GraphileConfig.Plugin = {
   name: "RelayPlugin",
   description:
-    "[EXPERIMENTAL] Adds behaviors and inflectors to better hone your schema for Relay usage",
+    "[EXPERIMENTAL] Adds behaviors, inflectors, and other accomodations to better hone your schema for Relay usage",
   version,
 
   inflection: {
@@ -33,8 +34,16 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
-    globalBehavior:
-      "+node +connection -list +nodeId:resource:update -constraint:resource:update +nodeId:resource:delete -constraint:resource:delete -query:resource:single",
+    globalBehavior: `\
++node \
++connection -list \
+-query:resource:single \
++nodeId:resource:update -constraint:resource:update \
++nodeId:resource:delete -constraint:resource:delete \
++nodeId:insert -relation:attribute:insert \
++nodeId:update -relation:attribute:update \
++nodeId:base -relation:attribute:base \
+`,
     entityBehavior: {
       // TODO: tell functions to use nodeId inputs
       pgCodecAttribute(behavior, [codec, attributeName], build) {

@@ -23,6 +23,7 @@ import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 import { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
+import { PgNodeIdAttributesPlugin } from "./plugins/PgNodeIdAttributesPlugin.js";
 import { PgOrderAllAttributesPlugin } from "./plugins/PgOrderAllAttributesPlugin.js";
 import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
@@ -50,6 +51,7 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgMutationCreatePlugin,
     PgProceduresPlugin,
     PgAttributesPlugin,
+    PgNodeIdAttributesPlugin,
     PgAllRowsPlugin,
     PgRowByUniquePlugin,
     PgConnectionTotalCountPlugin,
