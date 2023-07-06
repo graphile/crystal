@@ -115,7 +115,8 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                         ),
                       )
                     : allAttributes;
-                  // TODO: move this to a separate plugin
+                  // TODO: move this to PgAttributesPlugin (see
+                  // PgNodeIdAttributesPlugin for similar approach for NodeIDs)
                   return Object.entries(attributes).reduce(
                     (memo, [attributeName, attribute]) => {
                       if (
