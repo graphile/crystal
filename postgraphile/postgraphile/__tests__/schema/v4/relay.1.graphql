@@ -938,13 +938,14 @@ input PostCondition {
 
 """An input for mutations affecting `Post`"""
 input PostInput {
-  authorId: Int
+  author: ID
   body: String
   rowId: Int
 }
 
 """Represents an update to a `Post`. Fields that are set will be updated."""
 input PostPatch {
+  author: ID
   body: String
 }
 
@@ -1432,8 +1433,8 @@ input TvEpisodeCondition {
 """An input for mutations affecting `TvEpisode`"""
 input TvEpisodeInput {
   code: Int!
-  showId: Int
   title: String
+  tvShowByShowId: ID
 }
 
 """
@@ -1441,6 +1442,7 @@ Represents an update to a `TvEpisode`. Fields that are set will be updated.
 """
 input TvEpisodePatch {
   title: String
+  tvShowByShowId: ID
 }
 
 """A connection to a list of `TvEpisode` values."""
@@ -1529,7 +1531,7 @@ input TvShowCondition {
 """An input for mutations affecting `TvShow`"""
 input TvShowInput {
   code: Int!
-  studioId: Int
+  studioByStudioId: ID
   title: String
 }
 
@@ -1537,6 +1539,7 @@ input TvShowInput {
 Represents an update to a `TvShow`. Fields that are set will be updated.
 """
 input TvShowPatch {
+  studioByStudioId: ID
   title: String
 }
 
