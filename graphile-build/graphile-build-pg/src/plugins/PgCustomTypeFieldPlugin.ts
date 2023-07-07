@@ -166,7 +166,7 @@ declare global {
       ): string;
     }
     interface SchemaOptions {
-      pgUseNodeIdForFunctionRecordArguments?: boolean;
+      pgFunctionsPreferNodeId?: boolean;
     }
   }
 }
@@ -352,7 +352,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           build[$$computed] = new Map();
           const {
             graphql: { GraphQLID, GraphQLList, GraphQLNonNull, isInputType },
-            options: { pgUseNodeIdForFunctionRecordArguments },
+            options: { pgFunctionsPreferNodeId },
           } = build;
           build.pgGetArgDetailsFromParameters = (
             resource,
@@ -368,7 +368,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
               const variant =
                 param.extensions?.variant ??
-                (pgUseNodeIdForFunctionRecordArguments &&
+                (pgFunctionsPreferNodeId &&
                 !resource.isMutation &&
                 param.codec.attributes &&
                 finalBuild.behavior.pgCodecMatches(param.codec, "node")

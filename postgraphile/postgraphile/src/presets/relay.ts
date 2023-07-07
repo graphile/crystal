@@ -98,6 +98,6 @@ export const PgRelayPreset: GraphileConfig.Preset = {
   plugins: [PgRelayPlugin],
   schema: {
     pgMutationPayloadRelations: false,
-    pgUseNodeIdForFunctionRecordArguments: true,
+    pgFunctionsPreferNodeId: true,
   },
 };
