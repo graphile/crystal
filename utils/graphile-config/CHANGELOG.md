@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-alpha.5
+
+### Patch Changes
+
+- [#402](https://github.com/benjie/postgraphile-private/pull/402)
+  [`644938276`](https://github.com/benjie/postgraphile-private/commit/644938276ebd48c5486ba9736a525fcc66d7d714)
+  Thanks [@benjie](https://github.com/benjie)! - Use `file://` URLs in import()
+  to fix compatibility with Windows (e.g. when loading `graphile.config.mjs`)
+
 ## 0.0.1-alpha.4
 
 ### Patch Changes

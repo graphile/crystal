@@ -1,5 +1,76 @@
 # postgraphile
 
+## 5.0.0-alpha.13
+
+### Patch Changes
+
+- [#402](https://github.com/benjie/postgraphile-private/pull/402)
+  [`70b2c3900`](https://github.com/benjie/postgraphile-private/commit/70b2c3900cd29d241e968fc81d6279848fafb9ae)
+  Thanks [@benjie](https://github.com/benjie)! - pgCodecAttribute behavior now
+  uses attributeName rather than attribute spec in the callback (BREAKING)
+
+- [#402](https://github.com/benjie/postgraphile-private/pull/402)
+  [`37d829b89`](https://github.com/benjie/postgraphile-private/commit/37d829b8912fb3d2b7e1aa99d2314444d136971d)
+  Thanks [@benjie](https://github.com/benjie)! - Ability to control whether the
+  nodeId or regular column CRUD mutations are used
+
+- [#402](https://github.com/benjie/postgraphile-private/pull/402)
+  [`ff91a5660`](https://github.com/benjie/postgraphile-private/commit/ff91a5660c5a33ab32555ab3da12f880179d9892)
+  Thanks [@benjie](https://github.com/benjie)! - Added
+  `postgraphile/presets/relay` preset:
+
+  - Hides primary key columns from output schema, and includes `id: ID` instead
+  - Hides foreign key columns from output schema, expecting you to use the
+    relation instead
+  - Hides columns that are part of the primary key from update/delete mutations
+    (but still present for create if the column is writeable - it shouldn't be)
+  - Hides columns that are part of a foreign key from CRUD mutations/filters,
+    instead exposes the `ID` for the remote side of the relation
+  - Does not allow ordering by individual primary key columns (though you can
+    still order by `PRIMARY_KEY_ASC`/`DESC`)
+  - Does not allow ordering by individual foreign key columns
+  - Turns off the row fetchers that don't use the node `ID`
+  - Turns off the CRUD mutations that don't use the node `ID`
+  - Functions can now use `@arg0variant nodeId` to indicate the first argument
+    (increase the `0` for other arguments) should accept a node `ID` (this
+    currently only works where the argument type is a table type)
+  - Removes relations from mutation payloads, these should be traversed via the
+    record instead (they're redundant)
+
+  Most of these changes are reversible, so for example if you really want to
+  turn back on `Query.userByUsername` you can do so by adding the `+connection`
+  behavior to the "unique username" constraint on the `users` table.
+
+- [#402](https://github.com/benjie/postgraphile-private/pull/402)
+  [`644938276`](https://github.com/benjie/postgraphile-private/commit/644938276ebd48c5486ba9736a525fcc66d7d714)
+  Thanks [@benjie](https://github.com/benjie)! - Use `file://` URLs in import()
+  to fix compatibility with Windows (e.g. when loading `graphile.config.mjs`)
+
+- [#402](https://github.com/benjie/postgraphile-private/pull/402)
+  [`47365f0df`](https://github.com/benjie/postgraphile-private/commit/47365f0df2644fd91839a6698998e1463df8de79)
+  Thanks [@benjie](https://github.com/benjie)! - Add helper for more easily
+  handling NodeIDs for known typeName.
+
+- [#402](https://github.com/benjie/postgraphile-private/pull/402)
+  [`339cb005e`](https://github.com/benjie/postgraphile-private/commit/339cb005ed91aa8d421cdacd934877aee32e3f23)
+  Thanks [@benjie](https://github.com/benjie)! - Remove relations from mutation
+  payloads (unless using V4 preset) - they're redundant.
+- Updated dependencies
+  [[`70b2c3900`](https://github.com/benjie/postgraphile-private/commit/70b2c3900cd29d241e968fc81d6279848fafb9ae),
+  [`37d829b89`](https://github.com/benjie/postgraphile-private/commit/37d829b8912fb3d2b7e1aa99d2314444d136971d),
+  [`ff91a5660`](https://github.com/benjie/postgraphile-private/commit/ff91a5660c5a33ab32555ab3da12f880179d9892),
+  [`644938276`](https://github.com/benjie/postgraphile-private/commit/644938276ebd48c5486ba9736a525fcc66d7d714),
+  [`47365f0df`](https://github.com/benjie/postgraphile-private/commit/47365f0df2644fd91839a6698998e1463df8de79),
+  [`339cb005e`](https://github.com/benjie/postgraphile-private/commit/339cb005ed91aa8d421cdacd934877aee32e3f23)]:
+  - graphile-build-pg@5.0.0-alpha.13
+  - graphile-build@5.0.0-alpha.12
+  - graphile-config@0.0.1-alpha.5
+  - @dataplan/pg@0.0.1-alpha.12
+  - grafast@0.0.1-alpha.11
+  - grafserv@0.0.1-alpha.11
+  - ruru@2.0.0-alpha.8
+  - @dataplan/json@0.0.1-alpha.11
+
 ## 5.0.0-alpha.12
 
 ### Patch Changes
