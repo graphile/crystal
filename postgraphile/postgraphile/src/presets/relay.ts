@@ -46,7 +46,6 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
 +nodeId:base -relation:attribute:base \
 `,
     entityBehavior: {
-      // TODO: tell functions to use nodeId inputs
       pgCodecAttribute(behavior, [codec, attributeName], build) {
         const newBehavior = [behavior];
 
@@ -79,7 +78,6 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
             if (!r.isUnique) return false;
             if (r.isReferencee) return false;
             if (!r.localAttributes.includes(attributeName)) return false;
-            // TODO: check remote columns are attribute
             return true;
           });
           if (singularRelationsUsingThisColumn.length > 0) {
