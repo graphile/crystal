@@ -151,11 +151,13 @@ const plans = {
   Forum: {
     messages($forum) {
       return messages.find({ forum_id: $forum.get("id") });
+      // OR: return $forum.manyRelation("messages");
     },
   },
   Message: {
     forum($message) {
       return forums.get({ id: $message.get("forum_id") });
+      // OR: return $message.singleRelation("forum");
     },
   },
 };

@@ -144,10 +144,18 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `resource:connection` - "connection" field for a resource at any level
 - `constraint:resource:update` - can update a record by this constraint
 - `constraint:resource:delete` - can delete a record by this constraint
+- `nodeId:resource:update` - can update a record by its NodeID
+- `nodeId:resource:delete` - can delete a record by its NodeID
 - `attribute:select` - can this attribute be selected?
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
 - `attribute:base` - should we add this attribute to the "base" input type?
+- `relation:attribute:insert` - can this attribute (which is part of a foreign key) be inserted into?
+- `relation:attribute:update` - can this attribute (which is part of a foreign key) be updated?
+- `relation:attribute:base` - should we add this attribute (which is part of a foreign key) to the "base" input type?
+- `nodeId:insert` - can we insert to the columns represented by this nodeId which represents a table related via foreign key constraint?
+- `nodeId:update` - can we update the columns represented by this nodeId which represents a table related via foreign key constraint?
+- `nodeId:base` - should we add a nodeId input representing this foreign key constraint to the "base" input type?
 - `node` - should this resource implement the GraphQL Global Object Identification
   specification
 - `list` - list (simple collection)

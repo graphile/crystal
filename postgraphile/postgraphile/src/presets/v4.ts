@@ -201,6 +201,7 @@ export const makeV4Preset = (
       ...(options.ignoreIndexes === false ? [] : ["PgIndexBehaviorsPlugin"]),
     ],
     schema: {
+      pgMutationPayloadRelations: true,
       ...otherGraphileBuildOptions,
       ...({ simpleCollections: options.simpleCollections } as any),
       pgUseCustomNetworkScalars: pgUseCustomNetworkScalars ?? false,

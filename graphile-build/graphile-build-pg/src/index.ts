@@ -29,6 +29,7 @@ export { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
 export { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 export { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 export { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
+export { PgNodeIdAttributesPlugin } from "./plugins/PgNodeIdAttributesPlugin.js";
 export { PgOrderAllAttributesPlugin } from "./plugins/PgOrderAllAttributesPlugin.js";
 export { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 export { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";

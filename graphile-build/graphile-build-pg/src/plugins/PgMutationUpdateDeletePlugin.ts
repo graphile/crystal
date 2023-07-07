@@ -387,18 +387,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
             `Creating ${mode} payload for ${resource} from PgMutationUpdateDeletePlugin`,
           );
 
-          const primaryUnique = resource.uniques.find(
-            (u: PgResourceUnique) => u.isPrimary,
-          );
-          const specs = [
-            ...(primaryUnique && build.getNodeIdCodec !== undefined
-              ? [{ unique: primaryUnique, uniqueMode: "node" }]
-              : []),
-            ...resource.uniques.map((unique: PgResourceUnique) => ({
-              unique,
-              uniqueMode: "keys",
-            })),
-          ];
+          const specs = getSpecs(build, resource, mode);
           for (const spec of specs) {
             const { uniqueMode, unique } = spec;
             const details = {
@@ -620,25 +609,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               mode === "resource:update"
                 ? inflection.updatePayloadType({ resource })
                 : inflection.deletePayloadType({ resource });
-            const primaryUnique = resource.uniques.find(
-              (u: PgResourceUnique) => u.isPrimary,
-            );
-            const constraintMode = `constraint:${mode}`;
-            const specs = [
-              ...(primaryUnique && !!build.getNodeIdHandler
-                ? [{ unique: primaryUnique, uniqueMode: "node" }]
-                : []),
-              ...resource.uniques.map((unique: PgResourceUnique) => ({
-                unique,
-                uniqueMode: "keys",
-              })),
-            ].filter((spec) => {
-              const unique = spec.unique as PgResourceUnique;
-              return !!build.behavior.pgResourceUniqueMatches(
-                [resource, unique],
-                constraintMode,
-              );
-            });
+            const specs = getSpecs(build, resource, mode);
             for (const spec of specs) {
               const { uniqueMode, unique } = spec;
               const details = {
@@ -662,6 +633,11 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     : uniqueMode === "node"
                     ? inflection.deleteNodeInputType(details)
                     : inflection.deleteByKeysInputType(details);
+
+                const fieldBehaviorScope =
+                  uniqueMode === "node"
+                    ? `nodeId:${mode}`
+                    : `constraint:${mode}`;
 
                 const payloadType = build.getOutputTypeByName(payloadTypeName);
                 const mutationInputType = build.getTypeByName(inputTypeName);
@@ -765,7 +741,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   fields,
                   {
                     [fieldName]: fieldWithHooks(
-                      { fieldName, fieldBehaviorScope: constraintMode },
+                      { fieldName, fieldBehaviorScope },
                       {
                         args: {
                           input: {
@@ -901,3 +877,33 @@ return (_$root, args) => {
     },
   },
 };
+
+function getSpecs(
+  build: GraphileBuild.Build,
+  resource: PgResource<any, PgCodecWithAttributes, any, any, any>,
+  mode: "resource:update" | "resource:delete",
+) {
+  const primaryUnique = resource.uniques.find(
+    (u: PgResourceUnique) => u.isPrimary,
+  );
+  const constraintMode = `constraint:${mode}`;
+  const specs = [
+    ...(primaryUnique &&
+    build.getNodeIdCodec !== undefined &&
+    build.behavior.pgCodecMatches(resource.codec, `nodeId:${mode}`)
+      ? [{ unique: primaryUnique, uniqueMode: "node" }]
+      : []),
+    ...resource.uniques
+      .filter((unique: PgResourceUnique) => {
+        return build.behavior.pgResourceUniqueMatches(
+          [resource, unique],
+          constraintMode,
+        );
+      })
+      .map((unique: PgResourceUnique) => ({
+        unique,
+        uniqueMode: "keys",
+      })),
+  ];
+  return specs;
+}

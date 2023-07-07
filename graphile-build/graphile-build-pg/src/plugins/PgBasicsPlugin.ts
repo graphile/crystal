@@ -5,9 +5,9 @@ import "graphile-config";
 
 import type {
   PgCodec,
-  PgCodecAttribute,
   PgCodecRef,
   PgCodecRelation,
+  PgCodecWithAttributes,
   PgRefDefinition,
   PgResource,
   PgResourceUnique,
@@ -87,7 +87,7 @@ declare global {
 
     interface BehaviorEntities {
       pgCodec: PgCodec;
-      pgCodecAttribute: [codec: PgCodec, attribute: PgCodecAttribute];
+      pgCodecAttribute: [codec: PgCodecWithAttributes, attributeName: string];
       pgResource: PgResource<any, any, any, any, any>;
       pgResourceUnique: [
         resource: PgResource<any, any, any, any, any>,
@@ -119,7 +119,13 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
       pgCodecAttribute: {
         after: ["default", "inferred"],
         provides: ["override"],
-        callback(behavior, [codec, attribute]) {
+        callback(behavior, [codec, attributeName]) {
+          if (typeof attributeName !== "string") {
+            throw new Error(
+              `pgCodecAttribute no longer accepts (codec, attribute) - it now accepts (codec, attributeName). Please update your code. Sorry! (Changed in PostGraphile V5 alpha 13.)`,
+            );
+          }
+          const attribute = codec.attributes[attributeName];
           return [
             behavior,
             getBehavior([codec.extensions, attribute.extensions]),

@@ -8,6 +8,7 @@ import type {
   PgCodecAttribute,
   PgCodecAttributes,
   PgCodecList,
+  PgCodecRelation,
   PgCodecWithAttributes,
   PgSelectSingleStep,
 } from "@dataplan/pg";
@@ -104,7 +105,7 @@ function processAttribute(
 
   if (
     !build.behavior.pgCodecAttributeMatches(
-      [pgCodec, attribute],
+      [pgCodec, attributeName],
       "attribute:select",
     )
   ) {
@@ -381,7 +382,11 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         return fields;
       },
       GraphQLInputObjectType_fields(fields, build, context) {
-        const { extend, inflection } = build;
+        const {
+          extend,
+          inflection,
+          input: { pgRegistry },
+        } = build;
         const {
           scope: {
             isPgRowType,
@@ -411,10 +416,20 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                 ? "update"
                 : "insert";
 
-              const fieldBehaviorScope = `attribute:${action}`;
+              const relations = (
+                Object.values(
+                  pgRegistry.pgRelations[pgCodec.name] ?? {},
+                ) as PgCodecRelation[]
+              ).filter((r) => !r.isReferencee && r.isUnique);
+              const isPartOfRelation = relations.some((r) =>
+                r.localAttributes.includes(attributeName),
+              );
+              const prefix = isPartOfRelation ? `relation:` : ``;
+
+              const fieldBehaviorScope = `${prefix}attribute:${action}`;
               if (
                 !build.behavior.pgCodecAttributeMatches(
-                  [pgCodec, attribute],
+                  [pgCodec, attributeName],
                   fieldBehaviorScope,
                 )
               ) {

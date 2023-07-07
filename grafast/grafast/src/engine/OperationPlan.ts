@@ -81,6 +81,13 @@ const atpe = process.env.ALWAYS_THROW_PLANNING_ERRORS;
 const ALWAYS_THROW_PLANNING_ERRORS = atpe === "1";
 const THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS = atpe === "2";
 
+/**
+ * Returns true for steps that the system populates automatically without executing.
+ */
+function isPrepopulatedStep(step: ExecutableStep) {
+  return step instanceof __ItemStep || step instanceof __ValueStep;
+}
+
 if (
   atpe &&
   atpe !== "0" &&
@@ -2309,7 +2316,7 @@ export class OperationPlan {
     if (step.hasSideEffects) {
       return true;
     }
-    if (step instanceof __ItemStep || step instanceof __ValueStep) {
+    if (isPrepopulatedStep(step)) {
       return true;
     }
     if (step[$$subroutine] !== null) {
@@ -3052,7 +3059,7 @@ export class OperationPlan {
       const processed = new Set<ExecutableStep>();
 
       const processSideEffectPlan = (step: ExecutableStep) => {
-        if (processed.has(step)) {
+        if (processed.has(step) || isPrepopulatedStep(step)) {
           return;
         }
         processed.add(step);

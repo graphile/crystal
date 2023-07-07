@@ -26,7 +26,9 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
   ) {
     super();
     this.planDep = $plan != null ? this.addDependency($plan) : null;
-    if ((fn as any).isSyncAndSafe) {
+    if ((fn as any).hasSideEffects) {
+      this.hasSideEffects = true;
+    } else if ((fn as any).isSyncAndSafe) {
       if (fn.constructor.name === "AsyncFunction") {
         throw new Error(
           `${this}'s callback claims to be syncAndSafe, however it is asynchronous`,
