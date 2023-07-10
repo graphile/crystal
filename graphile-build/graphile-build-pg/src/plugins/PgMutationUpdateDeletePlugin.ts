@@ -234,7 +234,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgResource: "update delete",
+      pgResource: "update delete update:select -delete:select",
       pgResourceUnique: "update delete",
     },
 
@@ -312,8 +312,12 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         [constant],
                       ),
                     },
-                    // TODO: default to `...(mode === "resource:update" && TableType`; we only want the record on delete for v4 compatibility
-                    ...(TableType
+                    ...(build.behavior.pgResourceMatches(
+                      resource,
+                      mode === "resource:update"
+                        ? `update:select`
+                        : `delete:select`,
+                    ) && TableType
                       ? {
                           [tableName]: fieldWithHooks(
                             {
