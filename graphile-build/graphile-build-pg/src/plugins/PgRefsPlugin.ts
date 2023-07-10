@@ -9,13 +9,13 @@ import type {
   PgResourceOptions,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
+import { gatherConfig } from "graphile-build";
 
 import {
   parseDatabaseIdentifierFromSmartTag,
   parseSmartTagsOptsString,
 } from "../utils.js";
 import { version } from "../version.js";
-import { gatherConfig } from "graphile-build";
 
 declare global {
   namespace GraphileConfig {

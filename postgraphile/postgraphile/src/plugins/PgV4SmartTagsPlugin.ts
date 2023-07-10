@@ -1,9 +1,9 @@
 import "graphile-config";
 
+import { gatherConfig } from "graphile-build";
 import type { PgSmartTagsDict } from "graphile-build-pg";
 import { addBehaviorToTags } from "graphile-build-pg";
 import { inspect } from "util";
-import { gatherConfig } from "graphile-build";
 
 declare global {
   namespace GraphileConfig {

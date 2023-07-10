@@ -264,7 +264,7 @@ export function makePgSmartTagsPlugin(
     version: "0.0.0",
     before: ["smart-tags"],
 
-    gather: gatherConfig({
+    gather: gatherConfig<any, State, Cache>({
       namespace:
         `pgSmartTags_${id}` as any /* Cannot make type safe because dynamic */,
       helpers: {},

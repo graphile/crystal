@@ -41,11 +41,11 @@ export {
   constantCaseAll,
   EXPORTABLE,
   formatInsideUnderscores,
+  gatherConfig,
   pluralize,
   singularize,
   upperCamelCase,
   upperFirst,
-  gatherConfig,
 } from "./utils.js";
 import { isPromiseLike } from "grafast";
 

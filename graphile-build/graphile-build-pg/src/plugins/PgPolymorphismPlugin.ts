@@ -23,6 +23,7 @@ import type {
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
+import { gatherConfig } from "graphile-build";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
@@ -35,7 +36,6 @@ import {
   parseSmartTagsOptsString,
 } from "../utils.js";
 import { version } from "../version.js";
-import { gatherConfig } from "graphile-build";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;

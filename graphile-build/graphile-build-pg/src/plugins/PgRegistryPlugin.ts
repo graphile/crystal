@@ -2,9 +2,9 @@
 import type { PgRegistry, PgRegistryBuilder } from "@dataplan/pg";
 import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
+import { gatherConfig } from "graphile-build";
 
 import { version } from "../version.js";
-import { gatherConfig } from "graphile-build";
 
 declare global {
   namespace GraphileConfig {
