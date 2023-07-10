@@ -339,7 +339,6 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          // TODO: better support for partitioned tables
           // TODO: check compatibility with 'foreign' tables
           if (
             !["r", "v", "m", "f", "p", "c"].includes(pgClass.relkind) ||
@@ -538,11 +537,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         helpers.pgTables.getResourceOptions(serviceName, pgClass);
       },
 
-      // TODO: Ensure introspection has occurred, to ensure that
-      // `pgIntrospection_class` above is called before
-      // `pgRegistry_PgRegistryBuilder_pgRelations` below.
-
       async pgRegistry_PgRegistryBuilder_pgRelations(info, _event) {
+        // Ensure introspection has occurred, to ensure that
+        // `pgIntrospection_class` above is called before this.
+        await info.helpers.pgIntrospection.getIntrospection();
+
         const toProcess: Array<{
           resourceOptions: PgResourceOptions;
           pgClass: PgClass;
