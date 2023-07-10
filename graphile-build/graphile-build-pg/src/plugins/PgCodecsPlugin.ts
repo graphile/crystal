@@ -1465,7 +1465,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               }
             } else {
               // We have no idea what this is or how to handle it.
-              // TODO: add some default handling, like "behavesLike = TYPES.string"?
+              // TODO: add some default handling, like "behavesLike = TYPES.text"?
               console.warn(
                 `PgCodec '${codec.name}' not understood, please set 'domainOfCodec' to indicate the underlying behaviour the type should have when exposed to GraphQL`,
               );

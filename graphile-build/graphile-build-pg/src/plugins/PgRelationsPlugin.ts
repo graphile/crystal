@@ -359,7 +359,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             // Common to all types
           } else {
             if (isReferencee) {
-              // TODO: consider supporting backward relationships for single
+              // ENHANCE: consider supporting backward relationships for single
               // table polymorphic types. It's not immediately clear what the
               // user would want in these cases: is it separate fields for each
               // type (that would inflate the schema), or is it a relation to
@@ -974,7 +974,7 @@ function addRelations(
         sharedSource = firstSource;
       }
 
-      // TODO: if there's only one path do we still need union?
+      // TEST: if there's only one path do we still need union?
       const needsPgUnionAll =
         sharedCodec?.polymorphism?.mode === "union" || paths.length > 1;
 
@@ -1051,7 +1051,6 @@ function addRelations(
               te`  const ${collectionIdentifier} = ${ref_finalLayerResource}.find();`,
             );
             // FIXME: if required, make the above `DISTINCT ON (primary key)`.
-            // FIXME: make `previousAlias` a safe identifier
             functionLines.push(
               te`  let previousAlias = ${collectionIdentifier}.alias;`,
             );
@@ -1235,7 +1234,7 @@ function addRelations(
       behavior = build.behavior.pgRefDefinitionBehavior(refSpec);
       typeName = refSpec.graphqlType;
       if (!typeName) {
-        // TODO: remove this restriction
+        // ENHANCE: remove this restriction
         throw new Error(`@ref on polymorphic type must declare to:TargetType`);
       }
       const type = build.getTypeByName(typeName);
