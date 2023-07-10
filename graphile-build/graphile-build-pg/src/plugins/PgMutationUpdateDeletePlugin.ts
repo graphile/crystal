@@ -355,12 +355,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     deletedNodeIdFieldName &&
                     handler &&
                     nodeIdCodec &&
-                    build.behavior.pgResourceMatches(resource, "node")
+                    build.behavior.pgResourceMatches(resource, "node") &&
+                    build.behavior.pgResourceMatches(
+                      resource,
+                      "delete:resource:nodeId",
+                    )
                       ? {
                           [deletedNodeIdFieldName]: fieldWithHooks(
                             {
                               fieldName: deletedNodeIdFieldName,
-                              // TODO: fieldBehaviorScope: `...`,
+                              fieldBehaviorScope: "delete:resource:nodeId",
                               isPgMutationPayloadDeletedNodeIdField: true,
                             },
                             () => {

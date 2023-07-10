@@ -140,6 +140,7 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `insert:resource:select` - can select the row that was inserted (on the mutation payload)
 - `update:resource:select` - can select the row that was updated (on the mutation payload)
 - `delete:resource:select` - can select the row that was deleted (on the mutation payload)
+- `delete:resource:nodeId` - can select the nodeId of the row that was deleted (on the mutation payload)
 - `resource:insert` - can insert into this resource
 - `resource:update` - can update a record in this resource
 - `resource:delete` - can delete a record in this resource
