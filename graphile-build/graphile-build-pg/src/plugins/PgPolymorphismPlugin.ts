@@ -35,6 +35,7 @@ import {
   parseSmartTagsOptsString,
 } from "../utils.js";
 import { version } from "../version.js";
+import { gatherConfig } from "graphile-build";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
@@ -91,13 +92,21 @@ function parseAttribute(
   };
 }
 
+const EMPTY_OBJECT = Object.freeze({});
+
 export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
   name: "PgPolymorphismPlugin",
   description: "Adds polymorphism",
   version,
   after: ["smart-tags", "PgTablesPlugin", "PgCodecsPlugin"],
-  gather: {
+  gather: gatherConfig({
     namespace: "pgPolymorphism",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
+    initialState() {
+      return EMPTY_OBJECT;
+    },
     helpers: {},
     hooks: {
       async pgCodecs_recordType_spec(info, event) {
@@ -584,7 +593,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  },
+  }),
   schema: {
     entityBehavior: {
       pgCodec: {

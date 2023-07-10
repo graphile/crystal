@@ -7,7 +7,7 @@ import type {
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
-import { EXPORTABLE } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
 import { addBehaviorToTags } from "../utils.js";
@@ -212,7 +212,8 @@ interface State {
     { serviceName: string; pgClass: PgClass }
   >;
 }
-interface Cache {}
+
+const EMPTY_OBJECT = Object.freeze({});
 
 export const PgTablesPlugin: GraphileConfig.Plugin = {
   name: "PgTablesPlugin",
@@ -300,8 +301,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  gather: {
+  gather: gatherConfig({
     namespace: "pgTables",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
     helpers: {
       getResourceOptions(info, serviceName, pgClass) {
         let resourceOptionsByPgClass =
@@ -523,7 +527,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         return resourceOptions;
       },
     },
-    initialState: () => ({
+    initialState: (): State => ({
       resourceOptionsByPgClassByService: new Map(),
       resourceByResourceOptions: new Map(),
       detailsByResourceOptions: new Map(),
@@ -568,7 +572,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  } as GraphileConfig.PluginGatherConfig<"pgTables", State, Cache>,
+  }),
 
   schema: {
     entityBehavior: {

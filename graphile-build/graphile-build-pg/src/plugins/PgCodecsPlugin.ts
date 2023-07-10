@@ -18,7 +18,7 @@ import {
   recordCodec,
   TYPES,
 } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
@@ -274,8 +274,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
-  gather: <GraphileConfig.PluginGatherConfig<"pgCodecs", State>>{
+  // TYPES: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
+  gather: gatherConfig({
     namespace: "pgCodecs",
     initialState: (): State => ({
       codecByTypeIdByDatabaseName: new Map(),
@@ -289,7 +289,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           info.state.codecByClassIdByDatabaseName.set(serviceName, map);
         }
         if (map.has(classId)) {
-          return map.get(classId);
+          return map.get(classId)!;
         }
 
         const promise = (async () => {
@@ -467,7 +467,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           info.state.codecByTypeIdByDatabaseName.set(serviceName, map);
         }
         if (map.has(typeId)) {
-          return map.get(typeId);
+          return map.get(typeId)!;
         }
 
         const promise = (async (): Promise<PgCodec | null> => {
@@ -871,7 +871,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  },
+  }),
 
   schema: {
     hooks: {

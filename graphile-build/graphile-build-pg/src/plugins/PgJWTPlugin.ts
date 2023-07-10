@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type { PgCodec, PgSelectSingleStep } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import { sign as signJwt } from "jsonwebtoken";
 
 import { version } from "../version.js";
@@ -41,8 +41,7 @@ declare global {
   }
 }
 
-interface State {}
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
 
 export const PgJWTPlugin: GraphileConfig.Plugin = {
   name: "PgJWTPlugin",
@@ -52,8 +51,14 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
 
   before: ["PgCodecsPlugin", "PgTablesPlugin"],
 
-  gather: {
+  gather: gatherConfig({
     namespace: "pgJWT",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
+    initialState() {
+      return EMPTY_OBJECT;
+    },
     helpers: {},
     hooks: {
       pgCodecs_PgCodec(info, { pgCodec, pgType }) {
@@ -68,7 +73,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  } as GraphileConfig.PluginGatherConfig<"pgJWT", State, Cache>,
+  }),
 
   schema: {
     hooks: {

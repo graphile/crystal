@@ -45,6 +45,7 @@ export {
   singularize,
   upperCamelCase,
   upperFirst,
+  gatherConfig,
 } from "./utils.js";
 import { isPromiseLike } from "grafast";
 

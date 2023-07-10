@@ -11,6 +11,7 @@ import { sql } from "pg-sql2";
 import { withPgClientFromPgService } from "../pgServices.js";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
+import { gatherConfig } from "graphile-build";
 
 declare global {
   namespace GraphileConfig {
@@ -64,7 +65,7 @@ interface State {
   codecByPgConstraint: Map<PgConstraint, PgEnumCodec>;
   codecByPgAttribute: Map<PgAttribute, PgEnumCodec>;
 }
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
 
 // TODO: Assert the attributes are text
 /*
@@ -116,8 +117,11 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  gather: <GraphileConfig.PluginGatherConfig<"pgEnumTables", State, Cache>>{
+  gather: gatherConfig({
     namespace: "pgEnumTables",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
     initialState: (): State => ({
       codecByPgConstraint: new Map(),
       codecByPgAttribute: new Map(),
@@ -337,7 +341,7 @@ Original error: ${e.message}
         }
       },
     },
-  },
+  }),
 };
 
 function isEnumConstraint(

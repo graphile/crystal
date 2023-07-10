@@ -19,7 +19,7 @@ import type {
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
 import { arraysMatch, connection, first } from "grafast";
-import { EXPORTABLE } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
@@ -128,7 +128,7 @@ declare global {
 }
 
 interface State {}
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
 
 // TODO: split this into one plugin for gathering and another for schema
 export const PgRelationsPlugin: GraphileConfig.Plugin = {
@@ -253,8 +253,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  gather: <GraphileConfig.PluginGatherConfig<"pgRelations", State, Cache>>{
+  gather: gatherConfig({
     namespace: "pgRelations",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
     initialState: (): State => Object.create(null),
     helpers: {
       async addRelation(info, event, pgConstraint, isReferencee = false) {
@@ -489,7 +492,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  },
+  }),
 
   schema: {
     entityBehavior: {

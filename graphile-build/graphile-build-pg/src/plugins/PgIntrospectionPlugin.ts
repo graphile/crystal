@@ -3,6 +3,7 @@ import { PgExecutor } from "@dataplan/pg";
 import type { ExecutableStep, PromiseOrDirect } from "grafast";
 import { constant, context, defer, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
+import { gatherConfig } from "graphile-build";
 import { EXPORTABLE } from "graphile-build";
 import type {
   Introspection,
@@ -151,7 +152,7 @@ declare global {
         getRangeByType(
           serviceName: string,
           typeId: string,
-        ): Promise<PgRange | null>;
+        ): Promise<PgRange | undefined>;
         getExtensionByName(
           serviceName: string,
           extensionName: string,
@@ -316,8 +317,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
   // triggered/announced before the registryBuilder is built.
   before: ["PgRegistryPlugin"],
 
-  // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
-  gather: <GraphileConfig.PluginGatherConfig<"pgIntrospection", State, Cache>>{
+  gather: gatherConfig({
     namespace: "pgIntrospection",
     initialCache: (): Cache => ({
       introspectionResultsPromise: null,
@@ -395,17 +395,17 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       //
 
       async getAttribute(info, serviceName, classId, attributeNumber) {
-        // const pgClass = this.getClass(info, serviceName, classId);
-        const attributes = await this.getAttributesForClass(
-          info,
-          serviceName,
-          classId,
-        );
+        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
+        const attributes =
+          await info.helpers.pgIntrospection.getAttributesForClass(
+            serviceName,
+            classId,
+          );
         return attributes.find((attr) => attr.attnum === attributeNumber);
       },
 
       async getAttributesForClass(info, serviceName, classId) {
-        // const pgClass = this.getClass(info, serviceName, classId);
+        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
         const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.attributes;
         // TODO: cache
@@ -413,7 +413,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       async getConstraintsForClass(info, serviceName, classId) {
-        // const pgClass = this.getClass(info, serviceName, classId);
+        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
         const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.constraints;
         // TODO: cache
@@ -421,7 +421,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       async getForeignConstraintsForClass(info, serviceName, classId) {
-        // const pgClass = this.getClass(info, serviceName, classId);
+        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
         const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.constraints;
         // TODO: cache
@@ -429,7 +429,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       async getInheritedForClass(info, serviceName, classId) {
-        // const pgClass = this.getClass(info, serviceName, classId);
+        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
         const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.inherits;
         // TODO: cache
@@ -761,5 +761,5 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         }
       };
     },
-  },
+  }),
 };

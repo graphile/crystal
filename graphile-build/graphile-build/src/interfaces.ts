@@ -174,14 +174,10 @@ declare global {
        * internal state. (Just use an empty object if you don't need any.)
        */
       helpers?: {
-        [key in keyof GatherHelpers[TNamespace]]: GatherHelpers[TNamespace][key] extends (
-          ...args: infer UArgs
-        ) => infer UReturnType
-          ? (
-              info: GatherPluginContext<TState, TCache>,
-              ...args: UArgs
-            ) => UReturnType
-          : never;
+        [key in keyof GatherHelpers[TNamespace]]: (
+          info: GatherPluginContext<TState, TCache>,
+          ...args: Parameters<GatherHelpers[TNamespace][key]>
+        ) => ReturnType<GatherHelpers[TNamespace][key]>;
       };
 
       hooks?: {

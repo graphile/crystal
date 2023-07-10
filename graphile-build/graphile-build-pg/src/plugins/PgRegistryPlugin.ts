@@ -4,6 +4,7 @@ import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 
 import { version } from "../version.js";
+import { gatherConfig } from "graphile-build";
 
 declare global {
   namespace GraphileConfig {
@@ -50,7 +51,7 @@ export const PgRegistryPlugin: GraphileConfig.Plugin = {
     "Generates the registry during the gather phase, containing details of all the codecs, resources, relations and behaviors.",
   version: version,
 
-  gather: <GraphileConfig.PluginGatherConfig<"pgRegistry", State, Cache>>{
+  gather: gatherConfig({
     namespace: "pgRegistry",
     initialCache: (): Cache => ({}),
     initialState: (): State => ({
@@ -96,5 +97,5 @@ export const PgRegistryPlugin: GraphileConfig.Plugin = {
     async main(output, info) {
       output.pgRegistry = await info.helpers.pgRegistry.getRegistry();
     },
-  },
+  }),
 };

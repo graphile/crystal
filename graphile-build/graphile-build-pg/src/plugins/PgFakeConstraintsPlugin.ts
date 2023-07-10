@@ -1,5 +1,6 @@
 import type { PromiseOrDirect } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
+import { gatherConfig } from "graphile-build";
 import type {
   Introspection,
   PgAttribute,
@@ -35,7 +36,8 @@ declare global {
 interface State {
   fakeId: number;
 }
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
+type Cache = typeof EMPTY_OBJECT;
 
 export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
   name: "PgFakeConstraintsPlugin",
@@ -44,10 +46,13 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
   version: version,
   after: ["smart-tags"],
 
-  gather: {
+  gather: gatherConfig({
     namespace: "pgFakeConstraints",
     helpers: {},
-    initialState: () => ({
+    initialCache(): Cache {
+      return EMPTY_OBJECT;
+    },
+    initialState: (): State => ({
       fakeId: 0,
     }),
     hooks: {
@@ -101,7 +106,7 @@ export const PgFakeConstraintsPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  } as GraphileConfig.PluginGatherConfig<"pgFakeConstraints", State, Cache>,
+  }),
 };
 
 function parseConstraintSpec(rawSpec: string) {
