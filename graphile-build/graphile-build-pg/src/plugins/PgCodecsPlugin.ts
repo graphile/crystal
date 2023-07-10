@@ -355,7 +355,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   (attributeAttribute.attidentity != null &&
                     attributeAttribute.attidentity !== "") ||
                   attributeAttribute.getType()?.typdefault != null,
-                // TODO: identicalVia,
+                // PERF: identicalVia,
                 extensions: {
                   tags,
                 },
