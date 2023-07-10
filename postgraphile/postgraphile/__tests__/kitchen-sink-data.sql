@@ -185,6 +185,8 @@ insert into b.types values (
   null,
   null,
   null,
+  null,
+  null,
   null
 );
 
@@ -233,7 +235,9 @@ insert into b.types values (
   'english', 
   'simple',
   ARRAY['1 year', '2 months', '3 days']::text[],
-  ARRAY[1, 2, 2098288669218571760]
+  ARRAY[1, 2, 2098288669218571760],
+  decode('12340000AAAAFFFF9876', 'base64'),
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[]
 );
 
 insert into c.edge_case values

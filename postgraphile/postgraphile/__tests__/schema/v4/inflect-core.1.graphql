@@ -324,6 +324,9 @@ type AuthenticatePayloadPayload {
   query: Q
 }
 
+"""Binary data encoded using Base64"""
+scalar Base64EncodedBinary
+
 """
 A floating point number that requires more precision than IEEE 754 binary 64
 """
@@ -8297,6 +8300,8 @@ type Type implements N {
   anIntRange: AnIntRange!
   bigint: BigInt!
   boolean: Boolean!
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: String
   compoundType: CompoundType!
   date: Date!
@@ -8364,6 +8369,12 @@ input TypeCondition {
 
   """Checks for equality with the object’s `boolean` field."""
   boolean: Boolean
+
+  """Checks for equality with the object’s `bytea` field."""
+  bytea: Base64EncodedBinary
+
+  """Checks for equality with the object’s `byteaArray` field."""
+  byteaArray: [Base64EncodedBinary]
 
   """Checks for equality with the object’s `cidr` field."""
   cidr: String
@@ -8584,6 +8595,8 @@ input TypeInput {
   anIntRange: AnIntRangeInput!
   bigint: BigInt!
   boolean: Boolean!
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: String
   compoundType: CompoundTypeInput!
   date: Date!
@@ -8633,6 +8646,8 @@ input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
   boolean: Boolean
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: String
   compoundType: CompoundTypeInput
   date: Date
@@ -8741,6 +8756,8 @@ enum TypesOrderBy {
   BIGINT_DESC
   BOOLEAN_ASC
   BOOLEAN_DESC
+  BYTEA_ASC
+  BYTEA_DESC
   CIDR_ASC
   CIDR_DESC
   COMPOUND_TYPE_ASC

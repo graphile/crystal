@@ -1951,6 +1951,8 @@ type Type implements Node {
   regdictionary: RegDictionary
   textArrayDomain: [String]
   int8ArrayDomain: [BigInt]
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
 
   """Reads a single `Post` that is related to this `Type`."""
   postBySmallint: Post
@@ -2087,6 +2089,9 @@ scalar RegConfig
 """A builtin object identifier type for a text search dictionary"""
 scalar RegDictionary
 
+"""Binary data encoded using Base64"""
+scalar Base64EncodedBinary
+
 """A `Type` edge in the connection."""
 type TypesEdge {
   """A cursor for use in pagination."""
@@ -2173,6 +2178,8 @@ enum TypesOrderBy {
   REGCONFIG_DESC
   REGDICTIONARY_ASC
   REGDICTIONARY_DESC
+  BYTEA_ASC
+  BYTEA_DESC
 }
 
 """
@@ -2315,6 +2322,12 @@ input TypeCondition {
 
   """Checks for equality with the object’s `int8ArrayDomain` field."""
   int8ArrayDomain: [BigInt]
+
+  """Checks for equality with the object’s `bytea` field."""
+  bytea: Base64EncodedBinary
+
+  """Checks for equality with the object’s `byteaArray` field."""
+  byteaArray: [Base64EncodedBinary]
 }
 
 """A range of `BigFloat`."""
@@ -7805,6 +7818,8 @@ input TypeInput {
   regdictionary: RegDictionary
   textArrayDomain: [String]
   int8ArrayDomain: [BigInt]
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
 }
 
 """The output of our update `Input` mutation."""
@@ -9116,6 +9131,8 @@ input TypePatch {
   regdictionary: RegDictionary
   textArrayDomain: [String]
   int8ArrayDomain: [BigInt]
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
 }
 
 """All input for the `updateTypeById` mutation."""

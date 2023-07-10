@@ -75,6 +75,8 @@ mutation {
           "2098288669218571760"
           "2098288669218571761"
         ]
+        bytea: "WlPqWn/q"
+        byteaArray: ["AaBbCcDd", "AaBb"]
       }
     }
   ) {
@@ -272,6 +274,8 @@ fragment type on Type {
   regdictionary
   textArrayDomain
   int8ArrayDomain
+  bytea
+  byteaArray
   postBySmallint {
     id
     headline

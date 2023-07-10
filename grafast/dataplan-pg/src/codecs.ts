@@ -899,26 +899,6 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   };
 };
 
-/**
- * Casts by converting to/from base64
- */
-const viaBase64 = (): Cast => {
-  function castFromPg(frag: SQL) {
-    return sql`encode(${frag}, 'base64')`;
-  }
-  return {
-    castFromPg,
-    listCastFromPg(frag) {
-      return sql`(${sql.indent(
-        sql`select array_agg(${castFromPg.call(
-          this,
-          sql`t`,
-        )})\nfrom unnest(${frag}) t`,
-      )})::text`;
-    },
-  };
-};
-
 const parseAsInt = (n: string) => parseInt(n, 10);
 const jsonParse = (s: string) => JSON.parse(s);
 const jsonStringify = (o: JSONValue) => JSON.stringify(o);
@@ -1040,7 +1020,27 @@ export const TYPES = {
     fromPg: parseHstore,
     toPg: stringifyHstore,
   }),
-  bytea: t<string>()("17", "bytea", viaBase64()),
+  bytea: t<Buffer>()("17", "bytea", {
+    fromPg(str) {
+      // The bytea type supports two formats for input and output: “hex”
+      // format and PostgreSQL's historical “escape” format. Both of these
+      // are always accepted on input. The output format depends on the
+      // configuration parameter bytea_output; the default is hex.
+      // -- https://www.postgresql.org/docs/current/datatype-binary.html
+      if (str.startsWith("\\x")) {
+        // Hex format
+        return Buffer.from(str.substring(2), "hex");
+      } else {
+        // ENHANCE: consider supporting this
+        throw new Error(
+          `PostgreSQL bytea escape format is currently unsupported, please use \`bytea_output = 'hex'\` in your PostgreSQL configuration.`,
+        );
+      }
+    },
+    toPg(data: Buffer) {
+      return `\\x${data.toString("hex")}`;
+    },
+  }),
 } as const;
 exportAs("@dataplan/pg", TYPES, "TYPES");
 for (const [name, codec] of Object.entries(TYPES)) {

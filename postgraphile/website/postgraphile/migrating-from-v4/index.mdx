@@ -229,6 +229,7 @@ API how you need, but we suggest that if possible you accept these new changes.
   primary key.
 - If you disable `NodePlugin` then the `deletedFooId` field on mutation
   payloads now will not be added to the schema (it never should have been).
+- The `bytea` type is now natively supported, exposed as `Base64EncodedBinary`
 
 Many of the above issues will not cause any problems for the vast majority of
 your operations - an engineer from our sponsor Netflix reported all 4,000
