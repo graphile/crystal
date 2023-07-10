@@ -145,7 +145,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
         return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list`;
       },
       entityBehavior: {
-        pgResource: "+delete:select",
+        pgResource: "+delete:resource:select",
       },
     },
   };

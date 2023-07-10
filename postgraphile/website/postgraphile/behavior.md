@@ -137,6 +137,9 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   see details about a `users` when it's returned by a function or similar. (In
   this case the `codec` has `select` but the `resource` has `-select`.)
 - `resource:select` - can select rows from this resource
+- `insert:resource:select` - can select the row that was inserted (on the mutation payload)
+- `update:resource:select` - can select the row that was updated (on the mutation payload)
+- `delete:resource:select` - can select the row that was deleted (on the mutation payload)
 - `resource:insert` - can insert into this resource
 - `resource:update` - can update a record in this resource
 - `resource:delete` - can delete a record in this resource
@@ -197,8 +200,6 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `manyRelation:resource:connection`
 - `jwt` - should the given codec behave as if it were a JWT?
 - `insert:input:record` - input to the 'insert' mutation
-- `insert:payload:record` - the record added to the insert mutation payload
-- `update:payload:record`
 - `totalCount` - on a codec, should we add the `totalCount` field?
 
 ## Fragment matching algorithm

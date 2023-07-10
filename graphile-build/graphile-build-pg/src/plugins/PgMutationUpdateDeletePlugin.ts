@@ -234,7 +234,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgResource: "update delete update:select -delete:select",
+      pgResource:
+        "update delete update:resource:select -delete:resource:select",
       pgResourceUnique: "update delete",
     },
 
@@ -292,6 +293,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   const nodeIdCodec = handler
                     ? build.getNodeIdCodec(handler.codecName)
                     : null;
+                  const fieldBehaviorScope =
+                    mode === "resource:update"
+                      ? `update:resource:select`
+                      : `delete:resource:select`;
                   return {
                     clientMutationId: {
                       description: build.wrapDescription(
@@ -312,17 +317,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         [constant],
                       ),
                     },
-                    ...(build.behavior.pgResourceMatches(
+                    ...(TableType &&
+                    build.behavior.pgResourceMatches(
                       resource,
-                      mode === "resource:update"
-                        ? `update:select`
-                        : `delete:select`,
-                    ) && TableType
+                      fieldBehaviorScope,
+                    )
                       ? {
                           [tableName]: fieldWithHooks(
                             {
                               fieldName: tableName,
-                              fieldBehaviorScope: `update:payload:record`,
+                              fieldBehaviorScope,
                             },
                             () => ({
                               description: build.wrapDescription(
