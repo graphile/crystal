@@ -19,6 +19,8 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
     "[EXPERIMENTAL] Adds behaviors, inflectors, and other accomodations to better hone your schema for Relay usage",
   version,
 
+  after: ["PostGraphileV4CompatibilityPlugin"],
+
   inflection: {
     replace: {
       nodeIdFieldName() {
