@@ -254,6 +254,21 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
             "graphile-build-pg built-in (RegDictionary)",
           );
           doConnection("RegDictionary");
+
+          build.registerScalarType(
+            inflection.builtin("Base64EncodedBinary"),
+            {},
+            () =>
+              stringTypeSpec(
+                build.wrapDescription(
+                  "Binary data encoded using Base64",
+                  "type",
+                ),
+              ),
+            "graphile-build-pg built-in (Base64EncodedBinary)",
+          );
+          doConnection("Base64EncodedBinary");
+
           if (pgUseCustomNetworkScalars !== false) {
             build.registerScalarType(
               inflection.builtin("CidrAddress"),

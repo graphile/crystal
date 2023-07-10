@@ -899,6 +899,26 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   };
 };
 
+/**
+ * Casts by converting to/from base64
+ */
+const viaBase64 = (): Cast => {
+  function castFromPg(frag: SQL) {
+    return sql`encode(${frag}, 'base64')`;
+  }
+  return {
+    castFromPg,
+    listCastFromPg(frag) {
+      return sql`(${sql.indent(
+        sql`select array_agg(${castFromPg.call(
+          this,
+          sql`t`,
+        )})\nfrom unnest(${frag}) t`,
+      )})::text`;
+    },
+  };
+};
+
 const parseAsInt = (n: string) => parseInt(n, 10);
 const jsonParse = (s: string) => JSON.parse(s);
 const jsonStringify = (o: JSONValue) => JSON.stringify(o);
@@ -1020,6 +1040,7 @@ export const TYPES = {
     fromPg: parseHstore,
     toPg: stringifyHstore,
   }),
+  bytea: t<string>()("17", "bytea", viaBase64()),
 } as const;
 exportAs("@dataplan/pg", TYPES, "TYPES");
 for (const [name, codec] of Object.entries(TYPES)) {
@@ -1037,9 +1058,8 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
     case "bool":
       return TYPES.boolean;
 
-    // TODO!
-    //case "bytea":
-    //  return TYPES.bytea; // oid: 17
+    case "bytea":
+      return TYPES.bytea; // oid: 17
 
     case "char":
       return TYPES.char;

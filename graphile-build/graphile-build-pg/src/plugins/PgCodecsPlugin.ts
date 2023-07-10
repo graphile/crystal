@@ -1080,6 +1080,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               pgUseCustomNetworkScalars !== false
                 ? inflection.builtin("MacAddress8")
                 : "String",
+            bytea: inflection.builtin("Base64EncodedBinary"),
           };
           for (const rawKey in typeNameByTYPESKey) {
             const key = rawKey as keyof typeof typeNameByTYPESKey;
