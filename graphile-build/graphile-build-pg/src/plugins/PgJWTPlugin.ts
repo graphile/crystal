@@ -9,13 +9,12 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface SchemaOptions {
-      // TODO:
+      // TYPES: Replace these `any`s
       pgJwtSecret?: any;
       pgJwtSignOptions?: any;
     }
 
     interface GatherOptions {
-      // TODO: we may want multiple of these!
       /**
        * If you would like PostGraphile to automatically recognize a PostgreSQL
        * type as a JWT, you should pass a tuple of the
@@ -23,6 +22,8 @@ declare global {
        * case sensitive.
        */
       pgJwtType?: [string, string];
+      // TODO: we may want multiple of these! e.g.
+      // pgJwtType?: [string, string] | Array<[string, string]>;
     }
 
     interface ScopeScalar {
