@@ -77,7 +77,6 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
           options: { pgJwtSecret, pgJwtSignOptions },
         } = build;
         const jwtCodec = [...build.pgCodecMetaLookup.keys()].find((codec) =>
-          // TODO: why is b.jwt_token not found here?
           build.behavior.pgCodecMatches(codec, "jwt"),
         );
 
