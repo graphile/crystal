@@ -235,7 +235,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgResource:
-        "update delete update:resource:select -delete:resource:select",
+        "update delete update:resource:select delete:resource:nodeId -delete:resource:select",
       pgResourceUnique: "update delete",
     },
 
@@ -258,7 +258,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               ? inflection.updatePayloadType({ resource })
               : inflection.deletePayloadType({ resource });
 
-          // Payload type is shared independent of the keys used
+          // Payload type is shared (across the resource) independent of the keys used
           build.registerObjectType(
             payloadTypeName,
             {
