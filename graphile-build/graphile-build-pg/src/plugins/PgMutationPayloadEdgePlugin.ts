@@ -19,7 +19,6 @@ import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      // TODO: move this somewhere more shared
       tableEdgeField(this: Inflection, codec: PgCodecWithAttributes): string;
     }
 
@@ -70,12 +69,6 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
         }
 
         if (pgTypeResource?.parameters && !pgTypeResource.isUnique) {
-          return fields;
-        }
-
-        // TODO: this is a rule on the codec; we must ensure that everywhere
-        // that uses 'list'/'connection' respects the codec behaviors
-        if (!build.behavior.pgCodecMatches(pgCodec, "*:connection")) {
           return fields;
         }
 
