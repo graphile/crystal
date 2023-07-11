@@ -11,7 +11,7 @@ const debugWarn = debugFactory("graphile-build:warn");
  */
 export default function swallowError(e: Error): void {
   // BE VERY CAREFUL NOT TO THROW!
-  // TODO: Improve this
+  // LOGGING: Improve this
   if (debugWarn.enabled) {
     debugWarn("Recoverable error occurred: %s", e);
   } else {
