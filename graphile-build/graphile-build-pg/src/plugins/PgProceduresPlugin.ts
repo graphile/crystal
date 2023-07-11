@@ -213,6 +213,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           }(${pgProc.getArguments().map(argTypeName).join(",")})`;
 
           const { tags: rawTags, description } = pgProc.getTagsAndDescription();
+          const tags = JSON.parse(JSON.stringify(rawTags));
 
           const makeCodecFromReturn = async (): Promise<PgCodec | null> => {
             // We're building a PgCodec to represent specifically the
@@ -235,7 +236,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 const trueArgName = pgProc.proargnames?.[i];
                 const argName = trueArgName || `column${i + 1}`;
 
-                const tag = rawTags[`arg${i}modifier`];
+                const tag = tags[`arg${i}modifier`];
                 const typeModifier =
                   typeof tag === "string"
                     ? /^[0-9]+$/.test(tag)
@@ -328,19 +329,18 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             isStrict || info.options.pgStrictFunctions === true;
           const numberOfRequiredArguments =
             numberOfArguments - numberOfArgumentsWithDefaults;
-          const tags = JSON.parse(JSON.stringify(rawTags));
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
-            const typeModifierTag = rawTags[`arg${i}modifier`];
+            const typeModifierTag = tags[`arg${i}modifier`];
             const typeModifier =
               typeof typeModifierTag === "string"
                 ? /^[0-9]+$/.test(typeModifierTag)
                   ? parseInt(typeModifierTag, 10)
                   : typeModifierTag
                 : undefined;
-            const tag = rawTags[`arg${i}variant`];
+            const tag = tags[`arg${i}variant`];
             const variant = typeof tag === "string" ? tag : undefined;
 
             // i for IN arguments, o for OUT arguments, b for INOUT arguments,
