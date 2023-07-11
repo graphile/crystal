@@ -184,7 +184,9 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `attribute:orderBy` - can we order by this attribute (column, property)?
 - `array:attribute:orderBy` - can we order by this attribute that's an array?
 - `range:attribute:orderBy` - can we order by this attribute that's a range?
-- `binary:attribute:orderBy` - can we order by this attribute that's binary?
+- `composite:attribute:orderBy` - can we order by this attribute that's underlying type is a composite (record) type?
+- `binary:attribute:orderBy` - can we order by this attribute that's underlying type is binary?
+- `scalar:attribute:orderBy` - can we order by this attribute that's underlying type is a scalar?
 - `filterBy` - can we filter by this thing (e.g. column, table, etc)?
 - `proc:filterBy` - can we filter by this proc (resource)
 - `attribute:filterBy` - can we filter by this attribute (column, property)
