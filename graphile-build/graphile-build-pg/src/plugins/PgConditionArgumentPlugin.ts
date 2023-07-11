@@ -2,6 +2,7 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  PgCodec,
   PgCodecWithAttributes,
   PgConditionStep,
   PgSelectParsedCursorStep,
@@ -119,25 +120,36 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                   // PgNodeIdAttributesPlugin for similar approach for NodeIDs)
                   return Object.entries(attributes).reduce(
                     (memo, [attributeName, attribute]) => {
-                      if (
-                        !build.behavior.pgCodecAttributeMatches(
-                          [codec, attributeName],
-                          "attribute:filterBy",
-                        )
-                      ) {
-                        return memo;
+                      const behaviors: string[] = [];
+                      function walk(codec: PgCodec) {
+                        if (codec.arrayOfCodec) {
+                          behaviors.push("array:attribute:filterBy");
+                          walk(codec.arrayOfCodec);
+                        } else if (codec.rangeOfCodec) {
+                          behaviors.push("range:attribute:filterBy");
+                          walk(codec.rangeOfCodec);
+                        } else if (codec.domainOfCodec) {
+                          // No need to add a behavior for domain
+                          walk(codec.domainOfCodec);
+                        } else if (codec.attributes) {
+                          behaviors.push("composite:attribute:filterBy");
+                        } else if (codec.isBinary) {
+                          behaviors.push("binary:attribute:filterBy");
+                        } else {
+                          behaviors.push("scalar:attribute:filterBy");
+                        }
                       }
-                      if (
-                        attribute.codec.isBinary &&
-                        !build.behavior.pgCodecAttributeMatches(
-                          [codec, attributeName],
-                          "binary:attribute:filterBy",
-                        )
-                      ) {
-                        return memo;
+                      walk(attribute.codec);
+                      for (const behavior of behaviors) {
+                        if (
+                          !build.behavior.pgCodecAttributeMatches(
+                            [codec, attributeName],
+                            behavior,
+                          )
+                        ) {
+                          return memo;
+                        }
                       }
-
-                      // TODO: add `range:`/`binary:`/`array:attribute:filterBy` ?
 
                       const fieldName = inflection.attribute({
                         attributeName,

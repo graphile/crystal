@@ -638,7 +638,6 @@ export function listOfCodec<
     arrayOfCodec: innerCodec,
     castFromPg: innerCodec.listCastFromPg,
     executor: innerCodec.executor,
-    isBinary: innerCodec.isBinary,
   };
 
   // Memoize such that every `listOfCodec(foo)` returns the same object.

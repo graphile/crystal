@@ -192,7 +192,9 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `attribute:filterBy` - can we filter by this attribute (column, property)
 - `array:attribute:filterBy` - can we filter by this attribute that's an array?
 - `range:attribute:filterBy` - can we filter by this attribute that's a range?
-- `binary:attribute:filterBy` - can we filter by this attribute that's binary?
+- `composite:attribute:filterBy` - can we filter by this attribute that's underlying type is a composite (record) type?
+- `binary:attribute:filterBy` - can we filter by this attribute that's underlying type is binary?
+- `scalar:attribute:filterBy` - can we filter by this attribute that's underlying type is a scalar?
 - `single` - can we get just one?
 - `query:resource:single` - can we get a single one of these (resource) at the root?
 - `singularRelation:resource:single` - can we get a single one of these (resource) from a
