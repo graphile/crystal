@@ -79,7 +79,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ),
               }),
               `Adding condition type for ${codec.name}.`,
-              // TODO:
+              // ERRORS: implement a more helpful error message:
               /* `You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 {

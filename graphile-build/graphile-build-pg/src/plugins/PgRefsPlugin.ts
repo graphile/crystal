@@ -262,7 +262,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 registryConfig.pgRelations[currentResourceOptions.codec.name],
               ) as Array<RelationEntry>;
               const part = rawPart.trim();
-              // TODO: allow whitespace
+              // ENHANCE: allow whitespace
               const matches = part.match(
                 /^\(([^)]+)\)->([^)]+)(?:\(([^)]+)\))?$/,
               );

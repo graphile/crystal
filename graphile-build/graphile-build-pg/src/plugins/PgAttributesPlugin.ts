@@ -181,12 +181,12 @@ function processAttribute(
           // This error only exists to satisfy TypeScript
           throw new Error("This should be unreachable");
         }
-        // TODO: this is pretty horrible in the export; we should fix that.
+        // ENHANCE: this is pretty horrible in the export; we should fix that.
         if (!attribute.codec.arrayOfCodec) {
           const notNull = attribute.notNull || attribute.codec.notNull;
           // Single record from resource
           /*
-           * TODO: if we refactor `PgSelectSingleStep` we can probably
+           * ENHANCE: if we refactor `PgSelectSingleStep` we can probably
            * optimise this to do inline selection and still join against
            * the base table using e.g. `(table.column).attribute =
            * joined_thing.column`
@@ -580,7 +580,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                   ),
                 },
                 `Adding input object field for ${pgCodec.name}.`,
-                // TODO:
+                // ERRORS: implement a more helpful error message:
                 /* `You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                   attr,
                   {

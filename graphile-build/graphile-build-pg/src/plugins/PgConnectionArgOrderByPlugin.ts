@@ -65,7 +65,6 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
         const { inflection, pgCodecMetaLookup } = build;
         pgCodecMetaLookup.forEach((meta, codec) => {
           if (!codec.attributes || codec.isAnonymous) return;
-          // TODO: should this be `type:order` or similar?
           if (!build.behavior.pgCodecMatches(codec, "order")) {
             return;
           }
@@ -96,7 +95,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
               },
             }),
             `Adding connection "orderBy" argument for ${codec.name}.`,
-            // TODO:
+            // ERRORS: implement a more helpful error message:
             /* `You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               table,
               {
@@ -105,7 +104,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
             )}`,*/
           );
           if (codec.polymorphism?.mode === "single") {
-            // TODO: register OrderBy for each concrete type
+            // ENHANCE: register OrderBy for each concrete type
           }
         });
         return _;
