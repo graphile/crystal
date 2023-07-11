@@ -468,19 +468,19 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       async getEnumsForType(info, serviceName, typeId) {
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.enums;
-        // TODO: cache
-        return list
-          .filter((entity) => entity.enumtypid === typeId)
-          .sort((a, z) => a.enumsortorder - z.enumsortorder);
+        const type = await info.helpers.pgIntrospection.getType(
+          serviceName,
+          typeId,
+        );
+        return type?.getEnumValues() ?? [];
       },
 
       async getRangeByType(info, serviceName, typeId) {
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.ranges;
-        // TODO: cache
-        return list.find((entity) => entity.rngtypid === typeId);
+        const type = await info.helpers.pgIntrospection.getType(
+          serviceName,
+          typeId,
+        );
+        return type?.getRange();
       },
 
       async getExtensionByName(info, serviceName, extensionName) {
