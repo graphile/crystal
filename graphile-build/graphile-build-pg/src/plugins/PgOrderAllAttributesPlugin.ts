@@ -45,8 +45,9 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      // Enable ordering, but don't order by array or range types
-      pgCodecAttribute: "orderBy orderBy:* -orderBy:array -orderBy:range",
+      // Enable ordering, but don't order by array, range or binary types
+      pgCodecAttribute:
+        "orderBy -array:attribute:orderBy -range:attribute:orderBy -binary:attribute:orderBy",
     },
     hooks: {
       GraphQLEnumType_values(values, build, context) {
@@ -111,7 +112,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                 if (
                   !build.behavior.pgCodecAttributeMatches(
                     [pgCodec, attributeName],
-                    "attribute:orderBy:array",
+                    "array:attribute:orderBy",
                   )
                 ) {
                   return memo;
@@ -121,7 +122,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                 if (
                   !build.behavior.pgCodecAttributeMatches(
                     [pgCodec, attributeName],
-                    "attribute:orderBy:range",
+                    "range:attribute:orderBy",
                   )
                 ) {
                   return memo;

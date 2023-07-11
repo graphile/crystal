@@ -181,14 +181,16 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `query:resource:list:order`
 - `query:resource:connection:order`
 - `orderBy` - can we order by this thing (e.g. column)?
-- `orderBy:array` - can we order by this thing that's an array?
-- `orderBy:range` - can we order by this thing that's a range?
-- `attribute:orderBy` - can we order by attribute (column, property)?
-- `attribute:orderBy:array`
-- `attribute:orderBy:range`
+- `attribute:orderBy` - can we order by this attribute (column, property)?
+- `array:attribute:orderBy` - can we order by this attribute that's an array?
+- `range:attribute:orderBy` - can we order by this attribute that's a range?
+- `binary:attribute:orderBy` - can we order by this attribute that's binary?
 - `filterBy` - can we filter by this thing (e.g. column, table, etc)?
 - `proc:filterBy` - can we filter by this proc (resource)
 - `attribute:filterBy` - can we filter by this attribute (column, property)
+- `array:attribute:filterBy` - can we filter by this attribute that's an array?
+- `range:attribute:filterBy` - can we filter by this attribute that's a range?
+- `binary:attribute:filterBy` - can we filter by this attribute that's binary?
 - `single` - can we get just one?
 - `query:resource:single` - can we get a single one of these (resource) at the root?
 - `singularRelation:resource:single` - can we get a single one of these (resource) from a
