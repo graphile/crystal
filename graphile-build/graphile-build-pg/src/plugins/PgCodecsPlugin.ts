@@ -873,6 +873,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
+    entityBehavior: {
+      pgCodecAttribute(behavior, [codec, attributeName], build) {
+        if (codec.attributes[attributeName].codec === TYPES.bytea) {
+          return [behavior, "-filterBy", "-orderBy"];
+        }
+        return behavior;
+      },
+    },
     hooks: {
       build(build) {
         build.allPgCodecs = new Set<PgCodec>();

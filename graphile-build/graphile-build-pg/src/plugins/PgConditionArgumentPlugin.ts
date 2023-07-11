@@ -128,7 +128,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                         return memo;
                       }
 
-                      // TODO: add `attribute:filterBy:array`/`:range` ?
+                      // TODO: add `range:`/`binary:`/`array:attribute:filterBy` ?
 
                       const fieldName = inflection.attribute({
                         attributeName,
