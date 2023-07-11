@@ -459,7 +459,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         );
       },
 
-      // TODO: we should maybe use pg_type.typelem and look up by ID directy
+      // ENHANCE: we should maybe use pg_type.typelem and look up by ID directy
       // instead of having this function
       async getTypeByArray(info, serviceName, arrayId) {
         const relevant = await getDb(info, serviceName);
@@ -486,7 +486,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       async getExtensionByName(info, serviceName, extensionName) {
         const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.extensions;
-        // TODO: cache
+        // PERF: cache
         return list.find((entity) => entity.extname === extensionName);
       },
 

@@ -67,7 +67,7 @@ interface State {
 }
 const EMPTY_OBJECT = Object.freeze({});
 
-// TODO: Assert the attributes are text
+// LOGGING: output warning if the attributes are not text
 /*
 const VARCHAR_ID = "1043";
 const TEXT_ID = "25";
@@ -263,7 +263,7 @@ Original error: ${e.message}
                   pgAttribute.atttypmod,
                 );
               if (!originalCodec) {
-                // TODO: throw an error?
+                // LOGGING: inform user of this (or throw?)
                 continue;
               }
 
@@ -277,7 +277,7 @@ Original error: ${e.message}
               );
 
               const extensions: PgCodecExtensions = {
-                // TODO: more extensions/tags?
+                // ENHANCE: more extensions/tags?
                 tags: {
                   name: info.inflection.enumTableEnum({
                     serviceName,
