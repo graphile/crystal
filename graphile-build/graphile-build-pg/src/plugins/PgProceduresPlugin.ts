@@ -219,13 +219,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             const numberOfArguments = allArgTypes.length ?? 0;
             const attributes: PgCodecAttributes = Object.create(null);
             for (let i = 0, l = numberOfArguments; i < l; i++) {
-              const argType = allArgTypes[i];
-              const trueArgName = pgProc.proargnames?.[i];
-              const argName = trueArgName || `column${i + 1}`;
-
-              // TODO: smart tag should allow changing the modifier
-              const typeModifier = undefined;
-
               // i for IN arguments, o for OUT arguments, b for INOUT arguments,
               // v for VARIADIC arguments, t for TABLE arguments
               const argMode = (pgProc.proargmodes?.[i] ?? "i") as
@@ -236,6 +229,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 | "t";
 
               if (argMode === "o" || argMode === "b" || argMode === "t") {
+                const argType = allArgTypes[i];
+                const trueArgName = pgProc.proargnames?.[i];
+                const argName = trueArgName || `column${i + 1}`;
+
+                // TODO: smart tag should allow changing the modifier
+                const typeModifier = undefined;
+
                 // This argument exists on the record type output
                 // NOTE: we treat `OUT foo`, `INOUT foo` and
                 // `RETURNS TABLE (foo ...)` as the same.
