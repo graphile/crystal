@@ -44,7 +44,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgCodec: "select filter",
-      pgCodecAttribute: "filterBy",
+      pgCodecAttribute: "filterBy -binary:attribute:filterBy",
       pgResource: {
         provides: ["default"],
         before: ["inferred", "override"],
@@ -123,6 +123,15 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                         !build.behavior.pgCodecAttributeMatches(
                           [codec, attributeName],
                           "attribute:filterBy",
+                        )
+                      ) {
+                        return memo;
+                      }
+                      if (
+                        attribute.codec.isBinary &&
+                        !build.behavior.pgCodecAttributeMatches(
+                          [codec, attributeName],
+                          "binary:attribute:filterBy",
                         )
                       ) {
                         return memo;

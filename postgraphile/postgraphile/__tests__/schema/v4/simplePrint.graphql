@@ -2320,9 +2320,6 @@ input TypeCondition {
 
   """Checks for equality with the object’s `int8ArrayDomain` field."""
   int8ArrayDomain: [BigInt]
-
-  """Checks for equality with the object’s `byteaArray` field."""
-  byteaArray: [Base64EncodedBinary]
 }
 
 """A range of `BigFloat`."""

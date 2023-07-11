@@ -666,9 +666,6 @@ input BTypeCondition {
   """Checks for equality with the object’s `boolean` field."""
   boolean: Boolean
 
-  """Checks for equality with the object’s `byteaArray` field."""
-  byteaArray: [Base64EncodedBinary]
-
   """Checks for equality with the object’s `cidr` field."""
   cidr: CidrAddress
 

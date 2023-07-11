@@ -128,6 +128,16 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                   return memo;
                 }
               }
+              if (attribute.codec.isBinary) {
+                if (
+                  !build.behavior.pgCodecAttributeMatches(
+                    [pgCodec, attributeName],
+                    "binary:attribute:orderBy",
+                  )
+                ) {
+                  return memo;
+                }
+              }
               const isUnique = uniques.some(
                 (list) => list.attributes[0] === attributeName,
               );
