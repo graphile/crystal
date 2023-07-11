@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type { PgCodec, PgSelectSingleStep } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import { sign as signJwt } from "jsonwebtoken";
 
 import { version } from "../version.js";
@@ -9,13 +9,12 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface SchemaOptions {
-      // TODO:
+      // TYPES: Replace these `any`s
       pgJwtSecret?: any;
       pgJwtSignOptions?: any;
     }
 
     interface GatherOptions {
-      // TODO: we may want multiple of these!
       /**
        * If you would like PostGraphile to automatically recognize a PostgreSQL
        * type as a JWT, you should pass a tuple of the
@@ -23,6 +22,8 @@ declare global {
        * case sensitive.
        */
       pgJwtType?: [string, string];
+      // TODO: we may want multiple of these! e.g.
+      // pgJwtType?: [string, string] | Array<[string, string]>;
     }
 
     interface ScopeScalar {
@@ -40,8 +41,7 @@ declare global {
   }
 }
 
-interface State {}
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
 
 export const PgJWTPlugin: GraphileConfig.Plugin = {
   name: "PgJWTPlugin",
@@ -51,8 +51,14 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
 
   before: ["PgCodecsPlugin", "PgTablesPlugin"],
 
-  gather: {
+  gather: gatherConfig({
     namespace: "pgJWT",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
+    initialState() {
+      return EMPTY_OBJECT;
+    },
     helpers: {},
     hooks: {
       pgCodecs_PgCodec(info, { pgCodec, pgType }) {
@@ -67,7 +73,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  } as GraphileConfig.PluginGatherConfig<"pgJWT", State, Cache>,
+  }),
 
   schema: {
     hooks: {
@@ -76,7 +82,6 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
           options: { pgJwtSecret, pgJwtSignOptions },
         } = build;
         const jwtCodec = [...build.pgCodecMetaLookup.keys()].find((codec) =>
-          // TODO: why is b.jwt_token not found here?
           build.behavior.pgCodecMatches(codec, "jwt"),
         );
 

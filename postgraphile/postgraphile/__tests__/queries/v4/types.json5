@@ -138,6 +138,8 @@
         regdictionary: null,
         textArrayDomain: null,
         int8ArrayDomain: null,
+        bytea: null,
+        byteaArray: null,
         postBySmallint: {
           id: 10,
           headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -300,6 +302,11 @@
           "2",
           "2098288669218571760",
         ],
+        bytea: "12340000AAAAFFFF9876",
+        byteaArray: [
+          "AAAA123400xXyYzZAAAA",
+          "1234AAAA567890abcdefGHIJKAAA",
+        ],
         postBySmallint: null,
         postById: null,
       },
@@ -443,6 +450,8 @@
           regdictionary: null,
           textArrayDomain: null,
           int8ArrayDomain: null,
+          bytea: null,
+          byteaArray: null,
           postBySmallint: {
             id: 10,
             headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -606,6 +615,11 @@
             "1",
             "2",
             "2098288669218571760",
+          ],
+          bytea: "12340000AAAAFFFF9876",
+          byteaArray: [
+            "AAAA123400xXyYzZAAAA",
+            "1234AAAA567890abcdefGHIJKAAA",
           ],
           postBySmallint: null,
           postById: null,
@@ -758,6 +772,8 @@
       regdictionary: null,
       textArrayDomain: null,
       int8ArrayDomain: null,
+      bytea: null,
+      byteaArray: null,
       postBySmallint: {
         id: 10,
         headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -920,6 +936,11 @@
         "2",
         "2098288669218571760",
       ],
+      bytea: "12340000AAAAFFFF9876",
+      byteaArray: [
+        "AAAA123400xXyYzZAAAA",
+        "1234AAAA567890abcdefGHIJKAAA",
+      ],
       postBySmallint: null,
       postById: null,
     },
@@ -1061,6 +1082,8 @@
     regdictionary: null,
     textArrayDomain: null,
     int8ArrayDomain: null,
+    bytea: null,
+    byteaArray: null,
     postBySmallint: {
       id: 10,
       headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -1207,6 +1230,8 @@
     regdictionary: null,
     textArrayDomain: null,
     int8ArrayDomain: null,
+    bytea: null,
+    byteaArray: null,
     postBySmallint: {
       id: 10,
       headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -1353,6 +1378,8 @@
     regdictionary: null,
     textArrayDomain: null,
     int8ArrayDomain: null,
+    bytea: null,
+    byteaArray: null,
     postBySmallint: {
       id: 10,
       headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -1499,6 +1526,8 @@
     regdictionary: null,
     textArrayDomain: null,
     int8ArrayDomain: null,
+    bytea: null,
+    byteaArray: null,
     postBySmallint: {
       id: 10,
       headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -1646,6 +1675,8 @@
       regdictionary: null,
       textArrayDomain: null,
       int8ArrayDomain: null,
+      bytea: null,
+      byteaArray: null,
       postBySmallint: {
         id: 10,
         headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -1808,6 +1839,11 @@
         "2",
         "2098288669218571760",
       ],
+      bytea: "12340000AAAAFFFF9876",
+      byteaArray: [
+        "AAAA123400xXyYzZAAAA",
+        "1234AAAA567890abcdefGHIJKAAA",
+      ],
       postBySmallint: null,
       postById: null,
     },
@@ -1951,6 +1987,8 @@
         regdictionary: null,
         textArrayDomain: null,
         int8ArrayDomain: null,
+        bytea: null,
+        byteaArray: null,
         postBySmallint: {
           id: 10,
           headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -2113,6 +2151,11 @@
           "2",
           "2098288669218571760",
         ],
+        bytea: "12340000AAAAFFFF9876",
+        byteaArray: [
+          "AAAA123400xXyYzZAAAA",
+          "1234AAAA567890abcdefGHIJKAAA",
+        ],
         postBySmallint: null,
         postById: null,
       },
@@ -2256,6 +2299,8 @@
           regdictionary: null,
           textArrayDomain: null,
           int8ArrayDomain: null,
+          bytea: null,
+          byteaArray: null,
           postBySmallint: {
             id: 10,
             headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -2419,6 +2464,11 @@
             "1",
             "2",
             "2098288669218571760",
+          ],
+          bytea: "12340000AAAAFFFF9876",
+          byteaArray: [
+            "AAAA123400xXyYzZAAAA",
+            "1234AAAA567890abcdefGHIJKAAA",
           ],
           postBySmallint: null,
           postById: null,
@@ -2571,6 +2621,8 @@
       regdictionary: null,
       textArrayDomain: null,
       int8ArrayDomain: null,
+      bytea: null,
+      byteaArray: null,
       postBySmallint: {
         id: 10,
         headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -2718,6 +2770,8 @@
         regdictionary: null,
         textArrayDomain: null,
         int8ArrayDomain: null,
+        bytea: null,
+        byteaArray: null,
         postBySmallint: {
           id: 10,
           headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -2880,6 +2934,11 @@
           "2",
           "2098288669218571760",
         ],
+        bytea: "12340000AAAAFFFF9876",
+        byteaArray: [
+          "AAAA123400xXyYzZAAAA",
+          "1234AAAA567890abcdefGHIJKAAA",
+        ],
         postBySmallint: null,
         postById: null,
       },
@@ -3023,6 +3082,8 @@
           regdictionary: null,
           textArrayDomain: null,
           int8ArrayDomain: null,
+          bytea: null,
+          byteaArray: null,
           postBySmallint: {
             id: 10,
             headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -3185,6 +3246,11 @@
             "2",
             "2098288669218571760",
           ],
+          bytea: "12340000AAAAFFFF9876",
+          byteaArray: [
+            "AAAA123400xXyYzZAAAA",
+            "1234AAAA567890abcdefGHIJKAAA",
+          ],
           postBySmallint: null,
           postById: null,
         },
@@ -3328,6 +3394,8 @@
             regdictionary: null,
             textArrayDomain: null,
             int8ArrayDomain: null,
+            bytea: null,
+            byteaArray: null,
             postBySmallint: {
               id: 10,
               headline: "What’s with you kids? Every other day it’s food, food, food.",
@@ -3492,6 +3560,11 @@
               "2",
               "2098288669218571760",
             ],
+            bytea: "12340000AAAAFFFF9876",
+            byteaArray: [
+              "AAAA123400xXyYzZAAAA",
+              "1234AAAA567890abcdefGHIJKAAA",
+            ],
             postBySmallint: null,
             postById: null,
           },
@@ -3646,6 +3719,8 @@
       regdictionary: null,
       textArrayDomain: null,
       int8ArrayDomain: null,
+      bytea: null,
+      byteaArray: null,
       postBySmallint: {
         id: 10,
         headline: "What’s with you kids? Every other day it’s food, food, food.",

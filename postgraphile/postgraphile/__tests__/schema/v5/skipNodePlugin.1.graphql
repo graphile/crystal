@@ -601,6 +601,8 @@ type BType {
   anIntRange: AnIntRange!
   bigint: BigInt!
   boolean: Boolean!
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: CidrAddress
   compoundType: CCompoundType!
   date: Date!
@@ -903,6 +905,8 @@ input BTypeInput {
   anIntRange: AnIntRangeInput!
   bigint: BigInt!
   boolean: Boolean!
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: CidrAddress
   compoundType: CCompoundTypeInput!
   date: Date!
@@ -1033,6 +1037,8 @@ input BTypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
   boolean: Boolean
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: CidrAddress
   compoundType: CCompoundTypeInput
   date: Date
@@ -1160,6 +1166,9 @@ type BWrappedUrl {
 input BWrappedUrlInput {
   url: BNotNullUrl!
 }
+
+"""Binary data encoded using Base64"""
+scalar Base64EncodedBinary
 
 """
 A floating point number that requires more precision than IEEE 754 binary 64

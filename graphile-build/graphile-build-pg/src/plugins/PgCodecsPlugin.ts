@@ -18,7 +18,7 @@ import {
   recordCodec,
   TYPES,
 } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 import sql from "pg-sql2";
 
@@ -274,8 +274,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
-  gather: <GraphileConfig.PluginGatherConfig<"pgCodecs", State>>{
+  gather: gatherConfig({
     namespace: "pgCodecs",
     initialState: (): State => ({
       codecByTypeIdByDatabaseName: new Map(),
@@ -289,7 +288,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           info.state.codecByClassIdByDatabaseName.set(serviceName, map);
         }
         if (map.has(classId)) {
-          return map.get(classId);
+          return map.get(classId)!;
         }
 
         const promise = (async () => {
@@ -355,7 +354,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   (attributeAttribute.attidentity != null &&
                     attributeAttribute.attidentity !== "") ||
                   attributeAttribute.getType()?.typdefault != null,
-                // TODO: identicalVia,
+                // PERF: identicalVia,
                 extensions: {
                   tags,
                 },
@@ -467,7 +466,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           info.state.codecByTypeIdByDatabaseName.set(serviceName, map);
         }
         if (map.has(typeId)) {
-          return map.get(typeId);
+          return map.get(typeId)!;
         }
 
         const promise = (async (): Promise<PgCodec | null> => {
@@ -871,7 +870,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  },
+  }),
 
   schema: {
     hooks: {
@@ -1080,6 +1079,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               pgUseCustomNetworkScalars !== false
                 ? inflection.builtin("MacAddress8")
                 : "String",
+            bytea: inflection.builtin("Base64EncodedBinary"),
           };
           for (const rawKey in typeNameByTYPESKey) {
             const key = rawKey as keyof typeof typeNameByTYPESKey;
@@ -1464,7 +1464,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               }
             } else {
               // We have no idea what this is or how to handle it.
-              // TODO: add some default handling, like "behavesLike = TYPES.string"?
+              // TODO: add some default handling, like "behavesLike = TYPES.text"?
               console.warn(
                 `PgCodec '${codec.name}' not understood, please set 'domainOfCodec' to indicate the underlying behaviour the type should have when exposed to GraphQL`,
               );

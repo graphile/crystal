@@ -41,6 +41,7 @@ export {
   constantCaseAll,
   EXPORTABLE,
   formatInsideUnderscores,
+  gatherConfig,
   pluralize,
   singularize,
   upperCamelCase,

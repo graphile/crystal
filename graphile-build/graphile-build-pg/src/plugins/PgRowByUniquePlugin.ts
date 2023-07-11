@@ -44,7 +44,8 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
         }
         const uniqueKeys = unique.attributes;
         return this.camelCase(
-          // TODO: should this use the _resource_ rather than the _codec_ in case the same codec is used across multiple resources?
+          // NOTE: If your schema uses the same codec for multiple resources,
+          // you should probably change this to use the resource name.
           `${this.tableType(resource.codec)}-by-${this._joinAttributeNames(
             resource.codec,
             uniqueKeys,

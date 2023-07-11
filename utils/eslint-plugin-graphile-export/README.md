@@ -63,3 +63,17 @@ import { EXPORTABLE } from "graphile-export";
 ```
 
 TODO: more docs!
+
+## The rules
+
+TODO: document them
+
+```
+      rules: {
+        "graphile-export/exhaustive-deps": 2,
+        "graphile-export/export-methods": 2,
+        "graphile-export/export-instances": 2,
+        "graphile-export/export-subclasses": 2,
+        "graphile-export/no-nested": 2,
+      },
+```

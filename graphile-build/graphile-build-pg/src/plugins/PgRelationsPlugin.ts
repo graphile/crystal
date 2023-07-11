@@ -19,7 +19,7 @@ import type {
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
 import { arraysMatch, connection, first } from "grafast";
-import { EXPORTABLE } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
@@ -128,7 +128,7 @@ declare global {
 }
 
 interface State {}
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
 
 // TODO: split this into one plugin for gathering and another for schema
 export const PgRelationsPlugin: GraphileConfig.Plugin = {
@@ -253,8 +253,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  gather: <GraphileConfig.PluginGatherConfig<"pgRelations", State, Cache>>{
+  gather: gatherConfig({
     namespace: "pgRelations",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
     initialState: (): State => Object.create(null),
     helpers: {
       async addRelation(info, event, pgConstraint, isReferencee = false) {
@@ -356,7 +359,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             // Common to all types
           } else {
             if (isReferencee) {
-              // TODO: consider supporting backward relationships for single
+              // ENHANCE: consider supporting backward relationships for single
               // table polymorphic types. It's not immediately clear what the
               // user would want in these cases: is it separate fields for each
               // type (that would inflate the schema), or is it a relation to
@@ -489,7 +492,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  },
+  }),
 
   schema: {
     entityBehavior: {
@@ -971,7 +974,7 @@ function addRelations(
         sharedSource = firstSource;
       }
 
-      // TODO: if there's only one path do we still need union?
+      // TEST: if there's only one path do we still need union?
       const needsPgUnionAll =
         sharedCodec?.polymorphism?.mode === "union" || paths.length > 1;
 
@@ -1048,7 +1051,6 @@ function addRelations(
               te`  const ${collectionIdentifier} = ${ref_finalLayerResource}.find();`,
             );
             // FIXME: if required, make the above `DISTINCT ON (primary key)`.
-            // FIXME: make `previousAlias` a safe identifier
             functionLines.push(
               te`  let previousAlias = ${collectionIdentifier}.alias;`,
             );
@@ -1232,7 +1234,7 @@ function addRelations(
       behavior = build.behavior.pgRefDefinitionBehavior(refSpec);
       typeName = refSpec.graphqlType;
       if (!typeName) {
-        // TODO: remove this restriction
+        // ENHANCE: remove this restriction
         throw new Error(`@ref on polymorphic type must declare to:TargetType`);
       }
       const type = build.getTypeByName(typeName);

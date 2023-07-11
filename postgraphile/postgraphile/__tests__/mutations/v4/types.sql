@@ -55,7 +55,9 @@ lateral (
     __type_function_mutation__."regdictionary"::text as "42",
     __type_function_mutation__."text_array_domain"::text as "43",
     __type_function_mutation__."int8_array_domain"::text as "44",
-    __type_function_mutation_identifiers__.idx as "45"
+    __type_function_mutation__."bytea"::text as "45",
+    __type_function_mutation__."bytea_array"::text as "46",
+    __type_function_mutation_identifiers__.idx as "47"
   from "b"."type_function_mutation"(__type_function_mutation_identifiers__."id0") as __type_function_mutation__
 ) as __type_function_mutation_result__;
 
@@ -230,7 +232,9 @@ select
   __type_function_list_mutation__."regconfig"::text as "41",
   __type_function_list_mutation__."regdictionary"::text as "42",
   __type_function_list_mutation__."text_array_domain"::text as "43",
-  __type_function_list_mutation__."int8_array_domain"::text as "44"
+  __type_function_list_mutation__."int8_array_domain"::text as "44",
+  __type_function_list_mutation__."bytea"::text as "45",
+  __type_function_list_mutation__."bytea_array"::text as "46"
 from unnest("b"."type_function_list_mutation"()) as __type_function_list_mutation__;
 
 select __frmcdc_compound_type_result__.*
@@ -404,7 +408,9 @@ select
   __type_function_connection_mutation__."regconfig"::text as "41",
   __type_function_connection_mutation__."regdictionary"::text as "42",
   __type_function_connection_mutation__."text_array_domain"::text as "43",
-  __type_function_connection_mutation__."int8_array_domain"::text as "44"
+  __type_function_connection_mutation__."int8_array_domain"::text as "44",
+  __type_function_connection_mutation__."bytea"::text as "45",
+  __type_function_connection_mutation__."bytea_array"::text as "46"
 from "b"."type_function_connection_mutation"() as __type_function_connection_mutation__;
 
 select __frmcdc_compound_type_result__.*
@@ -525,7 +531,7 @@ lateral (
   )
 ) as __post_result__;
 
-update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int8", "numeric" = $3::"numeric", "decimal" = $4::"numeric", "boolean" = $5::"bool", "varchar" = $6::"varchar", "enum" = $7::"b"."color", "enum_array" = $8::"b"."color"[], "domain" = $9::"a"."an_int", "domain2" = $10::"b"."another_int", "text_array" = $11::"text"[], "json" = $12::"json", "jsonb" = $13::"jsonb", "numrange" = $14::"pg_catalog"."numrange", "daterange" = $15::"pg_catalog"."daterange", "an_int_range" = $16::"a"."an_int_range", "timestamp" = $17::"timestamp", "timestamptz" = $18::"timestamptz", "date" = $19::"date", "time" = $20::"time", "timetz" = $21::"timetz", "interval" = $22::"interval", "interval_array" = $23::"interval"[], "money" = $24::"money", "compound_type" = $25::"c"."compound_type", "nested_compound_type" = $26::"b"."nested_compound_type", "point" = $27::"point", "nullablePoint" = $28::"point", "inet" = $29::"inet", "cidr" = $30::"cidr", "macaddr" = $31::"macaddr", "regproc" = $32::"regproc", "regprocedure" = $33::"regprocedure", "regoper" = $34::"regoper", "regoperator" = $35::"regoperator", "regclass" = $36::"regclass", "regtype" = $37::"regtype", "regconfig" = $38::"regconfig", "regdictionary" = $39::"regdictionary", "text_array_domain" = $40::"c"."text_array_domain", "int8_array_domain" = $41::"c"."int8_array_domain" where (__types__."id" = $42::"int4") returning
+update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int8", "numeric" = $3::"numeric", "decimal" = $4::"numeric", "boolean" = $5::"bool", "varchar" = $6::"varchar", "enum" = $7::"b"."color", "enum_array" = $8::"b"."color"[], "domain" = $9::"a"."an_int", "domain2" = $10::"b"."another_int", "text_array" = $11::"text"[], "json" = $12::"json", "jsonb" = $13::"jsonb", "numrange" = $14::"pg_catalog"."numrange", "daterange" = $15::"pg_catalog"."daterange", "an_int_range" = $16::"a"."an_int_range", "timestamp" = $17::"timestamp", "timestamptz" = $18::"timestamptz", "date" = $19::"date", "time" = $20::"time", "timetz" = $21::"timetz", "interval" = $22::"interval", "interval_array" = $23::"interval"[], "money" = $24::"money", "compound_type" = $25::"c"."compound_type", "nested_compound_type" = $26::"b"."nested_compound_type", "point" = $27::"point", "nullablePoint" = $28::"point", "inet" = $29::"inet", "cidr" = $30::"cidr", "macaddr" = $31::"macaddr", "regproc" = $32::"regproc", "regprocedure" = $33::"regprocedure", "regoper" = $34::"regoper", "regoperator" = $35::"regoperator", "regclass" = $36::"regclass", "regtype" = $37::"regtype", "regconfig" = $38::"regconfig", "regdictionary" = $39::"regdictionary", "text_array_domain" = $40::"c"."text_array_domain", "int8_array_domain" = $41::"c"."int8_array_domain", "bytea" = $42::"bytea", "bytea_array" = $43::"bytea"[] where (__types__."id" = $44::"int4") returning
   __types__."id"::text as "0",
   __types__."smallint"::text as "1",
   __types__."bigint"::text as "2",
@@ -578,7 +584,9 @@ update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int
   __types__."regconfig"::text as "41",
   __types__."regdictionary"::text as "42",
   __types__."text_array_domain"::text as "43",
-  __types__."int8_array_domain"::text as "44";
+  __types__."int8_array_domain"::text as "44",
+  __types__."bytea"::text as "45",
+  __types__."bytea_array"::text as "46";
 
 select __frmcdc_compound_type_result__.*
 from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
@@ -751,7 +759,9 @@ insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal"
   __types__."regconfig"::text as "41",
   __types__."regdictionary"::text as "42",
   __types__."text_array_domain"::text as "43",
-  __types__."int8_array_domain"::text as "44";
+  __types__."int8_array_domain"::text as "44",
+  __types__."bytea"::text as "45",
+  __types__."bytea_array"::text as "46";
 
 select __frmcdc_compound_type_result__.*
 from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,

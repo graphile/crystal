@@ -1,4 +1,4 @@
-import type {} from "graphile-build";
+import { gatherConfig } from "graphile-build";
 import type {} from "graphile-build-pg";
 import type {} from "graphile-config";
 import JSON5 from "json5";
@@ -264,7 +264,7 @@ export function makePgSmartTagsPlugin(
     version: "0.0.0",
     before: ["smart-tags"],
 
-    gather: <GraphileConfig.PluginGatherConfig<any, State, Cache>>{
+    gather: gatherConfig<any, State, Cache>({
       namespace:
         `pgSmartTags_${id}` as any /* Cannot make type safe because dynamic */,
       helpers: {},
@@ -363,7 +363,7 @@ export function makePgSmartTagsPlugin(
             },
           }
         : null),
-    },
+    }),
   };
 }
 

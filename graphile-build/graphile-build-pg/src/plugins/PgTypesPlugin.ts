@@ -254,6 +254,59 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
             "graphile-build-pg built-in (RegDictionary)",
           );
           doConnection("RegDictionary");
+
+          build.registerScalarType(
+            inflection.builtin("Base64EncodedBinary"),
+            {},
+            () => ({
+              description: build.wrapDescription(
+                "Binary data encoded using Base64",
+                "type",
+              ),
+              serialize: EXPORTABLE(
+                () =>
+                  function serialize(data: unknown) {
+                    if (Buffer.isBuffer(data)) {
+                      return data.toString("base64");
+                    } else {
+                      throw new Error(
+                        `Base64EncodeBinary can only be used with Node.js buffers.`,
+                      );
+                    }
+                  },
+                [],
+              ),
+              parseValue: EXPORTABLE(
+                (GraphQLError) =>
+                  function parseValue(data: unknown) {
+                    if (typeof data === "string") {
+                      return Buffer.from(data, "base64");
+                    } else {
+                      throw new GraphQLError(
+                        "Base64EncodedBinary can only parse string values.",
+                      );
+                    }
+                  },
+                [GraphQLError],
+              ),
+              parseLiteral: EXPORTABLE(
+                (GraphQLError, Kind) =>
+                  function parseLiteral(ast) {
+                    if (ast.kind !== Kind.STRING) {
+                      // TODO: add name to this error
+                      throw new GraphQLError(
+                        "Base64EncodedBinary can only parse string values",
+                      );
+                    }
+                    return Buffer.from(ast.value, "base64");
+                  },
+                [GraphQLError, Kind],
+              ),
+            }),
+            "graphile-build-pg built-in (Base64EncodedBinary)",
+          );
+          doConnection("Base64EncodedBinary");
+
           if (pgUseCustomNetworkScalars !== false) {
             build.registerScalarType(
               inflection.builtin("CidrAddress"),

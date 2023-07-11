@@ -73,7 +73,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
         provides: ["default"],
         before: ["inferred", "override"],
         callback(behavior, resource) {
-          const newBehavior = [behavior];
+          const newBehavior = [behavior, "+insert:resource:select"];
           if (
             !resource.parameters &&
             !!resource.codec.attributes &&
@@ -177,6 +177,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     resource.codec,
                     "output",
                   ) as GraphQLOutputType | undefined;
+                  const fieldBehaviorScope = `insert:resource:select`;
                   return {
                     clientMutationId: {
                       type: GraphQLString,
@@ -196,13 +197,13 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     ...(TableType &&
                     build.behavior.pgResourceMatches(
                       resource,
-                      "insert:payload:record",
+                      fieldBehaviorScope,
                     )
                       ? {
                           [tableFieldName]: fieldWithHooks(
                             {
                               fieldName: tableFieldName,
-                              fieldBehaviorScope: `insert:payload:record`,
+                              fieldBehaviorScope,
                             },
                             {
                               description: `The \`${tableTypeName}\` that was created by this mutation.`,

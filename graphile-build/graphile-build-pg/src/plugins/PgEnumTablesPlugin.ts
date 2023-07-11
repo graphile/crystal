@@ -1,5 +1,6 @@
 import type { PgCodecExtensions, PgEnumCodec, PgEnumValue } from "@dataplan/pg";
 import { enumCodec } from "@dataplan/pg";
+import { gatherConfig } from "graphile-build";
 import type {
   Introspection,
   PgAttribute,
@@ -64,7 +65,7 @@ interface State {
   codecByPgConstraint: Map<PgConstraint, PgEnumCodec>;
   codecByPgAttribute: Map<PgAttribute, PgEnumCodec>;
 }
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
 
 // TODO: Assert the attributes are text
 /*
@@ -116,8 +117,11 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  gather: <GraphileConfig.PluginGatherConfig<"pgEnumTables", State, Cache>>{
+  gather: gatherConfig({
     namespace: "pgEnumTables",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
     initialState: (): State => ({
       codecByPgConstraint: new Map(),
       codecByPgAttribute: new Map(),
@@ -337,7 +341,7 @@ Original error: ${e.message}
         }
       },
     },
-  },
+  }),
 };
 
 function isEnumConstraint(

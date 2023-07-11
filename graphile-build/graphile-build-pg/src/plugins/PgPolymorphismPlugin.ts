@@ -23,6 +23,7 @@ import type {
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
+import { gatherConfig } from "graphile-build";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
@@ -91,13 +92,21 @@ function parseAttribute(
   };
 }
 
+const EMPTY_OBJECT = Object.freeze({});
+
 export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
   name: "PgPolymorphismPlugin",
   description: "Adds polymorphism",
   version,
   after: ["smart-tags", "PgTablesPlugin", "PgCodecsPlugin"],
-  gather: {
+  gather: gatherConfig({
     namespace: "pgPolymorphism",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
+    initialState() {
+      return EMPTY_OBJECT;
+    },
     helpers: {},
     hooks: {
       async pgCodecs_recordType_spec(info, event) {
@@ -223,14 +232,29 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 const remotePk = referencedClass
                   .getConstraints()
                   .find((c) => c.contype === "p");
-                const pgConstraint = referencedClass.getConstraints().find(
-                  (c) =>
-                    // TODO: this isn't safe, we should also check that the attributes match up
-                    c.contype === "f" && c.confrelid === pgClass._id,
-                );
-                if (!pk || !remotePk || !pgConstraint) {
+                if (!pk || !remotePk) {
                   throw new Error(
-                    "Could not build polymorphic reference due to missing primary key or foreign key constraint",
+                    "Could not build polymorphic reference due to missing primary key",
+                  );
+                }
+                const pgConstraint = referencedClass
+                  .getConstraints()
+                  .find(
+                    (c) =>
+                      c.contype === "f" &&
+                      c.confrelid === pgClass._id &&
+                      arraysMatch(
+                        c.getAttributes()!,
+                        remotePk.getAttributes()!,
+                      ) &&
+                      arraysMatch(
+                        c.getForeignAttributes()!,
+                        pk.getAttributes()!,
+                      ),
+                  );
+                if (!pgConstraint) {
+                  throw new Error(
+                    "Could not build polymorphic reference due to missing foreign key constraint",
                   );
                 }
                 const codec = await info.helpers.pgCodecs.getCodecFromClass(
@@ -569,7 +593,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  },
+  }),
   schema: {
     entityBehavior: {
       pgCodec: {

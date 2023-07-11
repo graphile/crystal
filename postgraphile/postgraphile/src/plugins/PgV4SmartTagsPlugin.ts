@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import { gatherConfig } from "graphile-build";
 import type { PgSmartTagsDict } from "graphile-build-pg";
 import { addBehaviorToTags } from "graphile-build-pg";
 import { inspect } from "util";
@@ -11,6 +12,7 @@ declare global {
     }
   }
 }
+const EMPTY_OBJECT = Object.freeze({});
 
 export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
   name: "PgV4SmartTagsPlugin",
@@ -20,8 +22,14 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
   before: ["PgFakeConstraintsPlugin", "PgEnumTablesPlugin"],
   provides: ["smart-tags"],
 
-  gather: {
+  gather: gatherConfig({
     namespace: "pgV4SmartTags",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
+    initialState() {
+      return EMPTY_OBJECT;
+    },
     helpers: {},
     hooks: {
       // Run in the 'introspection' phase before anything uses the tags
@@ -69,7 +77,7 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
         processTags(entity.getTags());
       },
     },
-  },
+  }),
 };
 
 export default PgV4SmartTagsPlugin;

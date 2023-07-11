@@ -9,6 +9,7 @@ import type {
   PgResourceOptions,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
+import { gatherConfig } from "graphile-build";
 
 import {
   parseDatabaseIdentifierFromSmartTag,
@@ -59,8 +60,7 @@ declare module "@dataplan/pg" {
   }
 }
 
-interface State {}
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
 
 export const PgRefsPlugin: GraphileConfig.Plugin = {
   name: "PgRefsPlugin",
@@ -91,8 +91,14 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  gather: {
+  gather: gatherConfig({
     namespace: "pgRefs",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
+    initialState() {
+      return EMPTY_OBJECT;
+    },
     helpers: {},
     hooks: {
       async pgCodecs_PgCodec(info, event) {
@@ -354,5 +360,5 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  } as GraphileConfig.PluginGatherConfig<"pgRefs", State, Cache>,
+  }),
 };

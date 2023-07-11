@@ -167,7 +167,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
   undefined
 > {
   return (oid, type, options = {}) => {
-    const { castFromPg, listCastFromPg, fromPg, toPg } = options;
+    const { castFromPg, listCastFromPg, fromPg, toPg, isBinary } = options;
     return {
       name: type,
       sqlType: sql.identifier(...type.split(".")),
@@ -178,6 +178,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       castFromPg,
       listCastFromPg,
       executor: null,
+      isBinary,
     };
   };
 }
@@ -854,6 +855,7 @@ type Cast<TFromJavaScript = any, TFromPostgres = string> = {
   listCastFromPg?(frag: SQL): SQL;
   toPg?: PgEncode<TFromJavaScript>;
   fromPg?: PgDecode<TFromJavaScript, TFromPostgres>;
+  isBinary?: boolean;
 };
 
 /**
@@ -1020,6 +1022,28 @@ export const TYPES = {
     fromPg: parseHstore,
     toPg: stringifyHstore,
   }),
+  bytea: t<Buffer>()("17", "bytea", {
+    fromPg(str) {
+      // The bytea type supports two formats for input and output: “hex”
+      // format and PostgreSQL's historical “escape” format. Both of these
+      // are always accepted on input. The output format depends on the
+      // configuration parameter bytea_output; the default is hex.
+      // -- https://www.postgresql.org/docs/current/datatype-binary.html
+      if (str.startsWith("\\x")) {
+        // Hex format
+        return Buffer.from(str.substring(2), "hex");
+      } else {
+        // ENHANCE: consider supporting this
+        throw new Error(
+          `PostgreSQL bytea escape format is currently unsupported, please use \`bytea_output = 'hex'\` in your PostgreSQL configuration.`,
+        );
+      }
+    },
+    toPg(data: Buffer) {
+      return `\\x${data.toString("hex")}`;
+    },
+    isBinary: true,
+  }),
 } as const;
 exportAs("@dataplan/pg", TYPES, "TYPES");
 for (const [name, codec] of Object.entries(TYPES)) {
@@ -1037,9 +1061,8 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
     case "bool":
       return TYPES.boolean;
 
-    // TODO!
-    //case "bytea":
-    //  return TYPES.bytea; // oid: 17
+    case "bytea":
+      return TYPES.bytea; // oid: 17
 
     case "char":
       return TYPES.char;

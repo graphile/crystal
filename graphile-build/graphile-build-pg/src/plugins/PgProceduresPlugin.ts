@@ -17,7 +17,7 @@ import {
   recordCodec,
   sqlFromArgDigests,
 } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 import sql from "pg-sql2";
 
@@ -104,7 +104,8 @@ interface State {
     Map<PgProc, Promise<PgResourceOptions | null>>
   >;
 }
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
+type Cache = typeof EMPTY_OBJECT;
 
 function argTypeName(arg: PgProcArgument): string {
   const nsp = arg.type.getNamespace()!;
@@ -140,7 +141,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  gather: {
+  gather: gatherConfig({
     namespace: "pgProcedures",
     helpers: {
       async getResourceOptions(info, serviceName, pgProc) {
@@ -571,7 +572,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         return resourceOptionsPromise;
       },
     },
-    initialState: () => ({
+    initialCache(): Cache {
+      return EMPTY_OBJECT;
+    },
+    initialState: (): State => ({
       resourceOptionsByPgProcByService: new Map(),
     }),
     hooks: {
@@ -589,7 +593,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         // Only process procedures from one of the published namespaces
         const namespace = pgProc.getNamespace();
         if (!namespace || !schemas.includes(namespace.nspname)) {
-          return null;
+          return;
         }
 
         // Do not select procedures that create range types. These are utility
@@ -634,5 +638,5 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         helpers.pgProcedures.getResourceOptions(serviceName, pgProc);
       },
     },
-  } as GraphileConfig.PluginGatherConfig<"pgProcedures", State, Cache>,
+  }),
 };

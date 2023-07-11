@@ -183,6 +183,8 @@ fragment type on Type {
   regdictionary
   textArrayDomain
   int8ArrayDomain
+  bytea
+  byteaArray
   postBySmallint {
     id
     headline

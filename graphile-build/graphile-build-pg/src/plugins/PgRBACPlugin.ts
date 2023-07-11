@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import { gatherConfig } from "graphile-build";
 import { resolvePermissions } from "pg-introspection";
 
 import { addBehaviorToTags } from "../utils.js";
@@ -13,14 +14,21 @@ declare global {
   }
 }
 
+const EMPTY_OBJECT = Object.freeze({});
 export const PgRBACPlugin: GraphileConfig.Plugin = {
   name: "PgRBACPlugin",
   description:
     "Converts the database GRANT/REVOKE privileges to behaviors. Experimental.",
   experimental: true,
   version,
-  gather: {
+  gather: gatherConfig({
     namespace: "pgRBAC",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
+    initialState() {
+      return EMPTY_OBJECT;
+    },
     helpers: {},
     hooks: {
       async pgCodecs_attribute(info, event) {
@@ -193,5 +201,5 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  },
+  }),
 };

@@ -1,5 +1,7 @@
 import "graphile-config";
 
+import { gatherConfig } from "graphile-build";
+
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
@@ -11,8 +13,7 @@ declare global {
   }
 }
 
-interface State {}
-interface Cache {}
+const EMPTY_OBJECT = Object.freeze({});
 
 export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
   name: "PgRemoveExtensionResourcesPlugin",
@@ -20,8 +21,14 @@ export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
     "Removes resources that come from Postgres extensions, typically you don't want these utility types and functions in your GraphQL API",
   version: version,
 
-  gather: {
+  gather: gatherConfig({
     namespace: "pgRemoveExtensionResources",
+    initialCache() {
+      return EMPTY_OBJECT;
+    },
+    initialState() {
+      return EMPTY_OBJECT;
+    },
     helpers: {},
     hooks: {
       pgIntrospection_introspection(info, event) {
@@ -73,9 +80,5 @@ export const PgRemoveExtensionResourcesPlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  } as GraphileConfig.PluginGatherConfig<
-    "pgRemoveExtensionResources",
-    State,
-    Cache
-  >,
+  }),
 };

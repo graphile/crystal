@@ -157,6 +157,9 @@ type AuthenticatePayloadPayload {
   query: Query
 }
 
+"""Binary data encoded using Base64"""
+scalar Base64EncodedBinary
+
 """
 A floating point number that requires more precision than IEEE 754 binary 64
 """
@@ -1068,6 +1071,8 @@ type Type implements Node {
   anIntRange: AnIntRange!
   bigint: BigInt!
   boolean: Boolean!
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: String
   compoundType: CompoundType!
   date: Date!
@@ -1343,6 +1348,8 @@ input TypeInput {
   anIntRange: AnIntRangeInput!
   bigint: BigInt!
   boolean: Boolean!
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: String
   compoundType: CompoundTypeInput!
   date: Date!
@@ -1392,6 +1399,8 @@ input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
   boolean: Boolean
+  bytea: Base64EncodedBinary
+  byteaArray: [Base64EncodedBinary]
   cidr: String
   compoundType: CompoundTypeInput
   date: Date

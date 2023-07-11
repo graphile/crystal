@@ -234,7 +234,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgResource: "update delete",
+      pgResource:
+        "update delete update:resource:select delete:resource:nodeId -delete:resource:select",
       pgResourceUnique: "update delete",
     },
 
@@ -257,7 +258,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
               ? inflection.updatePayloadType({ resource })
               : inflection.deletePayloadType({ resource });
 
-          // Payload type is shared independent of the keys used
+          // Payload type is shared (across the resource) independent of the keys used
           build.registerObjectType(
             payloadTypeName,
             {
@@ -292,6 +293,10 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   const nodeIdCodec = handler
                     ? build.getNodeIdCodec(handler.codecName)
                     : null;
+                  const fieldBehaviorScope =
+                    mode === "resource:update"
+                      ? `update:resource:select`
+                      : `delete:resource:select`;
                   return {
                     clientMutationId: {
                       description: build.wrapDescription(
@@ -312,13 +317,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         [constant],
                       ),
                     },
-                    // TODO: default to `...(mode === "resource:update" && TableType`; we only want the record on delete for v4 compatibility
-                    ...(TableType
+                    ...(TableType &&
+                    build.behavior.pgResourceMatches(
+                      resource,
+                      fieldBehaviorScope,
+                    )
                       ? {
                           [tableName]: fieldWithHooks(
                             {
                               fieldName: tableName,
-                              fieldBehaviorScope: `update:payload:record`,
+                              fieldBehaviorScope,
                             },
                             () => ({
                               description: build.wrapDescription(
@@ -347,12 +355,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     deletedNodeIdFieldName &&
                     handler &&
                     nodeIdCodec &&
-                    build.behavior.pgResourceMatches(resource, "node")
+                    build.behavior.pgResourceMatches(resource, "node") &&
+                    build.behavior.pgResourceMatches(
+                      resource,
+                      "delete:resource:nodeId",
+                    )
                       ? {
                           [deletedNodeIdFieldName]: fieldWithHooks(
                             {
                               fieldName: deletedNodeIdFieldName,
-                              // TODO: fieldBehaviorScope: `...`,
+                              fieldBehaviorScope: "delete:resource:nodeId",
                               isPgMutationPayloadDeletedNodeIdField: true,
                             },
                             () => {

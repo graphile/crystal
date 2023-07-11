@@ -137,6 +137,10 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   see details about a `users` when it's returned by a function or similar. (In
   this case the `codec` has `select` but the `resource` has `-select`.)
 - `resource:select` - can select rows from this resource
+- `insert:resource:select` - can select the row that was inserted (on the mutation payload)
+- `update:resource:select` - can select the row that was updated (on the mutation payload)
+- `delete:resource:select` - can select the row that was deleted (on the mutation payload)
+- `delete:resource:nodeId` - can select the nodeId of the row that was deleted (on the mutation payload)
 - `resource:insert` - can insert into this resource
 - `resource:update` - can update a record in this resource
 - `resource:delete` - can delete a record in this resource
@@ -177,14 +181,20 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `query:resource:list:order`
 - `query:resource:connection:order`
 - `orderBy` - can we order by this thing (e.g. column)?
-- `orderBy:array` - can we order by this thing that's an array?
-- `orderBy:range` - can we order by this thing that's a range?
-- `attribute:orderBy` - can we order by attribute (column, property)?
-- `attribute:orderBy:array`
-- `attribute:orderBy:range`
+- `attribute:orderBy` - can we order by this attribute (column, property)?
+- `array:attribute:orderBy` - can we order by this attribute that's an array?
+- `range:attribute:orderBy` - can we order by this attribute that's a range?
+- `composite:attribute:orderBy` - can we order by this attribute that's underlying type is a composite (record) type?
+- `binary:attribute:orderBy` - can we order by this attribute that's underlying type is binary?
+- `scalar:attribute:orderBy` - can we order by this attribute that's underlying type is a scalar?
 - `filterBy` - can we filter by this thing (e.g. column, table, etc)?
 - `proc:filterBy` - can we filter by this proc (resource)
 - `attribute:filterBy` - can we filter by this attribute (column, property)
+- `array:attribute:filterBy` - can we filter by this attribute that's an array?
+- `range:attribute:filterBy` - can we filter by this attribute that's a range?
+- `composite:attribute:filterBy` - can we filter by this attribute that's underlying type is a composite (record) type?
+- `binary:attribute:filterBy` - can we filter by this attribute that's underlying type is binary?
+- `scalar:attribute:filterBy` - can we filter by this attribute that's underlying type is a scalar?
 - `single` - can we get just one?
 - `query:resource:single` - can we get a single one of these (resource) at the root?
 - `singularRelation:resource:single` - can we get a single one of these (resource) from a
@@ -197,8 +207,6 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `manyRelation:resource:connection`
 - `jwt` - should the given codec behave as if it were a JWT?
 - `insert:input:record` - input to the 'insert' mutation
-- `insert:payload:record` - the record added to the insert mutation payload
-- `update:payload:record`
 - `totalCount` - on a codec, should we add the `totalCount` field?
 
 ## Fragment matching algorithm
