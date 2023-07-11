@@ -1416,7 +1416,6 @@ function addRelations(
                 description:
                   description ??
                   `Reads and enables pagination through a set of \`${typeName}\`.`,
-                // TODO: handle nullability
                 type: new GraphQLNonNull(ConnectionType as GraphQLObjectType),
                 plan: connectionPlan,
                 deprecationReason,

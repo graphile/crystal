@@ -65,13 +65,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
             }
             const codec = rawCodec as PgCodecWithAttributes;
 
-            // TODO: do we want this filter here? E.g. we might want to enable
-            // a bulk delete mutation without allowing any selects? Maybe this
-            // is actually a 'filter' behavior instead?
-            if (!build.behavior.pgCodecMatches(codec, "select")) {
-              return;
-            }
-
             const tableTypeName = inflection.tableType(codec);
             const conditionName = inflection.conditionType(tableTypeName);
             /* const TableConditionType = */
