@@ -72,6 +72,14 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
+        if (
+          pgTypeResource
+            ? !build.behavior.pgResourceMatches(pgTypeResource, "connection")
+            : !build.behavior.pgCodecMatches(pgCodec, "connection")
+        ) {
+          return fields;
+        }
+
         const resources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
