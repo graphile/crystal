@@ -134,7 +134,6 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
             [fieldName]: fieldWithHooks(
               {
                 fieldName,
-                // TODO: fieldBehaviorScope: `...`,
                 isPgMutationPayloadEdgeField: true,
                 pgCodec: pgCodec,
               },
@@ -161,7 +160,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                 deprecationReason: tagToString(
                   resource.extensions?.tags?.deprecated,
                 ),
-                // TODO: review this plan, it feels overly complex and somewhat hacky.
+                // ENHANCE: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
                   (
                     EdgeStep,

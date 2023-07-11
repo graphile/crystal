@@ -12,6 +12,9 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
+    interface ScopeObject {
+      isPgCreatePayloadType?: boolean;
+    }
     interface Inflection {
       createField(
         this: Inflection,
@@ -166,7 +169,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
               payloadTypeName,
               {
                 isMutationPayload: true,
-                // TODO: isPgCreatePayloadType: true,
+                isPgCreatePayloadType: true,
                 pgTypeResource: resource,
               },
               () => ({
