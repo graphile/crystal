@@ -233,8 +233,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 const trueArgName = pgProc.proargnames?.[i];
                 const argName = trueArgName || `column${i + 1}`;
 
-                // TODO: smart tag should allow changing the modifier
-                const typeModifier = undefined;
+                const tag = rawTags[`arg${i}modifier`];
+                const typeModifier =
+                  typeof tag === "string"
+                    ? /^[0-9]+$/.test(tag)
+                      ? parseInt(tag, 10)
+                      : tag
+                    : undefined;
 
                 // This argument exists on the record type output
                 // NOTE: we treat `OUT foo`, `INOUT foo` and
