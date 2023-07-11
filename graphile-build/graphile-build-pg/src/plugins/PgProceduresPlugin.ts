@@ -212,6 +212,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             pgProc.proname
           }(${pgProc.getArguments().map(argTypeName).join(",")})`;
 
+          const { tags: rawTags, description } = pgProc.getTagsAndDescription();
+
           const makeCodecFromReturn = async (): Promise<PgCodec | null> => {
             // We're building a PgCodec to represent specifically the
             // return type of this function.
@@ -268,7 +270,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                     argIndex: i,
                     argName: trueArgName,
                   },
-                  // TODO: could use "param" smart tag in function to add extensions here?
+                  // ENHANCE: could use "param" smart tag in function to add extensions here?
                 };
               }
             }
@@ -285,7 +287,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   attributes,
                   description: undefined,
                   extensions: {
-                    // TODO: we should figure out what field this is going to use, and reference that
                     /* `The return type of our \`${name}\` ${
                       pgProc.provolatile === "v" ? "mutation" : "query"
                     }.`, */
@@ -327,13 +328,18 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             isStrict || info.options.pgStrictFunctions === true;
           const numberOfRequiredArguments =
             numberOfArguments - numberOfArgumentsWithDefaults;
-          const { tags: rawTags, description } = pgProc.getTagsAndDescription();
           const tags = JSON.parse(JSON.stringify(rawTags));
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
-            // TODO: smart tag should allow changing the modifier
+            const typeModifierTag = rawTags[`arg${i}modifier`];
+            const typeModifier =
+              typeof typeModifierTag === "string"
+                ? /^[0-9]+$/.test(typeModifierTag)
+                  ? parseInt(typeModifierTag, 10)
+                  : typeModifierTag
+                : undefined;
             const tag = rawTags[`arg${i}variant`];
             const variant = typeof tag === "string" ? tag : undefined;
 
@@ -356,7 +362,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               const argCodec = await info.helpers.pgCodecs.getCodecFromType(
                 serviceName,
                 argType,
-                undefined,
+                typeModifier,
               );
               if (!argCodec) {
                 console.warn(
