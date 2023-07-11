@@ -132,7 +132,7 @@ export default function makeNewBuild(
     input,
 
     hasVersion(
-      packageName: string,
+      packageName: keyof GraphileBuild.BuildVersions,
       range: string,
       options: { includePrerelease?: boolean } = { includePrerelease: true },
     ): boolean {

@@ -271,6 +271,11 @@ declare global {
         | ((context: ContextInterfaceInterfaces) => GraphQLInterfaceType[]);
     }
 
+    interface BuildVersions {
+      graphql: string;
+      "graphile-build": string;
+    }
+
     /**
      * The absolute bare bones `Build` object that graphile-build makes before
      * calling any hooks.
@@ -286,11 +291,7 @@ declare global {
        * can register versions in here, and other plugins can indicate that
        * they need certain versions via the `hasVersion` function.
        */
-      versions: {
-        graphql: string;
-        "graphile-build": string;
-        [packageName: string]: string;
-      };
+      versions: BuildVersions;
 
       /**
        * Input from the "data gathering" phase that plugins can use to
