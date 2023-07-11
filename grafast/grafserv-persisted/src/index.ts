@@ -8,8 +8,7 @@ import type {} from "graphile-config";
 import fsp from "node:fs/promises";
 
 export type { PersistedOperationGetter } from "./interfaces.js";
-
-const version = require("../package.json").version;
+import { version } from "./version.js";
 
 const PersistedPlugin: GraphileConfig.Plugin = {
   name: "PersistedPlugin",

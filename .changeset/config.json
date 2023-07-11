@@ -5,7 +5,7 @@
     { "repo": "benjie/postgraphile-private" }
   ],
   "//": { "snapshot": { "useCalculatedVersion": true } },
-  "commit": true,
+  "commit": false,
   "fixed": [],
   "linked": [],
   "access": "public",
