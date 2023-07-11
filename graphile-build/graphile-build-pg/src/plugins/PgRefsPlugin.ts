@@ -13,6 +13,7 @@ import { gatherConfig } from "graphile-build";
 
 import {
   parseDatabaseIdentifierFromSmartTag,
+  parseDatabaseIdentifiers,
   parseSmartTagsOptsString,
 } from "../utils.js";
 import { version } from "../version.js";
@@ -276,13 +277,14 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                   maybeRawTargetCols,
                 ] = matches;
 
-                // TODO: use proper identifier parsing here!
-                const localAttributes = rawLocalCols
-                  .split(",")
-                  .map((t) => t.trim());
+                const localAttributes = parseDatabaseIdentifiers(
+                  rawLocalCols,
+                  1,
+                ).map((i) => i[0]);
                 const maybeTargetAttributes = maybeRawTargetCols
-                  ? // TODO: use proper identifier parsing here!
-                    maybeRawTargetCols.split(",").map((t) => t.trim())
+                  ? parseDatabaseIdentifiers(maybeRawTargetCols, 1).map(
+                      (i) => i[0],
+                    )
                   : null;
 
                 const targetCodec = await getCodecForTableName(
