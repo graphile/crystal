@@ -8365,9 +8365,6 @@ input TypeCondition {
   """Checks for equality with the object’s `boolean` field."""
   boolean: Boolean
 
-  """Checks for equality with the object’s `bytea` field."""
-  bytea: Base64EncodedBinary
-
   """Checks for equality with the object’s `byteaArray` field."""
   byteaArray: [Base64EncodedBinary]
 
@@ -8751,8 +8748,6 @@ enum TypesOrderBy {
   BIGINT_DESC
   BOOLEAN_ASC
   BOOLEAN_DESC
-  BYTEA_ASC
-  BYTEA_DESC
   CIDR_ASC
   CIDR_DESC
   COMPOUND_TYPE_ASC

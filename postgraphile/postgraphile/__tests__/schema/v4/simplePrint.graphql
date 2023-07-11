@@ -2178,8 +2178,6 @@ enum TypesOrderBy {
   REGCONFIG_DESC
   REGDICTIONARY_ASC
   REGDICTIONARY_DESC
-  BYTEA_ASC
-  BYTEA_DESC
 }
 
 """
@@ -2322,9 +2320,6 @@ input TypeCondition {
 
   """Checks for equality with the object’s `int8ArrayDomain` field."""
   int8ArrayDomain: [BigInt]
-
-  """Checks for equality with the object’s `bytea` field."""
-  bytea: Base64EncodedBinary
 
   """Checks for equality with the object’s `byteaArray` field."""
   byteaArray: [Base64EncodedBinary]
