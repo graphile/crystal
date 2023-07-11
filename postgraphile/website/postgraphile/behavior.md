@@ -181,6 +181,7 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `query:resource:list:order`
 - `query:resource:connection:order`
 - `orderBy` - can we order by this thing (e.g. column)?
+- `proc:orderBy` - can we order by the result of this proc (function resource)?
 - `attribute:orderBy` - can we order by this attribute (column, property)?
 - `array:attribute:orderBy` - can we order by this attribute that's an array?
 - `range:attribute:orderBy` - can we order by this attribute that's a range?
@@ -188,7 +189,7 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `binary:attribute:orderBy` - can we order by this attribute that's underlying type is binary?
 - `scalar:attribute:orderBy` - can we order by this attribute that's underlying type is a scalar?
 - `filterBy` - can we filter by this thing (e.g. column, table, etc)?
-- `proc:filterBy` - can we filter by this proc (resource)
+- `proc:filterBy` - can we filter by the result of this proc (function resource)
 - `attribute:filterBy` - can we filter by this attribute (column, property)
 - `array:attribute:filterBy` - can we filter by this attribute that's an array?
 - `range:attribute:filterBy` - can we filter by this attribute that's a range?

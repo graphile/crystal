@@ -24,16 +24,6 @@ import sql from "pg-sql2";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
-// TODO: these should be used, surely?
-interface _ComputedAttributeDetails {
-  resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
-}
-interface _ArgumentDetails {
-  resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
-  param: PgResourceParameter;
-  index: number;
-}
-
 declare global {
   namespace GraphileBuild {
     interface Inflection {

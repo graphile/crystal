@@ -82,8 +82,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
         ).filter((resource) => {
           if (!isSimpleScalarComputedColumnLike(resource)) return false;
           if (resource.parameters![0].codec !== pgCodec) return false;
-          // TODO: should this be `proc:orderBy`? If so, should we make it so `getBehavior` accepts a prefix to prepend, so `"orderBy"` in a smart tag on a proc becomes `proc:orderBy`?
-          return !!build.behavior.pgResourceMatches(resource, "orderBy");
+          return !!build.behavior.pgResourceMatches(resource, "proc:orderBy");
         });
 
         return build.extend(
