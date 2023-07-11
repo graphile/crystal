@@ -199,6 +199,11 @@ export interface PgCodec<
   isAnonymous?: boolean;
 
   /**
+   * True if this type is a binary type (e.g. bytea)
+   */
+  isBinary?: boolean;
+
+  /**
    * If this is a composite type, the attributes it supports.
    */
   attributes: TAttributes;

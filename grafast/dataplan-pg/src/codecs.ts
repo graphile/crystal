@@ -167,7 +167,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
   undefined
 > {
   return (oid, type, options = {}) => {
-    const { castFromPg, listCastFromPg, fromPg, toPg } = options;
+    const { castFromPg, listCastFromPg, fromPg, toPg, isBinary } = options;
     return {
       name: type,
       sqlType: sql.identifier(...type.split(".")),
@@ -178,6 +178,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       castFromPg,
       listCastFromPg,
       executor: null,
+      isBinary,
     };
   };
 }
@@ -637,6 +638,7 @@ export function listOfCodec<
     arrayOfCodec: innerCodec,
     castFromPg: innerCodec.listCastFromPg,
     executor: innerCodec.executor,
+    isBinary: innerCodec.isBinary,
   };
 
   // Memoize such that every `listOfCodec(foo)` returns the same object.
@@ -854,6 +856,7 @@ type Cast<TFromJavaScript = any, TFromPostgres = string> = {
   listCastFromPg?(frag: SQL): SQL;
   toPg?: PgEncode<TFromJavaScript>;
   fromPg?: PgDecode<TFromJavaScript, TFromPostgres>;
+  isBinary?: boolean;
 };
 
 /**
@@ -1040,6 +1043,7 @@ export const TYPES = {
     toPg(data: Buffer) {
       return `\\x${data.toString("hex")}`;
     },
+    isBinary: true,
   }),
 } as const;
 exportAs("@dataplan/pg", TYPES, "TYPES");
