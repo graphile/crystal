@@ -10,7 +10,9 @@ import type {
   PgCodecList,
   PgCodecRelation,
   PgCodecWithAttributes,
+  PgConditionStep,
   PgSelectSingleStep,
+  PgSelectStep,
 } from "@dataplan/pg";
 import { pgSelectFromRecords, pgSelectSingleFromRecord } from "@dataplan/pg";
 import type { GrafastFieldConfig, SetterStep } from "grafast";
@@ -386,6 +388,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
           extend,
           inflection,
           input: { pgRegistry },
+          sql,
         } = build;
         const {
           scope: {
@@ -394,11 +397,12 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
             isPgPatch,
             isPgBaseInput,
             pgCodec: rawPgCodec,
+            isPgCondition,
           },
           fieldWithHooks,
         } = context;
         if (
-          !(isPgRowType || isPgCompoundType) ||
+          !(isPgRowType || isPgCompoundType || isPgCondition) ||
           !rawPgCodec ||
           !rawPgCodec.attributes ||
           rawPgCodec.isAnonymous
@@ -406,15 +410,64 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
           return fields;
         }
         const pgCodec = rawPgCodec as PgCodecWithAttributes;
+        const allAttributes = pgCodec.attributes;
+        const allowedAttributes =
+          pgCodec.polymorphism?.mode === "single"
+            ? [
+                ...pgCodec.polymorphism.commonAttributes,
+                // ENHANCE: add condition input type for the underlying concrete types, which should also include something like:
+                /*
+                  ...(pgPolymorphicSingleTableType
+                    ? pgCodec.polymorphism.types[
+                        pgPolymorphicSingleTableType.typeIdentifier
+                      ].attributes.map(
+                        (attr) =>
+                          // FIX*ME: we should be factoring in the attr.rename
+                          attr.attribute,
+                      )
+                    : []),
+                  */
+              ]
+            : null;
+        const attributes = allowedAttributes
+          ? (Object.fromEntries(
+              Object.entries(allAttributes).filter(([attrName, _attr]) =>
+                allowedAttributes.includes(attrName),
+              ),
+            ) as PgCodecAttributes)
+          : allAttributes;
 
-        return Object.entries(pgCodec.attributes as PgCodecAttributes).reduce(
+        return Object.entries(attributes).reduce(
           (memo, [attributeName, attribute]) =>
             build.recoverable(memo, () => {
               const action = isPgBaseInput
                 ? "base"
                 : isPgPatch
                 ? "update"
+                : isPgCondition
+                ? "filterBy"
                 : "insert";
+
+              const behaviors: string[] = [];
+              function walk(codec: PgCodec) {
+                if (codec.arrayOfCodec) {
+                  behaviors.push(`array:attribute:${action}`);
+                  walk(codec.arrayOfCodec);
+                } else if (codec.rangeOfCodec) {
+                  behaviors.push(`range:attribute:${action}`);
+                  walk(codec.rangeOfCodec);
+                } else if (codec.domainOfCodec) {
+                  // No need to add a behavior for domain
+                  walk(codec.domainOfCodec);
+                } else if (codec.attributes) {
+                  behaviors.push(`composite:attribute:${action}`);
+                } else if (codec.isBinary) {
+                  behaviors.push(`binary:attribute:${action}`);
+                } else {
+                  behaviors.push(`scalar:attribute:${action}`);
+                }
+              }
+              walk(attribute.codec);
 
               const relations = (
                 Object.values(
@@ -424,16 +477,19 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
               const isPartOfRelation = relations.some((r) =>
                 r.localAttributes.includes(attributeName),
               );
-              const prefix = isPartOfRelation ? `relation:` : ``;
+              if (isPartOfRelation) {
+                behaviors.push(`relation:attribute:${action}`);
+              }
 
-              const fieldBehaviorScope = `${prefix}attribute:${action}`;
-              if (
-                !build.behavior.pgCodecAttributeMatches(
-                  [pgCodec, attributeName],
-                  fieldBehaviorScope,
-                )
-              ) {
-                return memo;
+              for (const behavior of behaviors) {
+                if (
+                  !build.behavior.pgCodecAttributeMatches(
+                    [pgCodec, attributeName],
+                    behavior,
+                  )
+                ) {
+                  return memo;
+                }
               }
 
               const fieldName = inflection.attribute({
@@ -458,15 +514,22 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
-                      fieldBehaviorScope,
+                      fieldBehaviorScope: `attribute:${action}`,
                       pgCodec,
                       pgAttribute: attribute,
+                      isPgConnectionConditionInputField: isPgCondition,
                     },
                     {
-                      description: attribute.description,
+                      description: isPgCondition
+                        ? build.wrapDescription(
+                            `Checks for equality with the object’s \`${fieldName}\` field.`,
+                            "field",
+                          )
+                        : attribute.description,
                       type: build.nullableIf(
                         isPgBaseInput ||
                           isPgPatch ||
+                          isPgCondition ||
                           (!attribute.notNull &&
                             !attribute.extensions?.tags?.notNull) ||
                           attribute.hasDefault ||
@@ -475,13 +538,44 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                       ),
                       autoApplyAfterParentInputPlan: true,
                       autoApplyAfterParentApplyPlan: true,
-                      applyPlan: EXPORTABLE(
-                        (attributeName) =>
-                          function plan($insert: SetterStep<any, any>, val) {
-                            $insert.set(attributeName, val.get());
-                          },
-                        [attributeName],
-                      ),
+                      applyPlan: isPgCondition
+                        ? EXPORTABLE(
+                            (attribute, attributeName, sql) =>
+                              function plan(
+                                $condition: PgConditionStep<PgSelectStep<any>>,
+                                val,
+                              ) {
+                                if (val.getRaw().evalIs(null)) {
+                                  $condition.where({
+                                    type: "attribute",
+                                    attribute: attributeName,
+                                    callback: (expression) =>
+                                      sql`${expression} is null`,
+                                  });
+                                } else {
+                                  $condition.where({
+                                    type: "attribute",
+                                    attribute: attributeName,
+                                    callback: (expression) =>
+                                      sql`${expression} = ${$condition.placeholder(
+                                        val.get(),
+                                        attribute.codec,
+                                      )}`,
+                                  });
+                                }
+                              },
+                            [attribute, attributeName, sql],
+                          )
+                        : EXPORTABLE(
+                            (attributeName) =>
+                              function plan(
+                                $insert: SetterStep<any, any>,
+                                val,
+                              ) {
+                                $insert.set(attributeName, val.get());
+                              },
+                            [attributeName],
+                          ),
                     },
                   ),
                 },
