@@ -274,7 +274,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
     },
   },
 
-  // TYPES: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
   gather: gatherConfig({
     namespace: "pgCodecs",
     initialState: (): State => ({
