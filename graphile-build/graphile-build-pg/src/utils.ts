@@ -263,7 +263,7 @@ export function parseDatabaseIdentifiers<TExpectedLength extends number>(
 > {
   const identifiers: string[][] = [];
   let currentParts: string[] = [];
-  let currentIdentifier: string = "";
+  let currentIdentifier = "";
   let state:
     | "EXPECT_IDENTIFIER"
     | "QUOTED_IDENTIFIER"

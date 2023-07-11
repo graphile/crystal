@@ -2,6 +2,7 @@ import "graphile-config";
 import "graphile-build-pg";
 
 import type { PgCodecRelation } from "@dataplan/pg";
+
 import { version } from "../version.js";
 
 const RELAY_HIDDEN_COLUMN_BEHAVIORS = [
