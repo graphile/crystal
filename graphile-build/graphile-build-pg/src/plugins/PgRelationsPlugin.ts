@@ -794,6 +794,7 @@ function addRelations(
     pgCodec: PgCodec | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     relatedTypeName: string;
+    isNonNull: boolean | undefined;
   };
 
   const digests: Digest[] = [];
@@ -901,6 +902,7 @@ function addRelations(
         pgCodec: remoteResource.codec,
         pgRelationDetails: relationDetails,
         relatedTypeName: build.inflection.tableType(codec),
+        isNonNull: relation.extensions?.tags?.notNull,
       };
       digests.push(digest);
     }
@@ -1323,6 +1325,7 @@ function addRelations(
       listPlan,
       connectionPlan,
       relatedTypeName: context.Self.name,
+      isNonNull: ref?.extensions?.tags.notNull,
     };
     digests.push(digest);
   }
@@ -1380,8 +1383,8 @@ function addRelations(
               description:
                 description ??
                 `Reads a single \`${typeName}\` that is related to this \`${relatedTypeName}\`.`,
-              // TODO: handle nullability
-              type: OtherType,
+              // Defaults to nullable due to RLS
+              type: build.nullableIf(!digest.isNonNull, OtherType),
               plan: singleRecordPlan,
               deprecationReason,
             },
