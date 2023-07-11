@@ -87,14 +87,14 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                     codec.polymorphism?.mode === "single"
                       ? [
                           ...codec.polymorphism.commonAttributes,
-                          // TODO: add condition input type for the underlying concrete types, which should also include something like:
+                          // ENHANCE: add condition input type for the underlying concrete types, which should also include something like:
                           /*
                           ...(pgPolymorphicSingleTableType
                             ? codec.polymorphism.types[
                                 pgPolymorphicSingleTableType.typeIdentifier
                               ].attributes.map(
                                 (attr) =>
-                                  // FIXME: we should be factoring in the attr.rename
+                                  // FIX*ME: we should be factoring in the attr.rename
                                   attr.attribute,
                               )
                             : []),
