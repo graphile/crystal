@@ -386,7 +386,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       getIndex: makeGetEntity("indexes"),
       getLanguage: makeGetEntity("languages"),
 
-      // TODO: we need getters for these
+      // ENHANCE: we need getters for these
       // getAuthMembers: makeGetEntity("authMembers"),
       // getRange: makeGetEntity("ranges"),
       // getDepend: makeGetEntity("depends"),
@@ -394,44 +394,42 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       //
 
       async getAttribute(info, serviceName, classId, attributeNumber) {
-        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
-        const attributes =
-          await info.helpers.pgIntrospection.getAttributesForClass(
-            serviceName,
-            classId,
-          );
-        return attributes.find((attr) => attr.attnum === attributeNumber);
+        const pgClass = await info.helpers.pgIntrospection.getClass(
+          serviceName,
+          classId,
+        );
+        return pgClass?.getAttribute({ number: attributeNumber });
       },
 
       async getAttributesForClass(info, serviceName, classId) {
-        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.attributes;
-        // TODO: cache
-        return list.filter((entity) => entity.attrelid === classId);
+        const pgClass = await info.helpers.pgIntrospection.getClass(
+          serviceName,
+          classId,
+        );
+        return pgClass?.getAttributes() ?? [];
       },
 
       async getConstraintsForClass(info, serviceName, classId) {
-        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.constraints;
-        // TODO: cache
-        return list.filter((entity) => entity.conrelid === classId);
+        const pgClass = await info.helpers.pgIntrospection.getClass(
+          serviceName,
+          classId,
+        );
+        return pgClass?.getConstraints() ?? [];
       },
 
       async getForeignConstraintsForClass(info, serviceName, classId) {
-        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
-        const relevant = await getDb(info, serviceName);
-        const list = relevant.introspection.constraints;
-        // TODO: cache
-        return list.filter((entity) => entity.confrelid === classId);
+        const pgClass = await info.helpers.pgIntrospection.getClass(
+          serviceName,
+          classId,
+        );
+        return pgClass?.getForeignConstraints() ?? [];
       },
 
       async getInheritedForClass(info, serviceName, classId) {
-        // const pgClass = info.helpers.pgIntrospection.getClass(info, serviceName, classId);
+        // const pgClass = await info.helpers.pgIntrospection.getClass(serviceName, classId);
         const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.inherits;
-        // TODO: cache
+        // PERF: cache
         return list.filter((entity) => entity.inhrelid === classId);
       },
 
