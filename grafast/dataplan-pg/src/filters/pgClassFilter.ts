@@ -8,12 +8,12 @@ import type {
   PgConditionStep,
 } from "../steps/pgCondition.js";
 
-export class ClassFilterStep<
+export class PgClassFilterStep<
   TParentStep extends PgConditionCapableParentStep = PgConditionCapableParentStep,
 > extends ModifierStep<PgConditionStep<TParentStep>> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "ClassFilterStep",
+    exportName: "PgClassFilterStep",
   };
 
   private conditions: SQL[] = [];

@@ -4,12 +4,12 @@ import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
 import type { PgResource } from "../datasource.js";
-import type { ClassFilterStep } from "../filters/classFilter.js";
+import type { PgClassFilterStep } from "../filters/pgClassFilter.js";
 import type { PgCodec } from "../interfaces.js";
 import type { PgConditionCapableParentStep } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 
-export class TempTableStep<
+export class PgTempTableStep<
     TResource extends PgResource<any, any, any, any, any>,
   >
   extends BaseStep
@@ -23,7 +23,7 @@ export class TempTableStep<
   public readonly alias: SQL;
   public readonly conditions: SQL[] = [];
   constructor(
-    public readonly $parent: ClassFilterStep,
+    public readonly $parent: PgClassFilterStep,
     public readonly resource: TResource,
   ) {
     super();

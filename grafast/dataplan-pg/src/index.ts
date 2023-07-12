@@ -60,10 +60,10 @@ import {
   PgExecutorOptions,
   WithPgClient,
 } from "./executor.js";
-import { BooleanFilterStep } from "./filters/booleanFilter.js";
-import { ClassFilterStep } from "./filters/classFilter.js";
-import { ManyFilterStep } from "./filters/manyFilter.js";
-import { OrFilterStep } from "./filters/orFilter.js";
+import { PgBooleanFilterStep } from "./filters/pgBooleanFilter.js";
+import { PgClassFilterStep } from "./filters/pgClassFilter.js";
+import { PgManyFilterStep } from "./filters/pgManyFilter.js";
+import { PgOrFilterStep } from "./filters/pgOrFilter.js";
 import {
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
@@ -167,7 +167,7 @@ import {
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
 } from "./steps/pgValidateParsedCursor.js";
-import { TempTableStep } from "./steps/tempTable.js";
+import { PgTempTableStep } from "./steps/pgTempTable.js";
 import { toPg, ToPgStep } from "./steps/toPg.js";
 import {
   withPgClient,
@@ -179,8 +179,8 @@ import { assertPgClassSingleStep } from "./utils.js";
 
 export {
   assertPgClassSingleStep,
-  BooleanFilterStep,
-  ClassFilterStep,
+  PgBooleanFilterStep,
+  PgClassFilterStep,
   digestsFromArgumentSpecs,
   domainOfCodec,
   enumCodec,
@@ -202,9 +202,9 @@ export {
   MakePgServiceOptions,
   makeRegistry,
   makeRegistryBuilder,
-  ManyFilterStep,
+  PgManyFilterStep,
   ObjectFromPgCodecAttributes,
-  OrFilterStep,
+  PgOrFilterStep,
   PgBox,
   PgCircle,
   pgClassExpression,
@@ -322,7 +322,7 @@ export {
   rangeOfCodec,
   recordCodec,
   sqlFromArgDigests,
-  TempTableStep,
+  PgTempTableStep,
   toPg,
   ToPgStep,
   TuplePlanMap,
@@ -350,10 +350,10 @@ exportAsMany("@dataplan/pg", {
   TYPES,
   PgResource,
   PgExecutor,
-  BooleanFilterStep,
-  ClassFilterStep,
-  ManyFilterStep,
-  OrFilterStep,
+  PgBooleanFilterStep,
+  PgClassFilterStep,
+  PgManyFilterStep,
+  PgOrFilterStep,
   pgClassExpression,
   PgClassExpressionStep,
   PgConditionStep,
@@ -384,12 +384,25 @@ exportAsMany("@dataplan/pg", {
   PgUpdateSingleStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
-  TempTableStep,
+  PgTempTableStep,
   toPg,
   ToPgStep,
   withPgClient,
   withPgClientTransaction,
   WithPgClientStep,
 });
+
+export {
+  /** @deprecated Use Pg prefix */
+  PgBooleanFilterStep as BooleanFilterStep,
+  /** @deprecated Use Pg prefix */
+  PgClassFilterStep as ClassFilterStep,
+  /** @deprecated Use Pg prefix */
+  PgManyFilterStep as ManyFilterStep,
+  /** @deprecated Use Pg prefix */
+  PgOrFilterStep as OrFilterStep,
+  /** @deprecated Use Pg prefix */
+  PgTempTableStep as TempTableStep,
+};
 
 export { version } from "./version.js";

@@ -2,20 +2,20 @@ import { ModifierStep } from "grafast";
 import sql from "pg-sql2";
 
 import type { PgResource } from "../datasource.js";
-import { TempTableStep } from "../steps/tempTable.js";
-import { ClassFilterStep } from "./classFilter.js";
+import { PgTempTableStep } from "../steps/pgTempTable.js";
+import { PgClassFilterStep } from "./pgClassFilter.js";
 
-export class ManyFilterStep<
+export class PgManyFilterStep<
   TChildResource extends PgResource<any, any, any, any, any>,
-> extends ModifierStep<ClassFilterStep> {
+> extends ModifierStep<PgClassFilterStep> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "ManyFilterStep",
+    exportName: "PgManyFilterStep",
   };
 
-  public $some: TempTableStep<TChildResource> | null = null;
+  public $some: PgTempTableStep<TChildResource> | null = null;
   constructor(
-    $parentFilterPlan: ClassFilterStep,
+    $parentFilterPlan: PgClassFilterStep,
     public childDataSource: TChildResource,
     private myAttrs: string[],
     private theirAttrs: string[],
@@ -29,7 +29,7 @@ export class ManyFilterStep<
   }
 
   some() {
-    const $table = new TempTableStep(this.$parent, this.childDataSource);
+    const $table = new PgTempTableStep(this.$parent, this.childDataSource);
 
     // Implement the relationship
     this.myAttrs.forEach((attr, i) => {
@@ -40,7 +40,7 @@ export class ManyFilterStep<
       );
     });
 
-    const $filter = new ClassFilterStep($table.wherePlan(), $table.alias);
+    const $filter = new PgClassFilterStep($table.wherePlan(), $table.alias);
     this.$some = $table;
     return $filter;
   }
