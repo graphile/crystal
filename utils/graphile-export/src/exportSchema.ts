@@ -918,6 +918,10 @@ function desc(description: string | null | undefined): t.Expression | null {
   return description ? t.stringLiteral(description) : null;
 }
 
+function canBeRegularObjectKey(key: string): boolean {
+  return key !== "__proto__";
+}
+
 function _convertToAST(
   file: CodegenFile,
   thing: unknown,
@@ -992,26 +996,70 @@ function _convertToAST(
         `Attempting to export an instance of a class; you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
       );
     }
-    const obj = t.objectExpression(
-      Object.entries(thing).map(([key, value]) => {
-        const tKey = identifierOrLiteral(key);
-        return t.objectProperty(tKey, handleSubvalue(value, tKey, key));
-      }),
-    );
+    const normals: Array<t.ObjectMethod | t.ObjectProperty | t.SpreadElement> =
+      [];
+    const specials: Array<
+      [
+        keyLiteral: t.StringLiteral | t.NumericLiteral | t.Identifier,
+        value: t.Expression,
+      ]
+    > = [];
+    Object.entries(thing).forEach(([key, value]) => {
+      const tKey = identifierOrLiteral(key);
+      const subvalue = handleSubvalue(value, tKey, key);
+      if (canBeRegularObjectKey(key)) {
+        normals.push(t.objectProperty(tKey, subvalue));
+      } else {
+        specials.push([tKey, subvalue]);
+      }
+    });
     if (prototype === null) {
-      return t.callExpression(
+      const obj = t.objectExpression(normals);
+      let finalExpression = t.callExpression(
         t.memberExpression(t.identifier("Object"), t.identifier("assign")),
         [
           t.callExpression(
             t.memberExpression(t.identifier("Object"), t.identifier("create")),
             [t.nullLiteral()],
           ),
-          // TODO: this is unsafe if obj has any forbidden keys
           obj,
         ],
       );
+      for (const [tKey, subvalue] of specials) {
+        // There's keys that we can't safely include in an object literal, so assign those manually afterwards.
+        // Object.defineProperty(_, KEY, { value: VALUE, configurable: true, enumerable: true, writable: true })
+        finalExpression = t.callExpression(
+          t.memberExpression(
+            t.identifier("Object"),
+            t.identifier("defineProperty"),
+          ),
+          [
+            finalExpression,
+            tKey,
+            t.objectExpression([
+              t.objectProperty(t.stringLiteral("value"), subvalue),
+              t.objectProperty(
+                t.stringLiteral("configurable"),
+                t.booleanLiteral(true),
+              ),
+              t.objectProperty(
+                t.stringLiteral("enumerable"),
+                t.booleanLiteral(true),
+              ),
+              t.objectProperty(
+                t.stringLiteral("writable"),
+                t.booleanLiteral(true),
+              ),
+            ]),
+          ],
+        );
+      }
+      return finalExpression;
     } else {
-      return obj;
+      if (specials.length > 0) {
+        throw new Error(`Unexportable key found on non-null-prototype object`);
+      }
+      return t.objectExpression(normals);
     }
   } else {
     throw new Error(
