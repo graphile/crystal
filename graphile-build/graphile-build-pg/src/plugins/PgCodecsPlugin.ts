@@ -142,11 +142,11 @@ declare global {
       }): Promise<void> | void;
     }
   }
-}
 
-declare module "@dataplan/pg" {
-  interface PgCodecRelationExtensions {
-    originalName?: string;
+  namespace DataplanPg {
+    interface PgCodecRelationExtensions {
+      originalName?: string;
+    }
   }
 }
 

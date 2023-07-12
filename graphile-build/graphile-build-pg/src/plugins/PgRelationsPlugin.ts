@@ -86,22 +86,20 @@ declare global {
       ): string;
     }
   }
-}
 
-declare module "@dataplan/pg" {
-  interface PgCodecRelationExtensions {
-    /** The (singular) forward relation name */
-    fieldName?: string;
-    /** The (singular) backward relation name for a FK against a unique combo */
-    foreignSingleFieldName?: string;
-    /** The (plural) backward relation name for a FK when exposed as a list (rather than a connection) */
-    foreignSimpleFieldName?: string;
-    /** The (generally plural) backward relation name, also used as a fallback from foreignSimpleFieldName, foreignSingleFieldName */
-    foreignFieldName?: string;
+  namespace DataplanPg {
+    interface PgCodecRelationExtensions {
+      /** The (singular) forward relation name */
+      fieldName?: string;
+      /** The (singular) backward relation name for a FK against a unique combo */
+      foreignSingleFieldName?: string;
+      /** The (plural) backward relation name for a FK when exposed as a list (rather than a connection) */
+      foreignSimpleFieldName?: string;
+      /** The (generally plural) backward relation name, also used as a fallback from foreignSimpleFieldName, foreignSingleFieldName */
+      foreignFieldName?: string;
+    }
   }
-}
 
-declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgRelations: {

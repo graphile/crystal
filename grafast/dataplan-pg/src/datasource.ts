@@ -72,19 +72,15 @@ export function EXPORTABLE<T, TScope extends any[]>(
   return fn;
 }
 
-/**
- * Extra metadata you can attach to a unique constraint.
- */
-export interface PgResourceUniqueExtensions {}
+/** @deprecated Use DataplanPg.PgResourceUniqueExtensions instead */
+export type PgResourceUniqueExtensions = DataplanPg.PgResourceUniqueExtensions;
 
-/**
- * Space for extra metadata about this resource
- */
-export interface PgResourceExtensions {}
+/** @deprecated Use DataplanPg.PgResourceExtensions instead */
+export type PgResourceExtensions = DataplanPg.PgResourceExtensions;
 
-export interface PgResourceParameterExtensions {
-  variant?: string;
-}
+/** @deprecated Use DataplanPg.PgResourceParameterExtensions instead */
+export type PgResourceParameterExtensions =
+  DataplanPg.PgResourceParameterExtensions;
 
 /**
  * If this is a functional (rather than static) resource, this describes one of
@@ -142,7 +138,8 @@ export interface PgCodecRefPathEntry {
 }
 
 export type PgCodecRefPath = PgCodecRefPathEntry[];
-export interface PgCodecRefExtensions {}
+/** @deprecated Use DataplanPg.PgCodecRefExtensions instead */
+export type PgCodecRefExtensions = DataplanPg.PgCodecRefExtensions;
 
 export interface PgCodecRef {
   definition: PgRefDefinition;

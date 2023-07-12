@@ -56,7 +56,8 @@ export type PgCodecAttributeViaExplicit = {
 };
 export type PgCodecAttributeVia = string | PgCodecAttributeViaExplicit;
 
-export interface PgCodecAttributeExtensions {}
+/** @deprecated Use DataplanPg.PgCodecAttributeExtensions instead */
+export type PgCodecAttributeExtensions = DataplanPg.PgCodecAttributeExtensions;
 
 export interface PgCodecAttribute<
   TCodec extends PgCodec = PgCodec,

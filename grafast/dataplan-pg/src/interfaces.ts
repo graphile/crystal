@@ -41,12 +41,13 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
   value: TFromPostgres,
 ) => TForJavaScript;
 
-export interface PgRefDefinitionExtensions {}
+/** @deprecated Use DataplanPg.PgRefDefinitionExtensions instead */
+export type PgRefDefinitionExtensions = DataplanPg.PgRefDefinitionExtensions;
 export interface PgRefDefinition {
   graphqlType?: string;
   singular?: boolean;
   description?: string;
-  extensions?: PgRefDefinitionExtensions;
+  extensions?: DataplanPg.PgRefDefinitionExtensions;
   singleRecordFieldName?: string;
   listFieldName?: string;
   connectionFieldName?: string;
@@ -55,18 +56,8 @@ export interface PgRefDefinitions {
   [refName: string]: PgRefDefinition;
 }
 
-/**
- * Custom metadata for a codec
- */
-export interface PgCodecExtensions {
-  oid?: string;
-  pg?: {
-    serviceName: string;
-    schemaName: string;
-    name: string;
-  };
-  listItemNonNull?: boolean;
-}
+/** @deprecated Use DataplanPg.PgCodecExtensions instead */
+export type PgCodecExtensions = DataplanPg.PgCodecExtensions;
 
 export interface PgCodecPolymorphismSingleTypeAttributeSpec<
   TAttributeName extends string = string,
@@ -374,7 +365,7 @@ export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
 export interface PgGroupSpec {
   fragment: SQL;
   // codec: PgCodec<string, any, any, any>;
-  // TODO: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
+  // ENHANCE: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
 export type TuplePlanMap<
@@ -471,6 +462,40 @@ declare global {
       /* Add your own via declaration merging */
     }
   }
+  namespace DataplanPg {
+    interface PgConditionStepExtensions {}
+    /**
+     * Custom metadata for a codec
+     */
+    interface PgCodecExtensions {
+      oid?: string;
+      pg?: {
+        serviceName: string;
+        schemaName: string;
+        name: string;
+      };
+      listItemNonNull?: boolean;
+    }
+
+    /**
+     * Extra metadata you can attach to a unique constraint.
+     */
+    interface PgResourceUniqueExtensions {}
+
+    /**
+     * Space for extra metadata about this resource
+     */
+    interface PgResourceExtensions {}
+
+    interface PgResourceParameterExtensions {
+      variant?: string;
+    }
+
+    interface PgCodecRefExtensions {}
+    interface PgCodecAttributeExtensions {}
+    interface PgRefDefinitionExtensions {}
+    interface PgCodecRelationExtensions {}
+  }
 }
 
 export interface MakePgServiceOptions
@@ -492,7 +517,8 @@ export interface MakePgServiceOptions
   pubsub?: boolean;
 }
 
-export interface PgCodecRelationExtensions {}
+/** @deprecated Use DataplanPg.PgCodecRelationExtensions instead */
+export type PgCodecRelationExtensions = DataplanPg.PgCodecRelationExtensions;
 
 export interface PgCodecRelationBase<
   TLocalCodec extends PgCodec = PgCodec,

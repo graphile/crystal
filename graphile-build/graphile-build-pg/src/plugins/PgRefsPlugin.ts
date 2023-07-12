@@ -40,24 +40,24 @@ declare global {
       ): string;
     }
   }
-}
 
-declare module "@dataplan/pg" {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface PgCodecExtensions {
-    /**
-     * References between codecs (cannot be implemented directly, but sources
-     * may implement them).
-     */
-    refDefinitions?: PgRefDefinitions;
-  }
+  namespace DataplanPg {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface PgCodecExtensions {
+      /**
+       * References between codecs (cannot be implemented directly, but sources
+       * may implement them).
+       */
+      refDefinitions?: PgRefDefinitions;
+    }
 
-  interface PgRefDefinitionExtensions {
-    /** @experimental Need to define its own TypeScript type. */
-    tags?: {
-      behavior?: string | string[];
-    };
-    via?: string;
+    interface PgRefDefinitionExtensions {
+      /** @experimental Need to define its own TypeScript type. */
+      tags?: {
+        behavior?: string | string[];
+      };
+      via?: string;
+    }
   }
 }
 

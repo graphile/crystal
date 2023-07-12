@@ -50,16 +50,14 @@ declare global {
       pgStrictFunctions?: boolean;
     }
   }
-}
 
-declare module "@dataplan/pg" {
-  interface PgCodecAttributeExtensions {
-    argIndex?: number;
-    argName?: string;
+  namespace DataplanPg {
+    interface PgCodecAttributeExtensions {
+      argIndex?: number;
+      argName?: string;
+    }
   }
-}
 
-declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgProcedures: {
