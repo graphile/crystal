@@ -392,6 +392,18 @@ export const getBuilder = (
   inflection: GraphileBuild.Inflection = buildInflection(preset),
 ): SchemaBuilder => {
   const resolvedPreset = resolvePresets([preset]);
+  if (!resolvedPreset.plugins || resolvedPreset.plugins.length === 0) {
+    throw new Error(
+      `You're attempting to build a GraphQL schema, but no plugins are specified in your preset. Please check the 'extends' key in your preset - you may have forgotten to add the relevant presets, or the presets may not have been imported correctly.`,
+    );
+  }
+
+  if (!resolvedPreset.plugins.includes(QueryPlugin)) {
+    console.warn(
+      `[WARNING] You're attempting to build a GraphQL schema, but the QueryPlugin is missing from your configuration. Unless you have done this very deliberately, this is probably a mistake - please check the 'extends' key in your preset - you may have forgotten to add the relevant presets, or the presets may not have been imported correctly.`,
+    );
+  }
+
   const builder = new SchemaBuilder(resolvedPreset, inflection);
   return builder;
 };
