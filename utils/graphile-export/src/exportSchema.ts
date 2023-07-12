@@ -996,70 +996,62 @@ function _convertToAST(
         `Attempting to export an instance of a class; you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
       );
     }
-    const normals: Array<t.ObjectMethod | t.ObjectProperty | t.SpreadElement> =
-      [];
-    const specials: Array<
+    const propertyPairs: Array<
       [
         keyLiteral: t.StringLiteral | t.NumericLiteral | t.Identifier,
         value: t.Expression,
       ]
     > = [];
+    let hasUnsafeKeys = false;
     Object.entries(thing).forEach(([key, value]) => {
       const tKey = identifierOrLiteral(key);
       const subvalue = handleSubvalue(value, tKey, key);
-      if (canBeRegularObjectKey(key)) {
-        normals.push(t.objectProperty(tKey, subvalue));
-      } else {
-        specials.push([tKey, subvalue]);
+      propertyPairs.push([tKey, subvalue]);
+      if (!canBeRegularObjectKey(key)) {
+        hasUnsafeKeys = true;
       }
     });
     if (prototype === null) {
-      const obj = t.objectExpression(normals);
-      let finalExpression = t.callExpression(
-        t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-        [
-          t.callExpression(
-            t.memberExpression(t.identifier("Object"), t.identifier("create")),
-            [t.nullLiteral()],
-          ),
-          obj,
-        ],
-      );
-      for (const [tKey, subvalue] of specials) {
-        // There's keys that we can't safely include in an object literal, so assign those manually afterwards.
-        // Object.defineProperty(_, KEY, { value: VALUE, configurable: true, enumerable: true, writable: true })
-        finalExpression = t.callExpression(
+      if (hasUnsafeKeys) {
+        // Object.fromEntries([[k, v], [k, v], ...])
+        return t.callExpression(
           t.memberExpression(
             t.identifier("Object"),
-            t.identifier("defineProperty"),
+            t.identifier("fromEntries"),
           ),
           [
-            finalExpression,
-            tKey,
-            t.objectExpression([
-              t.objectProperty(t.stringLiteral("value"), subvalue),
-              t.objectProperty(
-                t.stringLiteral("configurable"),
-                t.booleanLiteral(true),
+            t.arrayExpression(
+              propertyPairs.map(([key, val]) => t.arrayExpression([key, val])),
+            ),
+          ],
+        );
+      } else {
+        const obj = t.objectExpression(
+          propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
+        );
+        return t.callExpression(
+          t.memberExpression(t.identifier("Object"), t.identifier("assign")),
+          [
+            t.callExpression(
+              t.memberExpression(
+                t.identifier("Object"),
+                t.identifier("create"),
               ),
-              t.objectProperty(
-                t.stringLiteral("enumerable"),
-                t.booleanLiteral(true),
-              ),
-              t.objectProperty(
-                t.stringLiteral("writable"),
-                t.booleanLiteral(true),
-              ),
-            ]),
+              [t.nullLiteral()],
+            ),
+            obj,
           ],
         );
       }
-      return finalExpression;
     } else {
-      if (specials.length > 0) {
+      if (hasUnsafeKeys) {
         throw new Error(`Unexportable key found on non-null-prototype object`);
+      } else {
+        const obj = t.objectExpression(
+          propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
+        );
+        return obj;
       }
-      return t.objectExpression(normals);
     }
   } else {
     throw new Error(
