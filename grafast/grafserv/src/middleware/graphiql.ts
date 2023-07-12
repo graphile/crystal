@@ -5,7 +5,6 @@ import { getGrafservHooks } from "../hooks.js";
 import type { HandlerResult, NormalizedRequestDigest } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 
-// TODO: use a specific version of mermaid
 export function makeGraphiQLHandler(
   resolvedPreset: GraphileConfig.ResolvedPreset,
   dynamicOptions: OptionsFromConfig,

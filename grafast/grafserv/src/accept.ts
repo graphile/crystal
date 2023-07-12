@@ -8,7 +8,7 @@ import LRU from "@graphile/lru";
  */
 export function makeAcceptMatcher(mediaTypes: string[]) {
   const typeDigests: TypeDigest[] = mediaTypes.map((t) => {
-    // TODO: this parsing is super lazy and isn't 100% reliable; e.g. it could
+    // NOTE: this parsing is super lazy and isn't 100% reliable; e.g. it could
     // be broken by `foo/bar;baz="\\";frog"`. We're only handling values passed
     // by our own code though, and we ain't passing this kind of nonsense.
     const [spec, ...params] = t.split(";");

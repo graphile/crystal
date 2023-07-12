@@ -314,7 +314,7 @@ export interface JSONResult {
   type: "json";
   statusCode: number;
   headers: Record<string, string>;
-  // TODO: should this be `ExecutionResult | AsyncExecutionResult` instead?
+  // TYPES: should this be `ExecutionResult | AsyncExecutionResult` instead?
   json: JSONValue;
 }
 

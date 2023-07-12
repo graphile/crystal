@@ -43,7 +43,7 @@ function handleGraphQLHandlerError(
         ],
       },
       statusCode: e.extensions?.statusCode ?? 500,
-      // TODO: we should respect the `accept` header here if we can.
+      // FIXME: we should respect the `accept` header here if we can.
       contentType: APPLICATION_JSON,
     } as HandlerResult;
   }
@@ -258,7 +258,7 @@ export class GrafservBase {
     if (!this.initialized) {
       return;
     }
-    // TODO: this.graphqlHandler?.release()?
+    // ENHANCE: this.graphqlHandler?.release()?
     this.graphqlHandler = makeGraphQLHandler(
       this.resolvedPreset,
       this.dynamicOptions,
