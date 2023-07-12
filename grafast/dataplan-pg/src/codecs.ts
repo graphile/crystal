@@ -113,7 +113,7 @@ export interface PgCodecAttribute<
    * (except in 1-to-1 relationships).
    */
   identicalVia?: PgCodecAttributeVia;
-  // TODO: can identicalVia be plural? Is that useful? Maybe a attribute that has
+  // ENHANCE: can identicalVia be plural? Is that useful? Maybe a attribute that has
   // multiple foreign key references?
 
   /**
@@ -249,7 +249,7 @@ function toListString(val: SQLRawValue): string {
   }
 }
 
-// TODO: this needs unit tests!
+// TESTS: this needs unit tests!
 /**
  * Parses a PostgreSQL record string (e.g. `(1,2,   hi)`) into a tuple (e.g.
  * `["1", "2", "   hi"]`).

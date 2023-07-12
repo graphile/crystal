@@ -1248,7 +1248,9 @@ function factoryAst<TTuple extends any[]>(
     );
   });
 
-  // TODO: we can remove this now that we have the post-processing via babel
+  // DEBT: we should be able to remove this now that we have the
+  // post-processing via babel, however currently the result of doing so is
+  // messy.
   if (shouldOptimizeFactoryCalls) {
     /*
      * Factories take the form of an IIFE: `((a, b, c) => ...)(x, y, z)`; where

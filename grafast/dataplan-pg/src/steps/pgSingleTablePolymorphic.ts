@@ -53,8 +53,6 @@ export class PgSingleTablePolymorphicStep<
   }
 
   planForType(_type: GraphQLObjectType): ExecutableStep {
-    // TODO: need to include the `_type` information so we know what type it
-    // is. Can we wrap it?
     return this.rowPlan();
   }
 
