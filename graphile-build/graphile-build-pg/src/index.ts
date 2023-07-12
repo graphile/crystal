@@ -44,3 +44,4 @@ export { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
 export { defaultPreset } from "./preset.js";
 export { addBehaviorToTags } from "./utils.js";
+export { version } from "./version.js";

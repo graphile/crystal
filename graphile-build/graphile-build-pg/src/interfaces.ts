@@ -24,11 +24,13 @@ export interface PgResourceUniqueTags extends PgSmartTagsDict {
 export interface PgCodecRelationTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
+  notNull: true;
 }
 
 export interface PgCodecRefTags extends PgSmartTagsDict {
   behavior: string | string[];
   deprecated: string | string[];
+  notNull: true;
 }
 
 export interface PgCodecAttributeTags extends PgSmartTagsDict {

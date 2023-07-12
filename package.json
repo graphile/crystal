@@ -12,7 +12,7 @@
     "watch": "yarn build && tsc -b --watch",
     "clean": "jest --clearCache && rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo,tsconfig.build.tsbuildinfo}",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
-    "version": "yarn run changelog && git add CHANGELOG.md",
+    "changeset:version": "yarn run changesets version && node scripts/postversion.mjs",
     "docs:gen": "yarn typedoc .",
     "w": "yarn workspace",
     "postgraphile": "cd postgraphile/postgraphile && node dist/cli-run.js",
@@ -66,7 +66,8 @@
     "typedoc": "^0.22.15",
     "typedoc-monorepo-link-types": "^0.0.2",
     "typescript": "^5.0.4",
-    "webpack": "^5.65.0"
+    "webpack": "^5.65.0",
+    "zx": "^7.2.3"
   },
   "workspaces": [
     "grafast/*",

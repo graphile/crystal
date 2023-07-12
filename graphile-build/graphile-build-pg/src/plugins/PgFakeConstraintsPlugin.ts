@@ -456,10 +456,8 @@ function addConstraintToClass(
   oid: string | null | undefined,
   foreign = false,
 ) {
-  if (oid != null) {
-    const pgClass = introspection.classes.find(
-      (rel) => rel._id === pgConstraint.conrelid,
-    );
+  if (oid != null && oid != "0") {
+    const pgClass = introspection.classes.find((rel) => rel._id === oid);
     if (!pgClass) {
       throw new Error(
         `Broken foreign constraint, class '${oid}' doesn't exist?`,

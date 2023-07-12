@@ -24,16 +24,6 @@ import sql from "pg-sql2";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
-// TODO: these should be used, surely?
-interface _ComputedAttributeDetails {
-  resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
-}
-interface _ArgumentDetails {
-  resource: PgResource<any, any, any, readonly PgResourceParameter[], any>;
-  param: PgResourceParameter;
-  index: number;
-}
-
 declare global {
   namespace GraphileBuild {
     interface Inflection {
@@ -222,6 +212,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             pgProc.proname
           }(${pgProc.getArguments().map(argTypeName).join(",")})`;
 
+          const { tags: rawTags, description } = pgProc.getTagsAndDescription();
+          const tags = JSON.parse(JSON.stringify(rawTags));
+
           const makeCodecFromReturn = async (): Promise<PgCodec | null> => {
             // We're building a PgCodec to represent specifically the
             // return type of this function.
@@ -229,13 +222,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             const numberOfArguments = allArgTypes.length ?? 0;
             const attributes: PgCodecAttributes = Object.create(null);
             for (let i = 0, l = numberOfArguments; i < l; i++) {
-              const argType = allArgTypes[i];
-              const trueArgName = pgProc.proargnames?.[i];
-              const argName = trueArgName || `column${i + 1}`;
-
-              // TODO: smart tag should allow changing the modifier
-              const typeModifier = undefined;
-
               // i for IN arguments, o for OUT arguments, b for INOUT arguments,
               // v for VARIADIC arguments, t for TABLE arguments
               const argMode = (pgProc.proargmodes?.[i] ?? "i") as
@@ -246,6 +232,18 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 | "t";
 
               if (argMode === "o" || argMode === "b" || argMode === "t") {
+                const argType = allArgTypes[i];
+                const trueArgName = pgProc.proargnames?.[i];
+                const argName = trueArgName || `column${i + 1}`;
+
+                const tag = tags[`arg${i}modifier`];
+                const typeModifier =
+                  typeof tag === "string"
+                    ? /^[0-9]+$/.test(tag)
+                      ? parseInt(tag, 10)
+                      : tag
+                    : undefined;
+
                 // This argument exists on the record type output
                 // NOTE: we treat `OUT foo`, `INOUT foo` and
                 // `RETURNS TABLE (foo ...)` as the same.
@@ -273,7 +271,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                     argIndex: i,
                     argName: trueArgName,
                   },
-                  // TODO: could use "param" smart tag in function to add extensions here?
+                  // ENHANCE: could use "param" smart tag in function to add extensions here?
                 };
               }
             }
@@ -290,7 +288,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   attributes,
                   description: undefined,
                   extensions: {
-                    // TODO: we should figure out what field this is going to use, and reference that
                     /* `The return type of our \`${name}\` ${
                       pgProc.provolatile === "v" ? "mutation" : "query"
                     }.`, */
@@ -332,14 +329,18 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             isStrict || info.options.pgStrictFunctions === true;
           const numberOfRequiredArguments =
             numberOfArguments - numberOfArgumentsWithDefaults;
-          const { tags: rawTags, description } = pgProc.getTagsAndDescription();
-          const tags = JSON.parse(JSON.stringify(rawTags));
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
-            // TODO: smart tag should allow changing the modifier
-            const tag = rawTags[`arg${i}variant`];
+            const typeModifierTag = tags[`arg${i}modifier`];
+            const typeModifier =
+              typeof typeModifierTag === "string"
+                ? /^[0-9]+$/.test(typeModifierTag)
+                  ? parseInt(typeModifierTag, 10)
+                  : typeModifierTag
+                : undefined;
+            const tag = tags[`arg${i}variant`];
             const variant = typeof tag === "string" ? tag : undefined;
 
             // i for IN arguments, o for OUT arguments, b for INOUT arguments,
@@ -361,7 +362,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               const argCodec = await info.helpers.pgCodecs.getCodecFromType(
                 serviceName,
                 argType,
-                undefined,
+                typeModifier,
               );
               if (!argCodec) {
                 console.warn(

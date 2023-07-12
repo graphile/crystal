@@ -655,3 +655,5 @@ export async function watchSchema(
   );
   return stopWatching;
 }
+
+export { version } from "./version.js";

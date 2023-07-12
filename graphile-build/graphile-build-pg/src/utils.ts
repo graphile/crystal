@@ -226,30 +226,143 @@ export function parseDatabaseIdentifierFromSmartTag<
   : TExpectedLength extends 3
   ? [string, string, string]
   : string[] {
-  const parts = identifier.split(".");
-  // TODO: parse this better!
-  if (parts.length > expectedLength || parts.length < expectedLength - 1) {
+  const identifiers = parseDatabaseIdentifiers(
+    identifier,
+    expectedLength,
+    fallbackNamespace,
+  );
+  if (identifiers.length === 1) {
+    return identifiers[0];
+  } else {
     throw new Error(
-      "Cannot parse database identifier - it has the wrong number of parts",
+      `Was expecting '${identifier}' to contain exactly 1 identifier`,
     );
   }
-  const bits = parts.map((part) => {
-    if (part[0] === '"') {
-      if (part[part.length - 1] !== '"') {
-        throw new Error(
-          `Cannot parse database identifier; invalid quoting '${part}'`,
-        );
-      }
-      return part.slice(1, part.length - 1);
-    } else {
-      return part;
+}
+
+/**
+ * Parses an identifier string like `a."fooBar",baz,"MySchema".MyCol` into a
+ * list of tuples of length `expectedLength`, backfilling with fallbackNamespace
+ * if necessary (e.g. to produce `[["a", "fooBar"], ["public", "baz"], ["MySchema", "mycol"]]`)
+ *
+ * To find this, you might also search for: `parseIdentifier()`,
+ * `parseIdentifiers()`.
+ */
+export function parseDatabaseIdentifiers<TExpectedLength extends number>(
+  identifier: string,
+  expectedLength: TExpectedLength,
+  fallbackNamespace = "public",
+): Array<
+  TExpectedLength extends 1
+    ? [string]
+    : TExpectedLength extends 2
+    ? [string, string]
+    : TExpectedLength extends 3
+    ? [string, string, string]
+    : string[]
+> {
+  const identifiers: string[][] = [];
+  let currentParts: string[] = [];
+  let currentIdentifier = "";
+  let state:
+    | "EXPECT_IDENTIFIER"
+    | "QUOTED_IDENTIFIER"
+    | "UNQUOTED_IDENTIFIER"
+    | "EXPECT_NEXT" = "EXPECT_IDENTIFIER";
+
+  function nextIdentifier() {
+    if (currentIdentifier !== "") {
+      throw new Error(
+        `GraphileInternalError<05c47638-c2cd-4b47-bfc2-67ccbf861e2c>: bug in identifier parser - currentIdentifier should be blank at this point`,
+      );
     }
-  });
-  if (bits.length < expectedLength) {
-    return [fallbackNamespace, ...bits] as any;
-  } else {
-    return bits as any;
+
+    if (
+      currentParts.length > expectedLength ||
+      currentParts.length < expectedLength - 1
+    ) {
+      throw new Error(
+        `Cannot parse database identifier '${identifier}' - it has the wrong number of parts`,
+      );
+    }
+    const parts =
+      currentParts.length < expectedLength
+        ? ([fallbackNamespace, ...currentParts] as any)
+        : (currentParts as any);
+
+    identifiers.push(parts);
+    currentParts = [];
   }
+
+  for (let i = 0, l = identifier.length; i < l; i++) {
+    const c = identifier[i];
+    switch (state) {
+      case "EXPECT_IDENTIFIER": {
+        if (c === '"') {
+          state = "QUOTED_IDENTIFIER";
+        } else if (/[_\w]/.test(c)) {
+          state = "UNQUOTED_IDENTIFIER";
+          currentIdentifier += c.toLowerCase();
+        } else if (/\s/.test(c)) {
+          //ignore
+        } else {
+          throw new Error(`Failed to parse identifier string '${identifier}'`);
+        }
+        break;
+      }
+      case "QUOTED_IDENTIFIER": {
+        if (c === '"') {
+          currentParts.push(currentIdentifier);
+          currentIdentifier = "";
+          state = "EXPECT_NEXT";
+        } else if (c === "\\") {
+          throw new Error(
+            `GraphileInternalError<72452ea1-715a-4a7b-93d5-49b5348a9c16>: parser for identifiers currently does not support backslashes`,
+          );
+        } else {
+          currentIdentifier += c;
+        }
+        break;
+      }
+      case "UNQUOTED_IDENTIFIER": {
+        if (/[_\w\d$]/.test(c)) {
+          currentIdentifier += c.toLowerCase();
+        } else {
+          currentParts.push(currentIdentifier);
+          currentIdentifier = "";
+          state = "EXPECT_NEXT";
+          // Process the character again, as a divider
+          i--;
+        }
+        break;
+      }
+      case "EXPECT_NEXT": {
+        if (c === ".") {
+          state = "EXPECT_IDENTIFIER";
+        } else if (c === ",") {
+          nextIdentifier();
+          state = "EXPECT_IDENTIFIER";
+        } else if (/\s/.test(c)) {
+          // ignore
+        } else {
+          throw new Error(
+            `Unexpected character '${c}' at position '${i}' in identifiers string '${identifier}'`,
+          );
+        }
+        break;
+      }
+    }
+  }
+  if (state === "UNQUOTED_IDENTIFIER" && currentIdentifier) {
+    currentParts.push(currentIdentifier);
+    currentIdentifier = "";
+  } else if (currentIdentifier) {
+    throw new Error(`Identifier '${identifier}' terminated unexpectedly`);
+  }
+  if (currentParts.length > 0) {
+    nextIdentifier();
+  }
+  return identifiers as Array<any>;
 }
 
 type Layer = {

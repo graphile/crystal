@@ -2,10 +2,21 @@
   "$schema": "https://unpkg.com/@changesets/config@2.2.0/schema.json",
   "changelog": [
     "@changesets/changelog-github",
-    { "repo": "benjie/postgraphile-private" }
+    {
+      "repo": "benjie/postgraphile-private"
+    }
   ],
-  "//": { "snapshot": { "useCalculatedVersion": true } },
-  "commit": true,
+  "//": {
+    "snapshot": {
+      "useCalculatedVersion": true
+    }
+  },
+  "commit": [
+    "./commit.js",
+    {
+      "skipCI": "version"
+    }
+  ],
   "fixed": [],
   "linked": [],
   "access": "public",

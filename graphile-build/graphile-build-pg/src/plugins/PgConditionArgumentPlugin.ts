@@ -2,16 +2,13 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgCodec,
   PgCodecWithAttributes,
-  PgConditionStep,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
-import { EXPORTABLE } from "graphile-build";
-import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
+import type { GraphQLInputObjectType } from "graphql";
 
 import { version } from "../version.js";
 
@@ -56,7 +53,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
     },
     hooks: {
       init(_, build) {
-        const { inflection, sql } = build;
+        const { inflection } = build;
         for (const rawCodec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
             // Ignore scalar codecs
@@ -64,13 +61,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
               return;
             }
             const codec = rawCodec as PgCodecWithAttributes;
-
-            // TODO: do we want this filter here? E.g. we might want to enable
-            // a bulk delete mutation without allowing any selects? Maybe this
-            // is actually a 'filter' behavior instead?
-            if (!build.behavior.pgCodecMatches(codec, "select")) {
-              return;
-            }
 
             const tableTypeName = inflection.tableType(codec);
             const conditionName = inflection.conditionType(tableTypeName);
@@ -87,138 +77,9 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                   `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
                   "type",
                 ),
-                fields: (context) => {
-                  const { fieldWithHooks } = context;
-                  const allAttributes = codec.attributes;
-                  const allowedAttributes =
-                    codec.polymorphism?.mode === "single"
-                      ? [
-                          ...codec.polymorphism.commonAttributes,
-                          // TODO: add condition input type for the underlying concrete types, which should also include something like:
-                          /*
-                          ...(pgPolymorphicSingleTableType
-                            ? codec.polymorphism.types[
-                                pgPolymorphicSingleTableType.typeIdentifier
-                              ].attributes.map(
-                                (attr) =>
-                                  // FIXME: we should be factoring in the attr.rename
-                                  attr.attribute,
-                              )
-                            : []),
-                          */
-                        ]
-                      : null;
-                  const attributes = allowedAttributes
-                    ? Object.fromEntries(
-                        Object.entries(allAttributes).filter(
-                          ([attrName, _attr]) =>
-                            allowedAttributes.includes(attrName),
-                        ),
-                      )
-                    : allAttributes;
-                  // TODO: move this to PgAttributesPlugin (see
-                  // PgNodeIdAttributesPlugin for similar approach for NodeIDs)
-                  return Object.entries(attributes).reduce(
-                    (memo, [attributeName, attribute]) => {
-                      const behaviors: string[] = [];
-                      function walk(codec: PgCodec) {
-                        if (codec.arrayOfCodec) {
-                          behaviors.push("array:attribute:filterBy");
-                          walk(codec.arrayOfCodec);
-                        } else if (codec.rangeOfCodec) {
-                          behaviors.push("range:attribute:filterBy");
-                          walk(codec.rangeOfCodec);
-                        } else if (codec.domainOfCodec) {
-                          // No need to add a behavior for domain
-                          walk(codec.domainOfCodec);
-                        } else if (codec.attributes) {
-                          behaviors.push("composite:attribute:filterBy");
-                        } else if (codec.isBinary) {
-                          behaviors.push("binary:attribute:filterBy");
-                        } else {
-                          behaviors.push("scalar:attribute:filterBy");
-                        }
-                      }
-                      walk(attribute.codec);
-                      for (const behavior of behaviors) {
-                        if (
-                          !build.behavior.pgCodecAttributeMatches(
-                            [codec, attributeName],
-                            behavior,
-                          )
-                        ) {
-                          return memo;
-                        }
-                      }
-
-                      const fieldName = inflection.attribute({
-                        attributeName,
-                        codec,
-                      });
-                      const type = build.getGraphQLTypeByPgCodec(
-                        attribute.codec,
-                        "input",
-                      );
-                      if (!type) {
-                        return memo;
-                      }
-                      memo = build.extend(
-                        memo,
-                        {
-                          [fieldName]: fieldWithHooks(
-                            {
-                              fieldName,
-                              fieldBehaviorScope: "attribute:filterBy",
-                              isPgConnectionConditionInputField: true,
-                            },
-                            {
-                              description: build.wrapDescription(
-                                `Checks for equality with the object’s \`${fieldName}\` field.`,
-                                "field",
-                              ),
-                              type: type as GraphQLInputType,
-                              applyPlan: EXPORTABLE(
-                                (attribute, attributeName, sql) =>
-                                  function plan(
-                                    $condition: PgConditionStep<
-                                      PgSelectStep<any>
-                                    >,
-                                    val,
-                                  ) {
-                                    if (val.getRaw().evalIs(null)) {
-                                      $condition.where({
-                                        type: "attribute",
-                                        attribute: attributeName,
-                                        callback: (expression) =>
-                                          sql`${expression} is null`,
-                                      });
-                                    } else {
-                                      $condition.where({
-                                        type: "attribute",
-                                        attribute: attributeName,
-                                        callback: (expression) =>
-                                          sql`${expression} = ${$condition.placeholder(
-                                            val.get(),
-                                            attribute.codec,
-                                          )}`,
-                                      });
-                                    }
-                                  },
-                                [attribute, attributeName, sql],
-                              ),
-                            },
-                          ),
-                        },
-                        `Adding condition argument for ${codec.name}' ${attributeName} attribute`,
-                      );
-                      return memo;
-                    },
-                    Object.create(null),
-                  );
-                },
               }),
               `Adding condition type for ${codec.name}.`,
-              // TODO:
+              // ERRORS: implement a more helpful error message:
               /* `You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 {

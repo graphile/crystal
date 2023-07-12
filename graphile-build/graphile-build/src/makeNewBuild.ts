@@ -25,16 +25,7 @@ import { inspect } from "util";
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import { EXPORTABLE, stringTypeSpec, wrapDescription } from "./utils.js";
-
-// TODO: the versioning!
-const version = "TODO";
-/*
-import { readFileSync } from "node:fs";
-import { URL } from "node:url";
-const version: string = JSON.parse(
-  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
-).version;
-*/
+import { version } from "./version.js";
 
 /** Have we warned the user they're using the 5-arg deprecated registerObjectType call? */
 let registerObjectType5argsDeprecatedWarned = false;
@@ -126,13 +117,14 @@ export default function makeNewBuild(
   const build: GraphileBuild.BuildBase = {
     options: builder.options,
     versions: {
+      grafast: grafast.version,
       graphql: graphql.version,
       "graphile-build": version,
     },
     input,
 
     hasVersion(
-      packageName: string,
+      packageName: keyof GraphileBuild.BuildVersions,
       range: string,
       options: { includePrerelease?: boolean } = { includePrerelease: true },
     ): boolean {

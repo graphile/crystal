@@ -391,3 +391,5 @@ exportAsMany("@dataplan/pg", {
   withPgClientTransaction,
   WithPgClientStep,
 });
+
+export { version } from "./version.js";

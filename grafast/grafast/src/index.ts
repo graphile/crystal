@@ -504,3 +504,4 @@ exportAsMany("grafast", {
 });
 
 export { hookArgs } from "./args.js";
+export { version } from "./version.js";

@@ -401,13 +401,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   variant === "input"
                     ? ' (perhaps you used "-insert" behavior instead of "-resource:insert")'
                     : "";
-                // TODO: convert this to a diagnostic
+                // ERRORS: convert this to a diagnostic
                 throw new Error(
                   `Failed to find a suitable type for argument codec '${param.codec.name}' variant '${variant}'${hint}; not adding function field for '${resource}'`,
                 );
               }
               if (!isInputType(baseInputType)) {
-                // TODO: convert this to a diagnostic
+                // ERRORS: convert this to a diagnostic
                 throw new Error(
                   `Variant '${variant}' for codec '${param.codec.name}' returned type '${baseInputType}', but that's not an input type so we cannot use it for an argument; not adding function field for '${resource}'`,
                 );
@@ -827,7 +827,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 someSource.parameters &&
                 build.behavior.pgResourceMatches(someSource, "typeField");
               if (isComputedSource) {
-                // TODO: should we allow other forms of computed attributes here,
+                // ENHANCE: should we allow other forms of computed attributes here,
                 // e.g. accepting the row id rather than the row itself.
                 const pgCodec = someSource.parameters?.[0]?.codec;
                 if (pgCodec) {
@@ -982,7 +982,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             })),
                           )}`;
                         }
-                        // TODO: or here, if scalar add select to `$row`?
+                        // PERF: or here, if scalar add select to `$row`?
                         return resource.execute(selectArgs);
                       },
                     [
@@ -1043,6 +1043,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   },
                 );
               } else if (resource.isUnique) {
+                // NOTE: just because it's unique doesn't mean it doesn't
+                // return a list.
+
                 const type = getFunctionSourceReturnGraphQLType(
                   build,
                   resource,
@@ -1057,9 +1060,6 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 memo[fieldName] = fieldWithHooks(
                   {
                     fieldName,
-                    // TODO: just because it's unique doesn't mean it doesn't
-                    // return a list. But even if it does, we can't order it or
-                    // filter it... So maybe `single` is fine?
                     fieldBehaviorScope: isRootQuery
                       ? "queryField:single"
                       : "typeField:single",

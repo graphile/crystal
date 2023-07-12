@@ -42,6 +42,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
   description:
     "Add GraphQL conditions based on 'filterable' PostgreSQL functions",
   version: version,
+  after: ["PgAttributesPlugin"],
 
   schema: {
     entityBehavior: {
