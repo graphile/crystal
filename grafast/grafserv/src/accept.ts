@@ -102,6 +102,7 @@ const SEMICOLON = ";".charCodeAt(0);
 const EQUALS = "=".charCodeAt(0);
 const DOUBLE_QUOTE = '"'.charCodeAt(0);
 const BACKSLASH = "\\".charCodeAt(0);
+const DEL = 0x7f;
 
 /*
  * Whitespace:
@@ -344,8 +345,7 @@ function parseAccepts(acceptHeader: string) {
             currentParameterValue;
           state = State.EXPECT_COMMA_OR_SEMICOLON;
         } else if (charCode === BACKSLASH) {
-          const char = acceptHeader[++i];
-          if (char === undefined) {
+          if (++i === l) {
             throw new Error(`Unexpected terminating backslash`);
           }
           // From the spec:
@@ -360,11 +360,35 @@ function parseAccepts(acceptHeader: string) {
           // i.e. this isn't for `\n` and `\t` and similar, those would just
           // come out as "n" and "t" in the output. This is specifically for
           // escaping quote marks, parenthesis, backslashes.
-          // TODO: Technically we should respect `quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )`
-          currentParameterValue += char;
+
+          // Respect `quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )`
+          if (
+            charCode === HORIZONTAL_TAB ||
+            (charCode >= 0x20 && charCode <= 0xff && charCode !== DEL)
+          ) {
+            currentParameterValue += acceptHeader[i];
+          } else {
+            throw new Error(
+              `Unexpected escaped character with code '${charCode}' at position ${i}`,
+            );
+          }
         } else {
-          // TODO: Technically we should respect `qdtext = HTAB / SP / %x21 / %x23-5B / %x5D-7E / obs-text`
-          currentParameterValue += acceptHeader[i];
+          // Respect `qdtext = HTAB / SP / %x21 / %x23-5B / %x5D-7E / obs-text`
+          // 0x09 0x20-0xff !0x22=`"` !0x5c=`\` !0x7f=DEL
+          if (
+            charCode === HORIZONTAL_TAB ||
+            (charCode >= 0x20 &&
+              charCode <= 0xff &&
+              /* charCode !== DOUBLE_QUOTE && */
+              /* charCode !== BACKSLASH && */
+              charCode !== DEL)
+          ) {
+            currentParameterValue += acceptHeader[i];
+          } else {
+            throw new Error(
+              `Unexpected character with code '${charCode}' at position ${i}.`,
+            );
+          }
         }
         break;
       }
