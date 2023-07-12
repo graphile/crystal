@@ -39,6 +39,18 @@ declare global {
       persistedOperationsDirectory?: string;
 
       /**
+       * How many milliseconds should we leave it between scans of the persisted
+       * operations folder, checking for new files?
+       *
+       * Set this to the string "watch" to use `fs.watch` to monitor for changes. [EXPERIMENTAL].
+       *
+       * Set to `-1` to disable.
+       *
+       * Default: -1
+       */
+      persistedOperationsDirectoryScanInterval?: number | "watch";
+
+      /**
        * An optional string-string key-value object defining the persisted
        * operations, where the keys are the hashes, and the values are the
        * operation document strings to use.

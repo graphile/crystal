@@ -83,17 +83,34 @@ function persistedOperationGetterForCache(cache: { [key: string]: string }) {
   return (key: string) => cache[key];
 }
 
-function makeGetterForDirectory(directory: string) {
+function makeGetterForDirectory(
+  directory: string,
+  scanInterval: number | "watch" = -1,
+) {
+  // TODO: implement AbortController integration for timer, etc.
+  const abortController = new AbortController();
+  const { signal } = abortController;
+
   // NOTE: We periodically scan the folder to see what files it contains so
   // that we can reject requests to non-existent files to avoid DOS attacks
   // having us make lots of requests to the filesystem.
 
   let files: string[] | null = null;
+  /** is scanDirectory active? */
+  let scanning = false;
+  /** Should we scan the directory again once the current scanDirectory is complete? */
+  let scanAgain = false;
 
   /**
    * This function must never reject.
    */
   async function scanDirectory() {
+    if (scanning) {
+      scanAgain = true;
+      return;
+    }
+    scanning = true;
+    scanAgain = false;
     try {
       const allFiles = await fsp.readdir(directory);
       files = allFiles.filter((name) => name.endsWith(".graphql"));
@@ -101,18 +118,37 @@ function makeGetterForDirectory(directory: string) {
       console.error(`Error occurred whilst scanning '${directory}'`);
       console.error(e);
     } finally {
-      // TODO: This interval should be configurable.
-      // TODO: This might not be needed in production, and if so should be able to be disabled.
-      // TODO: In dev watching the folder might be a better experience.
-
-      // We don't know how long the scanning takes, so rather than setting an
-      // interval, we wait 5 seconds between scans before kicking off the next
-      // one.
-      setTimeout(scanDirectory, 5000);
+      scanning = false;
+      if (scanInterval === "watch") {
+        if (scanAgain) {
+          scanDirectory();
+        }
+      } else if (typeof scanInterval === "number" && scanInterval >= 0) {
+        // We don't know how long the scanning takes, so rather than setting an
+        // interval, we wait for a scan to complete before kicking off the next
+        // one.
+        setTimeout(scanDirectory, scanInterval);
+      }
     }
   }
 
   scanDirectory();
+  if (scanInterval === "watch") {
+    (async () => {
+      try {
+        const watcher = fsp.watch(directory, { signal, recursive: false });
+        for await (const _event of watcher) {
+          scanDirectory();
+        }
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        console.error(
+          `Error occurred whilst watching the persisted operations directory. Folder is no longer being watched. Recommend you restart your server (and file an issue explaining what happened).`,
+        );
+        console.error(err);
+      }
+    })();
+  }
 
   const operationFromHash = new Map<
     string,
@@ -140,7 +176,7 @@ function makeGetterForDirectory(directory: string) {
     return operation;
   }
 
-  return getOperationFromHash;
+  return { getter: getOperationFromHash, abortController };
 }
 
 const directoryGetterByDirectory = new Map<
@@ -151,11 +187,15 @@ const directoryGetterByDirectory = new Map<
 /**
  * Given a directory, get or make the persisted operations getter.
  */
-function getterForDirectory(directory: string) {
-  let getter = directoryGetterByDirectory.get(directory);
+function getterForDirectory(
+  directory: string,
+  scanInterval: number | "watch" | undefined,
+) {
+  const key = `${scanInterval}|${directory}`;
+  let getter = directoryGetterByDirectory.get(key);
   if (!getter) {
-    getter = makeGetterForDirectory(directory);
-    directoryGetterByDirectory.set(directory, getter);
+    getter = makeGetterForDirectory(directory, scanInterval);
+    directoryGetterByDirectory.set(key, getter);
   }
   return getter;
 }
@@ -185,7 +225,12 @@ function getterFromOptionsCore(options: GraphileConfig.GrafservOptions) {
   } else if (options.persistedOperations) {
     return persistedOperationGetterForCache(options.persistedOperations);
   } else if (options.persistedOperationsDirectory) {
-    return getterForDirectory(options.persistedOperationsDirectory);
+    // TODO: do something with abortController? abortController.abort()
+    const { getter, abortController: _abortController } = getterForDirectory(
+      options.persistedOperationsDirectory,
+      options.persistedOperationsDirectoryScanInterval,
+    );
+    return getter;
   } else {
     throw new Error(
       "Server misconfiguration issue: persisted operations (operation allowlist) is in place, but the server has not been told how to fetch the allowed operations. Please provide one of the persisted operations configuration options.",
