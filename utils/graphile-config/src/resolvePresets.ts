@@ -66,9 +66,11 @@ export function resolvePresets(
   if (withAssertions) {
     if (finalPreset.disablePlugins && finalPreset.disablePlugins.length > 0) {
       console.warn(
-        `Attempted to 'disablePlugins', but the following plugin(s) weren't found: '${finalPreset.disablePlugins.join(
-          "', '",
-        )}' (known: ${finalPreset.plugins?.map((p) => p.name) ?? "-"})`,
+        `One or more of the plugin(s) entered in your preset's 'disablePlugins' list was not found:\n${finalPreset.disablePlugins
+          .map((p) => `  - ${p}`)
+          .join("\n")}\nThe list of know plugins is:\n  ${
+          finalPreset.plugins?.map((p) => p.name).join(", ") ?? "-"
+        }`,
       );
     }
   }
