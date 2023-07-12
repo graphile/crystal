@@ -20,7 +20,6 @@ import {
 } from "graphql";
 import * as graphql from "graphql";
 import * as semver from "semver";
-import { inspect } from "util";
 
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";

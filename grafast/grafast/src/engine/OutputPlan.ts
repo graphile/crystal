@@ -8,7 +8,7 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 import type { TE } from "tamedevil";
-import te, { stringifyString, stringifyJSON } from "tamedevil";
+import te, { stringifyJSON, stringifyString } from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";

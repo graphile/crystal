@@ -1064,8 +1064,7 @@ export {
   batch,
   cache,
   compile,
-  safeKeyOrThrow as safeKeyOrThrow,
-  /** @deprecated */
+  /** @deprecated Use safeKeyOrThrow instead */
   safeKeyOrThrow as dangerousKey,
   dangerouslyIncludeRawCode,
   run as eval,
@@ -1079,6 +1078,7 @@ export {
   ref,
   run,
   runInBatch,
+  safeKeyOrThrow,
   set,
   subcomment,
   substring,
