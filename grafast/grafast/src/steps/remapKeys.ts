@@ -27,7 +27,9 @@ function makeMapper(
     return te.runInBatch<any>(
       te`(function(obj) {
   return (obj == null ? obj : { ${te.join(
-    entries.map(([key, val]) => te`${te.safeKeyOrThrow(key)}: obj${te.get(val)}`),
+    entries.map(
+      ([key, val]) => te`${te.safeKeyOrThrow(key)}: obj${te.get(val)}`,
+    ),
     ", ",
   )} });
 })`,
