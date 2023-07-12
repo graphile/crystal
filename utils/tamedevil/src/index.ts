@@ -523,11 +523,10 @@ export function stringifyString(value: string): string {
 }
 
 // PERF: more optimal stringifier
-// TODO: rename to jsonStringify?
 /**
  * Equivalent to JSON.stringify, but typically faster.
  */
-export const toJSON = (value: any): string => {
+export const stringifyJSON = (value: any): string => {
   if (value == null) return "null";
   if (value === true) return "true";
   if (value === false) return "false";
@@ -561,7 +560,7 @@ function lit(val: any): TE {
      * https://github.com/tc39/proposal-json-superset
      */
     const primitive: Primitive = val;
-    return makeRawNode(toJSON(primitive));
+    return makeRawNode(stringifyJSON(primitive));
   } else {
     return ref(val);
   }
@@ -744,7 +743,7 @@ function get(key: string | symbol | number): TE {
       makeRawNode(`.${key}`)
     : // ["@@meaning"]
     typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`[${toJSON(key)}]`)
+    ? makeRawNode(`[${stringifyJSON(key)}]`)
     : te`[${te.lit(key)}]`;
 }
 
@@ -761,7 +760,7 @@ function optionalGet(key: string | symbol | number): TE {
       makeRawNode(`?.${key}`)
     : // ?.["@@meaning"]
     typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`?.[${toJSON(key)}]`)
+    ? makeRawNode(`?.[${stringifyJSON(key)}]`)
     : te`?.[${te.lit(key)}]`;
 }
 
@@ -790,7 +789,7 @@ function set(key: string | symbol | number, hasNullPrototype = false): TE {
       makeRawNode(`.${key}`)
     : // ["@@meaning"]
     typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`[${toJSON(key)}]`)
+    ? makeRawNode(`[${stringifyJSON(key)}]`)
     : te`[${te.lit(key)}]`;
 }
 
