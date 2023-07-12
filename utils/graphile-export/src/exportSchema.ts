@@ -918,6 +918,15 @@ function desc(description: string | null | undefined): t.Expression | null {
   return description ? t.stringLiteral(description) : null;
 }
 
+/**
+ * Returns if the key can be used as a regular object key (and will be seen as
+ * one of the "own" properties of the object) when created using object literal
+ * syntax.
+ *
+ * I.e. returns `true` unless key is `__proto__`
+ *
+ * @see {@link https://tc39.es/ecma262/#sec-runtime-semantics-propertydefinitionevaluation}
+ */
 function canBeRegularObjectKey(key: string): boolean {
   return key !== "__proto__";
 }
