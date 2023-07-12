@@ -1064,6 +1064,8 @@ export {
   cache,
   compile,
   safeKeyOrThrow as safeKeyOrThrow,
+  /** @deprecated */
+  safeKeyOrThrow as dangerousKey,
   dangerouslyIncludeRawCode,
   run as eval,
   get,
@@ -1098,6 +1100,8 @@ export interface TamedEvil {
   join: typeof join;
   identifier: typeof identifier;
   safeKeyOrThrow: typeof safeKeyOrThrow;
+  /** @deprecated Use safeKeyOrThrow instead */
+  dangerousKey: typeof safeKeyOrThrow;
   get: typeof get;
   optionalGet: typeof optionalGet;
   set: typeof set;
@@ -1133,7 +1137,8 @@ const attributes = {
   subcomment,
   join,
   identifier,
-  safeKeyOrThrow: safeKeyOrThrow,
+  safeKeyOrThrow,
+  dangerousKey: safeKeyOrThrow,
   get,
   optionalGet,
   set,
