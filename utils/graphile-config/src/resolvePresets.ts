@@ -11,14 +11,22 @@ const PRESET_FORBIDDEN_KEYS = [
 ];
 const PLUGIN_FORBIDDEN_KEYS = ["plugins", "disablePlugins", "extends"];
 
-function inspect(a: any): string {
-  // TODO: if node, use util.inspect
-  return Array.isArray(a) ||
-    !a ||
-    Object.getPrototypeOf(a) === null ||
-    Object.getPrototypeOf(a) === Object.prototype
-    ? JSON.stringify(a)
-    : String(a);
+let inspect: (obj: any, options?: { colors: boolean }) => string;
+
+try {
+  inspect = require("util").inspect;
+  if (typeof inspect !== "function") {
+    throw new Error("Failed to load inspect");
+  }
+} catch {
+  inspect = (obj) => {
+    return Array.isArray(obj) ||
+      !obj ||
+      Object.getPrototypeOf(obj) === null ||
+      Object.getPrototypeOf(obj) === Object.prototype
+      ? JSON.stringify(obj)
+      : String(obj);
+  };
 }
 
 export function isResolvedPreset(
