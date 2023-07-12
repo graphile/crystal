@@ -28,7 +28,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
 
   schema: {
     hooks: {
-      // TODO: add "specifiedBy" configuration
+      // ENHANCE: add "specifiedBy" configuration to custom scalars
       init(_, build) {
         const {
           options: { jsonScalarAsString },

@@ -1067,7 +1067,7 @@ export type SpecForType<TType extends GraphQLNamedType | GraphQLSchema> =
     ? Partial<GraphileBuild.GrafastInputObjectTypeConfig> & { name: string }
     : never;
 
-// TODO: this returning `never` for non-GraphQLSchema seems wrong... why is it
+// TYPES: this returning `never` for non-GraphQLSchema seems wrong... why is it
 // not causing issues?
 export type ScopeForType<TType extends GraphQLNamedType | GraphQLSchema> =
   TType extends GraphQLSchema ? GraphileBuild.ScopeSchema : never;

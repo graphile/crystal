@@ -233,7 +233,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                               function plan(
                                 $connection: ConnectionStep<any, any, any>,
                               ) {
-                                // TODO: why is this a TypeScript issue without the 'any'?
+                                // TYPES: why is this a TypeScript issue without the 'any'?
                                 return $connection.pageInfo() as any;
                               },
                             [],

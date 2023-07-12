@@ -96,7 +96,7 @@ class SchemaBuilder<
     fn: GraphileBuild.SchemaBuilderHooks[THookName][number],
   ): void {
     if (!this.hooks[hookName]) {
-      // TODO: fuzzy-find a similar hook
+      // ERRORS: fuzzy-find a similar hook
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
     }
     if (this._currentPluginName) {
