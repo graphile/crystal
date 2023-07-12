@@ -37,7 +37,8 @@ function getDigest(
   return {
     httpVersionMajor: request.raw.httpVersionMajor,
     httpVersionMinor: request.raw.httpVersionMinor,
-    // TODO: check Fastify respects X-Forwarded-Proto when configured to trust the proxy
+    // Fastify respects X-Forwarded-Proto when configured to trust the proxy, see:
+    // https://github.com/fastify/fastify/blob/59c5b273dad30821d03c952bbe073a976f92a325/docs/Reference/Server.md#trustproxy
     isSecure: request.protocol === "https",
     method: request.method,
     path: request.url,
@@ -83,7 +84,7 @@ export class FastifyGrafserv extends GrafservBase {
         const { statusCode, headers } = result;
         reply.headers(headers);
         reply.statusCode = statusCode;
-        // TODO: mutating the error is probably bad form...
+        // DEBT: mutating the error is probably bad form...
         const errorWithStatus = Object.assign(result.error, {
           status: statusCode,
         });
