@@ -703,14 +703,14 @@ function identifier(name: string) {
  * ```
  *
  * IMPORTANT: It's strongly recommended that instead of defining an object via
- * `const obj = { ${te.dangerousKey(untrustedKey)}: value }` you instead use
+ * `const obj = { ${te.safeKeyOrThrow(untrustedKey)}: value }` you instead use
  * `const obj = Object.create(null);` and then set the properties on the resulting
  * object via `${obj}${te.set(untrustedKey, true)} = value;` - this prevents
  * attacks such as **prototype polution** since properties like `__proto__` are
  * not special on null-prototype objects, whereas they can cause havok in
  * regular `{}` objects (POJOs).
  */
-function dangerousKey(key: string | symbol | number): TE {
+function safeKeyOrThrow(key: string | symbol | number): TE {
   if (isSafeObjectPropertyName(key)) {
     if (canBeObjectKeyWithoutQuotes(key)) {
       return makeRawNode(String(key));
@@ -1063,7 +1063,7 @@ export {
   batch,
   cache,
   compile,
-  dangerousKey,
+  safeKeyOrThrow as safeKeyOrThrow,
   dangerouslyIncludeRawCode,
   run as eval,
   get,
@@ -1097,7 +1097,7 @@ export interface TamedEvil {
   subcomment: typeof subcomment;
   join: typeof join;
   identifier: typeof identifier;
-  dangerousKey: typeof dangerousKey;
+  safeKeyOrThrow: typeof safeKeyOrThrow;
   get: typeof get;
   optionalGet: typeof optionalGet;
   set: typeof set;
@@ -1133,7 +1133,7 @@ const attributes = {
   subcomment,
   join,
   identifier,
-  dangerousKey,
+  safeKeyOrThrow: safeKeyOrThrow,
   get,
   optionalGet,
   set,

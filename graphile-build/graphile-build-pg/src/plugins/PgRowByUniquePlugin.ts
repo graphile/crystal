@@ -147,7 +147,7 @@ return function (resource) {
   return (_$root, args) => resource.get({ ${te.join(
     attributeNames.map(
       (attributeName) =>
-        te`${te.dangerousKey(attributeName)}: args.get(${te.lit(
+        te`${te.safeKeyOrThrow(attributeName)}: args.get(${te.lit(
           detailsByAttributeName[attributeName].graphqlName,
         )})`,
     ),

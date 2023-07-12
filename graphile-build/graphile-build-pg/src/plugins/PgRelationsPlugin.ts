@@ -557,7 +557,7 @@ function makeSpecString(
   return te`{ ${te.join(
     remoteAttributes.map(
       (remoteAttributeName, i) =>
-        te`${te.dangerousKey(remoteAttributeName)}: ${identifier}.get(${te.lit(
+        te`${te.safeKeyOrThrow(remoteAttributeName)}: ${identifier}.get(${te.lit(
           localAttributes[i],
         )})`,
     ),

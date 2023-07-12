@@ -1,7 +1,7 @@
 import te from "../dist/index.js";
 
 it("allows normal keys", () => {
-  const frag = te`return { ${te.dangerousKey("a")}: 1, ${te.dangerousKey(
+  const frag = te`return { ${te.safeKeyOrThrow("a")}: 1, ${te.safeKeyOrThrow(
     "monkey",
   )}: 2 }`;
   expect(te.compile(frag).string).toMatchInlineSnapshot(
@@ -15,7 +15,7 @@ it("allows normal keys", () => {
 });
 
 it("allows awkward keys", () => {
-  const frag = te`return { ${te.dangerousKey("1")}: 1, ${te.dangerousKey(
+  const frag = te`return { ${te.safeKeyOrThrow("1")}: 1, ${te.safeKeyOrThrow(
     "_1frog",
   )}: 2 }`;
   expect(te.compile(frag).string).toMatchInlineSnapshot(
@@ -30,7 +30,7 @@ it("allows awkward keys", () => {
 
 it("forbids __proto__", () => {
   expect(() => {
-    te`return { ${te.dangerousKey("__proto__")}: {a: 1} }`;
+    te`return { ${te.safeKeyOrThrow("__proto__")}: {a: 1} }`;
   }).toThrowErrorMatchingInlineSnapshot(
     `"Forbidden object key: \\"__proto__\\"; consider using 'Object.create(null)' and assigning properties using te.lit."`,
   );

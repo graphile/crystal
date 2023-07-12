@@ -245,7 +245,7 @@ Joins an array of `te` values using the delimiter (a plain string); e.g.
 
 ```js
 const keysAndValues = ["a", "b", "c", "d"].map(
-  (n, i) => te`${te.dangerousKey(n)}: ${te.literal(i)}`,
+  (n, i) => te`${te.safeKeyOrThrow(n)}: ${te.literal(i)}`,
 );
 const obj = te.run`return { ${te.join(keysAndValues, ", ")} }`;
 
@@ -268,7 +268,7 @@ object into variable name TE nodes without using `te.dangerouslyIncludeRawCode`.
 Normally you'd just use `` te`myVarNameHere` `` to define a variable name (as
 just regular code).
 
-### `te.dangerousKey(ident, forceQuotes = false)`
+### `te.safeKeyOrThrow(ident, forceQuotes = false)`
 
 Takes `ident` and turns it into the representation of a safely escaped
 JavaScript object key (to be used in an object definition). We do our best to
@@ -282,7 +282,7 @@ this is intended to be used with relatively straightforward strings
 `Object.getOwnPropertyNames(Object.prototype)`.)
 
 **IMPORTANT**: It's strongly recommended that instead of defining an object via
-`const obj = { ${te.dangerousKey(untrustedKey)}: value }` you instead use
+`const obj = { ${te.safeKeyOrThrow(untrustedKey)}: value }` you instead use
 `const obj = Object.create(null);` and then set the properties on the resulting
 object via `${obj}[${te.lit(untrustedKey)}] = value;` - this prevents attacks
 such as **prototype polution** since properties like `__proto__` are not special
