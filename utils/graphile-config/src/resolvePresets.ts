@@ -41,6 +41,7 @@ export function isResolvedPreset(
  */
 export function resolvePresets(
   presets: ReadonlyArray<GraphileConfig.Preset>,
+  withAssertions = true,
 ): GraphileConfig.ResolvedPreset {
   if (presets.length === 1) {
     // Maybe it's already resolved?
@@ -60,6 +61,16 @@ export function resolvePresets(
       finalPreset.plugins,
       "name",
     );
+  }
+
+  if (withAssertions) {
+    if (finalPreset.disablePlugins && finalPreset.disablePlugins.length > 0) {
+      console.warn(
+        `Attempted to 'disablePlugins', but the following plugin(s) weren't found: '${finalPreset.disablePlugins.join(
+          "', '",
+        )}' (known: ${finalPreset.plugins?.map((p) => p.name) ?? "-"})`,
+      );
+    }
   }
 
   return finalPreset;
@@ -140,7 +151,7 @@ function resolvePreset(
       }
     }
     const { extends: presets = [] } = preset;
-    const basePreset = resolvePresets(presets);
+    const basePreset = resolvePresets(presets, false);
     mergePreset(basePreset, preset);
 
     const disabled = basePreset.disablePlugins;
@@ -154,19 +165,6 @@ function resolvePreset(
           plugins.delete(plugin);
         }
       }
-      /*
-
-    TODO: we need an alert like this, but only at the very top level.
-    The easiest way to check is to just see if `disablePlugins` has length.
-
-    if (remaining.size > 0) {
-      console.warn(
-        `Attempted to 'disablePlugins', but the following plugin(s) weren't found: '${[
-          ...remaining,
-        ].join("', '")}' (known: ${[...plugins].map((p) => p.name)})`,
-      );
-    }
-    */
       basePreset.plugins = [...plugins];
       basePreset.disablePlugins = [...remaining];
     }
