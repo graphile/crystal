@@ -13,8 +13,11 @@ async function exists(filePath: string): Promise<boolean> {
     await access(filePath);
     return true;
   } catch (e) {
-    // TODO: check the error code
-    return false;
+    if (e.code === "ENOENT") {
+      return false;
+    } else {
+      throw e;
+    }
   }
 }
 
