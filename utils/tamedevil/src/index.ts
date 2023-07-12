@@ -766,7 +766,6 @@ function optionalGet(key: string | symbol | number): TE {
     : te`?.[${te.lit(key)}]`;
 }
 
-// TODO: rename this. 'leftSet'? 'leftAccess'? 'safeAccess'?
 /**
  * Access to the key of an object either via `.` or `[]` as appropriate ready
  * for being assigned to; `obj${te.set(key)}` would become `obj.foo` or
@@ -777,6 +776,9 @@ function optionalGet(key: string | symbol | number): TE {
  * (`Object.create(null)`) then you can set `hasNullPrototype` to true and all
  * keys are allowed. If this is not the case, then an error will be thrown on
  * certain potentially dangerous keys such as `__proto__` or `constructor`.
+ *
+ * ENHANCE: consider aliasing this as 'leftAccess' (accessing a property, to
+ * be done on the left side of an assignment).
  */
 function set(key: string | symbol | number, hasNullPrototype = false): TE {
   if (!hasNullPrototype && disallowedKeys.includes(key)) {
@@ -848,7 +850,7 @@ function run<TResult>(
   try {
     return newFunction(...argNames, compiled.string)(...argValues) as TResult;
   } catch (e) {
-    // TODO: improve this!
+    // ERRORS: improve this!
     console.error(`Error occurred during code generation:`);
     console.error(e);
     console.error("Function definition:");
