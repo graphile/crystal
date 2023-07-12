@@ -110,38 +110,40 @@ export class FastifyGrafserv extends GrafservBase {
       }
       case "bufferStream": {
         const { statusCode, headers, lowLatency, bufferIterator } = result;
-        if (lowLatency) {
-          request.raw.socket.setTimeout(0);
-          request.raw.socket.setNoDelay(true);
-          request.raw.socket.setKeepAlive(true);
-        }
-        reply.headers(headers);
-        reply.statusCode = statusCode;
-        const stream = new PassThrough();
-        reply.send(stream);
-
-        // Fork off and convert bufferIterator to
+        let bufferIteratorHandled = false;
         try {
-          for await (const buffer of bufferIterator) {
-            stream.write(buffer);
+          if (lowLatency) {
+            request.raw.socket.setTimeout(0);
+            request.raw.socket.setNoDelay(true);
+            request.raw.socket.setKeepAlive(true);
           }
-          stream.end();
-        } catch (e) {
+          reply.headers(headers);
+          reply.statusCode = statusCode;
+          const stream = new PassThrough();
+          reply.send(stream);
+
+          // Fork off and convert bufferIterator to
           try {
-            stream.end();
-          } catch (e2) {
-            /* nom nom nom */
-          }
-          try {
-            // TODO: what should we really do here?
-            if (bufferIterator.return) {
-              bufferIterator.return();
-            } else if (bufferIterator.throw) {
-              bufferIterator.throw(e);
+            bufferIteratorHandled = true;
+            for await (const buffer of bufferIterator) {
+              stream.write(buffer);
             }
-          } catch (e2) {
-            /* nom nom nom */
+          } finally {
+            stream.end();
           }
+        } catch (e) {
+          if (!bufferIteratorHandled) {
+            try {
+              if (bufferIterator.return) {
+                bufferIterator.return();
+              } else if (bufferIterator.throw) {
+                bufferIterator.throw(e);
+              }
+            } catch (e2) {
+              /* nom nom nom */
+            }
+          }
+          throw e;
         }
 
         return reply;
