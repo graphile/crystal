@@ -172,12 +172,15 @@ export class GrafservBase {
     try {
       const result = this._processRequest(request);
       if (isPromiseLike(result)) {
-        returnValue = result.then(convertHandlerResultToResult, handleError);
+        returnValue = result.then(
+          convertHandlerResultToResult,
+          convertErrorToErrorResult,
+        );
       } else {
         returnValue = convertHandlerResultToResult(result);
       }
     } catch (e) {
-      returnValue = handleError(e);
+      returnValue = convertErrorToErrorResult(e);
     }
     if (this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
       if (isPromiseLike(returnValue)) {
@@ -520,7 +523,7 @@ export function convertHandlerResultToResult(
   }
 }
 
-export const handleError = (
+export const convertErrorToErrorResult = (
   error: Error & { statusCode?: number },
 ): ErrorResult => {
   // TODO: need to assert `error` is not a GraphQLError, that should be handled elsewhere.
