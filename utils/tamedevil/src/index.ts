@@ -538,6 +538,9 @@ export const stringifyJSON = (value: any): string => {
   return JSON.stringify(value);
 };
 
+/** @deprecated Use stringifyJSON instead */
+export const toJSON = stringifyJSON;
+
 /**
  * If the value is simple this will stringify it and inject it directly into
  * the code to be evaluated, otherwise will defer to `te.ref`.
