@@ -71,8 +71,10 @@ export const ExportSubclasses: Rule.RuleModule = {
 
         if (hasExportableParent(node)) return;
 
-        // TODO: determine if the definition for this identifier is an import from any of these `possibles`.
+        // ENHANCE: if the definition for the `superClass` identifier is not actually an import from any of these `possibles` then we should `return;`. It just happens to share the same name?
+
         //const scope = scopeManager.acquire(node);
+
         const isTypeScript = /\.[mc]?tsx?$/.test(context.getFilename());
         const isGeneric = !!(node as unknown as ClassDeclaration)
           .typeParameters;

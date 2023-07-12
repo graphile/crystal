@@ -158,7 +158,7 @@ const gatherBase = (
       const spec = plugin.gather!;
       if (spec.namespace != null) {
         if (spec.namespace in globalState) {
-          // TODO: track who registers which namespace, output more helpful error.
+          // ERRORS: track who registers which namespace, output more helpful error.
           throw new Error(
             `Namespace '${spec.namespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique.`,
           );
@@ -170,7 +170,7 @@ const gatherBase = (
               spec.initialCache?.() ?? Object.create(null))
           : EMPTY_OBJECT;
       if (typeof cache.then === "function") {
-        // TODO: can we just make `initialCache` allow promises?
+        // ENHANCE: can we just make `initialCache` allow promises?
         throw new Error(
           `\`initialCache\` may not return a promise directly; instead set one of the keys on the object it returns to a promise and await that in \`initialState\` (which is allowed to be async)`,
         );
@@ -278,7 +278,7 @@ const gatherBase = (
           try {
             callback(v, undefined, makeRetry(counter));
           } catch {
-            // TODO: this indicates a bug in user code; how to handle?
+            // ERRORS: this indicates a bug in user code; how to handle?
             /*nom nom nom*/
           }
           if (runAgain) handleChange();
@@ -289,7 +289,7 @@ const gatherBase = (
           try {
             callback(null, e, makeRetry(counter));
           } catch {
-            // TODO: this indicates a bug in user code; how to handle?
+            // ERRORS: this indicates a bug in user code; how to handle?
             /*nom nom nom*/
           }
           if (runAgain) handleChange();
@@ -400,7 +400,7 @@ async function writeFileIfDiffers(
   path: string,
   contents: string,
 ): Promise<void> {
-  // TODO: support other environments than Node
+  // COMPAT: support other environments than Node
   const { readFile, writeFile } = await import("node:fs/promises");
   let oldContents: string | null = null;
   try {
@@ -496,7 +496,7 @@ export interface SchemaResult {
  */
 export async function makeSchema(
   preset: GraphileConfig.Preset,
-  // TODO: AbortSignal
+  // ENHANCE: AbortSignal
 ): Promise<SchemaResult> {
   const resolvedPreset = resolvePresets([preset]);
   // An error caused here cannot be solved by retrying, so don't catch it.

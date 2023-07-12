@@ -65,7 +65,9 @@ export const ExportInstances: Rule.RuleModule = {
         if (possibles.length === 0) {
           return;
         }
-        // TODO: determine if the definition for this identifier is an import from any of these `possibles`.
+
+        // TODO: determine if the definition for this `callee` identifier is an import from any of these `possibles` (and if not, `return;`).
+
         //const scope = scopeManager.acquire(node);
 
         if (hasExportableParent(node)) return;

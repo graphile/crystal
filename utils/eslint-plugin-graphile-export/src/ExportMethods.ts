@@ -149,7 +149,7 @@ function processNode(
         reportProblem(context, options, {
           node: node as unknown as ESTreeNode,
           message: "is not exportable.",
-          // TODO:
+          // TODO: implement the suggestion
           /*
           suggest: [
             {
