@@ -23,7 +23,7 @@ declare global {
         handler: NodeIdHandler,
         codec: NodeIdCodec,
       ): (nodeId: string) => any;
-      nodeFetcherByTypeName(typeName: string): NodeFetcher;
+      nodeFetcherByTypeName(typeName: string): NodeFetcher | null;
     }
     interface Inflection {
       nodeById(this: Inflection, typeName: string): string;
@@ -85,7 +85,8 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               if (existing) return existing;
               const finalBuild = build as GraphileBuild.Build;
               const { specForHandler } = finalBuild;
-              const handler = finalBuild.getNodeIdHandler(typeName)!;
+              const handler = finalBuild.getNodeIdHandler(typeName);
+              if (!handler) return null;
               const codec = finalBuild.getNodeIdCodec(handler.codecName);
               const fetcher = EXPORTABLE(
                 (codec, handler, lambda, specForHandler) => {
@@ -131,6 +132,9 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
             return memo;
           }
           const fetcher = build.nodeFetcherByTypeName(typeName);
+          if (!fetcher) {
+            return memo;
+          }
           return build.extend(
             memo,
             {
