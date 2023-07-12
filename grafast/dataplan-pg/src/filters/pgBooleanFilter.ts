@@ -7,7 +7,7 @@ import type { PgCodec, PgConditionLikeStep } from "../interfaces.js";
 export class PgBooleanFilterStep extends ModifierStep<PgConditionLikeStep> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "BooleanFilterStep",
+    exportName: "PgBooleanFilterStep",
   };
 
   private conditions: SQL[] = [];

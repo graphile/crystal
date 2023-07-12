@@ -17,7 +17,7 @@ export class PgTempTableStep<
 {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "TempTableStep",
+    exportName: "PgTempTableStep",
   };
 
   public readonly alias: SQL;
@@ -44,7 +44,7 @@ export class PgTempTableStep<
   fromExpression() {
     const from = this.resource.from;
     if (typeof from === "function") {
-      throw new Error("TempTableStep doesn't support function sources yet.");
+      throw new Error("PgTempTableStep doesn't support function sources yet.");
     } else {
       return from;
     }
