@@ -694,7 +694,6 @@ function identifier(name: string) {
   return makeRawNode(name);
 }
 
-// TODO: rename to `ensureSafeKey` or `safeKeyOrThrow` or something?
 /**
  * Checks that the given `key` is not explicitly disallowed as a key on a POJO and returns a TE node representing it. If disallowed, an error will be thrown. Useful for building easy to read objects:
  *
