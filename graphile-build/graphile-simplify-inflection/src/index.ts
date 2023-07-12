@@ -29,23 +29,23 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       distinctPluralize(this: GraphileBuild.Inflection, str: string): string;
-      // TODO: methods that return non-string should be prefixed with `_` to
+      // NOTE: methods that may return non-string should be prefixed with `_` to
       // indicate they should only be used from other inflectors
-      getBaseName(
+      _getBaseName(
         this: GraphileBuild.Inflection,
         attributeName: string,
       ): string | null;
-      baseNameMatches(
+      _baseNameMatches(
         this: GraphileBuild.Inflection,
         baseName: string,
         otherName: string,
       ): boolean;
       /* This is a good method to override. */
-      getOppositeBaseName(
+      _getOppositeBaseName(
         this: GraphileBuild.Inflection,
         baseName: string,
       ): string | null;
-      getBaseNameFromKeys(
+      _getBaseNameFromKeys(
         this: GraphileBuild.Inflection,
         detailedKeys: Array<{
           codec: PgCodec<any, any, any, any, any, any, any>;
@@ -142,7 +142,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         }
       },
 
-      getBaseName(_preset, attributeName) {
+      _getBaseName(_preset, attributeName) {
         const matches = attributeName.match(
           /^(.+?)(_row_id|_id|_uuid|_fk|_pk|RowId|Id|Uuid|UUID|Fk|Pk)$/,
         );
@@ -152,13 +152,13 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         return null;
       },
 
-      baseNameMatches(_preset, baseName, otherName) {
+      _baseNameMatches(_preset, baseName, otherName) {
         const singularizedName = this.singularize(otherName);
         return this.camelCase(baseName) === this.camelCase(singularizedName);
       },
 
       /* This is a good method to override. */
-      getOppositeBaseName(_preset, baseName) {
+      _getOppositeBaseName(_preset, baseName) {
         return (
           (
             {
@@ -180,18 +180,18 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         );
       },
 
-      getBaseNameFromKeys(preset, detailedKeys) {
+      _getBaseNameFromKeys(preset, detailedKeys) {
         if (detailedKeys.length === 1) {
           const key = detailedKeys[0];
           const attributeName = this._attributeName(key);
-          return this.getBaseName(attributeName);
+          return this._getBaseName(attributeName);
         }
         if (preset.schema?.pgSimplifyMultikeyRelations) {
           const attributeNames = detailedKeys.map((key) =>
             this._attributeName(key),
           );
           const baseNames = attributeNames.map((attributeName) =>
-            this.getBaseName(attributeName),
+            this._getBaseName(attributeName),
           );
           // Check none are null
           if (baseNames.every((n) => n)) {
@@ -316,7 +316,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             attributeName,
           }),
         );
-        const baseName = this.getBaseNameFromKeys(detailedKeys);
+        const baseName = this._getBaseNameFromKeys(detailedKeys);
         if (baseName) {
           return this.camelCase(baseName);
         }
@@ -351,9 +351,9 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             attributeName,
           }),
         );
-        const baseName = this.getBaseNameFromKeys(detailedKeys);
+        const baseName = this._getBaseNameFromKeys(detailedKeys);
         if (baseName) {
-          const oppositeBaseName = this.getOppositeBaseName(baseName);
+          const oppositeBaseName = this._getOppositeBaseName(baseName);
           if (oppositeBaseName) {
             return this.camelCase(
               `${oppositeBaseName}-${this._singularizedCodecName(
@@ -361,7 +361,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               )}`,
             );
           }
-          if (this.baseNameMatches(baseName, codec.name)) {
+          if (this._baseNameMatches(baseName, codec.name)) {
             return this.camelCase(
               `${this._singularizedCodecName(relation.remoteResource.codec)}`,
             );
@@ -399,9 +399,9 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             attributeName,
           }),
         );
-        const baseName = this.getBaseNameFromKeys(detailedKeys);
+        const baseName = this._getBaseNameFromKeys(detailedKeys);
         if (baseName) {
-          const oppositeBaseName = this.getOppositeBaseName(baseName);
+          const oppositeBaseName = this._getOppositeBaseName(baseName);
           if (oppositeBaseName) {
             return this.camelCase(
               `${oppositeBaseName}-${this.distinctPluralize(
@@ -409,7 +409,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               )}`,
             );
           }
-          if (this.baseNameMatches(baseName, codec.name)) {
+          if (this._baseNameMatches(baseName, codec.name)) {
             return this.camelCase(
               `${this.distinctPluralize(
                 this._singularizedCodecName(relation.remoteResource.codec),
