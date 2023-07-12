@@ -110,8 +110,7 @@ export function augmentIntrospection(
   const getConstraints = (id: string | null): PgConstraint[] =>
     introspection.constraints
       .filter((entity) => entity.conrelid === id)
-      // TODO: do NOT use localeCompare here; it's unstable across different machines
-      .sort((a, z) => a.conname.localeCompare(z.conname));
+      .sort((a, z) => a.conname.localeCompare(z.conname, "en-US"));
   const getForeignConstraints = (id: string | null): PgConstraint[] =>
     introspection.constraints.filter((entity) => entity.confrelid === id);
   const getEnums = (id: string | null): PgEnum[] =>
