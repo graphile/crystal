@@ -24,6 +24,7 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface BuildVersions {
+      "graphile-build-pg": string;
       "@dataplan/pg": string;
     }
     type HasGraphQLTypeForPgCodec = (
@@ -278,9 +279,10 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             versions: build.extend(
               build.versions,
               {
-                "@dataplan/pg": version,
+                "graphile-build-pg": version,
+                "@dataplan/pg": dataplanPg.version,
               },
-              "Adding @dataplan/pg version to build.versions",
+              "Adding graphile-build-pg and @dataplan/pg version to build.versions",
             ),
             dataplanPg,
             pgCodecMetaLookup,

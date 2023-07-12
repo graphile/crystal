@@ -117,6 +117,7 @@ export default function makeNewBuild(
   const build: GraphileBuild.BuildBase = {
     options: builder.options,
     versions: {
+      grafast: grafast.version,
       graphql: graphql.version,
       "graphile-build": version,
     },

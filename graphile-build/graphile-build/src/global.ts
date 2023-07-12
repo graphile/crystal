@@ -272,6 +272,7 @@ declare global {
     }
 
     interface BuildVersions {
+      grafast: string;
       graphql: string;
       "graphile-build": string;
     }
