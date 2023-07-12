@@ -4,7 +4,7 @@ export interface PgHStore {
   [key: string]: string | null;
 }
 
-// TODO: need unit tests for this!
+// TESTS: need unit tests for this!
 // NOTE: I've not tried running this and I was sleep-deprived when I wrote it.
 // NOTE: I don't believe this is vulnerable to prototype polution since we do
 //   `Object.create(null)` and you can only set the value to a string or null.
