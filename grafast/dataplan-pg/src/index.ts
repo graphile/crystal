@@ -152,6 +152,7 @@ import {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
 } from "./steps/pgSingleTablePolymorphic.js";
+import { PgTempTableStep } from "./steps/pgTempTable.js";
 import {
   pgUnionAll,
   PgUnionAllSingleStep,
@@ -167,7 +168,6 @@ import {
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
 } from "./steps/pgValidateParsedCursor.js";
-import { PgTempTableStep } from "./steps/pgTempTable.js";
 import { toPg, ToPgStep } from "./steps/toPg.js";
 import {
   withPgClient,
@@ -179,8 +179,6 @@ import { assertPgClassSingleStep } from "./utils.js";
 
 export {
   assertPgClassSingleStep,
-  PgBooleanFilterStep,
-  PgClassFilterStep,
   digestsFromArgumentSpecs,
   domainOfCodec,
   enumCodec,
@@ -202,13 +200,13 @@ export {
   MakePgServiceOptions,
   makeRegistry,
   makeRegistryBuilder,
-  PgManyFilterStep,
   ObjectFromPgCodecAttributes,
-  PgOrFilterStep,
+  PgBooleanFilterStep,
   PgBox,
   PgCircle,
   pgClassExpression,
   PgClassExpressionStep,
+  PgClassFilterStep,
   PgClassSingleStep,
   PgClient,
   PgClientQuery,
@@ -267,7 +265,9 @@ export {
   PgLockableParameter,
   PgLockCallback,
   PgLseg,
+  PgManyFilterStep,
   PgOrderSpec,
+  PgOrFilterStep,
   pgPageInfo,
   PgPageInfoStep,
   PgPath,
@@ -303,6 +303,7 @@ export {
   PgSelectStep,
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
+  PgTempTableStep,
   PgTypedExecutableStep,
   pgUnionAll,
   PgUnionAllSingleStep,
@@ -322,7 +323,6 @@ export {
   rangeOfCodec,
   recordCodec,
   sqlFromArgDigests,
-  PgTempTableStep,
   toPg,
   ToPgStep,
   TuplePlanMap,
