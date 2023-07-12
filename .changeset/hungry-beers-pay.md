@@ -3,4 +3,4 @@
 "postgraphile": patch
 ---
 
-Allow marking relations as @notNull
+Allow marking relations as `@notNull`

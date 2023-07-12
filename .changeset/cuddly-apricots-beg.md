@@ -7,5 +7,6 @@
 "@dataplan/pg": patch
 ---
 
-Exported version no longer uses 'require' hack, instead it's added at build
-time. Packages now export `version`.
+Exported `version` no longer uses `require('../package.json')` hack, instead the
+version number is written to a source file at versioning time. Packages now
+export `version`.
