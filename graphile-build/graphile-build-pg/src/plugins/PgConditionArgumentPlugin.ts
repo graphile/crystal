@@ -2,6 +2,7 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  PgCodec,
   PgCodecWithAttributes,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
@@ -42,7 +43,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgCodec: "select filter",
-      pgCodecAttribute: "filterBy -binary:attribute:filterBy",
       pgResource: {
         provides: ["default"],
         before: ["inferred", "override"],

@@ -294,7 +294,42 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgCodecAttribute: "select base update insert",
+      pgCodecAttribute: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, [codec, attributeName]) {
+          const behaviors = new Set([
+            "select base update insert filterBy orderBy",
+          ]);
+          const attribute = codec.attributes[attributeName];
+          function walk(codec: PgCodec) {
+            if (codec.arrayOfCodec) {
+              behaviors.add("-condition:attribute:filterBy");
+              behaviors.add(`-attribute:orderBy`);
+              walk(codec.arrayOfCodec);
+            } else if (codec.rangeOfCodec) {
+              behaviors.add(`-condition:attribute:filterBy`);
+              behaviors.add(`-attribute:orderBy`);
+              walk(codec.rangeOfCodec);
+            } else if (codec.domainOfCodec) {
+              // No need to add a behavior for domain
+              walk(codec.domainOfCodec);
+            } else if (codec.attributes) {
+              behaviors.add(`-condition:attribute:filterBy`);
+              behaviors.add(`-attribute:orderBy`);
+            } else if (codec.isBinary) {
+              // Never filter, not in condition plugin nor any other
+              behaviors.add(`-attribute:filterBy`);
+              behaviors.add(`-attribute:orderBy`);
+            } else {
+              // Done
+            }
+          }
+          walk(attribute.codec);
+
+          return [...behaviors, behavior];
+        },
+      },
     },
     hooks: {
       GraphQLInterfaceType_fields(fields, build, context) {
@@ -440,56 +475,21 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         return Object.entries(attributes).reduce(
           (memo, [attributeName, attribute]) =>
             build.recoverable(memo, () => {
-              const action = isPgBaseInput
-                ? "base"
+              const fieldBehaviorScope = isPgBaseInput
+                ? `attribute:base`
                 : isPgPatch
-                ? "update"
+                ? `attribute:update`
                 : isPgCondition
-                ? "filterBy"
-                : "insert";
+                ? `condition:attribute:filterBy`
+                : `attribute:insert`;
 
-              const behaviors: string[] = [];
-              function walk(codec: PgCodec) {
-                if (codec.arrayOfCodec) {
-                  behaviors.push(`array:attribute:${action}`);
-                  walk(codec.arrayOfCodec);
-                } else if (codec.rangeOfCodec) {
-                  behaviors.push(`range:attribute:${action}`);
-                  walk(codec.rangeOfCodec);
-                } else if (codec.domainOfCodec) {
-                  // No need to add a behavior for domain
-                  walk(codec.domainOfCodec);
-                } else if (codec.attributes) {
-                  behaviors.push(`composite:attribute:${action}`);
-                } else if (codec.isBinary) {
-                  behaviors.push(`binary:attribute:${action}`);
-                } else {
-                  behaviors.push(`scalar:attribute:${action}`);
-                }
-              }
-              walk(attribute.codec);
-
-              const relations = (
-                Object.values(
-                  pgRegistry.pgRelations[pgCodec.name] ?? {},
-                ) as PgCodecRelation[]
-              ).filter((r) => !r.isReferencee && r.isUnique);
-              const isPartOfRelation = relations.some((r) =>
-                r.localAttributes.includes(attributeName),
-              );
-              if (isPartOfRelation) {
-                behaviors.push(`relation:attribute:${action}`);
-              }
-
-              for (const behavior of behaviors) {
-                if (
-                  !build.behavior.pgCodecAttributeMatches(
-                    [pgCodec, attributeName],
-                    behavior,
-                  )
-                ) {
-                  return memo;
-                }
+              if (
+                !build.behavior.pgCodecAttributeMatches(
+                  [pgCodec, attributeName],
+                  fieldBehaviorScope,
+                )
+              ) {
+                return memo;
               }
 
               const fieldName = inflection.attribute({
@@ -514,7 +514,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
-                      fieldBehaviorScope: `attribute:${action}`,
+                      fieldBehaviorScope,
                       pgCodec,
                       pgAttribute: attribute,
                       isPgConnectionConditionInputField: isPgCondition,

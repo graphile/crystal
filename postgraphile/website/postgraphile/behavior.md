@@ -154,9 +154,6 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
 - `attribute:base` - should we add this attribute to the "base" input type?
-- `relation:attribute:insert` - can this attribute (which is part of a foreign key) be inserted into?
-- `relation:attribute:update` - can this attribute (which is part of a foreign key) be updated?
-- `relation:attribute:base` - should we add this attribute (which is part of a foreign key) to the "base" input type?
 - `nodeId:insert` - can we insert to the columns represented by this nodeId which represents a table related via foreign key constraint?
 - `nodeId:update` - can we update the columns represented by this nodeId which represents a table related via foreign key constraint?
 - `nodeId:base` - should we add a nodeId input representing this foreign key constraint to the "base" input type?
@@ -183,19 +180,10 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `orderBy` - can we order by this thing (e.g. column)?
 - `proc:orderBy` - can we order by the result of this proc (function resource)?
 - `attribute:orderBy` - can we order by this attribute (column, property)?
-- `array:attribute:orderBy` - can we order by this attribute that's an array?
-- `range:attribute:orderBy` - can we order by this attribute that's a range?
-- `composite:attribute:orderBy` - can we order by this attribute that's underlying type is a composite (record) type?
-- `binary:attribute:orderBy` - can we order by this attribute that's underlying type is binary?
-- `scalar:attribute:orderBy` - can we order by this attribute that's underlying type is a scalar?
 - `filterBy` - can we filter by this thing (e.g. column, table, etc)?
 - `proc:filterBy` - can we filter by the result of this proc (function resource)
-- `attribute:filterBy` - can we filter by this attribute (column, property)
-- `array:attribute:filterBy` - can we filter by this attribute that's an array?
-- `range:attribute:filterBy` - can we filter by this attribute that's a range?
-- `composite:attribute:filterBy` - can we filter by this attribute that's underlying type is a composite (record) type?
-- `binary:attribute:filterBy` - can we filter by this attribute that's underlying type is binary?
-- `scalar:attribute:filterBy` - can we filter by this attribute that's underlying type is a scalar?
+- `attribute:filterBy` - can we filter by this attribute (column, property)?
+- `condition:attribute:filterBy` - can we filter by this attribute (column, property) in the `condition` argument?
 - `single` - can we get just one?
 - `query:resource:single` - can we get a single one of these (resource) at the root?
 - `singularRelation:resource:single` - can we get a single one of these (resource) from a

@@ -657,9 +657,6 @@ type BType {
 A condition to be used against `BType` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input BTypeCondition {
-  """Checks for equality with the object’s `anIntRange` field."""
-  anIntRange: AnIntRangeInput
-
   """Checks for equality with the object’s `bigint` field."""
   bigint: BigInt
 
@@ -669,14 +666,8 @@ input BTypeCondition {
   """Checks for equality with the object’s `cidr` field."""
   cidr: CidrAddress
 
-  """Checks for equality with the object’s `compoundType` field."""
-  compoundType: CCompoundTypeInput
-
   """Checks for equality with the object’s `date` field."""
   date: Date
-
-  """Checks for equality with the object’s `daterange` field."""
-  daterange: DateRangeInput
 
   """Checks for equality with the object’s `decimal` field."""
   decimal: BigFloat
@@ -690,20 +681,11 @@ input BTypeCondition {
   """Checks for equality with the object’s `enum` field."""
   enum: BColor
 
-  """Checks for equality with the object’s `enumArray` field."""
-  enumArray: [BColor]
-
   """Checks for equality with the object’s `inet` field."""
   inet: InternetAddress
 
-  """Checks for equality with the object’s `int8ArrayDomain` field."""
-  int8ArrayDomain: [BigInt]
-
   """Checks for equality with the object’s `interval` field."""
   interval: IntervalInput
-
-  """Checks for equality with the object’s `intervalArray` field."""
-  intervalArray: [IntervalInput]
 
   """Checks for equality with the object’s `json` field."""
   json: JSON
@@ -717,28 +699,11 @@ input BTypeCondition {
   """Checks for equality with the object’s `money` field."""
   money: Float
 
-  """Checks for equality with the object’s `nestedCompoundType` field."""
-  nestedCompoundType: BNestedCompoundTypeInput
-
-  """Checks for equality with the object’s `nullableCompoundType` field."""
-  nullableCompoundType: CCompoundTypeInput
-
-  """
-  Checks for equality with the object’s `nullableNestedCompoundType` field.
-  """
-  nullableNestedCompoundType: BNestedCompoundTypeInput
-
   """Checks for equality with the object’s `nullablePoint` field."""
   nullablePoint: PointInput
 
-  """Checks for equality with the object’s `nullableRange` field."""
-  nullableRange: BigFloatRangeInput
-
   """Checks for equality with the object’s `numeric` field."""
   numeric: BigFloat
-
-  """Checks for equality with the object’s `numrange` field."""
-  numrange: BigFloatRangeInput
 
   """Checks for equality with the object’s `point` field."""
   point: PointInput
@@ -772,12 +737,6 @@ input BTypeCondition {
 
   """Checks for equality with the object’s `smallint` field."""
   smallint: Int
-
-  """Checks for equality with the object’s `textArray` field."""
-  textArray: [String]
-
-  """Checks for equality with the object’s `textArrayDomain` field."""
-  textArrayDomain: [String]
 
   """Checks for equality with the object’s `time` field."""
   time: Time
@@ -959,8 +918,6 @@ enum BTypeOrderBy {
   BOOLEAN_DESC
   CIDR_ASC
   CIDR_DESC
-  COMPOUND_TYPE_ASC
-  COMPOUND_TYPE_DESC
   DATE_ASC
   DATE_DESC
   DECIMAL_ASC
@@ -986,12 +943,6 @@ enum BTypeOrderBy {
   MONEY_ASC
   MONEY_DESC
   NATURAL
-  NESTED_COMPOUND_TYPE_ASC
-  NESTED_COMPOUND_TYPE_DESC
-  NULLABLE_COMPOUND_TYPE_ASC
-  NULLABLE_COMPOUND_TYPE_DESC
-  NULLABLE_NESTED_COMPOUND_TYPE_ASC
-  NULLABLE_NESTED_COMPOUND_TYPE_DESC
   NULLABLE_POINT_ASC
   NULLABLE_POINT_DESC
   NUMERIC_ASC
@@ -2887,9 +2838,6 @@ input CPersonCondition {
   """Checks for equality with the object’s `about` field."""
   about: String
 
-  """Checks for equality with the object’s `aliases` field."""
-  aliases: [String]
-
   """Checks for equality with the object’s `config` field."""
   config: KeyValueHash
 
@@ -2910,9 +2858,6 @@ input CPersonCondition {
 
   """Checks for equality with the object’s `rowId` field."""
   rowId: Int
-
-  """Checks for equality with the object’s `site` field."""
-  site: BWrappedUrlInput
 
   """Checks for equality with the object’s `userMac` field."""
   userMac: MacAddress
@@ -2984,8 +2929,6 @@ enum CPersonOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  SITE_ASC
-  SITE_DESC
   USER_MAC_ASC
   USER_MAC_DESC
 }
@@ -6349,12 +6292,6 @@ input PostCondition {
 
   """Checks for equality with the object’s `body` field."""
   body: String
-
-  """Checks for equality with the object’s `comptypes` field."""
-  comptypes: [ComptypeInput]
-
-  """Checks for equality with the object’s `enums` field."""
-  enums: [AnEnum]
 
   """Checks for equality with the object’s `headline` field."""
   headline: String

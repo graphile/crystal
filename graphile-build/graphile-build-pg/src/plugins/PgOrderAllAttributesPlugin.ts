@@ -45,11 +45,6 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
-    entityBehavior: {
-      // Enable ordering, but don't order by array, range or binary types
-      pgCodecAttribute:
-        "orderBy -array:attribute:orderBy -range:attribute:orderBy -binary:attribute:orderBy",
-    },
     hooks: {
       GraphQLEnumType_values(values, build, context) {
         const { extend, inflection, options } = build;
@@ -101,35 +96,14 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
           values,
           Object.entries(attributes).reduce(
             (memo, [attributeName, attribute]) => {
-              const behaviors: string[] = [];
-              function walk(codec: PgCodec) {
-                if (codec.arrayOfCodec) {
-                  behaviors.push("array:attribute:orderBy");
-                  walk(codec.arrayOfCodec);
-                } else if (codec.rangeOfCodec) {
-                  behaviors.push("range:attribute:orderBy");
-                  walk(codec.rangeOfCodec);
-                } else if (codec.domainOfCodec) {
-                  // No need to add a behavior for domain
-                  walk(codec.domainOfCodec);
-                } else if (codec.attributes) {
-                  behaviors.push("composite:attribute:orderBy");
-                } else if (codec.isBinary) {
-                  behaviors.push("binary:attribute:orderBy");
-                } else {
-                  behaviors.push("scalar:attribute:orderBy");
-                }
-              }
-              walk(attribute.codec);
-              for (const behavior of behaviors) {
-                if (
-                  !build.behavior.pgCodecAttributeMatches(
-                    [pgCodec, attributeName],
-                    behavior,
-                  )
-                ) {
-                  return memo;
-                }
+              const fieldBehaviorScope = `attribute:orderBy`;
+              if (
+                !build.behavior.pgCodecAttributeMatches(
+                  [pgCodec, attributeName],
+                  fieldBehaviorScope,
+                )
+              ) {
+                return memo;
               }
               const isUnique = uniques.some(
                 (list) => list.attributes[0] === attributeName,
