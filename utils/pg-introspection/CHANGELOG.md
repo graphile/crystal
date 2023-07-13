@@ -1,5 +1,14 @@
 # pg-introspection
 
+## 0.0.1-alpha.4
+
+### Patch Changes
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`bc14d488d`](https://github.com/benjie/postgraphile-private/commit/bc14d488d5385f350b6d377716e43c46a405dc57)
+  Thanks [@benjie](https://github.com/benjie)! - When sorting, specify a
+  concrete locale to localeCompare to ensure stable ordering across machines.
+
 ## 0.0.1-alpha.3
 
 ### Patch Changes

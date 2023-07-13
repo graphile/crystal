@@ -1,5 +1,97 @@
 # graphile-build-pg
 
+## 5.0.0-alpha.14
+
+### Patch Changes
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`bfe5997e3`](https://github.com/benjie/postgraphile-private/commit/bfe5997e365fae9561133f6cd8126e986860b8c2)
+  Thanks [@benjie](https://github.com/benjie)! - Ability to control via
+  behaviors whether the record type is selectable on CRUD mutation payloads.
+
+- [#407](https://github.com/benjie/postgraphile-private/pull/407)
+  [`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478)
+  Thanks [@benjie](https://github.com/benjie)! - Exported `version` no longer
+  uses `require('../package.json')` hack, instead the version number is written
+  to a source file at versioning time. Packages now export `version`.
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`903c04b3b`](https://github.com/benjie/postgraphile-private/commit/903c04b3b866b4b9136ba6f8ba22dfd7aae8b7b5)
+  Thanks [@benjie](https://github.com/benjie)! - Add `filterBy` and `orderBy`
+  behaviors for each codec type (array, range, composite, binary, scalar) to
+  allow simpler global customization.
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`c5eceba07`](https://github.com/benjie/postgraphile-private/commit/c5eceba07d0ca2ec93c058e2fcaf9fdf1b7b32e0)
+  Thanks [@benjie](https://github.com/benjie)! - Incorrect ordering of behaviors
+  `orderBy:array`/`orderBy:range` fixed ->
+  `array:attribute:orderBy`/`range:attribute:orderBy`.
+
+- [#407](https://github.com/benjie/postgraphile-private/pull/407)
+  [`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478)
+  Thanks [@benjie](https://github.com/benjie)! - More accurate database
+  identifier parser used in a couple places.
+
+- [#407](https://github.com/benjie/postgraphile-private/pull/407)
+  [`808af8af3`](https://github.com/benjie/postgraphile-private/commit/808af8af3fcc0d20154845a6b9962a094153d899)
+  Thanks [@benjie](https://github.com/benjie)! - Allow marking relations as
+  `@notNull`
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`9f5a784c6`](https://github.com/benjie/postgraphile-private/commit/9f5a784c601b67dfb2cbf7bd836d7aa060fba63c)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce TypeScript CIF
+  gatherConfig() to help typing the `gather` phase for plugins.
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`2849cc3fb`](https://github.com/benjie/postgraphile-private/commit/2849cc3fb8e4302b57cdf21f8c9a5fea33b797f8)
+  Thanks [@benjie](https://github.com/benjie)! - Better handle the situation
+  where a node fetcher could not be found.
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`51414d328`](https://github.com/benjie/postgraphile-private/commit/51414d3281f04c8fd450d6364960336b862a5795)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for `bytea`
+  datatype using new `Base64EncodedBinary` scalar in GraphQL.
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`a298fc893`](https://github.com/benjie/postgraphile-private/commit/a298fc8931f3a0579fb6846d63b52fa3fcc6e65e)
+  Thanks [@benjie](https://github.com/benjie)! - Fix constraint finding for
+  polymorphism (was theoretically possible to find the wrong constraint).
+
+- [#407](https://github.com/benjie/postgraphile-private/pull/407)
+  [`1300a9753`](https://github.com/benjie/postgraphile-private/commit/1300a975394f4e22540019bb0d40ba0bb9bec550)
+  Thanks [@benjie](https://github.com/benjie)! - Move attribute logic from
+  PgConditionArgumentPlugin to PgAttributesPlugin
+
+- [#407](https://github.com/benjie/postgraphile-private/pull/407)
+  [`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478)
+  Thanks [@benjie](https://github.com/benjie)! - Possible to set the modifier of
+  an argument type via `@arg0modifier` smart tag
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`dda361d11`](https://github.com/benjie/postgraphile-private/commit/dda361d11c4d2625c5770df32843f3ec1407c922)
+  Thanks [@benjie](https://github.com/benjie)! - Improve error messages for
+  getInputTypeByName and getOutputTypeByName.
+
+- Updated dependencies
+  [[`f5dd38aa3`](https://github.com/benjie/postgraphile-private/commit/f5dd38aa34c10f5ef0e0fa8fa48b70534ac3c294),
+  [`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478),
+  [`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999),
+  [`c5050dd28`](https://github.com/benjie/postgraphile-private/commit/c5050dd286bd6d9fa4a5d9cfbf87ba609cb148dd),
+  [`9f5a784c6`](https://github.com/benjie/postgraphile-private/commit/9f5a784c601b67dfb2cbf7bd836d7aa060fba63c),
+  [`2849cc3fb`](https://github.com/benjie/postgraphile-private/commit/2849cc3fb8e4302b57cdf21f8c9a5fea33b797f8),
+  [`8ca9425ed`](https://github.com/benjie/postgraphile-private/commit/8ca9425edec68fbac0e727bd3d2754bf4843cc74),
+  [`51414d328`](https://github.com/benjie/postgraphile-private/commit/51414d3281f04c8fd450d6364960336b862a5795),
+  [`088d83b1d`](https://github.com/benjie/postgraphile-private/commit/088d83b1de2782a1a37a5998747b202a6c2b27a2),
+  [`0d1782869`](https://github.com/benjie/postgraphile-private/commit/0d1782869adc76f5bbcecfdcbb85a258c468ca37),
+  [`bc14d488d`](https://github.com/benjie/postgraphile-private/commit/bc14d488d5385f350b6d377716e43c46a405dc57),
+  [`dda361d11`](https://github.com/benjie/postgraphile-private/commit/dda361d11c4d2625c5770df32843f3ec1407c922)]:
+  - tamedevil@0.0.0-alpha.4
+  - grafast@0.0.1-alpha.12
+  - graphile-build@5.0.0-alpha.13
+  - @dataplan/pg@0.0.1-alpha.13
+  - graphile-config@0.0.1-alpha.6
+  - pg-introspection@0.0.1-alpha.4
+
 ## 5.0.0-alpha.13
 
 ### Patch Changes

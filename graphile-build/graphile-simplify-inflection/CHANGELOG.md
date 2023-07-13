@@ -1,5 +1,17 @@
 # v8.0.0
 
+## 8.0.0-alpha.4
+
+### Patch Changes
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`01ad64d5d`](https://github.com/benjie/postgraphile-private/commit/01ad64d5d34be84b8fb5c096505db553406328e6)
+  Thanks [@benjie](https://github.com/benjie)! - Renamed `getBaseName`,
+  `baseNameMatches`, `getOppositeBaseName` and `getBaseNameFromKeys` inflectors
+  to all begin with an underscore (`_`) - this is because these inflectors
+  should only be used from other inflectors, since they may return non-string
+  types (null/boolean/etc).
+
 ## 8.0.0-alpha.3
 
 ### Patch Changes

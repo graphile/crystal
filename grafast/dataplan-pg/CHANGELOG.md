@@ -1,5 +1,38 @@
 # @dataplan/pg
 
+## 0.0.1-alpha.13
+
+### Patch Changes
+
+- [#407](https://github.com/benjie/postgraphile-private/pull/407)
+  [`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478)
+  Thanks [@benjie](https://github.com/benjie)! - Exported `version` no longer
+  uses `require('../package.json')` hack, instead the version number is written
+  to a source file at versioning time. Packages now export `version`.
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999)
+  Thanks [@benjie](https://github.com/benjie)! - `inspect()` fallback function
+  updated
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`51414d328`](https://github.com/benjie/postgraphile-private/commit/51414d3281f04c8fd450d6364960336b862a5795)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for `bytea`
+  datatype using new `Base64EncodedBinary` scalar in GraphQL.
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`bc14d488d`](https://github.com/benjie/postgraphile-private/commit/bc14d488d5385f350b6d377716e43c46a405dc57)
+  Thanks [@benjie](https://github.com/benjie)! - When sorting, specify a
+  concrete locale to localeCompare to ensure stable ordering across machines.
+- Updated dependencies
+  [[`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478),
+  [`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999),
+  [`c5050dd28`](https://github.com/benjie/postgraphile-private/commit/c5050dd286bd6d9fa4a5d9cfbf87ba609cb148dd),
+  [`0d1782869`](https://github.com/benjie/postgraphile-private/commit/0d1782869adc76f5bbcecfdcbb85a258c468ca37)]:
+  - grafast@0.0.1-alpha.12
+  - graphile-config@0.0.1-alpha.6
+  - @dataplan/json@0.0.1-alpha.12
+
 ## 0.0.1-alpha.12
 
 ### Patch Changes

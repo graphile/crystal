@@ -1,5 +1,19 @@
 # graphile
 
+## 5.0.0-alpha.7
+
+### Patch Changes
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`bc14d488d`](https://github.com/benjie/postgraphile-private/commit/bc14d488d5385f350b6d377716e43c46a405dc57)
+  Thanks [@benjie](https://github.com/benjie)! - When sorting, specify a
+  concrete locale to localeCompare to ensure stable ordering across machines.
+- Updated dependencies
+  [[`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999),
+  [`c5050dd28`](https://github.com/benjie/postgraphile-private/commit/c5050dd286bd6d9fa4a5d9cfbf87ba609cb148dd),
+  [`0d1782869`](https://github.com/benjie/postgraphile-private/commit/0d1782869adc76f5bbcecfdcbb85a258c468ca37)]:
+  - graphile-config@0.0.1-alpha.6
+
 ## 5.0.0-alpha.6
 
 ### Patch Changes

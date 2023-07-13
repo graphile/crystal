@@ -1,5 +1,44 @@
 # graphile-build
 
+## 5.0.0-alpha.13
+
+### Patch Changes
+
+- [#407](https://github.com/benjie/postgraphile-private/pull/407)
+  [`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478)
+  Thanks [@benjie](https://github.com/benjie)! - Exported `version` no longer
+  uses `require('../package.json')` hack, instead the version number is written
+  to a source file at versioning time. Packages now export `version`.
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`9f5a784c6`](https://github.com/benjie/postgraphile-private/commit/9f5a784c601b67dfb2cbf7bd836d7aa060fba63c)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce TypeScript CIF
+  gatherConfig() to help typing the `gather` phase for plugins.
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`2849cc3fb`](https://github.com/benjie/postgraphile-private/commit/2849cc3fb8e4302b57cdf21f8c9a5fea33b797f8)
+  Thanks [@benjie](https://github.com/benjie)! - Better handle the situation
+  where a node fetcher could not be found.
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`8ca9425ed`](https://github.com/benjie/postgraphile-private/commit/8ca9425edec68fbac0e727bd3d2754bf4843cc74)
+  Thanks [@benjie](https://github.com/benjie)! - Detect when your preset doesn't
+  have any plugins, or omits the QueryPlugin, and raise an error or warning
+  indicating to the user that there's likely an issue here.
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`dda361d11`](https://github.com/benjie/postgraphile-private/commit/dda361d11c4d2625c5770df32843f3ec1407c922)
+  Thanks [@benjie](https://github.com/benjie)! - Improve error messages for
+  getInputTypeByName and getOutputTypeByName.
+
+- Updated dependencies
+  [[`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478),
+  [`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999),
+  [`c5050dd28`](https://github.com/benjie/postgraphile-private/commit/c5050dd286bd6d9fa4a5d9cfbf87ba609cb148dd),
+  [`0d1782869`](https://github.com/benjie/postgraphile-private/commit/0d1782869adc76f5bbcecfdcbb85a258c468ca37)]:
+  - grafast@0.0.1-alpha.12
+  - graphile-config@0.0.1-alpha.6
+
 ## 5.0.0-alpha.12
 
 ### Patch Changes

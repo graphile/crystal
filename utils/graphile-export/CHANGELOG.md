@@ -1,5 +1,18 @@
 # graphile-export
 
+## 0.0.2-alpha.6
+
+### Patch Changes
+
+- [#406](https://github.com/benjie/postgraphile-private/pull/406)
+  [`ecd7598f1`](https://github.com/benjie/postgraphile-private/commit/ecd7598f1a12c724e744249246eec7b882198a8a)
+  Thanks [@benjie](https://github.com/benjie)! - More docs for graphile-export
+
+- Updated dependencies
+  [[`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478),
+  [`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999)]:
+  - grafast@0.0.1-alpha.12
+
 ## 0.0.2-alpha.5
 
 ### Patch Changes

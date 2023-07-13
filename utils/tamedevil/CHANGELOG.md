@@ -1,5 +1,19 @@
 # tamedevil
 
+## 0.0.0-alpha.4
+
+### Patch Changes
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`f5dd38aa3`](https://github.com/benjie/postgraphile-private/commit/f5dd38aa34c10f5ef0e0fa8fa48b70534ac3c294)
+  Thanks [@benjie](https://github.com/benjie)! - 'toJSON' export is now named
+  'stringifyJSON'
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`088d83b1d`](https://github.com/benjie/postgraphile-private/commit/088d83b1de2782a1a37a5998747b202a6c2b27a2)
+  Thanks [@benjie](https://github.com/benjie)! - Rename `dangerousKey` to
+  `safeKeyOrThrow` for clarity.
+
 ## 0.0.0-alpha.3
 
 ### Patch Changes

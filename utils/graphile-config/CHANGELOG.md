@@ -1,5 +1,24 @@
 # graphile-config
 
+## 0.0.1-alpha.6
+
+### Patch Changes
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999)
+  Thanks [@benjie](https://github.com/benjie)! - `inspect()` fallback function
+  updated
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`c5050dd28`](https://github.com/benjie/postgraphile-private/commit/c5050dd286bd6d9fa4a5d9cfbf87ba609cb148dd)
+  Thanks [@benjie](https://github.com/benjie)! - Warn if plugins could not be
+  disabled (due to not being specified).
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`0d1782869`](https://github.com/benjie/postgraphile-private/commit/0d1782869adc76f5bbcecfdcbb85a258c468ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Only eat ENOENT errors when
+  checking for file existance, other errors should still throw.
+
 ## 0.0.1-alpha.5
 
 ### Patch Changes

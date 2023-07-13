@@ -1,5 +1,18 @@
 # grafserv
 
+## 0.0.1-alpha.12
+
+### Patch Changes
+
+- Updated dependencies
+  [[`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478),
+  [`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999),
+  [`c5050dd28`](https://github.com/benjie/postgraphile-private/commit/c5050dd286bd6d9fa4a5d9cfbf87ba609cb148dd),
+  [`0d1782869`](https://github.com/benjie/postgraphile-private/commit/0d1782869adc76f5bbcecfdcbb85a258c468ca37)]:
+  - grafast@0.0.1-alpha.12
+  - graphile-config@0.0.1-alpha.6
+  - ruru@2.0.0-alpha.9
+
 ## 0.0.1-alpha.11
 
 ### Patch Changes

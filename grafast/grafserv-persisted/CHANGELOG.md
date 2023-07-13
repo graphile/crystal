@@ -1,5 +1,29 @@
 # @grafserv/persisted
 
+## 0.0.0-alpha.13
+
+### Patch Changes
+
+- [#407](https://github.com/benjie/postgraphile-private/pull/407)
+  [`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478)
+  Thanks [@benjie](https://github.com/benjie)! - Exported `version` no longer
+  uses `require('../package.json')` hack, instead the version number is written
+  to a source file at versioning time. Packages now export `version`.
+
+- [#408](https://github.com/benjie/postgraphile-private/pull/408)
+  [`799007532`](https://github.com/benjie/postgraphile-private/commit/79900753258f5fae8c64160281dfd4f3c68d7b11)
+  Thanks [@benjie](https://github.com/benjie)! - No longer polls the persisted
+  queries folder every 5 seconds unless you configure it to do so. New watch
+  mode _untested_.
+- Updated dependencies
+  [[`9281a2d88`](https://github.com/benjie/postgraphile-private/commit/9281a2d889ab1e72a3f6f9777779f31a6588d478),
+  [`675b7abb9`](https://github.com/benjie/postgraphile-private/commit/675b7abb93e11d955930b9026fb0b65a56ecc999),
+  [`c5050dd28`](https://github.com/benjie/postgraphile-private/commit/c5050dd286bd6d9fa4a5d9cfbf87ba609cb148dd),
+  [`0d1782869`](https://github.com/benjie/postgraphile-private/commit/0d1782869adc76f5bbcecfdcbb85a258c468ca37)]:
+  - grafast@0.0.1-alpha.12
+  - graphile-config@0.0.1-alpha.6
+  - grafserv@0.0.1-alpha.12
+
 ## 0.0.0-alpha.12
 
 ### Patch Changes
