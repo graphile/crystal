@@ -7,6 +7,11 @@ try {
   }
 } catch {
   inspect = (obj) => {
-    return String(obj);
+    return Array.isArray(obj) ||
+      !obj ||
+      Object.getPrototypeOf(obj) === null ||
+      Object.getPrototypeOf(obj) === Object.prototype
+      ? JSON.stringify(obj)
+      : String(obj);
   };
 }

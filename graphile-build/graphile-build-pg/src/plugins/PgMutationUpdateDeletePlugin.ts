@@ -696,7 +696,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   ? te`{ ${te.join(
                       uniqueAttributes.map(
                         ([attributeName, fieldName]) =>
-                          te`${te.dangerousKey(
+                          te`${te.safeKeyOrThrow(
                             attributeName,
                           )}: args.get(['input', ${te.lit(fieldName)}])`,
                       ),

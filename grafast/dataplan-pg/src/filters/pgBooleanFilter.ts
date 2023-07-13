@@ -4,11 +4,10 @@ import type { SQL } from "pg-sql2";
 
 import type { PgCodec, PgConditionLikeStep } from "../interfaces.js";
 
-// FIXME: rename me and steps like me to use the Pg prefix
-export class BooleanFilterStep extends ModifierStep<PgConditionLikeStep> {
+export class PgBooleanFilterStep extends ModifierStep<PgConditionLikeStep> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "BooleanFilterStep",
+    exportName: "PgBooleanFilterStep",
   };
 
   private conditions: SQL[] = [];

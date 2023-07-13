@@ -16,7 +16,7 @@ const nodeName = (str) => str.replace(/[^a-z0-9]+/g, "_");
 /** @type {Array<{location: string, name: string}>} */
 const workspaces = JSON.parse(
   "[" + output.replace(/\n/g, ",").replace(/,+$/, "") + "]",
-).sort((a, z) => a.location.localeCompare(z.location));
+).sort((a, z) => a.location.localeCompare(z.location, "en-US"));
 
 const workspaceModuleNames = workspaces.map((w) => w.name);
 

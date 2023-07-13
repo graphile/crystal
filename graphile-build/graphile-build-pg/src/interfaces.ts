@@ -65,42 +65,42 @@ export interface PgAdaptor<
  * Declaration merging to add graphile-build-pg 'tags' to @dataplan/pg
  * extensions so we can easily use them with TypeScript.
  */
-declare module "@dataplan/pg" {
-  interface PgResourceExtensions {
-    tags: Partial<PgResourceTags>;
-    singleOutputParameterName?: string;
-    /** For v4 compatibility, what's the name of the actual table. */
-    pg?: {
-      serviceName: string;
-      schemaName: string;
-      name: string;
-    };
-  }
-
-  interface PgResourceUniqueExtensions {
-    tags: Partial<PgResourceUniqueTags>;
-  }
-
-  interface PgCodecRelationExtensions {
-    tags: Partial<PgCodecRelationTags>;
-  }
-
-  interface PgCodecRefExtensions {
-    tags: Partial<PgCodecRefTags>;
-  }
-
-  interface PgCodecAttributeExtensions {
-    tags: Partial<PgCodecAttributeTags>;
-  }
-
-  interface PgCodecExtensions {
-    /** If false but the codec has attributes then it's probably a composite type */
-    isTableLike?: boolean;
-    tags: Partial<PgCodecTags>;
-  }
-}
-
 declare global {
+  namespace DataplanPg {
+    interface PgResourceExtensions {
+      tags: Partial<PgResourceTags>;
+      singleOutputParameterName?: string;
+      /** For v4 compatibility, what's the name of the actual table. */
+      pg?: {
+        serviceName: string;
+        schemaName: string;
+        name: string;
+      };
+    }
+
+    interface PgResourceUniqueExtensions {
+      tags: Partial<PgResourceUniqueTags>;
+    }
+
+    interface PgCodecRelationExtensions {
+      tags: Partial<PgCodecRelationTags>;
+    }
+
+    interface PgCodecRefExtensions {
+      tags: Partial<PgCodecRefTags>;
+    }
+
+    interface PgCodecAttributeExtensions {
+      tags: Partial<PgCodecAttributeTags>;
+    }
+
+    interface PgCodecExtensions {
+      /** If false but the codec has attributes then it's probably a composite type */
+      isTableLike?: boolean;
+      tags: Partial<PgCodecTags>;
+    }
+  }
+
   namespace GraphileBuild {
     interface BuildInput {
       pgRegistry: PgRegistry<any, any, any>;

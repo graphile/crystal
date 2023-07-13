@@ -918,6 +918,19 @@ function desc(description: string | null | undefined): t.Expression | null {
   return description ? t.stringLiteral(description) : null;
 }
 
+/**
+ * Returns if the key can be used as a regular object key (and will be seen as
+ * one of the "own" properties of the object) when created using object literal
+ * syntax.
+ *
+ * I.e. returns `true` unless key is `__proto__`
+ *
+ * @see {@link https://tc39.es/ecma262/#sec-runtime-semantics-propertydefinitionevaluation}
+ */
+function canBeRegularObjectKey(key: string): boolean {
+  return key !== "__proto__";
+}
+
 function _convertToAST(
   file: CodegenFile,
   thing: unknown,
@@ -992,26 +1005,62 @@ function _convertToAST(
         `Attempting to export an instance of a class; you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
       );
     }
-    const obj = t.objectExpression(
-      Object.entries(thing).map(([key, value]) => {
-        const tKey = identifierOrLiteral(key);
-        return t.objectProperty(tKey, handleSubvalue(value, tKey, key));
-      }),
-    );
+    const propertyPairs: Array<
+      [
+        keyLiteral: t.StringLiteral | t.NumericLiteral | t.Identifier,
+        value: t.Expression,
+      ]
+    > = [];
+    let hasUnsafeKeys = false;
+    Object.entries(thing).forEach(([key, value]) => {
+      const tKey = identifierOrLiteral(key);
+      const subvalue = handleSubvalue(value, tKey, key);
+      propertyPairs.push([tKey, subvalue]);
+      if (!canBeRegularObjectKey(key)) {
+        hasUnsafeKeys = true;
+      }
+    });
     if (prototype === null) {
-      return t.callExpression(
-        t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-        [
-          t.callExpression(
-            t.memberExpression(t.identifier("Object"), t.identifier("create")),
-            [t.nullLiteral()],
+      if (hasUnsafeKeys) {
+        // Object.fromEntries([[k, v], [k, v], ...])
+        return t.callExpression(
+          t.memberExpression(
+            t.identifier("Object"),
+            t.identifier("fromEntries"),
           ),
-          // TODO: this is unsafe if obj has any forbidden keys
-          obj,
-        ],
-      );
+          [
+            t.arrayExpression(
+              propertyPairs.map(([key, val]) => t.arrayExpression([key, val])),
+            ),
+          ],
+        );
+      } else {
+        const obj = t.objectExpression(
+          propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
+        );
+        return t.callExpression(
+          t.memberExpression(t.identifier("Object"), t.identifier("assign")),
+          [
+            t.callExpression(
+              t.memberExpression(
+                t.identifier("Object"),
+                t.identifier("create"),
+              ),
+              [t.nullLiteral()],
+            ),
+            obj,
+          ],
+        );
+      }
     } else {
-      return obj;
+      if (hasUnsafeKeys) {
+        throw new Error(`Unexportable key found on non-null-prototype object`);
+      } else {
+        const obj = t.objectExpression(
+          propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
+        );
+        return obj;
+      }
     }
   } else {
     throw new Error(
@@ -1199,7 +1248,9 @@ function factoryAst<TTuple extends any[]>(
     );
   });
 
-  // TODO: we can remove this now that we have the post-processing via babel
+  // DEBT: we should be able to remove this now that we have the
+  // post-processing via babel, however currently the result of doing so is
+  // messy.
   if (shouldOptimizeFactoryCalls) {
     /*
      * Factories take the form of an IIFE: `((a, b, c) => ...)(x, y, z)`; where

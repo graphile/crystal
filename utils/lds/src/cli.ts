@@ -57,7 +57,7 @@ async function main() {
         clients.splice(i, 1);
       }
       // Release all the subscriptions
-      // TODO: do this more performantly!!
+      // PERF: do this more performantly!!
       for (const tableMap of Object.values(channels)) {
         for (const clientsMap of Object.values(tableMap)) {
           for (const channelClients of Object.values(clientsMap)) {

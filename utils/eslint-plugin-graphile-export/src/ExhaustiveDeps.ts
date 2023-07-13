@@ -386,8 +386,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
               ", ",
             )}]`,
             fix(fixer) {
-              // TODO: consider preserving the comments or formatting?
-              //
+              // ENHANCE: preserve the comments and optionally the formatting
               const fixArgs = [];
 
               const range: [number, number] | null =
@@ -471,7 +470,6 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         }
 
         if (!declaredDependenciesNode) {
-          // TODO: Can this have a suggestion?
           reportProblem(context, options, {
             node: fnCall as unknown as ESTreeNode,
             message:

@@ -4,12 +4,12 @@ import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
 import type { PgResource } from "../datasource.js";
-import type { ClassFilterStep } from "../filters/classFilter.js";
+import type { PgClassFilterStep } from "../filters/pgClassFilter.js";
 import type { PgCodec } from "../interfaces.js";
 import type { PgConditionCapableParentStep } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 
-export class TempTableStep<
+export class PgTempTableStep<
     TResource extends PgResource<any, any, any, any, any>,
   >
   extends BaseStep
@@ -17,13 +17,13 @@ export class TempTableStep<
 {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "TempTableStep",
+    exportName: "PgTempTableStep",
   };
 
   public readonly alias: SQL;
   public readonly conditions: SQL[] = [];
   constructor(
-    public readonly $parent: ClassFilterStep,
+    public readonly $parent: PgClassFilterStep,
     public readonly resource: TResource,
   ) {
     super();
@@ -44,7 +44,7 @@ export class TempTableStep<
   fromExpression() {
     const from = this.resource.from;
     if (typeof from === "function") {
-      throw new Error("TempTableStep doesn't support function sources yet.");
+      throw new Error("PgTempTableStep doesn't support function sources yet.");
     } else {
       return from;
     }

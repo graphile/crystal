@@ -8,7 +8,7 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 import type { TE } from "tamedevil";
-import te, { stringifyString, toJSON } from "tamedevil";
+import te, { stringifyJSON, stringifyString } from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
@@ -151,7 +151,7 @@ const ref_$$error = te.ref($$error, "$$error");
 const ref_coerceError = te.ref(coerceError, "coerceError");
 const ref_nonNullError = te.ref(nonNullError, "nonNullError");
 const ref_stringifyString = te.ref(stringifyString, "stringifyString");
-const ref_toJSON = te.ref(toJSON, "toJSON");
+const ref_stringifyJSON = te.ref(stringifyJSON, "stringifyJSON");
 const ref_isPolymorphicData = te.ref(isPolymorphicData, "isPolymorphicData");
 const ref_$$concreteType = te.ref($$concreteType, "$$concreteType");
 const ref_assert = te.ref(assert, "assert");
@@ -981,7 +981,7 @@ const leafExecutor = makeExecutor({
 
 const leafExecutorString = makeExecutor({
   inner: te`\
-  return ${ref_toJSON}(this.type.graphqlType.serialize(bucketRootValue));
+  return ${ref_stringifyJSON}(this.type.graphqlType.serialize(bucketRootValue));
 `,
   nameExtra: te.cache`leaf`,
   asString: true,

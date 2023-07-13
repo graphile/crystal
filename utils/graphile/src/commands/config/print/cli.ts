@@ -33,8 +33,6 @@ export function options(yargs: Argv) {
       description: "Include details to help debug the ordering of plugins",
       normalize: true,
     });
-  // TODO: add options for debugging things like: where did this option come
-  // from, why are the plugins in this order, etc.
 }
 
 type Opts = ArgsFromOptions<typeof options>;

@@ -163,7 +163,7 @@ function parseGraphQLBody(
   }
   const ct = rawContentType as RequestContentType;
 
-  // TODO: we should probably at least look at the parameters... e.g. throw if encoding !== utf-8
+  // FIXME: we should probably at least look at the parameters... e.g. throw if encoding !== utf-8
 
   switch (ct) {
     case "application/json": {
@@ -210,7 +210,7 @@ function parseGraphQLBody(
       }
     }
     case "application/graphql": {
-      // TODO: I have a vague feeling that people that do this pass variables via the query string?
+      // ENHANCE: I have a vague feeling that people that do this pass variables via the query string?
       switch (body.type) {
         case "text": {
           return {
@@ -233,7 +233,7 @@ function parseGraphQLBody(
           };
         }
         case "json": {
-          // TODO: non-standard; perhaps raise a warning?
+          // ERRORS: non-standard; perhaps raise a warning?
           return parseGraphQLJSONBody(body.json);
         }
         default: {
@@ -456,8 +456,8 @@ export const makeGraphQLHandler = (
       ) {
         throw e;
       } else {
-        // TODO: should maybe handle more specific issues here. See examples:
-        // https://graphql.github.io/graphql-over-http/draft/#sec-Examples
+        // ENHANCE: should maybe handle more specific issues here. See examples:
+        // https://graphql.github.io/graphql-over-http/draft/#sec-application-json.Examples
         throw httpError(
           400,
           `Parsing failed, please check that the data you're sending to the server is correct`,

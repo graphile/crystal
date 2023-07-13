@@ -1,11 +1,15 @@
 import { isAsyncIterable, isSafeError } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import * as graphql from "graphql";
+import { createHash } from "node:crypto";
 
 const { GraphQLError } = graphql;
 // Only the non-ambiguous characters
 const RANDOM_STRING_LETTERS = "ABCDEFGHJKLMNPQRTUVWXYZ2346789";
 const RANDOM_STRING_LETTERS_LENGTH = RANDOM_STRING_LETTERS.length;
+
+const sha1 = (text: string) =>
+  createHash("sha1").update(text).digest("base64url");
 
 const randomString = (length = 10) => {
   let str = "";
@@ -34,12 +38,15 @@ export function defaultMaskError(
       error.originalError.extensions ?? null,
     );
   } else {
-    // TODO: would it be good to do a hash instead, that way similar errors can
-    // easily be grouped?
+    // Hash so similar errors can easily be grouped
+    const hash = sha1(String(error));
     const errorId = randomString();
-    console.error(`Masked GraphQL error (code: '${errorId}')`, error);
+    console.error(
+      `Masked GraphQL error (hash: '${hash}', id: '${errorId}')`,
+      error,
+    );
     return new GraphQLError(
-      `An error occurred (logged with code: '${errorId}')`,
+      `An error occurred (logged with hash: '${hash}', id: '${errorId}')`,
       error.nodes,
       error.source,
       error.positions,

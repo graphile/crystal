@@ -1,7 +1,7 @@
 import { $$idempotent, SafeError } from "grafast";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLError, GraphQLObjectType, Kind } from "graphql";
-// TODO: remove 'lodash' dependency
+// ENHANCE: remove 'lodash' dependency
 import camelCaseAll from "lodash/camelCase.js";
 import upperFirstAll from "lodash/upperFirst.js";
 import plz from "pluralize";
@@ -196,7 +196,7 @@ export const stringTypeSpec = (
     ? EXPORTABLE(
         (GraphQLError, Kind, coerce) => (ast) => {
           if (ast.kind !== Kind.STRING) {
-            // TODO: add name to this error
+            // ERRORS: add name to this error
             throw new GraphQLError("Can only parse string values");
           }
           return coerce(ast.value);

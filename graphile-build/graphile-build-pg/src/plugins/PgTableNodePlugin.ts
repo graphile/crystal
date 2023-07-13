@@ -149,7 +149,7 @@ return function (access) {
   return $list => ({ ${te.join(
     pk.map(
       (attributeName, index) =>
-        te`${te.dangerousKey(attributeName)}: access($list, [${te.lit(
+        te`${te.safeKeyOrThrow(attributeName)}: access($list, [${te.lit(
           index + 1,
         )}])`,
     ),

@@ -241,7 +241,6 @@ export function tightDisplayParts(info: ts.QuickInfo | undefined, length = 60) {
 }
 
 export const accessKey = (key: string): string => {
-  // TODO: improve?
   if (/^[A-Za-z0-9_]+$/.test(key)) {
     return `.${key}`;
   } else {

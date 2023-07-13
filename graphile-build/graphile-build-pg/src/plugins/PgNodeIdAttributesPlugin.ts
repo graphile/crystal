@@ -105,6 +105,10 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               if (typeName === build.inflection.builtin("Query")) {
                 return memo;
               }
+              const fetcher = build.nodeFetcherByTypeName(typeName);
+              if (!fetcher) {
+                return memo;
+              }
               const action = isPgBaseInput
                 ? "base"
                 : isPgPatch
@@ -138,7 +142,6 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               const localAttributeCodecs = localAttributes.map(
                 (name) => pgCodec.attributes[name].codec,
               );
-              const fetcher = build.nodeFetcherByTypeName(typeName);
               return extend(
                 memo,
                 {

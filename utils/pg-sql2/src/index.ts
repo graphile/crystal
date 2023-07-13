@@ -491,7 +491,7 @@ export function compile(
           break;
         }
         case "PLACEHOLDER": {
-          // TODO: symbol substitutes?
+          // TODO: should `item.s` be checked in symbol substitutes?
           const resolvedPlaceholder = placeholderValues?.get(item.s) ?? item.k;
           if (!resolvedPlaceholder) {
             throw new Error(
@@ -896,7 +896,7 @@ export function parens(frag: SQL, force?: boolean): SQL {
       return parenthesize(frag);
     } else if (nodeCount === 2) {
       // Check for `IDENTIFIER.rawtext`
-      // TODO: check for 'rawtext.IDENTIFIER' too
+      // ENHANCE: check for 'rawtext.IDENTIFIER' too
       const [identifier, rawtext] = nodes;
       if (
         identifier[$$type] !== "IDENTIFIER" ||

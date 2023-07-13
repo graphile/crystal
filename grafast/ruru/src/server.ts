@@ -6,7 +6,7 @@ export { RuruConfig } from "./interfaces.js";
 const { version } = JSON.parse(
   readFileSync(path.resolve(__dirname, `../package.json`), "utf8"),
 );
-// TODO: make this 'readFileSync' call webpackable
+// ENHANCE: make this 'readFileSync' call webpackable
 const graphiQLContent = readFileSync(
   path.resolve(__dirname, "../bundle/ruru.min.js"),
   "utf8",

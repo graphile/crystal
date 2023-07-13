@@ -95,7 +95,7 @@ async function runTestQuery(basePath) {
             return res;
           }
         } else if (typeof key1 === "string" && typeof key2 === "string") {
-          const res = key1.localeCompare(key2);
+          const res = key1.localeCompare(key2, "en-US");
           if (res !== 0) {
             return res;
           }
@@ -104,7 +104,10 @@ async function runTestQuery(basePath) {
         }
       }
       // We should do canonical JSON... but whatever.
-      return JSON.stringify(payload1).localeCompare(JSON.stringify(payload2));
+      return JSON.stringify(payload1).localeCompare(
+        JSON.stringify(payload2),
+        "en-US",
+      );
     };
     const payloads = [
       originalPayloads[0],

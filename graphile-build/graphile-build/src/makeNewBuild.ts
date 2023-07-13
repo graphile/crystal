@@ -20,7 +20,6 @@ import {
 } from "graphql";
 import * as graphql from "graphql";
 import * as semver from "semver";
-import { inspect } from "util";
 
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
@@ -393,11 +392,20 @@ export default function makeNewBuild(
         );
       }
       const type = this.getTypeByName(typeName);
-      if (!type || !isInputType(type)) {
+      if (!type) {
         throw new Error(
-          `Expected an input type named '${typeName}', instead found ${String(
+          `Expected an input type named '${typeName}', but ${
+            this.getTypeMetaByName(typeName)
+              ? `that type was not successfully constructed; typically this is because it ended up with no fields.`
+              : `a type with that name has not been registered.`
+          }`,
+        );
+      }
+      if (!isInputType(type)) {
+        throw new Error(
+          `Expected '${typeName}' to be an input type, but it isn't (${String(
             type,
-          )}`,
+          )})`,
         );
       }
       return type;
@@ -409,11 +417,20 @@ export default function makeNewBuild(
         );
       }
       const type = this.getTypeByName(typeName);
-      if (!type || !isOutputType(type)) {
+      if (!type) {
         throw new Error(
-          `Expected an output type named '${typeName}', instead found ${inspect(
+          `Expected an output type named '${typeName}', but ${
+            this.getTypeMetaByName(typeName)
+              ? `that type was not successfully constructed; typically this is because it ended up with no fields.`
+              : `a type with that name has not been registered.`
+          }`,
+        );
+      }
+      if (!isOutputType(type)) {
+        throw new Error(
+          `Expected '${typeName}' to be an output type, but it isn't (${String(
             type,
-          )}`,
+          )})`,
         );
       }
       return type;

@@ -523,11 +523,10 @@ export function stringifyString(value: string): string {
 }
 
 // PERF: more optimal stringifier
-// TODO: rename to jsonStringify?
 /**
  * Equivalent to JSON.stringify, but typically faster.
  */
-export const toJSON = (value: any): string => {
+export const stringifyJSON = (value: any): string => {
   if (value == null) return "null";
   if (value === true) return "true";
   if (value === false) return "false";
@@ -538,6 +537,9 @@ export const toJSON = (value: any): string => {
   }
   return JSON.stringify(value);
 };
+
+/** @deprecated Use stringifyJSON instead */
+export const toJSON = stringifyJSON;
 
 /**
  * If the value is simple this will stringify it and inject it directly into
@@ -561,7 +563,7 @@ function lit(val: any): TE {
      * https://github.com/tc39/proposal-json-superset
      */
     const primitive: Primitive = val;
-    return makeRawNode(toJSON(primitive));
+    return makeRawNode(stringifyJSON(primitive));
   } else {
     return ref(val);
   }
@@ -692,7 +694,6 @@ function identifier(name: string) {
   return makeRawNode(name);
 }
 
-// TODO: rename to `ensureSafeKey` or `safeKeyOrThrow` or something?
 /**
  * Checks that the given `key` is not explicitly disallowed as a key on a POJO and returns a TE node representing it. If disallowed, an error will be thrown. Useful for building easy to read objects:
  *
@@ -701,14 +702,14 @@ function identifier(name: string) {
  * ```
  *
  * IMPORTANT: It's strongly recommended that instead of defining an object via
- * `const obj = { ${te.dangerousKey(untrustedKey)}: value }` you instead use
+ * `const obj = { ${te.safeKeyOrThrow(untrustedKey)}: value }` you instead use
  * `const obj = Object.create(null);` and then set the properties on the resulting
  * object via `${obj}${te.set(untrustedKey, true)} = value;` - this prevents
  * attacks such as **prototype polution** since properties like `__proto__` are
  * not special on null-prototype objects, whereas they can cause havok in
  * regular `{}` objects (POJOs).
  */
-function dangerousKey(key: string | symbol | number): TE {
+function safeKeyOrThrow(key: string | symbol | number): TE {
   if (isSafeObjectPropertyName(key)) {
     if (canBeObjectKeyWithoutQuotes(key)) {
       return makeRawNode(String(key));
@@ -744,7 +745,7 @@ function get(key: string | symbol | number): TE {
       makeRawNode(`.${key}`)
     : // ["@@meaning"]
     typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`[${toJSON(key)}]`)
+    ? makeRawNode(`[${stringifyJSON(key)}]`)
     : te`[${te.lit(key)}]`;
 }
 
@@ -761,11 +762,10 @@ function optionalGet(key: string | symbol | number): TE {
       makeRawNode(`?.${key}`)
     : // ?.["@@meaning"]
     typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`?.[${toJSON(key)}]`)
+    ? makeRawNode(`?.[${stringifyJSON(key)}]`)
     : te`?.[${te.lit(key)}]`;
 }
 
-// TODO: rename this. 'leftSet'? 'leftAccess'? 'safeAccess'?
 /**
  * Access to the key of an object either via `.` or `[]` as appropriate ready
  * for being assigned to; `obj${te.set(key)}` would become `obj.foo` or
@@ -776,6 +776,9 @@ function optionalGet(key: string | symbol | number): TE {
  * (`Object.create(null)`) then you can set `hasNullPrototype` to true and all
  * keys are allowed. If this is not the case, then an error will be thrown on
  * certain potentially dangerous keys such as `__proto__` or `constructor`.
+ *
+ * ENHANCE: consider aliasing this as 'leftAccess' (accessing a property, to
+ * be done on the left side of an assignment).
  */
 function set(key: string | symbol | number, hasNullPrototype = false): TE {
   if (!hasNullPrototype && disallowedKeys.includes(key)) {
@@ -790,7 +793,7 @@ function set(key: string | symbol | number, hasNullPrototype = false): TE {
       makeRawNode(`.${key}`)
     : // ["@@meaning"]
     typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`[${toJSON(key)}]`)
+    ? makeRawNode(`[${stringifyJSON(key)}]`)
     : te`[${te.lit(key)}]`;
 }
 
@@ -847,7 +850,7 @@ function run<TResult>(
   try {
     return newFunction(...argNames, compiled.string)(...argValues) as TResult;
   } catch (e) {
-    // TODO: improve this!
+    // ERRORS: improve this!
     console.error(`Error occurred during code generation:`);
     console.error(e);
     console.error("Function definition:");
@@ -1061,7 +1064,8 @@ export {
   batch,
   cache,
   compile,
-  dangerousKey,
+  /** @deprecated Use safeKeyOrThrow instead */
+  safeKeyOrThrow as dangerousKey,
   dangerouslyIncludeRawCode,
   run as eval,
   get,
@@ -1074,6 +1078,7 @@ export {
   ref,
   run,
   runInBatch,
+  safeKeyOrThrow,
   set,
   subcomment,
   substring,
@@ -1095,7 +1100,9 @@ export interface TamedEvil {
   subcomment: typeof subcomment;
   join: typeof join;
   identifier: typeof identifier;
-  dangerousKey: typeof dangerousKey;
+  safeKeyOrThrow: typeof safeKeyOrThrow;
+  /** @deprecated Use safeKeyOrThrow instead */
+  dangerousKey: typeof safeKeyOrThrow;
   get: typeof get;
   optionalGet: typeof optionalGet;
   set: typeof set;
@@ -1131,7 +1138,8 @@ const attributes = {
   subcomment,
   join,
   identifier,
-  dangerousKey,
+  safeKeyOrThrow,
+  dangerousKey: safeKeyOrThrow,
   get,
   optionalGet,
   set,

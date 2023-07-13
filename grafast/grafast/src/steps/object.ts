@@ -151,7 +151,7 @@ export class ObjectStep<
   const newObj = {
 ${te.join(
   this.keys.map(
-    (key, i) => te`    ${te.dangerousKey(key)}: ${te.identifier(`val${i}`)}`,
+    (key, i) => te`    ${te.safeKeyOrThrow(key)}: ${te.identifier(`val${i}`)}`,
   ),
   ",\n",
 )}

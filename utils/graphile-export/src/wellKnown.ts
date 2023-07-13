@@ -38,7 +38,6 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     }
   }
 
-  // TODO: fill this out a bit...
   wellKnownMap.set(crypto, { moduleName: "crypto", exportName: "default" });
   wellKnownMap.set(util, { moduleName: "util", exportName: "default" });
   exportAll(grafastStar, "grafast");

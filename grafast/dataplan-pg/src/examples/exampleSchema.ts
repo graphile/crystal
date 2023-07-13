@@ -86,16 +86,16 @@ import {
   makeRegistryBuilder,
 } from "../datasource.js";
 import {
-  BooleanFilterStep,
-  ClassFilterStep,
   enumCodec,
-  ManyFilterStep,
+  PgBooleanFilterStep,
   pgClassExpression,
   PgClassExpressionStep,
+  PgClassFilterStep,
   pgDeleteSingle,
   PgDeleteSingleStep,
   PgExecutor,
   pgInsertSingle,
+  PgManyFilterStep,
   pgPolymorphic,
   PgResource,
   pgSelect,
@@ -2265,7 +2265,7 @@ export function makeExampleSchema(
 
   const BooleanFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    BooleanFilterStep
+    PgBooleanFilterStep
   >()({
     name: "BooleanFilter",
     fields: {
@@ -2293,7 +2293,7 @@ export function makeExampleSchema(
         type: GraphQLBoolean,
         applyPlan: EXPORTABLE(
           (TYPES, sql) =>
-            function plan($parent: BooleanFilterStep, val) {
+            function plan($parent: PgBooleanFilterStep, val) {
               const $value = val.getRaw();
               if ($value.evalIs(null)) {
                 // Ignore
@@ -2314,7 +2314,7 @@ export function makeExampleSchema(
 
   const MessageFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    ClassFilterStep
+    PgClassFilterStep
   >()({
     name: "MessageFilter",
     fields: {
@@ -2334,7 +2334,7 @@ export function makeExampleSchema(
                 arg.apply(plan);
               }
             },
-          [BooleanFilterStep, sql],
+          [PgBooleanFilterStep, sql],
         ),
       },
     },
@@ -2371,7 +2371,7 @@ export function makeExampleSchema(
 
   const ForumToManyMessageFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    ManyFilterStep<typeof messageResource>
+    PgManyFilterStep<typeof messageResource>
   >()({
     name: "ForumToManyMessageFilter",
     fields: {
@@ -2380,7 +2380,7 @@ export function makeExampleSchema(
         applyPlan: EXPORTABLE(
           () =>
             function plan(
-              $manyFilter: ManyFilterStep<typeof messageResource>,
+              $manyFilter: PgManyFilterStep<typeof messageResource>,
               arg,
             ) {
               const $value = arg.getRaw();
@@ -2397,18 +2397,18 @@ export function makeExampleSchema(
 
   const ForumFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
-    ClassFilterStep
+    PgClassFilterStep
   >()({
     name: "ForumFilter",
     fields: {
       messages: {
         type: ForumToManyMessageFilter,
         applyPlan: EXPORTABLE(
-          (ManyFilterStep, messageResource) =>
+          (PgManyFilterStep, messageResource) =>
             function plan($condition, arg) {
               const $value = arg.getRaw();
               if (!$value.evalIs(null)) {
-                const plan = new ManyFilterStep(
+                const plan = new PgManyFilterStep(
                   $condition,
                   messageResource,
                   ["id"],
@@ -2417,7 +2417,7 @@ export function makeExampleSchema(
                 arg.apply(plan);
               }
             },
-          [ManyFilterStep, messageResource],
+          [PgManyFilterStep, messageResource],
         ),
       },
     },
@@ -2502,17 +2502,17 @@ export function makeExampleSchema(
             type: MessageFilter,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              (ClassFilterStep) =>
+              (PgClassFilterStep) =>
                 function plan(
                   _$forum: ForumStep,
                   $messages: PgSelectStep<typeof messageResource>,
                 ) {
-                  return new ClassFilterStep(
+                  return new PgClassFilterStep(
                     $messages.wherePlan(),
                     $messages.alias,
                   );
                 },
-              [ClassFilterStep],
+              [PgClassFilterStep],
             ),
           },
           includeArchived: makeIncludeArchivedArg<
@@ -2590,18 +2590,18 @@ export function makeExampleSchema(
             type: MessageFilter,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              (ClassFilterStep) =>
+              (PgClassFilterStep) =>
                 function plan(
                   _$forum,
                   $connection: ResourceConnectionPlan<typeof messageResource>,
                 ) {
                   const $messages = $connection.getSubplan();
-                  return new ClassFilterStep(
+                  return new PgClassFilterStep(
                     $messages.wherePlan(),
                     $messages.alias,
                   );
                 },
-              [ClassFilterStep],
+              [PgClassFilterStep],
             ),
           },
           includeArchived: makeIncludeArchivedArg<
@@ -3713,17 +3713,17 @@ export function makeExampleSchema(
             type: ForumFilter,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              (ClassFilterStep) =>
+              (PgClassFilterStep) =>
                 function plan(
                   _$root,
                   $forums: PgSelectStep<typeof forumResource>,
                 ) {
-                  return new ClassFilterStep(
+                  return new PgClassFilterStep(
                     $forums.wherePlan(),
                     $forums.alias,
                   );
                 },
-              [ClassFilterStep],
+              [PgClassFilterStep],
             ),
           },
         },
@@ -3797,18 +3797,18 @@ export function makeExampleSchema(
             type: MessageFilter,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              (ClassFilterStep) =>
+              (PgClassFilterStep) =>
                 function plan(
                   _$root: any,
                   $connection: ResourceConnectionPlan<typeof messageResource>,
                 ) {
                   const $messages = $connection.getSubplan();
-                  return new ClassFilterStep(
+                  return new PgClassFilterStep(
                     $messages.wherePlan(),
                     $messages.alias,
                   );
                 },
-              [ClassFilterStep],
+              [PgClassFilterStep],
             ),
           },
           includeArchived: makeIncludeArchivedArg<

@@ -43,7 +43,7 @@ function handleGraphQLHandlerError(
         ],
       },
       statusCode: e.extensions?.statusCode ?? 500,
-      // TODO: we should respect the `accept` header here if we can.
+      // FIXME: we should respect the `accept` header here if we can.
       contentType: APPLICATION_JSON,
     } as HandlerResult;
   }
@@ -172,12 +172,15 @@ export class GrafservBase {
     try {
       const result = this._processRequest(request);
       if (isPromiseLike(result)) {
-        returnValue = result.then(convertHandlerResultToResult, handleError);
+        returnValue = result.then(
+          convertHandlerResultToResult,
+          convertErrorToErrorResult,
+        );
       } else {
         returnValue = convertHandlerResultToResult(result);
       }
     } catch (e) {
-      returnValue = handleError(e);
+      returnValue = convertErrorToErrorResult(e);
     }
     if (this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
       if (isPromiseLike(returnValue)) {
@@ -258,7 +261,7 @@ export class GrafservBase {
     if (!this.initialized) {
       return;
     }
-    // TODO: this.graphqlHandler?.release()?
+    // ENHANCE: this.graphqlHandler?.release()?
     this.graphqlHandler = makeGraphQLHandler(
       this.resolvedPreset,
       this.dynamicOptions,
@@ -520,7 +523,7 @@ export function convertHandlerResultToResult(
   }
 }
 
-export const handleError = (
+export const convertErrorToErrorResult = (
   error: Error & { statusCode?: number },
 ): ErrorResult => {
   // TODO: need to assert `error` is not a GraphQLError, that should be handled elsewhere.

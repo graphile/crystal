@@ -32,7 +32,7 @@ function getDigest(
   return {
     httpVersionMajor: ctx.req.httpVersionMajor,
     httpVersionMinor: ctx.req.httpVersionMinor,
-    // TODO: check Koa respects X-Forwarded-Proto when configured to trust the proxy
+    // Koa respects X-Forwarded-Proto when configured to trust the proxy
     isSecure: ctx.secure,
     method: ctx.request.method,
     path: ctx.request.url,
@@ -84,7 +84,7 @@ export class KoaGrafserv extends GrafservBase {
           const { statusCode, headers } = result;
           ctx.response.set(headers);
           ctx.response.status = statusCode;
-          // TODO: mutating the error is probably bad form...
+          // DEBT: mutating the error is probably bad form...
           const errorWithStatus = Object.assign(result.error, {
             status: statusCode,
           });

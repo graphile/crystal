@@ -5,10 +5,10 @@ import { sql } from "pg-sql2";
 
 import type { PgCodec, PgConditionLikeStep } from "../interfaces.js";
 
-export class OrFilterStep extends ModifierStep<PgConditionLikeStep> {
+export class PgOrFilterStep extends ModifierStep<PgConditionLikeStep> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "OrFilterStep",
+    exportName: "PgOrFilterStep",
   };
 
   private conditions: SQL[] = [];

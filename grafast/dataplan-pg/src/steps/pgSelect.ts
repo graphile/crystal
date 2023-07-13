@@ -2304,7 +2304,7 @@ ${lateralText};`;
           if (a.nulls !== b.nulls) return false;
           if (a.attribute != null) {
             if (b.attribute !== a.attribute) return false;
-            // TODO: really should compare if the result is equivalent?
+            // ENHANCEMENT: really should compare if the result is equivalent?
             return a.callback === b.callback;
           } else {
             if (b.attribute != null) return false;

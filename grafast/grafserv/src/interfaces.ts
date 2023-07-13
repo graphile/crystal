@@ -199,13 +199,20 @@ export interface RequestDigest {
   method: "HEAD" | "GET" | "POST" | string;
   httpVersionMajor: number;
   httpVersionMinor: number;
+  /** True if HTTPS was used, false otherwise */
   isSecure: boolean;
+  /** The path segment of the URL, not including the query parameters */
   path: string;
   headers: Record<string, string>;
   getQueryParams: () => PromiseOrDirect<Record<string, string | string[]>>;
   getBody(): PromiseOrDirect<GrafservBody>;
   requestContext: Partial<Grafast.RequestContext>;
-  // TODO: honour this, for Koa/Fastify/etc that may want to process the JSON sans stringification
+  /**
+   * If your server would prefer to receive the JSON objects in memory rather
+   * than having the response written directly out as a string/buffer, set this
+   * true. It does not guarantee that you'll receive JSON, but it does state
+   * your preference.
+   */
   preferJSON?: boolean;
   [$$normalizedHeaders]?: any;
 }
@@ -307,7 +314,7 @@ export interface JSONResult {
   type: "json";
   statusCode: number;
   headers: Record<string, string>;
-  // TODO: should this be `ExecutionResult | AsyncExecutionResult` instead?
+  // TYPES: should this be `ExecutionResult | AsyncExecutionResult` instead?
   json: JSONValue;
 }
 

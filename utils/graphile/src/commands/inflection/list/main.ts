@@ -49,7 +49,7 @@ on the plugins and presets you use. You should regenerate it from time to time
   out();
 
   const completions = [...(getCompletions(".")?.entries ?? [])];
-  completions.sort((a, z) => a.name.localeCompare(z.name));
+  completions.sort((a, z) => a.name.localeCompare(z.name, "en-US"));
 
   let later: Array<string | undefined> = [];
   function outLater(str?: string): void {

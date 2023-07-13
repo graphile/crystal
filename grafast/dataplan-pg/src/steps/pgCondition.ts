@@ -17,8 +17,8 @@ export type PgWhereConditionSpec<TAttribute extends string> =
 export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
 // | ...
 
-// TODO: move this onto a global so it can be extended via declaration merging
-export interface PgConditionStepExtensions {}
+/** @deprecated Use DataplanPg.PgConditionStepExtensions instead */
+export type PgConditionStepExtensions = DataplanPg.PgConditionStepExtensions;
 
 export interface PgConditionCapableParentStep extends BaseStep {
   alias: SQL;
