@@ -79,6 +79,8 @@ export class Behavior {
     };
   };
 
+  public behaviorEntityTypes: (keyof GraphileBuild.BehaviorEntities)[] = [];
+
   private globalDefaultBehavior: ResolvedBehavior;
   constructor(
     private resolvedPreset: GraphileConfig.ResolvedPreset,
@@ -152,6 +154,7 @@ export class Behavior {
       (this as this & BehaviorDynamicMethods).stringBehavior = (str) => str;
       return;
     }
+    this.behaviorEntityTypes.push(entityType);
     this.behaviorEntities[entityType] = {
       behaviorCallbacks: [],
       listCache: new Map(),
@@ -273,6 +276,14 @@ export class Behavior {
       this.globalDefaultBehavior
     } ${specString ?? ""}`;
     return stringMatches(finalBehaviorSpecsString, filter);
+  }
+
+  parseBehaviorString(behaviorString: string) {
+    return parseSpecs(behaviorString);
+  }
+
+  parseScope(filter: string) {
+    return parseScope(filter);
   }
 }
 

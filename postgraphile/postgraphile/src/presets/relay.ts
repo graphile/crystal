@@ -73,7 +73,7 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
           const relationsMap = build.input.pgRegistry.pgRelations[codec.name];
           const relations = relationsMap
             ? (Object.values(
-                build.input.pgRegistry.pgRelations[codec.name],
+                build.input.pgRegistry.pgRelations[codec.name] ?? {},
               ) as PgCodecRelation[])
             : [];
           const singularRelationsUsingThisColumn = relations.filter((r) => {
