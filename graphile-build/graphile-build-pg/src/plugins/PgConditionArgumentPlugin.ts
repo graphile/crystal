@@ -2,7 +2,6 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgCodec,
   PgCodecWithAttributes,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,

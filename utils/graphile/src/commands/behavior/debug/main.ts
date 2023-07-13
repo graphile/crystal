@@ -1,9 +1,8 @@
+import type { PgRegistry } from "@dataplan/pg";
 import chalk from "chalk";
-import type {} from "postgraphile";
 import { resolvePresets } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
-import { PgRegistry } from "@dataplan/pg";
-import { inspect } from "util";
+import type {} from "postgraphile";
 
 export async function main(options: {
   config?: string;
@@ -122,8 +121,8 @@ function debugAndSimplify(
     build.behavior.parseBehaviorString(previous),
     build.behavior.parseBehaviorString(suffix),
   ];
-  let finalParts: string[] = [];
-  let highlightedParts: string[] = [];
+  const finalParts: string[] = [];
+  const highlightedParts: string[] = [];
   const seen: string[][] = [];
   function hasExisting(spec: string[]) {
     for (const otherSpec of seen) {
@@ -183,7 +182,7 @@ function getEntities(
       const memo = Object.create(null);
       for (const [codecName, codec] of Object.entries(registry.pgCodecs)) {
         if (!codec.attributes) continue;
-        for (const [attributeName, attribute] of Object.entries(
+        for (const [attributeName, _attribute] of Object.entries(
           codec.attributes,
         )) {
           memo[`${codecName}.${attributeName}`] = [codec, attributeName];
@@ -196,7 +195,7 @@ function getEntities(
       for (const [codecName, codec] of Object.entries(registry.pgCodecs)) {
         const relations = registry.pgRelations[codecName];
         if (!relations) continue;
-        for (const [relationName, relation] of Object.entries(relations)) {
+        for (const [relationName, _relation] of Object.entries(relations)) {
           memo[`${codecName}.${relationName}`] = [codec, relationName];
         }
       }
@@ -206,7 +205,7 @@ function getEntities(
       const memo = Object.create(null);
       for (const [codecName, codec] of Object.entries(registry.pgCodecs)) {
         if (!codec.refs) continue;
-        for (const [refName, ref] of Object.entries(codec.refs)) {
+        for (const [refName, _ref] of Object.entries(codec.refs)) {
           memo[`${codecName}.${refName}`] = [codec, refName];
         }
       }

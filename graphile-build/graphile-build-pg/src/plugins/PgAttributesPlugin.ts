@@ -8,7 +8,6 @@ import type {
   PgCodecAttribute,
   PgCodecAttributes,
   PgCodecList,
-  PgCodecRelation,
   PgCodecWithAttributes,
   PgConditionStep,
   PgSelectSingleStep,
@@ -419,12 +418,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         return fields;
       },
       GraphQLInputObjectType_fields(fields, build, context) {
-        const {
-          extend,
-          inflection,
-          input: { pgRegistry },
-          sql,
-        } = build;
+        const { extend, inflection, sql } = build;
         const {
           scope: {
             isPgRowType,
