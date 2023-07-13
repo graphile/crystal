@@ -50,7 +50,11 @@ export const version = ${JSON.stringify(packageJson.version)};
 
 releasedPackages.sort();
 
-// 3. Commit changes (including `.changeset/pre.json`) with helpful commit message
+// 3. run yarn
+await $`yarn`;
+await $`git add yarn.lock`;
+
+// 4. Commit changes (including `.changeset/pre.json`) with helpful commit message
 await $`git add ${toCommit}`;
 const commitMessage = `\
 RELEASING: Releasing ${releasedPackages.length} package(s)
