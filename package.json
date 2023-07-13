@@ -12,7 +12,7 @@
     "watch": "yarn build && tsc -b --watch",
     "clean": "jest --clearCache && rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo,tsconfig.build.tsbuildinfo}",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
-    "changeset:version": "yarn run changesets version && node scripts/postversion.mjs",
+    "changeset:version": "yarn changeset version && node scripts/postversion.mjs",
     "docs:gen": "yarn typedoc .",
     "w": "yarn workspace",
     "postgraphile": "cd postgraphile/postgraphile && node dist/cli-run.js",
