@@ -335,6 +335,10 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
 function scopeMatches(
   specifiedScope: BehaviorScope,
   filterScope: BehaviorScope,
+  // We only need to know positive or negative in case the filter contains an `*`.
+  // This is because if you filter for '*:foo' against '+bar:foo -baz:foo' then
+  // we should skip the negative (`-baz:foo`) because we only need _one_ match,
+  // not *every* match.
   positive: boolean,
 ): boolean {
   if (specifiedScope.length > filterScope.length) {

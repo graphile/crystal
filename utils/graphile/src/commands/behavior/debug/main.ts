@@ -9,8 +9,9 @@ export async function main(options: {
   config?: string;
   entityType?: string;
   entityIdentifier?: string;
+  filterString?: string;
 }) {
-  const { entityType, entityIdentifier } = options;
+  const { entityType, entityIdentifier, filterString } = options;
   const userPreset = await loadConfig(options.config);
   if (!userPreset) {
     console.error("Failed to load config, please check the file exists");
@@ -79,6 +80,7 @@ export async function main(options: {
       prefix,
       finalString,
       suffix,
+      filterString,
     );
 
     path += `
@@ -89,15 +91,22 @@ ${chalk.whiteBright.underline(entry.source)}:
     finalString = nextFinalString;
   }
 
+  const matchText = filterString
+    ? build.behavior.stringMatches(finalString, filterString)
+      ? chalk.whiteBright.bold(`Positive match`)
+      : chalk.red.bold(`Negative match`)
+    : null;
+
   return `\
 ${path}
 
 ${chalk.bold.whiteBright(`Final string:`)}
   ${finalString}
-`;
+${matchText ? `\n` + matchText : ""}`;
 }
 
 function arraysMatch(a1: any[], a2: any[]): boolean {
+  // FIXME: this logic doesn't respect `*` scopes.
   return a1.length === a2.length && a1.every((v, i) => a2[i] === v);
 }
 
@@ -106,6 +115,7 @@ function debugAndSimplify(
   prefix: string,
   previous: string,
   suffix: string,
+  filterString: string | undefined,
 ) {
   const sections = [
     build.behavior.parseBehaviorString(prefix),
@@ -115,7 +125,7 @@ function debugAndSimplify(
   let finalParts: string[] = [];
   let highlightedParts: string[] = [];
   const seen: string[][] = [];
-  function hasMatch(spec: string[]) {
+  function hasExisting(spec: string[]) {
     for (const otherSpec of seen) {
       if (
         otherSpec.length <= spec.length &&
@@ -130,12 +140,20 @@ function debugAndSimplify(
     const section = sections[i];
     for (let j = section.length - 1; j >= 0; j--) {
       const spec = section[j];
-      console.log(spec);
-      const isOverridden = hasMatch(spec.scope);
       const scopeString = `${spec.positive ? "" : "-"}${spec.scope.join(":")}`;
-      const highlightedScopeString = (
+
+      const isOverridden = hasExisting(spec.scope);
+      const isMatch = filterString
+        ? build.behavior.stringMatches(spec.scope.join(":"), filterString)
+        : false;
+
+      const highlightedScopeStringBase = (
         i === 0 ? chalk.greenBright : i === 2 ? chalk.cyanBright : chalk.gray
       )(isOverridden ? chalk.strikethrough(scopeString) : scopeString);
+      const highlightedScopeString = isMatch
+        ? chalk.inverse(highlightedScopeStringBase)
+        : highlightedScopeStringBase;
+
       if (isOverridden) {
         highlightedParts.push(highlightedScopeString);
         // DO NOT PUSH TO finalParts

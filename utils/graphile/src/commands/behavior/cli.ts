@@ -5,7 +5,7 @@ import * as debugCmd from "./debug/cli.js";
 export function options(yargs: Argv) {
   return yargs
     .command(
-      "debug [entityType] [entityIdentifier]",
+      "debug [entityType] [entityIdentifier] [filterString]",
       "Detail the behavior for a particular entity",
       debugCmd.options,
       debugCmd.run,
