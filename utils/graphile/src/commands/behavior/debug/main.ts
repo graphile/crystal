@@ -71,22 +71,85 @@ export async function main(options: {
   let path = "";
   let finalString = "";
   for (const entry of behaviors.stack) {
+    if (!entry.prefix && !entry.suffix) continue;
     const prefix = entry.prefix.trim();
     const suffix = entry.suffix.trim();
-    const nextFinalString = `${prefix} ${finalString} ${suffix}`.trim();
-    if (nextFinalString === finalString) continue;
+    const { final: nextFinalString, highlighted } = debugAndSimplify(
+      build,
+      prefix,
+      finalString,
+      suffix,
+    );
 
     path += `
 ${chalk.whiteBright.underline(entry.source)}:
-  ${chalk.greenBright(prefix)} ${chalk.grey(finalString)} ${chalk.cyanBright(
-      suffix,
-    )}
+  ${highlighted}
 `;
 
     finalString = nextFinalString;
   }
 
-  return path;
+  return `\
+${path}
+
+${chalk.bold.whiteBright(`Final string:`)}
+  ${finalString}
+`;
+}
+
+function arraysMatch(a1: any[], a2: any[]): boolean {
+  return a1.length === a2.length && a1.every((v, i) => a2[i] === v);
+}
+
+function debugAndSimplify(
+  build: GraphileBuild.Build,
+  prefix: string,
+  previous: string,
+  suffix: string,
+) {
+  const sections = [
+    build.behavior.parseBehaviorString(prefix),
+    build.behavior.parseBehaviorString(previous),
+    build.behavior.parseBehaviorString(suffix),
+  ];
+  let finalParts: string[] = [];
+  let highlightedParts: string[] = [];
+  const seen: string[][] = [];
+  function hasMatch(spec: string[]) {
+    for (const otherSpec of seen) {
+      if (
+        otherSpec.length <= spec.length &&
+        arraysMatch(otherSpec, spec.slice(spec.length - otherSpec.length))
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+  for (let i = 2; i >= 0; i--) {
+    const section = sections[i];
+    for (let j = section.length - 1; j >= 0; j--) {
+      const spec = section[j];
+      console.log(spec);
+      const isOverridden = hasMatch(spec.scope);
+      const scopeString = `${spec.positive ? "" : "-"}${spec.scope.join(":")}`;
+      const highlightedScopeString = (
+        i === 0 ? chalk.greenBright : i === 2 ? chalk.cyanBright : chalk.gray
+      )(isOverridden ? chalk.strikethrough(scopeString) : scopeString);
+      if (isOverridden) {
+        highlightedParts.push(highlightedScopeString);
+        // DO NOT PUSH TO finalParts
+      } else {
+        highlightedParts.push(highlightedScopeString);
+        finalParts.push(scopeString);
+        seen.push(spec.scope);
+      }
+    }
+  }
+  return {
+    final: finalParts.reverse().join(" "),
+    highlighted: highlightedParts.reverse().join(" "),
+  };
 }
 
 function getEntities(

@@ -306,6 +306,7 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
   const fragments = behaviorSpecsString.split(/\s+/);
   const specs: BehaviorSpec[] = [];
   for (const fragment of fragments) {
+    if (fragment === "") continue;
     // `+` is implicit
     const [pm, rest] = /^[+-]/.test(fragment)
       ? [fragment.slice(0, 1), fragment.slice(1)]
