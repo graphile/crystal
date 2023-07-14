@@ -107,6 +107,60 @@ declare global {
      * The GraphQL context our schemas expect, generally generated from details in Grafast.RequestContext
      */
     interface Context {}
+
+    interface FieldExtensions {
+      plan?: FieldPlanResolver<any, any, any>;
+      subscribePlan?: FieldPlanResolver<any, any, any>;
+    }
+
+    interface ArgumentExtensions {
+      // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
+      inputPlan?: ArgumentInputPlanResolver;
+      applyPlan?: ArgumentApplyPlanResolver;
+      autoApplyAfterParentPlan?: boolean;
+      autoApplyAfterParentSubscribePlan?: boolean;
+    }
+
+    interface InputObjectTypeExtensions {
+      inputPlan?: InputObjectTypeInputPlanResolver;
+    }
+
+    interface InputFieldExtensions {
+      // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
+      inputPlan?: InputObjectFieldInputPlanResolver;
+      applyPlan?: InputObjectFieldApplyPlanResolver;
+      autoApplyAfterParentInputPlan?: boolean;
+      autoApplyAfterParentApplyPlan?: boolean;
+    }
+
+    interface ObjectTypeExtensions {
+      assertStep?:
+        | ((step: ExecutableStep) => asserts step is ExecutableStep)
+        | { new (...args: any[]): ExecutableStep }
+        | null;
+    }
+
+    interface EnumTypeExtensions {}
+
+    interface EnumValueExtensions {
+      /**
+       * EXPERIMENTAL!
+       *
+       * @internal
+       */
+      applyPlan?: EnumValueApplyPlanResolver<any>;
+    }
+
+    interface ScalarTypeExtensions {
+      plan?: ScalarPlanResolver;
+      inputPlan?: ScalarInputPlanResolver;
+      /**
+       * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
+       */
+      idempotent?: boolean;
+    }
+
+    interface SchemaExtensions {}
   }
   namespace GraphileConfig {
     interface Preset {
@@ -133,58 +187,6 @@ declare global {
   }
 }
 
-export interface GrafastFieldExtensions {
-  plan?: FieldPlanResolver<any, any, any>;
-  subscribePlan?: FieldPlanResolver<any, any, any>;
-}
-
-export interface GrafastArgumentExtensions {
-  // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
-  inputPlan?: ArgumentInputPlanResolver;
-  applyPlan?: ArgumentApplyPlanResolver;
-  autoApplyAfterParentPlan?: boolean;
-  autoApplyAfterParentSubscribePlan?: boolean;
-}
-
-export interface GrafastInputObjectTypeExtensions {
-  inputPlan?: InputObjectTypeInputPlanResolver;
-}
-
-export interface GrafastInputFieldExtensions {
-  // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
-  inputPlan?: InputObjectFieldInputPlanResolver;
-  applyPlan?: InputObjectFieldApplyPlanResolver;
-  autoApplyAfterParentInputPlan?: boolean;
-  autoApplyAfterParentApplyPlan?: boolean;
-}
-
-export interface GrafastObjectTypeExtensions {
-  assertStep?:
-    | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): ExecutableStep }
-    | null;
-}
-
-export interface GrafastEnumTypeExtensions {}
-
-export interface GrafastEnumValueExtensions {
-  /**
-   * EXPERIMENTAL!
-   *
-   * @internal
-   */
-  applyPlan?: EnumValueApplyPlanResolver<any>;
-}
-
-export interface GrafastScalarTypeExtensions {
-  plan?: ScalarPlanResolver;
-  inputPlan?: ScalarInputPlanResolver;
-  /**
-   * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
-   */
-  idempotent?: boolean;
-}
-
 /*
  * We register certain things (plans, etc) into the GraphQL "extensions"
  * property on the various GraphQL configs (type, field, argument, etc); this
@@ -192,35 +194,39 @@ export interface GrafastScalarTypeExtensions {
  */
 declare module "graphql" {
   interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
-    grafast?: GrafastFieldExtensions;
+    grafast?: Grafast.FieldExtensions;
   }
 
   interface GraphQLArgumentExtensions {
-    grafast?: GrafastArgumentExtensions;
+    grafast?: Grafast.ArgumentExtensions;
   }
 
   interface GraphQLInputObjectTypeExtensions {
-    grafast?: GrafastInputObjectTypeExtensions;
+    grafast?: Grafast.InputObjectTypeExtensions;
   }
 
   interface GraphQLInputFieldExtensions {
-    grafast?: GrafastInputFieldExtensions;
+    grafast?: Grafast.InputFieldExtensions;
   }
 
   interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
-    grafast?: GrafastObjectTypeExtensions;
+    grafast?: Grafast.ObjectTypeExtensions;
   }
 
   interface GraphQLEnumTypeExtensions {
-    grafast?: GrafastEnumTypeExtensions;
+    grafast?: Grafast.EnumTypeExtensions;
   }
 
   interface GraphQLEnumValueExtensions {
-    grafast?: GrafastEnumValueExtensions;
+    grafast?: Grafast.EnumValueExtensions;
   }
 
   interface GraphQLScalarTypeExtensions {
-    grafast?: GrafastScalarTypeExtensions;
+    grafast?: Grafast.ScalarTypeExtensions;
+  }
+
+  interface GraphQLSchemaExtensions {
+    grafast?: Grafast.SchemaExtensions;
   }
 }
 
