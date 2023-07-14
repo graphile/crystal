@@ -2847,6 +2847,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@grafserv/persisted@workspace:grafast/grafserv-persisted"
   dependencies:
+    "@graphile/lru": "workspace:^"
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
