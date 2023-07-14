@@ -1,3 +1,4 @@
+import type LRU from "@graphile/lru";
 import type EventEmitter from "eventemitter3";
 import type { PluginHook } from "graphile-config";
 import type {
@@ -26,6 +27,8 @@ import type {
 } from "graphql";
 
 import type { Bucket, RequestTools } from "./bucket.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
+import type { SafeError } from "./error.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -38,9 +41,6 @@ import type {
   ConstantStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
-import type LRU from "@graphile/lru";
-import type { SafeError } from "./error.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
 
 type PromiseOrValue<T> = T | Promise<T>;
 

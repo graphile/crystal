@@ -13,8 +13,8 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
-import { isPromiseLike } from "./utils.js";
 import { $$queryCache } from "./interfaces.js";
+import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
 

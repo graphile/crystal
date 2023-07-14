@@ -158,7 +158,6 @@ export const NodePlugin: GraphileConfig.Plugin = {
           extend,
           graphql: { GraphQLNonNull, GraphQLID },
           inflection,
-          [NODE_ID_CODECS]: nodeIdCodecs,
           [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
         } = build;
         const nodeIdFieldName = build.inflection.nodeIdFieldName();

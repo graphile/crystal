@@ -1,10 +1,6 @@
 import LRU from "@graphile/lru";
 import debugFactory from "debug";
-import type {
-  FragmentDefinitionNode,
-  GraphQLSchema,
-  OperationDefinitionNode,
-} from "graphql";
+import type { GraphQLSchema, OperationDefinitionNode } from "graphql";
 
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
