@@ -29,19 +29,23 @@ export function hookArgs(
   const finalize = (args: ExecutionArgs) => {
     const userContext = resolvedPreset.grafast?.context;
     if (typeof userContext === "function") {
-      const result = userContext(ctx, args.contextValue as Record<string, any>);
+      const result = userContext(
+        ctx,
+        args.contextValue as Partial<Grafast.Context>,
+        args,
+      );
       if (isPromiseLike(result)) {
         // Deliberately shadowed 'result'
         return result.then((result) => {
-          Object.assign(args.contextValue as Record<string, any>, result);
+          Object.assign(args.contextValue as Partial<Grafast.Context>, result);
           return args;
         });
       } else {
-        Object.assign(args.contextValue as Record<string, any>, result);
+        Object.assign(args.contextValue as Partial<Grafast.Context>, result);
         return args;
       }
     } else if (typeof userContext === "object" && userContext !== null) {
-      Object.assign(args.contextValue as Record<string, any>, userContext);
+      Object.assign(args.contextValue as Partial<Grafast.Context>, userContext);
       return args;
     } else {
       return args;

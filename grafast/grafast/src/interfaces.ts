@@ -75,7 +75,8 @@ export interface GrafastOptions {
     | Partial<Grafast.Context>
     | ((
         ctx: Partial<Grafast.RequestContext>,
-        currentContext?: Partial<Grafast.Context>,
+        currentContext: Partial<Grafast.Context> | undefined,
+        args: ExecutionArgs,
       ) => PromiseOrValue<Partial<Grafast.Context>>);
 
   /**
@@ -102,9 +103,7 @@ declare global {
      * It's anticipated this will be expanded via declaration merging, e.g. if
      * your server is Koa then a `koaCtx` might be added.
      */
-    interface RequestContext {
-      // TODO: add things like operationName, operation, etc?
-    }
+    interface RequestContext {}
 
     // TODO: context should probably be passed as a generic instead?
     /**
