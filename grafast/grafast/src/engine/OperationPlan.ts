@@ -34,7 +34,7 @@ import {
   object,
   SafeError,
 } from "../index.js";
-import { inputPlan } from "../input.js";
+import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
   FieldPlanResolver,
@@ -1885,7 +1885,7 @@ export class OperationPlan {
       const argumentValue = argumentValues?.find(
         (v) => v.name.value === argumentName,
       );
-      const argumentPlan = inputPlan(
+      const argumentPlan = inputStep(
         this,
         argumentType,
         argumentValue?.value,

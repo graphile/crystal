@@ -2,7 +2,7 @@ import type { GraphQLInputType } from "graphql";
 import * as graphql from "graphql";
 
 import * as assert from "../assert.js";
-import { assertInputStep, inputPlan } from "../input.js";
+import { assertInputStep, inputStep } from "../input.js";
 import type { InputStep, NotVariableValueNode } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { ConstantStep } from "./constant.js";
@@ -51,7 +51,7 @@ export class __InputListStep<
         inputValueIndex++
       ) {
         const inputValue = values[inputValueIndex];
-        const innerPlan = inputPlan(
+        const innerPlan = inputStep(
           this.operationPlan,
           innerType,
           inputValue,

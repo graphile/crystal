@@ -73,7 +73,6 @@ export function graphqlGetTypeForNode(
   }
 }
 
-// TODO: rename to 'inputStep'
 /**
  * Returns a plan for the given `rawInputValue` AST node which could be a
  * variable or a literal, and could be nested so that a variable (or more than
@@ -81,7 +80,7 @@ export function graphqlGetTypeForNode(
  *
  * @internal
  */
-export function inputPlan(
+export function inputStep(
   operationPlan: OperationPlan,
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
@@ -126,7 +125,7 @@ export function inputPlan(
   inputValue = inputValue ?? defaultValue;
   if (inputType instanceof GraphQLNonNull) {
     const innerType = inputType.ofType;
-    const valuePlan = inputPlan(
+    const valuePlan = inputStep(
       operationPlan,
       innerType,
       inputValue,
@@ -221,7 +220,7 @@ function inputVariablePlan(
     // `defaultValue` is NOT undefined, and we know variableValue is
     // `undefined` (and always will be); we're going to loop back and pretend
     // that no value was passed in the first place (instead of the variable):
-    return inputPlan(operationPlan, inputType, undefined, defaultValue);
+    return inputStep(operationPlan, inputType, undefined, defaultValue);
   }
 }
 
