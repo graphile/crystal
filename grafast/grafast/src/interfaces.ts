@@ -2,9 +2,11 @@ import type EventEmitter from "eventemitter3";
 import type { PluginHook } from "graphile-config";
 import type {
   ASTNode,
+  DocumentNode,
   ExecutionArgs,
   GraphQLArgument,
   GraphQLArgumentConfig,
+  GraphQLError,
   GraphQLField,
   GraphQLFieldConfig,
   GraphQLInputField,
@@ -34,6 +36,7 @@ import type {
   ConstantStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
+import LRU from "@graphile/lru";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
@@ -88,6 +91,8 @@ export interface GrafastOptions {
 
   timeouts?: GrafastTimeouts;
 }
+
+export const $$queryCache = Symbol("grafastQueryCache");
 
 declare global {
   namespace Grafast {
@@ -160,7 +165,17 @@ declare global {
       idempotent?: boolean;
     }
 
-    interface SchemaExtensions {}
+    interface SchemaExtensions {
+      /**
+       * Maximum number of queries to store in this schema's query cache.
+       */
+      queryCacheMaxLength?: number;
+
+      /**
+       * The underlying query cache
+       */
+      [$$queryCache]?: LRU<string, DocumentNode | ReadonlyArray<GraphQLError>>;
+    }
   }
   namespace GraphileConfig {
     interface Preset {

@@ -14,6 +14,7 @@ import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
 import { isPromiseLike } from "./utils.js";
+import { $$queryCache } from "./interfaces.js";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
 
@@ -21,21 +22,11 @@ const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
 const CACHE_MULTIPLIER = 100000;
 const MEGABYTE = 1024 * 1024;
 
-const $$queryCache = Symbol("grafastQueryCache");
-
-declare module "graphql" {
-  interface GraphQLSchema {
-    [$$queryCache]?: LRU<
-      string,
-      DocumentNode | ReadonlyArray<graphql.GraphQLError>
-    >;
-  }
-}
-
-// TODO: turn this into a setting.
-const queryCacheMaxSize = 50 * MEGABYTE;
-
-const cacheSize = Math.max(2, Math.ceil(queryCacheMaxSize / CACHE_MULTIPLIER));
+const queryCacheMaxSizeInBytes = 50 * MEGABYTE;
+const defaultQueryCacheMaxSize = Math.max(
+  2,
+  Math.ceil(queryCacheMaxSizeInBytes / CACHE_MULTIPLIER),
+);
 
 // If we can use crypto to create a hash, great. Otherwise just use the string.
 let calculateQueryHash: (queryString: string) => string;
@@ -61,13 +52,19 @@ const parseAndValidate = (
   gqlSchema: GraphQLSchema,
   stringOrSource: string | graphql.Source,
 ): DocumentNode | ReadonlyArray<graphql.GraphQLError> => {
-  let queryCache = gqlSchema[$$queryCache];
+  let queryCache = gqlSchema.extensions.grafast?.[$$queryCache];
   if (!queryCache) {
+    const cacheSize =
+      gqlSchema.extensions.grafast?.queryCacheMaxLength ??
+      defaultQueryCacheMaxSize;
     queryCache = new LRU<
       string,
       DocumentNode | ReadonlyArray<graphql.GraphQLError>
     >({ maxLength: cacheSize });
-    gqlSchema[$$queryCache] = queryCache;
+    if (!gqlSchema.extensions.grafast) {
+      (gqlSchema.extensions as any).grafast = Object.create(null);
+    }
+    gqlSchema.extensions.grafast![$$queryCache] = queryCache;
   }
 
   // Only cache queries that are less than 100kB, we don't want DOS attacks
