@@ -21,7 +21,7 @@ import { lambda } from "./lambda.js";
  * typeNames supported and their details (codec to use, how to find the record,
  * etc), and finally the Node id string plan.
  */
-export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
+export class NodeStep
   extends UnbatchedExecutableStep
   implements PolymorphicStep
 {
@@ -35,25 +35,29 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   private specPlanDep: number;
 
   constructor(
-    codecs: TCodecs,
     private possibleTypes: {
-      [typeName: string]: NodeIdHandler<TCodecs>;
+      [typeName: string]: NodeIdHandler;
     },
     $id: ExecutableStep<string>,
   ) {
     super();
+    const codecSet = new Set<NodeIdCodec>();
+    for (const handler of Object.values(possibleTypes)) {
+      codecSet.add(handler.codec);
+    }
+    const codecs = [...codecSet];
     function decodeNodeIdWithCodecs(raw: string) {
-      return Object.entries(codecs).reduce(
-        (memo, [codecName, codec]) => {
+      return codecs.reduce(
+        (memo, codec) => {
           try {
-            memo[codecName as keyof TCodecs] = codec.decode(raw);
+            memo[codec.name] = codec.decode(raw);
           } catch (e) {
-            memo[codecName as keyof TCodecs] = null;
+            memo[codec.name] = null;
           }
           return memo;
         },
         { raw } as {
-          [key in keyof TCodecs]: ReturnType<TCodecs[key]["decode"]> | null;
+          [codecName: string]: any | null;
         },
       );
     }
@@ -65,7 +69,7 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     const spec = this.possibleTypes[type.name];
     if (spec !== undefined) {
       return spec.get(
-        spec.getSpec(access(this.getDep(this.specPlanDep), [spec.codecName])),
+        spec.getSpec(access(this.getDep(this.specPlanDep), [spec.codec.name])),
       );
     } else {
       return constant(null);
@@ -74,7 +78,7 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
 
   private getTypeNameFromSpecifier(specifier: any) {
     for (const [typeName, typeSpec] of Object.entries(this.possibleTypes)) {
-      const value = specifier[typeSpec.codecName];
+      const value = specifier[typeSpec.codec.name];
       if (value != null && typeSpec.match(value)) {
         return typeName;
       }
@@ -106,24 +110,22 @@ export class NodeStep<TCodecs extends { [key: string]: NodeIdCodec<any> }>
  * typeNames supported and their details (codec to use, how to find the record,
  * etc), and finally the Node id string plan.
  */
-export function node<TCodecs extends { [key: string]: NodeIdCodec<any> }>(
-  codecs: TCodecs,
+export function node(
   possibleTypes: {
-    [typeName: string]: NodeIdHandler<TCodecs>;
+    [typeName: string]: NodeIdHandler;
   },
   $id: ExecutableStep<string>,
-): NodeStep<TCodecs> {
-  return new NodeStep(codecs, possibleTypes, $id);
+): NodeStep {
+  return new NodeStep(possibleTypes, $id);
 }
 
 export function specFromNodeId(
-  codec: NodeIdCodec<any>,
   handler: NodeIdHandler<any>,
   $id: ExecutableStep<string>,
 ) {
   function decodeWithCodecAndHandler(raw: string) {
     try {
-      const decoded = codec.decode(raw);
+      const decoded = handler.codec.decode(raw);
       if (handler.match(decoded)) {
         return decoded;
       }
@@ -132,7 +134,7 @@ export function specFromNodeId(
       return null;
     }
   }
-  decodeWithCodecAndHandler.displayName = `decode_${handler.typeName}_${handler.codecName}`;
+  decodeWithCodecAndHandler.displayName = `decode_${handler.typeName}_${handler.codec.name}`;
   decodeWithCodecAndHandler.isSyncAndSafe = true; // Optimization
   const $decoded = lambda($id, decodeWithCodecAndHandler);
   return handler.getSpec($decoded);

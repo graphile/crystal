@@ -9,7 +9,7 @@ Usage:
 
 ```ts
 const $nodeIdString = fieldArgs.get("id");
-const $node = node(codecs, handlers, $nodeIdString);
+const $node = node(handlers, $nodeIdString);
 ```
 
 ## codecs
@@ -44,13 +44,9 @@ function base64JSONDecode(value: string): any {
 base64JSONDecode.isSyncAndSafe = true; // Optimization
 
 const base64JSONCodec = {
+  name: "base64JSON",
   encode: base64JSONEncode,
   decode: base64JSONDecode,
-};
-
-const codecs = {
-  base64JSON: base64JSONCodec,
-  // Add more codecs here
 };
 ```
 
@@ -85,7 +81,7 @@ const USER = "User";
 const userHandler = {
   typeName: USER,
 
-  codecName: "base64JSON",
+  codec: base64JSONCodec,
 
   // Given a User record, return a step describing the data to be encoded by
   // the codec:
@@ -127,7 +123,7 @@ const handlers = {
 Given you have a Node ID represented by the step `$id` and you already know
 what type it should be (e.g. for an `updateUser` mutation you might know that
 the `$id` should represent a `User`), you can use `specFromNodeId` passing the
-relevant codec and handler to get a specification for the entity in question.
+relevant handler to get a specification for the entity in question.
 This is typically useful when you want to mutate an entity without having to
 actually retrieve it (if you want to retrieve it then use `node()` above
 instead).
@@ -137,15 +133,10 @@ resulting spec will resolve to null-ish values (or maybe raise an error).
 
 ```ts
 function specFromNodeId(
-  codec: NodeIdCodec<any>,
   handler: NodeIdHandler<any>,
   $id: ExecutableStep<string>,
 ): any;
 ```
-
-TODO: `specFromNodeId` should either accept `codecs` (rather than `codec`) or
-should _just_ accept `handler` and `handler` should embed the codec directly
-rather than just its name - probably the latter.
 
 Here's an example of an `updateUser` mutation that uses
 the `userHandler` example handler from above:
@@ -161,7 +152,7 @@ const plans = {
   Mutation: {
     updateUser(parent, { $id }) {
       // Turn the $id into a specifier:
-      const spec = specFromNodeId(base64JSONCodec, userHandler, $id);
+      const spec = specFromNodeId(userHandler, $id);
 
       // Now use this specifier to plan an update for this user:
       const $result = pgUpdateSingle(userSource, spec);

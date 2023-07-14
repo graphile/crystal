@@ -373,12 +373,11 @@ Here's an example:
 ```js
 const typeName = "User";
 const handler = build.getNodeIdHandler(typeName);
-const codec = build.getNodeIdCodec(handler.codecName);
 
 const plans = {
   Mutation: {
     updateUser(parent, fieldArgs) {
-      const spec = specFromNodeId(codec, handler, fieldArgs.$id);
+      const spec = specFromNodeId(handler, fieldArgs.$id);
       const plan = object({ result: pgUpdateSingle(userSource, spec) });
       fieldArgs.apply(plan);
       return plan;

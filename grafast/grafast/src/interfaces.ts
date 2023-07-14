@@ -786,6 +786,7 @@ export type GrafastSubscriber<
  * to/from `WyJVc2VyIiwgMV0=`
  */
 export interface NodeIdCodec<T = any> {
+  name: string;
   encode(value: T): string | null;
   decode(value: string): T;
 }
@@ -795,10 +796,7 @@ export interface NodeIdCodec<T = any> {
  * encoding the NodeID for that type.
  */
 export type NodeIdHandler<
-  TCodecs extends { [key: string]: NodeIdCodec<any> } = {
-    [key: string]: NodeIdCodec<any>;
-  },
-  TCodecName extends keyof TCodecs = keyof TCodecs,
+  TCodec extends NodeIdCodec<any> = NodeIdCodec<any>,
   TNodeStep extends ExecutableStep = ExecutableStep,
   TSpec = any,
 > = {
@@ -807,19 +805,15 @@ export type NodeIdHandler<
    */
   typeName: string;
 
-  // FIXME: this should use the codec directly, since Grafast has no codec
-  // lookup by name functionality?
   /**
    * Which codec are we using to encode/decode the NodeID string?
    */
-  codecName: TCodecName & string;
+  codec: TCodec;
 
   /**
    * Returns true if the given decoded Node ID value represents this type.
    */
-  match(
-    specifier: TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any,
-  ): boolean;
+  match(specifier: TCodec extends NodeIdCodec<infer U> ? U : any): boolean;
 
   /**
    * Returns a plan that returns the value ready to be encoded. When the result
@@ -827,7 +821,7 @@ export type NodeIdHandler<
    */
   plan(
     $thing: TNodeStep,
-  ): ExecutableStep<TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any>;
+  ): ExecutableStep<TCodec extends NodeIdCodec<infer U> ? U : any>;
 
   /**
    * Returns a specification based on the Node ID, this can be in any format
@@ -837,9 +831,7 @@ export type NodeIdHandler<
    * delete a node by its ID without first fetching it.)
    */
   getSpec(
-    plan: ExecutableStep<
-      TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any
-    >,
+    plan: ExecutableStep<TCodec extends NodeIdCodec<infer U> ? U : any>,
   ): TSpec;
 
   /**

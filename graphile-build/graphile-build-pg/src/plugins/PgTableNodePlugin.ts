@@ -111,7 +111,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
           build.registerNodeIdHandler({
             typeName: tableTypeName,
-            codecName: "base64JSON",
+            codec: build.getNodeIdCodec("base64JSON"),
             deprecationReason: tagToString(
               codec.extensions?.tags?.deprecation ??
                 firstSource?.extensions?.tags?.deprecated,
