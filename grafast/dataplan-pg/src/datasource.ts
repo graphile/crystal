@@ -690,7 +690,7 @@ export class PgResource<
         step:
           stepOrConstant instanceof ExecutableStep
             ? stepOrConstant
-            : constant(stepOrConstant),
+            : constant(stepOrConstant, false),
         codec,
         matches: (alias: SQL) =>
           typeof attribute.expression === "function"

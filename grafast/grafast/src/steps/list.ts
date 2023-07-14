@@ -64,15 +64,18 @@ export class ListStep<
           (v, i) => v === (this.dependencies[i] as ConstantStep<any>).data,
         ),
       );
+      const isSensitive = this.dependencies.some(
+        (d) => (d as ConstantStep<any>).isSensitive,
+      );
       if (existing !== undefined) {
-        return constant(existing);
+        return constant(existing, isSensitive);
       } else {
         // Replace self with constant
         const arr = this.dependencies.map(
           (dep) => (dep as ConstantStep<any>).data,
         );
         meta[cardinality].push(arr);
-        return constant(arr);
+        return constant(arr, isSensitive);
       }
     }
     return this;

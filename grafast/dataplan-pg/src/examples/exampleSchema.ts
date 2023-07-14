@@ -1638,7 +1638,9 @@ export function makeExampleSchema(
      * because it's not being ran as part of a Grafast planning context - hence
      * the `if`.
      */
-    const $person = registry.pgResources.people.get({ person_id: constant(1) });
+    const $person = registry.pgResources.people.get({
+      person_id: constant(1, false),
+    });
     const $posts = $person.manyRelation("posts");
     const $post = $posts.single();
     const $id = $post.get("post_id");
@@ -4139,7 +4141,7 @@ export function makeExampleSchema(
             function plan(_$root, { $id }) {
               const $item: SingleTableItemStep = singleTableItemsResource.get({
                 id: $id as ExecutableStep<number>,
-                type: constant("TOPIC"),
+                type: constant("TOPIC", false),
               });
               return $item;
             },
@@ -4451,7 +4453,7 @@ export function makeExampleSchema(
                 attribute: "cvss_score",
                 callback: (alias) =>
                   sql`${alias} > ${$vulnerabilities.placeholder(
-                    constant(6),
+                    constant(6, false),
                     TYPES.float,
                   )}`,
               });
@@ -4884,7 +4886,7 @@ export function makeExampleSchema(
             function plan(_$root, fieldArgs) {
               const $item = pgInsertSingle(relationalItemsResource, {
                 type: constant`POST`,
-                author_id: constant(2),
+                author_id: constant(2, false),
               });
               const $itemId = $item.get("id");
               const $post = pgInsertSingle(relationalPostsResource, {
@@ -4941,13 +4943,13 @@ export function makeExampleSchema(
               for (let i = 0; i < 3; i++) {
                 const $item = pgInsertSingle(relationalItemsResource, {
                   type: constant`POST`,
-                  author_id: constant(2),
+                  author_id: constant(2, false),
                 });
                 const $itemId = $item.get("id");
                 $post = pgInsertSingle(relationalPostsResource, {
                   id: $itemId,
-                  title: constant(`Post #${i + 1}`),
-                  description: constant(`Desc ${i + 1}`),
+                  title: constant(`Post #${i + 1}`, false),
+                  description: constant(`Desc ${i + 1}`, false),
                   note: constant(null),
                 });
               }
@@ -4983,11 +4985,11 @@ export function makeExampleSchema(
                     sql`interfaces_and_unions.insert_post(${authorId.placeholder}, ${title.placeholder})`,
                   args: [
                     {
-                      step: constant(2),
+                      step: constant(2, false),
                       pgCodec: TYPES.int,
                     },
                     {
-                      step: constant(`Computed post #${i + 1}`),
+                      step: constant(`Computed post #${i + 1}`, false),
                       pgCodec: TYPES.text,
                     },
                   ],

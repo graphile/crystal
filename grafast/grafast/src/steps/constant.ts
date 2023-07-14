@@ -13,13 +13,16 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
   };
   isSyncAndSafe = true;
 
-  constructor(public readonly data: TData, private isSensitive = false) {
+  constructor(
+    public readonly data: TData,
+    public readonly isSensitive = typeof data !== "boolean" && data != null,
+  ) {
     super();
   }
   toStringMeta() {
     // ENHANCE: use nicer simplification
     return this.isSensitive
-      ? `[SECRET]`
+      ? `[HIDDEN]`
       : inspect(this.data)
           .replace(/[\r\n]/g, " ")
           .slice(0, 60);
@@ -73,12 +76,16 @@ function isTemplateStringsArray(data: any): data is TemplateStringsArray {
  * Call this as a template string or as a function. Only intended for handling
  * scalar values, not arrays/objects/etc.
  */
-export function constant(
-  strings: TemplateStringsArray & [string],
-): ConstantStep<string>;
-export function constant<TData>(data: TData): ConstantStep<TData>;
+export function constant<const TString extends string>(
+  strings: TemplateStringsArray & [TString],
+): ConstantStep<TString>;
+export function constant<TData>(
+  data: TData,
+  isSecret?: boolean,
+): ConstantStep<TData>;
 export function constant<TData>(
   data: TData | (TemplateStringsArray & [TData]),
+  isSecret?: boolean,
 ): ConstantStep<TData> {
   if (isTemplateStringsArray(data)) {
     if (data.length !== 1) {
@@ -86,7 +93,7 @@ export function constant<TData>(
         "constant`...` doesn't currently support placeholders; please use 'constant(`...`)' instead",
       );
     }
-    return new ConstantStep<TData>(data[0]);
+    return new ConstantStep<TData>(data[0], false);
   }
-  return new ConstantStep<TData>(data);
+  return new ConstantStep<TData>(data, isSecret);
 }

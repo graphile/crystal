@@ -323,7 +323,7 @@ export class ConnectionStep<
   because otherwise errors in cursors/etc will be pushed down a level.
 
   public optimize() {
-    return constant(EMPTY_OBJECT);
+    return constant(EMPTY_OBJECT, false);
   }
   */
 

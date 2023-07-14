@@ -54,7 +54,7 @@ export class ListenStep<
       typeof topicOrPlan === "string" ? constant(topicOrPlan) : topicOrPlan;
     const $pubsub = isExecutableStep(pubsubOrPlan)
       ? pubsubOrPlan
-      : constant(pubsubOrPlan);
+      : constant(pubsubOrPlan, false);
     this.pubsubDep = this.addDependency($pubsub);
     this.topicDep = this.addDependency($topic);
   }

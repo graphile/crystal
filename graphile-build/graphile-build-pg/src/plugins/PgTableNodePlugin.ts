@@ -121,7 +121,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                 EXPORTABLE(
                   te.run`\
 return function (list, constant) {
-  return $record => list([constant(${te.lit(identifier)}), ${te.join(
+  return $record => list([constant(${te.lit(identifier)}, false), ${te.join(
                     pk.map(
                       (attributeName) =>
                         te`$record.get(${te.lit(attributeName)})`,
@@ -135,7 +135,7 @@ return function (list, constant) {
                   (constant, identifier, list, pk) =>
                     ($record: PgSelectSingleStep) => {
                       return list([
-                        constant(identifier),
+                        constant(identifier, false),
                         ...pk.map((attribute) => $record.get(attribute)),
                       ]);
                     },

@@ -54,7 +54,7 @@ export class __InputStaticLeafStep<
   }
 
   optimize() {
-    return constant(this.coercedValue);
+    return constant(this.coercedValue, false);
   }
 
   eval(): TLeaf {
