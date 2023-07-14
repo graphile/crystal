@@ -79,6 +79,8 @@ export class Behavior {
     };
   };
 
+  public behaviorEntityTypes: (keyof GraphileBuild.BehaviorEntities)[] = [];
+
   private globalDefaultBehavior: ResolvedBehavior;
   constructor(
     private resolvedPreset: GraphileConfig.ResolvedPreset,
@@ -152,6 +154,7 @@ export class Behavior {
       (this as this & BehaviorDynamicMethods).stringBehavior = (str) => str;
       return;
     }
+    this.behaviorEntityTypes.push(entityType);
     this.behaviorEntities[entityType] = {
       behaviorCallbacks: [],
       listCache: new Map(),
@@ -274,6 +277,14 @@ export class Behavior {
     } ${specString ?? ""}`;
     return stringMatches(finalBehaviorSpecsString, filter);
   }
+
+  parseBehaviorString(behaviorString: string) {
+    return parseSpecs(behaviorString);
+  }
+
+  parseScope(filter: string) {
+    return parseScope(filter);
+  }
 }
 
 /**
@@ -295,6 +306,7 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
   const fragments = behaviorSpecsString.split(/\s+/);
   const specs: BehaviorSpec[] = [];
   for (const fragment of fragments) {
+    if (fragment === "") continue;
     // `+` is implicit
     const [pm, rest] = /^[+-]/.test(fragment)
       ? [fragment.slice(0, 1), fragment.slice(1)]
@@ -323,6 +335,10 @@ function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
 function scopeMatches(
   specifiedScope: BehaviorScope,
   filterScope: BehaviorScope,
+  // We only need to know positive or negative in case the filter contains an `*`.
+  // This is because if you filter for '*:foo' against '+bar:foo -baz:foo' then
+  // we should skip the negative (`-baz:foo`) because we only need _one_ match,
+  // not *every* match.
   positive: boolean,
 ): boolean {
   if (specifiedScope.length > filterScope.length) {

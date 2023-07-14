@@ -112,7 +112,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
   return {
     name: "PostGraphileV4CompatibilityPlugin",
     version: "0.0.0",
-    after: ["PgMutationUpdateDeletePlugin"],
+    after: ["PgAttributesPlugin", "PgMutationUpdateDeletePlugin"],
     inflection: {
       ignoreReplaceIfNotExists: ["nodeIdFieldName"],
       replace: {
@@ -142,10 +142,30 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     schema: {
       // We could base this on the legacy relations setting; but how to set deprecated?
       globalBehavior(behavior) {
-        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list`;
+        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list +condition:attribute:filterBy +attribute:orderBy +condition:attribute:filterBy`;
       },
       entityBehavior: {
         pgResource: "+delete:resource:select",
+        pgCodecAttribute(behavior, [codec, attributeName]) {
+          const attribute = codec.attributes[attributeName];
+          const underlyingCodec =
+            attribute.codec.domainOfCodec ?? attribute.codec;
+          const newBehavior = [behavior];
+          if (
+            underlyingCodec.arrayOfCodec ||
+            underlyingCodec.isBinary ||
+            underlyingCodec.rangeOfCodec
+          ) {
+            newBehavior.push("-attribute:orderBy");
+          }
+          if (
+            underlyingCodec.isBinary ||
+            underlyingCodec.arrayOfCodec?.isBinary
+          ) {
+            newBehavior.push("-condition:attribute:filterBy");
+          }
+          return newBehavior;
+        },
       },
     },
   };

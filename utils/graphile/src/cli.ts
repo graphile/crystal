@@ -1,5 +1,6 @@
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 
+import * as behaviorCmd from "./commands/behavior/cli.js";
 import * as configCmd from "./commands/config/cli.js";
 import * as inflectionCmd from "./commands/inflection/cli.js";
 
@@ -24,6 +25,12 @@ export function options(yargs: Argv) {
       "Tools for helping with inflection",
       (yargs) => inflectionCmd.options(yargs),
       inflectionCmd.run,
+    )
+    .command(
+      "behavior",
+      "Tools for helping with behavior",
+      (yargs) => behaviorCmd.options(yargs),
+      behaviorCmd.run,
     )
     .demandCommand();
 }

@@ -12021,7 +12021,14 @@ __metadata:
     tslib: "npm:^2.5.0"
     typescript: "npm:^5.0.4"
   peerDependencies:
+    graphile-build: "workspace:^"
     graphile-config: "workspace:^"
+    postgraphile: "workspace:^"
+  peerDependenciesMeta:
+    graphile-build:
+      optional: true
+    postgraphile:
+      optional: true
   bin:
     graphile: dist/cli-run.js
   languageName: unknown

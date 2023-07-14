@@ -44,9 +44,9 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
 +nodeId:filterBy \
 +nodeId:resource:update -constraint:resource:update \
 +nodeId:resource:delete -constraint:resource:delete \
-+nodeId:insert -relation:attribute:insert \
-+nodeId:update -relation:attribute:update \
-+nodeId:base -relation:attribute:base \
++nodeId:insert \
++nodeId:update \
++nodeId:base \
 `,
     entityBehavior: {
       pgCodecAttribute(behavior, [codec, attributeName], build) {
@@ -73,7 +73,7 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
           const relationsMap = build.input.pgRegistry.pgRelations[codec.name];
           const relations = relationsMap
             ? (Object.values(
-                build.input.pgRegistry.pgRelations[codec.name],
+                build.input.pgRegistry.pgRelations[codec.name] ?? {},
               ) as PgCodecRelation[])
             : [];
           const singularRelationsUsingThisColumn = relations.filter((r) => {
@@ -88,6 +88,26 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
             newBehavior.push(...RELAY_HIDDEN_COLUMN_BEHAVIORS);
           }
         }
+
+        const relations = (
+          Object.values(
+            build.input.pgRegistry.pgRelations[codec.name] ?? {},
+          ) as PgCodecRelation[]
+        ).filter((r) => !r.isReferencee && r.isUnique);
+        const isPartOfRelation = relations.some((r) =>
+          r.localAttributes.includes(attributeName),
+        );
+        if (isPartOfRelation) {
+          // `nodeId:filterBy` handles this
+          newBehavior.push(`-attribute:filterBy`);
+          // `nodeId:insert` handles this
+          newBehavior.push(`-attribute:insert`);
+          // `nodeId:update` handles this
+          newBehavior.push(`-attribute:update`);
+          // `nodeId:base` handles this
+          newBehavior.push(`-attribute:base`);
+        }
+
         return newBehavior;
       },
     },

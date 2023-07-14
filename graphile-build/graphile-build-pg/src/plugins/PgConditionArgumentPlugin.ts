@@ -42,7 +42,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgCodec: "select filter",
-      pgCodecAttribute: "filterBy -binary:attribute:filterBy",
       pgResource: {
         provides: ["default"],
         before: ["inferred", "override"],

@@ -199,9 +199,11 @@ const preset: GraphileConfig.Preset = {
   pgServices: [
     makePgService({
       // Database connection string:
-      connectionString: process.env.DATABASE_URL,
+      connectionString: process.env.DATABASE_URL ?? "pggql_test",
       // List of schemas to expose:
-      schemas: process.env.DATABASE_SCHEMAS?.split(",") ?? ["public"],
+      schemas:
+        process.env.DATABASE_SCHEMAS?.split(",") ??
+        (process.env.DATABASE_URL ? ["public"] : ["a", "b", "c"]),
       // Enable LISTEN/NOTIFY client
       pubsub: true,
     }),
