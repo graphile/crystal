@@ -137,8 +137,6 @@ export function inputStep(
   } else if (isLeafType(inputType)) {
     if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
       const scalarType = assertScalarType(inputType);
-      // TODO: should tidy this up somewhat. (Mostly it's for handling JSON
-      // scalars that have variables in subfields.)
       return new __InputDynamicScalarStep(scalarType, inputValue);
     } else {
       // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
@@ -201,9 +199,9 @@ function inputVariablePlan(
         defaultValue,
       );
       if (variablePlan.evalIs(null) || variablePlan.evalIs(undefined)) {
-        // TODO: Proper GraphQL error here
         throw new GraphQLError(
           `Expected non-null value of type ${inputType.ofType.toString()}`,
+          // FIXME: The error here needs more details to make it conform to spec (AST nodes, etc). At least I think so?
         );
       }
       return variablePlan;
