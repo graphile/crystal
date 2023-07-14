@@ -66,18 +66,17 @@ export interface GrafastTimeouts {
 }
 
 export interface GrafastOptions {
-  // TODO: context should be a generic
   /**
    * An object to merge into the GraphQL context. Alternatively, pass an
    * (optionally asynchronous) function that returns an object to merge into
    * the GraphQL context.
    */
   context?:
-    | Record<string, any>
-    | (<TContext extends Record<string, any>>(
+    | Partial<Grafast.Context>
+    | ((
         ctx: Partial<Grafast.RequestContext>,
-        currentContext?: Partial<TContext>,
-      ) => PromiseOrValue<Partial<TContext>>);
+        currentContext?: Partial<Grafast.Context>,
+      ) => PromiseOrValue<Partial<Grafast.Context>>);
 
   /**
    * A list of 'explain' types that should be included in `extensions.explain`.
