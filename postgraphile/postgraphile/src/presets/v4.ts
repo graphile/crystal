@@ -142,7 +142,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     schema: {
       // We could base this on the legacy relations setting; but how to set deprecated?
       globalBehavior(behavior) {
-        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list +condition:attribute:filterBy +attribute:orderBy +condition:attribute:filterBy`;
+        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list +condition:attribute:filterBy +attribute:orderBy`;
       },
       entityBehavior: {
         pgResource: "+delete:resource:select",
