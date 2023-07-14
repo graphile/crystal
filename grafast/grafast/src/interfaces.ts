@@ -4,6 +4,7 @@ import type {
   ASTNode,
   DocumentNode,
   ExecutionArgs,
+  FragmentDefinitionNode,
   GraphQLArgument,
   GraphQLArgumentConfig,
   GraphQLError,
@@ -19,6 +20,7 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  OperationDefinitionNode,
   ValueNode,
   VariableNode,
 } from "graphql";
@@ -36,7 +38,9 @@ import type {
   ConstantStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
-import LRU from "@graphile/lru";
+import type LRU from "@graphile/lru";
+import type { SafeError } from "./error.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
@@ -92,7 +96,48 @@ export interface GrafastOptions {
   timeouts?: GrafastTimeouts;
 }
 
-export const $$queryCache = Symbol("grafastQueryCache");
+export const $$queryCache = Symbol("queryCache");
+
+/**
+ * We store the cache directly onto the GraphQLSchema so that it gets garbage
+ * collected along with the schema when it's not needed any more. To do so, we
+ * attach it using this symbol.
+ */
+export const $$cacheByOperation = Symbol("cacheByOperation");
+export type Fragments = {
+  [key: string]: FragmentDefinitionNode;
+};
+export type OperationPlanOrError =
+  | OperationPlan
+  | Error
+  | SafeError<
+      | { [$$timeout]: number; [$$ts]: number }
+      | { [$$timeout]?: undefined; [$$ts]?: undefined }
+      | undefined
+    >;
+
+/**
+ * This represents the list of possible operationPlans for a specific document.
+ *
+ * @remarks
+ *
+ * It also includes the fragments for validation, but generally we trust that
+ * if the OperationDefinitionNode is the same then the request is equivalent.
+ */
+export interface CacheByOperationEntry {
+  /**
+   * Implemented as a linked list so the hot operationPlans can be kept at the top of the
+   * list, and if the list grows beyond a maximum size we can drop the last
+   * element.
+   */
+  possibleOperationPlans: LinkedList<OperationPlanOrError> | null;
+  fragments: Fragments;
+}
+
+export interface LinkedList<T> {
+  value: T;
+  next: LinkedList<T> | null;
+}
 
 declare global {
   namespace Grafast {
@@ -172,6 +217,24 @@ declare global {
        * The underlying query cache
        */
       [$$queryCache]?: LRU<string, DocumentNode | ReadonlyArray<GraphQLError>>;
+
+      /**
+       * Maximum number of operations to store an operation plan lookup cache for
+       */
+      operationsCacheMaxLength?: number;
+
+      /**
+       * Maximum number of operation plans to store in a single operation's cache
+       */
+      operationOperationPlansCacheMaxLength?: number;
+
+      /**
+       * The starting point for finding/storing the relevant OperationPlan for a request.
+       */
+      [$$cacheByOperation]?: LRU<
+        OperationDefinitionNode,
+        CacheByOperationEntry
+      >;
     }
   }
   namespace GraphileConfig {
