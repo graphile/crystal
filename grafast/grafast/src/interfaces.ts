@@ -378,7 +378,7 @@ export type AnyInputStep =
 
 export type AnyInputStepWithDollars = AnyInputStep & AnyInputStepDollars;
 
-// TODO: solve these lies
+// TYPES: solve these lies
 /**
  * Lies to make it easier to write TypeScript code like
  * `{ $input: { $user: { $username } } }` without having to pass loads of
@@ -420,7 +420,7 @@ export type FieldPlanResolver<
   info: FieldInfo,
 ) => TResultStep | null;
 
-// TODO: review _TContext
+// TYPES: review _TContext
 /**
  * Fields on input objects can have plans; the plan resolver is passed a parent plan
  * (from an argument, or from a parent input object) or null if none, and an
@@ -463,7 +463,7 @@ export type InputObjectTypeInputPlanResolver = (
   },
 ) => ExecutableStep;
 
-// TODO: review _TContext
+// TYPES: review _TContext
 /**
  * Arguments can have plans; the plan resolver is passed the parent plan (the
  * plan that represents the _parent_ field of the field the arg is defined on),
@@ -554,16 +554,23 @@ type OutputPlanForNamedType<TType extends GraphQLType> =
     ? TStep
     : ExecutableStep;
 
-// TODO: this is completely wrong now; ListCapableStep is no longer required to be supported for lists.
 export type OutputPlanForType<TType extends GraphQLOutputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
+    ?
+        | ListCapableStep<any, OutputPlanForNamedType<U>>
+        | ExecutableStep<ReadonlyArray<any>>
     : TType extends GraphQLNonNull<GraphQLList<infer U>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
+    ?
+        | ListCapableStep<any, OutputPlanForNamedType<U>>
+        | ExecutableStep<ReadonlyArray<any>>
     : TType extends GraphQLList<GraphQLNonNull<infer U>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
+    ?
+        | ListCapableStep<any, OutputPlanForNamedType<U>>
+        | ExecutableStep<ReadonlyArray<any>>
     : TType extends GraphQLList<infer U>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
+    ?
+        | ListCapableStep<any, OutputPlanForNamedType<U>>
+        | ExecutableStep<ReadonlyArray<any>>
     : TType extends GraphQLNonNull<infer U>
     ? OutputPlanForNamedType<U>
     : OutputPlanForNamedType<TType>;
