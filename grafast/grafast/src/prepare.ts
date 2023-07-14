@@ -647,7 +647,7 @@ function newIterator<T = any>(
     },
     push(v: T) {
       if (done) {
-        // TODO: should
+        // LOGGING: should we raise this as a bigger issue?
         console.warn(
           "GrafastWarning<85e02385-d3d2-48a1-b791-b4cf87817899>: value pushed into iterable after done; ignoring",
         );
@@ -893,7 +893,7 @@ async function processStream(
     } else {
       pendingQueues++;
       queue = [[result, payloadIndex]];
-      // TODO: tune this delay
+      // OPTIMIZE: tune this delay
       timeout = setTimeout(processQueue, 1);
     }
   };
