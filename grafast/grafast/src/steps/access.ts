@@ -192,13 +192,16 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
         this.fallback,
       );
     }
-    // This must be in `optimize` rather than `finalize` because
-    // `OutputPlan.optimize` depends on it.
-    // TODO: resolve the above comment; this should be in finalize.
+    return this;
+  }
+
+  finalize() {
+    // Note that `OutputPlan.optimize` depends on this.
     constructDestructureFunction(this.path, this.fallback, (fn) => {
       this.unbatchedExecute = fn;
     });
-    return this;
+
+    super.finalize();
   }
 
   unbatchedExecute(_extra: ExecutionExtra, ..._values: any[]): any {

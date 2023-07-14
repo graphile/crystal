@@ -387,17 +387,9 @@ export class OperationPlan {
     this.checkTimeout();
     this.lap("optimizeSteps");
 
-    // Replace access plans with direct access, etc
-    te.batch(() => {
-      this.optimizeOutputPlans();
-    });
-
-    this.checkTimeout();
-    this.lap("optimizeOutputPlans");
-
     this.phase = "finalize";
 
-    this.stepTracker.finalize();
+    this.stepTracker.finalizeSteps();
 
     // Get rid of steps that are no longer needed after optimising outputPlans
     // (we shouldn't see any new steps or dependencies after here)
@@ -419,6 +411,22 @@ export class OperationPlan {
     });
 
     this.lap("finalizeSteps");
+
+    // Replace access plans with direct access, etc (must come after finalizeSteps)
+    te.batch(() => {
+      this.optimizeOutputPlans();
+    });
+
+    this.checkTimeout();
+    this.lap("optimizeOutputPlans");
+
+    // AccessSteps may have been removed
+    this.stepTracker.treeShakeSteps();
+
+    this.checkTimeout();
+    this.lap("treeShakeSteps", "optimizeOutputPlans");
+
+    this.stepTracker.finalizeOutputPlans();
 
     te.batch(() => {
       this.finalizeLayerPlans();
