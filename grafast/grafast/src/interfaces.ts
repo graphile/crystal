@@ -105,7 +105,6 @@ declare global {
      */
     interface RequestContext {}
 
-    // TODO: context should probably be passed as a generic instead?
     /**
      * The GraphQL context our schemas expect, generally generated from details in Grafast.RequestContext
      */
@@ -332,14 +331,13 @@ export interface BaseGraphQLArguments {
 }
 export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
-// TODO: we need to work some TypeScript magic to know which callback forms are
+// TYPES: we need to work some TypeScript magic to know which callback forms are
 // appropriate. Or split up FieldArgs.apply/applyEach/applyField or whatever.
 export type TargetStepOrCallback =
   | ExecutableStep
   | ModifierStep
   | ((indexOrFieldName: number | string) => TargetStepOrCallback);
 
-// TODO: rename
 export type FieldArgs = {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
   get(path?: string | ReadonlyArray<string | number>): ExecutableStep;
@@ -367,7 +365,7 @@ export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
         | __TrackedValueStepWithDollars<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
         | __InputObjectStepWithDollars<TInputType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
         | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
-    : // TODO: handle the other types
+    : // TYPES: handle the other types
       AnyInputStep;
 
 export type AnyInputStep =
