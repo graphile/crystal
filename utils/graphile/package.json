@@ -38,7 +38,17 @@
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
-    "graphile-config": "workspace:^"
+    "graphile-build": "workspace:^",
+    "graphile-config": "workspace:^",
+    "postgraphile": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "graphile-build": {
+      "optional": true
+    },
+    "postgraphile": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",

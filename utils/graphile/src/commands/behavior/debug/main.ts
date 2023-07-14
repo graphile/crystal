@@ -4,6 +4,20 @@ import { resolvePresets } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
 import type {} from "postgraphile";
 
+async function importGraphileBuild() {
+  try {
+    return await import("graphile-build");
+  } catch {
+    try {
+      return await import("postgraphile/graphile-build");
+    } catch (e) {
+      throw new Error(
+        `Failed to import both 'graphile-build' and 'postgraphile/graphile-build', please install this binary in the same location that you've installed graphile-build`,
+      );
+    }
+  }
+}
+
 export async function main(options: {
   config?: string;
   entityType?: string;
@@ -16,9 +30,7 @@ export async function main(options: {
     console.error("Failed to load config, please check the file exists");
     process.exit(1);
   }
-  const { buildInflection, gather, getBuilder } = await import(
-    "graphile-build"
-  );
+  const { buildInflection, gather, getBuilder } = await importGraphileBuild();
   const resolvedPreset = resolvePresets([userPreset]);
   const inflection = buildInflection(resolvedPreset);
   const shared = { inflection };
