@@ -106,7 +106,7 @@ export class ConnectionStep<
   private _beforeDepId: number | null | undefined = undefined;
   private _afterDepId: number | null | undefined = undefined;
 
-  // TODO:TS: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `itemPlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
+  // TYPES: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `itemPlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
   constructor(
     subplan: TStep,
     public readonly itemPlan?: ($item: TItemStep) => TNodeStep,
@@ -116,7 +116,7 @@ export class ConnectionStep<
   ) {
     super();
     if (!cursorPlan) {
-      // TODO: Assert that the `itemPlan` has a `.cursor()` method.
+      // ENHANCE: Assert that the `itemPlan` has a `.cursor()` method.
     }
     // This is a _soft_ reference to the plan; we're not adding it as a
     // dependency since we do not actually need it to execute; it's our
@@ -235,7 +235,7 @@ export class ConnectionStep<
    * This cannot be called before the arguments have been finalized.
    */
   public cloneSubplanWithPagination(
-    // TODO:TS: ugh. The `|[]` shouldn't be needed.
+    // TYPES: ugh. The `|[]` shouldn't be needed.
     ...args: ParametersExceptFirst<TStep["connectionClone"]> | []
   ): TStep {
     const clonedPlan = this.cloneSubplanWithoutPagination(...(args as any));
