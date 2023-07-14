@@ -130,7 +130,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
         path: {
           typename: this.resolveInfoBase.parentType.name,
           key: this.resolveInfoBase.fieldName,
-          // TODO: add full support for path (requires runtime indexes)
+          // ENHANCE: add full support for path (requires runtime indexes)
           prev: undefined,
         },
       },
@@ -171,7 +171,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     const resolveInfo: GraphQLResolveInfo = Object.assign(
       Object.create(this.resolveInfoBase),
       {
-        // TODO: add support for path
+        // ENHANCE: add support for path
         variableValues,
         rootValue,
       },
