@@ -13,15 +13,16 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
   };
   isSyncAndSafe = true;
 
-  constructor(public readonly data: TData) {
+  constructor(public readonly data: TData, private isSensitive = false) {
     super();
   }
   toStringMeta() {
-    // TODO: use nicer simplification
-    // FIXME: give users a way to opt out of this, in case the data is security sensitive.
-    return inspect(this.data)
-      .replace(/[\r\n]/g, " ")
-      .slice(0, 60);
+    // ENHANCE: use nicer simplification
+    return this.isSensitive
+      ? `[SECRET]`
+      : inspect(this.data)
+          .replace(/[\r\n]/g, " ")
+          .slice(0, 60);
   }
 
   deduplicate(peers: readonly ConstantStep<any>[]) {
