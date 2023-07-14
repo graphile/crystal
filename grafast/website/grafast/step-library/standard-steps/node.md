@@ -1,9 +1,11 @@
 # node
 
-A step to get a Node by it's global object identifier (string). Accepts an
-object specifying the supported codecs, an object map detailing the typeNames
-supported and their details (codec to use, how to find the record, etc), and
-finally the Node id string plan, typically supplied from an argument.
+A step to get a Node by it's global object identifier (string). Accepts two parameters:
+
+- `handlers`: a map from typeName to handler spec (codec to use, how to find the record, etc) - see below
+- `$id`: the step (typically supplied from a field argument) representing the Node ID
+
+Returns a polymorphic-capable step representing the record this `$id` represents.
 
 Usage:
 
@@ -21,7 +23,7 @@ A codec is responsible for parsing and deparsing this string. There are many
 different ways of encoding node identifiers, so we allow for many different
 codecs.
 
-A code is made of two methods:
+A code is made of a `name` (string) and two methods:
 
 - `encode` takes an intermediate representation and turns it into the final node identifier string
 - `decode` takes the final node identifier string and turns it back into an intermediate representation
@@ -53,13 +55,16 @@ const base64JSONCodec = {
 ## handlers
 
 Each GraphQL object type that supports the `Node` interface must have its own
-`NodeIdHandler`. This handler indicates the object type's name, the codec to
-use (see above), and supports the following operations:
+`NodeIdHandler`. This handler specifies:
 
-- `plan` - takes an entity of the given object type and return a step
-  representing the intermediate representation for this entity
+- `typeName` - the GraphQL object type name to which the handler applies
+- `codec` - the NodeID codec (see above) to use with this handler
 - `match` - determines whether a given intermediate representation of a node
-  identifier string relates to this type or not
+  identifier string (i.e. the result of `codec.decode()`) relates to this type
+  or not
+- `plan` - takes an entity of the given object type and return a step
+  representing the intermediate representation for this entity (ready to be fed
+  to `codec.encode()`)
 - `getSpec` - builds a "specification" of the entity from a step representing a
   matching intermediate representation
 - `get` - given the specification from `getSpec` above, returns a step
@@ -123,13 +128,12 @@ const handlers = {
 Given you have a Node ID represented by the step `$id` and you already know
 what type it should be (e.g. for an `updateUser` mutation you might know that
 the `$id` should represent a `User`), you can use `specFromNodeId` passing the
-relevant handler to get a specification for the entity in question.
-This is typically useful when you want to mutate an entity without having to
-actually retrieve it (if you want to retrieve it then use `node()` above
-instead).
+relevant handler to get a specification for the entity in question. This is
+typically useful when you want to mutate an entity without having to actually
+retrieve it (if you want to retrieve it then use `node()` above instead).
 
-If the codec/handler doesn't match then the executable steps inside the
-resulting spec will resolve to null-ish values (or maybe raise an error).
+If the handler doesn't match then the executable steps inside the resulting
+spec will resolve to null-ish values (or maybe raise an error).
 
 ```ts
 function specFromNodeId(
@@ -138,8 +142,8 @@ function specFromNodeId(
 ): any;
 ```
 
-Here's an example of an `updateUser` mutation that uses
-the `userHandler` example handler from above:
+Here's an example of an `updateUser` mutation that uses the `userHandler`
+example handler from above:
 
 ```js
 const typeDefs = /* GraphQL */ `
