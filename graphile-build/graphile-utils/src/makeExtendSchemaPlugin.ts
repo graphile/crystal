@@ -1,5 +1,4 @@
 import type { FieldPlanResolver } from "grafast";
-import type { GraphileBuild } from "graphile-build";
 import type {
   DefinitionNode,
   DirectiveDefinitionNode,
@@ -46,6 +45,7 @@ import type {
   UnionTypeDefinitionNode,
   ValueNode,
 } from "grafast/graphql";
+import type { GraphileBuild } from "graphile-build";
 
 import { EXPORTABLE } from "./exportable.js";
 

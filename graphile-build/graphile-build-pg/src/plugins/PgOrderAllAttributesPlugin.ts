@@ -8,8 +8,8 @@ import type {
 } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
-import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
+import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
 

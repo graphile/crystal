@@ -19,8 +19,8 @@ import {
   ObjectStep,
   specFromNodeId,
 } from "grafast";
-import { EXPORTABLE } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "grafast/graphql";
+import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { tagToString } from "../utils.js";

@@ -19,8 +19,8 @@ import type {
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
 import { arraysMatch, connection, first } from "grafast";
-import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "grafast/graphql";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
 import type { TE } from "tamedevil";

@@ -9,8 +9,8 @@ import type {
 import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
 import { connection, constant, EdgeStep, first } from "grafast";
-import { EXPORTABLE } from "graphile-build";
 import type { GraphQLEnumType, GraphQLObjectType } from "grafast/graphql";
+import { EXPORTABLE } from "graphile-build";
 
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";

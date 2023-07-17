@@ -1,5 +1,10 @@
 /* eslint-disable graphile-export/export-methods  */
 import {
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLString,
+} from "grafast/graphql";
+import {
   buildSchema,
   // defaultPlugins,
   CommonTypesPlugin,
@@ -9,11 +14,6 @@ import {
   QueryQueryPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import {
-  GraphQLObjectType,
-  GraphQLSchema,
-  GraphQLString,
-} from "grafast/graphql";
 
 import { makeProcessSchemaPlugin } from "../src/index.js";
 

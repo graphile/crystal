@@ -2,7 +2,6 @@ import "./global.js";
 import "./interfaces.js";
 
 import * as grafast from "grafast";
-import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
 import type { GraphQLSchema } from "grafast/graphql";
 import {
   getIntrospectionQuery,
@@ -10,6 +9,7 @@ import {
   lexicographicSortSchema,
   printSchema,
 } from "grafast/graphql";
+import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
 
 import extend from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";

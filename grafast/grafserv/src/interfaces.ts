@@ -1,13 +1,13 @@
 import "graphile-config";
 
 import type { PromiseOrDirect, SafeError } from "grafast";
-import type { PluginHook } from "graphile-config";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
   GraphQLError,
   GraphQLSchema,
 } from "grafast/graphql";
+import type { PluginHook } from "graphile-config";
 import type { Context } from "graphql-ws";
 import type { RuruHTMLParts } from "ruru/server";
 

@@ -17,6 +17,7 @@ import {
 import { makePgAdaptorWithPgClient } from "@dataplan/pg/adaptors/pg";
 import chalk from "chalk";
 import { context, object } from "grafast";
+import { graphql, printSchema } from "grafast/graphql";
 import {
   buildSchema,
   defaultPreset as graphileBuildPreset,
@@ -24,7 +25,6 @@ import {
 } from "graphile-build";
 import { resolvePresets } from "graphile-config";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { graphql, printSchema } from "grafast/graphql";
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";

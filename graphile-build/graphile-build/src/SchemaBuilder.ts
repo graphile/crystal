@@ -2,9 +2,9 @@ import "./global.js";
 
 import debugFactory from "debug";
 import { EventEmitter } from "events";
-import { applyHooks } from "graphile-config";
 import type { GraphQLSchemaConfig } from "grafast/graphql";
 import { GraphQLSchema, validateSchema } from "grafast/graphql";
+import { applyHooks } from "graphile-config";
 import { inspect } from "util";
 
 import type { BehaviorDynamicMethods } from "./behavior.js";

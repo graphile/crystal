@@ -4,7 +4,6 @@ import type {
   GrafastFieldConfigArgumentMap,
   PromiseOrDirect,
 } from "grafast";
-import type { AsyncHooks, PluginHook } from "graphile-config";
 import type {
   GraphQLArgumentConfig,
   GraphQLEnumTypeConfig,
@@ -22,6 +21,7 @@ import type {
   GraphQLSchema,
   GraphQLSchemaConfig,
 } from "grafast/graphql";
+import type { AsyncHooks, PluginHook } from "graphile-config";
 
 /**
  * The details in the 'info' object passed as the first argument to all gather

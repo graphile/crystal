@@ -1,5 +1,5 @@
-import type {} from "graphile-config";
 import type { GraphQLSchema } from "grafast/graphql";
+import type {} from "graphile-config";
 
 let counter = 0;
 

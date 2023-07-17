@@ -16,8 +16,8 @@ import type {
 import { pgSelectFromRecords, pgSelectSingleFromRecord } from "@dataplan/pg";
 import type { GrafastFieldConfig, SetterStep } from "grafast";
 import { each } from "grafast";
-import { EXPORTABLE } from "graphile-build";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "grafast/graphql";
+import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
 

@@ -1,8 +1,8 @@
 import { TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { grafast } from "grafast";
-import type { SchemaResult } from "graphile-build";
 import type { ExecutionResult } from "grafast/graphql";
+import type { SchemaResult } from "graphile-build";
 import type { Pool } from "pg";
 import pg from "pg";
 import { makeSchema } from "postgraphile";

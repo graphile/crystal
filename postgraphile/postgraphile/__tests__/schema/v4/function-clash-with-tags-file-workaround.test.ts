@@ -1,6 +1,6 @@
 import { stripAnsi } from "grafast";
-import { makePgSmartTagsPlugin } from "graphile-utils";
 import type { PgClass } from "graphile-build-pg/pg-introspection";
+import { makePgSmartTagsPlugin } from "graphile-utils";
 
 import * as core from "./core.js";
 
