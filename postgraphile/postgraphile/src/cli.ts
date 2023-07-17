@@ -106,8 +106,13 @@ async function loadPresets(
   const specs = presetSpecs.split(",");
   const presets: GraphileConfig.Preset[] = [];
   for (const spec of specs) {
-    // FIXME: need to handle `C:` paths on Windows
-    const [moduleName, exportName = null] = spec.split(":");
+    // This is for compatibility with Windows: `C:\Users\Benjie\Some Folder\myfile.js:myExport`
+    let colonIndex = spec.lastIndexOf(":");
+    if (colonIndex === 1) {
+      colonIndex = -1;
+    }
+    const moduleName = colonIndex >= 0 ? spec.substring(0, colonIndex) : spec;
+    const exportName = colonIndex >= 0 ? spec.substring(colonIndex + 1) : null;
     let mod;
     try {
       mod = require(moduleName);
