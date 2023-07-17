@@ -6,7 +6,7 @@ import { lexicographicSortSchema } from "graphql";
 import type { Pool } from "pg";
 import pg from "pg";
 import { makeSchema } from "postgraphile";
-import { postgraphilePresetAmber } from "postgraphile/presets/amber";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
 import { makeAddPgTableConditionPlugin } from "../src/index.js";
@@ -67,7 +67,7 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
 it("allows adding a condition to a Relay connection", async () => {
   const preset: GraphileConfig.Preset = {
     extends: [
-      postgraphilePresetAmber,
+      PostGraphileAmberPreset,
       makeV4Preset({
         disableDefaultMutations: true,
       }),
@@ -116,7 +116,7 @@ it("allows adding a condition to a Relay connection", async () => {
 it("allows adding a condition to a simple collection", async () => {
   const preset: GraphileConfig.Preset = {
     extends: [
-      postgraphilePresetAmber,
+      PostGraphileAmberPreset,
       makeV4Preset({
         simpleCollections: "both",
         disableDefaultMutations: true,

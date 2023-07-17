@@ -5,7 +5,7 @@ const child_process = require("child_process");
 const { PgSimplifyInflectionPreset } = require("./dist/index.js");
 const { makeSchema } = require("postgraphile");
 const { makePgService } = require("@dataplan/pg/adaptors/pg");
-const { postgraphilePresetAmber } = require("postgraphile/presets/amber");
+const { PostGraphileAmberPreset } = require("postgraphile/presets/amber");
 const { makeV4Preset } = require("postgraphile/presets/v4");
 const { printSchema, lexicographicSortSchema } = require("graphql");
 const { parse: parseConnectionString } = require("pg-connection-string");
@@ -83,7 +83,7 @@ async function getSchema(client, withSimplify, settings) {
   ];
   const result = await makeSchema({
     extends: [
-      postgraphilePresetAmber,
+      PostGraphileAmberPreset,
       makeV4Preset({
         simpleCollections: "both",
         ...settings,
