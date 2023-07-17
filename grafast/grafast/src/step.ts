@@ -90,22 +90,18 @@ export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
 
-  // TODO: this comment is WAY out of date.
   /**
-   * This identifies the "bucket" into which this plan's results will be stored;
-   * the this is determined as:
+   * This identifies the "bucket" into which this plan's results will be stored.
+   * New buckets are introduced when you cross boundaries that may change the
+   * number of results in the bucket, or where control over execution is desired.
    *
-   * - If this is an __ItemStep then a new bucket is assigned (this covers
-   *   lists (whether streamed or not) and subscriptions)
-   * - Otherwise, if this plan is deferred, then the deferred bucket id
-   * - Otherwise, if no dependencies then the root bucket
-   * - Otherwise, if all dependencies buckets overlap then the containing
-   *   bucket (the largest bucket), and make this bucket dependent on the
-   *   relevant plans in the other buckets
-   * - Otherwise, a new bucket is created representing the union of the
-   *   largest non-overlapping buckets
+   * - Lists / list items (generally multiplies up)
+   * - Polymorphism - different entries may go into different buckets
+   * - Mutations - early termination is likely
+   * - Defer boundaries - don't execute this stuff until later
+   * - null boundaries - if a null is met, no need to continue execution
    *
-   * This value is then used to influence:
+   * This bucket influences:
    *
    * 1. how plans are deduplicated
    * 2. the order in which the plans are executed
@@ -116,9 +112,6 @@ export abstract class BaseStep {
    * them (built on the `__Item`) that's thrown away once the transform is
    * complete.
    *
-   * A value of -1 indicates that a bucket has not yet been assigned (buckets
-   * are assigned as the last step before the OperationPlan is 'ready'.
-   *
    * @internal
    */
   public readonly layerPlan: LayerPlan;
@@ -128,7 +121,7 @@ export abstract class BaseStep {
   public isFinalized: boolean;
   public debug: boolean;
 
-  // TODO: change hasSideEffects to getter/setter, forbid setting after a
+  // ENHANCE: change hasSideEffects to getter/setter, forbid setting after a
   // particular phase.
   /**
    * Set this true for plans that implement mutations; this will prevent them
@@ -172,11 +165,7 @@ export abstract class BaseStep {
     }
   }
 
-  public destroy(): void {
-    // TODO: should we do something to deliberately break this class, such as
-    // deleting all its properties? That would ensure anything that tried to
-    // use it after it was destroyed would end up in error.
-  }
+  public destroy(): void {}
 }
 
 /**

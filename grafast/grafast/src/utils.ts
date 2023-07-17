@@ -899,7 +899,7 @@ export function isTypePlanned(
       if (firstHadPlan === null) {
         firstHadPlan = hasPlan;
       } else if (hasPlan !== firstHadPlan) {
-        // TODO: validate this at schema build time
+        // ENHANCE: validate this at schema build time
         throw new Error(
           `The '${namedType.name}' interface or union type's first type '${
             types[0]
@@ -987,24 +987,45 @@ export function stepsAreInSamePhase(
       return true;
     }
     const t = currentLayerPlan.reason.type;
-    if (t === "polymorphic") {
-      // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
-      // passes
-      return false;
-    } else if (t === "subscription" || t === "defer") {
-      // These indicate boundaries over which plans shouldn't be optimized
-      // together (generally).
-      return false;
+    switch (t) {
+      case "subscription":
+      case "defer": {
+        // These indicate boundaries over which plans shouldn't be optimized
+        // together (generally).
+        return false;
+      }
+      case "listItem": {
+        if (currentLayerPlan.reason.stream) {
+          // It's streamed, so different boundaries
+          return false;
+        } else {
+          continue;
+        }
+      }
+      case "polymorphic": {
+        // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
+        // passes
+        return false;
+      }
+      case "root":
+      case "listItem":
+      case "nullableBoundary":
+      case "subroutine":
+      case "mutationField": {
+        continue;
+      }
+      default: {
+        const never: never = t;
+        throw new Error(`Unhandled layer plan type '${never}'`);
+      }
     }
-    // TODO: what about streams?
-    // `t === "listItem" && currentLayerPlan.reason.stream`
   } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
   throw new Error(
     `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
   );
 }
 
-// TODO: implement this!
+// ENHANCE: implement this!
 export const canonicalJSONStringify = (o: object) => JSON.stringify(o);
 
 export function assertNotAsync(fn: any, name: string): void {

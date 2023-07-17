@@ -26,7 +26,7 @@ const {
   parse,
 } = graphql;
 
-// TODO:TS: improve the types here!
+// TYPES: improve the types here!
 /**
  * When defining a field with `typeDefs/plans` you can declare the field plan
  * directly, or you can define a configuration object that accepts the plan and
