@@ -74,14 +74,15 @@ export function assertNullPrototype(
   }
 }
 
-// TODO: it's possible for this to generate `LIST(INT, FLOAT, STRING)` which is
-// not possible in GraphQL since lists have a single defined type. We may want
-// to address this.
 /**
  * Converts a JSON value into the equivalent ValueNode _without_ checking that
  * it's compatible with the expected type. Typically only used with scalars
  * (since they can use any ValueNode) - other parts of the GraphQL schema
  * should use explicitly compatible ValueNodes.
+ *
+ * WARNING: It's possible for this to generate `LIST(INT, FLOAT, STRING)` which
+ * is not possible in GraphQL since lists have a single defined type. This should
+ * only be used with custom scalars.
  */
 function dangerousRawValueToValueNode(value: JSON): ConstValueNode {
   if (value == null) {

@@ -1177,6 +1177,7 @@ export class OperationPlan {
         // ENHANCEMENT: should we do `step = parentStep.object()` (i.e.
         // `$pgSelectSingle.record()`) or similar for "opaque" steps to become
         // suitable for consumption by resolvers?
+        // Maybe `parentStep.forResolver()` or `parentStep.hydrate()` or `parentStep.toFullObject()`?
         step = parentStep;
       }
 
@@ -1709,9 +1710,8 @@ export class OperationPlan {
       }
       for (const t of allPossibleObjectTypes) {
         if (!layerPlan.reason.typeNames.includes(t.name)) {
-          // TODO: do I need to do anything extra here? Since we're re-using an
-          // existing LayerPlan, we should be careful to ensure none of the
-          // previous assumptions have been broken.
+          // Since we're re-using an existing LayerPlan, we should be careful to
+          // ensure none of the previous assumptions have been broken.
           layerPlan.reason.typeNames.push(t.name);
         }
       }
