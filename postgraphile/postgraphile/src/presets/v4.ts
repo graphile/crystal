@@ -1,13 +1,13 @@
 import "graphile-config";
 
 import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
+import { parseDatabaseIdentifier } from "graphile-build-pg";
 import type { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
-import { parseDatabaseIdentifier } from "graphile-build-pg";
 
 export { PgV4BehaviorPlugin, PgV4InflectionPlugin, PgV4SmartTagsPlugin };
 
