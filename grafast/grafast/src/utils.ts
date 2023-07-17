@@ -994,21 +994,21 @@ export function stepsAreInSamePhase(
         // together (generally).
         return false;
       }
-      case "listItem": {
-        if (currentLayerPlan.reason.stream) {
-          // It's streamed, so different boundaries
-          return false;
-        } else {
-          continue;
-        }
-      }
       case "polymorphic": {
         // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
         // passes
         return false;
       }
+      case "listItem": {
+        if (currentLayerPlan.reason.stream) {
+          // It's streamed, but we can still inline the step into its parent since its the parent that is being streamed (so it should not add to the initial execution overhead).
+          // OPTIMIZE: maybe we should only allow this if the parent actually has `stream` support, and disable it otherwise?
+          continue;
+        } else {
+          continue;
+        }
+      }
       case "root":
-      case "listItem":
       case "nullableBoundary":
       case "subroutine":
       case "mutationField": {
