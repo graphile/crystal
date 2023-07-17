@@ -232,7 +232,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const config = resolvePresets([preset]);
   if (!Array.isArray(config.pgServices) || config.pgServices.length === 0) {
-    // TODO: respect envvars here?
+    // ENHANCE: respect envvars here?
     console.error(
       `ERROR: Please specify \`--connection\` so we know which database to connect to (or add details to your \`graphile.config.js\`):\n\n  postgraphile${
         process.argv.length > 2 ? ` ${process.argv.slice(2).join(" ")}` : ""

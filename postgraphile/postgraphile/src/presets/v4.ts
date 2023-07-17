@@ -122,7 +122,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
           ? null
           : {
               // Rename GraphQL Global Object Identification 'id' to 'nodeId'
-              // TODO: this will be better as `_id` in general, but V4 uses `nodeId`
+              // NOTE: this would be better as `_id` in general, but V4 uses `nodeId`
               nodeIdFieldName() {
                 return "nodeId";
               },
