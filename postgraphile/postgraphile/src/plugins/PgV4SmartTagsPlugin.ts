@@ -216,12 +216,12 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
           break;
         }
         case "filter": {
-          // TODO: we should figure out which of these to use depending on the circumstance
+          // ENHANCE: we should figure out which of these to use depending on the circumstance
           behavior.push("-filter -filterBy");
           break;
         }
         case "order": {
-          // TODO: we should figure out which of these to use depending on the circumstance
+          // ENHANCE: we should figure out which of these to use depending on the circumstance
           behavior.push("-order -orderBy");
           break;
         }
@@ -244,7 +244,7 @@ function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
           break;
         }
         default: {
-          // TODO: we should give plugin authors the option of adding other
+          // ENHANCE: we should give plugin authors the option of adding other
           // omits here, e.g. `@omit manyToMany`
           console.warn(
             `Option '${part}' in '@omit' string '${omit}' not recognized; assuming -${part} behavior`,
