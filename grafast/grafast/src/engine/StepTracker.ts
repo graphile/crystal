@@ -73,19 +73,34 @@ export class StepTracker {
     return (this.stepById as ExecutableStep[]).slice(oldStepCount);
   }
 
-  /** Called when OperationPlan enters finalize phase. */
-  public finalize() {
-    const forbidden = () => {
-      throw new Error(`Forbidden after 'finalize' phase`);
+  private forbid(
+    key: keyof {
+      [K in keyof StepTracker as StepTracker[K] extends (...args: any[]) => any
+        ? K
+        : never]: any;
+    },
+  ) {
+    this[key] = () => {
+      throw new Error(
+        `StepTracker.${key as string}(...) is forbidden after 'finalize' phase`,
+      );
     };
-    this.addStep = forbidden;
-    this.addLayerPlan = forbidden;
-    this.addOutputPlan = forbidden;
-    this.deleteLayerPlan = forbidden;
-    this.addStepDependency = forbidden;
-    this.setOutputPlanRootStep = forbidden;
-    this.setLayerPlanRootStep = forbidden;
-    this.replaceStep = forbidden;
+  }
+
+  /** Called when OperationPlan enters finalize phase. */
+  public finalizeSteps() {
+    this.forbid("addStep");
+    this.forbid("addLayerPlan");
+    this.forbid("addOutputPlan");
+    this.forbid("deleteLayerPlan");
+    this.forbid("addStepDependency");
+    this.forbid("setLayerPlanRootStep");
+    this.forbid("replaceStep");
+  }
+
+  /** Called when OperationPlan is about to finalize the output plans. */
+  public finalizeOutputPlans() {
+    this.forbid("setOutputPlanRootStep");
   }
 
   public addStep($step: ExecutableStep): number {

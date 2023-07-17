@@ -74,7 +74,7 @@ export class __ListTransformStep<
     moduleName: "grafast",
     exportName: "__ListTransformStep",
   };
-  // TODO: change this to 'true' and rewrite execute to be synchronous
+  // OPTIMIZE: if all the steps in the inner bucket are synchronous then theoretically we can be synchronous too
   isSyncAndSafe = false;
 
   private listStepDepId: number;
@@ -151,7 +151,6 @@ export class __ListTransformStep<
             !$listItem.isSyncAndSafe ||
             !$newListItem.isSyncAndSafe)
         ) {
-          // TODO: log this deopt?
           this.isSyncAndSafe = false;
         }
         return $newListItem;
@@ -213,7 +212,7 @@ export class __ListTransformStep<
     const map: Map<number, number[]> = new Map();
     let size = 0;
 
-    // TODO: do this better!
+    // ENHANCE: do this better!
     const itemStepId = this.operationPlan.dangerouslyGetStep(
       this.itemStepId,
     ).id;
@@ -289,7 +288,7 @@ export class __ListTransformStep<
       }
       const indexes = map.get(originalIndex);
       if (!Array.isArray(list) || !Array.isArray(indexes)) {
-        // TODO: should this be an error?
+        // ERRORS: should this be an error?
         console.warn(
           `Either list or values was not an array when processing ${this}`,
         );

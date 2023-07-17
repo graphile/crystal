@@ -1230,7 +1230,7 @@ const arrayExecutorString_nonNullable_streaming = makeArrayExecutor(
  * workaround until we can afford the time to write our own introspection
  * execution.
  *
- * TODO: write our own introspection execution!
+ * ENHANCE: write our own introspection execution!
  */
 const introspect = (
   root: PayloadRoot,

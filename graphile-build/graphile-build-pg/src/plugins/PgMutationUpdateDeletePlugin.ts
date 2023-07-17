@@ -290,9 +290,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     TableType && build.getNodeIdHandler
                       ? build.getNodeIdHandler(TableType.name)
                       : null;
-                  const nodeIdCodec = handler
-                    ? build.getNodeIdCodec(handler.codecName)
-                    : null;
+                  const nodeIdCodec = handler?.codec;
                   const fieldBehaviorScope =
                     mode === "resource:update"
                       ? `update:resource:select`
@@ -708,11 +706,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                 const handler = build.getNodeIdHandler
                   ? build.getNodeIdHandler(tableTypeName)
                   : null;
-                const codec = handler
-                  ? build.getNodeIdCodec(handler.codecName)
-                  : null;
 
-                if (uniqueMode !== "keys" && (!codec || !handler)) {
+                if (uniqueMode !== "keys" && !handler) {
                   return fields;
                 }
 
@@ -738,15 +733,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         [uniqueAttributes],
                       )
                     : EXPORTABLE(
-                        (codec, handler, nodeIdFieldName, specFromNodeId) =>
+                        (handler, nodeIdFieldName, specFromNodeId) =>
                           (args: FieldArgs) => {
                             const $nodeId = args.get([
                               "input",
                               nodeIdFieldName,
                             ]);
-                            return specFromNodeId(codec!, handler!, $nodeId);
+                            return specFromNodeId(handler!, $nodeId);
                           },
-                        [codec, handler, nodeIdFieldName, specFromNodeId],
+                        [handler, nodeIdFieldName, specFromNodeId],
                       );
 
                 return build.extend(

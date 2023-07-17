@@ -36,8 +36,7 @@ export const useSchema = (
       // finished.
       const result = await fetcher({
         query: getIntrospectionQuery(),
-        // TODO: remove this TypeScript hack once https://github.com/graphql/graphiql/pull/2373 is merged/released
-        operationName: null as unknown as string,
+        operationName: null,
       });
       let payload;
       if (isAsyncIterable(result)) {

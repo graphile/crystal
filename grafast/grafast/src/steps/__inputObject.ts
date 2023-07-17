@@ -1,7 +1,7 @@
 import type { GraphQLInputObjectType } from "graphql";
 import te from "tamedevil";
 
-import { inputPlan } from "../input.js";
+import { inputStep } from "../input.js";
 import type {
   ExecutionExtra,
   InputStep,
@@ -47,7 +47,7 @@ export class __InputObjectStep<
       const inputFieldValue = inputFields?.find(
         (val) => val.name.value === inputFieldName,
       );
-      const step = inputPlan(
+      const step = inputStep(
         this.operationPlan,
         inputFieldType,
         inputFieldValue?.value,

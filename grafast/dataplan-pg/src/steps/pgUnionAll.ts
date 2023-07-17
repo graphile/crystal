@@ -1519,7 +1519,7 @@ and ${condition(i + 1)}`}
   optimize() {
     if (this.memberDigests.length === 0) {
       // We have no implementations, we'll never return anything
-      return constant([]);
+      return constant([], false);
     }
 
     this.planLimitAndOffset();

@@ -11,9 +11,6 @@ import * as graphql from "graphql";
 import type {
   EnumValueApplyPlanResolver,
   FieldPlanResolver,
-  GrafastArgumentExtensions,
-  GrafastEnumValueExtensions,
-  GrafastInputFieldExtensions,
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { ExecutableStep } from "./step.js";
@@ -29,7 +26,7 @@ const {
   parse,
 } = graphql;
 
-// TODO:TS: improve the types here!
+// TYPES: improve the types here!
 /**
  * When defining a field with `typeDefs/plans` you can declare the field plan
  * directly, or you can define a configuration object that accepts the plan and
@@ -43,7 +40,7 @@ export type FieldPlans =
       resolve?: GraphQLFieldResolver<any, any>;
       subscribe?: GraphQLFieldResolver<any, any>;
       args?: {
-        [argName: string]: GrafastArgumentExtensions;
+        [argName: string]: Grafast.ArgumentExtensions;
       };
     };
 
@@ -60,7 +57,7 @@ export type ObjectPlans = {
  * The plans for each field of a GraphQL input object type.
  */
 export type InputObjectPlans = {
-  [fieldName: string]: GrafastInputFieldExtensions;
+  [fieldName: string]: Grafast.InputFieldExtensions;
 };
 
 /**
@@ -191,7 +188,7 @@ export function makeGrafastSchema(details: {
                   `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an object with 'inputPlan' (optional) and 'applyPlan' (optional) plans`,
                 );
               } else {
-                const grafastExtensions: GrafastArgumentExtensions =
+                const grafastExtensions: Grafast.ArgumentExtensions =
                   Object.create(null);
                 (arg.extensions as any).grafast = grafastExtensions;
                 Object.assign(grafastExtensions, argSpec);
@@ -223,7 +220,7 @@ export function makeGrafastSchema(details: {
           );
         } else {
           // it's a spec
-          const grafastExtensions: GrafastInputFieldExtensions =
+          const grafastExtensions: Grafast.InputFieldExtensions =
             Object.create(null);
           (field.extensions as any).grafast = grafastExtensions;
           Object.assign(grafastExtensions, fieldSpec);
@@ -273,13 +270,13 @@ export function makeGrafastSchema(details: {
           // It's a plan
           (enumValue.extensions as any).grafast = {
             applyPlan: enumValueSpec,
-          } as GrafastEnumValueExtensions;
+          } as Grafast.EnumValueExtensions;
         } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
           // It's a full spec
           if (enumValueSpec.applyPlan) {
             (enumValue.extensions as any).grafast = {
               applyPlan: enumValueSpec.applyPlan,
-            } as GrafastEnumValueExtensions;
+            } as Grafast.EnumValueExtensions;
           }
           if ("value" in enumValueSpec) {
             enumValue.value = enumValueSpec.value;

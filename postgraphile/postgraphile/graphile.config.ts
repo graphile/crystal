@@ -8,7 +8,7 @@ import { makePgService } from "postgraphile/adaptors/pg";
 import { context, listen, object } from "postgraphile/grafast";
 import type {} from "postgraphile/grafserv/node";
 import { StreamDeferPlugin } from "postgraphile/graphile-build";
-import { postgraphilePresetAmber } from "postgraphile/presets/amber";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { PgRelayPreset } from "postgraphile/presets/relay";
 import { makeV4Preset } from "postgraphile/presets/v4";
 import { defaultHTMLParts } from "ruru/server";
@@ -159,7 +159,7 @@ const preset: GraphileConfig.Preset = {
     ExportSchemaPlugin,
   ],
   extends: [
-    postgraphilePresetAmber,
+    PostGraphileAmberPreset,
     makeV4Preset({
       simpleCollections: "both",
       jwtPgTypeIdentifier: '"b"."jwt_token"',

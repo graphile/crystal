@@ -31,7 +31,7 @@ export function polymorphicWrap<TType extends string, TData>(
   // TODO: when we stop mutating `data` we can replace this with `EMPTY_OBJECT`
   data: TData = Object.create(null),
 ): PolymorphicData<TType, TData> {
-  // TODO: validate type further, e.g. that it's a valid object type
+  // ENHANCE: validate type further, e.g. that it's a valid object type
   if (typeof type !== "string") {
     throw new Error(
       `Expected a GraphQLObjectType name, but received ${inspect(type)}`,

@@ -20,11 +20,11 @@ import {
   __ItemStep,
   __TrackedValueStep,
   access,
+  applyTransforms,
   arrayOfLength,
   ConnectionStep,
   constant,
   ConstantStep,
-  deepEval,
   ExecutableStep,
   exportAs,
   first,
@@ -786,7 +786,7 @@ export class PgSelectStep<
       );
     }
 
-    const $evalledStep = deepEval($step);
+    const $evalledStep = applyTransforms($step);
 
     const dependencyIndex = this.addDependency($evalledStep);
     const symbol = Symbol(`step-${$step.id}`);

@@ -168,7 +168,7 @@ const finalize = (
       // Return an async iterator
       let _alive = true;
       const iterator: ResultIterator = newIterator(() => {
-        // TODO: ABORT code
+        // ENHANCE: AbortSignal or similar, feed into `processRoot`?
         _alive = false;
       });
       const payload = Object.create(null);
@@ -183,14 +183,12 @@ const finalize = (
         payload.extensions = extensions;
       }
       payload.hasNext = true;
-      // TODO: payload.label
       iterator.push(payload);
 
       const promise = processRoot(ctx, iterator, outputDataAsString);
       if (isPromiseLike(promise)) {
         promise.then(
           () => {
-            // FIXME: below factors in outputDataAsString, but this does not. Is that deliberate?!
             iterator.push({ hasNext: false });
             iterator.return(undefined);
           },
@@ -199,11 +197,7 @@ const finalize = (
           },
         );
       } else {
-        iterator.push(
-          outputDataAsString
-            ? ('{"hasNext":false}' as any)
-            : { hasNext: false },
-        );
+        iterator.push({ hasNext: false });
         iterator.return(undefined);
       }
 
@@ -484,10 +478,11 @@ function executePreemptive(
             break;
           }
           if (isAsyncIterable(payload)) {
-            // TODO: do we need to avoid 'for await' because it can cause the
+            // FIXME: do we need to avoid 'for await' because it can cause the
             // stream to exit late if we're waiting on a promise and the stream
             // exits in the interrim? We're assuming that no promises will be
             // sufficiently long-lived for this to be an issue right now.
+            // TODO: should probably tie all this into an AbortController/signal too
             for await (const entry of payload) {
               iterator.push(entry);
             }
@@ -647,7 +642,7 @@ function newIterator<T = any>(
     },
     push(v: T) {
       if (done) {
-        // TODO: should
+        // LOGGING: should we raise this as a bigger issue?
         console.warn(
           "GrafastWarning<85e02385-d3d2-48a1-b791-b4cf87817899>: value pushed into iterable after done; ignoring",
         );
@@ -667,7 +662,6 @@ function newIterator<T = any>(
               } catch (e) {
                 // ignore
               }
-              // TODO: does an error here imply we should cancel the iterator?
               this.throw(e);
             },
           );
@@ -893,14 +887,13 @@ async function processStream(
     } else {
       pendingQueues++;
       queue = [[result, payloadIndex]];
-      // TODO: tune this delay
+      // OPTIMIZE: tune this delay
       timeout = setTimeout(processQueue, 1);
     }
   };
 
   let loopComplete = false;
   try {
-    // TODO: need to unwrap this and loop manually so it's abortable
     let payloadIndex = spec.startIndex;
     let nextValuePromise: PromiseOrDirect<IteratorResult<any, any>>;
     while ((nextValuePromise = spec.stream.next())) {

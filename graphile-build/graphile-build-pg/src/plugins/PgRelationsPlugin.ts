@@ -1050,7 +1050,7 @@ function addRelations(
             functionLines.push(
               te`  const ${collectionIdentifier} = ${ref_finalLayerResource}.find();`,
             );
-            // FIXME: if required, make the above `DISTINCT ON (primary key)`.
+            // NOTE: do we ever need to make the above `DISTINCT ON (primary key)`?
             functionLines.push(
               te`  let previousAlias = ${collectionIdentifier}.alias;`,
             );

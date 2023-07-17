@@ -13,6 +13,7 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
+import { $$queryCache } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
@@ -21,15 +22,11 @@ const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
 const CACHE_MULTIPLIER = 100000;
 const MEGABYTE = 1024 * 1024;
 
-// TODO: turn this into a setting.
-const queryCacheMaxSize = 50 * MEGABYTE;
-
-const cacheSize = Math.max(2, Math.ceil(queryCacheMaxSize / CACHE_MULTIPLIER));
-
-const queryCache = new LRU<
-  string,
-  DocumentNode | ReadonlyArray<graphql.GraphQLError>
->({ maxLength: cacheSize });
+const queryCacheMaxSizeInBytes = 50 * MEGABYTE;
+const defaultQueryCacheMaxSize = Math.max(
+  2,
+  Math.ceil(queryCacheMaxSizeInBytes / CACHE_MULTIPLIER),
+);
 
 // If we can use crypto to create a hash, great. Otherwise just use the string.
 let calculateQueryHash: (queryString: string) => string;
@@ -51,14 +48,23 @@ try {
   calculateQueryHash = (str) => str;
 }
 
-let lastGqlSchema: GraphQLSchema;
 const parseAndValidate = (
   gqlSchema: GraphQLSchema,
   stringOrSource: string | graphql.Source,
 ): DocumentNode | ReadonlyArray<graphql.GraphQLError> => {
-  if (gqlSchema !== lastGqlSchema) {
-    queryCache.reset();
-    lastGqlSchema = gqlSchema;
+  let queryCache = gqlSchema.extensions.grafast?.[$$queryCache];
+  if (!queryCache) {
+    const cacheSize =
+      gqlSchema.extensions.grafast?.queryCacheMaxLength ??
+      defaultQueryCacheMaxSize;
+    queryCache = new LRU<
+      string,
+      DocumentNode | ReadonlyArray<graphql.GraphQLError>
+    >({ maxLength: cacheSize });
+    if (!gqlSchema.extensions.grafast) {
+      (gqlSchema.extensions as any).grafast = Object.create(null);
+    }
+    gqlSchema.extensions.grafast![$$queryCache] = queryCache;
   }
 
   // Only cache queries that are less than 100kB, we don't want DOS attacks

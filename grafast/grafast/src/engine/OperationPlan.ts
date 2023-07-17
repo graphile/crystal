@@ -34,7 +34,7 @@ import {
   object,
   SafeError,
 } from "../index.js";
-import { inputPlan } from "../input.js";
+import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
   FieldPlanResolver,
@@ -387,17 +387,9 @@ export class OperationPlan {
     this.checkTimeout();
     this.lap("optimizeSteps");
 
-    // Replace access plans with direct access, etc
-    te.batch(() => {
-      this.optimizeOutputPlans();
-    });
-
-    this.checkTimeout();
-    this.lap("optimizeOutputPlans");
-
     this.phase = "finalize";
 
-    this.stepTracker.finalize();
+    this.stepTracker.finalizeSteps();
 
     // Get rid of steps that are no longer needed after optimising outputPlans
     // (we shouldn't see any new steps or dependencies after here)
@@ -419,6 +411,22 @@ export class OperationPlan {
     });
 
     this.lap("finalizeSteps");
+
+    // Replace access plans with direct access, etc (must come after finalizeSteps)
+    te.batch(() => {
+      this.optimizeOutputPlans();
+    });
+
+    this.checkTimeout();
+    this.lap("optimizeOutputPlans");
+
+    // AccessSteps may have been removed
+    this.stepTracker.treeShakeSteps();
+
+    this.checkTimeout();
+    this.lap("treeShakeSteps", "optimizeOutputPlans");
+
+    this.stepTracker.finalizeOutputPlans();
 
     te.batch(() => {
       this.finalizeLayerPlans();
@@ -1169,6 +1177,7 @@ export class OperationPlan {
         // ENHANCEMENT: should we do `step = parentStep.object()` (i.e.
         // `$pgSelectSingle.record()`) or similar for "opaque" steps to become
         // suitable for consumption by resolvers?
+        // Maybe `parentStep.forResolver()` or `parentStep.hydrate()` or `parentStep.toFullObject()`?
         step = parentStep;
       }
 
@@ -1701,9 +1710,8 @@ export class OperationPlan {
       }
       for (const t of allPossibleObjectTypes) {
         if (!layerPlan.reason.typeNames.includes(t.name)) {
-          // TODO: do I need to do anything extra here? Since we're re-using an
-          // existing LayerPlan, we should be careful to ensure none of the
-          // previous assumptions have been broken.
+          // Since we're re-using an existing LayerPlan, we should be careful to
+          // ensure none of the previous assumptions have been broken.
           layerPlan.reason.typeNames.push(t.name);
         }
       }
@@ -1885,7 +1893,7 @@ export class OperationPlan {
       const argumentValue = argumentValues?.find(
         (v) => v.name.value === argumentName,
       );
-      const argumentPlan = inputPlan(
+      const argumentPlan = inputStep(
         this,
         argumentType,
         argumentValue?.value,

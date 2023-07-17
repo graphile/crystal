@@ -106,8 +106,13 @@ async function loadPresets(
   const specs = presetSpecs.split(",");
   const presets: GraphileConfig.Preset[] = [];
   for (const spec of specs) {
-    // FIXME: need to handle `C:` paths on Windows
-    const [moduleName, exportName = null] = spec.split(":");
+    // This is for compatibility with Windows: `C:\Users\Benjie\Some Folder\myfile.js:myExport`
+    let colonIndex = spec.lastIndexOf(":");
+    if (colonIndex === 1) {
+      colonIndex = -1;
+    }
+    const moduleName = colonIndex >= 0 ? spec.substring(0, colonIndex) : spec;
+    const exportName = colonIndex >= 0 ? spec.substring(colonIndex + 1) : null;
     let mod;
     try {
       mod = require(moduleName);
@@ -227,7 +232,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 
   const config = resolvePresets([preset]);
   if (!Array.isArray(config.pgServices) || config.pgServices.length === 0) {
-    // TODO: respect envvars here?
+    // ENHANCE: respect envvars here?
     console.error(
       `ERROR: Please specify \`--connection\` so we know which database to connect to (or add details to your \`graphile.config.js\`):\n\n  postgraphile${
         process.argv.length > 2 ? ` ${process.argv.slice(2).join(" ")}` : ""

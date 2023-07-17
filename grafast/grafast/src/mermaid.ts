@@ -229,7 +229,6 @@ export function printPlanGraph(
         return planId($dep);
       });
       const transformItemPlanNode = null;
-      // TODO: bucket steps need to be factored in here.
       /*
       plan instanceof __ListTransformStep
         ? planId(

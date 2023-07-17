@@ -74,7 +74,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                     }
                     return null;
                   }
-                  spec.displayName = `specifier_${handler.typeName}_${handler.codecName}`;
+                  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
                   spec.isSyncAndSafe = true; // Optimization
                   return spec;
                 },
@@ -87,7 +87,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               const { specForHandler } = finalBuild;
               const handler = finalBuild.getNodeIdHandler(typeName);
               if (!handler) return null;
-              const codec = finalBuild.getNodeIdCodec(handler.codecName);
+              const codec = finalBuild.getNodeIdCodec(handler.codec.name);
               const fetcher = EXPORTABLE(
                 (codec, handler, lambda, specForHandler) => {
                   const fn: NodeFetcher = ($nodeId: ExecutableStep<string>) => {

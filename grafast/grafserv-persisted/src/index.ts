@@ -8,6 +8,8 @@ import type {} from "graphile-config";
 import fsp from "node:fs/promises";
 
 export type { PersistedOperationGetter } from "./interfaces.js";
+import LRU from "@graphile/lru";
+
 import { version } from "./version.js";
 
 const PersistedPlugin: GraphileConfig.Plugin = {
@@ -238,13 +240,12 @@ function getterFromOptionsCore(options: GraphileConfig.GrafservOptions) {
   }
 }
 
-// TODO: use an LRU? For users using lots of new options objects this will
-// cause a memory leak. But LRUs have a performance cost... Maybe switch to LRU
-// once the size has grown?
-const getterFromOptionsCache = new Map<
+const getterFromOptionsCache = new LRU<
   GraphileConfig.GrafservOptions,
   ReturnType<typeof getterFromOptionsCore>
->();
+>({
+  maxLength: 100,
+});
 
 /**
  * Returns a cached getter for performance reasons.

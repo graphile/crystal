@@ -19,7 +19,8 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdCodec) {
           return _;
         }
-        build.registerNodeIdCodec("base64JSON", {
+        build.registerNodeIdCodec({
+          name: "base64JSON",
           encode: base64JSONEncode,
           decode: base64JSONDecode,
         });

@@ -15,7 +15,7 @@ declare global {
     interface Build {
       [NODE_ID_CODECS]: { [codecName: string]: NodeIdCodec };
       [NODE_ID_HANDLER_BY_TYPE_NAME]: { [typeName: string]: NodeIdHandler };
-      registerNodeIdCodec(codecName: string, codec: NodeIdCodec): void;
+      registerNodeIdCodec(codec: NodeIdCodec): void;
       getNodeIdCodec(codecName: string): NodeIdCodec;
       registerNodeIdHandler(matcher: NodeIdHandler): void;
       getNodeIdHandler(typeName: string): NodeIdHandler | undefined;
@@ -69,6 +69,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
 
         // Add the 'raw' encoder
         nodeIdCodecs.raw = {
+          name: "raw",
           encode: rawEncode,
           decode: rawDecode,
         };
@@ -78,7 +79,8 @@ export const NodePlugin: GraphileConfig.Plugin = {
           {
             [NODE_ID_CODECS]: nodeIdCodecs,
             [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
-            registerNodeIdCodec(codecName, codec) {
+            registerNodeIdCodec(codec) {
+              const codecName = codec.name;
               if (nodeIdCodecs[codecName]) {
                 throw new Error(
                   `Node ID codec '${codecName}' is already registered`,
@@ -89,7 +91,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
             getNodeIdCodec(codecName) {
               const codec = nodeIdCodecs[codecName];
               if (!codec) {
-                throw new Error("Could not find matching Node ID codec");
+                throw new Error(`Could not find Node ID codec '${codecName}'`);
               }
               return codec;
             },
@@ -156,7 +158,6 @@ export const NodePlugin: GraphileConfig.Plugin = {
           extend,
           graphql: { GraphQLNonNull, GraphQLID },
           inflection,
-          [NODE_ID_CODECS]: nodeIdCodecs,
           [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
         } = build;
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
@@ -190,25 +191,14 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   },
                 },
                 plan: EXPORTABLE(
-                  (
-                    node,
-                    nodeIdCodecs,
-                    nodeIdFieldName,
-                    nodeIdHandlerByTypeName,
-                  ) =>
+                  (node, nodeIdFieldName, nodeIdHandlerByTypeName) =>
                     function plan(_$root, args) {
                       return node(
-                        nodeIdCodecs,
                         nodeIdHandlerByTypeName,
                         args.get(nodeIdFieldName),
                       );
                     },
-                  [
-                    node,
-                    nodeIdCodecs,
-                    nodeIdFieldName,
-                    nodeIdHandlerByTypeName,
-                  ],
+                  [node, nodeIdFieldName, nodeIdHandlerByTypeName],
                 ),
               }),
             ),

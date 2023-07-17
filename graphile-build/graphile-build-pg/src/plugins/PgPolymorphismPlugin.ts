@@ -31,10 +31,7 @@ import type {
 } from "graphql";
 
 import { getBehavior } from "../behavior.js";
-import {
-  parseDatabaseIdentifierFromSmartTag,
-  parseSmartTagsOptsString,
-} from "../utils.js";
+import { parseDatabaseIdentifier, parseSmartTagsOptsString } from "../utils.js";
 import { version } from "../version.js";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
@@ -209,12 +206,11 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     `@type of an @interface(mode:relational) must have a 'references:' parameter`,
                   );
                 }
-                const [namespaceName, tableName] =
-                  parseDatabaseIdentifierFromSmartTag(
-                    references,
-                    2,
-                    pgClass.getNamespace()?.nspname,
-                  );
+                const [namespaceName, tableName] = parseDatabaseIdentifier(
+                  references,
+                  2,
+                  pgClass.getNamespace()?.nspname,
+                );
                 const referencedClass =
                   await info.helpers.pgIntrospection.getClassByName(
                     serviceName,
@@ -327,12 +323,11 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
-              const [schemaName, tableName] =
-                parseDatabaseIdentifierFromSmartTag(
-                  spec.references,
-                  2,
-                  resourceSchemaName,
-                );
+              const [schemaName, tableName] = parseDatabaseIdentifier(
+                spec.references,
+                2,
+                resourceSchemaName,
+              );
               const pgRelatedClass =
                 await info.helpers.pgIntrospection.getClassByName(
                   serviceName,
@@ -461,12 +456,11 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
-              const [schemaName, tableName] =
-                parseDatabaseIdentifierFromSmartTag(
-                  spec.references,
-                  2,
-                  resourceSchemaName,
-                );
+              const [schemaName, tableName] = parseDatabaseIdentifier(
+                spec.references,
+                2,
+                resourceSchemaName,
+              );
               const pgRelatedClass =
                 await info.helpers.pgIntrospection.getClassByName(
                   serviceName,

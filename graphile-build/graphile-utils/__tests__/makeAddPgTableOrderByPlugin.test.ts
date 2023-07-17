@@ -6,7 +6,7 @@ import type { ExecutionResult } from "graphql";
 import type { Pool } from "pg";
 import pg from "pg";
 import { makeSchema } from "postgraphile";
-import { postgraphilePresetAmber } from "postgraphile/presets/amber";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
 import type { NullsSortMethod } from "../src/index.js";
@@ -61,7 +61,7 @@ const checkArraysAreEqual = (array1: any[], array2: any[]) =>
 const getSchema = async (nullsSortMethod?: NullsSortMethod) => {
   const schemaResult = await makeSchema({
     extends: [
-      postgraphilePresetAmber,
+      PostGraphileAmberPreset,
       makeV4Preset({
         disableDefaultMutations: true,
         simpleCollections: "both",

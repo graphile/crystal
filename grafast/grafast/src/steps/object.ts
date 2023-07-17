@@ -249,8 +249,11 @@ ${inner}
             (this.dependencies[i] as ConstantStep<any>).data,
         ),
       );
+      const isSensitive = this.dependencies.some(
+        (d) => (d as ConstantStep<any>).isSensitive,
+      );
       if (existing !== undefined) {
-        return constant(existing);
+        return constant(existing, isSensitive);
       } else {
         const obj = Object.create(null);
         for (let i = 0, l = this.keys.length; i < l; i++) {
@@ -259,7 +262,7 @@ ${inner}
           obj[key] = value;
         }
         meta[keysJoined].push(obj);
-        return constant(obj);
+        return constant(obj, isSensitive);
       }
     }
     return this;

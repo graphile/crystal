@@ -1,10 +1,14 @@
+import type LRU from "@graphile/lru";
 import type EventEmitter from "eventemitter3";
 import type { PluginHook } from "graphile-config";
 import type {
   ASTNode,
+  DocumentNode,
   ExecutionArgs,
+  FragmentDefinitionNode,
   GraphQLArgument,
   GraphQLArgumentConfig,
+  GraphQLError,
   GraphQLField,
   GraphQLFieldConfig,
   GraphQLInputField,
@@ -17,11 +21,14 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  OperationDefinitionNode,
   ValueNode,
   VariableNode,
 } from "graphql";
 
 import type { Bucket, RequestTools } from "./bucket.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
+import type { SafeError } from "./error.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -63,18 +70,17 @@ export interface GrafastTimeouts {
 }
 
 export interface GrafastOptions {
-  // TODO: context should be a generic
   /**
    * An object to merge into the GraphQL context. Alternatively, pass an
    * (optionally asynchronous) function that returns an object to merge into
    * the GraphQL context.
    */
   context?:
-    | Record<string, any>
-    | (<TContext extends Record<string, any>>(
+    | Partial<Grafast.Context>
+    | ((
         ctx: Partial<Grafast.RequestContext>,
-        currentContext?: Partial<TContext>,
-      ) => PromiseOrValue<Partial<TContext>>);
+        args: ExecutionArgs,
+      ) => PromiseOrValue<Partial<Grafast.Context>>);
 
   /**
    * A list of 'explain' types that should be included in `extensions.explain`.
@@ -89,6 +95,49 @@ export interface GrafastOptions {
   timeouts?: GrafastTimeouts;
 }
 
+export const $$queryCache = Symbol("queryCache");
+
+/**
+ * We store the cache directly onto the GraphQLSchema so that it gets garbage
+ * collected along with the schema when it's not needed any more. To do so, we
+ * attach it using this symbol.
+ */
+export const $$cacheByOperation = Symbol("cacheByOperation");
+export type Fragments = {
+  [key: string]: FragmentDefinitionNode;
+};
+export type OperationPlanOrError =
+  | OperationPlan
+  | Error
+  | SafeError<
+      | { [$$timeout]: number; [$$ts]: number }
+      | { [$$timeout]?: undefined; [$$ts]?: undefined }
+      | undefined
+    >;
+
+/**
+ * This represents the list of possible operationPlans for a specific document.
+ *
+ * @remarks
+ *
+ * It also includes the fragments for validation, but generally we trust that
+ * if the OperationDefinitionNode is the same then the request is equivalent.
+ */
+export interface CacheByOperationEntry {
+  /**
+   * Implemented as a linked list so the hot operationPlans can be kept at the top of the
+   * list, and if the list grows beyond a maximum size we can drop the last
+   * element.
+   */
+  possibleOperationPlans: LinkedList<OperationPlanOrError> | null;
+  fragments: Fragments;
+}
+
+export interface LinkedList<T> {
+  value: T;
+  next: LinkedList<T> | null;
+}
+
 declare global {
   namespace Grafast {
     /**
@@ -98,15 +147,94 @@ declare global {
      * It's anticipated this will be expanded via declaration merging, e.g. if
      * your server is Koa then a `koaCtx` might be added.
      */
-    interface RequestContext {
-      // TODO: add things like operationName, operation, etc?
-    }
+    interface RequestContext {}
 
-    // TODO: context should probably be passed as a generic instead?
     /**
      * The GraphQL context our schemas expect, generally generated from details in Grafast.RequestContext
      */
     interface Context {}
+
+    interface FieldExtensions {
+      plan?: FieldPlanResolver<any, any, any>;
+      subscribePlan?: FieldPlanResolver<any, any, any>;
+    }
+
+    interface ArgumentExtensions {
+      // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
+      inputPlan?: ArgumentInputPlanResolver;
+      applyPlan?: ArgumentApplyPlanResolver;
+      autoApplyAfterParentPlan?: boolean;
+      autoApplyAfterParentSubscribePlan?: boolean;
+    }
+
+    interface InputObjectTypeExtensions {
+      inputPlan?: InputObjectTypeInputPlanResolver;
+    }
+
+    interface InputFieldExtensions {
+      // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
+      inputPlan?: InputObjectFieldInputPlanResolver;
+      applyPlan?: InputObjectFieldApplyPlanResolver;
+      autoApplyAfterParentInputPlan?: boolean;
+      autoApplyAfterParentApplyPlan?: boolean;
+    }
+
+    interface ObjectTypeExtensions {
+      assertStep?:
+        | ((step: ExecutableStep) => asserts step is ExecutableStep)
+        | { new (...args: any[]): ExecutableStep }
+        | null;
+    }
+
+    interface EnumTypeExtensions {}
+
+    interface EnumValueExtensions {
+      /**
+       * EXPERIMENTAL!
+       *
+       * @internal
+       */
+      applyPlan?: EnumValueApplyPlanResolver<any>;
+    }
+
+    interface ScalarTypeExtensions {
+      plan?: ScalarPlanResolver;
+      inputPlan?: ScalarInputPlanResolver;
+      /**
+       * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
+       */
+      idempotent?: boolean;
+    }
+
+    interface SchemaExtensions {
+      /**
+       * Maximum number of queries to store in this schema's query cache.
+       */
+      queryCacheMaxLength?: number;
+
+      /**
+       * The underlying query cache
+       */
+      [$$queryCache]?: LRU<string, DocumentNode | ReadonlyArray<GraphQLError>>;
+
+      /**
+       * Maximum number of operations to store an operation plan lookup cache for
+       */
+      operationsCacheMaxLength?: number;
+
+      /**
+       * Maximum number of operation plans to store in a single operation's cache
+       */
+      operationOperationPlansCacheMaxLength?: number;
+
+      /**
+       * The starting point for finding/storing the relevant OperationPlan for a request.
+       */
+      [$$cacheByOperation]?: LRU<
+        OperationDefinitionNode,
+        CacheByOperationEntry
+      >;
+    }
   }
   namespace GraphileConfig {
     interface Preset {
@@ -133,58 +261,6 @@ declare global {
   }
 }
 
-export interface GrafastFieldExtensions {
-  plan?: FieldPlanResolver<any, any, any>;
-  subscribePlan?: FieldPlanResolver<any, any, any>;
-}
-
-export interface GrafastArgumentExtensions {
-  // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
-  inputPlan?: ArgumentInputPlanResolver;
-  applyPlan?: ArgumentApplyPlanResolver;
-  autoApplyAfterParentPlan?: boolean;
-  autoApplyAfterParentSubscribePlan?: boolean;
-}
-
-export interface GrafastInputObjectTypeExtensions {
-  inputPlan?: InputObjectTypeInputPlanResolver;
-}
-
-export interface GrafastInputFieldExtensions {
-  // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
-  inputPlan?: InputObjectFieldInputPlanResolver;
-  applyPlan?: InputObjectFieldApplyPlanResolver;
-  autoApplyAfterParentInputPlan?: boolean;
-  autoApplyAfterParentApplyPlan?: boolean;
-}
-
-export interface GrafastObjectTypeExtensions {
-  assertStep?:
-    | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): ExecutableStep }
-    | null;
-}
-
-export interface GrafastEnumTypeExtensions {}
-
-export interface GrafastEnumValueExtensions {
-  /**
-   * EXPERIMENTAL!
-   *
-   * @internal
-   */
-  applyPlan?: EnumValueApplyPlanResolver<any>;
-}
-
-export interface GrafastScalarTypeExtensions {
-  plan?: ScalarPlanResolver;
-  inputPlan?: ScalarInputPlanResolver;
-  /**
-   * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
-   */
-  idempotent?: boolean;
-}
-
 /*
  * We register certain things (plans, etc) into the GraphQL "extensions"
  * property on the various GraphQL configs (type, field, argument, etc); this
@@ -192,35 +268,39 @@ export interface GrafastScalarTypeExtensions {
  */
 declare module "graphql" {
   interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
-    grafast?: GrafastFieldExtensions;
+    grafast?: Grafast.FieldExtensions;
   }
 
   interface GraphQLArgumentExtensions {
-    grafast?: GrafastArgumentExtensions;
+    grafast?: Grafast.ArgumentExtensions;
   }
 
   interface GraphQLInputObjectTypeExtensions {
-    grafast?: GrafastInputObjectTypeExtensions;
+    grafast?: Grafast.InputObjectTypeExtensions;
   }
 
   interface GraphQLInputFieldExtensions {
-    grafast?: GrafastInputFieldExtensions;
+    grafast?: Grafast.InputFieldExtensions;
   }
 
   interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
-    grafast?: GrafastObjectTypeExtensions;
+    grafast?: Grafast.ObjectTypeExtensions;
   }
 
   interface GraphQLEnumTypeExtensions {
-    grafast?: GrafastEnumTypeExtensions;
+    grafast?: Grafast.EnumTypeExtensions;
   }
 
   interface GraphQLEnumValueExtensions {
-    grafast?: GrafastEnumValueExtensions;
+    grafast?: Grafast.EnumValueExtensions;
   }
 
   interface GraphQLScalarTypeExtensions {
-    grafast?: GrafastScalarTypeExtensions;
+    grafast?: Grafast.ScalarTypeExtensions;
+  }
+
+  interface GraphQLSchemaExtensions {
+    grafast?: Grafast.SchemaExtensions;
   }
 }
 
@@ -313,14 +393,13 @@ export interface BaseGraphQLArguments {
 }
 export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
-// TODO: we need to work some TypeScript magic to know which callback forms are
+// TYPES: we need to work some TypeScript magic to know which callback forms are
 // appropriate. Or split up FieldArgs.apply/applyEach/applyField or whatever.
 export type TargetStepOrCallback =
   | ExecutableStep
   | ModifierStep
   | ((indexOrFieldName: number | string) => TargetStepOrCallback);
 
-// TODO: rename
 export type FieldArgs = {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
   get(path?: string | ReadonlyArray<string | number>): ExecutableStep;
@@ -348,7 +427,7 @@ export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
         | __TrackedValueStepWithDollars<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
         | __InputObjectStepWithDollars<TInputType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
         | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
-    : // TODO: handle the other types
+    : // TYPES: handle the other types
       AnyInputStep;
 
 export type AnyInputStep =
@@ -361,7 +440,7 @@ export type AnyInputStep =
 
 export type AnyInputStepWithDollars = AnyInputStep & AnyInputStepDollars;
 
-// TODO: solve these lies
+// TYPES: solve these lies
 /**
  * Lies to make it easier to write TypeScript code like
  * `{ $input: { $user: { $username } } }` without having to pass loads of
@@ -403,7 +482,7 @@ export type FieldPlanResolver<
   info: FieldInfo,
 ) => TResultStep | null;
 
-// TODO: review _TContext
+// TYPES: review _TContext
 /**
  * Fields on input objects can have plans; the plan resolver is passed a parent plan
  * (from an argument, or from a parent input object) or null if none, and an
@@ -446,7 +525,7 @@ export type InputObjectTypeInputPlanResolver = (
   },
 ) => ExecutableStep;
 
-// TODO: review _TContext
+// TYPES: review _TContext
 /**
  * Arguments can have plans; the plan resolver is passed the parent plan (the
  * plan that represents the _parent_ field of the field the arg is defined on),
@@ -537,16 +616,23 @@ type OutputPlanForNamedType<TType extends GraphQLType> =
     ? TStep
     : ExecutableStep;
 
-// TODO: this is completely wrong now; ListCapableStep is no longer required to be supported for lists.
 export type OutputPlanForType<TType extends GraphQLOutputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
+    ?
+        | ListCapableStep<any, OutputPlanForNamedType<U>>
+        | ExecutableStep<ReadonlyArray<any>>
     : TType extends GraphQLNonNull<GraphQLList<infer U>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
+    ?
+        | ListCapableStep<any, OutputPlanForNamedType<U>>
+        | ExecutableStep<ReadonlyArray<any>>
     : TType extends GraphQLList<GraphQLNonNull<infer U>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
+    ?
+        | ListCapableStep<any, OutputPlanForNamedType<U>>
+        | ExecutableStep<ReadonlyArray<any>>
     : TType extends GraphQLList<infer U>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | ExecutableStep
+    ?
+        | ListCapableStep<any, OutputPlanForNamedType<U>>
+        | ExecutableStep<ReadonlyArray<any>>
     : TType extends GraphQLNonNull<infer U>
     ? OutputPlanForNamedType<U>
     : OutputPlanForNamedType<TType>;
@@ -762,6 +848,7 @@ export type GrafastSubscriber<
  * to/from `WyJVc2VyIiwgMV0=`
  */
 export interface NodeIdCodec<T = any> {
+  name: string;
   encode(value: T): string | null;
   decode(value: string): T;
 }
@@ -771,10 +858,7 @@ export interface NodeIdCodec<T = any> {
  * encoding the NodeID for that type.
  */
 export type NodeIdHandler<
-  TCodecs extends { [key: string]: NodeIdCodec<any> } = {
-    [key: string]: NodeIdCodec<any>;
-  },
-  TCodecName extends keyof TCodecs = keyof TCodecs,
+  TCodec extends NodeIdCodec<any> = NodeIdCodec<any>,
   TNodeStep extends ExecutableStep = ExecutableStep,
   TSpec = any,
 > = {
@@ -783,19 +867,15 @@ export type NodeIdHandler<
    */
   typeName: string;
 
-  // FIXME: this should use the codec directly, since Grafast has no codec
-  // lookup by name functionality?
   /**
    * Which codec are we using to encode/decode the NodeID string?
    */
-  codecName: TCodecName & string;
+  codec: TCodec;
 
   /**
    * Returns true if the given decoded Node ID value represents this type.
    */
-  match(
-    specifier: TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any,
-  ): boolean;
+  match(specifier: TCodec extends NodeIdCodec<infer U> ? U : any): boolean;
 
   /**
    * Returns a plan that returns the value ready to be encoded. When the result
@@ -803,7 +883,7 @@ export type NodeIdHandler<
    */
   plan(
     $thing: TNodeStep,
-  ): ExecutableStep<TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any>;
+  ): ExecutableStep<TCodec extends NodeIdCodec<infer U> ? U : any>;
 
   /**
    * Returns a specification based on the Node ID, this can be in any format
@@ -813,9 +893,7 @@ export type NodeIdHandler<
    * delete a node by its ID without first fetching it.)
    */
   getSpec(
-    plan: ExecutableStep<
-      TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any
-    >,
+    plan: ExecutableStep<TCodec extends NodeIdCodec<infer U> ? U : any>,
   ): TSpec;
 
   /**

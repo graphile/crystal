@@ -1,6 +1,7 @@
 import "graphile-config";
 
 import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
+import { parseDatabaseIdentifier } from "graphile-build-pg";
 import type { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
@@ -121,7 +122,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
           ? null
           : {
               // Rename GraphQL Global Object Identification 'id' to 'nodeId'
-              // TODO: this will be better as `_id` in general, but V4 uses `nodeId`
+              // NOTE: this would be better as `_id` in general, but V4 uses `nodeId`
               nodeIdFieldName() {
                 return "nodeId";
               },
@@ -142,7 +143,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     schema: {
       // We could base this on the legacy relations setting; but how to set deprecated?
       globalBehavior(behavior) {
-        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list +condition:attribute:filterBy +attribute:orderBy +condition:attribute:filterBy`;
+        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list +condition:attribute:filterBy +attribute:orderBy`;
       },
       entityBehavior: {
         pgResource: "+delete:resource:select",
@@ -170,26 +171,6 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     },
   };
 };
-
-function parseJWTType(type: string): [string, string] {
-  const parts = type.split(".");
-  // TODO: parse this better!
-  if (parts.length !== 2) {
-    throw new Error(
-      "Cannot parse JWT type - it must have schema and type name separated by a period",
-    );
-  }
-  return parts.map((part) => {
-    if (part[0] === '"') {
-      if (part[part.length - 1] !== '"') {
-        throw new Error(`Cannot parse JWT type; invalid quoting '${part}'`);
-      }
-      return part.slice(1, part.length - 1);
-    } else {
-      return part;
-    }
-  }) as [string, string];
-}
 
 export const makeV4Preset = (
   options: V4Options = {},
@@ -251,7 +232,7 @@ export const makeV4Preset = (
       pgStrictFunctions,
       ...(options.jwtPgTypeIdentifier
         ? {
-            pgJwtType: parseJWTType(options.jwtPgTypeIdentifier),
+            pgJwtType: parseDatabaseIdentifier(options.jwtPgTypeIdentifier, 2),
           }
         : null),
     },

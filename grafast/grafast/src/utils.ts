@@ -74,14 +74,15 @@ export function assertNullPrototype(
   }
 }
 
-// TODO: it's possible for this to generate `LIST(INT, FLOAT, STRING)` which is
-// not possible in GraphQL since lists have a single defined type. We may want
-// to address this.
 /**
  * Converts a JSON value into the equivalent ValueNode _without_ checking that
  * it's compatible with the expected type. Typically only used with scalars
  * (since they can use any ValueNode) - other parts of the GraphQL schema
  * should use explicitly compatible ValueNodes.
+ *
+ * WARNING: It's possible for this to generate `LIST(INT, FLOAT, STRING)` which
+ * is not possible in GraphQL since lists have a single defined type. This should
+ * only be used with custom scalars.
  */
 function dangerousRawValueToValueNode(value: JSON): ConstValueNode {
   if (value == null) {
@@ -135,7 +136,6 @@ function rawValueToValueNode(
   type: GraphQLInputType,
   value: any,
 ): ConstValueNode | undefined {
-  // TODO: move this to input object section
   if (type instanceof GraphQLNonNull) {
     if (value == null) {
       throw new Error(
@@ -219,7 +219,7 @@ function rawValueToValueNode(
     };
   }
   if (type instanceof GraphQLInputObjectType) {
-    if (typeof value !== "object" || !value) {
+    if (typeof value !== "object" || value === null) {
       throw new Error(
         "defaultValue contained invalid value at location expecting an object",
       );
@@ -258,7 +258,7 @@ function rawValueToValueNode(
 
 /**
  * Specifically allows for the `defaultValue` to be undefined, but otherwise
- * defers to {@link valueToValueNode}
+ * defers to {@link rawValueToValueNode}
  */
 export function defaultValueToValueNode(
   type: GraphQLInputType,
@@ -899,7 +899,7 @@ export function isTypePlanned(
       if (firstHadPlan === null) {
         firstHadPlan = hasPlan;
       } else if (hasPlan !== firstHadPlan) {
-        // TODO: validate this at schema build time
+        // ENHANCE: validate this at schema build time
         throw new Error(
           `The '${namedType.name}' interface or union type's first type '${
             types[0]
@@ -987,24 +987,45 @@ export function stepsAreInSamePhase(
       return true;
     }
     const t = currentLayerPlan.reason.type;
-    if (t === "polymorphic") {
-      // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
-      // passes
-      return false;
-    } else if (t === "subscription" || t === "defer") {
-      // These indicate boundaries over which plans shouldn't be optimized
-      // together (generally).
-      return false;
+    switch (t) {
+      case "subscription":
+      case "defer": {
+        // These indicate boundaries over which plans shouldn't be optimized
+        // together (generally).
+        return false;
+      }
+      case "polymorphic": {
+        // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
+        // passes
+        return false;
+      }
+      case "listItem": {
+        if (currentLayerPlan.reason.stream) {
+          // It's streamed, but we can still inline the step into its parent since its the parent that is being streamed (so it should not add to the initial execution overhead).
+          // OPTIMIZE: maybe we should only allow this if the parent actually has `stream` support, and disable it otherwise?
+          continue;
+        } else {
+          continue;
+        }
+      }
+      case "root":
+      case "nullableBoundary":
+      case "subroutine":
+      case "mutationField": {
+        continue;
+      }
+      default: {
+        const never: never = t;
+        throw new Error(`Unhandled layer plan type '${never}'`);
+      }
     }
-    // TODO: what about streams?
-    // `t === "listItem" && currentLayerPlan.reason.stream`
   } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
   throw new Error(
     `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
   );
 }
 
-// TODO: implement this!
+// ENHANCE: implement this!
 export const canonicalJSONStringify = (o: object) => JSON.stringify(o);
 
 export function assertNotAsync(fn: any, name: string): void {

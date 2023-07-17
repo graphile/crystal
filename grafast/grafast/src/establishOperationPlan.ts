@@ -1,10 +1,6 @@
 import LRU from "@graphile/lru";
 import debugFactory from "debug";
-import type {
-  FragmentDefinitionNode,
-  GraphQLSchema,
-  OperationDefinitionNode,
-} from "graphql";
+import type { GraphQLSchema, OperationDefinitionNode } from "graphql";
 
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
@@ -12,8 +8,11 @@ import { OperationPlan, SafeError } from "./index.js";
 import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
+  Fragments,
+  LinkedList,
+  OperationPlanOrError,
 } from "./interfaces.js";
-import { $$timeout, $$ts } from "./interfaces.js";
+import { $$cacheByOperation, $$timeout, $$ts } from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
 
 const debug = debugFactory("grafast:establishOperationPlan");
@@ -23,50 +22,9 @@ const TIMEOUT_TIMEOUT =
   (typeof process.env.GRAFAST_TIMEOUT_VALIDITY_MS === "string"
     ? parseInt(process.env.GRAFAST_TIMEOUT_VALIDITY_MS, 10)
     : null) || 60_000;
-// TODO: we should consider increasing the timeout once the process has been
+// OPTIMIZE: we should consider increasing the timeout once the process has been
 // running a while (since the JIT should have kicked in) - we could even use
 // `setTimeout` to trigger it after certain amount of time elapsed.
-
-type Fragments = {
-  [key: string]: FragmentDefinitionNode;
-};
-
-type OperationPlanOrError =
-  | OperationPlan
-  | Error
-  | SafeError<
-      | { [$$timeout]: number; [$$ts]: number }
-      | { [$$timeout]?: undefined; [$$ts]?: undefined }
-      | undefined
-    >;
-
-interface LinkedList<T> {
-  value: T;
-  next: LinkedList<T> | null;
-}
-
-/**
- * This represents the list of possible operationPlans for a specific document.
- *
- * @remarks
- *
- * It also includes the fragments for validation, but generally we trust that
- * if the OperationDefinitionNode is the same then the request is equivalent.
- */
-interface Cache {
-  /**
-   * Implemented as a linked list so the hot operationPlans can be kept at the top of the
-   * list, and if the list grows beyond a maximum size we can drop the last
-   * element.
-   */
-  possibleOperationPlans: LinkedList<OperationPlanOrError> | null;
-  fragments: Fragments;
-}
-
-/**
- * The starting point for finding/storing the relevant OperationPlan for a request.
- */
-type CacheByOperation = LRU<OperationDefinitionNode, Cache>;
 
 /**
  * This is a development-only validation to check fragments do, in fact, match
@@ -137,19 +95,6 @@ function isOperationPlanCompatible<
 }
 
 /**
- * We store the cache directly onto the GraphQLSchema so that it gets garbage
- * collected along with the schema when it's not needed any more. To do so, we
- * attach it using this symbol.
- */
-const $$cacheByOperation = Symbol("cacheByOperation");
-
-declare module "graphql" {
-  interface GraphQLSchema {
-    [$$cacheByOperation]?: CacheByOperation;
-  }
-}
-
-/**
  * Implements the `EstablishOpPlan` algorithm.
  *
  * @remarks Though EstablishOpPlan accepts document and operationName, we
@@ -170,7 +115,7 @@ export function establishOperationPlan<
   rootValue: TRootValue,
   planningTimeout: number | null = null,
 ): OperationPlan {
-  let cacheByOperation = schema[$$cacheByOperation];
+  let cacheByOperation = schema.extensions.grafast?.[$$cacheByOperation];
 
   let cache = cacheByOperation?.get(operation);
 
@@ -258,9 +203,13 @@ export function establishOperationPlan<
 
   // Store it to the cache
   if (!cacheByOperation) {
-    // TODO: make this configurable
-    cacheByOperation = new LRU({ maxLength: 500 });
-    schema[$$cacheByOperation] = cacheByOperation;
+    if (!schema.extensions.grafast) {
+      (schema.extensions as any).grafast = Object.create(null);
+    }
+    cacheByOperation = new LRU({
+      maxLength: schema.extensions.grafast!.operationsCacheMaxLength ?? 500,
+    });
+    schema.extensions.grafast![$$cacheByOperation] = cacheByOperation;
   }
   const operationPlanOrError = operationPlan ?? error!;
   if (!cache) {
@@ -270,12 +219,13 @@ export function establishOperationPlan<
     };
     cacheByOperation.set(operation, cache);
   } else {
-    // TODO: make this configurable
-    if (count >= 50) {
+    const max =
+      schema.extensions.grafast!.operationOperationPlansCacheMaxLength ?? 50;
+    if (count >= max) {
       // Remove the tail to ensure we never grow too big
       lastButOneItem!.next = null;
       count--;
-      // TODO: we should announce this so that people know there's something that needs fixing in their schema (too much eval?)
+      // LOGGING: we should announce this so that people know there's something that needs fixing in their schema (too much eval?)
     }
 
     // Add new operationPlan to top of the linked list.
