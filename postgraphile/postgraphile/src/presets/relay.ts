@@ -77,7 +77,10 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
               ) as PgCodecRelation[])
             : [];
           const singularRelationsUsingThisColumn = relations.filter((r) => {
-            // TODO: check relation is visible
+            // NOTE: We do this even if the end table is not visible, because
+            // otherwise making the end table visible would be a breaking schema
+            // change. Users should make sure these columns are hidden from the
+            // schema if they are also hiding the target table.
             if (!r.isUnique) return false;
             if (r.isReferencee) return false;
             if (!r.localAttributes.includes(attributeName)) return false;
