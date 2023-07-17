@@ -481,7 +481,7 @@ export default {
   // ...
 
   grafast: {
-    async context(requestCtx, graphqlContext) {
+    async context(requestCtx, graphqlRequestArgs) {
       // Extract details from the requestCtx:
       const req = requestCtx.node?.req;
       // Or: const req = requestCtx.expressv4?.req;
@@ -499,7 +499,7 @@ export default {
           const claims = jwt.verify(token, process.env.JWT_SECRET);
           const userId = claims.uid;
           context.pgSettings = {
-            ...graphqlContext.pgSettings,
+            ...graphqlRequestArgs.contextValue.pgSettings,
             "myapp.user_id": userId,
             "myapp.headers.x_something": req.getHeader("x-something"),
           };
@@ -545,10 +545,13 @@ object from an Express server:
 ```js title="graphile.config.js"
 export default {
   grafast: {
-    context(requestCtx, graphqlContext) {
+    context(requestCtx, graphqlRequestArgs) {
       // Base context used for all GraphQL requests
       const context = {
-        pgSettings: { ...graphqlContext.pgSettings, role: "visitor" },
+        pgSettings: {
+          ...graphqlRequestArgs.contextValue.pgSettings,
+          role: "visitor",
+        },
       };
 
       // Extract the current user from the Express request:

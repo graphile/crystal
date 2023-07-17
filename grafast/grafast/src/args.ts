@@ -29,11 +29,7 @@ export function hookArgs(
   const finalize = (args: ExecutionArgs) => {
     const userContext = resolvedPreset.grafast?.context;
     if (typeof userContext === "function") {
-      const result = userContext(
-        ctx,
-        args.contextValue as Partial<Grafast.Context>,
-        args,
-      );
+      const result = userContext(ctx, args);
       if (isPromiseLike(result)) {
         // Deliberately shadowed 'result'
         return result.then((result) => {

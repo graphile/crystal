@@ -79,7 +79,6 @@ export interface GrafastOptions {
     | Partial<Grafast.Context>
     | ((
         ctx: Partial<Grafast.RequestContext>,
-        currentContext: Partial<Grafast.Context> | undefined,
         args: ExecutionArgs,
       ) => PromiseOrValue<Partial<Grafast.Context>>);
 
