@@ -136,7 +136,6 @@ function rawValueToValueNode(
   type: GraphQLInputType,
   value: any,
 ): ConstValueNode | undefined {
-  // TODO: move this to input object section
   if (type instanceof GraphQLNonNull) {
     if (value == null) {
       throw new Error(
@@ -220,7 +219,7 @@ function rawValueToValueNode(
     };
   }
   if (type instanceof GraphQLInputObjectType) {
-    if (typeof value !== "object" || !value) {
+    if (typeof value !== "object" || value === null) {
       throw new Error(
         "defaultValue contained invalid value at location expecting an object",
       );
@@ -259,7 +258,7 @@ function rawValueToValueNode(
 
 /**
  * Specifically allows for the `defaultValue` to be undefined, but otherwise
- * defers to {@link valueToValueNode}
+ * defers to {@link rawValueToValueNode}
  */
 export function defaultValueToValueNode(
   type: GraphQLInputType,
