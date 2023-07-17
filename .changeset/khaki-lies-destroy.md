@@ -1,4 +1,5 @@
 ---
+"@dataplan/pg": patch
 "graphile-build-pg": patch
 "postgraphile": patch
 "grafast": patch

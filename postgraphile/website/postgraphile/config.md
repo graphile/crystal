@@ -499,7 +499,7 @@ export default {
           const claims = jwt.verify(token, process.env.JWT_SECRET);
           const userId = claims.uid;
           context.pgSettings = {
-            ...graphqlRequestArgs.contextValue.pgSettings,
+            ...graphqlRequestArgs.contextValue?.pgSettings,
             "myapp.user_id": userId,
             "myapp.headers.x_something": req.getHeader("x-something"),
           };
@@ -549,7 +549,7 @@ export default {
       // Base context used for all GraphQL requests
       const context = {
         pgSettings: {
-          ...graphqlRequestArgs.contextValue.pgSettings,
+          ...graphqlRequestArgs.contextValue?.pgSettings,
           role: "visitor",
         },
       };
