@@ -17337,6 +17337,7 @@ __metadata:
     graphile-build-pg: "workspace:*"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
+    graphql: "npm:^16.1.0-experimental-stream-defer.6"
     iterall: "npm:^1.3.0"
     jest: "npm:^28.1.3"
     jsonwebtoken: "npm:^8.5.1"
@@ -17358,6 +17359,7 @@ __metadata:
     graphile-build: "workspace:*"
     graphile-build-pg: "workspace:*"
     graphile-config: "workspace:^"
+    graphql: ^16.1.0-experimental-stream-defer.6
     pg: ^8.7.1
     pg-sql2: "workspace:^"
     tamedevil: "workspace:^"

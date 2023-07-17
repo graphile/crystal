@@ -177,6 +177,7 @@
     "graphile-build": "workspace:*",
     "graphile-build-pg": "workspace:*",
     "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "iterall": "^1.3.0",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.1",
@@ -195,6 +196,7 @@
     "graphile-build": "workspace:*",
     "graphile-build-pg": "workspace:*",
     "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "pg": "^8.7.1",
     "pg-sql2": "workspace:^",
     "tamedevil": "workspace:^"
