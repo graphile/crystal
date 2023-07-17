@@ -88,9 +88,11 @@ async function makeFwd(rootPath, target) {
     node: `./fwd/${target}/index.js`,
     default: `./fwd/${target}/index.js`,
   };
+  const disableEslint = target === "graphile-build";
   await fs.writeFile(
     `${fwdDir}/index.d.ts`,
     `\
+${disableEslint ? `// eslint-disable-next-line import/export\n` : ``}\
 export * from "${target}";
 `,
   );
