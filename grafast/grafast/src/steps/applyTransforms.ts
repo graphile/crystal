@@ -18,10 +18,10 @@ import { __ItemStep } from "./__item.js";
 /**
  * @internal
  */
-export class DeepEvalStep extends ExecutableStep {
+export class ApplyTransformsStep extends ExecutableStep {
   static $$export = {
     moduleName: "grafast",
-    exportName: "DeepEvalStep",
+    exportName: "ApplyTransformsStep",
   };
 
   // OPTIMIZE: if all the steps in the inner bucket are synchronous then theoretically we can be synchronous too
@@ -55,7 +55,7 @@ export class DeepEvalStep extends ExecutableStep {
         const $listItem = isListCapableStep(listPlan)
           ? listPlan.listItem($__listItem)
           : $__listItem;
-        const $newListItem = deepEval($listItem as any);
+        const $newListItem = applyTransforms($listItem as any);
 
         if (
           this.isSyncAndSafe &&
@@ -182,7 +182,7 @@ export class DeepEvalStep extends ExecutableStep {
         assert.strictEqual(
           list.length,
           values.length,
-          "GrafastInternalError<43cb302e-673b-4881-8c4c-f2d00fe5a3d7>: The list and values length must match for a DeepEvalStep",
+          "GrafastInternalError<43cb302e-673b-4881-8c4c-f2d00fe5a3d7>: The list and values length must match for a ApplyTransformsStep",
         );
       }
       return values;
@@ -193,19 +193,15 @@ export class DeepEvalStep extends ExecutableStep {
 // TODO: document this better. (Had to do it for `each($items, $item =>
 // object({...}))` JSON transform in pg-many-to-many
 
-// TODO: rename this! Don't want to confuse with `eval()`.
-// Ideas: "evaluate", "resolve", "conclude", "finalize", "execute".
-// Don't like any of these really. `deepEvaluate` is probably the best, but is
-// it worth the effort?
 /**
  * If you want to use a step that might represent a list and you need all of
  * the `listItem` transforms to have already taken place (e.g. you're going to
  * send the result to an external service) rather than processing them through
- * the GraphQL response, then you may need to `deepEval` it.
+ * the GraphQL response, then you may need to call `applyTransforms` on it.
  */
-export function deepEval($step: ExecutableStep) {
+export function applyTransforms($step: ExecutableStep) {
   if (isListCapableStep($step)) {
-    return new DeepEvalStep($step);
+    return new ApplyTransformsStep($step);
   } else {
     // No eval necessary
     return $step;

@@ -77,7 +77,7 @@ export {
   __TrackedValueStepWithDollars,
 } from "./__trackedValue.js";
 export { __ValueStep } from "./__value.js";
-export { deepEval, DeepEvalStep } from "./deepEval.js";
+export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
 export {
   GraphQLItemHandler,
   graphqlItemHandler,

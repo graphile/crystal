@@ -24,7 +24,7 @@ import {
   ConnectionStep,
   constant,
   ConstantStep,
-  deepEval,
+  applyTransforms,
   ExecutableStep,
   exportAs,
   first,
@@ -786,7 +786,7 @@ export class PgSelectStep<
       );
     }
 
-    const $evalledStep = deepEval($step);
+    const $evalledStep = applyTransforms($step);
 
     const dependencyIndex = this.addDependency($evalledStep);
     const symbol = Symbol(`step-${$step.id}`);

@@ -118,8 +118,8 @@ import {
   ConstantStep,
   context,
   debugPlans,
-  deepEval,
-  DeepEvalStep,
+  applyTransforms,
+  ApplyTransformsStep,
   each,
   EdgeCapableStep,
   EdgeStep,
@@ -241,8 +241,8 @@ export {
   ConstantStep,
   context,
   debugPlans,
-  deepEval,
-  DeepEvalStep,
+  applyTransforms,
+  ApplyTransformsStep,
   defer,
   Deferred,
   each,
@@ -442,8 +442,8 @@ exportAsMany("grafast", {
   node,
   specFromNodeId,
   proxy,
-  deepEval,
-  DeepEvalStep,
+  applyTransforms,
+  ApplyTransformsStep,
   ProxyStep,
   graphqlResolver,
   GraphQLResolverStep,
@@ -495,3 +495,8 @@ exportAsMany("grafast", {
 
 export { hookArgs } from "./args.js";
 export { version } from "./version.js";
+
+/** @deprecated Renamed to 'applyTransforms' */
+export const deepEval = applyTransforms;
+/** @deprecated Renamed to 'ApplyTransformsStep' */
+export const DeepEvalStep = ApplyTransformsStep;
