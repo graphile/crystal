@@ -63,12 +63,18 @@
     "node": ">=16.10"
   },
   "peerDependencies": {
+    "@envelop/core": "^3.0.4",
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "ruru": "workspace:^",
+    "tamedevil": "workspace:^",
     "ws": "^8.12.1"
   },
   "peerDependenciesMeta": {
+    "@envelop/core": {
+      "optional": true
+    },
     "ws": {
       "optional": true
     }
