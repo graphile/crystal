@@ -478,10 +478,11 @@ function executePreemptive(
             break;
           }
           if (isAsyncIterable(payload)) {
-            // TODO: do we need to avoid 'for await' because it can cause the
+            // FIXME: do we need to avoid 'for await' because it can cause the
             // stream to exit late if we're waiting on a promise and the stream
             // exits in the interrim? We're assuming that no promises will be
             // sufficiently long-lived for this to be an issue right now.
+            // TODO: should probably tie all this into an AbortController/signal too
             for await (const entry of payload) {
               iterator.push(entry);
             }
@@ -661,7 +662,6 @@ function newIterator<T = any>(
               } catch (e) {
                 // ignore
               }
-              // TODO: does an error here imply we should cancel the iterator?
               this.throw(e);
             },
           );
@@ -894,7 +894,6 @@ async function processStream(
 
   let loopComplete = false;
   try {
-    // TODO: need to unwrap this and loop manually so it's abortable
     let payloadIndex = spec.startIndex;
     let nextValuePromise: PromiseOrDirect<IteratorResult<any, any>>;
     while ((nextValuePromise = spec.stream.next())) {
