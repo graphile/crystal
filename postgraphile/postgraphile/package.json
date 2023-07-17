@@ -109,6 +109,31 @@
       "types": "./fwd/tamedevil/index.d.ts",
       "node": "./fwd/tamedevil/index.js",
       "default": "./fwd/tamedevil/index.js"
+    },
+    "./ruru": {
+      "types": "./fwd/ruru/index.d.ts",
+      "node": "./fwd/ruru/index.js",
+      "default": "./fwd/ruru/index.js"
+    },
+    "./ruru/server": {
+      "types": "./fwd/ruru/server/index.d.ts",
+      "node": "./fwd/ruru/server/index.js",
+      "default": "./fwd/ruru/server/index.js"
+    },
+    "./ruru/cli": {
+      "types": "./fwd/ruru/cli/index.d.ts",
+      "node": "./fwd/ruru/cli/index.js",
+      "default": "./fwd/ruru/cli/index.js"
+    },
+    "./grafast/graphql": {
+      "types": "./fwd/grafast/graphql/index.d.ts",
+      "node": "./fwd/grafast/graphql/index.js",
+      "default": "./fwd/grafast/graphql/index.js"
+    },
+    "./graphile-build-pg/pg-introspection": {
+      "types": "./fwd/graphile-build-pg/pg-introspection/index.d.ts",
+      "node": "./fwd/graphile-build-pg/pg-introspection/index.js",
+      "default": "./fwd/graphile-build-pg/pg-introspection/index.js"
     }
   },
   "bin": "./dist/cli-run.js",
@@ -152,7 +177,6 @@
     "graphile-build": "workspace:*",
     "graphile-build-pg": "workspace:*",
     "graphile-config": "workspace:^",
-    "graphql": "16.1.0-experimental-stream-defer.6",
     "iterall": "^1.3.0",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.1",
@@ -163,14 +187,20 @@
     "ws": "^8.12.1"
   },
   "peerDependencies": {
+    "@dataplan/json": "workspace:*",
+    "@dataplan/pg": "workspace:*",
     "@envelop/core": "^3.0.4",
-    "pg-introspection": "workspace:^"
+    "grafast": "workspace:^",
+    "grafserv": "workspace:^",
+    "graphile-build": "workspace:*",
+    "graphile-build-pg": "workspace:*",
+    "graphile-config": "workspace:^",
+    "pg": "^8.7.1",
+    "pg-sql2": "workspace:^",
+    "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
     "@envelop/core": {
-      "optional": true
-    },
-    "pg-introspection": {
       "optional": true
     }
   },

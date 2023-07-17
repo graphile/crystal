@@ -2,7 +2,7 @@ import { glob } from "glob";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
-import { isSchema } from "graphql";
+import { isSchema } from "grafast/graphql";
 import * as fsp from "node:fs/promises";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";

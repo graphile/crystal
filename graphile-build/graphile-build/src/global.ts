@@ -35,7 +35,7 @@ import type {
   GraphQLType,
   GraphQLUnionType,
   GraphQLUnionTypeConfig,
-} from "graphql";
+} from "grafast/graphql";
 
 import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
 import type { InflectionBase } from "./inflection.js";

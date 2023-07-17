@@ -3,8 +3,8 @@ import type {
   ExecutionPatchResult,
   ExecutionResult,
   GraphQLSchema,
-} from "graphql";
-import { parse, validate } from "graphql";
+} from "grafast/graphql";
+import { parse, validate } from "grafast/graphql";
 import { EventEmitter } from "node:stream";
 
 import type { BenchOperation, GrafastBenchSetupResult } from "./interfaces.js";

@@ -2,7 +2,7 @@ import crypto from "crypto";
 // eslint-disable-next-line @typescript-eslint/no-duplicate-imports
 import * as _crypto from "crypto";
 import * as grafastStar from "grafast";
-import * as graphqlStar from "graphql";
+import * as graphqlStar from "grafast/graphql";
 import util, * as utilStar from "util";
 
 import type { ExportOptions } from "./interfaces.js";

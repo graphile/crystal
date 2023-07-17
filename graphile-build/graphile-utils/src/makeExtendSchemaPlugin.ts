@@ -45,7 +45,7 @@ import type {
   TypeNode,
   UnionTypeDefinitionNode,
   ValueNode,
-} from "graphql";
+} from "grafast/graphql";
 
 import { EXPORTABLE } from "./exportable.js";
 

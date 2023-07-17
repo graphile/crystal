@@ -28,7 +28,7 @@ import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
   GraphQLObjectType,
-} from "graphql";
+} from "grafast/graphql";
 
 import { getBehavior } from "../behavior.js";
 import { parseDatabaseIdentifier, parseSmartTagsOptsString } from "../utils.js";

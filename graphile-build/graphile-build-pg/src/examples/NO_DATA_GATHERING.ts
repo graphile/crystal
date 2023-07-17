@@ -24,7 +24,7 @@ import {
 } from "graphile-build";
 import { resolvePresets } from "graphile-config";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { graphql, printSchema } from "graphql";
+import { graphql, printSchema } from "grafast/graphql";
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";

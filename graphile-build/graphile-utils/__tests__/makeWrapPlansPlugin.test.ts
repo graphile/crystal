@@ -17,7 +17,7 @@ import {
   QueryPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import type { ExecutionResult } from "graphql";
+import type { ExecutionResult } from "grafast/graphql";
 
 import type {
   PlanWrapperFilter,

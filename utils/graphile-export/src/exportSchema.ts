@@ -23,7 +23,7 @@ import type {
   GraphQLSchemaConfig,
   GraphQLType,
   GraphQLUnionTypeConfig,
-} from "graphql";
+} from "grafast/graphql";
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -37,7 +37,7 @@ import {
   isNamedType,
   isSchema,
   printSchema,
-} from "graphql";
+} from "grafast/graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import { writeFile } from "node:fs/promises";
 import type { URL } from "node:url";

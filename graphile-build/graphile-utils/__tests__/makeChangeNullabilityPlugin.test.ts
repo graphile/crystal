@@ -6,14 +6,14 @@ import {
   QueryPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import type { GraphQLType } from "graphql";
+import type { GraphQLType } from "grafast/graphql";
 import {
   GraphQLInputObjectType,
   GraphQLInterfaceType,
   GraphQLObjectType,
   isListType,
   isNonNullType,
-} from "graphql";
+} from "grafast/graphql";
 
 import type { NullabilitySpecString } from "../src/index.js";
 import {

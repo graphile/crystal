@@ -9,7 +9,11 @@ import {
   QueryQueryPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
+import {
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLString,
+} from "grafast/graphql";
 
 import { makeProcessSchemaPlugin } from "../src/index.js";
 

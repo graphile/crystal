@@ -2,7 +2,7 @@ import "graphile-config";
 import "graphile-build-pg";
 
 import type { PgResourceOptions } from "@dataplan/pg";
-import type { PgProc } from "pg-introspection";
+import type { PgProc } from "graphile-build-pg/pg-introspection";
 import { inspect } from "util";
 
 declare global {

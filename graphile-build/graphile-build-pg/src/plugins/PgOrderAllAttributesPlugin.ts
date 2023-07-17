@@ -9,7 +9,7 @@ import type {
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type { GraphQLEnumValueConfigMap } from "graphql";
+import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
 
 import { version } from "../version.js";
 

@@ -26,7 +26,7 @@ import {
 } from "graphile-build";
 import { resolvePresets } from "graphile-config";
 import { exportSchema } from "graphile-export";
-import { graphql } from "graphql";
+import { graphql } from "grafast/graphql";
 import {
   getGraphQLParameters,
   processRequest,

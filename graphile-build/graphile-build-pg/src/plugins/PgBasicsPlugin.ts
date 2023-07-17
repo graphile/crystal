@@ -13,7 +13,7 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import * as dataplanPg from "@dataplan/pg";
-import type { GraphQLType } from "graphql";
+import type { GraphQLType } from "grafast/graphql";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";

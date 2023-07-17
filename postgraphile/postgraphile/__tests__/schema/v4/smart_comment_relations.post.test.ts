@@ -1,4 +1,4 @@
-import { isObjectType } from "graphql";
+import { isObjectType } from "grafast/graphql";
 import type { PoolClient } from "pg";
 
 import * as core from "./core.js";

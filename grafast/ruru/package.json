@@ -45,6 +45,7 @@
   "homepage": "https://grafast.org/ruru/",
   "dependencies": {
     "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "http-proxy": "^1.18.1",
     "tslib": "^2.5.0",
     "yargs": "^17.6.2"

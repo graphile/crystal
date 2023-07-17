@@ -8,17 +8,43 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(
 );
 
 const todo = {
+  grafast: {
+    graphql: true,
+  },
+  "graphile-build-pg": {
+    "pg-introspection": true,
+  },
   postgraphile: {
+    "@dataplan/pg/adaptors/pg": "./adaptors/pg",
+
+    graphql: true,
     "@dataplan/json": true,
     "@dataplan/pg": true,
-    "@dataplan/pg/adaptors/pg": "./adaptors/pg",
     grafast: true,
     grafserv: true,
     "graphile-build": true,
     "graphile-build-pg": true,
-    graphql: true,
     "pg-sql2": true,
     tamedevil: true,
+    ruru: true,
+  },
+  pgl: {
+    "postgraphile/presets/amber": "./amber",
+    "postgraphile/presets/v4": "./v4",
+    "postgraphile/presets/relay": "./relay",
+
+    "@dataplan/pg/adaptors/pg": "./adaptors/pg",
+
+    graphql: true,
+    "@dataplan/json": true,
+    "@dataplan/pg": true,
+    grafast: true,
+    grafserv: true,
+    "graphile-build": true,
+    "graphile-build-pg": true,
+    "pg-sql2": true,
+    tamedevil: true,
+    ruru: true,
   },
 };
 

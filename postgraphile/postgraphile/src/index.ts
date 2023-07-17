@@ -7,7 +7,7 @@ import type { GrafservBase, GrafservConfig } from "grafserv";
 import type { SchemaResult } from "graphile-build";
 import { makeSchema, watchSchema } from "graphile-build";
 import { resolvePresets } from "graphile-config";
-import type { GraphQLSchema } from "graphql";
+import type { GraphQLSchema } from "grafast/graphql";
 
 export { makeSchema, watchSchema };
 

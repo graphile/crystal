@@ -20,8 +20,13 @@ import type {
   ExecutionPatchResult,
   GraphQLError,
   GraphQLSchema,
-} from "graphql";
-import { getOperationAST, parse, validate, validateSchema } from "graphql";
+} from "grafast/graphql";
+import {
+  getOperationAST,
+  parse,
+  validate,
+  validateSchema,
+} from "grafast/graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import { relative } from "path";

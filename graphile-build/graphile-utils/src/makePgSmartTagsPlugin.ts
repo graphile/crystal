@@ -13,7 +13,7 @@ import type {
   PgNamespace,
   PgProc,
   PgType,
-} from "pg-introspection";
+} from "graphile-build-pg/pg-introspection";
 
 import { parseIdentifierParts } from "./parseIdentifierParts.js";
 

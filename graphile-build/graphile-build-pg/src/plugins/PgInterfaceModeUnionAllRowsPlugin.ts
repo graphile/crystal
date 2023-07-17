@@ -10,7 +10,7 @@ import type {
 import { pgUnionAll } from "@dataplan/pg";
 import { connection } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
+import type { GraphQLInterfaceType, GraphQLObjectType } from "grafast/graphql";
 
 import { version } from "../version.js";
 

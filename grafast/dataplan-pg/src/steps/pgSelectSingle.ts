@@ -5,7 +5,7 @@ import {
   polymorphicWrap,
   UnbatchedExecutableStep,
 } from "grafast";
-import type { GraphQLObjectType } from "graphql";
+import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 

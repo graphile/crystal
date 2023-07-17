@@ -31,7 +31,7 @@ import type {
   GraphQLError,
   GraphQLSchema,
   SubscriptionArgs,
-} from "graphql";
+} from "grafast/graphql";
 import {
   execute as graphqlExecute,
   getOperationAST,
@@ -39,7 +39,7 @@ import {
   subscribe as graphqlSubscribe,
   validate,
   validateSchema,
-} from "graphql";
+} from "grafast/graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import type { JwtPayload } from "jsonwebtoken";

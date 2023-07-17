@@ -6,7 +6,7 @@ import type { PgHStore } from "@dataplan/pg";
 import type { ExecutableStep } from "grafast";
 import { access, assertExecutableStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
+import type { GraphQLInputFieldConfigMap, ValueNode } from "grafast/graphql";
 
 import { version } from "../version.js";
 

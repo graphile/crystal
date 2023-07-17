@@ -14,7 +14,7 @@ import type {
 } from "grafast";
 import { getEnumValueConfig, SafeError } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type { GraphQLEnumType, GraphQLSchema } from "graphql";
+import type { GraphQLEnumType, GraphQLSchema } from "grafast/graphql";
 import { inspect } from "util";
 
 import { version } from "../version.js";

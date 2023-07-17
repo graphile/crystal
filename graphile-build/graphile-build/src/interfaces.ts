@@ -21,7 +21,7 @@ import type {
   GraphQLScalarTypeConfig,
   GraphQLSchema,
   GraphQLSchemaConfig,
-} from "graphql";
+} from "grafast/graphql";
 
 /**
  * The details in the 'info' object passed as the first argument to all gather

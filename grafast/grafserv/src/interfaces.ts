@@ -7,7 +7,7 @@ import type {
   ExecutionResult,
   GraphQLError,
   GraphQLSchema,
-} from "graphql";
+} from "grafast/graphql";
 import type { Context } from "graphql-ws";
 import type { RuruHTMLParts } from "ruru/server";
 

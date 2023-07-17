@@ -20,7 +20,7 @@ import {
   specFromNodeId,
 } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import type { GraphQLFieldConfigMap, GraphQLObjectType } from "graphql";
+import type { GraphQLFieldConfigMap, GraphQLObjectType } from "grafast/graphql";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { tagToString } from "../utils.js";

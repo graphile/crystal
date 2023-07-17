@@ -1,7 +1,7 @@
 import type { PromiseOrDirect } from "grafast";
 import { makeSchema } from "graphile-build";
-import type { GraphQLSchema } from "graphql";
-import { lexicographicSortSchema, printSchema } from "graphql";
+import type { GraphQLSchema } from "grafast/graphql";
+import { lexicographicSortSchema, printSchema } from "grafast/graphql";
 import type { PoolClient } from "pg";
 
 import AmberPreset from "../../../src/presets/amber.js";

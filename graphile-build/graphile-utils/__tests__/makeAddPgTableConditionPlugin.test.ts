@@ -1,8 +1,8 @@
 import { TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { grafast } from "grafast";
-import type { ExecutionResult } from "graphql";
-import { lexicographicSortSchema } from "graphql";
+import type { ExecutionResult } from "grafast/graphql";
+import { lexicographicSortSchema } from "grafast/graphql";
 import type { Pool } from "pg";
 import pg from "pg";
 import { makeSchema } from "postgraphile";
