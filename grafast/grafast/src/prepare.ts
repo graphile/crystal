@@ -168,7 +168,7 @@ const finalize = (
       // Return an async iterator
       let _alive = true;
       const iterator: ResultIterator = newIterator(() => {
-        // TODO: ABORT code
+        // ENHANCE: AbortSignal or similar, feed into `processRoot`?
         _alive = false;
       });
       const payload = Object.create(null);
@@ -183,14 +183,12 @@ const finalize = (
         payload.extensions = extensions;
       }
       payload.hasNext = true;
-      // TODO: payload.label
       iterator.push(payload);
 
       const promise = processRoot(ctx, iterator, outputDataAsString);
       if (isPromiseLike(promise)) {
         promise.then(
           () => {
-            // FIXME: below factors in outputDataAsString, but this does not. Is that deliberate?!
             iterator.push({ hasNext: false });
             iterator.return(undefined);
           },
@@ -199,11 +197,7 @@ const finalize = (
           },
         );
       } else {
-        iterator.push(
-          outputDataAsString
-            ? ('{"hasNext":false}' as any)
-            : { hasNext: false },
-        );
+        iterator.push({ hasNext: false });
         iterator.return(undefined);
       }
 
