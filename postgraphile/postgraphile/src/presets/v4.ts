@@ -7,6 +7,7 @@ import type { IncomingMessage, ServerResponse } from "http";
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
+import { parseDatabaseIdentifier } from "graphile-build-pg";
 
 export { PgV4BehaviorPlugin, PgV4InflectionPlugin, PgV4SmartTagsPlugin };
 
@@ -171,26 +172,6 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
   };
 };
 
-function parseJWTType(type: string): [string, string] {
-  const parts = type.split(".");
-  // TODO: parse this better!
-  if (parts.length !== 2) {
-    throw new Error(
-      "Cannot parse JWT type - it must have schema and type name separated by a period",
-    );
-  }
-  return parts.map((part) => {
-    if (part[0] === '"') {
-      if (part[part.length - 1] !== '"') {
-        throw new Error(`Cannot parse JWT type; invalid quoting '${part}'`);
-      }
-      return part.slice(1, part.length - 1);
-    } else {
-      return part;
-    }
-  }) as [string, string];
-}
-
 export const makeV4Preset = (
   options: V4Options = {},
 ): GraphileConfig.Preset => {
@@ -251,7 +232,7 @@ export const makeV4Preset = (
       pgStrictFunctions,
       ...(options.jwtPgTypeIdentifier
         ? {
-            pgJwtType: parseJWTType(options.jwtPgTypeIdentifier),
+            pgJwtType: parseDatabaseIdentifier(options.jwtPgTypeIdentifier, 2),
           }
         : null),
     },

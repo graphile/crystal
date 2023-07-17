@@ -12,7 +12,7 @@ import { arraysMatch } from "grafast";
 import { gatherConfig } from "graphile-build";
 
 import {
-  parseDatabaseIdentifierFromSmartTag,
+  parseDatabaseIdentifier,
   parseDatabaseIdentifiers,
   parseSmartTagsOptsString,
 } from "../utils.js";
@@ -173,12 +173,11 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
               `Couldn't determine namespace for '${pgClass.relname}'`,
             );
           }
-          const [targetSchemaName, targetTableName] =
-            parseDatabaseIdentifierFromSmartTag(
-              targetTableIdentifier,
-              2,
-              nsp.nspname,
-            );
+          const [targetSchemaName, targetTableName] = parseDatabaseIdentifier(
+            targetTableIdentifier,
+            2,
+            nsp.nspname,
+          );
           const targetPgClass =
             await info.helpers.pgIntrospection.getClassByName(
               serviceName,

@@ -213,9 +213,7 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
   return result;
 }
 
-export function parseDatabaseIdentifierFromSmartTag<
-  TExpectedLength extends number,
->(
+export function parseDatabaseIdentifier<TExpectedLength extends number>(
   identifier: string,
   expectedLength: TExpectedLength,
   fallbackNamespace = "public",
