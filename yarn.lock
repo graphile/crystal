@@ -5208,6 +5208,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/rimraf@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "@types/rimraf@npm:4.0.5"
+  dependencies:
+    rimraf: "npm:*"
+  checksum: 30982ab6fc169137e78a0df0152114be106b4f1ac8a69fae34b9a771b3763951ccd48cdfdc4198252c390dd9cc5d9aae57a147c256024748fd140bb1756178d2
+  languageName: node
+  linkType: hard
+
 "@types/sax@npm:^1.2.1":
   version: 1.2.4
   resolution: "@types/sax@npm:1.2.4"
@@ -18669,6 +18678,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rimraf@npm:*, rimraf@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "rimraf@npm:5.0.1"
+  dependencies:
+    glob: "npm:^10.2.5"
+  bin:
+    rimraf: dist/cjs/src/bin.js
+  checksum: 52dae5032c2557c832fd97aa174c006688b15811da72ef8412e556cc1fa99bb5485ae74ee0ea3725a2cb33c5dcd6a8486a0c72e1960aecd85e6c563d86a484e3
+  languageName: node
+  linkType: hard
+
 "rimraf@npm:3.0.2, rimraf@npm:^3.0.0, rimraf@npm:^3.0.2":
   version: 3.0.2
   resolution: "rimraf@npm:3.0.2"
@@ -18708,6 +18728,7 @@ __metadata:
     "@types/jest": "npm:^27.5.1"
     "@types/mock-fs": "npm:4.13.1"
     "@types/node": "npm:^18.15.5"
+    "@types/rimraf": "npm:^4.0.5"
     "@typescript-eslint/eslint-plugin": "npm:^5.59.2"
     "@typescript-eslint/parser": "npm:^5.59.2"
     "@typescript-eslint/typescript-estree": "npm:^5.59.2"
@@ -18732,6 +18753,7 @@ __metadata:
     mock-fs: "npm:^5.1.2"
     pg: "npm:^8.7.1"
     prettier: "npm:^2.8.7"
+    rimraf: "npm:^5.0.1"
     typedoc: "npm:^0.22.15"
     typedoc-monorepo-link-types: "npm:^0.0.2"
     typescript: "npm:^5.0.4"

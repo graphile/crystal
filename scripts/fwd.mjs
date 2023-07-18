@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { rimraf } from "rimraf";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(
   /\/+$/,
@@ -109,6 +110,7 @@ async function main() {
   for (const packageName in todo) {
     const packageTodo = todo[packageName];
     const rootPath = `${__dirname}/../node_modules/${packageName}`;
+    await rimraf(`${rootPath}/fwd`);
     const packageJson = await loadJSON(`${rootPath}/package.json`);
     for (const target in packageTodo) {
       const spec = packageTodo[target];
