@@ -1,5 +1,25 @@
 # grafserv
 
+## 0.0.1-alpha.13
+
+### Patch Changes
+
+- [#418](https://github.com/benjie/postgraphile-private/pull/418)
+  [`9ab2adba2`](https://github.com/benjie/postgraphile-private/commit/9ab2adba2c146b5d1bc91bbb2f25e4645ed381de)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul peerDependencies and
+  dependencies to try and eliminate duplicate modules error.
+- Updated dependencies
+  [[`620f9e07e`](https://github.com/benjie/postgraphile-private/commit/620f9e07ec6f4d66a8dc01ed6bb054a75f7b1c8b),
+  [`1882e0185`](https://github.com/benjie/postgraphile-private/commit/1882e018576adf69bcae8a999224cb4d5e62a3e1),
+  [`881672305`](https://github.com/benjie/postgraphile-private/commit/88167230578393e3b24a364f0d673e36c5cb088d),
+  [`e5012f9a1`](https://github.com/benjie/postgraphile-private/commit/e5012f9a1901af63e1703ea4d717e8a22544f5e7),
+  [`9ab2adba2`](https://github.com/benjie/postgraphile-private/commit/9ab2adba2c146b5d1bc91bbb2f25e4645ed381de),
+  [`47f6f018b`](https://github.com/benjie/postgraphile-private/commit/47f6f018b11761cbfaa63d709edc0e3f4f9a9924),
+  [`ff4395bfc`](https://github.com/benjie/postgraphile-private/commit/ff4395bfc6e6b2fb263f644dae1e984c52dd84b9),
+  [`502b23340`](https://github.com/benjie/postgraphile-private/commit/502b233401975637bc0d516af78721b37f6f9b7b)]:
+  - grafast@0.0.1-alpha.13
+  - ruru@2.0.0-alpha.10
+
 ## 0.0.1-alpha.12
 
 ### Patch Changes

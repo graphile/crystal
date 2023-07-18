@@ -1,5 +1,26 @@
 # graphile
 
+## 5.0.0-alpha.8
+
+### Patch Changes
+
+- [#410](https://github.com/benjie/postgraphile-private/pull/410)
+  [`a7cd7eecf`](https://github.com/benjie/postgraphile-private/commit/a7cd7eecfb81a74a2a6e6500054f2defb8f2205e)
+  Thanks [@benjie](https://github.com/benjie)! - Add new
+  `graphile behavior debug` command for debugging behavior strings.
+
+- Updated dependencies
+  [[`e7dd2e039`](https://github.com/benjie/postgraphile-private/commit/e7dd2e039769958d59a83ec3b164cad063c82500),
+  [`620f9e07e`](https://github.com/benjie/postgraphile-private/commit/620f9e07ec6f4d66a8dc01ed6bb054a75f7b1c8b),
+  [`881672305`](https://github.com/benjie/postgraphile-private/commit/88167230578393e3b24a364f0d673e36c5cb088d),
+  [`9ab2adba2`](https://github.com/benjie/postgraphile-private/commit/9ab2adba2c146b5d1bc91bbb2f25e4645ed381de),
+  [`ff4395bfc`](https://github.com/benjie/postgraphile-private/commit/ff4395bfc6e6b2fb263f644dae1e984c52dd84b9),
+  [`502b23340`](https://github.com/benjie/postgraphile-private/commit/502b233401975637bc0d516af78721b37f6f9b7b),
+  [`dc94b4a30`](https://github.com/benjie/postgraphile-private/commit/dc94b4a3003a2fbe1d76e17bb519092fa134243a),
+  [`4eda0cd57`](https://github.com/benjie/postgraphile-private/commit/4eda0cd572274febad696ebb5a89472a981f8212)]:
+  - graphile-build@5.0.0-alpha.14
+  - postgraphile@5.0.0-alpha.15
+
 ## 5.0.0-alpha.7
 
 ### Patch Changes

@@ -1,5 +1,57 @@
 # grafast
 
+## 0.0.1-alpha.13
+
+### Patch Changes
+
+- [#417](https://github.com/benjie/postgraphile-private/pull/417)
+  [`620f9e07e`](https://github.com/benjie/postgraphile-private/commit/620f9e07ec6f4d66a8dc01ed6bb054a75f7b1c8b)
+  Thanks [@benjie](https://github.com/benjie)! - Grafast now supports
+  `operationsCacheMaxLength` and `operationOperationPlansCacheMaxLength`
+  configuration via `schema.extensions.grafast.*`. Currently undocumented.
+
+- [#417](https://github.com/benjie/postgraphile-private/pull/417)
+  [`1882e0185`](https://github.com/benjie/postgraphile-private/commit/1882e018576adf69bcae8a999224cb4d5e62a3e1)
+  Thanks [@benjie](https://github.com/benjie)! - `constant(foo)` no longer adds
+  the value of `foo` to the plan diagram unless you pass `true` as the second
+  option (`constant(foo, true)`) or `foo` is something very basic like
+  `null`/`undefined`/`true`/`false`. This is to protect your secrets.
+
+- [#417](https://github.com/benjie/postgraphile-private/pull/417)
+  [`881672305`](https://github.com/benjie/postgraphile-private/commit/88167230578393e3b24a364f0d673e36c5cb088d)
+  Thanks [@benjie](https://github.com/benjie)! - `deepEval` has been renamed to
+  `applyTransforms`
+
+- [#417](https://github.com/benjie/postgraphile-private/pull/417)
+  [`e5012f9a1`](https://github.com/benjie/postgraphile-private/commit/e5012f9a1901af63e1703ea4d717e8a22544f5e7)
+  Thanks [@benjie](https://github.com/benjie)! - Move `GrafastFieldExtensions`
+  to `Grafast.FieldExtensions` and the same for most other `Grafast*Extensions`
+  interfaces. This is to make TypeScript declaration merging easier.
+
+- [#418](https://github.com/benjie/postgraphile-private/pull/418)
+  [`9ab2adba2`](https://github.com/benjie/postgraphile-private/commit/9ab2adba2c146b5d1bc91bbb2f25e4645ed381de)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul peerDependencies and
+  dependencies to try and eliminate duplicate modules error.
+
+- [#417](https://github.com/benjie/postgraphile-private/pull/417)
+  [`47f6f018b`](https://github.com/benjie/postgraphile-private/commit/47f6f018b11761cbfaa63d709edc0e3f4f9a9924)
+  Thanks [@benjie](https://github.com/benjie)! - Fix planning such that
+  OutputPlan optimizations based on `AccessPlan` can happen after the AccessPlan
+  is optimized.
+
+- [#417](https://github.com/benjie/postgraphile-private/pull/417)
+  [`ff4395bfc`](https://github.com/benjie/postgraphile-private/commit/ff4395bfc6e6b2fb263f644dae1e984c52dd84b9)
+  Thanks [@benjie](https://github.com/benjie)! - Grafast operation cache now
+  tied to the schema, so multiple schemas will not cause degraded performance
+  from clearing the cache.
+
+- [#417](https://github.com/benjie/postgraphile-private/pull/417)
+  [`502b23340`](https://github.com/benjie/postgraphile-private/commit/502b233401975637bc0d516af78721b37f6f9b7b)
+  Thanks [@benjie](https://github.com/benjie)! - `preset.grafast.context` second
+  parameter is no longer the existing GraphQL context, but instead the GraphQL
+  request details (which contains the `contextValue`). If you were using this
+  (unlikely), add `.contextValue` to usage of the second argument.
+
 ## 0.0.1-alpha.12
 
 ### Patch Changes

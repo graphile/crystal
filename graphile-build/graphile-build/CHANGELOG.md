@@ -1,5 +1,48 @@
 # graphile-build
 
+## 5.0.0-alpha.14
+
+### Patch Changes
+
+- [#417](https://github.com/benjie/postgraphile-private/pull/417)
+  [`e7dd2e039`](https://github.com/benjie/postgraphile-private/commit/e7dd2e039769958d59a83ec3b164cad063c82500)
+  Thanks [@benjie](https://github.com/benjie)! - `codec` is now baked into
+  NodeId handlers (rather than using `codecName` and looking that up in
+  `codecs`). All related APIs have thus simplified, e.g. the step
+  `node(codecs, handler, $id)` is now `node(handler, $id)`, etc. TypeScript
+  should point out any issues you have hopefully.
+
+- [#418](https://github.com/benjie/postgraphile-private/pull/418)
+  [`9ab2adba2`](https://github.com/benjie/postgraphile-private/commit/9ab2adba2c146b5d1bc91bbb2f25e4645ed381de)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul peerDependencies and
+  dependencies to try and eliminate duplicate modules error.
+
+- [#410](https://github.com/benjie/postgraphile-private/pull/410)
+  [`4eda0cd57`](https://github.com/benjie/postgraphile-private/commit/4eda0cd572274febad696ebb5a89472a981f8212)
+  Thanks [@benjie](https://github.com/benjie)! - Use a single behavior check per
+  location.
+
+  In the past two weeks I added a few behavior strings like
+  `array:attribute:filterBy` (a scoped form of `attribute:filterBy` to only be
+  used by attributes that were arrays); however I've realised that this will
+  require plugin authors to implement all the same logic to figure out what type
+  an attribute is in order to then see if it has the relevant behavior. This
+  goes against the design of the behavior system, and makes plugin authors'
+  lives harder. So I've reverted this, and instead used the `entityBehaviors`
+  system to add or remove the base `attribute:filterBy` (etc) behavior depending
+  on what the type of the attribute is.
+
+- Updated dependencies
+  [[`620f9e07e`](https://github.com/benjie/postgraphile-private/commit/620f9e07ec6f4d66a8dc01ed6bb054a75f7b1c8b),
+  [`1882e0185`](https://github.com/benjie/postgraphile-private/commit/1882e018576adf69bcae8a999224cb4d5e62a3e1),
+  [`881672305`](https://github.com/benjie/postgraphile-private/commit/88167230578393e3b24a364f0d673e36c5cb088d),
+  [`e5012f9a1`](https://github.com/benjie/postgraphile-private/commit/e5012f9a1901af63e1703ea4d717e8a22544f5e7),
+  [`9ab2adba2`](https://github.com/benjie/postgraphile-private/commit/9ab2adba2c146b5d1bc91bbb2f25e4645ed381de),
+  [`47f6f018b`](https://github.com/benjie/postgraphile-private/commit/47f6f018b11761cbfaa63d709edc0e3f4f9a9924),
+  [`ff4395bfc`](https://github.com/benjie/postgraphile-private/commit/ff4395bfc6e6b2fb263f644dae1e984c52dd84b9),
+  [`502b23340`](https://github.com/benjie/postgraphile-private/commit/502b233401975637bc0d516af78721b37f6f9b7b)]:
+  - grafast@0.0.1-alpha.13
+
 ## 5.0.0-alpha.13
 
 ### Patch Changes

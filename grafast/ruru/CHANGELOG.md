@@ -1,5 +1,14 @@
 # ruru
 
+## 2.0.0-alpha.10
+
+### Patch Changes
+
+- [#418](https://github.com/benjie/postgraphile-private/pull/418)
+  [`9ab2adba2`](https://github.com/benjie/postgraphile-private/commit/9ab2adba2c146b5d1bc91bbb2f25e4645ed381de)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul peerDependencies and
+  dependencies to try and eliminate duplicate modules error.
+
 ## 2.0.0-alpha.9
 
 ### Patch Changes
