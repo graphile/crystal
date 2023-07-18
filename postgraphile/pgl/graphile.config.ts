@@ -8,9 +8,9 @@ import { makePgService } from "pgl/adaptors/pg";
 import { PostGraphileAmberPreset } from "pgl/amber";
 import { context, listen, object } from "pgl/grafast";
 import type {} from "pgl/grafserv/node";
+import { defaultHTMLParts } from "pgl/grafserv/ruru/server";
 import { StreamDeferPlugin } from "pgl/graphile-build";
 import { PgRelayPreset } from "pgl/relay";
-import { defaultHTMLParts } from "pgl/ruru/server";
 import { makeV4Preset } from "pgl/v4";
 
 import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
