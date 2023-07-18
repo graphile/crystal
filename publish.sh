@@ -24,6 +24,7 @@ tar tzf $BUILD_DIR/pg-sql2.tgz
 tar tzf $BUILD_DIR/dataplan__pg.tgz
 tar tzf $BUILD_DIR/graphile-build-pg.tgz
 tar tzf $BUILD_DIR/postgraphile.tgz
+tar tzf $BUILD_DIR/pgl.tgz
 tar tzf $BUILD_DIR/graphile__simplify-inflection.tgz
 tar tzf $BUILD_DIR/grafserv__persisted.tgz
 tar tzf $BUILD_DIR/graphile.tgz
@@ -50,6 +51,7 @@ case $doit in
     npm publish --access=public --tag="$TAG" "$BUILD_DIR/dataplan__pg.tgz"
     npm publish --access=public --tag="$TAG" "$BUILD_DIR/graphile-build-pg.tgz"
     npm publish --access=public --tag="$TAG" "$BUILD_DIR/postgraphile.tgz"
+    npm publish --access=public --tag="$TAG" "$BUILD_DIR/pgl.tgz"
     npm publish --access=public --tag="$TAG" "$BUILD_DIR/graphile__simplify-inflection.tgz"
     npm publish --access=public --tag="$TAG" "$BUILD_DIR/grafserv__persisted.tgz"
     npm publish --access=public --tag="$TAG" "$BUILD_DIR/graphile.tgz"
