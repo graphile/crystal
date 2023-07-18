@@ -158,27 +158,19 @@ for (const module of Object.values(all)) {
                 !dep.packageJson.peerDependenciesMeta?.[peerDepName]?.optional
               ) {
                 fails.push(
-                  `${
-                    dep.name
-                  } has a peer dependency on ${peerDepName}; ${name} ${
-                    isPeer ? "peer " : ""
-                  }depends on ${
-                    dep.name
-                  } but does not provide ${peerDepName} (range: "${
+                  `${name} should provide "${peerDepName}": "${
                     depPeerDeps[peerDepName]
-                  }")`,
+                  }" because it's peer dependended on by ${
+                    isPeer ? "peer " : ""
+                  }dependency ${dep.name}.`,
                 );
               } else {
                 warnings.push(
-                  `${
-                    dep.name
-                  } has an optional peer dependency on ${peerDepName}; ${name} ${
-                    isPeer ? "peer " : ""
-                  }depends on ${
-                    dep.name
-                  } but does not provide ${peerDepName} (range: "${
+                  `${name} should provide "${peerDepName}": "${
                     depPeerDeps[peerDepName]
-                  }")`,
+                  }" because it's peer dependend on by ${
+                    isPeer ? "peer " : ""
+                  }dependency ${dep.name}.`,
                 );
               }
             }
