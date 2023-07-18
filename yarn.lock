@@ -11833,16 +11833,11 @@ __metadata:
     tslib: "npm:^2.5.0"
     typescript: "npm:^5.0.4"
   peerDependencies:
-    "@envelop/core": ^3.0.4
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
-    ruru: "workspace:^"
-    tamedevil: "workspace:^"
     ws: ^8.12.1
   peerDependenciesMeta:
-    "@envelop/core":
-      optional: true
     ws:
       optional: true
   languageName: unknown
@@ -16741,7 +16736,6 @@ __metadata:
     pg-introspection: "workspace:^"
     pg-sql2: "workspace:^"
     postgraphile: "workspace:^"
-    ruru: "workspace:^"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.5.0"
@@ -17364,7 +17358,6 @@ __metadata:
     nodemon: "npm:^2.0.15"
     pg: "npm:^8.7.1"
     pg-sql2: "workspace:^"
-    ruru: "workspace:^"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.5.0"
