@@ -47,3 +47,11 @@ And please give some love to our featured sponsors 🤩:
 <em>\* Sponsors the entire Graphile suite</em>
 
 <!-- SPONSORS_END -->
+
+## Thanks
+
+The `pgl` module was previously
+[pgl@0.0.6](https://www.npmjs.com/package/pgl/v/0.0.6) (GitHub:
+https://github.com/mattholl/pgl). The package name was generously transferred to
+the PostGraphile project by [Matthew Hollings](https://github.com/mattholl).
+Thanks Matthew!
