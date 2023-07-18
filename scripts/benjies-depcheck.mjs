@@ -142,7 +142,7 @@ for (const module of Object.values(all)) {
     name,
     packageJson: { dependencies, peerDependencies },
   } = module;
-  if (dependencies) {
+  const check = (dependencies, isPeer) => {
     for (const depModuleName in dependencies) {
       const dep = all[depModuleName];
       if (dep) {
@@ -158,11 +158,27 @@ for (const module of Object.values(all)) {
                 !dep.packageJson.peerDependenciesMeta?.[peerDepName]?.optional
               ) {
                 fails.push(
-                  `${dep.name} has a peer dependency on ${peerDepName}; ${name} depends on ${dep.name} but does not provide ${peerDepName} (range: "${depPeerDeps[peerDepName]}")`,
+                  `${
+                    dep.name
+                  } has a peer dependency on ${peerDepName}; ${name} ${
+                    isPeer ? "peer " : ""
+                  }depends on ${
+                    dep.name
+                  } but does not provide ${peerDepName} (range: "${
+                    depPeerDeps[peerDepName]
+                  }")`,
                 );
               } else {
                 warnings.push(
-                  `${dep.name} has an optional peer dependency on ${peerDepName}; ${name} depends on ${dep.name} but does not provide ${peerDepName} (range: "${depPeerDeps[peerDepName]}")`,
+                  `${
+                    dep.name
+                  } has an optional peer dependency on ${peerDepName}; ${name} ${
+                    isPeer ? "peer " : ""
+                  }depends on ${
+                    dep.name
+                  } but does not provide ${peerDepName} (range: "${
+                    depPeerDeps[peerDepName]
+                  }")`,
                 );
               }
             }
@@ -172,6 +188,12 @@ for (const module of Object.values(all)) {
         // Out of scope
       }
     }
+  };
+  if (dependencies) {
+    check(dependencies);
+  }
+  if (peerDependencies) {
+    check(peerDependencies, true);
   }
 }
 
