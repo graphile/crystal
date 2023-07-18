@@ -30,6 +30,7 @@ const todo = {
     "graphile-build-pg": true,
     "pg-sql2": true,
     tamedevil: true,
+    "graphile-utils": "./utils",
   },
   pgl: {
     "postgraphile/presets/amber": "./amber",
@@ -47,6 +48,7 @@ const todo = {
     "graphile-build-pg": true,
     "pg-sql2": true,
     tamedevil: true,
+    "postgraphile/utils": "./utils",
   },
 };
 

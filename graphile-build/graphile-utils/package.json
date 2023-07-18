@@ -39,10 +39,6 @@
   "homepage": "https://github.com/graphile/heart/tree/main/graphile-build/graphile-utils",
   "dependencies": {
     "debug": "^4.1.1",
-    "grafast": "workspace:^",
-    "graphile-build": "workspace:^",
-    "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
     "json5": "^2.2.3",
     "tslib": "^2.5.0"
   },
@@ -50,7 +46,6 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
-    "@envelop/core": "^3.0.4",
     "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
@@ -59,9 +54,6 @@
     "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@envelop/core": {
-      "optional": true
-    },
     "graphile-build-pg": {
       "optional": true
     }

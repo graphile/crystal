@@ -128,6 +128,11 @@
       "types": "./fwd/tamedevil/index.d.ts",
       "node": "./fwd/tamedevil/index.js",
       "default": "./fwd/tamedevil/index.js"
+    },
+    "./utils": {
+      "types": "./fwd/postgraphile/utils/index.d.ts",
+      "node": "./fwd/postgraphile/utils/index.js",
+      "default": "./fwd/postgraphile/utils/index.js"
     }
   },
   "bin": "./dist/cli-run.js",

@@ -134,6 +134,11 @@
       "types": "./fwd/tamedevil/index.d.ts",
       "node": "./fwd/tamedevil/index.js",
       "default": "./fwd/tamedevil/index.js"
+    },
+    "./utils": {
+      "types": "./fwd/graphile-utils/index.d.ts",
+      "node": "./fwd/graphile-utils/index.js",
+      "default": "./fwd/graphile-utils/index.js"
     }
   },
   "bin": "./dist/cli-run.js",
@@ -177,6 +182,7 @@
     "graphile-build": "workspace:*",
     "graphile-build-pg": "workspace:*",
     "graphile-config": "workspace:^",
+    "graphile-utils": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "iterall": "^1.3.0",
     "jsonwebtoken": "^8.5.1",
