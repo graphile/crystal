@@ -1,4 +1,12 @@
 /* eslint-disable graphile-export/export-methods  */
+import type { GraphQLType } from "grafast/graphql";
+import {
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
+  GraphQLObjectType,
+  isListType,
+  isNonNullType,
+} from "grafast/graphql";
 import {
   buildSchema,
   CommonTypesPlugin,
@@ -6,14 +14,6 @@ import {
   QueryPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import type { GraphQLType } from "graphql";
-import {
-  GraphQLInputObjectType,
-  GraphQLInterfaceType,
-  GraphQLObjectType,
-  isListType,
-  isNonNullType,
-} from "graphql";
 
 import type { NullabilitySpecString } from "../src/index.js";
 import {

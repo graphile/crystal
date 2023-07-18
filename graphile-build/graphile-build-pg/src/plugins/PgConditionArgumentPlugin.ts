@@ -8,7 +8,7 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
-import type { GraphQLInputObjectType } from "graphql";
+import type { GraphQLInputObjectType } from "grafast/graphql";
 
 import { version } from "../version.js";
 

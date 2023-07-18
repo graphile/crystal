@@ -23,12 +23,12 @@ import type {
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
-import { gatherConfig } from "graphile-build";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
   GraphQLObjectType,
-} from "graphql";
+} from "grafast/graphql";
+import { gatherConfig } from "graphile-build";
 
 import { getBehavior } from "../behavior.js";
 import { parseDatabaseIdentifier, parseSmartTagsOptsString } from "../utils.js";

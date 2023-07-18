@@ -2,7 +2,7 @@ import "graphile-config";
 
 import type { ExecutableStep } from "grafast";
 import { lambda } from "grafast";
-import type { GraphQLInterfaceType } from "graphql";
+import type { GraphQLInterfaceType } from "grafast/graphql";
 
 import { EXPORTABLE } from "../utils.js";
 import { NODE_ID_CODECS, NODE_ID_HANDLER_BY_TYPE_NAME } from "./NodePlugin.js";

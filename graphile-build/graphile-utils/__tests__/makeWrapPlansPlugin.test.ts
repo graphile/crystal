@@ -8,6 +8,7 @@ import {
   LambdaStep,
   proxy,
 } from "grafast";
+import type { ExecutionResult } from "grafast/graphql";
 import {
   buildSchema,
   // defaultPlugins,
@@ -17,7 +18,6 @@ import {
   QueryPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import type { ExecutionResult } from "graphql";
 
 import type {
   PlanWrapperFilter,

@@ -3,11 +3,11 @@ import "graphile-build-pg";
 
 import type { Deferred, PromiseOrDirect } from "grafast";
 import { defer, isPromiseLike } from "grafast";
+import type { GraphQLSchema } from "grafast/graphql";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import type { SchemaResult } from "graphile-build";
 import { makeSchema, watchSchema } from "graphile-build";
 import { resolvePresets } from "graphile-config";
-import type { GraphQLSchema } from "graphql";
 
 export { makeSchema, watchSchema };
 

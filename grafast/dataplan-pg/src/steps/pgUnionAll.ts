@@ -26,7 +26,7 @@ import {
   reverseArray,
   SafeError,
 } from "grafast";
-import type { GraphQLObjectType } from "graphql";
+import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import { $$symbolToIdentifier, sql } from "pg-sql2";
 

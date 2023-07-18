@@ -5,7 +5,7 @@ import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
   GraphQLInputFieldConfig,
-} from "graphql";
+} from "grafast/graphql";
 
 /**
  * Sets the 'description' attribute to null if it's the empty string; useful

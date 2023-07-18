@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { lambda } from "grafast";
+import { graphql, printSchema } from "grafast/graphql";
 import { resolvePresets } from "graphile-config";
 import { exportSchema } from "graphile-export";
-import { graphql, printSchema } from "graphql";
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 

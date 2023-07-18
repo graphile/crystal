@@ -25,6 +25,21 @@
     "./fastify/v4": {
       "types": "./dist/servers/fastify/v4/index.d.ts",
       "default": "./dist/servers/fastify/v4/index.js"
+    },
+    "./ruru": {
+      "types": "./fwd/ruru/index.d.ts",
+      "node": "./fwd/ruru/index.js",
+      "default": "./fwd/ruru/index.js"
+    },
+    "./ruru/server": {
+      "types": "./fwd/ruru/server/index.d.ts",
+      "node": "./fwd/ruru/server/index.js",
+      "default": "./fwd/ruru/server/index.js"
+    },
+    "./ruru/cli": {
+      "types": "./fwd/ruru/cli/index.d.ts",
+      "node": "./fwd/ruru/cli/index.js",
+      "default": "./fwd/ruru/cli/index.js"
     }
   },
   "scripts": {
@@ -91,6 +106,7 @@
   },
   "files": [
     "dist",
+    "fwd",
     "index.js"
   ]
 }

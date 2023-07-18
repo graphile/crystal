@@ -1,6 +1,6 @@
 import { isAsyncIterable, isSafeError } from "grafast";
-import type { AsyncExecutionResult, ExecutionResult } from "graphql";
-import * as graphql from "graphql";
+import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
+import * as graphql from "grafast/graphql";
 import { createHash } from "node:crypto";
 
 const { GraphQLError } = graphql;

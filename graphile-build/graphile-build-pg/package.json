@@ -9,6 +9,11 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./pg-introspection": {
+      "types": "./fwd/pg-introspection/index.d.ts",
+      "node": "./fwd/pg-introspection/index.js",
+      "default": "./fwd/pg-introspection/index.js"
     }
   },
   "scripts": {
@@ -66,6 +71,7 @@
   },
   "files": [
     "dist",
+    "fwd",
     "index.js"
   ],
   "devDependencies": {

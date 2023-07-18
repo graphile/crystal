@@ -48,7 +48,7 @@ import {
   object,
   operationPlan,
 } from "grafast";
-import type { GraphQLOutputType } from "graphql";
+import type { GraphQLOutputType } from "grafast/graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -63,7 +63,7 @@ import {
   GraphQLString,
   GraphQLUnionType,
   printSchema,
-} from "graphql";
+} from "grafast/graphql";
 import sql from "pg-sql2";
 //import prettier from "prettier";
 import { inspect } from "util";

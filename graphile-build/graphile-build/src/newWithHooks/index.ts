@@ -14,7 +14,7 @@ import type {
   GraphQLOutputType,
   GraphQLScalarTypeConfig,
   GraphQLSchemaConfig,
-} from "graphql";
+} from "grafast/graphql";
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -24,7 +24,7 @@ import {
   GraphQLSchema,
   GraphQLUnionType,
   isNamedType,
-} from "graphql";
+} from "grafast/graphql";
 import { inspect } from "util";
 
 import type { ScopeForType, SpecForType } from "../global.js";

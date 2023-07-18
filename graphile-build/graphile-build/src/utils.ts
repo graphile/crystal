@@ -1,6 +1,9 @@
 import { $$idempotent, SafeError } from "grafast";
-import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
-import { GraphQLError, GraphQLObjectType, Kind } from "graphql";
+import type {
+  GraphQLNamedType,
+  GraphQLScalarTypeConfig,
+} from "grafast/graphql";
+import { GraphQLError, GraphQLObjectType, Kind } from "grafast/graphql";
 // ENHANCE: remove 'lodash' dependency
 import camelCaseAll from "lodash/camelCase.js";
 import upperFirstAll from "lodash/upperFirst.js";

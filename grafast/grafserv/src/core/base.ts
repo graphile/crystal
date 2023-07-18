@@ -1,9 +1,9 @@
 import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import { isPromiseLike, SafeError, stringifyPayload } from "grafast";
+import type { GraphQLSchema } from "grafast/graphql";
+import * as graphql from "grafast/graphql";
 import { resolvePresets } from "graphile-config";
-import type { GraphQLSchema } from "graphql";
-import * as graphql from "graphql";
 
 import type {
   BufferResult,

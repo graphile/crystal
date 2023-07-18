@@ -5,8 +5,8 @@ import type {
   ExecutionArgs,
   ExecutionResult,
   GraphQLSchema,
-} from "graphql";
-import * as graphql from "graphql";
+} from "grafast/graphql";
+import * as graphql from "grafast/graphql";
 import type { ServerOptions, SubscribePayload } from "graphql-ws";
 import type { Extra } from "graphql-ws/lib/use/ws";
 import type { Readable } from "node:stream";

@@ -7,11 +7,11 @@ import { jsonParse } from "postgraphile/@dataplan/json";
 import { makePgService } from "postgraphile/adaptors/pg";
 import { context, listen, object } from "postgraphile/grafast";
 import type {} from "postgraphile/grafserv/node";
+import { defaultHTMLParts } from "postgraphile/grafserv/ruru/server";
 import { StreamDeferPlugin } from "postgraphile/graphile-build";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { PgRelayPreset } from "postgraphile/presets/relay";
 import { makeV4Preset } from "postgraphile/presets/v4";
-import { defaultHTMLParts } from "ruru/server";
 
 import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
 import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";

@@ -3,7 +3,7 @@ import "graphile-config";
 import type {
   GraphQLScalarLiteralParser,
   GraphQLScalarValueParser,
-} from "graphql";
+} from "grafast/graphql";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";

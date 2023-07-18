@@ -13,8 +13,8 @@ import type {
   InputStep,
 } from "grafast";
 import { getEnumValueConfig, SafeError } from "grafast";
+import type { GraphQLEnumType, GraphQLSchema } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
-import type { GraphQLEnumType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 
 import { version } from "../version.js";

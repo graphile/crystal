@@ -39,7 +39,6 @@
   "homepage": "https://github.com/graphile/heart/tree/main/graphile-build/graphile-utils",
   "dependencies": {
     "debug": "^4.1.1",
-    "graphile-config": "workspace:^",
     "json5": "^2.2.3",
     "tslib": "^2.5.0"
   },
@@ -52,22 +51,10 @@
     "graphile-build-pg": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
-    "pg-introspection": "workspace:^"
+    "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "grafast": {
-      "optional": true
-    },
-    "graphile-build": {
-      "optional": true
-    },
     "graphile-build-pg": {
-      "optional": true
-    },
-    "graphile-config": {
-      "optional": true
-    },
-    "pg-introspection": {
       "optional": true
     }
   },

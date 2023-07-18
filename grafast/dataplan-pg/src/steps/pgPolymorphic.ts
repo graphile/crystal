@@ -11,7 +11,7 @@ import {
   SafeError,
   UnbatchedExecutableStep,
 } from "grafast";
-import type { GraphQLObjectType } from "graphql";
+import type { GraphQLObjectType } from "grafast/graphql";
 
 import { inspect } from "../inspect.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";

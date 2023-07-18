@@ -21,7 +21,7 @@ import {
   isAsyncIterable,
   stripAnsi,
 } from "grafast";
-import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";

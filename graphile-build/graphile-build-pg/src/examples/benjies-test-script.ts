@@ -16,6 +16,7 @@ import { useValidationCache } from "@envelop/validation-cache";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
 import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
+import { graphql } from "grafast/graphql";
 import {
   buildInflection,
   buildSchema,
@@ -26,7 +27,6 @@ import {
 } from "graphile-build";
 import { resolvePresets } from "graphile-config";
 import { exportSchema } from "graphile-export";
-import { graphql } from "graphql";
 import {
   getGraphQLParameters,
   processRequest,

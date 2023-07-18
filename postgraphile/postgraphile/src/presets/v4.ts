@@ -1,8 +1,8 @@
 import "graphile-config";
 
+import type { GraphQLError } from "grafast/graphql";
 import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
 import { parseDatabaseIdentifier } from "graphile-build-pg";
-import type { GraphQLError } from "graphql";
 import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";

@@ -9,8 +9,12 @@ import {
   isPromiseLike,
   SafeError,
 } from "grafast";
-import type { DocumentNode, ExecutionArgs, GraphQLSchema } from "graphql";
-import * as graphql from "graphql";
+import type {
+  DocumentNode,
+  ExecutionArgs,
+  GraphQLSchema,
+} from "grafast/graphql";
+import * as graphql from "grafast/graphql";
 import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { makeAcceptMatcher } from "../accept.js";

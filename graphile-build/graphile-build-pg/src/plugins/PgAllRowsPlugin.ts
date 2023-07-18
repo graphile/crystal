@@ -3,8 +3,8 @@ import "graphile-config";
 
 import type { PgResource } from "@dataplan/pg";
 import { connection } from "grafast";
+import type { GraphQLObjectType, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
-import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";

@@ -6,7 +6,7 @@ import type {
   PromiseOrDirect,
 } from "grafast";
 import { ExecutableStep, exportAs, polymorphicWrap } from "grafast";
-import type { GraphQLObjectType } from "graphql";
+import type { GraphQLObjectType } from "grafast/graphql";
 
 import type { PgResource } from "../datasource.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";

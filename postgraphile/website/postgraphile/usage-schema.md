@@ -105,8 +105,8 @@ Here's a full example:
 
 ```ts
 import { makeSchema } from "postgraphile";
-import { parse, validate } from "graphql";
-import { hookArgs, execute } from "grafast";
+import { parse, validate } from "postgraphile/graphql";
+import { hookArgs, execute } from "postgraphile/grafast";
 
 import preset from "./graphile.config.js";
 

@@ -2,7 +2,7 @@ import "./global.js";
 
 import chalk from "chalk";
 import * as grafast from "grafast";
-import type { GraphQLNamedType } from "graphql";
+import type { GraphQLNamedType } from "grafast/graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -17,8 +17,8 @@ import {
   GraphQLUnionType,
   isInputType,
   isOutputType,
-} from "graphql";
-import * as graphql from "graphql";
+} from "grafast/graphql";
+import * as graphql from "grafast/graphql";
 import * as semver from "semver";
 
 import extend, { indent } from "./extend.js";

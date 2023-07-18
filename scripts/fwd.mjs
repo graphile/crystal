@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { rimraf } from "rimraf";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(
   /\/+$/,
@@ -8,17 +9,46 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(
 );
 
 const todo = {
+  grafast: {
+    graphql: true,
+  },
+  grafserv: {
+    ruru: true,
+  },
+  "graphile-build-pg": {
+    "pg-introspection": true,
+  },
   postgraphile: {
+    "@dataplan/pg/adaptors/pg": "./adaptors/pg",
+
+    "grafast/graphql": "./graphql",
     "@dataplan/json": true,
     "@dataplan/pg": true,
-    "@dataplan/pg/adaptors/pg": "./adaptors/pg",
     grafast: true,
     grafserv: true,
     "graphile-build": true,
     "graphile-build-pg": true,
-    graphql: true,
     "pg-sql2": true,
     tamedevil: true,
+    "graphile-utils": "./utils",
+  },
+  pgl: {
+    "postgraphile/presets/amber": "./amber",
+    "postgraphile/presets/v4": "./v4",
+    "postgraphile/presets/relay": "./relay",
+
+    "@dataplan/pg/adaptors/pg": "./adaptors/pg",
+
+    "grafast/graphql": "./graphql",
+    "@dataplan/json": true,
+    "@dataplan/pg": true,
+    grafast: true,
+    grafserv: true,
+    "graphile-build": true,
+    "graphile-build-pg": true,
+    "pg-sql2": true,
+    tamedevil: true,
+    "postgraphile/utils": "./utils",
   },
 };
 
@@ -62,9 +92,11 @@ async function makeFwd(rootPath, target) {
     node: `./fwd/${target}/index.js`,
     default: `./fwd/${target}/index.js`,
   };
+  const disableEslint = target === "graphile-build";
   await fs.writeFile(
     `${fwdDir}/index.d.ts`,
     `\
+${disableEslint ? `// eslint-disable-next-line import/export\n` : ``}\
 export * from "${target}";
 `,
   );
@@ -81,7 +113,19 @@ async function main() {
   for (const packageName in todo) {
     const packageTodo = todo[packageName];
     const rootPath = `${__dirname}/../node_modules/${packageName}`;
+    await rimraf(`${rootPath}/fwd`);
     const packageJson = await loadJSON(`${rootPath}/package.json`);
+    if (!packageJson.files.includes("fwd")) {
+      packageJson.files.push("fwd");
+    }
+    if (packageJson.exports) {
+      // Delete all the old fwds
+      for (const [key, spec] of Object.entries(packageJson.exports)) {
+        if (spec.types.startsWith("./fwd/")) {
+          delete packageJson.exports[key];
+        }
+      }
+    }
     for (const target in packageTodo) {
       const spec = packageTodo[target];
       if (spec === true) {

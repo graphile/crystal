@@ -4,8 +4,8 @@ import type { PgInsertSingleStep, PgResource } from "@dataplan/pg";
 import { pgInsertSingle } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
 import { assertExecutableStep, constant, object } from "grafast";
+import type { GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
-import type { GraphQLOutputType } from "graphql";
 
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";

@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { GraphQLEnumType } from "graphql";
+import type { GraphQLEnumType } from "grafast/graphql";
 
 import { version } from "../version.js";
 

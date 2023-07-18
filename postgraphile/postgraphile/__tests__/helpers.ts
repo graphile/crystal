@@ -23,7 +23,6 @@ import {
   hookArgs,
   subscribe as grafastSubscribe,
 } from "grafast";
-import { StreamDeferPlugin } from "graphile-build";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
@@ -31,7 +30,7 @@ import type {
   GraphQLError,
   GraphQLSchema,
   SubscriptionArgs,
-} from "graphql";
+} from "grafast/graphql";
 import {
   execute as graphqlExecute,
   getOperationAST,
@@ -39,7 +38,8 @@ import {
   subscribe as graphqlSubscribe,
   validate,
   validateSchema,
-} from "graphql";
+} from "grafast/graphql";
+import { StreamDeferPlugin } from "graphile-build";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import type { JwtPayload } from "jsonwebtoken";

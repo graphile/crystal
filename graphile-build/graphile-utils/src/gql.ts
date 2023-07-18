@@ -1,6 +1,6 @@
-import type { ASTNode, DefinitionNode, DocumentNode } from "graphql";
+import type { ASTNode, DefinitionNode, DocumentNode } from "grafast/graphql";
 // eslint-disable-next-line no-restricted-syntax
-import { parse, visit } from "graphql";
+import { parse, visit } from "grafast/graphql";
 
 function isGraphQLDocument(input: any): input is DocumentNode {
   return (
