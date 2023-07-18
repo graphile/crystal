@@ -89,6 +89,21 @@
       "node": "./fwd/grafserv/fastify/v4/index.js",
       "default": "./fwd/grafserv/fastify/v4/index.js"
     },
+    "./grafserv/ruru": {
+      "types": "./fwd/grafserv/ruru/index.d.ts",
+      "node": "./fwd/grafserv/ruru/index.js",
+      "default": "./fwd/grafserv/ruru/index.js"
+    },
+    "./grafserv/ruru/server": {
+      "types": "./fwd/grafserv/ruru/server/index.d.ts",
+      "node": "./fwd/grafserv/ruru/server/index.js",
+      "default": "./fwd/grafserv/ruru/server/index.js"
+    },
+    "./grafserv/ruru/cli": {
+      "types": "./fwd/grafserv/ruru/cli/index.d.ts",
+      "node": "./fwd/grafserv/ruru/cli/index.js",
+      "default": "./fwd/grafserv/ruru/cli/index.js"
+    },
     "./graphile-build": {
       "types": "./fwd/graphile-build/index.d.ts",
       "node": "./fwd/graphile-build/index.js",
@@ -113,21 +128,6 @@
       "types": "./fwd/tamedevil/index.d.ts",
       "node": "./fwd/tamedevil/index.js",
       "default": "./fwd/tamedevil/index.js"
-    },
-    "./ruru": {
-      "types": "./fwd/ruru/index.d.ts",
-      "node": "./fwd/ruru/index.js",
-      "default": "./fwd/ruru/index.js"
-    },
-    "./ruru/server": {
-      "types": "./fwd/ruru/server/index.d.ts",
-      "node": "./fwd/ruru/server/index.js",
-      "default": "./fwd/ruru/server/index.js"
-    },
-    "./ruru/cli": {
-      "types": "./fwd/ruru/cli/index.d.ts",
-      "node": "./fwd/ruru/cli/index.js",
-      "default": "./fwd/ruru/cli/index.js"
     }
   },
   "bin": "./dist/cli-run.js",
@@ -178,7 +178,6 @@
     "pg-introspection": "workspace:^",
     "pg-sql2": "workspace:^",
     "postgraphile": "workspace:^",
-    "ruru": "workspace:^",
     "tamedevil": "workspace:^",
     "tslib": "^2.5.0",
     "ws": "^8.12.1"

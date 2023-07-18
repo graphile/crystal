@@ -12,6 +12,9 @@ const todo = {
   grafast: {
     graphql: true,
   },
+  grafserv: {
+    ruru: true,
+  },
   "graphile-build-pg": {
     "pg-introspection": true,
   },
@@ -27,7 +30,6 @@ const todo = {
     "graphile-build-pg": true,
     "pg-sql2": true,
     tamedevil: true,
-    ruru: true,
   },
   pgl: {
     "postgraphile/presets/amber": "./amber",
@@ -45,7 +47,6 @@ const todo = {
     "graphile-build-pg": true,
     "pg-sql2": true,
     tamedevil: true,
-    ruru: true,
   },
 };
 
