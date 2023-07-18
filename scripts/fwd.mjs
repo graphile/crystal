@@ -17,7 +17,7 @@ const todo = {
   postgraphile: {
     "@dataplan/pg/adaptors/pg": "./adaptors/pg",
 
-    graphql: true,
+    "grafast/graphql": "./graphql",
     "@dataplan/json": true,
     "@dataplan/pg": true,
     grafast: true,
@@ -35,7 +35,7 @@ const todo = {
 
     "@dataplan/pg/adaptors/pg": "./adaptors/pg",
 
-    graphql: true,
+    "grafast/graphql": "./graphql",
     "@dataplan/json": true,
     "@dataplan/pg": true,
     grafast: true,

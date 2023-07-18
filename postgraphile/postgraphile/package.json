@@ -96,9 +96,9 @@
       "default": "./fwd/@dataplan/json/index.js"
     },
     "./graphql": {
-      "types": "./fwd/graphql/index.d.ts",
-      "node": "./fwd/graphql/index.js",
-      "default": "./fwd/graphql/index.js"
+      "types": "./fwd/grafast/graphql/index.d.ts",
+      "node": "./fwd/grafast/graphql/index.js",
+      "default": "./fwd/grafast/graphql/index.js"
     },
     "./pg-sql2": {
       "types": "./fwd/pg-sql2/index.d.ts",
