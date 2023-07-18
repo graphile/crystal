@@ -1,5 +1,12 @@
 # grafast
 
+## 0.0.1-alpha.14
+
+### Patch Changes
+
+- [`d99d666fb`](https://github.com/benjie/postgraphile-private/commit/d99d666fb234eb02dd196610995fa480c596242a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix grafast release command
+
 ## 0.0.1-alpha.13
 
 ### Patch Changes
