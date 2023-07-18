@@ -30,12 +30,27 @@
       "node": "./dist/presets/relay.js",
       "default": "./dist/presets/relay.js"
     },
+    "./adaptors/pg": {
+      "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
+      "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
+      "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
+    },
+    "./graphql": {
+      "types": "./fwd/grafast/graphql/index.d.ts",
+      "node": "./fwd/grafast/graphql/index.js",
+      "default": "./fwd/grafast/graphql/index.js"
+    },
+    "./@dataplan/json": {
+      "types": "./fwd/@dataplan/json/index.d.ts",
+      "node": "./fwd/@dataplan/json/index.js",
+      "default": "./fwd/@dataplan/json/index.js"
+    },
     "./@dataplan/pg": {
       "types": "./fwd/@dataplan/pg/index.d.ts",
       "node": "./fwd/@dataplan/pg/index.js",
       "default": "./fwd/@dataplan/pg/index.js"
     },
-    "./adaptors/pg": {
+    "./@dataplan/pg/adaptors/pg": {
       "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
       "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
       "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
@@ -44,6 +59,16 @@
       "types": "./fwd/grafast/index.d.ts",
       "node": "./fwd/grafast/index.js",
       "default": "./fwd/grafast/index.js"
+    },
+    "./grafast/envelop": {
+      "types": "./fwd/grafast/envelop/index.d.ts",
+      "node": "./fwd/grafast/envelop/index.js",
+      "default": "./fwd/grafast/envelop/index.js"
+    },
+    "./grafast/graphql": {
+      "types": "./fwd/grafast/graphql/index.d.ts",
+      "node": "./fwd/grafast/graphql/index.js",
+      "default": "./fwd/grafast/graphql/index.js"
     },
     "./grafserv": {
       "types": "./fwd/grafserv/index.d.ts",
@@ -54,16 +79,6 @@
       "types": "./fwd/grafserv/node/index.d.ts",
       "node": "./fwd/grafserv/node/index.js",
       "default": "./fwd/grafserv/node/index.js"
-    },
-    "./@dataplan/pg/adaptors/pg": {
-      "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
-      "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
-      "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
-    },
-    "./grafast/envelop": {
-      "types": "./fwd/grafast/envelop/index.d.ts",
-      "node": "./fwd/grafast/envelop/index.js",
-      "default": "./fwd/grafast/envelop/index.js"
     },
     "./grafserv/express/v4": {
       "types": "./fwd/grafserv/express/v4/index.d.ts",
@@ -90,15 +105,10 @@
       "node": "./fwd/graphile-build-pg/index.js",
       "default": "./fwd/graphile-build-pg/index.js"
     },
-    "./@dataplan/json": {
-      "types": "./fwd/@dataplan/json/index.d.ts",
-      "node": "./fwd/@dataplan/json/index.js",
-      "default": "./fwd/@dataplan/json/index.js"
-    },
-    "./graphql": {
-      "types": "./fwd/grafast/graphql/index.d.ts",
-      "node": "./fwd/grafast/graphql/index.js",
-      "default": "./fwd/grafast/graphql/index.js"
+    "./graphile-build-pg/pg-introspection": {
+      "types": "./fwd/graphile-build-pg/pg-introspection/index.d.ts",
+      "node": "./fwd/graphile-build-pg/pg-introspection/index.js",
+      "default": "./fwd/graphile-build-pg/pg-introspection/index.js"
     },
     "./pg-sql2": {
       "types": "./fwd/pg-sql2/index.d.ts",
@@ -124,16 +134,6 @@
       "types": "./fwd/ruru/cli/index.d.ts",
       "node": "./fwd/ruru/cli/index.js",
       "default": "./fwd/ruru/cli/index.js"
-    },
-    "./grafast/graphql": {
-      "types": "./fwd/grafast/graphql/index.d.ts",
-      "node": "./fwd/grafast/graphql/index.js",
-      "default": "./fwd/grafast/graphql/index.js"
-    },
-    "./graphile-build-pg/pg-introspection": {
-      "types": "./fwd/graphile-build-pg/pg-introspection/index.d.ts",
-      "node": "./fwd/graphile-build-pg/pg-introspection/index.js",
-      "default": "./fwd/graphile-build-pg/pg-introspection/index.js"
     }
   },
   "bin": "./dist/cli-run.js",

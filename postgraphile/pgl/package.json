@@ -24,10 +24,15 @@
       "node": "./fwd/postgraphile/presets/relay/index.js",
       "default": "./fwd/postgraphile/presets/relay/index.js"
     },
-    "./pg": {
-      "types": "./fwd/@dataplan/pg/adaptors/pg/relay/index.d.ts",
-      "node": "./fwd/@dataplan/pg/adaptors/pg/relay/index.js",
-      "default": "./fwd/@dataplan/pg/adaptors/pg/relay/index.js"
+    "./adaptors/pg": {
+      "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
+      "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
+      "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
+    },
+    "./graphql": {
+      "types": "./fwd/grafast/graphql/index.d.ts",
+      "node": "./fwd/grafast/graphql/index.js",
+      "default": "./fwd/grafast/graphql/index.js"
     },
     "./@dataplan/json": {
       "types": "./fwd/@dataplan/json/index.d.ts",
@@ -44,11 +49,6 @@
       "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
       "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
     },
-    "./adaptors/pg": {
-      "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
-      "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
-      "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
-    },
     "./grafast": {
       "types": "./fwd/grafast/index.d.ts",
       "node": "./fwd/grafast/index.js",
@@ -58,6 +58,11 @@
       "types": "./fwd/grafast/envelop/index.d.ts",
       "node": "./fwd/grafast/envelop/index.js",
       "default": "./fwd/grafast/envelop/index.js"
+    },
+    "./grafast/graphql": {
+      "types": "./fwd/grafast/graphql/index.d.ts",
+      "node": "./fwd/grafast/graphql/index.js",
+      "default": "./fwd/grafast/graphql/index.js"
     },
     "./grafserv": {
       "types": "./fwd/grafserv/index.d.ts",
@@ -94,10 +99,10 @@
       "node": "./fwd/graphile-build-pg/index.js",
       "default": "./fwd/graphile-build-pg/index.js"
     },
-    "./graphql": {
-      "types": "./fwd/grafast/graphql/index.d.ts",
-      "node": "./fwd/grafast/graphql/index.js",
-      "default": "./fwd/grafast/graphql/index.js"
+    "./graphile-build-pg/pg-introspection": {
+      "types": "./fwd/graphile-build-pg/pg-introspection/index.d.ts",
+      "node": "./fwd/graphile-build-pg/pg-introspection/index.js",
+      "default": "./fwd/graphile-build-pg/pg-introspection/index.js"
     },
     "./pg-sql2": {
       "types": "./fwd/pg-sql2/index.d.ts",
@@ -123,16 +128,6 @@
       "types": "./fwd/ruru/cli/index.d.ts",
       "node": "./fwd/ruru/cli/index.js",
       "default": "./fwd/ruru/cli/index.js"
-    },
-    "./grafast/graphql": {
-      "types": "./fwd/grafast/graphql/index.d.ts",
-      "node": "./fwd/grafast/graphql/index.js",
-      "default": "./fwd/grafast/graphql/index.js"
-    },
-    "./graphile-build-pg/pg-introspection": {
-      "types": "./fwd/graphile-build-pg/pg-introspection/index.d.ts",
-      "node": "./fwd/graphile-build-pg/pg-introspection/index.js",
-      "default": "./fwd/graphile-build-pg/pg-introspection/index.js"
     }
   },
   "bin": "./dist/cli-run.js",
