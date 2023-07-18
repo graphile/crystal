@@ -155,6 +155,13 @@ yarn pack -o package.tgz
 mv package.tgz ../../builds/postgraphile.tgz
 cd -
 
+#pgl
+cd postgraphile/pgl/
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/pgl.tgz
+cd -
+
 # @graphile/simplify-inflection
 cd graphile-build/graphile-simplify-inflection
 rm -f *.tgz
