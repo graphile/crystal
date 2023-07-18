@@ -113,6 +113,9 @@ async function main() {
     const rootPath = `${__dirname}/../node_modules/${packageName}`;
     await rimraf(`${rootPath}/fwd`);
     const packageJson = await loadJSON(`${rootPath}/package.json`);
+    if (!packageJson.files.includes("fwd")) {
+      packageJson.files.push("fwd");
+    }
     if (packageJson.exports) {
       // Delete all the old fwds
       for (const [key, spec] of Object.entries(packageJson.exports)) {
