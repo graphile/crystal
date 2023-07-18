@@ -19,7 +19,7 @@
     "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE.md",
   "bugs": {
     "url": "https://github.com/graphile/heart/issues"
   },
@@ -28,7 +28,8 @@
     "node": ">=14.17"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE.md"
   ],
   "dependencies": {
     "@typescript/vfs": "^1.4.0",

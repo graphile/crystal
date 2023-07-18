@@ -1,63 +1,3 @@
-# SPONSORS-ONLY PERIOD
-
-**Hello and thanks for being one of the first people to look at PostGraphile and
-Graphile Engine V5!**
-
-Though this repository is MIT licensed, we're not ready for it to go public yet.
-**Please do not share this code** beyond your company/organization. Preferably,
-don't even share details of the new features!
-
-**STATUS**: you should assume everything in this repository is highly unstable
-and liable to change. This is a technology preview to help us shape the best
-possible software for GraphQL, it's not ready for you to run in production...
-yet!
-
-**GETTING STARTED**: I'm afraid since our focus has been on the core technology,
-the "awesome DX" parts haven't been finished yet (and in some cases haven't even
-been started!) We suggest that you start by cloning down the repository, then
-running the following:
-
-```
-yarn
-yarn watch
-```
-
-This'll keep the compiled code up to date.
-
-First step is probably to run PostGraphile, to do so:
-
-```
-cd postgraphile/postgraphile
-# This next line is optional, among other things it adds indentation to the SQL
-export GRAPHILE_ENV=development
-yarn postgraphile -e -c postgres:///your_db_here
-```
-
-This should run PostGraphile [at http://localhost:5678](http://localhost:5678).
-It may take a good few seconds to load GraphiQL the first time... I should look
-into that. If you go to `Panels > Explain` then when you run queries you'll be
-able to see the Grafast query plan (and the SQL queries) in the resizeable panel
-at the bottom.
-
-Should you wish to get your feet a little wetter, have a look at
-[graphile-build/graphile-build-pg/src/examples/README.md](graphile-build/graphile-build-pg/src/examples/README.md)
-and follow the guidance there, try out a couple examples, etc.
-
-**DOCS**: I've put a fair amount of effort into documenting various of the
-functions/variables in the codebase, but there's very little in the way of
-user-docs right now. Further, quite a lot of stuff is in flux (e.g. we're moving
-from "execution-v1" to "execution-v2"), so I've not bothered to document stuff
-I'm planning to remove before release. Please don't hesitate to ask me questions
-in the #🔮 channel [on Discord](https://discord.gg/graphile), or file an issue.
-I won't be investing significant time in documentation until the codebase is a
-little further along.
-
-Also, **please look at the
-[discussions](https://github.com/benjie/postgraphile-private/discussions)** - we
-need your feedback!
-
----
-
 # Graphile GraphQL Monorepo
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
@@ -67,7 +7,7 @@ need your feedback!
 
 At Graphile we love GraphQL so much we named ourself for our love of it! This
 repository houses many of the Graphile packages that relate to GraphQL; the two
-headline projects are **Grafast** and **PostGraphile** but there's many other
+headline projects are **Gra*fast*** and **PostGraphile** but there's many other
 packages, a fair few of which can be used independently - see below for more
 details.
 
@@ -128,9 +68,9 @@ Here's a rough breakdown of the main packages:
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask all
-individuals and businesses that use it to help support its ongoing maintenance
-and development via sponsorship.
+To help us develop this software sustainably, we ask all individuals and
+businesses that use it to help support its ongoing maintenance and development
+via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -149,56 +89,6 @@ And please give some love to our featured sponsors 🤩:
 <em>\* Sponsors the entire Graphile suite</em>
 
 <!-- SPONSORS_END -->
-
-## Development
-
-### Requirements
-
-Node 16 or above
-
-### Set up
-
-We use `yarn` to manage this monorepo; we strongly recommend that you only use
-`yarn` when dealing with it - not `npm`, `pnpm` or similar. (Not because these
-technologies are in any way inferior to `yarn`, simply because they're not 100%
-compatible with each other and we require that you use `yarn` to contribute.)
-
-Install the dependencies with `yarn`, and then run `yarn watch` which will
-compile all the source code with `tsc` (TypeScript) and will keep watching the
-filesystem for changes. (You can do `yarn build` for a one-time build if you
-prefer.)
-
-```bash
-yarn
-yarn watch # or 'yarn build'
-```
-
-**TODO:** check the following instructions work on a clean checkout.
-
-We assume you have a local PostgreSQL server running in "trust" authentication
-mode. Other options may or may not work.
-
-First, create a database for running the tests: `createdb graphile_graphql_test`
-
-Then tell our system this is the database you're using (you'll need to do this
-each time you run the tests in a new terminal):
-
-```bash
-export TEST_DATABASE_URL="postgres:///graphile_graphql_test"
-```
-
-Then run the tests with `yarn test`
-
-If the above succeeds, you're good to go! If not, please try again after running
-`yarn install --force` and always feel free to reach out via
-[our discord chat](http://discord.gg/graphile) on the #core-development channel.
-
-### Working with Docker
-
-**TODO:** the below is outdated.
-
-If you want to work in a Docker environment you can follow
-[the instructions on the wiki](https://github.com/graphile/graphile-build/wiki/Development-with-docker-compose).
 
 [grafast]: grafast/grafast/
 [@dataplan/pg]: grafast/dataplan-pg/

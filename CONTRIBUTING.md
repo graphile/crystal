@@ -10,11 +10,40 @@ Following are some guidelines for contributions.
 
 ## Setting up a development environment
 
-```
-createdb graphile_graphql_test
+We use `yarn` to manage this monorepo; we strongly recommend that you only use
+`yarn` when dealing with it - not `npm`, `pnpm` or similar. (Not because these
+technologies are in any way inferior to `yarn`, simply because they're not 100%
+compatible with each other and we require that you use `yarn` to contribute.)
+
+Install the dependencies with `yarn`, and then run `yarn watch` which will
+compile all the source code with `tsc` (TypeScript) and will keep watching the
+filesystem for changes. (You can do `yarn build` for a one-time build if you
+prefer.)
+
+```bash
 yarn
-yarn watch
+yarn watch # or 'yarn build'
 ```
+
+**TODO:** check the following instructions work on a clean checkout.
+
+We assume you have a local PostgreSQL server running in "trust" authentication
+mode. Other options may or may not work.
+
+First, create a database for running the tests: `createdb graphile_graphql_test`
+
+Then tell our system this is the database you're using (you'll need to do this
+each time you run the tests in a new terminal):
+
+```bash
+export TEST_DATABASE_URL="postgres:///graphile_graphql_test"
+```
+
+Then run the tests with `yarn test`
+
+If the above succeeds, you're good to go! If not, please try again after running
+`yarn install --force` and always feel free to reach out via
+[our discord chat](http://discord.gg/graphile) on the #core-development channel.
 
 ## ASK FIRST!
 
