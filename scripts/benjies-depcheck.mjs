@@ -143,6 +143,10 @@ for (const module of Object.values(all)) {
     packageJson: { dependencies, peerDependencies },
   } = module;
   const check = (dependencies, isPeer) => {
+    // Peer deps don't need their peer's other peerDeps
+    if (isPeer) {
+      return;
+    }
     for (const depModuleName in dependencies) {
       const dep = all[depModuleName];
       if (dep) {
@@ -166,9 +170,9 @@ for (const module of Object.values(all)) {
                 );
               } else {
                 warnings.push(
-                  `${name} should provide "${peerDepName}": "${
+                  `${name} could provide "${peerDepName}": "${
                     depPeerDeps[peerDepName]
-                  }" because it's peer dependend on by ${
+                  }" because it's (optionally) peer dependend on by ${
                     isPeer ? "peer " : ""
                   }dependency ${dep.name}.`,
                 );
