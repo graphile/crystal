@@ -82,7 +82,6 @@
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "ruru": "workspace:^",
-    "tamedevil": "workspace:^",
     "ws": "^8.12.1"
   },
   "peerDependenciesMeta": {
