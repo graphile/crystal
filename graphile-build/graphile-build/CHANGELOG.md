@@ -1,5 +1,14 @@
 # graphile-build
 
+## 5.0.0-alpha.16
+
+### Patch Changes
+
+- [#420](https://github.com/benjie/postgraphile-private/pull/420)
+  [`c1518fad0`](https://github.com/benjie/postgraphile-private/commit/c1518fad093dc53c033866541f378878aab69b5c)
+  Thanks [@benjie](https://github.com/benjie)! - Fix schema so it can run
+  without NodePlugin
+
 ## 5.0.0-alpha.15
 
 ### Patch Changes

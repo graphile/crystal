@@ -1,6 +1,6 @@
 {
   "name": "graphile",
-  "version": "5.0.0-alpha.9",
+  "version": "5.0.0-alpha.10",
   "description": "Swiss army knife for dealing with all things Graphile",
   "main": "dist/index.js",
   "bin": "dist/cli-run.js",
