@@ -6,6 +6,7 @@ import type {
   DocumentNode,
   ExecutionArgs,
   FragmentDefinitionNode,
+  GraphQLArgs,
   GraphQLArgument,
   GraphQLArgumentConfig,
   GraphQLError,
@@ -1003,3 +1004,8 @@ export type StreamMaybeMoreableArray<T = any> = Array<T> & {
 export type StreamMoreableArray<T = any> = Array<T> & {
   [$$streamMore]: AsyncIterator<any, any, any> | Iterator<any, any, any>;
 };
+
+export interface GrafastArgs extends GraphQLArgs {
+  resolvedPreset?: GraphileConfig.ResolvedPreset;
+  requestContext?: Partial<Grafast.RequestContext>;
+}
