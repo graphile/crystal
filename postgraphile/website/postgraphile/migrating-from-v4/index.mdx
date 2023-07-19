@@ -372,7 +372,7 @@ has a lifecycle that needs to be carefully managed. Just run the query through
 
 The `context` will still need to be generated however. The easy option is to
 have this done automatically by additionally passing the `resolvedPreset` and a
-`requestCtx` object to `grafast`:
+`requestContext` object to `grafast`:
 
 ```ts title="schema-only.mjs"
 import { grafast } from "grafast";
@@ -389,8 +389,8 @@ const args = {
     }
   `,
 };
-const requestCtx = {};
-const result = await grafast(args, resolvedPreset, requestCtx);
+const requestContext = {};
+const result = await grafast(args, resolvedPreset, requestContext);
 console.dir(result);
 ```
 

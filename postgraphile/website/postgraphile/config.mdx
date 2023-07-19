@@ -1,3 +1,9 @@
+---
+title: Configuration
+---
+
+import GraphileCLI from "@theme/GraphileCLI";
+
 # Configuration
 
 PostGraphile is configured through a `graphile-config` "preset." A preset is a
@@ -8,13 +14,8 @@ Your preset will almost certainly need to extend an existing preset or presets,
 and which preset(s) to extend depends on what you're looking for from
 PostGraphile.
 
-(TODO: expand here with different use cases and presets that support them.)
-
-The PostGraphile base presets are named after crystals; the first preset available is
-`postgraphile/presets/amber`, so you'll definitely want that. **If you're coming
-from PostGraphile V4** you may also want to make your own preset with the
-`makeV4Preset()` factory - see the
-[V4 migration docs](./migrating-from-v4/) for more information.
+The PostGraphile base presets are named after crystals; the first base preset
+available is `postgraphile/presets/amber`, so you'll definitely want that.
 
 :::caution
 
@@ -22,6 +23,14 @@ Please don't name your own presets after crystals, or we may end up having
 confusion!
 
 :::
+
+**If you're coming from PostGraphile V4** you may then want to add your own
+V4-themed preset with the `makeV4Preset()` factory - see the [V4 migration
+docs](./migrating-from-v4/) for more information.
+
+If your schema is meant to be consumed by Relay, you may add the
+`postgraphile/presets/relay` preset which enables behaviors and plugins
+optimized for Relay consumption.
 
 ## General structure
 
@@ -45,8 +54,9 @@ scopes, `graphile-build-pg` registers the `pgServices` scope, and Grafserv
 registers the `grafserv` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
-get auto-completion for the options available in each scope. It may be necessary
-to add `import "postgraphile"` at the top of the configuration file so that
+get auto-completion for the options available in each scope; you can also use
+the `graphile config options` command detailed below. It may be necessary to
+add `import "postgraphile"` at the top of the configuration file so that
 TypeScript imports all the available scopes.
 
 :::note
@@ -54,9 +64,10 @@ TypeScript imports all the available scopes.
 The schema build process in PostGraphile is:
 
 - Synchronously build the inflectors via the `inflection` phase - inflectors are
-  used throughout all other phases
+  used throughout the phases
 - Asynchronously build the registry by performing database introspection in the
   `gather` phase
+- Synchronously determine the behaviors of each of the entities in the registry during the `behavior` phase
 - Synchronously build the GraphQL schema during the `schema` phase
 
 :::
@@ -67,14 +78,14 @@ The schema build process in PostGraphile is:
 // Only needed for TypeScript types support
 import "postgraphile";
 
-import amber from "postgraphile/presets/amber";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 // Use the 'pg' module to connect to the database
 import { makePgService } from "postgraphile/adaptors/pg";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
   extends: [
-    amber,
+    PostGraphileAmberPreset,
     /* Add more presets here */
   ],
 
@@ -124,6 +135,17 @@ find out what options are available to you:
 graphile config options
 ```
 
+:::info
+
+The `graphile` CLI is a development aid only, and is not needed at runtime or
+in production. This utility is sponsors-only source-available software. If
+you're not a sponsor there's a 30 day free trial that starts as soon as you run
+it for the first time. You may sponsor at any level for access to this utility.
+Read the details in the [graphile command's
+README](https://www.npmjs.com/package/graphile/v/alpha).
+
+:::
+
 Note that the options available will be influenced by the modules that you are
 using, so be sure to import any plugins and presets at the top of your config
 file.
@@ -155,9 +177,9 @@ graphile config print
 
 What follows are some of the more commonly used options to serve as a quick
 reference, but this list can quickly become out of date (feel free to send a
-PR!). You should use the `graphile config options` command mentioned above to
-see what options are available to you - different presets and plugins make
-different options available.
+PR!). You can use TypeScript or the sponsors-only `graphile config options`
+command mentioned above to see what options are available to you - different
+presets and plugins make different options available.
 
 ### `inflection` options
 
@@ -185,7 +207,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
-- `pgSettings: (requestCtx: Grafast.RequestContext) => Record<string, string> | null` -
+- `pgSettings: (requestContext: Grafast.RequestContext) => Record<string, string> | null` -
   a callback function that will be called by the server to determine the
   pgSettings to use for a particular request
 - `pgSettingsForIntrospection: Record<string, string> | null` - the pgSettings
@@ -250,9 +272,9 @@ explicit and unique name.
 
 :::
 
-It may additionally accept any other options it likes (but care should be taken
-to not conflict with options of other adaptors, or options that we might want
-to add to core in future).
+Each adaptor may additionally accept any other options it likes (but care
+should be taken to not conflict with options of other adaptors, or options that
+we might want to add to core in future).
 
 `makePgService` will return a fully resolved configuration object, suitable for
 inclusion into the `pgServices` array in your `graphile.config.mjs` (or similar)
@@ -397,8 +419,8 @@ Example:
 ```js title="graphile.config.js"
 export default {
   grafast: {
-    async context(requestCtx) {
-      const req = requestCtx.node?.req;
+    async context(requestContext, args) {
+      const req = requestContext.node?.req;
       // You can perform asynchronous actions here if you need to; for example
       // looking up the current user in the database.
 
@@ -409,7 +431,7 @@ export default {
 
         // Add a helper to get a header
         getHeader(name) {
-          return req.get(name);
+          return req?.get(name);
         },
 
         // Give access to the database-owner PostgreSQL pool, for example to
@@ -423,10 +445,11 @@ export default {
 
 :::warning
 
-When adding details to `context`, you must careful to not add properties that
+When adding details to `grafast.context`, you must careful to not add properties that
 will clash with system context keys such as `withPgClient`, `pgSettings`,
 `pgSubscriber` and `jwtClaims` (you can see the existing context keys by
-inspecting the second argument to the `context` callback).
+inspecting the `contextValue` property of second argument to the `grafast.context`
+callback: `args.contextValue`).
 
 For the absolute best future compatibility, we recommend that you prefix your
 context keys with your initials, company name, or similar.
@@ -436,11 +459,12 @@ context keys with your initials, company name, or similar.
 :::tip
 
 It's _not_ a good idea to give direct access to the `req` or `res` objects
-via `context` as it binds the context too tightly to the HTTP request
-lifecycle — this will cause you issues if you try and use the GraphQL schema in
-other contexts (e.g. directly from the application, in integration tests,
-or over alternative transports such as websockets for realtime).
-Instead, add helpers to get/set the data you need.
+via `grafast.context` as it binds the GraphQL context too tightly to the HTTP
+request lifecycle — this will cause you issues if you try and use the GraphQL
+schema in other contexts (e.g. directly from the application, in integration
+tests, or over alternative transports such as websockets for realtime).
+Instead, add helpers to get/set the data you need that can be implemented in
+each future situation.
 
 :::
 
@@ -467,10 +491,10 @@ such as `role`, and will be applied by Postgres.
 
 :::
 
-Remember: the `context` entry can be a callback (even an asynchronous callback
-if you need) which can extract details from the HTTP request. Here's an example
-that extracts the user's ID from a JWT and adds information from a specific
-HTTP header:
+Remember: the `grafast.context` entry can be a callback (even an asynchronous
+callback if you need) which can extract details from the HTTP request. Here's
+an example that extracts the user's ID from a JWT and adds information from a
+specific HTTP header:
 
 ```ts title="graphile.config.js"
 import jwt from "jsonwebtoken";
@@ -481,13 +505,13 @@ export default {
   // ...
 
   grafast: {
-    async context(requestCtx, graphqlRequestArgs) {
-      // Extract details from the requestCtx:
-      const req = requestCtx.node?.req;
-      // Or: const req = requestCtx.expressv4?.req;
-      // Or: const ctx = requestCtx.koav2?.ctx;
+    async context(requestContext, args) {
+      // Extract details from the requestContext:
+      const req = requestContext.node?.req;
+      // Or: const req = requestContext.expressv4?.req;
+      // Or: const ctx = requestContext.koav2?.ctx;
 
-      const auth = req.getHeader("authorization");
+      const auth = req?.getHeader("authorization");
 
       const context = {};
 
@@ -499,7 +523,7 @@ export default {
           const claims = jwt.verify(token, process.env.JWT_SECRET);
           const userId = claims.uid;
           context.pgSettings = {
-            ...graphqlRequestArgs.contextValue?.pgSettings,
+            ...args.contextValue?.pgSettings,
             "myapp.user_id": userId,
             "myapp.headers.x_something": req.getHeader("x-something"),
           };
@@ -515,7 +539,7 @@ export default {
 :::tip
 
 GraphQL itself is transport agnostic, as is `grafast`, so depending on how you
-choose to use your PostGraphile schema you may or may not have access to an the
+choose to use your PostGraphile schema you may or may not have access to an
 HTTP request. Your `context` callback should be written to support all the
 different ways that your schema may be used: directly, over HTTP, using
 websockets, etc.
@@ -545,17 +569,17 @@ object from an Express server:
 ```js title="graphile.config.js"
 export default {
   grafast: {
-    context(requestCtx, graphqlRequestArgs) {
+    context(requestContext, args) {
       // Base context used for all GraphQL requests
       const context = {
         pgSettings: {
-          ...graphqlRequestArgs.contextValue?.pgSettings,
+          ...args.contextValue?.pgSettings,
           role: "visitor",
         },
       };
 
       // Extract the current user from the Express request:
-      const user = requestCtx.expressv4?.req.user;
+      const user = requestContext.expressv4?.req.user;
 
       // If there's a user, pass additional data to Postgres:
       if (user) {
