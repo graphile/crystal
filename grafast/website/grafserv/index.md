@@ -5,11 +5,72 @@ sidebar_position: 1
 # Grafserv Introduction
 
 Grafserv - an incredibly fast GraphQL server for Node.js powered by
-[Grafast](/grafast/).
+[Gra*fast*](/grafast/).
 
-<!-- FIXME: actual documentation please! -->
+## Usage
 
-See: https://www.npmjs.com/package/grafserv/v/0.0.1-0.7
+Grafserv supports many different servers, and because each server is different
+each has their own entrypoint, e.g. `grafserv/node` for the Node.js HTTP server
+or `grafserv/express/v4` for Express v4. Generally you import the `grafserv`
+function from the relevant entrypoint for your server of choice and then create
+an instance:
+
+```js
+const serv = grafserv({ schema, preset });
+```
+
+`grafserv` is passed the GraphQL schema to use (if it's available, otherwise
+passing either null or a promise is also acceptable) and a `graphql-config`
+preset - i.e. your configuration.
+
+Calling `grafserv` will return an instance; this instance will have a number of
+helpers on it, including helpers specific to integrating it with your framework
+of choice. For servers that operate on a middleware basis this is typically
+`serv.addTo(app)` (which allows registering multiple route handlers), though
+different servers may have different APIs, such as `serv.createGraphQLHandler()`
+for Lambda and Next.js.
+
+Note: There is little value in Grafserv reimplementing every non-GraphQL concern
+your server may have, so instead it leans on the ecosystem of your chosen server
+to handle things like compression, rate limits, sessions, cookies, etc. For
+example, to compress your responses you'd need to use a module like
+[`compression`](https://expressjs.com/en/resources/middleware/compression.html)
+for Express, [`koa-compress`](https://www.npmjs.com/package/koa-compress) for
+Koa, or [`@fastify/compress`](https://www.npmjs.com/package/@fastify/compress)
+for Fastify.
+
+### serv.release()
+
+Releases any resources created by the instance; no further requests should be
+handled (though currently active requests will be allowed to complete).
+
+// TODO: consider terminating subscriptions or other long-lived things.
+
+### serv.onRelease(cb)
+
+Adds `cb` to the list of callbacks to be called when the server is released;
+useful for releasing resources you created only for the server. Callbacks will
+be called in reverse order that they were added.
+
+### serv.setSchema(newSchema)
+
+Replaces the schema to use for future requests (currently active requests are
+unaffected) - this is primarily used for "watch" mode.
+
+### serv.setPreset(newPreset)
+
+Replaces the config to use for future requests (currently active requests are
+unaffected) - this is primarily used for "watch" mode. Note that certain
+configuration changes might not be reflected by certain servers until a restart.
+
+### serv.getSchema()
+
+Returns either the GraphQL schema that is currently in use, or a promise to the
+same.
+
+### serv.getPreset()
+
+Returns the resolved `graphile-config` preset that is currently in use.
 
 <!--
 
