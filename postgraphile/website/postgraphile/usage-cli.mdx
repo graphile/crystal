@@ -7,18 +7,11 @@ title: Usage - Command Line
 The easiest way to get up and running with PostGraphile is to use the Command
 Line Interface.
 
-Create yourself a new directory for your project, we'll refer to this as
-`~/postgraphile`. Open a terminal in this directory and install PostGraphile:
+To try without installing, run the `pgl` command via the `npx` command that
+comes bundled with Node.js:
 
-```bash npm2yarn
-cd ~/postgraphile
-npm install postgraphile
 ```
-
-You can then run PostGraphile via:
-
-```bash npm2yarn
-npx postgraphile -P postgraphile/presets/amber -e -c postgres:///mydb
+npx pgl -P pgl/amber -e -c postgers:///mydb
 ```
 
 :::info
@@ -28,6 +21,21 @@ pointing at your database, and if you use a non-standard PostgreSQL schema you
 should indicate the schema name via `-s my_schema_name_here`.
 
 :::
+
+For a more permanent installation we suggest you create yourself a new
+directory for your project, we'll refer to this as `~/postgraphile`. Open a
+terminal in this directory and install PostGraphile:
+
+```bash npm2yarn
+cd ~/postgraphile
+npm install postgraphile
+```
+
+You can then run PostGraphile equivalent to above via:
+
+```bash npm2yarn
+npx postgraphile -P postgraphile/presets/amber -e -c postgres:///mydb
+```
 
 :::caution
 
@@ -78,3 +86,20 @@ you can run PostGraphile with no (or minimal) CLI flags.
 - `--port <number>` (alias: `-p`)
   <equivalent>{`{ server: { port: 5678 } }`}</equivalent>
   the port to be used. Defaults to 5678
+
+## `pgl` vs `postgraphile`
+
+New to V5 if PostGraphile is the `pgl` command. This is almost identical to the
+`postgraphile` command (it actually defers to `postgraphile` under the hood),
+with the following differences:
+
+- `pgl` has no `peerDependencies` - as soon as you start installing plugins that need peerDependencies you should consider moving to `postgraphile`
+- `pgl` exposes `postgraphile/presets/amber` as `pgl/amber` (and similar for `pgl/v4` and `pgl/relay`), so it's more concise
+
+:::tip
+
+`pgl` is most suitable for running from `npx` without the need to permanently
+install anything. If you want to start using PostGraphile in your project you
+should install `postgraphile` instead.
+
+:::

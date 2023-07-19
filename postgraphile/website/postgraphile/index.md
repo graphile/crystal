@@ -90,21 +90,26 @@ Some of the features we offer:
   - [polymorphism](./polymorphism.md) (interfaces and unions)
   - [Real-time](./realtime.md) features (subscriptions and soon: live queries)
   - `@stream` / `@defer` support
-- Massively reduced load on your database (and other data stores!)
-- Integrates with any authentication middleware available in Node.
+- Excellent Relay support via our `postgraphile/presets/relay` preset:
+  - Global object identification
+  - Cursor pagination
+  - Mutation input objects and payloads
+- Massively reduced load on your database without the complexity of caching/cache invalidation
+- Integrates with any authentication middleware available in Node
 - Easily add fields and mutations via [JS/TS plugins](./extending/) or
   [database functions](./functions)
 - Written in pure TypeScript - no binary modules!
 - [Export](./exporting-schema.md) your schema as executable JavaScript code
 - Very fast startup in serverless
-- Bring your own PostgreSQL driver/adaptor
+- Bring your own PostgreSQL driver/adaptor (integrate with almost any Postgres client library)
 - Run as a CLI, as a Node.js middleware, or a standalone GraphQL schema
 - Easy customization via [smart tags](./smart-tags)
-- Explain your operations via [Ruru](https://grafast.org/ruru/) (our Gra*fast*-enhanced Graph*i*QL)
+- Explain your operations via [Ruru](https://grafast.org/ruru/) (our Gra*fast*-enhanced Graph*i*QL IDE)
 - [Auto-discovered relations](./relations/)
 - [Automatic CRUD mutations](./crud-mutations/) e.g. `updatePost`
+- Almost all features are optional, and most can be customised on a per-table, per-column or per-constraint basis (as appropriate)
 - Incredible versatility via a wide array of plugins:
-  - Aggregation
+  - Aggregates
   - Powerful filtering
   - Soft deletion
   - Upsert
@@ -118,8 +123,9 @@ The easiest way to get started is with the [CLI interface](./usage-cli/); if you
 have `npx` installed you can try it out with:
 
 ```
-npx postgraphile -P postgraphile/presets/amber -e -c 'postgres:///mydb' -s public
+npx pgl -P pgl/amber -e -c 'postgres:///mydb'
 ```
 
-(replacing the connection string with a PostgreSQL connection string to your
-database)
+_(Replace the connection string with a PostgreSQL connection string to your
+database. If your data is not located in the `public` schema of your database
+you can specify a comma-separated list of database schemas with `-s a,b,c`.)_
