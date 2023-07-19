@@ -13,7 +13,7 @@ Usage](./usage-schema/).
 ## PostGraphile instance
 
 Library mode is configured using a preset (see [Configuration](./config.md) for
-the options) and returns a PostGraphile instance which has various
+the options) and returns a PostGraphile instance `pgl` which has various
 methods you can use depending on what you're trying to do.
 
 ```js title="pgl.js"
@@ -27,12 +27,27 @@ export const pgl = postgraphile(preset);
 ### `pgl.createServ(grafserv)`
 
 [Grafserv][] supports a number of different servers in the JS ecosystem, you
-should import the `grafserv` function from the relevant grafserv subpath (e.g.
-for Express you would `import { grafserv } from "grafserv/express/v4"`) and
-feed that into the `pgl.createServ(grafserv)` method. This will return a
-Grafserv instance that can be mounted inside of your chosen server - for
-instructions on how to do that, please see the relevant entry for your server
-of choice in the Grafserv documentation.
+should import the `grafserv` function from the relevant grafserv subpath:
+
+```js
+import { grafserv } from "grafserv/express/v4";
+// OR: import { grafserv } from "grafserv/node";
+// OR: import { grafserv } from "grafserv/koa/v2";
+// OR: import { grafserv } from "grafserv/fastify/v4";
+```
+
+Then create your `serv` instance by passing this to the `pgl.createServ()`
+method:
+
+```js
+const serv = pgl.createServ(grafserv);
+```
+
+This Grafserv instance (`serv`) can be mounted inside of your chosen server -
+for instructions on how to do that, please see the relevant entry for your
+server of choice in [the Grafserv
+documentation](https://grafast.org/grafserv/); typically there's a
+`serv.addTo(...)` method you can use.
 
 Here's an example with Node's HTTP server:
 
@@ -80,17 +95,11 @@ server.listen(5678);
 console.log("Server listening at http://localhost:5678");
 ```
 
-For information about using PostGraphile with Connect, Express, Koa, Fastify,
+For information about using this `serv` instance with Connect, Express, Koa, Fastify,
 Restify, or any other HTTP servers, please see the [Grafserv
 documentation][grafserv].
 
 ### `pgl.getSchemaResult()`
-
-:::caution
-
-This will likely be renamed before the V5.0.0 release.
-
-:::
 
 Returns a promise to the schema result - an object containing:
 
@@ -101,8 +110,8 @@ Note that this may change over time, e.g. in watch mode.
 
 ### `pgl.getSchema()`
 
-Shortcut to `(await getSchemaResult()).schema` - the current GraphQL schema the
-instance represents (may change due to watch mode).
+Shortcut to `(await pgl.getSchemaResult()).schema` - a promise to the GraphQL
+schema the instance represents (may change due to watch mode).
 
 ### `pgl.getResolvedPreset()`
 

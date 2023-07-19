@@ -47,42 +47,42 @@ const { schema, resolvedPreset } = await pgl.getSchemaResult();
 
 ## Easy execution: `grafast()`
 
-Now that you have your schema, you can execute a GraphQL query via:
+Now that you have `schema` and `resolvedPreset`, you can execute a GraphQL
+query via:
 
 ```js
 import { grafast } from "grafast";
 
-const ctx = {};
-const result = await grafast(
-  {
-    schema,
-    source: /* GraphQL */ `
-      query MyQuery {
-        __typename
-      }
-    `,
-    variableValues: {},
-  },
+const { data, errors } = await grafast({
+  schema,
   resolvedPreset,
-  ctx,
-);
-
-// const { data, errors } = result;
+  requestContext: {
+    // This is the "request context" - it is **NOT** the GraphQL context
+  },
+  source: /* GraphQL */ `
+    query MyQuery {
+      __typename
+    }
+  `,
+  variableValues: {},
+});
 ```
 
 `grafast()` is equivalent to `graphql()` except it also accepts two additional
-optional parameters: the `resolvedPreset` and the _request context_ `ctx`. If you
-pass these parameters then `grafast` will take care of building the _GraphQL
-context_ for you based on what is in your preset.
+optional entries in the `args` object: the `resolvedPreset` and the _request
+context_ `requestContext`. If you pass these parameters then `grafast` will
+take care of building the _GraphQL context_ for you based on what is in your
+preset.
 
 :::caution
 
-Do not confuse `ctx` with the GraphQL context; `ctx` is the parameter passed to
-your `preset.grafast.context()` callback (and any plugins that need it)
-containing details of where the request came from. In a web server it would
-typically be something like `ctx = { node: { req, res } }` and would be
-used to extract things like the `Authorization` header to determine who is
-making the request.
+Do not confuse `requestContext` with the GraphQL context; `requestContext` is
+the parameter passed to your `preset.grafast.context(requestContext)` callback
+(and any plugins that need it) containing details of where the request came
+from. In a node HTTP web server it would typically be something like
+`requestContext = { node: { req, res } }` and would be used to extract things
+like the `Authorization` header to determine who is making the request.
+Different servers and situations may add alternative or additional information.
 
 :::
 
@@ -114,12 +114,12 @@ import preset from "./graphile.config.js";
 const schemaResultPromise = makeSchema(preset);
 
 /**
- * Given a request context `ctx`, GraphQL query text `source` and optionally
- * variable values and operation name, execute the given GraphQL operation
- * against our schema and return the result.
+ * Given a request context `requestContext`, GraphQL query text `source` and
+ * optionally variable values and operation name, execute the given GraphQL
+ * operation against our schema and return the result.
  */
 export async function executeQuery(
-  ctx: Grafast.RequestContext,
+  requestContext: Grafast.RequestContext,
   source: string,
   variableValues?: Record<string, unknown> | null,
   operationName?: string,
@@ -145,7 +145,7 @@ export async function executeQuery(
       operationName,
     },
     resolvedPreset,
-    ctx,
+    requestContext,
   );
 
   // Execute the request using Grafast:
