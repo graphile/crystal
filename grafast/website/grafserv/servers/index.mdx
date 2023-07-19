@@ -20,12 +20,12 @@ sequenceDiagram
   Server->>Adaptor: Framework request object
   Adaptor->>Grafserv: Normalized request digest<br/>(method, path, headers, etc)
   opt For POST requests
-    Grafserv-->>Adaptor: Get request body
-    Adaptor-->>Server: Fetch body
-    Server-->>Adaptor: Framework specific body<br/>(Buffer, JSON, text, etc)
-    Adaptor-->>Grafserv: Normalized body 
+    Grafserv--)Adaptor: Get request body
+    Adaptor--)Server: Fetch body
+    Server--)Adaptor: Framework specific body<br/>(Buffer, JSON, text, etc)
+    Adaptor--)Grafserv: Normalized body
   end
-  Grafserv->>Grafserv: Compute GraphQL Result
+  Grafserv-)Grafserv: Compute GraphQL Result
   Grafserv->>Adaptor: Grafserv response<br/>(JSON, text, stream, etc)
   Adaptor->>Server: Framework response
 `} />
