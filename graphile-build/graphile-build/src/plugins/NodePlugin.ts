@@ -13,13 +13,13 @@ declare global {
     }
 
     interface Build {
-      [NODE_ID_CODECS]: { [codecName: string]: NodeIdCodec };
-      [NODE_ID_HANDLER_BY_TYPE_NAME]: { [typeName: string]: NodeIdHandler };
-      registerNodeIdCodec(codec: NodeIdCodec): void;
-      getNodeIdCodec(codecName: string): NodeIdCodec;
-      registerNodeIdHandler(matcher: NodeIdHandler): void;
-      getNodeIdHandler(typeName: string): NodeIdHandler | undefined;
-      getNodeTypeNames(): string[];
+      [NODE_ID_CODECS]?: { [codecName: string]: NodeIdCodec };
+      [NODE_ID_HANDLER_BY_TYPE_NAME]?: { [typeName: string]: NodeIdHandler };
+      registerNodeIdCodec?(codec: NodeIdCodec): void;
+      getNodeIdCodec?(codecName: string): NodeIdCodec;
+      registerNodeIdHandler?(matcher: NodeIdHandler): void;
+      getNodeIdHandler?(typeName: string): NodeIdHandler | undefined;
+      getNodeTypeNames?(): string[];
     }
 
     interface ScopeObjectFieldsField {
@@ -194,7 +194,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   (node, nodeIdFieldName, nodeIdHandlerByTypeName) =>
                     function plan(_$root, args) {
                       return node(
-                        nodeIdHandlerByTypeName,
+                        nodeIdHandlerByTypeName!,
                         args.get(nodeIdFieldName),
                       );
                     },

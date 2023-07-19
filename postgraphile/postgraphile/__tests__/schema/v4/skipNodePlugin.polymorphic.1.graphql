@@ -1,0 +1,5404 @@
+interface Application {
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `Application`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): VulnerabilitiesConnection!
+}
+
+"""
+A condition to be used against `Application` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ApplicationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lastDeployed` field."""
+  lastDeployed: Datetime
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""A connection to a list of `Application` values."""
+type ApplicationsConnection {
+  """
+  A list of edges which contains the `Application` and cursor to aid in pagination.
+  """
+  edges: [ApplicationsEdge]!
+
+  """A list of `Application` objects."""
+  nodes: [Application]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Application` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Application` edge in the connection."""
+type ApplicationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Application` at the end of the edge."""
+  node: Application
+}
+
+"""Methods to use when ordering `Application`."""
+enum ApplicationsOrderBy {
+  ID_ASC
+  ID_DESC
+  LAST_DEPLOYED_ASC
+  LAST_DEPLOYED_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+}
+
+type AwsApplication implements Application {
+  awsId: String
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+
+  """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `AwsApplication`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+  personId: Int
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection!
+}
+
+"""
+A condition to be used against `AwsApplication` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input AwsApplicationCondition {
+  """Checks for equality with the object’s `awsId` field."""
+  awsId: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lastDeployed` field."""
+  lastDeployed: Datetime
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+}
+
+"""An input for mutations affecting `AwsApplication`"""
+input AwsApplicationInput {
+  awsId: String
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+  organizationId: Int
+  personId: Int
+}
+
+"""
+Represents an update to a `AwsApplication`. Fields that are set will be updated.
+"""
+input AwsApplicationPatch {
+  awsId: String
+  id: Int
+  lastDeployed: Datetime
+  name: String
+  organizationId: Int
+  personId: Int
+}
+
+"""A connection to a list of `AwsApplication` values."""
+type AwsApplicationsConnection {
+  """
+  A list of edges which contains the `AwsApplication` and cursor to aid in pagination.
+  """
+  edges: [AwsApplicationsEdge]!
+
+  """A list of `AwsApplication` objects."""
+  nodes: [AwsApplication]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AwsApplication` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `AwsApplication` edge in the connection."""
+type AwsApplicationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AwsApplication` at the end of the edge."""
+  node: AwsApplication
+}
+
+"""Methods to use when ordering `AwsApplication`."""
+enum AwsApplicationsOrderBy {
+  AWS_ID_ASC
+  AWS_ID_DESC
+  ID_ASC
+  ID_DESC
+  LAST_DEPLOYED_ASC
+  LAST_DEPLOYED_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+"""All input for the create `AwsApplication` mutation."""
+input CreateAwsApplicationInput {
+  """The `AwsApplication` to be created by this mutation."""
+  awsApplication: AwsApplicationInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `AwsApplication` mutation."""
+type CreateAwsApplicationPayload {
+  """The `AwsApplication` that was created by this mutation."""
+  awsApplication: AwsApplication
+
+  """An edge for our `AwsApplication`. May be used by Relay 1."""
+  awsApplicationEdge(
+    """The method to use when ordering `AwsApplication`."""
+    orderBy: [AwsApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AwsApplicationsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `FirstPartyVulnerability` mutation."""
+input CreateFirstPartyVulnerabilityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `FirstPartyVulnerability` to be created by this mutation."""
+  firstPartyVulnerability: FirstPartyVulnerabilityInput!
+}
+
+"""The output of our create `FirstPartyVulnerability` mutation."""
+type CreateFirstPartyVulnerabilityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FirstPartyVulnerability` that was created by this mutation."""
+  firstPartyVulnerability: FirstPartyVulnerability
+
+  """An edge for our `FirstPartyVulnerability`. May be used by Relay 1."""
+  firstPartyVulnerabilityEdge(
+    """The method to use when ordering `FirstPartyVulnerability`."""
+    orderBy: [FirstPartyVulnerabilitiesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FirstPartyVulnerabilitiesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `GcpApplication` mutation."""
+input CreateGcpApplicationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `GcpApplication` to be created by this mutation."""
+  gcpApplication: GcpApplicationInput!
+}
+
+"""The output of our create `GcpApplication` mutation."""
+type CreateGcpApplicationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GcpApplication` that was created by this mutation."""
+  gcpApplication: GcpApplication
+
+  """An edge for our `GcpApplication`. May be used by Relay 1."""
+  gcpApplicationEdge(
+    """The method to use when ordering `GcpApplication`."""
+    orderBy: [GcpApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GcpApplicationsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `LogEntry` mutation."""
+input CreateLogEntryInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `LogEntry` to be created by this mutation."""
+  logEntry: LogEntryInput!
+}
+
+"""The output of our create `LogEntry` mutation."""
+type CreateLogEntryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `LogEntry` that was created by this mutation."""
+  logEntry: LogEntry
+
+  """An edge for our `LogEntry`. May be used by Relay 1."""
+  logEntryEdge(
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LogEntriesEdge
+
+  """Reads a single `Organization` that is related to this `LogEntry`."""
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `LogEntry`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Organization` mutation."""
+input CreateOrganizationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Organization` to be created by this mutation."""
+  organization: OrganizationInput!
+}
+
+"""The output of our create `Organization` mutation."""
+type CreateOrganizationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Organization` that was created by this mutation."""
+  organization: Organization
+
+  """An edge for our `Organization`. May be used by Relay 1."""
+  organizationEdge(
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrganizationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Person` mutation."""
+input CreatePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Person` to be created by this mutation."""
+  person: PersonInput!
+}
+
+"""The output of our create `Person` mutation."""
+type CreatePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` that was created by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `RelationalChecklist` mutation."""
+input CreateRelationalChecklistInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RelationalChecklist` to be created by this mutation."""
+  relationalChecklist: RelationalChecklistInput!
+}
+
+"""All input for the create `RelationalChecklistItem` mutation."""
+input CreateRelationalChecklistItemInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RelationalChecklistItem` to be created by this mutation."""
+  relationalChecklistItem: RelationalChecklistItemInput!
+}
+
+"""The output of our create `RelationalChecklistItem` mutation."""
+type CreateRelationalChecklistItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalChecklistItem` that was created by this mutation."""
+  relationalChecklistItem: RelationalChecklistItem
+
+  """An edge for our `RelationalChecklistItem`. May be used by Relay 1."""
+  relationalChecklistItemEdge(
+    """The method to use when ordering `RelationalChecklistItem`."""
+    orderBy: [RelationalChecklistItemsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistItemsEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""The output of our create `RelationalChecklist` mutation."""
+type CreateRelationalChecklistPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalChecklist` that was created by this mutation."""
+  relationalChecklist: RelationalChecklist
+
+  """An edge for our `RelationalChecklist`. May be used by Relay 1."""
+  relationalChecklistEdge(
+    """The method to use when ordering `RelationalChecklist`."""
+    orderBy: [RelationalChecklistsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistsEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""All input for the create `RelationalDivider` mutation."""
+input CreateRelationalDividerInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RelationalDivider` to be created by this mutation."""
+  relationalDivider: RelationalDividerInput!
+}
+
+"""The output of our create `RelationalDivider` mutation."""
+type CreateRelationalDividerPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalDivider` that was created by this mutation."""
+  relationalDivider: RelationalDivider
+
+  """An edge for our `RelationalDivider`. May be used by Relay 1."""
+  relationalDividerEdge(
+    """The method to use when ordering `RelationalDivider`."""
+    orderBy: [RelationalDividersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalDividersEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""All input for the create `RelationalPost` mutation."""
+input CreateRelationalPostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RelationalPost` to be created by this mutation."""
+  relationalPost: RelationalPostInput!
+}
+
+"""The output of our create `RelationalPost` mutation."""
+type CreateRelationalPostPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalPost`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalPost` that was created by this mutation."""
+  relationalPost: RelationalPost
+
+  """An edge for our `RelationalPost`. May be used by Relay 1."""
+  relationalPostEdge(
+    """The method to use when ordering `RelationalPost`."""
+    orderBy: [RelationalPostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalPostsEdge
+}
+
+"""All input for the create `RelationalTopic` mutation."""
+input CreateRelationalTopicInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RelationalTopic` to be created by this mutation."""
+  relationalTopic: RelationalTopicInput!
+}
+
+"""The output of our create `RelationalTopic` mutation."""
+type CreateRelationalTopicPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalTopic` that was created by this mutation."""
+  relationalTopic: RelationalTopic
+
+  """An edge for our `RelationalTopic`. May be used by Relay 1."""
+  relationalTopicEdge(
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsEdge
+}
+
+"""All input for the create `ThirdPartyVulnerability` mutation."""
+input CreateThirdPartyVulnerabilityInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ThirdPartyVulnerability` to be created by this mutation."""
+  thirdPartyVulnerability: ThirdPartyVulnerabilityInput!
+}
+
+"""The output of our create `ThirdPartyVulnerability` mutation."""
+type CreateThirdPartyVulnerabilityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ThirdPartyVulnerability` that was created by this mutation."""
+  thirdPartyVulnerability: ThirdPartyVulnerability
+
+  """An edge for our `ThirdPartyVulnerability`. May be used by Relay 1."""
+  thirdPartyVulnerabilityEdge(
+    """The method to use when ordering `ThirdPartyVulnerability`."""
+    orderBy: [ThirdPartyVulnerabilitiesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ThirdPartyVulnerabilitiesEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""All input for the `deleteAwsApplicationById` mutation."""
+input DeleteAwsApplicationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `AwsApplication` mutation."""
+type DeleteAwsApplicationPayload {
+  """The `AwsApplication` that was deleted by this mutation."""
+  awsApplication: AwsApplication
+
+  """An edge for our `AwsApplication`. May be used by Relay 1."""
+  awsApplicationEdge(
+    """The method to use when ordering `AwsApplication`."""
+    orderBy: [AwsApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AwsApplicationsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteFirstPartyVulnerabilityById` mutation."""
+input DeleteFirstPartyVulnerabilityByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `FirstPartyVulnerability` mutation."""
+type DeleteFirstPartyVulnerabilityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FirstPartyVulnerability` that was deleted by this mutation."""
+  firstPartyVulnerability: FirstPartyVulnerability
+
+  """An edge for our `FirstPartyVulnerability`. May be used by Relay 1."""
+  firstPartyVulnerabilityEdge(
+    """The method to use when ordering `FirstPartyVulnerability`."""
+    orderBy: [FirstPartyVulnerabilitiesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FirstPartyVulnerabilitiesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteGcpApplicationById` mutation."""
+input DeleteGcpApplicationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `GcpApplication` mutation."""
+type DeleteGcpApplicationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GcpApplication` that was deleted by this mutation."""
+  gcpApplication: GcpApplication
+
+  """An edge for our `GcpApplication`. May be used by Relay 1."""
+  gcpApplicationEdge(
+    """The method to use when ordering `GcpApplication`."""
+    orderBy: [GcpApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GcpApplicationsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteLogEntryById` mutation."""
+input DeleteLogEntryByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `LogEntry` mutation."""
+type DeleteLogEntryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `LogEntry` that was deleted by this mutation."""
+  logEntry: LogEntry
+
+  """An edge for our `LogEntry`. May be used by Relay 1."""
+  logEntryEdge(
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LogEntriesEdge
+
+  """Reads a single `Organization` that is related to this `LogEntry`."""
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `LogEntry`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteOrganizationByName` mutation."""
+input DeleteOrganizationByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
+}
+
+"""All input for the `deleteOrganizationByOrganizationId` mutation."""
+input DeleteOrganizationByOrganizationIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  organizationId: Int!
+}
+
+"""The output of our delete `Organization` mutation."""
+type DeleteOrganizationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Organization` that was deleted by this mutation."""
+  organization: Organization
+
+  """An edge for our `Organization`. May be used by Relay 1."""
+  organizationEdge(
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrganizationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePersonByPersonId` mutation."""
+input DeletePersonByPersonIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  personId: Int!
+}
+
+"""All input for the `deletePersonByUsername` mutation."""
+input DeletePersonByUsernameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  username: String!
+}
+
+"""The output of our delete `Person` mutation."""
+type DeletePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` that was deleted by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteRelationalChecklistById` mutation."""
+input DeleteRelationalChecklistByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteRelationalChecklistItemById` mutation."""
+input DeleteRelationalChecklistItemByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `RelationalChecklistItem` mutation."""
+type DeleteRelationalChecklistItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalChecklistItem` that was deleted by this mutation."""
+  relationalChecklistItem: RelationalChecklistItem
+
+  """An edge for our `RelationalChecklistItem`. May be used by Relay 1."""
+  relationalChecklistItemEdge(
+    """The method to use when ordering `RelationalChecklistItem`."""
+    orderBy: [RelationalChecklistItemsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistItemsEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""The output of our delete `RelationalChecklist` mutation."""
+type DeleteRelationalChecklistPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalChecklist` that was deleted by this mutation."""
+  relationalChecklist: RelationalChecklist
+
+  """An edge for our `RelationalChecklist`. May be used by Relay 1."""
+  relationalChecklistEdge(
+    """The method to use when ordering `RelationalChecklist`."""
+    orderBy: [RelationalChecklistsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistsEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""All input for the `deleteRelationalDividerById` mutation."""
+input DeleteRelationalDividerByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `RelationalDivider` mutation."""
+type DeleteRelationalDividerPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalDivider` that was deleted by this mutation."""
+  relationalDivider: RelationalDivider
+
+  """An edge for our `RelationalDivider`. May be used by Relay 1."""
+  relationalDividerEdge(
+    """The method to use when ordering `RelationalDivider`."""
+    orderBy: [RelationalDividersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalDividersEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""All input for the `deleteRelationalPostById` mutation."""
+input DeleteRelationalPostByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `RelationalPost` mutation."""
+type DeleteRelationalPostPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalPost`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalPost` that was deleted by this mutation."""
+  relationalPost: RelationalPost
+
+  """An edge for our `RelationalPost`. May be used by Relay 1."""
+  relationalPostEdge(
+    """The method to use when ordering `RelationalPost`."""
+    orderBy: [RelationalPostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalPostsEdge
+}
+
+"""All input for the `deleteRelationalTopicById` mutation."""
+input DeleteRelationalTopicByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `RelationalTopic` mutation."""
+type DeleteRelationalTopicPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalTopic` that was deleted by this mutation."""
+  relationalTopic: RelationalTopic
+
+  """An edge for our `RelationalTopic`. May be used by Relay 1."""
+  relationalTopicEdge(
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsEdge
+}
+
+"""All input for the `deleteThirdPartyVulnerabilityById` mutation."""
+input DeleteThirdPartyVulnerabilityByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete `ThirdPartyVulnerability` mutation."""
+type DeleteThirdPartyVulnerabilityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ThirdPartyVulnerability` that was deleted by this mutation."""
+  thirdPartyVulnerability: ThirdPartyVulnerability
+
+  """An edge for our `ThirdPartyVulnerability`. May be used by Relay 1."""
+  thirdPartyVulnerabilityEdge(
+    """The method to use when ordering `ThirdPartyVulnerability`."""
+    orderBy: [ThirdPartyVulnerabilitiesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ThirdPartyVulnerabilitiesEdge
+}
+
+"""A connection to a list of `FirstPartyVulnerability` values."""
+type FirstPartyVulnerabilitiesConnection {
+  """
+  A list of edges which contains the `FirstPartyVulnerability` and cursor to aid in pagination.
+  """
+  edges: [FirstPartyVulnerabilitiesEdge]!
+
+  """A list of `FirstPartyVulnerability` objects."""
+  nodes: [FirstPartyVulnerability]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `FirstPartyVulnerability` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `FirstPartyVulnerability` edge in the connection."""
+type FirstPartyVulnerabilitiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `FirstPartyVulnerability` at the end of the edge."""
+  node: FirstPartyVulnerability
+}
+
+"""Methods to use when ordering `FirstPartyVulnerability`."""
+enum FirstPartyVulnerabilitiesOrderBy {
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TEAM_NAME_ASC
+  TEAM_NAME_DESC
+}
+
+type FirstPartyVulnerability implements Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+  cvssScore: Float!
+  id: Int!
+  name: String!
+  teamName: String
+}
+
+"""
+A condition to be used against `FirstPartyVulnerability` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input FirstPartyVulnerabilityCondition {
+  """Checks for equality with the object’s `cvssScore` field."""
+  cvssScore: Float
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `teamName` field."""
+  teamName: String
+}
+
+"""An input for mutations affecting `FirstPartyVulnerability`"""
+input FirstPartyVulnerabilityInput {
+  cvssScore: Float!
+  id: Int!
+  name: String!
+  teamName: String
+}
+
+"""
+Represents an update to a `FirstPartyVulnerability`. Fields that are set will be updated.
+"""
+input FirstPartyVulnerabilityPatch {
+  cvssScore: Float
+  id: Int
+  name: String
+  teamName: String
+}
+
+type GcpApplication implements Application {
+  gcpId: String
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `GcpApplication`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
+  personId: Int
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection!
+}
+
+"""
+A condition to be used against `GcpApplication` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input GcpApplicationCondition {
+  """Checks for equality with the object’s `gcpId` field."""
+  gcpId: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lastDeployed` field."""
+  lastDeployed: Datetime
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+}
+
+"""An input for mutations affecting `GcpApplication`"""
+input GcpApplicationInput {
+  gcpId: String
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+  organizationId: Int
+  personId: Int
+}
+
+"""
+Represents an update to a `GcpApplication`. Fields that are set will be updated.
+"""
+input GcpApplicationPatch {
+  gcpId: String
+  id: Int
+  lastDeployed: Datetime
+  name: String
+  organizationId: Int
+  personId: Int
+}
+
+"""A connection to a list of `GcpApplication` values."""
+type GcpApplicationsConnection {
+  """
+  A list of edges which contains the `GcpApplication` and cursor to aid in pagination.
+  """
+  edges: [GcpApplicationsEdge]!
+
+  """A list of `GcpApplication` objects."""
+  nodes: [GcpApplication]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `GcpApplication` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `GcpApplication` edge in the connection."""
+type GcpApplicationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `GcpApplication` at the end of the edge."""
+  node: GcpApplication
+}
+
+"""Methods to use when ordering `GcpApplication`."""
+enum GcpApplicationsOrderBy {
+  GCP_ID_ASC
+  GCP_ID_DESC
+  ID_ASC
+  ID_DESC
+  LAST_DEPLOYED_ASC
+  LAST_DEPLOYED_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+enum ItemType {
+  CHECKLIST
+  CHECKLIST_ITEM
+  DIVIDER
+  POST
+  TOPIC
+}
+
+"""A connection to a list of `LogEntry` values."""
+type LogEntriesConnection {
+  """
+  A list of edges which contains the `LogEntry` and cursor to aid in pagination.
+  """
+  edges: [LogEntriesEdge]!
+
+  """A list of `LogEntry` objects."""
+  nodes: [LogEntry]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `LogEntry` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `LogEntry` edge in the connection."""
+type LogEntriesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LogEntry` at the end of the edge."""
+  node: LogEntry
+}
+
+"""Methods to use when ordering `LogEntry`."""
+enum LogEntriesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TEXT_ASC
+  TEXT_DESC
+}
+
+type LogEntry {
+  """
+  Reads a single `PersonOrOrganization` that is related to this `LogEntry`.
+  """
+  author: PersonOrOrganization
+  id: Int!
+
+  """Reads a single `Organization` that is related to this `LogEntry`."""
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """Reads a single `Person` that is related to this `LogEntry`."""
+  personByPersonId: Person
+  personId: Int
+  text: String!
+}
+
+"""
+A condition to be used against `LogEntry` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LogEntryCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+
+  """Checks for equality with the object’s `text` field."""
+  text: String
+}
+
+"""An input for mutations affecting `LogEntry`"""
+input LogEntryInput {
+  id: Int
+  organizationId: Int
+  personId: Int
+  text: String!
+}
+
+"""
+Represents an update to a `LogEntry`. Fields that are set will be updated.
+"""
+input LogEntryPatch {
+  id: Int
+  organizationId: Int
+  personId: Int
+  text: String
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `AwsApplication`."""
+  createAwsApplication(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAwsApplicationInput!
+  ): CreateAwsApplicationPayload
+
+  """Creates a single `FirstPartyVulnerability`."""
+  createFirstPartyVulnerability(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateFirstPartyVulnerabilityInput!
+  ): CreateFirstPartyVulnerabilityPayload
+
+  """Creates a single `GcpApplication`."""
+  createGcpApplication(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateGcpApplicationInput!
+  ): CreateGcpApplicationPayload
+
+  """Creates a single `LogEntry`."""
+  createLogEntry(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateLogEntryInput!
+  ): CreateLogEntryPayload
+
+  """Creates a single `Organization`."""
+  createOrganization(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrganizationInput!
+  ): CreateOrganizationPayload
+
+  """Creates a single `Person`."""
+  createPerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  """Creates a single `RelationalChecklist`."""
+  createRelationalChecklist(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalChecklistInput!
+  ): CreateRelationalChecklistPayload
+
+  """Creates a single `RelationalChecklistItem`."""
+  createRelationalChecklistItem(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalChecklistItemInput!
+  ): CreateRelationalChecklistItemPayload
+
+  """Creates a single `RelationalDivider`."""
+  createRelationalDivider(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalDividerInput!
+  ): CreateRelationalDividerPayload
+
+  """Creates a single `RelationalPost`."""
+  createRelationalPost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalPostInput!
+  ): CreateRelationalPostPayload
+
+  """Creates a single `RelationalTopic`."""
+  createRelationalTopic(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalTopicInput!
+  ): CreateRelationalTopicPayload
+
+  """Creates a single `ThirdPartyVulnerability`."""
+  createThirdPartyVulnerability(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateThirdPartyVulnerabilityInput!
+  ): CreateThirdPartyVulnerabilityPayload
+
+  """Deletes a single `AwsApplication` using a unique key."""
+  deleteAwsApplicationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAwsApplicationByIdInput!
+  ): DeleteAwsApplicationPayload
+
+  """Deletes a single `FirstPartyVulnerability` using a unique key."""
+  deleteFirstPartyVulnerabilityById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFirstPartyVulnerabilityByIdInput!
+  ): DeleteFirstPartyVulnerabilityPayload
+
+  """Deletes a single `GcpApplication` using a unique key."""
+  deleteGcpApplicationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteGcpApplicationByIdInput!
+  ): DeleteGcpApplicationPayload
+
+  """Deletes a single `LogEntry` using a unique key."""
+  deleteLogEntryById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLogEntryByIdInput!
+  ): DeleteLogEntryPayload
+
+  """Deletes a single `Organization` using a unique key."""
+  deleteOrganizationByName(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrganizationByNameInput!
+  ): DeleteOrganizationPayload
+
+  """Deletes a single `Organization` using a unique key."""
+  deleteOrganizationByOrganizationId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrganizationByOrganizationIdInput!
+  ): DeleteOrganizationPayload
+
+  """Deletes a single `Person` using a unique key."""
+  deletePersonByPersonId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonByPersonIdInput!
+  ): DeletePersonPayload
+
+  """Deletes a single `Person` using a unique key."""
+  deletePersonByUsername(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePersonByUsernameInput!
+  ): DeletePersonPayload
+
+  """Deletes a single `RelationalChecklist` using a unique key."""
+  deleteRelationalChecklistById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalChecklistByIdInput!
+  ): DeleteRelationalChecklistPayload
+
+  """Deletes a single `RelationalChecklistItem` using a unique key."""
+  deleteRelationalChecklistItemById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalChecklistItemByIdInput!
+  ): DeleteRelationalChecklistItemPayload
+
+  """Deletes a single `RelationalDivider` using a unique key."""
+  deleteRelationalDividerById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalDividerByIdInput!
+  ): DeleteRelationalDividerPayload
+
+  """Deletes a single `RelationalPost` using a unique key."""
+  deleteRelationalPostById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalPostByIdInput!
+  ): DeleteRelationalPostPayload
+
+  """Deletes a single `RelationalTopic` using a unique key."""
+  deleteRelationalTopicById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalTopicByIdInput!
+  ): DeleteRelationalTopicPayload
+
+  """Deletes a single `ThirdPartyVulnerability` using a unique key."""
+  deleteThirdPartyVulnerabilityById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteThirdPartyVulnerabilityByIdInput!
+  ): DeleteThirdPartyVulnerabilityPayload
+
+  """Updates a single `AwsApplication` using a unique key and a patch."""
+  updateAwsApplicationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAwsApplicationByIdInput!
+  ): UpdateAwsApplicationPayload
+
+  """
+  Updates a single `FirstPartyVulnerability` using a unique key and a patch.
+  """
+  updateFirstPartyVulnerabilityById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFirstPartyVulnerabilityByIdInput!
+  ): UpdateFirstPartyVulnerabilityPayload
+
+  """Updates a single `GcpApplication` using a unique key and a patch."""
+  updateGcpApplicationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGcpApplicationByIdInput!
+  ): UpdateGcpApplicationPayload
+
+  """Updates a single `LogEntry` using a unique key and a patch."""
+  updateLogEntryById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLogEntryByIdInput!
+  ): UpdateLogEntryPayload
+
+  """Updates a single `Organization` using a unique key and a patch."""
+  updateOrganizationByName(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrganizationByNameInput!
+  ): UpdateOrganizationPayload
+
+  """Updates a single `Organization` using a unique key and a patch."""
+  updateOrganizationByOrganizationId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrganizationByOrganizationIdInput!
+  ): UpdateOrganizationPayload
+
+  """Updates a single `Person` using a unique key and a patch."""
+  updatePersonByPersonId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonByPersonIdInput!
+  ): UpdatePersonPayload
+
+  """Updates a single `Person` using a unique key and a patch."""
+  updatePersonByUsername(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePersonByUsernameInput!
+  ): UpdatePersonPayload
+
+  """Updates a single `RelationalChecklist` using a unique key and a patch."""
+  updateRelationalChecklistById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalChecklistByIdInput!
+  ): UpdateRelationalChecklistPayload
+
+  """
+  Updates a single `RelationalChecklistItem` using a unique key and a patch.
+  """
+  updateRelationalChecklistItemById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalChecklistItemByIdInput!
+  ): UpdateRelationalChecklistItemPayload
+
+  """Updates a single `RelationalDivider` using a unique key and a patch."""
+  updateRelationalDividerById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalDividerByIdInput!
+  ): UpdateRelationalDividerPayload
+
+  """Updates a single `RelationalPost` using a unique key and a patch."""
+  updateRelationalPostById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalPostByIdInput!
+  ): UpdateRelationalPostPayload
+
+  """Updates a single `RelationalTopic` using a unique key and a patch."""
+  updateRelationalTopicById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalTopicByIdInput!
+  ): UpdateRelationalTopicPayload
+
+  """
+  Updates a single `ThirdPartyVulnerability` using a unique key and a patch.
+  """
+  updateThirdPartyVulnerabilityById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateThirdPartyVulnerabilityByIdInput!
+  ): UpdateThirdPartyVulnerabilityPayload
+}
+
+type Organization {
+  """Reads and enables pagination through a set of `AwsApplication`."""
+  awsApplicationsByOrganizationId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AwsApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AwsApplication`."""
+    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AwsApplicationsConnection!
+
+  """Reads and enables pagination through a set of `GcpApplication`."""
+  gcpApplicationsByOrganizationId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GcpApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GcpApplication`."""
+    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GcpApplicationsConnection!
+
+  """Reads and enables pagination through a set of `LogEntry`."""
+  logEntriesByOrganizationId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LogEntriesConnection!
+  name: String!
+  organizationId: Int!
+}
+
+"""
+A condition to be used against `Organization` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input OrganizationCondition {
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+}
+
+"""An input for mutations affecting `Organization`"""
+input OrganizationInput {
+  name: String!
+  organizationId: Int
+}
+
+"""
+Represents an update to a `Organization`. Fields that are set will be updated.
+"""
+input OrganizationPatch {
+  name: String
+  organizationId: Int
+}
+
+"""A connection to a list of `Organization` values."""
+type OrganizationsConnection {
+  """
+  A list of edges which contains the `Organization` and cursor to aid in pagination.
+  """
+  edges: [OrganizationsEdge]!
+
+  """A list of `Organization` objects."""
+  nodes: [Organization]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Organization` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Organization` edge in the connection."""
+type OrganizationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Organization` at the end of the edge."""
+  node: Organization
+}
+
+"""Methods to use when ordering `Organization`."""
+enum OrganizationsOrderBy {
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""A connection to a list of `Person` values."""
+type PeopleConnection {
+  """
+  A list of edges which contains the `Person` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge]!
+
+  """A list of `Person` objects."""
+  nodes: [Person]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Person` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Person` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Person` at the end of the edge."""
+  node: Person
+}
+
+"""Methods to use when ordering `Person`."""
+enum PeopleOrderBy {
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  USERNAME_ASC
+  USERNAME_DESC
+}
+
+type Person {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+
+  """Reads and enables pagination through a set of `AwsApplication`."""
+  awsApplicationsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AwsApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AwsApplication`."""
+    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AwsApplicationsConnection!
+
+  """Reads and enables pagination through a set of `GcpApplication`."""
+  gcpApplicationsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GcpApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GcpApplication`."""
+    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GcpApplicationsConnection!
+
+  """Reads and enables pagination through a set of `LogEntry`."""
+  logEntriesByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LogEntriesConnection!
+  personId: Int!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByAuthorId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByAuthorId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  username: String!
+}
+
+"""
+A condition to be used against `Person` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PersonCondition {
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+
+  """Checks for equality with the object’s `username` field."""
+  username: String
+}
+
+"""An input for mutations affecting `Person`"""
+input PersonInput {
+  personId: Int
+  username: String!
+}
+
+union PersonOrOrganization = Organization | Person
+
+"""
+Represents an update to a `Person`. Fields that are set will be updated.
+"""
+input PersonPatch {
+  personId: Int
+  username: String
+}
+
+"""A connection to a list of `Priority` values."""
+type PrioritiesConnection {
+  """
+  A list of edges which contains the `Priority` and cursor to aid in pagination.
+  """
+  edges: [PrioritiesEdge]!
+
+  """A list of `Priority` objects."""
+  nodes: [Priority]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Priority` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Priority` edge in the connection."""
+type PrioritiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Priority` at the end of the edge."""
+  node: Priority
+}
+
+type Priority {
+  id: Int!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByPriorityId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  title: String!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  allApplications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection
+
+  """Reads and enables pagination through a set of `AwsApplication`."""
+  allAwsApplications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AwsApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `AwsApplication`."""
+    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AwsApplicationsConnection
+
+  """
+  Reads and enables pagination through a set of `FirstPartyVulnerability`.
+  """
+  allFirstPartyVulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: FirstPartyVulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `FirstPartyVulnerability`."""
+    orderBy: [FirstPartyVulnerabilitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FirstPartyVulnerabilitiesConnection
+
+  """Reads and enables pagination through a set of `GcpApplication`."""
+  allGcpApplications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GcpApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `GcpApplication`."""
+    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): GcpApplicationsConnection
+
+  """Reads and enables pagination through a set of `LogEntry`."""
+  allLogEntries(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LogEntriesConnection
+
+  """Reads and enables pagination through a set of `Organization`."""
+  allOrganizations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: OrganizationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrganizationsConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  allPeople(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Priority`."""
+  allPriorities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PrioritiesConnection
+
+  """
+  Reads and enables pagination through a set of `RelationalChecklistItem`.
+  """
+  allRelationalChecklistItems(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalChecklistItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalChecklistItem`."""
+    orderBy: [RelationalChecklistItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistItemsConnection
+
+  """Reads and enables pagination through a set of `RelationalChecklist`."""
+  allRelationalChecklists(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalChecklistCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalChecklist`."""
+    orderBy: [RelationalChecklistsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistsConnection
+
+  """Reads and enables pagination through a set of `RelationalDivider`."""
+  allRelationalDividers(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalDividerCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalDivider`."""
+    orderBy: [RelationalDividersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalDividersConnection
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  allRelationalItems(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection
+
+  """Reads and enables pagination through a set of `RelationalPost`."""
+  allRelationalPosts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalPostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalPost`."""
+    orderBy: [RelationalPostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalPostsConnection
+
+  """Reads and enables pagination through a set of `RelationalTopic`."""
+  allRelationalTopics(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalTopicCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsConnection
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  allSingleTableItems(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection
+
+  """
+  Reads and enables pagination through a set of `ThirdPartyVulnerability`.
+  """
+  allThirdPartyVulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ThirdPartyVulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ThirdPartyVulnerability`."""
+    orderBy: [ThirdPartyVulnerabilitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ThirdPartyVulnerabilitiesConnection
+  allVulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection
+  allZeroImplementations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ZeroImplementationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ZeroImplementation`."""
+    orderBy: [ZeroImplementationsOrderBy!]
+  ): ZeroImplementationsConnection
+
+  """Get a single `AwsApplication`."""
+  awsApplicationById(id: Int!): AwsApplication
+
+  """Get a single `FirstPartyVulnerability`."""
+  firstPartyVulnerabilityById(id: Int!): FirstPartyVulnerability
+
+  """Get a single `GcpApplication`."""
+  gcpApplicationById(id: Int!): GcpApplication
+
+  """Get a single `LogEntry`."""
+  logEntryById(id: Int!): LogEntry
+
+  """Get a single `Organization`."""
+  organizationByName(name: String!): Organization
+
+  """Get a single `Organization`."""
+  organizationByOrganizationId(organizationId: Int!): Organization
+
+  """Get a single `Person`."""
+  personByPersonId(personId: Int!): Person
+
+  """Get a single `Person`."""
+  personByUsername(username: String!): Person
+
+  """Get a single `Priority`."""
+  priorityById(id: Int!): Priority
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Get a single `RelationalChecklist`."""
+  relationalChecklistById(id: Int!): RelationalChecklist
+
+  """Get a single `RelationalChecklistItem`."""
+  relationalChecklistItemById(id: Int!): RelationalChecklistItem
+
+  """Get a single `RelationalDivider`."""
+  relationalDividerById(id: Int!): RelationalDivider
+
+  """Get a single `RelationalPost`."""
+  relationalPostById(id: Int!): RelationalPost
+
+  """Get a single `RelationalTopic`."""
+  relationalTopicById(id: Int!): RelationalTopic
+
+  """Get a single `ThirdPartyVulnerability`."""
+  thirdPartyVulnerabilityById(id: Int!): ThirdPartyVulnerability
+}
+
+type RelationalChecklist implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalChecklist`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalChecklist` that is related to this `RelationalChecklist`.
+  """
+  relationalChecklistById: RelationalChecklist
+
+  """
+  Reads a single `RelationalChecklistItem` that is related to this `RelationalChecklist`.
+  """
+  relationalChecklistItemById: RelationalChecklistItem
+
+  """
+  Reads a single `RelationalDivider` that is related to this `RelationalChecklist`.
+  """
+  relationalDividerById: RelationalDivider
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
+  """
+  relationalItemById: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalPost` that is related to this `RelationalChecklist`.
+  """
+  relationalPostById: RelationalPost
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
+  """
+  relationalTopicById: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  title: String!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalChecklist` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalChecklistCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""An input for mutations affecting `RelationalChecklist`"""
+input RelationalChecklistInput {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime
+  id: Int!
+  isExplicitlyArchived: Boolean
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  title: String!
+  type: ItemType
+  updatedAt: Datetime
+}
+
+type RelationalChecklistItem implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  description: String!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  note: String
+  parentId: Int
+
+  """
+  Reads a single `Person` that is related to this `RelationalChecklistItem`.
+  """
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalChecklist` that is related to this `RelationalChecklistItem`.
+  """
+  relationalChecklistById: RelationalChecklist
+
+  """
+  Reads a single `RelationalChecklistItem` that is related to this `RelationalChecklistItem`.
+  """
+  relationalChecklistItemById: RelationalChecklistItem
+
+  """
+  Reads a single `RelationalDivider` that is related to this `RelationalChecklistItem`.
+  """
+  relationalDividerById: RelationalDivider
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
+  """
+  relationalItemById: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalPost` that is related to this `RelationalChecklistItem`.
+  """
+  relationalPostById: RelationalPost
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
+  """
+  relationalTopicById: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalChecklistItem` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalChecklistItemCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `note` field."""
+  note: String
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""An input for mutations affecting `RelationalChecklistItem`"""
+input RelationalChecklistItemInput {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime
+  description: String!
+  id: Int!
+  isExplicitlyArchived: Boolean
+  note: String
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""
+Represents an update to a `RelationalChecklistItem`. Fields that are set will be updated.
+"""
+input RelationalChecklistItemPatch {
+  archivedAt: Datetime
+  authorId: Int
+  createdAt: Datetime
+  description: String
+  id: Int
+  isExplicitlyArchived: Boolean
+  note: String
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalChecklistItem` values."""
+type RelationalChecklistItemsConnection {
+  """
+  A list of edges which contains the `RelationalChecklistItem` and cursor to aid in pagination.
+  """
+  edges: [RelationalChecklistItemsEdge]!
+
+  """A list of `RelationalChecklistItem` objects."""
+  nodes: [RelationalChecklistItem]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalChecklistItem` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalChecklistItem` edge in the connection."""
+type RelationalChecklistItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalChecklistItem` at the end of the edge."""
+  node: RelationalChecklistItem
+}
+
+"""Methods to use when ordering `RelationalChecklistItem`."""
+enum RelationalChecklistItemsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  NOTE_ASC
+  NOTE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""
+Represents an update to a `RelationalChecklist`. Fields that are set will be updated.
+"""
+input RelationalChecklistPatch {
+  archivedAt: Datetime
+  authorId: Int
+  createdAt: Datetime
+  id: Int
+  isExplicitlyArchived: Boolean
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  title: String
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalChecklist` values."""
+type RelationalChecklistsConnection {
+  """
+  A list of edges which contains the `RelationalChecklist` and cursor to aid in pagination.
+  """
+  edges: [RelationalChecklistsEdge]!
+
+  """A list of `RelationalChecklist` objects."""
+  nodes: [RelationalChecklist]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalChecklist` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalChecklist` edge in the connection."""
+type RelationalChecklistsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalChecklist` at the end of the edge."""
+  node: RelationalChecklist
+}
+
+"""Methods to use when ordering `RelationalChecklist`."""
+enum RelationalChecklistsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type RelationalDivider implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  color: String
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalDivider`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalChecklist` that is related to this `RelationalDivider`.
+  """
+  relationalChecklistById: RelationalChecklist
+
+  """
+  Reads a single `RelationalChecklistItem` that is related to this `RelationalDivider`.
+  """
+  relationalChecklistItemById: RelationalChecklistItem
+
+  """
+  Reads a single `RelationalDivider` that is related to this `RelationalDivider`.
+  """
+  relationalDividerById: RelationalDivider
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
+  """
+  relationalItemById: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalPost` that is related to this `RelationalDivider`.
+  """
+  relationalPostById: RelationalPost
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
+  """
+  relationalTopicById: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  title: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalDivider` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalDividerCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `color` field."""
+  color: String
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""An input for mutations affecting `RelationalDivider`"""
+input RelationalDividerInput {
+  archivedAt: Datetime
+  authorId: Int!
+  color: String
+  createdAt: Datetime
+  id: Int!
+  isExplicitlyArchived: Boolean
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  title: String
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""
+Represents an update to a `RelationalDivider`. Fields that are set will be updated.
+"""
+input RelationalDividerPatch {
+  archivedAt: Datetime
+  authorId: Int
+  color: String
+  createdAt: Datetime
+  id: Int
+  isExplicitlyArchived: Boolean
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  title: String
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalDivider` values."""
+type RelationalDividersConnection {
+  """
+  A list of edges which contains the `RelationalDivider` and cursor to aid in pagination.
+  """
+  edges: [RelationalDividersEdge]!
+
+  """A list of `RelationalDivider` objects."""
+  nodes: [RelationalDivider]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalDivider` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalDivider` edge in the connection."""
+type RelationalDividersEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalDivider` at the end of the edge."""
+  node: RelationalDivider
+}
+
+"""Methods to use when ordering `RelationalDivider`."""
+enum RelationalDividersOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  COLOR_ASC
+  COLOR_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+interface RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalChecklist` that is related to this `RelationalItem`.
+  """
+  relationalChecklistById: RelationalChecklist
+
+  """
+  Reads a single `RelationalChecklistItem` that is related to this `RelationalItem`.
+  """
+  relationalChecklistItemById: RelationalChecklistItem
+
+  """
+  Reads a single `RelationalDivider` that is related to this `RelationalItem`.
+  """
+  relationalDividerById: RelationalDivider
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItem`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalPost` that is related to this `RelationalItem`.
+  """
+  relationalPostById: RelationalPost
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
+  """
+  relationalTopicById: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalItem` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalItem` values."""
+type RelationalItemsConnection {
+  """
+  A list of edges which contains the `RelationalItem` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemsEdge]!
+
+  """A list of `RelationalItem` objects."""
+  nodes: [RelationalItem]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `RelationalItem` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `RelationalItem` edge in the connection."""
+type RelationalItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalItem` at the end of the edge."""
+  node: RelationalItem
+}
+
+"""Methods to use when ordering `RelationalItem`."""
+enum RelationalItemsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type RelationalPost implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  description: String
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  note: String
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalPost`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalChecklist` that is related to this `RelationalPost`.
+  """
+  relationalChecklistById: RelationalChecklist
+
+  """
+  Reads a single `RelationalChecklistItem` that is related to this `RelationalPost`.
+  """
+  relationalChecklistItemById: RelationalChecklistItem
+
+  """
+  Reads a single `RelationalDivider` that is related to this `RelationalPost`.
+  """
+  relationalDividerById: RelationalDivider
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalPost`.
+  """
+  relationalItemById: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalPost`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalPost` that is related to this `RelationalPost`.
+  """
+  relationalPostById: RelationalPost
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalPost`.
+  """
+  relationalTopicById: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalPost`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  title: String!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalPost` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalPostCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `note` field."""
+  note: String
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""An input for mutations affecting `RelationalPost`"""
+input RelationalPostInput {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime
+  description: String
+  id: Int!
+  isExplicitlyArchived: Boolean
+  note: String
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  title: String!
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""
+Represents an update to a `RelationalPost`. Fields that are set will be updated.
+"""
+input RelationalPostPatch {
+  archivedAt: Datetime
+  authorId: Int
+  createdAt: Datetime
+  description: String
+  id: Int
+  isExplicitlyArchived: Boolean
+  note: String
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  title: String
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalPost` values."""
+type RelationalPostsConnection {
+  """
+  A list of edges which contains the `RelationalPost` and cursor to aid in pagination.
+  """
+  edges: [RelationalPostsEdge]!
+
+  """A list of `RelationalPost` objects."""
+  nodes: [RelationalPost]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `RelationalPost` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `RelationalPost` edge in the connection."""
+type RelationalPostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalPost` at the end of the edge."""
+  node: RelationalPost
+}
+
+"""Methods to use when ordering `RelationalPost`."""
+enum RelationalPostsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  NOTE_ASC
+  NOTE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type RelationalTopic implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalTopic`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalChecklist` that is related to this `RelationalTopic`.
+  """
+  relationalChecklistById: RelationalChecklist
+
+  """
+  Reads a single `RelationalChecklistItem` that is related to this `RelationalTopic`.
+  """
+  relationalChecklistItemById: RelationalChecklistItem
+
+  """
+  Reads a single `RelationalDivider` that is related to this `RelationalTopic`.
+  """
+  relationalDividerById: RelationalDivider
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemById: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByRootTopicId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalPost` that is related to this `RelationalTopic`.
+  """
+  relationalPostById: RelationalPost
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
+  """
+  relationalTopicById: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  title: String!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalTopic` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalTopicCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""An input for mutations affecting `RelationalTopic`"""
+input RelationalTopicInput {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime
+  id: Int!
+  isExplicitlyArchived: Boolean
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  title: String!
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""
+Represents an update to a `RelationalTopic`. Fields that are set will be updated.
+"""
+input RelationalTopicPatch {
+  archivedAt: Datetime
+  authorId: Int
+  createdAt: Datetime
+  id: Int
+  isExplicitlyArchived: Boolean
+  parentId: Int
+  position: BigInt
+  rootTopicId: Int
+  title: String
+  type: ItemType
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalTopic` values."""
+type RelationalTopicsConnection {
+  """
+  A list of edges which contains the `RelationalTopic` and cursor to aid in pagination.
+  """
+  edges: [RelationalTopicsEdge]!
+
+  """A list of `RelationalTopic` objects."""
+  nodes: [RelationalTopic]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalTopic` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalTopic` edge in the connection."""
+type RelationalTopicsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalTopic` at the end of the edge."""
+  node: RelationalTopic
+}
+
+"""Methods to use when ordering `RelationalTopic`."""
+enum RelationalTopicsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type SingleTableChecklist implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklist`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  title: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+type SingleTableChecklistItem implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  description: String
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  note: String
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """Reads a single `Priority` that is related to this `SingleTableItem`."""
+  priorityByPriorityId: Priority
+  priorityId: Int
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklistItem`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+type SingleTableDivider implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  color: String
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableDivider`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  title: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+interface SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableItem`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemsConnection!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `SingleTableItem` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input SingleTableItemCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `SingleTableItem` values."""
+type SingleTableItemsConnection {
+  """
+  A list of edges which contains the `SingleTableItem` and cursor to aid in pagination.
+  """
+  edges: [SingleTableItemsEdge]!
+
+  """A list of `SingleTableItem` objects."""
+  nodes: [SingleTableItem]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SingleTableItem` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SingleTableItem` edge in the connection."""
+type SingleTableItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SingleTableItem` at the end of the edge."""
+  node: SingleTableItem
+}
+
+"""Methods to use when ordering `SingleTableItem`."""
+enum SingleTableItemsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type SingleTablePost implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  description: String
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  note: String
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """Reads a single `Priority` that is related to this `SingleTableItem`."""
+  priorityByPriorityId: Priority
+  priorityId: Int
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTablePost`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  subject: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+type SingleTableTopic implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableTopic`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  title: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""A connection to a list of `ThirdPartyVulnerability` values."""
+type ThirdPartyVulnerabilitiesConnection {
+  """
+  A list of edges which contains the `ThirdPartyVulnerability` and cursor to aid in pagination.
+  """
+  edges: [ThirdPartyVulnerabilitiesEdge]!
+
+  """A list of `ThirdPartyVulnerability` objects."""
+  nodes: [ThirdPartyVulnerability]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ThirdPartyVulnerability` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ThirdPartyVulnerability` edge in the connection."""
+type ThirdPartyVulnerabilitiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ThirdPartyVulnerability` at the end of the edge."""
+  node: ThirdPartyVulnerability
+}
+
+"""Methods to use when ordering `ThirdPartyVulnerability`."""
+enum ThirdPartyVulnerabilitiesOrderBy {
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  VENDOR_NAME_ASC
+  VENDOR_NAME_DESC
+}
+
+type ThirdPartyVulnerability implements Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+  cvssScore: Float!
+  id: Int!
+  name: String!
+  vendorName: String
+}
+
+"""
+A condition to be used against `ThirdPartyVulnerability` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input ThirdPartyVulnerabilityCondition {
+  """Checks for equality with the object’s `cvssScore` field."""
+  cvssScore: Float
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `vendorName` field."""
+  vendorName: String
+}
+
+"""An input for mutations affecting `ThirdPartyVulnerability`"""
+input ThirdPartyVulnerabilityInput {
+  cvssScore: Float!
+  id: Int!
+  name: String!
+  vendorName: String
+}
+
+"""
+Represents an update to a `ThirdPartyVulnerability`. Fields that are set will be updated.
+"""
+input ThirdPartyVulnerabilityPatch {
+  cvssScore: Float
+  id: Int
+  name: String
+  vendorName: String
+}
+
+"""All input for the `updateAwsApplicationById` mutation."""
+input UpdateAwsApplicationByIdInput {
+  """
+  An object where the defined keys will be set on the `AwsApplication` being updated.
+  """
+  awsApplicationPatch: AwsApplicationPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our update `AwsApplication` mutation."""
+type UpdateAwsApplicationPayload {
+  """The `AwsApplication` that was updated by this mutation."""
+  awsApplication: AwsApplication
+
+  """An edge for our `AwsApplication`. May be used by Relay 1."""
+  awsApplicationEdge(
+    """The method to use when ordering `AwsApplication`."""
+    orderBy: [AwsApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AwsApplicationsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateFirstPartyVulnerabilityById` mutation."""
+input UpdateFirstPartyVulnerabilityByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `FirstPartyVulnerability` being updated.
+  """
+  firstPartyVulnerabilityPatch: FirstPartyVulnerabilityPatch!
+  id: Int!
+}
+
+"""The output of our update `FirstPartyVulnerability` mutation."""
+type UpdateFirstPartyVulnerabilityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FirstPartyVulnerability` that was updated by this mutation."""
+  firstPartyVulnerability: FirstPartyVulnerability
+
+  """An edge for our `FirstPartyVulnerability`. May be used by Relay 1."""
+  firstPartyVulnerabilityEdge(
+    """The method to use when ordering `FirstPartyVulnerability`."""
+    orderBy: [FirstPartyVulnerabilitiesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FirstPartyVulnerabilitiesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateGcpApplicationById` mutation."""
+input UpdateGcpApplicationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `GcpApplication` being updated.
+  """
+  gcpApplicationPatch: GcpApplicationPatch!
+  id: Int!
+}
+
+"""The output of our update `GcpApplication` mutation."""
+type UpdateGcpApplicationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `GcpApplication` that was updated by this mutation."""
+  gcpApplication: GcpApplication
+
+  """An edge for our `GcpApplication`. May be used by Relay 1."""
+  gcpApplicationEdge(
+    """The method to use when ordering `GcpApplication`."""
+    orderBy: [GcpApplicationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): GcpApplicationsEdge
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateLogEntryById` mutation."""
+input UpdateLogEntryByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `LogEntry` being updated.
+  """
+  logEntryPatch: LogEntryPatch!
+}
+
+"""The output of our update `LogEntry` mutation."""
+type UpdateLogEntryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `LogEntry` that was updated by this mutation."""
+  logEntry: LogEntry
+
+  """An edge for our `LogEntry`. May be used by Relay 1."""
+  logEntryEdge(
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LogEntriesEdge
+
+  """Reads a single `Organization` that is related to this `LogEntry`."""
+  organizationByOrganizationId: Organization
+
+  """Reads a single `Person` that is related to this `LogEntry`."""
+  personByPersonId: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateOrganizationByName` mutation."""
+input UpdateOrganizationByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
+
+  """
+  An object where the defined keys will be set on the `Organization` being updated.
+  """
+  organizationPatch: OrganizationPatch!
+}
+
+"""All input for the `updateOrganizationByOrganizationId` mutation."""
+input UpdateOrganizationByOrganizationIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  organizationId: Int!
+
+  """
+  An object where the defined keys will be set on the `Organization` being updated.
+  """
+  organizationPatch: OrganizationPatch!
+}
+
+"""The output of our update `Organization` mutation."""
+type UpdateOrganizationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Organization` that was updated by this mutation."""
+  organization: Organization
+
+  """An edge for our `Organization`. May be used by Relay 1."""
+  organizationEdge(
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrganizationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePersonByPersonId` mutation."""
+input UpdatePersonByPersonIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  personId: Int!
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+}
+
+"""All input for the `updatePersonByUsername` mutation."""
+input UpdatePersonByUsernameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Person` being updated.
+  """
+  personPatch: PersonPatch!
+  username: String!
+}
+
+"""The output of our update `Person` mutation."""
+type UpdatePersonPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Person` that was updated by this mutation."""
+  person: Person
+
+  """An edge for our `Person`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateRelationalChecklistById` mutation."""
+input UpdateRelationalChecklistByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalChecklist` being updated.
+  """
+  relationalChecklistPatch: RelationalChecklistPatch!
+}
+
+"""All input for the `updateRelationalChecklistItemById` mutation."""
+input UpdateRelationalChecklistItemByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalChecklistItem` being updated.
+  """
+  relationalChecklistItemPatch: RelationalChecklistItemPatch!
+}
+
+"""The output of our update `RelationalChecklistItem` mutation."""
+type UpdateRelationalChecklistItemPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalChecklistItem` that was updated by this mutation."""
+  relationalChecklistItem: RelationalChecklistItem
+
+  """An edge for our `RelationalChecklistItem`. May be used by Relay 1."""
+  relationalChecklistItemEdge(
+    """The method to use when ordering `RelationalChecklistItem`."""
+    orderBy: [RelationalChecklistItemsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistItemsEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""The output of our update `RelationalChecklist` mutation."""
+type UpdateRelationalChecklistPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalChecklist` that was updated by this mutation."""
+  relationalChecklist: RelationalChecklist
+
+  """An edge for our `RelationalChecklist`. May be used by Relay 1."""
+  relationalChecklistEdge(
+    """The method to use when ordering `RelationalChecklist`."""
+    orderBy: [RelationalChecklistsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistsEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""All input for the `updateRelationalDividerById` mutation."""
+input UpdateRelationalDividerByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalDivider` being updated.
+  """
+  relationalDividerPatch: RelationalDividerPatch!
+}
+
+"""The output of our update `RelationalDivider` mutation."""
+type UpdateRelationalDividerPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalDivider` that was updated by this mutation."""
+  relationalDivider: RelationalDivider
+
+  """An edge for our `RelationalDivider`. May be used by Relay 1."""
+  relationalDividerEdge(
+    """The method to use when ordering `RelationalDivider`."""
+    orderBy: [RelationalDividersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalDividersEdge
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
+  """
+  relationalItemById: RelationalItem
+}
+
+"""All input for the `updateRelationalPostById` mutation."""
+input UpdateRelationalPostByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalPost` being updated.
+  """
+  relationalPostPatch: RelationalPostPatch!
+}
+
+"""The output of our update `RelationalPost` mutation."""
+type UpdateRelationalPostPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalPost`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalPost` that was updated by this mutation."""
+  relationalPost: RelationalPost
+
+  """An edge for our `RelationalPost`. May be used by Relay 1."""
+  relationalPostEdge(
+    """The method to use when ordering `RelationalPost`."""
+    orderBy: [RelationalPostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalPostsEdge
+}
+
+"""All input for the `updateRelationalTopicById` mutation."""
+input UpdateRelationalTopicByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalTopic` being updated.
+  """
+  relationalTopicPatch: RelationalTopicPatch!
+}
+
+"""The output of our update `RelationalTopic` mutation."""
+type UpdateRelationalTopicPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemById: RelationalItem
+
+  """The `RelationalTopic` that was updated by this mutation."""
+  relationalTopic: RelationalTopic
+
+  """An edge for our `RelationalTopic`. May be used by Relay 1."""
+  relationalTopicEdge(
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsEdge
+}
+
+"""All input for the `updateThirdPartyVulnerabilityById` mutation."""
+input UpdateThirdPartyVulnerabilityByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `ThirdPartyVulnerability` being updated.
+  """
+  thirdPartyVulnerabilityPatch: ThirdPartyVulnerabilityPatch!
+}
+
+"""The output of our update `ThirdPartyVulnerability` mutation."""
+type UpdateThirdPartyVulnerabilityPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ThirdPartyVulnerability` that was updated by this mutation."""
+  thirdPartyVulnerability: ThirdPartyVulnerability
+
+  """An edge for our `ThirdPartyVulnerability`. May be used by Relay 1."""
+  thirdPartyVulnerabilityEdge(
+    """The method to use when ordering `ThirdPartyVulnerability`."""
+    orderBy: [ThirdPartyVulnerabilitiesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ThirdPartyVulnerabilitiesEdge
+}
+
+"""A connection to a list of `Vulnerability` values."""
+type VulnerabilitiesConnection {
+  """
+  A list of edges which contains the `Vulnerability` and cursor to aid in pagination.
+  """
+  edges: [VulnerabilitiesEdge]!
+
+  """A list of `Vulnerability` objects."""
+  nodes: [Vulnerability]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Vulnerability` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Vulnerability` edge in the connection."""
+type VulnerabilitiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Vulnerability` at the end of the edge."""
+  node: Vulnerability
+}
+
+"""Methods to use when ordering `Vulnerability`."""
+enum VulnerabilitiesOrderBy {
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+}
+
+interface Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): ApplicationsConnection!
+  cvssScore: Float!
+  id: Int!
+  name: String!
+}
+
+"""
+A condition to be used against `Vulnerability` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input VulnerabilityCondition {
+  """Checks for equality with the object’s `cvssScore` field."""
+  cvssScore: Float
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+interface ZeroImplementation {
+  id: Int
+  name: String
+}
+
+"""
+A condition to be used against `ZeroImplementation` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ZeroImplementationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""A connection to a list of `ZeroImplementation` values."""
+type ZeroImplementationsConnection {
+  """
+  A list of edges which contains the `ZeroImplementation` and cursor to aid in pagination.
+  """
+  edges: [ZeroImplementationsEdge]!
+
+  """A list of `ZeroImplementation` objects."""
+  nodes: [ZeroImplementation]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ZeroImplementation` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ZeroImplementation` edge in the connection."""
+type ZeroImplementationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ZeroImplementation` at the end of the edge."""
+  node: ZeroImplementation
+}
+
+"""Methods to use when ordering `ZeroImplementation`."""
+enum ZeroImplementationsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+}

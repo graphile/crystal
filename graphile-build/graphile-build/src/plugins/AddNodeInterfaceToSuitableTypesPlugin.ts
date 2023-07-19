@@ -86,7 +86,7 @@ export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
                     const specifier = handler.plan($parent);
                     return lambda(
                       specifier,
-                      nodeIdCodecs[handler.codec.name].encode,
+                      nodeIdCodecs![handler.codec.name].encode,
                     );
                   },
                 [handler, lambda, nodeIdCodecs],
