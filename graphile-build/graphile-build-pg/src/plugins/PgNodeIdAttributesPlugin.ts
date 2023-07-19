@@ -105,7 +105,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               if (typeName === build.inflection.builtin("Query")) {
                 return memo;
               }
-              const fetcher = build.nodeFetcherByTypeName(typeName);
+              const fetcher = build.nodeFetcherByTypeName?.(typeName);
               if (!fetcher) {
                 return memo;
               }

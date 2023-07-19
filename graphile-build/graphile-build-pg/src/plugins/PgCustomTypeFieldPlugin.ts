@@ -393,8 +393,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       "output",
                     )
                   : null;
+              if (variant === "nodeId" && !finalBuild.nodeFetcherByTypeName) {
+                // ERRORS: tell them how to turn the nodeId variant off
+                throw new Error(
+                  `Argument is configured to use nodeId variant, but build is not configured with Node support - there is no 'build.nodeFetcherByTypeName'. Did you skip NodePlugin?`,
+                );
+              }
               const fetcher = typeNameForFetcher
-                ? finalBuild.nodeFetcherByTypeName(typeNameForFetcher)
+                ? finalBuild.nodeFetcherByTypeName!(typeNameForFetcher)
                 : null;
               if (!baseInputType) {
                 const hint =

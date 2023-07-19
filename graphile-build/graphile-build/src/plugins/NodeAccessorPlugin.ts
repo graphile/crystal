@@ -19,11 +19,11 @@ type NodeFetcher = {
 declare global {
   namespace GraphileBuild {
     interface Build {
-      specForHandler(
+      specForHandler?(
         handler: NodeIdHandler,
         codec: NodeIdCodec,
       ): (nodeId: string) => any;
-      nodeFetcherByTypeName(typeName: string): NodeFetcher | null;
+      nodeFetcherByTypeName?(typeName: string): NodeFetcher | null;
     }
     interface Inflection {
       nodeById(this: Inflection, typeName: string): string;
@@ -85,9 +85,10 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               if (existing) return existing;
               const finalBuild = build as GraphileBuild.Build;
               const { specForHandler } = finalBuild;
-              const handler = finalBuild.getNodeIdHandler(typeName);
+              if (!specForHandler) return null;
+              const handler = finalBuild.getNodeIdHandler?.(typeName);
               if (!handler) return null;
-              const codec = finalBuild.getNodeIdCodec(handler.codec.name);
+              const codec = finalBuild.getNodeIdCodec!(handler.codec.name);
               const fetcher = EXPORTABLE(
                 (codec, handler, lambda, specForHandler) => {
                   const fn: NodeFetcher = ($nodeId: ExecutableStep<string>) => {
@@ -122,6 +123,9 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
         if (!isRootQuery) {
           return fields;
         }
+        if (!build.nodeFetcherByTypeName) {
+          return fields;
+        }
 
         const typeNames = build.getNodeTypeNames();
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
@@ -131,7 +135,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
           if (typeName === build.inflection.builtin("Query")) {
             return memo;
           }
-          const fetcher = build.nodeFetcherByTypeName(typeName);
+          const fetcher = build.nodeFetcherByTypeName!(typeName);
           if (!fetcher) {
             return memo;
           }
