@@ -4,7 +4,6 @@ import type {
   DocumentNode,
   ExecutionArgs,
   ExecutionResult,
-  GraphQLArgs,
   GraphQLSchema,
 } from "graphql";
 import * as graphql from "graphql";
@@ -13,7 +12,8 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
-import { $$queryCache, GrafastArgs } from "./interfaces.js";
+import type { GrafastArgs } from "./interfaces.js";
+import { $$queryCache } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
