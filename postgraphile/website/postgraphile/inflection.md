@@ -82,23 +82,34 @@ arguments.
 
 ### Advice
 
-The relation field names are explicit to avoid accidental conflicts, and
-can make your schema somewhat verbose, e.g. `userByAuthorId`, `userByEditorId`,
-`userByPublisherId`, etc.
+By default, the relation field names are explicit to avoid accidental
+conflicts, and can make your schema somewhat verbose, e.g. `userByAuthorId`,
+`userByEditorId`, `userByPublisherId`, etc.
 
-Some people like this verbosity, however if you prefer shorter names we
-encourage you use
+Some people like this verbosity; however if you, like us, prefer shorter names
+then we encourage you use
 [the `@graphile/simplify-inflection` plugin](https://github.com/graphile/simplify-inflection).
 This would automatically change those fields to be named `author`, `editor` and
 `publisher` respectively.
 
-```
-postgraphile --append-plugins @graphile/simplify-inflection
+```js title="graphile.config.mjs"
+import { PgSimplifyInflectionPreset } from "@graphile/simplify-inflection";
+
+const preset = {
+  extends: [
+    PgSimplifyInflectionPreset,
+    //...
+  ],
+  //...
+};
 ```
 
-I, Benjie, prefer to use this plugin in all my projects.
+Our maintainer, Benjie, prefers to use this plugin in all his projects.
 
 ## Listing available inflectors
+
+We've built a command into our sponsors-only `graphile` development assistant
+to help you determine all the inflectors available to you:
 
 ```bash npm2yarn
 npm install --save-dev graphile
