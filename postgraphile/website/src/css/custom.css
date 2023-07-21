@@ -14,7 +14,7 @@
   --ifm-color-primary-lighter: #cbe3ff;
   --ifm-color-primary-lightest: #f4faff;
   /*--ifm-code-font-size: 95%;*/
-  --docusaurus-highlighted-code-line-bg: #112559;
+  --docusaurus-highlighted-code-line-bg: rgba(200, 230, 255, 0.3);
   --ifm-navbar-link-color: #112559;
   --ifm-font-family-base: Sarabun, Helvetica, Verdana, Arial, sans-serif;
   --ifm-footer-background-color: transparent;
@@ -31,7 +31,7 @@
   --ifm-color-primary-light: #cbe3ff;
   --ifm-color-primary-lighter: #cbe3ff;
   --ifm-color-primary-lightest: #f4faff;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --docusaurus-highlighted-code-line-bg: #0d3658cc;
   --ifm-navbar-link-color: var(--ifm-color-primary-light);
   --ifm-footer-link-color: var(--ifm-color-primary-light);
   --ifm-footer-color: var(--ifm-color-primary-lightest);
