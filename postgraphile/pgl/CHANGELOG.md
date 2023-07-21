@@ -1,5 +1,16 @@
 # pgl
 
+## 5.0.0-alpha.18
+
+### Patch Changes
+
+- Updated dependencies
+  [[`415f436a0`](https://github.com/benjie/postgraphile-private/commit/415f436a04d42ba7d7a51457f99e8d8e6baee051),
+  [`5b8e46a8a`](https://github.com/benjie/postgraphile-private/commit/5b8e46a8a868d68290d0f274934593a23b5bb25e),
+  [`bb64c090d`](https://github.com/benjie/postgraphile-private/commit/bb64c090d1094875ec51a8577a000cb4f796e197)]:
+  - graphile-build-pg@5.0.0-alpha.18
+  - postgraphile@5.0.0-alpha.18
+
 ## 5.0.0-alpha.17
 
 ### Patch Changes
