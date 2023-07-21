@@ -92,9 +92,9 @@ Which layer would you like to read more about?
 - [**CLI**](./usage-cli.mdx)
 - [**Middleware** ("library")](./usage-library.md)
 - [**GraphQL schema** ("schema-only")](./usage-schema.md)
-- [Configuration](./config.md)
+- [Configuration](./config.mdx)
 
-[config file]: ./config.md
+[config file]: ./config.mdx
 [grafserv]: https://grafast.org/grafserv
 [grafast]: https://grafast.org/grafast
 [gra*fast*]: https://grafast.org/grafast

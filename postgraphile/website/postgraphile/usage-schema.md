@@ -21,7 +21,7 @@ The first function you will need is `makeSchema` (or `watchSchema` if you want
 to get a new schema each time the database is updated) which creates your
 PostGraphile GraphQL schema by introspecting your database.
 
-The `makeSchema` function accepts a [configuration preset](./config.md) and
+The `makeSchema` function accepts a [configuration preset](./config.mdx) and
 returns a promise to a SchemaResult, which is an object containing:
 
 - `schema` - the GraphQL schema

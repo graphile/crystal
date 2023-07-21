@@ -12,7 +12,7 @@ Usage](./usage-schema/).
 
 ## PostGraphile instance
 
-Library mode is configured using a preset (see [Configuration](./config.md) for
+Library mode is configured using a preset (see [Configuration](./config.mdx) for
 the options) and returns a PostGraphile instance `pgl` which has various
 methods you can use depending on what you're trying to do.
 
