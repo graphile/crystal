@@ -207,15 +207,15 @@ $ npx postgraphile
 
 ### Writing GraphQL Queries
 
-Running PostGraphile will give you two endpoints:
+Running PostGraphile will give you a URL:
 
 ```
-  ‣ GraphQL endpoint served at http://localhost:5000/graphql
-  ‣ GraphiQL endpoint served at http://localhost:5000/graphiql
+Server listening on port 5678 at http://127.0.0.1:5678/graphql
 ```
 
-The first endpoint is for your application to talk to; the second endpoint can
-be opened in a web browser to give you access to your database through
-`GraphiQL` - [a visual GraphQL explorer](https://github.com/graphql/graphiql).
+You can visit this URL in your web browser to see the
+[Ruru](https://grafast.org/ruru) (a Gra*fast* flavoured
+[GraphiQL](https://github.com/graphql/graphiql) IDE) interface, or you can
+issue GraphQL requests to this URL using a GraphQL client of your choosing.
 
 Well done — you've got PostGraphile up and running!
