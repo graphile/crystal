@@ -169,9 +169,17 @@ whenever the PostgreSQL schemas you are introspecting change.
 
 ### Configuring PostGraphile
 
-Having to write these details each time can become cumbersome, so we'll create
-a `graphile.config.mjs` file to store our configuration. An initial
-configuration equivalent to the above CLI flags might look like this:
+Having to enter all these flags each time can become cumbersome, so we'll
+create a `graphile.config.mjs` file to store our configuration.
+
+A minimal config so you just don't need the `-P postgraphile/presets/amber` would be be:
+
+```js title="graphile.config.mjs"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+export default { extends: [PostGraphileAmberPreset] };
+```
+
+An configuration equivalent to the CLI with the watch flag above would be:
 
 ```js title="graphile.config.mjs"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
@@ -190,7 +198,8 @@ export default preset;
 (Read more about `graphile.config.mjs`, including how to write it in
 TypeScript, in the [Configuration documentation](./config.mdx).)
 
-With this configuration in place, we no longer need to pass the flags, so we can just run PostGraphile as:
+With this configuration in place, we no longer need to pass the flags, so we
+can just run PostGraphile as:
 
 ```bash npm2yarn
 $ npx postgraphile
