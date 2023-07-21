@@ -10,20 +10,26 @@ set of named functions, and we call each of these inflection functions an
 "inflector."
 
 The inflectors that you have available will depend on the plugins and presets
-you're using, to get a list of the inflectors available to you, install the
+you're using. To get a list of the inflectors available to you, you can use
+TypeScript autocompletion, or if you're a sponsor you can install the
 `graphile` package and run `yarn graphile inflection list` (or equivalent for
 other package managers).
 
-In GraphQL types typically use singular `UpperCamelCase` (`PascalCase`);
+In GraphQL, types typically use singular `UpperCamelCase` (`PascalCase`);
 fields, arguments and directives typically use `camelCase`; and enum values
-typically use `CONSTANT_CASE`. The default inflectors attempt to map things to
-natural names in GraphQL whilst avoiding naming conflicts. For example:
+typically use `CONSTANT_CASE`. These conventions can be seen in [the GraphQL
+specification itself](https://spec.graphql.org/draft/#example-916f4). The
+default inflectors attempt to map things to natural names in GraphQL whilst
+avoiding naming conflicts. For example:
 
 - Table names are singularized and changed to UpperCamelCase: `pending_users` →
   `PendingUser`
 - Column names are changed to camelCase: `created_at` → `createdAt`
 - Relations reference the target type and the referencing columns:
   `postsByAuthorId` (see "advice" below about making this shorter!)
+
+But if you don't want this (or it's doing something wrong), then you can fix it
+by overriding inflectors!
 
 ### Overriding Naming - One-off
 
