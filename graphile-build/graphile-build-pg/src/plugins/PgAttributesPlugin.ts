@@ -23,6 +23,13 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
+    interface Build {
+      pgResolveOutputType(
+        codec: PgCodec,
+        notNull?: boolean,
+      ): [baseCodec: PgCodec, resolvedType: GraphQLOutputType] | null;
+    }
+
     interface Inflection {
       /**
        * Given a attributeName on a PgCodec's attributes, should return the field
@@ -120,10 +127,9 @@ function processAttribute(
       attributeName,
       codec: pgCodec,
     });
-  const resolveResult = resolveOutputType(
-    build,
+  const resolveResult = build.pgResolveOutputType(
     attribute.codec,
-    attribute.notNull,
+    attribute.notNull || attribute.extensions?.tags?.notNull,
   );
   if (!resolveResult) {
     console.warn(
@@ -138,13 +144,6 @@ function processAttribute(
   }
   const [baseCodec, type] = resolveResult;
 
-  if (!type) {
-    // Could not determine the type, skip this field
-    console.warn(
-      `Could not determine the type for attribute '${attributeName}' of ${pgCodec.name}`,
-    );
-    return;
-  }
   const fieldSpec: GrafastFieldConfig<any, any, any, any, any> = {
     description: attribute.description,
     type: type as GraphQLOutputType,
@@ -331,6 +330,21 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
       },
     },
     hooks: {
+      build(build) {
+        return build.extend(
+          build,
+          {
+            pgResolveOutputType(codec, notNull) {
+              return resolveOutputType(
+                build as GraphileBuild.Build,
+                codec,
+                notNull,
+              );
+            },
+          },
+          "Adding helpers from PgAttributesPlugin",
+        );
+      },
       GraphQLInterfaceType_fields(fields, build, context) {
         const {
           scope: { pgCodec, pgPolymorphism },
