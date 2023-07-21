@@ -12,7 +12,8 @@ Please see the subpages for the builtin webserver support.
 If you plan to implement your own Grafserv adaptor (rather than using a built
 in one), this sequence diagram may aid your understanding:
 
-<Mermaid chart={`\
+<Mermaid
+  chart={`\
 sequenceDiagram
   participant Server as Server Framework
   participant Adaptor as Grafserv Adaptor
@@ -28,4 +29,5 @@ sequenceDiagram
   Grafserv-)Grafserv: Compute GraphQL Result
   Grafserv->>Adaptor: Grafserv response<br/>(JSON, text, stream, etc)
   Adaptor->>Server: Framework response
-`} />
+`}
+/>
