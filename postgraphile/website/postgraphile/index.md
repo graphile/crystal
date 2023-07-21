@@ -85,7 +85,7 @@ through the PostGraphile documentation._
 
 Some of the features we offer:
 
-- [Incredible performance](./performance/) - even for your custom logic!
+- Incredible performance - even for your custom logic!
 - Full GraphQL feature-set, including advanced topics such as:
   - [polymorphism](./polymorphism.md) (interfaces and unions)
   - [Real-time](./realtime.md) features (subscriptions and soon: live queries)
