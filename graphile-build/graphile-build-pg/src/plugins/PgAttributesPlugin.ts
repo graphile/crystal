@@ -129,7 +129,7 @@ function processAttribute(
     });
   const resolveResult = build.pgResolveOutputType(
     attribute.codec,
-    attribute.notNull,
+    attribute.notNull || attribute.extensions?.tags?.notNull,
   );
   if (!resolveResult) {
     console.warn(
