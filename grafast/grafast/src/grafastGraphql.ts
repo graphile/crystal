@@ -4,7 +4,6 @@ import type {
   DocumentNode,
   ExecutionArgs,
   ExecutionResult,
-  GraphQLArgs,
   GraphQLSchema,
 } from "graphql";
 import * as graphql from "graphql";
@@ -13,6 +12,7 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
+import type { GrafastArgs } from "./interfaces.js";
 import { $$queryCache } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -117,9 +117,9 @@ const parseAndValidate = (
  * execute instead
  */
 export function grafast(
-  args: GraphQLArgs,
-  resolvedPreset?: GraphileConfig.ResolvedPreset,
-  ctx?: Partial<Grafast.RequestContext>,
+  args: GrafastArgs,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
+  legacyCtx?: Partial<Grafast.RequestContext>,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
@@ -132,6 +132,8 @@ export function grafast(
     operationName,
     fieldResolver,
     typeResolver,
+    resolvedPreset = legacyResolvedPreset,
+    requestContext = legacyCtx,
   } = args;
 
   // Validate Schema
@@ -158,8 +160,12 @@ export function grafast(
     typeResolver,
   };
 
-  if (resolvedPreset && ctx) {
-    const argsOrPromise = hookArgs(executionArgs, resolvedPreset, ctx);
+  if (resolvedPreset && requestContext) {
+    const argsOrPromise = hookArgs(
+      executionArgs,
+      resolvedPreset,
+      requestContext,
+    );
     if (isPromiseLike(argsOrPromise)) {
       return Promise.resolve(argsOrPromise).then((hookedArgs) =>
         execute(hookedArgs, resolvedPreset),
@@ -175,11 +181,11 @@ export function grafast(
 }
 
 export function grafastSync(
-  args: GraphQLArgs,
-  resolvedPreset?: GraphileConfig.ResolvedPreset,
-  ctx?: Partial<Grafast.RequestContext>,
+  args: GrafastArgs,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
+  legacyRequestContext?: Partial<Grafast.RequestContext>,
 ): ExecutionResult {
-  const result = grafast(args, resolvedPreset, ctx);
+  const result = grafast(args, legacyResolvedPreset, legacyRequestContext);
   if (isPromiseLike(result)) {
     throw new SafeError("Grafast execution failed to complete synchronously.");
   }

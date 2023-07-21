@@ -185,6 +185,7 @@ const preset: GraphileConfig.Preset = {
     sortExport: true,
   },
   grafserv: {
+    port: 5678,
     graphqlPath: "/graphql",
     websockets: true,
     graphqlOverGET: true,

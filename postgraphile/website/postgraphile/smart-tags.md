@@ -23,7 +23,7 @@ PostGraphile's GraphiQL client that the related types and fields will reflect
 the change almost immediately. If you're not using `--watch` then you may need
 to restart the server for smart tag changes to take effect.
 
-### The @ character
+## The @ character
 
 We often refer to things like the `@omit` smart tag or the `@name` smart tag;
 really these tags are just `omit` and `name` respectively; but in the
@@ -38,7 +38,7 @@ quickly. Read the [Smart Comments Spec](./smart-comments/#smart-comment-spec)
 and you'll soon learn to translate `@omit update,delete` to
 `omit: "update,delete"` (and vice-versa) in your head.
 
-### Valid values
+## Valid values
 
 Tags have a limited set of valid values:
 
@@ -48,7 +48,7 @@ Tags have a limited set of valid values:
 
 Some tags only support one or two of these types of values.
 
-### Ways of adding tags
+## Ways of adding tags
 
 There's multiple ways of adding tags to entities:
 
@@ -57,7 +57,7 @@ There's multiple ways of adding tags to entities:
 - A [`makePgSmartTagsPlugin`](./make-pg-smart-tags-plugin/) instance
 - Your own custom [Graphile Engine plugin](./extending-raw/)
 
-### Example
+## Example
 
 _In this example we're going to use Smart Comments for brevity, but this works
 with all the ways of adding smart tags._
@@ -118,12 +118,14 @@ So now the query needs to use the new name for the table:
 
 </div>
 
-### Built-in smart tags
+## Non-exhaustive
 
 Any plugin may implement support for smart tags, so refer to those plugins'
-documentation. The following are smart tags built into PostGraphile.
+documentation for details of the smart tags they add.
 
-#### @deprecated
+The following are some of the smart tags built into PostGraphile:
+
+## @deprecated
 
 You can deprecate a database column using the `deprecated` tag. If you need
 multiple lines, you can specify the tag multiple times, one per line of output
@@ -148,7 +150,7 @@ comment on column my_schema.my_table.my_column is
   E'@deprecated Use myOtherColumn instead.';
 ```
 
-#### @name
+## @name
 
 You can add a smart tag to an entity to rename that entity. For tables, columns,
 custom types and many functions you can use the `name` tag. For more complex
@@ -190,7 +192,7 @@ comment on function search_posts(text) is
   E'@name returnPostsMatching';
 ```
 
-#### @fieldName
+## @fieldName
 
 Applies to:
 
@@ -199,7 +201,7 @@ Applies to:
 - unique constraints: the root finder field name
 - computed column functions: the field name this function creates
 
-#### @foreignFieldName
+## @foreignFieldName
 
 `foreignFieldName` applies to
 
@@ -219,21 +221,21 @@ list field, use `@foreignSimpleFieldName`.
 
 See also: `@fieldName`, `@foreignSimpleFieldName`, `@foreignConnectionFieldName`
 
-##### `@foreignSimpleFieldName`
+### @foreignSimpleFieldName
 
 `foreignSimpleFieldName` applies to _list_ fields generated from
 
 - foreign key constraints: the field on the remote type (the "backwards"
   relation)
 
-##### `@foreignConnectionFieldName`
+### @foreignConnectionFieldName
 
 `foreignConnectionFieldName` applies to _connection_ fields generated from
 
 - foreign key constraints: the field on the remote type (the "backwards"
   relation)
 
-#### @resultFieldName
+## @resultFieldName
 
 Applies to:
 
@@ -256,7 +258,258 @@ comment on function authenticate(text, text) is
   E'@resultFieldName token\n@name login';
 ```
 
-#### @omit
+## @behavior
+
+Use this smart tag to override the behavior associated with a table, view,
+materialized view, type, column, constraint, function or other database entity.
+See the [behavior documentation](./behavior.md).
+
+## @arg0variant, @arg1variant, ...
+
+When building a custom mutation, you probably want to use the composite type
+that is generated when creating a table in PostgreSQL as a function argument,
+like this (note this is just an example for illustrative purposes):
+
+```sql
+create table example(
+  id uuid primary key,
+  name text not null
+);
+
+create function new_example(input example) returns example as $$
+  insert into example (id, name) values (input.id, input.name) returning *;
+$$ language sql volatile;
+```
+
+By default, composite types will be translated into a GraphQL types by
+PostGraphile with the same characteristics, i.e. all `not null` columns will
+become non-nullable fields. You can let PostGraphile know that you want to
+convert the composite type into another "variant" GraphQL type with a smart
+comment. Variants include `patch` (which is equivalent to the argument to
+`update*` mutations) and `base` (which makes every column both available
+(ignores permissions) and nullable). For example:
+
+```sql
+create table example(
+  id uuid primary key,
+  name text not null
+);
+
+create function new_example_with_auto_id(input example) returns example as $$
+  insert into example (id, name) values (gen_random_uuid(), input.name) returning *;
+$$ language sql volatile;
+
+comment on function new_example_with_auto_id(input example) is
+  E'@arg0variant patch';
+```
+
+This uses the `patch` variant from PostGraphile's update mutations which has all
+the fields except `id`. This will mean that the custom mutation will not ask for
+the `id` on the client-side anymore (because it will generate it itself). Note
+how `arg0` refers to the first function parameter (we use a 0-indexed counter of
+the arguments), thus `arg2` would be the third parameter.
+
+Applies to:
+
+- Custom Query functions
+- Custom Mutation functions
+- Computed Column functions
+
+## @ref
+
+TODO (see Ref docs)
+
+### @refVia
+
+TODO (see Ref docs)
+
+## Virtual constraints
+
+You can add "virtual" (fake) constraints to types in PostgreSQL using smart
+comments. The primary use case for this is to make views act more table-like -
+allowing you to express the connections between tables and views. It's also
+useful on composite types.
+
+### @notNull
+
+Allows marking the column as non-nullable.
+
+Applies to:
+
+- columns
+
+```json5
+attribute: {
+  "my_view.my_column": {
+    tags: {
+      notNull: true
+    }
+  }
+}
+```
+
+```sql
+comment on column my_view.my_column is E'@notNull`;
+```
+
+### @primaryKey
+
+Primary key columns will automatically be marked as `@notNull`, as they would in
+PostgreSQL.
+
+If you declare something as a primary key it _must_ be unique. We do not check
+it's unique - we trust you - but if it isn't unique then we're not sure what
+will happen...
+
+```json5
+class: {
+  my_view: {
+    tags: {
+      primaryKey: "id"
+      // or:
+      //   primaryKey: "type,identifier"
+    }
+  }
+}
+```
+
+```sql
+comment on view my_view is E'@primaryKey id';
+-- or
+comment on view my_view is E'@primaryKey type,identifier';
+```
+
+### @foreignKey
+
+The foreign key adds virtual constraints pretending to be foreign keys. It has
+the following syntax which mirrors the PostgreSQL foreign key constraint:
+
+`@foreignKey (col1, ...) references [my_schema.]my_table [(col1, ...)]`
+
+In the tags file you must omit the leading `@foreignKey` text since it is
+specified as the key (rather than the value) in the tags object ─ see example
+below.
+
+The schema is optional if the target table is in the same schema. If you're
+referencing a Primary Key on the remote table/view then you can skip the final
+column specification should you wish. Otherwise, you must reference columns
+matching a unique constraint.
+
+Applies to:
+
+- Tables
+- Views
+- Materialized views
+- Composite types (one direction only)
+
+```json5
+class: {
+  my_materialized_view: {
+    tags: {
+      foreignKey: "(key_1, key_2) references other_table (key_1, key_2)"
+    }
+  }
+}
+
+// or if you want multiple foreignKeys
+class: {
+  my_materialized_view: {
+    tags: {
+      foreignKey: [
+        "(key_1, key_2) references other_table (key_1, key_2)",
+        "(key_3, key_4) references some_other_table (key_3, key_4)"
+      ]
+    }
+  }
+}
+
+```
+
+```sql
+comment on materialized view my_materialized_view is E'@foreignKey (key_1, key_2) references other_table (key_1, key_2)';
+
+-- or if you want multiple foreignKeys
+comment on materialized view my_materialized_view is E'@foreignKey (key_1, key_2) references other_table (key_1, key_2)\n@foreignKey (key_3, key_4) references some_other_table (key_3, key_4)';
+```
+
+:::note
+
+Fake constraints are treated as if they are indexed.
+
+:::
+
+### @unique
+
+_From PostGraphile 4.9.1_
+
+Introduces a "fake" unique constraint, so `@unique col1,col2` is somewhat
+equivalent to the following, except it can also be applied to entities that
+cannot have unique constraints, e.g. views. It is up to you to ensure that your
+data is indeed unique on the given columns.
+
+```sql
+-- `@unique col1,col2` is roughly equivalent to:
+ALTER TABLE foo ADD CONSTRAINT fake_unique UNIQUE (col1, col2);
+```
+
+More than one `@unique` tag may be specified.
+
+```json5
+class: {
+  my_view: {
+    tags: {
+      unique: [
+        "id",
+        "org_id,slug"
+      ]
+      // or:
+      //   unique: "id"
+    }
+  }
+}
+```
+
+```sql
+comment on view my_view is E'@unique id\n@unique org,slug';
+```
+
+### Smart Tags on virtual constraints
+
+You can also add smart tags on virtual constraints, for example adding the
+`fieldName` smart tag to a virtual foreign key constraint, by appending the pipe
+character `|` followed by the `@`-prefixed smart tag:
+
+```json5
+class: {
+  my_materialized_view: {
+    tags: {
+      foreignKey: "(key_1, key_2) references other_table (key_1, key_2)|@fieldName field_1"
+    }
+  }
+}
+```
+
+## Polymorphism
+
+### @interface
+
+TODO (see Polymorphism docs)
+
+#### @type
+
+TODO (see Polymorphism docs)
+
+### @unionMember
+
+TODO (see Polymorphism docs)
+
+## Deprecated tags
+
+These tags are only available if you're using the V4 preset, and have been replaced by better methods.
+
+### @omit
+
+_Deprecated: use `@behavior -*` instead._
 
 To remove an entity from your API, you can use the 'omit' smart tag. If you only
 want to omit the entity from certain operations you can list them. For example,
@@ -319,7 +572,7 @@ Applies to:
 - Unique constraints
 - Foreign key constraints
 
-###### Example
+#### Example
 
 On a simple table called `book` we have added a smart comment omitting the
 `update` and `delete` operations:
@@ -345,7 +598,47 @@ can see the reduced fields and types once the `create` operation is omitted.
 
 ![GraphiQL displaying an omit smart comment example](./smart-comments-omit-example.png)
 
-#### @sortable
+### @simpleCollections
+
+_Deprecated: use `@behavior +list +connection` instead, replacing `+` with `-`
+for the features to disable._
+
+You can control whether simple collections are enabled by default using
+`--simple-collections omit|both|only` (or
+`simpleCollections: "omit"|"both"|"only"`); however sometimes you want to
+override this on a case by case setting - for example if you want relay
+connections for almost all collections, except when it comes to a user's email
+addresses where you want to use a simple list.
+
+You can do this with the `@simpleCollections omit`, `@simpleCollections both`
+and `@simpleCollections only` smart comments.
+
+Applies to:
+
+- Tables
+- Views
+- Materialized views
+- Custom Query functions
+- Computed Column functions
+
+```sql
+comment on table email is
+  E'@simpleCollections both';
+```
+
+```sql
+comment on constraint email_user_id_fkey on email is
+  E'@simpleCollections both';
+```
+
+```sql
+comment on function search_people(query text) is
+  E'@simpleCollections both';
+```
+
+### @sortable
+
+_Deprecated: use `@behavior +sort +sortBy` instead._
 
 Since version
 [v4.3.1](https://github.com/graphile/postgraphile/releases/tag/v4.3.1)
@@ -383,7 +676,9 @@ comment on function users_foo(users) is E'@sortable';
 }
 ```
 
-#### @filterable
+### @filterable
+
+_Deprecated: use `@behavior +filter +filterBy` instead._
 
 Since version
 [v4.3.1](https://github.com/graphile/postgraphile/releases/tag/v4.3.1).
@@ -418,7 +713,7 @@ comment on function users_foo(users) is E'@filterable';
 }
 ```
 
-##### Sorting and filtering non-scalar computed columns
+#### Sorting and filtering non-scalar computed columns
 
 If your computed column is returning a composite type, the recommended approach
 is to wrap it with a computed column that returns the scalar field you want to
@@ -465,277 +760,5 @@ Now you can use the array as a _filter by_, for example:
 {
   # get all users who own an object with field == 'foo'
   allUsers(filter: {object_fields: contains: 'foo'}) { ... }
-}
-```
-
-#### @simpleCollections
-
-You can control whether simple collections are enabled by default using
-`--simple-collections omit|both|only` (or
-`simpleCollections: "omit"|"both"|"only"`); however sometimes you want to
-override this on a case by case setting - for example if you want relay
-connections for almost all collections, except when it comes to a user's email
-addresses where you want to use a simple list.
-
-You can do this with the `@simpleCollections omit`, `@simpleCollections both`
-and `@simpleCollections only` smart comments.
-
-Applies to:
-
-- Tables
-- Views
-- Materialized views
-- Custom Query functions
-- Computed Column functions
-
-```sql
-comment on table email is
-  E'@simpleCollections both';
-```
-
-```sql
-comment on constraint email_user_id_fkey on email is
-  E'@simpleCollections both';
-```
-
-```sql
-comment on function search_people(query text) is
-  E'@simpleCollections both';
-```
-
-#### @arg0variant, @arg1variant, ...
-
-When building a custom mutation, you probably want to use the composite type
-that is generated when creating a table in PostgreSQL as a function argument,
-like this (note this is just an example for illustrative purposes):
-
-```sql
-create table example(
-  id uuid primary key,
-  name text not null
-);
-
-create function new_example(input example) returns example as $$
-  insert into example (id, name) values (input.id, input.name) returning *;
-$$ language sql volatile;
-```
-
-By default, composite types will be translated into a GraphQL types by
-PostGraphile with the same characteristics, i.e. all `not null` columns will
-become non-nullable fields. You can let PostGraphile know that you want to
-convert the composite type into another "variant" GraphQL type with a smart
-comment. Variants include `patch` (which is equivalent to the argument to
-`update*` mutations) and `base` (which makes every column both available
-(ignores permissions) and nullable). For example:
-
-```sql
-create table example(
-  id uuid primary key,
-  name text not null
-);
-
-create function new_example_with_auto_id(input example) returns example as $$
-  insert into example (id, name) values (gen_random_uuid(), input.name) returning *;
-$$ language sql volatile;
-
-comment on function new_example_with_auto_id(input example) is
-  E'@arg0variant patch';
-```
-
-This uses the `patch` variant from PostGraphile's update mutations which has all
-the fields except `id`. This will mean that the custom mutation will not ask for
-the `id` on the client-side anymore (because it will generate it itself). Note
-how `arg0` refers to the first function parameter (we use a 0-indexed counter of
-the arguments), thus `arg2` would be the third parameter.
-
-Applies to:
-
-- Custom Query functions
-- Custom Mutation functions
-- Computed Column functions
-
-#### Tags to add virtual constraint
-
-You can add "virtual" (fake) constraints to types in PostgreSQL using smart
-comments. The primary use case for this is to make views act more table-like -
-allowing you to express the connections between tables and views. It's also
-useful on composite types.
-
-##### @notNull
-
-Allows marking the column as non-nullable.
-
-Applies to:
-
-- columns
-
-```json5
-attribute: {
-  "my_view.my_column": {
-    tags: {
-      notNull: true
-    }
-  }
-}
-```
-
-```sql
-comment on column my_view.my_column is E'@notNull`;
-```
-
-##### @primaryKey
-
-Primary key columns will automatically be marked as `@notNull`, as they would in
-PostgreSQL.
-
-If you declare something as a primary key it _must_ be unique. We do not check
-it's unique - we trust you - but if it isn't unique then we're not sure what
-will happen...
-
-```json5
-class: {
-  my_view: {
-    tags: {
-      primaryKey: "id"
-      // or:
-      //   primaryKey: "type,identifier"
-    }
-  }
-}
-```
-
-```sql
-comment on view my_view is E'@primaryKey id';
--- or
-comment on view my_view is E'@primaryKey type,identifier';
-```
-
-##### @foreignKey
-
-The foreign key adds virtual constraints pretending to be foreign keys. It has
-the following syntax which mirrors the PostgreSQL foreign key constraint:
-
-`@foreignKey (col1, ...) references [my_schema.]my_table [(col1, ...)]`
-
-In the tags file you must omit the leading `@foreignKey` text since it is
-specified as the key (rather than the value) in the tags object ─ see example
-below.
-
-The schema is optional if the target table is in the same schema. If you're
-referencing a Primary Key on the remote table/view then you can skip the final
-column specification should you wish. Otherwise, you must reference columns
-matching a unique constraint.
-
-Applies to:
-
-- Tables
-- Views
-- Materialized views
-- Composite types (one direction only)
-
-```json5
-class: {
-  my_materialized_view: {
-    tags: {
-      foreignKey: "(key_1, key_2) references other_table (key_1, key_2)"
-    }
-  }
-}
-
-// or if you want multiple foreignKeys
-class: {
-  my_materialized_view: {
-    tags: {
-      foreignKey: [
-        "(key_1, key_2) references other_table (key_1, key_2)",
-        "(key_3, key_4) references some_other_table (key_3, key_4)"
-      ]
-    }
-  }
-}
-
-```
-
-```sql
-comment on materialized view my_materialized_view is E'@foreignKey (key_1, key_2) references other_table (key_1, key_2)';
-
--- or if you want multiple foreignKeys
-comment on materialized view my_materialized_view is E'@foreignKey (key_1, key_2) references other_table (key_1, key_2)\n@foreignKey (key_3, key_4) references some_other_table (key_3, key_4)';
-```
-
-:::note
-
-Fake constraints are treated as if they are indexed.
-
-:::
-
-##### @unique
-
-_From PostGraphile 4.9.1_
-
-Introduces a "fake" unique constraint, so `@unique col1,col2` is somewhat
-equivalent to the following, except it can also be applied to entities that
-cannot have unique constraints, e.g. views. It is up to you to ensure that your
-data is indeed unique on the given columns.
-
-```sql
--- `@unique col1,col2` is roughly equivalent to:
-ALTER TABLE foo ADD CONSTRAINT fake_unique UNIQUE (col1, col2);
-```
-
-More than one `@unique` tag may be specified.
-
-```json5
-class: {
-  my_view: {
-    tags: {
-      unique: [
-        "id",
-        "org_id,slug"
-      ]
-      // or:
-      //   unique: "id"
-    }
-  }
-}
-```
-
-```sql
-comment on view my_view is E'@unique id\n@unique org,slug';
-```
-
-##### @interface
-
-TODO (see Polymorphism docs)
-
-###### @type
-
-TODO (see Polymorphism docs)
-
-##### @unionMember
-
-TODO (see Polymorphism docs)
-
-##### @ref
-
-TODO (see Ref docs)
-
-###### @refVia
-
-TODO (see Ref docs)
-
-##### Smart Tags on virtual constraints
-
-You can also add smart tags on virtual constraints, for example adding the
-`fieldName` smart tag to a virtual foreign key constraint, by appending the pipe
-character `|` followed by the `@`-prefixed smart tag:
-
-```json5
-class: {
-  my_materialized_view: {
-    tags: {
-      foreignKey: "(key_1, key_2) references other_table (key_1, key_2)|@fieldName field_1"
-    }
-  }
 }
 ```

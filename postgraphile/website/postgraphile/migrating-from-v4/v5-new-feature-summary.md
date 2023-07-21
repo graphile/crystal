@@ -118,7 +118,7 @@ User data and Postgres leaf data (e.g. column values) can be used interchangeabl
 - Even if you query remote data sources (e.g. Stripe) in fields within a list, when you come back to postgres everything is automatically re-batched so no introduction of N+1 problem
 - Unified plugins: no "server plugins" vs "schema plugins" any more
 - Presets: easily share plugin lists and configuration options between servers, and still perform local customization easily
-- [Consolidated configuration](../config.md) across CLI, library and schema-only usage; no more postgraphilerc.
+- [Consolidated configuration](../config.mdx) across CLI, library and schema-only usage; no more postgraphilerc.
 
 <details>
 <summary>

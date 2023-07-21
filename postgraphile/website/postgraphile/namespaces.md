@@ -1,11 +1,12 @@
 ---
 layout: page
 path: /postgraphile/namespaces/
-title: Namespaces (PostgreSQL "schemas")
+title: Database schemas
 ---
 
-In PostgreSQL, each database consists of a number of "schemas". The default
-schema is named "public" and many users only ever deal with this one schema.
+In PostgreSQL, each database consists of a number of "schemas" (also known as
+"namespaces"). The default schema is named "public" and many users only ever
+deal with this one schema.
 
 In PostGraphile we advise you to use schemas to help organize your application -
 you can use one schema for the tables that will be exposed to GraphQL, another

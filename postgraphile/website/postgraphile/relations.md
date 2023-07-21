@@ -4,24 +4,20 @@ path: /postgraphile/relations/
 title: Relations
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
-We automatically discover relations between database tables by inspecting their
-foreign keys (and indexes if `--no-ignore-indexes` or `ignoreIndexes: false` is
-set), and use these to build relations into the generated GraphQL schema.
+PostGraphile automatically discovers relations between database tables by
+inspecting their foreign keys, and uses these to build relations into the
+generated GraphQL schema. If you're using the `PgIndexBehaviorsPlugin` (enabled
+by default) then PostGraphile will also look at the database indexes and only
+include relations that don't require a table-scan to implement.
 
 An example of a foreign key constraint when defining a table would be the
 `REFERENCES` keyword below:
 
-```sql{4}
+```sql
 CREATE TABLE app_public.users (
   -- ...
   organization_id int NOT NULL
+    /* highlight-next-line */
     REFERENCES app_public.organizations ON DELETE CASCADE,
   -- ...
 );
@@ -51,9 +47,10 @@ By default, relations are exposed as GraphQL fields using a camelCase
 combination of the target type and the source fields (inflectors:
 `singleRelationByKeys`, `singleRelationByKeysBackwards`, and
 `manyRelationByKeys`). Unique constraints expose a GraphQL table type directly,
-non-unique constraints expose a [connection](./connections/). The GraphQL
-connections that these relations expose support pagination,
-[filtering](./filtering/), and ordering.
+non-unique constraints expose a [connection](./connections/) or list depending
+on your configuration. The GraphQL connections that these relations expose
+support pagination, [filtering](./filtering/), and ordering (and other features
+such as aggregation if you add the relevant plugin).
 
 ### Examples
 

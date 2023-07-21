@@ -1,0 +1,33 @@
+import Mermaid from "@theme/Mermaid";
+
+# Servers
+
+Grafserv has support for a number of Node.js webservers built in, and you can
+build an adaptor to make Grafserv compatible with your server of choice.
+
+Please see the subpages for the builtin webserver support.
+
+## Sequence diagram
+
+If you plan to implement your own Grafserv adaptor (rather than using a built
+in one), this sequence diagram may aid your understanding:
+
+<Mermaid
+  chart={`\
+sequenceDiagram
+  participant Server as Server Framework
+  participant Adaptor as Grafserv Adaptor
+  participant Grafserv as Grafserv Core
+  Server->>Adaptor: Framework request object
+  Adaptor->>Grafserv: Normalized request digest<br/>(method, path, headers, etc)
+  opt For POST requests
+    Grafserv--)Adaptor: Get request body
+    Adaptor--)Server: Fetch body
+    Server--)Adaptor: Framework specific body<br/>(Buffer, JSON, text, etc)
+    Adaptor--)Grafserv: Normalized body
+  end
+  Grafserv-)Grafserv: Compute GraphQL Result
+  Grafserv->>Adaptor: Grafserv response<br/>(JSON, text, stream, etc)
+  Adaptor->>Server: Framework response
+`}
+/>
