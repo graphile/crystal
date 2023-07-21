@@ -5,9 +5,8 @@ minimal effort, the **library mode** that we expect most users will ultimately
 want to use, and **schema-only mode** which gives you the most control (but
 also the most responsibilities). Each of these layers builds on top of the
 layer below it, so it's fairly easy to move between them. We've also made sure
-that they are each configured via the same [preset
-system](./usage/configuration) so you can move from one to another with minimal
-effort.
+that they are each configured via the same [preset system](./config.mdx) so you
+can move from one to another with minimal effort.
 
 ## CLI
 
