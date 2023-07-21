@@ -1,11 +1,4 @@
 export {
-  PgCodecAttributeTags,
-  PgCodecRelationTags,
-  PgCodecTags,
-  PgResourceTags,
-  PgSmartTagsDict,
-} from "./interfaces.js";
-export {
   getWithPgClientFromPgService,
   withPgClientFromPgService,
 } from "./pgServices.js";

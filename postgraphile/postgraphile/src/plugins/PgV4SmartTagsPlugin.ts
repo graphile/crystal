@@ -1,7 +1,6 @@
 import "graphile-config";
 
 import { gatherConfig } from "graphile-build";
-import type { PgSmartTagsDict } from "graphile-build-pg";
 import { addBehaviorToTags } from "graphile-build-pg";
 import { inspect } from "util";
 
@@ -82,7 +81,9 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
 
 export default PgV4SmartTagsPlugin;
 
-function processTags(tags: Partial<PgSmartTagsDict> | undefined): void {
+function processTags(
+  tags: Partial<GraphileBuild.PgSmartTagsDict> | undefined,
+): void {
   processUniqueKey(tags);
   processOmit(tags);
   convertBoolean(tags, "sortable", "orderBy order");
@@ -91,7 +92,9 @@ function processTags(tags: Partial<PgSmartTagsDict> | undefined): void {
   processSimpleCollections(tags);
 }
 
-function processSimpleCollections(tags: Partial<PgSmartTagsDict> | undefined) {
+function processSimpleCollections(
+  tags: Partial<GraphileBuild.PgSmartTagsDict> | undefined,
+) {
   if (tags?.simpleCollections) {
     switch (tags.simpleCollections) {
       case "omit": {
@@ -116,7 +119,7 @@ function processSimpleCollections(tags: Partial<PgSmartTagsDict> | undefined) {
 }
 
 function convertBoolean(
-  tags: Partial<PgSmartTagsDict> | undefined,
+  tags: Partial<GraphileBuild.PgSmartTagsDict> | undefined,
   key: string,
   behavior: string,
 ): void {
@@ -125,7 +128,9 @@ function convertBoolean(
   }
 }
 
-function processUniqueKey(tags: Partial<PgSmartTagsDict> | undefined) {
+function processUniqueKey(
+  tags: Partial<GraphileBuild.PgSmartTagsDict> | undefined,
+) {
   if (tags && typeof tags.uniqueKey === "string") {
     const newUnique = `${tags.uniqueKey}|@behavior -single -update -delete`;
     if (Array.isArray(tags.unique)) {
@@ -174,7 +179,9 @@ function expandOmit(omit: string) {
   return parts;
 }
 
-function processOmit(tags: Partial<PgSmartTagsDict> | undefined): void {
+function processOmit(
+  tags: Partial<GraphileBuild.PgSmartTagsDict> | undefined,
+): void {
   const omit = tags?.omit;
   if (!omit) {
     return;
