@@ -6,16 +6,18 @@ import GraphileCLI from "@theme/GraphileCLI";
 
 # Configuration
 
-PostGraphile is configured through a `graphile-config` "preset." A preset is a
-simple JS object that contains a combination of other presets, plugins, and
-options for the various scopes.
+No matter whether you're using PostGraphile CLI, library mode or schema only,
+PostGraphile (and other elements of the stack including Graphile Build, Grafast
+and Grafserv) are configured via a `graphile-config` "preset."
 
-Your preset will almost certainly need to extend an existing preset or presets,
-and which preset(s) to extend depends on what you're looking for from
-PostGraphile.
+A preset is a simple JS object that contains a combination of: other presets,
+plugins, and options for the various scopes. Your configuration, your preset,
+will almost certainly need to extend an existing preset or presets; which
+preset(s) to extend depends on what you're looking for from PostGraphile.
 
 The PostGraphile base presets are named after crystals; the first base preset
-available is `postgraphile/presets/amber`, so you'll definitely want that.
+available is `postgraphile/presets/amber`, so you'll almost definitely want
+that.
 
 :::caution
 
@@ -32,6 +34,50 @@ If your schema is meant to be consumed by Relay, you may add the
 `postgraphile/presets/relay` preset which enables behaviors and plugins
 optimized for Relay consumption.
 
+## Creating your configuration file
+
+Though you can build a preset anywhere in your source code and pass it to the
+relevant APIs, we recommend that you put your preset into a
+`graphile.config.mjs` (or `.ts` or `.mts` or `.js` etc) file, so that it can
+easily be picked up by the PostGraphile CLI and any other utilities (e.g. the
+`graphile` command). You may write your preset in either JS or TS, and you may
+expose it as either CommonJS (`module.exports = ...;`) or ESM (`export default
+...;`). In our examples, we'll typically use `.mjs` since it's modern but
+without the overhead of requiring TypeScript.
+
+Here's an example preset that just extends the "Amber" preset:
+
+```js title="graphile.config.mjs"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+/** @type {GraphileConfig.Preset} */
+const preset = {
+  extends: [PostGraphileAmberPreset],
+};
+
+export default preset;
+```
+
+You could also have created this in TypeScript, in which case you might add a
+couple of `import` statements to the top in order to ensure that the relevant
+TypeScript types exist.
+
+```ts title="graphile.config.ts"
+import "graphile-config";
+import "postgraphile";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset],
+};
+
+export default preset;
+```
+
+Similarly you can create your config as a `.js`, `.cjs`, `.mts` or `.cts` file;
+the PostGraphile API will pick up all of these automatically assuming that you
+have TypeScript installed locally.
+
 ## General structure
 
 A preset is a plain JavaScript object, and every key in the preset is optional.
@@ -40,7 +86,7 @@ at the top level of a preset, this allows us to detect common issues with
 ESM/CommonJS interoperability.
 
 The value for the `extends` key, if specified, must be an array of other presets
-your preset wishes to extend.
+your preset wishes to inherit from.
 
 The value for the `plugins` key, if specified, must be an array of
 `graphile-config` plugins that your preset wishes to make use of. Plugins must
@@ -50,8 +96,8 @@ if the same plugin is referenced in multiple presets.
 The preset also accepts keys for each supported scope. `graphile-config` has no
 native scopes, but different Graphile projects can register their own scopes,
 for example `graphile-build` registers the `inflection`, `gather` and `schema`
-scopes, `graphile-build-pg` registers the `pgServices` scope, and Grafserv
-registers the `grafserv` scope.
+scopes, `graphile-build-pg` registers the `pgServices` scope, Grafserv
+registers the `grafserv` scope and `ruru` registers the `ruru` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
 get auto-completion for the options available in each scope; you can also use
@@ -72,34 +118,102 @@ The schema build process in PostGraphile is:
 
 :::
 
-### Example
+### Simple example
 
-```ts
+```ts title="graphile.config.ts"
+import "postgraphile"; // To import the TypeScript types
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
+
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset],
+  grafserv: { port: 5678 },
+  pgServices: [makePgService({ connectionString: "postgres:///my_db" })],
+};
+```
+
+### Larger example
+
+```ts title="graphile.config.ts"
 // Only needed for TypeScript types support
 import "postgraphile";
 
+// The standard base preset to use, includes the main PostGraphile features
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+// More presets you might want to mix in
+import { makeV4Preset } from "postgraphile/presets/v4";
+import { PgRelayPreset } from "postgraphile/presets/relay";
+
 // Use the 'pg' module to connect to the database
 import { makePgService } from "postgraphile/adaptors/pg";
 
-/** @type {GraphileConfig.Preset} */
-const preset = {
+// In case we want to customize the Ruru we render:
+import { defaultHTMLParts } from "postgraphile/grafserv/ruru/server";
+
+// A plugin for the system to use for persisted operations support
+import PersistedPlugin from "@grafserv/persisted";
+
+const preset: GraphileConfig.Preset = {
   extends: [
     PostGraphileAmberPreset,
-    /* Add more presets here */
+    /* Add more presets here, e.g.: */
+    makeV4Preset({
+      simpleCollections: "both",
+      jwtPgTypeIdentifier: '"b"."jwt_token"',
+      dynamicJson: true,
+      graphiql: true,
+      graphiqlRoute: "/",
+    }),
+    PgRelayPreset,
   ],
 
   plugins: [
-    /* Add plugins here */
+    /* Add plugins here, e.g.: */
+    PersistedPlugin,
   ],
 
   inflection: {
     /* options for the inflection system */
   },
+  gather: {
+    /* options for the gather phase, e.g.: */
+    pgStrictFunctions: true,
+    installWatchFixtures: true,
+  },
+  schema: {
+    /* options for the schema build phase, e.g.: */
+    retryOnInitFail: true,
+    exportSchemaSDLPath: `${process.cwd()}/latestSchema.graphql`,
+    exportSchemaIntrospectionResultPath: `${process.cwd()}/latestSchema.json`,
+    sortExport: true,
+  },
+  grafast: {
+    /* options for Grafast, including setting GraphQL context, e.g.: */
+    context: {
+      meaningOfLife: 42,
+    },
+    // explain: true, // DO NOT ENABLE IN PRODUCTION!
+  },
+  grafserv: {
+    /* options for Grafserv, e.g.: */
+    port: 5678,
+    graphqlPath: "/graphql",
+    websockets: true,
+    graphqlOverGET: true,
+    persistedOperationsDirectory: `${process.cwd()}/.persisted_operations`,
+    allowUnpersistedOperation: true,
+  },
+  ruru: {
+    /* options for customizing Ruru, e.g.: */
+    htmlParts: {
+      metaTags: defaultHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
+    },
+  },
   pgServices: [
     /* list of PG database configurations, e.g.: */
     makePgService({
-      // Database connection string:
+      // Database connection string, read from an environmental variable:
       connectionString: process.env.DATABASE_URL,
 
       // List of database schemas to expose:
@@ -109,18 +223,6 @@ const preset = {
       pubsub: true,
     }),
   ],
-  gather: {
-    /* options for the gather phase */
-  },
-  schema: {
-    /* options for the schema build phase */
-  },
-  grafast: {
-    /* options for Grafast, including setting GraphQL context*/
-  },
-  server: {
-    /* options for the server */
-  },
 };
 
 export default preset;
@@ -243,8 +345,21 @@ const pgServices = [
 
 ### `makePgService`
 
-Every adaptor should expose a helper function that takes a common set of
-optional configuration parameters:
+When PostGraphile (or, strictly, `@dataplan/pg`) wishes to communicate with
+PostgreSQL, it does so using an "adaptor". The adaptor must expose a common set
+of functionality, but on top of that it can add adaptor-specific features, for
+example you might write an adaptor to add support for using your ORM of choice,
+so that in your custom fields/plan resolvers you can use that ORM to execute
+queries against the database.
+
+Your choice of adaptor is quite important if you want to write custom JS logic
+in your schema, but otherwise it likely comes down to performance, convenience,
+and maybe avoiding additional dependencies. By default, PostGraphile uses the
+`postgraphile/adaptors/pg` adaptor which wraps [the `pg`
+module](https://npmjs.com/package/pg).
+
+Every adaptor should expose a `makePgService` helper function that takes a
+common set of optional configuration parameters:
 
 - `connectionString`
 - `schemas`
@@ -259,7 +374,7 @@ optional configuration parameters:
 
 :::info
 
-These common options are those that the `postgraphile` CLI will pass, which is
+These common options are those that the `postgraphile` CLI might pass, which is
 why every adaptor should support them.
 
 :::
@@ -281,28 +396,36 @@ inclusion into the `pgServices` array in your `graphile.config.mjs` (or similar)
 file.
 
 ```js title="Example configuration via makePgService"
-const pgServices = [
-  makePgService({
-    // Database connection string:
-    connectionString: process.env.DATABASE_URL,
+import { makePgService } from "postgraphile/adaptors/pg";
 
-    // List of database schemas:
-    schemas: ["app_public"],
+/** @type {GraphileConfig.Preset} */
+const preset = {
+  // ...
+  pgServices: [
+    makePgService({
+      // Database connection string:
+      connectionString: process.env.DATABASE_URL,
 
-    // Enable LISTEN/NOTIFY:
-    pubsub: true,
+      // List of database schemas:
+      schemas: ["app_public"],
 
-    // Optional, only needed for `--watch` mode:
-    superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
-  }),
-];
+      // Enable LISTEN/NOTIFY:
+      pubsub: true,
+
+      // Optional, only needed for `--watch` mode:
+      superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
+    }),
+  ],
+};
 ```
 
 #### `adaptorSettings`
 
 Each adaptor has its own adaptor-specific settings.
 
-##### `@dataplan/pg/adaptors/pg`
+##### `postgraphile/adaptors/pg`
+
+_(Or, equivalently, `postgraphile/@dataplan/pg/adaptors/pg` or `@dataplan/pg/adaptors/pg`)_
 
 This adaptor uses the `pg` module under the hood and uses the `pg.Pool` API
 primarily, it accepts the following options:

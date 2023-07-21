@@ -177,7 +177,8 @@ configuration equivalent to the above CLI flags might look like this:
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makePgService } from "postgraphile/adaptors/pg";
 
-const preset: GraphileConfig.Preset = {
+/** @type {GraphileConfig.Preset} */
+const preset = {
   extends: [PostGraphileAmberPreset],
   pgServices: [makePgService({ connectionString: "postgres:///mydb" })],
   grafserv: { watch: true },
