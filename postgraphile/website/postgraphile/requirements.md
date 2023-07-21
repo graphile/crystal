@@ -4,9 +4,10 @@ path: /postgraphile/requirements/
 title: Requirements
 ---
 
-PostGraphile is packaged as a Node.js module, you can install it with `npm` or
-`yarn` (depending on your preference) - users tend to have fewer issues with
-`yarn`, so we recommend it.
+PostGraphile is packaged as a Node.js module, you can install it with any Node
+package manager such as `npm` or `yarn` (depending on your preference) - users
+tend to have fewer issues with `yarn`, so we recommend it (but if you use yarn
+"berry", we recommend using `nodeLinker: node-modules` in your `.yarnrc.yml`).
 
 We recommend using the latest LTS version of Node.js and PostgreSQL, but we have
 limited support for older versions, so long as they are still LTS. Using newer
