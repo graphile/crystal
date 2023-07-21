@@ -5,7 +5,11 @@
  * registry (hence the "no data gathering" - we skip the gather phase).
  */
 
-import type { PgExecutorContextPlans, WithPgClient } from "@dataplan/pg";
+import type {
+  PgExecutorContextPlans,
+  PgRegistry,
+  WithPgClient,
+} from "@dataplan/pg";
 import {
   makePgResourceOptions,
   makeRegistryBuilder,
@@ -400,7 +404,9 @@ async function main() {
   );
 
   // We're crafting our own input
-  const input: GraphileBuild.BuildInput = { pgRegistry };
+  const input: GraphileBuild.BuildInput = {
+    pgRegistry: pgRegistry as unknown as PgRegistry,
+  };
   const schema = buildSchema(config, input);
 
   // Output our schema

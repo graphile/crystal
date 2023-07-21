@@ -106,7 +106,7 @@ declare global {
 
   namespace GraphileBuild {
     interface BuildInput {
-      pgRegistry: PgRegistry<any, any, any>;
+      pgRegistry: PgRegistry;
     }
   }
 }
