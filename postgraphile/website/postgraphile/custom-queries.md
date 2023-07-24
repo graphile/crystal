@@ -102,7 +102,9 @@ And that’s it! You can now use this function in your GraphQL like so:
 }
 ```
 
-**NOTE**: this function will have poor performance because `ILIKE`
+:::tip
+
+This function will have poor performance because `ILIKE`
 specifications of this form (beginning and ending with `%`) do not utilise
 indexes. If you're doing this in a real application then it's highly recommended
 that you look into
@@ -111,13 +113,14 @@ capabilities which can be exposed by a similar function. You may want to
 [check out `websearch_to_tsquery` in PG11](https://www.postgresql.org/docs/11/static/functions-textsearch.html)
 as part of this.
 
-<!--
-### Graphile Plugins
+:::
+
+### Extending schema in JS
 
 If you prefer adding to your schema on the JavaScript side, you can use
-`ExtendSchemaPlugin` from `graphile-utils`; see [Schema
-Plugins](./extending/) for more information.
+[`makeExtendSchemaPlugin`](./make-extend-schema-plugin).
 
+<!--
 ### GraphQL Schema Stitching
 
 You can also stitch multiple GraphQL schemas together, you can read more about
