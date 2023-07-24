@@ -4,36 +4,24 @@ path: /postgraphile/aggregates/
 title: Aggregates
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
-PostGraphile has support in its plugin system for powerful aggregates. This
-system was only introduced in 4.4 and is not well documented yet; should you
-need aggregates good starting points are:
-
-- The
-  [built in `PgConnectionTotalCountPlugin`](https://github.com/graphile/graphile-engine/blob/2353cf94867a88d76062ab274a30ce930a30aab7/packages/graphile-build-pg/src/plugins/PgConnectionTotalCount.js)
-  which adds a `totalCount` aggregate to connections, counting all rows that
-  match the criteria (ignoring pagination info)
-- The [@graphile/pg-aggregates](https://github.com/graphile/pg-aggregates)
-  module which adds `sum` aggregates to the schema (more to come)
-- The [Discord chat](http://discord.gg/graphile) (feel free to @benjie in
-  \#help-and-support)
+PostGraphile's engine has support for powerful aggregates. The
+[@graphile/pg-aggregates](https://github.com/graphile/pg-aggregates) module
+adds various aggregates to the schema, and gives you the ability to add more
+via plugins. Aggregates are located under connection fields.
 
 ### Aggregates ignore pagination info
 
-Aggregates are performed over the **entire collection** - not just the data that
-would be returned if you were to query the nodes. This means they ignore the
-`first`, `last`, `before`, `after` and `offset` arguments. This is deliberate
-(if you only need aggregates over the data that matches your pagination
-information then you could calculate these on the client).
+Aggregates are performed over the **entire collection** represented by the
+field and its filters - not just the data that would be returned if you were to
+query the nodes. This means they ignore the `first`, `last`, `before`, `after`
+and `offset` arguments. This is deliberate (if you only need aggregates over
+the data that matches your pagination information then you could calculate
+these on the client).
 
 ### Aggregates only work on Relay connection
 
-If you're using `simpleCollections: "only"` you can override it on a
-per-collection basis with the
-[`@simpleCollections` smart comment](./smart-comments/#simple-collections).
+Thanks to their expansibility, relay [connections](./connections) were the
+perfect place to add aggregates support. If you're using a behavior
+configuration that prefers lists over connections (e.g. `-connection +list`)
+then you can override it on a per-collection basis with the [`@behavior
++connection` smart tag](./smart-tag/#behavior).
