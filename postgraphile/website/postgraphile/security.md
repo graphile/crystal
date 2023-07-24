@@ -4,13 +4,6 @@ path: /postgraphile/security/
 title: Security
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 Traditionally in web application architectures the security is implemented in
 the server layer and the database is treated as a simple store of data. Partly
 this was due to necessity (the security policies offered by databases such as
@@ -51,23 +44,30 @@ generate JWT tokens for your users (and we even help you with that), or use
 
 ### Processing JWTs
 
-To enable the JWT functionality you must provide a `--jwt-secret` on the CLI (or
-`jwtSecret` to the library options). This will allow PostGraphile to
-authenticate incoming JWTs and set the granted claims on the database
-transaction.
-
-You should also supply a `--default-role` which is used for requests that don't
-specify a role.
+To enable the JWT functionality you must provide a `preset.schema.pgJwtSecret`.
+This will allow PostGraphile to authenticate incoming JWTs and set the granted
+claims on the database transaction.
 
 ### Generating JWTs
 
 PostGraphile also has support for generating JWTs easily from inside your
 PostgreSQL schema.
 
-To do so we will take a composite type that you specify via
-`--jwt-token-identifier` and whenever a value of that type is returned from a
-PostgreSQL function we will instead sign it with your `--jwt-secret` and return
-it as a string JWT token as part of your GraphQL response payload.
+To do so we will take a composite type that you specify via `preset.gather.pgJwtType`:
+
+```js title="graphile.config.mjs"
+export default {
+  gather: {
+    pgJwtType: ["public", "jwt_token"],
+  },
+  //...
+};
+```
+
+The value of this setting is a schema-name, type-name tuple. Whenever a value
+of the type identified by this tuple is returned from a PostgreSQL function we
+will instead sign it with your JWT secret and return it as a string JWT token
+as part of your GraphQL response payload.
 
 For example, you might define a composite type such as this in PostgreSQL:
 
@@ -81,23 +81,33 @@ create type my_public_schema.jwt_token as (
 );
 ```
 
-Then run postgraphile as:
+Then run PostGraphile with this configuration
 
-```
-postgraphile \
-  --jwt-token-identifier my_public_schema.jwt_token \
-  --jwt-secret $JWT_SECRET \
-  -c postgres://user:pass@host/dbname \
-  -s my_public_schema
+```js title="graphile.config.mjs"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+export default {
+  extends: [PostGraphileAmberPreset],
+  gather: {
+    // highlight-next-line
+    pgJwtType: ["my_public_schema", "jwt_token"],
+  },
+  schema: {
+    // highlight-next-line
+    pgJwtSecret: process.env.JWT_SECRET,
+  },
+};
 ```
 
 And finally you might add a PostgreSQL function such as:
 
-```sql
+```sql {5}
 create function my_public_schema.authenticate(
   email text,
   password text
-) returns my_public_schema.jwt_token as $$
+)
+returns my_public_schema.jwt_token
+as $$
 declare
   account my_private_schema.person_account;
 begin
@@ -191,7 +201,7 @@ const environment = new Environment({
 
 If you are using Apollo:
 
-```js {3,8}
+```js {5,10}
 // get the authentication token from wherever you store it
 const token = getJWTToken();
 
@@ -221,8 +231,8 @@ Your JWT token will include a number of claims, something like:
 ```
 
 When we verify that the JWT token is for us (via `aud: "postgraphile"`) we can
-authenticate the PostgreSQL client that is used to perform the GraphQL query. We
-do this as follows:
+authenticate the PostgreSQL client that is used to perform the GraphQL query.
+The PostgreSQL adaptor might use something like this to achieve this goal:
 
 ```sql
 begin;
@@ -230,24 +240,26 @@ set local role app_user;
 set local jwt.claims.role to 'app_user';
 set local jwt.claims.user_id to '2';
 
--- WE PERFORM GRAPHQL QUERIES HERE
+-- PERFORM GRAPHQL QUERIES HERE
 
 commit;
 ```
 
-> _Actually, to save roundtrips we perform just one query to set all configs via
-> ..._
+:::info
+
+To save roundtrips, many adaptors perform just one query to set all configs via:
 
 ```sql
 select set_config('role', 'app_user', true), set_config('user_id', '2', true), ...
 ```
 
-> _... but showing `set local` is simpler to understand._
+but showing `set local` is simpler to understand.
+
+:::
 
 You can then access this information via `current_setting` (the second argument
-says it's okay for the property to be missing, but **only works in PostgreSQL
-9.6+**, in previous versions you'll need to set the setting on the database to
-the empty string); for example here's a helper function:
+says it's okay for the property to be missing); for example here's a helper
+function:
 
 ```sql
 create function current_user_id() returns integer as $$

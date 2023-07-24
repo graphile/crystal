@@ -4,13 +4,6 @@ path: /postgraphile/postgresql-indexes/
 title: PostgreSQL Indexes
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 It’s important that your queries stay fast for your users, this section outlines
 some resources to help you optimize you queries with indexes.
 
@@ -31,11 +24,14 @@ _This article was originally written by
 
 ### Advice - Foreign Key Indexes
 
-Many people don't realise that when you create a
-[foreign key relation](./relations/), PostgreSQL does NOT automatically create
-an index on the referencing column(s). That can mean that when you query based
-on that relation, which PostGraphile does a lot when traversing relationships,
-it can involve a full table scan which is very expensive.
+Many people don't realise that when you create a [foreign key
+relation](./relations/), PostgreSQL does NOT automatically create an index on
+the referencing column(s). That can mean that when you query based on that
+relation, which PostGraphile does a lot when traversing relationships, it can
+involve a full table scan which is very expensive. By default, PostGraphile
+will not add this "reverse lookup" field to the GraphQL schema unless there is
+an index on it for this reason (though you can force it with the `+select`
+behavior on the foreign key constraint).
 
 Cameron Ellis has written a short article on
 [finding missing indexes on foreign keys](https://medium.com/@awesboss/how-to-find-missing-indexes-on-foreign-keys-2faffd7e6958)
@@ -91,3 +87,7 @@ ORDER BY reltuples DESC;
 
 You should consider integrating something like this into your CI tests to ensure
 that all your foreign keys are indexed.
+
+Our [pgRITA.com](https://pgrita.com) tool will also help you spot this kind of
+issue and more; it has a free usage tier with some essentials and is also
+included in certain sponsorship tiers.
