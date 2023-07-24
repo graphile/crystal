@@ -469,6 +469,6 @@ More information on constructing advanced queries can be found
 
 ---
 
-_This article was originally written by
-[Caleb Meredith](https://twitter.com/calebmer) but has been heavily edited
-since._
+_The original (pre-2018?) version of this article was written by [Caleb
+Meredith](https://twitter.com/calebmer); thanks Caleb! It has been heavily
+edited and expanded since._
