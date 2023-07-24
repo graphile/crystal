@@ -4,19 +4,56 @@ path: /postgraphile/crud-mutations/
 title: CRUD Mutations
 ---
 
-:::caution
+CRUD, or "Create, Read, Update, Delete", is a common paradigm in data
+manipulation APIs; "CRUD Mutations" refer to all but the "R". PostGraphile will
+automatically add CRUD mutations to the schema for each table that has the
+relevant database permissions.
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+### Designing mutations
+
+CRUD mutations can easily be disabled by disabling the `create`,
+`update` and `delete` behaviors in your preset:
+
+```js title="graphile.config.mjs"
+export default {
+  // ...
+  schema: {
+    defaultBehavior: "-create -update -delete",
+  },
+};
+```
+
+You might do this if you prefer to define all of your mutations yourself (e.g.
+with [custom mutations](./custom-mutations/)).
+
+It's a common misconception for people unfamiliar with PostGraphile that it's
+main feature is the CRUD mutations. In actuality, a very significant portion of
+users (including the maintainer) hardly ever use the CRUD mutations.
+PostGraphile encourages you to write the best GraphQL API that you can, so
+before designing your mutations we strongly recommend that you read Marc-André
+Giroux's excellent [GraphQL Mutation Design: Anemic
+Mutations](https://xuorig.medium.com/graphql-mutation-design-anemic-mutations-dd107ba70496)
+article.
+
+PostGraphile gives you a lot of ways to define your own mutations (from
+[database functions](./custom-mutations/), to [schema
+extensions](./make-extend-schema-plugin/), to [custom plugins](./extending)),
+so you can pick whichever pattern you and your team are most comfortable with.
+
+:::note
+
+If you're wondering what value users see in PostGraphile if not the CRUD
+mutations, these users typically recognize that PostGraphile's significant
+efficiency gains in the query schema (often meaning they can handle larger
+amounts of traffic and don't need to concern themselves with the complexities
+of caches and cache invalidation for a lot longer), the consistency afforded
+through and time save by autogeneration, the GraphQL best practices enabled
+by the out of the box schema, and the easy schema-wide changes via the plugin
+and behavior systems are some of the key features.
 
 :::
 
-CRUD, or "Create, Read, Update, Delete", is a common paradigm in data
-manipulation APIs; "CRUD Mutations" refer to all but the "R". PostGraphile will
-automatically add CRUD mutations to the schema for each table; this behaviour
-can be disabled via the `--disable-default-mutations` CLI setting (or the
-`disableDefaultMutations: true` library setting) if you prefer to define all of
-your mutations yourself (e.g. with [custom mutations](./custom-mutations/)).
+### CRUD mutation fields
 
 Using the `users` table from the [parent article](./tables/), depending on the
 PostGraphile settings you use (and the permissions you've granted), you might
@@ -90,9 +127,8 @@ First of all, check for errors being output from your PostGraphile server. If
 there are no errors, here's some reasons that mutations might not show up in the
 generated schema:
 
-- `--disable-default-mutations` (or `-M`) specified (or library equivalent)
-- `@omit create,update,delete` smart comments on the tables
-- Insufficient permissions on the tables and `--no-ignore-rbac` specified
+- Your behaviors (e.g. `defaultBehavior: "-create -update -delete"` or `@behavior -create -update -delete` smart comments on the tables) may be disabling them
+- Insufficient permissions on the tables
 - Tables not in an exposed schema
 - Views instead of tables
 - Missing primary keys (though 'create' mutations will still be added in this
@@ -100,10 +136,8 @@ generated schema:
 - If you only see mutations using primary key: You might be using the
   `PrimaryKeyMutationsOnlyPlugin`
 
-Don't forget to check any associated `.postgraphilerc` for these settings too!
-
-If you're new to GraphQL, perhaps you're looking in the wrong place? In the
-GraphiQL interface, open the docs on the right and go to the root. Select the
+If you're new to GraphQL, perhaps you're looking in the wrong place? In Ruru (the
+Graph*i*QL interface), open the docs on the right and go to the root. Select the
 `Mutation` type to see the available mutations. If you try to execute a mutation
 (e.g. using autocomplete) you must use the `mutation` operation type when
 composing the request:
@@ -114,4 +148,4 @@ mutation {
 }
 ```
 
-otherwise GraphiQL will interpret the request as a query.
+otherwise GraphQL will interpret the request as a `query`.

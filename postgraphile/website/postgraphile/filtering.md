@@ -9,6 +9,8 @@ Out of the box, PostGraphile supports rudimentary filtering on
 filter using equality with specific values (e.g. `username: "Alice"` or
 `category: ARTICLE`).
 
+[See an example using the `connection` argument.](./examples/#Collections__Relation_condition)
+
 It's important when implementing filters to keep performance in mind. By
 default (unless you're using the V4 preset), PostGraphile will not allow you to
 filter by a column that isn't indexed. To force a column to appear in the
