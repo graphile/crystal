@@ -118,10 +118,13 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
 };
 
 /** @experimental */
-export const PgRelayPreset: GraphileConfig.Preset = {
+export const PostGraphileRelayPreset: GraphileConfig.Preset = {
   plugins: [PgRelayPlugin],
   schema: {
     pgMutationPayloadRelations: false,
     pgFunctionsPreferNodeId: true,
   },
 };
+
+/** @deprecated use PostGraphileRelayPreset */
+export const PgRelayPreset = PostGraphileRelayPreset;
