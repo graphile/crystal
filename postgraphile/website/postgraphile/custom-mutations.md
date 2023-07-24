@@ -4,13 +4,6 @@ path: /postgraphile/custom-mutations/
 title: Custom Mutations
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 PostGraphile automatically generates [CRUD Mutations](./crud-mutations/) for
 you; but it's rare that these will cover all your needs - and many people just
 disable them outright. Custom mutations enable you to write exactly the business
@@ -18,6 +11,8 @@ logic you need with access to all of your data all wrapped up in a PostgreSQL
 function. You can even bypass the RLS and GRANT checks, should you so choose, by
 tagging your function as `SECURITY DEFINER` - but be very careful when you do
 so!
+
+### Rules
 
 To create a function that PostGraphile will recognise as a custom mutation, it
 must obey the following rules:
@@ -38,7 +33,7 @@ CREATE FUNCTION my_function(a int, b int) RETURNS text AS $$ … $$ LANGUAGE sql
 
 could be called from GraphQL like this:
 
-```graphql
+```graphql {2}
 mutation {
   myFunction(input: { a: 1, b: 2 }) {
     text
@@ -46,11 +41,11 @@ mutation {
 }
 ```
 
-Look at the documentation in GraphiQL to find the parameters you may use!
+Look at the documentation in Ruru/Graph*i*QL to find the parameters you may use.
 
 ### Example
 
-Here's an example of a custom mutation, which will generate the graphql
+Here's an example of a custom mutation, which will generate the GraphQL
 `acceptTeamInvite` mutation:
 
 ```sql
@@ -83,29 +78,28 @@ Notes on the above function:
   extension), or one of the built in `LANGUAGE` options such as Python, Perl or
   Tcl
 
+### pgStrictFunctions
+
 If you'd like PostGraphile to treat all function arguments as required
 (non-null) unless they have a default then you can use the
-`graphileBuildOptions.pgStrictFunctions = true` setting. This is similar to
-marking the function as `STRICT` but with the subtle difference that arguments
-with defaults may be specified as `NULL` without necessitating that the function
-returns null. With this setting enabled, arguments without default value will be
-set mandatory while arguments with default value will be optional. For example:
-`CREATE FUNCTION foo(a int, b int, c int = 0, d int = null)...` would give a
-mutation `foo(a: Int!, b: Int!, c: Int, d: Int)`. To set this in the library
-version, pass it as part of `graphileBuildOptions`:
+`preset.gather.pgStrictFunctions` setting:
 
-```js
-app.use(
-  postgraphile(connectionString, schemaName, {
-    graphileBuildOptions: {
-      pgStrictFunctions: true,
-    },
-  }),
-);
+```js title="graphile.config.mjs"
+export default {
+  // ...
+  gather: {
+    pgStrictFunctions: true,
+  },
+};
 ```
 
-To use it with the CLI you need to do similar using the `.postgraphilerc.js`
-file.
+This is similar to marking the function as `STRICT` but with the subtle
+difference that arguments with defaults may be specified as `NULL` without
+necessitating that the function returns null. With this setting enabled,
+arguments without default value will be set mandatory while arguments with
+default value will be optional. For example: `CREATE FUNCTION foo(a int, b int,
+c int = 0, d int = null)...` would give a mutation `foo(a: Int!, b: Int!, c:
+Int, d: Int)`.
 
 ### Bulk Insert Example
 
