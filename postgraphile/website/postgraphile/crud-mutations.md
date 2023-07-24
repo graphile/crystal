@@ -26,7 +26,7 @@ export default {
 You might do this if you prefer to define all of your mutations yourself (e.g.
 with [custom mutations](./custom-mutations/)).
 
-It's a common misconception for people unfamiliar with PostGraphile that it's
+It's a common misconception for people unfamiliar with PostGraphile that its
 main feature is the CRUD mutations. In actuality, a very significant portion of
 users (including the maintainer) hardly ever use the CRUD mutations.
 PostGraphile encourages you to write the best GraphQL API that you can, so
@@ -42,14 +42,14 @@ so you can pick whichever pattern you and your team are most comfortable with.
 
 :::note
 
-If you're wondering what value users see in PostGraphile if not the CRUD
-mutations, these users typically recognize that PostGraphile's significant
-efficiency gains in the query schema (often meaning they can handle larger
+You might be wondering, &quot;What value do users see in PostGraphile if not the
+CRUD mutations?&quot; These users typically recognize PostGraphile's significant
+efficiency gains in the query schema &mdash; meaning they can handle larger
 amounts of traffic and don't need to concern themselves with the complexities
-of caches and cache invalidation for a lot longer), the consistency afforded
-through and time save by autogeneration, the GraphQL best practices enabled
-by the out of the box schema, and the easy schema-wide changes via the plugin
-and behavior systems are some of the key features.
+of caches and cache invalidation for a lot longer. There's also the consistency afforded
+through (and time saved by) autogeneration; the GraphQL best practices enabled
+by the out-of-the box schema; and the easy schema-wide changes via the plugin
+and behavior systems. These are just some of the well-known key features of PostGraphile.
 
 :::
 
