@@ -4,13 +4,6 @@ path: /postgraphile/enums/
 title: Enums
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 PostGraphile will automatically map PostgreSQL enums into GraphQL enums; they'll
 be automatically renamed in order to make sure they conform to the GraphQL
 naming requirements and conventions.
@@ -42,20 +35,14 @@ limitations (e.g. you can never drop a value from a PostgreSQL enum, and you
 cannot add a value to it within a transaction). There are other ways to add
 enums to PostGraphile:
 
-### With enum tables
-
-_Since 4.8.0_
+### Enum tables
 
 We can leverage PostgreSQL's foreign key relations to enforce that a value is
 contained within a small set, defined by the values in some other table. To use
 this feature, we must have a table in which to contain our enums, and we must
-tell PostGraphile that it is an enum table using the `@enum`
-[smart comment](./smart-comments/). You may also include a column named
-'description' to provide the description for the enum value.
-
-**IMPORTANT**: this is one of the few places where a smart tag and a smart
-comment is not equivalent, this **must** be achieved with a smart comment since
-smart tags have not yet loaded at this stage in introspection.
+tell PostGraphile that it is an enum table using the `@enum` [smart
+tag](./smart-tag/). You may also include a column named 'description' to
+provide the description for the enum value.
 
 ```sql
 create table animal_type (
@@ -75,7 +62,7 @@ create table pets (
 );
 ```
 
-We also support the `@enum` smart comment on unique constraints (not indexes) so
+We also support the `@enum` smart tag on unique constraints (not indexes) so
 you could use a single table to contain all your enums should you wish. We do
 not recommend this specific pattern, but it's sometimes used in the ecosystem.
 
@@ -89,7 +76,7 @@ comment, e.g.:
 comment on table animal_type is E'@enum\n@enumName TypeOfAnimal';
 ```
 
-The name must conform to the GraphQL identifier restrictions.
+The name must conform to the GraphQL `Name` restrictions.
 
 ### With makeExtendSchemaPlugin
 
@@ -97,6 +84,7 @@ Use the standard `enum` GraphQL interface definition language (IDL/SDL) to
 define your enum:
 
 ```js
+import { constant } from "postgraphile/grafast";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 
 const myPlugin = makeExtendSchemaPlugin(() => ({
@@ -122,7 +110,7 @@ const myPlugin = makeExtendSchemaPlugin(() => ({
       type: AnimalType!
     }
   `,
-  resolvers: {
+  plans: {
     AnimalType: {
       CAT: "cat",
       DOG: "dog",
@@ -131,7 +119,7 @@ const myPlugin = makeExtendSchemaPlugin(() => ({
     Pet: {
       type() {
         /* TODO: add logic here */
-        return "cat";
+        return constant("cat");
       },
     },
   },
@@ -140,5 +128,5 @@ const myPlugin = makeExtendSchemaPlugin(() => ({
 
 ### Other ways
 
-You can also use the underlying Graphile Engine API to add a new
+You can also use the underlying Graphile Build API to add a new
 `GraphQLEnumType`.
