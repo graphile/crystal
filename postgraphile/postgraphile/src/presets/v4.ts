@@ -86,6 +86,8 @@ export interface V4Options<
   exportGqlSchemaPath?: string;
   exportJsonSchemaPath?: string;
   watchPg?: boolean;
+  /** @deprecated Use 'preset.grafast.context' callback instead */
+  defaultRole?: never;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -93,7 +95,12 @@ function isNotNullish<T>(arg: T | undefined | null): arg is T {
 }
 
 const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
-  const { classicIds = false } = options;
+  const { classicIds = false, defaultRole } = options;
+  if (defaultRole) {
+    throw new Error(
+      `The 'defaultRole' V4 option is not currently supported in V5; please use the \`preset.grafast.context\` callback instead.`,
+    );
+  }
   const simpleCollectionsBehavior = (() => {
     switch (options.simpleCollections) {
       case "both": {
