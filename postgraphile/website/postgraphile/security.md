@@ -136,7 +136,7 @@ Authorization: Bearer JWT_TOKEN_HERE
 e.g.
 [with Apollo](https://www.apollographql.com/docs/react/networking/authentication/#header):
 
-```js{7,13}
+```js {7,13}
 const httpLink = createHttpLink({
   uri: "/graphql",
 });
@@ -162,7 +162,7 @@ const client = new ApolloClient({
 
 or [with Relay](https://relay.dev/docs/guides/network-layer/)
 
-```js{3,8}
+```js {3,8}
 function fetchQuery( operation, variables, cacheConfig, uploadables) {
   // get the authentication token from wherever you store it
   const token = getJWTToken();
@@ -191,7 +191,7 @@ const environment = new Environment({
 
 If you are using Apollo:
 
-```js{3,8}
+```js {3,8}
 // get the authentication token from wherever you store it
 const token = getJWTToken();
 

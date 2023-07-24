@@ -39,7 +39,7 @@ $$ LANGUAGE sql STABLE;
 Will create a computed column for your table named `person`, which can be
 queried like this:
 
-```graphql{5}
+```graphql {5}
 {
   personById(id: …) {
     # nodeId, id, ...
@@ -54,7 +54,7 @@ queried like this:
 This example creates two computed columns, one returning a simple varchar and
 the other a connection. Note that `||` in PostgreSQL is string concatenation.
 
-```sql{14-17,20-27}
+```sql {14-17,20-27}
 create table my_schema.users (
   id serial not null primary key,
   first_name varchar not null,
@@ -87,7 +87,7 @@ $$ language sql stable;
 You can add parameters to your computed column field by declaring additional
 parameters in your PostgreSQL function:
 
-```sql{1,4}
+```sql {1,4}
 -- Creates `User.greet(greeting: String!)` string field
 create function my_schema.users_greet(
   u my_schema.users,  --- required table type parameter, unexposed
@@ -99,7 +99,7 @@ $$ language sql stable strict;
 
 which can be queried like:
 
-```graphql{5}
+```graphql {5}
 {
   userById(id: …) {
     greet(greeting: "Greetings and salutations")

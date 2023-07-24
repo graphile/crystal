@@ -10,7 +10,7 @@ so any table that has a primary key will automatically have a unique `nodeId`
 field available for queries and mutations. This is commonly used as the cache
 key for your client library, e.g. with Apollo Client's `dataIdFromObject`:
 
-```js{6}
+```js {6}
 import ApolloClient from "apollo-client";
 import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";

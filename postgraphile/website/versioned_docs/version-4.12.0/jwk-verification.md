@@ -50,7 +50,7 @@ an API which we will need to verify.
 You will need two values from your Auth0 configuration: The Auth0 _tenant domain
 name_, and the API _identifier._
 
-```javascript{1-2,20,24-25}
+```javascript {1-2,20,24-25}
 const jwt = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
 
@@ -93,7 +93,7 @@ function.
 
 Let's look at an example payload:
 
-```json{8}
+```json {8}
 {
   "iss": "https://YOUR_DOMAIN/",
   "sub": "CLIENT_ID@clients",
@@ -114,7 +114,7 @@ is in the `scope` value.
 
 Now let's make use of the `checkJwt` middleware function:
 
-```javascript{23-24,28-36}
+```javascript {23-24,28-36}
 const express = require("express");
 const { postgraphile } = require("postgraphile");
 

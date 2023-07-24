@@ -182,7 +182,7 @@ export const createUsers = async function createUsers(
 
 Then a test file might look like:
 
-```js{3-13}
+```js {3-13}
 import { becomeUser, createUsers, withRootDb } from "../test_helpers";
 
 test("can delete self", () =>
@@ -219,7 +219,7 @@ First, make sure that you've extracted your PostGraphile (library mode) options
 into a function that you can import in your tests; for example your PostGraphile
 server file might look like this:
 
-```js{6-11,17}
+```js {6-11,17}
 const express = require("express");
 const { postgraphile } = require("postgraphile");
 
@@ -496,7 +496,7 @@ Graphile Starter:
 
 Your test might look something like this:
 
-```js{9,24-25}
+```js {9,24-25}
 const { setup, teardown, runGraphQLQuery } = require("../test_helper");
 
 beforeAll(setup);

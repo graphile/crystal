@@ -202,7 +202,7 @@ functionality is well suited to being performed in Node.js (e.g. by making a
 REST call to a foreign exchange service over the internet) but might be a
 struggle from with PostgreSQL.
 
-```js{2,4,6-25,30}
+```js {2,4,6-25,30}
 const { postgraphile } = require("postgraphile");
 const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
 const express = require("express");
@@ -447,7 +447,7 @@ app.listen(3030);
 For example, you might want to add a custom `registerUser` mutation which
 inserts the new user into the database and also sends them an email:
 
-```js{17,23-91}
+```js {17,23-91}
 const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin(build => {
   const { pgSql: sql } = build;
   return {
