@@ -15,7 +15,7 @@ out-perform even hand-rolled schemas using traditional techniques such as
 resolvers and DataLoader.
 
 An example of a system build with Graphile Build is
-[PostGraphile](/postgraphile/), which automatically builds a high performance,
+[PostGraphile](https://postgraphile.org), which automatically builds a high performance,
 highly customizeable, and best practices GraphQL API from your PostgreSQL
 database.
 
@@ -31,7 +31,7 @@ schema in sync.
 the popular PostgreSQL database system by performing introspection of your
 database schema and **automatically** building the relevant GraphQL objects and
 fields based on the tables, columns, functions, relations that it finds. This is
-the core of [PostGraphile](/postgraphile/).
+the core of [PostGraphile](https://postgraphile.org/).
 
 But Graphile Build isn't limited to PostgreSQL, you can build `graphile-build`
 plugins for anything that Node.js can communicate with.

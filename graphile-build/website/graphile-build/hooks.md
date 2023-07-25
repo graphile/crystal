@@ -55,7 +55,7 @@ The general flow is:
 This hook system makes the library both powerful and flexible, at the expense of
 traceability - instead of having a clear declarative `import`, the origin of a
 called method might be in any of the used plugins, or even multiple ones. See
-[PostGraphile's _Debugging_ instructions](/postgraphile/debugging/#debug-envvars)
+[PostGraphile's _Debugging_ instructions](https://postgraphile.org/postgraphile/current/debugging/#debug-envvars)
 for how to alleviate this.
 
 Hook callback functions will be called with 3 arguments:
