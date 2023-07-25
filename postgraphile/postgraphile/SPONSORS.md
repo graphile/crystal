@@ -29,14 +29,16 @@ Graphile ecosystem. Find out
 - Notably
 - Taiste
 - latch.bio
-- Ayog Healthcare
 - Severin Ibarluzea
 - BairesDev
 - FOLX Health
+- Two Bit Solutions
+- Beacon
+- Ndustrial
+- dimply
 
 ## Supporters
 
-- Postlight
 - HR-ON
 - stlbucket
 - Sam Levin
@@ -48,7 +50,6 @@ Graphile ecosystem. Find out
 - CJ Lazell
 - Daniel Einspanjer
 - Mansoor Razzaq
-- Mark
 - Alvin Ali Khaled
 - Keith Layne
 - Paul Melnikow
@@ -65,8 +66,12 @@ Graphile ecosystem. Find out
 - JYC
 - Ben Periton
 - SpaceFill
+- Vizcom
 - Nate Smith
 - The Outbound Collective
 - Charlie Hadden
 - Kiron Open Higher Education
 - Antonio Angelino
+- urtho
+- Andrew Joseph
+- Old Grammar
