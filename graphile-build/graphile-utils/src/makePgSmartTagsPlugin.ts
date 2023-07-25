@@ -257,10 +257,12 @@ export function makePgSmartTagsPlugin(
     PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
   >,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
+  rawName?: string,
 ): GraphileConfig.Plugin {
   const id = ++counter;
+  const name = rawName ?? `PgSmartTagsPlugin_${id}`;
   return {
-    name: `PgSmartTagsPlugin_${id}`,
+    name,
     version: "0.0.0",
     before: ["smart-tags"],
 
@@ -540,6 +542,7 @@ export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
 export function makeJSONPgSmartTagsPlugin(
   jsonOrThunk: ThunkOrDirect<PromiseOrDirect<JSONPgSmartTags | null>>,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
+  name?: string,
 ): GraphileConfig.Plugin {
   // Get rules from JSON
 
@@ -562,16 +565,21 @@ export function makeJSONPgSmartTagsPlugin(
         }
       : null;
 
-  return makePgSmartTagsPlugin(async () => {
-    const json = await (typeof jsonOrThunk === "function"
-      ? jsonOrThunk()
-      : jsonOrThunk);
-    return pgSmartTagRulesFromJSON(json);
-  }, subscribeToUpdatesCallback);
+  return makePgSmartTagsPlugin(
+    async () => {
+      const json = await (typeof jsonOrThunk === "function"
+        ? jsonOrThunk()
+        : jsonOrThunk);
+      return pgSmartTagRulesFromJSON(json);
+    },
+    subscribeToUpdatesCallback,
+    name,
+  );
 }
 
 export const makePgSmartTagsFromFilePlugin = (
   tagsFile = process.cwd() + "/postgraphile.tags.json5",
+  name?: string,
 ): GraphileConfig.Plugin => {
   /*
    * We're wrapping the `smartTagsPlugin` defined below with a plugin wrapper
@@ -618,9 +626,13 @@ export const makePgSmartTagsFromFilePlugin = (
         watchFile(tagsFile, { interval: 507 }, tagsListener);
       }
     },
+    name,
   );
 
   return plugin;
 };
 
-export const TagsFilePlugin = makePgSmartTagsFromFilePlugin();
+export const TagsFilePlugin = makePgSmartTagsFromFilePlugin(
+  undefined,
+  "TagsFilePlugin",
+);
