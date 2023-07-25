@@ -28,6 +28,7 @@ import {
   PgTablesPlugin,
   PgTypesPlugin,
 } from "graphile-build-pg";
+import { TagsFilePlugin } from "graphile-utils";
 
 // Shunts the plugins into an order that's more compatible with PostGraphile V4.
 export const orderedPlugins: GraphileConfig.Preset = {
@@ -53,6 +54,7 @@ export const orderedPlugins: GraphileConfig.Preset = {
     PgOrderCustomFieldsPlugin,
     PgOrderByPrimaryKeyPlugin,
     PgMutationPayloadEdgePlugin,
+    TagsFilePlugin,
   ],
 };
 
