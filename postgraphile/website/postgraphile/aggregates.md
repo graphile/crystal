@@ -24,4 +24,4 @@ Thanks to their expansibility, relay [connections](./connections) were the
 perfect place to add aggregates support. If you're using a behavior
 configuration that prefers lists over connections (e.g. `-connection +list`)
 then you can override it on a per-collection basis with the [`@behavior
-+connection` smart tag](./smart-tag/#behavior).
++connection` smart tag](./smart-tags/#behavior).

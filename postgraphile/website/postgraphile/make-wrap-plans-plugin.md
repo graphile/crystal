@@ -1,7 +1,7 @@
 ---
 layout: page
-path: /postgraphile/make-wrap-resolvers-plugin/
-title: makeWrapResolversPlugin (graphile-utils)
+path: /postgraphile/make-wrap-plans-plugin/
+title: makeWrapPlansPlugin (graphile-utils)
 ---
 
 :::caution

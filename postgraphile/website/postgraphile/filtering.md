@@ -15,7 +15,7 @@ It's important when implementing filters to keep performance in mind. By
 default (unless you're using the V4 preset), PostGraphile will not allow you to
 filter by a column that isn't indexed. To force a column to appear in the
 filtering options you can applying the `@behavior filterBy` [smart
-tag](./smart-tag/) to the relevant column, or you can use `@behavior -filterBy`
+tag](./smart-tags/) to the relevant column, or you can use `@behavior -filterBy`
 to force it remove it.
 
 ### Advanced filtering
