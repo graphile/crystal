@@ -1,1 +1,1 @@
-# PG Introspection
+# pg-introspection

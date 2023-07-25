@@ -1,1 +1,1 @@
-# PG SQL2
+# pg-sql2

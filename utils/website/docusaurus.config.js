@@ -90,9 +90,9 @@ const config = {
     [
       "@docusaurus/plugin-content-docs",
       {
-        id: "tamedeval",
-        path: "tamedeval",
-        routeBasePath: "tamedeval",
+        id: "tamedevil",
+        path: "tamedevil",
+        routeBasePath: "tamedevil",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
       },
@@ -152,21 +152,21 @@ const config = {
             docId: "index",
             docsPluginId: "pg-introspection",
             position: "left",
-            label: "PG Introspection",
+            label: "pg-introspection",
           },
           {
             type: "doc",
             docId: "index",
             docsPluginId: "pg-sql2",
             position: "left",
-            label: "PG SQL2",
+            label: "pg-sql2",
           },
           {
             type: "doc",
             docId: "index",
-            docsPluginId: "tamedeval",
+            docsPluginId: "tamedevil",
             position: "left",
-            label: "Tamed Eval",
+            label: "tamedevil",
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,
@@ -190,20 +190,23 @@ const config = {
                 to: "/graphile-export/",
               },
               {
-                label: "PG Introspection",
+                label: "pg-introspection",
                 to: "/pg-introspection/",
               },
               {
-                label: "PG SQL2",
+                label: "pg-sql2",
                 to: "/pg-sql2/",
               },
               {
-                label: "Tamedeval",
-                to: "/tamedeval/",
+                label: "tamedevil",
+                to: "/tamedevil/",
               },
               {
-                label: "Grafast",
-                to: "https://grafast.org",
+                html: '<a class="footer__link-item" href="https://grafast.org">Gra<em>fast</em></a>',
+              },
+              {
+                label: "PostGraphile",
+                to: "https://postgraphile.org",
               },
             ],
           },
