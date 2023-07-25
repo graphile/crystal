@@ -391,9 +391,13 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 required,
                 notNull,
                 codec: argCodec,
-                extensions: {
-                  variant,
-                },
+                ...(variant
+                  ? {
+                      extensions: {
+                        variant,
+                      },
+                    }
+                  : null),
               });
             }
           }
@@ -531,7 +535,18 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             );
           } else {
             const options: PgResourceOptions = EXPORTABLE(
-              (description, executor, extensions, fromCallback, identifier, isMutation, name, parameters, returnCodec, returnsSetof) => ({
+              (
+                description,
+                executor,
+                extensions,
+                fromCallback,
+                identifier,
+                isMutation,
+                name,
+                parameters,
+                returnCodec,
+                returnsSetof,
+              ) => ({
                 executor,
                 name,
                 identifier,
@@ -544,7 +559,18 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 extensions,
                 description,
               }),
-              [description, executor, extensions, fromCallback, identifier, isMutation, name, parameters, returnCodec, returnsSetof],
+              [
+                description,
+                executor,
+                extensions,
+                fromCallback,
+                identifier,
+                isMutation,
+                name,
+                parameters,
+                returnCodec,
+                returnsSetof,
+              ],
             );
 
             await info.process("pgProcedures_PgResourceOptions", {
