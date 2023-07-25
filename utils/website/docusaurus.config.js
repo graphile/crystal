@@ -15,9 +15,9 @@ const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${ma
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "Graphile Build",
+  title: "Graphile Utils",
   tagline: "Automate the boring parts of building GraphQL APIs",
-  url: "https://build.graphile.org",
+  url: "https://utils.graphile.org",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
