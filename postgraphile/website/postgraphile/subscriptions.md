@@ -7,7 +7,8 @@ title: GraphQL Subscriptions
 Subscriptions notify you when an event occurs on the server side. PostGraphile
 supports subscriptions out of the box (assuming you are using it with a
 supported webserver), but you are responsible for adding subscription fields to
-your schema.
+your schema - without any subscription fields, the `subscription` operation is
+not possible.
 
 ## Websockets
 
@@ -84,12 +85,12 @@ forum, substituting `FORUM_ID` for the id of the forum that we're interested in
 
 The following is an example pulling it all together. In this example when a new
 message is created an event will be sent to `forum:FORUM_ID:message` containing
-the payload `{"op": "create", "id": MESSAGE_ID}`. This event will be picked up
+the payload `{"event": "create", "sub": FORUM_ID, "id": MESSAGE_ID}`. This event will be picked up
 by the `pgSubscriber`, which `listen()` subscribes to. This event will then be
 parsed by `listen()` using the `jsonParse` method, and the resulting object
 will be passed to the `Subscription.forumMessage.plan()` plan resolver, which
 does no further processing. The data then flows down to the
-ForumMessageSubscriptionPayload field steps, which will extract the details
+`ForumMessageSubscriptionPayload` field steps, which will extract the details
 that they care about and use them to provide the relevant data to the user.
 
 ```ts
@@ -106,7 +107,7 @@ const MySubscriptionPlugin = makeExtendSchemaPlugin((build) => {
       }
 
       type ForumMessageSubscriptionPayload {
-        operationType: String
+        event: String
         message: Message
       }
     `,
@@ -125,9 +126,8 @@ const MySubscriptionPlugin = makeExtendSchemaPlugin((build) => {
         },
       },
       ForumMessageSubscriptionPayload: {
-        operationType($event) {
-          const $op = $event.get("op");
-          return lambda($op, (op) => String(op).toLowerCase());
+        event($event) {
+          return $event.get("event");
         },
         message($event) {
           const $id = $event.get("id");
@@ -139,7 +139,17 @@ const MySubscriptionPlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-## Triggering subscriptions from database events
+## Triggering subscriptions manually
+
+You can use the `NOTIFY` keyword or `pg_notify` function in PostgreSQL to
+trigger an event. For example, you might simulate an event for creating message
+`27` within forum `1` with:
+
+```sql
+NOTIFY "forum:1:message", '{"event": "create", "sub": 1, "id": 27}';
+```
+
+## Triggering subscriptions automatically
 
 <details>
 <summary>
@@ -147,8 +157,14 @@ I'm using a fairly complex PostgreSQL function so that I can just use `CREATE TR
 each trigger. Click this paragraph to expand and see the function.
 </summary>
 
+**IMPORTANT**: this trigger assumes that the primary key for your tables is
+always `id`. If this is not the case, you should delete the line containing
+`'id', v_record.id`.
+
 ```sql
-create function app_public.graphql_subscription() returns trigger as $$
+CREATE FUNCTION tg__graphql_subscription() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
 declare
   v_process_new bool = (TG_OP = 'INSERT' OR TG_OP = 'UPDATE');
   v_process_old bool = (TG_OP = 'UPDATE' OR TG_OP = 'DELETE');
@@ -161,8 +177,6 @@ declare
   v_i int = 0;
   v_last_topic text;
 begin
-  -- On UPDATE sometimes topic may be changed for NEW record,
-  -- so we need notify to both topics NEW and OLD.
   for v_i in 0..1 loop
     if (v_i = 0) and v_process_new is true then
       v_record = new;
@@ -186,13 +200,15 @@ begin
       v_last_topic = v_topic;
       perform pg_notify(v_topic, json_build_object(
         'event', v_event,
-        'subject', v_sub
+        'subject', v_sub,
+        /* highlight-next-line */
+        'id', v_record.id
       )::text);
     end if;
   end loop;
   return v_record;
 end;
-$$ language plpgsql volatile set search_path from current;
+$_$;
 ```
 
 </details>
@@ -201,22 +217,17 @@ Hooking the database up to a GraphQL subscription can be achieved via `CREATE
 TRIGGER`:
 
 ```sql
-CREATE TRIGGER _500_gql_update
-  AFTER UPDATE ON app_public.users
+CREATE TRIGGER _500_gql_insert
+  AFTER INSERT ON messages
   FOR EACH ROW
-  EXECUTE PROCEDURE app_public.graphql_subscription(
-    'userChanged', -- the "event" string, useful for the client to know what happened
-    'graphql:user:$1', -- the "topic" the event will be published to, as a template
-    'id' -- If specified, `$1` above will be replaced with NEW.id or OLD.id from the trigger.
+  EXECUTE FUNCTION tg__graphql_subscription(
+    'create', -- the "event" string, useful for the client to know what happened
+    'forum:$1:message', -- the "topic" the event will be published to, as a template
+    'forum_id' -- If specified, `$1` above will be replaced with NEW.forum_id or OLD.forum_id from the trigger.
   );
-
-CREATE TRIGGER _500_gql_update_member
-  AFTER INSERT OR UPDATE OR DELETE ON app_public.organization_members
-  FOR EACH ROW
-  EXECUTE PROCEDURE app_public.graphql_subscription('organizationsChanged', 'graphql:user:$1', 'member_id');
 ```
 
-#### Testing your subscription with Ruru
+## Testing your subscription with Ruru
 
 To test your subscription you will need to first subscribe and then trigger it.
 
@@ -224,7 +235,7 @@ To subscribe, in one Ruru tab execute
 
 ```graphql
 subscription MySubscription {
-  currentUserUpdated {
+  forumMessage(forumId: 1) {
     user
     event
   }
@@ -233,12 +244,12 @@ subscription MySubscription {
 
 You should get the answer: `"Waiting for subscription to yield data…"`
 
-To trigger the subscription, _in another Ruru tab_ run a mutation that
-changes the user. This will depend on your implementation, for example:
+To trigger the subscription, _in another Ruru tab_ run a mutation that adds a
+message to that forum. This will depend on your implementation, for example:
 
 ```graphql
 mutation MyMutation {
-  updateUserById(input: { userPatch: { name: "foo" }, id: 27 }) {
+  createMessage(input: { message: { forumId: 1, body: "Hello World!" } }) {
     clientMutationId
   }
 }
