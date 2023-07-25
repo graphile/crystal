@@ -8,6 +8,7 @@ import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
+import { TagsFilePlugin } from "graphile-utils";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";
@@ -167,6 +168,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const userPreset = await loadConfig(configFileLocation);
   const preset: GraphileConfig.Preset = {
     extends: [...(userPreset ? [userPreset] : []), ...cliPresets],
+    plugins: [TagsFilePlugin],
   };
 
   if (preset.extends!.length === 0) {
