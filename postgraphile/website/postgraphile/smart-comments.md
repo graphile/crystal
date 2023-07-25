@@ -4,13 +4,6 @@ path: /postgraphile/smart-comments/
 title: Smart Comments
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 _Ensure you've read the [Smart Tags](./smart-tags/) page before referring here._
 
 You can customise your PostGraphile GraphQL schema without making breaking
