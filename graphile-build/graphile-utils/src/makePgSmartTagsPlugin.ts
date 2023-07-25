@@ -257,13 +257,13 @@ export function makePgSmartTagsPlugin(
     PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
   >,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
-  rawName?: string,
+  details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   const id = ++counter;
-  const name = rawName ?? `PgSmartTagsPlugin_${id}`;
   return {
-    name,
-    version: "0.0.0",
+    name: details?.name ?? `PgSmartTagsPlugin_${id}`,
+    description: details?.description,
+    version: details?.version ?? "0.0.0",
     before: ["smart-tags"],
 
     gather: gatherConfig<any, State, Cache>({
@@ -542,7 +542,7 @@ export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
 export function makeJSONPgSmartTagsPlugin(
   jsonOrThunk: ThunkOrDirect<PromiseOrDirect<JSONPgSmartTags | null>>,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
-  name?: string,
+  details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   // Get rules from JSON
 
@@ -573,7 +573,7 @@ export function makeJSONPgSmartTagsPlugin(
       return pgSmartTagRulesFromJSON(json);
     },
     subscribeToUpdatesCallback,
-    name,
+    details,
   );
 }
 
@@ -626,7 +626,10 @@ export const makePgSmartTagsFromFilePlugin = (
         watchFile(tagsFile, { interval: 507 }, tagsListener);
       }
     },
-    name,
+    {
+      name,
+      description: `Loads smart tags from '${tagsFile}' if it exists`,
+    },
   );
 
   return plugin;
