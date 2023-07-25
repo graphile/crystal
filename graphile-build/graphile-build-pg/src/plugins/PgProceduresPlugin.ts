@@ -530,19 +530,22 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [finalResourceOptions, makePgResourceOptions],
             );
           } else {
-            const options: PgResourceOptions = {
-              executor,
-              name,
-              identifier,
-              from: fromCallback,
-              parameters,
-              isUnique: !returnsSetof,
-              codec: returnCodec,
-              uniques: [],
-              isMutation,
-              extensions,
-              description,
-            };
+            const options: PgResourceOptions = EXPORTABLE(
+              (description, executor, extensions, fromCallback, identifier, isMutation, name, parameters, returnCodec, returnsSetof) => ({
+                executor,
+                name,
+                identifier,
+                from: fromCallback,
+                parameters,
+                isUnique: !returnsSetof,
+                codec: returnCodec,
+                uniques: [],
+                isMutation,
+                extensions,
+                description,
+              }),
+              [description, executor, extensions, fromCallback, identifier, isMutation, name, parameters, returnCodec, returnsSetof],
+            );
 
             await info.process("pgProcedures_PgResourceOptions", {
               serviceName,
