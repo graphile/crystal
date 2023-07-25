@@ -4,13 +4,6 @@ path: /postgraphile/smart-tags/
 title: Smart Tags
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 You can customise your PostGraphile GraphQL schema by tagging tables, columns,
 functions, relations, etc. These changes could be renaming something, omitting
 things from your GraphQL schema, or anything else a plugin supports!
@@ -19,24 +12,24 @@ We call this functionality "Smart Tags" and it allows you to easily customise
 the generated GraphQL schema without making breaking changes to your database.
 
 If you're using PostGraphile in `--watch` mode, you should be able to see in
-PostGraphile's GraphiQL client that the related types and fields will reflect
-the change almost immediately. If you're not using `--watch` then you may need
-to restart the server for smart tag changes to take effect.
+Ruru that the related types and fields will reflect the change almost
+immediately. If you're not using `--watch` then you may need to restart the
+server for smart tag changes to take effect.
 
 ## The @ character
 
-We often refer to things like the `@omit` smart tag or the `@name` smart tag;
-really these tags are just `omit` and `name` respectively; but in the
+We often refer to things like the `@behavior` smart tag or the `@name` smart
+tag; really these tags are just `behavior` and `name` respectively; but in the
 [Smart Comment](./smart-comments/) syntax (the oldest form of smart tags in
 PostGraphile) the `@` is required to denote a smart tag, and this pattern has
 stuck when referring to smart tags.
 
-You will also often see the
-[smart comment syntax](./smart-comments/#smart-comment-spec) used to refer to
-smart tags in general, it's because the syntax is a little easier to write
-quickly. Read the [Smart Comments Spec](./smart-comments/#smart-comment-spec)
-and you'll soon learn to translate `@omit update,delete` to
-`omit: "update,delete"` (and vice-versa) in your head.
+You will also often see the [smart comment
+syntax](./smart-comments/#smart-comment-spec) used to refer to smart tags in
+general, it's because the syntax is a little easier to write quickly. Read the
+[Smart Comments Spec](./smart-comments/#smart-comment-spec) and you'll soon
+learn to translate `@omit update,delete` to `omit: "update,delete"` (and
+vice-versa) in your head.
 
 ## Valid values
 
@@ -55,7 +48,11 @@ There's multiple ways of adding tags to entities:
 - The [postgraphile.tags.json5](./smart-tags-file/) file
 - [Smart Comments](./smart-comments/) in the database via `COMMENT`
 - A [`makePgSmartTagsPlugin`](./make-pg-smart-tags-plugin/) instance
-- Your own custom [Graphile Engine plugin](./extending-raw/)
+- Your own [plugin](./extending-raw/); specifically:
+  - implement the `gather.hooks.pgIntrospection_introspection` callback,
+  - get the relevant entity,
+  - call `entity.getTagsAndDescription()` on it,
+  - mutate the resulting `.tags` property of the returned object.
 
 ## Example
 
@@ -118,6 +115,13 @@ So now the query needs to use the new name for the table:
 
 </div>
 
+:::info
+
+These screenshots were take in an early PostGraphile V4 GraphiQL. Though Ruru
+in PostGraphile V5 will look different, the results are the same.
+
+:::
+
 ## Non-exhaustive
 
 Any plugin may implement support for smart tags, so refer to those plugins'
@@ -135,13 +139,18 @@ Applies to:
 
 - columns
 
-```json5
-attribute: {
-  my_column: {
-    tags: {
-      deprecated: "Use myOtherColumn instead."
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    attribute: {
+      my_column: {
+        tags: {
+          deprecated: "Use myOtherColumn instead.",
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -168,20 +177,25 @@ Applies to:
 - [Custom Query](./custom-queries/) functions: the `Query` field name
 - [Custom Mutation](./custom-mutations/) functions: the `Mutation` field name
 
-```json5
-class: {
-  post: {
-    tags: {
-      name: "message"
-    }
-  }
-},
-procedure: {
-  search_posts: {
-    tags: {
-      name: "returnPostsMatching"
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    class: {
+      post: {
+        tags: {
+          name: "message",
+        },
+      },
+    },
+    procedure: {
+      search_posts: {
+        tags: {
+          name: "returnPostsMatching",
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -208,9 +222,20 @@ Applies to:
 - foreign key constraints: the field on the remote type (the "backwards"
   relation)
 
-```json5
-foreignFieldName: "threads",
-fieldName: "author"
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    constraint: {
+      "my_table.my_constraint": {
+        tags: {
+          foreignFieldName: "threads",
+          fieldName: "author",
+        },
+      },
+    },
+  },
+}
 ```
 
 This name will be fed through the `connectionField` (by default does nothing)
@@ -242,14 +267,19 @@ Applies to:
 - [Custom Mutation](./custom-mutations/) functions: the field on the mutation
   payload type
 
-```json5
-procedure: {
-  authenticate: {
-    tags: {
-      name: "login",
-      resultFieldName: "token",
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    procedure: {
+      authenticate: {
+        tags: {
+          name: "login",
+          resultFieldName: "token",
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -263,6 +293,11 @@ comment on function authenticate(text, text) is
 Use this smart tag to override the behavior associated with a table, view,
 materialized view, type, column, constraint, function or other database entity.
 See the [behavior documentation](./behavior.md).
+
+```sql
+comment on table users is
+  E'@behavior -insert -delete';
+```
 
 ## @arg0variant, @arg1variant, ...
 
@@ -317,18 +352,18 @@ Applies to:
 
 ## @ref
 
-TODO (see Ref docs)
+See [Refs](./refs)
 
 ### @refVia
 
-TODO (see Ref docs)
+See [Refs](./refs)
 
 ## Virtual constraints
 
 You can add "virtual" (fake) constraints to types in PostgreSQL using smart
 comments. The primary use case for this is to make views act more table-like -
 allowing you to express the connections between tables and views. It's also
-useful on composite types.
+useful on composite types, especially for adding relationships.
 
 ### @notNull
 
@@ -338,13 +373,18 @@ Applies to:
 
 - columns
 
-```json5
-attribute: {
-  "my_view.my_column": {
-    tags: {
-      notNull: true
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    attribute: {
+      "my_view.my_column": {
+        tags: {
+          notNull: true,
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -361,15 +401,20 @@ If you declare something as a primary key it _must_ be unique. We do not check
 it's unique - we trust you - but if it isn't unique then we're not sure what
 will happen...
 
-```json5
-class: {
-  my_view: {
-    tags: {
-      primaryKey: "id"
-      // or:
-      //   primaryKey: "type,identifier"
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    class: {
+      my_view: {
+        tags: {
+          primaryKey: "id",
+          // or:
+          //   primaryKey: "type,identifier"
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -402,27 +447,37 @@ Applies to:
 - Materialized views
 - Composite types (one direction only)
 
-```json5
-class: {
-  my_materialized_view: {
-    tags: {
-      foreignKey: "(key_1, key_2) references other_table (key_1, key_2)"
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    class: {
+      my_materialized_view: {
+        tags: {
+          foreignKey: "(key_1, key_2) references other_table (key_1, key_2)",
+        },
+      },
+    },
+  },
 }
+```
 
-// or if you want multiple foreignKeys
-class: {
-  my_materialized_view: {
-    tags: {
-      foreignKey: [
-        "(key_1, key_2) references other_table (key_1, key_2)",
-        "(key_3, key_4) references some_other_table (key_3, key_4)"
-      ]
-    }
-  }
+```json5 title="postgraphile.tags.json5 (multiple foreign keys)"
+{
+  version: 1,
+  config: {
+    class: {
+      my_materialized_view: {
+        tags: {
+          foreignKey: [
+            "(key_1, key_2) references other_table (key_1, key_2)",
+            "(key_3, key_4) references some_other_table (key_3, key_4)",
+          ],
+        },
+      },
+    },
+  },
 }
-
 ```
 
 ```sql
@@ -454,18 +509,20 @@ ALTER TABLE foo ADD CONSTRAINT fake_unique UNIQUE (col1, col2);
 
 More than one `@unique` tag may be specified.
 
-```json5
-class: {
-  my_view: {
-    tags: {
-      unique: [
-        "id",
-        "org_id,slug"
-      ]
-      // or:
-      //   unique: "id"
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    class: {
+      my_view: {
+        tags: {
+          unique: ["id", "org_id,slug"],
+          // or:
+          //   unique: "id"
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -479,13 +536,18 @@ You can also add smart tags on virtual constraints, for example adding the
 `fieldName` smart tag to a virtual foreign key constraint, by appending the pipe
 character `|` followed by the `@`-prefixed smart tag:
 
-```json5
-class: {
-  my_materialized_view: {
-    tags: {
-      foreignKey: "(key_1, key_2) references other_table (key_1, key_2)|@fieldName field_1"
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    class: {
+      my_materialized_view: {
+        tags: {
+          foreignKey: "(key_1, key_2) references other_table (key_1, key_2)|@fieldName field_1",
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -493,15 +555,15 @@ class: {
 
 ### @interface
 
-TODO (see Polymorphism docs)
+See [Polymorphism](./polymorphism)
 
 #### @type
 
-TODO (see Polymorphism docs)
+See [Polymorphism](./polymorphism)
 
 ### @unionMember
 
-TODO (see Polymorphism docs)
+See [Polymorphism](./polymorphism)
 
 ## Deprecated tags
 
@@ -545,13 +607,18 @@ table!):
 Multiple actions can be listed using commas (no spaces!), as in the following
 example which disables mutations on a table:
 
-```json5
-class: {
-  table_name: {
-    tags: {
-      omit: "create,update,delete"
-    }
-  }
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    class: {
+      table_name: {
+        tags: {
+          omit: "create,update,delete",
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -756,9 +823,14 @@ comment on function user_object_fields() is E'@sortable';
 
 Now you can use the array as a _filter by_, for example:
 
-```gql
+```graphql
 {
   # get all users who own an object with field == 'foo'
-  allUsers(filter: {object_fields: contains: 'foo'}) { ... }
+  allUsers(filter: { object_fields: { contains: "foo" } }) {
+    nodes {
+      id
+      # ...
+    }
+  }
 }
 ```
