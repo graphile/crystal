@@ -16,7 +16,7 @@ export type PlanWrapperFn = (
   plan: SmartFieldPlanResolver,
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   $source: import("grafast").ExecutableStep,
-  args: FieldArgs,
+  fieldArgs: FieldArgs,
   info: FieldInfo,
 ) => any;
 
