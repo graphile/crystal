@@ -1,112 +1,177 @@
 ---
 layout: page
 path: /postgraphile/make-add-inflectors-plugin/
-title: makeAddInflectorsPlugin (graphile-utils)
+title: Adding and replacing inflectors
 ---
 
-:::caution
+Inflection relates to naming things; please see the [inflection
+article](./inflection/) for more information on inflection in PostGraphile.
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+In V4 of PostGraphile we had `makeAddInflectorsPlugin`, but in V5 this is no
+longer needed since inflection is now a first class feature of the plugin
+system. Writing a plugin to add or replace inflectors is relatively
+straightforward:
+
+## Replacing an inflector
+
+Replacing an inflector is slightly easier than adding a new one because there's
+no need to define the TypeScript types (you just use the existing types); so
+we'll start there.
+
+Replacement inflectors are added via a plugin, using the
+`inflection.replace.<inflectorName>` property, which should be set to a
+function. This function accepts three or more parameters:
+
+1. The previous version of the inflector, for delegation, or `null` if there wasn't previously an inflector with this name
+2. The resolved `graphile-config` preset that the user is using
+3. All remaining parameters are the inflector's inputs, from which a name should be derived
+
+### Example 1
+
+This following plugin replaces the `builtin` inflector with one that returns
+`RootQuery` instead of `Query` for the root query type:
+
+```ts
+// Import types for TypeScript, no need in JS
+import "graphile-config";
+import "graphile-build";
+import "graphile-build-pg";
+
+export const ReplaceInflectorPlugin: GraphileConfig.Plugin = {
+  // Unique name for your plugin:
+  name: "ReplaceInflectorPlugin",
+  version: "0.0.0",
+
+  inflection: {
+    replace: {
+      builtin(
+        // The previous version of this inflector, the one you're replacing
+        previous,
+
+        // The resolved configuration
+        preset,
+
+        // Everything from the 3rd paramater onward are the arguments to this inflector
+        text,
+      ) {
+        if (name === "Query") return "RootQuery";
+        return previous(text);
+      },
+    },
+  },
+};
+```
+
+:::info
+
+The first two arguments to your replace inflector definition are supplied by the
+Graphile Build system and hidden from calling code, so only arguments from the
+third onward are supplied by the calling code. For example, a replacement for
+the `builtin` inflector could be defined as above, but calling code would only
+supply the third argument:
+
+```ts
+const text = inflection.builtin("Query");
+```
 
 :::
 
-**NOTE: this documentation applies to PostGraphile v4.1.0+**
-
-If you're not happy with the default naming conventions in PostGraphile (or if
-you want to extend PostGraphile's functionality and use the inflection system to
-do so), you can use `makeAddInflectorsPlugin` from `graphile-utils`.
-
-Please see the [inflection article](./inflection/) for more information on
-inflection in PostGraphile.
-
-### Syntax
-
-```ts
-interface Inflectors {
-  [str: string]: (...args: Array<any>) => string;
-}
-
-type InflectorsGenerator = (
-  inflection: Inflectors,
-  build: Build,
-  options: Options,
-) => Inflectors;
-
-function makeAddInflectorsPlugin(
-  additionalInflectorsOrGenerator: Inflectors | InflectorsGenerator,
-  replace = false,
-): Plugin;
-```
-
-By default, this plugin is for adding new inflectors; however if you pass `true`
-as the second argument then it can be used for replacing (or wrapping) existing
-inflectors.
-
-You can pass either a new inflectors object to makeAddInflectorsPlugin, or if
-you need to call the previous inflector you're replacing then you can pass an
-"inflectors generator" function which will be passed the whole inflectors
-object. NOTE: your new inflectors will be merged into this object, so if you
-need to call the old inflectors from the new ones you must take a copy of them
-which you can do with "dereferencing," but be sure to use `.call(this, ...)` to
-keep the `this` binding correct; e.g.:
-
-```ts
-const { makeAddInflectorsPlugin } = require("graphile-utils");
-
-module.exports = makeAddInflectorsPlugin((inflectors) => {
-  // Here 'enumName' is dereferenced to 'oldEnumName' from the existing
-  // inflectors.
-  const { enumName: oldEnumName } = inflectors;
-
-  return {
-    enumName(value: string) {
-      // By the time we get here, `inflectors.enumName` refers to this very
-      // method, so we must call `oldEnumName` rather than
-      // `inflectors.enumName` otherwise we will get a "Maximum call stack size
-      // exceeded" error.
-
-      // Further, we must ensure that the value of `this` is passed through
-      // otherwise the old inflector cannot reference other inflectors.
-
-      return oldEnumName.call(this, value.replace(/\./g, "_"));
-    },
-  };
-}, true);
-```
-
-### Example
+### Example 2
 
 If you want `*Patch` types to instead be called `*ChangeSet` you could make a
 plugin such as this one:
 
-```js {6-8}
-// MyInflectionPlugin.js
-const { makeAddInflectorsPlugin } = require("graphile-utils");
+```ts
+// Import types for TypeScript, no need in JS
+import "graphile-config";
+import "graphile-build";
+import "graphile-build-pg";
 
-module.exports = makeAddInflectorsPlugin(
-  {
-    patchType(typeName: string) {
-      return this.upperCamelCase(`${typeName}-change-set`);
+export const ReplaceInflectorPlugin: GraphileConfig.Plugin = {
+  // Unique name for your plugin:
+  name: "ReplaceInflectorPlugin",
+  version: "0.0.0",
+
+  inflection: {
+    replace: {
+      patchType(previous, preset, typeName) {
+        return this.upperCamelCase(`${typeName}-change-set`);
+      },
     },
   },
-  /* Passing true here allows the plugin to overwrite
-   * existing inflectors.
-   */
-  true
-);
-
-// Load this plugin with `postgraphile --append-plugins /path/to/MyInflectionPlugin.js`
+};
 ```
 
-### Where are the default inflectors defined?
+## Adding a new inflector
 
-The default Graphile Engine inflectors (`pluralize`, `singularize`,
-`upperCamelCase`, `camelCase` and `constantCase`) can be found
-[in `makeNewBuild.js`](https://github.com/graphile/graphile-engine/blob/v4.4.4/packages/graphile-build/src/makeNewBuild.js#L929-L997).
+Adding a new inflector is very much like adding a replacement inflector, with
+the following differences:
 
-The additional inflectors used in PostGraphile can be found
-[in `PgBasicsPlugin.js`](https://github.com/graphile/graphile-engine/blob/v4.4.4/packages/graphile-build-pg/src/plugins/PgBasicsPlugin.js#L383-L874),
-but also
-[some other places](<https://github.com/graphile/graphile-engine/search?q="hook inflection">)
-There's a lot of them!
+1. No `previous` inflector existed, so the first argument is omitted
+2. The types won't already exist, so you must declare them yourself, via the `global.GraphileBuild.Inflection` interface
+
+In JS, adding a new inflector is straightforward:
+
+```js
+export const MyNewInflectorPlugin: GraphileConfig.Plugin = {
+  name: "MyNewInflectorPlugin",
+  version: "0.0.0",
+  inflection: {
+    add: {
+      enhanced(preset, columnName) {
+        return columnName + "Enhanced";
+      },
+    },
+  },
+};
+```
+
+In TypeScript, it's somewhat more verbose as we use [declaration merging][] to
+make other plugins aware of the new inflector:
+
+```ts
+// Import types for TypeScript, no need in JS
+import "graphile-config";
+import "graphile-build";
+import "graphile-build-pg";
+
+declare global {
+  namespace GraphileBuild {
+    interface Inflection {
+      /**
+       * Add documentation for your inflector here.
+       */
+      enhanced(this: Inflection, columnName: string): string;
+    }
+  }
+}
+
+export const MyNewInflectorPlugin: GraphileConfig.Plugin = {
+  name: "MyNewInflectorPlugin",
+  version: "0.0.0",
+
+  inflection: {
+    add: {
+      enhanced(preset, columnName) {
+        return columnName + "Enhanced";
+      },
+    },
+  },
+};
+```
+
+:::info
+
+The first argument to your add inflector definition is supplied by the Graphile
+Build system and hidden from calling code, so only arguments from the second
+onward are supplied by the calling code. For example, the `enhanced` inflector
+could be defined as above, but calling code would only supply the second
+argument:
+
+```js
+const text = inflection.enhanced("avatarUrl");
+```
+
+:::
+
+[declaration merging]: https://www.typescriptlang.org/docs/handbook/declaration-merging.html
