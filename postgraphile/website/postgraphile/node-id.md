@@ -44,12 +44,13 @@ const IdPlugin: GraphileConfig.Plugin = {
 One common use case for the `nodeId` (or `id`) field is as the cache key for
 your client library, e.g. with Apollo Client's `dataIdFromObject`:
 
-```js {6}
+```ts
 import ApolloClient from "apollo-client";
 import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 
 const cache = new InMemoryCache({
+  // highlight-next-line
   dataIdFromObject: (object) => object.nodeId || null,
 });
 
@@ -63,7 +64,7 @@ export const client = new ApolloClient({
 
 You can disable the global object identifier throughout your API by disabling `NodePlugin`:
 
-```js title="graphile.config.mjs"
+```ts title="graphile.config.mjs"
 export default {
   // ...
   // highlight-next-line
