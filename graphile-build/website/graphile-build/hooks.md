@@ -40,14 +40,16 @@ The general flow is:
     functionality is created
 2.  The `build` hook allows plugins to add new utility methods to the `build`
     object itself, or overwrite previously declared ones.
-3.  The `init` hook is the setup phase where all possible types should be
+3.  A `Behavior` instance is added to the Build object, and behaviors for all the relevant entities are registered.
+4.  The build object is frozen to prevent further modification.
+5.  The `init` hook acts as the setup phase where all possible types should be
     registered via `build.registerObjectType`, `build.registerUnionType`, etc.
-4.  The schema is constructed internally using `newWithHooks(GraphQLSchema, …)`,
+6.  The schema is constructed internally using `newWithHooks(GraphQLSchema, …)`,
     where the `query`, `mutation` and `subscription` root operations are
-    provided by the respective default plugins. This in turn triggers all the
-    various hooks to be called in a recursive fashion as types, fields, arguments
-    and so on are created.
-5.  The `finalize` hook allows plugins to replace the schema that has been built
+    provided by the respective default plugins (e.g. `QueryPlugin`). This in
+    turn triggers all the various hooks to be called in a recursive fashion as
+    types, fields, arguments and so on are created.
+7.  The `finalize` hook allows plugins to replace the schema that has been built
     with an alternative (likely derivative) schema, should that be desired. It
     also opens an opportunity to do something with the built schema (for example
     log it out) before it is returned.

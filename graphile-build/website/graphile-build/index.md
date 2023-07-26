@@ -47,7 +47,7 @@ your server!
 
 ```js
 import { buildSchema, defaultPreset } from "graphile-build";
-import { printSchema } from "graphql/utilities";
+import { printSchema } from "graphql";
 
 const preset = {
   extends: [

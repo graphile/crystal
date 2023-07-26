@@ -47,7 +47,7 @@ Once you have a preset, you can feed it into the relevant Graphile Build methods
 
 ```js {3, 5}
 import { buildSchema } from "graphile-build";
-import { printSchema } from "graphql/utilities";
+import { printSchema } from "graphql";
 import preset from "./graphile.config.mjs";
 
 const schema = await buildSchema(preset);
