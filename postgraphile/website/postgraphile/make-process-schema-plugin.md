@@ -1,17 +1,8 @@
 ---
 layout: page
 path: /postgraphile/make-process-schema-plugin/
-title: makeProcessSchemaPlugin (graphile-utils)
+title: makeProcessSchemaPlugin
 ---
-
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
-**NOTE: this documentation applies to PostGraphile v4.1.0+**
 
 This plugin enables a way of processing the schema after it's built.
 
@@ -21,37 +12,54 @@ Use cases include:
 - Uploading the schema SDL to a network service
 - Checking the schema against your persisted queries
 - Validating the schema against your custom logic
+- Exporting the executable schema (in JavaScript) to a file
 - Replacing the schema with a mocked version or a derivative version (e.g.
   stitching it with another schema)
 - Integrating with third-party libraries
 
+## Signature
+
+```ts
+function makeProcessSchemaPlugin(
+  process: (schema: GraphQLSchema) => GraphQLSchema,
+): GraphileConfig.Plugin;
+```
+
 The plugin accepts one argument: a schema processing function which will be
 called with the generated schema and must either return the same schema (e.g. if
 you're doing a read-only operation, or mutating the schema directly) or return
-an alternative schema (e.g. a derivative).
+an alternative schema (typically a derivative).
 
-**PLEASE NOTE**: some third party tooling mutates the existing GraphQL schema
-which is likely to cause issues. Please use only tools that treat GraphQL
-schemas as immutable; if you cannot then try building a sacrificial schema that
-delegates to the PostGraphile schema but can be mutated.
+:::info
 
-### Example
+The callback to this plugin operates synchronously. If you need to do
+asynchronous work then be sure to handle any errors that may occur, and note
+that the result of the asynchronous work will not affect the return result of
+this plugin (and thus the schema being used by your server).
 
-```js
-const { makeProcessSchemaPlugin } = require("graphile-utils");
+:::
 
-module.exports = makeProcessSchemaPlugin((schema) => {
-  return addThirdPartyEnhancementsToSchema(schema);
-});
-```
+:::warning
 
-You can also use `makeProcessSchemaPlugin` to replace the current schema with a
-stitched schema and run it from within the PostGraphile server:
+Because PostGraphile schemas use Gra*fast* plan resolvers, third party tooling
+that manipulate traditional resolvers are likely to break the schema, and not
+achieve the goals set out. For example, `graphql-shield` is currently not
+compatible with Gra*fast* plans.
 
-```js
-const { makeProcessSchemaPlugin } = require("graphile-utils");
+:::
 
-module.exports = makeProcessSchemaPlugin((schema) => {
-  return stitchOtherSchemasInto(schema);
+## Example: exporting the schema as exportable code
+
+```ts
+import { makeProcessSchemaPlugin } from "postgraphile/utils";
+import { exportSchema } from "graphile-export";
+
+const ExportSchemaPlugin = makeProcessSchemaPlugin((schema) => {
+  exportSchema(schema, `${process.cwd()}/exported-schema.mjs`, {
+    mode: "typeDefs",
+  }).catch((e) => {
+    console.error(e);
+  });
+  return schema;
 });
 ```
