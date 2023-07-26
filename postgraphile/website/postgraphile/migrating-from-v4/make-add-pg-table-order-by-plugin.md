@@ -85,7 +85,7 @@ export function makeAddPgTableOrderByPlugin(
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
-      graphile: {
+      grafast: {
         applyPlan($select: PgSelectStep): void;
       };
     };

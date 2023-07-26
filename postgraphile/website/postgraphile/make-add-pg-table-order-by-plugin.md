@@ -1,19 +1,8 @@
 ---
 layout: page
 path: /postgraphile/make-add-pg-table-order-by-plugin/
-title: makeAddPgTableOrderByPlugin (graphile-utils v4.4.5+)
+title: makeAddPgTableOrderByPlugin
 ---
-
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
-**WARNING**: _this plugin generator doesn't currently have any tests, so it's
-status is **experimental**. If you can spare the time to write some tests (or
-sponsor me to do so) then we can promote it to stable._
 
 PostGraphile adds `orderBy` arguments to various of the table collection fields
 it builds so that you can control the order in which you receive the results. By
@@ -46,29 +35,39 @@ To sort a list of forums (stored in the table `app_public.forums`) by the date
 of their latest post (posts are stored in `app_public.posts`) you might create a
 plugin like this:
 
-```js
+```ts
+import { makeAddPgTableOrderByPlugin } from "postgraphile/utils";
+import { TYPES } from "postgraphile/@dataplan/pg";
+
 /* TODO: test this plugin works! */
-module.exports = makeAddPgTableOrderByPlugin(
-  "app_public",
-  "forums",
-  ({ pgSql: sql }) => {
+export default makeAddPgTableOrderByPlugin(
+  { schemaName: "app_public", tableName: "forums" },
+  ({ sql }) => {
     const sqlIdentifier = sql.identifier(Symbol("lastPostInForum"));
     return orderByAscDesc(
       "LAST_POST_CREATED_AT",
-      ({ queryBuilder }) => sql.fragment`(
-        select ${sqlIdentifier}.created_at
-        from app_public.posts as ${sqlIdentifier}
-        where ${sqlIdentifier}.forum_id = ${queryBuilder.getTableAlias()}.id
-        order by ${sqlIdentifier}.created_at desc
-        limit 1
-      )`,
+      ($select) => {
+        const orderByFrag = sql`(
+          select ${sqlIdentifier}.created_at
+          from app_public.posts as ${sqlIdentifier}
+          where ${sqlIdentifier}.forum_id = ${$select.alias}.id
+          order by ${sqlIdentifier}.created_at desc
+          limit 1
+        )`;
+        return { fragment: orderByFrag, codec: TYPES.timestamptz };
+      },
+      { nulls: "last-iff-ascending" },
     );
   },
 );
 ```
 
-(Note: we used the `orderByAscDesc` helper to easily create the `_ASC` and
-`_DESC` variants without needing redundant code.)
+:::tip
+
+We used the `orderByAscDesc` helper to easily create the `_ASC` and
+`_DESC` variants without needing redundant code.
+
+:::
 
 The above plugin adds the `LAST_POST_CREATED_AT_ASC` and
 `LAST_POST_CREATED_AT_DESC` enum values to the `ForumOrderBy` enum, so you can
@@ -93,72 +92,76 @@ The signature of the `makeAddPgTableOrderByPlugin` function is:
 
 ```ts
 function makeAddPgTableOrderByPlugin(
-  schemaName: string,
-  tableName: string,
-  ordersGenerator: (build: Build) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with makeAddPgTableOrderByPlugin to "${schemaName}"."${tableName}"`,
-): Plugin;
+  match: {
+    serviceName?: string;
+    schemaName: string;
+    tableName: string;
+  },
+  ordersGenerator: (
+    build: GraphileBuild.Build,
+  ) => MakeAddPgTableOrderByPluginOrders,
+  hint?: string,
+): GraphileConfig.Plugin;
 
 interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
-    value: {
-      alias?: string;
-      specs: Array<OrderSpec>;
-      unique: boolean;
+    extensions: {
+      grafast: {
+        applyPlan($select: PgSelectStep): void;
+      };
     };
   };
 }
-
-type OrderSpec = [string | SQL, boolean] | [string | SQL, boolean, boolean];
 ```
 
-The `OrderSpec` here is a 2- or 3-tuple, with the following entries:
-
-1. the first entry (`string | SQL`) is the value to order by; if a string then
-   it's assumed to be a column from the table, otherwise it must be an SQL
-   fragment from `pg-sql2`.
-2. whether the order should be ascending (`true`) or descending (`false`).
-3. whether nulls appear before or after non-null values in the sort ordering.
-   Pass true for nulls first, false for nulls last, and nothing/null for default
-   behaviour.
-
-The unique key specifies whether the order is unique (true) or not (false) ─ if
-in doubt, pass false and PostGraphile will make it unique by adding the primary
-key as the last sort field invisibly.
-
 `MakeAddPgTableOrderByPluginOrders` is a hash (POJO ─ plain old JavaScript
-object) which maps from the name of the enum value to
-[a `GraphQLEnumValueConfig` spec](https://graphql.org/graphql-js/type/#graphqlenumtype).
-We have a defined format for the value of an orderBy enum as shown above. In
-addition to the `value` entry detailed above, you could also provide a
-`description` or `deprecationReason` (both strings).
+object) which maps from the name of the enum value to [a
+`GraphQLEnumValueConfig`
+spec](https://graphql.org/graphql-js/type/#graphqlenumtype). Importantly, these
+enum values have an associated `extensions.grafast.applyPlan` method which will
+be used to apply the ordering to the parent PgSelectStep via
+`$select.orderBy(...)`. The `applyPlan` can also choose to set the order as
+unique via `$select.setOrderIsUnique()`, which will mean that the primary key
+will not need to be added to the order by clause.
+
+:::tip
+
+Note that you wouldn't typically build the `MakeAddPgTableOrderByPluginOrders`
+yourself, instead you would use the `orderByAscDesc` helper.
+
+:::
 
 ### `orderByAscDesc`
 
-We also expose the `orderByAscDesc` helper which makes it easier to build the
-`_ASC` and `_DESC` orders which are typically identical except for name and
-reversed sort:
+The `orderByAscDesc` helper makes it easier to build the `_ASC` and `_DESC`
+orders which are typically identical except for name and reversed sort:
 
 ```ts
 export function orderByAscDesc(
   baseName: string,
-  columnOrSqlFragment: string | SQL,
+  orderBySpec: OrderBySpecIdentity,
   uniqueOrOptions: boolean | OrderByAscDescOptions = false,
 ): MakeAddPgTableOrderByPluginOrders;
+
+type OrderBySpecIdentity =
+  | string // Column name
+  | Omit<PgOrderSpec, "direction"> // Expression
+  | (($select: PgSelectStep) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 ```
 
 The `baseName` will have `_ASC` and `_DESC` appended for the two enum values
 this function creates.
 
-`columnOrSqlFragment` is where the order value is specified, it becomes the
-first entry in the `OrderSpec` tuple defined above.
+`orderBySpec` is where the order is specified, it either specifies a column
+name (string), an order spec without the "direction", or a callback which
+returns the order spec without the "direction".
 
 `uniqueOrOptions` define 1) whether the sort order is unique, and 2) how to sort
 null values when sorting by ascending and descending order. Only set
-`uniqueOrOptions` (or `unique`) to `true` if you can guarantee that the sort
-order is unique.
+`uniqueOrOptions` (or `uniqueOrOptions.unique`) to `true` if you can guarantee
+that the sort order is unique.
 
-As of v4.12, you can also customize how nulls are sorted:
+You can also customize how nulls are sorted:
 
 ```ts
 export type NullsSortMethod =
@@ -193,16 +196,13 @@ or lowest-rated first (meaning the average of the movie's reviews):
 ```ts
 const customOrderBy = orderByAscDesc(
   "RATING",
-  (helpers) => {
-    const { queryBuilder } = helpers;
-
-    const orderByFrag = sql.fragment`(
+  ($select) => {
+    const sqlIdentifier = sql.identifier(Symbol("movie_reviews"));
+    return sql`(
       select avg(${sqlIdentifier}.rating)
       from app_public.movie_reviews as ${sqlIdentifier}
-      where ${sqlIdentifier}.movie_id = ${queryBuilder.getTableAlias()}.id
+      where ${sqlIdentifier}.movie_id = ${$select.alias}.id
     )`;
-
-    return orderByFrag;
   },
   { nulls: "last" },
 );
