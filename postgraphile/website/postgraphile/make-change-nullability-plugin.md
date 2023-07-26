@@ -1,57 +1,75 @@
 ---
 layout: page
 path: /postgraphile/make-change-nullability-plugin/
-title: makeChangeNullabilityPlugin (graphile-utils)
+title: makeChangeNullabilityPlugin
 ---
 
-:::caution
+Use this plugin to easily change the nullability of fields and arguments in
+your GraphQL schema.
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+For more information about nullability in PostGraphile in general (and to help
+determine if the change that you want to make is wise or misguided), see the
+FAQ question ["Why is it nullable?"](./why-nullable/)
 
-:::
+## Function signature
 
-**NOTE: this documentation applies to PostGraphile v4.1.0+**
+The `makeChangeNullabilityPlugin` function accepts one parameter, a rules object:
 
-Use this plugin to easily change the nullability of fields in your GraphQL,
-where true = nullable (e.g. `String`), false = non-nullable (e.g. `String!`).
+```ts
+function makeChangeNullabilityPlugin(
+  rules: ChangeNullabilityRules,
+): GraphileConfig.Plugin;
 
-For more information about nullability in PostGraphile in general, see the FAQ
-question ["Why is it nullable?"](./why-nullable/)
+interface ChangeNullabilityRules {
+  [typeName: string]: {
+    [fieldName: string]:
+      | NullabilitySpecString
+      | {
+          type?: NullabilitySpecString;
+          args?: {
+            [argName: string]: NullabilitySpecString;
+          };
+        };
+  };
+}
+```
 
-### Example
+Note that the format allows you to indicate the nullability for a field
+directly, or to pass an object in which you can indicate the field nullability
+and the nullability of that field's arguments at the same time.
 
-You can combine this plugin with the use of `makeWrapResolversPlugin` so that
-only the current user can see their own email address:
+The `NullabilitySpecString` uses syntax similar to GraphQL's SDL to define the
+nullability of a field, including control over lists and nested lists:
 
-```js
-const {
-  makeChangeNullabilityPlugin,
-  makeWrapResolversPlugin,
-  makePluginByCombiningPlugins,
-} = require("graphile-utils");
+```ts
+export type NullabilitySpecString =
+  | "" // nullable
+  | "!" // non-nullable
+  | "[]" // nullable list of nullables
+  | "[]!" // non-nullable list of nullables
+  | "[!]" // nullable list of non-nullables
+  | "[!]!"
+  | "[[]]"
+  | "[[]]!"
+  | "[[]!]"
+  | "[[]!]!"
+  | "[[!]]"
+  | "[[!]]!"
+  | "[[!]!]"
+  | "[[!]!]!";
+```
 
-module.exports = makePluginByCombiningPlugins(
-  // 1: make User.email nullable:
-  makeChangeNullabilityPlugin({
-    User: {
-      email: true,
-    },
-  }),
+## Example
 
-  // 2: return null unless the user id matches the current logged in user_id
-  makeWrapResolversPlugin({
-    User: {
-      email: {
-        requires: {
-          siblingColumns: [{ column: "id", alias: "$user_id" }],
-        },
-        resolve(resolver, user, args, context, _resolveInfo) {
-          if (context.jwtClaims.user_id !== user.$user_id) return null;
-          return resolver();
-        },
-      },
-    },
-  }),
-);
+To indicate that `UsersConnection.nodes` should be a non-nullable list of
+non-nullables you would do:
+
+```ts
+import { makeChangeNullabilityPlugin } from "postgraphile/utils";
+
+const MyNullabilityPlugin = makeChangeNullabilityPlugin({
+  UsersConnection: {
+    nodes: "[!]!",
+  },
+});
 ```
