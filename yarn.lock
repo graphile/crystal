@@ -3758,9 +3758,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@localrepo/utils-website@workspace:utils/website":
+"@localrepo/star-website@workspace:utils/website":
   version: 0.0.0-use.local
-  resolution: "@localrepo/utils-website@workspace:utils/website"
+  resolution: "@localrepo/star-website@workspace:utils/website"
   dependencies:
     "@docusaurus/core": "npm:2.4.0"
     "@docusaurus/module-type-aliases": "npm:2.4.0"
