@@ -11,7 +11,7 @@ const projectName = "postgraphile-private";
 // TODO: change this to "main"
 const mainBranch = "planning";
 
-const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${mainBranch}/graphile-build/website/`;
+const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${mainBranch}/utils/website/`;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {

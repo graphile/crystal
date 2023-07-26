@@ -27,7 +27,7 @@ export default function swallowError(e: Error): void {
     } else {
       // eslint-disable-next-line no-console
       console.warn(
-        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for error (see: https://postgraphile.org/postgraphile/dcurrent/ebugging )`,
+        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for error (see: https://postgraphile.org/postgraphile/current/debugging )`,
       );
     }
   }
