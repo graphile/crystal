@@ -15,7 +15,7 @@ const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${ma
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "Graphile *",
+  title: "Graphile*",
   tagline: "... the stars we forge to build our universe",
   url: "https://star.graphile.org",
   baseUrl: "/",
