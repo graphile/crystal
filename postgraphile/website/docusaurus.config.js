@@ -6,7 +6,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 // TODO: change this to "graphile"?
 const organizationName = "benjie";
-// TODO: change this to "graphql" or similar?
+// TODO: change this to "heart" or similar?
 const projectName = "postgraphile-private";
 // TODO: change this to "main"
 const mainBranch = "planning";
@@ -231,6 +231,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ["json5"],
       },
     }),
 

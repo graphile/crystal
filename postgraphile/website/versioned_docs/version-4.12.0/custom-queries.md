@@ -55,7 +55,7 @@ Here we write a search query for our [forum example][] using the PostgreSQL
 query we create is included in the forum example’s schema, so if you want to run
 that example locally you can try it out.
 
-```sql{10-27}
+```sql {10-27}
 -- Columns unnecessary to this demo were omitted. You can find the full table in
 -- our forum example.
 create table post (
@@ -87,7 +87,7 @@ create function search_posts(search text)
 
 And that’s it! You can now use this function in your GraphQL like so:
 
-```graphql{2}
+```graphql {2}
 {
   searchPosts(search: "Hello world", first: 5) {
     pageInfo {

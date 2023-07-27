@@ -137,8 +137,10 @@ export function makeGrafastSchema(details: {
       const objSpec = spec as ObjectPlans;
       const fields = type.getFields();
       for (const [fieldName, fieldSpec] of Object.entries(objSpec)) {
-        if (fieldName === "__Step") {
-          (type.extensions as any).grafast = { Step: fieldSpec };
+        if (fieldName === "__assertStep") {
+          (
+            type.extensions as graphql.GraphQLObjectTypeExtensions<any, any>
+          ).grafast = { assertStep: fieldSpec as any };
           continue;
         }
 

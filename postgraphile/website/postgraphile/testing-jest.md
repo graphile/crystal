@@ -189,11 +189,11 @@ export const createUsers = async function createUsers(
 
 Then a test file might look like:
 
-```js{3-13}
+```js {3-13}
 import { becomeUser, createUsers, withRootDb } from "../test_helpers";
 
 test("can delete self", () =>
-  withRootDb(async pgClient => {
+  withRootDb(async (pgClient) => {
     const [user] = await createUsers(pgClient, 1);
 
     await becomeUser(pgClient, user);
@@ -201,7 +201,7 @@ test("can delete self", () =>
       rows: [deletedUser],
     } = await pgClient.query(
       "delete from app_public.users where id = $1 returning *",
-      [user.id]
+      [user.id],
     );
     expect(deletedUser).toBeTruthy();
   }));
@@ -226,7 +226,7 @@ First, make sure that you've extracted your PostGraphile (library mode) options
 into a function that you can import in your tests; for example your PostGraphile
 server file might look like this:
 
-```js{6-11,17}
+```js {6-11,17}
 const express = require("express");
 const { postgraphile } = require("postgraphile");
 
@@ -243,8 +243,8 @@ app.use(
   postgraphile(
     process.env.DATABASE_URL || "postgres:///",
     ["app_public"],
-    postgraphileOptions()
-  )
+    postgraphileOptions(),
+  ),
 );
 
 app.listen(process.env.PORT || 3000);
@@ -503,7 +503,7 @@ Graphile Starter:
 
 Your test might look something like this:
 
-```js{9,24-25}
+```js {9,24-25}
 const { setup, teardown, runGraphQLQuery } = require("../test_helper");
 
 beforeAll(setup);
@@ -533,15 +533,14 @@ test("GraphQL query nodeId", async () => {
       // If you need to, you can query the DB within the context of this
       // function - e.g. to check that your mutation made the changes you'd
       // expect.
-      const {
-        rows,
-      } = await pgClient.query(`SELECT * FROM app_public.users WHERE id = $1`, [
-        17,
-      ]);
+      const { rows } = await pgClient.query(
+        `SELECT * FROM app_public.users WHERE id = $1`,
+        [17],
+      );
       if (rows.length !== 1) {
         throw new Error("User not found!");
       }
-    }
+    },
   );
 });
 ```

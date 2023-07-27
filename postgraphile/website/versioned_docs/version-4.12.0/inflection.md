@@ -36,14 +36,14 @@ documented in the
 
 An example plugin looks something like this:
 
-```js{2-4}
+```js {2-4}
 module.exports = makeAddInflectorsPlugin(
   {
     patchType(typeName: string) {
       return this.upperCamelCase(`${typeName}-change-set`);
     },
   },
-  true
+  true,
 );
 ```
 

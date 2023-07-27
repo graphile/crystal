@@ -434,10 +434,14 @@ comment on function user_object_fields() is E'@sortable';
 
 Now you can use the array as a _filter by_, for example:
 
-```gql
+```graphql
 {
   # get all users who own an object with field == 'foo'
-  allUsers(filter: {object_fields: contains: 'foo'}) { ... }
+  allUsers(filter: { object_fields: { contains: "foo" } }) {
+    nodes {
+      id
+    }
+  }
 }
 ```
 

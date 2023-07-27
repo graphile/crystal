@@ -15,7 +15,7 @@ const RELAY_HIDDEN_COLUMN_BEHAVIORS = [
 
 /** @experimental */
 export const PgRelayPlugin: GraphileConfig.Plugin = {
-  name: "RelayPlugin",
+  name: "PgRelayPlugin",
   description:
     "[EXPERIMENTAL] Adds behaviors, inflectors, and other accomodations to better hone your schema for Relay usage",
   version,
@@ -118,10 +118,13 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
 };
 
 /** @experimental */
-export const PgRelayPreset: GraphileConfig.Preset = {
+export const PostGraphileRelayPreset: GraphileConfig.Preset = {
   plugins: [PgRelayPlugin],
   schema: {
     pgMutationPayloadRelations: false,
     pgFunctionsPreferNodeId: true,
   },
 };
+
+/** @deprecated use PostGraphileRelayPreset */
+export const PgRelayPreset = PostGraphileRelayPreset;

@@ -11,7 +11,7 @@ set), and use these to build relations into the generated GraphQL schema.
 An example of a foreign key constraint when defining a table would be the
 `REFERENCES` keyword below:
 
-```sql{4}
+```sql {4}
 CREATE TABLE app_public.users (
   -- ...
   organization_id int NOT NULL

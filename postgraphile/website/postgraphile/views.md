@@ -4,21 +4,14 @@ path: /postgraphile/views/
 title: Views
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 Views are a great solution for abstraction. PostGraphile supports reading from
 and writing to views; however PostgreSQL lacks the powerful introspection
 capabilities on views that it has on tables, so we cannot easily automatically
 infer the relations. However, you can
-[use our "smart comments" functionality to add constraints to views](./smart-comments/#constraints)
+[use our "smart tags" functionality to add constraints to views](./smart-tags/#virtual-constraints)
 which will make them a lot more table-like (giving them a primary key so you can
-get a `nodeId`, adding foreign key references between views and other views or
-tables, setting columns as non-null).
+get a `nodeId` and maybe CRUD mutations; adding foreign key references between views and other views or
+tables; setting columns as non-null).
 
 ### Abstract Business Logic
 
@@ -97,8 +90,12 @@ query After {
 }
 ```
 
-**_NOTE: you can use [smart comments](./smart-comments/) to change the GraphQL
-field name_**
+:::note
+
+You can use [smart tags](./smart-tags/) to change the GraphQL
+field name.
+
+:::
 
 ### Authorization
 
@@ -133,4 +130,5 @@ CREATE VIEW personal_data_view
 Using views, one can create an access layer that will remain consistent even
 while making changes to the underlying tables - for example when splitting
 tables or combining them. Note that simple name changes can be solved using
-smart comments without the need for views.
+smart tags without the need for views. Much of what can be achieved with views
+can also be achieved with functions or plugins, so consider those options too.

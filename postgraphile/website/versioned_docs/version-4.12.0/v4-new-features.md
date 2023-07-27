@@ -168,7 +168,7 @@ create table bar (
 in V3 the one-to-one nature of the relationship was not accounted for, so you
 would have to query like:
 
-```graphql{5-7,9-11}
+```graphql {5-7,9-11}
 {
   fooById(id: 1) {
     # Due to this being one-to-one, at most one row would ever be returned,
@@ -187,7 +187,7 @@ would have to query like:
 with v4's native support for these relations you can now use this much neater
 query:
 
-```graphql{3,5}
+```graphql {3,5}
 {
   fooById(id: 1) {
     barByFooId {

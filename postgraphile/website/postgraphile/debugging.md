@@ -4,17 +4,10 @@ path: /postgraphile/debugging/
 title: Debugging
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 When something's wrong with your app it can be hugely frustrating; so we want to
 make it as easy as we can for you to get to the bottom of these issues!
 
-### Step 1: check you're requesting what you think you're requesting
+## Step 1: check you're requesting what you think you're requesting
 
 Often issues occur because your client code isn't doing what you think it's
 doing. The first step here is to determine exactly what's being sent over the
@@ -33,97 +26,155 @@ Devtools to see exactly what's being sent and received.
     expect, that no variables are unexpectedly null, that the relevant access
     tokens are being set in the request headers, etc
 
-### Step 2: try your query in GraphiQL
+## Step 2: try your query in Ruru or GraphiQL
 
 It sometimes helps to try doing the same thing a different way, and this is
-where GraphiQL comes in handy. Take the query you're running and execute it via
-GraphiQL. Is it producing the same issue? Note that you can set headers in
-GraphiQL by ensuring that you're using the enhanced GraphiQL
-(`--enhance-graphiql` or `enhanceGraphiql: true`) and pressing the `Headers`
-button.
+where Ruru (or any GraphiQL) comes in handy. Take the query you're running and
+execute it via Ruru. Is it producing the same issue? Note that you can set
+headers in Ruru via the `Headers` tab at the bottom, where variables are
+entered.
 
-### Step 3: increase PostGraphile's logging
+## Step 3: increase PostGraphile's logging
 
 Note that the errors are sent through to the GraphQL client (they're not output
 on the server by default) so you'll need to reproduce this from your client so
 you can see the output (or use a network inspector such as WireShark if
 modifying the client is not an option). If you're using PostGraphile as a
-library then you can use `handleErrors` to output the error details on the
-server side (and to manipulate them before they're returned to the client).
+library then you can use `preset.grafserv.maskError` to output the error
+details on the server side (and to manipulate them before they're returned to
+the client). The default implementation of `maskError` trims out a lot of
+details for security reasons, if you replace it be sure that you are also being
+cautious about what you're outputting to potential attackers.
 
-You probably don't want this level of debugging on production as the results are
-sent to the client and it may leak implementation details you wish to keep
-private.
+```js title="graphile.config.mjs"
+import { GraphQLError } from "postgraphile/graphql";
+import { isSafeError } from "postgraphile/grafast";
+import { createHash } from "node:crypto";
 
-Use the following CLI options with PostGraphile:
+const sha1 = (text: string) =>
+  createHash("sha1").update(text).digest("base64url");
 
-- `--show-error-stack`
-- `--extended-errors hint,detail,errcode` (other options available
-  [here](https://github.com/brianc/node-postgres/blob/7de137f9f88611b8fcae5539aa90b6037133f1f1/lib/connection.js#L565-L580))
-- or
+export default {
+  //...
+  grafserv: {
+    maskError(error) {
+      console.error("maskError was called with the following error:");
+      console.error(error);
+      console.error("which had an originalError of:");
+      console.error(error.originalError);
 
+      // You probably don't want this level of debugging in production as the
+      // results are sent to the client and it may leak implementation details
+      // you wish to keep private.
+      //
+      //   return error;
+
+      // Here's a more careful implementation:
+
+      if (error.originalError instanceof GraphQLError) {
+        return error;
+      } else if (
+        error.originalError != null &&
+        isSafeError(error.originalError)
+      ) {
+        return new GraphQLError(
+          error.originalError.message,
+          error.nodes,
+          error.source,
+          error.positions,
+          error.path,
+          error.originalError,
+          error.originalError.extensions ?? null,
+        );
+      } else {
+        // Hash so that similar errors can easily be grouped
+        const hash = sha1(String(error));
+        console.error(`Masked GraphQL error (hash: '${hash}')`, error);
+        return new GraphQLError(
+          `An error occurred (logged with hash: '${hash}')`,
+          error.nodes,
+          error.source,
+          error.positions,
+          error.path,
+          error.originalError,
+          // Deliberately wipe the extensions
+          {},
+        );
+      }
+    },
+  },
+};
 ```
---extended-errors severity,code,detail,hint,position,internalPosition,internalQuery,where,schema,table,column,dataType,constraint,file,line,routine
-```
 
-or for the library:
+:::tip
 
-- `showErrorStack: true`
-- `extendedErrors: ['hint', 'detail', 'errcode']` (other options available
-  [here](https://github.com/brianc/node-postgres/blob/7de137f9f88611b8fcae5539aa90b6037133f1f1/lib/connection.js#L565-L580))
-- or
+GraphQLError instances have an `error.originalError` property that can be used
+to retrieve the underlying error, this typically contains more actionable
+information than the GraphQL error itself.
 
-```
-extendedErrors: ['severity', 'code', 'detail', 'hint', 'position', 'internalPosition', 'internalQuery', 'where', 'schema', 'table', 'column', 'dataType', 'constraint', 'file', 'line', 'routine']
-```
+:::
 
-- or use a custom `handleErrors` function to explore even more details about the
-  errors (or to log them server side), note this overrides the above options.
-  You might be interested in the `originalError` property on the GraphQLErrors
-  you're handed.
-
-### Step 4: viewing the generated SQL
+## Step 4: viewing the generated SQL
 
 Assuming that the error is coming from within the database, you can see what SQL
 statements PostGraphile is generating.
 
-#### Via PostGraphiQL 'Explain'
+### Via Ruru 'Explain'
 
-One way to do so is via the "Explain" feature available in PostGraphiQL since
-PostGraphile v4.5. To use this, you must run PostGraphile with
-`--enhance-graphiql --allow-explain` (or for the library
-`enhanceGraphiql: true, allowExplain: (req) => { return true; }`). It is
-recommended that you do not use this functionality in production; however if you
-choose to do so you can use the `allowExplain` callback to determine which
-requests can use this functionality.
+One way to do so is via the "Explain" feature available in Ruru. To use this,
+you must ensure that `preset.grafast.explain` is enabled in your configuration:
 
-Once enabled, visit GraphiQL (by default this will be at
-http://localhost:5000/graphiql) and click the 'Explain disabled' button to
-toggle it into 'Explain ON'. You should see the query that was executed and the
-associated query plan:
+```js title="graphile.config.mjs"
+export default {
+  // ...
+  grafast: {
+    explain: true,
+  },
+};
+```
 
-![PostGraphiQL with Explain ON](https://user-images.githubusercontent.com/129910/68597446-df861a00-0494-11ea-801c-8741362dafa4.png)
+:::warning
 
-#### Via `DEBUG` envvar
+Explain should be disabled in production since it could leak information about
+the internals of your schema that would be useful to an attacker.
+
+:::
+
+Once enabled, visit Ruru (by default this will be at
+http://localhost:5678/graphiql) and open the `Explain` tab on the left - the
+icon looks like a magnifying glass 🔍. You should see the query that was
+executed and the associated Gra*fast* operation plan, and from the dropdown you
+can select the various SQL queries and their explain results.
+
+:::info
+
+Currently SQL `EXPLAIN` can only be enabled via `DEBUG` envvar. This is a known
+issue that should be fixed before the release of PostGraphile v5.0.0.
+
+<!-- TODO: fix this! -->
+
+:::
+
+### Via `DEBUG` envvar
 
 Another way is to set the relevant [DEBUG](https://github.com/visionmedia/debug)
 environmental variable before running PostGraphile. For example:
 
 ```bash
 # Bash (Linux, macOS, etc)
-export DEBUG="postgraphile:postgres"
+export DEBUG="@dataplan/pg:PgExecutor:explain"
 postgraphile -c postgres://...
 
 # Windows Console
-set DEBUG=postgraphile:postgres & postgraphile -c postgres://...
+set DEBUG=@dataplan/pg:PgExecutor:explain & postgraphile -c postgres://...
 
 # Windows PowerShell
-$env:DEBUG='postgraphile:postgres'; postgraphile -c postgres://...
+$env:DEBUG='@dataplan/pg:PgExecutor:explain'; postgraphile -c postgres://...
 ```
 
-Note that this works with PostGraphile CLI and also when using PostGraphile as
-an express middleware (in which case replace the
-`postgraphile -c postgres://...` command with your own server startup command).
+<!--
+
+TODO: restore greater debugability
 
 To find details of any errors thrown whilst executing SQL, use:
 
@@ -146,52 +197,37 @@ $env:DEBUG = "postgraphile:postgres,postgraphile:postgres:error"; postgraphile -
 $env:DEBUG = "postgraphile:postgres*"; postgraphile -c postgres://...
 ```
 
-### Other `DEBUG` envvars
+-->
+
+## Other `DEBUG` envvars
 
 We use a lot of DEBUG envvars for different parts of the system. Here's some of
 the ones you might care about:
 
-- `postgraphile:cli` - informs about plugins being loaded
-- `postgraphile:graphql` - prints out the full GraphQL query after validation
-  and before execution
-- `postgraphile:request` - prints out statuses during the HTTP request
-  life-cycle
-- `postgraphile:postgres` - prints out every SQL statement that's issued to the
-  database (does not include placeholder values)
-- `postgraphile:postgres:notice` - outputs any notices generated whilst
-  executing SQL statements (very useful for tracing functions/triggers)
-- `postgraphile:postgres:error` - outputs any errors generated whilst executing
-  SQL statements
-- `graphile-builder` - desperately in need of renaming, this hook is extremely
-  useful for understanding the order in which hooks execute, and how hook
-  executions can nest - a must for people getting started with graphile-build
-  plugins
-- `graphile-build-pg` - prints out various things, many of which should not
-  occur. Also used to output errors from the update/delete mutations (where
-  `null` is returned to GraphQL)
-- `graphile-build-pg:warn` - prints out warnings that occur during schema
-  generation; these warnings might hint at field conflicts and similar issues
-- `graphile-build-pg:sql` - prints out _some_ SQL statements, you probably want
-  `postgraphile:postgres` instead
-- `graphql-parse-resolve-info` - far more information than you could possibly
-  need regarding how we process the resolveInfo / AST
+- `graphile-build:warn` - details of "recoverable" errors that occurred during
+  schema construction. Often include details of how to fix the issue.
+- `graphile-build:SchemaBuilder` - this hook is useful for understanding the
+  order in which hooks execute, and how hook executions can nest - a must for
+  people getting started with graphile-build plugins
+- `@dataplan/pg:PgExecutor:verbose` - details of the SQL queries being executed, their inputs, and their results
+- `@dataplan/pg:PgExecutor:explain` - as above, but also their EXPLAIN results
 
 To enable these DEBUG modes, join them with commas when setting a DEBUG envvar,
 then run PostGraphile or your Node.js server in the same terminal:
 
 ```bash
 # Bash (Linux, macOS, etc)
-export DEBUG="postgraphile:graphql,postgraphile:request,postgraphile:postgres*"
+export DEBUG="graphile-build:warn,@dataplan/pg:*"
 postgraphile -c postgres://...
 
 # Windows Console
-set DEBUG=postgraphile:graphql,postgraphile:request,postgraphile:postgres* & postgraphile -c postgres://...
+set DEBUG=graphile-build:warn,@dataplan/pg:* & postgraphile -c postgres://...
 
 # Windows PowerShell
-$env:DEBUG = "postgraphile:graphql,postgraphile:request,postgraphile:postgres*"; postgraphile -c postgres://...
+$env:DEBUG = "graphile-build:warn,@dataplan/pg:*"; postgraphile -c postgres://...
 ```
 
-### Advanced: getting your hands dirty
+## Advanced: getting your hands dirty
 
 If you're a plugin author, you think you've discovered an issue in PostGraphile,
 or you just like seeing how things work, you can use the Chrome Debug tools to

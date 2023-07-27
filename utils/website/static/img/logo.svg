@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="1200" height="1200" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<!--
+
+This file is Copyright © 2018 Benjie Gillam. All rights reserved.
+
+-->
+<style type="text/css">
+polygon {
+  stroke-width: 1;
+  shape-rendering: geometricPrecision;
+}
+.seg1 {
+  fill: #cd4948;
+  stroke: #cd4948;
+}
+.seg2 {
+  fill: #fd504e;
+  stroke: #fd504e;
+}
+.seg3 {
+  fill: #c0201c;
+  stroke: #c0201c;
+}
+.seg4 {
+  fill: #7e120e;
+  stroke: #7e120e;
+}
+.seg5 {
+  fill: #610f0d;
+  stroke: #610f0d;
+}
+.heart-outline {
+  fill: transparent;
+  stroke: black;
+  stroke-width: 8;
+  stroke-linejoin: round;
+}
+</style>
+
+  <desc>Graphile logo</desc>
+  <polygon points="25,360 260,25 715,615" class="seg2" />
+  <polygon points="260,25 600,130 715,615" class="seg1" />
+  <polygon points="600,130 940,25 715,615" class="seg2" />
+  <polygon points="940,25 1175,360 715,615" class="seg3" />
+  <polygon points="1175,360 1100,615 715,615" class="seg4" />
+  <polygon points="1100,615 600,1055 715,615" class="seg5" />
+  <polygon points="600,1055 100,615 715,615" class="seg4" />
+  <polygon points="100,615 25,360 715,615" class="seg3" />
+
+  <!-- polygon points="25,360 260,25 260,25 600,130 600,130 940,25 940,25 1175,360 1175,360 1100,615 1100,615 600,1055 600,1055 100,615 100,615 25,360" class="heart-outline" / -->
+
+
+</svg>

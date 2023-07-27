@@ -4,18 +4,11 @@ path: /postgraphile/custom-queries/
 title: Custom Queries
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 You can add root-level `Query` fields to your GraphQL schema using "Custom
 Queries". These are PostgreSQL functions, similar to
 [computed columns](./computed-columns/), that can return scalars, records, lists
 or sets. Sets (denoted by `RETURNS SETOF ...`) are exposed as
-[connections](./connections/). The arguments to these functions will be exposed
+[connections](./connections/) or lists (depending on your behavior configuration). The arguments to these functions will be exposed
 via GraphQL - named arguments are preferred, if your arguments are not named we
 will assign them an auto-generated name such as `arg1`.
 
@@ -62,7 +55,7 @@ Here we write a search query for our [forum example][] using the PostgreSQL
 query we create is included in the forum example’s schema, so if you want to run
 that example locally you can try it out.
 
-```sql{10-27}
+```sql {10-27}
 -- Columns unnecessary to this demo were omitted. You can find the full table in
 -- our forum example.
 create table post (
@@ -94,7 +87,7 @@ create function search_posts(search text)
 
 And that’s it! You can now use this function in your GraphQL like so:
 
-```graphql{2}
+```graphql {2}
 {
   searchPosts(search: "Hello world", first: 5) {
     pageInfo {
@@ -109,7 +102,9 @@ And that’s it! You can now use this function in your GraphQL like so:
 }
 ```
 
-**NOTE**: this function will have poor performance because `ILIKE`
+:::tip
+
+This function will have poor performance because `ILIKE`
 specifications of this form (beginning and ending with `%`) do not utilise
 indexes. If you're doing this in a real application then it's highly recommended
 that you look into
@@ -118,13 +113,14 @@ capabilities which can be exposed by a similar function. You may want to
 [check out `websearch_to_tsquery` in PG11](https://www.postgresql.org/docs/11/static/functions-textsearch.html)
 as part of this.
 
-<!--
-### Graphile Plugins
+:::
+
+### Extending schema in JS
 
 If you prefer adding to your schema on the JavaScript side, you can use
-`ExtendSchemaPlugin` from `graphile-utils`; see [Schema
-Plugins](./extending/) for more information.
+[`makeExtendSchemaPlugin`](./make-extend-schema-plugin).
 
+<!--
 ### GraphQL Schema Stitching
 
 You can also stitch multiple GraphQL schemas together, you can read more about

@@ -4,25 +4,28 @@ path: /postgraphile/computed-columns/
 title: Computed Columns
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 "Computed columns" add what appears to be an extra column (field) to the GraphQL
 table type, but, unlike an actual column, the value for this field is the result
 of calling a function defined in the PostgreSQL schema. This function will
 automatically be exposed to the resultant GraphQL schema as a field on the type;
 it can accept arguments that influence its result, and may return either a
 scalar, record, list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
-as [connections](./connections/).
+as [connections](./connections/) or lists, depending on the behavior configuration.
 
-_Performance note: we inline these function calls into the original `SELECT`
-statement, so there's no N+1 issues - it's very efficient._
+:::tip
 
-To create a function that PostGraphile will recognise as a computed column, it
+We inline these function calls into the original `SELECT` statement for
+efficiency, so no additional SQL queries need to be issued to the database.
+That said, SQL function calls do have a performance overhead, which can build
+up if you're doing this on thousands of rows. PostgreSQL can [sometimes inline
+your SQL functions](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions)
+for great performance, but if this fails and you're seeing performance issues
+you might want to investigate using
+[`makeExtendSchemaPlugin`](./make-extend-schema-plugin) instead.
+
+:::
+
+To create a function that PostGraphile will recognize as a computed column, it
 must obey the following rules:
 
 - adhere to
@@ -46,7 +49,7 @@ $$ LANGUAGE sql STABLE;
 Will create a computed column for your table named `person`, which can be
 queried like this:
 
-```graphql{5}
+```graphql {5}
 {
   personById(id: …) {
     # nodeId, id, ...
@@ -61,7 +64,7 @@ queried like this:
 This example creates two computed columns, one returning a simple varchar and
 the other a connection. Note that `||` in PostgreSQL is string concatenation.
 
-```sql{14-17,20-27}
+```sql {14-17,20-27}
 create table my_schema.users (
   id serial not null primary key,
   first_name varchar not null,
@@ -94,8 +97,8 @@ $$ language sql stable;
 You can add parameters to your computed column field by declaring additional
 parameters in your PostgreSQL function:
 
-```sql{1,4}
--- Creates `User.greet(greeting: String!)` string field
+```sql {1,4}
+-- Creates `User.greet(greeting: String)` string field
 create function my_schema.users_greet(
   u my_schema.users,  --- required table type parameter, unexposed
   greeting text       --- additional parameter, will be exposed
@@ -106,7 +109,7 @@ $$ language sql stable strict;
 
 which can be queried like:
 
-```graphql{5}
+```graphql {3}
 {
   userById(id: …) {
     greet(greeting: "Greetings and salutations")

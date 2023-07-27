@@ -284,7 +284,7 @@ CREATE FUNCTION my_function(a int, b int) RETURNS SETOF person AS $$ … $$ LANG
 This function would be recognised as a [custom query](./custom-queries/), and
 could be queried like this:
 
-```graphql{2}
+```graphql {2}
 {
   myFunction(a: 1, b: 2, first: 2) {
     pageInfo {

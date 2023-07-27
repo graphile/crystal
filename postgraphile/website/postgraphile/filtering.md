@@ -4,24 +4,19 @@ path: /postgraphile/filtering/
 title: Filtering
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 Out of the box, PostGraphile supports rudimentary filtering on
 [connections](./connections/) using a `condition` argument. This allows you to
-filter for specific values (e.g. `username: "Alice"` or `category: ARTICLE`).
+filter using equality with specific values (e.g. `username: "Alice"` or
+`category: ARTICLE`).
 
 [See an example using the `connection` argument.](./examples/#Collections__Relation_condition)
 
-It's important when implementing filters to keep performance in mind, so
-PostGraphile gives you the ability to omit certain fields from the list of
-filters using the `@omit filter` [smart comment](./smart-comments/). You may
-also use the `--no-ignore-indexes` option to try and automatically omit fields
-that don't appear to be indexed.
+It's important when implementing filters to keep performance in mind. By
+default (unless you're using the V4 preset), PostGraphile will not allow you to
+filter by a column that isn't indexed. To force a column to appear in the
+filtering options you can applying the `@behavior filterBy` [smart
+tag](./smart-tags/) to the relevant column, or you can use `@behavior -filterBy`
+to force it remove it.
 
 ### Advanced filtering
 
@@ -30,8 +25,10 @@ adding fields using [custom queries](./custom-queries/),
 [computed columns](./computed-columns/) or by using
 [makeExtendSchemaPlugin](./make-extend-schema-plugin/).
 
-You can also augment PostGraphile's existing connections using custom
-[Graphile Engine plugins](./extending-raw/), such as the following:
+To add a condition to an existing condition another option is the
+[`makeAddPgTableConditionPlugin`](./make-add-pg-table-condition-plugin). You
+can also augment PostGraphile's existing connections using custom [Graphile
+Engine plugins](./extending-raw/), such as the following:
 
 #### Filter Plugin
 
@@ -55,16 +52,7 @@ of functions. If you need advanced filtering in your GraphQL API (and you can
 use something like
 [persisted queries](./production/#simple-query-whitelist-persisted-queries) to
 prevent malicious parties issuing complex requests) then I recommend you check
-it out!
-
-Be aware that the connection-filter plugin has no live-query specific handling.
-This means while [live queries](./live-queries/) will work, the filters are not
-taken into account when checking if the query result changed. This means that
-you may get a subscription update every time something in the collection
-changes, even if the result with the applied filter is still the same.
-
-With the included `condition` filters live queries work as expected until you
-start using `makeAddPgConditionPlugin` to add your own conditions.
+it out! (But do keep the caveats above in mind.)
 
 #### Other plugins
 

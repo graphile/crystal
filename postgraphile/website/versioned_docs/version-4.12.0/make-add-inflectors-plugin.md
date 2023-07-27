@@ -73,7 +73,7 @@ module.exports = makeAddInflectorsPlugin((inflectors) => {
 If you want `*Patch` types to instead be called `*ChangeSet` you could make a
 plugin such as this one:
 
-```js{6-8}
+```js {6-8}
 // MyInflectionPlugin.js
 const { makeAddInflectorsPlugin } = require("graphile-utils");
 
@@ -86,7 +86,7 @@ module.exports = makeAddInflectorsPlugin(
   /* Passing true here allows the plugin to overwrite
    * existing inflectors.
    */
-  true
+  true,
 );
 
 // Load this plugin with `postgraphile --append-plugins /path/to/MyInflectionPlugin.js`

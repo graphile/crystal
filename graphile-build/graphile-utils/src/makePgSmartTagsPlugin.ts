@@ -257,11 +257,13 @@ export function makePgSmartTagsPlugin(
     PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
   >,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
+  details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   const id = ++counter;
   return {
-    name: `PgSmartTagsPlugin_${id}`,
-    version: "0.0.0",
+    name: details?.name ?? `PgSmartTagsPlugin_${id}`,
+    description: details?.description,
+    version: details?.version ?? "0.0.0",
     before: ["smart-tags"],
 
     gather: gatherConfig<any, State, Cache>({
@@ -540,6 +542,7 @@ export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
 export function makeJSONPgSmartTagsPlugin(
   jsonOrThunk: ThunkOrDirect<PromiseOrDirect<JSONPgSmartTags | null>>,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
+  details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   // Get rules from JSON
 
@@ -562,16 +565,21 @@ export function makeJSONPgSmartTagsPlugin(
         }
       : null;
 
-  return makePgSmartTagsPlugin(async () => {
-    const json = await (typeof jsonOrThunk === "function"
-      ? jsonOrThunk()
-      : jsonOrThunk);
-    return pgSmartTagRulesFromJSON(json);
-  }, subscribeToUpdatesCallback);
+  return makePgSmartTagsPlugin(
+    async () => {
+      const json = await (typeof jsonOrThunk === "function"
+        ? jsonOrThunk()
+        : jsonOrThunk);
+      return pgSmartTagRulesFromJSON(json);
+    },
+    subscribeToUpdatesCallback,
+    details,
+  );
 }
 
 export const makePgSmartTagsFromFilePlugin = (
   tagsFile = process.cwd() + "/postgraphile.tags.json5",
+  name?: string,
 ): GraphileConfig.Plugin => {
   /*
    * We're wrapping the `smartTagsPlugin` defined below with a plugin wrapper
@@ -618,9 +626,16 @@ export const makePgSmartTagsFromFilePlugin = (
         watchFile(tagsFile, { interval: 507 }, tagsListener);
       }
     },
+    {
+      name,
+      description: `Loads smart tags from '${tagsFile}' if it exists`,
+    },
   );
 
   return plugin;
 };
 
-export const TagsFilePlugin = makePgSmartTagsFromFilePlugin();
+export const TagsFilePlugin = makePgSmartTagsFromFilePlugin(
+  undefined,
+  "TagsFilePlugin",
+);

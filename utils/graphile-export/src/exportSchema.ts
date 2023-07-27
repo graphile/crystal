@@ -1034,6 +1034,11 @@ function _convertToAST(
             ),
           ],
         );
+      } else if (propertyPairs.length === 0) {
+        return t.callExpression(
+          t.memberExpression(t.identifier("Object"), t.identifier("create")),
+          [t.nullLiteral()],
+        );
       } else {
         const obj = t.objectExpression(
           propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
@@ -1169,15 +1174,16 @@ function extensions(
 export function objectNullPrototype(
   properties: t.ObjectProperty[],
 ): t.Expression {
+  const objectCreateNull = t.callExpression(
+    t.memberExpression(t.identifier("Object"), t.identifier("create")),
+    [t.nullLiteral()],
+  );
+  if (properties.length === 0) {
+    return objectCreateNull;
+  }
   return t.callExpression(
     t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-    [
-      t.callExpression(
-        t.memberExpression(t.identifier("Object"), t.identifier("create")),
-        [t.nullLiteral()],
-      ),
-      t.objectExpression(properties),
-    ],
+    [objectCreateNull, t.objectExpression(properties)],
   );
 }
 

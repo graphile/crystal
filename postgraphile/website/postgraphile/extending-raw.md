@@ -132,7 +132,7 @@ that PostGraphile works (where the root Query field resolvers are the only ones
 who perform SQL queries) this is generally most useful at the top level.
 
 In PostGraphile version 4.1 and above, you can
-[use `makeWrapResolversPlugin`](./make-wrap-resolvers-plugin/) to easily wrap a
+[use `makeWrapPlansPlugin`](./make-wrap-plans-plugin/) to easily wrap a
 resolver:
 
 ```js

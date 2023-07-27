@@ -196,6 +196,7 @@ const preset: GraphileConfig.Preset = {
     context: {
       mol: 42,
     },
+    explain: true,
   },
   pgServices: [
     makePgService({

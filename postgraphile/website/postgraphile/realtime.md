@@ -4,27 +4,24 @@ path: /postgraphile/realtime/
 title: PostGraphile Realtime
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 Every application is different, and no more so than when it comes to their
 realtime requirements. Some applications are read-heavy, others write-heavy, and
 others are collaborative and need to put in effort to avoid conflicts between
 multiple people editing the same things at the same time (e.g. Google Docs).
 
 PostGraphile focusses on customisability and extensibility; rather than giving a
-one-size-fits-all solution, we provide the baseline subscriptions and live
-queries functionality in core, and the rest is achieved by adding and combining
+one-size-fits-all solution, we provide the baseline subscription
+functionality in core, and the rest is achieved by adding and combining
 plugins - the official ones, ones made by the community, or ones you've
 developed in-house. This enables you to use whatever technology best suits your
 requirements to provide the realtime features to PostGraphile.
 
+<!--
+
 First, though, there are two main types of real-time provided by PostGraphile —
 "subscriptions" (which are event based) and "live queries" (which are reactive).
+
+-->
 
 ### Subscriptions
 
@@ -50,13 +47,15 @@ when the message is edited, or if the author changes their avatar.
 Subscriptions are part of the latest GraphQL specification, and are well
 supported by many clients.
 
-When to use subscriptions:
+Use subscriptions when:
 
-- When you know exactly what events will trigger an update
-- When you care about an event (e.g. "broadcast") rather than a change in state
-- When performance and scalability is a strong concern
+- You need to update your UI based on events happening in the system
+- You know which events should trigger an update
+- Performance and scalability is important to you
 
 [Find out more about subscriptions in PostGraphile](./subscriptions/).
+
+<!--
 
 ### Live queries [EXPERIMENTAL]
 
@@ -99,3 +98,5 @@ When to use live queries:
 - When you want to fawn over the power of GraphQL 🤤
 
 [Find out more about live queries in PostGraphile](./live-queries/).
+
+-->

@@ -195,13 +195,13 @@ functionality is well suited to being performed in Node.js (e.g. by making a
 REST call to a foreign exchange service over the internet) but might be a
 struggle from with PostgreSQL.
 
-```js{2,4,6-25,30}
+```js {2,4,6-25,30}
 const { postgraphile } = require("postgraphile");
 const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
 const express = require("express");
 const { convertUsdToAud } = require("ficticious-npm-library");
 
-const MyForeignExchangePlugin = makeExtendSchemaPlugin(build => {
+const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
   return {
     typeDefs: gql`
       extend type Product {
@@ -210,7 +210,7 @@ const MyForeignExchangePlugin = makeExtendSchemaPlugin(build => {
     `,
     resolvers: {
       Product: {
-        priceInAuCents: async product => {
+        priceInAuCents: async (product) => {
           // Note that the columns are converted to fields, so the case changes
           // from `price_in_us_cents` to `priceInUsCents`
           const { priceInUsCents } = product;
@@ -226,7 +226,7 @@ app.use(
   postgraphile(process.env.DATABASE_URL, ["app_public"], {
     graphiql: true,
     appendPlugins: [MyForeignExchangePlugin],
-  })
+  }),
 );
 app.listen(3030);
 ```
@@ -440,8 +440,8 @@ app.listen(3030);
 For example, you might want to add a custom `registerUser` mutation which
 inserts the new user into the database and also sends them an email:
 
-```js{17,23-91}
-const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin(build => {
+```js {17,23-91}
+const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
   const { pgSql: sql } = build;
   return {
     typeDefs: gql`
@@ -475,7 +475,7 @@ const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin(build => {
                 name, email, bio
               ) VALUES ($1, $2, $3)
               RETURNING *`,
-              [args.input.name, args.input.email, args.input.bio]
+              [args.input.name, args.input.email, args.input.bio],
             );
 
             // Now we fetch the result that the GraphQL
@@ -484,16 +484,15 @@ const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin(build => {
             // should always use
             // `resolveInfo.graphile.selectGraphQLResultFromTable` if you return database
             // data from your custom field.
-            const [
-              row,
-            ] = await resolveInfo.graphile.selectGraphQLResultFromTable(
-              sql.fragment`app_public.users`,
-              (tableAlias, queryBuilder) => {
-                queryBuilder.where(
-                  sql.fragment`${tableAlias}.id = ${sql.value(user.id)}`
-                );
-              }
-            );
+            const [row] =
+              await resolveInfo.graphile.selectGraphQLResultFromTable(
+                sql.fragment`app_public.users`,
+                (tableAlias, queryBuilder) => {
+                  queryBuilder.where(
+                    sql.fragment`${tableAlias}.id = ${sql.value(user.id)}`,
+                  );
+                },
+              );
 
             // Finally we send the email. If this
             // fails then we'll catch the error
@@ -503,7 +502,7 @@ const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin(build => {
             await mockSendEmail(
               args.input.email,
               "Welcome to my site",
-              `You're user ${user.id} - thanks for being awesome`
+              `You're user ${user.id} - thanks for being awesome`,
             );
 
             // If the return type is a database record type, like User, then
