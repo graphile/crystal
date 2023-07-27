@@ -5,45 +5,76 @@ import styles from "./styles.module.css";
 
 const FeatureList = [
   {
-    title: "Automated",
-    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
+    title: "Graphile Config",
+    imgsrc: "/img/config.png",
+    link: "/graphile-config/",
     description: (
       <>
-        Don&apos;t repeat yourself, have Graphile Build do the repetative tasks
-        for you.
+        Provides a standard plugin interface and helpers which can be used
+        across the entire Graphile suite
       </>
     ),
   },
   {
-    title: "Extensible",
-    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
+    title: "Graphile Export",
+    imgsrc: "/img/export.png",
+    link: "/graphile-export/",
     description: (
       <>
-        Extend your schemas to do whatever you need with many different
-        extension hooks.
+        Export a GraphQL Schema (or other code) as executable JavaScript code!
       </>
     ),
   },
   {
-    title: "Hone your API",
-    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
+    title: "tamedevil",
+    imgsrc: "/img/tamedevil.png",
+    link: "/tamedevil/",
+    description: <>Eval is evil, this module helps tame it!</>,
+  },
+  {
+    title: "pg-sql2",
+    imgsrc: "/img/pgsql2.png",
+    link: "/pg-sql2/",
     description: (
       <>
-        Graphile Build is not rigid, it&apos;s plugin based system allows you to
-        override every facet of the generated API.
+        Create highly dynamic SQL in a powerful and flexible manner without
+        opening yourself to SQL injection attacks.
+      </>
+    ),
+  },
+  {
+    title: "pg-introspection",
+    imgsrc: "/img/introspection.png",
+    link: "/pg-introspection/",
+    description: (
+      <>
+        A strongly typed PostgresSQL introspection library for PostgresSQL built
+        automatically from the PostgresSQL documentation.
+      </>
+    ),
+  },
+  {
+    title: "Sponsor Graphile",
+    imgsrc: "/img/sponsor.png",
+    link: "https://graphile.org/sponsor",
+    description: (
+      <>
+        Like our work? Depend on our software? We have sponsorship slots open
+        for both individuals and companies!
       </>
     ),
   },
 ];
 
-function Feature({ Svg, title, description }) {
+function Feature({ title, description, imgsrc, link }) {
   return (
     <div className={clsx("col col--4")}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <a href={link}>
+          <img className={styles.featureSvg} src={imgsrc} alt={title}></img>
+        </a>
       </div>
       <div className="text--center padding-horiz--md">
-        <h3>{title}</h3>
         <p>{description}</p>
       </div>
     </div>
