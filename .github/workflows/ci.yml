@@ -52,6 +52,8 @@ jobs:
           cat .github/workflows/ci/docker-entrypoint-initdb.d/030-setup.sh | docker exec -i postgres bash
           docker restart postgres
 
+      - run: yarn --immutable
+
       - name: "Wait for postgres"
         run: node .github/wait-for-postgres.js
 
@@ -64,7 +66,6 @@ jobs:
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }}
-      - run: yarn --immutable
 
       - name: "Build Code"
         run: yarn prepack:all
