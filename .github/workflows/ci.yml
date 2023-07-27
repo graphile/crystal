@@ -52,13 +52,16 @@ jobs:
           cat .github/workflows/ci/docker-entrypoint-initdb.d/030-setup.sh | docker exec -i postgres bash
           docker restart postgres
 
-      - run: yarn --immutable
 
+      - name: "Docker logs postgres"
+        run: docker logs "${{ job.services.postgres.id }}"
+
+      - name: "Postgres config"
+        run: echo "cat /var/lib/postgresql/data/postgresql.conf" | docker exec -i postgres bash
+
+      - run: yarn --immutable
       - name: "Wait for postgres"
         run: node .github/wait-for-postgres.js
-
-      - name: "Docker logs"
-        run: docker logs "${{ job.services.postgres.id }}"
 
       - name: Install pg_dump
         run: |
