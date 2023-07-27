@@ -80,6 +80,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "The exact time of day, does not include the date. May or may not have a timezone offset.",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("Time"),
               ),
             "graphile-build-pg built-in (Time)",
           );
@@ -96,6 +98,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A string representing a series of binary bits",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("BitString"),
               ),
             "graphile-build-pg built-in (BitString)",
           );
@@ -110,6 +114,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "An IPv4 or IPv6 host address, and optionally its subnet.",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("InternetAddress"),
               ),
             "graphile-build-pg built-in (InternetAddress)",
           );
@@ -124,6 +130,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for a function name",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegProc"),
               ),
             "graphile-build-pg built-in (RegProc)",
           );
@@ -138,6 +146,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for a function with argument types",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegProcedure"),
               ),
             "graphile-build-pg built-in (RegProcedure)",
           );
@@ -152,6 +162,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for an operator",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegOper"),
               ),
             "graphile-build-pg built-in (RegOper)",
           );
@@ -166,6 +178,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for an operator with argument types",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegOperator"),
               ),
             "graphile-build-pg built-in (RegOperator)",
           );
@@ -180,6 +194,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for a relation name",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegClass"),
               ),
             "graphile-build-pg built-in (RegClass)",
           );
@@ -194,6 +210,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for a data type name",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegType"),
               ),
             "graphile-build-pg built-in (RegType)",
           );
@@ -208,6 +226,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for a role name",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegRole"),
               ),
             "graphile-build-pg built-in (RegRole)",
           );
@@ -222,6 +242,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for a namespace name",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegNamespace"),
               ),
             "graphile-build-pg built-in (RegNamespace)",
           );
@@ -236,6 +258,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for a text search configuration",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegConfig"),
               ),
             "graphile-build-pg built-in (RegConfig)",
           );
@@ -250,6 +274,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "A builtin object identifier type for a text search dictionary",
                   "type",
                 ),
+                undefined,
+                inflection.builtin("RegDictionary"),
               ),
             "graphile-build-pg built-in (RegDictionary)",
           );
@@ -317,6 +343,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                     "An IPv4 or IPv6 CIDR address.",
                     "type",
                   ),
+                  undefined,
+                  inflection.builtin("CidrAddress"),
                 ),
               "graphile-build-pg built-in (CidrAddress)",
             );
@@ -328,6 +356,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
               () =>
                 stringTypeSpec(
                   build.wrapDescription("A 6-byte MAC address.", "type"),
+                  undefined,
+                  inflection.builtin("MacAddress"),
                 ),
               "graphile-build-pg built-in (MacAddress)",
             );
@@ -339,6 +369,8 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
               () =>
                 stringTypeSpec(
                   build.wrapDescription("An 8-byte MAC address.", "type"),
+                  undefined,
+                  inflection.builtin("MacAddress8"),
                 ),
               "graphile-build-pg built-in (MacAddress8)",
             );

@@ -46,6 +46,8 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 "A signed eight-byte integer. The upper big integer values are greater than the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers.",
                 "type",
               ),
+              undefined,
+              inflection.builtin("BigInt"),
             ),
           "graphile-build built-in (BigInt type)",
         );
@@ -64,6 +66,8 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 "A floating point number that requires more precision than IEEE 754 binary 64",
                 "type",
               ),
+              undefined,
+              inflection.builtin("BigFloat"),
             ),
           "graphile-build built-in (BigFloat type)",
         );
@@ -82,6 +86,8 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 "A point in time as described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead to unexpected results.",
                 "type",
               ),
+              undefined,
+              inflection.builtin("Datetime"),
             ),
           "graphile-build built-in (Datetime type)",
         );
@@ -100,6 +106,8 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 "A calendar date in YYYY-MM-DD format.",
                 "type",
               ),
+              undefined,
+              inflection.builtin("Date"),
             ),
           "graphile-build built-in (Datetype)",
         );
@@ -133,6 +141,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                 },
                 [GraphQLError],
               ),
+              inflection.builtin("UUID"),
             ),
           "graphile-build built-in (UUID type)",
         );
@@ -240,7 +249,11 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           inflection.builtin("XML"),
           {},
           () =>
-            stringTypeSpec(build.wrapDescription("An XML document", "type")),
+            stringTypeSpec(
+              build.wrapDescription("An XML document", "type"),
+              undefined,
+              inflection.builtin("XML"),
+            ),
           "graphile-build built-in (XML type)",
         );
         build.registerCursorConnection?.({
