@@ -2,7 +2,8 @@ const pg = require("pg");
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const pool = new pg.Pool({
-  connectionString: `postgres://localhost:5432/template1`,
+  connectionString:
+    process.env.TEST_DATABASE_URL ?? `postgres://localhost:5432/template1`,
 });
 pool.on("error", () => {});
 pool.on("connect", (client) => {
