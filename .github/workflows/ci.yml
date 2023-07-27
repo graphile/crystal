@@ -50,7 +50,7 @@ jobs:
           cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -i postgres bash
           cat .github/workflows/ci/docker-entrypoint-initdb.d/020-wal2json.sh | docker exec -i postgres bash
           cat .github/workflows/ci/docker-entrypoint-initdb.d/030-setup.sh | docker exec -i postgres bash
-          docker restart postgres
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/999-reload-config.sh | docker exec -i postgres bash
       - name: Install pg_dump
         run: |
           sudo bash -c "echo deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main >> /etc/apt/sources.list.d/pgdg.list"

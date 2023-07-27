@@ -14,7 +14,8 @@ async function main() {
   for (let n = 1; n < 30; n++) {
     try {
       const client = await pool.connect();
-      const result = await client.query("select 1");
+      await client.query("select 1");
+      console.log("Connection successful");
       client.release();
       break;
     } catch (e) {
@@ -24,7 +25,6 @@ async function main() {
       await sleep(delay);
     }
   }
-  console.log("Connection successful");
   pool.end();
 }
 
