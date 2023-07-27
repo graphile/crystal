@@ -4,13 +4,6 @@ path: /postgraphile/postgresql-schema-design/
 title: PostgreSQL Schema Design
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 The Postgres database is rich with features well beyond that of any other
 database. However, most developers do not know the extent to which they can
 leverage the features in Postgres to completely express their application
@@ -770,12 +763,34 @@ to grant access to the `forum_example_anonymous` role to the
 `forum_example_postgraphile` role. Now, the `forum_example_postgraphile` role
 can control and become the `forum_example_anonymous` role. If we did not use
 that grant, we could not change into the `forum_example_anonymous` role in
-PostGraphile. Now we will start our server like so:
+PostGraphile.
+
+To use this role, we could put the following into our config file:
+
+```ts title="graphile.config.mjs"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+export default {
+  extends: [PostGraphileAmberPreset],
+  grafast: {
+    context(requestContext, args) {
+      return {
+        // highlight-start
+        pgSettings: {
+          role: "forum_example_anonymous",
+        },
+        // highlight-end
+      };
+    },
+  },
+};
+```
+
+We can still start our server as before:
 
 ```bash
 postgraphile \
-  --connection postgres://forum_example_postgraphile:xyz@localhost/mydb \
-  --default-role forum_example_anonymous
+  --connection postgres://forum_example_postgraphile:xyz@localhost/mydb
 ```
 
 There is one more role we want to create. When a user logs in we don’t want them
@@ -829,7 +844,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoxLCJiIjoyLCJjIjozfQ.hxhGCCCmGV9nT1sl
 
 This allows PostGraphile to securely make claims about who a user is. Attackers
 would not be able to fake a claim unless they had access to the private ‘secret’
-you define when you start PostGraphile with the `--jwt-secret` option.
+you define via `preset.schema.pgJwtSecret` in your configuration.
 
 When PostGraphile gets a JWT from an HTTP request’s `Authorization` header, like
 so:
@@ -861,8 +876,8 @@ PostGraphile will also set the Postgres role of the local transaction. So say
 you had a `role` of `forum_example_person`. PostGraphile would run:
 
 ```sql
-set local role to 'forum_example_person'
-set local jwt.claims.role to 'forum_example_person'
+set local role to 'forum_example_person';
+set local jwt.claims.role to 'forum_example_person';
 ```
 
 Now, the user would have the permissions of the `forum_example_person` role as
@@ -886,10 +901,11 @@ PostGraphile create a JWT? Stay tuned.
 
 #### Logging In
 
-You can pass an option to PostGraphile, called
-`--jwt-token-identifier <identifier>` in the CLI, which takes a composite type
-identifier. PostGraphile will turn this type into a JWT wherever you see it in
-the GraphQL output. So let’s define the type we will use for our JWTs:
+You can specify `preset.gather.pgJwtType` in your configuration which is a
+tuple containing the schema name and type name of a composite type in your
+database. When PostGraphile would expose this type, instead of doing so as an
+object it does so as a JWT scalar. So let’s define the type we will use for our
+JWTs:
 
 ```sql
 create type forum_example.jwt_token as (
@@ -906,11 +922,42 @@ a composite type. The definition for a composite type looks very much like the
 definition of a table type, except a composite type cannot store rows. i.e. you
 can’t `INSERT`, `SELECT`, `UPDATE`, or `DELETE` from a composite type. While you
 can’t store rows in a composite type, PostGraphile can turn a composite type
-into a JWT. Now that we’ve defined this type we will want to start PostGraphile
-with the `--jwt-token-identifier` flag:
+into a JWT. Now that we’ve defined this type we will want to specify it in our
+preset, along with enabling basic JWT functionality:
 
-```bash
-postgraphile --jwt-token-identifier forum_example.jwt_token
+```ts title="graphile.config.mjs"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+// highlight-next-line
+import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
+
+export default {
+  extends: [
+    PostGraphileAmberPreset,
+    // highlight-next-line
+    PgLazyJWTPreset,
+  ],
+  gather: {
+    // highlight-next-line
+    pgJwtType: ["forum_example", "jwt_token"],
+  },
+  schema: {
+    // highlight-next-line
+    pgJwtSecret: "keyboard_kitten", // REPLACE THIS!
+  },
+  grafast: {
+    context(requestContext, args) {
+      return {
+        pgSettings: {
+          role: "forum_example_anonymous",
+          // highlight-start
+          // JWT may override the role:
+          ...args.contextValue?.pgSettings,
+          // highlight-end
+        },
+      };
+    },
+  },
+};
 ```
 
 Next we need to create the function which will actually return the token:
@@ -1186,16 +1233,39 @@ That’s it! We have successfully created a Postgres schema embedded with our
 business logic. When we use this schema with PostGraphile we will get a well
 designed GraphQL API that we can use in our frontend application.
 
-The final argument list for starting our PostGraphile server using the CLI would
-be as follows:
+The final configuration for our PostGraphile server would be as follows:
+
+```ts title="graphile.config.mjs"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
+
+export default {
+  extends: [PostGraphileAmberPreset, PgLazyJWTPreset],
+  gather: {
+    pgJwtType: ["forum_example", "jwt_token"],
+  },
+  schema: {
+    pgJwtSecret: "keyboard_kitten", // REPLACE THIS!
+  },
+  grafast: {
+    context(requestContext, args) {
+      return {
+        pgSettings: {
+          role: "forum_example_anonymous",
+          // JWT may override the role:
+          ...args.contextValue?.pgSettings,
+        },
+      };
+    },
+  },
+};
+```
+
+And you'd run PostGraphile as:
 
 ```bash
 postgraphile \
-  --connection postgres://forum_example_postgraphile:xyz@localhost \
-  --schema forum_example \
-  --default-role forum_example_anonymous \
-  --jwt-secret keyboard_kitten \
-  --jwt-token-identifier forum_example.jwt_token
+  --connection postgres://forum_example_postgraphile:xyz@localhost
 ```
 
 ---
