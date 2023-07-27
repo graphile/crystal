@@ -10,6 +10,7 @@ USE_PGXS=1
 export PGUSER=postgres
 export PGPASSWORD=postgres
 createuser --superuser root
+createdb root -O root
 
 apt-get update
 apt-get install -f -y --no-install-recommends \
