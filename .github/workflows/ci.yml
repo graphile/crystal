@@ -62,6 +62,9 @@ jobs:
       - name: "Build Code"
         run: yarn prepack:all
 
+      - name: "Wait for postgres"
+        run: node .github/wait-for-postgres.js
+
       - name: "Test Project"
         run: yarn run pretest && yarn test --ci && yarn run posttest
 
