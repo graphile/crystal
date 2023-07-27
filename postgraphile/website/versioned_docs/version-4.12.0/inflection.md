@@ -43,7 +43,7 @@ module.exports = makeAddInflectorsPlugin(
       return this.upperCamelCase(`${typeName}-change-set`);
     },
   },
-  true
+  true,
 );
 ```
 

@@ -193,7 +193,7 @@ Then a test file might look like:
 import { becomeUser, createUsers, withRootDb } from "../test_helpers";
 
 test("can delete self", () =>
-  withRootDb(async pgClient => {
+  withRootDb(async (pgClient) => {
     const [user] = await createUsers(pgClient, 1);
 
     await becomeUser(pgClient, user);
@@ -201,7 +201,7 @@ test("can delete self", () =>
       rows: [deletedUser],
     } = await pgClient.query(
       "delete from app_public.users where id = $1 returning *",
-      [user.id]
+      [user.id],
     );
     expect(deletedUser).toBeTruthy();
   }));
@@ -243,8 +243,8 @@ app.use(
   postgraphile(
     process.env.DATABASE_URL || "postgres:///",
     ["app_public"],
-    postgraphileOptions()
-  )
+    postgraphileOptions(),
+  ),
 );
 
 app.listen(process.env.PORT || 3000);
@@ -533,15 +533,14 @@ test("GraphQL query nodeId", async () => {
       // If you need to, you can query the DB within the context of this
       // function - e.g. to check that your mutation made the changes you'd
       // expect.
-      const {
-        rows,
-      } = await pgClient.query(`SELECT * FROM app_public.users WHERE id = $1`, [
-        17,
-      ]);
+      const { rows } = await pgClient.query(
+        `SELECT * FROM app_public.users WHERE id = $1`,
+        [17],
+      );
       if (rows.length !== 1) {
         throw new Error("User not found!");
       }
-    }
+    },
   );
 });
 ```

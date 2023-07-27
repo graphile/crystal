@@ -142,7 +142,7 @@ app.use("/graphql", checkJwt);
 
 app.use(
   postgraphile(process.env.DATABASE_URL, process.env.DB_SCHEMA, {
-    pgSettings: req => {
+    pgSettings: (req) => {
       const settings = {};
       if (req.user) {
         settings["user.permissions"] = req.user.scopes;
@@ -150,7 +150,7 @@ app.use(
       return settings;
     },
     // any other PostGraphile options go here
-  })
+  }),
 );
 ```
 

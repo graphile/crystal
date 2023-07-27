@@ -86,7 +86,7 @@ module.exports = makeAddInflectorsPlugin(
   /* Passing true here allows the plugin to overwrite
    * existing inflectors.
    */
-  true
+  true,
 );
 
 // Load this plugin with `postgraphile --append-plugins /path/to/MyInflectionPlugin.js`

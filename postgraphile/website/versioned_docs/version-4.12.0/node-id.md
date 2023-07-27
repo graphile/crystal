@@ -16,7 +16,7 @@ import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 
 const cache = new InMemoryCache({
-  dataIdFromObject: object => object.nodeId || null,
+  dataIdFromObject: (object) => object.nodeId || null,
 });
 
 export const client = new ApolloClient({
