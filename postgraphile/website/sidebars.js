@@ -122,7 +122,6 @@ const sidebars = {
         "make-add-pg-table-condition-plugin",
         "make-add-pg-table-order-by-plugin",
         "make-pg-smart-tags-plugin",
-        "make-plugin-by-combining-plugins",
         "extending-raw",
         "plugin-gallery",
         "community-plugins",
