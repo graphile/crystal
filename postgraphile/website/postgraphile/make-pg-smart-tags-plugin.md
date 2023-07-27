@@ -1,20 +1,32 @@
 ---
 layout: page
 path: /postgraphile/make-pg-smart-tags-plugin/
-title: makePgSmartTagsPlugin (graphile-utils v4.5.0+)
+title: makePgSmartTagsPlugin
 ---
-
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
 
 Smart Tags enable you to customize how (or if) your PostgreSQL resources are
 represented in your PostGraphile GraphQL schema. Before reading this page, you
 should familiarize yourself with [Smart Tags](./smart-tags/) so that you know
 when and why you would use them.
+
+## Recommended: TagsFilePlugin
+
+We recommend the [postgraphile.tags.json5 file](./smart-tags-file/) to most
+users; you can enable it by adding the `TagsFilePlugin` to your preset:
+
+```js title="graphile.config.mjs"
+import { TagsFilePlugin } from "postgraphile/utils";
+
+export default {
+  // ...
+  plugins: [TagsFilePlugin],
+};
+```
+
+The below plugin generators can be helpful if you have more advanced needs than
+can be served by this plugin.
+
+## Smart tags plugin generators
 
 `makePgSmartTagsPlugin` and `makeJSONPgSmartTagsPlugin` are plugin generators
 that allows you to easily apply smart tags to various PostgreSQL entities.
@@ -27,54 +39,56 @@ that allows you to easily apply smart tags to various PostgreSQL entities.
 - `makePgSmartTagsPlugin` is the lowest level plugin, it allows you to apply
   smart tags to PostgreSQL entities that match your specified rules.
 
-We recommend the [postgraphile.tags.json5 file](./smart-tags-file/) to most
-users; but the below plugin generators can be helpful if you have more advanced
-needs.
-
-### makePgSmartTagsFromFilePlugin
-
-Unlike most other plugin generators, this plugin comes from
-`postgraphile/plugins`. The reason it's not in `graphile-utils` is because it
-needs to access the file-system.
-
-```ts
-const { makePgSmartTagsFromFilePlugin } = require("postgraphile/plugins");
-```
+## makePgSmartTagsFromFilePlugin
 
 Usage example:
 
 ```ts
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+// highlight-next-line
+import { makePgSmartTagsFromFilePlugin } from "postgraphile/utils";
+
+// highlight-start
 const SmartTagsPlugin = makePgSmartTagsFromFilePlugin(
   // JSON and JSONC are also JSON5 compatible, so you can use these extensions if you prefer:
   "/path/to/my/tags.file.json5",
 );
+// highlight-end
 
-// ...
-
-app.use(
-  postgraphile(process.env.DATABASE_URL, "app_public", {
-    //...
-    appendPlugins: [SmartTagsPlugin],
-  }),
-);
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset],
+  plugins: [
+    // highlight-next-line
+    SmartTagsPlugin,
+  ],
+};
 ```
 
-This plugin powers the automatic
-[postgraphile.tags.json5 file](./smart-tags-file/) support in PostGraphile CLI,
-and can be used as above for library users. You can even use it multiple times
-to merge smart tags from multiple files should you wish.
+This plugin powers the [postgraphile.tags.json5 file](./smart-tags-file/)
+enabled by `TagsFilePlugin`. You can use it multiple times to merge smart tags
+from multiple files should you wish.
 
-### makeJSONPgSmartTagsPlugin
+## makeJSONPgSmartTagsPlugin
+
+This plugin generator takes a `JSONPgSmartTags` object, and adds the relevant
+tags to the relevant entities referenced. It is what powers
+`makePgSmartTagsFromFilePlugin` above, but you can also use it in your own
+PostGraphile schema plugins.
+
+### Importing
 
 ```ts
-const { makeJSONPgSmartTagsPlugin } = require("graphile-utils");
+import { makeJSONPgSmartTagsPlugin } from "postgraphile/utils";
 ```
+
+### Signature
 
 ```ts
 function makeJSONPgSmartTagsPlugin(
-  json: JSONPgSmartTags | null,
+  jsonOrThunk: ThunkOrDirect<PromiseOrDirect<JSONPgSmartTags | null>>,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
-): Plugin;
+  details?: { name?: string; description?: string; version?: string },
+): GraphileConfig.Plugin;
 
 type JSONPgSmartTags = {
   version: 1;
@@ -105,10 +119,7 @@ type SubscribeToJSONPgSmartTagsUpdatesCallback = (
 ) => void | Promise<void>;
 ```
 
-This plugin generator takes a `JSONPgSmartTags` object, and adds the relevant
-tags to the relevant entities referenced. It is what powers
-makePgSmartTagsFromFilePlugin above, but you can also use it in your own
-PostGraphile schema plugins.
+### Example
 
 An example of an empty `JSONPgSmartTags` object would be:
 
@@ -126,6 +137,8 @@ An example of an empty `JSONPgSmartTags` object would be:
 
 A more in-depth example of this configuration file, with comments, is available
 in [the postgraphile.tags.json5 file documentation](./smart-tags-file/).
+
+### Details
 
 Within the config object, we can add entries for each supported "kind" of
 PostgreSQL entity. The supported entities include:
@@ -194,36 +207,50 @@ you.
 - `constraint` - for constraints
 
 To have this plugin work in watch mode, a `subscribeToJSONUpdatesCallback`
-method can be passed as a second argument. If/when Graphile Engine enters watch
-mode (e.g. via `postgraphile --watch`), this callback will be called, and it
-will be passed a callback function that in turn must be called when a change
-takes place. When watch mode is exited, the function will be called again
-without a callback, and whatever was in place for watching must be released. An
-example implementation of this can be found in `makePgSmartTagsFromFilePlugin`
-in PostGraphile itself, which monitors a JSON5 file for changes and triggers the
-schema to refresh when this file changes. See:
-https://github.com/graphile/postgraphile/blob/9de271ecdddcd13fd42f8eac6777f0057ee8f7e7/src/plugins.ts#L23-L47
+method can be passed as a second argument. If/when Graphile Build enters watch
+mode, this callback will be called, and it will be passed a callback function
+that in turn must be called when a change takes place. When watch mode is
+exited, the function will be called again without a callback, and whatever was
+in place for watching must be released. An example implementation of this can
+be found in `makePgSmartTagsFromFilePlugin`, which monitors a JSON5 file for
+changes and triggers the schema to refresh when this file changes.
 
-### makePgSmartTagsPlugin
+## makePgSmartTagsPlugin
+
+This is a more versatile, but higher effort plugin generator that powers
+`makeJSONPgSmartTagsPlugin`. Rather than passing a configuration object, a list
+of rules (or a single rule) is passed.
+
+### Importing
 
 ```ts
-const { makePgSmartTagsPlugin } = require("graphile-utils");
+import { makePgSmartTagsPlugin } from "postgraphile/utils";
 ```
+
+### Signature
 
 ```ts
 function makePgSmartTagsPlugin(
-  ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
+  initialRules: ThunkOrDirect<
+    PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
+  >,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
-): Plugin;
+  details?: { name?: string; description?: string; version?: string },
+): GraphileConfig.Plugin;
 
-interface PgSmartTagRule<T extends PgEntity = PgEntity> {
-  kind: PgEntityKind;
-  match: string | PgSmartTagFilterFunction<T>;
+interface PgSmartTagRule<
+  TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
+> {
+  serviceName?: string;
+  kind: TKind;
+  match: string | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
   tags?: PgSmartTagTags;
   description?: string;
 }
 
-type PgSmartTagFilterFunction<T> = (input: T, build: Build) => boolean;
+type PgSmartTagFilterFunction<TEntity extends PgEntity> = (
+  input: TEntity,
+) => boolean;
 
 type UpdatePgSmartTagRulesCallback = (
   ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
@@ -231,23 +258,19 @@ type UpdatePgSmartTagRulesCallback = (
 
 type SubscribeToPgSmartTagUpdatesCallback = (
   cb: UpdatePgSmartTagRulesCallback | null,
-) => void | Promise<void>;
+) => PromiseOrDirect<void>;
 ```
 
-This is a more versatile, but higher effort plugin generator that powers
-`makeJSONPgSmartTagsPlugin`. Rather than passing a configuration object, a list
-of rules (or a single rule) is passed.
+### Details
 
 Rules must specify a `kind` (`class`, `attribute`, `constraint` or `procedure`)
 and a `match` which could be the identifier (following the same rules as for
 `makeJSONPgSmartTagsPlugin`) or a matcher function. The matcher function makes
 this plugin generator incredibly powerful, for example it could be used to apply
 tags to all PostgreSQL entities that match a particular criteria that does not
-need to relate to the entity's name. The matcher function is passed the Graphile
-Engine representation of the entity type (see
-[PgIntrospectionPlugin](https://github.com/graphile/graphile-engine/blob/49c99ced8a186a42d4f3f20c66cd3761f61cd4c3/packages/graphile-build-pg/src/plugins/PgIntrospectionPlugin.d.ts#L22-L145)
-for these definitions) and the `Build` object, and must return a boolean to say
-whether this entity should be matched or not.
+need to relate to the entity's name. The matcher function is passed
+a `pg-introspection` entity, and must return a boolean to say whether this
+entity should be matched or not.
 
 Like with `makeJSONPgSmartTagsPlugin`, the rule may also optionally supply the
 `tags` Smart Tags object to be merged, and a `description` to overwrite the
@@ -256,10 +279,3 @@ previous description.
 The plugin also supports a `subscribeToUpdatesCallback` to enable watch mode,
 which works in the same way as `subscribeToJSONUpdatesCallback` from
 `makeJSONPgSmartTagsPlugin`.
-
-### Source code
-
-Please refer to
-https://github.com/graphile/graphile-engine/blob/master/packages/graphile-utils/src/makePgSmartTagsPlugin.ts,
-https://github.com/graphile/postgraphile/blob/9de271ecdddcd13fd42f8eac6777f0057ee8f7e7/src/plugins.ts#L23-L47
-and https://github.com/graphile/graphile-engine/pull/541
