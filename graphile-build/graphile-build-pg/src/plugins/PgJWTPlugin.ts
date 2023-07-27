@@ -2,6 +2,7 @@ import "graphile-config";
 
 import type { PgCodec, PgSelectSingleStep } from "@dataplan/pg";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
+import type { Secret, SignOptions } from "jsonwebtoken";
 import { sign as signJwt } from "jsonwebtoken";
 
 import { version } from "../version.js";
@@ -9,9 +10,8 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface SchemaOptions {
-      // TYPES: Replace these `any`s
-      pgJwtSecret?: any;
-      pgJwtSignOptions?: any;
+      pgJwtSecret?: Secret;
+      pgJwtSignOptions?: SignOptions;
     }
 
     interface GatherOptions {
@@ -85,7 +85,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
           build.behavior.pgCodecMatches(codec, "jwt"),
         );
 
-        if (!jwtCodec) {
+        if (!jwtCodec || !pgJwtSecret) {
           return _;
         }
         if (!jwtCodec.attributes) {
