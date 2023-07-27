@@ -12,6 +12,7 @@ import { StreamDeferPlugin } from "postgraphile/graphile-build";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { PgRelayPreset } from "postgraphile/presets/relay";
 import { makeV4Preset } from "postgraphile/presets/v4";
+import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
 
 import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
 import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";
@@ -170,6 +171,7 @@ const preset: GraphileConfig.Preset = {
     PgManyToManyPreset,
     PostGraphileConnectionFilterPreset,
     PgRelayPreset,
+    PgLazyJWTPreset,
   ],
   ruru: {
     htmlParts: {
@@ -177,12 +179,15 @@ const preset: GraphileConfig.Preset = {
     },
   },
   inflection: {},
-  gather: {},
+  gather: {
+    pgJwtType: ["b", "jwt_token"],
+  },
   schema: {
     retryOnInitFail: true,
     exportSchemaSDLPath: `${__dirname}/latestSchema.graphql`,
     exportSchemaIntrospectionResultPath: `${__dirname}/latestSchema.json`,
     sortExport: true,
+    pgJwtSecret: "FROGS",
   },
   grafserv: {
     port: 5678,

@@ -30,6 +30,11 @@
       "node": "./dist/presets/relay.js",
       "default": "./dist/presets/relay.js"
     },
+    "./presets/lazy-jwt": {
+      "types": "./dist/presets/lazy-jwt.d.ts",
+      "node": "./dist/presets/lazy-jwt.js",
+      "default": "./dist/presets/lazy-jwt.js"
+    },
     "./adaptors/pg": {
       "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
       "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
