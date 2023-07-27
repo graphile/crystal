@@ -21,6 +21,7 @@ apt-get install -f -y --no-install-recommends \
         postgresql-server-dev-$PG_MAJOR
 add-apt-repository "deb http://ftp.debian.org/debian testing main contrib"
 apt-get update
+localedef -i en_US -f UTF-8 en_US.UTF-8
 rm -rf /var/lib/apt/lists/*
 
 cd /
