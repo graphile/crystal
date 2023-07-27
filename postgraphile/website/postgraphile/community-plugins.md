@@ -93,5 +93,7 @@ Examples of using these plugins:
 
 These extensions extend PostGraphile in different ways:
 
+- [@grafserv/persisted](https://github.com/benjie/postgraphile-private/blob/planning/grafast/grafserv-persisted) -
+  adds support for persisted operations to Grafserv (and thus PostGraphile)
 - [hapi-postgraphile](https://github.com/mshick/hapi-postgraphile) - add
   PostGraphile to your HAPI application :question:_(Not yet ported to V5)_
