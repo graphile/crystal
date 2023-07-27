@@ -198,8 +198,14 @@ const preset: GraphileConfig.Preset = {
     allowUnpersistedOperation: true,
   },
   grafast: {
-    context: {
-      mol: 42,
+    context(requestContext, args) {
+      return {
+        pgSettings: {
+          role: "postgres",
+          ...args.contextValue?.pgSettings,
+        },
+        mol: 42,
+      };
     },
     explain: true,
   },
