@@ -65,6 +65,9 @@ jobs:
       - name: "Wait for postgres"
         run: node .github/wait-for-postgres.js
 
+      - name: "Docker logs"
+        run: docker logs "${{ job.services.postgres.id }}"
+
       - name: "Test Project"
         run: yarn run pretest && yarn test --ci && yarn run posttest
 
