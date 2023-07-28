@@ -84,7 +84,7 @@ export async function makeSharedPresetAndClient(pool: Pool) {
       },
     ],
     gather: {
-      // pgJwtType: ["public", "jwt_token"],
+      // pgJwtTypes: "jwt_token",
     },
     schema: {
       // pgJwtSecret: "secret",

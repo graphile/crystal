@@ -239,7 +239,7 @@ export const makeV4Preset = (
       pgStrictFunctions,
       ...(options.jwtPgTypeIdentifier
         ? {
-            pgJwtType: parseDatabaseIdentifier(options.jwtPgTypeIdentifier, 2),
+            pgJwtTypes: [options.jwtPgTypeIdentifier],
           }
         : null),
     },

@@ -901,11 +901,10 @@ PostGraphile create a JWT? Stay tuned.
 
 #### Logging In
 
-You can specify `preset.gather.pgJwtType` in your configuration which is a
-tuple containing the schema name and type name of a composite type in your
-database. When PostGraphile would expose this type, instead of doing so as an
-object it does so as a JWT scalar. So let’s define the type we will use for our
-JWTs:
+You can specify `preset.gather.pgJwtTypes` in your configuration which is the
+names (schema name and type name) of composite types in your database. When
+PostGraphile would expose these types, instead of doing so as an object it does
+so as a JWT scalar. So let’s define the type we will use for our JWTs:
 
 ```sql
 create type forum_example.jwt_token as (
@@ -938,7 +937,7 @@ export default {
   ],
   gather: {
     // highlight-next-line
-    pgJwtType: ["forum_example", "jwt_token"],
+    pgJwtTypes: "forum_example.jwt_token",
   },
   schema: {
     // highlight-next-line
@@ -1242,7 +1241,7 @@ import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
 export default {
   extends: [PostGraphileAmberPreset, PgLazyJWTPreset],
   gather: {
-    pgJwtType: ["forum_example", "jwt_token"],
+    pgJwtTypes: "forum_example.jwt_token",
   },
   schema: {
     pgJwtSecret: "keyboard_kitten", // REPLACE THIS!

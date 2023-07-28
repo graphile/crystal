@@ -453,9 +453,10 @@ _(TypeScript type: `GraphileBuild.GatherOptions`)_
 
 - `pgStrictFunctions: boolean` - if true, we'll treat all PostgreSQL function
   arguments that don't have defaults as being required (non-nullable)
-- `pgJwtType: [string, string]` - the schema name and type name for the type in
-  the database to convert into a JWT (equivalent to giving this type the
-  behavior `"-table +jwt"`)
+- `pgJwtTypes: string | string[]` - an array of (or comma separated list of)
+  the names (including schemas) for the types in the database to convert into a
+  JWT (equivalent to giving these type the behavior `"-table +jwt"`); example:
+  `pgJwtTypes: "app_public.jwt_token"`
 - `installWatchFixtures: boolean` - if not false and schema is in watch mode
   then we will attempt to install the "event triggers" into the database so that
   PostGraphile can be notified when your database changes

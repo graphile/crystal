@@ -6,6 +6,7 @@ import type { Secret, SignOptions } from "jsonwebtoken";
 import { sign as signJwt } from "jsonwebtoken";
 
 import { version } from "../version.js";
+import { parseDatabaseIdentifier, parseDatabaseIdentifiers } from "../utils.js";
 
 declare global {
   namespace GraphileBuild {
@@ -15,15 +16,21 @@ declare global {
     }
 
     interface GatherOptions {
+      /** @deprecated use pgJwtTypes instead */
+      pgJwtType?: string | [string, string];
       /**
-       * If you would like PostGraphile to automatically recognize a PostgreSQL
-       * type as a JWT, you should pass a tuple of the
-       * `["<schema name>", "<type name>"]` so we can recognize it. This is
-       * case sensitive.
+       * If you would like PostGraphile to automatically recognize certain
+       * PostgreSQL types as a JWT, you should pass a list of their identifiers
+       * here:
+       * `pgJwtTypes: ['my_schema.my_jwt_type', 'my_schema."myOtherJwtType"']`
+       *
+       * Parsing is similar to PostgreSQL's parsing, so identifiers are
+       * lower-cased unless they are escaped via double quotes.
+       *
+       * You can alternatively supply a comma-separated list if you prefer:
+       * `pgJwtTypes: 'my_schema.my_jwt_type,my_schema."myOtherJwtType"'`
        */
-      pgJwtType?: [string, string];
-      // TODO: we may want multiple of these! e.g.
-      // pgJwtType?: [string, string] | Array<[string, string]>;
+      pgJwtTypes?: string | string[];
     }
 
     interface ScopeScalar {
@@ -42,6 +49,31 @@ declare global {
 }
 
 const EMPTY_OBJECT = Object.freeze({});
+
+function getPgJwtTypeDigests(
+  options: GraphileBuild.GatherOptions,
+): Array<[string, string]> {
+  const digests: Array<[string, string]> = [];
+
+  if (Array.isArray(options.pgJwtType)) {
+    digests.push(options.pgJwtType);
+  } else if (typeof options.pgJwtType === "string") {
+    const tuples = parseDatabaseIdentifiers(options.pgJwtType, 2, "public");
+    digests.push(...tuples);
+  }
+  if (typeof options.pgJwtTypes === "string") {
+    const tuples = parseDatabaseIdentifiers(options.pgJwtTypes, 2, "public");
+    digests.push(...tuples);
+  }
+  if (Array.isArray(options.pgJwtTypes)) {
+    const tuples = options.pgJwtTypes.map((type) =>
+      parseDatabaseIdentifier(type, 2, "public"),
+    );
+    digests.push(...tuples);
+  }
+
+  return digests;
+}
 
 export const PgJWTPlugin: GraphileConfig.Plugin = {
   name: "PgJWTPlugin",
@@ -62,9 +94,12 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
     helpers: {},
     hooks: {
       pgCodecs_PgCodec(info, { pgCodec, pgType }) {
+        const pgJwtTypeDigests = getPgJwtTypeDigests(info.options);
         if (
-          info.options.pgJwtType?.[1] === pgType.typname &&
-          info.options.pgJwtType?.[0] === pgType.getNamespace()!.nspname
+          pgJwtTypeDigests.some(
+            ([nsp, typ]) =>
+              typ === pgType.typname && nsp === pgType.getNamespace()!.nspname,
+          )
         ) {
           // It's a JWT type!
           pgCodec.extensions ||= Object.create(null);
