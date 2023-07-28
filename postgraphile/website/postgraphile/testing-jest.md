@@ -4,6 +4,11 @@ path: /postgraphile/testing-jest/
 title: Testing with Jest
 ---
 
+Graphile Starter has been ported to V5, so we recommend digging into the
+testing there.
+
+---
+
 :::caution
 
 This documentation is copied from Version 4 and has not been updated to Version
