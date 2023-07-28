@@ -4,19 +4,12 @@ path: /postgraphile/production/
 title: Production Considerations
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 When it comes time to deploy your PostGraphile application to production,
 there's a few things you'll want to think about including topics such as
 logging, security and stability. This article outlines some of the issues you
 might face, and how to solve them.
 
-### Database Access Considerations
+## Database Access Considerations
 
 PostGraphile is just a node app / middleware, so you can deploy it to any number
 of places: Heroku, Now.sh, a VM, a container such as Docker, or of course onto
@@ -45,17 +38,30 @@ Heroku have some instructions on making RDS available for use under Heroku which
 should also work for Now.sh or any other service:
 https://devcenter.heroku.com/articles/amazon-rds
 
-It is recommended that you use the `--no-ignore-rbac` (or `ignoreRBAC: false` in
-the library). It inspects the RBAC (GRANT / REVOKE) privileges in the database
-and reflects these in your GraphQL schema. As is GraphQL best practices, this
-still only results in one GraphQL schema (not one per user), so it takes the
-user account you connect to PostgreSQL with (from your connection string) and
-walks all the roles that this user can become within the database, and uses the
-union of all these permissions. Using this flag is recommended, as it results in
-a much leaner schema that doesn't contain functionality that you can't actually
-use.
+By default `PgRBACPlugin` is enabled which inspects the RBAC (GRANT / REVOKE)
+privileges in the database and reflects these in your GraphQL schema. As is
+GraphQL best practices, this still only results in one GraphQL schema (not one
+per user), so it takes the user account you connect to PostgreSQL with (from
+your connection string) and walks all the roles that this user can become
+within the database, and uses the union of all these permissions. Using this
+plugin is recommended, as it results in a much leaner schema that doesn't
+contain functionality that you can't actually use. You can, however, disable it
+via `disablePlugins: ['PgRBACPlugin']`.
 
-### Common Middleware Considerations
+## Database Latency
+
+PostGraphile needs to issue queries to your database. For a transaction this
+might be multiple statements (`begin`, `set local ...`, `select ...`, `commit`)
+and each of these requires a roundtrip to the database. Thus the latency
+between your database and your PostGraphile server can easily be multiplied.
+If your database is in London but your PostGraphile server is in Tokyo then the
+~300ms roundtrip time times 4 is a base latency that users will see of 1.2
+seconds, no matter how fast your queries actually are.
+
+Run PostGraphile in the same city as your database, preferably in the same data
+centre.
+
+## Common Middleware Considerations
 
 In a production app, you typically want to add a few common enhancements, e.g.
 
@@ -72,23 +78,10 @@ requirements. This is why we recommend
 [using PostGraphile as a library](./usage-library/) for production usage.
 
 Picking the Express (or similar) middlewares that work for you is beyond the
-scope of this article; below is an example of where to place these middlewares.
+scope of this article; but you should ensure that they're installed before you
+add your PostGraphile server to the middleware stack.
 
-```js
-const express = require("express");
-const { postgraphile } = require("postgraphile");
-
-const app = express();
-
-/* Example middleware you might want to put in front of PostGraphile */
-// app.use(require('morgan')(...));
-// app.use(require('compression')({...}));
-// app.use(require('helmet')({...}));
-
-app.use(postgraphile(process.env.DATABASE_URL || "postgres:///"));
-
-app.listen(process.env.PORT || 3000);
-```
+<!-- TODO
 
 Should you want to use something like PostGraphile's built in logging, but send
 it to your own logging provider, you can compose a PostGraphile server plugin to
@@ -96,7 +89,9 @@ do so. Here's an example plugin that uses Nuxt's consola library for logging,
 you could use it as a base for your own plugin:
 https://github.com/graphile/postgraphile-log-consola
 
-### Denial of Service Considerations
+-->
+
+## Denial of Service Considerations
 
 When you run PostGraphile in production you'll want to ensure that people cannot
 easily trigger denial of service (DOS) attacks against you. Due to the nature of
@@ -146,7 +141,7 @@ separate layer; for example you could use
 [Cloudflare rate limiting](https://www.cloudflare.com/rate-limiting/) for this,
 or an Express.js middleware.
 
-#### Statement Timeout
+### Statement Timeout
 
 One simple solution to this issue is to place a timeout on the database
 operations via the
@@ -163,41 +158,62 @@ before a query is ever sent to the database using one or more of the techniques
 detailed below.
 
 Currently you can set this on a per-transaction basis using the
-[`pgSettings` functionality](./usage-library/#pgsettings-function) in
+[`pgSettings` functionality](./config#exposing-http-request-data-to-postgresql) in
 PostGraphile library mode, e.g.:
 
-```js
-app.use(
-  postgraphile(process.env.DATABASE_URL, "public", {
-    // ...
-    pgSettings: {
-      statement_timeout: "3000",
+```ts title="graphile.config.mjs"
+export default {
+  // ...
+  grafast: {
+    context(requestContext, args) {
+      return {
+        // highlight-next-line
+        statement_timeout: "3000",
+        // ...
+      };
     },
-  }),
-);
+  },
+};
 ```
 
-You can also set this up on a per connection basis if you pass a correctly
-configured `pg.Pool` instance to PostGraphile directly, e.g.:
+To be more efficient (only setting this once per database connection rather
+than once per GraphQL request) you can also set this up on a per connection
+basis if you pass a correctly configured `pg.Pool` instance to PostGraphile
+directly, e.g.:
 
-```js
-const { Pool } = require('pg');
+```ts title="graphile.config.mjs"
+import { Pool } from "pg";
+import { makePgService } from "postgraphile/adaptors/pg";
 
-const pool = new Pool();
-pool.on('connect', (client) => {
-  client.query('SET statement_timeout TO 3000')
+/** does nothing */
+function noop() {}
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+pool.on("error", noop);
+pool.on("connect", (client) => {
+  client.on("error", noop);
+  // highlight-next-line
+  client.query("SET statement_timeout TO 3000");
 });
 
-// ...
-app.use(postgraphile(pool, "public", { ... }));
-// ...
+export default {
+  // ...
+  pgServices: [
+    makePgService({
+      pool,
+      schemas: ["app_public"],
+    }),
+  ],
+};
 ```
 
-#### Simple: Query Allowlist ("persisted queries" / "persisted operations")
+### Simple: Query Allowlist ("persisted queries" / "persisted operations")
 
 If you do not intend to allow third parties to run arbitrary operations against
 your API then using
-[persisted operations](https://github.com/graphile/persisted-operations) as a
+[persisted operations](https://npmjs.com/package/@grafserv/persisted) as a
 query allowlist is a highly recommended solution to protect your GraphQL
 endpoint. This technique ensures that only the operations you use in your own
 applications can be executed on the server, preventing malicious (or merely
@@ -222,16 +238,17 @@ GraphQL clients, but it does have a few caveats:
   process as much data as possible. Use fixed limits, conditions and orders
   where possible, even if it means having additional static operations.
 - It does not protect you from writing expensive queries yourself; it may be
-  wise to combine this technique with a cost estimation technique such as that
-  provided by the [Graphile Pro plugin](/pricing/) to help guide your developers
+  wise to combine this technique with a cost estimation technique <!-- TODO: such as that
+  provided by the [Graphile Pro plugin](/pricing/) --> to help guide your developers
   and avoid accidentally writing expensive queries.
 
 PostGraphile has first-party support for persisted operations via the open
-source
-[@graphile/persisted-operations](https://github.com/graphile/persisted-operations)
+source [@grafserv/persisted](https://npmjs.com/package/@grafserv/persisted)
 plugin; we recommend its use to the vast majority of our users.
 
-#### Advanced
+<!-- TODO!
+
+### Advanced
 
 Using a query allowlist puts the decision in the hands of your engineers whether
 a particular query should be accepted or not. Sometimes this isn't enough - it
@@ -252,7 +269,7 @@ on how you might go about solving the issues for yourself. Many of these
 techniques can be implemented outside of PostGraphile, for example in an express
 middleware or a nginx reverse proxy between PostGraphile and the client.
 
-#### Sending queries to read replicas
+### Sending queries to read replicas
 
 Probably the most important thing regarding scalability is making sure that your
 master database doesn't bow under the pressure of all the clients talking to it.
@@ -276,7 +293,7 @@ instead.)
 > string, but you can use a PostgreSQL proxy such a PgPool or PgBouncer between
 > PostGraphile and your database to enable connecting to multiple read replicas.
 
-#### Pagination caps
+### Pagination caps
 
 It's unlikely that you want users to request `allUsers` and receive back
 literally all of the users in the database. More likely you want users to use
@@ -294,7 +311,7 @@ comment on table users is
   E'@paginationCap 20\nSomeone who can log in.';
 ```
 
-#### Limiting GraphQL query depth
+### Limiting GraphQL query depth
 
 Most GraphQL queries tend to be only a few levels deep, queries like the deep
 one at the top of this article are generally not required. You may use
@@ -302,7 +319,7 @@ one at the top of this article are generally not required. You may use
 that hit PostGraphile - any deeper than this will be discarded during query
 validation.
 
-#### [EXPERIMENTAL] GraphQL cost limit
+### [EXPERIMENTAL] GraphQL cost limit
 
 The most powerful way of preventing DOS is to limit the cost of GraphQL queries
 that may be executed against your GraphQL server. The Pro Plugin contains a
@@ -339,3 +356,5 @@ based on what your database has been dealing with recently, what indexes are
 available, and many more factors. Our cost estimation is based on analysis of a
 large test suite, but feel free to reach out with any bad costs/queries so we
 can improve this feature.
+
+-->
