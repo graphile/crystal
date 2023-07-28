@@ -180,7 +180,7 @@ const preset: GraphileConfig.Preset = {
   },
   inflection: {},
   gather: {
-    pgJwtType: ["b", "jwt_token"],
+    pgJwtTypes: "b.jwt_token",
   },
   schema: {
     retryOnInitFail: true,

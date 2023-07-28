@@ -79,7 +79,7 @@ pool.on("error", (e) => {
         },
       ],
       gather: {
-        pgJwtType: ["b", "jwt_token"],
+        pgJwtTypes: "b.jwt_token",
       },
       schema: {
         pgJwtSecret: "secret",

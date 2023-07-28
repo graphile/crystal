@@ -53,12 +53,12 @@ claims on the database transaction.
 PostGraphile also has support for generating JWTs easily from inside your
 PostgreSQL schema.
 
-To do so we will take a composite type that you specify via `preset.gather.pgJwtType`:
+To do so we will take a composite type that you specify via `preset.gather.pgJwtTypes`:
 
 ```js title="graphile.config.mjs"
 export default {
   gather: {
-    pgJwtType: ["public", "jwt_token"],
+    pgJwtTypes: "jwt_token",
   },
   //...
 };
@@ -90,7 +90,7 @@ export default {
   extends: [PostGraphileAmberPreset],
   gather: {
     // highlight-next-line
-    pgJwtType: ["my_public_schema", "jwt_token"],
+    pgJwtTypes: "my_public_schema.jwt_token",
   },
   schema: {
     // highlight-next-line
