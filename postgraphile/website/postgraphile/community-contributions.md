@@ -4,13 +4,6 @@ path: /postgraphile/community-contributions/
 title: Community contributions
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 The community contributes to PostGraphile development in many ways.
 
 One of the common ways of contributing is to write a plugin, see
@@ -26,4 +19,4 @@ code/projects/tutorials/blog posts. Here are links to some of these (use the
 
 And of course, we couldn't keep progressing this project like we do if it wasn't
 for the financial support of many
-[community members](https://github.com/graphile/postgraphile/blob/master/SPONSORS.md).
+[community members](https://graphile.org/sponsor).
