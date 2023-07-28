@@ -31,8 +31,8 @@ export default function Home() {
   // const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      title={`Graphile Build`}
-      description="Automate the repetative parts of building GraphQL APIs"
+      title={`Graphile*`}
+      description="the stars we forge to build our universe"
     >
       <HomepageHeader />
       <main>
