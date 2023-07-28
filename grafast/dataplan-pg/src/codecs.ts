@@ -532,12 +532,12 @@ export function listOfCodec<
   TInnerCodec extends PgCodec<string, any, any, any, undefined, any, any>,
 >(
   listedCodec: TInnerCodec,
-  config: {
+  config?: {
     description?: string;
     extensions?: Partial<PgCodecExtensions>;
     typeDelim?: string;
     identifier?: SQL;
-  } = {},
+  },
 ): PgCodec<
   `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
     ? UName
@@ -551,17 +551,18 @@ export function listOfCodec<
   undefined,
   undefined
 > {
+  const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
+
+  if (!config && innerCodec[$$listCodec]) {
+    return innerCodec[$$listCodec];
+  }
+
   const {
     description,
     extensions,
     identifier = sql`${listedCodec.sqlType}[]`,
     typeDelim = `,`,
-  } = config;
-  const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
-
-  if (innerCodec[$$listCodec]) {
-    return innerCodec[$$listCodec];
-  }
+  } = config ?? ({} as Record<string, never>);
 
   const listCodec: PgCodec<
     `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
@@ -641,8 +642,10 @@ export function listOfCodec<
     executor: innerCodec.executor,
   };
 
-  // Memoize such that every `listOfCodec(foo)` returns the same object.
-  Object.defineProperty(innerCodec, $$listCodec, { value: listCodec });
+  if (!config) {
+    // Memoize such that every `listOfCodec(foo)` returns the same object.
+    Object.defineProperty(innerCodec, $$listCodec, { value: listCodec });
+  }
 
   return listCodec;
 }
