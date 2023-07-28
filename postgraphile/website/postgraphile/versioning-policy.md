@@ -26,6 +26,16 @@ and require a major version update (e.g. 5.0.0 -> 6.0.0). To work around this,
 we will often add configuration options (or updated presets) to opt into new
 functionality before it is enabled by default.
 
+### Exception: naming clashes
+
+It's possible that when we add new functionality, the name of it will clash
+with something that you've added to your schema (since it shares the same
+namespace). If this happens, an error will be raised and you should address it
+by either disabling the new functionality (via `disablePlugins` or behaviors or
+similar) or by renaming one or both entities. This exception is required,
+otherwise we could never add another field to the GraphQL schema without a
+major version bump.
+
 ### Exception: schema ordering
 
 We do not see changes in the order of fields, types, enum values, directives,
