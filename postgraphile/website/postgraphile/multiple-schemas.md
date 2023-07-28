@@ -60,16 +60,11 @@ for (const [service, connectionString] of Object.entries(services)) {
   // Build a preset specifically for this service
   const preset = {
     extends: [userPreset],
+    pgServices: [makePgService({ connectionString })],
     grafserv: {
       graphqlPath: `/${service}/graphql`,
       graphiqlPath: `/${service}`,
     },
-    pgServices: [
-      makePgService({
-        connectionString,
-        schemas: ["public"],
-      }),
-    ],
   };
   // Build a PostGraphile instance for this service
   export const pgl = postgraphile(preset);
@@ -113,14 +108,15 @@ server.on("error", (e) => {
   console.error(e);
 });
 
+// A preset shared between our services which disables websockets and
+// subscriptions since they are not supported
 const commonPreset = {
   extends: [userPreset],
-
-  // This mode cannot use websockets
   grafserv: { websockets: false },
   disablePlugins: ["SubscriptionPlugin"],
 };
 
+// The services we wish to switch between
 const services = {
   admin: {
     handler: express(),
@@ -138,11 +134,13 @@ const services = {
   },
 };
 
+// Mount the PostGraphile instances into the handlers
 for (const { handler, pgl } of Object.values(services)) {
   const serv = pgl.createServ(grafserv);
   serv.addTo(handler);
 }
 
+// Add a custom middleware to switch between these handlers
 app.use((req, res, next) => {
   const isAdmin = req.user?.isAdmin;
   if (isAdmin) {
