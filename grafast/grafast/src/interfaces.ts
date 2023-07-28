@@ -4,7 +4,7 @@ import type { PluginHook } from "graphile-config";
 import type {
   ASTNode,
   DocumentNode,
-  ExecutionArgs,
+  ExecutionArgs as GraphQLExecutionArgs,
   FragmentDefinitionNode,
   GraphQLArgs,
   GraphQLArgument,
@@ -80,7 +80,7 @@ export interface GrafastOptions {
     | Partial<Grafast.Context>
     | ((
         ctx: Partial<Grafast.RequestContext>,
-        args: ExecutionArgs,
+        args: Grafast.ExecutionArgs,
       ) => PromiseOrValue<Partial<Grafast.Context>>);
 
   /**
@@ -139,8 +139,15 @@ export interface LinkedList<T> {
   next: LinkedList<T> | null;
 }
 
+export const $$hooked = Symbol("hookArgsApplied");
+
 declare global {
   namespace Grafast {
+    type ExecutionArgs = Pick<
+      GraphQLExecutionArgs,
+      "schema" | "document" | "rootValue" | "variableValues" | "operationName"
+    > & { [$$hooked]?: boolean; contextValue: Grafast.Context };
+
     /**
      * Details about the incoming GraphQL request - e.g. if it was sent over an
      * HTTP request, the request itself so headers can be interrogated.
@@ -248,7 +255,7 @@ declare global {
     interface GrafastHooks {
       args: PluginHook<
         (event: {
-          args: ExecutionArgs;
+          args: Grafast.ExecutionArgs;
           ctx: Grafast.RequestContext;
           resolvedPreset: GraphileConfig.ResolvedPreset;
         }) => PromiseOrValue<void>

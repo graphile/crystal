@@ -4,13 +4,6 @@ path: /postgraphile/why-nullable/
 title: Why is it nullable?
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 It's common for people, particularly those using strongly typed GraphQL
 implementations such as ReasonML or TypeScript, to ask why certain elements in a
 PostGraphile schema are nullable. A lot of thought has gone into which parts
@@ -88,7 +81,7 @@ return a null that would cascade and cause the field itself to be null.
 In PostGraphile, two of our `Query` fields are not nullable because they adhere
 to this check:
 
-- `nodeId` returns a set value (the string 'query') so it can never error
+- `nodeId` returns a constant value (the string 'query') so it can never error
 - `query` returns the `Query` object again (it's a Relay 1 hack) and so it has
   all the same guarantees as the Query object
 
@@ -163,14 +156,19 @@ functions which return connections (that is
 well as table rows. In my opinion, doing so is a bad practice.
 
 If you can commit to never returning null rows in your `SETOF` functions, then
-you can use the "no SETOF functions contain nulls" flag to change this
+you can use the `preset.schema.pgForbidSetofFunctionsToReturnNull` setting to change this
 behaviour. I recommend this flag; but it's disabled by default to maximise
 compatibility (also going from nullable to non-nullable is fine, but going the
 other way is a breaking change).
 
-    -N, --no-setof-functions-contain-nulls
-    if none of your RETURNS SETOF compound_type functions mix NULLs with the results
-    then you may enable this to reduce the nullables in the GraphQL schema
+```ts title="graphile.config.mjs"
+export default {
+  // ...
+  schema: {
+    pgForbidSetofFunctionsToReturnNull: true,
+  },
+};
+```
 
 ### What about computed fields?
 
@@ -196,17 +194,24 @@ Here's a plugin which looks for all forward relation fields (like
 `personByAuthorId`) and changes their definition so that their type is the
 GraphQLNonNull-wrapped version of their original type:
 
-```js
-module.exports = function NonNullRelationsPlugin(builder) {
-  builder.hook("GraphQLObjectType:fields:field", (field, build, context) => {
-    if (!context.scope.isPgForwardRelationField) {
-      return field;
-    }
-    return {
-      ...field,
-      type: new build.graphql.GraphQLNonNull(field.type),
-    };
-  });
+```ts
+const NonNullRelationsPlugin: GraphileConfig.Plugin = {
+  name: "NonNullRelationsPlugin",
+  version: "0.0.0",
+
+  schema: {
+    hooks: {
+      GraphQLObjectType_fields_field(field, build, context) {
+        const {
+          graphql: { GraphQLNonNull, getNullableType },
+        } = build;
+        if (context.scope.isPgSingleRelationField) {
+          field.type = new GraphQLNonNull(getNullableType(field.type));
+        }
+        return field;
+      },
+    },
+  },
 };
 ```
 

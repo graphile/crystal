@@ -10,6 +10,7 @@ import type {} from "postgraphile/grafserv/node";
 import { defaultHTMLParts } from "postgraphile/grafserv/ruru/server";
 import { StreamDeferPlugin } from "postgraphile/graphile-build";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
 import { PgRelayPreset } from "postgraphile/presets/relay";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
@@ -170,6 +171,7 @@ const preset: GraphileConfig.Preset = {
     PgManyToManyPreset,
     PostGraphileConnectionFilterPreset,
     PgRelayPreset,
+    PgLazyJWTPreset,
   ],
   ruru: {
     htmlParts: {
@@ -177,12 +179,15 @@ const preset: GraphileConfig.Preset = {
     },
   },
   inflection: {},
-  gather: {},
+  gather: {
+    pgJwtType: ["b", "jwt_token"],
+  },
   schema: {
     retryOnInitFail: true,
     exportSchemaSDLPath: `${__dirname}/latestSchema.graphql`,
     exportSchemaIntrospectionResultPath: `${__dirname}/latestSchema.json`,
     sortExport: true,
+    pgJwtSecret: "FROGS",
   },
   grafserv: {
     port: 5678,
@@ -193,8 +198,14 @@ const preset: GraphileConfig.Preset = {
     allowUnpersistedOperation: true,
   },
   grafast: {
-    context: {
-      mol: 42,
+    context(requestContext, args) {
+      return {
+        pgSettings: {
+          role: "postgres",
+          ...args.contextValue?.pgSettings,
+        },
+        mol: 42,
+      };
     },
     explain: true,
   },

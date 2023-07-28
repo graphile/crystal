@@ -2,6 +2,7 @@
 layout: page
 path: /postgraphile/required-knowledge/
 title: Required Knowledge
+toc_max_heading_level: 4
 ---
 
 **WORK IN PROGRESS**: PR's welcome!
@@ -14,7 +15,7 @@ This page aims to outline some of the things you might want to do with
 PostGraphile and what knowledge you may need (and where to get it) to do those
 things well.
 
-### Database - basics
+## Database
 
 Below outlines some of the SQL syntax and features you will probably want to be
 familiar with to make the most of your PostGraphile usage. PostGraphile is
@@ -23,7 +24,7 @@ write this syntax depending on what technologies you use to manage your DB (for
 example, you might use a graphical tool), but if you can read it then it will
 help you to read the PostGraphile documentation.
 
-#### Case insensitive unless quoted
+### Case insensitive unless quoted
 
 SQL is case insensitive, both keywords and identifiers, so the following are all
 equivalent:
@@ -44,7 +45,7 @@ as "shouty".
 It's common to use snake_case as the naming convention in SQL because of this
 case-insensitivity, to save having to escape all the identifiers.
 
-#### The word `user` is reserved, among others
+### The word `user` is reserved, among others
 
 If you want to call your table `user` you need to escape it; e.g.
 
@@ -58,7 +59,7 @@ https://www.postgresql.org/docs/current/sql-keywords-appendix.html
 Most PostgreSQL keywords are singular, which is why Benjie prefers to use
 plurals when naming tables as it helps avoid potential keyword clashes.
 
-#### PostgreSQL doc versioning
+### PostgreSQL doc versioning
 
 PostgreSQL docs are found at `https://postgresql.org/docs/VERSION/...`. Often
 when you google you will be taken to out of date docs, like those for version
@@ -70,7 +71,7 @@ In our documentation, we always try and link to `/docs/current/...` which is a
 special URL that always shows the latest stable version of PostgreSQL. If you
 are using an older version you should make sure to switch to the older docs.
 
-#### Defining tables
+### Defining tables
 
 ```sql
 create table users (
@@ -115,7 +116,7 @@ and faster to type.
 
 :::
 
-#### Creating roles
+### Creating roles
 
 ```sql
 create role my_superuser with login password 'password here' superuser;
@@ -135,7 +136,7 @@ grant app_visitor to app_authenticator;
   actually take any actions without first switching into another role (e.g.
   `app_visitor` or `app_admin`).
 
-#### Granting permissions
+### Granting permissions
 
 ```sql
 grant
@@ -157,7 +158,7 @@ on my_table to app_visitor;
   honed GraphQL schema.
 - `delete`: column-level grants don't make sense on delete.
 
-#### Creating security policies
+### Creating security policies
 
 Check out our Row-Level security infosheet here:
 https://learn.graphile.org/docs/PostgreSQL_Row_Level_Security_Infosheet.pdf
@@ -188,7 +189,62 @@ create policy friend_insert on my_other_table for insert with check ( are_friend
 - NOTE: if `with check` is not specified then the `using` clause will also be
   used for `with check` automatically.
 
-#### Recommended path
+#### Writing performant RLS policies
+
+One of the common mistakes that we see people make when taking their
+application programming experience and applying it to the database is thinking
+of functions as zero-cost. RLS policies are used to filter the rows that a user
+can see, and they run before some of the filters that you apply (for security
+reasons), so if your RLS policy passes row data to a function then that
+function might need to be called for every row in your table. This can be
+_incredibly_ expensive, but is generally easy to solve by shifting your
+perspective.
+
+For good performance in the database you want to ensure that the indexes/etc
+can be used, so you need to write your query in a way that can be easily
+optimized. Rather than asking "is the user a member of this organization" for
+each row, you can ask to "only include rows from the set of organizations the
+user is a member of". This sounds like the same question, but in database
+optimization terms it's a big shift.
+
+Here's an example of what not to do:
+
+```sql title="BAD! DO NOT USE!"
+-- Inefficient function, do not use!
+create function current_user_is_member_of_organization(org_id int)
+returns bool as $$
+  select exists(
+    select 1
+    from organization_members om
+    where om.organization_id = current_user_is_member_of_organization.org_id
+    and om.user_id = current_user_id()
+  );
+$$ language sql stable;
+
+-- Poorly performing RLS policy that passes row data to a function, do not use!
+create policy select_my_organizations
+  for select on posts
+  using (current_user_is_member_of_organization(organization_id));
+```
+
+And here's the question rephrased in such a way that the database only needs to
+call a function once _in total_ rather than once _per row_, and can then use
+indexes to filter the records:
+
+```sql title="Much better"
+create function current_user_organization_ids()
+returns setof int as $$
+  select organization_id
+  from organization_members om
+  where om.user_id = current_user_id()
+$$ language sql stable;
+
+create policy select_my_organizations
+  for select on posts
+  using (organization_id IN (select current_user_organization_ids()));
+```
+
+## Recommended path
 
 A good way to tackle and make sense of PostGraphile is to go through these
 steps:

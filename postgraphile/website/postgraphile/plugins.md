@@ -4,23 +4,87 @@ path: /postgraphile/plugins/
 title: Server Plugins
 ---
 
-:::caution
+_NOTE: This page relates to changing how the PostGraphile HTTP server
+(Grafserv) and other non-schema concerns work. If you're instead looking to
+change the generated GraphQL schema (e.g. to add fields or types), see [Schema
+Plugins](./extending/)._
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+In addition to the [Graphile Build plugin system](./extending/) which builds
+the GraphQL schema in PostGraphile, PostGraphile also has a plugin system for
+the CLI and web layer. Thanks to `graphile-config`, this now uses the same
+plugin system, just different scopes.
+
+Currently these scopes are undocumented, so here's some examples
+
+## Customizing Ruru's title:
+
+```ts
+function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
+  return {
+    name: "RuruTitlePlugin",
+    version: "0.0.0",
+
+    grafserv: {
+      hooks: {
+        ruruHTMLParts(_info, parts, extra) {
+          parts.titleTag = `<title>${escapeHTML(
+            title + " | " + extra.request.getHeader("host"),
+          )}</title>`;
+        },
+      },
+    },
+  };
+}
+```
+
+## Manipulating the request body
+
+For example you might want to implement a plugin where you pass only the
+operation name (not the full document) and have the server populate the
+document by looking up the operation name.
+
+:::tip
+
+This is purely for demonstration of the plugin API, you should not use this
+plugin! Instead, consider the `@grafserv/persisted` module (which uses the same
+hook).
 
 :::
 
-Stability: experimental, may change in **semver minor** versions.
+```ts
+import { SafeError } from "grafast";
 
-_NOTE: This page relates to changing how the PostGraphile HTTP server and CLI
-work. If you're instead looking to change the generated GraphQL schema (e.g. to
-add fields or types), see [Schema Plugins](./extending/)._
+const documents = Object.assign(Object.create(null), {
+  QueryName: `query QueryName { __typename }`,
+  WhoAmI: `query WhoAmI { currentUser { name } }`,
+  CreatePost: `mutation CreatePost($input: CreatePostInput!) { createPost(input: $input) { post { id title } } }`,
+});
 
-In addition to the [Graphile Engine plugin system](./extending/) which builds
-the GraphQL schema in PostGraphile, PostGraphile also has a plugin system for
-the CLI and web layer. This plugin system is less mature, help documenting it is
-welcome!
+export const QueryByNamePlugin: GraphileConfig.Plugin = {
+  name: "QueryByNamePlugin",
+  description: "Only specify the query name and the query will be populated",
+  version,
+
+  grafserv: {
+    hooks: {
+      processGraphQLRequestBody(info, event) {
+        const { body } = event;
+        const document = documents[body.id];
+        if (!document) {
+          throw new SafeError(
+            `QueryByNamePlugin couldn't find query '${body.id}'`,
+            { statusCode: 400 },
+          );
+        } else {
+          body.query = document;
+        }
+      },
+    },
+  },
+};
+```
+
+<!-- TODO: port!
 
 ### First-party open-source plugins
 
@@ -215,7 +279,7 @@ your main server.js file:
 ```js
 /**
  * This plugin override changes the branding piece of graphiql.
- */
+ * /
 const graphiqlBrandingTweak = {
   ["postgraphile:graphiql:html"](html) {
     console.log("Applying GraphiQL Branding Tweak...");
@@ -249,7 +313,7 @@ is not an option, then you can make a server plugin such as this one:
 ```js
 /**
  * This server plugin injects CORS headers to allow requests only from a specific origin.
- */
+ * /
 
 function makeAllowedOriginTweak(origin) {
   return {
@@ -298,6 +362,9 @@ const postGraphileMiddleware = postgraphile(databaseUrl, "app_public", {
   // ...
 });
 ```
+
+
+-->
 
 If you need help writing your own PostGraphile server plugins,
 [ask in #help-and-support in our Discord chat](http://discord.gg/graphile).

@@ -591,13 +591,52 @@ each future situation.
 
 :::
 
-## Exposing HTTP request data to PostgreSQL
+## `pgSettings`
 
-Using the `pgSettings` functionality mentioned in the `pgServices` section above
-you can extend the data made available within PostgreSQL through
-`current_setting(...)`. To do so, include a `pgSettings` entry in the GraphQL
-context mentioned in the "Grafast options" section above, the value for which
-should be a POJO (plain old JavaScript object) with string keys and values.
+Connections from PostGraphile to the PostgreSQL database may need to carry with
+them custom settings to be set within the PostgreSQL transaction. These can be
+used to indicate simple PostgreSQL settings such as `statement_timeout=5000`,
+or can be used to indicate details of the currently active user (e.g.
+`jwt.claims.user_id = 42`).
+
+Every `pgService` can indicate its own `pgSettings` callback to dictate which
+settings that specific service should use with its associated database (see
+[`pgServices`](#pgservices) above), and these settings are added to the
+GraphQL context using the key set in that services' `pgSettingsKey`.
+
+Presets may also add values to `pgSettings`, for example
+`postgraphile/presets/lazy-jwt` parses the `Authorization` header and adds the
+claims from the JWT to `pgSettings`.
+
+For most PostGraphile users there's only one pgService, and the default
+`pgSettingsKey` is `"pgSettings"`, so rather than configuring pgSettings via
+the adaptor you might opt to configure it via including a `pgSettings` key in
+the object you return from the Grafast context callback mentioned in the
+"Grafast options" section above. The value for this key should be a POJO (plain
+old JavaScript object) with string keys and string values, and you should be
+careful to copy across settings from the pgService adaptor and any
+presets/plugins that may have added to it. For example:
+
+```ts title="graphile.config.mjs"
+export default {
+  // ...
+
+  grafast: {
+    context(requestContext, args) {
+      return {
+        // highlight-start
+        pgSettings: {
+          // If any pgSettings were already set, mix them in
+          ...args.contextValue?.pgSettings,
+          // Add our own settings
+          statement_timeout: "10000",
+        },
+        // highlight-end
+      };
+    },
+  },
+};
+```
 
 :::caution
 
@@ -614,42 +653,91 @@ such as `role`, and will be applied by Postgres.
 
 :::
 
-Remember: the `grafast.context` entry can be a callback (even an asynchronous
-callback if you need) which can extract details from the HTTP request. Here's
-an example that extracts the user's ID from a JWT and adds information from a
-specific HTTP header:
+### Exposing HTTP request data to PostgreSQL
+
+Using the `pgSettings` functionality mentioned above you can extend the data
+made available within PostgreSQL through `current_setting(...)`. Remember: the
+`grafast.context` entry can be a callback (even an asynchronous callback if you
+need) which can extract details from the HTTP request.
+
+When using PostGraphile in library mode, you will likely have a middleware that
+handles user authentication (whether this be via sessions, cookies, or JWTs).
+You can use the `requestContext` to extract details from the request that came
+through your Grafserv adaptor and then expose this data to PostgreSQL; for
+example in an express app you might do something like:
+
+```ts title="graphile.config.js"
+export default {
+  // ...
+
+  grafast: {
+    async context(requestContext, args) {
+      // Extract request details from the requestContext:
+      // highlight-next-line
+      const req = requestContext.expressv4?.req;
+
+      return {
+        pgSettings: {
+          ...args.contextValue?.pgSettings,
+          // Expose a specific header (if present) to PostgreSQL
+          // highlight-next-line
+          "myapp.headers.x_something": req?.getHeader("x-something"),
+          // Expose the user id from the request, if present
+          // highlight-next-line
+          "myapp.user_id": req?.user?.id,
+        },
+      };
+    },
+  },
+};
+```
+
+If you're using the PostGraphile CLI then you won't have middlewares to do the
+heavy lifting for you, but you can still process incoming request headers -
+this more complicated example extracts the user's ID from a JWT and sends that
+and the value of a specific HTTP header to PostgreSQL:
 
 ```ts title="graphile.config.js"
 import jwt from "jsonwebtoken";
 
-// TODO: test this actually works
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export default {
   // ...
 
   grafast: {
     async context(requestContext, args) {
-      // Extract details from the requestContext:
+      // Extract request details from the requestContext:
+      // highlight-next-line
       const req = requestContext.node?.req;
       // Or: const req = requestContext.expressv4?.req;
       // Or: const ctx = requestContext.koav2?.ctx;
+      // Or: const req = requestContext.fastifyv4?.request;
 
-      const auth = req?.getHeader("authorization");
+      const context = {
+        // Base settings for all requests:
+        pgSettings: {
+          ...args.contextValue?.pgSettings,
+          // Expose a specific header (if present) to PostgreSQL
+          // highlight-next-line
+          "myapp.headers.x_something": req?.getHeader("x-something"),
+        },
+      };
 
-      const context = {};
-
-      // Process the authorization header
-      if (typeof auth === "string") {
+      // Process the authorization header, if present
+      const auth = req?.headers["authorization"];
+      if (typeof auth === "string" && typeof JWT_SECRET === "string") {
         const parts = auth.split(" ");
         if (parts.length === 2 && parts[0].toLowerCase() === "bearer") {
           const token = parts[1];
-          const claims = jwt.verify(token, process.env.JWT_SECRET);
-          const userId = claims.uid;
-          context.pgSettings = {
-            ...args.contextValue?.pgSettings,
-            "myapp.user_id": userId,
-            "myapp.headers.x_something": req.getHeader("x-something"),
-          };
+          const claims = jwt.verify(token, JWT_SECRET, {
+            algorithms: ["HS256", "HS384"],
+            audience: "postgraphile",
+            complete: false,
+          });
+          // Expose the user id from the request, if present
+          // highlight-next-line
+          context.pgSettings["myapp.user_id"] = claims.uid;
         }
       }
 
@@ -667,10 +755,15 @@ HTTP request. Your `context` callback should be written to support all the
 different ways that your schema may be used: directly, over HTTP, using
 websockets, etc.
 
+**Do not** expose the `request`, `response` or
+`requestContext` objects via the GraphQL context, always use abstractions.
+
 :::
 
-With the above example, you could write an SQL function `get_x_something()` to
-get the `myapp.headers.x_something` setting:
+### Accessing pgSettings data in PostgreSQL
+
+With either of the above examples, you could write an SQL function
+`get_x_something()` to get the `myapp.headers.x_something` setting:
 
 ```sql
 create function get_x_something() returns text as $$

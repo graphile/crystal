@@ -4,13 +4,6 @@ path: /postgraphile/best-practices/
 title: PostGraphile best practices
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 This guide is a work in progress. If you have ideas for best practices, please
 use the "Suggest improvements to this page" link above to submit them, or
 discuss them in #documentation on
@@ -19,14 +12,32 @@ discuss them in #documentation on
 ### Foreign Key Indexes
 
 PostgreSQL does _NOT_ add indexes to foreign keys by default. This isn't an
-issue for the forward relation (`user_id` → user), but for the reverse relation
-(user → things by `user_id`) it can make the lookup very expensive. Always add
-indexes to your foreign keys.
+issue for the forward relation (getting the record that your record belongs
+to), but for the reverse relation (getting all the records that belong to your
+record) it can make the lookup very expensive. Always add indexes to your
+foreign keys.
+
+```sql
+create table users (id serial primary key);
+create table things (id serial primary key, user_id int not null references users);
+/* highlight-next-line */
+create index on things (user_id);
+```
+
+Out of the box, if you don't do this then the "reverse relation" will not
+appear in your GraphQL schema. You can force it to appear by giving the
+foreign key constraint the `+select` behavior, or you can disable this behavior
+by adding `disablePlugins: ['PgIndexBehaviorsPlugin']` to your configuration.
 
 ### Row Level Security
 
-If you're using RLS, it's best to enable it on every table in your database. You
-should at least enable it on every table in your exposed schemas.
+If you're using RLS, it's best to enable it on every table in your database.
+You should at least enable it on every table in your exposed schemas. It's
+better to enable RLS and create a policy with `using (true)` to say "anything
+goes" than to not enable RLS; this helps your team mates understand intent:
+when you enable RLS you're being explicit about what access is allowed, whereas
+if you don't you're just implicitly allowing all access, which could have been
+an oversight.
 
 ### Use Table GRANT for SELECT/DELETE and Column GRANT for INSERT/UPDATE
 
@@ -55,11 +66,11 @@ GRANT UPDATE ON users TO graphql_role;
 ```
 
 Column-level SELECT grants
-[cause a lot of issues](./requirements/#dont-use-column-based-select-grants):
+[cause a lot of issues](./requirements/#dont-use-column-based-select-grants)
+not just for PostGraphile:
 
-- Reduces the number of optimisations we can do
 - Cannot `SELECT * FROM`
-- Cannot use `RETURNING *` (e.g. what we do in CRUD operations currently)
+- Cannot use `RETURNING *` on mutations
 - Cannot pass a row type into a function (like we do for computed columns)
 
 Table-level INSERT/UPDATE grants are not advisable because they lack the
@@ -68,17 +79,11 @@ explicitness that should come from such operations.
 ### Simplify Your GraphQL Field Names
 
 You can get a leg up on this
-[using `@graphile-contrib/pg-simplify-inflector`](https://github.com/graphile-contrib/pg-simplify-inflector).
+[using `@graphile/simplify-inflection`](https://npmjs.com/package/@graphile/simplify-inflection).
 The long names PostGraphile uses by default are to try and avoid people getting
 naming conflicts when they run PostGraphile for the first time. Once you're more
 comfortable you should move to using shorter names as it's a GraphQL best
 practice.
-
-### Enable the PostGraphile Recommended Options
-
-(Scan the docs for `[RECOMMENDED]`, but take a moment to understand why they're
-recommended and yet not enabled by default - they often require greater
-knowledge of PostGraphile and your database.)
 
 ### Protect Your API
 

@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { stringScalarSpec } from "../utils.js";
+import { stringTypeSpec } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -21,14 +21,16 @@ export const CursorTypePlugin: GraphileConfig.Plugin = {
         callback: (_, build) => {
           const { registerScalarType, inflection } = build;
 
+          const cursorTypeName = inflection.builtin("Cursor");
           registerScalarType(
-            inflection.builtin("Cursor"),
+            cursorTypeName,
             { isCursorType: true },
-            () => ({
-              ...stringScalarSpec,
-              description:
+            () =>
+              stringTypeSpec(
                 "A location in a connection that can be used for resuming pagination.",
-            }),
+                undefined,
+                cursorTypeName,
+              ),
             "graphile-build built-in (Cursor type)",
           );
 

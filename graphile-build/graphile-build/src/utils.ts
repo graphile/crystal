@@ -1,4 +1,4 @@
-import { $$idempotent, SafeError } from "grafast";
+import { $$idempotent } from "grafast";
 import type {
   GraphQLNamedType,
   GraphQLScalarTypeConfig,
@@ -105,30 +105,6 @@ function toString(value: any) {
   return "" + value;
 }
 
-/**
- * A GraphQL scalar spec for a scalar that'll be treated as a verbatim string
- * in and out (i.e. the type name is really just a hint to the user); purely a
- * convenience.
- */
-export const stringScalarSpec = Object.freeze({
-  serialize: toString,
-  parseValue: toString,
-  parseLiteral: EXPORTABLE(
-    (Kind, SafeError) => (ast) => {
-      if (ast.kind !== Kind.STRING) {
-        throw new SafeError("Can only parse string values");
-      }
-      return ast.value;
-    },
-    [Kind, SafeError],
-  ),
-  extensions: {
-    grafast: {
-      idempotent: true,
-    },
-  },
-} as Omit<GraphQLScalarTypeConfig<unknown, unknown>, "name" | "description">);
-
 // Copied from GraphQL v14, MIT license (c) GraphQL Contributors.
 /**
  * Word-wraps the given text to maxLen; for consistency with older GraphQL
@@ -189,6 +165,7 @@ export const wrapDescription = (
 export const stringTypeSpec = (
   description: string,
   coerce?: (input: string) => string,
+  name?: string,
 ): Omit<GraphQLScalarTypeConfig<any, any>, "name"> => ({
   description,
   serialize: toString,
@@ -197,23 +174,31 @@ export const stringTypeSpec = (
     : toString,
   parseLiteral: coerce
     ? EXPORTABLE(
-        (GraphQLError, Kind, coerce) => (ast) => {
+        (GraphQLError, Kind, coerce, name) => (ast) => {
           if (ast.kind !== Kind.STRING) {
             // ERRORS: add name to this error
-            throw new GraphQLError("Can only parse string values");
+            throw new GraphQLError(
+              `${name ?? "This scalar"} can only parse string values (kind = '${
+                ast.kind
+              }')`,
+            );
           }
           return coerce(ast.value);
         },
-        [GraphQLError, Kind, coerce],
+        [GraphQLError, Kind, coerce, name],
       )
     : EXPORTABLE(
-        (GraphQLError, Kind) => (ast) => {
+        (GraphQLError, Kind, name) => (ast) => {
           if (ast.kind !== Kind.STRING) {
-            throw new GraphQLError("Can only parse string values");
+            throw new GraphQLError(
+              `${name ?? "This scalar"} can only parse string values (kind='${
+                ast.kind
+              }')`,
+            );
           }
           return ast.value;
         },
-        [GraphQLError, Kind],
+        [GraphQLError, Kind, name],
       ),
   extensions: {
     grafast: {
