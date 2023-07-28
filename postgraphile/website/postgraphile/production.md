@@ -61,6 +61,12 @@ seconds, no matter how fast your queries actually are.
 Run PostGraphile in the same city as your database, preferably in the same data
 centre.
 
+## Grafast Considerations
+
+Since PostGraphile uses Gra*fast* under the hood, you should also familiarize
+yourself with [Gra*fast*'s production
+considerations](https://grafast.org/grafast/production-considerations).
+
 ## Common Middleware Considerations
 
 In a production app, you typically want to add a few common enhancements, e.g.
