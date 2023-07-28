@@ -1,8 +1,8 @@
 import type { ExecutionArgs } from "graphql";
 
 import { hook, NULL_PRESET } from "./config.js";
-import { isPromiseLike } from "./utils.js";
 import { $$hooked } from "./interfaces.js";
+import { isPromiseLike } from "./utils.js";
 
 /**
  * Applies Graphile Config hooks to your GraphQL request, e.g. to

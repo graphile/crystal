@@ -4,7 +4,7 @@ import type { PluginHook } from "graphile-config";
 import type {
   ASTNode,
   DocumentNode,
-  ExecutionArgs,
+  ExecutionArgs as GraphQLExecutionArgs,
   FragmentDefinitionNode,
   GraphQLArgs,
   GraphQLArgument,
@@ -144,7 +144,7 @@ export const $$hooked = Symbol("hookArgsApplied");
 declare global {
   namespace Grafast {
     type ExecutionArgs = Pick<
-      import("graphql").ExecutionArgs,
+      GraphQLExecutionArgs,
       "schema" | "document" | "rootValue" | "variableValues" | "operationName"
     > & { [$$hooked]?: boolean; contextValue: Grafast.Context };
 
@@ -255,7 +255,7 @@ declare global {
     interface GrafastHooks {
       args: PluginHook<
         (event: {
-          args: ExecutionArgs;
+          args: Grafast.ExecutionArgs;
           ctx: Grafast.RequestContext;
           resolvedPreset: GraphileConfig.ResolvedPreset;
         }) => PromiseOrValue<void>

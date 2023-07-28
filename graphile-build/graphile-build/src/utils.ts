@@ -1,4 +1,4 @@
-import { $$idempotent, SafeError } from "grafast";
+import { $$idempotent } from "grafast";
 import type {
   GraphQLNamedType,
   GraphQLScalarTypeConfig,
@@ -174,7 +174,7 @@ export const stringTypeSpec = (
     : toString,
   parseLiteral: coerce
     ? EXPORTABLE(
-        (GraphQLError, Kind, coerce) => (ast) => {
+        (GraphQLError, Kind, coerce, name) => (ast) => {
           if (ast.kind !== Kind.STRING) {
             // ERRORS: add name to this error
             throw new GraphQLError(
@@ -185,10 +185,10 @@ export const stringTypeSpec = (
           }
           return coerce(ast.value);
         },
-        [GraphQLError, Kind, coerce],
+        [GraphQLError, Kind, coerce, name],
       )
     : EXPORTABLE(
-        (GraphQLError, Kind) => (ast) => {
+        (GraphQLError, Kind, name) => (ast) => {
           if (ast.kind !== Kind.STRING) {
             throw new GraphQLError(
               `${name ?? "This scalar"} can only parse string values (kind='${
@@ -198,7 +198,7 @@ export const stringTypeSpec = (
           }
           return ast.value;
         },
-        [GraphQLError, Kind],
+        [GraphQLError, Kind, name],
       ),
   extensions: {
     grafast: {

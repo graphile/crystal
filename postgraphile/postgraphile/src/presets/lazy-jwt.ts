@@ -1,16 +1,16 @@
 import "graphile-config";
 
 import type {} from "grafserv/node";
-
 import { PgJWTPlugin } from "graphile-build-pg";
-import { version } from "../version";
-import {
+import type {
   GetPublicKeyOrSecret,
   JwtPayload,
   Secret,
   VerifyOptions,
-  verify as verifyJwt,
 } from "jsonwebtoken";
+import { verify as verifyJwt } from "jsonwebtoken";
+
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {
