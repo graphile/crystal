@@ -61,14 +61,10 @@ const GrafservPgJWTPlugin: GraphileConfig.Plugin = {
                       },
                     ),
                 );
-                if (!args.contextValue) {
-                  args.contextValue = Object.create(null);
+                if (!args.contextValue.pgSettings) {
+                  args.contextValue.pgSettings = Object.create(null);
                 }
-                const contextValue = args.contextValue as Grafast.Context;
-                if (!contextValue.pgSettings) {
-                  contextValue.pgSettings = Object.create(null);
-                }
-                const pgSettings = contextValue.pgSettings!;
+                const pgSettings = args.contextValue.pgSettings!;
                 if (claims.role) {
                   pgSettings.role = claims.role;
                 }
