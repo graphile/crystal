@@ -96,7 +96,7 @@ semver, but we do not (and also, even if it is, we're going to do it anyway).
 Supporting unsupported versions of Node or PostgreSQL does not make sense, no
 reasonable user should be using these unsupported versions because they may
 contain unpatched security vulnerabilities, and since no-one should be using
-them, dropping support for them should not be a breaking change. QED.
+them, dropping support for them should not be a breaking change.
 
 ## Use a lockfile
 
