@@ -4,13 +4,6 @@ path: /postgraphile/community-chat/
 title: PostGraphile chat
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 We have a fairly active chat room on Discord:
 
 http://discord.gg/graphile

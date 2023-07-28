@@ -4,13 +4,6 @@ path: /postgraphile/code-of-conduct/
 title: Code of Conduct
 ---
 
-:::caution
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 The Graphile project is governed by the Contributor Covenant code of conduct.
 Please be careful to ensure your language always contributes to creating a
 positive environment.
