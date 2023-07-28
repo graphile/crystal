@@ -73,7 +73,11 @@ const GrafservPgJWTPlugin: GraphileConfig.Plugin = {
                   pgSettings.role = claims.role;
                 }
                 for (const [key, value] of Object.entries(claims)) {
-                  if (value && /^[a-z_][a-z0-9_]*$/i.test(key)) {
+                  if (
+                    value &&
+                    /^[a-z_][a-z0-9_]*$/i.test(key) &&
+                    key.length <= 52
+                  ) {
                     pgSettings[`jwt.claims.${key}`] = String(value);
                   }
                 }
