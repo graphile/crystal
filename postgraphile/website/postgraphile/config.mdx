@@ -604,12 +604,18 @@ settings that specific service should use with its associated database (see
 [`pgServices`](#pgservices) above), and these settings are added to the
 GraphQL context using the key set in that services' `pgSettingsKey`.
 
+Presets may also add values to `pgSettings`, for example
+`postgraphile/presets/lazy-jwt` parses the `Authorization` header and adds the
+claims from the JWT to `pgSettings`.
+
 For most PostGraphile users there's only one pgService, and the default
 `pgSettingsKey` is `"pgSettings"`, so rather than configuring pgSettings via
 the adaptor you might opt to configure it via including a `pgSettings` key in
 the object you return from the Grafast context callback mentioned in the
 "Grafast options" section above. The value for this key should be a POJO (plain
-old JavaScript object) with string keys and string values. For example:
+old JavaScript object) with string keys and string values, and you should be
+careful to copy across settings from the pgService adaptor and any
+presets/plugins that may have added to it. For example:
 
 ```ts title="graphile.config.mjs"
 export default {

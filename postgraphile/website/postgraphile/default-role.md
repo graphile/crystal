@@ -4,6 +4,12 @@ path: /postgraphile/default-role/
 title: Default Role
 ---
 
+PostGraphile V5 doesn't have a "default role" any more, but you can indicate a
+role to use in your [pgSettings](./config#pgsettings), and this can be
+dependent on a role not already having been set.
+
+---
+
 :::caution
 
 This documentation is copied from Version 4 and has not been updated to Version
