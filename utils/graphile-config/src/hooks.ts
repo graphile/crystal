@@ -123,7 +123,7 @@ export function applyHooks<THooks extends HookObject<THooks>>(
           id,
           plugin,
           callback,
-          provides: [...(provides || []), id],
+          provides: [...(provides || []), id, plugin.name],
           before: before || [],
           after: after || [],
         });
