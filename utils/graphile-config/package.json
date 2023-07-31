@@ -1,6 +1,6 @@
 {
   "name": "graphile-config",
-  "version": "0.0.1-alpha.6",
+  "version": "0.0.1-alpha.7",
   "description": "Standard plugin interface and helpers to be used across the Graphile stack.",
   "type": "commonjs",
   "main": "./dist/index.js",

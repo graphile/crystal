@@ -1,5 +1,32 @@
 # graphile-utils
 
+## 5.0.0-alpha.19
+
+### Patch Changes
+
+- [#428](https://github.com/benjie/postgraphile-private/pull/428)
+  [`c00a21cb9`](https://github.com/benjie/postgraphile-private/commit/c00a21cb9e9dd80a8b69228746bd7973da21facc)
+  Thanks [@benjie](https://github.com/benjie)! - Improve name and description of
+  TagsFilePlugin
+
+- Updated dependencies
+  [[`ea003ca3a`](https://github.com/benjie/postgraphile-private/commit/ea003ca3a8f68fb87dca603582e47981ed033996),
+  [`5491e10b0`](https://github.com/benjie/postgraphile-private/commit/5491e10b0f1629e607e7385985315169e156071d),
+  [`a9561d62d`](https://github.com/benjie/postgraphile-private/commit/a9561d62d54a6a1331d64b32e4cf3d162ad67a55),
+  [`232885703`](https://github.com/benjie/postgraphile-private/commit/232885703dd577f71488fd1fc5a02e852a96d446),
+  [`db19ed9c3`](https://github.com/benjie/postgraphile-private/commit/db19ed9c39f08b537f3bf316d1cf9bb39cee2603),
+  [`31e776e03`](https://github.com/benjie/postgraphile-private/commit/31e776e03ad0829e0ded52e32be789578dcf8d4f),
+  [`055c4e438`](https://github.com/benjie/postgraphile-private/commit/055c4e43888c007706db7079edd89d6def9b318d),
+  [`cf32f0397`](https://github.com/benjie/postgraphile-private/commit/cf32f0397f7a47509df9876112275f1ad135e8f2),
+  [`57d88b5fa`](https://github.com/benjie/postgraphile-private/commit/57d88b5fa3ed296210c1fcb223452213fd57985b),
+  [`a22830b2f`](https://github.com/benjie/postgraphile-private/commit/a22830b2f293b50a244ac18e1601d7579b450c7d),
+  [`9f87a26b1`](https://github.com/benjie/postgraphile-private/commit/9f87a26b10e5539aa88cfd9909e265513e941fd5),
+  [`9695c65f8`](https://github.com/benjie/postgraphile-private/commit/9695c65f8dbad807de683a70f5f663af2d3b35f0)]:
+  - grafast@0.0.1-alpha.15
+  - graphile-build-pg@5.0.0-alpha.19
+  - graphile-build@5.0.0-alpha.17
+  - graphile-config@0.0.1-alpha.7
+
 ## 5.0.0-alpha.18
 
 ### Patch Changes

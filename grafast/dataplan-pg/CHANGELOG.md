@@ -1,5 +1,29 @@
 # @dataplan/pg
 
+## 0.0.1-alpha.16
+
+### Patch Changes
+
+- [#435](https://github.com/benjie/postgraphile-private/pull/435)
+  [`cf32f0397`](https://github.com/benjie/postgraphile-private/commit/cf32f0397f7a47509df9876112275f1ad135e8f2)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in listOfCodec causing
+  wrong extensions to be used in non-deterministic manner (thanks to @jvandermey
+  for finding the bug and helping to track it down).
+
+- [#422](https://github.com/benjie/postgraphile-private/pull/422)
+  [`9f87a26b1`](https://github.com/benjie/postgraphile-private/commit/9f87a26b10e5539aa88cfd9909e265513e941fd5)
+  Thanks [@benjie](https://github.com/benjie)! - Comments enabled in released
+  packages
+
+- Updated dependencies
+  [[`ea003ca3a`](https://github.com/benjie/postgraphile-private/commit/ea003ca3a8f68fb87dca603582e47981ed033996),
+  [`57d88b5fa`](https://github.com/benjie/postgraphile-private/commit/57d88b5fa3ed296210c1fcb223452213fd57985b),
+  [`a22830b2f`](https://github.com/benjie/postgraphile-private/commit/a22830b2f293b50a244ac18e1601d7579b450c7d),
+  [`9f87a26b1`](https://github.com/benjie/postgraphile-private/commit/9f87a26b10e5539aa88cfd9909e265513e941fd5)]:
+  - grafast@0.0.1-alpha.15
+  - graphile-config@0.0.1-alpha.7
+  - @dataplan/json@0.0.1-alpha.15
+
 ## 0.0.1-alpha.15
 
 ### Patch Changes

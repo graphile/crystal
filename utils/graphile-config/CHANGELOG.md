@@ -1,5 +1,15 @@
 # graphile-config
 
+## 0.0.1-alpha.7
+
+### Patch Changes
+
+- [#438](https://github.com/benjie/postgraphile-private/pull/438)
+  [`a22830b2f`](https://github.com/benjie/postgraphile-private/commit/a22830b2f293b50a244ac18e1601d7579b450c7d)
+  Thanks [@benjie](https://github.com/benjie)! - Plugin name now automatically
+  used in `provides` for every hook, allowing ordering hooks before/after their
+  equivalents in other plugins.
+
 ## 0.0.1-alpha.6
 
 ### Patch Changes

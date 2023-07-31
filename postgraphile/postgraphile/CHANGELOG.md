@@ -1,5 +1,106 @@
 # postgraphile
 
+## 5.0.0-alpha.19
+
+### Patch Changes
+
+- [#433](https://github.com/benjie/postgraphile-private/pull/433)
+  [`5491e10b0`](https://github.com/benjie/postgraphile-private/commit/5491e10b0f1629e607e7385985315169e156071d)
+  Thanks [@benjie](https://github.com/benjie)! - Improve error messages from
+  custom string scalars when they cannot be parsed as a string.
+
+- [#434](https://github.com/benjie/postgraphile-private/pull/434)
+  [`a9561d62d`](https://github.com/benjie/postgraphile-private/commit/a9561d62d54a6a1331d64b32e4cf3d162ad67a55)
+  Thanks [@benjie](https://github.com/benjie)! - Deprecate
+  `preset.gather.pgJwtType` (tuple), instead use `preset.gather.pgJwtTypes`
+  which expects a string and parses it similar to the PostgreSQL parser (and
+  also allows multiple types to be specified).
+
+- [#433](https://github.com/benjie/postgraphile-private/pull/433)
+  [`232885703`](https://github.com/benjie/postgraphile-private/commit/232885703dd577f71488fd1fc5a02e852a96d446)
+  Thanks [@benjie](https://github.com/benjie)! - Change type of pgJwtSecret and
+  pgJwtSignOptions from `any` to the correct types.
+
+- [#438](https://github.com/benjie/postgraphile-private/pull/438)
+  [`db19ed9c3`](https://github.com/benjie/postgraphile-private/commit/db19ed9c39f08b537f3bf316d1cf9bb39cee2603)
+  Thanks [@benjie](https://github.com/benjie)! - When using
+  `@interface mode:relational`, don't add pointless relationships from concrete
+  type back to abstract or from abstract to related concrete types.
+
+- [#438](https://github.com/benjie/postgraphile-private/pull/438)
+  [`31e776e03`](https://github.com/benjie/postgraphile-private/commit/31e776e03ad0829e0ded52e32be789578dcf8d4f)
+  Thanks [@benjie](https://github.com/benjie)! - Fix spurious error relating to
+  connection for `@interface type:relational`
+
+- [#436](https://github.com/benjie/postgraphile-private/pull/436)
+  [`055c4e438`](https://github.com/benjie/postgraphile-private/commit/055c4e43888c007706db7079edd89d6def9b318d)
+  Thanks [@benjie](https://github.com/benjie)! - Fix inflection of computed
+  column field names in secondary schemas when using the V5 preset. Also, use
+  underscores instead of dashes for the serviceName/schemaName separator for the
+  names of the function resources, so that they can be typed manually rather
+  than having to use string properties like
+  `const { ["myService-mySchema-my_function_name"]: myFunctionResource } = pgRegistry.pgResources`
+
+- [#435](https://github.com/benjie/postgraphile-private/pull/435)
+  [`cf32f0397`](https://github.com/benjie/postgraphile-private/commit/cf32f0397f7a47509df9876112275f1ad135e8f2)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in listOfCodec causing
+  wrong extensions to be used in non-deterministic manner (thanks to @jvandermey
+  for finding the bug and helping to track it down).
+
+- [#428](https://github.com/benjie/postgraphile-private/pull/428)
+  [`57d88b5fa`](https://github.com/benjie/postgraphile-private/commit/57d88b5fa3ed296210c1fcb223452213fd57985b)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug exporting schema, and
+  importing schema with \_\_assertStep.
+
+- [#438](https://github.com/benjie/postgraphile-private/pull/438)
+  [`a22830b2f`](https://github.com/benjie/postgraphile-private/commit/a22830b2f293b50a244ac18e1601d7579b450c7d)
+  Thanks [@benjie](https://github.com/benjie)! - Plugin name now automatically
+  used in `provides` for every hook, allowing ordering hooks before/after their
+  equivalents in other plugins.
+
+- [#422](https://github.com/benjie/postgraphile-private/pull/422)
+  [`9f87a26b1`](https://github.com/benjie/postgraphile-private/commit/9f87a26b10e5539aa88cfd9909e265513e941fd5)
+  Thanks [@benjie](https://github.com/benjie)! - Comments enabled in released
+  packages
+
+- [#428](https://github.com/benjie/postgraphile-private/pull/428)
+  [`9695c65f8`](https://github.com/benjie/postgraphile-private/commit/9695c65f8dbad807de683a70f5f663af2d3b35f0)
+  Thanks [@benjie](https://github.com/benjie)! - Optimize away some unnecessary
+  content from graphile-exported schema
+
+- [#428](https://github.com/benjie/postgraphile-private/pull/428)
+  [`c00a21cb9`](https://github.com/benjie/postgraphile-private/commit/c00a21cb9e9dd80a8b69228746bd7973da21facc)
+  Thanks [@benjie](https://github.com/benjie)! - Improve name and description of
+  TagsFilePlugin
+
+- [#433](https://github.com/benjie/postgraphile-private/pull/433)
+  [`a5f224295`](https://github.com/benjie/postgraphile-private/commit/a5f22429501f9e13f0490d25500ca7a8403babc7)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `postgraphile/presets/lazy-jwt` to handle boilerplate of JWT setup if the user
+  doesn't want to do it themselves.
+- Updated dependencies
+  [[`ea003ca3a`](https://github.com/benjie/postgraphile-private/commit/ea003ca3a8f68fb87dca603582e47981ed033996),
+  [`5491e10b0`](https://github.com/benjie/postgraphile-private/commit/5491e10b0f1629e607e7385985315169e156071d),
+  [`a9561d62d`](https://github.com/benjie/postgraphile-private/commit/a9561d62d54a6a1331d64b32e4cf3d162ad67a55),
+  [`232885703`](https://github.com/benjie/postgraphile-private/commit/232885703dd577f71488fd1fc5a02e852a96d446),
+  [`db19ed9c3`](https://github.com/benjie/postgraphile-private/commit/db19ed9c39f08b537f3bf316d1cf9bb39cee2603),
+  [`31e776e03`](https://github.com/benjie/postgraphile-private/commit/31e776e03ad0829e0ded52e32be789578dcf8d4f),
+  [`055c4e438`](https://github.com/benjie/postgraphile-private/commit/055c4e43888c007706db7079edd89d6def9b318d),
+  [`cf32f0397`](https://github.com/benjie/postgraphile-private/commit/cf32f0397f7a47509df9876112275f1ad135e8f2),
+  [`57d88b5fa`](https://github.com/benjie/postgraphile-private/commit/57d88b5fa3ed296210c1fcb223452213fd57985b),
+  [`a22830b2f`](https://github.com/benjie/postgraphile-private/commit/a22830b2f293b50a244ac18e1601d7579b450c7d),
+  [`9f87a26b1`](https://github.com/benjie/postgraphile-private/commit/9f87a26b10e5539aa88cfd9909e265513e941fd5),
+  [`9695c65f8`](https://github.com/benjie/postgraphile-private/commit/9695c65f8dbad807de683a70f5f663af2d3b35f0),
+  [`c00a21cb9`](https://github.com/benjie/postgraphile-private/commit/c00a21cb9e9dd80a8b69228746bd7973da21facc)]:
+  - grafast@0.0.1-alpha.15
+  - graphile-build-pg@5.0.0-alpha.19
+  - graphile-build@5.0.0-alpha.17
+  - @dataplan/pg@0.0.1-alpha.16
+  - graphile-config@0.0.1-alpha.7
+  - @dataplan/json@0.0.1-alpha.15
+  - grafserv@0.0.1-alpha.15
+  - graphile-utils@5.0.0-alpha.19
+
 ## 5.0.0-alpha.18
 
 ### Patch Changes

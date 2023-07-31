@@ -1,5 +1,20 @@
 # graphile-export
 
+## 0.0.2-alpha.8
+
+### Patch Changes
+
+- [#428](https://github.com/benjie/postgraphile-private/pull/428)
+  [`9695c65f8`](https://github.com/benjie/postgraphile-private/commit/9695c65f8dbad807de683a70f5f663af2d3b35f0)
+  Thanks [@benjie](https://github.com/benjie)! - Optimize away some unnecessary
+  content from graphile-exported schema
+
+- Updated dependencies
+  [[`ea003ca3a`](https://github.com/benjie/postgraphile-private/commit/ea003ca3a8f68fb87dca603582e47981ed033996),
+  [`57d88b5fa`](https://github.com/benjie/postgraphile-private/commit/57d88b5fa3ed296210c1fcb223452213fd57985b),
+  [`9f87a26b1`](https://github.com/benjie/postgraphile-private/commit/9f87a26b10e5539aa88cfd9909e265513e941fd5)]:
+  - grafast@0.0.1-alpha.15
+
 ## 0.0.2-alpha.7
 
 ### Patch Changes
