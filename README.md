@@ -68,7 +68,7 @@ Here's a rough breakdown of the main packages:
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask all
+To help us develop this software sustainably, we ask all
 individuals and businesses that use it to help support its ongoing maintenance
 and development via sponsorship.
 
