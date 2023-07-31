@@ -4760,21 +4760,6 @@ interface RelationalItem {
   position: BigInt!
 
   """
-  Reads a single `RelationalChecklist` that is related to this `RelationalItem`.
-  """
-  relationalChecklistByRowId: RelationalChecklist
-
-  """
-  Reads a single `RelationalChecklistItem` that is related to this `RelationalItem`.
-  """
-  relationalChecklistItemByRowId: RelationalChecklistItem
-
-  """
-  Reads a single `RelationalDivider` that is related to this `RelationalItem`.
-  """
-  relationalDividerByRowId: RelationalDivider
-
-  """
   Reads a single `RelationalItem` that is related to this `RelationalItem`.
   """
   relationalItemByParentId: RelationalItem
@@ -4801,19 +4786,9 @@ interface RelationalItem {
   ): RelationalItemConnection!
 
   """
-  Reads a single `RelationalPost` that is related to this `RelationalItem`.
-  """
-  relationalPostByRowId: RelationalPost
-
-  """
   Reads a single `RelationalTopic` that is related to this `RelationalItem`.
   """
   relationalTopicByRootTopicId: RelationalTopic
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
-  """
-  relationalTopicByRowId: RelationalTopic
   rootTopicId: Int
   rowId: Int!
   type: ItemType!

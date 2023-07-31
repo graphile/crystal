@@ -614,12 +614,13 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           } = build;
           const { localCodec, remoteResource, isUnique, isReferencee } = entity;
           const remoteCodec = remoteResource.codec;
+
+          // Hide relation from a concrete type back to the abstract root table.
           if (
             isUnique &&
             !isReferencee &&
             remoteCodec.polymorphism?.mode === "relational"
           ) {
-            // Hide relation from a concrete type back to the abstract root table.
             const localTypeName = build.inflection.tableType(localCodec);
             const polymorphicTypeDefinitionEntry = Object.entries(
               remoteCodec.polymorphism.types,
@@ -634,6 +635,17 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               }
             }
           }
+
+          // Hide relation from abstract root table to related elements
+          if (isReferencee && localCodec.polymorphism?.mode === "relational") {
+            const relations = Object.values(localCodec.polymorphism.types).map(
+              (t) => pgRelations[localCodec.name]?.[t.relationName],
+            );
+            if (relations.includes(entity)) {
+              return [behavior, "-connection -list -single"];
+            }
+          }
+
           return behavior;
         },
       },
