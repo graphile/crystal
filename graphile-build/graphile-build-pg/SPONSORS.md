@@ -12,6 +12,7 @@ Graphile ecosystem. Find out
 - Netflix
 - Chad Furman
 - Stellate
+- Accenture
 
 ## Leaders
 
@@ -75,3 +76,4 @@ Graphile ecosystem. Find out
 - urtho
 - Andrew Joseph
 - Old Grammar
+- Spear AI
