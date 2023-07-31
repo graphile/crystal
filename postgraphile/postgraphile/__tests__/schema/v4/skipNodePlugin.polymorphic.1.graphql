@@ -508,11 +508,6 @@ type CreateRelationalChecklistItemPayload {
     """The method to use when ordering `RelationalChecklistItem`."""
     orderBy: [RelationalChecklistItemsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalChecklistItemsEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """The output of our create `RelationalChecklist` mutation."""
@@ -536,11 +531,6 @@ type CreateRelationalChecklistPayload {
     """The method to use when ordering `RelationalChecklist`."""
     orderBy: [RelationalChecklistsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalChecklistsEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """All input for the create `RelationalDivider` mutation."""
@@ -576,11 +566,6 @@ type CreateRelationalDividerPayload {
     """The method to use when ordering `RelationalDivider`."""
     orderBy: [RelationalDividersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalDividersEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """All input for the create `RelationalPost` mutation."""
@@ -607,11 +592,6 @@ type CreateRelationalPostPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalPost`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalPost` that was created by this mutation."""
   relationalPost: RelationalPost
@@ -647,11 +627,6 @@ type CreateRelationalTopicPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalTopic` that was created by this mutation."""
   relationalTopic: RelationalTopic
@@ -991,11 +966,6 @@ type DeleteRelationalChecklistItemPayload {
     """The method to use when ordering `RelationalChecklistItem`."""
     orderBy: [RelationalChecklistItemsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalChecklistItemsEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """The output of our delete `RelationalChecklist` mutation."""
@@ -1019,11 +989,6 @@ type DeleteRelationalChecklistPayload {
     """The method to use when ordering `RelationalChecklist`."""
     orderBy: [RelationalChecklistsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalChecklistsEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """All input for the `deleteRelationalDividerById` mutation."""
@@ -1057,11 +1022,6 @@ type DeleteRelationalDividerPayload {
     """The method to use when ordering `RelationalDivider`."""
     orderBy: [RelationalDividersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalDividersEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """All input for the `deleteRelationalPostById` mutation."""
@@ -1086,11 +1046,6 @@ type DeleteRelationalPostPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalPost`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalPost` that was deleted by this mutation."""
   relationalPost: RelationalPost
@@ -1124,11 +1079,6 @@ type DeleteRelationalTopicPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalTopic` that was deleted by this mutation."""
   relationalTopic: RelationalTopic
@@ -2932,11 +2882,6 @@ type RelationalChecklist implements RelationalItem {
   """
   Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
   """
-  relationalItemById: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
-  """
   relationalItemByParentId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
@@ -3072,11 +3017,6 @@ type RelationalChecklistItem implements RelationalItem {
   Reads a single `RelationalDivider` that is related to this `RelationalChecklistItem`.
   """
   relationalDividerById: RelationalDivider
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
-  """
-  relationalItemById: RelationalItem
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
@@ -3371,11 +3311,6 @@ type RelationalDivider implements RelationalItem {
   """
   Reads a single `RelationalItem` that is related to this `RelationalDivider`.
   """
-  relationalItemById: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
-  """
   relationalItemByParentId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
@@ -3575,21 +3510,6 @@ interface RelationalItem {
   position: BigInt!
 
   """
-  Reads a single `RelationalChecklist` that is related to this `RelationalItem`.
-  """
-  relationalChecklistById: RelationalChecklist
-
-  """
-  Reads a single `RelationalChecklistItem` that is related to this `RelationalItem`.
-  """
-  relationalChecklistItemById: RelationalChecklistItem
-
-  """
-  Reads a single `RelationalDivider` that is related to this `RelationalItem`.
-  """
-  relationalDividerById: RelationalDivider
-
-  """
   Reads a single `RelationalItem` that is related to this `RelationalItem`.
   """
   relationalItemByParentId: RelationalItem
@@ -3614,16 +3534,6 @@ interface RelationalItem {
     """
     offset: Int
   ): RelationalItemsConnection!
-
-  """
-  Reads a single `RelationalPost` that is related to this `RelationalItem`.
-  """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
-  """
-  relationalTopicById: RelationalTopic
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalItem`.
@@ -3751,11 +3661,6 @@ type RelationalPost implements RelationalItem {
   Reads a single `RelationalDivider` that is related to this `RelationalPost`.
   """
   relationalDividerById: RelationalDivider
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalPost`.
-  """
-  relationalItemById: RelationalItem
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalPost`.
@@ -3977,11 +3882,6 @@ type RelationalTopic implements RelationalItem {
   Reads a single `RelationalDivider` that is related to this `RelationalTopic`.
   """
   relationalDividerById: RelationalDivider
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemById: RelationalItem
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalTopic`.
@@ -5069,11 +4969,6 @@ type UpdateRelationalChecklistItemPayload {
     """The method to use when ordering `RelationalChecklistItem`."""
     orderBy: [RelationalChecklistItemsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalChecklistItemsEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """The output of our update `RelationalChecklist` mutation."""
@@ -5097,11 +4992,6 @@ type UpdateRelationalChecklistPayload {
     """The method to use when ordering `RelationalChecklist`."""
     orderBy: [RelationalChecklistsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalChecklistsEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """All input for the `updateRelationalDividerById` mutation."""
@@ -5140,11 +5030,6 @@ type UpdateRelationalDividerPayload {
     """The method to use when ordering `RelationalDivider`."""
     orderBy: [RelationalDividersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalDividersEdge
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
-  """
-  relationalItemById: RelationalItem
 }
 
 """All input for the `updateRelationalPostById` mutation."""
@@ -5174,11 +5059,6 @@ type UpdateRelationalPostPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalPost`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalPost` that was updated by this mutation."""
   relationalPost: RelationalPost
@@ -5217,11 +5097,6 @@ type UpdateRelationalTopicPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalTopic` that was updated by this mutation."""
   relationalTopic: RelationalTopic

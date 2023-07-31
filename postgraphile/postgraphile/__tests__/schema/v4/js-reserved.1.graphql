@@ -560,11 +560,6 @@ type CreateRelationalStatusPayload {
   """
   query: Query
 
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalStatus`.
-  """
-  relationalItemById: RelationalItem
-
   """The `RelationalStatus` that was created by this mutation."""
   relationalStatus: RelationalStatus
 
@@ -599,11 +594,6 @@ type CreateRelationalTopicPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalTopic` that was created by this mutation."""
   relationalTopic: RelationalTopic
@@ -1294,11 +1284,6 @@ type DeleteRelationalStatusPayload {
   """
   query: Query
 
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalStatus`.
-  """
-  relationalItemById: RelationalItem
-
   """The `RelationalStatus` that was deleted by this mutation."""
   relationalStatus: RelationalStatus
 
@@ -1346,11 +1331,6 @@ type DeleteRelationalTopicPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalTopic` that was deleted by this mutation."""
   relationalTopic: RelationalTopic
@@ -3346,16 +3326,6 @@ interface RelationalItem {
   buildingByConstructor: Building
   constructor: String
   id: Int!
-
-  """
-  Reads a single `RelationalStatus` that is related to this `RelationalItem`.
-  """
-  relationalStatusById: RelationalStatus
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
-  """
-  relationalTopicById: RelationalTopic
   type: ItemType!
 }
 
@@ -3425,11 +3395,6 @@ type RelationalStatus implements Node & RelationalItem {
   """
   nodeId: ID!
   note: String
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalStatus`.
-  """
-  relationalItemById: RelationalItem
 
   """
   Reads a single `RelationalStatus` that is related to this `RelationalStatus`.
@@ -3539,11 +3504,6 @@ type RelationalTopic implements Node & RelationalItem {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemById: RelationalItem
 
   """
   Reads a single `RelationalStatus` that is related to this `RelationalTopic`.
@@ -4385,11 +4345,6 @@ type UpdateRelationalStatusPayload {
   """
   query: Query
 
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalStatus`.
-  """
-  relationalItemById: RelationalItem
-
   """The `RelationalStatus` that was updated by this mutation."""
   relationalStatus: RelationalStatus
 
@@ -4446,11 +4401,6 @@ type UpdateRelationalTopicPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemById: RelationalItem
 
   """The `RelationalTopic` that was updated by this mutation."""
   relationalTopic: RelationalTopic
