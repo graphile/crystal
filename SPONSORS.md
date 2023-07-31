@@ -12,6 +12,7 @@ sponsor](https://graphile.org/sponsor/).
 - Netflix
 - Chad Furman
 - Stellate
+- Accenture
 - Politics Rewired
 
 ## Leaders
@@ -75,3 +76,4 @@ sponsor](https://graphile.org/sponsor/).
 - urtho
 - Andrew Joseph
 - Old Grammar
+- Spear AI
