@@ -65,16 +65,6 @@ const config = {
         editUrl,
       },
     ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "graphile-utils",
-        path: "graphile-utils",
-        routeBasePath: "graphile-utils",
-        sidebarPath: require.resolve("./sidebars.js"),
-        editUrl,
-      },
-    ],
 
     // Allow us to import `.mermaid` files
     () => ({
@@ -123,14 +113,7 @@ const config = {
             docId: "index",
             docsPluginId: "graphile-build-pg",
             position: "left",
-            label: "Graphile Build PG",
-          },
-          {
-            type: "doc",
-            docId: "index",
-            docsPluginId: "graphile-utils",
-            position: "left",
-            label: "Graphile Utils",
+            label: "Graphile Build pg",
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,
