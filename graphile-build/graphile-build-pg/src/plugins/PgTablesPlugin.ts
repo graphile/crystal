@@ -229,11 +229,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           (db) => db.name === serviceName,
         );
         const databasePrefix =
-          serviceName === pgService?.name ? "" : `${serviceName}-`;
+          serviceName === pgService?.name ? "" : `${serviceName}_`;
         const schemaPrefix =
           pgNamespace.nspname === pgService?.schemas?.[0]
             ? ""
-            : `${pgNamespace.nspname}-`;
+            : `${pgNamespace.nspname}_`;
         return `${databasePrefix}${schemaPrefix}`;
       },
 

@@ -1291,16 +1291,16 @@ input CCompoundKeyPatch {
 """Awesome feature!"""
 type CCompoundType {
   a: Int
+  arrayQuery: [CCompoundType]
   b: String
-  bCompoundTypeArrayQuery: [CCompoundType]
-  bCompoundTypeQuery: CCompoundType
   c: BColor
-  cCompoundTypeComputedField: Int
+  computedField: Int
   d: UUID
   e: BEnumCaps
   f: BEnumWithEmptyString
   fooBar: Int
   g: Interval
+  query: CCompoundType
   queryCompoundTypeArray: [CCompoundType]
 }
 
@@ -1343,7 +1343,7 @@ input CCompoundTypeInput {
 }
 
 type CEdgeCase {
-  cEdgeCaseComputed: String
+  computed: String
   notNullHasDefault: Boolean!
   rowId: Int
   wontCastEasy: Int
@@ -2680,66 +2680,22 @@ type CPerson {
 
   """Reads a single `CLeftArm` that is related to this `CPerson`."""
   cLeftArmByPersonId: CLeftArm
-  cPersonComputedComplex(a: Int, b: String): CPersonComputedComplexRecord
-  cPersonComputedFirstArgInout: CPerson
-  cPersonComputedFirstArgInoutOut: CPersonComputedFirstArgInoutOutRecord
-  cPersonComputedInout(ino: String): String
-  cPersonComputedInoutOut(ino: String): CPersonComputedInoutOutRecord
-  cPersonComputedOut: String!
-  cPersonComputedOutOut: CPersonComputedOutOutRecord
-  cPersonExists(email: BEmail): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
-  cPersonFirstName: String
-  cPersonFirstPost: Post
-
-  """Reads and enables pagination through a set of `CPerson`."""
-  cPersonFriends(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-  ): CPersonConnection!
 
   """This `Person`'s `PersonSecret`."""
   cPersonSecretByPersonId: CPersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
-  cPersonTypeFunction(id: Int): BType
-
-  """Reads and enables pagination through a set of `BType`."""
-  cPersonTypeFunctionConnection(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-  ): BTypeConnection!
-  cPersonTypeFunctionList: [BType]
+  computedComplex(a: Int, b: String): CPersonComputedComplexRecord
+  computedFirstArgInout: CPerson
+  computedFirstArgInoutOut: CPersonComputedFirstArgInoutOutRecord
+  computedInout(ino: String): String
+  computedInoutOut(ino: String): CPersonComputedInoutOutRecord
+  computedOut: String!
+  computedOutOut: CPersonComputedOutOutRecord
   config: KeyValueHash
   createdAt: Datetime
   email: BEmail!
+  exists(email: BEmail): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
+  firstName: String
+  firstPost: Post
 
   """Reads and enables pagination through a set of `ForeignKey`."""
   foreignKeysByPersonId(
@@ -2769,6 +2725,27 @@ type CPerson {
     """The method to use when ordering `ForeignKey`."""
     orderBy: [ForeignKeyOrderBy!] = [NATURAL]
   ): ForeignKeyConnection!
+
+  """Reads and enables pagination through a set of `CPerson`."""
+  friends(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): CPersonConnection!
   lastLoginFromIp: InternetAddress
   lastLoginFromSubnet: CidrAddress
 
@@ -2807,6 +2784,29 @@ type CPerson {
   """The primary unique identifier for the person"""
   rowId: Int!
   site: BWrappedUrl @deprecated(reason: "Don’t use me")
+  typeFunction(id: Int): BType
+
+  """Reads and enables pagination through a set of `BType`."""
+  typeFunctionConnection(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): BTypeConnection!
+  typeFunctionList: [BType]
   userMac: MacAddress
 }
 
