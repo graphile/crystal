@@ -703,18 +703,18 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       }),
                       `PgPolymorphismPlugin single table type for ${codec.name}`,
                     );
+                    build.registerCursorConnection({
+                      typeName: tableTypeName,
+                      connectionTypeName:
+                        inflection.connectionType(tableTypeName),
+                      edgeTypeName: inflection.edgeType(tableTypeName),
+                      scope: {
+                        isPgConnectionRelated: true,
+                        pgCodec: codec,
+                      },
+                      nonNullNode: pgForbidSetofFunctionsToReturnNull,
+                    });
                   }
-                  build.registerCursorConnection({
-                    typeName: tableTypeName,
-                    connectionTypeName:
-                      inflection.connectionType(tableTypeName),
-                    edgeTypeName: inflection.edgeType(tableTypeName),
-                    scope: {
-                      isPgConnectionRelated: true,
-                      pgCodec: codec,
-                    },
-                    nonNullNode: pgForbidSetofFunctionsToReturnNull,
-                  });
                 }
               } else if (polymorphism.mode === "union") {
                 const interfaceTypeName = inflection.tableType(codec);
