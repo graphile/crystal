@@ -6,7 +6,7 @@ import styles from "./styles.module.css";
 const FeatureList = [
   {
     title: "Automated",
-    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
+    Svg: require("@site/static/img/automated.svg").default,
     description: (
       <>
         Don&apos;t repeat yourself, have Graphile Build do the repetative tasks
@@ -16,7 +16,7 @@ const FeatureList = [
   },
   {
     title: "Extensible",
-    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
+    Svg: require("@site/static/img/extensible.svg").default,
     description: (
       <>
         Extend your schemas to do whatever you need with many different
@@ -26,7 +26,7 @@ const FeatureList = [
   },
   {
     title: "Hone your API",
-    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
+    Svg: require("@site/static/img/hone.svg").default,
     description: (
       <>
         Graphile Build is not rigid, it&apos;s plugin based system allows you to

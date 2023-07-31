@@ -47,7 +47,7 @@ export default function Home() {
   return (
     <Layout
       title={`Graphile Build`}
-      description="Automate the repetative parts of building GraphQL APIs"
+      description="Automate the boring parts of building GraphQL APIs"
     >
       <HomepageHeader />
       <main>
