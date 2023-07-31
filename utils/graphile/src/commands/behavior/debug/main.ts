@@ -208,7 +208,7 @@ function getEntities(
         const relations = registry.pgRelations[codecName];
         if (!relations) continue;
         for (const [relationName, _relation] of Object.entries(relations)) {
-          memo[`${codecName}.${relationName}`] = [codec, relationName];
+          memo[`${codecName}.${relationName}`] = _relation;
         }
       }
       return memo;
