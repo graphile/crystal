@@ -4134,11 +4134,6 @@ type RelationalChecklist implements RelationalItem {
   """
   relationalItemByParentId: RelationalItem
 
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
-  """
-  relationalItemByRowId: RelationalItem
-
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4305,11 +4300,6 @@ type RelationalChecklistItem implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
   """
   relationalItemByParentId: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
-  """
-  relationalItemByRowId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
@@ -4573,11 +4563,6 @@ type RelationalDivider implements RelationalItem {
   """
   relationalItemByParentId: RelationalItem
 
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
-  """
-  relationalItemByRowId: RelationalItem
-
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4775,21 +4760,6 @@ interface RelationalItem {
   position: BigInt!
 
   """
-  Reads a single `RelationalChecklist` that is related to this `RelationalItem`.
-  """
-  relationalChecklistByRowId: RelationalChecklist
-
-  """
-  Reads a single `RelationalChecklistItem` that is related to this `RelationalItem`.
-  """
-  relationalChecklistItemByRowId: RelationalChecklistItem
-
-  """
-  Reads a single `RelationalDivider` that is related to this `RelationalItem`.
-  """
-  relationalDividerByRowId: RelationalDivider
-
-  """
   Reads a single `RelationalItem` that is related to this `RelationalItem`.
   """
   relationalItemByParentId: RelationalItem
@@ -4816,19 +4786,9 @@ interface RelationalItem {
   ): RelationalItemConnection!
 
   """
-  Reads a single `RelationalPost` that is related to this `RelationalItem`.
-  """
-  relationalPostByRowId: RelationalPost
-
-  """
   Reads a single `RelationalTopic` that is related to this `RelationalItem`.
   """
   relationalTopicByRootTopicId: RelationalTopic
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
-  """
-  relationalTopicByRowId: RelationalTopic
   rootTopicId: Int
   rowId: Int!
   type: ItemType!
@@ -4956,11 +4916,6 @@ type RelationalPost implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalPost`.
   """
   relationalItemByParentId: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalPost`.
-  """
-  relationalItemByRowId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
@@ -5182,11 +5137,6 @@ type RelationalTopic implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalTopic`.
   """
   relationalItemByParentId: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemByRowId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(

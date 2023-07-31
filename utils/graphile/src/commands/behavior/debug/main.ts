@@ -204,11 +204,11 @@ function getEntities(
     }
     case "pgCodecRelation": {
       const memo = Object.create(null);
-      for (const [codecName, codec] of Object.entries(registry.pgCodecs)) {
+      for (const [codecName, _codec] of Object.entries(registry.pgCodecs)) {
         const relations = registry.pgRelations[codecName];
         if (!relations) continue;
         for (const [relationName, _relation] of Object.entries(relations)) {
-          memo[`${codecName}.${relationName}`] = [codec, relationName];
+          memo[`${codecName}.${relationName}`] = _relation;
         }
       }
       return memo;

@@ -28,7 +28,7 @@ const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
         string
       > = {
         provides: ["default"],
-        before: ["inferred"],
+        before: ["inferred", "override"],
         callback: (behavior) => [lhs, behavior],
       };
       entry[1] = hook;
