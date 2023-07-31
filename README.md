@@ -15,9 +15,9 @@ _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL databa
 
 ## Version 5 is coming: Open now to all sponsors
 
-April 2023 marked a big milestone for PostGraphile Version 5, when it entered the alpha stage. Work preparing for the final release is ongoing, but we now have a detailed migration guide, updated docs, an enhanced developer experience and much improved compatability!
+April 2023 marked a big milestone for PostGraphile Version 5, when it entered the alpha stage. In mid-May came an even bigger milestone: **PostGraphile V5 deemed safe to run in production!** Work preparing for the final release will still be ongoing for a while (stabilizing APIs; improving types; writing documentation, tests and examples; etc), but we already have a detailed migration guide, updated docs, an enhanced developer experience and almost identical GraphQL schemas being produced with our V4 compatibility preset!
 
-In our new blog post series, **we are beginning to lift the curtain of secrecy which has surrounded Version 5** for the past few years. Each week, Benjie will dive in to a key feature of this massive new release; Find the first article [on DEV.to](https://dev.to/graphile/intro-to-postgraphile-v5-part-1-replacing-the-foundations-3lh0).
+In our new blog post series we are **beginning to lift the curtain of secrecy** which has surrounded Version 5 for the past few years. Each week Benjie will dive in to a key feature of this massive new release; starting with [Intro to PostGraphile V5 (Part 1): Replacing the Foundations](https://dev.to/graphile/intro-to-postgraphile-v5-part-1-replacing-the-foundations-3lh0).
 
 Now is the perfect time to join our sponsors and get your feet wet with V5 - even if you're not yet ready to migrate to it fully. **If you don't try V5 until after its public release then it may be too late to comment on things that could have been improved.** If you already sponsor us, send us an email with your sponsor details and we'll send you access to [postgraphile.org](https://postgraphile.org/) and [grafast.org](https://grafast.org)!
 
