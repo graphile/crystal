@@ -286,9 +286,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         if (typeof explicitName === "string") {
           return explicitName;
         }
-        const name = details.resource.name;
+        const name =
+          details.resource.extensions?.pg?.name ?? details.resource.name;
         const codecName =
-          details.resource.parameters[0].codec.extensions?.pg?.name;
+          details.resource.parameters[0].codec.extensions?.pg?.name ??
+          details.resource.parameters[0].codec.name;
         const legacyPrefix = codecName + "_";
         if (name.startsWith(legacyPrefix)) {
           return this.camelCase(name.slice(legacyPrefix.length));
