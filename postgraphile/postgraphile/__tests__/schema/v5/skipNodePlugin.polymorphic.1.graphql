@@ -4134,11 +4134,6 @@ type RelationalChecklist implements RelationalItem {
   """
   relationalItemByParentId: RelationalItem
 
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
-  """
-  relationalItemByRowId: RelationalItem
-
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4305,11 +4300,6 @@ type RelationalChecklistItem implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
   """
   relationalItemByParentId: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
-  """
-  relationalItemByRowId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
@@ -4572,11 +4562,6 @@ type RelationalDivider implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalDivider`.
   """
   relationalItemByParentId: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
-  """
-  relationalItemByRowId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
@@ -4957,11 +4942,6 @@ type RelationalPost implements RelationalItem {
   """
   relationalItemByParentId: RelationalItem
 
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalPost`.
-  """
-  relationalItemByRowId: RelationalItem
-
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -5182,11 +5162,6 @@ type RelationalTopic implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalTopic`.
   """
   relationalItemByParentId: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
-  """
-  relationalItemByRowId: RelationalItem
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
