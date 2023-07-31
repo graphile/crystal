@@ -624,7 +624,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             const localTypeName = build.inflection.tableType(localCodec);
             const polymorphicTypeDefinitionEntry = Object.entries(
               remoteCodec.polymorphism.types,
-            ).find(([key, val]) => val.name === localTypeName);
+            ).find(([, val]) => val.name === localTypeName);
             if (polymorphicTypeDefinitionEntry) {
               const [, { relationName }] = polymorphicTypeDefinitionEntry;
               const relation = pgRelations[remoteCodec.name]?.[relationName];
