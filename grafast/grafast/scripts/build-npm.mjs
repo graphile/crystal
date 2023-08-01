@@ -2,7 +2,7 @@
 
 import "zx/globals";
 
-import { transformPackageJson } from "../../../scripts/build-core.mjs";
+import { esmHack, transformPackageJson } from "../../../scripts/build-core.mjs";
 
 cd(__dirname + "/..");
 await $`rm -Rf tsconfig.tsbuildinfo dist release`;
@@ -21,3 +21,5 @@ await transformPackageJson(
   __dirname + "/../package.json",
   __dirname + "/../release/package.json",
 );
+await esmHack(__dirname + "/../release/dist/index.js");
+await esmHack(__dirname + "/../release/dist/envelop.js");
