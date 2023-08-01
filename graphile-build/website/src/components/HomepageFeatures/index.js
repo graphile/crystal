@@ -28,7 +28,7 @@ const FeatureList = [
     Svg: require("@site/static/img/hone.svg").default,
     description: (
       <>
-        Graphile Build is not rigid, it&apos;s plugin based system allows you to
+        Graphile Build is not rigid, its plugin based system allows you to
         override every facet of the generated API.
       </>
     ),
