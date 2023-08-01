@@ -18,6 +18,12 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       /**
+       * The base inflector used by allInterfaceModeUnionRowsConnection and
+       * allInterfaceModeUnionRowsList.
+       */
+      _allInterfaceModeUnionRows(this: Inflection, codec: PgCodec): string;
+
+      /**
        * The field name for a Cursor Connection field that returns all rows
        * from the given `@interface mode:union` codec.
        */
@@ -41,19 +47,16 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      allInterfaceModeUnionRowsConnection(options, codec) {
-        return this.connectionField(
-          this.camelCase(
-            `all-${this.pluralize(this._singularizedCodecName(codec))}`,
-          ),
+      _allInterfaceModeUnionRows(options, codec) {
+        return this.camelCase(
+          `all-${this.pluralize(this._singularizedCodecName(codec))}`,
         );
       },
+      allInterfaceModeUnionRowsConnection(options, codec) {
+        return this.connectionField(this._allInterfaceModeUnionRows(codec));
+      },
       allInterfaceModeUnionRowsList(options, codec) {
-        return this.listField(
-          this.camelCase(
-            `all-${this.pluralize(this._singularizedCodecName(codec))}`,
-          ),
-        );
+        return this.listField(this._allInterfaceModeUnionRows(codec));
       },
     },
   },
