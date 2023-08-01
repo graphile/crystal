@@ -7,5 +7,15 @@
 
 .featureSvg {
   height: 200px;
-  width: 200px;
+  width: 300px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  margin: 2rem;
+}
+
+.featureDetails {
+  padding: 2rem;
 }
