@@ -7,12 +7,12 @@ title: Schema Plugins - Graphile Build
 The PostGraphile GraphQL schema is constructed out of a number of Graphile
 Build plugins. The core PG-related plugins can be found here:
 
-https://github.com/benjie/crystal/tree/planning/graphile-build/graphile-build-pg/src/plugins
+https://github.com/benjie/crystal/tree/main/graphile-build/graphile-build-pg/src/plugins
 
 These plugins introduce small amounts of functionality, and build upon each
 other. The default list of plugins can be found from the `defaultPlugins`
 export in
-[`src/preset.ts`](https://github.com/benjie/crystal/blob/planning/graphile-build/graphile-build-pg/src/preset.ts)
+[`src/preset.ts`](https://github.com/benjie/crystal/blob/main/graphile-build/graphile-build-pg/src/preset.ts)
 of the `graphile-build-pg` module.
 
 You can extend PostGraphile's GraphQL schema by adding plugins or presets. You

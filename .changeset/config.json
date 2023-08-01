@@ -20,7 +20,7 @@
   "fixed": [],
   "linked": [],
   "access": "public",
-  "baseBranch": "planning",
+  "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": []
 }

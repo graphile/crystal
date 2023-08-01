@@ -7,8 +7,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 // TODO: change this to "graphile"?
 const organizationName = "benjie";
 const projectName = "crystal";
-// TODO: change this to "main"
-const mainBranch = "planning";
+const mainBranch = "main";
 
 const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${mainBranch}/postgraphile/website/`;
 
