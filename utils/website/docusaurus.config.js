@@ -171,6 +171,16 @@ const config = {
             label: "GitHub",
             position: "right",
           },
+          {
+            href: `https://graphile.org/sponsor/`,
+            label: "Sponsor",
+            position: "right",
+          },
+          {
+            href: `https://graphile.org/support/`,
+            label: "Support",
+            position: "right",
+          },
         ],
       },
       footer: {
