@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+- [`7f857950a`](https://github.com/benjie/crystal/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
   Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
   TypeScript/tslib
 
@@ -12,7 +12,7 @@
 
 ### Patch Changes
 
-- [`759ad403d`](https://github.com/benjie/postgraphile-private/commit/759ad403d71363312c5225c165873ae84b8a098c)
+- [`759ad403d`](https://github.com/benjie/crystal/commit/759ad403d71363312c5225c165873ae84b8a098c)
   Thanks [@benjie](https://github.com/benjie)! - Alpha release - see
   https://postgraphile.org/news/2023-04-26-version-5-alpha
 
@@ -20,8 +20,8 @@
 
 ### Patch Changes
 
-- [#260](https://github.com/benjie/postgraphile-private/pull/260)
-  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+- [#260](https://github.com/benjie/crystal/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/crystal/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
   Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
 
 ## 5.0.0-0.3
@@ -40,6 +40,6 @@
 
 ### Patch Changes
 
-- [#125](https://github.com/benjie/postgraphile-private/pull/125)
-  [`91f2256b3`](https://github.com/benjie/postgraphile-private/commit/91f2256b3fd699bec19fc86f1ca79df057e58639)
+- [#125](https://github.com/benjie/crystal/pull/125)
+  [`91f2256b3`](https://github.com/benjie/crystal/commit/91f2256b3fd699bec19fc86f1ca79df057e58639)
   Thanks [@benjie](https://github.com/benjie)! - Initial changesets release
