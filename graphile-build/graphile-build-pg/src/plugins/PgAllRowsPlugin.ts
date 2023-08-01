@@ -13,6 +13,13 @@ declare global {
   namespace GraphileBuild {
     interface Inflection {
       /**
+       * The base inflector used by `allRowsConnection` and `allRowsList`.
+       */
+      _allRows(
+        this: Inflection,
+        resource: PgResource<any, any, any, any, any>,
+      ): string;
+      /**
        * The field name for a Cursor Connection field that returns all rows
        * from the given resource.
        */
@@ -41,19 +48,16 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      allRowsConnection(options, resource) {
-        return this.connectionField(
-          this.camelCase(
-            `all-${this.pluralize(this._singularizedResourceName(resource))}`,
-          ),
+      _allRows(options, resource) {
+        return this.camelCase(
+          `all-${this.pluralize(this._singularizedResourceName(resource))}`,
         );
       },
+      allRowsConnection(options, resource) {
+        return this.connectionField(this._allRows(resource));
+      },
       allRowsList(options, resource) {
-        return this.listField(
-          this.camelCase(
-            `all-${this.pluralize(this._singularizedResourceName(resource))}`,
-          ),
-        );
+        return this.listField(this._allRows(resource));
       },
     },
   },
