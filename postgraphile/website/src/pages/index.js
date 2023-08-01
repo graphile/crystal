@@ -101,7 +101,14 @@ export default function Home() {
         />
         <SecondarySection
           title={<>Advanced planning and execution engine for GraphQL</>}
-          tagline={`Grafast's plan-based approach helps developers avoid common pitfalls and achieve better backend efficiency, leading to increased scalability and incredible performance your customers will love.`}
+          tagline={
+            <>
+              Gra<em>fast</em>'s plan-based approach helps developers avoid
+              common pitfalls and achieve better backend efficiency, leading to
+              increased scalability and incredible performance your customers
+              will love.
+            </>
+          }
           body={``}
           Svg={require("@site/static/img/homepage/grafast.svg").default}
           link={`https://grafast.org/`}

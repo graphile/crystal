@@ -35,14 +35,22 @@ const FeatureList = [
     ),
   },
   {
-    title: "Powered by Grafast",
+    title: (
+      <>
+        Powered by Gra<em>fast</em>
+      </>
+    ),
     Svg: require("@site/static/img/homepage/heart.svg").default,
     description: (
       <>
         PostGraphile Version 5 is built upon a new, powerful and pleasant
-        planning and execution engine which brings with it a new, holistic
-        approach and simpler abstractions, better performance and code which is
-        easier to read and maintain.
+        planning and execution engine,{" "}
+        <a href="https://grafast.org">
+          Gra<em>fast</em>
+        </a>
+        , which brings with it a new, holistic approach and simpler
+        abstractions, better performance and code which is easier to read and
+        maintain.
       </>
     ),
   },
