@@ -25,7 +25,6 @@
     "test:exportSchema:graphql-js": "ENABLE_DEFER_STREAM=1 ts-node ./scripts/exportExampleSchema.ts graphql-js && node ./scripts/runExampleSchema.mjs",
     "test:exportSchema:typeDefs": "ENABLE_DEFER_STREAM=1 ts-node ./scripts/exportExampleSchema.ts typeDefs && node ./scripts/runExampleSchema.mjs",
     "prepack": "tsc -b && cp src/.npmignore dist/.npmignore",
-    "postpack": "echo 'FORBIDDEN' && exit 1",
     "serve:example": "GRAPHILE_ENV=development NODE_ENV=development yarn nodemon --watch serve-example-schema.js --watch dist --watch ../grafast/dist/ -x 'node --inspect --enable-source-maps serve-example-schema.js'"
   },
   "repository": {
