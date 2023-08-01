@@ -127,7 +127,7 @@ const config = {
       announcementBar: {
         id: "announcementBar-2",
         content:
-          "Docs are WIP; PRs welcome! <a href='/caveats'>READ PRE-RELEASE CAVEATS</A>.",
+          "Pre-release! Documentation is not complete! Feel free to contribute via PRs ♥",
         //backgroundColor: "#fafbfc",
         //textColor: "#091E42",
         isCloseable: false,
