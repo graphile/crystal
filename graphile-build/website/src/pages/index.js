@@ -1,11 +1,11 @@
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-import HomepageFeatures from "@site/src/components/HomepageFeatures";
 import CalloutSection from "@site/src/components/CalloutSection";
+import HomepageFeatures from "@site/src/components/HomepageFeatures";
+import HeroImage from "@site/static/img/introspection.svg";
 import Layout from "@theme/Layout";
 import clsx from "clsx";
 import React from "react";
-import HeroImage from "@site/static/img/introspection.svg";
 
 import styles from "./index.module.css";
 
