@@ -4,8 +4,8 @@
 
 ### Patch Changes
 
-- [#408](https://github.com/benjie/postgraphile-private/pull/408)
-  [`01ad64d5d`](https://github.com/benjie/postgraphile-private/commit/01ad64d5d34be84b8fb5c096505db553406328e6)
+- [#408](https://github.com/benjie/crystal/pull/408)
+  [`01ad64d5d`](https://github.com/benjie/crystal/commit/01ad64d5d34be84b8fb5c096505db553406328e6)
   Thanks [@benjie](https://github.com/benjie)! - Renamed `getBaseName`,
   `baseNameMatches`, `getOppositeBaseName` and `getBaseNameFromKeys` inflectors
   to all begin with an underscore (`_`) - this is because these inflectors
@@ -16,8 +16,8 @@
 
 ### Patch Changes
 
-- [#338](https://github.com/benjie/postgraphile-private/pull/338)
-  [`dcc3d0355`](https://github.com/benjie/postgraphile-private/commit/dcc3d03558d28506260dcfc79e1a797b60ec1773)
+- [#338](https://github.com/benjie/crystal/pull/338)
+  [`dcc3d0355`](https://github.com/benjie/crystal/commit/dcc3d03558d28506260dcfc79e1a797b60ec1773)
   Thanks [@benjie](https://github.com/benjie)! - `@interface mode:union`
   interfaces now also gain root fields.
 
@@ -25,11 +25,11 @@
 
 ### Patch Changes
 
-- [`f61879689`](https://github.com/benjie/postgraphile-private/commit/f6187968901fc708e74b2b68e74a282465a8d07d)
+- [`f61879689`](https://github.com/benjie/crystal/commit/f6187968901fc708e74b2b68e74a282465a8d07d)
   Thanks [@benjie](https://github.com/benjie)! - Fix baseNameMatches to resolve
   a regression in simplify-inflector V7 compatibility.
 
-- [`7f857950a`](https://github.com/benjie/postgraphile-private/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
+- [`7f857950a`](https://github.com/benjie/crystal/commit/7f857950a7e4ec763c936eb6bd1fb77824041d71)
   Thanks [@benjie](https://github.com/benjie)! - Upgrade to the latest
   TypeScript/tslib
 
@@ -37,7 +37,7 @@
 
 ### Patch Changes
 
-- [`759ad403d`](https://github.com/benjie/postgraphile-private/commit/759ad403d71363312c5225c165873ae84b8a098c)
+- [`759ad403d`](https://github.com/benjie/crystal/commit/759ad403d71363312c5225c165873ae84b8a098c)
   Thanks [@benjie](https://github.com/benjie)! - Alpha release - see
   https://postgraphile.org/news/2023-04-26-version-5-alpha
 
@@ -45,12 +45,12 @@
 
 ### Patch Changes
 
-- [#260](https://github.com/benjie/postgraphile-private/pull/260)
-  [`d5312e6b9`](https://github.com/benjie/postgraphile-private/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
+- [#260](https://github.com/benjie/crystal/pull/260)
+  [`d5312e6b9`](https://github.com/benjie/crystal/commit/d5312e6b968fbeb46d074b82a41b4bdbc166598c)
   Thanks [@benjie](https://github.com/benjie)! - TypeScript v5 is now required
 
-- [#260](https://github.com/benjie/postgraphile-private/pull/260)
-  [`96b0bd14e`](https://github.com/benjie/postgraphile-private/commit/96b0bd14ed9039d60612e75b3aeb63dcaef271d4)
+- [#260](https://github.com/benjie/crystal/pull/260)
+  [`96b0bd14e`](https://github.com/benjie/crystal/commit/96b0bd14ed9039d60612e75b3aeb63dcaef271d4)
   Thanks [@benjie](https://github.com/benjie)! - `PgSource` has been renamed to
   `PgResource`, `PgTypeCodec` to `PgCodec`, `PgEnumTypeCodec` to `PgEnumCodec`,
   `PgTypeColumn` to `PgCodecAttribute` (and similar for related
@@ -95,8 +95,8 @@
 
   Fixes an RBAC bug when using superuser role for introspection.
 
-- [#271](https://github.com/benjie/postgraphile-private/pull/271)
-  [`261eb520b`](https://github.com/benjie/postgraphile-private/commit/261eb520b33fe3673fe3a7712085e50291aed1e5)
+- [#271](https://github.com/benjie/crystal/pull/271)
+  [`261eb520b`](https://github.com/benjie/crystal/commit/261eb520b33fe3673fe3a7712085e50291aed1e5)
   Thanks [@benjie](https://github.com/benjie)! - 🚨 **RENAME ALL THE THINGS**
 
   The term 'source' was overloaded, and 'configs' was too vague, and
@@ -134,8 +134,8 @@
 
 ### Patch Changes
 
-- [#211](https://github.com/benjie/postgraphile-private/pull/211)
-  [`f9c523bb6`](https://github.com/benjie/postgraphile-private/commit/f9c523bb66e91686ef43ed9fec4e4589c826bee2)
+- [#211](https://github.com/benjie/crystal/pull/211)
+  [`f9c523bb6`](https://github.com/benjie/crystal/commit/f9c523bb66e91686ef43ed9fec4e4589c826bee2)
   Thanks [@benjie](https://github.com/benjie)! - Simplified relations should
   still respect foreignFieldName if present
 
@@ -149,8 +149,8 @@
 
 ### Patch Changes
 
-- [#177](https://github.com/benjie/postgraphile-private/pull/177)
-  [`6be68a53e`](https://github.com/benjie/postgraphile-private/commit/6be68a53e21940406a9fd629ee15cb1673497a6e)
+- [#177](https://github.com/benjie/crystal/pull/177)
+  [`6be68a53e`](https://github.com/benjie/crystal/commit/6be68a53e21940406a9fd629ee15cb1673497a6e)
   Thanks [@benjie](https://github.com/benjie)! - `@foreignFieldName` smart tag
   is now fed into the `inflection.connectionField(...)` or
   `inflection.listField(...)` inflector as appropriate. If you are using
@@ -158,8 +158,8 @@
   you should consider renaming `@foreignFieldName` to
   `@foreignConnectionFieldName` for consistency.
 
-- [#176](https://github.com/benjie/postgraphile-private/pull/176)
-  [`11d6be65e`](https://github.com/benjie/postgraphile-private/commit/11d6be65e0da489f8ab3e3a8b8db145f8b2147ad)
+- [#176](https://github.com/benjie/crystal/pull/176)
+  [`11d6be65e`](https://github.com/benjie/crystal/commit/11d6be65e0da489f8ab3e3a8b8db145f8b2147ad)
   Thanks [@benjie](https://github.com/benjie)! - Fix issue with plugin
   versioning. Add more TSDoc comments. New getTerminalWidth() helper.
 

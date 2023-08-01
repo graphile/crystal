@@ -6,10 +6,8 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 // TODO: change this to "graphile"?
 const organizationName = "benjie";
-// TODO: change this to "graphql" or similar?
-const projectName = "postgraphile-private";
-// TODO: change this to "main"
-const mainBranch = "planning";
+const projectName = "crystal";
+const mainBranch = "main";
 
 const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${mainBranch}/grafast/website/`;
 
@@ -127,7 +125,7 @@ const config = {
       announcementBar: {
         id: "announcementBar-2",
         content:
-          "Docs are WIP; PRs welcome! <a href='/caveats'>READ PRE-RELEASE CAVEATS</A>.",
+          '<a href="/caveats">Read the pre-release caveats!</a> Documentation is not complete; PRs welcome ♥',
         //backgroundColor: "#fafbfc",
         //textColor: "#091E42",
         isCloseable: false,

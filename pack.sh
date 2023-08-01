@@ -127,18 +127,9 @@ cd -
 
 #@dataplan/pg # NEEDS CUSTOM RELEASE
 cd grafast/dataplan-pg
-yarn build
-cp -a ../../.yarn ../../.yarnrc.yml release
-rm -Rf /tmp/dataplan__pg-build
-mv release /tmp/dataplan__pg-build
-# Build in temp folder
-cd /tmp/dataplan__pg-build
 rm -f *.tgz
 yarn pack -o package.tgz
-cd -
-# Grab package
-mv /tmp/dataplan__pg-build/package.tgz ../../builds/dataplan__pg.tgz
-rm -Rf /tmp/dataplan__pg-build
+mv package.tgz ../../builds/dataplan__pg.tgz
 cd ../..
 
 #graphile-build-pg

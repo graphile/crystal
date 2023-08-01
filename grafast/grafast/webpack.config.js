@@ -4,6 +4,7 @@ const path = require("path");
 const LicenseCheckerWebpackPlugin = require("license-checker-webpack-plugin");
 
 module.exports = {
+  devtool: false,
   entry: {
     index: "./dist/index.js",
     envelop: {

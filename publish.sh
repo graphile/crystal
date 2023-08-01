@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e -x
 
-BUILD_DIR=postgraphile-private/builds
+BUILD_DIR=crystal/builds
 TAG=alpha
 
 cd ..

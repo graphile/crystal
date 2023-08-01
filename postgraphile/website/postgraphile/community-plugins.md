@@ -22,7 +22,7 @@ Schema extension plugins for PostGraphile:
   adds a `filter:` arg to connections that offers a more powerful alternative to
   the built in filtering operations :white_check_mark:
 - [@graphile/pg-aggregates](https://github.com/graphile/pg-aggregates) - aggregate support on connections :white_check_mark:
-- [@graphile/simplify-inflection](https://github.com/benjie/postgraphile-private/tree/planning/graphile-build/graphile-simplify-inflection) -
+- [@graphile/simplify-inflection](https://github.com/benjie/crystal/tree/main/graphile-build/graphile-simplify-inflection) -
   simplifies field names by automatically removing `ByFooIdAndBarId`-style
   suffixes. :white_check_mark:
 - [@graphile-contrib/pg-omit-archived](https://github.com/graphile-contrib/pg-omit-archived) -
@@ -93,7 +93,7 @@ Examples of using these plugins:
 
 These extensions extend PostGraphile in different ways:
 
-- [@grafserv/persisted](https://github.com/benjie/postgraphile-private/blob/planning/grafast/grafserv-persisted) -
+- [@grafserv/persisted](https://github.com/benjie/crystal/blob/main/grafast/grafserv-persisted) -
   adds support for persisted operations to Grafserv (and thus PostGraphile)
 - [hapi-postgraphile](https://github.com/mshick/hapi-postgraphile) - add
   PostGraphile to your HAPI application :question:_(Not yet ported to V5)_

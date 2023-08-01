@@ -11,12 +11,6 @@ Coming from PostGraphile Version 4? Check out the
 
 :::
 
-:::info
-
-To run PostGraphile Version 5, you will need an environmental variable whilst the software is still Sponsors Only. See [the Gra*fast* caveats page](https://grafast.org/caveats/) for details. You can enter the Gra*fast* website using the same access code you used to get here.
-
-:::
-
 If you already use PostgreSQL then you understand the value that a strongly
 typed and well defined schema can bring to application development; GraphQL is
 the perfect match for this technology when it comes to making your data layer
@@ -75,9 +69,9 @@ weeks if not months of development time.
 For databases that already use
 [row-level security](https://learn.graphile.org/docs/PostgreSQL_Row_Level_Security_Infosheet.pdf)
 you might be able to build a secure, performant and extensible GraphQL API in
-mere minutes; however, row-level security is not required to secure your
+mere minutes. <!-- ; however, row-level security is not required to secure your
 PostGraphile API ─ there are other options for authorization. (TODO: detail
-these options!)
+these options!) --> We still recommend that you take some time to hone your API though!
 
 _If you are new to GraphQL we recommend you read through the official
 introduction to GraphQL [here](https://graphql.org/learn/) before continuing
