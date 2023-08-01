@@ -123,7 +123,6 @@ const config = {
         ],
       },
       footer: {
-        style: "dark",
         links: [
           {
             title: "Docs",
@@ -133,16 +132,19 @@ const config = {
                 to: "/graphile-build/",
               },
               {
-                label: "Graphile Build",
+                label: "Graphile Build pg",
                 to: "/graphile-build-pg/",
               },
               {
-                label: "Graphile Utils",
-                to: "/graphile-utils/",
+                html: '<a class="footer__link-item" href="https://grafast.org">Gra<em>fast</em></a>',
               },
               {
-                label: "Grafast",
-                to: "https://grafast.org",
+                label: "PostGraphile",
+                to: "https://postgraphile.org",
+              },
+              {
+                label: "Graphile*",
+                to: "https://star.graphile.org",
               },
             ],
           },
@@ -152,6 +154,10 @@ const config = {
               {
                 label: "Discord",
                 href: "https://discord.gg/graphile",
+              },
+              {
+                label: "Mastodon",
+                href: "https://fosstodon.org/@graphile",
               },
               {
                 label: "Twitter",
