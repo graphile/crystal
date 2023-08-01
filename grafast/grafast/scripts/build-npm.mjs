@@ -2,11 +2,7 @@
 
 import "zx/globals";
 
-import {
-  encryptSourceFile,
-  transformPackageJson,
-  writePrereleaseLicense,
-} from "../../../scripts/build-core.mjs";
+import { transformPackageJson } from "../../../scripts/build-core.mjs";
 
 cd(__dirname + "/..");
 await $`rm -Rf tsconfig.tsbuildinfo dist release`;
@@ -18,12 +14,10 @@ await $`find fwd -type d -exec mkdir -p release/{} \\;`;
 await $`find fwd -type f -name '*.js' -exec cp {} release/{} \\;`;
 await $`find fwd -type f -name '*.d.ts' -exec cp {} release/{} \\;`;
 await $`cp src/.npmignore release/dist/.npmignore`;
-await $`cp README.npm.md release/README.md`;
+await $`cp LICENSE.md release/LICENSE.md`;
+await $`cp README.md release/README.md`;
 
-await writePrereleaseLicense(__dirname + "/../release/LICENSE.md");
 await transformPackageJson(
   __dirname + "/../package.json",
   __dirname + "/../release/package.json",
 );
-await encryptSourceFile(__dirname + "/../release/dist/index.js");
-await encryptSourceFile(__dirname + "/../release/dist/envelop.js");
