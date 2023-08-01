@@ -1,6 +1,7 @@
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
+import CalloutSection from "@site/src/components/CalloutSection";
 import Layout from "@theme/Layout";
 import clsx from "clsx";
 import React from "react";
@@ -52,6 +53,13 @@ export default function Home() {
       <HomepageHeader />
       <main>
         <HomepageFeatures />
+        <CalloutSection
+          title={`Crowd-funded open-source software`}
+          body={`We're extremely grateful to our sponsors, for helping to fund ongoing development on PostGraphile, Graphile Engine, Graphile Worker and Graphile Migrate.
+          THANK YOU!`}
+          link={`https://graphile.org/sponsor/`}
+          buttonText={`Learn more about sponsors and sponsorship`}
+        />
       </main>
     </Layout>
   );
