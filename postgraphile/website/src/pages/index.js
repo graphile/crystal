@@ -103,10 +103,10 @@ export default function Home() {
           title={<>Advanced planning and execution engine for GraphQL</>}
           tagline={
             <>
-              Gra<em>fast</em>'s plan-based approach helps developers avoid
-              common pitfalls and achieve better backend efficiency, leading to
-              increased scalability and incredible performance your customers
-              will love.
+              Gra<em>fast</em>&rsquo;s plan-based approach helps developers
+              avoid common pitfalls and achieve better backend efficiency,
+              leading to increased scalability and incredible performance your
+              customers will love.
             </>
           }
           body={``}
