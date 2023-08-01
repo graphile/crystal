@@ -25,7 +25,7 @@ const FeatureList = [
   },
   {
     title: "Versatile",
-    Svg: require("@site/static/img/homepage/fun-arrow.svg").default,
+    Svg: require("@site/static/img/homepage/versatile.svg").default,
     description: (
       <>
         Whether you&apos;re building the backend API for your SaaS, build
